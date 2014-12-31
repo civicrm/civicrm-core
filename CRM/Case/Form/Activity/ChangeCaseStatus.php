@@ -44,7 +44,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    *
    * @throws Exception
    */
-  static function preProcess(&$form) {
+  public static function preProcess(&$form) {
     if (!isset($form->_caseId)) {
       CRM_Core_Error::fatal(ts('Case Id not found.'));
     }
@@ -54,13 +54,12 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
    * @return void
    */
-  static function setDefaultValues(&$form) {
+  public static function setDefaultValues(&$form) {
     $defaults = array();
     // Retrieve current case status
     $defaults['case_status_id'] = $form->_defaultCaseStatus;
@@ -71,7 +70,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
   /**
    * @param CRM_Core_Form $form
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     $form->removeElement('status_id');
     $form->removeElement('priority_id');
 
@@ -111,30 +110,27 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($values, $files, $form) {
+  public static function formRule($values, $files, $form) {
     return TRUE;
   }
 
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @param array $params
    *
    * @return void
    */
-  static function beginPostProcess(&$form, &$params) {
+  public static function beginPostProcess(&$form, &$params) {
     $params['id'] = CRM_Utils_Array::value('case_id', $params);
   }
 
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @param array $params
@@ -142,7 +138,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    *
    * @return void
    */
-  static function endPostProcess(&$form, &$params, $activity) {
+  public static function endPostProcess(&$form, &$params, $activity) {
     $groupingValues = CRM_Core_OptionGroup::values('case_status', FALSE, TRUE, FALSE, NULL, 'value');
 
     // Set case end_date if we're closing the case. Clear end_date if we're (re)opening it.
@@ -196,4 +192,3 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     $params['statusMsg'] = ts('Case Status changed successfully.');
   }
 }
-

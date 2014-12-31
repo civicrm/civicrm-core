@@ -35,7 +35,7 @@ class WebTest_Admin_Form_ScheduleReminderTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testScheduleReminder() {
+  public function testScheduleReminder() {
     $this->webtestLogin();
 
     // Add new Schedule Reminder
@@ -87,4 +87,3 @@ class WebTest_Admin_Form_ScheduleReminderTest extends CiviSeleniumTestCase {
     $this->assertChecked('is_active');
   }
 }
-

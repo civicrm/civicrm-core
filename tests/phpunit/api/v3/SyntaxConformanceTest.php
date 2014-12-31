@@ -79,7 +79,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
          and that will never exist (eg an obsoleted Entity
          they need to be returned by the function toBeSkipped_{$action} (because it has to be a static method and therefore couldn't access a this->toBeSkipped)
     */
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->enableCiviCampaign();
     $this->toBeImplemented['get'] = array('Profile', 'CustomValue', 'Constant', 'CustomSearch', 'Extension', 'ReportTemplate', 'System', 'Setting');
@@ -90,7 +90,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->deletableTestObjects = array();
   }
 
-  function tearDown() {
+  public function tearDown() {
     foreach ($this->deletableTestObjects as $entityName => $entities) {
       foreach ($entities as $entityID) {
         CRM_Core_DAO::deleteTestObjects($entityName, array('id' => $entityID));
@@ -685,7 +685,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @param string $entityName
    *
    */
-  function testLimit($entityName) {
+  public function testLimit($entityName) {
     $cases = array(); // each case is array(0 => $inputtedApiOptions, 1 => $expectedResultCount)
     $cases[] = array(
       array('options' => array('limit' => NULL)),
@@ -751,7 +751,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @param string $entityName
    *
    */
-  function testSqlOperators($entityName) {
+  public function testSqlOperators($entityName) {
     $baoString = _civicrm_api3_get_BAO($entityName);
     if (empty($baoString)) {
       $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
@@ -784,7 +784,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @param integer $limit
    * @param string $message
    */
-  function checkLimitAgainstExpected($entityName, $params, $limit, $message) {
+  public function checkLimitAgainstExpected($entityName, $params, $limit, $message) {
     $result = $this->callAPISuccess($entityName, 'get', $params);
     if($limit == 30) {
       $this->assertGreaterThanOrEqual($limit, $result['count'], $message);

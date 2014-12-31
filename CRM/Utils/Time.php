@@ -52,7 +52,7 @@ class CRM_Utils_Time {
    *
    * @static
    */
-  static function getTime($returnFormat = 'YmdHis') {
+  public static function getTime($returnFormat = 'YmdHis') {
     return date($returnFormat, self::getTimeRaw());
   }
 
@@ -61,7 +61,7 @@ class CRM_Utils_Time {
    *
    * @return int, seconds since epoch
    */
-  static function getTimeRaw() {
+  public static function getTimeRaw() {
     return time() + self::$_delta;
   }
 
@@ -75,7 +75,7 @@ class CRM_Utils_Time {
    *
    * @static
    */
-  static function setTime($newDateTime, $returnFormat = 'YmdHis') {
+  public static function setTime($newDateTime, $returnFormat = 'YmdHis') {
     self::$_delta = strtotime($newDateTime) - time();
     return self::getTime($returnFormat);
   }
@@ -83,7 +83,7 @@ class CRM_Utils_Time {
   /**
    * Remove any time overrides
    */
-  static function resetTime() {
+  public static function resetTime() {
     self::$_delta = 0;
   }
 
@@ -96,9 +96,8 @@ class CRM_Utils_Time {
    * @param int $threshold maximum allowed difference (in seconds)
    * @return bool
    */
-  static function isEqual($a, $b, $threshold = 0) {
+  public static function isEqual($a, $b, $threshold = 0) {
     $diff = strtotime($b) - strtotime($a);
     return (abs($diff) <= $threshold);
   }
 }
-

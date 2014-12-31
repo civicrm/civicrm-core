@@ -12,7 +12,7 @@ class ContributionPage extends PHPUnit_Framework_Testcase {
    *
    * @return mixed $contributionPage id of created Contribution Page
    */
-  static function create($id = NULL) {
+  public static function create($id = NULL) {
     require_once "CRM/Contribute/BAO/ContributionPage.php";
     $params = array(
       'title' => 'Help Test CiviCRM!',
@@ -45,7 +45,7 @@ class ContributionPage extends PHPUnit_Framework_Testcase {
    * to be deleted
    * @return boolean true if Contribution Page deleted, false otherwise
    */
-  static function delete($contributionPageId) {
+  public static function delete($contributionPageId) {
     require_once "CRM/Contribute/DAO/ContributionPage.php";
     $cp = new CRM_Contribute_DAO_ContributionPage();
     $cp->id = $contributionPageId;

@@ -38,7 +38,7 @@ class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
   /*
     *  Test contact import for Individuals.
     */
-  function testContactImportWithTag() {
+  public function testContactImportWithTag() {
     $this->webtestLogin();
 
     // Get sample import data.
@@ -93,7 +93,7 @@ class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _contactTagCSVData() {
+  public function _contactTagCSVData() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -137,4 +137,3 @@ class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 }
-

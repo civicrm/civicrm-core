@@ -37,7 +37,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -49,7 +49,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *
    * @return CRM_Core_BAO_MailSettings  DAO with the default mail settings set
    */
-  static function defaultDAO($reset = FALSE) {
+  public static function defaultDAO($reset = FALSE) {
     static $mailSettings = array();
     $domainID = CRM_Core_Config::domainID();
     if (empty($mailSettings[$domainID]) || $reset) {
@@ -67,7 +67,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *
    * @return string  default domain
    */
-  static function defaultDomain() {
+  public static function defaultDomain() {
     return self::defaultDAO()->domain;
   }
 
@@ -76,7 +76,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *
    * @return string  default localpart
    */
-  static function defaultLocalpart() {
+  public static function defaultLocalpart() {
     return self::defaultDAO()->localpart;
   }
 
@@ -85,7 +85,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *
    * @return string  default return path
    */
-  static function defaultReturnPath() {
+  public static function defaultReturnPath() {
     return self::defaultDAO()->return_path;
   }
 
@@ -94,7 +94,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *
    * @return boolean  default include message ID
    */
-  static function includeMessageId() {
+  public static function includeMessageId() {
     return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
       'include_message_id',
       NULL,
@@ -112,10 +112,9 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_BAO_MailSettings object
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $mailSettings = new CRM_Core_DAO_MailSettings();
     $mailSettings->copyValues($params);
 
@@ -133,12 +132,11 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *
    * @param array $params reference array contains the values submitted by the form
    *
-   * @access public
    * @static
    *
    * @return object
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $result = NULL;
     if (empty($params)) {
       return $result;
@@ -169,10 +167,9 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Core_BAO_MailSettings object
-   * @access public
    * @static
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     $transaction = new CRM_Core_Transaction();
 
     $mailSettings = self::add($params);
@@ -192,11 +189,10 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    * @param int $id mail settings id
    *
    * @return mixed|null
-   * @access public
    * @static
    *
    */
-  static function deleteMailSettings($id) {
+  public static function deleteMailSettings($id) {
     $results = NULL;
     $transaction = new CRM_Core_Transaction();
 

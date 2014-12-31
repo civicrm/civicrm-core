@@ -37,7 +37,7 @@ Class CRM_Core_Form_Date {
   /**
    * Various Date Formats
    */
-  CONST DATE_yyyy_mm_dd = 1, DATE_mm_dd_yy = 2, DATE_mm_dd_yyyy = 4, DATE_Month_dd_yyyy = 8, DATE_dd_mon_yy = 16, DATE_dd_mm_yyyy = 32;
+  const DATE_yyyy_mm_dd = 1, DATE_mm_dd_yy = 2, DATE_mm_dd_yyyy = 4, DATE_Month_dd_yyyy = 8, DATE_dd_mon_yy = 16, DATE_dd_mm_yyyy = 32;
 
   /**
    * This function is to build the date-format form
@@ -45,9 +45,8 @@ Class CRM_Core_Form_Date {
    * @param CRM_Core_Form  $form   the form object that we are operating on
    *
    * @static
-   * @access public
    */
-  static function buildAllowedDateFormats(&$form) {
+  public static function buildAllowedDateFormats(&$form) {
 
     $dateOptions = array();
 
@@ -87,7 +86,6 @@ Class CRM_Core_Form_Date {
    *
    *
    * @static
-   * @access public
    */
 
   static function buildDateRange(
@@ -238,7 +236,7 @@ Class CRM_Core_Form_Date {
    *
    * @return null
    */
-  static function addDateRangeToForm(&$form, $fieldName, $selector, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $dateFormat = 'searchDate', $displayTime = FALSE) {
+  public static function addDateRangeToForm(&$form, $fieldName, $selector, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $dateFormat = 'searchDate', $displayTime = FALSE) {
     $form->add('select',
       "{$fieldName}_relative",
       ts('Relative Date Range'),
@@ -251,4 +249,3 @@ Class CRM_Core_Form_Date {
   }
 
 }
-

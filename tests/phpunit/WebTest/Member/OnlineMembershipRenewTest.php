@@ -38,7 +38,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
   /**
    * FIXME: This test tries to update a contribution page (id=2) that may not exist :(
    */
-  function testOnlineMembershipRenew() {
+  public function testOnlineMembershipRenew() {
     // a random 7-char string and an even number to make this pass unique
     $hash = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(2, 50);
@@ -212,7 +212,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
   /**
    * FIXME: This test tries to update a contribution page (id=2) that may not exist :(
    */
-  function testOnlineMembershipRenewChangeType() {
+  public function testOnlineMembershipRenewChangeType() {
     // a random 7-char string and an even number to make this pass unique
     $hash = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(2, 50);
@@ -360,7 +360,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->assertEquals($membershipCreatedId, $membershipRenewedId);
   }
 
-  function testUpdateInheritedMembershipOnBehalfOfRenewal() {
+  public function testUpdateInheritedMembershipOnBehalfOfRenewal() {
     // Log in as admin
     $this->webtestLogin('admin');
 
@@ -658,4 +658,3 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     }
   }
 }
-

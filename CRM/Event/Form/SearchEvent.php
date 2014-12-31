@@ -37,7 +37,7 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $defaults['eventsByDates'] = 0;
 
@@ -53,7 +53,6 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -86,7 +85,7 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
       ));
   }
 
-  function postProcess() {
+  public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
     $parent = $this->controller->getParent();
     $parent->set('searchResult', 1);
@@ -111,4 +110,3 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
     }
   }
 }
-

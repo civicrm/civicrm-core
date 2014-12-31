@@ -42,14 +42,12 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * The params that are sent to the query
    *
    * @var array
-   * @access protected
    */
   protected $_queryParams;
 
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_single = FALSE;
@@ -57,7 +55,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_limit = NULL;
@@ -74,9 +71,8 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * Processing needed for buildForm and later
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
 
     /**
      * set the button names
@@ -159,11 +155,10 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
     $this->addElement('text', 'sort_name', ts('Pledger Name or Email'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
 
@@ -197,9 +192,8 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * @param
    *
    * @return void
-   * @access public
    */
-  function postProcess() {
+  public function postProcess() {
     if ($this->_done) {
       return;
     }
@@ -292,10 +286,9 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * All local rules are added near the element
    *
    * @return void
-   * @access public
    * @see valid_date
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Pledge_Form_Search', 'formRule'));
   }
 
@@ -306,9 +299,8 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    *
    * @return void
    * @static
-   * @access public
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
 
     if (!empty($errors)) {
@@ -321,17 +313,16 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   /**
    * Set the default form values
    *
-   * @access protected
    *
    * @return array the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $defaults = $this->_formValues;
     return $defaults;
   }
 
-  function fixFormValues() {
+  public function fixFormValues() {
     if (!$this->_force) {
       return;
     }
@@ -419,7 +410,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   /**
    * @return null
    */
-  function getFormValues() {
+  public function getFormValues() {
     return NULL;
   }
 
@@ -427,10 +418,8 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Find Pledges');
   }
 }
-

@@ -46,7 +46,6 @@ abstract class CRM_Core_Component_Config {
    * @param $oldMode
    *
    * @return array collection of component settings
-   * @access public
    */
   public function add($config, $oldMode) {
     foreach (get_class_vars(get_class($this)) as $key => $value) {
@@ -65,4 +64,3 @@ abstract class CRM_Core_Component_Config {
     }
   }
 }
-

@@ -35,7 +35,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAssignUsersToRoles() {
+  public function testAssignUsersToRoles() {
 
     $this->webtestLogin();
 
@@ -72,7 +72,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_ACL_next-bottom");
   }
 
-  function testACLforSmartGroups() {
+  public function testACLforSmartGroups() {
     $this->webtestLogin();
 
     //Create role
@@ -177,4 +177,3 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[8]", 'United States');
   }
 }
-

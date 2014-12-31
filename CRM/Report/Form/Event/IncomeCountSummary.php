@@ -56,7 +56,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
 
     $this->_columns = array(
       'civicrm_event' => array(
@@ -157,11 +157,11 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
@@ -208,7 +208,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
     $this->_select = "SELECT " . implode(', ', $select);
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
         FROM civicrm_event {$this->_aliases['civicrm_event']}
              LEFT JOIN civicrm_participant {$this->_aliases['civicrm_participant']}
@@ -219,7 +219,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
                        {$this->_aliases['civicrm_line_item']}.entity_table = 'civicrm_participant' ";
   }
 
-  function where() {
+  public function where() {
     $clauses = array();
     $this->_participantWhere = "";
     foreach ($this->_columns as $tableName => $table) {
@@ -265,7 +265,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
     $select = "
          SELECT SUM( {$this->_aliases['civicrm_line_item']}.participant_count ) as count,
@@ -299,13 +299,13 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
     return $statistics;
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->assign('chartSupported', TRUE);
     $this->_rollup = " WITH ROLLUP";
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_event']}.id  {$this->_rollup}";
   }
 
-  function postProcess() {
+  public function postProcess() {
 
     $this->beginPostProcess();
 
@@ -365,7 +365,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
   /**
    * @param $rows
    */
-  function buildChart(&$rows) {
+  public function buildChart(&$rows) {
 
     $this->_interval = 'events';
     $countEvent = NULL;
@@ -408,7 +408,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
 
     if (is_array($rows)) {
       $eventType = CRM_Core_OptionGroup::values('event_type');
@@ -436,4 +436,3 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
     }
   }
 }
-

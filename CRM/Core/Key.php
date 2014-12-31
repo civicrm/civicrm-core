@@ -42,9 +42,8 @@ class CRM_Core_Key {
    *
    * @return string private key for this session
    * @static
-   * @access private
    */
-  static function privateKey() {
+  public static function privateKey() {
     if (!self::$_key) {
       $session = CRM_Core_Session::singleton();
       self::$_key = $session->get('qfPrivateKey');
@@ -59,7 +58,7 @@ class CRM_Core_Key {
   /**
    * @return mixed|null|string
    */
-  static function sessionID() {
+  public static function sessionID() {
     if (!self::$_sessionID) {
       $session = CRM_Core_Session::singleton();
       self::$_sessionID = $session->get('qfSessionID');
@@ -80,9 +79,8 @@ class CRM_Core_Key {
    *
    * @return string       valid formID
    * @static
-   * @access public
    */
-  static function get($name, $addSequence = FALSE) {
+  public static function get($name, $addSequence = FALSE) {
     $privateKey = self::privateKey();
     $sessionID  = self::sessionID();
     $key        = md5($sessionID . $name . $privateKey);
@@ -104,9 +102,8 @@ class CRM_Core_Key {
    *
    * @return string $formKey if valid, else null
    * @static
-   * @access public
    */
-  static function validate($key, $name, $addSequence = FALSE) {
+  public static function validate($key, $name, $addSequence = FALSE) {
     if (!is_string($key)) {
       return NULL;
     }
@@ -134,7 +131,7 @@ class CRM_Core_Key {
    *
    * @return bool
    */
-  static function valid($key) {
+  public static function valid($key) {
     // a valid key is a 32 digit hex number
     // followed by an optional _ and a number between 1 and 10000
     if (strpos('_', $key) !== FALSE) {
@@ -156,4 +153,3 @@ class CRM_Core_Key {
     return preg_match('#[0-9a-f]{32}#i', $hash) ? TRUE : FALSE;
   }
 }
-

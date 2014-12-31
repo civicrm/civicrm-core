@@ -61,9 +61,8 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     /*
          * initialize the task and row fields
          */
@@ -88,11 +87,10 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $ufGroupId = $this->get('ufGroupId');
 
     if (!$ufGroupId) {
@@ -192,11 +190,10 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if (empty($this->_fields)) {
       return;
     }
@@ -213,7 +210,6 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -286,4 +282,3 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
     }
   }
 }
-

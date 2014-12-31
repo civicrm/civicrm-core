@@ -68,7 +68,6 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    * @param string $groupType type of group(Access/Mailing)
    * @param bool $excludeHidden exclude hidden groups.
    *
-   * @access public
    *
    * @return array - array reference of all groups.
    */
@@ -141,7 +140,6 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    * @param  array $whereTables (reference) add the tables that are needed for the where clause
    *
    * @return string the clause to add to the query retrieving viewable groups
-   * @access public
    */
   public function groupClause($type, &$tables, &$whereTables) {
     if (!isset($this->_viewPermissionedGroups)) {
@@ -223,7 +221,7 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    *
    * @return string
    */
-  function getContactEmails($uids) {
+  public function getContactEmails($uids) {
     if (empty($uids)) {
       return '';
     }
@@ -254,10 +252,9 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    * @param array $array the roles to check
    *
    * @return boolean true if yes, else false
-   * @access public
    *
    */
-  function checkGroupRole($array) {
+  public function checkGroupRole($array) {
     if (function_exists('user_load') && isset($array)) {
       $user = user_load( $GLOBALS['user']->uid);
       //if giver roles found in user roles - return true
@@ -316,7 +313,7 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    * {@inheritdoc}
    *
    */
-  function upgradePermissions($permissions) {
+  public function upgradePermissions($permissions) {
     if (empty($permissions)) {
       throw new CRM_Core_Exception("Cannot upgrade permissions: permission list missing");
     }

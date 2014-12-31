@@ -35,7 +35,7 @@ class WebTest_Contact_AddContactsToEventAdvancedSearchTest extends CiviSeleniumT
     parent::setUp();
   }
 
-  function testAddContactsToEventAdvanceSearch() {
+  public function testAddContactsToEventAdvanceSearch() {
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -69,4 +69,3 @@ class WebTest_Contact_AddContactsToEventAdvancedSearchTest extends CiviSeleniumT
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 }
-

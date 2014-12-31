@@ -46,7 +46,7 @@ class CRM_Financial_Page_AJAX {
   /**
    * @param $config
    */
-  static function jqFinancial($config) {
+  public static function jqFinancial($config) {
     if (!isset($_GET['_value']) ||
       empty($_GET['_value'])) {
       CRM_Utils_System::civiExit();
@@ -97,7 +97,7 @@ class CRM_Financial_Page_AJAX {
   /**
    * @param $config
    */
-  static function jqFinancialRelation($config) {
+  public static function jqFinancialRelation($config) {
     if (!isset($_GET['_value']) ||
       empty($_GET['_value'])) {
       CRM_Utils_System::civiExit();
@@ -156,7 +156,7 @@ class CRM_Financial_Page_AJAX {
   /**
    * @param $config
    */
-  static function jqFinancialType($config) {
+  public static function jqFinancialType($config) {
     if (! isset($_GET['_value']) ||
       empty($_GET['_value'])) {
       CRM_Utils_System::civiExit();
@@ -169,7 +169,7 @@ class CRM_Financial_Page_AJAX {
   /**
    * Callback to perform action on batch records.
    */
-  static function assignRemove() {
+  public static function assignRemove() {
     $op = CRM_Utils_Type::escape($_POST['op'], 'String');
     $recordBAO = CRM_Utils_Type::escape($_POST['recordBAO'], 'String');
     foreach ($_POST['records'] as $record) {
@@ -258,7 +258,7 @@ class CRM_Financial_Page_AJAX {
     CRM_Utils_JSON::output($response);
   }
 
-  static function getFinancialTransactionsList() {
+  public static function getFinancialTransactionsList() {
     $sortMapper =
       array(
         0 => '', 1 => '', 2 => 'sort_name',
@@ -451,7 +451,7 @@ class CRM_Financial_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 
-  static function bulkAssignRemove() {
+  public static function bulkAssignRemove() {
     $checkIDs = $_REQUEST['ID'];
     $entityID = CRM_Utils_Type::escape($_REQUEST['entityID'], 'String');
     $action   = CRM_Utils_Type::escape($_REQUEST['action'], 'String');
@@ -490,7 +490,7 @@ class CRM_Financial_Page_AJAX {
     CRM_Utils_JSON::output($status);
   }
 
-  static function getBatchSummary() {
+  public static function getBatchSummary() {
     $batchID = CRM_Utils_Type::escape($_REQUEST['batchID'], 'String');
     $params = array('id' => $batchID);
     $batchInfo = CRM_Batch_BAO_Batch::retrieve($params, $value);

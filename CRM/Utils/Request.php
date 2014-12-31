@@ -44,7 +44,6 @@ class CRM_Utils_Request {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @access private
    * @static
    */
   static private $_singleton = NULL;
@@ -52,7 +51,7 @@ class CRM_Utils_Request {
   /**
    * Class constructor
    */
-  function __construct() {}
+  public function __construct() {}
 
   /**
    * Retrieve a value from the request (GET/POST/REQUEST)
@@ -65,10 +64,9 @@ class CRM_Utils_Request {
    * @param string $method where should we look for the variable
    *
    * @return mixed the value of the variable
-   * @access public
    * @static
    */
-  static function retrieve($name, $type, &$store = NULL, $abort = FALSE, $default = NULL, $method = 'REQUEST') {
+  public static function retrieve($name, $type, &$store = NULL, $abort = FALSE, $default = NULL, $method = 'REQUEST') {
 
     // hack to detect stuff not yet converted to new style
     if (!is_string($type)) {
@@ -127,7 +125,7 @@ class CRM_Utils_Request {
    *
    * @return array
    */
-  static function exportValues() {
+  public static function exportValues() {
     // For more discussion of default $_REQUEST handling, see:
     // http://www.php.net/manual/en/reserved.variables.request.php
     // http://www.php.net/manual/en/ini.core.php#ini.request-order
@@ -143,4 +141,3 @@ class CRM_Utils_Request {
     return $result;
   }
 }
-

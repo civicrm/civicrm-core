@@ -48,7 +48,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    *
    * @return bool
    */
-  function tokenIsFound($contact, $mailingFormatProperties, $tokenFields) {
+  public function tokenIsFound($contact, $mailingFormatProperties, $tokenFields) {
     foreach (array_merge($mailingFormatProperties, array_fill_keys($tokenFields, 1)) as $key => $dontCare) {
       //we should not consider addressee for data exists, CRM-6025
        if ($key != 'addressee' && !empty($contact[$key])) {
@@ -65,9 +65,8 @@ class CRM_Contact_Form_Task_LabelCommon {
    * @param   string   $fileName    The name of the file to save the label in
    *
    * @return  null
-   * @access  public
    */
-  static function createLabel(&$contactRows, &$format, $fileName = 'MailingLabels_CiviCRM.pdf') {
+  public static function createLabel(&$contactRows, &$format, $fileName = 'MailingLabels_CiviCRM.pdf') {
     $pdf = new CRM_Utils_PDF_Label($format, 'mm');
     $pdf->Open();
     $pdf->AddPage();
@@ -96,10 +95,9 @@ class CRM_Contact_Form_Task_LabelCommon {
    * @param bool $mergeSameHousehold UNUSED
    *
    * @return array of rows for labels
-   * @access  public
    */
 
-  static function getRows($contactIDs, $locationTypeID, $respectDoNotMail, $mergeSameAddress, $mergeSameHousehold) {
+  public static function getRows($contactIDs, $locationTypeID, $respectDoNotMail, $mergeSameAddress, $mergeSameHousehold) {
     $locName = NULL;
     //get the address format sequence from the config file
     $addressReturnProperties = CRM_Contact_Form_Task_LabelCommon::getAddressReturnProperties();
@@ -263,7 +261,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    * @param unknown_type $format
    * @return multitype:number
    */
-  function regexReturnProperties(&$format) {
+  public function regexReturnProperties(&$format) {
     $returnProperties = array();
     $matches = array();
     preg_match_all('/(?<!\{|\\\\)\{(\w+\.\w+)\}(?!\})/',
@@ -292,7 +290,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    * -  [supplemental_address_2] => 1
    * )
    */
-  function getAddressReturnProperties() {
+  public function getAddressReturnProperties() {
     $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'mailing_format'
     );
@@ -311,7 +309,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    * @param unknown_type $contacts
    * @return unknown
    */
-  function getTokenData(&$contacts) {
+  public function getTokenData(&$contacts) {
     $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'mailing_format'
     );
@@ -340,7 +338,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    * Merge contacts with the Same address to get one shared label
    * @param unknown_type $rows
    */
-  function mergeSameAddress(&$rows) {
+  public function mergeSameAddress(&$rows) {
     $uniqueAddress = array();
     foreach (array_keys($rows) as $rowID) {
       // load complete address as array key
@@ -408,7 +406,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    *
    * @return array
    */
-  function mergeSameHousehold(&$rows) {
+  public function mergeSameHousehold(&$rows) {
     # group selected contacts by type
     $individuals = array();
     $households = array();

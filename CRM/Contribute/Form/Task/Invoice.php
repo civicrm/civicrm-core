@@ -48,21 +48,18 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   /**
    * Gives all the statues for conribution
    *
-   * @access public
    */
   public $_contributionStatusId;
 
   /**
    * Gives the HTML template of PDF Invoice
    *
-   * @access public
    */
   public $_messageInvoice;
 
   /**
    * This variable is used to assign parameters for HTML template of PDF Invoice
    *
-   * @access public
    */
   public $_invoiceTemplate;
 
@@ -75,9 +72,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
     if ($id) {
       $this->_contributionIds = array($id);
@@ -147,7 +143,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -233,9 +228,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($values) {
+  public static function formRule($values) {
     $errors = array();
 
     if ($values['output'] == 'email_invoice' && empty($values['from_email_address'])) {
@@ -248,7 +242,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -269,7 +262,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @static
    *
    */
-  static function printPDF($contribIDs, &$params, $contactIds, &$form) {
+  public static function printPDF($contribIDs, &$params, $contactIds, &$form) {
     // get all the details needed to generate a invoice
     $messageInvoice = array();
     $invoiceTemplate = CRM_Core_Smarty::singleton();
@@ -606,7 +599,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @param string $fileName gives the location with name of the file
    * @param array $params for invoices
    *
-   * @access public
    * @static
    */
   static public function addActivities($subject, $contactIds, $fileName, $params) {
@@ -671,7 +663,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   /**
    * Callback to perform action on Print Invoice button.
    */
-  static function getPrintPDF() {
+  public static function getPrintPDF() {
     $contributionId = CRM_Utils_Request::retrieve('id', 'Positive', CRM_Core_DAO::$_nullObject, FALSE);
     $contributionIDs = array($contributionId);
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, FALSE);
@@ -679,4 +671,3 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     CRM_Contribute_Form_Task_Invoice::printPDF($contributionIDs, $params, $contactId, CRM_Core_DAO::$_nullObject);
   }
 }
-

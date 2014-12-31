@@ -37,7 +37,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -48,10 +48,9 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_BAO_OptionGroup object
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $optionGroup = new CRM_Core_DAO_OptionGroup();
     $optionGroup->copyValues($params);
     if ($optionGroup->find(TRUE)) {
@@ -70,7 +69,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    * @return Object             DAO object on sucess, null otherwise
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_OptionGroup', $id, 'is_active', $is_active);
   }
 
@@ -80,12 +79,11 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
    *
-   * @access public
    * @static
    *
    * @return object
    */
-  static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = array()) {
     if(empty($params['id'])){
       $params['id'] = CRM_Utils_Array::value('optionGroup', $ids);
     }
@@ -113,10 +111,9 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    *
    * @return void
    *
-   * @access public
    * @static
    */
-  static function del($optionGroupId) {
+  public static function del($optionGroupId) {
     // need to delete all option value field before deleting group
     $optionValue = new CRM_Core_DAO_OptionValue();
     $optionValue->option_group_id = $optionGroupId;
@@ -134,14 +131,12 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    *
    * @return String title
    *
-   * @access public
    * @static
    */
-  static function getTitle($optionGroupId) {
+  public static function getTitle($optionGroupId) {
     $optionGroup = new CRM_Core_DAO_OptionGroup();
     $optionGroup->id = $optionGroupId;
     $optionGroup->find(TRUE);
     return $optionGroup->name;
   }
 }
-

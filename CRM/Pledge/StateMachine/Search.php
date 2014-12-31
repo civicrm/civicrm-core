@@ -38,7 +38,6 @@ class CRM_Pledge_StateMachine_Search extends CRM_Core_StateMachine {
    * The task that the wizard is currently processing
    *
    * @var string
-   * @protected
    */
   protected $_task;
 
@@ -79,9 +78,8 @@ class CRM_Pledge_StateMachine_Search extends CRM_Core_StateMachine {
    * @param string $formName
    *
    * @return string the name of the form that will handle the task
-   * @access protected
    */
-  function taskName($controller, $formName = 'Search') {
+  public function taskName($controller, $formName = 'Search') {
     // total hack, check POST vars and then session to determine stuff
     $value = CRM_Utils_Array::value('task', $_POST);
     if (!isset($value)) {
@@ -95,9 +93,8 @@ class CRM_Pledge_StateMachine_Search extends CRM_Core_StateMachine {
    * Return the form name of the task
    *
    * @return string
-   * @access public
    */
-  function getTaskFormName() {
+  public function getTaskFormName() {
     return CRM_Utils_String::getClassName($this->_task);
   }
 
@@ -106,8 +103,7 @@ class CRM_Pledge_StateMachine_Search extends CRM_Core_StateMachine {
    * we dont want to issue a reset of the state session when we are done processing a task
    *
    */
-  function shouldReset() {
+  public function shouldReset() {
     return FALSE;
   }
 }
-

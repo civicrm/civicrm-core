@@ -44,7 +44,6 @@ abstract class CRM_Import_Form_Summary extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addButtons(array(
@@ -61,10 +60,8 @@ abstract class CRM_Import_Form_Summary extends CRM_Core_Form {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Summary');
   }
 }
-

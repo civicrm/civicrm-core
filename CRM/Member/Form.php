@@ -58,7 +58,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   protected $_fromEmails = array();
 
-  function preProcess() {
+  public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',$this, FALSE, 'add');
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'membership');
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -84,11 +84,10 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array defaults
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     if (isset($this->_id)) {
       $params = array('id' => $this->_id);
@@ -121,7 +120,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_mode) {
@@ -199,7 +197,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    *  - contact_id
    *  - soft_credit_contact_id
    */
-  function storeContactFields($formValues){
+  public function storeContactFields($formValues){
     // in a 'standalone form' (contact id not in the url) the contact will be in the form values
     if (!empty($formValues['contact_id'])) {
       $this->_contactID = $formValues['contact_id'];
@@ -223,4 +221,3 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     }
   }
 }
-

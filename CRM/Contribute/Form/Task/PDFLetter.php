@@ -54,9 +54,8 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->skipOnHold = $this->skipDeceased = FALSE;
     CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
     // store case id if present
@@ -90,7 +89,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     if (isset($this->_activityId)) {
       $params = array('id' => $this->_activityId);
@@ -107,7 +106,6 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -165,7 +163,6 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -173,4 +170,3 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     CRM_Contribute_Form_Task_PDFLetterCommon::postProcess($this);
   }
 }
-

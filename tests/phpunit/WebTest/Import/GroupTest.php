@@ -38,7 +38,7 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
   /**
    *  Test contact import for Individuals.
    */
-  function testIndividualImportWithGroup() {
+  public function testIndividualImportWithGroup() {
     $this->webtestLogin();
 
     // Get sample import data.
@@ -96,7 +96,7 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _individualGroupCSVData() {
+  public function _individualGroupCSVData() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -137,4 +137,3 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 }
-

@@ -47,7 +47,7 @@ class CRM_Mailing_StateMachine_Send extends CRM_Core_StateMachine {
    *
    * @return \CRM_Mailing_StateMachine_Send CRM_Mailing_StateMachine
    */
-  function __construct($controller, $action = CRM_Core_Action::NONE) {
+  public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
     $this->_pages = array(
@@ -73,4 +73,3 @@ class CRM_Mailing_StateMachine_Send extends CRM_Core_StateMachine {
     $this->addSequentialPages($this->_pages, $action);
   }
 }
-

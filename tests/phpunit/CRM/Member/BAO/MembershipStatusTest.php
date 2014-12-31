@@ -33,14 +33,14 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
   /* check function add()
      *
      */
-  function testAdd() {
+  public function testAdd() {
     $params = array(
       'name' => 'pending',
       'is_active' => 1,
@@ -55,7 +55,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     $this->assertEquals($result, 'pending', 'Verify membership status is_active.');
   }
 
-  function testRetrieve() {
+  public function testRetrieve() {
 
     $params = array(
       'name' => 'testStatus',
@@ -69,7 +69,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     CRM_Member_BAO_MembershipStatus::del($membershipStatus->id);
   }
 
-  function testSetIsActive() {
+  public function testSetIsActive() {
 
     $params = array(
       'name' => 'pending',
@@ -87,7 +87,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     $this->assertEquals($isActive, 0, 'Verify membership status is_active.');
   }
 
-  function testGetMembershipStatus() {
+  public function testGetMembershipStatus() {
     $params = array(
       'name' => 'pending',
       'is_active' => 1,
@@ -98,7 +98,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     $this->assertEquals($result['name'], 'pending', 'Verify membership status name.');
   }
 
-  function testDel() {
+  public function testDel() {
     $params = array(
       'name' => 'testStatus',
       'is_active' => 1,
@@ -111,7 +111,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     $this->assertEquals(empty($result), TRUE, 'Verify membership status record deletion.');
   }
 
-  function testGetMembershipStatusByDate() {
+  public function testGetMembershipStatusByDate() {
     $params = array(
       'name' => 'Current',
       'is_active' => 1,
@@ -126,7 +126,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     $this->assertEquals($result['name'], 'Current', 'Verify membership status record.');
   }
 
-  function testgetMembershipStatusCurrent() {
+  public function testgetMembershipStatusCurrent() {
     $params = array(
       'name' => 'Current',
       'is_active' => 1,
@@ -139,4 +139,3 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     $this->assertEquals(empty($result), FALSE, 'Verify membership status records is_current_member.');
   }
 }
-

@@ -42,7 +42,6 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
    * Mapper fields
    *
    * @var array
-   * @access protected
    */
   protected $_mapperFields;
 
@@ -50,7 +49,6 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
    * Number of columns in import file
    *
    * @var int
-   * @access protected
    */
   protected $_exportColumnCount;
 
@@ -58,7 +56,6 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
    * Loaded mapping ID
    *
    * @var int
-   * @access protected
    */
   protected $_mappingId;
 
@@ -66,7 +63,6 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_exportColumnCount = $this->get('exportColumnCount');
@@ -117,9 +113,8 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($fields, $values, $mappingTypeId) {
+  public static function formRule($fields, $values, $mappingTypeId) {
     $errors = array();
 
     if (!empty($fields['saveMapping']) && !empty($fields['_qf_Map_next'])) {
@@ -150,7 +145,6 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
    * Process the uploaded file
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -250,10 +244,8 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Select Fields to Export');
   }
 }
-

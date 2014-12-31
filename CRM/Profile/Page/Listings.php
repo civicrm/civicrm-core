@@ -45,7 +45,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    * All the fields that are listings related
    *
    * @var array
-   * @access protected
    */
   protected $_fields;
 
@@ -53,7 +52,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    * The custom fields for this domain
    *
    * @var array
-   * @access protected
    */
   protected $_customFields;
 
@@ -61,7 +59,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    * The input params from the request
    *
    * @var array
-   * @access protected
    */
   protected $_params;
 
@@ -97,10 +94,9 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    * the selector object to do a query
    *
    * @return void
-   * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
 
     $this->_search = TRUE;
 
@@ -279,7 +275,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    *
    * @return void
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $this->assign('recentlyViewed', FALSE);
@@ -403,9 +399,8 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    * @param int $gid
    *
    * @return array
-   * @access public
    */
-  function getProfileContact($gid) {
+  public function getProfileContact($gid) {
     $session = CRM_Core_Session::singleton();
     $params = $session->get('profileParams');
 
@@ -462,7 +457,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    *
    * @return null|string
    */
-  function checkTemplateFileExists($suffix = '') {
+  public function checkTemplateFileExists($suffix = '') {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Page/{$this->_gid}/Listings.{$suffix}tpl";
       $template = CRM_Core_Page::getTemplate();
@@ -486,12 +481,11 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
@@ -501,14 +495,12 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    * i.e. we dont override
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
    */
-  function overrideExtraTemplateFileName() {
+  public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
 }
-

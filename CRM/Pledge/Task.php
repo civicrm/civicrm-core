@@ -39,7 +39,7 @@
  *
  */
 class CRM_Pledge_Task {
-  CONST DELETE_PLEDGES = 1, PRINT_PLEDGES = 2, EXPORT_PLEDGES = 3;
+  const DELETE_PLEDGES = 1, PRINT_PLEDGES = 2, EXPORT_PLEDGES = 3;
 
   /**
    * The task array
@@ -63,9 +63,8 @@ class CRM_Pledge_Task {
    *
    * @return array the set of tasks for a group of contacts
    * @static
-   * @access public
    */
-  static function &tasks() {
+  public static function &tasks() {
     if (!self::$_tasks) {
       self::$_tasks = array(1 => array(
         'title' => ts('Delete Pledges'),
@@ -102,9 +101,8 @@ class CRM_Pledge_Task {
    *
    * @return array the set of task titles
    * @static
-   * @access public
    */
-  static function &taskTitles() {
+  public static function &taskTitles() {
     self::tasks();
     $titles = array();
     foreach (self::$_tasks as $id => $value) {
@@ -118,9 +116,8 @@ class CRM_Pledge_Task {
    *
    * @return array the set of optional tasks for a group of contacts
    * @static
-   * @access public
    */
-  static function &optionalTaskTitle() {
+  public static function &optionalTaskTitle() {
     $tasks = array();
     return $tasks;
   }
@@ -132,9 +129,8 @@ class CRM_Pledge_Task {
    * @param int $permission
    *
    * @return array set of tasks that are valid for the user
-   * @access public
    */
-  static function &permissionedTaskTitles($permission) {
+  public static function &permissionedTaskTitles($permission) {
     $tasks = array();
     if (($permission == CRM_Core_Permission::EDIT)
       || CRM_Core_Permission::check('edit pledges')
@@ -161,9 +157,8 @@ class CRM_Pledge_Task {
    *
    * @return array the set of tasks for a group of pledge holders
    * @static
-   * @access public
    */
-  static function getTask($value) {
+  public static function getTask($value) {
     self::tasks();
     if (!$value || !CRM_Utils_Array::value($value, self::$_tasks)) {
       // make the print task by default
@@ -175,4 +170,3 @@ class CRM_Pledge_Task {
     );
   }
 }
-

@@ -43,7 +43,6 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
@@ -125,7 +124,6 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addButtons(array(
@@ -139,4 +137,3 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
     );
   }
 }
-

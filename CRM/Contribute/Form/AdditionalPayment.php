@@ -45,7 +45,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    * Related component whose financial payment is being processed
    *
    * @var string
-   * @public
    */
   protected $_component = NULL;
 
@@ -351,7 +350,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     if ($self->_paymentType == 'owed' && $fields['total_amount'] > $self->_owed) {
       $errors['total_amount'] = ts('Payment amount cannot be greater than owed amount');
@@ -632,7 +631,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    *
    * @return mixed
    */
-  function emailReceipt(&$params) {
+  public function emailReceipt(&$params) {
     // email receipt sending
     // send message template
     if ($this->_component == 'event') {

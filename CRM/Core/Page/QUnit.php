@@ -9,7 +9,7 @@ require_once 'CRM/Core/Page.php';
 class CRM_Core_Page_QUnit extends CRM_Core_Page {
   protected $tplFile = NULL;
 
-  function run() {
+  public function run() {
     list ($ext, $suite) = $this->getRequestExtAndSuite();
     if (empty($ext) || empty($suite)) {
       throw new CRM_Core_Exception("FIXME: Not implemented: QUnit browser");
@@ -50,7 +50,7 @@ class CRM_Core_Page_QUnit extends CRM_Core_Page {
    *
    * @return array
    */
-  function getRequestExtAndSuite() {
+  public function getRequestExtAndSuite() {
     $config = CRM_Core_Config::singleton();
     $arg = explode('/', $_GET[$config->userFrameworkURLVar]);
 

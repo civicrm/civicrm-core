@@ -55,7 +55,7 @@ class CRM_Logging_Schema {
   /**
    * Populate $this->tables and $this->logs with current db state.
    */
-  function __construct() {
+  public function __construct() {
     $dao = new CRM_Contact_DAO_Contact();
     $civiDBName = $dao->_database;
 
@@ -107,14 +107,14 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
   /**
    * Return logging custom data tables.
    */
-  function customDataLogTables() {
+  public function customDataLogTables() {
     return preg_grep('/^log_civicrm_value_/', $this->logs);
   }
 
   /**
    * Return custom data tables for specified entity / extends.
    */
-  function entityCustomDataLogTables($extends) {
+  public function entityCustomDataLogTables($extends) {
     $customGroupTables = array();
     $customGroupDAO = CRM_Core_BAO_CustomGroup::getAllCustomGroupsByBaseEntity($extends);
     $customGroupDAO->find();
@@ -127,7 +127,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
   /**
    * Disable logging by dropping the triggers (but keep the log tables intact).
    */
-  function disableLogging() {
+  public function disableLogging() {
     $config = CRM_Core_Config::singleton();
     $config->logging = FALSE;
 
@@ -142,7 +142,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
   /**
    * Drop triggers for all logged tables.
    */
-  function dropTriggers($tableName = NULL) {
+  public function dropTriggers($tableName = NULL) {
     $dao = new CRM_Core_DAO;
 
     if ($tableName) {
@@ -186,7 +186,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
    *
    * @return void
    */
-  function enableLogging() {
+  public function enableLogging() {
     $this->fixSchemaDifferences(TRUE);
     $this->addReports();
   }
@@ -198,7 +198,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
    *
    * @return void
    */
-  function fixSchemaDifferences($enableLogging = FALSE) {
+  public function fixSchemaDifferences($enableLogging = FALSE) {
     $config = CRM_Core_Config::singleton();
     if ($enableLogging) {
       $config->logging = TRUE;
@@ -219,7 +219,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
    *
    * @return void
    */
-  function fixSchemaDifferencesFor($table, $cols = array(), $rebuildTrigger = FALSE) {
+  public function fixSchemaDifferencesFor($table, $cols = array(), $rebuildTrigger = FALSE) {
     if (empty($table)) {
       return FALSE;
     }
@@ -289,7 +289,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
   /**
    * @param bool $rebuildTrigger
    */
-  function fixSchemaDifferencesForAll($rebuildTrigger = FALSE) {
+  public function fixSchemaDifferencesForAll($rebuildTrigger = FALSE) {
     $diffs = array();
     foreach ($this->tables as $table) {
       if (empty($this->logs[$table])) {
@@ -320,7 +320,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
    *
    * @return mixed
    */
-  function fixTimeStampAndNotNullSQL($query) {
+  public function fixTimeStampAndNotNullSQL($query) {
     $query = str_ireplace("TIMESTAMP NOT NULL", "TIMESTAMP NULL", $query);
     $query = str_ireplace("DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", '', $query);
     $query = str_ireplace("DEFAULT CURRENT_TIMESTAMP", '', $query);
@@ -423,7 +423,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
    *
    * @return array
    */
-  function columnsWithDiffSpecs($civiTable, $logTable) {
+  public function columnsWithDiffSpecs($civiTable, $logTable) {
     $civiTableSpecs = $this->columnSpecsOf($civiTable);
     $logTableSpecs  = $this->columnSpecsOf($logTable);
 
@@ -563,7 +563,7 @@ COLS;
    * @param null $tableName
    * @param bool $force
    */
-  function triggerInfo(&$info, $tableName = NULL, $force = FALSE) {
+  public function triggerInfo(&$info, $tableName = NULL, $force = FALSE) {
     // check if we have logging enabled
     $config =& CRM_Core_Config::singleton();
     if (!$config->logging) {
@@ -653,9 +653,8 @@ COLS;
    * an audit trail
    *
    * @static
-   * @public
    */
-  static function disableLoggingForThisConnection( ) {
+  public static function disableLoggingForThisConnection( ) {
     // do this only if logging is enabled
     $config = CRM_Core_Config::singleton( );
     if ( $config->logging ) {
@@ -664,4 +663,3 @@ COLS;
   }
 
 }
-

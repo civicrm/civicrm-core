@@ -40,7 +40,7 @@ require_once 'CiviTest/Custom.php';
  * Class CRM_Core_BAO_CustomValueTest
  */
 class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
-  function testTypeCheckWithValidInput() {
+  public function testTypeCheckWithValidInput() {
 
     $values = array();
     $values = array(
@@ -65,7 +65,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  function testTypeCheckWithInvalidInput() {
+  public function testTypeCheckWithInvalidInput() {
     $values = array();
     $values = array('check1' => 'chk');
     foreach ($values as $type => $value) {
@@ -74,7 +74,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  function testTypeCheckWithWrongInput() {
+  public function testTypeCheckWithWrongInput() {
     $values = array();
     $values = array(
       'String' => 1,
@@ -86,7 +86,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  function testTypeToFieldWithValidInput() {
+  public function testTypeToFieldWithValidInput() {
     $values = array();
     $values = array(
       'String' => 'char_data',
@@ -108,7 +108,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  function testTypeToFieldWithWrongInput() {
+  public function testTypeToFieldWithWrongInput() {
     $values = array();
     $values = array(
       'String' => 'memo_data',
@@ -121,7 +121,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  function testFixFieldValueOfTypeMemo() {
+  public function testFixFieldValueOfTypeMemo() {
     $customGroup = Custom::createGroup(array(), 'Individual');
 
     $fields = array(
@@ -146,10 +146,9 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     Custom::deleteGroup($customGroup);
   }
 
-  function testFixFieldValueOfTypeMemoWithEmptyParams() {
+  public function testFixFieldValueOfTypeMemoWithEmptyParams() {
     $params = array();
     $result = CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($params);
     $this->assertEquals($result, NULL, 'Checking the returned value of type Memo.');
   }
 }
-

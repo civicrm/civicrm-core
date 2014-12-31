@@ -43,10 +43,9 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
 
     //CRM-13901 don't show dashboard to contacts with limited view writes & it does not relect
     //what they have access to
@@ -432,9 +431,8 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
    * it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $controller = new CRM_Core_Controller_Simple('CRM_Member_Form_Search', ts('Member'), NULL);
@@ -449,4 +447,3 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     return parent::run();
   }
 }
-

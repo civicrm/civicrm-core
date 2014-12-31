@@ -37,7 +37,7 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -61,9 +61,8 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
    * @return mixed Returns true on success, or a CRM_Eore_Error
    *               containing a descriptive error message on
    *               failure.
-   * @access public
    */
-  function send($recipient, $headers, $body, $job_id = null) {
+  public function send($recipient, $headers, $body, $job_id = null) {
     $headerStr = array();
     foreach ($headers as $name => $value) {
       $headerStr[] = "$name: $value";
@@ -136,4 +135,3 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
     return TRUE;
   }
 }
-

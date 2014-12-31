@@ -37,7 +37,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -50,10 +50,9 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_DAO_PrintLabel object on success, null otherwise
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $printLabel = new CRM_Core_DAO_PrintLabel();
     $printLabel->copyValues($params);
     if ($printLabel->find(TRUE)) {
@@ -71,10 +70,9 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    *
    * @return Object             DAO object on success, null otherwise
    *
-   * @access public
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_PrintLabel', $id, 'is_active', $is_active);
   }
 
@@ -83,12 +81,11 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    *
    * @param array $params reference array contains the values submitted by the form
    *
-   * @access public
    * @static
    *
    * @return object
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
     $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
     $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
@@ -125,10 +122,9 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    *
    * @param  int $printLabelId ID of the name label to be deleted.
    *
-   * @access public
    * @static
    */
-  static function del($printLabelId) {
+  public static function del($printLabelId) {
     $printLabel = new CRM_Core_DAO_PrintLabel();
     $printLabel->id = $printLabelId;
     $printLabel->delete();
@@ -138,10 +134,9 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    *  get the list of print labels
    *
    * @return array list of labels
-   * @access public
    * @static
    */
-  static function getList() {
+  public static function getList() {
     $printLabel = new CRM_Core_DAO_PrintLabel();
     $printLabel->find();
 
@@ -158,9 +153,8 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @param array $params associated array of submitted values
    *
    * @return array $formattedLayout array formatted array
-   * @access public
    */
-  static function buildLayout(&$params) {
+  public static function buildLayout(&$params) {
     $layoutParams = array('id' => $params['badge_id']);
     CRM_Badge_BAO_Layout::retrieve($layoutParams, $layoutInfo);
 
@@ -182,4 +176,3 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
     return json_decode($jsonData, true);
   }
 }
-

@@ -42,7 +42,7 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
 
   protected $_fields = NULL;
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
 
     $this->_fields = array(
@@ -151,7 +151,6 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
    * @param bool $check
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm($check = FALSE) {
     parent::buildQuickForm();
@@ -181,7 +180,7 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if (!$this->_id) {
@@ -208,7 +207,6 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -247,4 +245,3 @@ UPDATE civicrm_payment_processor SET is_default = 0";
     $dao->save();
   }
 }
-

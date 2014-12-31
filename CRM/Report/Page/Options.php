@@ -77,10 +77,9 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
    * Obtains the group name from url and sets the title.
    *
    * @return void
-   * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
     $this->_id = CRM_Utils_Request::retrieve('id', 'String', $this, FALSE);
 
@@ -108,7 +107,7 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Core_BAO_OptionValue';
   }
 
@@ -117,7 +116,7 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
@@ -153,7 +152,7 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
    *
    * @return void
    */
-  function run() {
+  public function run() {
     $this->preProcess();
     return parent::run();
   }
@@ -163,10 +162,9 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
    *
    *
    * @return void
-   * @access public
    * @static
    */
-  function browse() {
+  public function browse() {
     $groupParams = array('name' => self::$_gName);
     $optionValue = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'weight');
     $gName       = self::$_gName;
@@ -188,7 +186,7 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Report_Form_Register';
   }
 
@@ -197,7 +195,7 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return self::$_GName;
   }
 
@@ -208,7 +206,7 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/report/options/' . self::$_gName;
   }
 
@@ -218,10 +216,8 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
    * @param int $mode mode that we are in
    *
    * @return string
-   * @access public
    */
-  function userContextParams($mode = NULL) {
+  public function userContextParams($mode = NULL) {
     return 'reset=1&action=browse';
   }
 }
-

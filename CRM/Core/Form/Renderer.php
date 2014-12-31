@@ -69,7 +69,6 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   /**
    * Constructor
    *
-   * @access public
    */ function __construct() {
     $template = CRM_Core_Smarty::singleton();
     parent::__construct($template);
@@ -80,7 +79,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    *
    * Method providing static instance of as in Singleton pattern.
    */
-  static function &singleton() {
+  public static function &singleton() {
     if (!isset(self::$_singleton)) {
       self::$_singleton = new CRM_Core_Form_Renderer();
     }
@@ -93,7 +92,6 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    * work, but then we add some CiviCRM specific enhancements to
    * make the html compliant with our css etc
    *
-   * @access private
    *
    * @param  $element HTML_QuickForm_element
    * @param  $required bool - Whether an element is required
@@ -101,7 +99,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    *
    * @return array
    */
-  function _elementToArray(&$element, $required, $error) {
+  public function _elementToArray(&$element, $required, $error) {
     self::updateAttributes($element, $required, $error);
 
     $el = parent::_elementToArray($element, $required, $error);
@@ -142,7 +140,6 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    * Update the attributes of this element and add a few CiviCRM
    * based attributes so we can style this form element better
    *
-   * @access private
    *
    * @param  $element  HTML_QuickForm_element object
    * @param  $required bool      Whether an element is required
@@ -151,7 +148,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    * @return array
    * @static
    */
-  static function updateAttributes(&$element, $required, $error) {
+  public static function updateAttributes(&$element, $required, $error) {
     // lets create an id for all input elements, so we can generate nice label tags
     // to make it nice and clean, we'll just use the elementName if it is non null
     $attributes = array();
@@ -207,7 +204,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    *
    * @param $field HTML_QuickForm_element
    */
-  static function preProcessEntityRef($field) {
+  public static function preProcessEntityRef($field) {
     $val = $field->getValue();
     // Support array values
     if (is_array($val)) {
@@ -240,7 +237,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    * @param $el array
    * @param $field HTML_QuickForm_element
    */
-  function renderFrozenEntityRef(&$el, $field) {
+  public function renderFrozenEntityRef(&$el, $field) {
     $entity = $field->getAttribute('data-api-entity');
     $vals = json_decode($field->getAttribute('data-entity-value'), TRUE);
     $display = array();
@@ -269,7 +266,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    *
    * @param $field HTML_QuickForm_element
    */
-  static function preprocessContactReference($field) {
+  public static function preprocessContactReference($field) {
     $val = $field->getValue();
     if ($val && is_numeric($val)) {
 
@@ -297,7 +294,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    * @param array $el
    * @param HTML_QuickForm_element $field
    */
-  function addOptionsEditLink(&$el, $field) {
+  public function addOptionsEditLink(&$el, $field) {
     if (CRM_Core_Permission::check('administer CiviCRM')) {
       // NOTE: $path is used on the client-side to know which option lists need rebuilding,
       // that's why we need that bit of data both in the link and in the form element
@@ -312,11 +309,10 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    * @param array $el
    * @param HTML_QuickForm_element $field
    */
-  function appendUnselectButton(&$el, $field) {
+  public function appendUnselectButton(&$el, $field) {
     // Initially hide if not needed
     // Note: visibility:hidden prevents layout jumping around unlike display:none
     $display = $field->getValue() !== NULL ? '' : ' style="visibility:hidden;"';
     $el['html'] .= ' <a href="#" class="crm-hover-button crm-clear-link"' . $display . ' title="' . ts('Clear') . '"><span class="icon close-icon"></span></a>';
   }
 }
-

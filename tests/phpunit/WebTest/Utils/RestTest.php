@@ -79,7 +79,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
    *
    * @return array; each item is a list of parameters for testAPICalls
    */
-  function apiTestCases() {
+  public function apiTestCases() {
     $cases = array();
 
     // entity,action: omit apiKey, valid entity+action
@@ -190,7 +190,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   /**
    * @dataProvider apiTestCases
    */
-  function testAPICalls($query, $is_error) {
+  public function testAPICalls($query, $is_error) {
     $client = CRM_Utils_HttpClient::singleton();
     list($status, $data) = $client->post($this->url, $query);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
@@ -206,7 +206,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
    * Submit a request with an API key that exists but does not correspond to
    * a real user. Submit in "?entity=X&action=X" notation
    */
-  function testNotCMSUser_entityAction() {
+  public function testNotCMSUser_entityAction() {
     $client = CRM_Utils_HttpClient::singleton();
 
     //Create contact with api_key
@@ -238,7 +238,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
    * Submit a request with an API key that exists but does not correspond to
    * a real user. Submit in "?q=civicrm/$entity/$action" notation
    */
-  function testNotCMSUser_q() {
+  public function testNotCMSUser_q() {
     $client = CRM_Utils_HttpClient::singleton();
 
     //Create contact with api_key

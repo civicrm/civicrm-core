@@ -42,9 +42,8 @@ class CRM_Core_Page_AJAX {
    * Call generic ajax forms
    *
    * @static
-   * @access public
    */
-  static function run() {
+  public static function run() {
     $className = CRM_Utils_Type::escape($_REQUEST['class_name'], 'String');
     $type = '';
     if (!empty($_REQUEST['type'])) {
@@ -93,9 +92,8 @@ class CRM_Core_Page_AJAX {
    * Change is_quick_config priceSet to complex
    *
    * @static
-   * @access public
    */
-  static function setIsQuickConfig() {
+  public static function setIsQuickConfig() {
     $id = $context = NULL;
     if (!empty($_REQUEST['id'])) {
       $id = CRM_Utils_Type::escape($_REQUEST['id'], 'Integer');
@@ -138,7 +136,7 @@ class CRM_Core_Page_AJAX {
    *
    * @return bool
    */
-  static function checkAuthz($type, $className, $fnName = null) {
+  public static function checkAuthz($type, $className, $fnName = null) {
     switch ($type) {
       case 'method':
         if (!preg_match('/^CRM_[a-zA-Z0-9]+_Page_AJAX$/', $className)) {
@@ -167,7 +165,7 @@ class CRM_Core_Page_AJAX {
    * Outputs the CiviCRM standard json-formatted page/form response
    * @param array|string $response
    */
-  static function returnJsonResponse($response) {
+  public static function returnJsonResponse($response) {
     // Allow lazy callers to not wrap content in an array
     if (is_string($response)) {
       $response = array('content' => $response);
@@ -200,7 +198,7 @@ class CRM_Core_Page_AJAX {
   /**
    * Set headers appropriate for a js file
    */
-  static function setJsHeaders() {
+  public static function setJsHeaders() {
     // Encourage browsers to cache for a long time - 1 year
     $year = 60*60*24*364;
     header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + $year));
@@ -215,7 +213,7 @@ class CRM_Core_Page_AJAX {
    * @param string $key - array key to use as the key
    * @deprecated
    */
-  static function autocompleteResults($results, $val='label', $key='id') {
+  public static function autocompleteResults($results, $val='label', $key='id') {
     $output = array();
     if (is_array($results)) {
       foreach ($results as $k => $v) {
@@ -230,4 +228,3 @@ class CRM_Core_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 }
-

@@ -46,9 +46,8 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
    * @param null
    *
    * @return array    array of default values
-   * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     $ufJoinParams = array(
@@ -70,7 +69,6 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $subTypeId = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey', $this->_surveyId, 'activity_type_id');
@@ -111,7 +109,6 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // store the submitted values in an array

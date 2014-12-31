@@ -40,7 +40,7 @@ class CRM_Admin_Page_Admin extends CRM_Core_Page {
   /**
    * @return string
    */
-  function run() {
+  public function run() {
     $errorMessage = '';
     // ensure that all CiviCRM tables are InnoDB, else abort
     // this is not a very fast operation, so we do it randomly 10% of the times
@@ -119,4 +119,3 @@ class CRM_Admin_Page_Admin extends CRM_Core_Page {
     return parent::run();
   }
 }
-

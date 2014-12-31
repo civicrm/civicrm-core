@@ -9,7 +9,7 @@ class AuthorizeNet extends PHPUnit_Framework_Testcase {
    * a payment processor of type Authorize.net
    * @return CRM_Financial_DAO_PaymentProcessor
    */
-  function create() {
+  public function create() {
 
     $paymentProcessor = new CRM_Financial_DAO_PaymentProcessor();
     $paymentParams = array(
@@ -39,7 +39,7 @@ class AuthorizeNet extends PHPUnit_Framework_Testcase {
    * @return boolean true if payment processor deleted, false otherwise
    *
    */
-  function delete($id) {
+  public function delete($id) {
     $paymentProcessor = new CRM_Financial_DAO_PaymentProcessor();
     $paymentProcessor->id = $id;
     if ($paymentProcessor->find(TRUE)) {
@@ -48,6 +48,3 @@ class AuthorizeNet extends PHPUnit_Framework_Testcase {
     return $result;
   }
 }
-
-
-

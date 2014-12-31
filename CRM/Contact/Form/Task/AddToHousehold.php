@@ -41,11 +41,10 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function preProcess() {
+  public function preProcess() {
     /*
          * initialize the task and row fields
          */
@@ -56,11 +55,10 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
 
     CRM_Utils_System::setTitle(ts('Add Members to Household'));
     $this->addElement('text', 'name', ts('Find Target Household'));
@@ -112,7 +110,6 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -181,11 +178,10 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
    * @param CRM_Core_Form $form
    * @param  array $params This contains elements for search criteria
    *
-   * @access public
    *
    * @return void
    */
-  function search(&$form, &$params) {
+  public function search(&$form, &$params) {
     //max records that will be listed
     $searchValues = array();
     if (!empty($params['rel_contact'])) {
@@ -286,4 +282,3 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
     }
   }
 }
-

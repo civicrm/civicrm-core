@@ -35,7 +35,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testPrefixGenderSuffix(){
+  public function testPrefixGenderSuffix(){
     $this->webtestLogin();
 
     // Create new  group
@@ -148,7 +148,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
   /**
    *  Test Contact Export.
    */
-  function testContactExport() {
+  public function testContactExport() {
     $this->webtestLogin();
 
     // Create new  group
@@ -258,7 +258,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->reviewCSV($csvFile, $checkHeaders, $checkRows, 2);
   }
 
-  function testMergeHousehold() {
+  public function testMergeHousehold() {
     $this->webtestLogin();
 
     // Create new  group
@@ -417,7 +417,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function webtestAddContactWithGenderPrefixSuffix($fname = 'Anthony', $lname = 'Anderson', $email = NULL, $contactSubtype = NULL) {
+  public function webtestAddContactWithGenderPrefixSuffix($fname = 'Anthony', $lname = 'Anderson', $email = NULL, $contactSubtype = NULL) {
     $url = $this->sboxPath . 'civicrm/contact/add?reset=1&ct=Individual';
     if ($contactSubtype) {
       $url = $url . "&cst={$contactSubtype}";
@@ -462,7 +462,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
    *
    * @return array|int
    */
-  function getOptionLabel($optionGroupName,$optionValue){
+  public function getOptionLabel($optionGroupName,$optionValue){
     $params = array(
       'version' => 3,
       'sequential' => 1,

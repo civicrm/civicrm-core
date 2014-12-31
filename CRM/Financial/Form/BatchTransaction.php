@@ -47,7 +47,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
    */
   protected $_batchStatusId;
 
-  function preProcess() {
+  public function preProcess() {
     self::$_entityID = CRM_Utils_Request::retrieve( 'bid' , 'Positive' ) ? CRM_Utils_Request::retrieve( 'bid' , 'Positive' ) : $_POST['batch_id'];
     $this->assign('entityID', self::$_entityID);
     if (isset(self::$_entityID)) {
@@ -76,7 +76,6 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_batchStatusId == 2) {
@@ -159,7 +158,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     $this->add('text', 'name', ts('Batch Name'));
   }
 
-  function setDefaultValues() {
+  public function setDefaultValues() {
     // do not setdefault unless it is open batch
     if ($this->_batchStatusId != 1 ) {
       return;
@@ -175,7 +174,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
   /**
    * @return array|null
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         'view'  => array(
@@ -195,5 +194,3 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     return self::$_links;
   }
 }
-
-

@@ -38,7 +38,7 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
-  function setUp() {
+  public function setUp() {
     $this->_apiversion = 3;
     $this->params = array(
       'title' => "campaign title",
@@ -74,4 +74,3 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
 }
-

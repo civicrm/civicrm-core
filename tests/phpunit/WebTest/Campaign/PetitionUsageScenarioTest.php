@@ -35,7 +35,7 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testPetitionUsageScenario() {
+  public function testPetitionUsageScenario() {
     $this->webtestLogin('admin');
 
     // Enable CiviCampaign module if necessary
@@ -271,4 +271,3 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     }
   }
 }
-

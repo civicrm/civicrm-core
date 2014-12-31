@@ -4,7 +4,7 @@
  * Class CRM_Event_Cart_Page_AddToCart
  */
 class CRM_Event_Cart_Page_AddToCart extends CRM_Core_Page {
-  function run() {
+  public function run() {
     $transaction = new CRM_Core_Transaction();
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
@@ -23,6 +23,3 @@ class CRM_Event_Cart_Page_AddToCart extends CRM_Core_Page {
     return CRM_Utils_System::redirect($_SERVER['HTTP_REFERER']);
   }
 }
-
-
-

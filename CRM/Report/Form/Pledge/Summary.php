@@ -48,7 +48,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->_columns = array(
         'civicrm_contact' => array(
           'dao' => 'CRM_Contact_DAO_Contact',
@@ -178,15 +178,15 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     parent::select();
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
             FROM civicrm_pledge {$this->_aliases['civicrm_pledge']}
                  LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
@@ -221,7 +221,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = "";
     $append = FALSE;
 
@@ -276,7 +276,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
     if (!$this->_having) {
@@ -310,7 +310,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
     return $statistics;
   }
 
-  function where() {
+  public function where() {
     $clauses = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -362,14 +362,14 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
     }
   }
 
-  function postProcess() {
+  public function postProcess() {
     parent::postProcess();
   }
 
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
     $checkList = array();
@@ -407,4 +407,3 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
     }
   }
 }
-

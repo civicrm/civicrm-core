@@ -72,9 +72,9 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    * @var int
    * @const
    */
-  CONST LOCATION_BLOCKS = 1;
+  const LOCATION_BLOCKS = 1;
 
-  function preProcess() {
+  public function preProcess() {
     CRM_Utils_System::setTitle(ts('Organization Address and Contact Info'));
     $breadCrumbPath = CRM_Utils_System::url('civicrm/admin', 'reset=1');
     CRM_Utils_System::appendBreadCrumb(ts('Administer CiviCRM'), $breadCrumbPath);
@@ -94,7 +94,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    * Set default values for the form.
    * the default values are retrieved from the database
    *
-   * @access public
    * @return void
    */
   /**
@@ -109,7 +108,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults  = array();
     $params    = array();
 
@@ -153,7 +152,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -190,11 +188,10 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   /**
    * Add local and global form rules
    *
-   * @access protected
    *
    * @return void
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Contact_Form_Domain', 'formRule'));
   }
 
@@ -205,9 +202,8 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     // check for state/country mapping
     $errors = CRM_Contact_Form_Edit_Address::formRule($fields, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullObject);
     // $errors === TRUE means no errors from above formRule excution,
@@ -237,7 +233,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    * Process the form when submitted
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -323,4 +318,3 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
     $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
   }
 }
-

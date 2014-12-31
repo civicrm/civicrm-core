@@ -35,7 +35,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddCase() {
+  public function testAddCase() {
     $this->webtestLogin('admin');
 
     // Enable CiviCase module if necessary
@@ -177,7 +177,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
    *
    * @return array
    */
-  function _testGetCustomFieldId($customGrpId1, $noteRichEditor=FALSE) {
+  public function _testGetCustomFieldId($customGrpId1, $noteRichEditor=FALSE) {
     $customId = array();
     $this->openCiviPage('admin/custom/group/field/add', array('reset' => 1, 'action' => 'add', 'gid' => $customGrpId1));
 
@@ -248,7 +248,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
    * @param $customGrpId1
    * @param int $customId
    */
-  function _testDeleteCustomData($customGrpId1, $customId) {
+  public function _testDeleteCustomData($customGrpId1, $customId) {
     // delete all custom data
     foreach ($customId as $cKey => $cValue) {
       $this->openCiviPage("admin/custom/group/field", array('action' => 'delete', 'reset' => '1', 'gid' => $customGrpId1, 'id' => $cValue));
@@ -263,7 +263,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
   /**
    * CRM-12812
    */
-  function testCaseCustomNoteRichEditor() {
+  public function testCaseCustomNoteRichEditor() {
     $this->webtestLogin('admin');
 
     //setting ckeditor as WYSIWYG
@@ -397,7 +397,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
    * @param string $custMname
    * @param $custLname
    */
-  function _testAdvansearchCaseData($customId, $custFname, $custMname, $custLname) {
+  public function _testAdvansearchCaseData($customId, $custFname, $custMname, $custLname) {
     // search casecontact
     $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');
     $this->click("CiviCase");
@@ -413,4 +413,3 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('crm-container', '1 Contact');
   }
 }
-

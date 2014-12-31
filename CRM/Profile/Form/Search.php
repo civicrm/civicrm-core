@@ -50,10 +50,9 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
    *
    * @return void
    *
-   * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_SEARCH;
     parent::preProcess();
   }
@@ -61,11 +60,10 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
   /**
    * Set the default form values
    *
-   * @access protected
    *
    * @return array the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     // note we intentionally overwrite value since we use it as defaults
     // and its all pass by value
@@ -104,7 +102,6 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // Is proximity search enabled for this profile?
@@ -130,10 +127,8 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
   /**
    *
    *
-   * @access public
    *
    * @return void
    */
   public function postProcess() {}
 }
-

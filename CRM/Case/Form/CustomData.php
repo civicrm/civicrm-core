@@ -61,7 +61,6 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
    * Entity sub type of the table id
    *
    * @var string
-   * @access protected
    */
   protected $_subTypeID;
 
@@ -74,10 +73,9 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
    *
    * @return void
    *
-   * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_groupID   = CRM_Utils_Request::retrieve('groupID', 'Positive', $this, TRUE);
     $this->_entityID  = CRM_Utils_Request::retrieve('entityID', 'Positive', $this, TRUE);
     $this->_subTypeID = CRM_Utils_Request::retrieve('subType', 'Positive', $this, TRUE);
@@ -114,7 +112,6 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // make this form an upload since we dont know if the custom data injected dynamically
@@ -136,7 +133,6 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
   /**
    * Process the user submitted custom data values.
    *
-   * @access public
    *
    * @return void
    */
@@ -182,4 +178,3 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     $transaction->commit();
   }
 }
-

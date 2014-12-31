@@ -42,7 +42,6 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
    * Contact.display_name of contact for whom we are adding user
    *
    * @var int
-   * @public
    */
   public $_displayName;
 
@@ -50,11 +49,10 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
    * Primary email of contact for whom we are adding user
    *
    * @var int
-   * @public
    */
   public $_email;
 
-  function preProcess() {
+  public function preProcess() {
     $params = $defaults = $ids = array();
 
     $this->_contactId   = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
@@ -69,11 +67,10 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $defaults['contactID'] = $this->_contactId;
     $defaults['name'] = $this->_displayName;
@@ -88,7 +85,6 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $element = $this->add('text', 'name', ts('Full Name'), array('class' => 'huge'));
@@ -122,7 +118,6 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
   }
 
   /**
-   * @access public
    *
    * @return void
    */
@@ -139,7 +134,7 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
    *
    * @static
    */
-  static function usernameRule($params) {
+  public static function usernameRule($params) {
     $config = CRM_Core_Config::singleton();
     $errors = array();
     $check_params = array(
@@ -151,4 +146,3 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
     return empty($errors) ? TRUE : $errors;
   }
 }
-

@@ -35,7 +35,7 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testDuplicateContactAdd() {
+  public function testDuplicateContactAdd() {
     $this->webtestLogin();
 
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
@@ -88,4 +88,3 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("css=.notify-content", "Please correct the following errors in the form fields below: One matching contact was found. You can View or Edit the existing contact.");
   }
 }
-

@@ -35,7 +35,7 @@
  */
 class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
   # (not used, implicit in the API, might need to convert?)
-  CONST CHARSET = 'UFT-8';
+  const CHARSET = 'UFT-8';
 
   /**
    * We only need one instance of this object. So we use the singleton
@@ -55,7 +55,7 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
    *
    * @return \CRM_Core_Payment_Moneris
    */
-  function __construct($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
+  public function __construct($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('Moneris');
@@ -88,7 +88,7 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
    * @return object
    * @static
    */
-  static function &singleton($mode, &$paymentProcessor) {
+  public static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
     if (self::$_singleton[$processorName] === NULL) {
       self::$_singleton[$processorName] = new CRM_Core_Payment_Moneris($mode, $paymentProcessor);
@@ -105,7 +105,7 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
    * @return array the result in an nice formatted array (or an error object)
    * @abstract
    */
-  function doDirectPayment(&$params) {
+  public function doDirectPayment(&$params) {
     //make sure i've been called correctly ...
     if (!$this->_profile) {
       return self::error('Unexpected error, missing profile');
@@ -254,7 +254,7 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
    *
    * @return bool
    */
-  function isError(&$response) {
+  public function isError(&$response) {
     $responseCode = $response->getResponseCode();
     if (is_null($responseCode)) {
       return TRUE;
@@ -274,7 +274,7 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
    *
    * @return object
    */
-  function &checkResult(&$response) {
+  public function &checkResult(&$response) {
     return $response;
 
     $errors = $response->getErrors();
@@ -305,7 +305,7 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
    *
    * @return object
    */
-  function &error($error = NULL) {
+  public function &error($error = NULL) {
     $e = CRM_Core_Error::singleton();
     if (is_object($error)) {
       $e->push($error->getResponseCode(),
@@ -329,9 +329,8 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
    * This function checks to see if we have the right config values
    *
    * @return string the error message if any
-   * @public
    */
-  function checkConfig() {
+  public function checkConfig() {
     $error = array();
 
     if (empty($this->_paymentProcessor['signature'])) {
@@ -350,4 +349,3 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
     }
   }
 }
-

@@ -53,7 +53,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
   /**
    * Constants for static parameters of the pager
    */
-  CONST ROWCOUNT = 50, PAGE_ID = 'crmPID', PAGE_ID_TOP = 'crmPID', PAGE_ID_BOTTOM = 'crmPID_B', PAGE_ROWCOUNT = 'crmRowCount';
+  const ROWCOUNT = 50, PAGE_ID = 'crmPID', PAGE_ID_TOP = 'crmPID', PAGE_ID_BOTTOM = 'crmPID_B', PAGE_ROWCOUNT = 'crmRowCount';
 
   /**
    * The output of the pager. This is a name/value array with various keys
@@ -80,7 +80,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
    *
    * @return \CRM_Utils_Pager the newly created and initialized pager object@access public
    */
-  function __construct($params) {
+  public function __construct($params) {
     if ($params['status'] === NULL) {
       $params['status'] = ts('Contacts %%StatusMessage%%');
     }
@@ -135,12 +135,11 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * @param array   $params      the set of options needed to initialize the parent
    *                             constructor
    *
-   * @access public
    *
    * @return void
    *
    */
-  function initialize(&$params) {
+  public function initialize(&$params) {
     /* set the mode for the pager to Sliding */
 
     $params['mode'] = 'Sliding';
@@ -195,9 +194,8 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * @param array $params
    *
    * @return int                new pageId to display to the user
-   * @access public
    */
-  function getPageID($defaultPageId = 1, &$params) {
+  public function getPageID($defaultPageId = 1, &$params) {
     // POST has higher priority than GET vars
     // else if a value is set that has higher priority and finally the GET var
     $currentPage = $defaultPageId;
@@ -227,10 +225,9 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * @param int $defaultPageRowCount the default value if not set
    *
    * @return int                     the rowCount value to use
-   * @access public
    *
    */
-  function getPageRowCount($defaultPageRowCount = self::ROWCOUNT) {
+  public function getPageRowCount($defaultPageRowCount = self::ROWCOUNT) {
     // POST has higher priority than GET vars
     if (isset($_POST[self::PAGE_ROWCOUNT])) {
       $rowCount = max((int )@$_POST[self::PAGE_ROWCOUNT], 1);
@@ -251,10 +248,9 @@ class CRM_Utils_Pager extends Pager_Sliding {
    *
    * @return array: an array of the pageID and offset
    *
-   * @access public
    *
    */
-  function getOffsetAndRowCount() {
+  public function getOffsetAndRowCount() {
     $pageId = $this->getCurrentPageID();
     if (!$pageId) {
       $pageId = 1;
@@ -268,7 +264,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
   /**
    * @return string
    */
-  function getCurrentLocation() {
+  public function getCurrentLocation() {
     $config = CRM_Core_Config::singleton();
     $path = CRM_Utils_Array::value($config->userFrameworkURLVar, $_GET);
     return CRM_Utils_System::url($path, CRM_Utils_System::getLinksUrl(self::PAGE_ID, FALSE, TRUE), FALSE, NULL, FALSE) . $this->getCurrentPageID();
@@ -277,7 +273,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
   /**
    * @return string
    */
-  function getFirstPageLink() {
+  public function getFirstPageLink() {
     if ($this->isFirstPage()) {
       return '';
     }
@@ -289,7 +285,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
   /**
    * @return string
    */
-  function getLastPageLink() {
+  public function getLastPageLink() {
     if ($this->isLastPage()) {
       return '';
     }
@@ -300,7 +296,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
   /**
    * @return string
    */
-  function getBackPageLink() {
+  public function getBackPageLink() {
     if ($this->_currentPage > 1) {
       $href = $this->makeURL(self::PAGE_ID, $this->getPreviousPageID());
       return $this->formatLink($href, $this->_altPrev, $this->_prevImg) . $this->_spacesBefore . $this->_spacesAfter;
@@ -311,7 +307,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
   /**
    * @return string
    */
-  function getNextPageLink() {
+  public function getNextPageLink() {
     if ($this->_currentPage < $this->_totalPages) {
       $href = $this->makeURL(self::PAGE_ID, $this->getNextPageID());
       return $this->_spacesAfter .
@@ -324,7 +320,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
   /**
    * Build a url for pager links
    */
-  function makeURL($key, $value) {
+  public function makeURL($key, $value) {
     $href = CRM_Utils_System::makeURL($key, TRUE);
     // CRM-12212 Remove alpha sort param
     if (strpos($href, '&amp;sortByCharacter=')) {
@@ -344,4 +340,3 @@ class CRM_Utils_Pager extends Pager_Sliding {
     return sprintf('<a class="crm-pager-link action-item crm-hover-button" href="%s" title="%s">%s</a>', $href, $title, $image);
   }
 }
-

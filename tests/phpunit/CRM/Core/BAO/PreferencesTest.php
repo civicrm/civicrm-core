@@ -33,11 +33,11 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Core_BAO_PreferencesTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function testValueOptions() {
+  public function testValueOptions() {
 
     $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'address_options'
@@ -48,7 +48,7 @@ class CRM_Core_BAO_PreferencesTest extends CiviUnitTestCase {
     $this->assertEquals($addressOptions['country'], 1, 'Country is not set in address options');
   }
 
-  function testSetValueOptions() {
+  public function testSetValueOptions() {
     $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'address_options'
     );
@@ -64,4 +64,3 @@ class CRM_Core_BAO_PreferencesTest extends CiviUnitTestCase {
     $this->assertEquals($addressOptions['county'], 1, 'County was set but did not stick in db');
   }
 }
-

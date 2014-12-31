@@ -137,7 +137,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * Set default values for the form.
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -247,7 +246,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_cdType) {
@@ -457,10 +455,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
    * @param array $params (ref.) an assoc array of name/value pairs
    *
    * @return mixed true or array of errors
-   * @access public
    * @static
    */
-  static function formRule($params) {
+  public static function formRule($params) {
     $errors = array();
     if ($params['membership_type_id'][0] == 0) {
       $errors['membership_type_id'] = ts('Oops. It looks like you are trying to change the membership type while renewing the membership. Please click the "change membership type" link, and select a Membership Organization.');
@@ -488,7 +485,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   /**
    * Process the renewal form
    *
-   * @access public
    *
    * @return void
    */
@@ -833,4 +829,3 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
   }
 }
-

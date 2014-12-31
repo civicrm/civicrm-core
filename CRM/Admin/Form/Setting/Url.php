@@ -46,7 +46,6 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Resource URLs'));
@@ -73,7 +72,7 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
    *
    * @return array|bool
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     if (isset($fields['enableSSL']) &&
       $fields['enableSSL']
     ) {
@@ -106,4 +105,3 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
     parent::rebuildMenu();
   }
 }
-

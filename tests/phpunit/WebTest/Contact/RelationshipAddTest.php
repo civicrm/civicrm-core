@@ -35,7 +35,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testRelationshipAddTest() {
+  public function testRelationshipAddTest() {
     $this->webtestLogin();
 
     //create a relationship type between different contact types
@@ -280,7 +280,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent($params['label_b_a']));
   }
 
-  function testRelationshipAddNewIndividualTest() {
+  public function testRelationshipAddNewIndividualTest() {
     $this->webtestLogin();
 
     //create a relationship type between different contact types
@@ -352,7 +352,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent($params['label_a_b']));
   }
 
-  function testAjaxCustomGroupLoad() {
+  public function testAjaxCustomGroupLoad() {
     $this->webtestLogin();
 
     //create a New Individual
@@ -370,7 +370,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
   }
 
-  function testRelationshipAddCurrentEmployerTest() {
+  public function testRelationshipAddCurrentEmployerTest() {
     $this->webtestLogin();
 
     //create a New Individual

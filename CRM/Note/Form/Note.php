@@ -71,7 +71,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
    */
   protected $_parentId;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_entityTable = $this->get('entityTable');
     $this->_entityId    = $this->get('entityId');
     $this->_id          = $this->get('id');
@@ -90,11 +90,10 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
@@ -117,7 +116,6 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -160,7 +158,6 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
   }
 
   /**
-   * @access public
    *
    * @return void
    */

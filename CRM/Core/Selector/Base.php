@@ -68,10 +68,9 @@ class CRM_Core_Selector_Base {
    *
    * @return string            the attribute that matches the action if any
    *
-   * @access public
    *
    */
-  function getActionAttribute($match, $attribute = 'name') {
+  public function getActionAttribute($match, $attribute = 'name') {
     $links = &$this->links();
 
     foreach ($link as $action => $item) {
@@ -94,7 +93,7 @@ class CRM_Core_Selector_Base {
    * qs      : the parameters to the above url along with any dynamic substitutions
    * title   : A more descriptive name, typically used in breadcrumbs / navigation
    */
-  static function &links() {
+  public static function &links() {
     return NULL;
   }
 
@@ -104,9 +103,8 @@ class CRM_Core_Selector_Base {
    * @param string $action the action being performed
    *
    * @return string template file name
-   * @access public
    */
-  function getTemplateFileName($action = NULL) {
+  public function getTemplateFileName($action = NULL) {
     return (str_replace('_', DIRECTORY_SEPARATOR, CRM_Utils_System::getClassName($this)) . ".tpl");
   }
 
@@ -116,9 +114,8 @@ class CRM_Core_Selector_Base {
    * @param string action the action being performed
    *
    * @return array the elements that can be sorted along with their properties
-   * @access public
    */
-  function &getSortOrder($action) {
+  public function &getSortOrder($action) {
     $columnHeaders = &$this->getColumnHeaders(NULL);
 
     if (!isset($this->_order)) {
@@ -151,7 +148,6 @@ class CRM_Core_Selector_Base {
    * Setter for permission
    *
    * @var string
-   * @access public
    */
   public function setPermission($permission) {
     $this->_permission = $permission;
@@ -162,7 +158,6 @@ class CRM_Core_Selector_Base {
    * to display on the results page
    *
    * @return string
-   * @access public
    */
   public function getQill() {
     return NULL;
@@ -189,4 +184,3 @@ class CRM_Core_Selector_Base {
     return $this->_key;
   }
 }
-

@@ -44,10 +44,9 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return object       CRM_Core_BAO_OpenID object on success, null otherwise
-   * @access public
    * @static
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'OpenID', CRM_Utils_Array::value('id', $params), $params);
 
@@ -66,10 +65,9 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
    * @param array $entityBlock   input parameters to find object
    *
    * @return mixed
-   * @access public
    * @static
    */
-  static function &getValues($entityBlock) {
+  public static function &getValues($entityBlock) {
     return CRM_Core_BAO_Block::getValues('openid', $entityBlock);
   }
 
@@ -79,10 +77,9 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
    * @param  string  $identity_url the OpenID to check
    *
    * @return boolean
-   * @access public
    * @static
    */
-  static function isAllowedToLogin($identity_url) {
+  public static function isAllowedToLogin($identity_url) {
     $openId = new CRM_Core_DAO_OpenID();
     $openId->openid = $identity_url;
     if ($openId->find(TRUE)) {
@@ -99,10 +96,9 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
    * @param bool $updateBlankLocInfo
    *
    * @return array  the array of openid's
-   * @access public
    * @static
    */
-  static function allOpenIDs($id, $updateBlankLocInfo = FALSE) {
+  public static function allOpenIDs($id, $updateBlankLocInfo = FALSE) {
     if (!$id) {
       return NULL;
     }
@@ -146,8 +142,7 @@ ORDER BY
   /**
    * Call common delete function
    */
-  static function del($id) {
+  public static function del($id) {
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('OpenID', $id);
   }
 }
-

@@ -42,11 +42,10 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     if (isset($this->_id)) {
       $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
@@ -64,7 +63,6 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Premium');
@@ -116,7 +114,6 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
    * @param array $params (ref.) an assoc array of name/value pairs
    *
    * @return mixed true or array of errors
-   * @access public
    * @static
    */
   public static function formRule($params) {
@@ -133,7 +130,6 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
    * Process the form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // get the submitted form values.
@@ -165,10 +161,8 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Premiums');
   }
 }
-

@@ -12,7 +12,7 @@ class Contact extends CiviUnitTestCase {
    *
    * @return int $contactID id of created contact
    */
-  static function create($params) {
+  public static function create($params) {
     require_once "CRM/Contact/BAO/Contact.php";
     $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray);
     return $contactID;
@@ -25,7 +25,7 @@ class Contact extends CiviUnitTestCase {
    * @param array $params
    * @return int $contactID id of created Individual
    */
-  static function createIndividual($params = NULL) {
+  public static function createIndividual($params = NULL) {
     //compose the params, when not passed
     if (!$params) {
       $first_name = 'John';
@@ -47,7 +47,7 @@ class Contact extends CiviUnitTestCase {
    * @param array $params
    * @return mixed $contactID id of created Household
    */
-  static function createHousehold($params = NULL) {
+  public static function createHousehold($params = NULL) {
     //compose the params, when not passed
     if (!$params) {
       $household_name = "John Doe's home";
@@ -68,7 +68,7 @@ class Contact extends CiviUnitTestCase {
    * @param array $params
    * @return mixed $contactID id of created Organisation
    */
-  static function createOrganisation($params = NULL) {
+  public static function createOrganisation($params = NULL) {
     //compose the params, when not passed
     if (!$params) {
       $organization_name = "My Organization";
@@ -88,7 +88,7 @@ class Contact extends CiviUnitTestCase {
    * @param  int  $contactID   id of the contact to delete
    * @return boolean true if contact deleted, false otherwise
    */
-  static function delete($contactID) {
+  public static function delete($contactID) {
     require_once 'CRM/Contact/BAO/Contact.php';
     return CRM_Contact_BAO_Contact::deleteContact($contactID);
   }

@@ -35,7 +35,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     parent::setUp();
   }
 
-  function testAddPriceSet() {
+  public function testAddPriceSet() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -80,7 +80,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->_testSignUpOrRenewMembership($sid, $contactParams, $memTypeTitle1, $memTypeTitle2, $renew = TRUE);
   }
 
-   function testAddPriceSetWithMultipleTerms() {
+   public function testAddPriceSetWithMultipleTerms() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -172,7 +172,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
    * @param null $contributionType
    * @param $setHelp
    */
-  function _testAddSet($setTitle, $usedFor, $contributionType = NULL, $setHelp) {
+  public function _testAddSet($setTitle, $usedFor, $contributionType = NULL, $setHelp) {
     $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
 
     // Enter Priceset fields (Title, Used For ...)
@@ -206,7 +206,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
    *
    * @return array
    */
-  function _testAddPriceFields(&$fields, &$validateString, $dateSpecificFields = FALSE, $title, $sid, $contributionType) {
+  public function _testAddPriceFields(&$fields, &$validateString, $dateSpecificFields = FALSE, $title, $sid, $contributionType) {
     $memTypeParams1 = $this->webtestAddMembershipType();
     $memTypeTitle1  = $memTypeParams1['membership_type'];
 
@@ -272,7 +272,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
    * @param $validateStrings
    * @param int $sid
    */
-  function _testVerifyPriceSet($validateStrings, $sid) {
+  public function _testVerifyPriceSet($validateStrings, $sid) {
     // verify Price Set at Preview page
     // start at Manage Price Sets listing
     $this->openCiviPage('admin/price', 'reset=1');
@@ -294,7 +294,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
    * @param $memTypeTitle2
    * @param bool $renew
    */
-  function _testSignUpOrRenewMembership($sid, $contactParams, $memTypeTitle1, $memTypeTitle2, $renew = FALSE) {
+  public function _testSignUpOrRenewMembership($sid, $contactParams, $memTypeTitle1, $memTypeTitle2, $renew = FALSE) {
     //build the membership dates.
     require_once 'CRM/Core/Config.php';
     require_once 'CRM/Utils/Array.php';
@@ -381,7 +381,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
    * @param $memTypeTitle1
    * @param $term
    */
-  function _testMultilpeTermsMembershipRegistration($sid, $contactParams, $memTypeTitle1, $term){
+  public function _testMultilpeTermsMembershipRegistration($sid, $contactParams, $memTypeTitle1, $term){
     //build the membership dates.
     require_once 'CRM/Core/Config.php';
     require_once 'CRM/Utils/Array.php';

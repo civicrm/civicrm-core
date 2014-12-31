@@ -48,7 +48,6 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Search Preferences'));
@@ -96,4 +95,3 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
     parent::buildQuickForm();
   }
 }
-

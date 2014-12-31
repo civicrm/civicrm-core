@@ -36,7 +36,7 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
   /**
    * @param $formValues
    */
-  function __construct(&$formValues) {
+  public function __construct(&$formValues) {
     parent::__construct($formValues);
 
     $this->_columns = array(
@@ -51,7 +51,7 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
   /**
    * @param CRM_Core_Form $form
    */
-  function buildForm(&$form) {
+  public function buildForm(&$form) {
     $groups = array('' => ts('- select group -')) + CRM_Core_PseudoConstant::nestedGroup(FALSE);
     $form->addElement('select', 'group_id', ts('Group'), $groups, array('class' => 'crm-select2 huge'));
 
@@ -62,7 +62,7 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
     $form->assign('elements', array('group_id'));
   }
 
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
+  public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 
@@ -101,7 +101,7 @@ state_province.name     as state_province
   /**
    * @return string
    */
-  function from() {
+  public function from() {
     return "
 FROM      civicrm_group_contact as cgc,
           civicrm_contact       as contact_a
@@ -116,7 +116,7 @@ LEFT JOIN civicrm_state_province state_province ON  state_province.id = address.
    *
    * @return string
    */
-  function where($includeContactIDs = FALSE) {
+  public function where($includeContactIDs = FALSE) {
     $params = array();
 
     $count   = 1;
@@ -145,8 +145,7 @@ LEFT JOIN civicrm_state_province state_province ON  state_province.id = address.
   /**
    * @return string
    */
-  function templateFile() {
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 }
-

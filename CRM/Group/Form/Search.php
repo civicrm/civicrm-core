@@ -41,7 +41,7 @@ class CRM_Group_Form_Search extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $defaults['group_status[1]'] = 1;
     return $defaults;
@@ -91,7 +91,7 @@ class CRM_Group_Form_Search extends CRM_Core_Form {
     $this->assign('suppressForm', TRUE);
   }
 
-  function postProcess() {
+  public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
     $parent = $this->controller->getParent();
     if (!empty($params)) {
@@ -109,4 +109,3 @@ class CRM_Group_Form_Search extends CRM_Core_Form {
     }
   }
 }
-

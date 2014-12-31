@@ -210,7 +210,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -365,7 +364,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_cdType) {
@@ -748,10 +746,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
    *
    * @throws CiviCRM_API3_Exception
    * @return mixed true or array of errors
-   * @access public
    * @static
    */
-  static function formRule($params, $files, $self) {
+  public static function formRule($params, $files, $self) {
     $errors = array();
 
     $priceSetId = CRM_Utils_Array::value('price_set_id', $params);
@@ -982,7 +979,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -1709,7 +1705,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
    * @return boolean true if mail was sent successfully
    * @static
    */
-  static function emailReceipt(&$form, &$formValues, &$membership) {
+  public static function emailReceipt(&$form, &$formValues, &$membership) {
     // retrieve 'from email id' for acknowledgement
     $receiptFrom = $formValues['from_email_address'];
 
@@ -1867,4 +1863,3 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     return TRUE;
   }
 }
-

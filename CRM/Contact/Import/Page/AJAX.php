@@ -41,7 +41,7 @@ class CRM_Contact_Import_Page_AJAX {
   /**
    * Show import status
    */
-  static function status() {
+  public static function status() {
     // make sure we get an id
     if (!isset($_GET['id'])) {
       return;
@@ -60,4 +60,3 @@ class CRM_Contact_Import_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 }
-

@@ -43,7 +43,6 @@ class CRM_Admin_Form_Setting_Mapping extends CRM_Admin_Form_Setting {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Mapping and Geocoding Providers'));
@@ -64,10 +63,9 @@ class CRM_Admin_Form_Setting_Mapping extends CRM_Admin_Form_Setting {
    * @param array $fields  the input form values
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
 
     if (!CRM_Utils_System::checkPHPVersion(5, FALSE)) {
@@ -92,10 +90,8 @@ class CRM_Admin_Form_Setting_Mapping extends CRM_Admin_Form_Setting {
    * @param null
    *
    * @return void
-   * @access public
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Admin_Form_Setting_Mapping', 'formRule'));
   }
 }
-

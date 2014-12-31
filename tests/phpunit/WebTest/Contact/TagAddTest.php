@@ -35,7 +35,7 @@ class WebTest_Contact_TagAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddTag() {
+  public function testAddTag() {
     $this->webtestLogin();
 
     $this->openCiviPage("admin/tag", "action=add&reset=1", "_qf_Tag_next");
@@ -73,7 +73,7 @@ class WebTest_Contact_TagAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//table//tbody/tr/td[1][text()= '$tagName']/following-sibling::td[7]/span/a[text()= 'Edit']");
   }
 
-  function testAddTagSet() {
+  public function testAddTagSet() {
     $this->webtestLogin();
 
     $this->openCiviPage("admin/tag", "action=add&reset=1&tagset=1");
@@ -111,4 +111,3 @@ class WebTest_Contact_TagAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']/following-sibling::td[7]/span/a[text()= 'Edit']");
   }
 }
-

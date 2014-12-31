@@ -54,7 +54,7 @@ class CRM_Financial_BAO_ExportFormat {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     if ( !isset( self::$_template ) ) {
       self::$_template = CRM_Core_Smarty::singleton();
     }
@@ -66,7 +66,7 @@ class CRM_Financial_BAO_ExportFormat {
    *
    * @return mixed
    */
-  function export($exportParams) {
+  public function export($exportParams) {
     $this->_exportParams = $exportParams;
     return $exportParams;
   }
@@ -74,7 +74,7 @@ class CRM_Financial_BAO_ExportFormat {
   /**
    * @param null $fileName
    */
-  function output($fileName = NULL) {
+  public function output($fileName = NULL) {
     switch ($this->getFileExtension()) {
       case 'csv':
         self::createActivityExport($this->_batchIds, $fileName);
@@ -92,14 +92,14 @@ class CRM_Financial_BAO_ExportFormat {
   /**
    * @return string
    */
-  function getMimeType() {
+  public function getMimeType() {
     return 'text/plain';
   }
 
   /**
    * @return string
    */
-  function getFileExtension() {
+  public function getFileExtension() {
     return 'txt';
   }
 
@@ -107,14 +107,14 @@ class CRM_Financial_BAO_ExportFormat {
   /**
    * @return null
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     return null;
   }
 
   /**
    * @return object
    */
-  static function &getTemplate() {
+  public static function &getTemplate() {
     return self::$_template;
   }
 
@@ -122,7 +122,7 @@ class CRM_Financial_BAO_ExportFormat {
    * @param $var
    * @param null $value
    */
-  function assign($var, $value = NULL) {
+  public function assign($var, $value = NULL) {
     self::$_template->assign($var, $value);
   }
 
@@ -138,7 +138,7 @@ class CRM_Financial_BAO_ExportFormat {
    *
    * @return null
    */
-  static function format($s, $type = 'string') {
+  public static function format($s, $type = 'string') {
     if (!empty($s)) {
       return $s;
     }
@@ -147,7 +147,7 @@ class CRM_Financial_BAO_ExportFormat {
     }
   }
 
-  function initiateDownload() {
+  public function initiateDownload() {
     $config = CRM_Core_Config::singleton();
     //zip files if more than one.
     if (count($this->_downloadFile)>1) {
@@ -181,7 +181,7 @@ class CRM_Financial_BAO_ExportFormat {
    *
    * @throws CRM_Core_Exception
    */
-  static function createActivityExport($batchIds, $fileName) {
+  public static function createActivityExport($batchIds, $fileName) {
     $session = CRM_Core_Session::singleton();
     $values = array();
     $params = array('id' => $batchIds);
@@ -233,7 +233,7 @@ class CRM_Financial_BAO_ExportFormat {
    *
    * @return bool
    */
-  function createZip($files = array(), $destination = NULL, $overwrite = FALSE) {
+  public function createZip($files = array(), $destination = NULL, $overwrite = FALSE) {
     //if the zip file already exists and overwrite is false, return false
     if (file_exists($destination) && !$overwrite) {
       return FALSE;

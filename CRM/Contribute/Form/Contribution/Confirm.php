@@ -42,7 +42,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * The id of the contact associated with this contribution
    *
    * @var int
-   * @public
    */
   public $_contactID;
 
@@ -51,7 +50,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * The id of the contribution object that is created when the form is submitted
    *
    * @var int
-   * @public
    */
   public $_contributionID;
 
@@ -162,7 +160,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $config = CRM_Core_Config::singleton();
@@ -441,7 +438,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->assignToTemplate();
@@ -638,9 +634,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * no help display needed
    *
    * @return int
-   * @access public
    */
-  function getAction() {
+  public function getAction() {
     if ($this->_action & CRM_Core_Action::PREVIEW) {
       return CRM_Core_Action::VIEW | CRM_Core_Action::PREVIEW;
     }
@@ -653,17 +648,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {}
+  public function setDefaultValues() {}
 
   /**
    * Process the form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $contactID = $this->getContactID();
@@ -1048,7 +1041,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @return null|string
    */
-  function wrangleFinancialTypeID($contributionTypeId) {
+  public function wrangleFinancialTypeID($contributionTypeId) {
     if (isset($paymentParams['financial_type'])) {
       $contributionTypeId = $paymentParams['financial_type'];
     }
@@ -1068,7 +1061,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param $contribution
    *
    * @return void
-   * @access public
    */
   public function postProcessPremium($premiumParams, $contribution) {
     $hour = $minute = $second = 0;
@@ -1202,7 +1194,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @throws Exception
    * @return CRM_Contribute_DAO_Contribution
-   * @access public
    */
   static function processContribution(
     &$form,
@@ -1522,7 +1513,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @return mixed
    */
-  static function processRecurringContribution(&$form, &$params, $contactID, $contributionType, $online = TRUE) {
+  public static function processRecurringContribution(&$form, &$params, $contactID, $contributionType, $online = TRUE) {
     // return if this page is not set for recurring
     // or the user has not chosen the recurring option
 
@@ -1611,9 +1602,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param null $fields
    *
    * @return void
-   * @access public
    */
-  static function processOnBehalfOrganization(&$behalfOrganization, &$contactID, &$values, &$params, $fields = NULL) {
+  public static function processOnBehalfOrganization(&$behalfOrganization, &$contactID, &$values, &$params, $fields = NULL) {
     $isCurrentEmployer = FALSE;
     $dupeIDs = array();
     $orgID = NULL;
@@ -1717,9 +1707,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param object $contribution   contribution object
    *
    * @static
-   * @access public
    */
-  static function processPcpSoft(&$params, &$contribution) {
+  public static function processPcpSoft(&$params, &$contribution) {
     //add soft contribution due to pcp or Submit Credit / Debit Card Contribution by admin.
     if (!empty($params['soft_credit_to'])) {
       $contributionSoftParams = array();
@@ -1751,9 +1740,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @return array
    * @static
-   * @access public
    */
-  static function processPcp(&$page, $params) {
+  public static function processPcp(&$page, $params) {
     $params['pcp_made_through_id'] = $page->_pcpId;
     $page->assign('pcpBlock', TRUE);
     if (!empty($params['pcp_display_in_roll']) && empty($params['pcp_roll_nickname'])) {
@@ -1909,7 +1897,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @throws CiviCRM_API3_Exception
    */
-  static function submit($params) {
+  public static function submit($params) {
     $form = new CRM_Contribute_Form_Contribution_Confirm();
     $form->_id = $params['id'];
     if (!empty($params['contact_id'])) {
@@ -1955,7 +1943,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return array
    * @throws CiviCRM_API3_Exception
    */
-  static function getFormParams($id, array $params) {
+  public static function getFormParams($id, array $params) {
     if(!isset($params['is_pay_later'])) {
       if (!empty($params['payment_processor'])) {
         $params['is_pay_later'] = 0;

@@ -33,7 +33,7 @@
  *
  */
 class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
-  function preProcess() {
+  public function preProcess() {
     $job_id = CRM_Utils_Request::retrieve('jid', 'Positive',
       $this, NULL
     );
@@ -74,7 +74,6 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     for ($i = 0; $i < 5; $i++) {
@@ -105,7 +104,6 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
   /**
    * Form submission of new/edit contact is processed.
    *
-   * @access public
    *
    * @return void
    */
@@ -160,4 +158,3 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
     $session->pushUserContext($config->userFrameworkBaseURL);
   }
 }
-

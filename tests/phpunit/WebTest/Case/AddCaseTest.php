@@ -35,7 +35,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testStandaloneCaseAdd() {
+  public function testStandaloneCaseAdd() {
     // Log in as admin first to verify permissions for CiviCase
     $this->webtestLogin('admin');
 
@@ -138,7 +138,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->_testAssignToClient($client['first_name'], $client['last_name'], $caseTypeLabel);
   }
 
-  function testAjaxCustomGroupLoad() {
+  public function testAjaxCustomGroupLoad() {
     // Log in as admin first to verify permissions for CiviCase
     $this->webtestLogin('admin');
 
@@ -165,7 +165,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
    * @param $validateStrings
    * @param $activityTypes
    */
-  function _testVerifyCaseSummary($validateStrings, $activityTypes) {
+  public function _testVerifyCaseSummary($validateStrings, $activityTypes) {
     $this->assertStringsPresent($validateStrings);
     foreach ($activityTypes as $aType) {
       $this->assertElementPresent("xpath=//div[@class='case-control-panel']/div/p/select", $aType);
@@ -178,7 +178,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
    * @param $caseRoles
    * @param string $creatorName
    */
-  function _testVerifyCaseRoles($caseRoles, $creatorName) {
+  public function _testVerifyCaseRoles($caseRoles, $creatorName) {
     $id = $this->urlArg('id');
     $this->waitForElementPresent("xpath=//table[@id='caseRoles-selector-$id']/tbody/tr[4]/td[2]/a");
     // check that expected roles are listed in the Case Roles pane
@@ -192,7 +192,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
   /**
    * @param $activityTypes
    */
-  function _testVerifyCaseActivities($activityTypes) {
+  public function _testVerifyCaseActivities($activityTypes) {
     $id = $this->urlArg('id');
     // check that expected auto-created activities are listed in the Case Activities table
     foreach ($activityTypes as $aType) {
@@ -204,7 +204,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
    * @param $subject
    * @param $openCaseData
    */
-  function _testVerifyOpenCaseActivity($subject, $openCaseData) {
+  public function _testVerifyOpenCaseActivity($subject, $openCaseData) {
     $id = $this->urlArg('id');
     // check that open case subject is present
     $this->assertText("case_id_$id", $subject);
@@ -226,7 +226,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
    * @param string $lastName
    * @param $action
    */
-  function _testSearchbyDate($firstName, $lastName, $action) {
+  public function _testSearchbyDate($firstName, $lastName, $action) {
     // Find Cases
     if ($action != "0") {
       $this->openCiviPage('case/search', 'reset=1');
@@ -277,7 +277,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
    *
    * test for assign case to another client
    */
-   function _testAssignToClient($firstName, $lastName, $caseTypeLabel) {
+   public function _testAssignToClient($firstName, $lastName, $caseTypeLabel) {
     $this->openCiviPage('case/search', 'reset=1', '_qf_Search_refresh-bottom');
     $this->type('sort_name', $firstName);
     $this->clickLink('_qf_Search_refresh-bottom');
@@ -289,4 +289,3 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('page-title', "{$client['display_name']} - $caseTypeLabel");
   }
 }
-

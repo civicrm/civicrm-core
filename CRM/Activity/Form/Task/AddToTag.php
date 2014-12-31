@@ -57,11 +57,10 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     // add select for tag
     $this->_tags = CRM_Core_BAO_Tag::getTags('civicrm_activity');
 
@@ -76,7 +75,7 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
     $this->addDefaultButtons(ts('Tag Activities'));
   }
 
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Activity_Form_Task_AddToTag', 'formRule'));
   }
 
@@ -86,7 +85,7 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
    *
    * @return array
    */
-  static function formRule($form, $rule) {
+  public static function formRule($form, $rule) {
     $errors = array();
     if (empty($form['tag']) && empty($form['activity_taglist'])) {
       $errors['_qf_default'] = ts("Please select at least one tag.");
@@ -97,7 +96,6 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -157,4 +155,3 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
 
   }
 }
-

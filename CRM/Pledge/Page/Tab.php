@@ -40,9 +40,8 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
    * This function is called when action is browse
    *
    * return null
-   * @access public
    */
-  function browse() {
+  public function browse() {
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_Search', ts('Pledges'), $this->_action);
     $controller->setEmbedded(TRUE);
     $controller->reset();
@@ -68,9 +67,8 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
    * This function is called when action is view
    *
    * return null
-   * @access public
    */
-  function view() {
+  public function view() {
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_PledgeView',
       'View Pledge',
       $this->_action
@@ -86,9 +84,8 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
    * This function is called when action is update or new
    *
    * return null
-   * @access public
    */
-  function edit() {
+  public function edit() {
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_Pledge',
       'Create Pledge',
       $this->_action
@@ -100,7 +97,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
     return $controller->run();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $context       = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id     = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -129,9 +126,8 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
    * This function is the main function that is called when the page loads, it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     // check if we can process credit card registration
@@ -220,4 +216,3 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
     $session->pushUserContext($url);
   }
 }
-

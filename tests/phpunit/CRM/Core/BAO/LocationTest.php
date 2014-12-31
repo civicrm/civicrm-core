@@ -41,7 +41,7 @@ require_once 'CiviTest/Event.php';
  * Class CRM_Core_BAO_LocationTest
  */
 class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     $this->quickCleanup( array( 'civicrm_contact', 'civicrm_address', 'civicrm_loc_block', 'civicrm_email', 'civicrm_phone', 'civicrm_im' ) );
@@ -51,9 +51,8 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
    *
-   * @access protected
    */
-  function tearDown() {
+  public function tearDown() {
     $tablesToTruncate = array(
       'civicrm_contact',
       'civicrm_openid',
@@ -62,7 +61,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     $this->quickCleanup($tablesToTruncate);
   }
 
-  function testCreateWithMissingParams() {
+  public function testCreateWithMissingParams() {
     $contactId = Contact::createIndividual();
     $params = array(
       'contact_id' => $contactId,
@@ -85,7 +84,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
    * create various elements of location block
    * without civicrm_loc_block entry
    */
-  function testCreateWithoutLocBlock() {
+  public function testCreateWithoutLocBlock() {
     $contactId = Contact::createIndividual();
 
     //create various element of location block
@@ -209,7 +208,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
    * create various elements of location block
    * with civicrm_loc_block
    */
-  function testCreateWithLocBlock() {
+  public function testCreateWithLocBlock() {
     $this->_contactId = Contact::createIndividual();
     //create test event record.
     $eventId = Event::create($this->_contactId);
@@ -357,7 +356,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
    * created with various elements.
    *
    */
-  function testDeleteLocBlock() {
+  public function testDeleteLocBlock() {
     $this->_contactId = Contact::createIndividual();
     //create test event record.
     $eventId = Event::create($this->_contactId);
@@ -449,7 +448,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
    * GetValues() method
    * get the values of various location elements
    */
-  function testLocBlockgetValues() {
+  public function testLocBlockgetValues() {
     $contactId = Contact::createIndividual();
 
     //create various element of location block
@@ -549,4 +548,3 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     Contact::delete($contactId);
   }
 }
-

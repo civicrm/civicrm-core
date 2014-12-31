@@ -64,4 +64,3 @@ function smarty_block_localize($params, $text, &$smarty) {
 
   return implode(', ', $lines);
 }
-

@@ -38,9 +38,8 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
    * This function is called when action is browse
    *
    * return null
-   * @access public
    */
-  function listContribution() {
+  public function listContribution() {
     $controller = new CRM_Core_Controller_Simple(
       'CRM_Contribute_Form_Search',
       ts('Contributions'),
@@ -149,9 +148,8 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
    * loads, it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
-  function run() {
+  public function run() {
     $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $this->assign('invoicing', $invoicing);
@@ -159,4 +157,3 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
     $this->listContribution();
   }
 }
-

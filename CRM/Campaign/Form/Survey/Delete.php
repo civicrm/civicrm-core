@@ -57,7 +57,6 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
@@ -76,7 +75,6 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addButtons(array(
@@ -97,7 +95,6 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
    * Process the form when submitted
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     if ($this->_surveyId) {
@@ -109,4 +106,3 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
     }
   }
 }
-

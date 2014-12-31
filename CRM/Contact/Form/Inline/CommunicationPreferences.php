@@ -42,7 +42,6 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
    * Build the form object elements for communication preferences
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -54,7 +53,6 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
    * Set defaults for the form
    *
    * @return array
-   * @access public
    */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
@@ -85,7 +83,6 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
    * Process the form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->exportValues();

@@ -72,9 +72,8 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     /*
      * initialize the task and row fields
      */
@@ -84,11 +83,10 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $ufGroupId = $this->get('ufGroupId');
 
     if (!$ufGroupId) {
@@ -168,11 +166,10 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if (empty($this->_fields)) {
       return;
     }
@@ -201,10 +198,9 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
    * @param array $fields  the input form values
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
     $externalIdentifiers = array();
     foreach ($fields['field'] as $componentId => $field) {
@@ -226,7 +222,6 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -326,4 +321,3 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
     }
   }
 }
-

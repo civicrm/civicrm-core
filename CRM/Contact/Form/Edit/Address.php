@@ -48,10 +48,9 @@ class CRM_Contact_Form_Edit_Address {
    *
    * @return void
    *
-   * @access public
    * @static
    */
-  static function buildQuickForm(&$form, $addressBlockCount = NULL, $sharing = TRUE, $inlineEdit = FALSE) {
+  public static function buildQuickForm(&$form, $addressBlockCount = NULL, $sharing = TRUE, $inlineEdit = FALSE) {
     // passing this via the session is AWFUL. we need to fix this
     if (!$addressBlockCount) {
       $blockId = ($form->get('Address_Block_Count')) ? $form->get('Address_Block_Count') : 1;
@@ -261,10 +260,9 @@ class CRM_Contact_Form_Edit_Address {
    *
    * @return array|bool if no errors
    *
-   * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
 
     $customDataRequiredFields = array();
@@ -318,9 +316,8 @@ class CRM_Contact_Form_Edit_Address {
    * @param CRM_Core_Form $form     form object
    *
    * @static
-   * @access public
    */
-  static function setDefaultValues( &$defaults, &$form ) {
+  public static function setDefaultValues( &$defaults, &$form ) {
     $addressValues = array();
     if (isset($defaults['address']) && is_array($defaults['address']) &&
       !CRM_Utils_System::isNull($defaults['address'])
@@ -418,7 +415,7 @@ class CRM_Contact_Form_Edit_Address {
    * @param CRM_Core_Form $form
    * @param $groupTree
    */
-  static function storeRequiredCustomDataInfo(&$form, $groupTree) {
+  public static function storeRequiredCustomDataInfo(&$form, $groupTree) {
     if (CRM_Utils_System::getClassName($form) == 'CRM_Contact_Form_Contact') {
       $requireOmission = NULL;
       foreach ($groupTree as $csId => $csVal) {

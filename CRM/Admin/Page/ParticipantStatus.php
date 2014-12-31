@@ -39,14 +39,14 @@ class CRM_Admin_Page_ParticipantStatus extends CRM_Core_Page_Basic {
   /**
    * @return string
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Event_BAO_ParticipantStatusType';
   }
 
   /**
    * @return array
    */
-  function &links() {
+  public function &links() {
     static $links = NULL;
     if ($links === NULL) {
       $links = array(
@@ -77,7 +77,7 @@ class CRM_Admin_Page_ParticipantStatus extends CRM_Core_Page_Basic {
     return $links;
   }
 
-  function browse() {
+  public function browse() {
     $statusTypes = array();
 
     $dao = new CRM_Event_DAO_ParticipantStatusType;
@@ -117,14 +117,14 @@ class CRM_Admin_Page_ParticipantStatus extends CRM_Core_Page_Basic {
   /**
    * @return string
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Admin_Form_ParticipantStatus';
   }
 
   /**
    * @return string
    */
-  function editName() {
+  public function editName() {
     return 'Participant Status';
   }
 
@@ -133,8 +133,7 @@ class CRM_Admin_Page_ParticipantStatus extends CRM_Core_Page_Basic {
    *
    * @return string
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/participant_status';
   }
 }
-

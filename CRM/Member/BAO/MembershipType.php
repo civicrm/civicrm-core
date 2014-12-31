@@ -44,7 +44,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -55,10 +55,9 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Member_BAO_MembershipType object
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $membershipType = new CRM_Member_DAO_MembershipType();
     $membershipType->copyValues($params);
     if ($membershipType->find(TRUE)) {
@@ -77,7 +76,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @return Object             DAO object on sucess, null otherwise
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Member_DAO_MembershipType', $id, 'is_active', $is_active);
   }
 
@@ -87,12 +86,11 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids array contains the id (deprecated)
    *
-   * @access public
    * @static
    *
    * @return object
    */
-  static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = array()) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membershipType', $ids));
     if (!$id) {
       if (!isset($params['is_active'])) {
@@ -139,7 +137,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @return bool|mixed
    * @static
    */
-  static function del($membershipTypeId) {
+  public static function del($membershipTypeId) {
     //check dependencies
     $check      = FALSE;
     $status     = array();
@@ -193,7 +191,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param array $membershipType an array of membershipType-details.
    * @static
    */
-  static function convertDayFormat(&$membershipType) {
+  public static function convertDayFormat(&$membershipType) {
     $periodDays = array(
       'fixed_period_start_day',
       'fixed_period_rollover_day',
@@ -236,7 +234,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @return array
    * @static
    */
-  static function getMembershipTypes($public = TRUE) {
+  public static function getMembershipTypes($public = TRUE) {
     $membershipTypes = array();
     $membershipType = new CRM_Member_DAO_MembershipType();
     $membershipType->is_active = 1;
@@ -260,7 +258,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @return array|null
    * @static
    */
-  static function getMembershipTypeDetails($membershipTypeId) {
+  public static function getMembershipTypeDetails($membershipTypeId) {
     $membershipTypeDetails = array();
 
     $membershipType = new CRM_Member_DAO_MembershipType();
@@ -571,7 +569,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @return Array array of the details of membership types
    * @static
    */
-  static function getMembershipTypesByOrg($orgID) {
+  public static function getMembershipTypesByOrg($orgID) {
     $membershipTypes = array();
     $dao = new CRM_Member_DAO_MembershipType();
     $dao->member_of_contact_id = $orgID;
@@ -591,7 +589,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @return Array array of the details of membership types with Member of Contact id
    * @static
    */
-  static function getMemberOfContactByMemTypes($membershipTypes) {
+  public static function getMemberOfContactByMemTypes($membershipTypes) {
     $memTypeOrgs = array();
     if (empty($membershipTypes)) {
       return $memTypeOrgs;
@@ -612,7 +610,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *
    * @return array
    */
-  static function getMembershipTypeOrganization($membershipTypeId = NULL) {
+  public static function getMembershipTypeOrganization($membershipTypeId = NULL) {
     $allmembershipTypes = array();
 
     $membershipType = new CRM_Member_DAO_MembershipType();
@@ -635,9 +633,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @return array arrays of organization and membership types
    *
    * @static
-   * @access public
    */
-  static function getMembershipTypeInfo() {
+  public static function getMembershipTypeInfo() {
     if (!self::$_membershipTypeInfo) {
       $orgs = $types = array();
 
@@ -743,7 +740,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *
    *  @param  integer      financial type id
    */
-  static function updateAllPriceFieldValue($membershipTypeId, $params) {
+  public static function updateAllPriceFieldValue($membershipTypeId, $params) {
     if (!empty($params['minimum_fee'])){
       $amount = $params['minimum_fee'];
     }
@@ -780,4 +777,3 @@ AND cps.is_quick_config = 1 AND cps.name != 'default_membership_type_amount'";
     CRM_Core_DAO::executeQuery($query, $queryParams);
   }
 }
-

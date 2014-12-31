@@ -38,7 +38,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
   /*
    *  Test contact import for yyyy_mm_dd date format.
    */
-  function testDateFormat_yyyy_mm_dd() {
+  public function testDateFormat_yyyy_mm_dd() {
     $this->webtestLogin();
 
     // Get sample import data.
@@ -53,7 +53,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
   /*
    *  Test contact import for mm_dd_yy date format.
    */
-  function testDateFormat_mm_dd_yy() {
+  public function testDateFormat_mm_dd_yy() {
     $this->webtestLogin();
 
     // Get sample import data.
@@ -69,7 +69,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
   /*
    *  Test contact import for mm_dd_yyyy date format.
    */
-  function testDateFormat_mm_dd_yyyy() {
+  public function testDateFormat_mm_dd_yyyy() {
     // Logging in. Remember to wait for page to load. In most cases,
     // you can rely on 30000 as the value that allows your test to pass, however,
     // sometimes your test might fail because of this. In such cases, it's better to pick one element
@@ -90,7 +90,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
   /*
    *  Test contact import for Month_dd_yyyy date format.
    */
-  function testDateFormat_Month_dd_yyyy() {
+  public function testDateFormat_Month_dd_yyyy() {
     // Logging in. Remember to wait for page to load. In most cases,
     // you can rely on 30000 as the value that allows your test to pass, however,
     // sometimes your test might fail because of this. In such cases, it's better to pick one element
@@ -111,7 +111,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
   /*
    *  Test contact import for dd_mon_yy date format.
    */
-  function testDateFormat_dd_mon_yy() {
+  public function testDateFormat_dd_mon_yy() {
     // Logging in. Remember to wait for page to load. In most cases,
     // you can rely on 30000 as the value that allows your test to pass, however,
     // sometimes your test might fail because of this. In such cases, it's better to pick one element
@@ -132,7 +132,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
   /*
    *  Test contact import for dd_mm_yyyy date format.
    */
-  function testDateFormat_dd_mm_yyyy() {
+  public function testDateFormat_dd_mm_yyyy() {
     // Logging in. Remember to wait for page to load. In most cases,
     // you can rely on 30000 as the value that allows your test to pass, however,
     // sometimes your test might fail because of this. In such cases, it's better to pick one element
@@ -156,7 +156,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _individualCSVData_yyyy_mm_dd() {
+  public function _individualCSVData_yyyy_mm_dd() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -207,7 +207,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _individualCSVData_mm_dd_yy() {
+  public function _individualCSVData_mm_dd_yy() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -258,7 +258,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _individualCSVData_mm_dd_yyyy() {
+  public function _individualCSVData_mm_dd_yyyy() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -309,7 +309,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _individualCSVData_Month_dd_yyyy() {
+  public function _individualCSVData_Month_dd_yyyy() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -360,7 +360,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _individualCSVData_dd_mon_yy() {
+  public function _individualCSVData_dd_mon_yy() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -411,7 +411,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _individualCSVData_dd_mm_yyyy() {
+  public function _individualCSVData_dd_mm_yyyy() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -456,4 +456,3 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 }
-

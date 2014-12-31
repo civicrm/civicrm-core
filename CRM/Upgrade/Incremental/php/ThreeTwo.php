@@ -37,14 +37,14 @@ class CRM_Upgrade_Incremental_php_ThreeTwo {
    *
    * @return bool
    */
-  function verifyPreDBstate(&$errors) {
+  public function verifyPreDBstate(&$errors) {
     return TRUE;
   }
 
   /**
    * @param $rev
    */
-  function upgrade_3_2_alpha1($rev) {
+  public function upgrade_3_2_alpha1($rev) {
     //CRM-5666 -if user already have 'access CiviCase'
     //give all new permissions and drop access CiviCase.
     $config = CRM_Core_Config::singleton();
@@ -90,7 +90,7 @@ class CRM_Upgrade_Incremental_php_ThreeTwo {
   /**
    * @param $rev
    */
-  function upgrade_3_2_beta4($rev) {
+  public function upgrade_3_2_beta4($rev) {
     $upgrade = new CRM_Upgrade_Form;
 
     $config = CRM_Core_Config::singleton();
@@ -264,7 +264,7 @@ UPDATE  civicrm_membership_status
   /**
    * @param $rev
    */
-  function upgrade_3_2_1($rev) {
+  public function upgrade_3_2_1($rev) {
     //CRM-6565 check if Activity Index is already exists or not.
     $addActivityTypeIndex = TRUE;
     $indexes = CRM_Core_DAO::executeQuery('SHOW INDEXES FROM civicrm_activity');
@@ -282,4 +282,3 @@ UPDATE  civicrm_membership_status
     $upgrade->processSQL($rev);
   }
 }
-

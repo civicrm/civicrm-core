@@ -42,7 +42,6 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
    * The set id saved to the session for an update
    *
    * @var int
-   * @access protected
    */
   protected $_sid;
 
@@ -52,7 +51,6 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     // current set id
@@ -86,10 +84,9 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
    * @param array $options additional user data
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
-  static function formRule($fields, $files, $options) {
+  public static function formRule($fields, $files, $options) {
     $errors = array();
     $count = count(CRM_Utils_Array::value('extends', $fields));
     //price sets configured for membership
@@ -114,7 +111,6 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->applyFilter('__ALL__', 'trim');
@@ -237,9 +233,8 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
    * @param null
    *
    * @return array   array of default values
-   * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array('is_active' => TRUE);
     if ($this->_sid) {
       $params = array('id' => $this->_sid);
@@ -258,7 +253,6 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // get the submitted form values.
@@ -298,4 +292,3 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     }
   }
 }
-

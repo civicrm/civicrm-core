@@ -46,10 +46,9 @@ class CRM_Contact_Form_Edit_OpenID {
    * @param boolean       $blockEdit  is it block edit
    *
    * @return void
-   * @access public
    * @static
    */
-  static function buildQuickForm(&$form, $blockCount = NULL, $blockEdit = FALSE) {
+  public static function buildQuickForm(&$form, $blockCount = NULL, $blockEdit = FALSE) {
     if (!$blockCount) {
       $blockId = ($form->get('OpenID_Block_Count')) ? $form->get('OpenID_Block_Count') : 1;
     }
@@ -75,4 +74,3 @@ class CRM_Contact_Form_Edit_OpenID {
     $form->addElement('radio', "openid[$blockId][is_primary]", '', '', '1', $js);
   }
 }
-

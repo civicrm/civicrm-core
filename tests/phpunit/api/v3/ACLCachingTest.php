@@ -41,21 +41,21 @@ class api_v3_ACLCachingTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 /**
  * (non-PHPdoc)
  * @see CiviUnitTestCase::tearDown()
  */
-  function tearDown() {
+  public function tearDown() {
     $tablesToTruncate = array(
       'civicrm_activity',
     );
     $this->quickCleanup($tablesToTruncate, TRUE);
   }
 
-  function testActivityCreateCustomBefore() {
+  public function testActivityCreateCustomBefore() {
     $values = $this->callAPISuccess('custom_field', 'getoptions', array('field' => 'custom_group_id',));
     $this->assertTrue($values['count'] == 0);
     $this->CustomGroupCreate(array('extends' => 'Activity'));
@@ -65,4 +65,3 @@ class api_v3_ACLCachingTest extends CiviUnitTestCase {
     $this->assertTrue($values['count'] == 1, 'check that cached value is not retained for custom_group_id');
   }
 }
-

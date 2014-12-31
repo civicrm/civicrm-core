@@ -45,7 +45,7 @@ class CRM_Core_Block {
    *
    * @var int
    */
-  CONST
+  const
     CREATE_NEW = 1,
     RECENTLY_VIEWED = 2,
     DASHBOARD = 3,
@@ -63,14 +63,14 @@ class CRM_Core_Block {
    * Class constructor
    *
    */
-  function __construct() {}
+  public function __construct() {}
 
   /**
    * Initialises the $_properties array
    *
    * @return void
    */
-  static function initProperties() {
+  public static function initProperties() {
     if (!defined('BLOCK_CACHE_GLOBAL')) {
       define('BLOCK_CACHE_GLOBAL', 0x0008);
     }
@@ -187,7 +187,7 @@ class CRM_Core_Block {
    *
    * @return string  the value of the desired property
    */
-  static function getProperty($id, $property) {
+  public static function getProperty($id, $property) {
     if (!(self::$_properties)) {
       self::initProperties();
     }
@@ -203,7 +203,7 @@ class CRM_Core_Block {
    *
    * @return void
    */
-  static function setProperty($id, $property, $value) {
+  public static function setProperty($id, $property, $value) {
     if (!(self::$_properties)) {
       self::initProperties();
     }
@@ -215,7 +215,7 @@ class CRM_Core_Block {
    *
    * @return array  the $_properties array
    */
-  static function properties() {
+  public static function properties() {
     if (!(self::$_properties)) {
       self::initProperties();
     }
@@ -226,9 +226,8 @@ class CRM_Core_Block {
    * Creates the info block for drupal
    *
    * @return array
-   * @access public
    */
-  static function getInfo() {
+  public static function getInfo() {
 
     $block = array();
     foreach (self::properties() as $id => $value) {
@@ -283,7 +282,6 @@ class CRM_Core_Block {
    * @param int $id
    *
    * @return void
-   * @access private
    */
   private static function setTemplateValues($id) {
     switch ($id) {
@@ -340,7 +338,6 @@ class CRM_Core_Block {
    * Create the list of options to create New objects for the application and format is as a block
    *
    * @return void
-   * @access private
    */
   private static function setTemplateShortcutValues() {
     $config = CRM_Core_Config::singleton();
@@ -457,7 +454,6 @@ class CRM_Core_Block {
    * Create the list of dashboard links
    *
    * @return void
-   * @access private
    */
   private static function setTemplateDashboardValues() {
     static $dashboardLinks = array();
@@ -493,7 +489,6 @@ class CRM_Core_Block {
    * Create the list of mail urls for the application and format is as a block
    *
    * @return void
-   * @access private
    */
   private static function setTemplateMailValues() {
     static $shortCuts = NULL;
@@ -526,7 +521,6 @@ class CRM_Core_Block {
    * Create the list of shortcuts for the application and format is as a block
    *
    * @return void
-   * @access private
    */
   private static function setTemplateMenuValues() {
     $config = CRM_Core_Config::singleton();
@@ -542,7 +536,6 @@ class CRM_Core_Block {
    * Create the event blocks for upcoming events
    *
    * @return void
-   * @access private
    */
   private static function setTemplateEventValues() {
     $config = CRM_Core_Config::singleton();
@@ -570,9 +563,8 @@ class CRM_Core_Block {
    * @param int $id id of the block
    *
    * @return array
-   * @access public
    */
-  static function getContent($id) {
+  public static function getContent($id) {
     // return if upgrade mode
     $config = CRM_Core_Config::singleton();
     if ($config->isUpgradeMode()) {
@@ -650,9 +642,8 @@ class CRM_Core_Block {
    * @param array  $properties template variables
    *
    * @return array
-   * @access public
    */
-  static function fetch($id, $fileName, $properties) {
+  public static function fetch($id, $fileName, $properties) {
     $template = CRM_Core_Smarty::singleton();
 
     if ($properties) {
@@ -662,4 +653,3 @@ class CRM_Core_Block {
     return $template->fetch('CRM/Block/' . $fileName);
   }
 }
-

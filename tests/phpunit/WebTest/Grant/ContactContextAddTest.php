@@ -35,7 +35,7 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testContactContextAddTest() {
+  public function testContactContextAddTest() {
     // Log in as admin first to verify permissions for CiviGrant
     $this->webtestLogin('admin');
 
@@ -136,4 +136,3 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
     );
   }
 }
-

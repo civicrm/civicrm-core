@@ -53,7 +53,7 @@ class PostEvent extends \Symfony\Component\EventDispatcher\Event {
    */
   public $object;
 
-  function __construct($action, $entity, $id, $object) {
+  public function __construct($action, $entity, $id, $object) {
     $this->action = $action;
     $this->entity = $entity;
     $this->id = $id;

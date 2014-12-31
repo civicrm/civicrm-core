@@ -41,9 +41,8 @@ class CRM_Activity_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
-  static function select(&$query) {
+  public static function select(&$query) {
     if (!empty($query->_returnProperties['activity_id'])) {
       $query->_select['activity_id'] = "civicrm_activity.id as activity_id";
       $query->_element['activity_id'] = 1;
@@ -167,9 +166,8 @@ class CRM_Activity_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
-  static function where(&$query) {
+  public static function where(&$query) {
     $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
       if (substr($query->_params[$id][0], 0, 9) == 'activity_') {
@@ -188,9 +186,8 @@ class CRM_Activity_BAO_Query {
    * @param $values
    * @param $query
    * @return void
-   * @access public
    */
-  static function whereClauseSingle(&$values, &$query) {
+  public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
@@ -401,7 +398,7 @@ class CRM_Activity_BAO_Query {
    *
    * @return null|string
    */
-  static function from($name, $mode, $side) {
+  public static function from($name, $mode, $side) {
     $from = NULL;
     switch ($name) {
       case 'civicrm_activity':
@@ -455,22 +452,20 @@ class CRM_Activity_BAO_Query {
    * Getter for the qill object
    *
    * @return string
-   * @access public
    */
-  function qill() {
+  public function qill() {
     return (isset($this->_qill)) ? $this->_qill : "";
   }
 
   /**
    * Add all the elements shared between case activity search and advanced search
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @return void
    * @static
    */
-  static function buildSearchForm(&$form) {
+  public static function buildSearchForm(&$form) {
     $activityOptions = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     asort($activityOptions);
     foreach ($activityOptions as $activityID => $activity) {
@@ -585,7 +580,7 @@ class CRM_Activity_BAO_Query {
    *
    * @return array|null
    */
-  static function defaultReturnProperties($mode, $includeCustomFields = TRUE) {
+  public static function defaultReturnProperties($mode, $includeCustomFields = TRUE) {
     $properties = NULL;
     if ($mode & CRM_Contact_BAO_Query::MODE_ACTIVITY) {
       $properties = array(
@@ -635,7 +630,7 @@ class CRM_Activity_BAO_Query {
    *
    * @return array
    */
-  static function buildWhereAndQill(&$query, $value, $pseudoconstantType, $op, $grouping, $params) {
+  public static function buildWhereAndQill(&$query, $value, $pseudoconstantType, $op, $grouping, $params) {
     $matches = $val = $clause = array();
 
     if (is_array($value)) {
@@ -669,4 +664,3 @@ class CRM_Activity_BAO_Query {
     return $matches[0];
   }
 }
-

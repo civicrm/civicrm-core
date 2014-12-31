@@ -98,7 +98,7 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
    * Test checks that all v3 API return a standardised error message when
    * the $params passed in is not an array.
    */
-  function testParamsNotArray() {
+  public function testParamsNotArray() {
     /*I have commented this out as the check for is_array has been moved to civicrm_api. But keeping in place as
     * this test, in contrast to the standards test, tests all existing API rather than just CRUD ones
     * so want to keep code for re-use
@@ -125,7 +125,7 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
    * Get all the files in the API directory for the relevant version which contain API functions
    * @return array $files array of php files in the directory excluding helper files
    */
-  function getAllFilesinAPIDir() {
+  public function getAllFilesinAPIDir() {
     $files = array();
     $handle = opendir($this->_apiDir);
 
@@ -147,7 +147,7 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
    * Require once  Files
    * @param $files array list of files to load
    */
-  function requireOnceFilesArray($files) {
+  public function requireOnceFilesArray($files) {
     foreach ($files as $key => $file) {
       require_once $this->_apiDir . $file;
     }
@@ -157,7 +157,7 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
    * Get all api exposed functions that are expected to conform to standards
    * @return array $functionlist
    */
-  function getAllAPIStdFunctions() {
+  public function getAllAPIStdFunctions() {
     $functionlist = get_defined_functions();
     $functions = preg_grep($this->_regexForGettingAPIStdFunctions, $functionlist['user']);
     foreach ($functions as $key => $function) {
@@ -171,4 +171,3 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
     return $functions;
   }
 }
-

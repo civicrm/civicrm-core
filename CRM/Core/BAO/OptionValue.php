@@ -37,7 +37,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -49,7 +49,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @return object
    */
-  static function create($params) {
+  public static function create($params) {
     if (empty($params['id'])){
       self::setDefaults($params);
     }
@@ -72,7 +72,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @param array $params
    */
-  static function setDefaults(&$params){
+  public static function setDefaults(&$params){
     if(CRM_Utils_Array::value('label', $params, NULL) === NULL){
       $params['label'] = $params['name'];
     }
@@ -97,7 +97,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @return int
    */
-  static function getDefaultWeight($params){
+  public static function getDefaultWeight($params){
     return (int) CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
           array('option_group_id' => $params['option_group_id']));
   }
@@ -109,7 +109,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * more complex decision making
    * @param array $params
    */
-  static function getDefaultValue($params){
+  public static function getDefaultValue($params){
      $bao = new CRM_Core_BAO_OptionValue();
      $bao->option_group_id = $params['option_group_id'];
      if(isset($params['domain_id'])){
@@ -128,10 +128,9 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_BAO_OptionValue object
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $optionValue = new CRM_Core_DAO_OptionValue();
     $optionValue->copyValues($params);
     if ($optionValue->find(TRUE)) {
@@ -150,7 +149,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @return Object             DAO object on sucess, null otherwise
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_OptionValue', $id, 'is_active', $is_active);
   }
 
@@ -160,12 +159,11 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
    *
-   * @access public
    * @static
    *
    * @return CRM_Core_DAO_OptionValue
    */
-  static function add(&$params, &$ids) {
+  public static function add(&$params, &$ids) {
     // CRM-10921: do not reset attributes to default if this is an update
     //@todo consider if defaults are being set in the right place. 'dumb' defaults like
     // these would be usefully set @ the api layer so they are visible to api users
@@ -228,10 +226,9 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @return boolean
    *
-   * @access public
    * @static
    */
-  static function del($optionValueId) {
+  public static function del($optionValueId) {
     $optionValue = new CRM_Core_DAO_OptionValue();
     $optionValue->id = $optionValueId;
     if (self::updateRecords($optionValueId, CRM_Core_Action::DELETE)) {
@@ -248,9 +245,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @return array  label and description
    * @static
-   * @access public
    */
-  static function getActivityTypeDetails($activityTypeId) {
+  public static function getActivityTypeDetails($activityTypeId) {
     $query = "SELECT civicrm_option_value.label, civicrm_option_value.description
    FROM civicrm_option_value
         LEFT JOIN civicrm_option_group ON ( civicrm_option_value.option_group_id = civicrm_option_group.id )
@@ -271,7 +267,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @return string title
    *
-   * @access public
    * @static
    *
    */
@@ -287,7 +282,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @return bool
    */
-  static function updateRecords(&$optionValueId, $action) {
+  public static function updateRecords(&$optionValueId, $action) {
     //finding group name
     $optionValue = new CRM_Core_DAO_OptionValue();
     $optionValue->id = $optionValueId;
@@ -415,10 +410,9 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param array $opWeights options value , weight pair
    *
    * @return void
-   * @access public
    * @static
    */
-  static function updateOptionWeights($opGroupId, $opWeights) {
+  public static function updateOptionWeights($opGroupId, $opWeights) {
     if (!is_array($opWeights) || empty($opWeights)) {
       return;
     }
@@ -444,9 +438,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @return array an array of array of values for this option group
    * @static
-   * @public
    */
-  static function getOptionValuesArray($optionGroupID) {
+  public static function getOptionValuesArray($optionGroupID) {
     // check if we can get the field values from the system cache
     $cacheKey     = "CRM_Core_BAO_OptionValue_OptionGroupID_{$optionGroupID}";
     $cache        = CRM_Utils_Cache::singleton();
@@ -477,9 +470,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @return array an associative array of label, value pairs
    * @static
-   * @public
    */
-  static function getOptionValuesAssocArray($optionGroupID) {
+  public static function getOptionValuesAssocArray($optionGroupID) {
     $optionValues = self::getOptionValuesArray($optionGroupID);
 
     $options = array();
@@ -496,9 +488,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @return array an associative array of label, value pairs
    * @static
-   * @public
    */
-  static function getOptionValuesAssocArrayFromName($optionGroupName) {
+  public static function getOptionValuesAssocArrayFromName($optionGroupName) {
     $dao = new CRM_Core_DAO_OptionGroup();
     $dao->name = $optionGroupName;
     $dao->selectAdd();
@@ -514,4 +505,3 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
 }
-

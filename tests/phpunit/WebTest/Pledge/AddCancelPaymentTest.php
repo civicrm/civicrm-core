@@ -35,7 +35,7 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddCancelPayment() {
+  public function testAddCancelPayment() {
     $this->webtestLogin();
 
     $this->openCiviPage('pledge/add', 'reset=1&context=standalone', '_qf_Pledge_upload');
@@ -122,4 +122,3 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
 
   }
 }
-

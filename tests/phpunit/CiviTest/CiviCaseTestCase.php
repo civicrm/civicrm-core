@@ -126,9 +126,8 @@ class CiviCaseTestCase extends CiviUnitTestCase {
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
    *
-   * @access protected
    */
-  function tearDown() {
+  public function tearDown() {
     $this->quickCleanup($this->tablesToTruncate, TRUE);
     $this->customDirectories(array('template_path' => FALSE));
     CRM_Case_XMLRepository::singleton(TRUE);
@@ -140,6 +139,6 @@ class CiviCaseTestCase extends CiviUnitTestCase {
    * @param $caseTypes
    * @see CRM_Utils_Hook::caseTypes
    */
-  function hook_caseTypes(&$caseTypes) {
+  public function hook_caseTypes(&$caseTypes) {
   }
 }

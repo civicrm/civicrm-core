@@ -47,7 +47,7 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
   protected $_entityID;
   protected $_entityTable;
 
-  function preProcess() {
+  public function preProcess() {
     if ($this->get('entityID')) {
       $this->_entityID = $this->get('entityID');
     }
@@ -69,7 +69,6 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     CRM_Core_Resources::singleton()
@@ -113,7 +112,6 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
   }
 
   /**
-   * @access public
    *
    * @return void
    */
@@ -130,4 +128,3 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
     CRM_Core_Session::setStatus(ts('Your update(s) have been saved.'), ts('Saved'), 'success');
   }
 }
-

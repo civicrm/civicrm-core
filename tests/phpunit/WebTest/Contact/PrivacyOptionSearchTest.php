@@ -35,7 +35,7 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testPrivacyOptionSearch() {
+  public function testPrivacyOptionSearch() {
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -165,4 +165,3 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("$lname2, $fname2"));
   }
 }
-

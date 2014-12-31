@@ -185,7 +185,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    * @param string $type        import type (csv/sql)
    *                             @todo:currently only supports csv, need to work on sql import
    */
-  function importContacts($headers, $rows, $contactType = 'Individual', $mode = 'Skip', $fieldMapper = array(), $other = array(), $type = 'csv') {
+  public function importContacts($headers, $rows, $contactType = 'Individual', $mode = 'Skip', $fieldMapper = array(), $other = array(), $type = 'csv') {
 
     // Go to contact import page.
     $this->openCiviPage("import/contact", "reset=1", "uploadFile");
@@ -438,7 +438,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    *
    * @return string
    */
-  function _getImportComponentContactType($component, $contactType) {
+  public function _getImportComponentContactType($component, $contactType) {
     $importComponentMode = array(
       'Event' => array(
         'Individual' => 'CIVICRM_QFID_1_8',
@@ -468,7 +468,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    * @param array $checkMapperHeaders
    * @param string $headerSelector
    */
-  function _checkImportMapperData($headers, $rows, $existingMapping = NULL, $checkMapperHeaders = array(), $headerSelector = 'th') {
+  public function _checkImportMapperData($headers, $rows, $existingMapping = NULL, $checkMapperHeaders = array(), $headerSelector = 'th') {
 
     if (empty($checkMapperHeaders)) {
       $checkMapperHeaders = array(
@@ -509,7 +509,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    *
    * @return array $contactIds  imported contact ids
    */
-  function _getImportedContactIds($rows, $contactType = 'Individual') {
+  public function _getImportedContactIds($rows, $contactType = 'Individual') {
     $contactIds = array();
 
     foreach ($rows as $row) {
@@ -553,7 +553,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    * @param array $headers
    * @param array $rows
    */
-  function _formatContactCSVdata(&$headers, &$rows) {
+  public function _formatContactCSVdata(&$headers, &$rows) {
     if (!isset($headers['contact_relationships'])) {
       return;
     }
@@ -578,4 +578,3 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     }
   }
 }
-

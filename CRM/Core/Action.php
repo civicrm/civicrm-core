@@ -43,9 +43,8 @@ class CRM_Core_Action {
    *
    * @var integer const
    *
-   * @access public
    */
-  CONST
+  const
     NONE = 0,
     ADD = 1,
     UPDATE = 2,
@@ -78,7 +77,6 @@ class CRM_Core_Action {
    *
    * @var array $_names  type of variable name to action constant
    *
-   * @access private
    * @static
    *
    */
@@ -116,10 +114,9 @@ class CRM_Core_Action {
    * @param string $str the action to be resolved
    *
    * @return int the action mask corresponding to the input string
-   * @access public
    * @static
    */
-  static function resolve($str) {
+  public static function resolve($str) {
     $action = 0;
     if ($str) {
       $items = explode('|', $str);
@@ -135,11 +132,10 @@ class CRM_Core_Action {
    * @param mixed $item either a single string or an array of strings
    *
    * @return int the action mask corresponding to the input args
-   * @access public
    * @static
    *
    */
-  static function map($item) {
+  public static function map($item) {
     $mask = 0;
 
     if (is_array($item)) {
@@ -159,11 +155,10 @@ class CRM_Core_Action {
    * @param string $item the input action to process
    *
    * @return int the action mask corresponding to the input string
-   * @access public
    * @static
    *
    */
-  static function mapItem($item) {
+  public static function mapItem($item) {
     $mask = CRM_Utils_Array::value(trim($item), self::$_names);
     return $mask ? $mask : 0;
   }
@@ -175,11 +170,10 @@ class CRM_Core_Action {
    * @param int $mask the action mask
    *
    * @return string the corresponding action description
-   * @access public
    * @static
    *
    */
-  static function description($mask) {
+  public static function description($mask) {
     if (!isset($_description)) {
       self::$_description = array_flip(self::$_names);
     }
@@ -202,7 +196,6 @@ class CRM_Core_Action {
    * @param int $objectId
    *
    * @return string       the html string
-   * @access public
    * @static
    */
   static function formLink($links,
@@ -312,10 +305,9 @@ class CRM_Core_Action {
    * @param array  $values the array of values for parameter substitution in the str
    *
    * @return string        the substituted string
-   * @access public
    * @static
    */
-  static function &replace(&$str, &$values) {
+  public static function &replace(&$str, &$values) {
     foreach ($values as $n => $v) {
       $str = str_replace("%%$n%%", $v, $str);
     }
@@ -329,9 +321,8 @@ class CRM_Core_Action {
    *
    * @return int   the mask for the above permission
    * @static
-   * @access public
    */
-  static function mask($permissions) {
+  public static function mask($permissions) {
     $mask = NULL;
     if (!is_array($permissions) || CRM_Utils_System::isNull($permissions)) {
       return $mask;
@@ -352,4 +343,3 @@ class CRM_Core_Action {
     return $mask;
   }
 }
-

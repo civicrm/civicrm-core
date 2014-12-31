@@ -39,13 +39,12 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
    *
-   * @access protected
    */
   protected function setUp() {
     parent::setUp();
   }
 
-  function testAddPCPBlock() {
+  public function testAddPCPBlock() {
 
     $params = $this->pcpBlockParams();
     $pcpBlock = CRM_PCP_BAO_PCP::add($params, TRUE);
@@ -65,7 +64,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     // CRM_Core_DAO::deleteTestObjects( 'CRM_PCP_DAO_PCPBlock', $delParams );
   }
 
-  function testAddPCP() {
+  public function testAddPCP() {
     $blockParams = $this->pcpBlockParams();
     $pcpBlock = CRM_PCP_BAO_PCP::add($blockParams, TRUE);
 
@@ -92,7 +91,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     // CRM_Core_DAO::deleteTestObjects( 'CRM_PCP_DAO_PCP', $delParams );
   }
 
-  function testAddPCPNoStatus() {
+  public function testAddPCPNoStatus() {
     $blockParams = $this->pcpBlockParams();
     $pcpBlock = CRM_PCP_BAO_PCP::add($blockParams, TRUE);
 
@@ -120,7 +119,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     // CRM_Core_DAO::deleteTestObjects( 'CRM_PCP_DAO_PCP', $delParams );
   }
 
-  function testDeletePCP() {
+  public function testDeletePCP() {
 
     $pcp   = CRM_Core_DAO::createTestObject('CRM_PCP_DAO_PCP');
     $pcpId = $pcp->id;
@@ -186,8 +185,6 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
    *
-   * @access protected
    */
   protected function tearDown() {}
 }
-

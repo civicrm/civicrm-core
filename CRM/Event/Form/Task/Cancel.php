@@ -48,9 +48,8 @@ class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     // initialize the task and row fields
     parent::preProcess();
 
@@ -61,11 +60,10 @@ class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Cancel Registration for Event Participation'));
     $session = CRM_Core_Session::singleton();
     $this->addDefaultButtons(ts('Continue'), 'done');
@@ -74,7 +72,6 @@ class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -91,4 +88,3 @@ class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
     }
   }
 }
-

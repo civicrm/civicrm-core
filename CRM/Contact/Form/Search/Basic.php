@@ -47,7 +47,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    * csv - common search values
    *
    * @var array
-   * @access protected
    * @static
    */
   static $csv = array('contact_type', 'group', 'tag');
@@ -55,11 +54,10 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     // text for sort_name or email criteria
     $config = CRM_Core_Config::singleton();
     $label = empty($config->includeEmailInName) ? ts('Name') : ts('Name or Email');
@@ -106,11 +104,10 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   /**
    * Set the default form values
    *
-   * @access protected
    *
    * @return array the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     $defaults['sort_name'] = CRM_Utils_Array::value('sort_name', $this->_formValues);
@@ -138,11 +135,10 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   /**
    * Add local and global form rules
    *
-   * @access protected
    *
    * @return void
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Contact_Form_Search_Basic', 'formRule'));
   }
 
@@ -150,9 +146,8 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    * Processing needed for buildForm and later
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->set('searchFormName', 'Basic');
 
     parent::preProcess();
@@ -161,7 +156,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   /**
    * @return array
    */
-  function &getFormValues() {
+  public function &getFormValues() {
     return $this->_formValues;
   }
 
@@ -169,9 +164,8 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    * This method is called for processing a submitted search form
    *
    * @return void
-   * @access public
    */
-  function postProcess() {
+  public function postProcess() {
     $this->set('isAdvanced', '0');
     $this->set('isSearchBuilder', '0');
 
@@ -222,9 +216,8 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    * multiple purposes (queries, save/edit etc)
    *
    * @return void
-   * @access private
    */
-  function normalizeFormValues() {
+  public function normalizeFormValues() {
     $contactType = CRM_Utils_Array::value('contact_type', $this->_formValues);
     if ($contactType && !is_array($contactType)) {
       unset($this->_formValues['contact_type']);
@@ -252,7 +245,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    * Add a form rule for this form. If Go is pressed then we must select some checkboxes
    * and an action
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     // check actionName and if next, then do not repeat a search, since we are going to the next page
     if (array_key_exists('_qf_Search_next', $fields)) {
       if (empty($fields['task'])) {
@@ -283,13 +276,11 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
    */
-  function getTitle() {
+  public function getTitle() {
     return ts('Find Contacts');
   }
 }
-

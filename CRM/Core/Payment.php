@@ -41,7 +41,7 @@ abstract class CRM_Core_Payment {
    * FORM   - we collect it on the same page
    * BUTTON - the processor collects it and sends it back to us via some protocol
    */
-  CONST
+  const
     BILLING_MODE_FORM = 1,
     BILLING_MODE_BUTTON = 2,
     BILLING_MODE_NOTIFY = 4;
@@ -54,7 +54,7 @@ abstract class CRM_Core_Payment {
    * or both
    *
    */
-  CONST
+  const
     PAYMENT_TYPE_CREDIT_CARD = 1,
     PAYMENT_TYPE_DIRECT_DEBIT = 2;
 
@@ -63,7 +63,7 @@ abstract class CRM_Core_Payment {
    * START, END
    *
    */
-  CONST
+  const
     RECURRING_PAYMENT_START = 'START',
     RECURRING_PAYMENT_END = 'END';
 
@@ -95,7 +95,7 @@ abstract class CRM_Core_Payment {
    * @static
    *
    */
-  static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
+  public static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     // make sure paymentProcessor is not empty
     // CRM-7424
     if (empty($paymentProcessor)) {
@@ -200,7 +200,7 @@ abstract class CRM_Core_Payment {
    * @param CRM_Core_Form $paymentForm
    *
    */
-  function setForm(&$paymentForm) {
+  public function setForm(&$paymentForm) {
     $this->_paymentForm = $paymentForm;
   }
 
@@ -209,7 +209,7 @@ abstract class CRM_Core_Payment {
    *
    * @return CRM_Core_Form  A form object
    */
-  function getForm() {
+  public function getForm() {
     return $this->_paymentForm;
   }
 
@@ -220,7 +220,7 @@ abstract class CRM_Core_Payment {
    *
    * @return null
    */
-  function getVar($name) {
+  public function getVar($name) {
     return isset($this->$name) ? $this->$name : NULL;
   }
 
@@ -454,7 +454,6 @@ abstract class CRM_Core_Payment {
    * This function checks to see if we have the right config values
    *
    * @return string the error message if any
-   * @public
    */
   abstract function checkConfig();
 
@@ -463,7 +462,7 @@ abstract class CRM_Core_Payment {
    *
    * @return bool
    */
-  static function paypalRedirect(&$paymentProcessor) {
+  public static function paypalRedirect(&$paymentProcessor) {
     if (!$paymentProcessor) {
       return FALSE;
     }
@@ -481,9 +480,8 @@ abstract class CRM_Core_Payment {
 
   /**
    * Page callback for civicrm/payment/ipn
-   * @public
    */
-  static function handleIPN() {
+  public static function handleIPN() {
     self::handlePaymentMethod(
       'PaymentNotification',
       array(
@@ -500,11 +498,10 @@ abstract class CRM_Core_Payment {
    * processor & ideally the processor will be validating the results
    * Load requested payment processor and call that processor's handle<$method> method
    *
-   * @public
    * @param $method
    * @param array $params
    */
-  static function handlePaymentMethod($method, $params = array()) {
+  public static function handlePaymentMethod($method, $params = array()) {
     if (!isset($params['processor_id']) && !isset($params['processor_name'])) {
       CRM_Core_Error::fatal("Either 'processor_id' or 'processor_name' param is required for payment callback");
     }
@@ -601,9 +598,8 @@ abstract class CRM_Core_Payment {
    * @param  string $method method to check for.
    *
    * @return boolean
-   * @public
    */
-  function isSupported($method = 'cancelSubscription') {
+  public function isSupported($method = 'cancelSubscription') {
     return method_exists(CRM_Utils_System::getClassName($this), $method);
   }
 
@@ -614,7 +610,7 @@ abstract class CRM_Core_Payment {
    *
    * @return string
    */
-  function subscriptionURL($entityID = NULL, $entity = NULL, $action = 'cancel') {
+  public function subscriptionURL($entityID = NULL, $entity = NULL, $action = 'cancel') {
     // Set URL
     switch ($action) {
       case 'cancel' :

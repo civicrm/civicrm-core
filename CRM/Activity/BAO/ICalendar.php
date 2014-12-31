@@ -52,7 +52,7 @@ class CRM_Activity_BAO_ICalendar {
    * @return \CRM_Activity_BAO_ICalendar
   @access public
    */
-  function __construct( &$act ) {
+  public function __construct( &$act ) {
     $this->activity = $act;
   }
 
@@ -63,9 +63,8 @@ class CRM_Activity_BAO_ICalendar {
    * @param array $contacts     Array of contacts (attendees)
    *
    * @return string   Array index of the added attachment in the $attachments array, or else null.
-   * @access public
    */
-  function addAttachment( &$attachments, $contacts ) {
+  public function addAttachment( &$attachments, $contacts ) {
     // Check preferences setting
     if ( CRM_Core_BAO_Setting::getItem( CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'activity_assignee_notification_ics' ) ) {
       $config = &CRM_Core_Config::singleton();
@@ -102,7 +101,7 @@ class CRM_Activity_BAO_ICalendar {
     return null;
   }
 
-  function cleanup() {
+  public function cleanup() {
     if ( !empty ( $this->icsfile ) ) {
       @unlink( $this->icsfile );
     }
@@ -133,4 +132,3 @@ class CRM_Activity_BAO_ICalendar {
     return $primary;
   }
 }
-

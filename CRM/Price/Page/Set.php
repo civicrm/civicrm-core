@@ -56,7 +56,6 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * @param null
    *
    * @return  array   array of action links that we need to display for the browse screen
-   * @access public
    */ function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_actionLinks)) {
@@ -121,10 +120,9 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * @param null
    *
    * @return void
-   * @access public
    *
    */
-  function run() {
+  public function run() {
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String',
       // default to 'browse'
@@ -205,9 +203,8 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * @param string $action the action to be invoked
    *
    * @return void
-   * @access public
    */
-  function edit($sid, $action) {
+  public function edit($sid, $action) {
     // create a simple controller for editing price sets
     $controller = new CRM_Core_Controller_Simple('CRM_Price_Form_Set', ts('Price Set'), $action);
 
@@ -226,9 +223,8 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * @param int $sid price set id
    *
    * @return void
-   * @access public
    */
-  function preview($sid) {
+  public function preview($sid) {
     $controller = new CRM_Core_Controller_Simple('CRM_Price_Form_Preview', ts('Preview Price Set'), NULL);
     $session    = CRM_Core_Session::singleton();
     $context    = CRM_Utils_Request::retrieve('context', 'String', $this);
@@ -250,9 +246,8 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * @param string $action   the action to be invoked
    *
    * @return void
-   * @access public
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
     // get all price sets
     $priceSet = array();
     $comps = array('CiviEvent' => ts('Event'),
@@ -319,9 +314,8 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * all the fields in the page
    *
    * @return void
-   * @access public
    */
-  function copy() {
+  public function copy() {
     $id = CRM_Utils_Request::retrieve('sid', 'Positive',
       $this, TRUE, 0, 'GET'
     );
@@ -331,4 +325,3 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
     CRM_Utils_System::redirect(CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1'));
   }
 }
-

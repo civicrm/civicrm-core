@@ -150,7 +150,7 @@ class CRM_Custom_Form_CustomData {
    *
    * @return array
    */
-  static function setDefaultValues(&$form) {
+  public static function setDefaultValues(&$form) {
     $defaults = array();
     CRM_Core_BAO_CustomGroup::setDefaults($form->_groupTree, $defaults, FALSE, FALSE, $form->get('action'));
     return $defaults;
@@ -160,10 +160,9 @@ class CRM_Custom_Form_CustomData {
    * @param CRM_Core_Form $form
    * @return void
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     $form->addElement('hidden', 'hidden_custom', 1);
     $form->addElement('hidden', "hidden_custom_group_count[{$form->_groupID}]", $form->_groupCount);
     CRM_Core_BAO_CustomGroup::buildQuickForm($form, $form->_groupTree);
   }
 }
-

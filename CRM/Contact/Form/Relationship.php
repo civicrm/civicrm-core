@@ -121,7 +121,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    */
   public $_cdType;
 
-  function preProcess() {
+  public function preProcess() {
     //custom data related code
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
     $this->assign('cdType', FALSE);
@@ -214,11 +214,10 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * Set default values for the form. Relationship that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if ($this->_cdType) {
       return CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
@@ -280,9 +279,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * This function is used to add the rules for form.
    *
    * @return void
-   * @access public
    */
-  function addRules() {
+  public function addRules() {
     if ($this->_cdType) {
       return;
     }
@@ -296,7 +294,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_cdType) {
@@ -402,7 +399,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   /**
    *  This function is called when the form is submitted
    *
-   * @access public
    *
    * @return void
    */
@@ -546,10 +542,9 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return mixed true or array of errors
-   * @access public
    * @static
    */
-  static function dateRule($params) {
+  public static function dateRule($params) {
     $errors = array();
 
     // check start and end date
@@ -565,4 +560,3 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
 }
-

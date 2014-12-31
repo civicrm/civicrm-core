@@ -12,7 +12,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  function definitionProvider() {
+  public function definitionProvider() {
     $fixtures['empty-defn'] = array(
       'json' => json_encode(array()),
       'xml' => '<?xml version="1.0" encoding="utf-8" ?>
@@ -226,7 +226,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
    * @param string $inputXml
    * @dataProvider definitionProvider
    */
-  function testConvertXmlToDefinition($fixtureName, $expectedJson, $inputXml) {
+  public function testConvertXmlToDefinition($fixtureName, $expectedJson, $inputXml) {
     $xml = simplexml_load_string($inputXml);
     $expectedDefinition = json_decode($expectedJson, TRUE);
     $actualDefinition = CRM_Case_BAO_CaseType::convertXmlToDefinition($xml);
@@ -239,7 +239,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
    * @param string $expectedXml
    * @dataProvider definitionProvider
    */
-  function testConvertDefinitionToXml($fixtureName, $inputJson, $expectedXml) {
+  public function testConvertDefinitionToXml($fixtureName, $inputJson, $expectedXml) {
     $inputDefinition = json_decode($inputJson, TRUE);
     $actualXml = CRM_Case_BAO_CaseType::convertDefinitionToXML('Housing Support', $inputDefinition);
     $this->assertEquals($this->normalizeXml($expectedXml), $this->normalizeXml($actualXml));
@@ -251,7 +251,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
    * @param string $inputXml
    * @dataProvider definitionProvider
    */
-  function testRoundtrip_XmlToJsonToXml($fixtureName, $ignore, $inputXml) {
+  public function testRoundtrip_XmlToJsonToXml($fixtureName, $ignore, $inputXml) {
     $tempDefinition = CRM_Case_BAO_CaseType::convertXmlToDefinition(simplexml_load_string($inputXml));
     $actualXml = CRM_Case_BAO_CaseType::convertDefinitionToXML('Housing Support', $tempDefinition);
     $this->assertEquals($this->normalizeXml($inputXml), $this->normalizeXml($actualXml));
@@ -263,7 +263,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
    * @param string $ignore
    * @dataProvider definitionProvider
    */
-  function testRoundtrip_JsonToXmlToJson($fixtureName, $inputJson, $ignore) {
+  public function testRoundtrip_JsonToXmlToJson($fixtureName, $inputJson, $ignore) {
     $tempXml = CRM_Case_BAO_CaseType::convertDefinitionToXML('Housing Support', json_decode($inputJson, TRUE));
     $actualDefinition = CRM_Case_BAO_CaseType::convertXmlToDefinition(simplexml_load_string($tempXml));
     $expectedDefinition = json_decode($inputJson, TRUE);
@@ -276,7 +276,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
    * @param string $xml
    * @return string
    */
-  function normalizeXml($xml) {
+  public function normalizeXml($xml) {
     return trim(
       preg_replace(":\n*<:", "\n<", // tags on new lines
         preg_replace("/\n[\n ]+/", "\n", // no leading whitespace

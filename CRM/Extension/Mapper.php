@@ -51,7 +51,7 @@ class CRM_Extension_Mapper {
   /**
    * An URL for public extensions repository
    */
-  //CONST DEFAULT_EXTENSIONS_REPOSITORY = 'http://civicrm.org/extdir/ver={ver}|cms={uf}';
+  //const DEFAULT_EXTENSIONS_REPOSITORY = 'http://civicrm.org/extdir/ver={ver}|cms={uf}';
 
   /**
    * Extension info file name
@@ -112,7 +112,6 @@ class CRM_Extension_Mapper {
   /**
    * Given the class, provides extension's key.
    *
-   * @access public
    *
    * @param string $clazz extension class name
    *
@@ -125,7 +124,6 @@ class CRM_Extension_Mapper {
   /**
    * Given the class, provides extension path.
    *
-   * @access public
    *
    * @param $clazz
    *
@@ -140,7 +138,6 @@ class CRM_Extension_Mapper {
   /**
    * Given the string, returns true or false if it's an extension key.
    *
-   * @access public
    *
    * @param string $key a string which might be an extension key
    *
@@ -154,7 +151,6 @@ class CRM_Extension_Mapper {
   /**
    * Given the string, returns true or false if it's an extension class name.
    *
-   * @access public
    *
    * @param string $clazz a string which might be an extension class name
    *
@@ -194,7 +190,6 @@ class CRM_Extension_Mapper {
   /**
    * Given the key, provides extension's class name.
    *
-   * @access public
    *
    * @param string $key extension key
    *
@@ -208,7 +203,6 @@ class CRM_Extension_Mapper {
    * Given the key, provides the path to file containing
    * extension's main class.
    *
-   * @access public
    *
    * @param string $key extension key
    *
@@ -223,7 +217,6 @@ class CRM_Extension_Mapper {
    * Given the key, provides the path to file containing
    * extension's main class.
    *
-   * @access public
    * @param string $key extension key
    * @return string local path of the extension source tree
    */
@@ -238,7 +231,6 @@ class CRM_Extension_Mapper {
    * Given the key, provides the path to file containing
    * extension's main class.
    *
-   * @access public
    *
    * @param string $key extension key
    *
@@ -362,7 +354,6 @@ class CRM_Extension_Mapper {
   /**
    * Given the class, provides the template path.
    *
-   * @access public
    *
    * @param string $clazz extension class name
    *
@@ -383,7 +374,6 @@ class CRM_Extension_Mapper {
    * Given te class, provides the template name.
    * @todo consider multiple templates, support for one template for now
    *
-   * @access public
    *
    * @param string $clazz extension class name
    *

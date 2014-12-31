@@ -38,7 +38,7 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
   /*
     *  Test Multiple Relationship import for Individuals.
     */
-  function testMultipleRelationshipImport() {
+  public function testMultipleRelationshipImport() {
     $this->webtestLogin();
 
     // Get sample import data.
@@ -56,7 +56,7 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
   /**
    * @return array
    */
-  function _individualRelationshipCSVData() {
+  public function _individualRelationshipCSVData() {
 
     $headers = array(
       'first_name' => 'First Name',
@@ -217,4 +217,3 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
     return array($headers, $rows, $fieldMapper);
   }
 }
-

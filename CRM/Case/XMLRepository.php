@@ -257,7 +257,7 @@ class CRM_Case_XMLRepository {
    * @param string $activityType symbolic-name of an activity type
    * @return int
    */
-  function getActivityReferenceCount($activityType) {
+  public function getActivityReferenceCount($activityType) {
     $p = new CRM_Case_XMLProcessor_Process();
     $count = 0;
     foreach ($this->getAllCaseTypes() as $caseTypeName) {
@@ -276,7 +276,7 @@ class CRM_Case_XMLRepository {
    * @param string $relationshipTypeName symbolic-name of a relationship-type
    * @return int
    */
-  function getRelationshipReferenceCount($relationshipTypeName) {
+  public function getRelationshipReferenceCount($relationshipTypeName) {
     $p = new CRM_Case_XMLProcessor_Process();
     $count = 0;
     foreach ($this->getAllCaseTypes() as $caseTypeName) {

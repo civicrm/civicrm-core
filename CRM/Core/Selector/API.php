@@ -56,10 +56,9 @@ interface CRM_Core_Selector_API {
    *
    * @return void
    *
-   * @access public
    *
    */
-  function getPagerParams($action, &$params);
+  public function getPagerParams($action, &$params);
 
   /**
    * Returns the sort order array for the given action
@@ -67,10 +66,9 @@ interface CRM_Core_Selector_API {
    * @param string action the action being performed
    *
    * @return array the elements that can be sorted along with their properties
-   * @access public
    *
    */
-  function &getSortOrder($action);
+  public function &getSortOrder($action);
 
   /**
    * Returns the column headers as an array of tuples:
@@ -80,9 +78,8 @@ interface CRM_Core_Selector_API {
    * @param enum   $type   what should the result set include (web/email/csv)
    *
    * @return array the column headers that need to be displayed
-   * @access public
    */
-  function &getColumnHeaders($action = NULL, $type = NULL);
+  public function &getColumnHeaders($action = NULL, $type = NULL);
 
   /**
    * Returns the number of rows for this action
@@ -91,10 +88,9 @@ interface CRM_Core_Selector_API {
    *
    * @return int   the total number of rows for this action
    *
-   * @access public
    *
    */
-  function getTotalCount($action);
+  public function getTotalCount($action);
 
   /**
    * Returns all the rows in the given offset and rowCount
@@ -106,9 +102,8 @@ interface CRM_Core_Selector_API {
    * @param enum   $type     what should the result set include (web/email/csv)
    *
    * @return int   the total number of rows for this action
-   * @access public
    */
-  function &getRows($action, $offset, $rowCount, $sort, $type = NULL);
+  public function &getRows($action, $offset, $rowCount, $sort, $type = NULL);
 
   /**
    * Return the template (.tpl) filename
@@ -116,10 +111,9 @@ interface CRM_Core_Selector_API {
    * @param string $action the action being performed
    *
    * @return string
-   * @access public
    *
    */
-  function getTemplateFileName($action = NULL);
+  public function getTemplateFileName($action = NULL);
 
   /**
    * Return the filename for the exported CSV
@@ -130,6 +124,5 @@ interface CRM_Core_Selector_API {
    *                special characters to avoid various browser issues
    *
    */
-  function getExportFileName($type = 'csv');
+  public function getExportFileName($type = 'csv');
 }
-

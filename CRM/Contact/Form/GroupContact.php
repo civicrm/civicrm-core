@@ -53,7 +53,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
    */
   protected $_contactId;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_contactId = $this->get('contactId');
     $this->_groupContactId = $this->get('groupContactId');
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
@@ -63,7 +63,6 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // get the list of all the groups
@@ -116,7 +115,6 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
   }
 
   /**
-   * @access public
    *
    * @return void
    */
@@ -139,4 +137,3 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
     }
   }
 }
-

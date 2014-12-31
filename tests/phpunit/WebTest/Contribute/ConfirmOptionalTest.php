@@ -36,7 +36,7 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testWithConfirm() {
+  public function testWithConfirm() {
     $this->_addContributionPage(TRUE);
     $this->_fillOutContributionPage();
 
@@ -51,7 +51,7 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("Your transaction has been processed successfully"), "Should load thank you page");
   }
 
-  function testWithoutConfirm() {
+  public function testWithoutConfirm() {
     $this->_addContributionPage(FALSE);
     $this->_fillOutContributionPage();
 
@@ -111,4 +111,3 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 }
-

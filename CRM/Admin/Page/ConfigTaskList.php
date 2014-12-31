@@ -40,7 +40,7 @@ class CRM_Admin_Page_ConfigTaskList extends CRM_Core_Page {
   /**
    * @return string
    */
-  function run() {
+  public function run() {
 
     CRM_Utils_System::setTitle(ts("Configuration Checklist"));
     $this->assign('recentlyViewed', FALSE);
@@ -56,4 +56,3 @@ class CRM_Admin_Page_ConfigTaskList extends CRM_Core_Page {
     return parent::run();
   }
 }
-

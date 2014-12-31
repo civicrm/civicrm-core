@@ -43,7 +43,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The id of the contribution page that we are processsing
    *
    * @var int
-   * @public
    */
   public $_id;
 
@@ -59,7 +58,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The contact id related to a membership
    *
    * @var int
-   * @public
    */
   public $_membershipContactID;
 
@@ -67,7 +65,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The values for the contribution db object
    *
    * @var array
-   * @protected
    */
   public $_values;
 
@@ -75,7 +72,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The paymentProcessor attributes for this page
    *
    * @var array
-   * @protected
    */
   public $_paymentProcessor;
   public $_paymentObject = NULL;
@@ -84,7 +80,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The membership block for this page
    *
    * @var array
-   * @protected
    */
   public $_membershipBlock = NULL;
 
@@ -97,7 +92,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The default values for the form
    *
    * @var array
-   * @protected
    */
   protected $_defaults;
 
@@ -105,7 +99,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The params submitted by the form and computed by the app
    *
    * @var array
-   * @public
    */
   public $_params;
 
@@ -113,7 +106,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The fields involved in this contribution page
    *
    * @var array
-   * @public
    */
   public $_fields = array();
 
@@ -121,7 +113,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The billing location id for this contribiution page
    *
    * @var int
-   * @protected
    */
   public $_bltID;
 
@@ -129,7 +120,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Cache the amount to make things easier
    *
    * @var float
-   * @public
    */
   public $_amount;
 
@@ -137,7 +127,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Pcp id
    *
    * @var integer
-   * @public
    */
   public $_pcpId;
 
@@ -145,7 +134,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Pcp block
    *
    * @var array
-   * @public
    */
   public $_pcpBlock;
 
@@ -153,7 +141,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Pcp info
    *
    * @var array
-   * @public
    */
   public $_pcpInfo;
 
@@ -170,7 +157,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The Membership ID for membership renewal
    *
    * @var int
-   * @public
    */
   public $_membershipId;
 
@@ -178,7 +164,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Price Set ID, if the new price set method is used
    *
    * @var int
-   * @protected
    */
   public $_priceSetId;
 
@@ -186,7 +171,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Array of fields for the price set
    *
    * @var array
-   * @protected
    */
   public $_priceSet;
 
@@ -196,7 +180,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Is honor block is enabled for this contribution?
    *
    * @var boolean
-   * @protected
    */
   public $_honor_block_is_active = FALSE;
 
@@ -217,7 +200,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $config = CRM_Core_Config::singleton();
@@ -540,9 +522,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Set the default values
    *
    * @return void
-   * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return $this->_defaults;
   }
 
@@ -550,9 +531,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Assign the minimal set of variables to the template
    *
    * @return void
-   * @access public
    */
-  function assignToTemplate() {
+  public function assignToTemplate() {
     $name = CRM_Utils_Array::value('billing_first_name', $this->_params);
     if (!empty($this->_params['billing_middle_name'])) {
       $name .= " {$this->_params['billing_middle_name']}";
@@ -683,9 +663,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @param null $fieldTypes
    *
    * @return void
-   * @access public
    */
-  function buildCustom($id, $name, $viewOnly = FALSE, $profileContactType = NULL, $fieldTypes = NULL) {
+  public function buildCustom($id, $name, $viewOnly = FALSE, $profileContactType = NULL, $fieldTypes = NULL) {
     if ($id) {
       $contactID = $this->getContactID();
 
@@ -799,7 +778,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    *
    * @return null|string
    */
-  function checkTemplateFileExists($suffix = NULL) {
+  public function checkTemplateFileExists($suffix = NULL) {
     if ($this->_id) {
       $templateFile = "CRM/Contribute/Form/Contribution/{$this->_id}/{$this->_name}.{$suffix}tpl";
       $template = CRM_Core_Form::getTemplate();
@@ -814,12 +793,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
@@ -829,12 +807,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * i.e. we dont override
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
    */
-  function overrideExtraTemplateFileName() {
+  public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
@@ -842,7 +819,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * Authenticate pledge user during online payment.
    *
-   * @access public
    *
    * @return void
    */
@@ -913,4 +889,3 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
   }
 }
-

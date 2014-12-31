@@ -101,7 +101,7 @@ class CRM_Core_IDS {
    * @return string the full path to the config file
    * @static
    */
-  static function createConfigFile($force = FALSE) {
+  public static function createConfigFile($force = FALSE) {
     $config = CRM_Core_Config::singleton();
     $configFile = $config->configAndLogDir . 'Config.IDS.ini';
     if (!$force && file_exists($configFile)) {
@@ -278,4 +278,3 @@ class CRM_Core_IDS {
     CRM_Core_Error::fatal($msg);
   }
 }
-

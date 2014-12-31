@@ -40,10 +40,9 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @param array  $params           (reference ) an assoc array of name/value pairs
    *
    * @return object activity contact object
-   * @access public
    *
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     return self::add($params);
   }
 
@@ -57,11 +56,10 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Contribute_BAO_Contribution object
-   * @access public
    * @static
    * @todo move hook calls / extended logic to create - requires changing calls to call create not add
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'ContributionRecur', $params['id'], $params);
     }
@@ -111,10 +109,9 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @param array  $duplicates (reference ) store ids of duplicate contribs
    *
    * @return boolean true if duplicate, false otherwise
-   * @access public
    * static
    */
-  static function checkDuplicate($params, &$duplicates) {
+  public static function checkDuplicate($params, &$duplicates) {
     $id         = CRM_Utils_Array::value('id', $params);
     $trxn_id    = CRM_Utils_Array::value('trxn_id', $params);
     $invoice_id = CRM_Utils_Array::value('invoice_id', $params);
@@ -158,7 +155,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    *
    * @return array|null
    */
-  static function getPaymentProcessor($id, $mode) {
+  public static function getPaymentProcessor($id, $mode) {
     //FIX ME:
     $sql = "
 SELECT r.payment_processor_id
@@ -181,10 +178,9 @@ SELECT r.payment_processor_id
    * @param array  $ids (reference ) an array of recurring contribution ids
    *
    * @return array $totalCount an array of recurring ids count
-   * @access public
    * static
    */
-  static function getCount(&$ids) {
+  public static function getCount(&$ids) {
     $recurID = implode(',', $ids);
     $totalCount = array();
 
@@ -208,10 +204,9 @@ SELECT r.payment_processor_id
    * @param int $recurId
    *
    * @return bool
-   * @access public
    * @static
    */
-  static function deleteRecurContribution($recurId) {
+  public static function deleteRecurContribution($recurId) {
     $result = FALSE;
     if (!$recurId) {
       return $result;
@@ -234,10 +229,9 @@ SELECT r.payment_processor_id
    * @param array $activityParams
    *
    * @return bool
-   * @access public
    * @static
    */
-  static function cancelRecurContribution($recurId, $objects, $activityParams = array()) {
+  public static function cancelRecurContribution($recurId, $objects, $activityParams = array()) {
     if (!$recurId) {
       return FALSE;
     }
@@ -329,10 +323,9 @@ SELECT r.payment_processor_id
    *
    * @return array list of recurring contribution fields
    *
-   * @access public
    * @static
    */
-  static function getRecurContributions($contactId) {
+  public static function getRecurContributions($contactId) {
     $params = array();
     $recurDAO = new CRM_Contribute_DAO_ContributionRecur();
     $recurDAO->contact_id = $contactId;
@@ -365,7 +358,7 @@ SELECT r.payment_processor_id
    *
    * @return null|Object
    */
-  static function getSubscriptionDetails($entityID, $entity = 'recur') {
+  public static function getSubscriptionDetails($entityID, $entity = 'recur') {
     $sql = "
 SELECT rec.id                   as recur_id,
        rec.processor_id         as subscription_id,
@@ -414,7 +407,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     }
   }
 
-  static function setSubscriptionContext() {
+  public static function setSubscriptionContext() {
     // handle context redirection for subscription url
     $session = CRM_Core_Session::singleton();
     if ($session->get('userID')) {

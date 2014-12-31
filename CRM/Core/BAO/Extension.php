@@ -46,10 +46,9 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_BAO_LocationType object on success, null otherwise
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $extension = new CRM_Core_DAO_Extension();
     $extension->copyValues($params);
     if ($extension->find(TRUE)) {
@@ -66,10 +65,9 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
    *
    * @return void
    *
-   * @access public
    * @static
    */
-  static function del($id) {
+  public static function del($id) {
     $extension = new CRM_Core_DAO_Extension();
     $extension->id = $id;
     return $extension->delete();
@@ -82,7 +80,7 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
    * @param $schemaVersion string
    * @return void
    */
-  static function setSchemaVersion($fullName, $schemaVersion) {
+  public static function setSchemaVersion($fullName, $schemaVersion) {
     $sql = 'UPDATE civicrm_extension SET schema_version = %1 WHERE full_name = %2';
     $params = array(
       1 => array($schemaVersion, 'String'),
@@ -97,7 +95,7 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
    * @param $fullName string, the fully-qualified name (eg "com.example.myextension")
    * @return string
    */
-  static function getSchemaVersion($fullName) {
+  public static function getSchemaVersion($fullName) {
     $sql = 'SELECT schema_version FROM civicrm_extension WHERE full_name = %1';
     $params = array(
       1 => array($fullName, 'String'),

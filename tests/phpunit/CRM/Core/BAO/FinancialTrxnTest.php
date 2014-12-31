@@ -31,14 +31,14 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Core_BAO_FinancialTrxnTest
  */
 class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
   /**
    * Check method create()
    */
-  function testCreate() {
+  public function testCreate() {
     $contactId          = $this->individualCreate();
     $financialTypeId = 1;
     $contributionId     = $this->contributionCreate($contactId, $financialTypeId);
@@ -63,5 +63,3 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $this->assertEquals($result, 10, 'Verify financial trxn total_amount.');
   }
 }
-
-

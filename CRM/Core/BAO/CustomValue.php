@@ -46,7 +46,6 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
    * @param string $value The data to be validated
    *
    * @return boolean True if the value is of the specified type
-   * @access public
    * @static
    */
   public static function typecheck($type, $value) {
@@ -123,7 +122,6 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
    * @param string $type the civicrm type string
    *
    * @return the mysql data store placeholder
-   * @access public
    * @static
    */
   public static function typeToField($type) {
@@ -198,7 +196,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
    * @return void
    * @static
    */
-  static function deleteCustomValue($customValueID, $customGroupID) {
+  public static function deleteCustomValue($customValueID, $customGroupID) {
     // first we need to find custom value table, from custom group ID
     $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupID, 'table_name');
 

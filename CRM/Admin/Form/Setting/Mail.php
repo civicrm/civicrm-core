@@ -42,7 +42,6 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - CiviMail'));
@@ -72,7 +71,7 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
    *
    * @return array|bool
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
 
     if (CRM_Utils_Array::value('mailerJobSize', $fields) > 0) {
@@ -88,4 +87,3 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
     return empty($errors) ? TRUE : $errors;
   }
 }
-

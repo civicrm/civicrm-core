@@ -49,9 +49,8 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
    * Pre processing
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this, FALSE, 0);
   }
 
@@ -59,7 +58,6 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -81,14 +79,13 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
     );
   }
 
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return $this->_defaults;
   }
 
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -109,4 +106,3 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
     CRM_Utils_System::redirect($url);
   }
 }
-

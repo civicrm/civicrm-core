@@ -43,11 +43,10 @@ class CRM_Contribute_Form extends CRM_Admin_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if (isset($this->_id)) {
@@ -82,4 +81,3 @@ class CRM_Contribute_Form extends CRM_Admin_Form {
   }
 
 }
-

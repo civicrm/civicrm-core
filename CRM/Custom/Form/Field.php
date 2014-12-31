@@ -41,13 +41,12 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   /**
    * Constants for number of options for data types of multiple option.
    */
-  CONST NUM_OPTION = 11;
+  const NUM_OPTION = 11;
 
   /**
    * The custom group id saved to the session for an update
    *
    * @var int
-   * @access protected
    */
   protected $_gid;
 
@@ -55,7 +54,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    * The field id, used when editing the field
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
@@ -63,7 +61,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    * The default custom data/input types, when editing the field
    *
    * @var array
-   * @access protected
    */
   protected $_defaultDataType;
 
@@ -91,7 +88,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     if (!(self::$_dataTypeKeys)) {
@@ -169,9 +165,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    * @param null
    *
    * @return array    array of default values
-   * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = $this->_values;
 
     if ($this->_id) {
@@ -275,7 +270,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_gid) {
@@ -569,9 +563,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    * @return array    if errors then list of errors to be posted back to the form,
    *                  true otherwise
    * @static
-   * @access public
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $default = CRM_Utils_Array::value('default_value', $fields);
 
     $errors = array();
@@ -895,7 +888,6 @@ AND    option_group_id = %2";
    * @param null
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // store the submitted values in an array
@@ -1016,4 +1008,3 @@ SELECT id
     $this->ajaxResponse['customField'] = $customField->toArray();
   }
 }
-

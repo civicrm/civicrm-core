@@ -34,7 +34,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  function translateExamples() {
+  public function translateExamples() {
     $cases = array();
     $cases[] = array(
       '',
@@ -62,7 +62,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     );
     $cases[] = array( // with arg
       '
-      function whits() {
+      public function whits() {
         for (a in b) {
           mitts("wallaby", function(zoo){
             alert(zoo + ts("Hello"))
@@ -104,7 +104,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
    * @param array $expectedStrings
    * @dataProvider translateExamples
    */
-  function testParseStrings($jsCode, $expectedStrings) {
+  public function testParseStrings($jsCode, $expectedStrings) {
     $actualStrings = CRM_Utils_JS::parseStrings($jsCode);
     sort($expectedStrings);
     sort($actualStrings);

@@ -42,7 +42,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * The set id saved to the session for an update
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
@@ -50,7 +49,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    *  set is empty or not
    *
    * @var bool
-   * @access protected
    */
   protected $_isGroupEmpty = TRUE;
 
@@ -58,7 +56,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * Array of existing subtypes set for a custom set
    *
    * @var array
-   * @access protected
    */
   protected $_subtypes = array();
 
@@ -66,7 +63,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * Array of default params
    *
    * @var array
-   * @access protected
    */
   protected $_defaults = array();
 
@@ -76,7 +72,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     // current set id
@@ -118,10 +113,9 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    *
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
 
     //validate group title as well as name.
@@ -180,10 +174,9 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    * @see valid_date
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Custom_Form_Group', 'formRule'), $this);
   }
 
@@ -193,7 +186,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->applyFilter('__ALL__', 'trim');
@@ -410,9 +402,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @param null
    *
    * @return array   array of default values
-   * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = &$this->_defaults;
     $this->assign('showMaxMultiple', TRUE);
     if ($this->_action == CRM_Core_Action::ADD) {
@@ -462,7 +453,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // get the submitted form values.
@@ -535,7 +525,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    *
    * @return array of relationship name.
    */
-  static function getFormattedList(&$list) {
+  public static function getFormattedList(&$list) {
     $relName = array();
 
     foreach ($list as $listItemKey => $itemValue) {
@@ -559,4 +549,3 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     return $relName;
   }
 }
-

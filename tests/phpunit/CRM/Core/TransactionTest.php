@@ -20,21 +20,21 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    */
   private $cids;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->quickCleanup(array('civicrm_contact', 'civicrm_activity'));
     $this->callbackLog = array();
     $this->cids = array();
   }
 
-  function dataCreateStyle() {
+  public function dataCreateStyle() {
     return array(
       array('sql-insert'),
       array('bao-create'),
     );
   }
 
-  function dataCreateAndCommitStyles() {
+  public function dataCreateAndCommitStyles() {
     return array(
       array('sql-insert', 'implicit-commit'),
       array('sql-insert', 'explicit-commit'),
@@ -48,7 +48,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    * @param string $commitStyle 'implicit-commit'|'explicit-commit'
    * @dataProvider dataCreateAndCommitStyles
    */
-  function testBasicCommit($createStyle, $commitStyle) {
+  public function testBasicCommit($createStyle, $commitStyle) {
     $this->createContactWithTransaction('reuse-tx', $createStyle, $commitStyle);
     $this->assertCount(1, $this->cids);
     $this->assertContactsExistByOffset(array(0 => TRUE));
@@ -57,7 +57,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   /**
    * @dataProvider dataCreateStyle
    */
-  function testBasicRollback($createStyle) {
+  public function testBasicRollback($createStyle) {
     $this->createContactWithTransaction('reuse-tx', $createStyle, 'rollback');
     $this->assertCount(1, $this->cids);
     $this->assertContactsExistByOffset(array(0 => FALSE));
@@ -71,7 +71,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    * @param string $commitStyle 'implicit-commit'|'explicit-commit'
    * @dataProvider dataCreateAndCommitStyles
    */
-  function testBatchRollback($createStyle, $commitStyle) {
+  public function testBatchRollback($createStyle, $commitStyle) {
     $this->runBatch(
       'reuse-tx',
       array(
@@ -95,7 +95,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    * @param string $commitStyle 'implicit-commit'|'explicit-commit'
    * @dataProvider dataCreateAndCommitStyles
    */
-  function testMixedBatchCommit_nesting($createStyle, $commitStyle) {
+  public function testMixedBatchCommit_nesting($createStyle, $commitStyle) {
     $this->runBatch(
       'reuse-tx',
       array(
@@ -120,7 +120,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    * @param string $commitStyle 'implicit-commit'|'explicit-commit'
    * @dataProvider dataCreateAndCommitStyles
    */
-  function testMixedBatchCommit_reuse($createStyle, $commitStyle) {
+  public function testMixedBatchCommit_reuse($createStyle, $commitStyle) {
     $this->runBatch(
       'reuse-tx',
       array(
@@ -144,7 +144,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    * @param string $commitStyle 'implicit-commit'|'explicit-commit'
    * @dataProvider dataCreateAndCommitStyles
    */
-  function testMixedBatchRollback_nesting($createStyle, $commitStyle) {
+  public function testMixedBatchRollback_nesting($createStyle, $commitStyle) {
     $this->assertFalse(CRM_Core_Transaction::isActive());
     $this->runBatch(
       'reuse-tx',
@@ -346,7 +346,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    * @param string $outcome 'rollback'|'implicit-commit'|'explicit-commit' how to finish transaction
    * @return int cid
    */
-  function runBatch($nesting, $callbacks, $existsByOffset, $outcome)  {
+  public function runBatch($nesting, $callbacks, $existsByOffset, $outcome)  {
     if ($nesting != 'reuse-tx' && $nesting != 'nest-tx') {
       throw new RuntimeException('Bad test data: nesting=' . $nesting);
     }
@@ -371,19 +371,19 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     } // else: implicit-commit
   }
 
-  function _preCommit($arg1, $arg2) {
+  public function _preCommit($arg1, $arg2) {
     $this->callbackLog[] = array('_preCommit', $arg1, $arg2);
   }
 
-  function _postCommit($arg1, $arg2) {
+  public function _postCommit($arg1, $arg2) {
     $this->callbackLog[] = array('_postCommit', $arg1, $arg2);
   }
 
-  function _preRollback($arg1, $arg2) {
+  public function _preRollback($arg1, $arg2) {
     $this->callbackLog[] = array('_preRollback', $arg1, $arg2);
   }
 
-  function _postRollback($arg1, $arg2) {
+  public function _postRollback($arg1, $arg2) {
     $this->callbackLog[] = array('_postRollback', $arg1, $arg2);
   }
 }

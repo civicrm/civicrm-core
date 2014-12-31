@@ -43,7 +43,6 @@ class CRM_Admin_Form_PreferencesDate extends CRM_Admin_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -96,9 +95,8 @@ class CRM_Admin_Form_PreferencesDate extends CRM_Admin_Form {
    * @return array    if errors then list of errors to be posted back to the form,
    *                  true otherwise
    * @static
-   * @access public
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
 
     if ($fields['name'] == 'activityDateTime' && !$fields['time_format']) {
@@ -111,7 +109,6 @@ class CRM_Admin_Form_PreferencesDate extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

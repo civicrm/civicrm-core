@@ -38,27 +38,27 @@ abstract class CRM_Import_Parser {
   /**
    * Settings
    */
-  CONST MAX_ERRORS = 250, MAX_WARNINGS = 25, DEFAULT_TIMEOUT = 30;
+  const MAX_ERRORS = 250, MAX_WARNINGS = 25, DEFAULT_TIMEOUT = 30;
 
   /**
    * Return codes
    */
-  CONST VALID = 1, WARNING = 2, ERROR = 4, CONFLICT = 8, STOP = 16, DUPLICATE = 32, MULTIPLE_DUPE = 64, NO_MATCH = 128, UNPARSED_ADDRESS_WARNING = 256;
+  const VALID = 1, WARNING = 2, ERROR = 4, CONFLICT = 8, STOP = 16, DUPLICATE = 32, MULTIPLE_DUPE = 64, NO_MATCH = 128, UNPARSED_ADDRESS_WARNING = 256;
 
   /**
    * Parser modes
    */
-  CONST MODE_MAPFIELD = 1, MODE_PREVIEW = 2, MODE_SUMMARY = 4, MODE_IMPORT = 8;
+  const MODE_MAPFIELD = 1, MODE_PREVIEW = 2, MODE_SUMMARY = 4, MODE_IMPORT = 8;
 
   /**
    * Codes for duplicate record handling
    */
-  CONST DUPLICATE_SKIP = 1, DUPLICATE_REPLACE = 2, DUPLICATE_UPDATE = 4, DUPLICATE_FILL = 8, DUPLICATE_NOCHECK = 16;
+  const DUPLICATE_SKIP = 1, DUPLICATE_REPLACE = 2, DUPLICATE_UPDATE = 4, DUPLICATE_FILL = 8, DUPLICATE_NOCHECK = 16;
 
   /**
    * Contact types
    */
-  CONST CONTACT_INDIVIDUAL = 1, CONTACT_HOUSEHOLD = 2, CONTACT_ORGANIZATION = 4;
+  const CONTACT_INDIVIDUAL = 1, CONTACT_HOUSEHOLD = 2, CONTACT_ORGANIZATION = 4;
 
 
   /**
@@ -188,7 +188,7 @@ abstract class CRM_Import_Parser {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     $this->_maxLinesToProcess = 0;
     $this->_maxErrorCount = self::MAX_ERRORS;
   }
@@ -240,7 +240,7 @@ abstract class CRM_Import_Parser {
    *
    * @return int
    */
-  function setActiveFieldValues($elements, &$erroneousField) {
+  public function setActiveFieldValues($elements, &$erroneousField) {
     $maxCount = count($elements) < $this->_activeFieldCount ? count($elements) : $this->_activeFieldCount;
     for ($i = 0; $i < $maxCount; $i++) {
       $this->_activeFields[$i]->setValue($elements[$i]);
@@ -268,9 +268,8 @@ abstract class CRM_Import_Parser {
    * Format the field values for input to the api
    *
    * @return array (reference) associative array of name/value pairs
-   * @access public
    */
-  function &getActiveFieldParams() {
+  public function &getActiveFieldParams() {
     $params = array();
     for ($i = 0; $i < $this->_activeFieldCount; $i++) {
       if (isset($this->_activeFields[$i]->_value)
@@ -287,7 +286,7 @@ abstract class CRM_Import_Parser {
   /**
    * @return array
    */
-  function getSelectValues() {
+  public function getSelectValues() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_title;
@@ -298,7 +297,7 @@ abstract class CRM_Import_Parser {
   /**
    * @return array
    */
-  function getSelectTypes() {
+  public function getSelectTypes() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
       if (isset($field->_hasLocationType)) {
@@ -311,7 +310,7 @@ abstract class CRM_Import_Parser {
   /**
    * @return array
    */
-  function getHeaderPatterns() {
+  public function getHeaderPatterns() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
       if (isset($field->_headerPattern)) {
@@ -324,7 +323,7 @@ abstract class CRM_Import_Parser {
   /**
    * @return array
    */
-  function getDataPatterns() {
+  public function getDataPatterns() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_dataPattern;
@@ -340,9 +339,8 @@ abstract class CRM_Import_Parser {
    *
    * @return void
    * @static
-   * @access public
    */
-  static function encloseScrub(&$values, $enclosure = "'") {
+  public static function encloseScrub(&$values, $enclosure = "'") {
     if (empty($values)) {
       return;
     }
@@ -358,9 +356,8 @@ abstract class CRM_Import_Parser {
    * @param int $max
    *
    * @return void
-   * @access public
    */
-  function setMaxLinesToProcess($max) {
+  public function setMaxLinesToProcess($max) {
     $this->_maxLinesToProcess = $max;
   }
 
@@ -371,7 +368,7 @@ abstract class CRM_Import_Parser {
    * @return string
    * @static
    */
-  static function errorFileName($type) {
+  public static function errorFileName($type) {
     $fileName = NULL;
     if (empty($type)) {
       return $fileName;
@@ -411,7 +408,7 @@ abstract class CRM_Import_Parser {
    * @return string
    * @static
    */
-  static function saveFileName($type) {
+  public static function saveFileName($type) {
     $fileName = NULL;
     if (empty($type)) {
       return $fileName;

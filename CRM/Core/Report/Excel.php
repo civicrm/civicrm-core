@@ -47,10 +47,9 @@ class CRM_Core_Report_Excel {
    *
    * @return  mixed    empty if output is printed, else output
    *
-   * @access  public
    * @static
    */
-  static function makeCSVTable(&$header, &$rows, $titleHeader = NULL, $print = TRUE, $outputHeader = TRUE) {
+  public static function makeCSVTable(&$header, &$rows, $titleHeader = NULL, $print = TRUE, $outputHeader = TRUE) {
     if ($titleHeader) {
       echo $titleHeader;
     }
@@ -158,7 +157,7 @@ class CRM_Core_Report_Excel {
    * @param null $titleHeader
    * @param bool $outputHeader
    */
-  function writeHTMLFile($fileName, &$header, &$rows, $titleHeader = NULL, $outputHeader = TRUE) {
+  public function writeHTMLFile($fileName, &$header, &$rows, $titleHeader = NULL, $outputHeader = TRUE) {
     if ($outputHeader) {
       CRM_Utils_System::download(CRM_Utils_String::munge($fileName),
         'application/vnd.ms-excel',
@@ -198,10 +197,9 @@ class CRM_Core_Report_Excel {
    * @param boolean $saveFile -
    *
    * @return void
-   * @public
    * @static
    */
-  static function writeCSVFile($fileName, &$header, &$rows, $titleHeader = NULL, $outputHeader = TRUE, $saveFile = NULL) {
+  public static function writeCSVFile($fileName, &$header, &$rows, $titleHeader = NULL, $outputHeader = TRUE, $saveFile = NULL) {
     if ($outputHeader && !$saveFile) {
       CRM_Utils_System::download(CRM_Utils_String::munge($fileName),
         'text/x-csv',
@@ -221,4 +219,3 @@ class CRM_Core_Report_Excel {
   }
 
 }
-

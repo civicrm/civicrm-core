@@ -36,7 +36,7 @@
 class CRM_Mailing_Form_Subscribe extends CRM_Core_Form {
   protected $_groupID = NULL;
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
     $this->_groupID = CRM_Utils_Request::retrieve('gid', 'Integer', $this,
       FALSE, NULL, 'REQUEST'
@@ -81,7 +81,6 @@ SELECT   title, description
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // add the email address
@@ -178,7 +177,7 @@ ORDER BY title";
    *
    * @return array|bool
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     foreach ($fields as $name => $dontCare) {
       if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
         return TRUE;
@@ -188,7 +187,6 @@ ORDER BY title";
   }
 
   /**
-   * @access public
    *
    * @return void
    */
@@ -210,4 +208,3 @@ ORDER BY title";
     CRM_Mailing_Event_BAO_Subscribe::commonSubscribe($groups, $params);
   }
 }
-

@@ -34,7 +34,7 @@
  *
  */
 class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
-  CONST ROW_COUNT_LIMIT = 2;
+  const ROW_COUNT_LIMIT = 2;
 
   protected $_summary = NULL;
   protected $_noFields = TRUE;
@@ -47,7 +47,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
 
     $this->_columns = array(
       'civicrm_event' => array(
@@ -66,7 +66,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->_csvSupported = FALSE;
     parent::preProcess();
   }
@@ -74,7 +74,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
   /**
    * @param $eventIDs
    */
-  function buildEventReport($eventIDs) {
+  public function buildEventReport($eventIDs) {
 
     $this->assign('events', $eventIDs);
 
@@ -269,7 +269,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
    *
    * @return array
    */
-  function statistics(&$eventIDs) {
+  public function statistics(&$eventIDs) {
     $statistics = array();
     $count = count($eventIDs);
     $this->countStat($statistics, $count);
@@ -283,7 +283,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
   /**
    * @param int $rowCount
    */
-  function limit($rowCount = self::ROW_COUNT_LIMIT) {
+  public function limit($rowCount = self::ROW_COUNT_LIMIT) {
     parent::limit($rowCount);
 
     //modify limit
@@ -300,7 +300,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
   /**
    * @param int $rowCount
    */
-  function setPager($rowCount = self::ROW_COUNT_LIMIT) {
+  public function setPager($rowCount = self::ROW_COUNT_LIMIT) {
     $params = array(
       'total' => $this->_rowsFound,
       'rowCount' => self::ROW_COUNT_LIMIT,
@@ -314,7 +314,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     $this->assign_by_ref('pager', $pager);
   }
 
-  function postProcess() {
+  public function postProcess() {
     $this->beginPostProcess();
     $this->_setVariable = TRUE;
 
@@ -377,4 +377,3 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     parent::endPostProcess();
   }
 }
-

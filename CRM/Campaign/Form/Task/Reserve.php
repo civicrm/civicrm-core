@@ -71,9 +71,8 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
 
     //get the survey id from user submitted values.
@@ -126,7 +125,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     CRM_Utils_System::setTitle(ts('Reserve Respondents'));
   }
 
-  function validateSurvey() {
+  public function validateSurvey() {
     $errorMsg = NULL;
     $maxVoters = CRM_Utils_Array::value('max_number_of_contacts', $this->_surveyDetails);
     if ($maxVoters) {
@@ -155,11 +154,10 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     // allow to add contact to either new or existing group.
     $this->addElement('text', 'ActivityType', ts('Activity Type'));
     $this->addElement('text', 'newGroupName', ts('Name for new group'));
@@ -210,9 +208,8 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     $invalidGroupName = FALSE;
     if (!empty($fields['newGroupName'])) {
@@ -235,7 +232,6 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -357,4 +353,3 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     return $groupAdditions;
   }
 }
-

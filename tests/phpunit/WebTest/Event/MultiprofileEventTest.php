@@ -35,7 +35,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCreateEventRegisterPage() {
+  public function testCreateEventRegisterPage() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -128,7 +128,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
-  function testAnoumyousRegisterPage() {
+  public function testAnoumyousRegisterPage() {
     // add the required Drupal permission
     $permission = array('edit-1-access-all-custom-data');
     $this->changePermissions($permission);
@@ -274,7 +274,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
    *
    * @return array
    */
-  function _testGetCustomFieldId($customGrpId1) {
+  public function _testGetCustomFieldId($customGrpId1) {
     $customId = array();
 
     // Create a custom data to add in profile
@@ -318,7 +318,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   /**
    * @param int $eventPageId
    */
-  function _testRemoveProfile($eventPageId) {
+  public function _testRemoveProfile($eventPageId) {
     $this->openCiviPage("event/manage/settings", "reset=1&action=update&id=$eventPageId");
 
     // Go to Online Contribution tab
@@ -337,7 +337,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
    *
    * @return array
    */
-  function _testGetProfileId($customId) {
+  public function _testGetProfileId($customId) {
     // create profiles
     $profileId = array();
     $profilefield = array(
@@ -416,7 +416,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
    *
    * @return null
    */
-  function _testCreateProfile($profilefield, $location = 0, $type) {
+  public function _testCreateProfile($profilefield, $location = 0, $type) {
     $locationfields = array(
       'supplemental_address_1',
       'supplemental_address_2',
@@ -465,7 +465,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
    * @param $eventTitle
    * @param $eventDescription
    */
-  function _testAddEventInfo($eventTitle, $eventDescription) {
+  public function _testAddEventInfo($eventTitle, $eventDescription) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
     $this->select("event_type_id", "value=1");
@@ -493,7 +493,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   /**
    * @param $streetAddress
    */
-  function _testAddLocation($streetAddress) {
+  public function _testAddLocation($streetAddress) {
     // Wait for Location tab form to load
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Location_upload-bottom");
@@ -520,7 +520,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
    * @param bool $priceSet
    * @param string $processorName
    */
-  function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName = "PP Pro") {
+  public function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName = "PP Pro") {
     // Go to Fees tab
     $this->click("link=Fees");
     $this->waitForElementPresent("_qf_Fee_upload-bottom");
@@ -559,7 +559,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
    *
    * @return null
    */
-  function _testAddMultipleProfile($profileId) {
+  public function _testAddMultipleProfile($profileId) {
     // Go to Online Contribution tab
     $this->click("link=Online Registration");
     $this->waitForElementPresent("_qf_Registration_upload-bottom");
@@ -729,7 +729,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
    * @param $email3
    * @param $email4
    */
-  function _testEventRegistrationAfterRemoving($eventPageId, $customId, $firstName2, $lastName2, $participantfname2, $participantlname2, $email3, $email4) {
+  public function _testEventRegistrationAfterRemoving($eventPageId, $customId, $firstName2, $lastName2, $participantfname2, $participantlname2, $email3, $email4) {
     $this->openCiviPage("event/register", "id={$eventPageId}&reset=1", "_qf_Register_upload-bottom");
     $this->select("additional_participants", "value=1");
 
@@ -797,7 +797,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   /**
    * @return array|string
    */
-  function _addEmailField() {
+  public function _addEmailField() {
     //add email field in name and address profile
     $this->openCiviPage('admin/uf/group/field/add', 'reset=1&action=add&gid=1', "_qf_Field_next-bottom");
     $this->select("field_name[0]", "value=Contact");
@@ -819,7 +819,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   /**
    * @param int $cfId
    */
-  function _removeEmailField($cfId) {
+  public function _removeEmailField($cfId) {
     $this->openCiviPage("admin/uf/group/field", "action=delete&id={$cfId}");
     $this->click("_qf_Field_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());

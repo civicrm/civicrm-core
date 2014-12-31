@@ -77,7 +77,6 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the case statues
    *
-   * @access public
    *
    * @param string $column
    * @param bool $onlyActive
@@ -106,7 +105,6 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the redaction rules
    *
-   * @access public
    *
    * @param null $filter
    *
@@ -136,7 +134,6 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the case type
    *
-   * @access public
    *
    * @param string $column
    * @param bool $onlyActive
@@ -169,7 +166,6 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the Encounter Medium
    *
-   * @access public
    *
    * @param string $column
    * @param bool $onlyActive
@@ -199,7 +195,6 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param bool $all
    *
-   * @access public
    * @static
    *
    * @return array - array reference of all activity types.
@@ -254,7 +249,6 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db
    * next time it's requested.
    *
-   * @access public
    * @static
    *
    * @param bool|string $name pseudoconstant to be flushed
@@ -265,4 +259,3 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
     }
   }
 }
-

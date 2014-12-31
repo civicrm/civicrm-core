@@ -46,13 +46,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @var int
    * @const
    */
-  CONST LOCATION_BLOCKS = 1;
+  const LOCATION_BLOCKS = 1;
 
   /**
    * The id of the event we are proceessing
    *
    * @var int
-   * @protected
    */
   public $_eventId;
 
@@ -60,7 +59,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * The array of ids of all the participant we are proceessing
    *
    * @var int
-   * @protected
    */
   protected $_participantIDS = NULL;
 
@@ -68,7 +66,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * The id of the participant we are proceessing
    *
    * @var int
-   * @protected
    */
   protected $_participantId;
 
@@ -76,7 +73,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Is participant able to walk registration wizard.
    *
    * @var Boolean
-   * @protected
    */
   public $_allowConfirmation;
 
@@ -84,7 +80,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Is participant requires approval
    *
    * @var Boolean
-   * @public
    */
   public $_requireApproval;
 
@@ -92,7 +87,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Is event configured for waitlist.
    *
    * @var Boolean
-   * @public
    */
   public $_allowWaitlist;
 
@@ -101,7 +95,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * when there are pre-registered.
    *
    * @var array
-   * @public
    */
   public $_additionalParticipantIds;
 
@@ -117,7 +110,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * The values for the contribution db object
    *
    * @var array
-   * @protected
    */
   public $_values;
 
@@ -125,7 +117,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * The paymentProcessor attributes for this page
    *
    * @var array
-   * @protected
    */
   public $_paymentProcessor;
 
@@ -133,7 +124,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * The params submitted by the form and computed by the app
    *
    * @var array
-   * @protected
    */
   protected $_params;
 
@@ -141,7 +131,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * The fields involved in this contribution page
    *
    * @var array
-   * @protected
    */
   public $_fields;
 
@@ -149,7 +138,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * The billing location id for this contribiution page
    *
    * @var int
-   * @protected
    */
   public $_bltID;
 
@@ -157,7 +145,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Price Set ID, if the new price set method is used
    *
    * @var int
-   * @protected
    */
   public $_priceSetId = NULL;
 
@@ -165,7 +152,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Array of fields for the price set
    *
    * @var array
-   * @protected
    */
   public $_priceSet;
 
@@ -176,7 +162,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /* Is event already full.
      *
      * @var boolean
-     * @protected
      */
 
   public $_isEventFull;
@@ -193,9 +178,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_eventId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
 
@@ -478,9 +462,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Assign the minimal set of variables to the template
    *
    * @return void
-   * @access public
    */
-  function assignToTemplate() {
+  public function assignToTemplate() {
     //process only primary participant params
     $this->_params = $this->get('params');
     if (isset($this->_params[0])) {
@@ -578,9 +561,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param bool $viewOnly
    *
    * @return void
-   * @access public
    */
-  function buildCustom($id, $name, $viewOnly = FALSE) {
+  public function buildCustom($id, $name, $viewOnly = FALSE) {
     if ($id) {
       $button    = substr($this->controller->getButtonName(), -4);
       $cid       = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
@@ -680,7 +662,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * @throws Exception
    */
-  static function initEventFee(&$form, $eventID) {
+  public static function initEventFee(&$form, $eventID) {
     // get price info
 
     // retrive all active price set fields.
@@ -740,9 +722,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param null $payment
    *
    * @return void
-   * @access public
    */
-  function confirmPostProcess($contactID = NULL, $contribution = NULL, $payment = NULL) {
+  public function confirmPostProcess($contactID = NULL, $contribution = NULL, $payment = NULL) {
     // add/update contact information
     $fields = array();
     unset($this->_params['note']);
@@ -842,7 +823,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param int $contactID
    *
    * @return void
-   * @access public
    */
   public static function addParticipant(&$form, $contactID) {
     if (empty($form->_params)) {
@@ -947,7 +927,6 @@ WHERE  v.option_group_id = g.id
    * @param  array $params user params.
    *
    * @return $totalCount total participant count.
-   * @access public
    */
   /**
    * @param CRM_Core_Form $form
@@ -1046,7 +1025,6 @@ WHERE  v.option_group_id = g.id
    *
    *
    * @return array $formatted, formatted price set params.
-   * @access public
    */
   /**
    * @param CRM_Core_Form $form
@@ -1096,7 +1074,6 @@ WHERE  v.option_group_id = g.id
    *
    *
    * @return array $optionsCount, array of each option w/ count total.
-   * @access public
    */
   /**
    * @param $form
@@ -1173,7 +1150,7 @@ WHERE  v.option_group_id = g.id
    *
    * @return null|string
    */
-  function checkTemplateFileExists($suffix = '') {
+  public function checkTemplateFileExists($suffix = '') {
     if ($this->_eventId) {
       $templateName = $this->_name;
       if (substr($templateName, 0, 12) == 'Participant_') {
@@ -1192,7 +1169,7 @@ WHERE  v.option_group_id = g.id
   /**
    * @return null|string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
@@ -1200,7 +1177,7 @@ WHERE  v.option_group_id = g.id
   /**
    * @return null|string
    */
-  function overrideExtraTemplateFileName() {
+  public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
@@ -1212,7 +1189,7 @@ WHERE  v.option_group_id = g.id
    * @param unknown_type $params
    * @return multitype:|Ambigous <multitype:, string, string>
    */
-  static function validatePriceSet(&$form, $params) {
+  public static function validatePriceSet(&$form, $params) {
     $errors = array();
     $hasOptMaxValue = FALSE;
     if (!is_array($params) || empty($params)) {
@@ -1349,7 +1326,7 @@ WHERE  v.option_group_id = g.id
   /**
    * @param int $participantID
    */
-  function processFirstParticipant($participantID) {
+  public function processFirstParticipant($participantID) {
     $this->_participantId = $participantID;
     $this->set('participantId', $this->_participantId);
 
@@ -1376,7 +1353,7 @@ WHERE  v.option_group_id = g.id
    *
    * @param string $redirect
    */
-  function checkValidEvent($redirect = NULL) {
+  public function checkValidEvent($redirect = NULL) {
     // is the event active (enabled)?
     if (!$this->_values['event']['is_active']) {
       // form is inactive, die a fatal death
@@ -1420,4 +1397,3 @@ WHERE  v.option_group_id = g.id
     }
   }
 }
-

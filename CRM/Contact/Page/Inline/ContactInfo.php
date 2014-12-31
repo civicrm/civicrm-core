@@ -45,10 +45,9 @@ class CRM_Contact_Page_Inline_ContactInfo extends CRM_Core_Page {
    * This method is called after the page is created.
    *
    * @return void
-   * @access public
    *
    */
-  function run() {
+  public function run() {
     // get the emails for this contact
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
 
@@ -75,4 +74,3 @@ class CRM_Contact_Page_Inline_ContactInfo extends CRM_Core_Page {
     parent::run();
   }
 }
-

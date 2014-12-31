@@ -67,13 +67,13 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     );
   }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->foreignKeyChecksOff();
     $this->quickCleanup($this->_tablesToTruncate);
   }
 
-  function tearDown() {
+  public function tearDown() {
     parent::tearDown();
     CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS civireport_contribution_detail_temp1');
     CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS civireport_contribution_detail_temp2');

@@ -51,7 +51,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
 
     // Check if CiviCampaign is a) enabled and b) has active campaigns
     $config = CRM_Core_Config::singleton();
@@ -264,7 +264,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
@@ -273,11 +273,11 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
    *
    * @return array
    */
-  function setDefaultValues($freeze = TRUE) {
+  public function setDefaultValues($freeze = TRUE) {
     return parent::setDefaultValues($freeze);
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
@@ -389,7 +389,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     //check for searching combination of dispaly columns and
     //grouping criteria
@@ -419,7 +419,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     return $errors;
   }
 
-  function from() {
+  public function from() {
     $softCreditJoin = "LEFT";
     if (!empty($this->_params['fields']['soft_amount']) &&
       empty($this->_params['fields']['total_amount'])
@@ -454,7 +454,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = "";
     $append = FALSE;
     if (is_array($this->_params['group_bys']) &&
@@ -503,7 +503,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     }
   }
 
-  function storeWhereHavingClauseArray() {
+  public function storeWhereHavingClauseArray() {
     parent::storeWhereHavingClauseArray();
     if (empty($this->_params['fields']['soft_amount']) &&
       !empty($this->_havingClauses)
@@ -521,7 +521,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
     $softCredit = CRM_Utils_Array::value('soft_amount', $this->_params['fields']);
@@ -598,7 +598,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
     return $statistics;
   }
 
-  function postProcess() {
+  public function postProcess() {
     $this->buildACLClause($this->_aliases['civicrm_contact']);
     parent::postProcess();
   }
@@ -606,7 +606,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
   /**
    * @param $rows
    */
-  function buildChart(&$rows) {
+  public function buildChart(&$rows) {
     $graphRows = array();
 
     if (!empty($this->_params['charts'])) {
@@ -657,7 +657,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
 
@@ -750,4 +750,3 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
     }
   }
 }
-

@@ -35,7 +35,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testGroupAdd() {
+  public function testGroupAdd() {
     $this->webtestLogin();
 
     $this->openCiviPage('group/add', 'reset=1', '_qf_Edit_upload-bottom');
@@ -104,7 +104,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("css=div.crm-summary-display_name", $displayName);
   }
 
-  function testGroupReserved() {
+  public function testGroupReserved() {
     $this->webtestLogin('admin');
 
     $this->openCiviPage('group/add', 'reset=1', '_qf_Edit_upload-bottom');
@@ -186,7 +186,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
    *
    * @return string
    */
-  function _testCreateUser($roleid) {
+  public function _testCreateUser($roleid) {
     $this->open($this->sboxPath . "admin/people/create");
 
     $this->waitForElementPresent("edit-submit");
@@ -222,7 +222,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
   /**
    * @param $role
    */
-  function _roleDelete($role) {
+  public function _roleDelete($role) {
     $this->waitForElementPresent("xpath=//table[@id='user-roles']/tbody//tr/td[text()='{$role}']/..//td/a[text()='edit role']");
     $this->click("xpath=//table[@id='user-roles']/tbody//tr/td[text()='{$role}']/..//td/a[text()='edit role']");
     $this->waitForElementPresent('edit-delete');
@@ -235,7 +235,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
    /**
    * Webtest for add contact to group (CRM-15108)
    */
-  function testAddContactToGroup() {
+  public function testAddContactToGroup() {
     $this->webtestLogin();
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
     $this->waitForElementPresent('_qf_Contact_upload_view-bottom');

@@ -39,7 +39,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * Constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -51,7 +51,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @return mixed
    */
-  static function retrieve($name, $type, $location = 'POST', $abort = TRUE) {
+  public static function retrieve($name, $type, $location = 'POST', $abort = TRUE) {
     static $store = NULL;
     $value = CRM_Utils_Request::retrieve($name, $type, $store,
       FALSE, NULL, $location
@@ -70,7 +70,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @param $objects
    * @param $first
    */
-  function recur(&$input, &$ids, &$objects, $first) {
+  public function recur(&$input, &$ids, &$objects, $first) {
     if (!isset($input['txnType'])) {
       CRM_Core_Error::debug_log_message("Could not find txn_type in input request");
       echo "Failure: Invalid parameters<p>";
@@ -285,7 +285,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     $this->completeTransaction($input, $ids, $objects, $transaction, $recur);
   }
 
-  function main() {
+  public function main() {
    //@todo - this could be refactored like PayPalProIPN & a test could be added
 
     $objects = $ids = $input = array();
@@ -342,7 +342,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @param $input
    * @param $ids
    */
-  function getInput(&$input, &$ids) {
+  public function getInput(&$input, &$ids) {
     if (!$this->getBillingID($ids)) {
       return FALSE;
     }

@@ -37,13 +37,12 @@ class CRM_Contribute_Form_AdditionalInfo {
   /**
    * Build the form object for Premium Information.
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
    * @return void
    */
-  static function buildPremium(&$form) {
+  public static function buildPremium(&$form) {
     //premium section
     $form->add('hidden', 'hidden_Premium', 1);
     $sel1 = $sel2 = array();
@@ -88,13 +87,12 @@ class CRM_Contribute_Form_AdditionalInfo {
   /**
    * Build the form object for Additional Details.
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
    * @return void
    */
-  static function buildAdditionalDetail(&$form) {
+  public static function buildAdditionalDetail(&$form) {
     //Additional information section
     $form->add('hidden', 'hidden_AdditionalDetail', 1);
 
@@ -176,13 +174,12 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * Build the form object for PaymentReminders Information.
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
    * @return void
    */
-  static function buildPaymentReminders(&$form) {
+  public static function buildPaymentReminders(&$form) {
     //PaymentReminders section
     $form->add('hidden', 'hidden_PaymentReminders', 1);
     $form->add('text', 'initial_reminder_day', ts('Send Initial Reminder'), array('size' => 3));
@@ -196,7 +193,6 @@ class CRM_Contribute_Form_AdditionalInfo {
   /**
    * Process the Premium Information
    *
-   * @access public
    *
    * @param array $params
    * @param int $contributionID
@@ -204,7 +200,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @param null $options
    * @return void
    */
-  static function processPremium(&$params, $contributionID, $premiumID = NULL, &$options = NULL) {
+  public static function processPremium(&$params, $contributionID, $premiumID = NULL, &$options = NULL) {
     $dao = new CRM_Contribute_DAO_ContributionProduct();
     $dao->contribution_id = $contributionID;
     $dao->product_id = $params['product_name'][0];
@@ -256,7 +252,6 @@ class CRM_Contribute_Form_AdditionalInfo {
   /**
    * Process the Note
    *
-   * @access public
    *
    * @param array $params
    * @param int $contactID
@@ -265,7 +260,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @return void
    */
-  static function processNote(&$params, $contactID, $contributionID, $contributionNoteID = NULL) {
+  public static function processNote(&$params, $contactID, $contributionID, $contributionNoteID = NULL) {
     //process note
     $noteParams = array(
       'entity_table' => 'civicrm_contribution',
@@ -284,14 +279,13 @@ class CRM_Contribute_Form_AdditionalInfo {
   /**
    * Process the Common data
    *
-   * @access public
    *
    * @param array $params
    * @param $formatted
    * @param CRM_Core_Form $form
    * @return void
    */
-  static function postProcessCommon(&$params, &$formatted, &$form) {
+  public static function postProcessCommon(&$params, &$formatted, &$form) {
     $fields = array(
       'non_deductible_amount',
       'total_amount',
@@ -342,11 +336,10 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @param array $params (reference ) an assoc array of name/value pairs.
    * @$ccContribution boolen,  is it credit card contribution.
    * @param bool $ccContribution
-   * @access public.
    *
    * @return array
    */
-  static function emailReceipt(&$form, &$params, $ccContribution = FALSE) {
+  public static function emailReceipt(&$form, &$params, $ccContribution = FALSE) {
     $form->assign('receiptType', 'contribution');
     // Retrieve Financial Type Name from financial_type_id
     $params['contributionType_name'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
@@ -518,5 +511,3 @@ class CRM_Contribute_Form_AdditionalInfo {
   }
 
 }
-
-

@@ -42,7 +42,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   protected $_membershipTypeID;
   protected $_contactID;
 
-  function setUp() {
+  public function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
     $config = CRM_Core_Config::singleton();
@@ -52,7 +52,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->_membershipTypeID = $this->membershipTypeCreate();
   }
 
-  function tearDown() {
+  public function tearDown() {
 
     $this->quickCleanup(array(
       'civicrm_contact',
@@ -71,7 +71,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check Without ProfileId
    */
-  function testProfileGetWithoutProfileId() {
+  public function testProfileGetWithoutProfileId() {
     $params = array(
       'contact_id' => 1,
     );
@@ -83,7 +83,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check with no invalid profile Id
    */
-  function testProfileGetInvalidProfileId() {
+  public function testProfileGetInvalidProfileId() {
     $params = array(
       'contact_id' => 1,
       'profile_id' => 1000,
@@ -94,7 +94,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check with success
    */
-  function testProfileGet() {
+  public function testProfileGet() {
     $pofileFieldValues = $this->_createIndividualContact();
     $expected          = current($pofileFieldValues);
     $contactId         = key($pofileFieldValues);
@@ -108,7 +108,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     }
   }
 
-  function testProfileGetMultiple() {
+  public function testProfileGetMultiple() {
     $pofileFieldValues = $this->_createIndividualContact();
     $expected          = current($pofileFieldValues);
     $contactId         = key($pofileFieldValues);
@@ -137,7 +137,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     ));
   }
 
-  function testProfileGetBillingUseIsBillingLocation() {
+  public function testProfileGetBillingUseIsBillingLocation() {
     $individual = $this->_createIndividualContact();
     $contactId  = key($individual);
     $this->callAPISuccess('address', 'create', array(
@@ -170,7 +170,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     ), $result['values']['Billing']);
   }
 
-  function testProfileGetMultipleHasBillingLocation() {
+  public function testProfileGetMultipleHasBillingLocation() {
     $individual = $this->_createIndividualContact();
     $contactId  = key($individual);
     $this->callAPISuccess('address', 'create', array('contact_id' => $contactId , 'street_address' => '25 Big Street', 'city' => 'big city', 'location_type_id' => 5));
@@ -202,7 +202,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Get Billing empty contact - this will return generic defaults
    */
-  function testProfileGetBillingEmptyContact() {
+  public function testProfileGetBillingEmptyContact() {
 
     $params = array(
       'profile_id' => array('Billing'),
@@ -226,7 +226,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check contact activity profile without activity id
    */
-  function testContactActivityGetWithoutActivityId() {
+  public function testContactActivityGetWithoutActivityId() {
     list($params, $expected) = $this->_createContactWithActivity();
 
     unset($params['activity_id']);
@@ -237,7 +237,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check contact activity profile wrong activity id
    */
-  function testContactActivityGetWrongActivityId() {
+  public function testContactActivityGetWrongActivityId() {
     list($params, $expected) = $this->_createContactWithActivity();
 
     $params['activity_id'] = 100001;
@@ -248,7 +248,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check contact activity profile with wrong activity type
    */
-  function testContactActivityGetWrongActivityType() {
+  public function testContactActivityGetWrongActivityType() {
     //flush cache by calling with reset
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name', TRUE);
 
@@ -281,7 +281,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check contact activity profile with success
    */
-  function testContactActivityGetSuccess() {
+  public function testContactActivityGetSuccess() {
     list($params, $expected) = $this->_createContactWithActivity();
 
     $result = $this->callAPISuccess('profile', 'get', $params);
@@ -295,7 +295,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check getfields works & gives us our fields
    */
-  function testGetFields() {
+  public function testGetFields() {
     $this->_createIndividualProfile();
     $this->_addCustomFieldToProfile($this->_profileID);
     $result = $this->callAPIAndDocument('profile', 'getfields', array('action' => 'submit', 'profile_id' => $this->_profileID), __FUNCTION__, __FILE__,
@@ -311,7 +311,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check getfields works & gives us our fields - partipant profile
    */
-  function testGetFieldsParticipantProfile() {
+  public function testGetFieldsParticipantProfile() {
     $result = $this->callAPISuccess('profile', 'getfields', array(
       'action' => 'submit',
       'profile_id' => 'participant_status',
@@ -326,7 +326,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Check getfields works & gives us our fields - membership_batch_entry
    * (getting to the end with no e-notices is pretty good evidence it's working)
    */
-  function testGetFieldsMembershipBatchProfile() {
+  public function testGetFieldsMembershipBatchProfile() {
     $result = $this->callAPISuccess('profile', 'getfields', array(
       'action' => 'submit',
       'profile_id' => 'membership_batch_entry',
@@ -343,7 +343,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Check getfields works & gives us our fields - do them all
    * (getting to the end with no e-notices is pretty good evidence it's working)
    */
-  function testGetFieldsAllProfiles() {
+  public function testGetFieldsAllProfiles() {
     $result = $this->callAPISuccess('uf_group', 'get', array('return' => 'id'));
     $profileIDs = array_keys($result['values']);
     foreach ($profileIDs as $profileID) {
@@ -359,7 +359,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check Without ProfileId
    */
-  function testProfileSubmitWithoutProfileId() {
+  public function testProfileSubmitWithoutProfileId() {
     $params = array(
       'contact_id' => 1,
     );
@@ -371,7 +371,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check with no invalid profile Id
    */
-  function testProfileSubmitInvalidProfileId() {
+  public function testProfileSubmitInvalidProfileId() {
     $params = array(
       'contact_id' => 1,
       'profile_id' => 1000,
@@ -382,7 +382,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check with missing required field in profile
    */
-  function testProfileSubmitCheckProfileRequired() {
+  public function testProfileSubmitCheckProfileRequired() {
     $pofileFieldValues = $this->_createIndividualContact();
     current($pofileFieldValues);
     $contactId = key($pofileFieldValues);
@@ -406,7 +406,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check with success
    */
-  function testProfileSubmit() {
+  public function testProfileSubmit() {
     $pofileFieldValues = $this->_createIndividualContact();
     current($pofileFieldValues);
     $contactId = key($pofileFieldValues);
@@ -448,7 +448,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Ensure caches are being cleared so we don't get into a debugging trap because of cached metadata
    * First we delete & create to increment the version & then check for caching probs
    */
-  function testProfileSubmitCheckCaching() {
+  public function testProfileSubmitCheckCaching() {
     $this->callAPISuccess('membership_type', 'delete', array('id' => $this->_membershipTypeID));
     $this->_membershipTypeID = $this->membershipTypeCreate();
 
@@ -463,7 +463,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Test that the fields are returned in the right order despite the faffing around that goes on
    */
-  function testMembershipGetFieldsOrder() {
+  public function testMembershipGetFieldsOrder() {
     $result = $this->callAPISuccess('profile', 'getfields', array('action' => 'submit', 'profile_id' => 'membership_batch_entry'));
     $weight = 1;
     foreach($result['values'] as $fieldName => $field) {
@@ -477,7 +477,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check we can submit membership batch profiles (create mode)
    */
-  function testProfileSubmitMembershipBatch() {
+  public function testProfileSubmitMembershipBatch() {
     $this->_contactID = $this->individualCreate();
     $this->callAPISuccess('profile', 'submit', array(
      'profile_id' => 'membership_batch_entry',
@@ -493,7 +493,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Set is deprecated but we need to ensure it still works
    */
-  function testLegacySet() {
+  public function testLegacySet() {
     $pofileFieldValues = $this->_createIndividualContact();
     current($pofileFieldValues);
     $contactId = key($pofileFieldValues);
@@ -529,7 +529,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check contact activity profile without activity id
    */
-  function testContactActivitySubmitWithoutActivityId() {
+  public function testContactActivitySubmitWithoutActivityId() {
     list($params, $expected) = $this->_createContactWithActivity();
 
     $params = array_merge($params, $expected);
@@ -541,7 +541,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check contact activity profile wrong activity id
    */
-  function testContactActivitySubmitWrongActivityId() {
+  public function testContactActivitySubmitWrongActivityId() {
     list($params, $expected) = $this->_createContactWithActivity();
     $params = array_merge($params, $expected);
     $params['activity_id'] = 100001;
@@ -552,7 +552,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check contact activity profile with wrong activity type
    */
-  function testContactActivitySubmitWrongActivityType() {
+  public function testContactActivitySubmitWrongActivityType() {
     //flush cache by calling with reset
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name', TRUE);
 
@@ -585,7 +585,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check contact activity profile with success
    */
-  function testContactActivitySubmitSuccess() {
+  public function testContactActivitySubmitSuccess() {
     list($params, $expected) = $this->_createContactWithActivity();
 
     $updateParams = array(
@@ -611,7 +611,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check profile apply Without ProfileId
    */
-  function testProfileApplyWithoutProfileId() {
+  public function testProfileApplyWithoutProfileId() {
     $params = array(
       'contact_id' => 1,
     );
@@ -622,7 +622,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check profile apply with no invalid profile Id
    */
-  function testProfileApplyInvalidProfileId() {
+  public function testProfileApplyInvalidProfileId() {
     $params = array(
       'contact_id' => 1,
       'profile_id' => 1000,
@@ -633,7 +633,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check with success
    */
-  function testProfileApply() {
+  public function testProfileApply() {
     $pofileFieldValues = $this->_createIndividualContact();
     current($pofileFieldValues);
     $contactId = key($pofileFieldValues);
@@ -698,7 +698,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    *
    * @return mixed
    */
-  function _createIndividualContact($params = array()) {
+  public function _createIndividualContact($params = array()) {
     $contactParams = array_merge(array(
       'first_name' => 'abc1',
       'last_name' => 'xyz1',
@@ -743,7 +743,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  function _createContactWithActivity() {
+  public function _createContactWithActivity() {
     // @TODO: Create profile with custom fields
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
@@ -821,7 +821,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Create a profile
    */
-  function _createIndividualProfile() {
+  public function _createIndividualProfile() {
 
     // creating these via the api as we want to utilise & test the flushing of caches when fields created
     // via the api
@@ -893,9 +893,8 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * @param int $profileID
    */
-  function _addCustomFieldToProfile($profileID) {
+  public function _addCustomFieldToProfile($profileID) {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, '');
     $this->uFFieldCreate(array('uf_group_id' => $profileID, 'field_name' => 'custom_' . $ids['custom_field_id'], 'contact_type' => 'Contact'));
   }
 }
-

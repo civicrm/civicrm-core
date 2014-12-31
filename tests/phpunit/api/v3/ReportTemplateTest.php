@@ -38,7 +38,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
   }
@@ -111,7 +111,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   /**
    *
    */
-  function testReportTemplateGetRowsContactSummary() {
+  public function testReportTemplateGetRowsContactSummary() {
     $description = "Retrieve rows from a report template (optionally providing the instance_id)";
     $result = $this->callAPIAndDocument('report_template', 'getrows', array(
       'report_id' => 'contact/summary',
@@ -135,7 +135,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   /**
    * @dataProvider getReportTemplates
    */
-  function testReportTemplateGetRowsAllReports($reportID) {
+  public function testReportTemplateGetRowsAllReports($reportID) {
     if(stristr($reportID, 'has existing issues')) {
       $this->markTestIncomplete($reportID);
     }
@@ -147,7 +147,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   /**
    * @dataProvider getReportTemplates
    */
-  function testReportTemplateGetStatisticsAllReports($reportID) {
+  public function testReportTemplateGetStatisticsAllReports($reportID) {
     if(stristr($reportID, 'has existing issues')) {
       $this->markTestIncomplete($reportID);
     }

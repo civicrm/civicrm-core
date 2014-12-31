@@ -42,7 +42,6 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
    * Custom group id
    *
    * @int
-   * @access public
    */
   public $_groupID;
 
@@ -72,7 +71,6 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
    * Build the form object elements for custom data
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -83,7 +81,6 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
    * Set defaults for the form
    *
    * @return array
-   * @access public
    */
   public function setDefaultValues() {
     return CRM_Custom_Form_CustomData::setDefaultValues($this);
@@ -93,7 +90,6 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
    * Process the form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // Process / save custom data

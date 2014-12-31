@@ -44,11 +44,9 @@ class CRM_Core_Permission_Soap extends CRM_Core_Permission_Base {
    * @param string $str the permission to check
    *
    * @return boolean true if yes, else false
-   * @access public
    */
 
-  function check($str) {
+  public function check($str) {
     return TRUE;
   }
 }
-

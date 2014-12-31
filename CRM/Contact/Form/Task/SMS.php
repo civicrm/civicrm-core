@@ -54,7 +54,7 @@ class CRM_Contact_Form_Task_SMS extends CRM_Contact_Form_Task {
    */
   public $_templates = NULL;
 
-  function preProcess() {
+  public function preProcess() {
 
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
@@ -75,7 +75,6 @@ class CRM_Contact_Form_Task_SMS extends CRM_Contact_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -89,7 +88,6 @@ class CRM_Contact_Form_Task_SMS extends CRM_Contact_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -97,4 +95,3 @@ class CRM_Contact_Form_Task_SMS extends CRM_Contact_Form_Task {
     CRM_Contact_Form_Task_SMSCommon::postProcess($this);
   }
 }
-

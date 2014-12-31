@@ -37,13 +37,12 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   /**
    * Class constructor
    *
-   * @access public
    * @return \CRM_Financial_DAO_FinancialTrxn
    */
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -55,10 +54,9 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @param string $trxnEntityTable entity_table
    *
    * @return CRM_Core_BAO_FinancialTrxn object
-   * @access public
    * @static
    */
-  static function create(&$params, $trxnEntityTable = null ) {
+  public static function create(&$params, $trxnEntityTable = null ) {
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->copyValues($params);
     $fids = array();
@@ -98,7 +96,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    *
    * @return array
    */
-  static function getBalanceTrxnAmt($contributionId, $contributionFinancialTypeId = NULL) {
+  public static function getBalanceTrxnAmt($contributionId, $contributionFinancialTypeId = NULL) {
     if (!$contributionFinancialTypeId) {
       $contributionFinancialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $contributionId, 'financial_type_id');
     }
@@ -126,10 +124,9 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Contribute_BAO_ContributionType object
-   * @access public
    * @static
    */
-  static function retrieve( &$params, &$defaults ) {
+  public static function retrieve( &$params, &$defaults ) {
     $financialItem = new CRM_Financial_DAO_FinancialTrxn( );
     $financialItem->copyValues($params);
     if ($financialItem->find(true)) {
@@ -149,10 +146,9 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    *
    * @return array $tag array of category id's the contact belongs to.
    *
-   * @access public
    * @static
    */
-  static function getFinancialTrxnId($entity_id, $orderBy = 'ASC', $newTrxn = FALSE) {
+  public static function getFinancialTrxnId($entity_id, $orderBy = 'ASC', $newTrxn = FALSE) {
     $ids = array('entityFinancialTrxnId' => NULL, 'financialTrxnId' => NULL);
 
     $condition = "";
@@ -192,10 +188,9 @@ LIMIT 1;";
    *
    * @return array $tag array of catagory id's the contact belongs to.
    *
-   * @access public
    * @static
    */
-  static function getFinancialTrxnTotal($entity_id) {
+  public static function getFinancialTrxnTotal($entity_id) {
     $query = "
       SELECT (ft.amount+SUM(ceft.amount)) AS total FROM civicrm_entity_financial_trxn AS ft
 LEFT JOIN civicrm_entity_financial_trxn AS ceft ON ft.financial_trxn_id = ceft.entity_id
@@ -215,10 +210,9 @@ WHERE ft.entity_table = 'civicrm_contribution' AND ft.entity_id = %1
    *
    * @return array $payment array of previous payments
    *
-   * @access public
    * @static
    */
-  static function getPayments($financial_trxn_id) {
+  public static function getPayments($financial_trxn_id) {
     $query = "
 SELECT ef1.financial_trxn_id, sum(ef1.amount) amount
 FROM civicrm_entity_financial_trxn ef1
@@ -267,10 +261,9 @@ WHERE  ef2.financial_trxn_id =%1
    *
    * @return array $tag array of catagory id's the contact belongs to.
    *
-   * @access public
    * @static
    */
-  static function getFinancialTrxnLineTotal($entity_id, $entity_table = 'civicrm_contribution') {
+  public static function getFinancialTrxnLineTotal($entity_id, $entity_table = 'civicrm_contribution') {
     $query = "SELECT lt.price_field_value_id AS id, ft.financial_trxn_id,ft.amount AS amount FROM civicrm_entity_financial_trxn AS ft
 LEFT JOIN civicrm_financial_item AS fi ON fi.id = ft.entity_id AND fi.entity_table = 'civicrm_line_item' AND ft.entity_table = 'civicrm_financial_item'
 LEFT JOIN civicrm_line_item AS lt ON lt.id = fi.entity_id AND lt.entity_table = %2
@@ -294,10 +287,9 @@ WHERE lt.entity_id = %1 ";
    *
    * @param int $entity_id
    * @return true on success, false otherwise
-   * @access public
    * @static
    */
-  static function deleteFinancialTrxn($entity_id) {
+  public static function deleteFinancialTrxn($entity_id) {
     $query = "DELETE ceft1, cfi, ceft, cft FROM `civicrm_financial_trxn` cft
 LEFT JOIN civicrm_entity_financial_trxn ceft
   ON ceft.financial_trxn_id = cft.id AND ceft.entity_table = 'civicrm_contribution'
@@ -313,10 +305,9 @@ WHERE ceft.entity_id = %1";
   /**
    * Create financial transaction for premium
    *
-   * @access public
    * @static
    */
-  static function createPremiumTrxn($params) {
+  public static function createPremiumTrxn($params) {
     if ((empty($params['financial_type_id']) || empty($params['contributionId'])) && empty($params['oldPremium'])) {
       return;
     }
@@ -363,10 +354,9 @@ WHERE ceft.entity_id = %1";
    *
    * @param array $params to create trxn entries
    *
-   * @access public
    * @static
    */
-  static function recordFees($params) {
+  public static function recordFees($params) {
     $expenseTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Expense Account is' "));
     $domainId = CRM_Core_Config::domainID();
     $amount = 0;
@@ -428,7 +418,7 @@ WHERE ceft.entity_id = %1";
    *
    * @return array|int|null|string
    */
-  static function getPartialPaymentWithType($entityId, $entityName = 'participant', $returnType = TRUE, $lineItemTotal = NULL) {
+  public static function getPartialPaymentWithType($entityId, $entityName = 'participant', $returnType = TRUE, $lineItemTotal = NULL) {
     $value = NULL;
     if (empty($entityName)) {
       return $value;

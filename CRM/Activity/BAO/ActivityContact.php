@@ -42,7 +42,7 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -52,7 +52,6 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
    * @param array  $params      the values for this table: activity id, contact id, record type
    *
    * @return object activity_contact object
-   * @access public
    *
    */
   public static function create(&$params) {
@@ -74,9 +73,8 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
    *
    * @return array
    *
-   * @access public
    */
-  static function getNames($activityID, $recordTypeID, $alsoIDs = FALSE) {
+  public static function getNames($activityID, $recordTypeID, $alsoIDs = FALSE) {
     $names = array();
     $ids   = array();
 
@@ -114,9 +112,8 @@ AND        contact_a.is_deleted = 0
    *
    * @return mixed
    *
-   * @access public
    */
-  static function retrieveContactIdsByActivityId($activityID, $recordTypeID) {
+  public static function retrieveContactIdsByActivityId($activityID, $recordTypeID) {
     $activityContact = array();
     if (!CRM_Utils_Rule::positiveInteger($activityID) ||
         !CRM_Utils_Rule::positiveInteger($recordTypeID)) {
@@ -155,13 +152,12 @@ AND        civicrm_contact.is_deleted = 0
    *           array       = if there are links defined for this table.
    *           empty array - if there is a links.ini file, but no links on this table
    *           null        - if no links.ini exists for this database (hence try auto_links).
-   * @access   public
    * @see      DB_DataObject::getLinks(), DB_DataObject::getLink()
    */
   /**
    * @return array|null
    */
-  function links() {
+  public function links() {
     $link = array('activity_id' => 'civicrm_activity:id');
     return $link;
   }

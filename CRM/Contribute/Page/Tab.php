@@ -57,9 +57,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * @param string $context
    *
    * @return array
-   * @access public
    */
-  static function &recurLinks($recurID = FALSE, $context = 'contribution') {
+  public static function &recurLinks($recurID = FALSE, $context = 'contribution') {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::VIEW => array(
@@ -106,9 +105,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * This function is called when action is browse
    *
    * return null
-   * @access public
    */
-  function browse() {
+  public function browse() {
     // add annual contribution
     $annual = array();
     list($annual['count'],
@@ -203,9 +201,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * This function is called when action is view
    *
    * return null
-   * @access public
    */
-  function view() {
+  public function view() {
     $controller = new CRM_Core_Controller_Simple(
       'CRM_Contribute_Form_ContributionView',
       ts('View Contribution'),
@@ -222,9 +219,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * This function is called when action is update or new
    *
    * return null
-   * @access public
    */
-  function edit() {
+  public function edit() {
     // set https for offline cc transaction
     $mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
     if ($mode == 'test' || $mode == 'live') {
@@ -243,7 +239,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     return $controller->run();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $context       = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id     = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -275,9 +271,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * loads, it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     // check if we can process credit card contribs
@@ -298,7 +293,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     return parent::run();
   }
 
-  function setContext() {
+  public function setContext() {
     $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
     $context = CRM_Utils_Request::retrieve('context', 'String',
       $this, FALSE, 'search'
@@ -468,4 +463,3 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     $session->pushUserContext($url);
   }
 }
-

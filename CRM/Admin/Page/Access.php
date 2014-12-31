@@ -41,7 +41,7 @@ class CRM_Admin_Page_Access extends CRM_Core_Page {
   /**
    * @return string
    */
-  function run() {
+  public function run() {
     $config = CRM_Core_Config::singleton();
 
     switch ($config->userFramework) {
@@ -80,4 +80,3 @@ class CRM_Admin_Page_Access extends CRM_Core_Page {
     return parent::run();
   }
 }
-

@@ -35,7 +35,7 @@ require_once 'CiviTest/Membership.php';
  */
 class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     $params = array(
@@ -72,7 +72,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    *
    */
-  function tearDown() {
+  public function tearDown() {
     $this->relationshipTypeDelete($this->_relationshipTypeId);
     $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
     $this->membershipStatusDelete($this->_mebershipStatusID);
@@ -82,7 +82,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
   /**
    *  Test add()
    */
-  function testadd() {
+  public function testadd() {
     $contactId = Contact::createIndividual();
 
     $params = array(
@@ -110,7 +110,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
   /**
    *  Test del()
    */
-  function testdel() {
+  public function testdel() {
     $contactId = Contact::createIndividual();
 
     $params = array(
@@ -139,7 +139,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
   /**
    *  Test resetmodified()
    */
-  function testresetmodifiedId() {
+  public function testresetmodifiedId() {
     $contactId = Contact::createIndividual();
 
     $params = array(
@@ -165,4 +165,3 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 }
-

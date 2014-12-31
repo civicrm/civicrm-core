@@ -45,7 +45,7 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
   /**
    * @param $self
    */
-  static function commonBuildQuickForm($self) {
+  public static function commonBuildQuickForm($self) {
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $self);
     if (!$contactId) {
       $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, NULL, $_REQUEST);
@@ -119,4 +119,3 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
     $self->assign('suppressForm', TRUE);
   }
 }
-

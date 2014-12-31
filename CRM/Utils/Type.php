@@ -33,7 +33,7 @@
  *
  */
 class CRM_Utils_Type {
-  CONST
+  const
     T_INT        = 1,
     T_STRING     = 2,
     T_ENUM       = 2,
@@ -51,7 +51,7 @@ class CRM_Utils_Type {
     T_CCNUM      = 8192,
     T_MEDIUMBLOB = 16384;
 
-  CONST
+  const
     TWO       = 2,
     FOUR      = 4,
     SIX       = 6,
@@ -73,7 +73,7 @@ class CRM_Utils_Type {
    * @return string $string     String datatype respective to integer datatype@access public
    * @static
    */
-  static function typeToString($type) {
+  public static function typeToString($type) {
     switch ($type) {
       case 1:
         $string = 'Int';
@@ -145,7 +145,6 @@ class CRM_Utils_Type {
    * @param boolean $abort        Should we abort if invalid
    *
    * @return mixed                The data, escaped if necessary
-   * @access public
    * @static
    */
   public static function escape($data, $type, $abort = TRUE) {
@@ -261,7 +260,6 @@ class CRM_Utils_Type {
    * @name string   $name    The name of the attribute
    *
    * @return mixed                The data, escaped if necessary
-   * @access public
    * @static
    */
   public static function validate($data, $type, $abort = TRUE, $name = 'One of parameters ') {
@@ -350,4 +348,3 @@ class CRM_Utils_Type {
     return NULL;
   }
 }
-

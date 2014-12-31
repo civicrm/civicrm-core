@@ -73,9 +73,8 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_votingTab = $this->get('votingTab');
     $this->_reserveToInterview = $this->get('reserveToInterview');
     if ($this->_reserveToInterview || $this->_votingTab) {
@@ -257,7 +256,7 @@ WHERE {$clause}
     CRM_Utils_System::setTitle(ts('Record %1 Responses', array(1 => $activityTypes[$this->_surveyTypeId])));
   }
 
-  function validateIds() {
+  public function validateIds() {
     $required = array('surveyId' => ts('Could not find Survey.'),
       'interviewerId' => ts('Could not find Interviewer.'),
       'contactIds' => ts('No respondents are currently reserved for you to interview.'),
@@ -281,11 +280,10 @@ WHERE {$clause}
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $this->assign('surveyTypeId', $this->_surveyTypeId);
 
     $options =
@@ -381,11 +379,10 @@ WHERE {$clause}
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     //load default data for only contact fields.
     $contactFields = $defaults = array();
     foreach ($this->_surveyFields as $name => $field) {
@@ -438,7 +435,6 @@ WHERE {$clause}
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -466,7 +462,7 @@ WHERE {$clause}
    *
    * @return mixed
    */
-  static function registerInterview($params) {
+  public static function registerInterview($params) {
     $activityId = CRM_Utils_Array::value('activity_id', $params);
     $surveyTypeId = CRM_Utils_Array::value('activity_type_id', $params);
     if (!is_array($params) || !$surveyTypeId || !$activityId) {
@@ -572,7 +568,7 @@ WHERE {$clause}
     return $activityId;
   }
 
-  function getVoterIds() {
+  public function getVoterIds() {
     if (!$this->_interviewerId) {
       $session = CRM_Core_Session::singleton();
       $this->_interviewerId = $session->get('userID');
@@ -604,7 +600,7 @@ WHERE {$clause}
     }
   }
 
-  function filterVoterIds() {
+  public function filterVoterIds() {
     //do the cleanup later on.
     if (!is_array($this->_contactIds)) {
       return;
@@ -655,4 +651,3 @@ INNER JOIN  {$tempTableName} ON ( {$tempTableName}.survey_contact_id = contact.i
     }
   }
 }
-

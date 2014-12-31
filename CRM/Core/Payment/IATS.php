@@ -35,9 +35,9 @@
  */
 class CRM_Core_Payment_IATS extends CRM_Core_Payment {
   # (not used, implicit in the API, might need to convert?)
-  CONST CHARSET = 'UFT-8';
+  const CHARSET = 'UFT-8';
   /* check IATS website for additional supported currencies */
-  CONST CURRENCIES = 'CAD,USD,AUD,GBP,EUR,NZD';
+  const CURRENCIES = 'CAD,USD,AUD,GBP,EUR,NZD';
 
   /**
    * We only need one instance of this object. So we use the singleton
@@ -57,7 +57,7 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
    *
    * @return \CRM_Core_Payment_IATS
    */
-  function __construct($mode, &$paymentProcessor) {
+  public function __construct($mode, &$paymentProcessor) {
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('IATS');
 
@@ -80,7 +80,7 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
    *
    * @return mixed
    */
-  static function &singleton($mode, &$paymentProcessor) {
+  public static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
     if (self::$_singleton[$processorName] === NULL) {
       self::$_singleton[$processorName] = new CRM_Core_Payment_IATS($mode, $paymentProcessor);
@@ -97,7 +97,7 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
    * @return array the result in an nice formatted array (or an error object)
    * @abstract
    */
-  function doDirectPayment(&$params) {
+  public function doDirectPayment(&$params) {
     // $result = '';
     //       foreach($params as $key => $value) {
     //         $result .= "<strong>$key</strong>: $value<br />";
@@ -266,7 +266,7 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
    *
    * @return object
    */
-  function &error($error = NULL) {
+  public function &error($error = NULL) {
     $e = CRM_Core_Error::singleton();
     if (is_object($error)) {
       $e->push($error->getResponseCode(),
@@ -297,7 +297,7 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
    *
    * @return string
    */
-  function errorString($error_id) {
+  public function errorString($error_id) {
     $errors = array(
       1 => 'Agent Code has not been set up on the authorization system.',
       2 => 'Unable to process transaction. Verify and re-enter credit card information.',
@@ -337,9 +337,8 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
    * @internal param string $mode the mode we are operating in (live or test)
    *
    * @return string the error message if any
-   * @public
    */
-  function checkConfig() {
+  public function checkConfig() {
     $error = array();
 
     if (empty($this->_paymentProcessor['signature'])) {
@@ -358,4 +357,3 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
     }
   }
 }
-

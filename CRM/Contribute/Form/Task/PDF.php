@@ -52,7 +52,6 @@ class CRM_Contribute_Form_Task_PDF extends CRM_Contribute_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */ function preProcess() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE
@@ -102,7 +101,6 @@ AND    {$this->_componentClause}";
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -139,7 +137,7 @@ AND    {$this->_componentClause}";
   /**
    * Set default values
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaultFormat = CRM_Core_BAO_PdfFormat::getDefaultValues();
     return array('pdf_format_id' => $defaultFormat['id'], 'receipt_update' => 1, 'override_privacy' => 0);
   }
@@ -147,7 +145,6 @@ AND    {$this->_componentClause}";
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -238,7 +235,6 @@ AND    {$this->_componentClause}";
   /**
    * Declaration of common variables for Invoice and PDF
    *
-   * @access public
    *
    * @param array $contribIds Contribution Id
    * @param array $params parameter for pdf or email invoices
@@ -246,7 +242,6 @@ AND    {$this->_componentClause}";
    *
    * @return array array of common elements
    *
-   * @access public
    * @static
    */
   static public function getElements($contribIds, $params, $contactIds) {
@@ -294,4 +289,3 @@ AND    {$this->_componentClause}";
     return $pdfElements;
   }
 }
-

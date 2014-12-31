@@ -92,9 +92,8 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * @param
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     self::preProcessCommon($this);
   }
 
@@ -102,7 +101,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * @param CRM_Core_Form $form
    * @param bool $useTable
    */
-  static function preProcessCommon(&$form, $useTable = FALSE) {
+  public static function preProcessCommon(&$form, $useTable = FALSE) {
 
     $form->_contactIds = array();
     $form->_contactTypes = array();
@@ -330,11 +329,10 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * Set default values for the form. Relationship that in edit/view action
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     return $defaults;
   }
@@ -343,16 +341,14 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * This function is used to add the rules for form.
    *
    * @return void
-   * @access public
    */
-  function addRules() {
+  public function addRules() {
   }
 
   /**
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addDefaultButtons(ts('Confirm Action'));
@@ -361,7 +357,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -378,9 +373,8 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * @param bool $submitOnce
    *
    * @return void
-   * @access public
    */
-  function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
+  public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(
         array(
           'type' => $nextType,
@@ -399,7 +393,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * Replace ids of household members in $this->_contactIds with the id of their household.
    * CRM-8338
    *
-   * @access public
    *
    * @return void
    */
@@ -464,4 +457,3 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     }
   }
 }
-

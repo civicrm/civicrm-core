@@ -79,7 +79,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {
+  public function tearDown() {
     $this->quickCleanup(
       array(
         'civicrm_group',
@@ -110,7 +110,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     $this->callAPIFailure('uf_field', 'create', $params);
   }
 
-  function testCreateUFFieldWithWrongParams() {
+  public function testCreateUFFieldWithWrongParams() {
     $this->callAPIFailure('uf_field', 'create', array('field_name' => 'test field'));
     $this->callAPIFailure('uf_field', 'create', array('label' => 'name-less field'));
   }

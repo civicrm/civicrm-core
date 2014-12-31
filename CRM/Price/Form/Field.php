@@ -41,13 +41,12 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
   /**
    * Constants for number of options for data types of multiple option.
    */
-  CONST NUM_OPTION = 15;
+  const NUM_OPTION = 15;
 
   /**
    * The custom set id saved to the session for an update
    *
    * @var int
-   * @access protected
    */
   protected $_sid;
 
@@ -55,7 +54,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    * The field id, used when editing the field
    *
    * @var int
-   * @access protected
    */
   protected $_fid;
 
@@ -63,13 +61,11 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    * The extended component Id
    *
    * @var array
-   * @access protected
    */
   protected $_extendComponentId;
 
   /**
    * Variable is set if price set is used for membership
-   * @access protected
    */
   protected $_useForMember;
 
@@ -79,7 +75,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
 
@@ -106,9 +101,8 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    * @param null
    *
    * @return array    array of default values
-   * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     // is it an edit operation ?
     if (isset($this->_fid)) {
@@ -175,7 +169,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // lets trim all the whitespace
@@ -399,9 +392,8 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    * @return array    if errors then list of errors to be posted back to the form,
    *                  true otherwise
    * @static
-   * @access public
    */
-  static function formRule($fields, $files, $form) {
+  public static function formRule($fields, $files, $form) {
 
     // all option fields are of type "money"
     $errors = array();
@@ -612,7 +604,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // store the submitted values in an array
@@ -693,4 +684,3 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     }
   }
 }
-

@@ -36,7 +36,7 @@ class CRM_Core_I18n_SchemaStructure_3_4_0 {
   /**
    * @return array
    */
-  static function &columns() {
+  public static function &columns() {
     static $result = NULL;
     if (!$result) {
       $result = array(
@@ -171,7 +171,7 @@ class CRM_Core_I18n_SchemaStructure_3_4_0 {
   /**
    * @return array
    */
-  static function &indices() {
+  public static function &indices() {
     static $result = NULL;
     if (!$result) {
       $result = array(
@@ -212,7 +212,7 @@ class CRM_Core_I18n_SchemaStructure_3_4_0 {
   /**
    * @return array
    */
-  static function &tables() {
+  public static function &tables() {
     static $result = NULL;
     if (!$result) {
       $result = array_keys(self::columns());
@@ -220,4 +220,3 @@ class CRM_Core_I18n_SchemaStructure_3_4_0 {
     return $result;
   }
 }
-

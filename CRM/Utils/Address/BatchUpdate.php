@@ -122,7 +122,7 @@ class CRM_Utils_Address_BatchUpdate {
    * @return array
    * @throws Exception
    */
-  function processContacts(&$config, $processGeocode, $parseStreetAddress) {
+  public function processContacts(&$config, $processGeocode, $parseStreetAddress) {
     // build where clause.
     $clause = array('( c.id = a.contact_id )');
     $params = array();
@@ -279,11 +279,10 @@ class CRM_Utils_Address_BatchUpdate {
   /**
    * @return array
    */
-  function returnResult() {
+  public function returnResult() {
     $result             = array();
     $result['is_error'] = $this->returnError;
     $result['messages'] = implode("", $this->returnMessages);
     return $result;
   }
 }
-

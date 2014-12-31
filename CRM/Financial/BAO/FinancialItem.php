@@ -38,7 +38,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   /**
    * Class constructor
    */
-  function __construct( ) {
+  public function __construct( ) {
     parent::__construct( );
   }
 
@@ -49,10 +49,9 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Contribute_BAO_FinancialItem object
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $financialItem = new CRM_Financial_DAO_FinancialItem();
     $financialItem->copyValues($params);
     if ($financialItem->find(TRUE)) {
@@ -69,11 +68,10 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param object $contribution contribution object
    * @param boolean $taxTrxnID
    *
-   * @access public
    * @static
    * @return void
    */
-  static function add($lineItem, $contribution, $taxTrxnID = FALSE) {
+  public static function add($lineItem, $contribution, $taxTrxnID = FALSE) {
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
     $itemStatus = NULL;
@@ -133,11 +131,10 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param array $ids financial item ids
    * @param array $trxnIds financial item ids
    *
-   * @access public
    * @static
    * @return object
    */
-  static function create(&$params, $ids = NULL, $trxnIds = NULL) {
+  public static function create(&$params, $ids = NULL, $trxnIds = NULL) {
     $financialItem = new CRM_Financial_DAO_FinancialItem();
     
     if (!empty($ids['id'])) {
@@ -183,10 +180,9 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Core_BAO_FinancialTrxn object
-   * @access public
    * @static
    */
-  static function createEntityTrxn($params) {
+  public static function createEntityTrxn($params) {
     $entity_trxn = new CRM_Financial_DAO_EntityFinancialTrxn();
     $entity_trxn->copyValues($params);
     $entity_trxn->save();
@@ -200,10 +196,9 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param bool $maxId to retrive max id
    *
    * @return array
-   * @access public
    * @static
    */
-  static function retrieveEntityFinancialTrxn($params, $maxId = FALSE) {
+  public static function retrieveEntityFinancialTrxn($params, $maxId = FALSE) {
     $financialItem = new CRM_Financial_DAO_EntityFinancialTrxn();
     $financialItem->copyValues($params);
     //retrieve last entry from civicrm_entity_financial_trxn
@@ -239,10 +234,9 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param array $error error to display
    *
    * @return array
-   * @access public
    * @static
    */
-  static function checkContactPresent($contactIds, &$error) {
+  public static function checkContactPresent($contactIds, &$error) {
     if (empty($contactIds)) {
       return FALSE;
     }

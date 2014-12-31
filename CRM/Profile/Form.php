@@ -42,7 +42,7 @@
  *
  */
 class CRM_Profile_Form extends CRM_Core_Form {
-  CONST
+  const
     MODE_REGISTER = 1,
     MODE_SEARCH   = 2,
     MODE_CREATE   = 4,
@@ -185,9 +185,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
    *
    * @return void
    *
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_id         = $this->get('id');
     $this->_profileIds = $this->get('profileIds');
     $this->_grid       = CRM_Utils_Request::retrieve('grid', 'Integer', $this);
@@ -409,11 +408,10 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultsValues() {
+  public function setDefaultsValues() {
     $this->_defaults = array();
     if ($this->_multiRecordProfile && ($this->_multiRecord == CRM_Core_Action::DELETE)) {
       return;
@@ -582,7 +580,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->add('hidden', 'gid', $this->_gid);
@@ -835,7 +832,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    *
    * @return array
    */
-  static function validateContactActivityProfile($activityId, $contactId, $gid) {
+  public static function validateContactActivityProfile($activityId, $contactId, $gid) {
     $errors = array();
     if (!$activityId) {
       $errors[] = 'Profile is using one or more activity fields, and is missing the activity Id (aid) in the URL.';
@@ -874,10 +871,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * @param CRM_Core_Form $form   the form object
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
-  static function formRule($fields, $files, $form) {
+  public static function formRule($fields, $files, $form) {
     CRM_Utils_Hook::validateProfile($form->_ufGroup['name']);
 
     $errors = array();
@@ -1049,7 +1045,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
   /**
    * Process the user submitted custom data values.
    *
-   * @access public
    *
    * @return void
    */
@@ -1313,7 +1308,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    *
    * @return null|string
    */
-  function checkTemplateFileExists($suffix = NULL) {
+  public function checkTemplateFileExists($suffix = NULL) {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Form/{$this->_gid}/{$this->_name}.{$suffix}tpl";
       $template = CRM_Core_Form::getTemplate();
@@ -1337,12 +1332,11 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
@@ -1352,14 +1346,12 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * i.e. we dont override
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
    */
-  function overrideExtraTemplateFileName() {
+  public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
 }
-

@@ -58,4 +58,3 @@
 function smarty_modifier_substring($string, $position, $length) {
   return substr($string, $position, $length);
 }
-

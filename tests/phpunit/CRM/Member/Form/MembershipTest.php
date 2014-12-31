@@ -216,7 +216,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a parameter
    *  that has an empty contact_select_id value
    */
-  function testFormRuleEmptyContact() {
+  public function testFormRuleEmptyContact() {
     $params = array(
       'contact_select_id' => 0,
       'membership_type_id' => array(),
@@ -246,7 +246,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  that has an start date before the join date and a rolling
    *  membership type
    */
-  function testFormRuleRollingEarlyStart() {
+  public function testFormRuleRollingEarlyStart() {
     $unixNow       = time();
     $ymdNow        = date('m/d/Y', $unixNow);
     $unixYesterday = $unixNow - (24 * 60 * 60);
@@ -275,7 +275,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  that has an end date before the start date and a rolling
    *  membership type
    */
-  function testFormRuleRollingEarlyEnd() {
+  public function testFormRuleRollingEarlyEnd() {
     $unixNow       = time();
     $ymdNow        = date('m/d/Y', $unixNow);
     $unixYesterday = $unixNow - (24 * 60 * 60);
@@ -302,7 +302,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  that has an end date but no start date and a rolling
    *  membership type
    */
-  function testFormRuleRollingEndNoStart() {
+  public function testFormRuleRollingEndNoStart() {
     $unixNow         = time();
     $ymdNow          = date('m/d/Y', $unixNow);
     $unixYearFromNow = $unixNow + (365 * 24 * 60 * 60);
@@ -328,7 +328,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a parameter
    *  that has an end date and a lifetime membership type
    */
-  function testFormRuleRollingLifetimeEnd() {
+  public function testFormRuleRollingLifetimeEnd() {
     $unixNow         = time();
     $unixYearFromNow = $unixNow + (365 * 24 * 60 * 60);
     $params          = array(
@@ -350,7 +350,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a parameter
    *  that has an override and no status
    */
-  function testFormRuleOverrideNoStatus() {
+  public function testFormRuleOverrideNoStatus() {
     $unixNow         = time();
     $unixYearFromNow = $unixNow + (365 * 24 * 60 * 60);
     $params          = array('join_date' => date('m/d/Y', $unixNow),
@@ -372,7 +372,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a join date
    *  of one month from now and a rolling membership type
    */
-  function testFormRuleRollingJoin1MonthFromNow() {
+  public function testFormRuleRollingJoin1MonthFromNow() {
     $unixNow     = time();
     $unix1MFmNow = $unixNow + (31 * 24 * 60 * 60);
     $params      = array('join_date' => date('m/d/Y', $unix1MFmNow),
@@ -397,7 +397,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a join date
    *  of today and a rolling membership type
    */
-  function testFormRuleRollingJoinToday() {
+  public function testFormRuleRollingJoinToday() {
     $unixNow = time();
     $params = array('join_date' => date('m/d/Y', $unixNow),
       'start_date' => '',
@@ -416,7 +416,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a join date
    *  of one month ago and a rolling membership type
    */
-  function testFormRuleRollingJoin1MonthAgo() {
+  public function testFormRuleRollingJoin1MonthAgo() {
     $unixNow   = time();
     $unix1MAgo = $unixNow - (31 * 24 * 60 * 60);
     $params    = array('join_date' => date('m/d/Y', $unix1MAgo),
@@ -436,7 +436,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a join date
    *  of six months ago and a rolling membership type
    */
-  function testFormRuleRollingJoin6MonthsAgo() {
+  public function testFormRuleRollingJoin6MonthsAgo() {
     $unixNow   = time();
     $unix6MAgo = $unixNow - (180 * 24 * 60 * 60);
     $params    = array('join_date' => date('m/d/Y', $unix6MAgo),
@@ -456,7 +456,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a join date
    *  of one year+ ago and a rolling membership type
    */
-  function testFormRuleRollingJoin1YearAgo() {
+  public function testFormRuleRollingJoin1YearAgo() {
     $unixNow   = time();
     $unix1YAgo = $unixNow - (370 * 24 * 60 * 60);
     $params    = array('join_date' => date('m/d/Y', $unix1YAgo),
@@ -476,7 +476,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a join date
    *  of two years ago and a rolling membership type
    */
-  function testFormRuleRollingJoin2YearsAgo() {
+  public function testFormRuleRollingJoin2YearsAgo() {
     $unixNow   = time();
     $unix2YAgo = $unixNow - (2 * 365 * 24 * 60 * 60);
     $params    = array('join_date' => date('m/d/Y', $unix2YAgo),
@@ -496,7 +496,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a join date
    *  of six months ago and a fixed membership type
    */
-  function testFormRuleFixedJoin6MonthsAgo() {
+  public function testFormRuleFixedJoin6MonthsAgo() {
     $unixNow   = time();
     $unix6MAgo = $unixNow - (180 * 24 * 60 * 60);
     $params    = array('join_date' => date('m/d/Y', $unix6MAgo),
@@ -513,4 +513,3 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   }
 }
 // class CRM_Member_Form_MembershipTest
-

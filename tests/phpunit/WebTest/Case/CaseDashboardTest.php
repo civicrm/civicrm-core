@@ -35,7 +35,7 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAllOrMyCases() {
+  public function testAllOrMyCases() {
     // Log in as admin first to verify permissions for CiviCase
     $this->webtestLogin('admin');
 
@@ -119,4 +119,3 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isChecked("name=case_owner value=2"), 'Drilldown on dashboard summary cells not properly setting search form value to my cases.');
   }
 }
-

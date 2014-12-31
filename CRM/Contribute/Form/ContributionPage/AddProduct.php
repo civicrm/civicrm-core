@@ -45,7 +45,6 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
   /**
    * Pre  process the form
    *
-   * @access public
    *
    * @return void
    */
@@ -72,11 +71,10 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if ($this->_pid) {
@@ -115,7 +113,6 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $urlParams = 'civicrm/admin/contribute/premium';
@@ -231,7 +228,6 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
    * Process the form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // get the submitted form values.
@@ -288,10 +284,8 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Add Premium to Contribution Page');
   }
 }
-

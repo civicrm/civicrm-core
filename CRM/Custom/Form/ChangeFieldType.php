@@ -42,7 +42,6 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
    * The field id
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
@@ -62,7 +61,7 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
    * @return void
    * @acess protected
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, TRUE
     );
@@ -94,7 +93,6 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -137,7 +135,6 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
    * Process the form when submitted
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -201,7 +198,7 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
    *
    * @return array|null
    */
-  static function fieldTypeTransitions($dataType, $htmlType) {
+  public static function fieldTypeTransitions($dataType, $htmlType) {
     // Text field is single value field,
     // can not be change to other single value option which contains option group
     if ($htmlType == 'Text') {
@@ -304,7 +301,7 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
    *
    * @return array
    */
-  static function explode($str) {
+  public static function explode($str) {
     if (empty($str) || $str == CRM_Core_DAO::VALUE_SEPARATOR . CRM_Core_DAO::VALUE_SEPARATOR) {
       return array();
     }
@@ -313,4 +310,3 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
     }
   }
 }
-

@@ -42,7 +42,6 @@ class CRM_Contribute_Form_ContributionPage_Delete extends CRM_Contribute_Form_Co
    * Page title
    *
    * @var string
-   * @protected
    */
   protected $_title;
 
@@ -56,7 +55,6 @@ class CRM_Contribute_Form_ContributionPage_Delete extends CRM_Contribute_Form_Co
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     //Check if there are contributions related to Contribution Page
@@ -81,7 +79,6 @@ class CRM_Contribute_Form_ContributionPage_Delete extends CRM_Contribute_Form_Co
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->_title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
@@ -110,7 +107,6 @@ class CRM_Contribute_Form_ContributionPage_Delete extends CRM_Contribute_Form_Co
    * Process the form when submitted
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $transaction = new CRM_Core_Transaction();
@@ -153,4 +149,3 @@ class CRM_Contribute_Form_ContributionPage_Delete extends CRM_Contribute_Form_Co
     CRM_Core_Session::setStatus(ts("The contribution page '%1' has been deleted.", array(1 => $this->_title)), ts('Deleted'), 'success');
   }
 }
-

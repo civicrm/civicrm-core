@@ -45,7 +45,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   protected $_participantPaymentID;
   protected $_contributionTypeId;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
     $event = $this->eventCreate(NULL);
@@ -68,7 +68,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * Test civicrm_participant_payment_create with wrong params type
    */
-  function testPaymentCreateWrongParamsType() {
+  public function testPaymentCreateWrongParamsType() {
     $params = 'a string';
     $result = $this->callAPIFailure('participant_payment', 'create', $params);
   }
@@ -76,7 +76,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * Test civicrm_participant_payment_create with empty params
    */
-  function testPaymentCreateEmptyParams() {
+  public function testPaymentCreateEmptyParams() {
     $params = array();
     $result = $this->callAPIFailure('participant_payment', 'create', $params);
   }
@@ -84,7 +84,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * Check without contribution_id
    */
-  function testPaymentCreateMissingContributionId() {
+  public function testPaymentCreateMissingContributionId() {
     //Without Payment EntityID
     $params = array(
       'participant_id' => $this->_participantID,    );
@@ -95,7 +95,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * Check with valid array
    */
-  function testPaymentCreate() {
+  public function testPaymentCreate() {
     //Create Contribution & get contribution ID
     $contributionID = $this->contributionCreate($this->_contactID);
 
@@ -118,7 +118,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * Test civicrm_participant_payment_create with wrong params type
    */
-  function testPaymentUpdateWrongParamsType() {
+  public function testPaymentUpdateWrongParamsType() {
     $params = 'a string';
     $result = $this->callAPIFailure('participant_payment', 'create', $params);
     $this->assertEquals('Input variable `params` is not an array', $result['error_message'], 'In line ' . __LINE__);
@@ -127,7 +127,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * Check with empty array
    */
-  function testPaymentUpdateEmpty() {
+  public function testPaymentUpdateEmpty() {
     $params = array();
     $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
   }
@@ -135,7 +135,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * Check with missing participant_id
    */
-  function testPaymentUpdateMissingParticipantId() {
+  public function testPaymentUpdateMissingParticipantId() {
     //WithoutParticipantId
     $params = array(
       'contribution_id' => '3',    );
@@ -146,7 +146,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * Check with missing contribution_id
    */
-  function testPaymentUpdateMissingContributionId() {
+  public function testPaymentUpdateMissingContributionId() {
     $params = array(
       'participant_id' => $this->_participantID,    );
     $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
@@ -155,7 +155,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * Check financial records for offline Participants
    */
-  function testPaymentOffline() {
+  public function testPaymentOffline() {
 
     // create contribution w/o fee
     $contributionID = $this->contributionCreate($this->_contactID, $this->_contributionTypeId, NULL, NULL, 4, FALSE);
@@ -181,7 +181,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * Check financial records for online Participant
    */
-  function testPaymentOnline() {
+  public function testPaymentOnline() {
 
     $paymentProcessor = $this->processorCreate();
     $pageParams['processor_id'] = $paymentProcessor->id;
@@ -214,7 +214,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * Check financial records for online Participant pay later scenario
    */
-  function testPaymentPayLaterOnline() {
+  public function testPaymentPayLaterOnline() {
 
     $paymentProcessor = $this->processorCreate();
     $pageParams['processor_id'] = $paymentProcessor->id;
@@ -251,7 +251,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * Test civicrm_participant_payment_delete with wrong params type
    */
-  function testPaymentDeleteWrongParamsType() {
+  public function testPaymentDeleteWrongParamsType() {
     $params = 'a string';
     $result = $this->callAPIFailure('participant_payment', 'delete', $params);
   }
@@ -259,7 +259,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * Check with empty array
    */
-  function testPaymentDeleteWithEmptyParams() {
+  public function testPaymentDeleteWithEmptyParams() {
     $params = array();
     $deletePayment = $this->callAPIFailure('participant_payment', 'delete', $params);
     $this->assertEquals('Mandatory key(s) missing from params array: id', $deletePayment['error_message']);
@@ -268,7 +268,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * Check with wrong id
    */
-  function testPaymentDeleteWithWrongID() {
+  public function testPaymentDeleteWithWrongID() {
     $params = array(
       'id' => 0,    );
     $deletePayment = $this->callAPIFailure('participant_payment', 'delete', $params);
@@ -278,7 +278,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * Check with valid array
    */
-  function testPaymentDelete() {
+  public function testPaymentDelete() {
 
     // create contribution
     $contributionID = $this->contributionCreate($this->_contactID, $this->_contributionTypeId);
@@ -316,7 +316,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    * @param array $params
    * @param $context
    */
-  function _checkFinancialRecords($params, $context) {
+  public function _checkFinancialRecords($params, $context) {
     $entityParams = array(
       'entity_id' => $params['id'],
       'entity_table' => 'civicrm_contribution',
@@ -377,4 +377,3 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);
   }
 }
-

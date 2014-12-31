@@ -49,9 +49,8 @@ abstract class CRM_Utils_System_Base {
    * @param boolean $maintenance  for maintenance mode
    *
    * @return void           prints content on stdout
-   * @access public
    */
-  function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
     $ret = FALSE;
 
     // TODO: Split up; this was copied verbatim from CiviCRM 4.0's multi-UF theming function
@@ -99,14 +98,14 @@ abstract class CRM_Utils_System_Base {
   /**
    * @return string
    */
-  function getDefaultBlockLocation() {
+  public function getDefaultBlockLocation() {
     return 'left';
   }
 
   /**
    * @return string
    */
-  function getVersion() {
+  public function getVersion() {
     return 'Unknown';
   }
 
@@ -134,7 +133,7 @@ abstract class CRM_Utils_System_Base {
    *
    * @return string|NULL local file system path to CMS root, or NULL if it cannot be determined
    */
-  function cmsRootPath() {
+  public function cmsRootPath() {
     return NULL;
   }
 
@@ -156,7 +155,7 @@ abstract class CRM_Utils_System_Base {
    * @throws CRM_Core_Exception
    * @return int|NULL
    */
-  function getUfId($username) {
+  public function getUfId($username) {
     $className = get_class($this);
     throw new CRM_Core_Exception("Not implemented: {$className}->getUfId");
   }
@@ -166,9 +165,8 @@ abstract class CRM_Utils_System_Base {
    *
    * @param array $data  array with user specific data
    *
-   * @access public
    */
-  function setUserSession($data) {
+  public function setUserSession($data) {
     list($userID, $ufID) = $data;
     $session = CRM_Core_Session::singleton();
     $session->set('ufID', $ufID);
@@ -179,14 +177,14 @@ abstract class CRM_Utils_System_Base {
    * Reset any system caches that may be required for proper CiviCRM
    * integration.
    */
-  function flush() {
+  public function flush() {
     // nullop by default
   }
 
   /**
    * Flush css/js caches
    */
-  function clearResourceCache() {
+  public function clearResourceCache() {
     // nullop by default
   }
 
@@ -200,7 +198,7 @@ abstract class CRM_Utils_System_Base {
    * - $siteName,
    * - $siteRoot
    */
-  function getDefaultSiteSettings($dir) {
+  public function getDefaultSiteSettings($dir) {
     $config = CRM_Core_Config::singleton();
     $url = $config->userFrameworkBaseURL;
     return array($url, NULL, NULL);
@@ -215,13 +213,13 @@ abstract class CRM_Utils_System_Base {
    *
    * FIXME: Document values accepted/required by $params
    */
-  function userLoginFinalize($params = array()){
+  public function userLoginFinalize($params = array()){
   }
 
   /**
    * Set timezone in mysql so that timestamp fields show the correct time
    */
-  function setMySQLTimeZone(){
+  public function setMySQLTimeZone(){
     $timeZoneOffset = $this->getTimeZoneOffset();
     if($timeZoneOffset){
       $sql = "SET time_zone = '$timeZoneOffset'";
@@ -238,7 +236,7 @@ abstract class CRM_Utils_System_Base {
    * Get timezone from Drupal
    * @return boolean|string
    */
-  function getTimeZoneOffset(){
+  public function getTimeZoneOffset(){
     $timezone = $this->getTimeZoneString();
     if($timezone){
       $tzObj = new DateTimeZone($timezone);
@@ -262,7 +260,7 @@ abstract class CRM_Utils_System_Base {
    * Over-ridable function to get timezone as a string eg.
    * @return string Timezone e.g. 'America/Los_Angeles'
    */
-  function getTimeZoneString() {
+  public function getTimeZoneString() {
     return date_default_timezone_get();
   }
 
@@ -272,7 +270,7 @@ abstract class CRM_Utils_System_Base {
    * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
    *
    */
-  function getUniqueIdentifierFromUserObject($user) {}
+  public function getUniqueIdentifierFromUserObject($user) {}
 
   /**
    * Get User ID from UserFramework system (CMS)
@@ -280,21 +278,21 @@ abstract class CRM_Utils_System_Base {
    * @return mixed <NULL, number>
    *
    */
-  function getUserIDFromUserObject($user) {}
+  public function getUserIDFromUserObject($user) {}
 
   /**
    * Get currently logged in user uf id.
    *
    * @return int $userID logged in user uf id.
    */
-  function getLoggedInUfID() {}
+  public function getLoggedInUfID() {}
 
   /**
    * Get currently logged in user unique identifier - this tends to be the email address or user name.
    *
    * @return string $userID logged in user unique identifier
    */
-  function getLoggedInUniqueIdentifier() {}
+  public function getLoggedInUniqueIdentifier() {}
 
   /**
    * Return a UFID (user account ID from the UserFramework / CMS system being based on the user object
@@ -307,7 +305,7 @@ abstract class CRM_Utils_System_Base {
    * @param object $user
    * @return int $ufid - user ID of UF System
    */
-  function getBestUFID($user = NULL) {
+  public function getBestUFID($user = NULL) {
     if($user) {
       return $this->getUserIDFromUserObject($user);
     }
@@ -323,7 +321,7 @@ abstract class CRM_Utils_System_Base {
    * @param object $user
    * @return string $uniqueIdentifier - unique identifier from the UF System
    */
-  function getBestUFUniqueIdentifier($user = NULL) {
+  public function getBestUFUniqueIdentifier($user = NULL) {
     if($user) {
       return $this->getUniqueIdentifierFromUserObject($user);
     }
@@ -336,14 +334,14 @@ abstract class CRM_Utils_System_Base {
    *
    * @return string
    */
-  function getUserRecordUrl($contactID) {
+  public function getUserRecordUrl($contactID) {
     return NULL;
   }
   /**
    * Is the current user permitted to add a user
    * @return bool
    */
-  function checkPermissionAddUser() {
+  public function checkPermissionAddUser() {
     return FALSE;
   }
 
@@ -351,20 +349,19 @@ abstract class CRM_Utils_System_Base {
    * Output code from error function
    * @param string $content
    */
-  function outputError($content) {
+  public function outputError($content) {
     echo CRM_Utils_System::theme($content);
   }
 
   /**
    * Log error to CMS
    */
-  function logger($message) {
+  public function logger($message) {
 
   }
 
   /**
    * Append to coreResourcesList
    */
-  function appendCoreResources(&$list) {}
+  public function appendCoreResources(&$list) {}
 }
-

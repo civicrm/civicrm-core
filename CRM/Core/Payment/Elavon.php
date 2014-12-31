@@ -25,7 +25,7 @@
  **/
 class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   // (not used, implicit in the API, might need to convert?)
-  CONST
+  const
   CHARSET = 'UFT-8';
 
   /**
@@ -46,7 +46,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
    *
    * @return \CRM_Core_Payment_Elavon *******************************************************
    */
-  function __construct($mode, &$paymentProcessor) {
+  public function __construct($mode, &$paymentProcessor) {
     // live or test
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
@@ -63,7 +63,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
    * @return object
    * @static
    */
-  static function &singleton($mode, &$paymentProcessor) {
+  public static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
     if (self::$_singleton[$processorName] === NULL) {
       self::$_singleton[$processorName] = new CRM_Core_Payment_Elavon($mode, $paymentProcessor);
@@ -77,7 +77,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
    *
    *  Comment out irrelevant fields
    **********************************************************/
-  function mapProcessorFieldstoParams($params) {
+  public function mapProcessorFieldstoParams($params) {
 
     /**********************************************************
      * compile array
@@ -134,7 +134,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
    * This function sends request and receives response from
    * the processor
    **********************************************************/
-  function doDirectPayment(&$params) {
+  public function doDirectPayment(&$params) {
     if (isset($params['is_recur']) && $params['is_recur'] == TRUE) {
       CRM_Core_Error::fatal(ts('Elavon - recurring payments not implemented'));
     }
@@ -313,7 +313,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
    *
    * @return bool                  True if ID exists, else false
    */
-  function _checkDupe($invoiceId) {
+  public function _checkDupe($invoiceId) {
     $contribution = new CRM_Contribute_DAO_Contribution();
     $contribution->invoice_id = $invoiceId;
     return $contribution->find();
@@ -322,7 +322,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   /**************************************************
    * Produces error message and returns from class
    **************************************************/
-  function &errorExit($errorCode = NULL, $errorMessage = NULL) {
+  public function &errorExit($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
     if ($errorCode) {
       $e->push($errorCode, 0, NULL, $errorMessage);
@@ -336,7 +336,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   /**************************************************
    * NOTE: 'doTransferCheckout' not implemented
    **************************************************/
-  function doTransferCheckout(&$params, $component) {
+  public function doTransferCheckout(&$params, $component) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
@@ -355,7 +355,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
    */
   //  function checkConfig( $mode )          // CiviCRM V1.9 Declaration
   // CiviCRM V2.0 Declaration
-  function checkConfig() {
+  public function checkConfig() {
     $errorMsg = array();
 
     if (empty($this->_paymentProcessor['user_name'])) {
@@ -379,7 +379,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
    *
    * @return string
    */
-  function buildXML($requestFields) {
+  public function buildXML($requestFields) {
     $xmlFieldLength['ssl_first_name'] = 15;
     // credit card name
     $xmlFieldLength['ssl_last_name'] = 15;
@@ -424,7 +424,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
    *
    * @return string
    */
-  function tidyStringforXML($value, $fieldlength) {
+  public function tidyStringforXML($value, $fieldlength) {
     // the xml is posted to a url so must not contain spaces etc. It also needs to be cut off at a certain
     // length to match the processor's field length. The cut needs to be made after spaces etc are
     // transformed but must not include a partial transformed character e.g. %20 must be in or out not half-way
@@ -442,7 +442,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
    * It returns the NodeValue for a given NodeName
    * or returns an empty string.
    ************************************************************************/
-  function GetNodeValue($NodeName, &$strXML) {
+  public function GetNodeValue($NodeName, &$strXML) {
     $OpeningNodeName = "<" . $NodeName . ">";
     $ClosingNodeName = "</" . $NodeName . ">";
 
@@ -469,7 +469,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
    *
    * @return mixed
    */
-  function decodeXMLresponse($Xml) {
+  public function decodeXMLresponse($Xml) {
 
     /**
      * $xtr = simplexml_load_string($Xml) or die ("Unable to load XML string!");
@@ -488,4 +488,3 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     return $processorResponse;
   }
 }
-

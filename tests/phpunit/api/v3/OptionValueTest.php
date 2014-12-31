@@ -33,7 +33,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_OptionValueTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
   }
@@ -58,7 +58,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   /**
    *  Test limit param
    */
-  function testGetOptionValueLimit() {
+  public function testGetOptionValueLimit() {
     $params = array();
     $result = $this->callAPISuccess('option_value', 'get', $params);
     $this->assertGreaterThan(1, $result['count'], "Check more than one exists In line " . __LINE__);
@@ -70,7 +70,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   /**
    *  Test offset param
    */
-  function testGetOptionValueOffSet() {
+  public function testGetOptionValueOffSet() {
 
     $result = $this->callAPISuccess('option_value', 'get', array(
       'option_group_id' => 1,
@@ -86,7 +86,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   /**
    *  Test offset param
    */
-  function testGetSingleValueOptionValueSort() {
+  public function testGetSingleValueOptionValueSort() {
     $description = "demonstrates use of Sort param (available in many api functions). Also, getsingle";
     $subfile     = 'SortOption';
     $result      = $this->callAPISuccess('option_value', 'getsingle', array(
@@ -108,7 +108,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   /**
    * Try to emulate a pagination: fetch the first page of 10 options, then fetch the second page with an offset of 9 (instead of 10) and check the start of the second page is the end of the 1st one.
    */
-  function testGetValueOptionPagination() {
+  public function testGetValueOptionPagination() {
     $pageSize = 10;
     $page1 = $this->callAPISuccess('option_value', 'get', array('options' => array('limit' => $pageSize),      ));
     $page2 = $this->callAPISuccess('option_value', 'get', array(

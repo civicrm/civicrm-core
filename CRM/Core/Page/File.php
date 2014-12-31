@@ -34,7 +34,7 @@
  */
 class CRM_Core_Page_File extends CRM_Core_Page {
 
-  function run() {
+  public function run() {
     $eid    = CRM_Utils_Request::retrieve('eid', 'Positive', $this, TRUE);
     $fid    = CRM_Utils_Request::retrieve('fid', 'Positive', $this, FALSE);
     $id     = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
@@ -70,4 +70,3 @@ class CRM_Core_Page_File extends CRM_Core_Page {
     }
   }
 }
-

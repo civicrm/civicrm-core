@@ -35,7 +35,7 @@ class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testStandalonePledgeAdd() {
+  public function testStandalonePledgeAdd() {
     $this->webtestLogin();
 
     $this->openCiviPage('pledge/add', 'reset=1&context=standalone', '_qf_Pledge_upload');
@@ -94,4 +94,3 @@ class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
     return $contact;
   }
 }
-

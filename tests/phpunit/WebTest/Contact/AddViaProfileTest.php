@@ -35,7 +35,7 @@ class WebTest_Contact_AddViaProfileTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddViaCreateProfile() {
+  public function testAddViaCreateProfile() {
     $this->webtestLogin();
 
     $this->openCiviPage('profile/create', 'reset=1&gid=1', '_qf_Edit_next');
@@ -64,4 +64,3 @@ class WebTest_Contact_AddViaProfileTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.msg-text', "Your information has been saved.");
   }
 }
-

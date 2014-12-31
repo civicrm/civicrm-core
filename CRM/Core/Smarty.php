@@ -45,7 +45,7 @@ if (!class_exists('Smarty')) {
  *
  */
 class CRM_Core_Smarty extends Smarty {
-  CONST
+  const
     // use print.tpl and bypass the CMS. Civi prints a valid html file
     PRINT_PAGE = 1,
     // this and all the below bypasses the CMS html surrounding it and assumes we will embed this within other pages
@@ -82,7 +82,6 @@ class CRM_Core_Smarty extends Smarty {
    * Class constructor
    *
    * @return CRM_Core_Smarty
-   * @access private
    */
   private function __construct() {
     parent::__construct();
@@ -177,7 +176,7 @@ class CRM_Core_Smarty extends Smarty {
    * Method providing static instance of SmartTemplate, as
    * in Singleton pattern.
    */
-  static function &singleton() {
+  public static function &singleton() {
     if (!isset(self::$_singleton)) {
       self::$_singleton = new CRM_Core_Smarty( );
       self::$_singleton->initialize( );
@@ -197,7 +196,7 @@ class CRM_Core_Smarty extends Smarty {
    *
    * @return bool|mixed|string
    */
-  function fetch($resource_name, $cache_id = NULL, $compile_id = NULL, $display = FALSE) {
+  public function fetch($resource_name, $cache_id = NULL, $compile_id = NULL, $display = FALSE) {
     if (preg_match( '/^(\s+)?string:/', $resource_name)) {
       $old_security = $this->security;
       $this->security = TRUE;
@@ -217,7 +216,7 @@ class CRM_Core_Smarty extends Smarty {
    * @throws Exception
    * @return bool|mixed|string
    */
-  function fetchWith($resource_name, $vars) {
+  public function fetchWith($resource_name, $vars) {
     $this->pushScope($vars);
     try {
       $result = $this->fetch($resource_name);
@@ -234,7 +233,7 @@ class CRM_Core_Smarty extends Smarty {
    * @param string $name
    * @param $value
    */
-  function appendValue($name, $value) {
+  public function appendValue($name, $value) {
     $currentValue = $this->get_template_vars($name);
     if (!$currentValue) {
       $this->assign($name, $value);
@@ -246,7 +245,7 @@ class CRM_Core_Smarty extends Smarty {
     }
   }
 
-  function clearTemplateVars() {
+  public function clearTemplateVars() {
     foreach (array_keys($this->_tpl_vars) as $key) {
       if ($key == 'config' || $key == 'session') {
         continue;
@@ -255,7 +254,7 @@ class CRM_Core_Smarty extends Smarty {
     }
   }
 
-  static function registerStringResource() {
+  public static function registerStringResource() {
     require_once 'CRM/Core/Smarty/resources/String.php';
     civicrm_smarty_register_string_resource();
   }
@@ -263,7 +262,7 @@ class CRM_Core_Smarty extends Smarty {
   /**
    * @param $path
    */
-  function addTemplateDir($path) {
+  public function addTemplateDir($path) {
     if ( is_array( $this->template_dir ) ) {
       array_unshift( $this->template_dir, $path );
     } else {
@@ -323,4 +322,3 @@ class CRM_Core_Smarty extends Smarty {
     return $this;
   }
 }
-

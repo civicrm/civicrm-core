@@ -4,12 +4,12 @@
  * Generate language files and classes
  */
 class CRM_Core_CodeGen_I18n extends CRM_Core_CodeGen_BaseTask {
-  function run() {
+  public function run() {
     $this->generateInstallLangs();
     $this->generateSchemaStructure();
   }
 
-  function generateInstallLangs() {
+  public function generateInstallLangs() {
     // CRM-7161: generate install/langs.php from the languages template
     // grep it for enabled languages and create a 'xx_YY' => 'Language name' $langs mapping
     $matches = array();
@@ -21,7 +21,7 @@ class CRM_Core_CodeGen_I18n extends CRM_Core_CodeGen_BaseTask {
     file_put_contents('../install/langs.php', "<?php \$langs = " . var_export($langs, true) . ";");
   }
 
-  function generateSchemaStructure() {
+  public function generateSchemaStructure() {
     echo "Generating CRM_Core_I18n_SchemaStructure...\n";
     $columns = array();
     $indices = array();

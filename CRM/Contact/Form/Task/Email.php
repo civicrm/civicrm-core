@@ -96,9 +96,8 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     // store case id if present
     $this->_caseId = CRM_Utils_Request::retrieve('caseid', 'String', $this, FALSE);
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
@@ -151,7 +150,6 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -166,7 +164,6 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -174,4 +171,3 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
     CRM_Contact_Form_Task_EmailCommon::postProcess($this);
   }
 }
-

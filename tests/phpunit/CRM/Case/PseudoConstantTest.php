@@ -6,7 +6,7 @@ require_once 'CiviTest/CiviCaseTestCase.php';
  */
 class CRM_Case_PseudoConstantTest extends CiviCaseTestCase {
 
-  function testCaseType() {
+  public function testCaseType() {
     CRM_Core_PseudoConstant::flush();
     $caseTypes = CRM_Case_PseudoConstant::caseType();
     $expectedTypes = array(

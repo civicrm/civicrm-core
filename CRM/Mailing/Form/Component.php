@@ -53,7 +53,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
    */
   protected $_BAOName;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_id = $this->get('id');
     $this->_BAOName = $this->get('BAOName');
   }
@@ -62,7 +62,6 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->applyFilter('__ALL__', 'trim');
@@ -108,11 +107,10 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $params = array();
 
@@ -129,7 +127,6 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -158,10 +155,9 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
    * @param $options
    *
    * @return mixed true or array of errors
-   * @access public
    * @static
    */
-  static function dataRule($params, $files, $options) {
+  public static function dataRule($params, $files, $options) {
     if ($params['component_type'] == 'Header' || $params['component_type'] == 'Footer') {
       $InvalidTokens = array();
     }
@@ -189,4 +185,3 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
     return empty($errors) ? TRUE : $errors;
   }
 }
-

@@ -61,7 +61,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * The sql params we use to get the list of contacts
    *
    * @var string
-   * @access protected
    */
   protected $_params;
 
@@ -69,7 +68,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * The public visible fields to be shown to the user
    *
    * @var array
-   * @access protected
    */
   protected $_fields;
 
@@ -77,7 +75,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * The custom fields for this domain
    *
    * @var array
-   * @access protected
    */
   protected $_customFields;
 
@@ -85,7 +82,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * Cache the query object
    *
    * @var object
-   * @access protected
    */
   protected $_query;
 
@@ -93,7 +89,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * Cache the expanded options list if any
    *
    * @var object
-   * @access protected
    */
   protected $_options;
 
@@ -219,9 +214,8 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * @param null $gids
    *
    * @return array
-   * @access public
    */
-  static function &links($map = FALSE, $editLink = FALSE, $ufLink = FALSE, $gids = NULL) {
+  public static function &links($map = FALSE, $editLink = FALSE, $ufLink = FALSE, $gids = NULL) {
     if (!self::$_links) {
       self::$_links = array();
 
@@ -282,9 +276,8 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * @param $action
    * @param array $params
    *
-   * @access public
    */
-  function getPagerParams($action, &$params) {
+  public function getPagerParams($action, &$params) {
     $status =
       CRM_Utils_System::isNull($this->_multiRecordTableName) ? ts('Contact %%StatusMessage%%') : ts('Contact Multi Records %%StatusMessage%%');
     $params['status']    = $status;
@@ -303,9 +296,8 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * @param enum   $output what should the result set include (web/email/csv)
    *
    * @return array the column headers that need to be displayed
-   * @access public
    */
-  function &getColumnHeaders($action = NULL, $output = NULL) {
+  public function &getColumnHeaders($action = NULL, $output = NULL) {
     static $skipFields = array('group', 'tag');
     $multipleFields = array('url');
     $direction      = CRM_Utils_Sort::ASCENDING;
@@ -394,9 +386,8 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * @param
    *
    * @return int Total number of rows
-   * @access public
    */
-  function getTotalCount($action) {
+  public function getTotalCount($action) {
     $additionalWhereClause = 'contact_a.is_deleted = 0';
     $additionalFromClause = NULL;
     $returnQuery = NULL;
@@ -425,9 +416,8 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * Return the qill for this selector
    *
    * @return string
-   * @access public
    */
-  function getQill() {
+  public function getQill() {
     return $this->_query->qill();
   }
 
@@ -442,7 +432,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    *
    * @return int   the total number of rows for this action
    */
-  function &getRows($action, $offset, $rowCount, $sort, $output = NULL, $extraWhereClause = NULL) {
+  public function &getRows($action, $offset, $rowCount, $sort, $output = NULL, $extraWhereClause = NULL) {
 
     $multipleFields = array('url');
     //$sort object processing for location fields
@@ -731,7 +721,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    *
    * @return string name of the file
    */
-  function getExportFileName($output = 'csv') {
+  public function getExportFileName($output = 'csv') {
     return ts('CiviCRM Profile Listings');
   }
 
@@ -739,7 +729,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    *  set the _multiRecordTableName to display the result set
    *  according to multi record custom field values
    */
-  function setMultiRecordTableName($fields) {
+  public function setMultiRecordTableName($fields) {
    $customGroupId = $multiRecordTableName = NULL;
    $selectorSet = FALSE;
 
@@ -788,4 +778,3 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     }
   } //func close
 }
-

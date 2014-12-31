@@ -68,7 +68,6 @@ class CRM_Utils_Verp {
    * @param string $recipient The address of the recipient
    *
    * @return string           The VERP encoded address
-   * @access public
    * @static
    */
   public static function encode($sender, $recipient) {
@@ -94,7 +93,6 @@ class CRM_Utils_Verp {
    * @param string $address   The address to be decoded
    *
    * @return array            The tuple ($sender, $recipient)
-   * @access public
    * @static
    */
   public static function &verpdecode($address) {
@@ -113,4 +111,3 @@ class CRM_Utils_Verp {
     return array("$slocal@$sdomain", "$rlocal@$rdomain");
   }
 }
-

@@ -35,7 +35,7 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddMembership() {
+  public function testAddMembership() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -87,7 +87,7 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
   /**
    * @return array
    */
-  function addMembershipType() {
+  public function addMembershipType() {
     $membershipTitle = substr(sha1(rand()), 0, 7);
     $membershipOrg = $membershipTitle . ' memorg';
     $this->webtestAddOrganization($membershipOrg, TRUE);

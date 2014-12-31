@@ -46,7 +46,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   /**
    * Various predefined settings that have been migrated to the setting table
    */
-  CONST
+  const
     ADDRESS_STANDARDIZATION_PREFERENCES_NAME = 'Address Standardization Preferences',
     CAMPAIGN_PREFERENCES_NAME = 'Campaign Preferences',
     DEVELOPER_PREFERENCES_NAME = 'Developer Preferences',
@@ -77,7 +77,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @return boolean true if item is already in cache
    * @static
-   * @access public
    */
   static function inCache(
     $group,
@@ -114,7 +113,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   * Allow key o be cleared
   * @param string $cacheKey
   */
-  static function flushCache($cacheKey){
+  public static function flushCache($cacheKey){
     unset(self::$_cache[$cacheKey]);
     $globalCache = CRM_Utils_Cache::singleton();
     $globalCache->delete($cacheKey);
@@ -207,7 +206,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @return mixed The data if present in the setting table, else null
    * @static
-   * @access public
    */
   static function getItem(
     $group,
@@ -259,9 +257,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @domains array an array of domains to get settings for. Default is the current domain
    * @return void
    * @static
-   * @access public
    */
-  static function getItems(&$params, $domains = NULL, $settingsToReturn) {
+  public static function getItems(&$params, $domains = NULL, $settingsToReturn) {
     $originalDomain = CRM_Core_Config::domainID();
     if (empty($domains)) {
       $domains[] = $originalDomain;
@@ -331,7 +328,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @return void
    * @static
-   * @access public
    */
   static function setItem(
     $value,
@@ -446,9 +442,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @domains array an array of domains to get settings for. Default is the current domain
    * @return array
    * @static
-   * @access public
    */
-  static function setItems(&$params, $domains = NULL) {
+  public static function setItems(&$params, $domains = NULL) {
     $originalDomain = CRM_Core_Config::domainID();
     if (empty($domains)) {
       $domains[] = $originalDomain;
@@ -515,7 +510,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @throws api_Exception
    * @return array $fieldstoset name => value array of the fields to be set (with extraneous removed)
    */
-  static function validateSettingsInput($params, &$fields, $createMode = TRUE) {
+  public static function validateSettingsInput($params, &$fields, $createMode = TRUE) {
     $group = CRM_Utils_Array::value('group', $params);
 
     $ignoredParams = array(
@@ -565,7 +560,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @value mixed value of the setting to be set
    * @fieldSpec array Metadata for given field (drawn from the xml)
    */
-  static function validateSetting(&$value, $fieldSpec) {
+  public static function validateSetting(&$value, $fieldSpec) {
     if($fieldSpec['type'] == 'String' && is_array($value)){
       $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,$value) . CRM_Core_DAO::VALUE_SEPARATOR;
     }
@@ -586,7 +581,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @value mixed value of the setting to be set
    * @fieldSpec array Metadata for given field (drawn from the xml)
    */
-  static function validateBoolSetting(&$value, $fieldSpec) {
+  public static function validateBoolSetting(&$value, $fieldSpec) {
     if (!CRM_Utils_Rule::boolean($value)) {
       throw new api_Exception("Boolean value required for {$fieldSpec['name']}");
     }
@@ -693,7 +688,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   /**
    * Load up settings metadata from files
    */
-  static function loadSettingsMetadata($metaDataFolder) {
+  public static function loadSettingsMetadata($metaDataFolder) {
     $settingMetaData = array();
     $settingsFiles = CRM_Utils_File::findFiles($metaDataFolder, '*.setting.php');
     foreach ($settingsFiles as $file) {
@@ -711,7 +706,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param array $filters Filters to match against data
    * @param array $settingSpec metadata to filter
    */
-  static function _filterSettingsSpecification($filters, &$settingSpec) {
+  public static function _filterSettingsSpecification($filters, &$settingSpec) {
     if (empty($filters)) {
       return;
     }
@@ -736,7 +731,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * Multisites have often been overlooked in upgrade scripts so can be expected to be missing
    * a number of settings
    */
-  static function updateSettingsFromMetaData() {
+  public static function updateSettingsFromMetaData() {
     $apiParams = array(
       'version' => 3,
       'domain_id' => 'all',
@@ -763,7 +758,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * Note that where the key name is being changed the 'legacy_key' will give us the old name
    */
-  static function convertConfigToSetting($name, $domainID = NULL) {
+  public static function convertConfigToSetting($name, $domainID = NULL) {
     // we have to force this here in case more than one domain is in play.
     // whenever there is a possibility of more than one domain we must force it
     $config = CRM_Core_Config::singleton();
@@ -908,7 +903,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param array $params
    * @param int $domainID
    */
-  static function fixAndStoreDirAndURL(&$params, $domainID = NULL) {
+  public static function fixAndStoreDirAndURL(&$params, $domainID = NULL) {
     if (self::isUpgradeFromPreFourOneAlpha1()) {
       return;
     }
@@ -983,7 +978,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param array $params
    * @param $group
    */
-  static function storeDirectoryOrURLPreferences(&$params, $group) {
+  public static function storeDirectoryOrURLPreferences(&$params, $group) {
     foreach ($params as $name => $value) {
       // always try to store relative directory or url from CMS root
       $value = ($group == self::DIRECTORY_PREFERENCES_NAME) ? CRM_Utils_File::relativeDirectory($value) : CRM_Utils_System::relativeURL($value);
@@ -996,7 +991,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param array $params
    * @param bool $setInConfig
    */
-  static function retrieveDirectoryAndURLPreferences(&$params, $setInConfig = FALSE) {
+  public static function retrieveDirectoryAndURLPreferences(&$params, $setInConfig = FALSE) {
     if (CRM_Core_Config::isUpgradeMode()) {
       $isJoomla = (defined('CIVICRM_UF') && CIVICRM_UF == 'Joomla') ? TRUE : FALSE;
       // hack to set the resource base url so that js/ css etc is loaded correctly
@@ -1088,7 +1083,7 @@ AND domain_id = %3
    *
    * @return boolean
    */
-  static function isUpgradeFromPreFourOneAlpha1() {
+  public static function isUpgradeFromPreFourOneAlpha1() {
     if (CRM_Core_Config::isUpgradeMode()) {
       $currentVer = CRM_Core_BAO_Domain::version();
       if (version_compare($currentVer, '4.1.alpha1') < 0) {

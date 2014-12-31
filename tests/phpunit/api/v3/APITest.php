@@ -38,7 +38,7 @@ class api_v3_APITest extends CiviUnitTestCase {
 
   protected $_apiversion =3;
 
-  function testAPIReplaceVariables() {
+  public function testAPIReplaceVariables() {
     $result = array();
     $result['testfield'] = 6;
     $result['api.tag.get'] = 999;
@@ -71,21 +71,21 @@ class api_v3_APITest extends CiviUnitTestCase {
   /*
     * test that error doesn't occur for non-existant file
     */
-  function testAPIWrapperIncludeNoFile() {
+  public function testAPIWrapperIncludeNoFile() {
 
 
     $result = $this->callAPIFailure('RandomFile', 'get', array(), 'API (RandomFile,get) does not exist (join the API team and implement it!)');
   }
 
-  function testAPIWrapperCamelCaseFunction() {
+  public function testAPIWrapperCamelCaseFunction() {
     $result = $this->callAPISuccess('OptionGroup', 'Get', array());
   }
 
-  function testAPIWrapperLcaseFunction() {
+  public function testAPIWrapperLcaseFunction() {
     $result = $this->callAPISuccess('OptionGroup', 'get', array());
   }
 
-  function testAPIResolver() {
+  public function testAPIResolver() {
     $oldpath = get_include_path();
     set_include_path($oldpath . PATH_SEPARATOR . dirname(__FILE__) . '/dataset/resolver');
 
@@ -99,7 +99,7 @@ class api_v3_APITest extends CiviUnitTestCase {
     set_include_path($oldpath);
   }
 
-  function testFromCamel() {
+  public function testFromCamel() {
     $cases = array(
       'Contribution' => 'contribution',
       'contribution' => 'contribution',
@@ -116,7 +116,7 @@ class api_v3_APITest extends CiviUnitTestCase {
     }
   }
 
-  function testToCamel() {
+  public function testToCamel() {
     $cases = array(
       'Contribution' => 'Contribution',
       'contribution' => 'Contribution',
@@ -135,7 +135,7 @@ class api_v3_APITest extends CiviUnitTestCase {
 /**
  * Test that calling via wrapper works
  */
-  function testv3Wrapper() {
+  public function testv3Wrapper() {
     try{
       $result = civicrm_api3('contact', 'get', array());
     }
@@ -149,7 +149,7 @@ class api_v3_APITest extends CiviUnitTestCase {
   /**
    * Test exception is thrown
    */
-  function testv3WrapperException(){
+  public function testv3WrapperException(){
     try{
       $result = civicrm_api3('contact', 'create', array('debug' => 1));
     }
@@ -196,4 +196,3 @@ class api_v3_APITest extends CiviUnitTestCase {
   }
 
 }
-

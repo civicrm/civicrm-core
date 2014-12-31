@@ -51,4 +51,3 @@ function smarty_block_edit($params, $text, &$smarty) {
   $action = $smarty->_tpl_vars['action'];
   return ($action & 3) ? $text : NULL;
 }
-

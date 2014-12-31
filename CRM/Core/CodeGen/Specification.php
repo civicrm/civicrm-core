@@ -15,7 +15,7 @@ class CRM_Core_CodeGen_Specification {
    * @param $schemaPath
    * @param string $buildVersion which version of the schema to build
    */
-  function parse($schemaPath, $buildVersion) {
+  public function parse($schemaPath, $buildVersion) {
     $this->buildVersion = $buildVersion;
 
     echo "Parsing schema description ".$schemaPath."\n";
@@ -61,7 +61,7 @@ class CRM_Core_CodeGen_Specification {
    *
    * @return array
    */
-  function &getDatabase(&$dbXML) {
+  public function &getDatabase(&$dbXML) {
     $database = array('name' => trim((string ) $dbXML->name));
 
     $attributes = '';
@@ -86,7 +86,7 @@ class CRM_Core_CodeGen_Specification {
    *
    * @return array
    */
-  function getTables($dbXML, &$database) {
+  public function getTables($dbXML, &$database) {
     $tables = array();
     foreach ($dbXML->tables as $tablesXML) {
       foreach ($tablesXML->table as $tableXML) {
@@ -107,7 +107,7 @@ class CRM_Core_CodeGen_Specification {
    * @param $tables
    * @param string $classNames
    */
-  function resolveForeignKeys(&$tables, &$classNames) {
+  public function resolveForeignKeys(&$tables, &$classNames) {
     foreach (array_keys($tables) as $name) {
       $this->resolveForeignKey($tables, $classNames, $name);
     }
@@ -118,7 +118,7 @@ class CRM_Core_CodeGen_Specification {
    * @param string $classNames
    * @param string $name
    */
-  function resolveForeignKey(&$tables, &$classNames, $name) {
+  public function resolveForeignKey(&$tables, &$classNames, $name) {
     if (!array_key_exists('foreignKey', $tables[$name])) {
       return;
     }
@@ -140,7 +140,7 @@ class CRM_Core_CodeGen_Specification {
    *
    * @return array
    */
-  function orderTables(&$tables) {
+  public function orderTables(&$tables) {
     $ordered = array();
 
     while (!empty($tables)) {
@@ -161,7 +161,7 @@ class CRM_Core_CodeGen_Specification {
    *
    * @return bool
    */
-  function validTable(&$tables, &$valid, $name) {
+  public function validTable(&$tables, &$valid, $name) {
     if (!array_key_exists('foreignKey', $tables[$name])) {
       return TRUE;
     }
@@ -180,7 +180,7 @@ class CRM_Core_CodeGen_Specification {
    * @param $database
    * @param $tables
    */
-  function getTable($tableXML, &$database, &$tables) {
+  public function getTable($tableXML, &$database, &$tables) {
     $name = trim((string ) $tableXML->name);
     $klass = trim((string ) $tableXML->class);
     $base = $this->value('base', $tableXML);
@@ -280,7 +280,7 @@ class CRM_Core_CodeGen_Specification {
    * @param $fieldXML
    * @param $fields
    */
-  function getField(&$fieldXML, &$fields) {
+  public function getField(&$fieldXML, &$fields) {
     $name  = trim((string ) $fieldXML->name);
     $field = array('name' => $name, 'localizable' => $fieldXML->localizable);
     $type  = (string ) $fieldXML->type;
@@ -419,7 +419,7 @@ class CRM_Core_CodeGen_Specification {
    *
    * @return string
    */
-  function composeTitle($name) {
+  public function composeTitle($name) {
     $names = explode('_', strtolower($name));
     $title = '';
     for ($i = 0; $i < count($names); $i++) {
@@ -445,7 +445,7 @@ class CRM_Core_CodeGen_Specification {
    * @param $fields
    * @param $table
    */
-  function getPrimaryKey(&$primaryXML, &$fields, &$table) {
+  public function getPrimaryKey(&$primaryXML, &$fields, &$table) {
     $name = trim((string ) $primaryXML->name);
 
     /** need to make sure there is a field of type name */
@@ -469,7 +469,7 @@ class CRM_Core_CodeGen_Specification {
    * @param $fields
    * @param $indices
    */
-  function getIndex(&$indexXML, &$fields, &$indices) {
+  public function getIndex(&$indexXML, &$fields, &$indices) {
     //echo "\n\n*******************************************************\n";
     //echo "entering getIndex\n";
 
@@ -536,7 +536,7 @@ class CRM_Core_CodeGen_Specification {
    * @param $foreignKeys
    * @param string $currentTableName
    */
-  function getForeignKey(&$foreignXML, &$fields, &$foreignKeys, &$currentTableName) {
+  public function getForeignKey(&$foreignXML, &$fields, &$foreignKeys, &$currentTableName) {
     $name = trim((string ) $foreignXML->name);
 
     /** need to make sure there is a field of type name */
@@ -565,7 +565,7 @@ class CRM_Core_CodeGen_Specification {
    * @param $foreignXML
    * @param $dynamicForeignKeys
    */
-  function getDynamicForeignKey(&$foreignXML, &$dynamicForeignKeys) {
+  public function getDynamicForeignKey(&$foreignXML, &$dynamicForeignKeys) {
     $foreignKey = array(
       'idColumn' => trim($foreignXML->idColumn),
       'typeColumn' => trim($foreignXML->typeColumn),

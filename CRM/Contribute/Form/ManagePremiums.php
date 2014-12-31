@@ -42,7 +42,6 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   /**
    * Pre  process the form
    *
-   * @access public
    *
    * @return void
    */
@@ -54,11 +53,10 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    * Set default values for the form. Manage Premiums that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     if ($this->_id) {
       $params = array('id' => $this->_id);
@@ -90,7 +88,6 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm( );
@@ -212,7 +209,6 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    * @param $files
    *
    * @return mixed true or array of errors
-   * @access public
    * @static
    */
   public static function formRule($params, $files) {
@@ -274,7 +270,6 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -353,7 +348,6 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   /**
    * Resize a premium image to a different size
    *
-   * @access private
    *
    * @param string $filename
    * @param string $resizedName
@@ -400,4 +394,3 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   }
 
 }
-

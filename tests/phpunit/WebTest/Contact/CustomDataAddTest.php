@@ -35,7 +35,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCustomDataAdd() {
+  public function testCustomDataAdd() {
     $this->webtestLogin();
 
     $this->openCiviPage('admin/custom/group', 'action=add&reset=1');
@@ -155,7 +155,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
-  function testCustomDataMoneyAdd() {
+  public function testCustomDataMoneyAdd() {
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -235,7 +235,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//div[@id='custom-set-content-{$customFieldsetId}']/div/div[2]/div[2]", '12,345,678.98');
   }
 
-  function testCustomDataChangeLog(){
+  public function testCustomDataChangeLog(){
     $this->webtestLogin();
 
     //enable logging
@@ -342,4 +342,3 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
   }
 
 }
-

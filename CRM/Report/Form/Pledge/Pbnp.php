@@ -50,7 +50,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
 
     // Check if CiviCampaign is a) enabled and b) has active campaigns
     $config = CRM_Core_Config::singleton();
@@ -193,12 +193,12 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->assign('reportTitle', ts('Pledged but not Paid Report'));
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
@@ -225,7 +225,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  function from() {
+  public function from() {
     $this->_from = NULL;
 
     $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -271,18 +271,18 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = "
          GROUP BY {$this->_aliases['civicrm_pledge']}.contact_id,
                   {$this->_aliases['civicrm_pledge']}.id,
                   {$this->_aliases['civicrm_pledge']}.currency";
   }
 
-  function orderBy() {
+  public function orderBy() {
     $this->_orderBy = "ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_pledge']}.contact_id, {$this->_aliases['civicrm_pledge']}.id";
   }
 
-  function postProcess() {
+  public function postProcess() {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
     parent::PostProcess();
@@ -291,7 +291,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
     $checkList = array();
@@ -391,4 +391,3 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     }
   }
 }
-

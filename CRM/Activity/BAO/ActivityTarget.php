@@ -42,7 +42,7 @@ class CRM_Activity_BAO_ActivityTarget extends CRM_Activity_DAO_ActivityContact {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -52,7 +52,6 @@ class CRM_Activity_BAO_ActivityTarget extends CRM_Activity_DAO_ActivityContact {
    * @param array $params
    *
    * @return object activity type of object that is added
-   * @access public
    */
   public static function create(&$params) {
     $target = new CRM_Activity_BAO_ActivityContact();
@@ -71,9 +70,8 @@ class CRM_Activity_BAO_ActivityTarget extends CRM_Activity_DAO_ActivityContact {
    *
    * @return mixed
    *
-   * @access public
    */
-  static function retrieveTargetIdsByActivityId($activity_id) {
+  public static function retrieveTargetIdsByActivityId($activity_id) {
     $targetArray = array();
     if (!CRM_Utils_Rule::positiveInteger($activity_id)) {
       return $targetArray;
@@ -104,9 +102,8 @@ AND        civicrm_contact.is_deleted = 0
    *
    * @return array
    *
-   * @access public
    */
-  static function getTargetNames($activityID) {
+  public static function getTargetNames($activityID) {
     $targetNames = array();
 
     if (empty($activityID)) {
@@ -133,4 +130,3 @@ AND        contact_a.is_deleted = 0
     return $targetNames;
   }
 }
-

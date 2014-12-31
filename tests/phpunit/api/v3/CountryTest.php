@@ -40,7 +40,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
   protected $_params;
 
 
-  function setUp() {
+  public function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
     $this->useTransaction(TRUE);
@@ -117,4 +117,3 @@ class api_v3_CountryTest extends CiviUnitTestCase {
     $this->assertEquals(1, $check);
   }
 }
-

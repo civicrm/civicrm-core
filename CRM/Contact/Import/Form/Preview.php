@@ -43,7 +43,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     //get the data from the session
@@ -130,7 +129,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addElement('text', 'newGroupName', ts('Name for new group'));
@@ -197,9 +195,8 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     $invalidTagName = $invalidGroupName = FALSE;
 
@@ -242,7 +239,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    * preview the file and extract some summary statistics
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
 
@@ -336,7 +332,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    * preview the file and extract some summary statistics
    *
    * @return void
-   * @access public
    */
   public function postProcessOld() {
 
@@ -594,4 +589,3 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
   }
 }
-

@@ -43,7 +43,6 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    * The id of the object being viewed (note/relationship etc)
    *
    * @int
-   * @access protected
    */
   protected $_id;
 
@@ -51,7 +50,6 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    * The contact id of the contact being viewed
    *
    * @int
-   * @access protected
    */
   protected $_contactId;
 
@@ -59,7 +57,6 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    * The action that we are performing
    *
    * @string
-   * @access protected
    */
   protected $_action;
 
@@ -67,7 +64,6 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    * The permission we have on this contact
    *
    * @string
-   * @access protected
    */
   protected $_permission;
 
@@ -76,10 +72,9 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     // process url params
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->assign('id', $this->_id);
@@ -262,9 +257,8 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    * @param int $contactId
    *
    * @return array contact fields in fixed order
-   * @access public
    */
-  static function getContactDetails($contactId) {
+  public static function getContactDetails($contactId) {
     return list($displayName,
       $contactImage,
       $contactType,
@@ -280,7 +274,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    * @param $page
    * @param int $contactID
    */
-  static function checkUserPermission($page, $contactID = NULL) {
+  public static function checkUserPermission($page, $contactID = NULL) {
     // check for permissions
     $page->_permission = NULL;
 
@@ -321,7 +315,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    *
    * @return string
    */
-  static function setTitle($contactId, $isDeleted = FALSE) {
+  public static function setTitle($contactId, $isDeleted = FALSE) {
     static $contactDetails;
     $displayName = $contactImage = NULL;
     if (!isset($contactDetails[$contactId])) {
@@ -353,7 +347,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    * @param CRM_Core_Page $obj
    * @param integer $cid
    */
-  static function addUrls(&$obj, $cid) {
+  public static function addUrls(&$obj, $cid) {
      $uid = CRM_Core_BAO_UFMatch::getUFId($cid);
 
     if ($uid) {
@@ -387,4 +381,3 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     }
   }
 }
-

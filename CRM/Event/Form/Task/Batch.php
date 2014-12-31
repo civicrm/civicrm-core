@@ -67,9 +67,8 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
    /*
     * initialize the task and row fields
     */
@@ -94,11 +93,10 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $ufGroupId = $this->get('ufGroupId');
 
     if (!$ufGroupId) {
@@ -236,11 +234,10 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if (empty($this->_fields)) {
       return;
     }
@@ -274,7 +271,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -355,7 +351,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    *
    * @return Ambigous|void
    */
-  static function updatePendingOnlineContribution($participantId, $statusId) {
+  public static function updatePendingOnlineContribution($participantId, $statusId) {
     if (!$participantId || !$statusId) {
       return;
     }
@@ -401,4 +397,3 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     return $updatedStatusId;
   }
 }
-

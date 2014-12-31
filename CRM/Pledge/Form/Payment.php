@@ -43,7 +43,6 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
    * The id of the pledge payment that we are proceessing
    *
    * @var int
-   * @public
    */
   public $_id;
 
@@ -51,7 +50,6 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     // check for edit permission
@@ -68,11 +66,10 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
    * Set default values for the form.
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     if ($this->_id) {
       $params['id'] = $this->_id;
@@ -92,7 +89,6 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     //add various dates
@@ -138,7 +134,6 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -195,4 +190,3 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
     CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
   }
 }
-

@@ -55,7 +55,6 @@ class CRM_Core_JobManager {
    * Class constructor
    *
    * @param void
-   * @access public
    *
    */
   /**
@@ -71,7 +70,6 @@ class CRM_Core_JobManager {
   /*
    *
    * @param void
-   * @access private
    *
    */
   /**
@@ -102,7 +100,6 @@ class CRM_Core_JobManager {
    * Class destructor
    *
    * @param void
-   * @access public
    *
    */
   public function __destruct() {}
@@ -157,7 +154,6 @@ class CRM_Core_JobManager {
    *
    * @param void
    * @return array ($id => CRM_Core_ScheduledJob)
-   * @access private
    *
    */
   /**
@@ -182,7 +178,6 @@ class CRM_Core_JobManager {
    * and creates ScheduledJob object.
    *
    * @param void
-   * @access private
    *
    */
   /**
@@ -225,7 +220,6 @@ class CRM_Core_JobManager {
   /*
    *
    * @return array|null collection of permissions, null if none
-   * @access public
    *
    */
   /**
@@ -292,4 +286,3 @@ class CRM_Core_JobManager {
 function CRM_Core_JobManager_scheduledJobFatalErrorHandler($message) {
   throw new Exception("{$message['message']}: {$message['code']}");
 }
-

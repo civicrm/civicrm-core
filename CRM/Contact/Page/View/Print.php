@@ -44,10 +44,9 @@ class CRM_Contact_Page_View_Print extends CRM_Contact_Page_View_Summary {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
    *
    */
-  function run() {
+  public function run() {
     $this->_print = CRM_Core_Smarty::PRINT_PAGE;
 
     $this->preProcess();
@@ -61,9 +60,8 @@ class CRM_Contact_Page_View_Print extends CRM_Contact_Page_View_Summary {
    * View summary details of a contact
    *
    * @return void
-   * @access public
    */
-  function view() {
+  public function view() {
     $params   = array();
     $defaults = array();
     $ids      = array();
@@ -76,4 +74,3 @@ class CRM_Contact_Page_View_Print extends CRM_Contact_Page_View_Summary {
     return parent::view();
   }
 }
-

@@ -52,7 +52,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array('CiviCampaign', $config->enableComponents);
     if ($campaignEnabled) {
@@ -383,11 +383,11 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
 
     $this->_columnHeaders = array();
@@ -451,7 +451,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     $this->_select = 'SELECT ' . implode(', ', $select) . ' ';
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
               FROM civireport_membership_contribution_detail
               INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
@@ -535,7 +535,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
   /**
    * @param bool $applyLimit
    */
-  function tempTable($applyLimit = TRUE) {
+  public function tempTable($applyLimit = TRUE) {
     // create temp table with contact ids,contribtuion id,membership id
     $dropTempTable = 'DROP TABLE IF EXISTS civireport_membership_contribution_detail';
     CRM_Core_DAO::executeQuery($dropTempTable);
@@ -564,7 +564,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
    *
    * @return string
    */
-  function buildQuery($applyLimit = TRUE) {
+  public function buildQuery($applyLimit = TRUE) {
     $this->select();
     //create temp table to be used as base table
     $this->tempTable();
@@ -588,11 +588,11 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     return $sql;
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_contribution']}.id ";
   }
 
-  function orderBy() {
+  public function orderBy() {
     $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id ";
     if (!empty($this->_params['fields']['first_donation_date']) ||
       !empty($this->_params['fields']['first_donation_amount'])
@@ -606,7 +606,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
     $select = "                                                                                                                                                                                                     SELECT COUNT({$this->_aliases['civicrm_contribution']}.total_amount ) as count,                                                                                                                                   SUM( {$this->_aliases['civicrm_contribution']}.total_amount ) as amount,                                                                                                                                   ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as avg,                                                                                                                              {$this->_aliases['civicrm_contribution']}.currency as currency                                                                                                                                       ";
@@ -637,7 +637,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     return $statistics;
   }
 
-  function postProcess() {
+  public function postProcess() {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
     parent::postProcess();
@@ -646,7 +646,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $checkList = array();
 
@@ -818,4 +818,3 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     }
   }
 }
-

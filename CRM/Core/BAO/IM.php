@@ -44,10 +44,9 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return object       CRM_Core_BAO_IM object on success, null otherwise
-   * @access public
    * @static
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'IM', CRM_Utils_Array::value('id', $params), $params);
 
@@ -66,10 +65,9 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
    * @param array entityBlock input parameters to find object
    *
    * @return boolean
-   * @access public
    * @static
    */
-  static function &getValues($entityBlock) {
+  public static function &getValues($entityBlock) {
     return CRM_Core_BAO_Block::getValues('im', $entityBlock);
   }
 
@@ -81,10 +79,9 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
    * @param bool $updateBlankLocInfo
    *
    * @return array  the array of im details
-   * @access public
    * @static
    */
-  static function allIMs($id, $updateBlankLocInfo = FALSE) {
+  public static function allIMs($id, $updateBlankLocInfo = FALSE) {
     if (!$id) {
       return NULL;
     }
@@ -132,10 +129,9 @@ ORDER BY
    * entity_table name
    *
    * @return array  the array of im details
-   * @access public
    * @static
    */
-  static function allEntityIMs(&$entityElements) {
+  public static function allEntityIMs(&$entityElements) {
     if (empty($entityElements)) {
       return NULL;
     }
@@ -172,8 +168,7 @@ ORDER BY cim.is_primary DESC, im_id ASC ";
   /**
    * Call common delete function
    */
-  static function del($id) {
+  public static function del($id) {
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('IM', $id);
   }
 }
-

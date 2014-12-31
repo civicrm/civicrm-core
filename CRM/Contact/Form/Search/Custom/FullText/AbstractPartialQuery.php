@@ -92,7 +92,7 @@ abstract class CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
    * @param $tables
    * @param $extends
    */
-  function fillCustomInfo(&$tables, $extends) {
+  public function fillCustomInfo(&$tables, $extends) {
     $sql = "
 SELECT     cg.table_name, cf.column_name
 FROM       civicrm_custom_group cg
@@ -127,7 +127,7 @@ AND        cf.html_type IN ( 'Text', 'TextArea', 'RichTextEditor' )
    *   - count: int
    *   - files: NULL | array
    */
-  function runQueries($queryText, &$tables, $entityIDTableName, $limit) {
+  public function runQueries($queryText, &$tables, $entityIDTableName, $limit) {
     $sql = "TRUNCATE {$entityIDTableName}";
     CRM_Core_DAO::executeQuery($sql);
 

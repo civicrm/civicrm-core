@@ -39,7 +39,7 @@ class CRM_Case_BAO_Query {
    *
    * @return array
    */
-  static function &getFields($excludeActivityFields = FALSE) {
+  public static function &getFields($excludeActivityFields = FALSE) {
     $fields = array();
     $fields = CRM_Case_BAO_Case::exportableFields();
 
@@ -57,9 +57,8 @@ class CRM_Case_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
-  static function select(&$query) {
+  public static function select(&$query) {
     if (($query->_mode & CRM_Contact_BAO_Query::MODE_CASE) || !empty($query->_returnProperties['case_id'])) {
       $query->_select['case_id'] = "civicrm_case.id as case_id";
       $query->_element['case_id'] = 1;
@@ -225,9 +224,8 @@ class CRM_Case_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
-  static function where(&$query) {
+  public static function where(&$query) {
     foreach ($query->_params as $id => $values) {
       if (!is_array($values) || count($values) != 5) {
         continue;
@@ -250,9 +248,8 @@ class CRM_Case_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
-  static function whereClauseSingle(&$values, &$query) {
+  public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
     $val = $names = array();
     switch ($name) {
@@ -536,7 +533,7 @@ class CRM_Case_BAO_Query {
    *
    * @return string
    */
-  static function from($name, $mode, $side) {
+  public static function from($name, $mode, $side) {
     $from = "";
 
     switch ($name) {
@@ -607,9 +604,8 @@ case_relation_type.id = case_relationship.relationship_type_id )";
    * Getter for the qill object
    *
    * @return string
-   * @access public
    */
-  function qill() {
+  public function qill() {
     return (isset($this->_qill)) ? $this->_qill : "";
   }
 
@@ -663,7 +659,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
   /**
    * This includes any extra fields that might need for export etc
    */
-  static function extraReturnProperties($mode) {
+  public static function extraReturnProperties($mode) {
     $properties = NULL;
 
     if ($mode & CRM_Contact_BAO_Query::MODE_CASE) {
@@ -685,7 +681,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
   /**
    * @param $tables
    */
-  static function tableNames(&$tables) {
+  public static function tableNames(&$tables) {
     if (!empty($tables['civicrm_case'])) {
       $tables = array_merge(array('civicrm_case_contact' => 1), $tables);
     }
@@ -698,14 +694,13 @@ case_relation_type.id = case_relationship.relationship_type_id )";
   /**
    * Add all the elements shared between case search and advanaced search
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
    * @return void
    * @static
    */
-  static function buildSearchForm(&$form) {
+  public static function buildSearchForm(&$form) {
     $config = CRM_Core_Config::singleton();
 
     //validate case configuration.
@@ -775,6 +770,5 @@ case_relation_type.id = case_relationship.relationship_type_id )";
    * @param $row
    * @param int $id
    */
-  static function searchAction(&$row, $id) {}
+  public static function searchAction(&$row, $id) {}
 }
-

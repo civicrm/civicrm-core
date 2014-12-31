@@ -45,7 +45,7 @@ class CRM_Core_Page_AJAX_Location {
    * This method is used by on-behalf-of form to dynamically generate poulate the
    * location field values for selected permissioned contact.
    */
-  static function getPermissionedLocation() {
+  public static function getPermissionedLocation() {
     $cid = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
     $ufId = CRM_Utils_Request::retrieve('ufId', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
 
@@ -199,15 +199,15 @@ class CRM_Core_Page_AJAX_Location {
     CRM_Utils_JSON::output($elements);
   }
 
-  static function jqState() {
+  public static function jqState() {
     CRM_Utils_JSON::output(CRM_Core_BAO_Location::getChainSelectValues($_GET['_value'], 'country'));
   }
 
-  static function jqCounty() {
+  public static function jqCounty() {
     CRM_Utils_JSON::output(CRM_Core_BAO_Location::getChainSelectValues($_GET['_value'], 'stateProvince'));
   }
 
-  static function getLocBlock() {
+  public static function getLocBlock() {
     // i wish i could retrieve loc block info based on loc_block_id,
     // Anyway, lets retrieve an event which has loc_block_id set to 'lbid'.
     if ($_REQUEST['lbid']) {

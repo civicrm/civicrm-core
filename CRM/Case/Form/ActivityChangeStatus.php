@@ -43,11 +43,9 @@ class CRM_Case_Form_ActivityChangeStatus extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     $this->add('select', 'activity_change_status', ts('New Status'), $activityStatus);
   }
 }
-

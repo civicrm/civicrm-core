@@ -47,7 +47,6 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
    * View details of a recurring contribution
    *
    * @return void
-   * @access public
    */ function view() {
     $recur = new CRM_Contribute_DAO_ContributionRecur();
     $recur->id = $this->_id;
@@ -71,7 +70,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
     }
   }
 
-  function preProcess() {
+  public function preProcess() {
     $context          = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->_action    = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'view');
     $this->_id        = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -95,9 +94,8 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
    * it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     if ($this->_action & CRM_Core_Action::VIEW) {
@@ -107,4 +105,3 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
     return parent::run();
   }
 }
-

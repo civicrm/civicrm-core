@@ -52,7 +52,7 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
    *
    * @return \CRM_Mailing_MailStore_Imap
    */
-  function __construct($host, $username, $password, $ssl = TRUE, $folder = 'INBOX') {
+  public function __construct($host, $username, $password, $ssl = TRUE, $folder = 'INBOX') {
     // default to INBOX if an empty string
     if (!$folder) {
       $folder = 'INBOX';
@@ -89,7 +89,7 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
   /**
    * Expunge the messages marked for deletion, CRM-7356
    */
-  function expunge() {
+  public function expunge() {
     $this->_transport->expunge();
   }
 
@@ -100,7 +100,7 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
    *
    * @return void
    */
-  function markIgnored($nr) {
+  public function markIgnored($nr) {
     if ($this->_debug) {
       print "setting $nr as seen and moving it to the ignored mailbox\n";
     }
@@ -116,7 +116,7 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
    *
    * @return void
    */
-  function markProcessed($nr) {
+  public function markProcessed($nr) {
     if ($this->_debug) {
       print "setting $nr as seen and moving it to the processed mailbox\n";
     }
@@ -125,4 +125,3 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
     $this->_transport->delete($nr);
   }
 }
-

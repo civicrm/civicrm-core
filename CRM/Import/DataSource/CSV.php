@@ -33,7 +33,7 @@
  *
  */
 class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
-  CONST
+  const
     NUM_ROWS_TO_INSERT = 100;
 
   /**
@@ -41,19 +41,17 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    *
    * @return array collection of info about this data source
    *
-   * @access public
    *
    */
-  function getInfo() {
+  public function getInfo() {
     return array('title' => ts('Comma-Separated Values (CSV)'));
   }
 
   /**
    * Set variables up before form is built
    *
-   * @access public
    */
-  function preProcess(&$form) {}
+  public function preProcess(&$form) {}
 
   /**
    * This is function is called by the form object to get the DataSource's
@@ -63,9 +61,8 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * @param CRM_Core_Form $form
    *
    * @return void (operates directly on form argument)
-   * @access public
    */
-  function buildQuickForm(&$form) {
+  public function buildQuickForm(&$form) {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_CSV');
 
     $config = CRM_Core_Config::singleton();
@@ -85,9 +82,8 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   /**
    * Process the form submission
    *
-   * @access public
    */
-  function postProcess(&$params, &$db, &$form) {
+  public function postProcess(&$params, &$db, &$form) {
     $file = $params['uploadFile']['name'];
     $result = self::_CsvToTable($db,
       $file,
@@ -256,4 +252,3 @@ function civicrm_mysql_real_escape_string($string) {
   }
   return $dao->escape($string);
 }
-

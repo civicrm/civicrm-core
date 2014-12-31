@@ -39,7 +39,7 @@ class CRM_Core_I18n_Schema {
    *
    * @return void
    */
-  static function dropAllViews() {
+  public static function dropAllViews() {
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
     if (!$domain->locales) {
@@ -64,7 +64,7 @@ class CRM_Core_I18n_Schema {
    *
    * @return void
    */
-  static function makeMultilingual($locale) {
+  public static function makeMultilingual($locale) {
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
 
@@ -118,7 +118,7 @@ class CRM_Core_I18n_Schema {
    *
    * @return void
    */
-  static function makeSinglelingual($retain) {
+  public static function makeSinglelingual($retain) {
     $domain = new CRM_Core_DAO_Domain;
     $domain->find(TRUE);
     $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
@@ -240,7 +240,7 @@ class CRM_Core_I18n_Schema {
    *
    * @return void
    */
-  static function addLocale($locale, $source) {
+  public static function addLocale($locale, $source) {
     // get the current supported locales
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
@@ -297,7 +297,7 @@ class CRM_Core_I18n_Schema {
    *
    * @return void
    */
-  static function rebuildMultilingualSchema($locales, $version = NULL) {
+  public static function rebuildMultilingualSchema($locales, $version = NULL) {
     if ($version) {
       $latest = self::getLatestSchema($version);
       require_once "CRM/Core/I18n/SchemaStructure_{$latest}.php";
@@ -360,7 +360,7 @@ class CRM_Core_I18n_Schema {
    *
    * @return string        the rewritten query
    */
-  static function rewriteQuery($query) {
+  public static function rewriteQuery($query) {
     global $dbLocale;
     $tables = self::schemaStructureTables();
     foreach ($tables as $table) {
@@ -377,7 +377,7 @@ class CRM_Core_I18n_Schema {
    *
    * @return array
    */
-  static function schemaStructureTables($version = NULL, $force = FALSE) {
+  public static function schemaStructureTables($version = NULL, $force = FALSE) {
     static $_tables = NULL;
     if ($_tables === NULL || $force) {
       if ($version) {
@@ -401,7 +401,7 @@ class CRM_Core_I18n_Schema {
    *
    * @return mixed
    */
-  static function getLatestSchema($version) {
+  public static function getLatestSchema($version) {
     // remove any .upgrade sub-str from version. Makes it easy to do version_compare & give right result
     $version = str_ireplace(".upgrade", "", $version);
 
@@ -495,7 +495,7 @@ class CRM_Core_I18n_Schema {
    * @param $info
    * @param null $tableName
    */
-  static function triggerInfo(&$info, $tableName = NULL) {
+  public static function triggerInfo(&$info, $tableName = NULL) {
     // get the current supported locales
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
@@ -590,4 +590,3 @@ class CRM_Core_I18n_Schema {
     }
   }
 }
-

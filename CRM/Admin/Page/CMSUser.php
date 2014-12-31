@@ -46,10 +46,9 @@ class CRM_Admin_Page_CMSUser extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
    *
    */
-  function run() {
+  public function run() {
     //if javascript is enabled
     if (CRM_Utils_Request::retrieve('confirmed', 'Boolean',
         $this, '', '', 'GET'
@@ -70,4 +69,3 @@ class CRM_Admin_Page_CMSUser extends CRM_Core_Page {
     return parent::run();
   }
 }
-

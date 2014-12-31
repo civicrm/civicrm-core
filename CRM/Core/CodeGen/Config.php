@@ -4,17 +4,17 @@
  * Generate configuration files
  */
 class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
-  function run() {
+  public function run() {
     $this->generateTemplateVersion();
 
     $this->setupCms();
   }
 
-  function generateTemplateVersion() {
+  public function generateTemplateVersion() {
     file_put_contents($this->config->tplCodePath . "/CRM/common/version.tpl", $this->config->db_version);
   }
 
-  function setupCms() {
+  public function setupCms() {
     if (!in_array($this->config->cms, array(
       'drupal', 'joomla', 'wordpress'))) {
       echo "Config file for '{$this->config->cms}' not known.";

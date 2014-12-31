@@ -82,7 +82,6 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_single = FALSE;
@@ -90,7 +89,6 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_limit = NULL;
@@ -98,7 +96,6 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   /**
    * What context are we being invoked from
    *
-   * @access protected
    * @var string
    */
   protected $_context = NULL;
@@ -108,7 +105,6 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    * the HTML_QuickForm_Controller for that page.
    *
    * @var array
-   * @access protected
    */
   public $_queryParams;
 
@@ -116,7 +112,6 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    * Represent the type of selector
    *
    * @var int
-   * @access protected
    */
   protected $_action;
 
@@ -193,7 +188,6 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    * @param bool $isCancelSupported
    *
    * @return array
-   * @access public
    */
   static
   function &links($status = 'all',
@@ -277,9 +271,8 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    *
    * @param $action
    * @param array $params
-   * @access public
    */
-  function getPagerParams($action, &$params) {
+  public function getPagerParams($action, &$params) {
     $params['status'] = ts('Member') . ' %%StatusMessage%%';
     $params['csvString'] = NULL;
     if ($this->_limit) {
@@ -299,9 +292,8 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    * @param
    *
    * @return int Total number of rows
-   * @access public
    */
-  function getTotalCount($action) {
+  public function getTotalCount($action) {
     return $this->_query->searchQuery(0, 0, NULL,
       TRUE, FALSE,
       FALSE, FALSE,
@@ -321,7 +313,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    *
    * @return int   the total number of rows for this action
    */
-  function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
+  public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     // check if we can process credit card registration
     $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE,
       "billing_mode IN ( 1, 3 )"
@@ -448,7 +440,6 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
 
   /**
    * @return array              $qill         which contains an array of strings
-   * @access public
    */
 
   // the current internationalisation is bad, but should more or less work
@@ -465,7 +456,6 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    * @param enum   $output what should the result set include (web/email/csv)
    *
    * @return array the column headers that need to be displayed
-   * @access public
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     if (!isset(self::$_columnHeaders)) {
@@ -523,14 +513,14 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   /**
    * @return mixed
    */
-  function alphabetQuery() {
+  public function alphabetQuery() {
     return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
   }
 
   /**
    * @return string
    */
-  function &getQuery() {
+  public function &getQuery() {
     return $this->_query;
   }
 
@@ -541,8 +531,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    *
    * @return string name of the file
    */
-  function getExportFileName($output = 'csv') {
+  public function getExportFileName($output = 'csv') {
     return ts('CiviCRM Member Search');
   }
 }
-

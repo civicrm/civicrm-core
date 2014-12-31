@@ -46,11 +46,10 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    * Set default values for the form.
    * default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if (!$this->_defaults) {
       $this->_defaults = array();
       $formArray       = array('Component', 'Localization');
@@ -117,7 +116,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
@@ -171,7 +169,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -284,4 +281,3 @@ AND    time_format <> ''
     @unlink($configFile);
   }
 }
-

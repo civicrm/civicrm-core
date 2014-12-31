@@ -91,7 +91,7 @@ class CRM_Utils_QueryFormatter {
   /**
    * @param string $mode eg MODE_NONE
    */
-  function __construct($mode) {
+  public function __construct($mode) {
     $this->mode = $mode;
   }
 

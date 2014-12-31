@@ -40,7 +40,7 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
 
     $this->activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
     asort($this->activityTypes);
@@ -165,7 +165,7 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
 
@@ -214,7 +214,7 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  function from() {
+  public function from() {
 
     $this->_from = "
         FROM civicrm_activity {$this->_aliases['civicrm_activity']}
@@ -227,7 +227,7 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
 ";
   }
 
-  function where() {
+  public function where() {
     $this->_where = " WHERE {$this->_aliases['civicrm_activity']}.is_current_revision = 1 AND
                                 {$this->_aliases['civicrm_activity']}.is_deleted = 0 AND
                                 {$this->_aliases['civicrm_activity']}.is_test = 0";
@@ -283,7 +283,7 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = '';
     if ($this->has_grouping) {
       $this->_groupBy = "
@@ -295,11 +295,11 @@ GROUP BY {$this->_aliases['civicrm_contact']}.id,
     }
   }
 
-  function orderBy() {
+  public function orderBy() {
     $this->_orderBy = "ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id";
   }
 
-  function postProcess() {
+  public function postProcess() {
     parent::postProcess();
   }
 
@@ -310,7 +310,7 @@ GROUP BY {$this->_aliases['civicrm_contact']}.id,
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     if (!empty($fields['group_bys']) &&
       (!array_key_exists('id', $fields['fields']) ||
@@ -325,7 +325,7 @@ GROUP BY {$this->_aliases['civicrm_contact']}.id,
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
 
     $entryFound = FALSE;
@@ -360,4 +360,3 @@ GROUP BY {$this->_aliases['civicrm_contact']}.id,
     }
   }
 }
-

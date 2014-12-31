@@ -47,7 +47,7 @@ class CRM_Core_Selector_Controller {
    * @var int
    */
   // move the values from the session to the template
-  CONST SESSION = 1, TEMPLATE = 2,
+  const SESSION = 1, TEMPLATE = 2,
   TRANSFER = 4, EXPORT = 8, SCREEN = 16, PDF = 32;
 
   /**
@@ -190,7 +190,7 @@ class CRM_Core_Selector_Controller {
    * @return \CRM_Core_Selector_Controller
   @access public
    */
-  function __construct($object, $pageID, $sortID, $action, $store = NULL, $output = self::TEMPLATE, $prefix = NULL, $case = NULL) {
+  public function __construct($object, $pageID, $sortID, $action, $store = NULL, $output = self::TEMPLATE, $prefix = NULL, $case = NULL) {
 
     $this->_object = $object;
     $this->_pageID = $pageID ? $pageID : 1;
@@ -255,9 +255,8 @@ class CRM_Core_Selector_Controller {
    * @param int $reset are we being reset
    *
    * @return boolean   if the GET params are different from the session params
-   * @access public
    */
-  function hasChanged($reset) {
+  public function hasChanged($reset) {
 
     /**
      * if we are in reset state, i.e the store is cleaned out, we return false
@@ -296,7 +295,7 @@ class CRM_Core_Selector_Controller {
    * @return void
    *
    */
-  function run() {
+  public function run() {
 
     // get the column headers
     $columnHeaders = &$this->_object->getColumnHeaders($this->_action, $this->_output);
@@ -388,7 +387,6 @@ class CRM_Core_Selector_Controller {
    * @param CRM_Core_Form $form
    *
    * @return array of rows
-   * @access public
    */
   public function getRows($form) {
     if ($form->_output == self::EXPORT || $form->_output == self::SCREEN) {
@@ -407,7 +405,6 @@ class CRM_Core_Selector_Controller {
    * expect the subclass to do it
    *
    * @return string the status message
-   * @access public
    */
   public function getQill() {
     return $this->_object->getQill();
@@ -424,9 +421,8 @@ class CRM_Core_Selector_Controller {
    * Getter for pager
    *
    * @return CRM_Utils_Pager
-   * @access public
    */
-  function getPager() {
+  public function getPager() {
     return $this->_pager;
   }
 
@@ -434,9 +430,8 @@ class CRM_Core_Selector_Controller {
    * Getter for sort
    *
    * @return CRM_Utils_Sort
-   * @access public
    */
-  function getSort() {
+  public function getSort() {
     return $this->_sort;
   }
 
@@ -444,9 +439,8 @@ class CRM_Core_Selector_Controller {
    * Move the variables from the session to the template
    *
    * @return void
-   * @access public
    */
-  function moveFromSessionToTemplate() {
+  public function moveFromSessionToTemplate() {
     self::$_template->assign_by_ref("{$this->_prefix}pager", $this->_pager);
 
     $rows = $this->_store->get("{$this->_prefix}rows");
@@ -489,9 +483,8 @@ class CRM_Core_Selector_Controller {
    * @param boolean $embedded
    *
    * @return void
-   * @access public
    */
-  function setEmbedded($embedded) {
+  public function setEmbedded($embedded) {
     $this->_embedded = $embedded;
   }
 
@@ -499,9 +492,8 @@ class CRM_Core_Selector_Controller {
    * Getter for embedded
    *
    * @return boolean return the embedded value
-   * @access public
    */
-  function getEmbedded() {
+  public function getEmbedded() {
     return $this->_embedded;
   }
 
@@ -511,9 +503,8 @@ class CRM_Core_Selector_Controller {
    * @param boolean $print
    *
    * @return void
-   * @access public
    */
-  function setPrint($print) {
+  public function setPrint($print) {
     $this->_print = $print;
   }
 
@@ -521,24 +512,22 @@ class CRM_Core_Selector_Controller {
    * Getter for print
    *
    * @return boolean return the print value
-   * @access public
    */
-  function getPrint() {
+  public function getPrint() {
     return $this->_print;
   }
 
   /**
    * @param $value
    */
-  function setDynamicAction($value) {
+  public function setDynamicAction($value) {
     $this->_dynamicAction = $value;
   }
 
   /**
    * @return bool
    */
-  function getDynamicAction() {
+  public function getDynamicAction() {
     return $this->_dynamicAction;
   }
 }
-

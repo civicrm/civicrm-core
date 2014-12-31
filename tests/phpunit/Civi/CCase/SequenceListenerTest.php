@@ -93,7 +93,7 @@ class SequenceListenerTest extends \CiviCaseTestCase {
    * @param $caseTypes
    * @see \CRM_Utils_Hook::caseTypes
    */
-  function hook_caseTypes(&$caseTypes) {
+  public function hook_caseTypes(&$caseTypes) {
     $caseTypes[$this->caseType] = array(
       'module' => 'org.civicrm.hrcase',
       'name' => $this->caseType,
@@ -101,7 +101,7 @@ class SequenceListenerTest extends \CiviCaseTestCase {
     );
   }
 
-  function assertApproxTime($expected, $actual, $tolerance = 1) {
+  public function assertApproxTime($expected, $actual, $tolerance = 1) {
     $diff = abs(strtotime($expected) - strtotime($actual));
     $this->assertTrue($diff <= $tolerance, sprintf("Check approx time equality. expected=[%s] actual=[%s] tolerance=[%s]",
       $expected, $actual, $tolerance
@@ -115,7 +115,7 @@ class SequenceListenerTest extends \CiviCaseTestCase {
    * @param $key
    * @return mixed
    */
-  static function ag($array, $key) {
+  public static function ag($array, $key) {
     return $array[$key];
   }
 }

@@ -43,7 +43,6 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
 
@@ -135,7 +134,6 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addButtons(array(
@@ -149,4 +147,3 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
     );
   }
 }
-

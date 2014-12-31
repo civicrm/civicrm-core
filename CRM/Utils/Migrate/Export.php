@@ -55,7 +55,7 @@ class CRM_Utils_Migrate_Export {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->_xml = array(
       'customGroup' => array(
         'data' => array(),
@@ -171,7 +171,7 @@ class CRM_Utils_Migrate_Export {
    *
    * @return void
    */
-  function build() {
+  public function build() {
     // fetch the option group / values for
     // activity type and event_type
 
@@ -270,7 +270,7 @@ class CRM_Utils_Migrate_Export {
    * @param array $customGroupIds list of custom groups to export
    * @return void
    */
-  function buildCustomGroups($customGroupIds) {
+  public function buildCustomGroups($customGroupIds) {
     $customGroupIdsSql = implode(',', array_filter($customGroupIds, 'is_numeric'));
     if (empty($customGroupIdsSql)) {
       return;
@@ -323,7 +323,7 @@ class CRM_Utils_Migrate_Export {
    * @param array $ufGroupIds list of custom groups to export
    * @return void
    */
-  function buildUFGroups($ufGroupIds) {
+  public function buildUFGroups($ufGroupIds) {
     $ufGroupIdsSql = implode(',', array_filter($ufGroupIds, 'is_numeric'));
     if (empty($ufGroupIdsSql)) {
       return;
@@ -361,7 +361,7 @@ class CRM_Utils_Migrate_Export {
    *
    * @return string XML
    */
-  function toXML() {
+  public function toXML() {
     $buffer = '<?xml version="1.0" encoding="iso-8859-1" ?>';
     $buffer .= "\n\n<CustomData>\n";
     foreach (array_keys($this->_xml) as $key) {
@@ -385,7 +385,7 @@ class CRM_Utils_Migrate_Export {
    *
    * @return array
    */
-  function toArray() {
+  public function toArray() {
     $result = array();
     foreach (array_keys($this->_xml) as $key) {
       if (!empty($this->_xml[$key]['data'])) {
@@ -400,7 +400,7 @@ class CRM_Utils_Migrate_Export {
    * @param string $daoName
    * @param null $sql
    */
-  function fetch($groupName, $daoName, $sql = NULL) {
+  public function fetch($groupName, $daoName, $sql = NULL) {
     $idNameFields = isset($this->_xml[$groupName]['idNameFields']) ? $this->_xml[$groupName]['idNameFields'] : NULL;
     $mappedFields = isset($this->_xml[$groupName]['mappedFields']) ? $this->_xml[$groupName]['mappedFields'] : NULL;
 
@@ -458,7 +458,7 @@ class CRM_Utils_Migrate_Export {
    *
    * @return array
    */
-  function exportDAO($objectName, $object, $mappedFields) {
+  public function exportDAO($objectName, $object, $mappedFields) {
     $dbFields = & $object->fields();
 
     // Filter the list of keys and values so that we only export interesting stuff
@@ -555,11 +555,10 @@ class CRM_Utils_Migrate_Export {
    * @throws Exception
    * @return string XML
    */
-  function renderTextTag($name, $value, $prefix = '') {
+  public function renderTextTag($name, $value, $prefix = '') {
     if (!preg_match('/^[a-zA-Z0-9\_]+$/', $name)) {
       throw new Exception("Malformed tag name: $name");
     }
     return $prefix . "<$name>" . htmlentities($value) . "</$name>";
   }
 }
-

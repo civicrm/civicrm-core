@@ -35,7 +35,7 @@ class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testSelectedContacts() {
+  public function testSelectedContacts() {
     $this->webtestLogin();
 
     // make group
@@ -133,4 +133,3 @@ class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 }
-

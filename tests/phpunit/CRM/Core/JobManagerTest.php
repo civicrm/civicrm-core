@@ -31,11 +31,11 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Core_JobManagerTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function testHookCron() {
+  public function testHookCron() {
     $hook = $this->getMock('stdClass', array('civicrm_cron'));
     $hook->expects($this->once())
       ->method('civicrm_cron')

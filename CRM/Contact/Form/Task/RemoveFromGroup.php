@@ -43,11 +43,10 @@ class CRM_Contact_Form_Task_RemoveFromGroup extends CRM_Contact_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     // add select for groups
     $group = array('' => ts('- select group -')) + CRM_Core_PseudoConstant::nestedGroup();
     $groupElement = $this->add('select', 'group_id', ts('Select Group'), $group, TRUE, array('class' => 'crm-select2 huge'));
@@ -59,11 +58,10 @@ class CRM_Contact_Form_Task_RemoveFromGroup extends CRM_Contact_Form_Task {
   /**
    * Set the default form values
    *
-   * @access protected
    *
    * @return array the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if ($this->get('context') === 'smog') {
@@ -75,7 +73,6 @@ class CRM_Contact_Form_Task_RemoveFromGroup extends CRM_Contact_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -93,4 +90,3 @@ class CRM_Contact_Form_Task_RemoveFromGroup extends CRM_Contact_Form_Task {
     CRM_Core_Session::setStatus($status, ts("Removed Contact From Group", array('plural' => "Removed Contacts From Group", 'count' => $removed)), 'success', array('expires' => 0));
   }
 }
-

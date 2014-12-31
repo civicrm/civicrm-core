@@ -51,7 +51,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
@@ -78,7 +77,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm( ) {
     parent::buildQuickForm( );
@@ -138,9 +136,8 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule( $values, $files, $self ) {
+  public static function formRule( $values, $files, $self ) {
     $errorMsg = array( );
     $financialAccountTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Liability' "));
     if (isset($values['is_tax'])) {
@@ -176,11 +173,10 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    * Set default values for the form.
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', CRM_Core_Config::domainID(), 'contact_id');
@@ -191,7 +187,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   /**
    * Process the form submission
    *
-   * @access public
    * @return void
    */
   public function postProcess() {

@@ -53,7 +53,7 @@ class CRM_Admin_Page_Mapping extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Core_BAO_Mapping';
   }
 
@@ -62,7 +62,7 @@ class CRM_Admin_Page_Mapping extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       // helper variable for nicer formatting
       $deleteExtra = ts('Are you sure you want to delete this mapping?') . ' ' . ts('This operation cannot be undone.');
@@ -89,7 +89,7 @@ class CRM_Admin_Page_Mapping extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Admin_Form_Mapping';
   }
 
@@ -98,7 +98,7 @@ class CRM_Admin_Page_Mapping extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Mapping';
   }
 
@@ -107,7 +107,7 @@ class CRM_Admin_Page_Mapping extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function deleteName() {
+  public function deleteName() {
     return 'Mapping';
   }
 
@@ -118,7 +118,7 @@ class CRM_Admin_Page_Mapping extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/mapping';
   }
 
@@ -127,7 +127,7 @@ class CRM_Admin_Page_Mapping extends CRM_Core_Page_Basic {
    *
    * @return string Classname of delete form.
    */
-  function deleteForm() {
+  public function deleteForm() {
     return 'CRM_Admin_Form_Mapping';
   }
 
@@ -136,9 +136,8 @@ class CRM_Admin_Page_Mapping extends CRM_Core_Page_Basic {
    *
    * @return void
    */
-  function run() {
+  public function run() {
     $sort = 'mapping_type asc';
     return parent::run($sort);
   }
 }
-

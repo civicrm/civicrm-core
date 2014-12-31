@@ -4,11 +4,11 @@
  * Create DAO ORM classes.
  */
 class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
-  function run() {
+  public function run() {
     $this->generateDAOs();
   }
 
-  function generateDAOs() {
+  public function generateDAOs() {
     foreach (array_keys($this->tables) as $name) {
       echo "Generating $name as " . $this->tables[$name]['fileName'] . "\n";
 

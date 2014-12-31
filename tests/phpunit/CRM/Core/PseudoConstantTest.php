@@ -32,7 +32,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     $this->loadAllFixtures();
@@ -45,7 +45,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
    * Assure CRM_Core_PseudoConstant::get() is working properly for a range of
    * DAO fields having a <pseudoconstant> tag in the XML schema.
    */
-  function testOptionValues() {
+  public function testOptionValues() {
 
     // Create a custom field group for testing.
     $custom_group_name = md5(microtime());
@@ -1070,7 +1070,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     }
   }
 
-  function testContactTypes() {
+  public function testContactTypes() {
     $byName = array(
       'Individual' => 'Individual',
       'Household' => 'Household',

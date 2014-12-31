@@ -44,10 +44,9 @@ class CRM_Contact_Page_DedupeException extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     //fetch the dedupe exception contacts.
     $dedupeExceptions = array();
 
@@ -83,11 +82,9 @@ class CRM_Contact_Page_DedupeException extends CRM_Core_Page {
    * it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
-  function run() {
+  public function run() {
     $this->preProcess();
     return parent::run();
   }
 }
-

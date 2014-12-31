@@ -34,7 +34,7 @@
  */
 class CRM_Mailing_Form_Optout extends CRM_Core_Form {
 
-  function preProcess() {
+  public function preProcess() {
 
     $this->_type = 'optout';
 
@@ -63,7 +63,7 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
     $this->_email = $email;
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
     CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
     CRM_Utils_System::setTitle(ts('Please Confirm Your Opt Out'));
 
@@ -85,7 +85,7 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
     $this->addButtons($buttons);
   }
 
-  function postProcess() {
+  public function postProcess() {
 
     $values = $this->exportValues();
 
@@ -125,5 +125,3 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
 
   }
 }
-
-

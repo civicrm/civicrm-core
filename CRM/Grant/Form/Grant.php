@@ -43,7 +43,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    * The id of the case that we are proceessing
    *
    * @var int
-   * @protected
    */
   protected $_id;
 
@@ -51,7 +50,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    * The id of the contact associated with this contribution
    *
    * @var int
-   * @protected
    */
   protected $_contactID;
 
@@ -61,7 +59,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     //custom data related code
@@ -120,7 +117,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if ($this->_cdType) {
       return CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
@@ -173,7 +170,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_cdType) {
@@ -261,7 +257,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -336,4 +331,3 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     }
   }
 }
-

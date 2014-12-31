@@ -86,7 +86,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * @return void
    * @acess protected
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_id = $this->get('id');
     if ($this->_id) {
       $breadCrumb = array(array('title' => ts('Manage Groups'),
@@ -162,10 +162,9 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * Set default values for the form. LocationType that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if (isset($this->_id)) {
@@ -212,7 +211,6 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action == CRM_Core_Action::DELETE) {
@@ -316,9 +314,8 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($fields, $fileParams, $options) {
+  public static function formRule($fields, $fileParams, $options) {
     $errors = array();
 
     $doParentCheck = $options['doParentCheck'];
@@ -372,7 +369,6 @@ WHERE  title = %1
    * Process the form when submitted
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     CRM_Utils_System::flushCache('CRM_Core_DAO_Group');
@@ -444,9 +440,8 @@ WHERE  title = %1
    *
    * @return array parent groups
    * @static
-   * @access public
    */
-  static function buildParentGroups(&$form) {
+  public static function buildParentGroups(&$form) {
     $groupNames = CRM_Core_PseudoConstant::group();
     $parentGroups = $parentGroupElements = array();
     if (isset($form->_id) && !empty($form->_groupValues['parents'])) {
@@ -490,4 +485,3 @@ WHERE  title = %1
     return $parentGroups;
   }
 }
-

@@ -35,7 +35,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddReport() {
+  public function testAddReport() {
     $this->webtestLogin();
 
     // create contact
@@ -192,4 +192,3 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->assertSelectedLabel("permission", "access CiviCRM");
   }
 }
-

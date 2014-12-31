@@ -43,7 +43,7 @@ class CRM_Core_QuickForm_Action_Jump extends CRM_Core_QuickForm_Action {
    * @return \CRM_Core_QuickForm_Action_Jump
   @access public
    */
-  function __construct(&$stateMachine) {
+  public function __construct(&$stateMachine) {
     parent::__construct($stateMachine);
   }
 
@@ -54,9 +54,8 @@ class CRM_Core_QuickForm_Action_Jump extends CRM_Core_QuickForm_Action {
    * @param  string    $actionName Current action name, as one Action object can serve multiple actions
    *
    * @return void
-   * @access public
    */
-  function perform(&$page, $actionName) {
+  public function perform(&$page, $actionName) {
     // check whether the page is valid before trying to go to it
     if ($page->controller->isModal()) {
       // we check whether *all* pages up to current are valid
@@ -78,4 +77,3 @@ class CRM_Core_QuickForm_Action_Jump extends CRM_Core_QuickForm_Action {
     CRM_Utils_System::redirect($url);
   }
 }
-

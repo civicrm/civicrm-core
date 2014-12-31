@@ -49,7 +49,7 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     // UI for selecting columns to appear in the report list
     // array conatining the columns, group_bys and filters build and provided to Form
     $this->_columns = array(
@@ -142,7 +142,7 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->assign('reportTitle', ts('Membership Summary Report'));
     parent::preProcess();
   }
@@ -150,11 +150,11 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return parent::setDefaultValues();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
@@ -188,7 +188,7 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     //check for searching combination of dispaly columns and
     //grouping criteria
@@ -196,7 +196,7 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
     return $errors;
   }
 
-  function from() {
+  public function from() {
     $this->_from = NULL;
 
     $this->_from = "
@@ -219,7 +219,7 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
     }
   }
 
-  function where() {
+  public function where() {
     $clauses = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -266,7 +266,7 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = array();
     $statistics[] = array(
       'title' => ts('Row(s) Listed'),
@@ -275,7 +275,7 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
     return $statistics;
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = "";
     if (is_array($this->_params['group_bys']) &&
       !empty($this->_params['group_bys'])
@@ -303,7 +303,7 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
     }
   }
 
-  function postProcess() {
+  public function postProcess() {
     $this->_params = $this->controller->exportValues($this->_name);
     if (empty($this->_params) &&
       $this->_force
@@ -368,7 +368,7 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
     $checkList = array();
@@ -438,4 +438,3 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
     }
   }
 }
-

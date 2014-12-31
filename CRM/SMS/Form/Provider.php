@@ -39,7 +39,7 @@
 class CRM_SMS_Form_Provider extends CRM_Core_Form {
   protected $_id = NULL;
 
-  function preProcess() {
+  public function preProcess() {
 
     $this->_id = $this->get('id');
 
@@ -65,7 +65,6 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -133,7 +132,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     $name = CRM_Utils_Request::retrieve('key', 'String', $this, FALSE, NULL);
@@ -166,7 +165,6 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -192,4 +190,3 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
     }
   }
 }
-

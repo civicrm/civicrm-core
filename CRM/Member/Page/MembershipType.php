@@ -53,7 +53,7 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
@@ -91,10 +91,9 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
    *
    */
-  function run() {
+  public function run() {
     $this->browse();
 
     // parent run
@@ -106,10 +105,9 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    *
    *
    * @return void
-   * @access public
    * @static
    */
-  function browse() {
+  public function browse() {
     // get all membership types sorted by weight
     $membershipType = array();
     $dao = new CRM_Member_DAO_MembershipType();
@@ -171,4 +169,3 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
     $this->assign('rows', $membershipType);
   }
 }
-

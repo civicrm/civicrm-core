@@ -37,7 +37,7 @@
  * Page for displaying Petition Signatures
  */
 class CRM_Campaign_Page_Petition extends CRM_Core_Page {
-  function browse() {
+  public function browse() {
 
     //get the survey id
     $surveyId = CRM_Utils_Request::retrieve('sid', 'Positive', $this);
@@ -50,7 +50,7 @@ class CRM_Campaign_Page_Petition extends CRM_Core_Page {
   /**
    * @return string
    */
-  function run() {
+  public function run() {
     $action = CRM_Utils_Request::retrieve('action', 'String',
       $this, FALSE, 0
     );
@@ -60,4 +60,3 @@ class CRM_Campaign_Page_Petition extends CRM_Core_Page {
     return parent::run();
   }
 }
-

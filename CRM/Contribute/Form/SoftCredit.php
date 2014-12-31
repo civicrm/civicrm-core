@@ -44,9 +44,8 @@ class CRM_Contribute_Form_SoftCredit {
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access static
    */
-  static function preProcess(&$form) {
+  public static function preProcess(&$form) {
     $contriDAO = new CRM_Contribute_DAO_Contribution();
     $contriDAO->id = $form->_id;
     $contriDAO->find(TRUE);
@@ -71,11 +70,10 @@ class CRM_Contribute_Form_SoftCredit {
    * Function used to build form element for soft credit block
    *
    * @param CRM_Core_Form $form
-   * @access public
    *
    * @return void
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     if ($form->_mode == 'live' && !empty($form->_honor_block_is_active)) {
       $ufJoinDAO = new CRM_Core_DAO_UFJoin();
       $ufJoinDAO->module = 'soft_credit';
@@ -163,7 +161,7 @@ class CRM_Contribute_Form_SoftCredit {
    * @param $defaults
    * @param $form
    */
-  static function setDefaultValues(&$defaults, &$form) {
+  public static function setDefaultValues(&$defaults, &$form) {
     //Used to hide/unhide PCP and/or Soft-credit Panes
     $noPCP = $noSoftCredit = TRUE;
     if (!empty($form->_softCreditInfo['soft_credit'])) {
@@ -200,10 +198,9 @@ class CRM_Contribute_Form_SoftCredit {
    * @param $self
    *
    * @return array of errors
-   * @access public
    * @static
    */
-  static function formRule($fields, $errors, $self) {
+  public static function formRule($fields, $errors, $self) {
     $errors = array();
 
     // if honor roll fields are populated but no PCP is selected
@@ -240,4 +237,3 @@ class CRM_Contribute_Form_SoftCredit {
     return $errors;
   }
 }
-

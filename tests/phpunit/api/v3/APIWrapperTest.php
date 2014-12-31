@@ -44,7 +44,6 @@ class api_v3_APIWrapperTest extends CiviUnitTestCase {
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
    *
-   * @access protected
    */
   protected function setUp() {
     parent::setUp();
@@ -56,7 +55,6 @@ class api_v3_APIWrapperTest extends CiviUnitTestCase {
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
    *
-   * @access protected
    */
   protected function tearDown() {
     parent::tearDown();
@@ -66,7 +64,7 @@ class api_v3_APIWrapperTest extends CiviUnitTestCase {
    * @param $apiWrappers
    * @param $apiRequest
    */
-  function onApiWrappers(&$apiWrappers, $apiRequest) {
+  public function onApiWrappers(&$apiWrappers, $apiRequest) {
     $this->assertTrue(is_string($apiRequest['entity']) && !empty($apiRequest['entity']));
     $this->assertTrue(is_string($apiRequest['action']) && !empty($apiRequest['action']));
     $this->assertTrue(is_array($apiRequest['params']) && !empty($apiRequest['params']));
@@ -74,7 +72,7 @@ class api_v3_APIWrapperTest extends CiviUnitTestCase {
     $apiWrappers[] = new api_v3_APIWrapperTest_Impl();
   }
 
-  function testWrapperHook() {
+  public function testWrapperHook() {
     // Note: this API call would fail due to missing contact_type, but
     // the wrapper intervenes (fromApiInput)
     // Note: The output would define "display_name", but the wrapper

@@ -44,7 +44,6 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
    * The financial batch id, used when editing the field
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
@@ -67,9 +66,8 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     // this mean it's a batch action
@@ -115,10 +113,9 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
   /**
    * Build the form object
    *
-   * @access public
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     // this mean it's a batch action
     if (!empty($this->_batchIds)) {
       $batchNames = CRM_Batch_BAO_Batch::getBatchNames($this->_batchIds);
@@ -155,7 +152,6 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    * @return void
    */
   public function postProcess( ) {

@@ -61,7 +61,7 @@ class CRM_Utils_Cache_APCcache {
    *
    * @return \CRM_Utils_Cache_APCcache
    */
-  function __construct(&$config) {
+  public function __construct(&$config) {
     if (isset($config['timeout'])) {
       $this->_timeout = intval($config['timeout']);
     }
@@ -76,7 +76,7 @@ class CRM_Utils_Cache_APCcache {
    *
    * @return bool
    */
-  function set($key, &$value) {
+  public function set($key, &$value) {
     if (!apc_store($this->_prefix . $key, $value, $this->_timeout)) {
       return FALSE;
     }
@@ -88,7 +88,7 @@ class CRM_Utils_Cache_APCcache {
    *
    * @return mixed
    */
-  function &get($key) {
+  public function &get($key) {
     return apc_fetch($this->_prefix . $key);
   }
 
@@ -97,11 +97,11 @@ class CRM_Utils_Cache_APCcache {
    *
    * @return bool|string[]
    */
-  function delete($key) {
+  public function delete($key) {
     return apc_delete($this->_prefix . $key);
   }
 
-  function flush() {
+  public function flush() {
     $allinfo = apc_cache_info('user');
     $keys = $allinfo['cache_list'];
     $prefix = $this->_prefix . "CRM_";  // Our keys follows this pattern: ([A-Za-z0-9_]+)?CRM_[A-Za-z0-9_]+

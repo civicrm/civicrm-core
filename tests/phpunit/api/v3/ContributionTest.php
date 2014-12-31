@@ -51,7 +51,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   protected $_ids = array();
   protected $_pageParams = array();
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     $this->_apiversion = 3;
@@ -92,11 +92,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
      );
   }
 
-  function tearDown() {
+  public function tearDown() {
     $this->quickCleanUpFinancialEntities();
   }
 
-  function testGetContribution() {
+  public function testGetContribution() {
     $p = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '2010-01-20',
@@ -176,7 +176,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 /**
  * We need to ensure previous tested behaviour still works as part of the api contract
  */
-  function testGetContributionLegacyBehaviour() {
+  public function testGetContributionLegacyBehaviour() {
     $p = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '2010-01-20',
@@ -251,7 +251,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ));
   }
   ///////////////// civicrm_contribution_
-  function testCreateEmptyContributionIDUseDonation() {
+  public function testCreateEmptyContributionIDUseDonation() {
     $params = array(
       'contribution_id' => FALSE,
       'contact_id' => 1,
@@ -266,7 +266,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * stability
    *///////////////// civicrm_contribution_
 
-  function testCreateLegacyBehaviour() {
+  public function testCreateLegacyBehaviour() {
     $params = array(
       'contribution_id' => FALSE,
       'contact_id' => 1,
@@ -285,7 +285,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
    */
-  function testCreateWithCustom() {
+  public function testCreateWithCustom() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
 
     $params = $this->_params;
@@ -308,7 +308,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
    */
-  function testCreateGetFieldsWithCustom() {
+  public function testCreateGetFieldsWithCustom() {
     $ids        = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $idsContact = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTest.php');
     $result     = $this->callAPISuccess('Contribution', 'getfields', array());
@@ -320,7 +320,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->customGroupDelete($idsContact['custom_group_id']);
   }
 
-  function testCreateContributionNoLineItems() {
+  public function testCreateContributionNoLineItems() {
 
     $params = array(
       'contact_id' => $this->_individualId,
@@ -349,7 +349,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /*
    * Test checks that passing in line items suppresses the create mechanism
    */
-  function testCreateContributionChainedLineItems() {
+  public function testCreateContributionChainedLineItems() {
 
     $params = array(
       'contact_id' => $this->_individualId,
@@ -394,7 +394,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(2, $lineItems['count']);
   }
 
-  function testCreateContributionOffline() {
+  public function testCreateContributionOffline() {
     $params = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
@@ -429,7 +429,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test create with valid payment instument
    */
-  function testCreateContributionWithPaymentInstrument() {
+  public function testCreateContributionWithPaymentInstrument() {
     $params = $this->_params + array('payment_instrument' => 'EFT');
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $contribution = $this->callAPISuccess('contribution','get', array(
@@ -448,7 +448,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals('Credit Card', $contribution['values'][0]['payment_instrument']);
   }
 
-  function testGetContributionByPaymentInstrument() {
+  public function testGetContributionByPaymentInstrument() {
     $params = $this->_params + array('payment_instrument' => 'EFT');
     $params2 = $this->_params + array('payment_instrument' => 'Cash');
     $this->callAPISuccess('contribution','create',$params);
@@ -479,7 +479,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Create test with unique field name on source
    */
-  function testCreateContributionSource() {
+  public function testCreateContributionSource() {
 
     $params = array(
       'contact_id' => $this->_individualId,
@@ -504,7 +504,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /*
    * Create test with unique field name on source
   */
-  function testCreateDefaultNow() {
+  public function testCreateDefaultNow() {
 
     $params = $this->_params;
     unset($params['receive_date']);
@@ -517,7 +517,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Create test with unique field name on source
    */
-  function testCreateContributionSourceInvalidContac() {
+  public function testCreateContributionSourceInvalidContac() {
 
     $params = array(
       'contact_id' => 999,
@@ -537,7 +537,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPIFailure('contribution', 'create', $params, 'contact_id is not valid : 999');
   }
 
-  function testCreateContributionSourceInvalidContContact() {
+  public function testCreateContributionSourceInvalidContContact() {
 
     $params = array(
       'contribution_contact_id' => 999,
@@ -560,7 +560,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test note created correctly
    */
-  function testCreateContributionWithNote() {
+  public function testCreateContributionWithNote() {
     $description = "Demonstrates creating contribution with Note Entity";
     $subfile     = "ContributionCreateWithNote";
     $params      = array(
@@ -585,7 +585,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'delete', array('id' => $contribution['id']));
   }
 
-  function testCreateContributionWithNoteUniqueNameAliases() {
+  public function testCreateContributionWithNoteUniqueNameAliases() {
     $params      = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
@@ -612,7 +612,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * This is the test for creating soft credits - however a 'get' is not yet possible via API
    * as the current BAO functions are contact-centric (from what I can find)
    */
-  function testCreateContributionWithSoftCredt() {
+  public function testCreateContributionWithSoftCredt() {
     $description = "Demonstrates creating contribution with SoftCredit";
     $subfile     = "ContributionCreateWithSoftCredit";
     $contact2    = $this->callAPISuccess('Contact', 'create', array('display_name' => 'superman', 'contact_type' => 'Individual'));
@@ -634,7 +634,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contact', 'delete', array('id' => $contact2['id']));
   }
 
-  function testCreateContributionWithSoftCreditDefaults() {
+  public function testCreateContributionWithSoftCreditDefaults() {
     $description = "Demonstrates creating contribution with Soft Credit defaults for amount and type";
     $subfile     = "ContributionCreateWithSoftCreditDefaults";
     $contact2    = $this->callAPISuccess('Contact', 'create', array('display_name' => 'superman', 'contact_type' => 'Individual'));
@@ -653,7 +653,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contact', 'delete', array('id' => $contact2['id']));
   }
 
-  function testCreateContributionWithHonoreeContact() {
+  public function testCreateContributionWithHonoreeContact() {
     $description = "Demonstrates creating contribution with Soft Credit by passing in honor_contact_id";
     $subfile     = "ContributionCreateWithHonoreeContact";
     $contact2    = $this->callAPISuccess('Contact', 'create', array('display_name' => 'superman', 'contact_type' => 'Individual'));
@@ -676,7 +676,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    *  Test  using example code
    */
-  function testContributionCreateExample() {
+  public function testContributionCreateExample() {
     //make sure at least on page exists since there is a truncate in tear down
     $page = $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
     $this->assertAPISuccess($page);
@@ -692,7 +692,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /*
    * Function tests that additional financial records are created when fee amount is recorded
    */
-  function testCreateContributionWithFee() {
+  public function testCreateContributionWithFee() {
     $params = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
@@ -740,7 +740,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Function tests that additional financial records are created when online contribution is created
    */
-  function testCreateContributionOnline() {
+  public function testCreateContributionOnline() {
     CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
     $contributionPage = $this->callAPISuccess( 'contribution_page','create',  $this->_pageParams );
     $this->assertAPISuccess($contributionPage);
@@ -773,7 +773,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * In the interests of removing financial type / contribution type checks from
    * legacy format function lets test that the api is doing this for us
    */
-  function testCreateInvalidFinancialType() {
+  public function testCreateInvalidFinancialType() {
     $params = $this->_params;
     $params['financial_type_id'] = 99999;
     $this->callAPIFailure($this->_entity, 'create', $params, "'99999' is not a valid option for field financial_type_id");
@@ -783,7 +783,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * In the interests of removing financial type / contribution type checks from
    * legacy format function lets test that the api is doing this for us
    */
-  function testValidNamedFinancialType() {
+  public function testValidNamedFinancialType() {
     $params = $this->_params;
     $params['financial_type_id'] = 'Donation';
     $this->callAPISuccess($this->_entity, 'create', $params);
@@ -793,7 +793,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Function tests that additional financial records are created when online contribution with pay later option
    * is created
    */
-  function testCreateContributionPayLaterOnline() {
+  public function testCreateContributionPayLaterOnline() {
     CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
     $this->_pageParams['is_pay_later'] = 1;
     $contributionPage = $this->callAPISuccess( 'contribution_page','create',$this->_pageParams );
@@ -827,7 +827,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Function tests that additional financial records are created when online contribution with pending option
    * is created
    */
-  function testCreateContributionPendingOnline() {
+  public function testCreateContributionPendingOnline() {
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
     $contributionPage = $this->callAPISuccess( 'contribution_page', 'create', $this->_pageParams );
     $this->assertAPISuccess($contributionPage);
@@ -857,7 +857,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test that BAO defaults work
    */
-  function testCreateBAODefaults() {
+  public function testCreateBAODefaults() {
     unset($this->_params['contribution_source_id'], $this->_params['payment_instrument_id']);
     $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $contribution['id'], 'api.contribution.delete' => 1));
@@ -868,7 +868,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /*
    * Function tests that line items, financial records are updated when contribution amount is changed
    */
-  function testCreateUpdateContributionChangeTotal() {
+  public function testCreateUpdateContributionChangeTotal() {
     $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
     $lineItems = $this->callAPISuccess('line_item','getvalue', array(
 
@@ -906,7 +906,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /*
    * Function tests that line items, financial records are updated when pay later contribution is received
    */
-  function testCreateUpdateContributionPayLater() {
+  public function testCreateUpdateContributionPayLater() {
     $contribParams = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
@@ -933,7 +933,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /*
    * Function tests that financial records are updated when Payment Instrument is changed
    */
-  function testCreateUpdateContributionPaymentInstrument() {
+  public function testCreateUpdateContributionPaymentInstrument() {
     $instrumentId = $this->_addPaymentInstrument();
     $contribParams = array(
       'contact_id' => $this->_individualId,
@@ -957,7 +957,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /*
    * Function tests that financial records are added when Contribution is Refunded
    */
-  function testCreateUpdateContributionRefund() {
+  public function testCreateUpdateContributionRefund() {
     $contribParams = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
@@ -982,7 +982,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /*
    * Function tests invalid contribution status change
    */
-  function testCreateUpdateContributionInValidStatusChange() {
+  public function testCreateUpdateContributionInValidStatusChange() {
     $contribParams = array(
       'contact_id' => 1,
       'receive_date' => '2012-01-01',
@@ -1004,7 +1004,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /*
    * Function tests that financial records are added when Pending Contribution is Canceled
    */
-  function testCreateUpdateContributionCancelPending() {
+  public function testCreateUpdateContributionCancelPending() {
     $contribParams = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
@@ -1029,7 +1029,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /*
    * Function tests that financial records are added when Financial Type is Changed
    */
-  function testCreateUpdateContributionChangeFinancialType() {
+  public function testCreateUpdateContributionChangeFinancialType() {
     $contribParams = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
@@ -1053,7 +1053,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test that update does not change status id CRM-15105
    */
-  function testCreateUpdateWithoutChangingPendingStatus() {
+  public function testCreateUpdateWithoutChangingPendingStatus() {
     $contribution = $this->callAPISuccess('contribution', 'create', array_merge($this->_params, array('contribution_status_id' => 2)));
     $this->callAPISuccess('contribution', 'create', array('id' => $contribution['id'], 'source' => 'new source'));
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $contribution['id'], 'api.contribution.delete' => 1));
@@ -1061,7 +1061,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
   //To Update Contribution
   //CHANGE: we require the API to do an incremental update
-  function testCreateUpdateContribution() {
+  public function testCreateUpdateContribution() {
 
     $contributionID = $this->contributionCreate($this->_individualId, $this->_financialTypeId, 'idofsh', 212355);
     $old_params = array(
@@ -1129,18 +1129,18 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_contribution_delete methods
-  function testDeleteEmptyParamsContribution() {
+  public function testDeleteEmptyParamsContribution() {
     $params = array();
     $this->callAPIFailure('contribution', 'delete', $params);
   }
 
-  function testDeleteParamsNotArrayContribution() {
+  public function testDeleteParamsNotArrayContribution() {
     $params = 'contribution_id= 1';
     $contribution = $this->callAPIFailure('contribution', 'delete', $params);
     $this->assertEquals($contribution['error_message'], 'Input variable `params` is not an array');
   }
 
-  function testDeleteWrongParamContribution() {
+  public function testDeleteWrongParamContribution() {
     $params = array(
       'contribution_source' => 'SSF',
 
@@ -1148,7 +1148,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPIFailure('contribution', 'delete', $params);
   }
 
-  function testDeleteContribution() {
+  public function testDeleteContribution() {
 
     $contributionID = $this->contributionCreate($this->_individualId, $this->_financialTypeId, 'dfsdf', 12389);
     $params = array(
@@ -1161,7 +1161,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *  Test civicrm_contribution_search with empty params.
    *  All available contributions expected.
    */
-  function testSearchEmptyParams() {
+  public function testSearchEmptyParams() {
     $params = array();
 
     $p = array(
@@ -1202,7 +1202,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    *  Test civicrm_contribution_search. Success expected.
    */
-  function testSearch() {
+  public function testSearch() {
     $p1 = array(
       'contact_id' => $this->_individualId,
       'receive_date' => date('Ymd'),
@@ -1257,7 +1257,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Note that we are creating a logged in user because email goes out from
    * that person
    */
-  function testCompleteTransaction() {
+  public function testCompleteTransaction() {
     $mut = new CiviMailUtils( $this, true );
     $this->createLoggedInUser();
     $params = array_merge($this->_params, array('contribution_status_id' => 2,));
@@ -1280,7 +1280,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * tests.
    */
-  function testCompleteTransactionWithReceiptDateSet() {
+  public function testCompleteTransactionWithReceiptDateSet() {
     $mut = new CiviMailUtils( $this, true );
     $this->createLoggedInUser();
     $params = array_merge($this->_params, array('contribution_status_id' => 2,'receipt_date' => 'now'));
@@ -1301,7 +1301,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Note that we are creating a logged in user because email goes out from
    * that person
    */
-  function testCompleteTransactionWithParticipantRecord() {
+  public function testCompleteTransactionWithParticipantRecord() {
     $mut = new CiviMailUtils( $this, true );
     $mut->clearMessages();
     $this->createLoggedInUser();
@@ -1322,7 +1322,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test membership is renewed when transaction completed
    */
-  function testCompleteTransactionMembershipPriceSet() {
+  public function testCompleteTransactionMembershipPriceSet() {
     $this->createPriceSetWithPage('membership');
     $this->setUpPendingContribution($this->_ids['price_field_value'][0]);
     $this->callAPISuccess('contribution', 'completetransaction', array('id' =>  $this->_ids['contribution']));
@@ -1334,7 +1334,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test membership is renewed when transaction completed
    */
-  function testCompleteTransactionMembershipPriceSetTwoTerms() {
+  public function testCompleteTransactionMembershipPriceSetTwoTerms() {
     $this->createPriceSetWithPage('membership');
     $this->setUpPendingContribution($this->_ids['price_field_value'][1]);
     $this->callAPISuccess('contribution', 'completetransaction', array('id' =>  $this->_ids['contribution']));
@@ -1343,7 +1343,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->cleanUpAfterPriceSets();
   }
 
-  function cleanUpAfterPriceSets() {
+  public function cleanUpAfterPriceSets() {
     $this->quickCleanUpFinancialEntities();
     $this->contactDelete($this->_ids['contact']);
     $this->callAPISuccess('price_set', 'delete', array('id' => $this->_ids['price_set']));
@@ -1356,7 +1356,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @param $entity
    * @param array $params
    */
-  function createPriceSetWithPage($entity, $params = array()) {
+  public function createPriceSetWithPage($entity, $params = array()) {
     $membershipTypeID = $this->membershipTypeCreate();
     $contributionPageResult = $this->callAPISuccess('contribution_page', 'create', array(
       'title' => "Test Contribution Page",
@@ -1412,7 +1412,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Set up a pending transaction with a specific price field id
    * @param int $priceFieldValueID
    */
-  function setUpPendingContribution($priceFieldValueID){
+  public function setUpPendingContribution($priceFieldValueID){
     $contactID = $this->individualCreate();
     $membership = $this->callAPISuccess('membership', 'create', array(
       'contact_id' => $contactID,
@@ -1455,7 +1455,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test sending a mail via the API
    */
-  function testSendMail() {
+  public function testSendMail() {
     $mut = new CiviMailUtils( $this, true );
     $contribution = $this->callAPISuccess('contribution','create',$this->_params);
     $this->callAPISuccess('contribution', 'sendconfirmation', array(
@@ -1477,7 +1477,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test sending a mail via the API
    */
-  function testSendMailEvent() {
+  public function testSendMailEvent() {
     $mut = new CiviMailUtils( $this, true );
     $contribution = $this->callAPISuccess('contribution','create',$this->_params);
     $event = $this->eventCreate(array(
@@ -1521,7 +1521,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   * This function does a GET & compares the result against the $params
   * Use as a double check on Creates
   */
-  function contributionGetnCheck($params, $id, $delete = 1) {
+  public function contributionGetnCheck($params, $id, $delete = 1) {
 
     $contribution = $this->callAPISuccess('Contribution', 'Get', array(
       'id' => $id,
@@ -1547,7 +1547,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Create a pending contribution & linked pending participant record
    * (along with an event)
    */
-  function createPendingParticipantContribution(){
+  public function createPendingParticipantContribution(){
     $event = $this->eventCreate(array('is_email_confirm' => 1, 'confirm_from_email' => 'test@civicrm.org',));
     $participantID = $this->participantCreate(array('event_id' => $event['id'], 'status_id' => 6));
     $this->_ids['participant']  = $participantID;
@@ -1600,7 +1600,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @param int $contId
    * @param $context
    */
-  function _checkFinancialItem($contId, $context) {
+  public function _checkFinancialItem($contId, $context) {
    if ($context != 'paylater') {
      $params = array (
        'entity_id' =>   $contId,
@@ -1669,7 +1669,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @param $context
    * @param int $instrumentId
    */
-  function _checkFinancialTrxn($contribution, $context, $instrumentId = NULL) {
+  public function _checkFinancialTrxn($contribution, $context, $instrumentId = NULL) {
    $trxnParams = array(
      'entity_id' =>   $contribution['id'],
      'entity_table' => 'civicrm_contribution',
@@ -1739,7 +1739,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * @return mixed
    */
-  function _addPaymentInstrument () {
+  public function _addPaymentInstrument () {
    $gId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'payment_instrument', 'id', 'name');
    $optionParams = array(
      'option_group_id' => $gId,
@@ -1766,7 +1766,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @param array $params
    * @param $context
    */
-  function _checkFinancialRecords($params,$context) {
+  public function _checkFinancialRecords($params,$context) {
    $entityParams = array(
      'entity_id' => $params['id'],
      'entity_table' => 'civicrm_contribution',
@@ -1858,4 +1858,3 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    }
  }
 }
-

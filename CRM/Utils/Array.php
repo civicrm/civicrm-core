@@ -39,7 +39,6 @@ class CRM_Utils_Array {
    * If $list is not actually an array at all, then the default value is
    * returned.
    *
-   * @access public
    *
    * @param string $key
    *   Key value to look up in the array.
@@ -51,7 +50,7 @@ class CRM_Utils_Array {
    * @return mixed
    *   Can return any type, since $list might contain anything.
    */
-  static function value($key, $list, $default = NULL) {
+  public static function value($key, $list, $default = NULL) {
     if (is_array($list)) {
       return array_key_exists($key, $list) ? $list[$key] : $default;
     }
@@ -71,9 +70,8 @@ class CRM_Utils_Array {
    *
    * @return mixed
    *   The value of the key, or null if the key is not found.
-   * @access public
    */
-  static function retrieveValueRecursive(&$params, $key) {
+  public static function retrieveValueRecursive(&$params, $key) {
     if (!is_array($params)) {
       return NULL;
     }
@@ -99,7 +97,6 @@ class CRM_Utils_Array {
    * version 4.2.0, which was to return NULL on failure. This function also
    * checks that $list is an array before attempting to search it.
    *
-   * @access public
    *
    * @param mixed $value
    *   The value to search for.
@@ -109,7 +106,7 @@ class CRM_Utils_Array {
    * @return int|string|null
    *   Returns the key, which could be an int or a string, or NULL on failure.
    */
-  static function key($value, &$list) {
+  public static function key($value, &$list) {
     if (is_array($list)) {
       $key = array_search($value, $list);
 
@@ -135,12 +132,11 @@ class CRM_Utils_Array {
    * @param string $seperator
    *   (optional) String to be appended after open/close tags.
    *
-   * @access public
    *
    * @return string
    *   XML fragment representing $list.
    */
-  static function &xml(&$list, $depth = 1, $seperator = "\n") {
+  public static function &xml(&$list, $depth = 1, $seperator = "\n") {
     $xml = '';
     foreach ($list as $name => $value) {
       $xml .= str_repeat(' ', $depth * 4);
@@ -171,7 +167,7 @@ class CRM_Utils_Array {
    * @return string
    *   Sanitized version of $value.
    */
-  static function escapeXML($value) {
+  public static function escapeXML($value) {
     static $src = NULL;
     static $dst = NULL;
 
@@ -236,9 +232,8 @@ class CRM_Utils_Array {
    * @param string $seperator
    *   (optional) String that separates the concatenated keys.
    *
-   * @access public
    */
-  static function flatten(&$list, &$flat, $prefix = '', $seperator = ".") {
+  public static function flatten(&$list, &$flat, $prefix = '', $seperator = ".") {
     foreach ($list as $name => $value) {
       $newPrefix = ($prefix) ? $prefix . $seperator . $name : $name;
       if (is_array($value)) {
@@ -265,9 +260,8 @@ class CRM_Utils_Array {
    * @return array
    *   Array-encoded tree
    *
-   * @access public
    */
-  function unflatten($delim, &$arr) {
+  public function unflatten($delim, &$arr) {
     $result = array();
     foreach ($arr as $key => $value) {
       $path = explode($delim, $key);
@@ -301,9 +295,8 @@ class CRM_Utils_Array {
    *
    * @return array
    *   The merged array.
-   * @access public
    */
-  static function crmArrayMerge($a1, $a2) {
+  public static function crmArrayMerge($a1, $a2) {
     if (empty($a1)) {
       return $a2;
     }
@@ -343,9 +336,8 @@ class CRM_Utils_Array {
    *
    * @return bool
    *   True if $list contains at least one sub-array, false otherwise.
-   * @access public
    */
-  static function isHierarchical(&$list) {
+  public static function isHierarchical(&$list) {
     foreach ($list as $n => $v) {
       if (is_array($v)) {
         return TRUE;
@@ -359,7 +351,7 @@ class CRM_Utils_Array {
    * @param $superset
    * @return bool TRUE if $subset is a subset of $superset
    */
-  static function isSubset($subset, $superset) {
+  public static function isSubset($subset, $superset) {
     foreach ($subset as $expected) {
       if (!in_array($expected, $superset)) {
         return FALSE;
@@ -381,9 +373,8 @@ class CRM_Utils_Array {
    * @return bool
    *   True if $value was found, false otherwise.
    *
-   * @access public
    */
-  static function crmInArray($value, $params, $caseInsensitive = TRUE) {
+  public static function crmInArray($value, $params, $caseInsensitive = TRUE) {
     foreach ($params as $item) {
       if (is_array($item)) {
         $ret = crmInArray($value, $item, $caseInsensitive);
@@ -406,7 +397,7 @@ class CRM_Utils_Array {
    * the api needs the name => value conversion, also the view layer typically
    * requires value => name conversion
    */
-  static function lookupValue(&$defaults, $property, $lookup, $reverse) {
+  public static function lookupValue(&$defaults, $property, $lookup, $reverse) {
     $id = $property . '_id';
 
     $src = $reverse ? $property : $id;
@@ -453,9 +444,8 @@ class CRM_Utils_Array {
    *
    * @return boolean
    *   True if the array is empty.
-   * @access public
    */
-  static function crmIsEmptyArray($array = array()) {
+  public static function crmIsEmptyArray($array = array()) {
     if (!is_array($array)) {
       return TRUE;
     }
@@ -483,7 +473,7 @@ class CRM_Utils_Array {
    * @return array
    *   Sorted array
    */
-  static function crmArraySortByField($array, $field) {
+  public static function crmArraySortByField($array, $field) {
     $code = "return strnatcmp(\$a['$field'], \$b['$field']);";
     uasort($array, create_function('$a,$b', $code));
     return $array;
@@ -498,7 +488,7 @@ class CRM_Utils_Array {
    * @return array
    *   The input array with duplicate values removed.
    */
-  static function crmArrayUnique($array) {
+  public static function crmArrayUnique($array) {
     $result = array_map("unserialize", array_unique(array_map("serialize", $array)));
     foreach ($result as $key => $value) {
       if (is_array($value)) {
@@ -522,7 +512,7 @@ class CRM_Utils_Array {
    * @return array
    *   Sorted array.
    */
-  static function asort($array = array()) {
+  public static function asort($array = array()) {
     $lcMessages = CRM_Utils_System::getUFLocale();
 
     if ($lcMessages && $lcMessages != 'en_US' && class_exists('Collator')) {
@@ -547,7 +537,7 @@ class CRM_Utils_Array {
    *   When passed an array of strings, unsets $items[$k] for each string $k
    *   in the array.
    */
-   static function remove(&$items) {
+   public static function remove(&$items) {
      foreach (func_get_args() as $n => $key) {
        // Skip argument 0 ($items) by testing $n for truth.
        if ($n && is_array($key)) {
@@ -571,7 +561,7 @@ class CRM_Utils_Array {
    * @return array
    *   Multi-dimensional array, with one layer for each key.
    */
-  static function index($keys, $records) {
+  public static function index($keys, $records) {
     $final_key = array_pop($keys);
 
     $result = array();
@@ -608,7 +598,7 @@ class CRM_Utils_Array {
    * @return array
    *   Keys are the original keys of $records; values are the $prop values.
    */
-  static function collect($prop, $records) {
+  public static function collect($prop, $records) {
     $result = array();
     if (is_array($records)) {
       foreach ($records as $key => $record) {
@@ -640,7 +630,7 @@ class CRM_Utils_Array {
    *   An array of strings produced by explode(), or the unmodified input
    *   array, or NULL.
    */
-  static function explodePadded($values, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
+  public static function explodePadded($values, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
     if ($values === NULL) {
       return NULL;
     }
@@ -668,7 +658,7 @@ class CRM_Utils_Array {
    * @return string|NULL
    *   The generated string, or NULL if NULL was passed as $values parameter.
    */
-  static function implodePadded($values, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
+  public static function implodePadded($values, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
     if ($values === NULL) {
       return NULL;
     }
@@ -701,7 +691,7 @@ class CRM_Utils_Array {
    * @return array
    *   The manipulated array.
    */
-  static function crmReplaceKey(&$elementArray, $oldKey, $newKey) {
+  public static function crmReplaceKey(&$elementArray, $oldKey, $newKey) {
     $keys = array_keys($elementArray);
     if (FALSE === $index = array_search($oldKey, $keys)) {
       throw new Exception(sprintf('key "%s" does not exit', $oldKey));
@@ -739,7 +729,7 @@ class CRM_Utils_Array {
    *
    * @return null
    */
-  static function valueByRegexKey($regexKey, $list, $default = NULL) {
+  public static function valueByRegexKey($regexKey, $list, $default = NULL) {
     if (is_array($list) && $regexKey) {
       $matches = preg_grep($regexKey, array_keys($list));
       $key = reset($matches);
@@ -773,7 +763,7 @@ class CRM_Utils_Array {
    *   {fg => blue, bg => black}
    * }
    */
-  static function product($dimensions, $template = array()) {
+  public static function product($dimensions, $template = array()) {
     if (empty($dimensions)) {
       return array($template);
     }
@@ -802,7 +792,7 @@ class CRM_Utils_Array {
    * @param array $array
    * @return mixed|NULL
    */
-  static function first($array) {
+  public static function first($array) {
     foreach ($array as $value) {
       return $value;
     }
@@ -819,7 +809,7 @@ class CRM_Utils_Array {
    * @param array $keys list of keys to copy
    * @return array
    */
-  static function subset($array, $keys) {
+  public static function subset($array, $keys) {
     $result = array();
     foreach ($keys as $key) {
       if (isset($array[$key])) {
@@ -838,7 +828,7 @@ class CRM_Utils_Array {
    * @param string $valueName
    * @return array
    */
-  static function makeNonAssociative($associative, $keyName = 'key', $valueName = 'value') {
+  public static function makeNonAssociative($associative, $keyName = 'key', $valueName = 'value') {
     $output = array();
     foreach ($associative as $key => $val) {
       $output[] = array($keyName => $key, $valueName => $val);
@@ -846,4 +836,3 @@ class CRM_Utils_Array {
     return $output;
   }
 }
-

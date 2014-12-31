@@ -46,10 +46,9 @@ class CRM_Contact_Form_Edit_Email {
    * @param boolean       $blockEdit         is it block edit
    *
    * @return void
-   * @access public
    * @static
    */
-  static function buildQuickForm(&$form, $blockCount = NULL, $blockEdit = FALSE) {
+  public static function buildQuickForm(&$form, $blockCount = NULL, $blockEdit = FALSE) {
     // passing this via the session is AWFUL. we need to fix this
     if (!$blockCount) {
       $blockId = ($form->get('Email_Block_Count')) ? $form->get('Email_Block_Count') : 1;
@@ -116,4 +115,3 @@ class CRM_Contact_Form_Edit_Email {
     }
   }
 }
-

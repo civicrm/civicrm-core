@@ -42,7 +42,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -54,10 +54,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @param array $params (reference) an assoc array of name/value pairs
    *
    * @return CRM_Core_DAO_CustomGroup object
-   * @access public
    * @static
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     // create custom group dao, populate fields and then save.
     $group = new CRM_Core_DAO_CustomGroup();
     $group->title = $params['title'];
@@ -230,10 +229,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_DAO_CustomGroup object
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomGroup', $params, $defaults);
   }
 
@@ -245,9 +243,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *
    * @return Object             DAO object on sucess, null otherwise
    * @static
-   * @access public
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     // reset the cache
     CRM_Core_BAO_Cache::deleteGroup('contact fields');
 
@@ -329,7 +326,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * The reason for the info array in unclear and it could be determined from parsing the group tree after creation
    * With caching the performance impact would be small & the function would be cleaner
    *
-   * @access public
    *
    * @static
    */
@@ -852,7 +848,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return string title
    *
-   * @access public
    * @static
    *
    */
@@ -873,7 +868,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return array $groupTree - array consisting of all group and field details
    *
-   * @access public
    *
    * @static
    */
@@ -1073,7 +1067,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return string $tableName
    *
-   * @access public
    * @static
    *
    * @see _apachesolr_civiAttachments_dereference_file_parent
@@ -1135,7 +1128,7 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return CRM_Core_DAO_CustomGroup
    */
-  static function getAllCustomGroupsByBaseEntity($entityType) {
+  public static function getAllCustomGroupsByBaseEntity($entityType) {
     $customGroupDAO = new CRM_Core_DAO_CustomGroup();
     self::_addWhereAdd($customGroupDAO, $entityType, NULL, TRUE);
     return $customGroupDAO;
@@ -1153,7 +1146,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return void
    *
-   * @access private
    * @static
    */
   private static function _addWhereAdd(&$customGroupDAO, $entityType, $entityID = NULL, $allSubtypes = FALSE) {
@@ -1219,7 +1211,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return boolean   false if field exists for this group, true if group gets deleted.
    *
-   * @access public
    * @static
    *
    */
@@ -1257,7 +1248,7 @@ ORDER BY civicrm_custom_group.weight,
    * @param bool $inactiveNeeded
    * @param int $action
    */
-  static function setDefaults(&$groupTree, &$defaults, $viewMode = FALSE, $inactiveNeeded = FALSE, $action = CRM_Core_Action::NONE) {
+  public static function setDefaults(&$groupTree, &$defaults, $viewMode = FALSE, $inactiveNeeded = FALSE, $action = CRM_Core_Action::NONE) {
     foreach ($groupTree as $id => $group) {
       if (!isset($group['fields'])) {
         continue;
@@ -1399,7 +1390,7 @@ ORDER BY civicrm_custom_group.weight,
    * @param array $params
    * @param bool $skipFile
    */
-  static function postProcess(&$groupTree, &$params, $skipFile = FALSE) {
+  public static function postProcess(&$groupTree, &$params, $skipFile = FALSE) {
     // Get the Custom form values and groupTree
     // first reset all checkbox and radio data
     foreach ($groupTree as $groupID => $group) {
@@ -1528,10 +1519,9 @@ ORDER BY civicrm_custom_group.weight,
    * @param string    $prefix           prefix for custom grouptree assigned to template
    *
    * @return void
-   * @access public
    * @static
    */
-  static function buildQuickForm(&$form, &$groupTree, $inactiveNeeded = FALSE, $prefix = '') {
+  public static function buildQuickForm(&$form, &$groupTree, $inactiveNeeded = FALSE, $prefix = '') {
     $form->assign_by_ref("{$prefix}groupTree", $groupTree);
 
     // this is fix for date field
@@ -1563,10 +1553,9 @@ ORDER BY civicrm_custom_group.weight,
    * @param string $type the type of custom group we are using
    *
    * @return array
-   * @access public
    * @static
    */
-  static function extractGetParams(&$form, $type) {
+  public static function extractGetParams(&$form, $type) {
     if (empty($_GET)) {
       return array();
     }
@@ -1672,9 +1661,8 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return boolean false if it matches else true
    * @static
-   * @access public
    */
-  static function checkCustomField($customFieldId, &$removeCustomFieldTypes) {
+  public static function checkCustomField($customFieldId, &$removeCustomFieldTypes) {
     $query = "SELECT cg.extends as extends
                   FROM civicrm_custom_group as cg, civicrm_custom_field as cf
                   WHERE cg.id = cf.custom_group_id
@@ -1695,7 +1683,7 @@ ORDER BY civicrm_custom_group.weight,
    * @return string
    * @throws Exception
    */
-  static function mapTableName($table) {
+  public static function mapTableName($table) {
     switch ($table) {
       case 'Contact':
       case 'Individual':
@@ -1761,7 +1749,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
   /**
    * @param $group
    */
-  static function createTable($group) {
+  public static function createTable($group) {
     $params = array(
       'name' => $group->table_name,
       'is_multiple' => $group->is_multiple ? 1 : 0,
@@ -1782,7 +1770,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    *
    * @return array $formattedGroupTree
    */
-  static function formatGroupTree(&$groupTree, $groupCount = 1, &$form) {
+  public static function formatGroupTree(&$groupTree, $groupCount = 1, &$form) {
     $formattedGroupTree = array();
     $uploadNames = array();
 
@@ -1855,7 +1843,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    *
    * @return array|int
    */
-  static function buildCustomDataView(&$form, &$groupTree, $returnCount = FALSE, $gID = NULL, $prefix = NULL, $customValueId = NULL) {
+  public static function buildCustomDataView(&$form, &$groupTree, $returnCount = FALSE, $gID = NULL, $prefix = NULL, $customValueId = NULL) {
     $details = array();
     foreach ($groupTree as $key => $group) {
       if ($key === 'info') {
@@ -1942,7 +1930,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    *
    * @return array|null|string
    */
-  static function formatCustomValues(&$values, &$field, $dncOptionPerLine = FALSE) {
+  public static function formatCustomValues(&$values, &$field, $dncOptionPerLine = FALSE) {
     $value = $values['data'];
 
     //changed isset CRM-4601
@@ -2173,7 +2161,6 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    * @param  array $fieldIds - array of custom field ids.
    *
    * @return array $groupLabels - array consisting of groups and fields labels with ids.
-   * @access public
    */
   public static function getGroupTitles($fieldIds) {
     if (!is_array($fieldIds) && empty($fieldIds)) {
@@ -2203,7 +2190,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
     return $groupLabels;
   }
 
-  static function dropAllTables() {
+  public static function dropAllTables() {
     $query = "SELECT table_name FROM civicrm_custom_group";
     $dao = CRM_Core_DAO::executeQuery($query);
 
@@ -2219,9 +2206,8 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    * @param   int $gID - custom group id.
    *
    * @return boolean true if empty otherwise false.
-   * @access public
    */
-  static function isGroupEmpty($gID) {
+  public static function isGroupEmpty($gID) {
     if (!$gID) {
       return;
     }
@@ -2247,9 +2233,8 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    * @param  array $types - var which should have the list appended.
    *
    * @return array of types.
-   * @access public
    */
-  static function getExtendedObjectTypes(&$types = array()) {
+  public static function getExtendedObjectTypes(&$types = array()) {
     static $flag = FALSE, $objTypes = array();
 
     if (!$flag) {
@@ -2289,7 +2274,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    *
    * @return bool
    */
-  static function hasReachedMaxLimit($customGroupId, $entityId) {
+  public static function hasReachedMaxLimit($customGroupId, $entityId) {
     //check whether the group is multiple
     $isMultiple = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'is_multiple');
     $isMultiple = ($isMultiple) ? TRUE : FALSE;
@@ -2318,7 +2303,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
   /**
    * @return array
    */
-  static function getMultipleFieldGroup() {
+  public static function getMultipleFieldGroup() {
     $multipleGroup = array();
     $dao = new CRM_Core_DAO_CustomGroup();
     $dao->is_multiple = 1;
@@ -2329,4 +2314,3 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
     return $multipleGroup;
   }
 }
-

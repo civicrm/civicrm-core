@@ -37,7 +37,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -48,10 +48,9 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param array $defaults    (reference ) an assoc array to hold the flattened values
    *
    * @return object     CRM_Core_DAO_Tag object on success, otherwise null
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $tag = new CRM_Core_DAO_Tag();
     $tag->copyValues($params);
     if ($tag->find(TRUE)) {
@@ -67,7 +66,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *
    * @return mixed
    */
-  function getTree($usedFor = NULL, $excludeHidden = FALSE) {
+  public function getTree($usedFor = NULL, $excludeHidden = FALSE) {
     if (!isset($this->tree)) {
       $this->buildTree($usedFor, $excludeHidden);
     }
@@ -79,7 +78,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param null $usedFor
    * @param bool $excludeHidden
    */
-  function buildTree($usedFor = NULL, $excludeHidden = FALSE) {
+  public function buildTree($usedFor = NULL, $excludeHidden = FALSE) {
     $sql = "SELECT id, parent_id, name, description, is_selectable FROM civicrm_tag";
 
     $whereClause = array();
@@ -125,7 +124,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *
    * @return array
    */
-  static function getTagsUsedFor($usedFor = array('civicrm_contact'),
+  public static function getTagsUsedFor($usedFor = array('civicrm_contact'),
     $buildSelect = TRUE,
     $all         = FALSE,
     $parentId    = NULL
@@ -311,11 +310,10 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param int $id   tag id
    *
    * @return boolean
-   * @access public
    * @static
    *
    */
-  static function del($id) {
+  public static function del($id) {
     // since this is a destructive operation, lets make sure
     // id is a postive number
     CRM_Utils_Type::validate($id, 'Positive');
@@ -350,10 +348,9 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * signatures
    *
    * @return object    CRM_Core_DAO_Tag object on success, otherwise null
-   * @access public
    * @static
    */
-  static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = array()) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('tag', $ids));
     if (!$id && !self::dataExists($params)) {
       return NULL;
@@ -400,10 +397,9 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return boolean
-   * @access public
    * @static
    */
-  static function dataExists(&$params) {
+  public static function dataExists(&$params) {
     // Disallow empty values except for the number zero.
     // TODO: create a utility for this since it's needed in many places
     if (!empty($params['name']) || (string) $params['name'] === '0') {
@@ -419,10 +415,9 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param string $entityTable entity_table
    *
    * @return array $tagSets array of tag sets
-   * @access public
    * @static
    */
-  static function getTagSet($entityTable) {
+  public static function getTagSet($entityTable) {
     $tagSets = array();
     $query = "SELECT name, id FROM civicrm_tag
               WHERE is_tagset=1 AND parent_id IS NULL and used_for LIKE %1";
@@ -440,7 +435,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @return array $tags associated array of tag name and id@access public
    * @static
    */
-  static function getTagsNotInTagset() {
+  public static function getTagsNotInTagset() {
     $tags = $tagSets = array();
     // first get all the tag sets
     $query = "SELECT id FROM civicrm_tag WHERE is_tagset=1 AND parent_id IS NULL";
@@ -464,4 +459,3 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     return $tags;
   }
 }
-

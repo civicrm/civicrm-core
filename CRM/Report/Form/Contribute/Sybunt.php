@@ -44,7 +44,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $yearsInPast = 10;
     $yearsInFuture = 1;
     $date = CRM_Core_SelectValues::date('custom', NULL, $yearsInPast, $yearsInFuture);
@@ -178,11 +178,11 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
     $current_year = $this->_params['yid_value'];
@@ -236,7 +236,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  function from() {
+  public function from() {
 
     $this->_from = "
         FROM  civicrm_contribution  {$this->_aliases['civicrm_contribution']}
@@ -259,7 +259,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     $this->addAddressFromClause();
   }
 
-  function where() {
+  public function where() {
     $this->_statusClause = "";
     $clauses = array($this->_aliases['civicrm_contribution'] . '.is_test = 0');
     foreach ($this->_columns as $tableName => $table) {
@@ -315,7 +315,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->assign('chartSupported', TRUE);
     $this->_groupBy =
       "Group BY {$this->_aliases['civicrm_contribution']}.contact_id, " .
@@ -328,7 +328,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
     if (!empty($rows)) {
@@ -349,7 +349,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     return $statistics;
   }
 
-  function postProcess() {
+  public function postProcess() {
     // get ready with post process params
     $this->beginPostProcess();
 
@@ -435,7 +435,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function buildChart(&$rows) {
+  public function buildChart(&$rows) {
     $graphRows = array();
     $count = 0;
     $current_year = $this->_params['yid_value'];
@@ -481,7 +481,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
 
@@ -525,7 +525,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
    *
    * @return array
    */
-  function getOperationPair($type = "string", $fieldName = NULL) {
+  public function getOperationPair($type = "string", $fieldName = NULL) {
     if ($fieldName == 'yid') {
       return array(
         'calendar' => ts('Is Calendar Year'),
@@ -535,4 +535,3 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     return parent::getOperationPair($type, $fieldName);
   }
 }
-

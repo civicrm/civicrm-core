@@ -53,7 +53,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Contribute_BAO_ManagePremiums';
   }
 
@@ -62,7 +62,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
@@ -106,10 +106,9 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
    *
    */
-  function run() {
+  public function run() {
 
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String',
@@ -139,10 +138,9 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    *
    *
    * @return void
-   * @access public
    * @static
    */
-  function browse() {
+  public function browse() {
     // get all custom groups sorted by weight
     $premiums = array();
     $dao = new CRM_Contribute_DAO_Product();
@@ -186,7 +184,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Contribute_Form_ManagePremiums';
   }
 
@@ -195,7 +193,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Manage Premiums';
   }
 
@@ -206,8 +204,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/contribute/managePremiums';
   }
 }
-

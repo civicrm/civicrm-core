@@ -69,7 +69,6 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    * Get all the mailing components of a particular type
    *
    * @param $type the type of component needed
-   * @access public
    *
    * @return array - array reference of all mailing components
    * @static
@@ -110,7 +109,6 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param $type the type of component needed
    * @param $undefined the value to use if no default is defined
-   * @access public
    *
    * @return integer -The ID of the default mailing component.
    * @static
@@ -137,7 +135,6 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the mailing templates
    *
-   * @access public
    *
    * @return array - array reference of all mailing templates if any
    * @static
@@ -152,7 +149,6 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the completed mailing
    *
-   * @access public
    *
    * @param null $mode
    *
@@ -210,7 +206,6 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db
    * next time it's requested.
    *
-   * @access public
    * @static
    *
    * @param bool|string $name pseudoconstant to be flushed
@@ -221,4 +216,3 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
     }
   }
 }
-

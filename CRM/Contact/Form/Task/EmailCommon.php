@@ -39,7 +39,7 @@
  * components in CiviCRM (since they all have send email as a task)
  */
 class CRM_Contact_Form_Task_EmailCommon {
-  CONST MAX_EMAILS_KILL_SWITCH = 50;
+  const MAX_EMAILS_KILL_SWITCH = 50;
 
   public $_contactDetails = array();
   public $_allContactDetails = array();
@@ -48,7 +48,7 @@ class CRM_Contact_Form_Task_EmailCommon {
   /**
    * @param CRM_Core_Form $form
    */
-  static function preProcessFromAddress(&$form) {
+  public static function preProcessFromAddress(&$form) {
     $form->_single = FALSE;
     $className = CRM_Utils_System::getClassName($form);
     if (property_exists($form, '_context') &&
@@ -132,13 +132,12 @@ class CRM_Contact_Form_Task_EmailCommon {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
    * @return void
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     $toArray = $ccArray = $bccArray = array();
     $suppressedEmails = 0;
     //here we are getting logged in user id as array but we need target contact id. CRM-5988
@@ -324,10 +323,9 @@ class CRM_Contact_Form_Task_EmailCommon {
    * @param array $self      additional values form 'this'
    *
    * @return true if no errors, else array of errors
-   * @access public
    *
    */
-  static function formRule($fields, $dontCare, $self) {
+  public static function formRule($fields, $dontCare, $self) {
     $errors = array();
     $template = CRM_Core_Smarty::singleton();
 
@@ -348,13 +346,12 @@ class CRM_Contact_Form_Task_EmailCommon {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
    * @return void
    */
-  static function postProcess(&$form) {
+  public static function postProcess(&$form) {
     if (count($form->_contactIds) > self::MAX_EMAILS_KILL_SWITCH) {
       CRM_Core_Error::fatal(ts('Please do not use this task to send a lot of emails (greater than %1). We recommend using CiviMail instead.',
           array(1 => self::MAX_EMAILS_KILL_SWITCH)

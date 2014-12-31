@@ -95,7 +95,6 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
@@ -140,7 +139,7 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
     $session->replaceUserContext($url);
   }
 
-  function endPostProcess() {
+  public function endPostProcess() {
     // make submit buttons keep the current working tab opened.
     if ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {
       $tabTitle = $className = CRM_Utils_String::getClassName($this->_name);
@@ -174,7 +173,7 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     if ($this->controller->getPrint() || $this->getVar('_surveyId') <= 0 ) {
       return parent::getTemplateFileName();
     }
@@ -185,4 +184,3 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
     }
   }
 }
-

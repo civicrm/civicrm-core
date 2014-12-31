@@ -48,7 +48,7 @@ class CRM_Dedupe_Finder {
    *
    * @return array  array of (cid1, cid2, weight) dupe triples
    */
-  static function dupes($rgid, $cids = array()) {
+  public static function dupes($rgid, $cids = array()) {
     $rgBao             = new CRM_Dedupe_BAO_RuleGroup();
     $rgBao->id         = $rgid;
     $rgBao->contactIds = $cids;
@@ -139,7 +139,7 @@ class CRM_Dedupe_Finder {
    *
    * @return array  array of (cid1, cid2, weight) dupe triples
    */
-  static function dupesInGroup($rgid, $gid) {
+  public static function dupesInGroup($rgid, $gid) {
     $cids = array_keys(CRM_Contact_BAO_Group::getMember($gid));
     if ( !empty($cids) ) {
     return self::dupes($rgid, $cids);
@@ -156,7 +156,7 @@ class CRM_Dedupe_Finder {
    *
    * @return array  array of dupe contact_ids
    */
-  static function dupesOfContact($cid, $used = 'Unsupervised', $ctype = NULL) {
+  public static function dupesOfContact($cid, $used = 'Unsupervised', $ctype = NULL) {
     // if not provided, fetch the contact type from the database
     if (!$ctype) {
       $dao = new CRM_Contact_DAO_Contact();
@@ -196,7 +196,7 @@ class CRM_Dedupe_Finder {
    *
    * @return array  valid $params array for dedupe
    */
-  static function formatParams($fields, $ctype) {
+  public static function formatParams($fields, $ctype) {
     $flat = array();
     CRM_Utils_Array::flatten($fields, $flat);
 
@@ -304,4 +304,3 @@ class CRM_Dedupe_Finder {
     return $params;
   }
 }
-

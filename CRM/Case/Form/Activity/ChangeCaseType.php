@@ -44,7 +44,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    *
    * @throws Exception
    */
-  static function preProcess(&$form) {
+  public static function preProcess(&$form) {
     if (!isset($form->_caseId)) {
       CRM_Core_Error::fatal(ts('Case Id not found.'));
     }
@@ -54,13 +54,12 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
    * @return void
    */
-  static function setDefaultValues(&$form) {
+  public static function setDefaultValues(&$form) {
     $defaults = array();
 
     $defaults['is_reset_timeline'] = 1;
@@ -75,7 +74,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
   /**
    * @param CRM_Core_Form $form
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     $form->removeElement('status_id');
     $form->removeElement('priority_id');
 
@@ -108,23 +107,21 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($values, $files, $form) {
+  public static function formRule($values, $files, $form) {
     return TRUE;
   }
 
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @param array $params
    *
    * @return void
    */
-  static function beginPostProcess(&$form, &$params) {
+  public static function beginPostProcess(&$form, &$params) {
     if ($form->_context == 'case') {
       $params['id'] = $form->_id;
     }
@@ -141,7 +138,6 @@ class CRM_Case_Form_Activity_ChangeCaseType {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @param array $params
@@ -149,7 +145,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    *
    * @return void
    */
-  static function endPostProcess(&$form, &$params, $activity) {
+  public static function endPostProcess(&$form, &$params, $activity) {
     if (!$form->_caseId) {
       // always expecting a change, so case-id is a must.
       return;
@@ -202,4 +198,3 @@ class CRM_Case_Form_Activity_ChangeCaseType {
     $params['statusMsg'] = ts('Case Type changed successfully.');
   }
 }
-

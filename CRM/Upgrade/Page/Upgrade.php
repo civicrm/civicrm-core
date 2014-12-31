@@ -33,11 +33,11 @@
  *
  */
 class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function run() {
+  public function run() {
     // lets get around the time limit issue if possible for upgrades
     if (!ini_get('safe_mode')) {
       set_time_limit(0);
@@ -80,7 +80,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
   /**
    * Display an introductory screen with any pre-upgrade messages
    */
-  function runIntro() {
+  public function runIntro() {
     $upgrade = new CRM_Upgrade_Form();
     $template = CRM_Core_Smarty::singleton();
     list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
@@ -131,7 +131,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
   /**
    * Begin the upgrade by building a queue of tasks and redirecting to the queue-runner
    */
-  function runBegin() {
+  public function runBegin() {
     $upgrade = new CRM_Upgrade_Form();
     list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
 
@@ -168,7 +168,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
   /**
    * Display any final messages, clear caches, etc
    */
-  function runFinish() {
+  public function runFinish() {
     $upgrade = new CRM_Upgrade_Form();
     $template = CRM_Core_Smarty::singleton();
 
@@ -202,4 +202,3 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     echo CRM_Utils_System::theme($content, $this->_print, TRUE);
   }
 }
-

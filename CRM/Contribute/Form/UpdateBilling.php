@@ -59,7 +59,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_mid = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE);
@@ -142,7 +141,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $this->_defaults = array();
 
     if ($this->_subscriptionDetails->contact_id) {
@@ -188,7 +187,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $type = 'next';
@@ -222,10 +220,9 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
    *
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
 
@@ -239,7 +236,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
    * Process the form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -435,4 +431,3 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     }
   }
 }
-

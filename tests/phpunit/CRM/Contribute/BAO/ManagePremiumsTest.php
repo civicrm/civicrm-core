@@ -32,14 +32,14 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
   /**
    * Check method add()
    */
-  function testAdd() {
+  public function testAdd() {
     $ids = array();
     $params = array(
       'name' => 'Test Product',
@@ -64,7 +64,7 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
   /**
    * Check method retrieve( )
    */
-  function testRetrieve() {
+  public function testRetrieve() {
     $ids = array();
     $params = array(
       'name' => 'Test Product',
@@ -86,7 +86,7 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
   /**
    * Check method setIsActive( )
    */
-  function testSetIsActive() {
+  public function testSetIsActive() {
     $ids = array();
     $params = array(
       'name' => 'Test Product',
@@ -112,7 +112,7 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
   /**
    * Check method del( )
    */
-  function testDel() {
+  public function testDel() {
     $ids = array();
     $params = array(
       'name' => 'Test Product',
@@ -135,5 +135,3 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
     $this->assertEquals(empty($result), TRUE, 'Verify product record deletion.');
   }
 }
-
-

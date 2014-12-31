@@ -60,7 +60,7 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
    * @return void
    * @acess protected
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_id = $this->get('id');
 
 
@@ -79,7 +79,6 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -103,7 +102,6 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $field = new CRM_Core_DAO_CustomField();
@@ -117,4 +115,3 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
 
   }
 }
-

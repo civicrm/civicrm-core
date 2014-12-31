@@ -38,7 +38,7 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
   /*
    * test individual pane seperatly.
    */
-  function testIndividualPanes() {
+  public function testIndividualPanes() {
     $this->webtestLogin();
 
     // Get all default advance search panes.
@@ -64,7 +64,7 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
   /*
    * test by selecting all panes at a time.
    */
-  function testAllPanes() {
+  public function testAllPanes() {
     $this->webtestLogin();
 
     // Get all default advance search panes.
@@ -170,7 +170,7 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
    *
    * @return array
    */
-  function _advanceSearchPanes($paneRef = NULL) {
+  public function _advanceSearchPanes($paneRef = NULL) {
     static $_advance_search_panes;
 
     if (!isset($_advance_search_panes) || empty($_advance_search_panes)) {
@@ -401,4 +401,3 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
     return $_advance_search_panes;
   }
 }
-

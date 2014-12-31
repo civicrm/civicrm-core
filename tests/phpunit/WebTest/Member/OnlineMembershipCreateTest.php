@@ -35,7 +35,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testOnlineMembershipCreate() {
+  public function testOnlineMembershipCreate() {
     //check for online contribution and profile listings permissions
     $permissions = array("edit-1-make-online-contributions", "edit-1-profile-listings-and-forms");
     $this->changePermissions($permissions);
@@ -190,7 +190,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
    * @param $hash
    * @param bool $otherAmount
    */
-  function _testOnlineMembershipSignup($pageId, $memTypeId, $firstName, $lastName, $payLater, $hash, $otherAmount = FALSE) {
+  public function _testOnlineMembershipSignup($pageId, $memTypeId, $firstName, $lastName, $payLater, $hash, $otherAmount = FALSE) {
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
     // Select membership type 1
@@ -251,7 +251,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
-  function testOnlineMembershipCreateWithContribution() {
+  public function testOnlineMembershipCreateWithContribution() {
     //login with admin credentials & make sure we do have required permissions.
     $permissions = array("edit-1-make-online-contributions", "edit-1-profile-listings-and-forms");
     $this->changePermissions($permissions);

@@ -40,7 +40,7 @@ class CRM_Core_Component {
    * End part (filename) of the component information class'es name
    * that needs to be present in components main directory.
    */
-  CONST COMPONENT_INFO_CLASS = 'Info';
+  const COMPONENT_INFO_CLASS = 'Info';
 
   private static $_info = NULL;
 
@@ -75,7 +75,7 @@ class CRM_Core_Component {
    *
    * @return mixed
    */
-  static function get($name, $attribute = NULL) {
+  public static function get($name, $attribute = NULL) {
     $comp = CRM_Utils_Array::value($name, self::_info());
     if ($attribute) {
       return CRM_Utils_Array::value($attribute, $comp->info);
@@ -151,7 +151,7 @@ class CRM_Core_Component {
    *
    * @return bool
    */
-  static function invoke(&$args, $type) {
+  public static function invoke(&$args, $type) {
     $info = self::_info();
     $config = CRM_Core_Config::singleton();
 
@@ -186,7 +186,7 @@ class CRM_Core_Component {
   /**
    * @return array
    */
-  static function xmlMenu() {
+  public static function xmlMenu() {
 
     // lets build the menu for all components
     $info = self::getComponents(TRUE);
@@ -204,7 +204,7 @@ class CRM_Core_Component {
   /**
    * @return array
    */
-  static function &menu() {
+  public static function &menu() {
     $info = self::_info();
     $items = array();
     foreach ($info as $name => $comp) {
@@ -223,7 +223,7 @@ class CRM_Core_Component {
    * @param $config
    * @param bool $oldMode
    */
-  static function addConfig(&$config, $oldMode = FALSE) {
+  public static function addConfig(&$config, $oldMode = FALSE) {
     $info = self::_info();
 
     foreach ($info as $name => $comp) {
@@ -238,7 +238,7 @@ class CRM_Core_Component {
    *
    * @return mixed
    */
-  static function getComponentID($componentName) {
+  public static function getComponentID($componentName) {
     $info = self::_info();
     if (!empty($info[$componentName])) {
       return $info[$componentName]->componentID;
@@ -253,7 +253,7 @@ class CRM_Core_Component {
    *
    * @return int|null|string
    */
-  static function getComponentName($componentID) {
+  public static function getComponentName($componentID) {
     $info = self::_info();
 
     $componentName = NULL;
@@ -270,7 +270,7 @@ class CRM_Core_Component {
   /**
    * @return array
    */
-  static function &getQueryFields() {
+  public static function &getQueryFields() {
     $info = self::_info();
     $fields = array();
     foreach ($info as $name => $comp) {
@@ -287,7 +287,7 @@ class CRM_Core_Component {
    * @param $query
    * @param string $fnName
    */
-  static function alterQuery(&$query, $fnName) {
+  public static function alterQuery(&$query, $fnName) {
     $info = self::_info();
 
     foreach ($info as $name => $comp) {
@@ -305,7 +305,7 @@ class CRM_Core_Component {
    *
    * @return null
    */
-  static function from($fieldName, $mode, $side) {
+  public static function from($fieldName, $mode, $side) {
     $info = self::_info();
 
     $from = NULL;
@@ -348,7 +348,7 @@ class CRM_Core_Component {
   /**
    * @param CRM_Core_Form $form
    */
-  static function &buildSearchForm(&$form) {
+  public static function &buildSearchForm(&$form) {
     $info = self::_info();
 
     foreach ($info as $name => $comp) {
@@ -363,7 +363,7 @@ class CRM_Core_Component {
    * @param $row
    * @param int $id
    */
-  static function searchAction(&$row, $id) {
+  public static function searchAction(&$row, $id) {
     $info = self::_info();
 
     foreach ($info as $name => $comp) {
@@ -377,7 +377,7 @@ class CRM_Core_Component {
   /**
    * @return array|null
    */
-  static function &contactSubTypes() {
+  public static function &contactSubTypes() {
     if (self::$_contactSubTypes == NULL) {
       self::$_contactSubTypes = array();
     }
@@ -391,7 +391,7 @@ class CRM_Core_Component {
    *
    * @return null
    */
-  static function &contactSubTypeProperties($subType, $op) {
+  public static function &contactSubTypeProperties($subType, $op) {
     $properties = self::contactSubTypes();
     if (array_key_exists($subType, $properties) &&
       array_key_exists($op, $properties[$subType])
@@ -404,7 +404,7 @@ class CRM_Core_Component {
   /**
    * FIXME: This function does not appear to do anything. The is_array() check runs on a bunch of objects and (always?) returns false
    */
-  static function &taskList() {
+  public static function &taskList() {
     $info = self::_info();
 
     $tasks = array();
@@ -422,10 +422,9 @@ class CRM_Core_Component {
    * @param array $tables  array of tables
    *
    * @return null
-   * @access public
    * @static
    */
-  static function tableNames(&$tables) {
+  public static function tableNames(&$tables) {
     $info = self::_info();
 
     foreach ($info as $name => $comp) {
@@ -440,7 +439,7 @@ class CRM_Core_Component {
    * Get components info from info file
    *
    */
-  static function getComponentsFromFile($crmFolderDir) {
+  public static function getComponentsFromFile($crmFolderDir) {
     $components = array();
     //traverse CRM folder and check for Info file
     if (is_dir($crmFolderDir)) {
@@ -465,4 +464,3 @@ class CRM_Core_Component {
     return $components;
   }
 }
-

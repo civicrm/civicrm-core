@@ -43,7 +43,7 @@ class CRM_Report_Page_Instance extends CRM_Core_Page {
    *
    * @return void
    */
-  function run() {
+  public function run() {
     $instanceId = CRM_Report_Utils_Report::getInstanceID();
     if (!$instanceId) {
       $instanceId = CRM_Report_Utils_Report::getInstanceIDForPath();
@@ -108,4 +108,3 @@ class CRM_Report_Page_Instance extends CRM_Core_Page {
     return CRM_Utils_System::redirect($reportUrl);
   }
 }
-

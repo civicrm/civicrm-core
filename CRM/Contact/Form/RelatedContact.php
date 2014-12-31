@@ -68,9 +68,8 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     // reset action from the session
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',
       $this, FALSE, 'update'
@@ -107,11 +106,10 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return $this->_defaults;
   }
 
@@ -119,7 +117,6 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $params       = array();
@@ -159,7 +156,6 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
   /**
    * Form submission of new/edit contact is processed.
    *
-   * @access public
    *
    * @return void
    */
@@ -199,4 +195,3 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
     CRM_Core_Session::setStatus($message, ts('Contact Saved'), 'success');
   }
 }
-

@@ -43,9 +43,8 @@ class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
    * This function is called when action is browse
    *
    * return null
-   * @access public
    */
-  function browse() {
+  public function browse() {
     $in = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, 'Added');
 
     // keep track of all 'added' contact groups so we can remove them from the smart group
@@ -85,7 +84,7 @@ class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
     }
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->assign('contactId', $this->_contactId);
 
@@ -102,9 +101,8 @@ class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
    * to be taken for the page.
    *
    * return null
-   * @access public
    */
-  function run() {
+  public function run() {
     $this->preProcess();
     $this->browse();
     return parent::run();

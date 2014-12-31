@@ -6,11 +6,11 @@ require_once 'CiviTest/Contact.php';
  * Class CRM_Activity_BAO_ActivityTest
  */
 class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function tearDown() {
+  public function tearDown() {
     // truncate a few tables
     $tablesToTruncate = array('civicrm_contact', 'civicrm_activity', 'civicrm_activity_contact');
     $this->quickCleanup($tablesToTruncate);
@@ -20,7 +20,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Testcases for create() method
    * create() method Add/Edit activity.
    */
-  function testCreate() {
+  public function testCreate() {
     $contactId = Contact::createIndividual();
 
     $params = array(
@@ -60,7 +60,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Testcase for getContactActivity() method.
    * getContactActivity() method get activities detail for given target contact id
    */
-  function testGetContactActivity() {
+  public function testGetContactActivity() {
     $contactId = Contact::createIndividual();
     $params = array(
       'first_name' => 'liz',
@@ -96,7 +96,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * retrieve($params, $defaults) method return activity detail for given params
    *                              and set defaults.
    */
-  function testRetrieve() {
+  public function testRetrieve() {
     $contactId = Contact::createIndividual();
     $params = array(
       'first_name' => 'liz',
@@ -143,7 +143,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Testcase for deleteActivity() method.
    * deleteActivity($params) method deletes activity for given params.
    */
-  function testDeleteActivity() {
+  public function testDeleteActivity() {
     $contactId = Contact::createIndividual();
     $params = array(
       'first_name' => 'liz',
@@ -190,7 +190,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Testcase for deleteActivityTarget() method.
    * deleteActivityTarget($activityId) method deletes activity target for given activity id.
    */
-  function testDeleteActivityTarget() {
+  public function testDeleteActivityTarget() {
     $contactId = Contact::createIndividual();
     $params = array(
       'first_name' => 'liz',
@@ -231,7 +231,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Testcase for deleteActivityAssignment() method.
    * deleteActivityAssignment($activityId) method deletes activity assignment for given activity id.
    */
-  function testDeleteActivityAssignment() {
+  public function testDeleteActivityAssignment() {
     $contactId = Contact::createIndividual();
     $params = array(
       'first_name' => 'liz',
@@ -271,7 +271,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivitiesCount BAO method
    */
-  function testGetActivitiesCountforAdminDashboard() {
+  public function testGetActivitiesCountforAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
@@ -300,7 +300,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivitiesCount BAO method
    */
-  function testGetActivitiesCountforNonAdminDashboard() {
+  public function testGetActivitiesCountforNonAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
@@ -330,7 +330,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivitiesCount BAO method
    */
-  function testGetActivitiesCountforContactSummary() {
+  public function testGetActivitiesCountforContactSummary() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
@@ -359,7 +359,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivitiesCount BAO method
    */
-  function testGetActivitiesCountforContactSummaryWithNoActivities() {
+  public function testGetActivitiesCountforContactSummaryWithNoActivities() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
@@ -387,7 +387,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivities BAO method
    */
-  function testGetActivitiesforAdminDashboard() {
+  public function testGetActivitiesforAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
@@ -422,7 +422,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivities BAO method
    */
-  function testGetActivitiesforNonAdminDashboard() {
+  public function testGetActivitiesforNonAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
@@ -465,7 +465,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivities BAO method
    */
-  function testGetActivitiesforContactSummary() {
+  public function testGetActivitiesforContactSummary() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
@@ -520,7 +520,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivities BAO method
    */
-  function testGetActivitiesforContactSummaryWithNoActivities() {
+  public function testGetActivitiesforContactSummaryWithNoActivities() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
@@ -545,4 +545,3 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals(0, sizeof($activities), 'In line ' . __LINE__);
   }
 }
-

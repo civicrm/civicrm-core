@@ -35,7 +35,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     parent::setUp();
   }
 
-  function testDefaultPricesetSelection() {
+  public function testDefaultPricesetSelection() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -130,7 +130,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
    * @param array $contactParams
    * @param $streetAddress
    */
-  function contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress) {
+  public function contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress) {
     //Credit Card Info
     $this->select("credit_card_type", "value=Visa");
     $this->type("credit_card_number", "4111111111111111");
@@ -152,7 +152,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
    * @param $priceSetSection
    * @param $optionNumber
    */
-  function checkOptions($priceSetSection, $optionNumber) {
+  public function checkOptions($priceSetSection, $optionNumber) {
     $this->assertChecked("xpath=//div[@id='priceset']/div[@class='crm-section {$priceSetSection}']/div[2]/div[{$optionNumber}]/span/input");
   }
 
@@ -160,7 +160,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
    * @param $priceSetSection
    * @param $optionNumber
    */
-  function _testDefaultSenarios($priceSetSection, $optionNumber) {
+  public function _testDefaultSenarios($priceSetSection, $optionNumber) {
     $this->click("xpath=//div[@id='priceset']/div[@class='crm-section {$priceSetSection}']/div[2]/div[{$optionNumber}]/span/input");
   }
 
@@ -170,7 +170,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
    * @param null $contributionType
    * @param $setHelp
    */
-  function _testAddSet($setTitle, $usedFor, $contributionType = NULL, $setHelp) {
+  public function _testAddSet($setTitle, $usedFor, $contributionType = NULL, $setHelp) {
     $this->openCiviPage("admin/price", "reset=1&action=add", '_qf_Set_next-bottom');
 
     // Enter Priceset fields (Title, Used For ...)
@@ -205,7 +205,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
    *
    * @return array
    */
-  function _testAddPriceFields(&$fields, &$validateString, $dateSpecificFields = FALSE, $title, $sid, $defaultPriceSet = FALSE, $contributionType) {
+  public function _testAddPriceFields(&$fields, &$validateString, $dateSpecificFields = FALSE, $title, $sid, $defaultPriceSet = FALSE, $contributionType) {
     if ($defaultPriceSet) {
 
       $memTypeTitle1 = 'General';
@@ -293,4 +293,3 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     return array($memTypeTitle1, $memTypeTitle2, $memTypeTitle3);
   }
 }
-

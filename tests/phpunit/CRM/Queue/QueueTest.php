@@ -40,7 +40,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
   /**
    * Return a list of persistent and transient queue providers
    */
-  function getQueueSpecs() {
+  public function getQueueSpecs() {
     $queueSpecs = array();
     $queueSpecs[] = array(
       array(
@@ -56,12 +56,12 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
   }
 
   /* ----------------------- Per-provider tests ----------------------- */
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->queueService = CRM_Queue_Service::singleton(TRUE);
   }
 
-  function tearDown() {
+  public function tearDown() {
     CRM_Utils_Time::resetTime();
 
     $tablesToTruncate = array('civicrm_queue_item');
@@ -73,7 +73,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    *
    * @dataProvider getQueueSpecs
    */
-  function testBasicUsage($queueSpec) {
+  public function testBasicUsage($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
     $this->assertTrue($this->queue instanceof CRM_Queue_Queue);
 
@@ -119,7 +119,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    *
    * @dataProvider getQueueSpecs
    */
-  function testManualRelease($queueSpec) {
+  public function testManualRelease($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
     $this->assertTrue($this->queue instanceof CRM_Queue_Queue);
 
@@ -145,7 +145,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    *
    * @dataProvider getQueueSpecs
    */
-  function testTimeoutRelease($queueSpec) {
+  public function testTimeoutRelease($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
     $this->assertTrue($this->queue instanceof CRM_Queue_Queue);
 
@@ -179,7 +179,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    *
    * @dataProvider getQueueSpecs
    */
-  function testStealItem($queueSpec) {
+  public function testStealItem($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
     $this->assertTrue($this->queue instanceof CRM_Queue_Queue);
 
@@ -213,7 +213,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    *
    * @dataProvider getQueueSpecs
    */
-  function testCreateResetTrue($queueSpec) {
+  public function testCreateResetTrue($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
     $this->queue->createItem(array(
         'test-key' => 'a',
@@ -235,7 +235,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    *
    * @dataProvider getQueueSpecs
    */
-  function testCreateResetFalse($queueSpec) {
+  public function testCreateResetFalse($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
     $this->queue->createItem(array(
         'test-key' => 'a',
@@ -259,7 +259,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    *
    * @dataProvider getQueueSpecs
    */
-  function testLoad($queueSpec) {
+  public function testLoad($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
     $this->queue->createItem(array(
         'test-key' => 'a',
@@ -278,4 +278,3 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $queue2->releaseItem($item);
   }
 }
-

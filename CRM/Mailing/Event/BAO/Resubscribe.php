@@ -48,7 +48,6 @@ class CRM_Mailing_Event_BAO_Resubscribe {
    * @param string $hash      The hash
    *
    * @return array|null $groups    Array of all groups to which the contact was added, or null if the queue event could not be found.
-   * @access public
    * @static
    */
   public static function &resub_to_mailing($job_id, $queue_id, $hash) {
@@ -194,7 +193,6 @@ class CRM_Mailing_Event_BAO_Resubscribe {
    * @param int $job              The job ID
    *
    * @return void
-   * @access public
    * @static
    */
   public static function send_resub_response($queue_id, $groups, $is_domain = FALSE, $job) {
@@ -293,4 +291,3 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     }
   }
 }
-

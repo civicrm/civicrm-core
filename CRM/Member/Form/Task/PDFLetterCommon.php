@@ -10,7 +10,6 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
    * Process the form after the input has been submitted and validated
    * @todo this is horrible copy & paste code because there is so much risk of breakage
    * in fixing the existing pdfLetter classes to be suitably generic
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @param $membershipIDs
@@ -20,7 +19,7 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
    *
    * @return void
    */
-  static function postProcessMembers(&$form, $membershipIDs, $skipOnHold, $skipDeceased, $contactIDs) {
+  public static function postProcessMembers(&$form, $membershipIDs, $skipOnHold, $skipDeceased, $contactIDs) {
 
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) =
       self::processMessageTemplate($form);
@@ -57,7 +56,7 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
    *
    * @return unknown
    */
-  static function generateHTML($membershipIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $html_message, $categories) {
+  public static function generateHTML($membershipIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $html_message, $categories) {
     $memberships = CRM_Utils_Token::getMembershipTokenDetails($membershipIDs);
 
     foreach ($membershipIDs as $membershipID) {
@@ -88,4 +87,3 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
     return $html;
   }
 }
-

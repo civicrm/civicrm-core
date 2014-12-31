@@ -46,14 +46,12 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * The params that are sent to the query
    *
    * @var array
-   * @access protected
    */
   protected $_queryParams;
 
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_single = FALSE;
@@ -61,7 +59,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_limit = NULL;
@@ -78,7 +75,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * Processing needed for buildForm and later
    *
    * @return void
-   * @access public
    */ function preProcess() {
     $this->set('searchFormName', 'Search');
 
@@ -165,7 +161,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     $this->assign('contributionSummary', $this->get('summary'));
   }
 
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if (empty($this->_defaults
 ['contribution_status'])) {
       $this->_defaults['contribution_status'][1] = 1;
@@ -176,11 +172,10 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
     // text for sort_name
     $this->addElement('text',
@@ -245,9 +240,8 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * @param
    *
    * @return void
-   * @access public
    */
-  function postProcess() {
+  public function postProcess() {
     if ($this->_done) {
       return;
     }
@@ -374,7 +368,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     $controller->run();
   }
 
-  function fixFormValues() {
+  public function fixFormValues() {
     // if this search has been forced
     // then see if there are any get values, and if so over-ride the post values
     // note that this means that GET over-rides POST :)
@@ -460,10 +454,8 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Find Contributions');
   }
 }
-
