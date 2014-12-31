@@ -502,4 +502,3 @@ SELECT  id, html_type
     $form->assign('hasPayment', $form->_paymentId);
   }
 }
-

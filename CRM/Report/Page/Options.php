@@ -221,4 +221,3 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
     return 'reset=1&action=browse';
   }
 }
-

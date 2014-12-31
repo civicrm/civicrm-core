@@ -276,4 +276,3 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $this->assertType('array', $result);
   }
 }
-

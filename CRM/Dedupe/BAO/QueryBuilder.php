@@ -23,6 +23,3 @@ class CRM_Dedupe_BAO_QueryBuilder {
     }
   }
 };
-
-
-

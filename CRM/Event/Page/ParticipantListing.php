@@ -96,4 +96,3 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
     $participantListingClass->run();
   }
 }
-

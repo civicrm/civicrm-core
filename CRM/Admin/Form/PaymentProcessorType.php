@@ -245,4 +245,3 @@ UPDATE civicrm_payment_processor SET is_default = 0";
     $dao->save();
   }
 }
-

@@ -390,4 +390,3 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
     return '';
   }
 }
-

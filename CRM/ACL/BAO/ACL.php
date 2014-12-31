@@ -970,4 +970,3 @@ ORDER BY a.object_id
     $acl->delete();
   }
 }
-

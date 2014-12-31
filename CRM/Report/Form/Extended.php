@@ -1423,4 +1423,3 @@ WHERE   line_item_civireport.id IS NOT NULL
     return $paymentInstruments[$value];
   }
 }
-

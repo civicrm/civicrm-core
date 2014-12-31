@@ -59,4 +59,3 @@ class CRM_Event_Badge_Simple extends CRM_Event_Badge {
     //$this->pdf->MultiCell ($this->pdf->width, $this->pdf->lineHeight, $txt,1,"L");
   }
 }
-

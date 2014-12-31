@@ -203,4 +203,3 @@ class CRM_Core_State {
     return $this->_type;
   }
 }
-

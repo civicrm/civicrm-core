@@ -276,4 +276,3 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@id='event_status_id']//div[@id='option11_wrapper']/table/tbody//tr/td[1]/a[text()='$eventTitle']");
   }
 }
-

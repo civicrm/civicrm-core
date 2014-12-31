@@ -501,4 +501,3 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.crm-summary-display_name', "$firstName adv$firstName");
   }
 }
-

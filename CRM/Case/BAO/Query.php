@@ -772,4 +772,3 @@ case_relation_type.id = case_relationship.relationship_type_id )";
    */
   public static function searchAction(&$row, $id) {}
 }
-

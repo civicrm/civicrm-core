@@ -56,4 +56,3 @@ class WebTest_AllTests extends CiviTestSuite {
     return $inst->implSuite(__FILE__);
   }
 }
-

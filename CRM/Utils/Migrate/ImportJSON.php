@@ -301,4 +301,3 @@ WHERE entity_table = '{$tableName}'
     }
   }
 }
-

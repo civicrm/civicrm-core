@@ -125,4 +125,3 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
     $this->_transport->delete($nr);
   }
 }
-

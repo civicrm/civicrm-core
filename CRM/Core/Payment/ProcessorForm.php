@@ -114,4 +114,3 @@ class CRM_Core_Payment_ProcessorForm {
     CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, empty($form->_isBillingAddressRequiredForPayLater));
   }
 }
-

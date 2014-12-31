@@ -375,4 +375,3 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     }
   }
 }
-

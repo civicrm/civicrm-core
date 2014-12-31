@@ -63,4 +63,3 @@ class CRM_Event_Controller_Registration extends CRM_Core_Controller {
   }
 
 }
-

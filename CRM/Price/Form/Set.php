@@ -292,4 +292,3 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     }
   }
 }
-

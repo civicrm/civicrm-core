@@ -291,4 +291,3 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     }
   }
 }
-

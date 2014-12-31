@@ -517,4 +517,3 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
   }
 
 }
-

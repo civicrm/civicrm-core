@@ -366,7 +366,3 @@ WHERE  $whereClause
     }
   }
 }
-
-
-
-

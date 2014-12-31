@@ -1863,4 +1863,3 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     return TRUE;
   }
 }
-

@@ -116,4 +116,3 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
   }
 
 }
-

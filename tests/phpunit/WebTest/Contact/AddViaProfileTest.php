@@ -64,4 +64,3 @@ class WebTest_Contact_AddViaProfileTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.msg-text', "Your information has been saved.");
   }
 }
-

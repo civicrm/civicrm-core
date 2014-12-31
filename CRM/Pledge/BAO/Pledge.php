@@ -1121,4 +1121,3 @@ SELECT  pledge.contact_id              as contact_id,
     return array_diff(array_flip($paymentStatus), self::getNonTransactionalStatus());
   }
 }
-

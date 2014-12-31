@@ -246,4 +246,3 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
     $this->assertEquals('CRM_Core_Payment_APITest_12', $result['values'][$result['id']]['class_name'], ' in line ' . __LINE__);
   }
 }
-

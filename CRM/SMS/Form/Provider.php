@@ -190,4 +190,3 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
     }
   }
 }
-

@@ -87,4 +87,3 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
     CRM_Core_Session::setStatus($status, '', 'info');
   }
 }
-

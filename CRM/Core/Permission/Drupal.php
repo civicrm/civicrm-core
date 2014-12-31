@@ -163,4 +163,3 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
     return $_cache[$permissionName];
   }
 }
-

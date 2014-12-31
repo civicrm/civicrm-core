@@ -119,4 +119,3 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isChecked("name=case_owner value=2"), 'Drilldown on dashboard summary cells not properly setting search form value to my cases.');
   }
 }
-

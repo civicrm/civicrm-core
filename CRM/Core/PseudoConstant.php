@@ -1861,4 +1861,3 @@ WHERE  id = %1
     return self::$taxRates;
   }
 }
-

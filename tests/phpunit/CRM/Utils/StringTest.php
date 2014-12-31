@@ -157,4 +157,3 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   }
 
 }
-

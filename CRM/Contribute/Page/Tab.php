@@ -463,4 +463,3 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     $session->pushUserContext($url);
   }
 }
-

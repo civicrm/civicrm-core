@@ -470,4 +470,3 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "has been updated");
   }
 }
-

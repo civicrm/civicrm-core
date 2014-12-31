@@ -336,4 +336,3 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
     return $params;
   }
 }
-

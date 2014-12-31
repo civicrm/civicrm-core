@@ -207,4 +207,3 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
     }
   }
 }
-

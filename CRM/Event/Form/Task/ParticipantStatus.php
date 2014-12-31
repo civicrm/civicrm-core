@@ -58,4 +58,3 @@ class CRM_Event_Form_Task_ParticipantStatus extends CRM_Event_Form_Task_Batch {
     parent::buildQuickForm();
   }
 }
-

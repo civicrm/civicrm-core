@@ -320,4 +320,3 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     return $extensionRow;
   }
 }
-

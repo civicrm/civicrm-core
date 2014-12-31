@@ -657,4 +657,3 @@ WHERE  gcc.group_id = {$ssGroup->id}
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
 }
-

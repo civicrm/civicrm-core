@@ -190,4 +190,3 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     return array("custom_{$customFieldId}", $customField, $customGroupTitle);
   }
 }
-

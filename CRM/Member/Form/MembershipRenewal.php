@@ -829,4 +829,3 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
   }
 }
-

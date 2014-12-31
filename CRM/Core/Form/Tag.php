@@ -186,4 +186,3 @@ class CRM_Core_Form_Tag {
     }
   }
 }
-

@@ -343,5 +343,3 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   }
 
 }
-
-

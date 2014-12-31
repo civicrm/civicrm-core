@@ -391,4 +391,3 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     }
   }
 }
-

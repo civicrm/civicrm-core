@@ -535,4 +535,3 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     return parent::getOperationPair($type, $fieldName);
   }
 }
-

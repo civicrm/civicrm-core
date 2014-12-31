@@ -319,4 +319,3 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
     else return $this->event->parent_event_id == $parent_event_id;
   }
 }
-

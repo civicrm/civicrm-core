@@ -166,4 +166,3 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
     return ts('Premiums');
   }
 }
-

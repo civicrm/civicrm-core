@@ -251,4 +251,3 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
     $params['statusMsg'] = ts('Case Start Date changed successfully.');
   }
 }
-

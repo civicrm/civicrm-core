@@ -171,4 +171,3 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
     $this->assign('errorMessages', empty($errorMessages) ? FALSE : $errorMessages);
   }
 }
-

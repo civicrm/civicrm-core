@@ -162,4 +162,3 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
     }
   }
 }
-

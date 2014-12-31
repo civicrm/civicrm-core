@@ -219,5 +219,3 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
     $controller->run();
   }
 }
-
-

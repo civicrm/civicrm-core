@@ -395,4 +395,3 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   public function fini() {}
 
 }
-

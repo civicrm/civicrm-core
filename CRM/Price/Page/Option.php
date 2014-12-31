@@ -318,4 +318,3 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     return parent::run();
   }
 }
-

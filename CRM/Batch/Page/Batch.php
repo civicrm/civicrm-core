@@ -119,4 +119,3 @@ class CRM_Batch_Page_Batch extends CRM_Core_Page_Basic {
     $form->run();
   }
 }
-

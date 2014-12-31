@@ -105,4 +105,3 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
     return FALSE;
   }
 }
-

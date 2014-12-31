@@ -39,4 +39,3 @@ class CRM_Event_Page_ParticipantListing_Name extends CRM_Event_Page_ParticipantL
     parent::preProcess();
   }
 }
-

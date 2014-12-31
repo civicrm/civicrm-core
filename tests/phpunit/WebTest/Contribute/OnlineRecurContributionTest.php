@@ -153,4 +153,3 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
     }
   }
 }
-

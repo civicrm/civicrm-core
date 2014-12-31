@@ -172,5 +172,3 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     ContributionPage::delete($contributionpage->id);
   }
 }
-
-

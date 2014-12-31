@@ -52,4 +52,3 @@ function smarty_modifier_crmAddClass($string, $class) {
   }
   return $string;
 }
-

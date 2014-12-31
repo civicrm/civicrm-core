@@ -268,4 +268,3 @@ WHERE cpse.id IS NOT NULL {$where}";
     CRM_Core_DAO::executeQuery($sql, $params);
   }
 }
-

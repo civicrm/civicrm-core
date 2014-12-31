@@ -97,4 +97,3 @@ class CRM_Mailing_Controller_Send extends CRM_Core_Controller {
     );
   }
 }
-

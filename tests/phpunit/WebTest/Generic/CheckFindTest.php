@@ -44,4 +44,3 @@ class WebTest_Generic_CheckFindTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("search-status"));
   }
 }
-

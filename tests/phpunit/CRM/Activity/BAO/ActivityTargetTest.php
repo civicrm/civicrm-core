@@ -69,4 +69,3 @@ class CRM_Activity_BAO_ActivityTargetTest extends CiviUnitTestCase {
     $this->assertEquals($targetIDs[0], $activity['target_contact_id'], 'The returned target contacts ids match');
   }
 }
-

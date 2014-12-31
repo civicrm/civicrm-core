@@ -74,4 +74,3 @@ class CRM_Contact_Form_Edit_OpenID {
     $form->addElement('radio', "openid[$blockId][is_primary]", '', '', '1', $js);
   }
 }
-

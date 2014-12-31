@@ -212,4 +212,3 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     return $pageId;
   }
 }
-

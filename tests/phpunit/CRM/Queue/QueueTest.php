@@ -278,4 +278,3 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $queue2->releaseItem($item);
   }
 }
-

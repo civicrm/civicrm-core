@@ -211,4 +211,3 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: id');
   }
 }
-

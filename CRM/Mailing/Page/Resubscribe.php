@@ -41,4 +41,3 @@ class CRM_Mailing_Page_Resubscribe extends CRM_Mailing_Page_Common {
     return parent::run();
   }
 }
-

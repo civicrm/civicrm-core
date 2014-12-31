@@ -324,4 +324,3 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
     }
   }
 }
-

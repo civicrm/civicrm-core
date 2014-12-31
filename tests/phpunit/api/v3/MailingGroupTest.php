@@ -185,4 +185,3 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
     $this->contactDelete($contactID);
   }
 }
-

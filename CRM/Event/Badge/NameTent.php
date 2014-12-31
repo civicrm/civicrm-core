@@ -88,4 +88,3 @@ class CRM_Event_Badge_NameTent extends CRM_Event_Badge {
     $this->pdf->StopTransform();
   }
 }
-

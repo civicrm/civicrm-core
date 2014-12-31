@@ -49,4 +49,3 @@ class CRM_Upgrade_Incremental_php_FourZero {
     // do nothing, db is already upgraded to 3.4.alpha1.
   }
 }
-

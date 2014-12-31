@@ -215,4 +215,3 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
     return 'reset=1';
   }
 }
-

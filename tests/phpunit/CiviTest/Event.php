@@ -43,6 +43,3 @@ class Event extends PHPUnit_Framework_Testcase {
     return CRM_Event_BAO_Event::del($eventId);
   }
 }
-
-
-

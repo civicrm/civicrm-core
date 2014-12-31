@@ -138,4 +138,3 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
   }
 
 }
-

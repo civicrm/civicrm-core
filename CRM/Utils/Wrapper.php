@@ -115,4 +115,3 @@ class CRM_Utils_Wrapper {
     return $this->_controller->run();
   }
 }
-

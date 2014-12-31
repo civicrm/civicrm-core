@@ -255,4 +255,3 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
     return ts('Approve/Reject Mailing');
   }
 }
-

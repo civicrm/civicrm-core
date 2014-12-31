@@ -148,4 +148,3 @@ class CRM_Admin_Page_PdfFormats extends CRM_Core_Page_Basic {
     $this->assign('rows', $pdfFormatList);
   }
 }
-

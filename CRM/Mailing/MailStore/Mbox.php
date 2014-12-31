@@ -108,4 +108,3 @@ class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
     $this->_leftToProcess--;
   }
 }
-

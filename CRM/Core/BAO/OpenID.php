@@ -146,4 +146,3 @@ ORDER BY
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('OpenID', $id);
   }
 }
-

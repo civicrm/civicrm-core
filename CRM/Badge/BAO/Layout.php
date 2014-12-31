@@ -176,4 +176,3 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
     return json_decode($jsonData, true);
   }
 }
-

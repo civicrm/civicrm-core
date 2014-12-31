@@ -169,4 +169,3 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData(array('Campaign' => $campaignTitle));
   }
 }
-

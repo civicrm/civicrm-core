@@ -858,4 +858,3 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     return $this->processContribution($params);
   }
 }
-

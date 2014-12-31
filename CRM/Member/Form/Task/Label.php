@@ -142,4 +142,3 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
     CRM_Utils_System::civiExit(1);
   }
 }
-

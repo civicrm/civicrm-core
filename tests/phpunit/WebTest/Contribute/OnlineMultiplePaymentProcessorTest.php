@@ -200,4 +200,3 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
     $this->click('_qf_ContributionView_cancel-bottom');
   }
 }
-

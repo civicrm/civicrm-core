@@ -120,4 +120,3 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
     $this->assertEquals(count($assignees), 1, '1 assignee names retrieved');
   }
 }
-

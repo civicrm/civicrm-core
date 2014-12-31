@@ -488,4 +488,3 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     return $processorResponse;
   }
 }
-

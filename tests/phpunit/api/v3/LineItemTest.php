@@ -100,4 +100,3 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
   }
 
 }
-

@@ -342,4 +342,3 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
   }
 
 }
-

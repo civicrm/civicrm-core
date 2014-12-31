@@ -249,4 +249,3 @@ Class CRM_Core_Form_Date {
   }
 
 }
-

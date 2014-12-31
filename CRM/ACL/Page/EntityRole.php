@@ -221,4 +221,3 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
     return 'civicrm/acl/entityrole';
   }
 }
-

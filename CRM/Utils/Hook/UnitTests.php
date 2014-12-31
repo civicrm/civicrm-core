@@ -106,4 +106,3 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
     }
   }
 }
-

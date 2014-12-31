@@ -578,4 +578,3 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
     }
   }
 }
-

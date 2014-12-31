@@ -504,4 +504,3 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('DataTables_Table_0', 'Household Member of');
   }
 }
-

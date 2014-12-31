@@ -759,4 +759,3 @@ SELECT id
     return ts('Amounts');
   }
 }
-

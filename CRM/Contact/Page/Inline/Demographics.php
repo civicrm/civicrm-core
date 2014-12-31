@@ -74,4 +74,3 @@ class CRM_Contact_Page_Inline_Demographics extends CRM_Core_Page {
     parent::run();
   }
 }
-

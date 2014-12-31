@@ -79,4 +79,3 @@ class CRM_Pledge_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
     $this->listPledges();
   }
 }
-

@@ -154,4 +154,3 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals(2, $result['count']);
   }
 }
-

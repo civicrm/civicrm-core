@@ -456,4 +456,3 @@ class CRM_Utils_Mail_Incoming {
     );
   }
 }
-

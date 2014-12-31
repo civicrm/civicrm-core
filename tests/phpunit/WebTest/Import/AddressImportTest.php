@@ -313,4 +313,3 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
   }
 
 }
-

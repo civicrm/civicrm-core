@@ -92,4 +92,3 @@ class CRM_Event_Page_DashBoard extends CRM_Core_Page {
     return parent::run();
   }
 }
-

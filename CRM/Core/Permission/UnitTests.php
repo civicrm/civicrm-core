@@ -73,4 +73,3 @@ class CRM_Core_Permission_UnitTests extends CRM_Core_Permission_Base {
     return '( 1 )';
   }
 }
-

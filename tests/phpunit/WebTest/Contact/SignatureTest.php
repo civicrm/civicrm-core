@@ -189,4 +189,3 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     $this->assertTextPresent($signature);
   }
 }
-

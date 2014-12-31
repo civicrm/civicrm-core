@@ -682,4 +682,3 @@ HTACCESS;
     return TRUE;
   }
 }
-

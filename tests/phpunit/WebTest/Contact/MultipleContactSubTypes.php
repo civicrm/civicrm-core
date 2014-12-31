@@ -250,4 +250,3 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     return array($customGroupTitle, $gid);
   }
 }
-

@@ -343,4 +343,3 @@ class CRM_Core_Action {
     return $mask;
   }
 }
-

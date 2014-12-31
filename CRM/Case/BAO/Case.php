@@ -3357,4 +3357,3 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     return CRM_Core_PseudoConstant::get($className, $fieldName, $params, $context);
   }
 }
-

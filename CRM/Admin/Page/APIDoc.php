@@ -64,4 +64,3 @@ class CRM_Admin_Page_APIDoc extends CRM_Core_Page {
     return 'civicrm/api/doc';
   }
 }
-

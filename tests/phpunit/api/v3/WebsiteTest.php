@@ -102,4 +102,3 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
     $this->assertArrayKeyExists('url', $result['values']);
   }
 }
-

@@ -310,4 +310,3 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
     }
   }
 }
-

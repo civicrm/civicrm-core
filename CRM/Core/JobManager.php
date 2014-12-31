@@ -286,4 +286,3 @@ class CRM_Core_JobManager {
 function CRM_Core_JobManager_scheduledJobFatalErrorHandler($message) {
   throw new Exception("{$message['message']}: {$message['code']}");
 }
-

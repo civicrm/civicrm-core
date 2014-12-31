@@ -194,4 +194,3 @@ class CRM_Event_Badge {
     $this->pdf->Output($this->event->title . '.pdf', 'D');
   }
 }
-

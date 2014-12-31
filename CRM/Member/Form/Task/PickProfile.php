@@ -142,4 +142,3 @@ class CRM_Member_Form_Task_PickProfile extends CRM_Member_Form_Task {
     $this->controller->resetPage('Batch');
   }
 }
-

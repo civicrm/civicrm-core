@@ -119,4 +119,3 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
     $this->click('_qf_GroupContact_next');
   }
 }
-

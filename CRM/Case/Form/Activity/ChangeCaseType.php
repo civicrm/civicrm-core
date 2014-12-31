@@ -198,4 +198,3 @@ class CRM_Case_Form_Activity_ChangeCaseType {
     $params['statusMsg'] = ts('Case Type changed successfully.');
   }
 }
-

@@ -340,4 +340,3 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
     return $this->relationshipTypeCreate($params);
   }
 }
-

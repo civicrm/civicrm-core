@@ -123,4 +123,3 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', 'Label already exists in Database.');
   }
 }
-

@@ -154,4 +154,3 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
   }
 
 }
-

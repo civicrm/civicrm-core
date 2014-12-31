@@ -357,4 +357,3 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
     }
   }
 }
-

@@ -2314,4 +2314,3 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
     return $multipleGroup;
   }
 }
-

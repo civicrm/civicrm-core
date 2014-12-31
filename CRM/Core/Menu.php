@@ -744,4 +744,3 @@ UNION (
     return $arr;
   }
 }
-

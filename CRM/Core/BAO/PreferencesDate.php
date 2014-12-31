@@ -90,4 +90,3 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
     CRM_Core_Error::fatal();
   }
 }
-

@@ -150,4 +150,3 @@ SELECT id
     return $groupID;
   }
 }
-

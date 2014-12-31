@@ -75,4 +75,3 @@ class CRM_Activity_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoar
     $this->listActivities();
   }
 }
-

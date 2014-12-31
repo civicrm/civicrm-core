@@ -158,4 +158,3 @@ class CRM_Core_Lock {
     return TRUE;
   }
 }
-

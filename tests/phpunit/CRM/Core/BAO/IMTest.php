@@ -74,5 +74,3 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
     Contact::delete($contactId);
   }
 }
-
-

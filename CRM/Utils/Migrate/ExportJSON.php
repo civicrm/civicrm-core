@@ -638,4 +638,3 @@ WHERE  date >= $lastExportTime
     // print_r( json_decode( $json ) );
   }
 }
-

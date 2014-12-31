@@ -397,4 +397,3 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     return $updatedStatusId;
   }
 }
-

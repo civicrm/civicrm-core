@@ -356,4 +356,3 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
     return $uri;
   }
 }
-

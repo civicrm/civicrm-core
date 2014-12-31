@@ -682,4 +682,3 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
     return ts('Mailing Content');
   }
 }
-

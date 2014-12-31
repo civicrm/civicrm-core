@@ -462,5 +462,3 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     Contact::delete($contactId);
   }
 }
-
-

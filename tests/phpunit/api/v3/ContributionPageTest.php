@@ -481,4 +481,3 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $unitTest->quickCleanup($tablesToTruncate);
   }
 }
-

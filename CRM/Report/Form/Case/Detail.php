@@ -679,4 +679,3 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     }
   }
 }
-

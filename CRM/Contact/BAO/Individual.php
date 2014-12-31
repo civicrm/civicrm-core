@@ -405,4 +405,3 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     return FALSE;
   }
 }
-

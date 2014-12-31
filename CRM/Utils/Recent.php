@@ -198,4 +198,3 @@ class CRM_Utils_Recent {
     $session->set(self::STORE_NAME, self::$_recent);
   }
 }
-

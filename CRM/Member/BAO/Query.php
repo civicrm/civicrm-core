@@ -497,4 +497,3 @@ class CRM_Member_BAO_Query {
     }
   }
 }
-

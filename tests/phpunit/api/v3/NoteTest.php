@@ -264,4 +264,3 @@ function testNoteCreateExample() {
   $expectedResult = UF_match_get_expectedresult();
   $this->assertEquals($result, $expectedResult);
 }
-

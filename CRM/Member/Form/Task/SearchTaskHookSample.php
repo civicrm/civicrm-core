@@ -86,4 +86,3 @@ WHERE      mem.id IN ( $memberIDs )";
     );
   }
 }
-

@@ -94,4 +94,3 @@ class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
     return $contact;
   }
 }
-

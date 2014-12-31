@@ -51,4 +51,3 @@ class CRM_Contact_Page_Task extends CRM_Core_Page {
     return "Task Results";
   }
 }
-

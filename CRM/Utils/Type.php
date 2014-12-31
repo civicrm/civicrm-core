@@ -348,4 +348,3 @@ class CRM_Utils_Type {
     return NULL;
   }
 }
-

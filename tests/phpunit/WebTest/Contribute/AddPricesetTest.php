@@ -716,4 +716,3 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     }
   }
 }
-

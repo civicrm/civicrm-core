@@ -366,4 +366,3 @@ class CRM_Case_Form_Activity_OpenCase {
     }
   }
 }
-

@@ -651,4 +651,3 @@ INNER JOIN  {$tempTableName} ON ( {$tempTableName}.survey_contact_id = contact.i
     }
   }
 }
-

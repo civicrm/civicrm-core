@@ -368,4 +368,3 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
     return $_advance_search_panes;
   }
 }
-

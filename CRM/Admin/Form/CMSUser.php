@@ -70,4 +70,3 @@ class CRM_Admin_Form_CMSUser extends CRM_Core_Form {
     CRM_Core_BAO_CMSUser::synchronize();
   }
 }
-

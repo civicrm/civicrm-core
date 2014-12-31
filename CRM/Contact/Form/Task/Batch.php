@@ -321,4 +321,3 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
     }
   }
 }
-

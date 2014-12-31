@@ -211,4 +211,3 @@ WHERE t2.id IS NULL {$reservedClause}";
     $this->assign('rows', $values);
   }
 }
-

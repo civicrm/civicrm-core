@@ -267,4 +267,3 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
     }
   }
 }
-

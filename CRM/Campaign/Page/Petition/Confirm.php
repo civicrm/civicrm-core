@@ -129,4 +129,3 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
     $bao->confirmSignature($activity_id, $contact_id, $petition_id);
   }
 }
-

@@ -101,4 +101,3 @@ class CRM_Group_Page_AJAX {
     }
   }
 }
-

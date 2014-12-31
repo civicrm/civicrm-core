@@ -924,4 +924,3 @@ WHERE ($subtypeClause)";
     return CRM_Core_DAO::singleValueQuery($query, array(1 => array($entityID, 'Integer')));
   }
 }
-

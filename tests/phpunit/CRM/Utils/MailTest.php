@@ -58,4 +58,3 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
     }
   }
 }
-

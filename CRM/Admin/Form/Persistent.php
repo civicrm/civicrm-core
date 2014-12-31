@@ -101,4 +101,3 @@ class CRM_Admin_Form_Persistent extends CRM_Core_Form {
     CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/tplstrings', "reset=1"));
   }
 }
-

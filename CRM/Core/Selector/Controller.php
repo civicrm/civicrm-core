@@ -531,4 +531,3 @@ class CRM_Core_Selector_Controller {
     return $this->_dynamicAction;
   }
 }
-

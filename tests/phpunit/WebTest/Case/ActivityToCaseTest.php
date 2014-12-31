@@ -412,4 +412,3 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     return array($radioOptionLabel1, "custom_{$textFieldId}_-1");
   }
 }
-

@@ -235,4 +235,3 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("mainTabContainer");
   }
 }
-

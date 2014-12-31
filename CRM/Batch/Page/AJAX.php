@@ -125,4 +125,3 @@ class CRM_Batch_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 }
-

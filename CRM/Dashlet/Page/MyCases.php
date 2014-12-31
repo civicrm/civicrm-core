@@ -64,4 +64,3 @@ class CRM_Dashlet_Page_MyCases extends CRM_Core_Page {
     return parent::run();
   }
 }
-

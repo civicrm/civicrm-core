@@ -383,4 +383,3 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     }
   }
 }
-

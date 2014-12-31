@@ -545,4 +545,3 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals(0, sizeof($activities), 'In line ' . __LINE__);
   }
 }
-

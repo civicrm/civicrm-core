@@ -201,4 +201,3 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
     }
   }
 }
-

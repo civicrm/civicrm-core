@@ -98,4 +98,3 @@ class CRM_Event_StateMachine_Registration extends CRM_Core_StateMachine {
     $this->addSequentialPages($pages, $action);
   }
 }
-

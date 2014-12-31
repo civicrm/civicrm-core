@@ -108,4 +108,3 @@ class CRM_Contact_Form_Edit_Organization {
     return empty($errors) ? TRUE : $errors;
   }
 }
-

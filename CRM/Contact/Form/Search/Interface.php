@@ -106,4 +106,3 @@ interface CRM_Contact_Form_Search_Interface {
    */
   public function &columns();
 }
-

@@ -223,4 +223,3 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
     return CRM_Utils_System::currentPath();
   }
 }
-

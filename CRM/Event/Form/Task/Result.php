@@ -67,4 +67,3 @@ class CRM_Event_Form_Task_Result extends CRM_Event_Form_Task {
     CRM_Utils_System::redirect($url);
   }
 }
-

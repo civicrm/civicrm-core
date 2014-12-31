@@ -138,4 +138,3 @@ SET mr.mailing_id = $newMailingID
   }
 
 }
-

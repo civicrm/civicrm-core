@@ -211,4 +211,3 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows, $fieldMapper);
   }
 }
-

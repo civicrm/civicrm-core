@@ -183,4 +183,3 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     $result = $this->callAPIFailure('domain', 'create', array());
   }
 }
-

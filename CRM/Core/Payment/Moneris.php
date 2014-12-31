@@ -349,4 +349,3 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
     }
   }
 }
-

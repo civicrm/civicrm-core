@@ -483,4 +483,3 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     $parser->set($this);
   }
 }
-

@@ -714,4 +714,3 @@ AND    cf.id IN ( $fieldIDList )
     }
   }
 }
-

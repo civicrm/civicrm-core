@@ -201,4 +201,3 @@ class api_v3_TagTest extends CiviUnitTestCase {
     $this->assertEquals($this->tag['used_for'], $result['values'][0]['extra']['used_for'], 'In line ' . __LINE__);
   }
 }
-

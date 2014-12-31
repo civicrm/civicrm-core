@@ -618,4 +618,3 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     );
   }
 }
-

@@ -371,4 +371,3 @@ abstract class CRM_Core_Component_Info {
     return new $className();
   }
 }
-

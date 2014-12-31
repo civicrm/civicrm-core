@@ -500,4 +500,3 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
    */
   public function fini() {}
 }
-

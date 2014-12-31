@@ -504,4 +504,3 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
 }
-

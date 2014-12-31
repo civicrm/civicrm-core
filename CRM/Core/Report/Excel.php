@@ -219,4 +219,3 @@ class CRM_Core_Report_Excel {
   }
 
 }
-

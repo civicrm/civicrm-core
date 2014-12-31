@@ -360,4 +360,3 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Tell-a-Friend Email");
   }
 }
-

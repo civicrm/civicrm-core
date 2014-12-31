@@ -202,4 +202,3 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     echo CRM_Utils_System::theme($content, $this->_print, TRUE);
   }
 }
-

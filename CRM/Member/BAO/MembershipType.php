@@ -777,4 +777,3 @@ AND cps.is_quick_config = 1 AND cps.name != 'default_membership_type_amount'";
     CRM_Core_DAO::executeQuery($query, $queryParams);
   }
 }
-

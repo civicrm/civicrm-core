@@ -111,4 +111,3 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
     }
   }
 }
-

@@ -168,4 +168,3 @@ class CRM_Utils_PagerAToZ {
     return $aToZBar;
   }
 }
-

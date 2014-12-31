@@ -175,4 +175,3 @@ class CRM_Event_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
   }
 }
-

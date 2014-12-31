@@ -48,4 +48,3 @@ class WebTest_Release_UpgradeScript extends WebTest_Release_ReleaseTestCase {
     $this->waitForTextPresent("CiviCRM upgrade was successful.");
   }
 }
-

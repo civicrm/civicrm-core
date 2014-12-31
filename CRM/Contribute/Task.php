@@ -219,4 +219,3 @@ class CRM_Contribute_Task {
     );
   }
 }
-

@@ -161,4 +161,3 @@ class CRM_Grant_Task {
     );
   }
 }
-

@@ -84,4 +84,3 @@ class CRM_Contact_Page_Inline_Phone extends CRM_Core_Page {
     parent::run();
   }
 }
-

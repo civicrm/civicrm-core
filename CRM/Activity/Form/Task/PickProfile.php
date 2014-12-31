@@ -170,4 +170,3 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
     $this->controller->resetPage('Batch');
   }
 }
-

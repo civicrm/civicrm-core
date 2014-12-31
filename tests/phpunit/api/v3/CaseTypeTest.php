@@ -229,4 +229,3 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
     $this->assertEquals(0, $getCaseType['count']);
   }
 }
-

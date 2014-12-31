@@ -664,4 +664,3 @@ ORDER BY   gc.contact_id, g.children
   }
 
 }
-

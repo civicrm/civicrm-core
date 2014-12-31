@@ -328,4 +328,3 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
     }
   }
 }
-

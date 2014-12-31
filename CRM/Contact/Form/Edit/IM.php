@@ -77,4 +77,3 @@ class CRM_Contact_Form_Edit_IM {
     $form->addElement('radio', "im[$blockId][is_primary]", '', '', '1', $js);
   }
 }
-

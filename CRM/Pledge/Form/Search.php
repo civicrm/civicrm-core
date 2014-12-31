@@ -423,4 +423,3 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
     return ts('Find Pledges');
   }
 }
-

@@ -83,4 +83,3 @@ class WebTest_Generic_CheckActivityTest extends CiviSeleniumTestCase {
     $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']","$contactFirstName2");
   }
 }
-

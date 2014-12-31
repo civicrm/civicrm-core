@@ -75,4 +75,3 @@ function civicrm_smarty_register_string_resource() {
     )
   );
 }
-

@@ -290,4 +290,3 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     CRM_Contribute_BAO_Contribution_Utils::createCMSUser($params, $contactID, 'email');
   }
 }
-

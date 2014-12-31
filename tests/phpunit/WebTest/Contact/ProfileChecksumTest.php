@@ -185,4 +185,3 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     return $profileId;
   }
 }
-

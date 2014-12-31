@@ -98,4 +98,3 @@ class CRM_Mailing_MailStore_Pop3 extends CRM_Mailing_MailStore {
     $this->_transport->delete($nr);
   }
 }
-

@@ -108,4 +108,3 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
     $this->callHook($info, 'enable');
   }
 }
-

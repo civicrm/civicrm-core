@@ -64,4 +64,3 @@ class CRM_Batch_Form_Search extends CRM_Core_Form {
     $this->assign('suppressForm', TRUE);
   }
 }
-

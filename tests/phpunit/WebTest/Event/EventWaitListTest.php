@@ -241,4 +241,3 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     }
   }
 }
-

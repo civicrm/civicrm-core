@@ -78,4 +78,3 @@ class CRM_Core_I18n_PseudoConstant {
     return substr($long, 0, 2);
   }
 }
-

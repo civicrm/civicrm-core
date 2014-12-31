@@ -410,4 +410,3 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
     }
   }
 }
-

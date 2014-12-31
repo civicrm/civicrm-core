@@ -137,4 +137,3 @@ class CRM_Admin_Form_ParticipantStatus extends CRM_Admin_Form {
     }
   }
 }
-

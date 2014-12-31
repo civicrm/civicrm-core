@@ -836,4 +836,3 @@ class CRM_Utils_Array {
     return $output;
   }
 }
-

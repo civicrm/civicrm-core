@@ -102,4 +102,3 @@ class CRM_Mailing_Page_Preview extends CRM_Core_Page {
     CRM_Utils_System::civiExit();
   }
 }
-

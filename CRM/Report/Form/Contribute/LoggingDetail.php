@@ -55,4 +55,3 @@ class CRM_Report_Form_Contribute_LoggingDetail extends CRM_Logging_ReportDetail 
     $this->assign('backURL', CRM_Report_Utils_Report::getNextUrl('logging/contribute/summary', 'reset=1', FALSE, TRUE));
   }
 }
-

@@ -1135,4 +1135,3 @@ SELECT  id
     return self::$_memberBatchEntryFields;
   }
 }
-

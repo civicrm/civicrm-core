@@ -81,4 +81,3 @@ class CRM_Contribute_Form_SearchContribution extends CRM_Core_Form {
     }
   }
 }
-

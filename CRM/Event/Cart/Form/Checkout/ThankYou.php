@@ -80,4 +80,3 @@ class CRM_Event_Cart_Form_Checkout_ThankYou extends CRM_Event_Cart_Form_Cart {
     //$this->loadParticipants( );
   }
 }
-

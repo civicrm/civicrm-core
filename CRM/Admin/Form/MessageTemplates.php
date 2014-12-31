@@ -236,4 +236,3 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     }
   }
 }
-

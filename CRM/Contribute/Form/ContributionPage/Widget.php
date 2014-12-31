@@ -270,4 +270,3 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
     return ts('Widget Settings');
   }
 }
-

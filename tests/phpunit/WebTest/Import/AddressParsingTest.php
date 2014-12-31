@@ -284,4 +284,3 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 }
-

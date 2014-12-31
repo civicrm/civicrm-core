@@ -223,6 +223,3 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     }
   }
 }
-
-
-

@@ -123,4 +123,3 @@ class CRM_Utils_Address_USPS {
     return TRUE;
   }
 }
-

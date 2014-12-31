@@ -145,4 +145,3 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     }
   }
 }
-

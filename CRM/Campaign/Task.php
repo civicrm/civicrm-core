@@ -157,4 +157,3 @@ class CRM_Campaign_Task {
     );
   }
 }
-

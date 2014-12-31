@@ -281,4 +281,3 @@ AND    time_format <> ''
     @unlink($configFile);
   }
 }
-

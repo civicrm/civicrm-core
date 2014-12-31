@@ -234,4 +234,3 @@ class CRM_Core_Permission_Base {
     return $permissions;
   }
 }
-

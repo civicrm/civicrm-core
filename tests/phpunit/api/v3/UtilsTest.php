@@ -294,4 +294,3 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertEquals('HTML', $result['values']['preferred_mail_format']['options']['HTML']);
   }
 }
-

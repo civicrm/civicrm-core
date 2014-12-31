@@ -827,4 +827,3 @@ ORDER BY parent_id, weight";
     return $key;
   }
 }
-

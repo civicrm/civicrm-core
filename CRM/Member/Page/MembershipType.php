@@ -169,4 +169,3 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
     $this->assign('rows', $membershipType);
   }
 }
-

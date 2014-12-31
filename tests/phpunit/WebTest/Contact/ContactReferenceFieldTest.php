@@ -173,4 +173,3 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("css=div.select2-result-label", "{$org1}@example.com");
   }
 }
-

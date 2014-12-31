@@ -89,4 +89,3 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
   }
 
 }
-

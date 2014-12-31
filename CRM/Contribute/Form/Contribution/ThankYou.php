@@ -284,4 +284,3 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->controller->reset();
   }
 }
-

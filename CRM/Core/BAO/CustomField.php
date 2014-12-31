@@ -2462,4 +2462,3 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
     return ($field['html_type'] == 'CheckBox' || strpos($field['html_type'], 'Multi') !== FALSE);
   }
 }
-

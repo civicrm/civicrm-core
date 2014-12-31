@@ -269,4 +269,3 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     $this->assertEquals('20140510000000', $date);
   }
 }
-

@@ -204,4 +204,3 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity,'delete', array('id' => $result2['id']));
   }
 }
-

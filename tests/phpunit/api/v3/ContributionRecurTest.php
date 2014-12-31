@@ -90,4 +90,3 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
     $this->assertEquals(12, $result['values']['start_date']['type']);
   }
 }
-

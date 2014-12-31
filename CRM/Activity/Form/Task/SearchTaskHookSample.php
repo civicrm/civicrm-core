@@ -94,4 +94,3 @@ INNER JOIN civicrm_contact ct ON ( ac.contact_id = ct.id )
     );
   }
 }
-

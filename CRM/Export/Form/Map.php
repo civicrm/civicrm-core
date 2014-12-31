@@ -249,4 +249,3 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
     return ts('Select Fields to Export');
   }
 }
-

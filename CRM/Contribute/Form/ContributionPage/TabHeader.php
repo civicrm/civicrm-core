@@ -212,4 +212,3 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
     return $current;
   }
 }
-

@@ -181,4 +181,3 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
   }
 
 }
-

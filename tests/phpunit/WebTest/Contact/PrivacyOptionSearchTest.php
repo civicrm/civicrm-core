@@ -165,4 +165,3 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("$lname2, $fname2"));
   }
 }
-

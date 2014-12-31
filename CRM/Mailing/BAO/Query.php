@@ -478,4 +478,3 @@ class CRM_Mailing_BAO_Query {
     $query->_tables[$tableName] = $query->_whereTables[$tableName] = 1;
   }
 }
-

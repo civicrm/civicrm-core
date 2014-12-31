@@ -227,4 +227,3 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     }
   }
 }
-

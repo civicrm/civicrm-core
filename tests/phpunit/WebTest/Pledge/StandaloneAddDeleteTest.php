@@ -136,4 +136,3 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
 
   }
 }
-

@@ -103,4 +103,3 @@ ORDER By  v.weight
     return $this->browse();
   }
 }
-

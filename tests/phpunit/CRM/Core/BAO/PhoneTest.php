@@ -116,4 +116,3 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
    */
   public function SKIPPED_testAllEntityPhones() {}
 }
-

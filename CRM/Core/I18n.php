@@ -520,4 +520,3 @@ function ts($text, $params = array()) {
     return $i18n->crm_translate($text, $params);
   }
 }
-

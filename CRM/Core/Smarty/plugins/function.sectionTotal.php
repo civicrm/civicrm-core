@@ -77,4 +77,3 @@ function smarty_function_sectionTotal($params, &$smarty) {
   // return the corresponding total
   return $smarty->_tpl_vars['sectionTotals'][$totalsKey];
 }
-

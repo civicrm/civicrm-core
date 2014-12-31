@@ -419,4 +419,3 @@ class CRM_Core_Page {
     $this->$name = $value;
   }
 }
-

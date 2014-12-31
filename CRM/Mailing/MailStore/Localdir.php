@@ -146,4 +146,3 @@ class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
     }
   }
 }
-

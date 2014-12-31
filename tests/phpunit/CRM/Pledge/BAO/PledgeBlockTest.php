@@ -174,4 +174,3 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
     $this->assertEquals($pledgeBlock->id, $getPledgeBlock['id']);
   }
 }
-

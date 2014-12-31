@@ -146,4 +146,3 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
     return empty($errors) ? TRUE : $errors;
   }
 }
-

@@ -664,4 +664,3 @@ class CRM_Activity_BAO_Query {
     return $matches[0];
   }
 }
-

@@ -485,4 +485,3 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     return $val;
   }
 }
-

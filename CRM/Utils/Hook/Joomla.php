@@ -119,4 +119,3 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
     }
   }
 }
-

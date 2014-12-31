@@ -99,4 +99,3 @@ class CRM_Mailing_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 }
-

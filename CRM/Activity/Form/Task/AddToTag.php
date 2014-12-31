@@ -155,4 +155,3 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
 
   }
 }
-

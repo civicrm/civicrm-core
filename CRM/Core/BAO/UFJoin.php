@@ -178,4 +178,3 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
     return array($first, $second, $firstActive, $secondActive);
   }
 }
-

@@ -199,4 +199,3 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
     CRM_Contact_BAO_GroupContact::removeContactsFromGroup($ids, $groupId, $method, $groupStatus);
   }
 }
-

@@ -63,5 +63,3 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $this->assertEquals($result, 10, 'Verify financial trxn total_amount.');
   }
 }
-
-

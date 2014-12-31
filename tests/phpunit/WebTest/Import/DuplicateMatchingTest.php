@@ -486,4 +486,3 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 }
-

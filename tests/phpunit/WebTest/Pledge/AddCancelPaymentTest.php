@@ -122,4 +122,3 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
 
   }
 }
-

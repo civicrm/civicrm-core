@@ -449,4 +449,3 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->enableDisablePopups(TRUE);
   }
 }
-

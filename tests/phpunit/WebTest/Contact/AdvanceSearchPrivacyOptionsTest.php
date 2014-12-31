@@ -229,4 +229,3 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
 
   }
 }
-

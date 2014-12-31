@@ -734,4 +734,3 @@ class CRM_Utils_String {
     return str_replace('&amp;', '&', $htmlUrl);
   }
 }
-

@@ -142,6 +142,3 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     }
   }
 }
-
-
-

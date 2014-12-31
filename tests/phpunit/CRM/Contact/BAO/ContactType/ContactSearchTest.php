@@ -307,6 +307,3 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
     $this->assertEquals(empty($result['values']), TRUE, 'In line ' . __LINE__);
   }
 }
-
-
-

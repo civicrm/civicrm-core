@@ -656,4 +656,3 @@ WHERE  v.option_group_id = g.id
     CRM_Utils_Cache::singleton()->flush();
   }
 }
-

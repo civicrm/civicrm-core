@@ -432,4 +432,3 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
 }
-

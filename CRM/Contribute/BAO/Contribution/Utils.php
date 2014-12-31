@@ -895,4 +895,3 @@ LIMIT 1
     return $taxAmount;
   }
 }
-

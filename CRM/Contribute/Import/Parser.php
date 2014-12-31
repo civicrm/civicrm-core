@@ -659,4 +659,3 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
     return $fileName;
   }
 }
-

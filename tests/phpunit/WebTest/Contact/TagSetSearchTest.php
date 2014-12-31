@@ -157,4 +157,3 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     return $tagid;
   }
 }
-

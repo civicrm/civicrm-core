@@ -124,4 +124,3 @@ class CRM_Activity_Import_Field {
     return TRUE;
   }
 }
-

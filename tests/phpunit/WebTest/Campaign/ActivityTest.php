@@ -206,4 +206,3 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//form[@id='Activity']/div[2]/table/tbody/tr[5]/td[2]/span", $campaignTitle);
   }
 }
-

@@ -300,4 +300,3 @@ WHERE cog.name = 'payment_instrument' ";
     return $titles;
   }
 }
-

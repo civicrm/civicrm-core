@@ -532,4 +532,3 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->assertEquals('Unconfirmed', $result['values'][$dom['id']]['tag_unconfirmed']);
   }
 }
-

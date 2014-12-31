@@ -193,4 +193,3 @@ class CRM_Member_Import_Form_DataSource extends CRM_Core_Form {
     return ts('Upload Data');
   }
 }
-

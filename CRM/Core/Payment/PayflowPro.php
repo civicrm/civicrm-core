@@ -703,4 +703,3 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     //RT0000000001
   }
 }
-

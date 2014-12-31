@@ -134,4 +134,3 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
     return $defaults;
   }
 }
-

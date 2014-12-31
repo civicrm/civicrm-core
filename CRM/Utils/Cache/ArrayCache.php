@@ -50,4 +50,3 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
     $this->_cache = array();
   }
 }
-

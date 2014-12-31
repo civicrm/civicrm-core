@@ -159,4 +159,3 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
     return 'civicrm/admin/options/subtype';
   }
 }
-
