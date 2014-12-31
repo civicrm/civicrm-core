@@ -446,6 +446,8 @@ abstract class CRM_Core_Payment {
     if (is_a($result, 'CRM_Core_Error')) {
       throw new CRM_Core_Exception(CRM_Core_Error::getMessages($result));
     }
+    //CRM-15767 - Submit Credit Card Contribution not being saved
+    return $result;
   }
 
   /**
