@@ -35,7 +35,7 @@ class WebTest_Contact_UpdateProfileTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testUpdateProfile() {
+  public function testUpdateProfile() {
     // Create new via profile
     include_once ('WebTest/Contact/AddViaProfileTest.php');
     WebTest_Contact_AddViaProfileTest::testAddViaCreateProfile();

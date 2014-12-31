@@ -37,14 +37,13 @@ class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
    * The task that the wizard is currently processing
    *
    * @var string
-   * @protected
    */
   protected $_task;
 
   /**
    * Class constructor
    */
-  function __construct($controller, $action = CRM_Core_Action::NONE) {
+  public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
     $this->_pages = array();
@@ -75,9 +74,8 @@ class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
    * @param string $formName
    *
    * @return string the name of the form that will handle the task
-   * @access protected
    */
-  function taskName($controller, $formName = 'Search') {
+  public function taskName($controller, $formName = 'Search') {
     // total hack, check POST vars and then session to determine stuff
     $value = CRM_Utils_Array::value('task', $_POST);
     if (!isset($value)) {
@@ -91,9 +89,8 @@ class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
    * Return the form name of the task
    *
    * @return string
-   * @access public
    */
-  function getTaskFormName() {
+  public function getTaskFormName() {
     return CRM_Utils_String::getClassName($this->_task);
   }
 
@@ -109,8 +106,7 @@ class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
   /**
    * @return bool
    */
-  function shouldReset() {
+  public function shouldReset() {
     return FALSE;
   }
 }
-

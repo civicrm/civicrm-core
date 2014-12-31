@@ -12,7 +12,7 @@ class CRM_Core_CodeGen_Util_Template {
   /**
    * @param string $filetype
    */
-  function __construct($filetype) {
+  public function __construct($filetype) {
     $this->filetype = $filetype;
 
     $this->smarty = CRM_Core_CodeGen_Util_Smarty::singleton()->getSmarty();
@@ -42,7 +42,7 @@ class CRM_Core_CodeGen_Util_Template {
    * @param array $inputs template filenames
    * @param string $outpath full path to the desired output file
    */
-  function runConcat($inputs, $outpath) {
+  public function runConcat($inputs, $outpath) {
     if (file_exists($outpath)) {
       unlink($outpath);
     }
@@ -56,7 +56,7 @@ class CRM_Core_CodeGen_Util_Template {
    * @param string $infile filename of the template, without a path
    * @param string $outpath full path to the desired output file
    */
-  function run($infile, $outpath) {
+  public function run($infile, $outpath) {
     $renderedContents = $this->smarty->fetch($infile);
 
     if ($this->filetype === 'php') {
@@ -73,7 +73,7 @@ class CRM_Core_CodeGen_Util_Template {
    * @param $key
    * @param $value
    */
-  function assign($key, $value) {
+  public function assign($key, $value) {
     $this->smarty->assign_by_ref($key, $value);
   }
 

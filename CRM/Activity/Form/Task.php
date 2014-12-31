@@ -80,9 +80,8 @@ class CRM_Activity_Form_Task extends CRM_Core_Form {
    * @param
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     self::preProcessCommon($this);
   }
 
@@ -90,7 +89,7 @@ class CRM_Activity_Form_Task extends CRM_Core_Form {
    * @param CRM_Core_Form $form
    * @param bool $useTable
    */
-  static function preProcessCommon(&$form, $useTable = FALSE) {
+  public static function preProcessCommon(&$form, $useTable = FALSE) {
     $form->_activityHolderIds = array();
 
     $values = $form->controller->exportValues($form->get('searchFormName'));
@@ -181,9 +180,8 @@ WHERE  activity_id IN ( $IDs ) AND
    * @param bool $submitOnce
    *
    * @return void
-   * @access public
    */
-  function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
+  public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(
         array(
           'type' => $nextType,
@@ -198,4 +196,3 @@ WHERE  activity_id IN ( $IDs ) AND
     );
   }
 }
-

@@ -35,7 +35,7 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
     parent::setUp();
   }
 
-  function testSeperateMembershipCreate() {
+  public function testSeperateMembershipCreate() {
     // a random 7-char string and an even number to make this pass unique
     $hash = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(2, 50);
@@ -148,7 +148,7 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
    * @param int $memTypeId
    * @param int $cid
    */
-  function _testOnlineMembershipSignup($pageId, $memTypeId, $cid = NULL) {
+  public function _testOnlineMembershipSignup($pageId, $memTypeId, $cid = NULL) {
     //Open Live Contribution Page
     $args = array('reset' => 1, 'id' => $pageId);
     if ($cid) {

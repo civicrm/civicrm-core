@@ -90,9 +90,8 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
     $this->assign('cdType', FALSE);
     if ($this->_cdType) {
@@ -207,11 +206,10 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if ($this->_action & CRM_Core_Action::DELETE || $this->_action & CRM_Core_Action::RENEW || $this->_cdType) {
       return TRUE;
     }
@@ -300,11 +298,10 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   /**
    * Add local and global form rules
    *
-   * @access protected
    *
    * @return void
    */
-  function addRules() {
+  public function addRules() {
     if ($this->_action & CRM_Core_Action::DELETE || $this->_action & CRM_Core_Action::RENEW || $this->_cdType) {
       return TRUE;
     }
@@ -323,16 +320,14 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($values, $files, $form) {
+  public static function formRule($values, $files, $form) {
     return TRUE;
   }
 
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -445,4 +440,3 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     CRM_Core_Session::setStatus($params['statusMsg'], ts('Saved'), 'success');
   }
 }
-

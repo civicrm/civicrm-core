@@ -53,10 +53,9 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
    * @param null $entity
    *
    * @return array   $location
-   * @access public
    * @static
    */
-  static function create(&$params, $fixAddress = TRUE, $entity = NULL) {
+  public static function create(&$params, $fixAddress = TRUE, $entity = NULL) {
     $location = array();
     if (!self::dataExists($params)) {
       return $location;
@@ -98,7 +97,7 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
    * Creates the entry in the civicrm_loc_block
    *
    */
-  static function createLocBlock(&$location, &$entityElements) {
+  public static function createLocBlock(&$location, &$entityElements) {
     $locId = self::findExisting($entityElements);
     $locBlock = array();
 
@@ -131,10 +130,9 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
 
   /**
    * Takes an entity array and finds the existing location block
-   * @access public
    * @static
    */
-  static function findExisting($entityElements) {
+  public static function findExisting($entityElements) {
     $eid    = $entityElements['entity_id'];
     $etable = $entityElements['entity_table'];
     $query  = "
@@ -156,10 +154,9 @@ WHERE e.id = %1";
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return object       CRM_Core_BAO_locBlock object on success, null otherwise
-   * @access public
    * @static
    */
-  static function addLocBlock(&$params) {
+  public static function addLocBlock(&$params) {
     $locBlock = new CRM_Core_DAO_LocBlock();
 
     $locBlock->copyValues($params);
@@ -173,7 +170,6 @@ WHERE e.id = %1";
    * @param  int  $locBlockId    id of the Location Block
    *
    * @return void
-   * @access public
    * @static
    */
   public static function deleteLocBlock($locBlockId) {
@@ -216,10 +212,9 @@ WHERE e.id = %1";
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return boolean
-   * @access public
    * @static
    */
-  static function dataExists(&$params) {
+  public static function dataExists(&$params) {
     // return if no data present
     $dataExists = FALSE;
     foreach (self::$blocks as $block) {
@@ -237,10 +232,9 @@ WHERE e.id = %1";
    * @param bool $microformat
    *
    * @return array   array of objects(CRM_Core_BAO_Location)
-   * @access public
    * @static
    */
-  static function &getValues($entityBlock, $microformat = FALSE) {
+  public static function &getValues($entityBlock, $microformat = FALSE) {
     if (empty($entityBlock)) {
       return NULL;
     }
@@ -271,10 +265,9 @@ WHERE e.id = %1";
    * @param  int  $locationTypeId id of the location to delete
    *
    * @return void
-   * @access public
    * @static
    */
-  static function deleteLocationBlocks($contactId, $locationTypeId) {
+  public static function deleteLocationBlocks($contactId, $locationTypeId) {
     // ensure that contactId has a value
     if (empty($contactId) ||
       !CRM_Utils_Rule::positiveInteger($contactId)
@@ -306,7 +299,7 @@ WHERE e.id = %1";
    *
    * @return int  newly created/updated location block id.
    */
-  static function copyLocBlock($locBlockId, $updateLocBlockId = NULL) {
+  public static function copyLocBlock($locBlockId, $updateLocBlockId = NULL) {
     //get the location info.
     $defaults = $updateValues = array();
     $locBlock = array('id' => $locBlockId);
@@ -351,10 +344,9 @@ WHERE e.id = %1";
    *
    * @param  int $contactId - contact id
    *
-   * @access public
    * @static
    */
-  static function checkPrimaryBlocks($contactId) {
+  public static function checkPrimaryBlocks($contactId) {
     if (!$contactId) {
       return;
     }
@@ -395,7 +387,7 @@ WHERE e.id = %1";
    *
    * @return array
    */
-  static function getChainSelectValues($values, $valueType, $flatten = FALSE) {
+  public static function getChainSelectValues($values, $valueType, $flatten = FALSE) {
     if (!$values) {
       return array();
     }
@@ -436,4 +428,3 @@ WHERE e.id = %1";
     return $elements;
   }
 }
-

@@ -45,10 +45,9 @@ class CRM_Contact_Form_Inline_Lock {
    * @param CRM_Core_Form $form form object
    * @param int $contactID
    *
-   * @access public
    * @return void
    */
-  static function buildQuickForm(&$form, $contactID) {
+  public static function buildQuickForm(&$form, $contactID) {
     // We provide a value for oplock_ts to client, but JS uses it carefully
     // -- i.e.  when loading the first inline form, JS copies oplock_ts to a
     // global value, and that global value is used for future form submissions.
@@ -70,10 +69,9 @@ class CRM_Contact_Form_Inline_Lock {
    * @param int $contactID
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
-  static function formRule($fields, $files, $contactID = NULL) {
+  public static function formRule($fields, $files, $contactID = NULL) {
     $errors = array();
 
     $timestamps = CRM_Contact_BAO_Contact::getTimestamps($contactID);
@@ -94,7 +92,7 @@ class CRM_Contact_Form_Inline_Lock {
    *
    * @return array extra options to return in JSON
    */
-  static function getResponse($contactID) {
+  public static function getResponse($contactID) {
     $timestamps = CRM_Contact_BAO_Contact::getTimestamps($contactID);
     return array('oplock_ts' => $timestamps['modified_date']);
   }

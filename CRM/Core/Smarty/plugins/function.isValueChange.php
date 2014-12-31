@@ -86,4 +86,3 @@ function smarty_function_isValueChange($params, &$smarty) {
 
   return;
 }
-

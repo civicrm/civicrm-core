@@ -63,4 +63,3 @@ function smarty_function_simpleActivityContacts($params, &$smarty) {
 
   return '';
 }
-

@@ -7,7 +7,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
 
-  function dataProvider() {
+  public function dataProvider() {
     $cases = array(); // array(0=>$inputText, 1=>$language, 2=>$options, 3=>$expectedText)
 
     $cases[] = array('first second', CRM_Utils_QueryFormatter::LANG_SQL_LIKE, CRM_Utils_QueryFormatter::MODE_NONE,             '%first second%');
@@ -56,7 +56,7 @@ class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
    * @param $expectedText
    * @dataProvider dataProvider
    */
-  function testFormat($text, $language, $mode, $expectedText) {
+  public function testFormat($text, $language, $mode, $expectedText) {
     $formatter = new CRM_Utils_QueryFormatter($mode);
     $actualText = $formatter->format($text, $language);
     $this->assertEquals($expectedText, $actualText);

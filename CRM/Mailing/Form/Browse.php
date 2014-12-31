@@ -40,7 +40,6 @@
  * @param
  *
  * @return void
- * @access public
  */
 class CRM_Mailing_Form_Browse extends CRM_Core_Form {
 
@@ -49,10 +48,9 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_mailingId = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this);
 
@@ -74,7 +72,6 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
 
   public function buildQuickForm() {
@@ -93,7 +90,6 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
   }
 
   /**
-   * @access public
    *
    * @return void
    */
@@ -110,4 +106,3 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
     }
   }
 }
-

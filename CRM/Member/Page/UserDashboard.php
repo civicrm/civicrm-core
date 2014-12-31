@@ -42,9 +42,8 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
    * List memberships for the UF user
    *
    * return null
-   * @access public
    */
-  function listMemberships() {
+  public function listMemberships() {
     $membership      = array();
     $dao             = new CRM_Member_DAO_Membership();
     $dao->contact_id = $this->_contactId;
@@ -96,11 +95,9 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
    * loads, it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
-  function run() {
+  public function run() {
     parent::preProcess();
     $this->listMemberships();
   }
 }
-

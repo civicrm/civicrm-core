@@ -166,7 +166,6 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param bool $addSequence should we add a unique sequence number to the end of the key
    * @param bool $ignoreKey should we not set a qfKey for this controller (for standalone forms)
    *
-   * @access public
    *
    * @return CRM_Core_Controller
    */
@@ -274,7 +273,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     );
   }
 
-  function fini() {
+  public function fini() {
     CRM_Core_BAO_Cache::storeSessionToCache(array(
       "_{$this->_name}_container",
         array('CiviCRM', $this->_scope),
@@ -290,7 +289,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *
    * @return mixed|string
    */
-  function key($name, $addSequence = FALSE, $ignoreKey = FALSE) {
+  public function key($name, $addSequence = FALSE, $ignoreKey = FALSE) {
     $config = CRM_Core_Config::singleton();
 
     if (
@@ -329,7 +328,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * jump action
    *
    */
-  function run() {
+  public function run() {
     // the names of the action and page should be saved
     // note that this is split into two, because some versions of
     // php 5.x core dump on the triple assignment :)
@@ -353,7 +352,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * @return bool
    */
-  function validate() {
+  public function validate() {
     $this->_actionName = $this->getActionName();
     list($pageName, $action) = $this->_actionName;
 
@@ -379,12 +378,11 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param string   directory to store all the uploaded files
    * @param array    names for the various upload buttons (note u can have more than 1 upload)
    *
-   * @access private
    *
    * @return void
    *
    */
-  function addActions($uploadDirectory = NULL, $uploadNames = NULL) {
+  public function addActions($uploadDirectory = NULL, $uploadNames = NULL) {
     $names = array(
       'display' => 'CRM_Core_QuickForm_Action_Display',
       'next' => 'CRM_Core_QuickForm_Action_Next',
@@ -410,9 +408,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Getter method for stateMachine
    *
    * @return CRM_Core_StateMachine
-   * @access public
    */
-  function getStateMachine() {
+  public function getStateMachine() {
     return $this->_stateMachine;
   }
 
@@ -422,9 +419,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param CRM_Core_StateMachine $stateMachine
    *
    * @return void
-   * @access public
    */
-  function setStateMachine($stateMachine) {
+  public function setStateMachine($stateMachine) {
     $this->_stateMachine = $stateMachine;
   }
 
@@ -437,9 +433,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *                              typicaly this will be add/view/edit
    *
    * @return void
-   * @access public
    */
-  function addPages(&$stateMachine, $action = CRM_Core_Action::NONE) {
+  public function addPages(&$stateMachine, $action = CRM_Core_Action::NONE) {
     $pages = $stateMachine->getPages();
     foreach ($pages as $name => $value) {
       $className = CRM_Utils_Array::value('className', $value, $name);
@@ -486,9 +481,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * the other as an image, both are of type 'submit'.
    *
    * @return string the name of the button that has been pressed by the user
-   * @access public
    */
-  function getButtonName() {
+  public function getButtonName() {
     $data = &$this->container();
     return CRM_Utils_Array::value('_qf_button_name', $data);
   }
@@ -496,11 +490,10 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * Destroy all the session state of the controller.
    *
-   * @access public
    *
    * @return void
    */
-  function reset() {
+  public function reset() {
     $this->container(TRUE);
     self::$_session->resetScope($this->_scope);
   }
@@ -513,9 +506,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * and can change based on the arguments
    *
    * @return void
-   * @access public
    */
-  function process() {}
+  public function process() {}
 
   /**
    * Store the variable with the value in the form scope
@@ -523,12 +515,11 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param  string|array $name  name  of the variable or an assoc array of name/value pairs
    * @param  mixed        $value value of the variable if string
    *
-   * @access public
    *
    * @return void
    *
    */
-  function set($name, $value = NULL) {
+  public function set($name, $value = NULL) {
     self::$_session->set($name, $value, $this->_scope);
   }
 
@@ -537,13 +528,12 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *
    * @param  string $name  : name  of the variable
    *
-   * @access public
 
    *
    * @return mixed
    *
    */
-  function get($name) {
+  public function get($name) {
     return self::$_session->get($name, $this->_scope);
   }
 
@@ -554,9 +544,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param string $currentPageName name of the page being displayed
    *
    * @return array
-   * @access public
    */
-  function wizardHeader($currentPageName) {
+  public function wizardHeader($currentPageName) {
     $wizard          = array();
     $wizard['steps'] = array();
     $count           = 0;
@@ -591,7 +580,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * @param array $wizard
    */
-  function addWizardStyle(&$wizard) {
+  public function addWizardStyle(&$wizard) {
     $wizard['style'] = array(
       'barClass' => '',
       'stepPrefixCurrent' => '&raquo;',
@@ -611,9 +600,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param mixed $value value of varaible
    *
    * @return void
-   * @access public
    */
-  function assign($var, $value = NULL) {
+  public function assign($var, $value = NULL) {
     self::$_template->assign($var, $value);
   }
 
@@ -624,9 +612,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param mixed $value (reference) value of varaible
    *
    * @return void
-   * @access public
    */
-  function assign_by_ref($var, &$value) {
+  public function assign_by_ref($var, &$value) {
     self::$_template->assign_by_ref($var, $value);
   }
 
@@ -637,7 +624,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param mixed $value the value to append
    * @param bool $merge
    */
-  function append($tpl_var, $value=NULL, $merge=FALSE) {
+  public function append($tpl_var, $value=NULL, $merge=FALSE) {
     self::$_template->append($tpl_var, $value, $merge);
   }
 
@@ -648,7 +635,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *
    * @return array
    */
-  function get_template_vars($name=null) {
+  public function get_template_vars($name=null) {
     return self::$_template->get_template_vars($name);
   }
 
@@ -658,9 +645,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param boolean $embedded
    *
    * @return void
-   * @access public
    */
-  function setEmbedded($embedded) {
+  public function setEmbedded($embedded) {
     $this->_embedded = $embedded;
   }
 
@@ -668,9 +654,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Getter for embedded
    *
    * @return boolean return the embedded value
-   * @access public
    */
-  function getEmbedded() {
+  public function getEmbedded() {
     return $this->_embedded;
   }
 
@@ -680,9 +665,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param boolean $skipRedirection
    *
    * @return void
-   * @access public
    */
-  function setSkipRedirection($skipRedirection) {
+  public function setSkipRedirection($skipRedirection) {
     $this->_skipRedirection = $skipRedirection;
   }
 
@@ -690,16 +674,15 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Getter for skipRedirection
    *
    * @return boolean return the skipRedirection value
-   * @access public
    */
-  function getSkipRedirection() {
+  public function getSkipRedirection() {
     return $this->_skipRedirection;
   }
 
   /**
    * @param null $fileName
    */
-  function setWord($fileName = NULL) {
+  public function setWord($fileName = NULL) {
     //Mark as a CSV file.
     header('Content-Type: application/vnd.ms-word');
 
@@ -713,7 +696,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * @param null $fileName
    */
-  function setExcel($fileName = NULL) {
+  public function setExcel($fileName = NULL) {
     //Mark as an excel file.
     header('Content-Type: application/vnd.ms-excel');
 
@@ -731,9 +714,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param boolean $print
    *
    * @return void
-   * @access public
    */
-  function setPrint($print) {
+  public function setPrint($print) {
     if ($print == "xls") {
       $this->setExcel();
     }
@@ -747,16 +729,15 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Getter for print
    *
    * @return boolean return the print value
-   * @access public
    */
-  function getPrint() {
+  public function getPrint() {
     return $this->_print;
   }
 
   /**
    * @return string
    */
-  function getTemplateFile() {
+  public function getTemplateFile() {
     if ($this->_print) {
       if ($this->_print == CRM_Core_Smarty::PRINT_PAGE) {
         return 'CRM/common/print.tpl';

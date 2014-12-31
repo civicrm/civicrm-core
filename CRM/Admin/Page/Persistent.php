@@ -70,7 +70,7 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
   /**
    * @return array
    */
-  function &customizeActionLinks() {
+  public function &customizeActionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_customizeActionLinks)) {
 
@@ -91,7 +91,7 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
    *
    * @return void
    */
-  function run() {
+  public function run() {
     CRM_Utils_System::setTitle(ts('DB Template Strings'));
     $this->browse();
     return parent::run();
@@ -102,10 +102,9 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
    *
    *
    * @return void
-   * @access public
    * @static
    */
-  function browse() {
+  public function browse() {
     $permission = FALSE;
     $this->assign('editClass', FALSE);
     if (CRM_Core_Permission::check('access CiviCRM')) {
@@ -152,4 +151,3 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
     $this->assign('rows', $rows);
   }
 }
-

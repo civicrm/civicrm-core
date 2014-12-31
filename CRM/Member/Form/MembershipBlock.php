@@ -47,11 +47,10 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     //parent::setDefaultValues();
     $defaults = array();
     if (isset($this->_id)) {
@@ -109,7 +108,6 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $membershipTypes = CRM_Member_BAO_MembershipType::getMembershipTypes();
@@ -220,10 +218,9 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
    * @param int $contributionPageId
    *
    * @return mixed true or array of errors
-   * @access public
    * @static
    */
-  static function formRule($params, $files, $contributionPageId = NULL) {
+  public static function formRule($params, $files, $contributionPageId = NULL) {
     $errors = array();
 
     if (!empty($params['member_price_set_id'])) {
@@ -322,7 +319,6 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
    * Process the form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // get the submitted form values.
@@ -488,10 +484,8 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Memberships');
   }
 }
-

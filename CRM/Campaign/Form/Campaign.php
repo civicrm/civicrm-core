@@ -64,7 +64,6 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
    * The id of the campaign we are proceessing
    *
    * @var int
-   * @protected
    */
   protected $_campaignId;
 
@@ -134,11 +133,10 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = $this->_values;
 
     //load only custom data defaults.
@@ -303,10 +301,9 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
    * @param $errors
    *
    * @return bool|array
-   * @access public
    * @see valid_date
    */
-  static function formRule($fields, $files, $errors) {
+  public static function formRule($fields, $files, $errors) {
     $errors = array();
 
     return empty($errors) ? TRUE : $errors;
@@ -315,7 +312,6 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
   /**
    * Form submission of new/edit campaign is processed.
    *
-   * @access public
    *
    * @return void
    */
@@ -391,6 +387,3 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     }
   }
 }
-
-
-

@@ -14,7 +14,7 @@
  */
 class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
   // (not used, implicit in the API, might need to convert?)
-  CONST
+  const
   CHARSET = 'UFT-8';
 
   /**
@@ -37,7 +37,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * @param $mode
    * @param $paymentProcessor
    */
-  function __construct($mode, &$paymentProcessor) {
+  public function __construct($mode, &$paymentProcessor) {
     // live or test
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
@@ -54,7 +54,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * @return object
    * @static
    */
-   static function &singleton($mode, &$paymentProcessor) {
+   public static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
     if (self::$_singleton[$processorName] === NULL) {
       self::$_singleton[$processorName] = new CRM_Core_Payment_PayflowPro($mode, $paymentProcessor);
@@ -76,7 +76,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * @return array the result in an nice formatted array (or an error object)
    * @abstract
    */
-  function doDirectPayment(&$params) {
+  public function doDirectPayment(&$params) {
     if (!defined('CURLOPT_SSLCERT')) {
       CRM_Core_Error::fatal(ts('PayFlowPro requires curl with SSL support'));
     }
@@ -373,7 +373,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    *
    * @return bool                  True if ID exists, else false
    */
-  function _checkDupe($invoiceId) {
+  public function _checkDupe($invoiceId) {
     //copied from Eway but not working and not really sure it should!
     $contribution = new CRM_Contribute_DAO_Contribution();
     $contribution->invoice_id = $invoiceId;
@@ -389,7 +389,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    *
    * @return object
    */
-  function &errorExit($errorCode = NULL, $errorMessage = NULL) {
+  public function &errorExit($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
     if ($errorCode) {
       $e->push($errorCode, 0, NULL, $errorMessage);
@@ -410,7 +410,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    *
    * @throws Exception
    */
-  function doTransferCheckout(&$params, $component) {
+  public function doTransferCheckout(&$params, $component) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
@@ -435,9 +435,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * @internal param string $mode the mode we are operating in (live or test)
    *
    * @return string the error message if any
-   * @public
    */
-  function checkConfig() {
+  public function checkConfig() {
     $errorMsg = array();
     if (empty($this->_paymentProcessor['user_name'])) {
       $errorMsg[] = ' ' . ts('ssl_merchant_id is not set for this payment processor');
@@ -464,7 +463,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    *
    * @return array|string
    */
-  function convert_to_nvp($payflow_query_array) {
+  public function convert_to_nvp($payflow_query_array) {
     foreach ($payflow_query_array as $key => $value) {
       $payflow_query[] = $key . '[' . strlen($value) . ']=' . $value;
     }
@@ -485,7 +484,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    *
    * @return mixed|object
    */
-  function submit_transaction($submiturl, $payflow_query) {
+  public function submit_transaction($submiturl, $payflow_query) {
     /*
      * Submit transaction using CuRL
      */
@@ -631,7 +630,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    *
    * @throws Exception
    */
-  function getRecurringTransactionStatus($recurringProfileID, $processorID) {
+  public function getRecurringTransactionStatus($recurringProfileID, $processorID) {
     if (!defined('CURLOPT_SSLCERT')) {
       CRM_Core_Error::fatal(ts('PayFlowPro requires curl with SSL support'));
     }
@@ -704,4 +703,3 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     //RT0000000001
   }
 }
-

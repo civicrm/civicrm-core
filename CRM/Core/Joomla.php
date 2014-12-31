@@ -43,10 +43,9 @@ class CRM_Core_Joomla {
    * to the smarty instance
    *
    * @return void
-   * @access public
    * @static
    */
-  static function sidebarLeft() {
+  public static function sidebarLeft() {
     $config = CRM_Core_Config::singleton();
 
     if ($config->userFrameworkFrontend) {
@@ -74,4 +73,3 @@ class CRM_Core_Joomla {
     $template->assign_by_ref('sidebarLeft', $sidebarLeft);
   }
 }
-

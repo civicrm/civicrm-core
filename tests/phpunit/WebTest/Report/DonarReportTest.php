@@ -35,7 +35,7 @@ class WebTest_Report_DonarReportTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testDonarReportPager() {
+  public function testDonarReportPager() {
     $this->webtestLogin();
 
     // now create new donar detail report instance

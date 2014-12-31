@@ -219,7 +219,6 @@ class CRM_Extension_Browser {
    * Connects to public server and grabs the list of publically available
    * extensions.
    *
-   * @access public
    *
    * @return Array list of extension names
    */

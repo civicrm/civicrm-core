@@ -39,7 +39,6 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
   protected $_fileName;
 
   /**#@+
-   * @access protected
    * @var integer
    */
 
@@ -294,9 +293,8 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
    * @param array mapped array of values
    *
    * @return void
-   * @access public
    */
-  function setActiveFields($fieldKeys) {
+  public function setActiveFields($fieldKeys) {
     $this->_activeFieldCount = count($fieldKeys);
     foreach ($fieldKeys as $key) {
       if (empty($this->_fields[$key])) {
@@ -312,9 +310,8 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
    * Format the field values for input to the api
    *
    * @return array (reference ) associative array of name/value pairs
-   * @access public
    */
-  function &getActiveFieldParams() {
+  public function &getActiveFieldParams() {
     $params = array();
     for ($i = 0; $i < $this->_activeFieldCount; $i++) {
       if (isset($this->_activeFields[$i]->_value)
@@ -335,9 +332,8 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
    * @param int $mode
    *
    * @return void
-   * @access public
    */
-  function set($store, $mode = self::MODE_SUMMARY) {
+  public function set($store, $mode = self::MODE_SUMMARY) {
     $store->set('fileSize', $this->_fileSize);
     $store->set('lineCount', $this->_lineCount);
     $store->set('seperator', $this->_separator);
@@ -384,4 +380,3 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
     }
   }
 }
-

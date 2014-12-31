@@ -35,7 +35,7 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCustomDataImport() {
+  public function testCustomDataImport() {
     $this->webtestLogin();
 
     $firstName1       = 'Ma_' . substr(sha1(rand()), 0, 7);
@@ -113,7 +113,7 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _individualCustomCSVData($customGroupTitle, $firstName1, $firstName2, $id1, $id2) {
+  public function _individualCustomCSVData($customGroupTitle, $firstName1, $firstName2, $id1, $id2) {
     list($customDataParams, $customDataVerify) = $this->_addCustomData($customGroupTitle, $id1, $id2);
 
     $headers = array(
@@ -155,7 +155,7 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _addCustomData($customGroupTitle, $id1, $id2) {
+  public function _addCustomData($customGroupTitle, $id1, $id2) {
 
     $this->openCiviPage("admin/custom/group", "reset=1");
 
@@ -353,4 +353,3 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
     return array($customDataParams, $customDataVerify);
   }
 }
-

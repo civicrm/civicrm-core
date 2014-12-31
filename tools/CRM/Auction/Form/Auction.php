@@ -46,7 +46,6 @@ class CRM_Auction_Form_Auction extends CRM_Core_Form {
    * the id of the auction we are proceessing
    *
    * @var int
-   * @protected
    */
   public $_id;
 

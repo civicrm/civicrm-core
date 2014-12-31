@@ -69,7 +69,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    */
   protected $_contactID4 = NULL;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     $params = array(
@@ -127,7 +127,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    *
    */
-  function tearDown()
+  public function tearDown()
   {
     $this->quickCleanUpFinancialEntities();
     $this->relationshipTypeDelete($this->_relationshipTypeId);
@@ -143,7 +143,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
   /**
    *  Test Import
    */
-  function testProcessMembership() {
+  public function testProcessMembership() {
     $form = new CRM_Batch_Form_Entry();
     $params = $this->getMembershipData();
     $this->assertTrue($form->testProcessMembership($params));
@@ -176,7 +176,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
   /**
    *  Test Contribution Import
    */
-  function testProcessContribution() {
+  public function testProcessContribution() {
     $this->offsetDefaultPriceSet();
     $form = new CRM_Batch_Form_Entry();
     $params = $this->getContributionData();
@@ -195,7 +195,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    * Data provider for test process membership
    * @return array
    */
-  function getMembershipData() {
+  public function getMembershipData() {
 
     return array(
       'batch_id' => 4,
@@ -259,7 +259,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  function getContributionData() {
+  public function getContributionData() {
     return array(
       //'batch_id' => 4,
       'primary_profiles' => array(1 => NULL, 2 => NULL, 3 => NULL),
@@ -293,4 +293,3 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     );
   }
 }
-

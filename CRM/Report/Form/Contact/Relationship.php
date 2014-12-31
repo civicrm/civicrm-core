@@ -45,7 +45,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   );
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
-  function __construct() {
+  public function __construct() {
 
     $contact_type = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, '_');
 
@@ -255,11 +255,11 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
@@ -291,7 +291,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
         FROM civicrm_relationship {$this->_aliases['civicrm_relationship']}
 
@@ -354,7 +354,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     }
   }
 
-  function where() {
+  public function where() {
     $whereClauses = $havingClauses = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -467,7 +467,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
     $isStatusFilter = FALSE;
@@ -505,7 +505,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     return $statistics;
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = " ";
     $groupBy = array();
     if ($this->relationType == 'a_b') {
@@ -524,11 +524,11 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     }
   }
 
-  function orderBy() {
+  public function orderBy() {
     $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact_b']}.sort_name ";
   }
 
-  function postProcess() {
+  public function postProcess() {
     $this->beginPostProcess();
 
     $this->relationType = NULL;
@@ -560,7 +560,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
 
@@ -631,4 +631,3 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     }
   }
 }
-

@@ -34,7 +34,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testInheritedMembership() {
+  public function testInheritedMembership() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -262,7 +262,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
    * Webtest for CRM-10146
    *
    */
-  function testInheritedMembershipActivity() {
+  public function testInheritedMembershipActivity() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -522,4 +522,3 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->assertEquals(1, $this->getText("xpath=//li[@id='tab_rel']/a/em"));
   }
 }
-

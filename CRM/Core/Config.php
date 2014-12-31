@@ -193,7 +193,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * @return CRM_Core_Config
    * @static
    */
-  static function &singleton($loadFromDB = TRUE, $force = FALSE) {
+  public static function &singleton($loadFromDB = TRUE, $force = FALSE) {
     if (self::$_singleton === NULL || $force) {
       // goto a simple error handler
       $GLOBALS['civicrm_default_error_scope'] = CRM_Core_TemporaryErrorScope::create(array('CRM_Core_Error', 'handle'));
@@ -404,7 +404,6 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * Initialize the DataObject framework
    *
    * @return void
-   * @access private
    */
   private function _initDAO() {
     CRM_Core_DAO::init($this->dsn);
@@ -421,7 +420,6 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * Returns the singleton logger for the application
    *
    * @param
-   * @access private
    *
    * @return object
    */
@@ -437,7 +435,6 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * Initialize the config variables
    *
    * @return void
-   * @access private
    */
   private function _initVariables() {
     // retrieve serialised settings
@@ -538,10 +535,9 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * Retrieve a mailer to send any mail from the application
    *
    * @param boolean $persist open a persistent smtp connection, should speed up mailings
-   * @access private
    * @return object
    */
-  static function &getMailer($persist = FALSE) {
+  public static function &getMailer($persist = FALSE) {
     if (!isset(self::$_mail)) {
       $mailingInfo = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
         'mailing_backend'
@@ -669,9 +665,8 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    *
    * @return boolean
    * @static
-   * @access public
    */
-  static function check(&$config, &$required) {
+  public static function check(&$config, &$required) {
     foreach ($required as $name) {
       if (CRM_Utils_System::isNull($config->$name)) {
         return FALSE;
@@ -684,13 +679,13 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * Reset the serialized array and recompute
    * use with care
    */
-  function reset() {
+  public function reset() {
     $query = "UPDATE civicrm_domain SET config_backend = null";
     CRM_Core_DAO::executeQuery($query);
   }
 
   // This method should initialize auth sources
-  function initAuthSrc() {
+  public function initAuthSrc() {
     $session = CRM_Core_Session::singleton();
     if ($session->get('userID') && !$session->get('authSrc')) {
       $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_LOGIN);
@@ -703,7 +698,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   /**
    * One function to get domain ID
    */
-  static function domainID($domainID = NULL, $reset = FALSE) {
+  public static function domainID($domainID = NULL, $reset = FALSE) {
     static $domain;
     if ($domainID) {
       $domain = $domainID;
@@ -719,7 +714,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * Do general cleanup of caches, temp directories and temp tables
    * CRM-8739
    */
-  function cleanupCaches($sessionReset = TRUE) {
+  public function cleanupCaches($sessionReset = TRUE) {
     // cleanup templates_c directory
     $this->cleanup(1, FALSE);
 
@@ -735,7 +730,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   /**
    * Do general cleanup of module permissions.
    */
-  function cleanupPermissions() {
+  public function cleanupPermissions() {
     $module_files = CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles();
     if ($this->userPermissionClass->isModulePermissionSupported()) {
       // Can store permissions -- so do it!
@@ -764,7 +759,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   /**
    * Flush information about loaded modules
    */
-  function clearModuleList() {
+  public function clearModuleList() {
     CRM_Extension_System::singleton()->getCache()->flush();
     CRM_Utils_Hook::singleton(TRUE);
     CRM_Core_PseudoConstant::getModuleExtensions(TRUE);
@@ -829,7 +824,7 @@ AND
   /**
    * Check if running in upgrade mode
    */
-  static function isUpgradeMode($path = NULL) {
+  public static function isUpgradeMode($path = NULL) {
     if (defined('CIVICRM_UPGRADE_ACTIVE')) {
       return TRUE;
     }
@@ -865,7 +860,7 @@ AND
    * it?
    * @return bool
    */
-  static function isEnabledBackOfficeCreditCardPayments() {
+  public static function isEnabledBackOfficeCreditCardPayments() {
     return CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('BackOffice'));
   }
 }

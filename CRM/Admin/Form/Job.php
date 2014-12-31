@@ -39,7 +39,7 @@
 class CRM_Admin_Form_Job extends CRM_Admin_Form {
   protected $_id = NULL;
 
-  function preProcess() {
+  public function preProcess() {
 
     parent::preProcess();
 
@@ -67,7 +67,6 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
    * @param bool $check
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm($check = FALSE) {
     parent::buildQuickForm();
@@ -114,7 +113,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
    * @return array|bool
    * @throws API_Exception
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
 
     $errors = array();
 
@@ -139,7 +138,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if (!$this->_id) {
@@ -170,7 +169,6 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -212,4 +210,3 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
 
   }
 }
-

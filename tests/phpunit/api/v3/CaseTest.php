@@ -73,14 +73,14 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Check with empty array
    */
-  function testCaseCreateEmpty() {
+  public function testCaseCreateEmpty() {
     $result = $this->callAPIFailure('case', 'create', array());
   }
 
   /**
    * Check if required fields are not passed
    */
-  function testCaseCreateWithoutRequired() {
+  public function testCaseCreateWithoutRequired() {
     $params = array(
       'subject' => 'this case should fail',
       'case_type_id' => 1,
@@ -92,7 +92,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test create function with valid parameters
    */
-  function testCaseCreate() {
+  public function testCaseCreate() {
     // Create Case
     $params = $this->_params;
     // Test using label instead of value
@@ -111,7 +111,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test update (create with id) function with valid parameters
    */
-  function testCaseUpdate() {
+  public function testCaseUpdate() {
     // Create Case
     $params = $this->_params;
     // Test using name instead of value
@@ -135,7 +135,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test delete function with valid parameters
    */
-  function testCaseDelete() {
+  public function testCaseDelete() {
     // Create Case
     $result = $this->callAPISuccess('case', 'create', $this->_params);
 
@@ -158,7 +158,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test get function based on activity
    */
-  function testCaseGetByActivity() {
+  public function testCaseGetByActivity() {
     // Create Case
     $result = $this->callAPISuccess('case', 'create', $this->_params);
     $id = $result['id'];
@@ -177,7 +177,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test get function based on contact id
    */
-  function testCaseGetByContact() {
+  public function testCaseGetByContact() {
     // Create Case
     $result = $this->callAPISuccess('case', 'create', $this->_params);
     $id = $result['id'];
@@ -193,7 +193,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test get function based on subject
    */
-  function testCaseGetBySubject() {
+  public function testCaseGetBySubject() {
     // Create Case
     $result = $this->callAPISuccess('case', 'create', $this->_params);
     $id = $result['id'];
@@ -209,7 +209,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test get function based on wrong subject
    */
-  function testCaseGetByWrongSubject() {
+  public function testCaseGetByWrongSubject() {
     // Create Case
     $result = $this->callAPISuccess('case', 'create', $this->_params);
     $id = $result['id'];
@@ -222,7 +222,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test get function with no criteria
    */
-  function testCaseGetNoCriteria() {
+  public function testCaseGetNoCriteria() {
     // Create Case
     $result = $this->callAPISuccess('case', 'create', $this->_params);
     $id = $result['id'];
@@ -237,7 +237,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    *  Test activity api create for case activities
    */
-  function testCaseActivityCreate() {
+  public function testCaseActivityCreate() {
     // Create a case first
     $params = $this->_params;
     $result = $this->callAPISuccess('case', 'create', $params);
@@ -275,7 +275,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    *  Test activity api update for case activities
    */
-  function testCaseActivityUpdate() {
+  public function testCaseActivityUpdate() {
     // Need to create the case and activity before we can update it
     $this->testCaseActivityCreate();
 
@@ -314,7 +314,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     //TODO: check some more things
   }
 
-  function testCaseActivityUpdateCustom() {
+  public function testCaseActivityUpdateCustom() {
     // Create a case first
     $result = $this->callAPISuccess('case', 'create', $this->_params);
 

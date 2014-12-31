@@ -51,7 +51,6 @@ class CRM_Event_Form_Task_SaveSearch extends CRM_Event_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */ function preProcess() {
     parent::preProcess();
     $this->_id = NULL;
@@ -62,11 +61,10 @@ class CRM_Event_Form_Task_SaveSearch extends CRM_Event_Form_Task {
    *    - displaying the QILL (query in local language)
    *    - displaying elements for saving the search
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Smart Group'));
     // get the qill
     $query = new CRM_Event_BAO_Query($this->get('formValues'));
@@ -105,7 +103,6 @@ class CRM_Event_Form_Task_SaveSearch extends CRM_Event_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -138,4 +135,3 @@ class CRM_Event_Form_Task_SaveSearch extends CRM_Event_Form_Task {
     $group = CRM_Contact_BAO_Group::create($params);
   }
 }
-

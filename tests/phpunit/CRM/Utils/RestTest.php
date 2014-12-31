@@ -6,11 +6,11 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Utils_RestTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function testProcessMultiple() {
+  public function testProcessMultiple() {
     $_SERVER['REQUEST_METHOD'] = 'POST';
     $input = array(
       'cow' => array(

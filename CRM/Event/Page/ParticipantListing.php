@@ -41,7 +41,7 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
   protected $_eventTitle;
 
   protected $_pager;
-  function preProcess() {
+  public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Integer', $this, TRUE);
 
     // ensure that there is a particpant type for this
@@ -64,7 +64,7 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
     $this->assign('displayRecent', FALSE);
   }
 
-  function run() {
+  public function run() {
     $this->preProcess();
 
     // get the class name from the participantListingID
@@ -96,4 +96,3 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
     $participantListingClass->run();
   }
 }
-

@@ -48,4 +48,3 @@
 function smarty_block_serialize($params, $text, &$smarty) {
   return serialize($text);
 }
-

@@ -35,7 +35,7 @@ class WebTest_Grant_StandaloneAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testStandaloneGrantAdd() {
+  public function testStandaloneGrantAdd() {
     // Log in as admin first to verify permissions for CiviGrant
     $this->webtestLogin('admin');
 
@@ -106,4 +106,3 @@ class WebTest_Grant_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($expected);
   }
 }
-

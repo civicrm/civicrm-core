@@ -40,7 +40,6 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
    *
-   * @access protected
    */
   protected function setUp() {
     parent::setUp();
@@ -50,14 +49,13 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
    *
-   * @access protected
    */
   protected function tearDown() {}
 
   /**
    * Test case for add( )
    */
-  function testAdd() {
+  public function testAdd() {
 
     //creates a test group contact by recursively creation
     //lets create 10 groupContacts for fun
@@ -73,7 +71,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
   /**
    * Test case for getGroupId( )
    */
-  function testGetGroupId() {
+  public function testGetGroupId() {
 
 
     //creates a test groupContact object
@@ -94,7 +92,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
   /**
    *  Test case for contact search: CRM-6706, CRM-6586 Parent Group search should return contacts from child groups too.
    */
-  function testContactSearchByParentGroup() {
+  public function testContactSearchByParentGroup() {
     // create a parent group
     // TODO: This is not an API test!!
     $groupParams1 = array(
@@ -161,4 +159,3 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     $this->assertEquals(array(), array_diff($validChildContactIds, $resultChildContactIds), 'Check that the difference between two arrays should be blank array');
   }
 }
-

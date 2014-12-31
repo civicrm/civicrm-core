@@ -13,7 +13,7 @@ class CRM_Core_Region {
    * @param bool $autocreate whether to automatically create an empty region
    * @return CRM_Core_Region
    */
-  static function &instance($name, $autocreate = TRUE) {
+  public static function &instance($name, $autocreate = TRUE) {
     if ( $autocreate && ! isset( self::$_instances[$name] ) ) {
       self::$_instances[$name] = new CRM_Core_Region($name);
     }
@@ -221,7 +221,7 @@ class CRM_Core_Region {
    *
    * @return int
    */
-  static function _cmpSnippet($a, $b) {
+  public static function _cmpSnippet($a, $b) {
     if ($a['weight'] < $b['weight']) return -1;
     if ($a['weight'] > $b['weight']) return 1;
     // fallback to name sort; don't really want to do this, but it makes results more stable

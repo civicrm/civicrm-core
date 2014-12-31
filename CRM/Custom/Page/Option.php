@@ -49,7 +49,6 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
    * The Group id of the option
    *
    * @var int
-   * @access protected
    */
   protected $_gid;
 
@@ -57,7 +56,6 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
    * The field id of the option
    *
    * @var int
-   * @access protected
    */
   protected $_fid;
 
@@ -65,7 +63,6 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @access private
    */
   private static $_actionLinks;
 
@@ -75,9 +72,8 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
    * @param null
    *
    * @return array  array of action links that we need to display for the browse screen
-   * @access public
    */
-  function &actionLinks() {
+  public function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
       self::$_actionLinks = array(
         CRM_Core_Action::UPDATE => array(
@@ -119,9 +115,8 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
    * @param null
    *
    * @return void
-   * @access public
    */
-  function browse() {
+  public function browse() {
     //get the default value from custom fields
     $customFieldBAO = new CRM_Core_BAO_CustomField();
     $customFieldBAO->id = $this->_fid;
@@ -245,9 +240,8 @@ ORDER BY weight, label
    * @param string  $action   the action to be invoked
    *
    * @return void
-   * @access public
    */
-  function edit($action) {
+  public function edit($action) {
     // create a simple controller for editing custom data
     $controller = new CRM_Core_Controller_Simple('CRM_Custom_Form_Option', ts('Custom Option'), $action);
 
@@ -271,9 +265,8 @@ ORDER BY weight, label
    * @param null
    *
    * @return void
-   * @access public
    */
-  function run() {
+  public function run() {
 
     // get the field id
     $this->_fid = CRM_Utils_Request::retrieve('fid', 'Positive',
@@ -333,4 +326,3 @@ ORDER BY weight, label
     return parent::run();
   }
 }
-

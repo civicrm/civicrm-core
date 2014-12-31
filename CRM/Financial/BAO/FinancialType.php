@@ -44,7 +44,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   /**
    * Class constructor
    */
-  function __construct( ) {
+  public function __construct( ) {
     parent::__construct( );
   }
 
@@ -55,10 +55,9 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Contribute_BAO_ContributionType object
-   * @access public
    * @static
    */
-  static function retrieve( &$params, &$defaults ) {
+  public static function retrieve( &$params, &$defaults ) {
     $financialType = new CRM_Financial_DAO_FinancialType( );
     $financialType->copyValues( $params );
     if ($financialType->find(true)) {
@@ -77,7 +76,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @return Object             DAO object on sucess, null otherwise
    * @static
    */
-  static function setIsActive( $id, $is_active ) {
+  public static function setIsActive( $id, $is_active ) {
     return CRM_Core_DAO::setFieldValue( 'CRM_Financial_DAO_FinancialType', $id, 'is_active', $is_active );
   }
 
@@ -87,11 +86,10 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
    *
-   * @access public
    * @static
    * @return object
    */
-  static function add(&$params, &$ids = array()) {
+  public static function add(&$params, &$ids = array()) {
     if(empty($params['id'])) {
       $params['is_active'] = CRM_Utils_Array::value('is_active', $params, false);
       $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, false);
@@ -121,7 +119,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @return array|bool
    * @static
    */
-  static function del($financialTypeId) {
+  public static function del($financialTypeId) {
     $financialType = new CRM_Financial_DAO_FinancialType( );
     $financialType->id = $financialTypeId;
     $financialType->find(true);
@@ -167,7 +165,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @return array  all financial type with income account is relationship
    * @static
    */
-  static function getIncomeFinancialType() {
+  public static function getIncomeFinancialType() {
     // Financial Type
     $financialType = CRM_Contribute_PseudoConstant::financialType();
     $revenueFinancialType = array();
@@ -189,4 +187,3 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     return $financialType;
   }
 }
-

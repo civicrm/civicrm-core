@@ -40,7 +40,7 @@
  *
  */
 class CRM_Campaign_Task {
-  CONST INTERVIEW = 1, RESERVE = 2, RELEASE = 3, PRINT_VOTERS = 4;
+  const INTERVIEW = 1, RESERVE = 2, RELEASE = 3, PRINT_VOTERS = 4;
 
   /**
    * The task array
@@ -64,9 +64,8 @@ class CRM_Campaign_Task {
    *
    * @return array the set of tasks for a group of voters.
    * @static
-   * @access public
    */
-  static function &tasks() {
+  public static function &tasks() {
     if (!(self::$_tasks)) {
       self::$_tasks = array(1 => array(
         'title' => ts('Record Respondents Interview'),
@@ -111,9 +110,8 @@ class CRM_Campaign_Task {
    *
    * @return array the set of task titles
    * @static
-   * @access public
    */
-  static function &taskTitles() {
+  public static function &taskTitles() {
     self::tasks();
     $titles = array();
     foreach (self::$_tasks as $id => $value) {
@@ -130,9 +128,8 @@ class CRM_Campaign_Task {
    * @param int $permission
    *
    * @return array set of tasks that are valid for the user
-   * @access public
    */
-  static function &permissionedTaskTitles($permission) {
+  public static function &permissionedTaskTitles($permission) {
     $tasks = self::taskTitles();
 
     return $tasks;
@@ -146,9 +143,8 @@ class CRM_Campaign_Task {
    *
    * @return array the set of tasks for a group of voters.
    * @static
-   * @access public
    */
-  static function getTask($value) {
+  public static function getTask($value) {
     self::tasks();
     if (!$value || !CRM_Utils_Array::value($value, self::$_tasks)) {
       // make the interview task by default
@@ -161,4 +157,3 @@ class CRM_Campaign_Task {
     );
   }
 }
-

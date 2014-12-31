@@ -70,9 +70,8 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
    * @param int $contactID
    *
    * @return boolean true if yes, else false
-   * @access public
    */
-  function check($str, $contactID = NULL) {
+  public function check($str, $contactID = NULL) {
     $str = $this->translatePermission($str, 'Drupal', array(
       'view user account' => 'access user profiles',
       'administer users' => 'administer users',
@@ -95,9 +94,8 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
    * @param array $array the roles to check
    *
    * @return boolean true if yes, else false
-   * @access public
    */
-  function checkGroupRole($array) {
+  public function checkGroupRole($array) {
     if (function_exists('user_load') && isset($array)) {
       $user = user_load( $GLOBALS['user']->uid);
       //if giver roles found in user roles - return true
@@ -120,7 +118,7 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
   /**
    * {@inheritdoc}
    */
-  function upgradePermissions($permissions) {
+  public function upgradePermissions($permissions) {
     if (empty($permissions)) {
       throw new CRM_Core_Exception("Cannot upgrade permissions: permission list missing");
     }
@@ -165,4 +163,3 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
     return $_cache[$permissionName];
   }
 }
-

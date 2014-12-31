@@ -41,7 +41,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
   /**
    * @param $formValues
    */
-  function __construct(&$formValues) {
+  public function __construct(&$formValues) {
     parent::__construct($formValues);
 
     $this->_groupTree = CRM_Core_BAO_CustomGroup::getTree("'Contact', 'Individual', 'Organization', 'Household'",
@@ -66,7 +66,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
     }
   }
 
-  function addColumns() {
+  public function addColumns() {
     // add all the fields for chosen groups
     $this->_tables = $this->_options = array();
     foreach ($this->_groupTree as $groupID => $group) {
@@ -94,7 +94,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
   /**
    * @param CRM_Core_Form $form
    */
-  function buildForm(&$form) {
+  public function buildForm(&$form) {
 
     /**
      * You can define a custom title for the search form
@@ -137,11 +137,11 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
   /**
    * @return null
    */
-  function summary() {
+  public function summary() {
     return NULL;
   }
 
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
+  public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 
@@ -154,7 +154,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
    *
    * @return string
    */
-  function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
+  public function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
     //redirect if custom group not select in search criteria
     if (empty($this->_formValues['custom_group'])) {
       CRM_Core_Error::statusBounce(ts("You must select at least one Custom Group as a search criteria."),
@@ -196,7 +196,7 @@ contact_a.sort_name    as sort_name,
   /**
    * @return string
    */
-  function from() {
+  public function from() {
     $from = "FROM civicrm_contact contact_a";
     $customFrom = array();
     // lets do an INNER JOIN so we get only relevant values rather than all values
@@ -226,7 +226,7 @@ contact_a.sort_name    as sort_name,
    *
    * @return string
    */
-  function where($includeContactIDs = FALSE) {
+  public function where($includeContactIDs = FALSE) {
     $count  = 1;
     $clause = array();
     $params = array();
@@ -274,21 +274,21 @@ contact_a.sort_name    as sort_name,
   /**
    * @return string
    */
-  function templateFile() {
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom/MultipleValues.tpl';
   }
 
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return array();
   }
 
   /**
    * @param $row
    */
-  function alterRow(&$row) {
+  public function alterRow(&$row) {
     foreach ($this->_options as $fieldID => $values) {
       $customVal = $valueSeparatedArray = array();
       if (in_array($values['attributes']['html_type'],
@@ -342,8 +342,7 @@ contact_a.sort_name    as sort_name,
   /**
    * @param $title
    */
-  function setTitle($title) {
+  public function setTitle($title) {
     CRM_Utils_System::setTitle($title);
   }
 }
-

@@ -38,7 +38,7 @@ require_once 'CRM/Core/Controller.php';
  */
 class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     // FIXME: something NULLs $GLOBALS['_HTML_QuickForm_registered_rules'] when the tests are ran all together
     $GLOBALS['_HTML_QuickForm_registered_rules'] = array(
@@ -68,7 +68,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    *
    */
-  function tearDown() {
+  public function tearDown() {
     $this->membershipTypeDelete( array( 'id' => $this->_membershipTypeID ) );
     $this->membershipStatusDelete( $this->_membershipStatusID );
     Contact::delete( $this->_contactID );
@@ -76,7 +76,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->_contactID = $this->_membershipStatusID = $this->_membershipTypeID = null;
   }
 
-  function testCreate() {
+  public function testCreate() {
 
     $contactId = Contact::createIndividual();
 
@@ -125,7 +125,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     Contact::delete($contactId);
   }
 
-  function testGetValues() {
+  public function testGetValues() {
     //        $this->markTestSkipped( 'causes mysterious exit, needs fixing!' );
     //  Calculate membership dates based on the current date
     $now = time();
@@ -183,7 +183,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     Contact::delete($contactId);
   }
 
-  function testRetrieve() {
+  public function testRetrieve() {
     $contactId = Contact::createIndividual();
 
     $params = array(
@@ -211,7 +211,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 
-  function testActiveMembers() {
+  public function testActiveMembers() {
     $contactId = Contact::createIndividual();
 
     $params = array(
@@ -271,7 +271,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     Contact::delete($contactId);
   }
 
-  function testDeleteMembership() {
+  public function testDeleteMembership() {
     $contactId = Contact::createIndividual();
 
     $params = array(
@@ -298,7 +298,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     Contact::delete($contactId);
   }
 
-  function testGetContactMembership() {
+  public function testGetContactMembership() {
     $contactId = Contact::createIndividual();
 
     $params = array(
@@ -331,7 +331,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Get the contribution
    * page id from the membership record
    */
-  function testgetContributionPageId() {
+  public function testgetContributionPageId() {
     $contactId = Contact::createIndividual();
 
     $params = array(
@@ -362,7 +362,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * type.
    *
    */
-  function testgetMembershipStarts() {
+  public function testgetMembershipStarts() {
     $contactId = Contact::createIndividual();
 
     $params = array(
@@ -394,7 +394,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * optionally for a specified date.
    *
    */
-  function testGetMembershipCount() {
+  public function testGetMembershipCount() {
     $contactId = Contact::createIndividual();
 
     $params = array(
@@ -427,7 +427,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * batch update member via profile
    *
    */
-  function testsortName() {
+  public function testsortName() {
     $contactId = Contact::createIndividual();
 
     $params = array(
@@ -462,7 +462,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Delete related memberships
    *
    */
-  function testdeleteRelatedMemberships() {
+  public function testdeleteRelatedMemberships() {
     $contactId = Contact::createIndividual();
 
     $params = array(
@@ -493,7 +493,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Renew membership with change in membership type
    *
    */
-  function testRenewMembership() {
+  public function testRenewMembership() {
     $contactId = Contact::createIndividual();
     $joinDate  = $startDate = date("Ymd", strtotime(date("Ymd") . " -6 month"));
     $endDate   = date("Ymd", strtotime($joinDate . " +1 year -1 day"));
@@ -556,7 +556,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Renew stale membership
    *
    */
-  function testStaleMembership() {
+  public function testStaleMembership() {
     $statusId  = 3;
     $contactId = Contact::createIndividual();
     $joinDate  = $startDate = date("Ymd", strtotime(date("Ymd") . " -1 year -15 days"));
@@ -623,5 +623,3 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     Contact::delete($contactId);
   }
 }
-
-

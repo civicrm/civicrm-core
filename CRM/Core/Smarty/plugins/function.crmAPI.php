@@ -75,7 +75,3 @@ function smarty_function_crmAPI($params, &$smarty) {
     $smarty->assign($params["var"], $result);
   }
 }
-
-
-
-

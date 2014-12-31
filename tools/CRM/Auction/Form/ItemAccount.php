@@ -44,7 +44,6 @@ class CRM_Auction_Form_ItemAccount extends CRM_Core_Form {
    * the id of the auction for which item needs to be updated/added.
    *
    * @var int
-   * @protected
    */
   public $_aid = NULL;
 
@@ -52,7 +51,6 @@ class CRM_Auction_Form_ItemAccount extends CRM_Core_Form {
    * the id of the item we are processing
    *
    * @var int
-   * @protected
    */
   public $_id = NULL;
 

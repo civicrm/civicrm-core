@@ -41,11 +41,10 @@ class CRM_Contact_Form_Task_AddToOrganization extends CRM_Contact_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function preProcess() {
+  public function preProcess() {
     // initialize the task and row fields
     parent::preProcess();
   }
@@ -53,11 +52,10 @@ class CRM_Contact_Form_Task_AddToOrganization extends CRM_Contact_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Add Contacts to Organization'));
     $this->addElement('text', 'name', ts('Find Target Organization'));
 
@@ -114,7 +112,6 @@ class CRM_Contact_Form_Task_AddToOrganization extends CRM_Contact_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */

@@ -50,7 +50,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -274,11 +274,11 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
 
     $this->_columnHeaders = array();
@@ -324,7 +324,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
     $this->_select = 'SELECT ' . implode(', ', $select) . ' ';
   }
 
-  function from() {
+  public function from() {
     $this->_from = NULL;
 
     $this->_from = "FROM  civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
@@ -355,7 +355,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
                     ON  fitem.entity_id = {$this->_aliases['civicrm_line_item']}.id AND fitem.entity_table = 'civicrm_line_item' ";
   }
 
-  function orderBy() {
+  public function orderBy() {
     parent::orderBy();
 
     // please note this will just add the order-by columns to select query, and not display in column-headers.
@@ -369,7 +369,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
     }
   }
 
-  function where() {
+  public function where() {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
@@ -420,7 +420,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
     }
   }
 
-  function postProcess() {
+  public function postProcess() {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
     parent::postProcess();
@@ -431,7 +431,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
     $select = " SELECT COUNT({$this->_aliases['civicrm_financial_trxn']}.id ) as count,
@@ -470,7 +470,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
@@ -508,4 +508,3 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
     }
   }
 }
-

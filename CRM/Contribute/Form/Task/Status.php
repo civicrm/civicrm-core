@@ -52,9 +52,8 @@ class CRM_Contribute_Form_Task_Status extends CRM_Contribute_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE
     );
@@ -90,7 +89,6 @@ AND    {$this->_componentClause}";
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -189,9 +187,8 @@ AND    co.id IN ( $contribIDs )";
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $seen = $errors = array();
     foreach ($fields as $name => $value) {
       if (strpos($name, 'trxn_id_') !== FALSE) {
@@ -217,7 +214,6 @@ AND    co.id IN ( $contribIDs )";
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -306,7 +302,7 @@ AND    co.id IN ( $contribIDs )";
    *
    * @return array
    */
-  static function &getDetails($contributionIDs) {
+  public static function &getDetails($contributionIDs) {
     $query = "
 SELECT    c.id              as contribution_id,
           c.contact_id      as contact_id     ,
@@ -344,4 +340,3 @@ WHERE     c.id IN ( $contributionIDs )";
     return $rows;
   }
 }
-

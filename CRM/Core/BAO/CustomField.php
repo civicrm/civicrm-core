@@ -69,10 +69,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param NULL
    *
    * @return array        Data type => Description
-   * @access public
    * @static
    */
-  static function &dataType() {
+  public static function &dataType() {
     if (!(self::$_dataType)) {
       self::$_dataType = array(
         'String' => ts('Alphanumeric'),
@@ -95,7 +94,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   /**
    * @return array
    */
-  static function dataToHtml() {
+  public static function dataToHtml() {
     if (!self::$_dataToHtml) {
       self::$_dataToHtml = array(
         array(
@@ -129,10 +128,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param array $params (reference) an assoc array of name/value pairs
    *
    * @return CRM_Core_DAO_CustomField object
-   * @access public
    * @static
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     $origParams = array_merge(array(), $params);
 
     if (!isset($params['id'])) {
@@ -319,10 +317,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_DAO_CustomField object
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $defaults);
   }
 
@@ -334,10 +331,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return   Object            DAO object on sucess, null otherwise
    *
-   * @access public
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
 
     CRM_Utils_System::flushCache();
 
@@ -353,7 +349,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return string name
    *
-   * @access public
    * @static
    *
    */
@@ -375,7 +370,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return array      $fields - an array of active custom fields.
    *
-   * @access public
    * @static
    */
   public static function &getFields($customDataType = 'Individual',
@@ -594,7 +588,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return array   $fields -
    *
-   * @access public
    * @static
    */
   public static function &getFieldsForImport($contactType = 'Individual',
@@ -660,7 +653,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @param bool $all
    * @return int|null         The id (if exists)
-   * @access public
    * @static
    */
   public static function getKeyID($key, $all = FALSE) {
@@ -688,7 +680,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @static
    * public
    */
-  static function getFieldObject($fieldID) {
+  public static function getFieldObject($fieldID) {
     $field = new CRM_Core_DAO_CustomField();
 
     // check if we can get the field values from the system cache
@@ -724,7 +716,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param boolean $search true if used for search else false
    * @param string $label label for custom field
    *
-   * @access public
    * @static
    */
   public static function addQuickFormElement(&$qf,
@@ -1047,7 +1038,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return  boolean
    *
-   * @access public
    * @static
    *
    */
@@ -1085,9 +1075,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @return  string   the display value
    *
    * @static
-   * @access public
    */
-  static function getDisplayValue($value, $id, &$options, $contactID = NULL, $fieldID = NULL) {
+  public static function getDisplayValue($value, $id, &$options, $contactID = NULL, $fieldID = NULL) {
     $option     = &$options[$id];
     $attributes = &$option['attributes'];
     $html_type  = $attributes['html_type'];
@@ -1321,7 +1310,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *                               just format the given value
    *
    * @static
-   * @access public
    */
   static function setProfileDefaults($customFieldId,
     $elementName,
@@ -1438,7 +1426,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return array
    */
-  static function getFileURL($contactID, $cfID, $fileID = NULL, $absolute = FALSE, $multiRecordWhereClause = NULL) {
+  public static function getFileURL($contactID, $cfID, $fileID = NULL, $absolute = FALSE, $multiRecordWhereClause = NULL) {
     if ($contactID) {
       if (!$fileID) {
         $params = array('id' => $cfID);
@@ -1760,7 +1748,7 @@ SELECT $columnName
    *
    * @return array
    */
-  static function &defaultCustomTableSchema(&$params) {
+  public static function &defaultCustomTableSchema(&$params) {
     // add the id and extends_id
     $table = array(
       'name' => $params['name'],
@@ -1804,7 +1792,7 @@ SELECT $columnName
    * @param bool $indexExist
    * @param bool $triggerRebuild
    */
-  static function createField($field, $operation, $indexExist = FALSE, $triggerRebuild = TRUE) {
+  public static function createField($field, $operation, $indexExist = FALSE, $triggerRebuild = TRUE) {
     $tableName = CRM_Core_DAO::getFieldValue(
       'CRM_Core_DAO_CustomGroup',
       $field->custom_group_id,
@@ -1872,7 +1860,7 @@ SELECT $columnName
    * @return array(
      string) or TRUE
    */
-  static function _moveFieldValidate($fieldID, $newGroupID) {
+  public static function _moveFieldValidate($fieldID, $newGroupID) {
     $errors = array();
 
     $field = new CRM_Core_DAO_CustomField();
@@ -1955,7 +1943,7 @@ WHERE  id IN ( %1, %2 )
    *
    * @return void
    */
-  static function moveField($fieldID, $newGroupID) {
+  public static function moveField($fieldID, $newGroupID) {
     $validation = self::_moveFieldValidate($fieldID, $newGroupID);
     if (TRUE !== $validation) {
       CRM_Core_Error::fatal(implode(' ', $validation));
@@ -1999,9 +1987,8 @@ WHERE  id IN ( %1, %2 )
    *
    * @return array           - fatal is fieldID does not exists, else array of tableName, columnName
    * @static
-   * @public
    */
-  static function getTableColumnGroup($fieldID, $force = FALSE) {
+  public static function getTableColumnGroup($fieldID, $force = FALSE) {
     $cacheKey    = "CRM_Core_DAO_CustomField_CustomGroup_TableColumn_{$fieldID}";
     $cache       = CRM_Utils_Cache::singleton();
     $fieldValues = $cache->get($cacheKey);
@@ -2034,7 +2021,6 @@ AND    cf.id = %1";
    * Currently this is required in the cases where option groups are to be included
    * for inactive fields : CRM-5369
    *
-   * @access public
    *
    * @return mixed $customOptionGroup@static
    */
@@ -2078,11 +2064,10 @@ INNER JOIN  civicrm_custom_field f ON ( g.id = f.option_group_id )
    * @param int $customFieldId custom field id
    * @param int $optionGroupId option group id
    *
-   * @access public
    * @return void
    * @static
    */
-  static function fixOptionGroups($customFieldId, $optionGroupId) {
+  public static function fixOptionGroups($customFieldId, $optionGroupId) {
     // check if option group belongs to any custom Field else delete
     // get the current option group
     $currentOptionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
@@ -2108,7 +2093,7 @@ INNER JOIN  civicrm_custom_field f ON ( g.id = f.option_group_id )
    * @return void
    * @static
    */
-  static function checkOptionGroup($optionGroupId) {
+  public static function checkOptionGroup($optionGroupId) {
     $query = "
 SELECT count(*)
 FROM   civicrm_custom_field
@@ -2128,7 +2113,7 @@ WHERE  option_group_id = {$optionGroupId}";
    *
    * @return null|string
    */
-  static function getOptionGroupDefault($optionGroupId, $htmlType) {
+  public static function getOptionGroupDefault($optionGroupId, $htmlType) {
     $query = "
 SELECT   default_value, html_type
 FROM     civicrm_custom_field
@@ -2218,7 +2203,7 @@ ORDER BY html_type";
    *
    * @throws Exception
    */
-  static function buildOption($field, &$options) {
+  public static function buildOption($field, &$options) {
     // Fixme - adding anything but options to the $options array is a bad idea
     // What if an option had the key 'attributes'?
     $options['attributes'] = array(
@@ -2272,7 +2257,7 @@ SELECT label, value
    *
    * @return null
    */
-  static function getCustomFieldID($fieldLabel, $groupTitle = NULL) {
+  public static function getCustomFieldID($fieldLabel, $groupTitle = NULL) {
     $params = array(1 => array($fieldLabel, 'String'));
     if ($groupTitle) {
       $params[2] = array($groupTitle, 'String');
@@ -2307,7 +2292,7 @@ WHERE      ( f.label = %1 OR f.name = %1 )
    * Given ID of a custom field, return its name as well as the name of the custom group it belongs to.
    *
    */
-  static function getNameFromID($ids) {
+  public static function getNameFromID($ids) {
     if (is_array($ids)) {
       $ids = implode(',', $ids);
     }
@@ -2340,7 +2325,7 @@ WHERE      f.id IN ($ids)";
    * @return array $errors validation errors.
    * @static
    */
-  static function validateCustomData($params) {
+  public static function validateCustomData($params) {
     $errors = array();
     if (!is_array($params) || empty($params)) {
       return $errors;
@@ -2442,7 +2427,7 @@ WHERE      f.id IN ($ids)";
    *
    * @return bool
    */
-  static function isMultiRecordField($customId) {
+  public static function isMultiRecordField($customId) {
     $isMultipleWithGid = FALSE;
     if (!is_numeric($customId)) {
       $customId = self::getKeyID($customId);
@@ -2470,11 +2455,10 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
    * @param CRM_Core_DAO_CustomField|array $field
    * @return bool
    */
-  static function isSerialized($field) {
+  public static function isSerialized($field) {
     // Fields retrieved via api are an array, or from the dao are an object. We'll accept either.
     $field = (array) $field;
     // FIXME: Currently the only way to know if data is serialized is by looking at the html_type. It would be cleaner to decouple this.
     return ($field['html_type'] == 'CheckBox' || strpos($field['html_type'], 'Multi') !== FALSE);
   }
 }
-

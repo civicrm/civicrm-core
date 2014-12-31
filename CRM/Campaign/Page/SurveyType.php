@@ -76,10 +76,9 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    * Obtains the group name from url and sets the title.
    *
    * @return void
-   * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_gName = 'activity_type';
 
     $this->_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $this->_gName, 'id', 'name');
@@ -99,7 +98,7 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Core_BAO_OptionValue';
   }
 
@@ -108,7 +107,7 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
@@ -143,7 +142,7 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    *
    * @return void
    */
-  function run() {
+  public function run() {
     $this->preProcess();
     return parent::run();
   }
@@ -153,10 +152,9 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    *
    *
    * @return void
-   * @access public
    * @static
    */
-  function browse() {
+  public function browse() {
     $campaingCompId = CRM_Core_Component::getComponentID('CiviCampaign');
     $groupParams    = array('name' => $this->_gName);
     $optionValues   = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'component_id,weight');
@@ -182,7 +180,7 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Campaign_Form_SurveyType';
   }
 
@@ -191,7 +189,7 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return $this->_GName;
   }
 
@@ -202,7 +200,7 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/campaign/surveyType';
   }
 
@@ -212,10 +210,8 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    * @param int $mode mode that we are in
    *
    * @return string
-   * @access public
    */
-  function userContextParams($mode = NULL) {
+  public function userContextParams($mode = NULL) {
     return 'reset=1';
   }
 }
-

@@ -43,14 +43,13 @@ class CRM_Case_Form_Activity_OpenCase {
    * The id of the client associated with this case
    *
    * @var int
-   * @public
    */
   public $_contactID;
 
   /**
    * @param CRM_Core_Form $form
    */
-  static function preProcess(&$form) {
+  public static function preProcess(&$form) {
     //get multi client case configuration
     $xmlProcessorProcess = new CRM_Case_XMLProcessor_Process();
     $form->_allowMultiClient = (bool) $xmlProcessorProcess->getAllowMultipleCaseClients();
@@ -93,13 +92,12 @@ class CRM_Case_Form_Activity_OpenCase {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
    * @return void
    */
-  static function setDefaultValues(&$form) {
+  public static function setDefaultValues(&$form) {
     $defaults = array();
     if ($form->_context == 'caseActivity') {
       return $defaults;
@@ -146,7 +144,7 @@ class CRM_Case_Form_Activity_OpenCase {
   /**
    * @param CRM_Case_Form_Case $form
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     if ($form->_context == 'caseActivity') {
       return;
     }
@@ -212,14 +210,13 @@ class CRM_Case_Form_Activity_OpenCase {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @param array $params
    *
    * @return void
    */
-  static function beginPostProcess(&$form, &$params) {
+  public static function beginPostProcess(&$form, &$params) {
     if ($form->_context == 'caseActivity') {
       return;
     }
@@ -259,9 +256,8 @@ class CRM_Case_Form_Activity_OpenCase {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($fields, $files, $form) {
+  public static function formRule($fields, $files, $form) {
     if ($form->_context == 'caseActivity') {
       return TRUE;
     }
@@ -273,14 +269,13 @@ class CRM_Case_Form_Activity_OpenCase {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @param $form
    * @param array $params
    *
    * @return void
    */
-  static function endPostProcess(&$form, &$params) {
+  public static function endPostProcess(&$form, &$params) {
     if ($form->_context == 'caseActivity') {
       return;
     }
@@ -371,4 +366,3 @@ class CRM_Case_Form_Activity_OpenCase {
     }
   }
 }
-

@@ -56,7 +56,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
    * @param null $title
    * @param null $mode
    */
-  function __construct($title = NULL, $mode = NULL) {
+  public function __construct($title = NULL, $mode = NULL) {
     parent::__construct($title, $mode);
 
     // fetch the ids of templates which diverted from defaults and can be reverted –
@@ -83,7 +83,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Core_BAO_MessageTemplate';
   }
 
@@ -92,7 +92,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       $confirm = ts('Are you sure you want to revert this template to the default for this workflow? You will lose any customizations you have made.', array('escape' => 'js')) . '\n\n' . ts('We recommend that you save a copy of the your customized Text and HTML message content to a text file before reverting so you can combine your changes with the system default messages as needed.', array('escape' => 'js'));
       self::$_links = array(
@@ -144,7 +144,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
    * @param string $permission
    * @param bool $forceAction
    */
-  function action(&$object, $action, &$values, &$links, $permission, $forceAction = FALSE) {
+  public function action(&$object, $action, &$values, &$links, $permission, $forceAction = FALSE) {
     if ($object->workflow_id) {
       // do not expose action link for reverting to default if the template did not diverge or we just reverted it now
       if (!in_array($object->id, array_keys($this->_revertible)) or
@@ -187,7 +187,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
    *
    * @throws Exception
    */
-  function run($args = NULL, $pageArgs = NULL, $sort = NULL) {
+  public function run($args = NULL, $pageArgs = NULL, $sort = NULL) {
     // handle the revert action and offload the rest to parent
     if (CRM_Utils_Request::retrieve('action', 'String', $this) & CRM_Core_Action::REVERT) {
 
@@ -211,7 +211,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Admin_Form_MessageTemplates';
   }
 
@@ -220,7 +220,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return ts('Message Template');
   }
 
@@ -231,7 +231,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/messageTemplates';
   }
 
@@ -239,9 +239,8 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
    * Browse all entities.
    *
    * @return void
-   * @access public
    */
-  function browse() {
+  public function browse() {
     $action = func_num_args() ? func_get_arg(0) : NULL;
     if ($this->_action & CRM_Core_Action::ADD) {
       return;
@@ -291,4 +290,3 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
     $this->assign('rows', $rows);
   }
 }
-

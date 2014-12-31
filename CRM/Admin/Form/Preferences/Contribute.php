@@ -8,11 +8,10 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
-  function preProcess() {
+  public function preProcess() {
     $config = CRM_Core_Config::singleton();
     CRM_Utils_System::setTitle(ts('CiviContribute Component Settings'));
     $this->_varNames = array(
@@ -88,9 +87,8 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
    * Build the form object
    *
    * @return void
-   * @access public
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $this->add('checkbox', 'invoicing', ts('Enable Tax and Invoicing'));
     parent::buildQuickForm();
   }
@@ -99,11 +97,10 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
    * Set default values for the form.
    * default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
     return $defaults;
   }
@@ -111,7 +108,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -146,6 +142,3 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     }
   }
 }
-
-
-

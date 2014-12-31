@@ -44,7 +44,7 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -218,7 +218,7 @@ contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
@@ -227,11 +227,11 @@ contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
    *
    * @return array
    */
-  function setDefaultValues($freeze = TRUE) {
+  public function setDefaultValues($freeze = TRUE) {
     return parent::setDefaultValues($freeze);
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $append = NULL;
     // since contact fields not related to financial type
@@ -276,7 +276,7 @@ contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
   /**
    * @param bool $tableCol
    */
-  function groupBy($tableCol = FALSE) {
+  public function groupBy($tableCol = FALSE) {
     $this->_groupBy = "";
     if (!empty($this->_params['group_bys']) &&
       is_array($this->_params['group_bys'])
@@ -300,7 +300,7 @@ contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
     }
   }
 
-  function from() {
+  public function from() {
     list($fromTable, $fromAlias, $fromCol) = $this->groupBy(TRUE);
     $from = "$fromTable $fromAlias";
 
@@ -341,7 +341,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
    *
    * @return mixed|string
    */
-  function whereContribution($replaceAliasWith = 'contribution1') {
+  public function whereContribution($replaceAliasWith = 'contribution1') {
     $clauses = array("is_test" => "{$this->_aliases['civicrm_contribution']}.is_test = 0");
 
     foreach ($this->_columns['civicrm_contribution']['filters'] as $fieldName => $field) {
@@ -399,7 +399,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
     return $whereClause;
   }
 
-  function where() {
+  public function where() {
     if (!$this->_amountClauseWithAND) {
       $this->_amountClauseWithAND =
         "!({$this->_aliases['civicrm_contribution']}1.total_amount_count IS NULL AND {$this->_aliases['civicrm_contribution']}2.total_amount_count IS NULL)";
@@ -439,7 +439,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
 
     $errors = $checkDate = $errorCount = array();
 
@@ -599,7 +599,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
     //fetch contributions for both date ranges from pre-existing temp tables
@@ -758,7 +758,7 @@ GROUP BY    currency
     return $statistics;
   }
 
-  function postProcess() {
+  public function postProcess() {
     $this->beginPostProcess();
     $create = $subSelect1 = $subSelect2 = NULL;
     list($fromTable, $fromAlias, $fromCol) = $this->groupBy(TRUE);
@@ -905,7 +905,7 @@ currency varchar(3)
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     list($from1, $to1) = $this->getFromTo(CRM_Utils_Array::value("receive_date1_relative", $this->_params),
       CRM_Utils_Array::value("receive_date1_from", $this->_params),
@@ -981,4 +981,3 @@ currency varchar(3)
     // foreach ends
   }
 }
-

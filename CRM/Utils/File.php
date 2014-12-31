@@ -44,9 +44,8 @@ class CRM_Utils_File {
    * @param string $name name of file
    *
    * @return boolean     true if file is ascii
-   * @access public
    */
-  static function isAscii($name) {
+  public static function isAscii($name) {
     $fd = fopen($name, "r");
     if (!$fd) {
       return FALSE;
@@ -71,9 +70,8 @@ class CRM_Utils_File {
    * @param string $name name of file
    *
    * @return boolean     true if file is html
-   * @access public
    */
-  static function isHtml($name) {
+  public static function isHtml($name) {
     $fd = fopen($name, "r");
     if (!$fd) {
       return FALSE;
@@ -102,10 +100,9 @@ class CRM_Utils_File {
    * @param boolean $abort should we abort or just return an invalid code
    *
    * @return void
-   * @access public
    * @static
    */
-  static function createDir($path, $abort = TRUE) {
+  public static function createDir($path, $abort = TRUE) {
     if (is_dir($path) || empty($path)) {
       return;
     }
@@ -135,10 +132,9 @@ class CRM_Utils_File {
    *
    * @throws Exception
    * @return void
-   * @access public
    * @static
    */
-  static function cleanDir($target, $rmdir = TRUE, $verbose = TRUE) {
+  public static function cleanDir($target, $rmdir = TRUE, $verbose = TRUE) {
     static $exceptions = array('.', '..');
     if ($target == '' || $target == '/') {
       throw new Exception("Overly broad deletion");
@@ -179,7 +175,7 @@ class CRM_Utils_File {
    * @param $source
    * @param $destination
    */
-  static function copyDir($source, $destination) {
+  public static function copyDir($source, $destination) {
     $dir = opendir($source);
     @mkdir($destination);
     while (FALSE !== ($file = readdir($dir))) {
@@ -201,9 +197,8 @@ class CRM_Utils_File {
    * @param string $name name of file
    *
    * @return boolean  whether the file was recoded properly
-   * @access public
    */
-  static function toUtf8($name) {
+  public static function toUtf8($name) {
     static $config = NULL;
     static $legacyEncoding = NULL;
     if ($config == NULL) {
@@ -248,10 +243,9 @@ class CRM_Utils_File {
    * @param string $slash
    *
    * @return string
-   * @access public
    * @static
    */
-  static function addTrailingSlash($path, $slash = NULL) {
+  public static function addTrailingSlash($path, $slash = NULL) {
     if (!$slash) {
       // FIXME: Defaulting to backslash on windows systems can produce unexpected results, esp for URL strings which should always use forward-slashes.
       // I think this fn should default to forward-slash instead.
@@ -270,7 +264,7 @@ class CRM_Utils_File {
    * @param bool $isQueryString
    * @param bool $dieOnErrors
    */
-  static function sourceSQLFile($dsn, $fileName, $prefix = NULL, $isQueryString = FALSE, $dieOnErrors = TRUE) {
+  public static function sourceSQLFile($dsn, $fileName, $prefix = NULL, $isQueryString = FALSE, $dieOnErrors = TRUE) {
     require_once 'DB.php';
 
     $db = DB::connect($dsn);
@@ -317,7 +311,7 @@ class CRM_Utils_File {
    *
    * @return bool
    */
-  static function isExtensionSafe($ext) {
+  public static function isExtensionSafe($ext) {
     static $extensions = NULL;
     if (!$extensions) {
       $extensions = CRM_Core_OptionGroup::values('safe_file_extension', TRUE);
@@ -347,7 +341,7 @@ class CRM_Utils_File {
    *
    * @return boolean  whether the file can be include()d or require()d
    */
-  static function isIncludable($name) {
+  public static function isIncludable($name) {
     $x = @fopen($name, 'r', TRUE);
     if ($x) {
       fclose($x);
@@ -362,7 +356,7 @@ class CRM_Utils_File {
    * Remove the 32 bit md5 we add to the fileName
    * also remove the unknown tag if we added it
    */
-  static function cleanFileName($name) {
+  public static function cleanFileName($name) {
     // replace the last 33 character before the '.' with null
     $name = preg_replace('/(_[\w]{32})\./', '.', $name);
     return $name;
@@ -373,7 +367,7 @@ class CRM_Utils_File {
    *
    * @return string
    */
-  static function makeFileName($name) {
+  public static function makeFileName($name) {
     $uniqID   = md5(uniqid(rand(), TRUE));
     $info     = pathinfo($name);
     $basename = substr($info['basename'],
@@ -396,7 +390,7 @@ class CRM_Utils_File {
    *
    * @return array
    */
-  static function getFilesByExtension($path, $ext) {
+  public static function getFilesByExtension($path, $ext) {
     $path  = self::addTrailingSlash($path);
     $dh    = opendir($path);
     $files = array();
@@ -415,7 +409,7 @@ class CRM_Utils_File {
    * @param string $dir the directory to be secured
    * @param bool $overwrite
    */
-  static function restrictAccess($dir, $overwrite = FALSE) {
+  public static function restrictAccess($dir, $overwrite = FALSE) {
     // note: empty value for $dir can play havoc, since that might result in putting '.htaccess' to root dir
     // of site, causing site to stop functioning.
     // FIXME: we should do more checks here -
@@ -441,7 +435,7 @@ HTACCESS;
    *
    * @param $publicDir
    */
-  static function restrictBrowsing($publicDir) {
+  public static function restrictBrowsing($publicDir) {
     if (!is_dir($publicDir) || !is_writable($publicDir)) {
       return;
     }
@@ -468,7 +462,7 @@ HTACCESS;
    * Create the base file path from which all our internal directories are
    * offset. This is derived from the template compile directory set
    */
-  static function baseFilePath($templateCompileDir = NULL) {
+  public static function baseFilePath($templateCompileDir = NULL) {
     static $_path = NULL;
     if (!$_path) {
       if ($templateCompileDir == NULL) {
@@ -497,7 +491,7 @@ HTACCESS;
    *
    * @return string
    */
-  static function relativeDirectory($directory) {
+  public static function relativeDirectory($directory) {
     // Do nothing on windows
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
       return $directory;
@@ -525,7 +519,7 @@ HTACCESS;
    *
    * @return string
    */
-  static function absoluteDirectory($directory) {
+  public static function absoluteDirectory($directory) {
     // check if directory is already absolute, if so return immediately
     // Note: Windows PHP accepts any mix of "/" or "\", so "C:\htdocs" or "C:/htdocs" would be a valid absolute path
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && preg_match(';^[a-zA-Z]:[/\\\\];', $directory)) {
@@ -551,7 +545,7 @@ HTACCESS;
    *
    * @return string
    */
-  static function relativize($directory, $basePath) {
+  public static function relativize($directory, $basePath) {
     if (substr($directory, 0, strlen($basePath)) == $basePath) {
       return substr($directory, strlen($basePath));
     } else {
@@ -569,7 +563,7 @@ HTACCESS;
    * @return string, path to an openable/writable file
    * @see tempnam
    */
-  static function tempnam($prefix = 'tmp-') {
+  public static function tempnam($prefix = 'tmp-') {
     //$config = CRM_Core_Config::singleton();
     //$nonce = md5(uniqid() . $config->dsn . $config->userFrameworkResourceURL);
     //$fileName = "{$config->configAndLogDir}" . $prefix . $nonce . $suffix;
@@ -587,7 +581,7 @@ HTACCESS;
    * @return string, path to an openable/writable directory; ends with '/'
    * @see tempnam
    */
-  static function tempdir($prefix = 'tmp-') {
+  public static function tempdir($prefix = 'tmp-') {
     $fileName = self::tempnam($prefix);
     unlink($fileName);
     mkdir($fileName, 0700);
@@ -603,7 +597,7 @@ HTACCESS;
    * @param $pattern string, glob pattern, eg "*.txt"
    * @return array(string)
    */
-  static function findFiles($dir, $pattern) {
+  public static function findFiles($dir, $pattern) {
     $todos = array($dir);
     $result = array();
     while (!empty($todos)) {
@@ -641,7 +635,7 @@ HTACCESS;
    *
    * @return bool
    */
-  static function isChildPath($parent, $child, $checkRealPath = TRUE) {
+  public static function isChildPath($parent, $child, $checkRealPath = TRUE) {
     if ($checkRealPath) {
       $parent = realpath($parent);
       $child = realpath($child);
@@ -671,7 +665,7 @@ HTACCESS;
    *
    * @return bool TRUE on success
    */
-  static function replaceDir($fromDir, $toDir, $verbose = FALSE) {
+  public static function replaceDir($fromDir, $toDir, $verbose = FALSE) {
     if (is_dir($toDir)) {
       if (!self::cleanDir($toDir, TRUE, $verbose)) {
         return FALSE;
@@ -688,4 +682,3 @@ HTACCESS;
     return TRUE;
   }
 }
-

@@ -45,7 +45,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -60,10 +60,9 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Pledge_BAO_Pledge object
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $pledge = new CRM_Pledge_DAO_Pledge();
     $pledge->copyValues($params);
     if ($pledge->find(TRUE)) {
@@ -78,12 +77,11 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    *
    * @param array $params reference array contains the values submitted by the form
    *
-   * @access public
    * @static
    *
    * @return object
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'Pledge', $params['id'], $params);
     }
@@ -127,10 +125,9 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @param array $returnProperties  if you want to return specific fields
    *
    * @return array associated array of field values
-   * @access public
    * @static
    */
-  static function &getValues(&$params, &$values, $returnProperties = NULL) {
+  public static function &getValues(&$params, &$values, $returnProperties = NULL) {
     if (empty($params)) {
       return NULL;
     }
@@ -144,10 +141,9 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Pledge_BAO_Pledge object
-   * @access public
    * @static
    */
-  static function &create(&$params) {
+  public static function &create(&$params) {
     //FIXME: a cludgy hack to fix the dates to MySQL format
     $dateFields = array('start_date', 'create_date', 'acknowledge_date', 'modified_date', 'cancel_date', 'end_date');
     foreach ($dateFields as $df) {
@@ -258,11 +254,10 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @param int $id pledge id
    *
    * @return mixed
-   * @access public
    * @static
    *
    */
-  static function deletePledge($id) {
+  public static function deletePledge($id) {
     CRM_Utils_Hook::pre('delete', 'Pledge', $id, CRM_Core_DAO::$_nullArray);
 
     $transaction = new CRM_Core_Transaction();
@@ -307,7 +302,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    *
    * @return array|null
    */
-  static function getTotalAmountAndCount($status = NULL, $startDate = NULL, $endDate = NULL) {
+  public static function getTotalAmountAndCount($status = NULL, $startDate = NULL, $endDate = NULL) {
     $where = array();
     $select = $from = $queryDate = NULL;
     //get all status
@@ -448,10 +443,9 @@ GROUP BY  currency
    *
    * @return array return the list of pledge fields
    *
-   * @access public
    * @static
    */
-  static function getHonorContacts($honorId) {
+  public static function getHonorContacts($honorId) {
     $params = array();
     $honorDAO = new CRM_Contribute_DAO_ContributionSoft();
     $honorDAO->contact_id = $honorId;
@@ -491,11 +485,10 @@ GROUP BY  currency
    *
    * @param CRM_Core_Form $form form object.
    * @param array $params an assoc array of name/value pairs.
-   * @access public
    *
    * @return void.
    */
-  static function sendAcknowledgment(&$form, $params) {
+  public static function sendAcknowledgment(&$form, $params) {
     //handle Acknowledgment.
     $allPayments = $payments = array();
 
@@ -685,10 +678,9 @@ GROUP BY  currency
    * Combine all the exportable fields from the lower levels object
    *
    * @return array array of exportable Fields
-   * @access public
    * @static
    */
-  static function &exportableFields() {
+  public static function &exportableFields() {
     if (!self::$_exportableFields) {
       if (!self::$_exportableFields) {
         self::$_exportableFields = array();
@@ -752,7 +744,7 @@ GROUP BY  currency
    * @return array associated array of pledge id(s)
    * @static
    */
-  static function getContactPledges($contactID) {
+  public static function getContactPledges($contactID) {
     $pledgeDetails = array();
     $pledgeStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
@@ -794,10 +786,9 @@ GROUP BY  currency
    * @param int $contactID
    *
    * @return int count of pledge records
-   * @access public
    * @static
    */
-  static function getContactPledgeCount($contactID) {
+  public static function getContactPledgeCount($contactID) {
     $query = "SELECT count(*) FROM civicrm_pledge WHERE civicrm_pledge.contact_id = {$contactID} AND civicrm_pledge.is_test = 0";
     return CRM_Core_DAO::singleValueQuery($query);
   }
@@ -1086,7 +1077,7 @@ SELECT  pledge.contact_id              as contact_id,
    * @param integer $pledgeStatusID
    * @return bool do financial transactions exist for this pledge?
    */
-   static function pledgeHasFinancialTransactions($pledgeID, $pledgeStatusID) {
+   public static function pledgeHasFinancialTransactions($pledgeID, $pledgeStatusID) {
     if (empty($pledgeStatusID)) {
       //why would this happen? If we can see where it does then we can see if we should look it up
       //but assuming from form code it CAN be empty
@@ -1130,4 +1121,3 @@ SELECT  pledge.contact_id              as contact_id,
     return array_diff(array_flip($paymentStatus), self::getNonTransactionalStatus());
   }
 }
-

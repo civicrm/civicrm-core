@@ -42,7 +42,6 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
    * The custom field id saved to the session for an update
    *
    * @var int
-   * @access protected
    */
   protected $_fid;
 
@@ -50,7 +49,6 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
    * The custom group id saved to the session for an update
    *
    * @var int
-   * @access protected
    */
   protected $_gid;
 
@@ -63,7 +61,6 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
    * The Option id, used when editing the Option
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
@@ -73,7 +70,6 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_fid = CRM_Utils_Request::retrieve('fid', 'Positive', $this);
@@ -110,9 +106,8 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
    * @param null
    *
    * @return array   array of default values
-   * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = $fieldDefaults = array();
     if (isset($this->_id)) {
       $params = array('id' => $this->_id);
@@ -158,7 +153,6 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action == CRM_Core_Action::DELETE) {
@@ -252,9 +246,8 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($fields, $files, $form) {
+  public static function formRule($fields, $files, $form) {
     $optionLabel   = $fields['label'];
     $optionValue   = $fields['value'];
     $fieldId       = $form->_fid;
@@ -401,7 +394,6 @@ SELECT count(*)
    * @param null
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // store the submitted values in an array
@@ -528,4 +520,3 @@ SELECT count(*)
     }
   }
 }
-

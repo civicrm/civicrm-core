@@ -44,7 +44,7 @@ class CRM_Mailing_Event_BAO_Subscribe extends CRM_Mailing_Event_DAO_Subscribe {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -60,7 +60,6 @@ class CRM_Mailing_Event_BAO_Subscribe extends CRM_Mailing_Event_DAO_Subscribe {
    * @param string $context
    *
    * @return int|null $se_id      The id of the subscription event, null on failure
-   * @access public
    * @static
    */
   public static function &subscribe($group_id, $email, $contactId = NULL, $context = NULL) {
@@ -181,7 +180,6 @@ SELECT     civicrm_email.id as email_id
    * @param string $hash          Hash to verify
    *
    * @return object|null          The subscribe event object, or null on failure
-   * @access public
    * @static
    */
   public static function &verify($contact_id, $subscribe_id, $hash) {
@@ -202,7 +200,6 @@ SELECT     civicrm_email.id as email_id
    * @param string $email         The email address
    *
    * @return void
-   * @access public
    */
   public function send_confirm_request($email) {
     $config = CRM_Core_Config::singleton();
@@ -302,7 +299,6 @@ SELECT     civicrm_email.id as email_id
    * @param int $subscribe_id     ID of the subscribe event
    *
    * @return object $domain       The domain owning the event
-   * @access public
    * @static
    */
   public static function &getDomain($subscribe_id) {
@@ -316,7 +312,6 @@ SELECT     civicrm_email.id as email_id
    * @param int    $contactID contactID if we want an exact match
    *
    * @return array $groups    array of group ids
-   * @access public
    */
   public static function getContactGroups($email, $contactID = NULL) {
     if ($contactID) {
@@ -370,7 +365,6 @@ SELECT     civicrm_email.id as email_id
    *
    * @return void
    * @static
-   * @access public
    */
   public static function commonSubscribe(&$groups, &$params, $contactId = NULL, $context = NULL) {
     $contactGroups = CRM_Mailing_Event_BAO_Subscribe::getContactGroups($params['email'], $contactId);
@@ -412,4 +406,3 @@ SELECT     civicrm_email.id as email_id
     }
   }
 }
-

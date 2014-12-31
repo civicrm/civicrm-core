@@ -56,10 +56,9 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
    *
    * @return void
    *
-   * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_CREATE;
 
     $this->_onPopupClose = CRM_Utils_Request::retrieve('onPopupClose', 'String', $this);
@@ -144,7 +143,6 @@ SELECT module,is_reserved
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if (empty($this->_ufGroup['id'])) {
@@ -248,7 +246,6 @@ SELECT module,is_reserved
   /**
    * Process the user submitted custom data values.
    *
-   * @access public
    *
    * @return void
    */
@@ -315,11 +312,10 @@ SELECT module,is_reserved
    *
    * This is a first version and will be tweaked over a period of time
    *
-   * @access    public
    *
    * @return    boolean   true if no error found
    */
-  function validate() {
+  public function validate() {
     $errors = parent::validate();
 
     if (!$errors && !empty($_POST['errorURL'])) {
@@ -347,4 +343,3 @@ SELECT module,is_reserved
     return $errors;
   }
 }
-

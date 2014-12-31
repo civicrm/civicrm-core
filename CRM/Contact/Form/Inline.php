@@ -80,7 +80,6 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    * Common form elements
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     CRM_Contact_Form_Inline_Lock::buildQuickForm($this, $this->_contactId);
@@ -103,7 +102,6 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    * Override default cancel action
    *
    * @return void
-   * @access public
    */
   public function cancelAction() {
     $response = array('status' => 'cancel');
@@ -114,7 +112,6 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    * Set defaults for the form
    *
    * @return array
-   * @access public
    */
   public function setDefaultValues() {
     $defaults = $params = array();
@@ -129,7 +126,6 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    * Add entry to log table
    *
    * @return void
-   * @protected
    */
   protected function log() {
     CRM_Core_BAO_Log::register($this->_contactId,
@@ -143,7 +139,6 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    * Prepares ajaxResponse
    *
    * @return void
-   * @protected
    */
   protected function response() {
     // Load changelog footer from template

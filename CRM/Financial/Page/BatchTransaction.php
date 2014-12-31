@@ -54,7 +54,7 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Batch_BAO_Batch';
   }
 
@@ -63,7 +63,7 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         'view'  => array(
@@ -90,10 +90,9 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
    *
    */
-  function run() {
+  public function run() {
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, false, 'browse'); // default to 'browse'
 
@@ -123,10 +122,9 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
    *
    *
    * @return void
-   * @access public
    * @static
    */
-  function browse() {
+  public function browse() {
   }
 
   /**
@@ -134,7 +132,7 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Financial_Form_BatchTransaction';
   }
 
@@ -143,7 +141,7 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Batch';
   }
 
@@ -154,9 +152,7 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = null) {
+  public function userContext($mode = null) {
     return 'civicrm/batchtransaction';
   }
 }
-
-

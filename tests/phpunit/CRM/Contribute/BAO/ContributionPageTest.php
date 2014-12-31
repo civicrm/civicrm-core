@@ -37,18 +37,18 @@ require_once 'CiviTest/PaypalPro.php';
  */
 class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->_financialTypeID = 1;
   }
 
-  function tearDown() {
+  public function tearDown() {
   }
 
   /**
    * Create() method (create Contribution Page)
    */
-  function testCreate() {
+  public function testCreate() {
 
     $params = array(
       'qfkey' => '9a3ef3c08879ad4c8c109b21c583400e',
@@ -80,7 +80,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
   /**
    *  test setIsActive() method
    */
-  function testsetIsActive() {
+  public function testsetIsActive() {
 
     $params = array(
       'title' => 'Test Contribution Page',
@@ -99,7 +99,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Test setValues() method
    */
-  function testSetValues() {
+  public function testSetValues() {
 
     $params = array(
       'title' => 'Test Contribution Page',
@@ -122,7 +122,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Test copy() method
    */
-  function testcopy() {
+  public function testcopy() {
     $params = array(
       'qfkey' => '9a3ef3c08879ad4c8c109b21c583400e',
       'title' => 'Test Contribution Page',
@@ -154,7 +154,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Test checkRecurPaymentProcessor() method
    */
-  function testcheckRecurPaymentProcessor() {
+  public function testcheckRecurPaymentProcessor() {
     //@todo paypalpro create seems to fail silently without causing this class to fail
     // $this->paymentProcessorCreate may be a better option
     $paymentProcessor = PaypalPro::create();
@@ -172,5 +172,3 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     ContributionPage::delete($contributionpage->id);
   }
 }
-
-

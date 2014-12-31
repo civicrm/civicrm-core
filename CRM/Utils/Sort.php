@@ -53,7 +53,7 @@ class CRM_Utils_Sort {
    *
    * @var int
    */
-  CONST ASCENDING = 1, DESCENDING = 2, DONTCARE = 4,
+  const ASCENDING = 1, DESCENDING = 2, DONTCARE = 4,
 
   /**
    * The name for the sort GET/POST param
@@ -122,7 +122,7 @@ class CRM_Utils_Sort {
    * @return \CRM_Utils_Sort
   @access public
    */
-  function __construct(&$vars, $defaultSortOrder = NULL) {
+  public function __construct(&$vars, $defaultSortOrder = NULL) {
     $this->_vars = array();
     $this->_response = array();
 
@@ -148,9 +148,8 @@ class CRM_Utils_Sort {
    * Function returns the string for the order by clause
    *
    * @return string the order by clause
-   * @access public
    */
-  function orderBy() {
+  public function orderBy() {
     if (empty($this->_vars[$this->_currentSortID])) {
       return '';
     }
@@ -175,9 +174,8 @@ class CRM_Utils_Sort {
    *
    * @return string  the string to append to the url
    * @static
-   * @access public
    */
-  static function sortIDValue($index, $dir) {
+  public static function sortIDValue($index, $dir) {
     return ($dir == self::DESCENDING) ? $index . '_d' : $index . '_u';
   }
 
@@ -187,9 +185,8 @@ class CRM_Utils_Sort {
    * @param string $defaultSortOrder the sort order to use by default
    *
    * @return returns null if $url- (sort url) is not found
-   * @access public
    */
-  function initSortID($defaultSortOrder) {
+  public function initSortID($defaultSortOrder) {
     $url = CRM_Utils_Array::value(self::SORT_ID, $_GET, $defaultSortOrder);
 
     if (empty($url)) {
@@ -224,9 +221,8 @@ class CRM_Utils_Sort {
    * @param string $defaultSortOrder the sort order to use by default
    *
    * @return void
-   * @access public
    */
-  function initialize($defaultSortOrder) {
+  public function initialize($defaultSortOrder) {
     $this->initSortID($defaultSortOrder);
 
     $this->_response = array();
@@ -260,7 +256,7 @@ class CRM_Utils_Sort {
    * @return int returns of the current sort id
    * @acccess public
    */
-  function getCurrentSortID() {
+  public function getCurrentSortID() {
     return $this->_currentSortID;
   }
 
@@ -270,7 +266,7 @@ class CRM_Utils_Sort {
    * @return int returns of the current sort direction
    * @acccess public
    */
-  function getCurrentSortDirection() {
+  public function getCurrentSortDirection() {
     return $this->_currentSortDirection;
   }
 
@@ -281,9 +277,8 @@ class CRM_Utils_Sort {
    * @param $b
    *
    * @return int (-1 or 1)
-   * @access public
    */
-  static function cmpFunc($a, $b) {
+  public static function cmpFunc($a, $b) {
     $cmp_order = array('weight', 'id', 'title', 'name');
     foreach ($cmp_order as $attribute) {
       if (isset($a[$attribute]) && isset($b[$attribute])) {

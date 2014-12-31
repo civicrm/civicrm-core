@@ -51,10 +51,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field object
-   * @access public
    * @static
    */
-  static function &add(&$params) {
+  public static function &add(&$params) {
     $priceFieldBAO = new CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field();
 
     $priceFieldBAO->copyValues($params);
@@ -75,10 +74,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * @param array $params (reference) an assoc array of name/value pairs
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field object
-   * @access public
    * @static
    */
-  static function create(&$params) {
+  public static function create(&$params) {
 
     $transaction = new CRM_Core_Transaction();
 
@@ -160,10 +158,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field object
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field', $params, $defaults);
   }
 
@@ -175,10 +172,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    *
    * @return   Object            DAO object on sucess, null otherwise
    *
-   * @access public
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field', $id, 'is_active', $is_active);
   }
 
@@ -189,7 +185,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    *
    * @return string name
    *
-   * @access public
    * @static
    *
    */
@@ -210,7 +205,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * @param array $freezeOptions
    *
    * @return null
-   * @access public
    * @static
    */
   public static function addQuickFormElement(&$qf,
@@ -505,7 +499,6 @@ WHERE
    *
    * @return  boolean
    *
-   * @access public
    * @static
    *
    */
@@ -532,7 +525,7 @@ WHERE
   /**
    * @return array
    */
-  static function &htmlTypes() {
+  public static function &htmlTypes() {
     static $htmlTypes = NULL;
     if (!$htmlTypes) {
       $htmlTypes = array(
@@ -555,7 +548,6 @@ WHERE
    * @param $fields
    * @param $error
    *
-   * @access public
    * @static
    */
 
@@ -627,4 +619,3 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
     }
   }
 }
-

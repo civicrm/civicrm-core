@@ -34,7 +34,7 @@
  */
 class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
 
-  function __construct() {
+  public function __construct() {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -208,11 +208,11 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
     $this->_currencyColumn = 'civicrm_contribution_recur_currency';
     parent::__construct();
   }
-  function getTemplateName() {
+  public function getTemplateName() {
     return 'CRM/Report/Form.tpl' ;
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
       FROM civicrm_contact  {$this->_aliases['civicrm_contact']}
         INNER JOIN civicrm_contribution_recur   {$this->_aliases['civicrm_contribution_recur']}
@@ -229,11 +229,11 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
        {$this->_aliases['civicrm_phone']}.is_primary = 1)";
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = "GROUP BY " . $this->_aliases['civicrm_contribution_recur'] . ".id";
   }
 
-  function where() {
+  public function where() {
     parent::where();
     // Handle calculated end date. This can come from one of two sources:
     // Either there is a specified end date for the end_date field
@@ -297,7 +297,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
   }
 
 
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
     foreach ($rows as $rowNum => $row) {
       // convert display name to links

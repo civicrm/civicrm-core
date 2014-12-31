@@ -35,7 +35,7 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testRelationshipTypeAdd() {
+  public function testRelationshipTypeAdd() {
 
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -78,7 +78,7 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
     }
   }
 
-  function testRelationshipTypeAddValidateFormRules() {
+  public function testRelationshipTypeAddValidateFormRules() {
 
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -123,4 +123,3 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', 'Label already exists in Database.');
   }
 }
-

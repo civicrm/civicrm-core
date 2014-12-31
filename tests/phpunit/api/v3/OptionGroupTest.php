@@ -35,7 +35,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
 
   protected $_entity = 'OptionGroup';
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->_params = array(
@@ -155,4 +155,3 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
     $this->callAPIAndDocument('OptionGroup', 'delete', array('id' => $result['id']), __FUNCTION__, __FILE__);
   }
 }
-

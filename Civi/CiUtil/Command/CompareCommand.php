@@ -2,7 +2,7 @@
 namespace Civi\CiUtil\Command;
 
 class CompareCommand {
-  static function main($argv) {
+  public static function main($argv) {
     if (empty($argv[1])) {
       echo "summary: Compares the output of different test runs\n";
       echo "usage: phpunit-compare [--out=txt|csv] [--phpunit-json|--jenkins-xml] <file1> <file2>...\n";

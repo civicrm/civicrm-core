@@ -54,7 +54,7 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Core_BAO_LabelFormat';
   }
 
@@ -63,7 +63,7 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       // helper variable for nicer formatting
       self::$_links = array(
@@ -96,7 +96,7 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Admin_Form_LabelFormats';
   }
 
@@ -105,7 +105,7 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Mailing Label Formats';
   }
 
@@ -116,7 +116,7 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/labelFormats';
   }
 
@@ -126,10 +126,9 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
    * @param null $action
    *
    * @return void
-   * @access public
    * @static
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
     // Get list of configured Label Formats
     $labelFormatList= CRM_Core_BAO_LabelFormat::getList();
     $nameFormatList= CRM_Core_BAO_LabelFormat::getList(false, 'name_badge');
@@ -166,4 +165,3 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
     $this->assign('rows', $labelFormatList);
   }
 }
-

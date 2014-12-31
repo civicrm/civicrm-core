@@ -41,7 +41,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
   /**
    * This is a contructor of the class.
    */
-  function __construct() {}
+  public function __construct() {}
 
   /**
    * Function is used to format the individual contact values
@@ -50,10 +50,9 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    * @param array  $contact  contact object
    *
    * @return CRM_Contact_BAO_Contact object
-   * @access public
    * @static
    */
-  static function format(&$params, &$contact) {
+  public static function format(&$params, &$contact) {
     if (!self::dataExists($params)) {
       return;
     }
@@ -340,7 +339,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    *
    * @return void
    */
-  static function updateDisplayNames(&$ids, $action) {
+  public static function updateDisplayNames(&$ids, $action) {
     // get the proper field name (prefix_id or suffix_id) and its value
     $fieldName = '';
     foreach ($ids as $key => $value) {
@@ -384,7 +383,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    *
    * @return string  the constructed display name
    */
-  function displayName() {
+  public function displayName() {
     $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
     $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
     return str_replace('  ', ' ', trim($prefix[$this->prefix_id] . ' ' . $this->first_name . ' ' . $this->middle_name . ' ' . $this->last_name . ' ' . $suffix[$this->suffix_id]));
@@ -396,10 +395,9 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return boolean
-   * @access public
    * @static
    */
-  static function dataExists(&$params) {
+  public static function dataExists(&$params) {
     if ($params['contact_type'] == 'Individual') {
       return TRUE;
     }
@@ -407,4 +405,3 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     return FALSE;
   }
 }
-

@@ -59,7 +59,7 @@ class CRM_Utils_OpenFlashChart {
    * @return object $chart   object of open flash chart.
    * @static
    */
-  static function &barChart(&$params) {
+  public static function &barChart(&$params) {
     $chart = NULL;
     if (empty($params)) {
       return $chart;
@@ -188,7 +188,7 @@ class CRM_Utils_OpenFlashChart {
    * @return object $chart   object of open flash chart.
    * @static
    */
-  static function &pieChart(&$params) {
+  public static function &pieChart(&$params) {
     $chart = NULL;
     if (empty($params)) {
       return $chart;
@@ -251,7 +251,7 @@ class CRM_Utils_OpenFlashChart {
    * @return object $chart   object of open flash chart.
    * @static
    */
-  static function &bar_3dChart(&$params) {
+  public static function &bar_3dChart(&$params) {
     $chart = NULL;
     if (empty($params)) {
       return $chart;
@@ -396,7 +396,7 @@ class CRM_Utils_OpenFlashChart {
    *
    * @return array
    */
-  static function chart($rows, $chart, $interval) {
+  public static function chart($rows, $chart, $interval) {
     $chartData = $dateKeys = array();
 
     switch ($interval) {
@@ -479,7 +479,7 @@ class CRM_Utils_OpenFlashChart {
    *
    * @return array
    */
-  static function reportChart($rows, $chart, $interval, &$chartInfo) {
+  public static function reportChart($rows, $chart, $interval, &$chartInfo) {
     foreach ($interval as $key => $val) {
       $graph[$val] = $rows['value'][$key];
     }
@@ -514,7 +514,7 @@ class CRM_Utils_OpenFlashChart {
    *
    * @return array
    */
-  static function buildChart(&$params, $chart) {
+  public static function buildChart(&$params, $chart) {
     $openFlashChart = array();
     if ($chart && is_array($params) && !empty($params)) {
       // build the chart objects.
@@ -553,4 +553,3 @@ class CRM_Utils_OpenFlashChart {
     return $openFlashChart;
   }
 }
-

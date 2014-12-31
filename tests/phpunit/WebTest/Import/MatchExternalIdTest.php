@@ -38,7 +38,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
   /**
    *  Test participant import for Individuals matching on external identifier.
    */
-  function testContributionImport() {
+  public function testContributionImport() {
     $this->webtestLogin();
 
     // Get sample import data.
@@ -51,7 +51,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
   /**
    *  Test membership import for Individuals matching on external identifier.
    */
-  function testMemberImportIndividual() {
+  public function testMemberImportIndividual() {
     $this->webtestLogin();
 
     // Get membership import data for Individuals.
@@ -64,7 +64,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
   /**
    *  Test participant import for Individuals matching on external identifier.
    */
-  function testParticipantImportIndividual() {
+  public function testParticipantImportIndividual() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -80,7 +80,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _contributionIndividualCSVData() {
+  public function _contributionIndividualCSVData() {
     $firstName1  = substr(sha1(rand()), 0, 7);
     $lastName1   = substr(sha1(rand()), 0, 7);
     $externalId1 = substr(sha1(rand()), 0, 4);
@@ -130,7 +130,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _memberIndividualCSVData() {
+  public function _memberIndividualCSVData() {
     $memTypeParams = $this->webtestAddMembershipType();
 
     $firstName1  = substr(sha1(rand()), 0, 7);
@@ -179,7 +179,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _participantIndividualCSVData() {
+  public function _participantIndividualCSVData() {
     $eventInfo = $this->_addNewEvent();
 
     $firstName1  = substr(sha1(rand()), 0, 7);
@@ -241,7 +241,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
    *
    * @return int external id
    */
-  function _addContact($firstName, $lastName, $externalId) {
+  public function _addContact($firstName, $lastName, $externalId) {
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 
     //fill in first name
@@ -268,7 +268,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
    *
    * @return array event details of newly created event
    */
-  function _addNewEvent($params = array()) {
+  public function _addNewEvent($params = array()) {
     if (empty($params)) {
 
       // Use default payment processor
@@ -361,4 +361,3 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     return $params;
   }
 }
-

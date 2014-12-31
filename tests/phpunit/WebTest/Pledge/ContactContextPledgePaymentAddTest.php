@@ -35,7 +35,7 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     parent::setUp();
   }
 
-  function testAddPledgePaymentWithAdjustPledgePaymentSchedule() {
+  public function testAddPledgePaymentWithAdjustPledgePaymentSchedule() {
     $this->webtestLogin();
     $this->openCiviPage('admin/setting/localization', 'reset=1');
     $this->select("currencyLimit-f","value=FJD");
@@ -206,7 +206,7 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->enableDisablePopups(TRUE);
   }
 
-  function testAddPledgePaymentWithAdjustTotalPledgeAmount() {
+  public function testAddPledgePaymentWithAdjustTotalPledgeAmount() {
     $this->webtestLogin();
     // Disable pop-ups for this test. Running test w/ pop-ups causes a spurious failure. dgg
     $this->enableDisablePopups(FALSE);
@@ -353,7 +353,7 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->enableDisablePopups(TRUE);
   }
 
-  function testAddPledgePayment() {
+  public function testAddPledgePayment() {
     $this->webtestLogin();
     // Disable pop-ups for this test. Running test w/ pop-ups causes a spurious failure. dgg
     $this->enableDisablePopups(FALSE);
@@ -449,4 +449,3 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->enableDisablePopups(TRUE);
   }
 }
-

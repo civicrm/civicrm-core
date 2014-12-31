@@ -42,7 +42,6 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $session = CRM_Core_Session::singleton();
@@ -62,7 +61,7 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $config = CRM_Core_Config::singleton();
     $defaults = array(
       'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
@@ -82,7 +81,6 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $multipleCustomData = CRM_Core_BAO_CustomGroup::getMultipleFieldGroup();
@@ -164,7 +162,6 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
    * Process the uploaded file
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $this->controller->resetPage('MapField');
@@ -207,7 +204,6 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Upload Data');

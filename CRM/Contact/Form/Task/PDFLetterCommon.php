@@ -45,9 +45,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access public
    */
-  static function preProcess(&$form) {
+  public static function preProcess(&$form) {
     $messageText    = array();
     $messageSubject = array();
     $dao            = new CRM_Core_BAO_MessageTemplate();
@@ -67,7 +66,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @param CRM_Core_Form $form
    * @param int $cid
    */
-  static function preProcessSingle(&$form, $cid) {
+  public static function preProcessSingle(&$form, $cid) {
     $form->_contactIds = array($cid);
     // put contact display name in title for single contact mode
     CRM_Utils_System::setTitle(ts('Create Printable Letter (PDF) for %1', array(1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name'))));
@@ -80,7 +79,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    *
    * @return void
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     // This form outputs a file so should never be submitted via ajax
     $form->preventAjaxSubmit();
 
@@ -195,7 +194,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   /**
    * Set default values
    */
-  static function setDefaultValues() {
+  public static function setDefaultValues() {
     $defaultFormat = CRM_Core_BAO_PdfFormat::getDefaultValues();
     $defaultFormat['format_id'] = $defaultFormat['id'];
     return $defaultFormat;
@@ -209,10 +208,9 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @param array $self      additional values form 'this'
    *
    * @return true if no errors, else array of errors
-   * @access public
    *
    */
-  static function formRule($fields, $dontCare, $self) {
+  public static function formRule($fields, $dontCare, $self) {
     $errors = array();
     $template = CRM_Core_Smarty::singleton();
 
@@ -238,7 +236,6 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   /**
    * Part of the post process which prepare and extract information from the template
    *
-   * @access protected
    *
    * @param CRM_Core_Form $form
    *
@@ -313,13 +310,12 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
    * @return void
    */
-  static function postProcess(&$form) {
+  public static function postProcess(&$form) {
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($form);
 
     $skipOnHold = isset($form->skipOnHold) ? $form->skipOnHold : FALSE;
@@ -370,7 +366,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    *
    * @throws CRM_Core_Exception
    */
-  static function createActivities($form, $html_message, $contactIds) {
+  public static function createActivities($form, $html_message, $contactIds) {
     //Added for CRM-12682: Add activity subject and campaign fields
     $formValues     = $form->controller->exportValues($form->getName());
 
@@ -421,7 +417,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   /**
    * @param $message
    */
-  static function formatMessage(&$message) {
+  public static function formatMessage(&$message) {
     $newLineOperators = array(
       'p' => array(
         'oper' => '<p>',
@@ -461,4 +457,3 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $message = implode($newLineOperators['p']['oper'], $htmlMsg);
   }
 }
-

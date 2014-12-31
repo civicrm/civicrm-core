@@ -61,9 +61,8 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
     $session = CRM_Core_Session::singleton();
     $this->_userContext = $session->readUserContext();
@@ -74,11 +73,10 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $this->add('text', 'unclosed_case_id', ts('Select Case'), array('class' => 'huge'), TRUE);
     $this->addDefaultButtons(ts('Continue >>'));
   }
@@ -86,16 +84,14 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
   /**
    * Add local and global form rules
    *
-   * @access protected
    *
    * @return void
    */
-  function addRules() {}
+  public function addRules() {}
 
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -145,4 +141,3 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
     CRM_Core_Session::setStatus("", ts('Total Selected Activities: %1', array(1 => count($this->_activityHolderIds))), "info");
   }
 }
-

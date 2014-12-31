@@ -35,7 +35,7 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
     parent::setUp();
   }
 
-  function testOnlineAutoRenewMembershipAnonymous() {
+  public function testOnlineAutoRenewMembershipAnonymous() {
     //configure membership signup page.
     $pageId = $this->_configureMembershipPage();
 
@@ -65,7 +65,7 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
     // has changed a bit. No point in adding test for external page as we 'll test with fake transactions.
   }
 
-  function testOnlineAutoRenewMembershipAuthenticated() {
+  public function testOnlineAutoRenewMembershipAuthenticated() {
     //configure membership signup page.
     $pageId = $this->_configureMembershipPage();
 
@@ -101,7 +101,7 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
   /**
    * @return null
    */
-  function _configureMembershipPage() {
+  public function _configureMembershipPage() {
     static $pageId = NULL;
 
     if (!$pageId) {
@@ -187,4 +187,3 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
     return $pageId;
   }
 }
-

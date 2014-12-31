@@ -42,7 +42,6 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
    * Page title
    *
    * @var string
-   * @protected
    */
   protected $_title;
 
@@ -50,7 +49,6 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
@@ -71,7 +69,6 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->assign('title', $this->_title);
@@ -94,7 +91,6 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
    * Process the form when submitted
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $participant = new CRM_Event_DAO_Participant();
@@ -117,4 +113,3 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
     }
   }
 }
-

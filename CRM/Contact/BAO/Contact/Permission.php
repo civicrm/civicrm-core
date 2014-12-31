@@ -41,10 +41,9 @@ class CRM_Contact_BAO_Contact_Permission {
    * @param int|string $type the type of operation (view|edit)
    *
    * @return boolean true if the user has permission, false otherwise
-   * @access public
    * @static
    */
-  static function allow($id, $type = CRM_Core_Permission::VIEW) {
+  public static function allow($id, $type = CRM_Core_Permission::VIEW) {
     $tables = array();
     $whereTables = array();
 
@@ -88,10 +87,9 @@ WHERE contact_a.id = %1 AND $permission";
    * @param boolean $force should we force a recompute
    *
    * @return void
-   * @access public
    * @static
    */
-  static function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
+  public static function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
     static $_processed = array();
 
     if ($type = CRM_Core_Permission::VIEW) {
@@ -155,7 +153,6 @@ ON DUPLICATE KEY UPDATE
    * @param int $contactID contact id
    *
    * @return boolean
-   * @access public
    * @static
    */
   static function hasContactsInCache($type = CRM_Core_Permission::VIEW,
@@ -194,7 +191,7 @@ AND    $operationClause LIMIT 1";
    *
    * @return array
    */
-  static function cacheClause($contactAlias = 'contact_a', $contactID = NULL) {
+  public static function cacheClause($contactAlias = 'contact_a', $contactID = NULL) {
     if (CRM_Core_Permission::check('view all contacts') ||
       CRM_Core_Permission::check('edit all contacts')
     ) {
@@ -249,7 +246,7 @@ AND    $operationClause LIMIT 1";
    *   selected contact record else false
    * @static
    */
-  static function relationship($selectedContactID, $contactID = NULL) {
+  public static function relationship($selectedContactID, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();
     $config = CRM_Core_Config::singleton();
     if (!$contactID) {
@@ -337,7 +334,7 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
    *
    * @return bool
    */
-  static function validateOnlyChecksum($contactID, &$form, $redirect = TRUE) {
+  public static function validateOnlyChecksum($contactID, &$form, $redirect = TRUE) {
     // check if this is of the format cs=XXX
     if (!CRM_Contact_BAO_Contact_Utils::validChecksum($contactID,
         CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE)
@@ -372,7 +369,7 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
    * @param bool $checkSumValidationResult
    * @param null $form
    */
-  static function initChecksumAuthSrc($checkSumValidationResult = FALSE, $form = NULL) {
+  public static function initChecksumAuthSrc($checkSumValidationResult = FALSE, $form = NULL) {
     $session = CRM_Core_Session::singleton();
     if ($checkSumValidationResult && $form && CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE)) {
       // if result is already validated, and url has cs, set the flag.
@@ -391,7 +388,7 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
    *
    * @return bool
    */
-  static function validateChecksumContact($contactID, &$form, $redirect = TRUE) {
+  public static function validateChecksumContact($contactID, &$form, $redirect = TRUE) {
     if (!self::allow($contactID, CRM_Core_Permission::EDIT)) {
       // check if this is of the format cs=XXX
       return self::validateOnlyChecksum($contactID, $form, $redirect);
@@ -399,4 +396,3 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
     return TRUE;
   }
 }
-

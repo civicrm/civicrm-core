@@ -35,7 +35,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testRolePermissionReport() {
+  public function testRolePermissionReport() {
     $this->webtestLogin('admin');
 
     //create new roles
@@ -98,7 +98,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
   /*
    *check for CRM-10148
    */
-  function testReservedReportPermission() {
+  public function testReservedReportPermission() {
     $this->webtestLogin('admin');
 
     //create new role
@@ -207,7 +207,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
   /**
    * @param $role
    */
-  function _roleDelete($role) {
+  public function _roleDelete($role) {
     $this->waitForElementPresent("xpath=//table[@id='user-roles']/tbody//tr/td[text()='{$role}']/..//td/a[text()='edit role']");
     $this->click("xpath=//table[@id='user-roles']/tbody//tr/td[text()='{$role}']/..//td/a[text()='edit role']");
     $this->waitForElementPresent('edit-delete');
@@ -222,7 +222,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
    *
    * @return string
    */
-  function _testCreateUser($roleid) {
+  public function _testCreateUser($roleid) {
 
     $this->open($this->sboxPath . "admin/people/create");
 

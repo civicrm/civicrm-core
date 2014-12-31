@@ -39,7 +39,7 @@ class CRM_Upgrade_Incremental_php_FourSix {
    *
    * @return bool
    */
-  function verifyPreDBstate(&$errors) {
+  public function verifyPreDBstate(&$errors) {
     return TRUE;
   }
 
@@ -55,7 +55,7 @@ class CRM_Upgrade_Incremental_php_FourSix {
    *
    * @return void
    */
-  function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
   }
 
   /**
@@ -65,7 +65,7 @@ class CRM_Upgrade_Incremental_php_FourSix {
    * @param $rev string, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs
    * @return void
    */
-  function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
    if ($rev == '4.6.alpha1') {
       $postUpgradeMessage .= '<br /><br />' . ts('Default versions of the following System Workflow Message Templates have been modified to handle new functionality: <ul><li>Events - Registration Confirmation and Receipt (on-line)</li><li>Events - Registration Confirmation and Receipt (off-line)</li><li>Contributions - Receipt (on-line)</li><li>Contributions - Receipt (off-line)</li><li>Memberships - Receipt (on-line)</li><li>Memberships - Signup and Renewal Receipts (off-line)</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages).');
     }
@@ -76,7 +76,7 @@ class CRM_Upgrade_Incremental_php_FourSix {
   /**
    * (Queue Task Callback)
    */
-  static function task_4_6_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
+  public static function task_4_6_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
 

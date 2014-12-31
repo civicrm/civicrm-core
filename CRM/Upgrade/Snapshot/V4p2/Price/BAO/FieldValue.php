@@ -47,10 +47,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @param $ids
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
-   * @access public
    * @static
    */
-  static function &add(&$params, $ids) {
+  public static function &add(&$params, $ids) {
 
     $fieldValueBAO = new CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue();
     $fieldValueBAO->copyValues($params);
@@ -76,10 +75,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @param $ids
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
-   * @access public
    * @static
    */
-  static function create(&$params, $ids) {
+  public static function create(&$params, $ids) {
 
     if (!is_array($params) || empty($params)) {
       return;
@@ -117,10 +115,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue', $params, $defaults);
   }
 
@@ -134,10 +131,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    *
    * @return array $values
    *
-   * @access public
    * @static
    */
-  static function getValues($fieldId, &$values, $orderBy = 'weight', $isActive = FALSE) {
+  public static function getValues($fieldId, &$values, $orderBy = 'weight', $isActive = FALSE) {
     $fieldValueDAO = new CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue();
     $fieldValueDAO->price_field_id = $fieldId;
     $fieldValueDAO->orderBy($orderBy, 'label');
@@ -160,7 +156,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    *
    * @return string name
    *
-   * @access public
    * @static
    *
    */
@@ -176,10 +171,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    *
    * @return   Object            DAO object on sucess, null otherwise
    *
-   * @access public
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue', $id, 'is_active', $is_active);
   }
 
@@ -190,10 +184,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    *
    * @return boolean
    *
-   * @access public
    * @static
    */
-  static function deleteValues($fieldId) {
+  public static function deleteValues($fieldId) {
     if (!$fieldId) {
       return FALSE;
     }
@@ -210,10 +203,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    *
    * @return  boolean
    *
-   * @access public
    * @static
    */
-  static function del($id) {
+  public static function del($id) {
     if (!$id) {
       return FALSE;
     }
@@ -223,4 +215,3 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
     return $fieldValueDAO->delete();
   }
 }
-

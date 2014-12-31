@@ -45,7 +45,7 @@ class CRM_Import_StateMachine extends CRM_Core_StateMachine {
    * @param \const|int $action
    *
    */
-  function __construct($controller, $action = CRM_Core_Action::NONE) {
+  public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
     $classType = str_replace('_Controller', '', get_class($controller));
@@ -59,4 +59,3 @@ class CRM_Import_StateMachine extends CRM_Core_StateMachine {
     $this->addSequentialPages($this->_pages, $action);
   }
 }
-

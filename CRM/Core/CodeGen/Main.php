@@ -36,7 +36,7 @@ class CRM_Core_CodeGen_Main {
    * @param $schemaPath
    * @param $digestPath
    */
-  function __construct($CoreDAOCodePath, $sqlCodePath, $phpCodePath, $tplCodePath, $smartyPluginDirs, $argCms, $argVersion, $schemaPath, $digestPath) {
+  public function __construct($CoreDAOCodePath, $sqlCodePath, $phpCodePath, $tplCodePath, $smartyPluginDirs, $argCms, $argVersion, $schemaPath, $digestPath) {
     $this->CoreDAOCodePath = $CoreDAOCodePath;
     $this->sqlCodePath = $sqlCodePath;
     $this->phpCodePath = $phpCodePath;
@@ -65,7 +65,7 @@ class CRM_Core_CodeGen_Main {
    * Automatically generate a variety of files
    *
    */
-  function main() {
+  public function main() {
     if (!empty($this->digestPath) && file_exists($this->digestPath) && $this->hasExpectedFiles()) {
       if ($this->getDigest() === file_get_contents($this->digestPath)) {
         echo "GenCode has previously executed. To force execution, please (a) omit CIVICRM_GENCODE_DIGEST\n";
@@ -105,7 +105,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     }
   }
 
-  function runAllTasks() {
+  public function runAllTasks() {
     // TODO: This configuration can be manipulated dynamically.
     $components = $this->getTasks();
     foreach ($components as $component) {
@@ -142,7 +142,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
    *
    * @return string
    */
-  function getDigest() {
+  public function getDigest() {
     if ($this->digest === NULL) {
       $srcDir = CRM_Core_CodeGen_Util_File::findCoreSourceDir();
       $files = CRM_Core_CodeGen_Util_File::findManyFiles(array(
@@ -173,7 +173,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   /**
    * @return array
    */
-  function getExpectedFiles() {
+  public function getExpectedFiles() {
     return array(
       $this->sqlCodePath . '/civicrm.mysql',
       $this->phpCodePath . '/CRM/Contact/DAO/Contact.php',
@@ -183,7 +183,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   /**
    * @return bool
    */
-  function hasExpectedFiles() {
+  public function hasExpectedFiles() {
     foreach ($this->getExpectedFiles() as $file) {
       if (!file_exists($file)) {
         return FALSE;

@@ -31,12 +31,12 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CiviReportTestCase
  */
 class CiviReportTestCase extends CiviUnitTestCase {
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->_sethtmlGlobals();
   }
 
-  function tearDown() {
+  public function tearDown() {
     // TODO Figure out how to automatically drop all temporary tables.
     // Note that MySQL doesn't provide a way to list them, so we would need
     // to keep track ourselves (eg CRM_Core_TemporaryTableManager) or reset
@@ -53,7 +53,7 @@ class CiviReportTestCase extends CiviUnitTestCase {
    * @return string
    * @throws Exception
    */
-  function getReportOutputAsCsv($reportClass, $inputParams) {
+  public function getReportOutputAsCsv($reportClass, $inputParams) {
     $config = CRM_Core_Config::singleton();
     $config->keyDisable = TRUE;
     $controller = new CRM_Core_Controller_Simple($reportClass, ts('some title'));
@@ -105,7 +105,7 @@ class CiviReportTestCase extends CiviUnitTestCase {
    *
    * @return array
    */
-  function getArrayFromCsv($csvFile) {
+  public function getArrayFromCsv($csvFile) {
     $arrFile = array();
     if (($handle = fopen($csvFile, "r")) !== FALSE) {
       while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {

@@ -45,11 +45,10 @@ class CRM_ACL_Form_ACLBasic extends CRM_Admin_Form {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if ($this->_id ||
@@ -78,7 +77,6 @@ SELECT object_table
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -115,7 +113,7 @@ SELECT object_table
    *
    * @return array|bool
    */
-  static function formRule($params) {
+  public static function formRule($params) {
     if ($params['entity_id'] == -1) {
       $errors = array('entity_id' => ts('Role is a required field'));
       return $errors;
@@ -127,7 +125,6 @@ SELECT object_table
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -169,4 +166,3 @@ DELETE
     }
   }
 }
-

@@ -37,7 +37,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -52,10 +52,9 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Pledge_BAO_PledgeBlock object
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $pledgeBlock = new CRM_Pledge_DAO_PledgeBlock();
     $pledgeBlock->copyValues($params);
     if ($pledgeBlock->find(TRUE)) {
@@ -71,10 +70,9 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Pledge_BAO_PledgeBlock object
-   * @access public
    * @static
    */
-  static function &create(&$params) {
+  public static function &create(&$params) {
     $transaction = new CRM_Core_Transaction();
     $pledgeBlock = self::add($params);
 
@@ -95,12 +93,11 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    *
    * @param array $params reference array contains the values submitted by the form
    *
-   * @access public
    * @static
    *
    * @return object
    */
-  static function add(&$params) {
+  public static function add(&$params) {
 
     if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'PledgeBlock', $params['id'], $params);
@@ -152,10 +149,9 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * @param int $id pledgeBlock id
    *
    * @return mixed|null
-   * @access public
    * @static
    */
-  static function deletePledgeBlock($id) {
+  public static function deletePledgeBlock($id) {
     CRM_Utils_Hook::pre('delete', 'PledgeBlock', $id, CRM_Core_DAO::$_nullArray);
 
     $transaction = new CRM_Core_Transaction();
@@ -181,7 +177,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * @return array
    * @static
    */
-  static function getPledgeBlock($pageID) {
+  public static function getPledgeBlock($pageID) {
     $pledgeBlock = array();
 
     $dao               = new CRM_Pledge_DAO_PledgeBlock();
@@ -200,7 +196,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * @param CRM_Core_Form $form
    * @static
    */
-  static function buildPledgeBlock($form) {
+  public static function buildPledgeBlock($form) {
     //build pledge payment fields.
     if (!empty($form->_values['pledge_id'])) {
       //get all payments required details.
@@ -309,4 +305,3 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
     }
   }
 }
-

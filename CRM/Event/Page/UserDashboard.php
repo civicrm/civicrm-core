@@ -42,9 +42,8 @@ class CRM_Event_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard {
    * List participations for the UF user
    *
    * return null
-   * @access public
    */
-  function listParticipations() {
+  public function listParticipations() {
     $controller = new CRM_Core_Controller_Simple(
       'CRM_Event_Form_Search',
       ts('Events'),
@@ -65,11 +64,9 @@ class CRM_Event_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard {
    * loads, it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
-  function run() {
+  public function run() {
     parent::preProcess();
     $this->listParticipations();
   }
 }
-

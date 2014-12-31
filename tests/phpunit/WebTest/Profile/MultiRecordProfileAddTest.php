@@ -34,13 +34,13 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
   protected function setUp() {
     parent::setUp();
   }
-  function testAdminAddNewProfile() {
+  public function testAdminAddNewProfile() {
     $this->webtestLogin();
     list($id, $profileTitle) = $this->_addNewProfile();
     $this->_deleteProfile($id, $profileTitle);
   }
 
-  function testUserAddNewProfile() {
+  public function testUserAddNewProfile() {
     //add the required permission
     $permissions = array(
       'edit-2-profile-listings-and-forms',
@@ -52,13 +52,13 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->_deleteProfile($id, $profileTitle);
   }
 
-  function testAddNewNonMultiProfile() {
+  public function testAddNewNonMultiProfile() {
     $this->webtestLogin();
     list($id, $profileTitle) = $this->_addNewProfile(FALSE);
     $this->_deleteProfile($id, $profileTitle);
   }
 
-  function testNonSearchableMultiProfile() {
+  public function testNonSearchableMultiProfile() {
     $this->webtestLogin();
     list($id, $profileTitle) = $this->_addNewProfile(TRUE, TRUE);
     $this->_deleteProfile($id, $profileTitle);
@@ -71,7 +71,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
    *
    * @return array
    */
-  function _addNewProfile($checkMultiRecord = TRUE, $checkSearchable = FALSE, $userCheck = FALSE) {
+  public function _addNewProfile($checkMultiRecord = TRUE, $checkSearchable = FALSE, $userCheck = FALSE) {
     $params = $this->_testCustomAdd($checkSearchable);
 
     $this->openCiviPage('admin/uf/group', 'reset=1');
@@ -284,7 +284,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
    * @param int $gid
    * @param $profileTitle
    */
-  function _deleteProfile($gid, $profileTitle) {
+  public function _deleteProfile($gid, $profileTitle) {
     $this->webtestLogin();
     $this->openCiviPage("admin/uf/group", "action=delete&id={$gid}", '_qf_Group_next-bottom');
     $this->click('_qf_Group_next-bottom');
@@ -297,7 +297,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
    *
    * @return mixed
    */
-  function _testCustomAdd($checkSearchable) {
+  public function _testCustomAdd($checkSearchable) {
 
     $this->openCiviPage('admin/custom/group', 'action=add&reset=1');
 
@@ -371,7 +371,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
    *
    * @return mixed
    */
-  function _addRecords($context = 'Edit', $dialog = FALSE) {
+  public function _addRecords($context = 'Edit', $dialog = FALSE) {
     $params['text'] = 'text' . substr(sha1(rand()), 0, 3);
     $this->waitForElementPresent("//div[@id='crm-profile-block']/div/div[2]/input[@class='crm-form-text required']");
     $this->type("//div[@id='crm-profile-block']/div/div[2]/input[@class='crm-form-text required']", $params['text']);

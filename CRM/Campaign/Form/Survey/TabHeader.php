@@ -43,7 +43,7 @@ class CRM_Campaign_Form_Survey_TabHeader {
    *
    * @return array
    */
-  static function build(&$form) {
+  public static function build(&$form) {
     $tabs = $form->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
       $tabs = self::process($form);
@@ -63,7 +63,7 @@ class CRM_Campaign_Form_Survey_TabHeader {
    *
    * @return array
    */
-  static function process(&$form) {
+  public static function process(&$form) {
     if ($form->getVar('_surveyId') <= 0) {
       return NULL;
     }
@@ -122,7 +122,7 @@ class CRM_Campaign_Form_Survey_TabHeader {
   /**
    * @param CRM_Core_Form $form
    */
-  static function reset(&$form) {
+  public static function reset(&$form) {
     $tabs = self::process($form);
     $form->set('tabHeader', $tabs);
   }
@@ -132,7 +132,7 @@ class CRM_Campaign_Form_Survey_TabHeader {
    *
    * @return int|string
    */
-  static function getCurrentTab($tabs) {
+  public static function getCurrentTab($tabs) {
     static $current = FALSE;
 
     if ($current) {
@@ -157,7 +157,7 @@ class CRM_Campaign_Form_Survey_TabHeader {
    *
    * @return int|string
    */
-  static function getNextTab(&$form) {
+  public static function getNextTab(&$form) {
     static $next = FALSE;
     if ($next)
       return $next;

@@ -46,7 +46,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    */
   protected $_membershipTypeID = NULL;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     $params = array(
@@ -88,7 +88,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    *
    */
-  function tearDown() {
+  public function tearDown() {
     $tablesToTruncate = array('civicrm_membership', 'civicrm_membership_log', 'civicrm_contribution', 'civicrm_membership_payment');
     $this->quickCleanup($tablesToTruncate);
     $this->relationshipTypeDelete($this->_relationshipTypeId);
@@ -100,7 +100,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   /**
    *  Test Import
    */
-  function testImport() {
+  public function testImport() {
     $contactId = $this->individualCreate();
     $contact2Params = array(
       'first_name' => 'Anthonita',
@@ -154,4 +154,3 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals(2, $result['count']);
   }
 }
-

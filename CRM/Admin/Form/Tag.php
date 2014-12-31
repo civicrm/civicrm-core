@@ -44,7 +44,6 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->setPageTitle($this->_isTagSet ? ts('Tag Set') : ts('Tag'));
@@ -129,7 +128,6 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -173,4 +171,3 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
   }
 
 }
-

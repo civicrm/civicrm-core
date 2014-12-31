@@ -43,7 +43,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->ids['contact'][0] = $this->individualCreate();
     $this->params = array(
@@ -58,7 +58,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {
+  public function tearDown() {
     foreach ($this->ids as $entity => $entities) {
       foreach ($entities as $id) {
         $this->callAPISuccess($entity, 'delete', array( 'id' => $id));
@@ -243,4 +243,3 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $baoObj->free();
   }
 }
-

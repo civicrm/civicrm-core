@@ -35,7 +35,7 @@
  *
  */
 class CRM_Core_BAO_CustomQuery {
-  CONST PREFIX = 'custom_value_';
+  const PREFIX = 'custom_value_';
 
   /**
    * The set of custom field ids
@@ -140,9 +140,8 @@ class CRM_Core_BAO_CustomQuery {
    * @param bool $contactSearch
    * @param array $locationSpecificFields
    *
-   * @access public
    */
-  function __construct($ids, $contactSearch = FALSE, $locationSpecificFields = array()) {
+  public function __construct($ids, $contactSearch = FALSE, $locationSpecificFields = array()) {
     $this->_ids = &$ids;
     $this->_locationSpecificCustomFields = $locationSpecificFields;
 
@@ -261,9 +260,8 @@ SELECT label, value
    * @param  NULL
    *
    * @return void
-   * @access public
    */
-  function select() {
+  public function select() {
     if (empty($this->_fields)) {
       return;
     }
@@ -330,9 +328,8 @@ SELECT label, value
    *
    * @return void
    *
-   * @access public
    */
-  function where() {
+  public function where() {
     foreach ($this->_ids as $id => $values) {
 
       // Fixed for Isuue CRM 607
@@ -559,9 +556,8 @@ SELECT label, value
    * @param NULL
    *
    * @return  array   array of strings
-   * @access public
    */
-  function query() {
+  public function query() {
     $this->select();
 
     $this->where();
@@ -593,7 +589,7 @@ SELECT label, value
    * @param $value
    * @param $grouping
    */
-  function searchRange(&$id, &$label, $type, $fieldName, &$value, &$grouping) {
+  public function searchRange(&$id, &$label, $type, $fieldName, &$value, &$grouping) {
     $qill = array();
 
     if (isset($value['from'])) {

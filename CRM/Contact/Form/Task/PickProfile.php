@@ -67,9 +67,8 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     /*
      * initialize the task and row fields
      */
@@ -99,11 +98,10 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Batch Profile Update for Contact'));
 
     foreach ($this->_contactIds as $id) {
@@ -128,11 +126,10 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
   /**
    * Add local and global form rules
    *
-   * @access protected
    *
    * @return void
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Contact_Form_Task_PickProfile', 'formRule'));
   }
 
@@ -143,9 +140,8 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     if (CRM_Core_BAO_UFField::checkProfileType($fields['uf_group_id'])) {
       $errorMsg['uf_group_id'] = "You cannot select mix profile for batch update.";
     }
@@ -160,7 +156,6 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -173,4 +168,3 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
     $this->controller->resetPage('Batch');
   }
 }
-

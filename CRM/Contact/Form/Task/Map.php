@@ -52,9 +52,8 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive',
       $this, FALSE
     );
@@ -117,7 +116,6 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -135,7 +133,6 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -151,9 +148,8 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
    * @param string $type
    *
    * @return string           the location of the file we have created
-   * @access protected
    */
-  static function createMapXML($ids, $locationId, &$page, $addBreadCrumb, $type = 'Contact') {
+  public static function createMapXML($ids, $locationId, &$page, $addBreadCrumb, $type = 'Contact') {
     $config = CRM_Core_Config::singleton();
 
     CRM_Utils_System::setTitle(ts('Map Location(s)'));
@@ -244,4 +240,3 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
     $page->assign_by_ref('span', $span);
   }
 }
-

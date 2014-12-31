@@ -35,7 +35,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testProfileChecksum() {
+  public function testProfileChecksum() {
     $this->webtestLogin('admin');
 
     // Profile fields.
@@ -148,7 +148,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
    *
    * @return null
    */
-  function _testCreateContactProfile($fields, $profileName) {
+  public function _testCreateContactProfile($fields, $profileName) {
     // Add new profile.
     $this->openCiviPage("admin/uf/group", "reset=1");
     $this->click('newCiviCRMProfile-top');
@@ -185,4 +185,3 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     return $profileId;
   }
 }
-

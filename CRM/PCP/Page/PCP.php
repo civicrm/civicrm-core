@@ -51,7 +51,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_PCP_BAO_PCP';
   }
 
@@ -60,7 +60,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       // helper variable for nicer formatting
       $deleteExtra = ts('Are you sure you want to delete this Campaign Page ?');
@@ -116,9 +116,8 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
    * @param
    *
    * @return void
-   * @access public
    */
-  function run() {
+  public function run() {
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String',
       $this, FALSE,
@@ -164,10 +163,9 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
    * @param null $action
    *
    * @return void
-   * @access public
    * @static
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
     $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter',
       'String',
       $this
@@ -343,7 +341,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
     }
   }
 
-  function search() {
+  public function search() {
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -361,7 +359,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_PCP_Form_PCP';
   }
 
@@ -370,7 +368,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return ts('Personal Campaign Page');
   }
 
@@ -381,7 +379,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/pcp';
   }
 
@@ -390,7 +388,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
    * @param $whereClause
    * @param array $whereParams
    */
-  function pagerAtoZ($whereClause, $whereParams) {
+  public function pagerAtoZ($whereClause, $whereParams) {
     $where = '';
     if ($whereClause) {
       if (strpos($whereClause, ' AND') == 0) {
@@ -412,4 +410,3 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
     $this->assign('aToZ', $aToZBar);
   }
 }
-

@@ -48,7 +48,7 @@ class CRM_Core_ClassLoader {
    *
    * @return object
    */
-  static function &singleton($force = FALSE) {
+  public static function &singleton($force = FALSE) {
     if ($force || self::$_singleton === NULL) {
       self::$_singleton = new CRM_Core_ClassLoader();
     }
@@ -74,7 +74,7 @@ class CRM_Core_ClassLoader {
    *
    * @api
    */
-  function register($prepend = FALSE) {
+  public function register($prepend = FALSE) {
     if ($this->_registered) {
       return;
     }
@@ -102,7 +102,7 @@ class CRM_Core_ClassLoader {
     require_once "$civicrm_base_path/packages/vendor/autoload.php";
   }
 
-  function initHtmlPurifier($prepend) {
+  public function initHtmlPurifier($prepend) {
     if (class_exists('HTMLPurifier_Bootstrap')) {
       // HTMLPurifier is already initialized, e.g. by the Drupal module.
       return;
@@ -149,7 +149,7 @@ class CRM_Core_ClassLoader {
   /**
    * @param $class
    */
-  function loadClass($class) {
+  public function loadClass($class) {
     if (
       // Only load classes that clearly belong to CiviCRM.
       // Note: api/v3 does not use classes, but api_v3's test-suite does

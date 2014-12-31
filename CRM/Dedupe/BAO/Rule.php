@@ -55,7 +55,7 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
    *
    * @return string  SQL query performing the search
    */
-  function sql() {
+  public function sql() {
     if ($this->params &&
       (!array_key_exists($this->rule_table, $this->params) ||
         !array_key_exists($this->rule_field, $this->params[$this->rule_table])
@@ -190,9 +190,8 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
    * @param array contains the rule group property to identify rule group
    *
    * @return rule fields array associated to rule group
-   * @access public
    */
-  static function dedupeRuleFields($params) {
+  public static function dedupeRuleFields($params) {
     $rgBao               = new CRM_Dedupe_BAO_RuleGroup();
     $rgBao->used         = $params['used'];
     $rgBao->contact_type = $params['contact_type'];
@@ -214,7 +213,7 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
    *
    * @return bool
    */
-  static function validateContacts($cid, $oid) {
+  public static function validateContacts($cid, $oid) {
     if (!$cid || !$oid) {
       return;
     }
@@ -230,4 +229,3 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
     return $exception->find(TRUE) ? FALSE : TRUE;
   }
 }
-

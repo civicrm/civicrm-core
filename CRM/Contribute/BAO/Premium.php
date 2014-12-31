@@ -44,7 +44,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -55,10 +55,9 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Contribute_BAO_ManagePremium object
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $premium = new CRM_Contribute_DAO_Product();
     $premium->copyValues($params);
     if ($premium->find(TRUE)) {
@@ -77,7 +76,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * @return Object             DAO object on sucess, null otherwise
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Premium', $id, 'premiums_active ', $is_active);
   }
 
@@ -88,7 +87,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    *
    * @static
    */
-  static function del($premiumID) {
+  public static function del($premiumID) {
     //check dependencies
 
         //delete from financial Type table
@@ -108,7 +107,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    *
    * @static
    */
-  static function buildPremiumBlock(&$form, $pageID, $formItems = FALSE, $selectedProductID = NULL, $selectedOption = NULL) {
+  public static function buildPremiumBlock(&$form, $pageID, $formItems = FALSE, $selectedProductID = NULL, $selectedOption = NULL) {
     $form->add('hidden', "selectProduct", $selectedProductID, array('id' => 'selectProduct'));
 
     $dao = new CRM_Contribute_DAO_Premium();
@@ -175,7 +174,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    *
    * @static
    */
-  function buildPremiumPreviewBlock($form, $productID, $premiumProductID = NULL) {
+  public function buildPremiumPreviewBlock($form, $productID, $premiumProductID = NULL) {
     if ($premiumProductID) {
       $dao = new CRM_Contribute_DAO_PremiumsProduct();
       $dao->id = $premiumProductID;
@@ -214,7 +213,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    *
    * @static
    */
-  static function deletePremium($contributionPageID) {
+  public static function deletePremium($contributionPageID) {
     if (!$contributionPageID) {
       return;
     }
@@ -246,9 +245,8 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    *
    * @return array product and option arrays
    * @static
-   * @access public
    */
-  static function getPremiumProductInfo() {
+  public static function getPremiumProductInfo() {
     if (!self::$productInfo) {
       $products = $options = array();
 
@@ -272,4 +270,3 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
     return self::$productInfo;
   }
 }
-

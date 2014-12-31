@@ -160,10 +160,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set extends CRM_Core_DAO
   /**
    * Class constructor
    *
-   * @access public
    * @return \CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set
    */
-    function __construct()
+    public function __construct()
     {
         $this->__table = 'civicrm_price_set';
         parent::__construct();
@@ -171,10 +170,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set extends CRM_Core_DAO
     /**
      * return foreign links
      *
-     * @access public
      * @return array
      */
-    function links()
+    public function links()
     {
         if (!(self::$_links)) {
             self::$_links = array(
@@ -187,7 +185,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set extends CRM_Core_DAO
     /**
      * returns all the column names of this table
      *
-     * @access public
      * @return array
      */
     static function &fields()
@@ -275,28 +272,25 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set extends CRM_Core_DAO
     /**
      * returns the names of this table
      *
-     * @access public
      * @static
      * @return string
      */
-    static function getTableName()
+    public static function getTableName()
     {
         return CRM_Core_DAO::getLocaleTableName(self::$_tableName);
     }
     /**
      * returns if this table needs to be logged
      *
-     * @access public
      * @return boolean
      */
-    function getLog()
+    public function getLog()
     {
         return self::$_log;
     }
     /**
      * returns the list of fields that can be imported
      *
-     * @access public
      * return array
      * @static
      */
@@ -320,7 +314,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set extends CRM_Core_DAO
     /**
      * returns the list of fields that can be exported
      *
-     * @access public
      * return array
      * @static
      */

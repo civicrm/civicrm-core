@@ -37,7 +37,6 @@ class CRM_Contribute_Form_SearchContribution extends CRM_Core_Form {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -63,7 +62,7 @@ class CRM_Contribute_Form_SearchContribution extends CRM_Core_Form {
       ));
   }
 
-  function postProcess() {
+  public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
     $parent = $this->controller->getParent();
     $parent->set('searchResult', 1);
@@ -82,4 +81,3 @@ class CRM_Contribute_Form_SearchContribution extends CRM_Core_Form {
     }
   }
 }
-

@@ -35,7 +35,7 @@ class WebTest_Campaign_PledgeTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCreateCampaign() {
+  public function testCreateCampaign() {
     // Log in as admin first to verify permissions for CiviGrant
     $this->webtestLogin('admin');
 
@@ -121,7 +121,7 @@ class WebTest_Campaign_PledgeTest extends CiviSeleniumTestCase {
    * @param $campaignTitle
    * @param int $id
    */
-  function pledgeAddTest($campaignTitle, $id) {
+  public function pledgeAddTest($campaignTitle, $id) {
     // create unique name
     $name = substr(sha1(rand()), 0, 7);
     $firstName = 'Adam' . $name;
@@ -182,4 +182,3 @@ class WebTest_Campaign_PledgeTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//form[@id='PledgeView']//table/tbody/tr[8]/td[2]", preg_quote($campaignTitle));
   }
 }
-

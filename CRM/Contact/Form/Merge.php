@@ -57,7 +57,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
   // to side-step this, we use the below UUID as a (re)placeholder
   var $_qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
 
-  function preProcess() {
+  public function preProcess() {
     if (!CRM_Core_Permission::check('merge duplicate contacts')) {
       CRM_Core_Error::fatal(ts('You do not have access to this page'));
     }
@@ -253,11 +253,11 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return array('deleteOther' => 1);
   }
 
-  function addRules() {}
+  public function addRules() {}
 
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Merge %1s', array(1 => $this->_contactType)));
@@ -312,7 +312,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     $link = CRM_Utils_System::href(ts('Flip between the original and duplicate contacts.'),
       'civicrm/contact/merge',
@@ -389,4 +389,3 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     CRM_Utils_System::redirect($url);
   }
 }
-

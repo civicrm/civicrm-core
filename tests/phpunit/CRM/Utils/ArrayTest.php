@@ -6,7 +6,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Utils_ArrayTest extends CiviUnitTestCase {
 
-  function testIndexArray() {
+  public function testIndexArray() {
     $inputs = array();
     $inputs[] = array(
       'lang' => 'en',
@@ -49,7 +49,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($inputs[5], $byLangMsgid[NULL]['greeting']);
   }
 
-  function testCollect() {
+  public function testCollect() {
     $arr = array(
       array('catWord' => 'cat', 'dogWord' => 'dog'),
       array('catWord' => 'chat', 'dogWord' => 'chien'),
@@ -66,7 +66,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($expected, CRM_Utils_Array::collect('catWord', $arr));
   }
 
-  function testProduct0() {
+  public function testProduct0() {
     $actual = CRM_Utils_Array::product(
       array(),
       array('base data' => 1)
@@ -76,7 +76,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     ), $actual);
   }
 
-  function testProduct1() {
+  public function testProduct1() {
     $actual = CRM_Utils_Array::product(
       array('dim1' => array('a', 'b')),
       array('base data' => 1)
@@ -87,7 +87,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     ), $actual);
   }
 
-  function testProduct3() {
+  public function testProduct3() {
     $actual = CRM_Utils_Array::product(
       array('dim1' => array('a', 'b'), 'dim2' => array('alpha', 'beta'), 'dim3' => array('one', 'two')),
       array('base data' => 1)
@@ -104,7 +104,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     ), $actual);
   }
 
-  function testIsSubset() {
+  public function testIsSubset() {
     $this->assertTrue(CRM_Utils_Array::isSubset(array(), array()));
     $this->assertTrue(CRM_Utils_Array::isSubset(array('a'), array('a')));
     $this->assertTrue(CRM_Utils_Array::isSubset(array('a'), array('b','a','c')));
@@ -114,7 +114,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertFalse(CRM_Utils_Array::isSubset(array('a'), array('b','c','d')));
   }
 
-  function testRemove() {
+  public function testRemove() {
     $data = array(
       'one' => 1,
       'two' => 2,

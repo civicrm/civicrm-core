@@ -44,9 +44,8 @@ class CRM_Contact_Form_Edit_CustomData {
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access public
    */
-  static function preProcess(&$form) {
+  public static function preProcess(&$form) {
     $form->_type = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject);
     $form->_subType = CRM_Utils_Request::retrieve('subType', 'String', CRM_Core_DAO::$_nullObject);
 
@@ -72,10 +71,9 @@ class CRM_Contact_Form_Edit_CustomData {
    * @param CRM_Core_Form $form       reference to the form object
    *
    * @return void
-   * @access public
    * @static
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     if(!empty($form->_submitValues)) {
       if ($customValueCount = CRM_Utils_Array::value('hidden_custom_group_count', $form->_submitValues)) {
         if (is_array($customValueCount)) {
@@ -105,15 +103,13 @@ class CRM_Contact_Form_Edit_CustomData {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @param $defaults
    *
    * @return void
    */
-  static function setDefaultValues(&$form, &$defaults) {
+  public static function setDefaultValues(&$form, &$defaults) {
     $defaults += CRM_Custom_Form_CustomData::setDefaultValues($form);
   }
 }
-

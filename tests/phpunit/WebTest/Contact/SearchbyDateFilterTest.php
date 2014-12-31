@@ -38,7 +38,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
   /*
    * test individual pane seperatly.
    */
-  function testAdvancedSearch() {
+  public function testAdvancedSearch() {
     $this->webtestLogin();
 
     // Get all default advance search panes.
@@ -61,7 +61,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
 
   }
 
-  function testIndividualSearchPage(){
+  public function testIndividualSearchPage(){
     $this->webtestLogin();
 
     $this->openCiviPage("contribute/search", "reset=1");
@@ -230,7 +230,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
    *
    * @return array
    */
-  function _advanceSearchPanesDateFilter($paneRef = NULL) {
+  public function _advanceSearchPanesDateFilter($paneRef = NULL) {
     static $_advance_search_panes;
 
     if (!isset($_advance_search_panes) || empty($_advance_search_panes)) {
@@ -368,4 +368,3 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
     return $_advance_search_panes;
   }
 }
-

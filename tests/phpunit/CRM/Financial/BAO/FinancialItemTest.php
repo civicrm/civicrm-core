@@ -33,14 +33,14 @@ require_once 'CRM/Financial/BAO/FinancialAccount.php';
  */
 class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
   /**
    * Check method add()
    */
-  function testAdd() {
+  public function testAdd() {
     $firstName = 'Shane';
     $lastName  = 'Whatson';
     $params    = array(
@@ -89,7 +89,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
   /**
    * Check method retrive()
    */
-  function testRetrieve() {
+  public function testRetrieve() {
     $firstName = 'Shane';
     $lastName  = 'Whatson';
     $params    = array(
@@ -136,7 +136,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
   /**
    * Check method create()
    */
-  function testCreate() {
+  public function testCreate() {
     $firstName = 'Shane';
     $lastName  = 'Whatson';
     $params    = array(
@@ -212,7 +212,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
   /**
    * Check method del()
    */
-  function testCreateEntityTrxn() {
+  public function testCreateEntityTrxn() {
     $fParams = array(
       'name' => 'Donations'.substr(sha1(rand()), 0, 7),
       'is_deductible' => 0,
@@ -248,7 +248,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
   /**
    * Check method retrieveEntityFinancialTrxn()
    */
-  function testRetrieveEntityFinancialTrxn() {
+  public function testRetrieveEntityFinancialTrxn() {
     $entityTrxn = self::testCreateEntityTrxn();
     $params = array(
       'entity_table' => 'civicrm_contribution',

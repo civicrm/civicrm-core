@@ -47,7 +47,6 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * The contact id of the person we are viewing
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
@@ -55,7 +54,6 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * The profile group are are interested in
    *
    * @var int
-   * @access protected
    */
   protected $_gid;
 
@@ -63,7 +61,6 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * The profile types we restrict this page to display
    *
    * @var string
-   * @access protected
    */
   protected $_restrict;
 
@@ -71,7 +68,6 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * Should we bypass permissions
    *
    * @var boolean
-   * @access protected
    */
   protected $_skipPermission;
 
@@ -115,9 +111,8 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * @param null $profileIds
    *
    * @return \CRM_Profile_Page_Dynamic
-   * @access public
    */
-  function __construct($id, $gid, $restrict, $skipPermission = FALSE, $profileIds = NULL) {
+  public function __construct($id, $gid, $restrict, $skipPermission = FALSE, $profileIds = NULL) {
     parent::__construct();
 
     $this->_id = $id;
@@ -172,7 +167,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * @return array $_actionLinks
    *
    */
-  function &actionLinks() {
+  public function &actionLinks() {
     return NULL;
   }
 
@@ -183,10 +178,9 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * type of action and executes that action.
    *
    * @return void
-   * @access public
    *
    */
-  function run() {
+  public function run() {
     $template = CRM_Core_Smarty::singleton();
     if ($this->_id && $this->_gid) {
 
@@ -391,7 +385,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    *
    * @return null|string
    */
-  function checkTemplateFileExists($suffix = '') {
+  public function checkTemplateFileExists($suffix = '') {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Page/{$this->_gid}/Dynamic.{$suffix}tpl";
       $template = CRM_Core_Page::getTemplate();
@@ -415,12 +409,11 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
@@ -430,14 +423,12 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * i.e. we dont override
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
    */
-  function overrideExtraTemplateFileName() {
+  public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
 }
-

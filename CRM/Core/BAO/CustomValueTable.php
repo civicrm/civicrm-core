@@ -39,7 +39,7 @@ class CRM_Core_BAO_CustomValueTable {
    *
    * @throws Exception
    */
-  static function create(&$customParams) {
+  public static function create(&$customParams) {
     if (empty($customParams) ||
       !is_array($customParams)
     ) {
@@ -258,7 +258,6 @@ class CRM_Core_BAO_CustomValueTable {
    * @param int $maxLength
    *
    * @return the mysql data store placeholder
-   * @access public
    * @static
    */
   public static function fieldToSQLType($type, $maxLength = 255) {
@@ -310,7 +309,7 @@ class CRM_Core_BAO_CustomValueTable {
    * @param $entityTable
    * @param int $entityID
    */
-  static function store(&$params, $entityTable, $entityID) {
+  public static function store(&$params, $entityTable, $entityID) {
     $cvParams = array();
     foreach ($params as $fieldID => $param) {
       foreach ($param as $index => $customValue) {
@@ -358,7 +357,7 @@ class CRM_Core_BAO_CustomValueTable {
    * @param int $entityID
    * @param $customFieldExtends
    */
-  static function postProcess(&$params, &$customFields, $entityTable, $entityID, $customFieldExtends) {
+  public static function postProcess(&$params, &$customFields, $entityTable, $entityID, $customFieldExtends) {
     $customData = CRM_Core_BAO_CustomField::postProcess($params,
       $customFields,
       $entityID,
@@ -388,7 +387,6 @@ class CRM_Core_BAO_CustomValueTable {
    * @return array      $fields        Array of custom values for the entity with key=>value
    *                                   pairs specified as civicrm_custom_field.id => custom value.
    *                                   Empty array if no custom values found.
-   * @access public
    * @static
    */
   public static function &getEntityValues($entityID, $entityType = NULL, $fieldIDs = NULL, $formatMultiRecordField = FALSE) {
@@ -496,7 +494,7 @@ AND    $cond
    * @return array
    * @static
    */
-  static function setValues(&$params) {
+  public static function setValues(&$params) {
 
     if (!isset($params['entityID']) ||
       CRM_Utils_Type::escape($params['entityID'], 'Integer', FALSE) === NULL
@@ -641,7 +639,7 @@ AND    cf.id IN ( $fieldIDList )
    * @return array
    * @static
    */
-  static function &getValues(&$params) {
+  public static function &getValues(&$params) {
     if (empty($params)) {
       return NULL;
     }
@@ -716,4 +714,3 @@ AND    cf.id IN ( $fieldIDList )
     }
   }
 }
-

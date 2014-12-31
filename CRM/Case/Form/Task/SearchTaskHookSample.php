@@ -42,9 +42,8 @@ class CRM_Case_Form_Task_SearchTaskHookSample extends CRM_Case_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
     $rows = array();
     // display name and email of all contact ids
@@ -76,7 +75,6 @@ WHERE cs.id IN ( {$caseIDs} )";
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addButtons(array(
@@ -89,4 +87,3 @@ WHERE cs.id IN ( {$caseIDs} )";
     );
   }
 }
-

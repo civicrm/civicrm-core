@@ -38,7 +38,7 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
-  function setUp() {
+  public function setUp() {
     $this->_apiversion = 3;
     $this->params = array(
       'name' => 'test status',
@@ -81,4 +81,3 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
     $this->assertEquals($entity['count'] - 1, $checkDeleted['count'], 'In line ' . __LINE__);
   }
 }
-

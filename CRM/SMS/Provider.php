@@ -43,7 +43,7 @@ abstract class CRM_SMS_Provider {
    * @static
    */
   static private $_singleton = array();
-  CONST MAX_SMS_CHAR = 460;
+  const MAX_SMS_CHAR = 460;
 
   /**
    * Singleton function used to manage this object
@@ -54,7 +54,7 @@ abstract class CRM_SMS_Provider {
    * @return object
    * @static
    */
-  static function &singleton($providerParams = array(), $force = FALSE) {
+  public static function &singleton($providerParams = array(), $force = FALSE) {
     $mailingID    = CRM_Utils_Array::value('mailing_id', $providerParams);
     $providerID   = CRM_Utils_Array::value('provider_id', $providerParams);
     $providerName = CRM_Utils_Array::value('provider', $providerParams);
@@ -91,16 +91,14 @@ abstract class CRM_SMS_Provider {
   /**
    * Send an SMS Message via the API Server
    *
-   * @access public
    */
   abstract function send($recipients, $header, $message, $dncID = NULL);
 
   /**
    * Return message text. Child class could override this function to have better control over the message being sent.
    *
-   * @access public
    */
-  function getMessage($message, $contactID, $contactDetails) {
+  public function getMessage($message, $contactID, $contactDetails) {
     $html = $message->getHTMLBody();
     $text = $message->getTXTBody();
 
@@ -113,7 +111,7 @@ abstract class CRM_SMS_Provider {
    *
    * @return mixed
    */
-  function getRecipientDetails($fields, $additionalDetails) {
+  public function getRecipientDetails($fields, $additionalDetails) {
     // we could do more altering here
     $fields['To'] = $fields['phone'];
     return $fields;
@@ -129,7 +127,7 @@ abstract class CRM_SMS_Provider {
    * @return $this|null|object
    * @throws CRM_Core_Exception
    */
-  function createActivity($apiMsgID, $message, $headers = array(), $jobID = NULL, $userID = NULL) {
+  public function createActivity($apiMsgID, $message, $headers = array(), $jobID = NULL, $userID = NULL) {
     if ($jobID) {
       $sql = "
 SELECT scheduled_id FROM civicrm_mailing m
@@ -173,7 +171,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
    *
    * @return mixed
    */
-  function retrieve($name, $type, $abort = TRUE, $default = NULL, $location = 'REQUEST') {
+  public function retrieve($name, $type, $abort = TRUE, $default = NULL, $location = 'REQUEST') {
     static $store = NULL;
     $value = CRM_Utils_Request::retrieve($name, $type, $store,
       FALSE, $default, $location
@@ -195,7 +193,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
    * @return $this|null|object
    * @throws CRM_Core_Exception
    */
-  function processInbound($from, $body, $to = NULL, $trackID = NULL) {
+  public function processInbound($from, $body, $to = NULL, $trackID = NULL) {
     $formatFrom   = $this->formatPhone($this->stripPhone($from), $like, "like");
     $escapedFrom  = CRM_Utils_Type::escape($formatFrom, 'String');
     $fromContactID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE "%' . $escapedFrom . '"');
@@ -263,7 +261,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
    *
    * @return mixed|string
    */
-  function stripPhone($phone) {
+  public function stripPhone($phone) {
     $newphone = preg_replace('/[^0-9x]/', '', $phone);
     while (substr($newphone, 0, 1) == "1") {
       $newphone = substr($newphone, 1);
@@ -284,7 +282,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
    *
    * @return mixed|string
    */
-  function formatPhone($phone, &$kind, $format = "dash") {
+  public function formatPhone($phone, &$kind, $format = "dash") {
     $phoneA = explode("x", $phone);
     switch (strlen($phoneA[0])) {
       case 0:
@@ -346,7 +344,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
    *
    * @return string
    */
-  function urlEncode($values) {
+  public function urlEncode($values) {
     $uri = '';
     foreach ($values as $key => $value) {
       $value = urlencode($value);
@@ -358,4 +356,3 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
     return $uri;
   }
 }
-

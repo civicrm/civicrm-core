@@ -45,10 +45,9 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Report_DAO_ReportInstance object
-   * @access public
    * @static
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $instance = new CRM_Report_DAO_ReportInstance();
     if (empty($params)) {
       return NULL;
@@ -126,10 +125,9 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    * @param array   $params      (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Report_BAO_ReportInstance object
-   * @access public
    * @static
    */
-  static function &create(&$params) {
+  public static function &create(&$params) {
     if (isset($params['report_header'])) {
       $params['header']    = CRM_Utils_Array::value('report_header',$params);
     }
@@ -231,7 +229,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    *
    * @return mixed $results no of deleted Instance on success, false otherwise@access public
    */
-  static function del($id = NULL) {
+  public static function del($id = NULL) {
     $dao = new CRM_Report_DAO_ReportInstance();
     $dao->id = $id;
     return $dao->delete();
@@ -243,7 +241,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    *
    * @return CRM_Report_DAO_ReportInstance|null
    */
-  static function retrieve($params, &$defaults) {
+  public static function retrieve($params, &$defaults) {
     $instance = new CRM_Report_DAO_ReportInstance();
     $instance->copyValues($params);
 

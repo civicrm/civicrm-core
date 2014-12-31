@@ -51,7 +51,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->_columns = array(
         'civicrm_contact' => array(
           'dao' => 'CRM_Contact_DAO_Contact',
@@ -160,11 +160,11 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
     //Headers for Rank column
@@ -226,7 +226,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
 
     $op = CRM_Utils_Array::value('total_range_op', $fields);
@@ -246,7 +246,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     return $errors;
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
         FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
             INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
@@ -261,7 +261,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     $this->addAddressFromClause();
   }
 
-  function where() {
+  public function where() {
     $clauses = array();
     $this->_tempClause = $this->_outerCluase = $this->_groupLimit = '';
     foreach ($this->_columns as $tableName => $table) {
@@ -314,11 +314,11 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_contribution']}.currency";
   }
 
-  function postProcess() {
+  public function postProcess() {
 
     $this->beginPostProcess();
 
@@ -366,7 +366,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
   /**
    * @param int $groupID
    */
-  function add2group($groupID) {
+  public function add2group($groupID) {
     if (is_numeric($groupID)) {
 
       $sql = "
@@ -389,7 +389,7 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
   /**
    * @param int $rowCount
    */
-  function limit($rowCount = CRM_Report_Form::ROW_COUNT_LIMIT) {
+  public function limit($rowCount = CRM_Report_Form::ROW_COUNT_LIMIT) {
     // lets do the pager if in html mode
     $this->_limit = NULL;
 
@@ -425,7 +425,7 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
 
     $entryFound = FALSE;
@@ -458,4 +458,3 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
     }
   }
 }
-

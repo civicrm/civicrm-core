@@ -39,9 +39,8 @@ class CRM_Case_Page_CaseDetails extends CRM_Core_Page {
    * it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
-  function run() {
+  public function run() {
     $this->_action  = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $type           = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject);
@@ -80,4 +79,3 @@ class CRM_Case_Page_CaseDetails extends CRM_Core_Page {
     return parent::run();
   }
 }
-

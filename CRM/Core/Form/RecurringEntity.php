@@ -73,7 +73,7 @@ class CRM_Core_Form_RecurringEntity {
    */
   public static $_hasParent = FALSE;
 
-  static function preProcess($entityTable) {
+  public static function preProcess($entityTable) {
     self::$_entityId = (int) CRM_Utils_Request::retrieve('id', 'Positive');
     self::$_entityTable = $entityTable;
 
@@ -108,11 +108,10 @@ class CRM_Core_Form_RecurringEntity {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return None
    */
-  static function setDefaultValues() {
+  public static function setDefaultValues() {
     $defaults = array();
     if (self::$_scheduleReminderID) {
       $defaults['repetition_frequency_unit'] = self::$_scheduleReminderDetails->repetition_frequency_unit;
@@ -147,7 +146,7 @@ class CRM_Core_Form_RecurringEntity {
     return $defaults;
   }
 
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     if (self::$_entityTable) {
       $entityType = explode("_", self::$_entityTable);
       if ($entityType[1]) {
@@ -232,9 +231,8 @@ class CRM_Core_Form_RecurringEntity {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($values) {
+  public static function formRule($values) {
     $errors = array();
     //Process this function only when you get this variable
     if ($values['allowRepeatConfigToSubmit'] == 1) {
@@ -313,11 +311,10 @@ class CRM_Core_Form_RecurringEntity {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return None
    */
-  static function postProcess($params = array(), $type, $linkedEntities = array()) {
+  public static function postProcess($params = array(), $type, $linkedEntities = array()) {
     //Check entity_id not present in params take it from class variable
     if (!CRM_Utils_Array::value('entity_id', $params)) {
       $params['entity_id'] = self::$_entityId;
@@ -481,7 +478,6 @@ class CRM_Core_Form_RecurringEntity {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Repeat Entity');

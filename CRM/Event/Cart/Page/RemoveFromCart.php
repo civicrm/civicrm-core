@@ -4,7 +4,7 @@
  * Class CRM_Event_Cart_Page_RemoveFromCart
  */
 class CRM_Event_Cart_Page_RemoveFromCart extends CRM_Core_Page {
-  function run() {
+  public function run() {
     $transaction = new CRM_Core_Transaction();
     $this->_id   = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $cart        = CRM_Event_Cart_BAO_Cart::find_or_create_for_current_session();
@@ -17,6 +17,3 @@ class CRM_Event_Cart_Page_RemoveFromCart extends CRM_Core_Page {
     return CRM_Utils_System::redirect($_SERVER['HTTP_REFERER']);
   }
 }
-
-
-

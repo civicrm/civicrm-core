@@ -48,7 +48,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_showRelatedCases = CRM_Utils_Array::value('relatedCases', $_GET);
@@ -196,11 +195,10 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     return $defaults;
   }
@@ -209,7 +207,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     //this call is for show related cases.
@@ -446,7 +443,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
    * Process the form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -503,7 +499,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
    * @param CRM_Core_Form $form
    * @param array $aTypes to include acivities related to current case id $form->_caseID
    */
-  static function activityForm($form, $aTypes = array()) {
+  public static function activityForm($form, $aTypes = array()) {
     $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($form->_contactID, $form->_caseID);
     //build reporter select
     $reporters = array("" => ts(' - any reporter - '));

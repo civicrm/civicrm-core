@@ -48,7 +48,7 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
    *
    * @return void
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $params   = array();
@@ -169,4 +169,3 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
     CRM_Utils_System::civiExit();
   }
 }
-

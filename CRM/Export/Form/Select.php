@@ -41,7 +41,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
   /**
    * Various Contact types
    */
-  CONST
+  const
     EXPORT_ALL = 1,
     EXPORT_SELECTED = 2,
     EXPORT_MERGE_DO_NOT_MERGE = 0,
@@ -51,7 +51,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
   /**
    * Export modes
    */
-  CONST
+  const
     CONTACT_EXPORT = 1,
     CONTRIBUTE_EXPORT = 2,
     MEMBER_EXPORT = 3,
@@ -76,9 +76,8 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
    * @param
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     //special case for custom search, directly give option to download csv file
     $customSearchID = $this->get('customSearchID');
     if ($customSearchID) {
@@ -240,7 +239,6 @@ FROM   {$this->_componentTable}
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     //export option
@@ -340,7 +338,6 @@ FROM   {$this->_componentTable}
    * @param $self
    *
    * @return mixed true or array of errors
-   * @access public
    * @static
    */
   static public function formRule($params, $files, $self) {
@@ -372,7 +369,6 @@ FROM   {$this->_componentTable}
    * Process the uploaded file
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params             = $this->controller->exportValues($this->_name);
@@ -438,7 +434,6 @@ FROM   {$this->_componentTable}
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Export All or Selected Fields');
@@ -448,7 +443,7 @@ FROM   {$this->_componentTable}
    * Build mapping form element
    *
    */
-  function buildMapping() {
+  public function buildMapping() {
     switch ($this->_exportMode) {
       case CRM_Export_Form_Select::CONTACT_EXPORT:
         $exportType = 'Export Contact';
@@ -495,7 +490,7 @@ FROM   {$this->_componentTable}
   /**
    * @return array
    */
-  static function getGreetingOptions() {
+  public static function getGreetingOptions() {
     $options = array();
     $greetings = array(
       'postal_greeting' => 'postal_greeting_other',
@@ -525,4 +520,3 @@ FROM   {$this->_componentTable}
     return $options;
   }
 }
-

@@ -35,7 +35,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testIndividualAdd() {
+  public function testIndividualAdd() {
     $this->webtestLogin();
 
     $groupName = $this->WebtestAddGroup();
@@ -171,7 +171,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Contact Saved");
   }
 
-  function testHouseholdAdd() {
+  public function testHouseholdAdd() {
     $this->webtestLogin();
 
     $groupName = $this->WebtestAddGroup();
@@ -282,7 +282,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Contact Saved");
   }
 
-  function testOrganizationAdd() {
+  public function testOrganizationAdd() {
     $this->webtestLogin();
 
     $groupName = $this->WebtestAddGroup();
@@ -386,7 +386,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Contact Saved");
   }
 
-  function testIndividualAddWithSharedAddress() {
+  public function testIndividualAddWithSharedAddress() {
     $this->webtestLogin();
 
     $this->openCiviPage('contact/add', "reset=1&ct=Individual");
@@ -504,4 +504,3 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('DataTables_Table_0', 'Household Member of');
   }
 }
-

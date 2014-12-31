@@ -41,7 +41,7 @@ class CRM_Logging_Reverter {
    * @param int $log_conn_id
    * @param $log_date
    */
-  function __construct($log_conn_id, $log_date) {
+  public function __construct($log_conn_id, $log_date) {
     $dsn               = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
     $this->db          = $dsn['database'];
     $this->log_conn_id = $log_conn_id;
@@ -51,7 +51,7 @@ class CRM_Logging_Reverter {
   /**
    * @param $tables
    */
-  function revert($tables) {
+  public function revert($tables) {
     // FIXME: split off the table → DAO mapping to a GenCode-generated class
     $daos = array(
       'civicrm_address' => 'CRM_Core_DAO_Address',
@@ -199,4 +199,3 @@ class CRM_Logging_Reverter {
     }
   }
 }
-

@@ -139,7 +139,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
   /**
    * @return bool
    */
-  static function workflowEnabled() {
+  public static function workflowEnabled() {
     $config = CRM_Core_Config::singleton();
 
     // early exit, since not true for most
@@ -242,4 +242,3 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
    */
   public function creatNewShortcut(&$shortCuts) {}
 }
-

@@ -49,7 +49,7 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
   }
 
-  function testDashboardCreate() {
+  public function testDashboardCreate() {
     $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_dashboard');
     $params = array(
       'version' => 3,
@@ -70,7 +70,7 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
    * @param int $id
    * @param $oldCount
    */
-  function DashboardDelete($id, $oldCount) {
+  public function DashboardDelete($id, $oldCount) {
     $params = array(
       'version' => 3,
       'id' => $id,

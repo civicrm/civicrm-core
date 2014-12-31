@@ -42,7 +42,7 @@ class CRM_Admin_Page_AJAX {
    * CRM-12337 Output navigation menu as executable javascript
    * @see smarty_function_crmNavigationMenu
    */
-  static function getNavigationMenu() {
+  public static function getNavigationMenu() {
     $contactID = CRM_Core_Session::singleton()->get('userID');
     if ($contactID) {
       CRM_Core_Page_AJAX::setJsHeaders();
@@ -56,7 +56,7 @@ class CRM_Admin_Page_AJAX {
   /**
    * Return menu tree as json data for editing
    */
-  static function getNavigationList() {
+  public static function getNavigationList() {
     echo CRM_Core_BAO_Navigation::buildNavigation(TRUE, FALSE);
     CRM_Utils_System::civiExit();
   }
@@ -64,7 +64,7 @@ class CRM_Admin_Page_AJAX {
   /**
    * Process drag/move action for menu tree
    */
-  static function menuTree() {
+  public static function menuTree() {
     CRM_Core_BAO_Navigation::processNavigation($_GET);
   }
 
@@ -72,7 +72,7 @@ class CRM_Admin_Page_AJAX {
    * Build status message while
    * enabling/ disabling various objects
    */
-  static function getStatusMsg() {
+  public static function getStatusMsg() {
     require_once('api/v3/utils.php');
     $recordID  = CRM_Utils_Type::escape($_GET['id'], 'Integer');
     $entity = CRM_Utils_Type::escape($_GET['entity'], 'String');
@@ -246,7 +246,7 @@ class CRM_Admin_Page_AJAX {
     CRM_Core_Page_AJAX::returnJsonResponse($ret);
   }
 
-  static function mergeTagList() {
+  public static function mergeTagList() {
     $name = CRM_Utils_Type::escape($_GET['term'], 'String');
     $fromId = CRM_Utils_Type::escape($_GET['fromId'], 'Integer');
     $limit = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10);
@@ -294,7 +294,7 @@ LIMIT $limit";
     CRM_Utils_JSON::output($result);
   }
 
-  function mappingList() {
+  public function mappingList() {
     if (empty($_GET['mappingID'])) {
       CRM_Utils_JSON::output(array('status' => 'error', 'error_msg' => 'required params missing.'));
     }
@@ -318,7 +318,7 @@ LIMIT $limit";
     CRM_Utils_JSON::output($output);
   }
 
-  static function mergeTags() {
+  public static function mergeTags() {
     $tagAId = CRM_Utils_Type::escape($_POST['fromId'], 'Integer');
     $tagBId = CRM_Utils_Type::escape($_POST['toId'], 'Integer');
 
@@ -340,4 +340,3 @@ LIMIT $limit";
   }
 
 }
-

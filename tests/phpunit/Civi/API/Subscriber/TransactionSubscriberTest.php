@@ -7,7 +7,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class TransactionSubscriberTest extends \CiviUnitTestCase {
 
-  function transactionOptions() {
+  public function transactionOptions() {
     $r = array();
     // $r[] = array(string $entity, string $action, array $params, bool $isTransactional, bool $isForceRollback, bool $isNested);
 
@@ -49,7 +49,7 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
    * Ensure that API parameters "is_transactional" and "force_rollback" are parsed correctly
    * @dataProvider transactionOptions
    */
-  function testTransactionOptions($version, $entity, $action, $params, $isTransactional, $isForceRollback, $isNested) {
+  public function testTransactionOptions($version, $entity, $action, $params, $isTransactional, $isForceRollback, $isNested) {
     $txs = new TransactionSubscriber();
     $apiProvider = NULL;
 
@@ -61,7 +61,7 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
     $this->assertEquals($isNested, $txs->isNested($apiProvider, $apiRequest), 'check isNested');
   }
 
-  function testForceRollback() {
+  public function testForceRollback() {
     $result = $this->callAPISuccess('contact', 'create', array(
       'contact_type' => 'Individual',
       'first_name' => 'Me',

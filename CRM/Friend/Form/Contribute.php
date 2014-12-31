@@ -54,7 +54,6 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -90,7 +89,6 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if (isset($this->_id)) {
@@ -107,7 +105,6 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -134,10 +131,8 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Tell a Friend');
   }
 }
-

@@ -49,7 +49,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * The price set group id of the field
    *
    * @var int
-   * @access protected
    */
   protected $_sid;
 
@@ -57,7 +56,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @access private
    */
   private static $_actionLinks;
 
@@ -65,7 +63,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * The price set is reserved or not
    *
    * @var boolean
-   * @access protected
    */
   protected $_isSetReserved = false;
 
@@ -75,7 +72,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @param null
    *
    * @return array  array of action links that we need to display for the browse screen
-   * @access public
    */ function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
       self::$_actionLinks = array(
@@ -118,9 +114,8 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @param null
    *
    * @return void
-   * @access public
    */
-  function browse() {
+  public function browse() {
     $resourceManager = CRM_Core_Resources::singleton();
     if (!empty($_GET['new']) && $resourceManager->ajaxPopupsEnabled) {
       $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999, 'html-header');
@@ -223,9 +218,8 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
 
    *
    * @return void
-   * @access public
    */
-  function edit($action) {
+  public function edit($action) {
     // create a simple controller for editing price data
     $controller = new CRM_Core_Controller_Simple('CRM_Price_Form_Field', ts('Price Field'), $action);
 
@@ -248,9 +242,8 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @param null
    *
    * @return void
-   * @access public
    */
-  function run() {
+  public function run() {
 
     // get the group id
     $this->_sid = CRM_Utils_Request::retrieve('sid', 'Positive',
@@ -343,9 +336,8 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @internal param int $id price field id
    *
    * @return void
-   * @access public
    */
-  function preview($fid) {
+  public function preview($fid) {
     $controller = new CRM_Core_Controller_Simple('CRM_Price_Form_Preview', ts('Preview Form Field'), CRM_Core_Action::PREVIEW);
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/price/field', 'reset=1&action=browse&sid=' . $this->_sid));
@@ -356,4 +348,3 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
     $controller->run();
   }
 }
-

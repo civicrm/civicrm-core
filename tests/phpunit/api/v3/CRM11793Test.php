@@ -31,7 +31,7 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
     Contact::createOrganisation();
   }
 
-  function tearDown() {
+  public function tearDown() {
   }
 
   /**
@@ -40,21 +40,21 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
    *  Verify that attempt to create individual contact with only
    *  first and last names succeeds
    */
-  function testCRM11793Organization() {
+  public function testCRM11793Organization() {
     $this->_testCRM11793ContactType('Organization');
   }
 
-  function testCRM11793Household() {
+  public function testCRM11793Household() {
     $this->_testCRM11793ContactType('Household');
   }
-  function testCRM11793Individual() {
+  public function testCRM11793Individual() {
     $this->_testCRM11793ContactType('Individual');
   }
 
   /**
    * @param $contactType
    */
-  function _testCRM11793ContactType($contactType) {
+  public function _testCRM11793ContactType($contactType) {
     $result = $this->callAPISuccess(
       'contact',
       'get',

@@ -46,7 +46,6 @@ class CRM_Auction_Form_Item extends CRM_Core_Form {
    * the id of the item we are processing
    *
    * @var int
-   * @protected
    */
   public $_id;
 
@@ -54,7 +53,6 @@ class CRM_Auction_Form_Item extends CRM_Core_Form {
    * the id of the auction for this item
    *
    * @var int
-   * @protected
    */
   public $_aid;
 
@@ -62,7 +60,6 @@ class CRM_Auction_Form_Item extends CRM_Core_Form {
    * the id of the person donating this item
    *
    * @var int
-   * @protected
    */
   public $_donorID;
 

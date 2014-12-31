@@ -42,7 +42,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   // which (and whether) mailing workflow this template belongs to
   protected $_workflow_id = NULL;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',
       $this, FALSE, 'add'
@@ -58,7 +58,6 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
    * Set default values for the form.
    * The default values are retrieved from the database.
    *
-   * @access public
    *
    * @return void
    */
@@ -113,7 +112,6 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -200,7 +198,6 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -239,4 +236,3 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     }
   }
 }
-

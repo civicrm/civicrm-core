@@ -43,7 +43,7 @@ class CRM_Core_QuickForm_Action_Process extends CRM_Core_QuickForm_Action {
    * @return \CRM_Core_QuickForm_Action_Process
   @access public
    */
-  function __construct(&$stateMachine) {
+  public function __construct(&$stateMachine) {
     parent::__construct($stateMachine);
   }
 
@@ -54,13 +54,11 @@ class CRM_Core_QuickForm_Action_Process extends CRM_Core_QuickForm_Action {
    * @param  string    $actionName Current action name, as one Action object can serve multiple actions
    *
    * @return void
-   * @access public
    */
-  function perform(&$page, $actionName) {
+  public function perform(&$page, $actionName) {
     if ($this->_stateMachine->shouldReset()) {
       $this->_stateMachine->reset();
     }
     $this->popUserContext();
   }
 }
-

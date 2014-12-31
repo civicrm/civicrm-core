@@ -49,7 +49,7 @@ class CRM_Utils_Mail_EmailProcessor {
    * @return boolean always returns true (for the api). at a later stage we should
    *                 fix this to return true on success / false on failure etc
    */
-  static function processBounces() {
+  public static function processBounces() {
     $dao             = new CRM_Core_DAO_MailSettings;
     $dao->domain_id  = CRM_Core_Config::domainID();
     $dao->is_default = TRUE;
@@ -71,7 +71,7 @@ class CRM_Utils_Mail_EmailProcessor {
    *
    * @return void
    */
-  static function cleanupDir($dir, $age = 5184000) {
+  public static function cleanupDir($dir, $age = 5184000) {
     // return early if we can’t read/write the dir
     if (!is_writable($dir) or !is_readable($dir) or !is_dir($dir)) {
       return;
@@ -97,7 +97,7 @@ class CRM_Utils_Mail_EmailProcessor {
    *
    * @return void
    */
-  static function processActivities() {
+  public static function processActivities() {
     $dao             = new CRM_Core_DAO_MailSettings;
     $dao->domain_id  = CRM_Core_Config::domainID();
     $dao->is_default = FALSE;
@@ -120,7 +120,7 @@ class CRM_Utils_Mail_EmailProcessor {
    *
    * @return void
    */
-  static function process($civiMail = TRUE) {
+  public static function process($civiMail = TRUE) {
     $dao = new CRM_Core_DAO_MailSettings;
     $dao->domain_id = CRM_Core_Config::domainID();
     $dao->find();
@@ -136,7 +136,7 @@ class CRM_Utils_Mail_EmailProcessor {
    *
    * @throws Exception
    */
-  static function _process($civiMail, $dao) {
+  public static function _process($civiMail, $dao) {
     // 0 = activities; 1 = bounce;
     $usedfor = $dao->is_default;
 
@@ -416,4 +416,3 @@ class CRM_Utils_Mail_EmailProcessor {
     }
   }
 }
-

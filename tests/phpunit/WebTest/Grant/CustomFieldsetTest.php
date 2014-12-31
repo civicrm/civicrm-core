@@ -35,7 +35,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCustomFieldsetTest() {
+  public function testCustomFieldsetTest() {
     // Log in as admin first to verify permissions for CiviGrant
     $this->webtestLogin('admin');
 
@@ -106,7 +106,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     );
   }
 
-  function testAjaxCustomGroupLoad() {
+  public function testAjaxCustomGroupLoad() {
     $this->webtestLogin();
 
     // Enable CiviGrant module if necessary

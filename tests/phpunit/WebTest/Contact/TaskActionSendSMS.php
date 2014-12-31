@@ -35,7 +35,7 @@ class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testSMSToContacts() {
+  public function testSMSToContacts() {
     $this->webtestLogin();
 
     // ADD a New Group
@@ -118,4 +118,3 @@ class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent('Your message has been sent.'), "Test SMS could not be sent!");
   }
 }
-

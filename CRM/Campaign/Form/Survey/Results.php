@@ -49,7 +49,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
      */
   public $_values;
 
-  CONST NUM_OPTION = 11;
+  const NUM_OPTION = 11;
 
   public function preProcess() {
     parent::preProcess();
@@ -80,9 +80,8 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
    * @param null
    *
    * @return array    array of default values
-   * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = $this->_values;
 
     // set defaults for weight.
@@ -103,7 +102,6 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $optionGroups = CRM_Campaign_BAO_Survey::getResultSets();
@@ -211,7 +209,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
    * Global validation rules for the form
    *
    */
-  static function formRule($fields, $files, $form) {
+  public static function formRule($fields, $files, $form) {
     $errors = array();
     if (!empty($fields['option_label']) && !empty($fields['option_value']) &&
       (count(array_filter($fields['option_label'])) == 0) &&
@@ -349,7 +347,6 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // store the submitted values in an array

@@ -58,9 +58,8 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     // get the controller vars
     $this->_groupId = $this->get('groupId');
     $this->_fieldId = $this->get('fieldId');
@@ -98,9 +97,8 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
    * @param null
    *
    * @return array   the default array reference
-   * @access protected
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     CRM_Core_BAO_CustomGroup::setDefaults($this->_groupTree, $defaults, FALSE, FALSE);
@@ -114,7 +112,6 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if (is_array($this->_groupTree[$this->_groupId])) {
@@ -135,4 +132,3 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
     );
   }
 }
-

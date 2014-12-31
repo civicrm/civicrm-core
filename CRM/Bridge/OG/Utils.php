@@ -33,12 +33,12 @@
  *
  */
 class CRM_Bridge_OG_Utils {
-  CONST aclEnabled = 1, syncFromCiviCRM = 1;
+  const aclEnabled = 1, syncFromCiviCRM = 1;
 
   /**
    * @return int
    */
-  static function aclEnabled() {
+  public static function aclEnabled() {
     return self::aclEnabled;
   }
 
@@ -47,7 +47,7 @@ class CRM_Bridge_OG_Utils {
    * This was always false before, and is always true
    * now.  Most likely, this needs to be a setting.
    */
-  static function syncFromCiviCRM() {
+  public static function syncFromCiviCRM() {
     // make sure that acls are not enabled
     //RMT -- the following makes no f**king sense...
     //return ! self::aclEnabled & self::syncFromCiviCRM;
@@ -59,7 +59,7 @@ class CRM_Bridge_OG_Utils {
    *
    * @return string
    */
-  static function ogSyncName($ogID) {
+  public static function ogSyncName($ogID) {
     return "OG Sync Group :{$ogID}:";
   }
 
@@ -68,7 +68,7 @@ class CRM_Bridge_OG_Utils {
    *
    * @return string
    */
-  static function ogSyncACLName($ogID) {
+  public static function ogSyncACLName($ogID) {
     return "OG Sync Group ACL :{$ogID}:";
   }
 
@@ -79,7 +79,7 @@ class CRM_Bridge_OG_Utils {
    * @return int|null|string
    * @throws Exception
    */
-  static function ogID($groupID, $abort = TRUE) {
+  public static function ogID($groupID, $abort = TRUE) {
     $source = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group',
       $groupID,
       'source'
@@ -103,7 +103,7 @@ class CRM_Bridge_OG_Utils {
    * @return int
    * @throws Exception
    */
-  static function contactID($ufID) {
+  public static function contactID($ufID) {
     $contactID = CRM_Core_BAO_UFMatch::getContactId($ufID);
     if ($contactID) {
       return $contactID;
@@ -128,7 +128,7 @@ class CRM_Bridge_OG_Utils {
    * @return null|string
    * @throws Exception
    */
-  static function groupID($source, $title = NULL, $abort = FALSE) {
+  public static function groupID($source, $title = NULL, $abort = FALSE) {
     $query = "
 SELECT id
   FROM civicrm_group
@@ -150,4 +150,3 @@ SELECT id
     return $groupID;
   }
 }
-

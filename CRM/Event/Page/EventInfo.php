@@ -46,10 +46,9 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
    *
    */
-  function run() {
+  public function run() {
     //get the event id.
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $config = CRM_Core_Config::singleton();
@@ -363,7 +362,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     if ($this->_id) {
       $templateFile = "CRM/Event/Page/{$this->_id}/EventInfo.tpl";
       $template = CRM_Core_Page::getTemplate();
@@ -375,4 +374,3 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     return parent::getTemplateFileName();
   }
 }
-

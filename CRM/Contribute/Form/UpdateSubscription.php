@@ -64,11 +64,10 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
    * The id of the contact associated with this recurring contribution
    *
    * @var int
-   * @public
    */
   public $_contactID;
 
-  function preProcess() {
+  public function preProcess() {
 
     $this->_crid = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
     if ($this->_crid) {
@@ -128,11 +127,10 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
 
     $this->_defaults = array();
     $this->_defaults['amount'] = $this->_subscriptionDetails->amount;
@@ -146,7 +144,6 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
    * Actually build the components of the form
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // define the fields
@@ -185,7 +182,6 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
   /**
    * This function is called after the user submits the form
    *
-   * @access public
    *
    * @return void
    */
@@ -321,4 +317,3 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     }
   }
 }
-

@@ -47,9 +47,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param boolean $maintenance  for maintenance mode
    *
    * @return void           prints content on stdout
-   * @access public
    */
-  function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
     // TODO: Simplify; this was copied verbatim from CiviCRM 3.4's multi-UF theming function, but that's more complex than necessary
     if (function_exists('theme') && !$print) {
       if ($maintenance) {
@@ -80,9 +79,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * @return uid if user exists, false otherwise
    *
-   * @access public
    */
-  function createUser(&$params, $mail) {
+  public function createUser(&$params, $mail) {
     $form_state = array();
     $form_state['values'] = array(
       'name' => $params['cms_name'],
@@ -128,7 +126,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param int $ufID
    * @param string $ufName
    */
-  function updateCMSName($ufID, $ufName) {
+  public function updateCMSName($ufID, $ufName) {
     // CRM-5555
     if (function_exists('user_load')) {
       $user = user_load(array('uid' => $ufID));
@@ -148,7 +146,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * @return void
    */
-  function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
+  public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     $config = CRM_Core_Config::singleton();
 
     $dao   = new CRM_Core_DAO();
@@ -218,7 +216,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @return string $destination destination value for URL
    *
    */
-  function getLoginDestination(&$form) {
+  public function getLoginDestination(&$form) {
     $args = NULL;
 
     $id = $form->get('id');
@@ -257,9 +255,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @paqram string $pageTitle
    *
    * @return void
-   * @access public
    */
-  function setTitle($title, $pageTitle = NULL) {
+  public function setTitle($title, $pageTitle = NULL) {
     if (!$pageTitle) {
       $pageTitle = $title;
     }
@@ -278,9 +275,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @internal param string $url
    *
    * @return void
-   * @access public
    */
-  function appendBreadCrumb($breadCrumbs) {
+  public function appendBreadCrumb($breadCrumbs) {
     $breadCrumb = drupal_get_breadcrumb();
 
     if (is_array($breadCrumbs)) {
@@ -306,9 +302,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * Reset an additional breadcrumb tag to the existing breadcrumb
    *
    * @return void
-   * @access public
    */
-  function resetBreadCrumb() {
+  public function resetBreadCrumb() {
     $bc = array();
     drupal_set_breadcrumb($bc);
   }
@@ -319,9 +314,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param string $head the new string to be appended
    *
    * @return void
-   * @access public
    */
-  function addHTMLHead($head) {
+  public function addHTMLHead($head) {
     drupal_set_html_head($head);
   }
 
@@ -335,7 +329,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addScriptUrl($url, $region) {
     // CRM-15450 - D6 doesn't order internal/external links correctly so we can't use drupal_add_js
@@ -352,7 +345,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addScript($code, $region) {
     // CRM-15450 - ensure scripts are in correct order
@@ -369,7 +361,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addStyleUrl($url, $region) {
     if ($region != 'html-header' || !$this->formatResourceUrl($url)) {
@@ -389,7 +380,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @see CRM_Core_Region::render()
    *
    * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
    */
   public function addStyle($code, $region) {
     return FALSE;
@@ -401,9 +391,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param null
    *
    * @return void
-   * @access public
    */
-  function mapConfigToSSL() {
+  public function mapConfigToSSL() {
     global $base_url;
     $base_url = str_replace('http://', 'https://', $base_url);
   }
@@ -414,9 +403,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param mix $action the default action if one is pre-specified
    *
    * @return string the url to post the form
-   * @access public
    */
-  function postURL($action) {
+  public function postURL($action) {
     if (!empty($action)) {
       return $action;
     }
@@ -435,9 +423,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @return mixed false if no auth
    *               array(
    *  contactID, ufID, unique string ) if success
-   * @access public
    */
-  function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
+  public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
    //@todo this 'PEAR-y' stuff is only required when bookstrap is not being loaded which is rare
    // if ever now.
    // probably if bootstrap is loaded this call
@@ -488,7 +475,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Load user into session
    */
-  function loadUser($username) {
+  public function loadUser($username) {
     global $user;
     $user = user_load(array('name' => $username));
     if (empty($user->uid)) {
@@ -514,7 +501,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * FIXME: Document values accepted/required by $params
    */
-  function userLoginFinalize($params = array()) {
+  public function userLoginFinalize($params = array()) {
     user_authenticate_finalize($params);
   }
 
@@ -524,7 +511,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param string $username
    * @return int|NULL
    */
-  function getUfId($username) {
+  public function getUfId($username) {
     $user = user_load(array('name' => $username));
     if (empty($user->uid)) {
       return NULL;
@@ -537,21 +524,20 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * @param string $message the message to set
    *
-   * @access public
    */
-  function setMessage($message) {
+  public function setMessage($message) {
     drupal_set_message($message);
   }
 
   /**
    * @return mixed
    */
-  function logout() {
+  public function logout() {
     module_load_include('inc', 'user', 'user.pages');
     return user_logout();
   }
 
-  function updateCategories() {
+  public function updateCategories() {
     // copied this from profile.module. Seems a bit inefficient, but i dont know a better way
     // CRM-3600
     cache_clear_all();
@@ -563,7 +549,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * @return string  with the locale or null for none
    */
-  function getUFLocale() {
+  public function getUFLocale() {
     // return CiviCRM’s xx_YY locale that either matches Drupal’s Chinese locale
     // (for CRM-6281), Drupal’s xx_YY or is retrieved based on Drupal’s xx
     // sometimes for CLI based on order called, this might not be set and/or empty
@@ -591,7 +577,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * @return string
    */
-  function getVersion() {
+  public function getVersion() {
     return defined('VERSION') ? VERSION : 'Unknown';
   }
 
@@ -605,7 +591,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * @return bool
    */
-  function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
+  public function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     //take the cms root path.
     $cmsPath = $this->cmsRootPath($realPath);
 
@@ -708,7 +694,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    *
    */
-  function cmsRootPath($scriptFilename = NULL) {
+  public function cmsRootPath($scriptFilename = NULL) {
     $cmsRoot = $valid = NULL;
 
     if (!is_null($scriptFilename)) {
@@ -797,7 +783,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @return string $url, formatted url.
    * @static
    */
-  function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
+  public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
     if (empty($url)) {
       return $url;
     }
@@ -865,7 +851,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * @return void
    */
-  function replacePermission($oldPerm, $newPerms) {
+  public function replacePermission($oldPerm, $newPerms) {
     $roles = user_roles(FALSE, $oldPerm);
     foreach ($roles as $rid => $roleName) {
       $permList = db_result(db_query('SELECT perm FROM {permission} WHERE rid = %d', $rid));
@@ -888,7 +874,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * @return array CRM_Core_Module
    */
-  function getModules() {
+  public function getModules() {
     $result = array();
     $q = db_query('SELECT name, status FROM {system} WHERE type = \'module\' AND schema_version <> -1');
     while ($row = db_fetch_object($q)) {
@@ -922,7 +908,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param integer $ogID Organic Group ID
    * @param integer $drupalID drupal User ID
    */
-  function og_membership_create($ogID, $drupalID){
+  public function og_membership_create($ogID, $drupalID){
     og_save_subscription( $ogID, $drupalID, array( 'is_active' => 1 ) );
   }
 
@@ -932,7 +918,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param integer $ogID Organic Group ID
    * @param integer $drupalID drupal User ID
    */
-  function og_membership_delete($ogID, $drupalID) {
+  public function og_membership_delete($ogID, $drupalID) {
       og_delete_subscription( $ogID, $drupalID );
   }
 
@@ -940,7 +926,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * Over-ridable function to get timezone as a string eg.
    * @return string Timezone e.g. 'America/Los_Angeles'
    */
-  function getTimeZoneString() {
+  public function getTimeZoneString() {
     global $user;
     if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
       $timezone = $user->timezone;
@@ -958,7 +944,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * Reset any system caches that may be required for proper CiviCRM
    * integration.
    */
-  function flush() {
+  public function flush() {
     drupal_flush_all_caches();
   }
 }

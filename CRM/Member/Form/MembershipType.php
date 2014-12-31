@@ -42,9 +42,9 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   /**
    * Max number of contacts we will display for membership-organisation
    */
-  CONST MAX_CONTACTS = 50;
+  const MAX_CONTACTS = 50;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0 );
     $this->_BAOName = 'CRM_Member_BAO_MembershipType';
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
@@ -61,7 +61,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -111,7 +110,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -217,10 +215,9 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    * @param array $params (ref.) an assoc array of name/value pairs
    *
    * @return mixed true or array of errors
-   * @access public
    * @static
    */
-  static function formRule($params) {
+  public static function formRule($params) {
     $errors = array();
 
     if (!$params['name']) {
@@ -291,7 +288,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -440,4 +436,3 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     }
   }
 }
-

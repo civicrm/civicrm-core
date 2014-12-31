@@ -40,7 +40,6 @@
  * @param string $class     the new class or classes to add (separate with a space)
  *
  * @return string        the new modified html string
- * @access public
  */
 function smarty_modifier_crmAddClass($string, $class) {
   // Standardize white space
@@ -53,4 +52,3 @@ function smarty_modifier_crmAddClass($string, $class) {
   }
   return $string;
 }
-

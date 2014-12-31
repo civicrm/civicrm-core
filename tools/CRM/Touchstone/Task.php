@@ -39,7 +39,7 @@
  *
  */
 class CRM_Touchstone_Task {
-  CONST FIRST_ACTION = 1, SECOND_ACTION = 2, THIRD_ACTION = 3;
+  const FIRST_ACTION = 1, SECOND_ACTION = 2, THIRD_ACTION = 3;
 
   /**
    * the task array

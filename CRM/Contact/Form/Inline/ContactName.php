@@ -42,7 +42,6 @@ class CRM_Contact_Form_Inline_ContactName extends CRM_Contact_Form_Inline {
    * Build the form object elements
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -56,7 +55,6 @@ class CRM_Contact_Form_Inline_ContactName extends CRM_Contact_Form_Inline {
    * Process the form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->exportValues();

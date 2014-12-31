@@ -96,7 +96,6 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
    * This function checks to see if we have the right config values
    *
    * @return string the error message if any
-   * @public
    */
   function checkConfig() {
     $config = CRM_Core_Config::singleton();

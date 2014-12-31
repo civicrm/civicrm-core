@@ -64,7 +64,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     parent::preProcess();
   }
 
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $dafaults = array();
     $dao = new CRM_PCP_DAO_PCP();
 
@@ -98,7 +98,6 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->add('text', 'pcp_title', ts('Title'), NULL, TRUE);
@@ -155,10 +154,9 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
    *
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     if ($fields['goal_amount'] <= 0) {
       $errors['goal_amount'] = ts('Goal Amount should be a numeric value greater than zero.');
@@ -172,7 +170,6 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -356,4 +353,3 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     }
   }
 }
-

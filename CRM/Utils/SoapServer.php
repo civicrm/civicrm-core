@@ -73,7 +73,6 @@ class CRM_Utils_SoapServer {
    * @param string $var   The string to be echoed
    *
    * @return string       $var
-   * @access public
    */
   public function ping($var) {
     $session = CRM_Core_Session::singleton();
@@ -89,7 +88,6 @@ class CRM_Utils_SoapServer {
    *
    * @throws SoapFault
    * @return void
-   * @access public
    */
   public function verify($key) {
     $session = CRM_Core_Session::singleton();
@@ -123,7 +121,6 @@ class CRM_Utils_SoapServer {
    *
    * @throws SoapFault
    * @return string           The SOAP Client key
-   * @access public
    * @static
    */
   public function authenticate($name, $pass, $loadCMSBootstrap = FALSE) {
@@ -332,4 +329,3 @@ class CRM_Utils_SoapServer {
     return civicrm_api('contact', 'get', $params);
   }
 }
-

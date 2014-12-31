@@ -35,7 +35,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testIndividualAdd() {
+  public function testIndividualAdd() {
     $this->webtestLogin();
 
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
@@ -199,7 +199,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertChecked("check_3");
   }
 
-  function testMergeContactSubType() {
+  public function testMergeContactSubType() {
     $this->webtestLogin();
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
     $this->waitForElementPresent('_qf_Contact_cancel-bottom');
@@ -255,7 +255,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
    * @param string $lastName
    * @param $subject
    */
-  function addActivity($firstName, $lastName, $subject) {
+  public function addActivity($firstName, $lastName, $subject) {
     $withContact = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($withContact, "Anderson", $withContact . "@anderson.name");
 
@@ -315,7 +315,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Activity '$subject' has been saved.", "Status message didn't show up after saving!");
   }
 
-  function testMergeTest() {
+  public function testMergeTest() {
     $this->webtestLogin();
 
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
@@ -499,7 +499,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='phone-block']/div/div/div[3]/div[2][contains(text(), '9876543210')]"));
   }
 
-  function testBatchMerge(){
+  public function testBatchMerge(){
     $this->webtestLogin();
 
     // add contact1 and its duplicate
@@ -639,7 +639,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
   /**
    * Helper FN
    */
-  function _createContacts($firstName = NULL, $lastName = NULL, $organizationName = NULL, $contactType = 'Individual') {
+  public function _createContacts($firstName = NULL, $lastName = NULL, $organizationName = NULL, $contactType = 'Individual') {
     if ($contactType == 'Individual') {
       // add contact
       $this->openCiviPage("contact/add", "reset=1&ct=Individual");
@@ -730,7 +730,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
    * Helper FN
    * to create new membership type
    */
-  function addMembershipType($membershipOrganization) {
+  public function addMembershipType($membershipOrganization) {
     $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");
     $this->click("link=Add Membership Type");
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
@@ -761,7 +761,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
   /**
    * Test for CRM-12695 fix
    */
-  function testMergeOrganizations() {
+  public function testMergeOrganizations() {
     $this->webtestLogin();
 
     // build organisation name
@@ -921,7 +921,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
   /**
    * Test for CRM-15658 fix
    */
-  function testMergeEmailAndAddress() {
+  public function testMergeEmailAndAddress() {
     $this->webtestLogin();
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
     $firstName = substr(sha1(rand()), 0, 7);
@@ -997,4 +997,3 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertElementNotContainsText("address-block-2", "3456");
   }
 }
-

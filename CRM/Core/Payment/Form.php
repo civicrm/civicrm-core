@@ -85,7 +85,6 @@ class CRM_Core_Payment_Form {
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access protected
    */
   static protected function setBillingDetailsFields(&$form) {
     $bltID = $form->_bltID;
@@ -206,7 +205,7 @@ class CRM_Core_Payment_Form {
    *
    * @return array
    */
-  static function getPaymentFields($paymentProcessor) {
+  public static function getPaymentFields($paymentProcessor) {
     $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
     return $paymentProcessorObject->getPaymentFormFields();
   }
@@ -216,7 +215,7 @@ class CRM_Core_Payment_Form {
    *
    * @return array
    */
-  static function getPaymentFieldMetadata($paymentProcessor) {
+  public static function getPaymentFieldMetadata($paymentProcessor) {
     $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
     return $paymentProcessorObject->getPaymentFormFieldsMetadata();
   }
@@ -226,7 +225,7 @@ class CRM_Core_Payment_Form {
    *
    * @return string
    */
-  static function getPaymentTypeName($paymentProcessor) {
+  public static function getPaymentTypeName($paymentProcessor) {
     $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
     return $paymentProcessorObject->getPaymentTypeName();
   }
@@ -236,7 +235,7 @@ class CRM_Core_Payment_Form {
    *
    * @return string
    */
-  static function getPaymentTypeLabel($paymentProcessor) {
+  public static function getPaymentTypeLabel($paymentProcessor) {
     $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
     return ts(($paymentProcessorObject->getPaymentTypeLabel()) . ' Information');
   }
@@ -250,7 +249,7 @@ class CRM_Core_Payment_Form {
    *
    * @return bool
    */
-  static function buildPaymentForm($form, $processor, $isBillingDataOptional){
+  public static function buildPaymentForm($form, $processor, $isBillingDataOptional){
     //if the form has address fields assign to the template so the js can decide what billing fields to show
     $profileAddressFields = $form->get('profileAddressFields');
     if (!empty($profileAddressFields)) {
@@ -316,7 +315,7 @@ class CRM_Core_Payment_Form {
    * The credit card pseudo constant results only the CC label, not the key ID
    * So we normalize the name to use it as a CSS class.
    */
-  static function getCreditCardCSSNames() {
+  public static function getCreditCardCSSNames() {
     $creditCardTypes = array();
     foreach (CRM_Contribute_PseudoConstant::creditCard() as $key => $name) {
       // Replace anything not css-friendly by an underscore
@@ -334,7 +333,7 @@ class CRM_Core_Payment_Form {
    * Make sure that credit card number and cvv are valid
    * Called within the scope of a QF formRule function
    */
-  static function validateCreditCard($values, &$errors) {
+  public static function validateCreditCard($values, &$errors) {
     if (!empty($values['credit_card_type'])) {
       if (!empty($values['credit_card_number']) &&
         !CRM_Utils_Rule::creditCardNumber($values['credit_card_number'], $values['credit_card_type'])
@@ -363,7 +362,7 @@ class CRM_Core_Payment_Form {
    * @return void
    * @static
    */
-  static function mapParams($id, &$src, &$dst, $reverse = FALSE) {
+  public static function mapParams($id, &$src, &$dst, $reverse = FALSE) {
     static $map = NULL;
     if (!$map) {
       $map = array(
@@ -404,7 +403,7 @@ class CRM_Core_Payment_Form {
    * @return int
    * @static
    */
-  static function getCreditCardExpirationMonth($src) {
+  public static function getCreditCardExpirationMonth($src) {
     if ($month = CRM_Utils_Array::value('M', $src['credit_card_exp_date'])) {
       return $month;
     }
@@ -422,7 +421,7 @@ class CRM_Core_Payment_Form {
    * @return int
    * @static
    */
-  static function getCreditCardExpirationYear($src) {
+  public static function getCreditCardExpirationYear($src) {
     return CRM_Utils_Array::value('Y', $src['credit_card_exp_date']);
   }
 }

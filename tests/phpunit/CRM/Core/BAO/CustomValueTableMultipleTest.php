@@ -9,11 +9,11 @@ require_once 'CiviTest/Custom.php';
  */
 class CRM_Core_BAO_CustomValueTableMultipleTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function testCustomGroupMultipleSingle() {
+  public function testCustomGroupMultipleSingle() {
     $params      = array();
     $contactID   = Contact::createIndividual();
     $customGroup = Custom::createGroup($params, 'Individual', TRUE);
@@ -44,7 +44,7 @@ class CRM_Core_BAO_CustomValueTableMultipleTest extends CiviUnitTestCase {
     Contact::delete($contactID);
   }
 
-  function testCustomGroupMultipleDouble() {
+  public function testCustomGroupMultipleDouble() {
     $params      = array();
     $contactID   = Contact::createIndividual();
     $customGroup = Custom::createGroup($params, 'Individual', TRUE);
@@ -77,7 +77,7 @@ class CRM_Core_BAO_CustomValueTableMultipleTest extends CiviUnitTestCase {
     Contact::delete($contactID);
   }
 
-  function testCustomGroupMultipleUpdate() {
+  public function testCustomGroupMultipleUpdate() {
     $params      = array();
     $contactID   = Contact::createIndividual();
     $customGroup = Custom::createGroup($params, 'Individual', TRUE);
@@ -119,7 +119,7 @@ class CRM_Core_BAO_CustomValueTableMultipleTest extends CiviUnitTestCase {
     Contact::delete($contactID);
   }
 
-  function testCustomGroupMultipleOldFormate() {
+  public function testCustomGroupMultipleOldFormate() {
     $params      = array();
     $contactID   = Contact::createIndividual();
     $customGroup = Custom::createGroup($params, 'Individual', TRUE);
@@ -150,4 +150,3 @@ class CRM_Core_BAO_CustomValueTableMultipleTest extends CiviUnitTestCase {
     Contact::delete($contactID);
   }
 }
-

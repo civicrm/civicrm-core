@@ -63,9 +63,8 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     /*
      * initialize the task and row fields
      */
@@ -75,14 +74,13 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @param $proxSearch
    *
    * @return void
    */
-  function buildQuickForm($form, $proxSearch) {
+  public function buildQuickForm($form, $proxSearch) {
     // is proximity search required (2) or optional (1)?
     $proxRequired = ($proxSearch == 2 ? TRUE : FALSE);
     $form->assign('proximity_search', TRUE);
@@ -115,10 +113,9 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
    * @param CRM_Core_Form $form
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
-  static function formRule($fields, $files, $form) {
+  public static function formRule($fields, $files, $form) {
     $errors = array();
     // If Distance is present, make sure state, country and city or postal code are populated.
     if (!empty($fields['prox_distance'])) {
@@ -138,13 +135,12 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
   /**
    * Set the default form values
    *
-   * @access protected
    *
    * @param CRM_Core_Form $form
    *
    * @return array the default array reference
    */
-  function setDefaultValues($form) {
+  public function setDefaultValues($form) {
     $defaults       = array();
     $config         = CRM_Core_Config::singleton();
     $countryDefault = $config->defaultContactCountry;
@@ -162,4 +158,3 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
     return $defaults;
   }
 }
-

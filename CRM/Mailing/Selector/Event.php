@@ -93,7 +93,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    * @return \CRM_Mailing_Selector_Event
   @access public
    */
-  function __construct($event, $distinct, $mailing, $job = NULL, $url = NULL) {
+  public function __construct($event, $distinct, $mailing, $job = NULL, $url = NULL) {
     $this->_event_type  = $event;
     $this->_is_distinct = $distinct;
     $this->_mailing_id  = $mailing;
@@ -105,10 +105,9 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    * This method returns the links that are given for each search row.
    *
    * @return array
-   * @access public
    * @static
    */
-  static function &links() {
+  public static function &links() {
     return self::$_links;
   }
 
@@ -118,9 +117,8 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    * @param $action
    * @param array $params
    *
-   * @access public
    */
-  function getPagerParams($action, &$params) {
+  public function getPagerParams($action, &$params) {
     $params['csvString'] = NULL;
     $params['rowCount']  = CRM_Utils_Pager::ROWCOUNT;
     $params['status']    = ts('%1 %%StatusMessage%%', array(1 => $this->eventToTitle()));
@@ -136,9 +134,8 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    * @param enum   $output what should the result set include (web/email/csv)
    *
    * @return array the column headers that need to be displayed
-   * @access public
    */
-  function &getColumnHeaders($action = NULL, $output = NULL) {
+  public function &getColumnHeaders($action = NULL, $output = NULL) {
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
 
     $contact = CRM_Contact_BAO_Contact::getTableName();
@@ -254,9 +251,8 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    * @param
    *
    * @return int Total number of rows
-   * @access public
    */
-  function getTotalCount($action) {
+  public function getTotalCount($action) {
     switch ($this->_event_type) {
       case 'queue':
         $event = new CRM_Mailing_Event_BAO_Queue();
@@ -347,7 +343,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    *
    * @return int   the total number of rows for this action
    */
-  function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
+  public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     switch ($this->_event_type) {
       case 'queue':
         return CRM_Mailing_Event_BAO_Queue::getRows($this->_mailing_id,
@@ -423,9 +419,9 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    *
    * @return string name of the file
    */
-  function getExportFileName($output = 'csv') {}
+  public function getExportFileName($output = 'csv') {}
 
-  function eventToTitle() {
+  public function eventToTitle() {
     static $events = NULL;
 
     if (empty($events)) {
@@ -450,8 +446,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
     return $events[$this->_event_type];
   }
 
-  function getTitle() {
+  public function getTitle() {
     return $this->eventToTitle();
   }
 }
-

@@ -47,7 +47,7 @@ class CRM_Report_Form_Case_Demographics extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -227,11 +227,11 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
@@ -265,12 +265,12 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     return $errors;
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
         FROM civicrm_contact {$this->_aliases['civicrm_contact']}
             LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
@@ -307,7 +307,7 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
     }
   }
 
-  function where() {
+  public function where() {
     $clauses = array();
     $this->_having = '';
     foreach ($this->_columns as $tableName => $table) {
@@ -359,15 +359,15 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
     $this->_where = "WHERE " . implode(' AND ', $clauses);
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_case']}.id";
   }
 
-  function orderBy() {
+  public function orderBy() {
     $this->_orderBy = "ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_case']}.id";
   }
 
-  function postProcess() {
+  public function postProcess() {
 
     $this->beginPostProcess();
 
@@ -383,7 +383,7 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
@@ -451,7 +451,7 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
    *
    * @return null|string
    */
-  function getCustomFieldLabel($fname, $val) {
+  public function getCustomFieldLabel($fname, $val) {
     $query = "
 SELECT v.label
   FROM civicrm_custom_group cg INNER JOIN civicrm_custom_field cf ON cg.id = cf.custom_group_id
@@ -465,4 +465,3 @@ SELECT v.label
     return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 }
-

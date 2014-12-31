@@ -51,7 +51,7 @@ class CRM_Admin_Page_PreferencesDate extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Core_BAO_PreferencesDate';
   }
 
@@ -60,7 +60,7 @@ class CRM_Admin_Page_PreferencesDate extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
@@ -82,10 +82,9 @@ class CRM_Admin_Page_PreferencesDate extends CRM_Core_Page_Basic {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
    *
    */
-  function run() {
+  public function run() {
     // set title and breadcrumb
     CRM_Utils_System::setTitle(ts('Settings - Date Preferences'));
     return parent::run();
@@ -96,7 +95,7 @@ class CRM_Admin_Page_PreferencesDate extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Admin_Form_PreferencesDate';
   }
 
@@ -105,7 +104,7 @@ class CRM_Admin_Page_PreferencesDate extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Date Preferences';
   }
 
@@ -116,8 +115,7 @@ class CRM_Admin_Page_PreferencesDate extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/setting/preferences/date';
   }
 }
-

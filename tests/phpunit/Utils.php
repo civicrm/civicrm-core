@@ -66,7 +66,7 @@ class Utils {
    *  @return mixed   PDOStatement => Results of the query
    *                  false        => Query failed
    */
-  function do_query($query) {
+  public function do_query($query) {
     // echo "do_query($query)\n";
     // $stmt = $this->pdo->query( $query, PDO::FETCH_ASSOC );
     // echo "PDO returned";
@@ -138,4 +138,3 @@ class Utils {
 // c-hanging-comment-ender-p: nil
 // indent-tabs-mode: nil
 // End:
-

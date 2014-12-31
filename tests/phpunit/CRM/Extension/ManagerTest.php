@@ -33,13 +33,13 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   const TESTING_TYPE = 'report';
   const OTHER_TESTING_TYPE = 'module';
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     list ($this->basedir, $this->container) = $this->_createContainer();
     $this->mapper = new CRM_Extension_Mapper($this->container);
   }
 
-  function tearDown() {
+  public function tearDown() {
     parent::tearDown();
   }
 
@@ -48,7 +48,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    *
    * @expectedException CRM_Extension_Exception
    */
-  function testInstallInvalidType() {
+  public function testInstallInvalidType() {
     $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
     $testingTypeManager->expects($this->never())
       ->method('onPreInstall');
@@ -65,7 +65,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    * the second. This controls for bad SQL queries which hit either
    * "the first row" or "all rows".
    */
-  function testInstall_Disable_Uninstall() {
+  public function testInstall_Disable_Uninstall() {
     $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
       self::TESTING_TYPE => $testingTypeManager,
@@ -108,7 +108,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    * Install an extension and then harshly remove the underlying source.
    * Subseuently disable and uninstall.
    */
-  function testInstall_DirtyRemove_Disable_Uninstall() {
+  public function testInstall_DirtyRemove_Disable_Uninstall() {
     $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
       self::TESTING_TYPE => $testingTypeManager,
@@ -146,7 +146,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   /**
    * Install an extension with a valid type name
    */
-  function testInstall_Disable_Enable() {
+  public function testInstall_Disable_Enable() {
     $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
       self::TESTING_TYPE => $testingTypeManager,
@@ -188,7 +188,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   /**
    * Performing 'install' on a 'disabled' extension performs an 'enable'
    */
-  function testInstall_Disable_Install() {
+  public function testInstall_Disable_Install() {
     $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
       self::TESTING_TYPE => $testingTypeManager,
@@ -226,7 +226,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   /**
    * Install an extension with a valid type name
    */
-  function testEnableBare() {
+  public function testEnableBare() {
     $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
       self::TESTING_TYPE => $testingTypeManager,
@@ -252,7 +252,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   /**
    * Get the status of an unknown extension
    */
-  function testStatusUnknownKey() {
+  public function testStatusUnknownKey() {
     $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
     $testingTypeManager->expects($this->never())
       ->method('onPreInstall');
@@ -265,7 +265,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   /**
    * Replace code for an extension that doesn't exist in the container
    */
-  function testReplace_Unknown() {
+  public function testReplace_Unknown() {
     $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
       self::TESTING_TYPE => $testingTypeManager,
@@ -291,7 +291,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   /**
    * Replace code for an extension that doesn't exist in the container
    */
-  function testReplace_Uninstalled() {
+  public function testReplace_Uninstalled() {
     $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
       self::TESTING_TYPE => $testingTypeManager,
@@ -322,7 +322,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    * Note that some metadata changes between versions -- the original has
    * file="oddball", and the upgrade has file="newextension".
    */
-  function testReplace_Installed() {
+  public function testReplace_Installed() {
     $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
       self::TESTING_TYPE => $testingTypeManager,
@@ -359,7 +359,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    * Note that some metadata changes between versions -- the original has
    * file="oddball", and the upgrade has file="newextension".
    */
-  function testReplace_InstalledMissing() {
+  public function testReplace_InstalledMissing() {
     $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
       self::TESTING_TYPE => $testingTypeManager,
@@ -399,7 +399,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    *
    * @return CRM_Extension_Manager
    */
-  function _createManager($typeManagers) {
+  public function _createManager($typeManagers) {
     //list ($basedir, $c) = $this->_createContainer();
     $mapper = new CRM_Extension_Mapper($this->container);
     return new CRM_Extension_Manager($this->container, $this->container, $this->mapper, $typeManagers);
@@ -411,7 +411,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  function _createContainer(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
+  public function _createContainer(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
     $basedir = $this->createTempDir('ext-');
     mkdir("$basedir/weird");
     mkdir("$basedir/weird/foobar");
@@ -430,7 +430,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    *
    * @return string
    */
-  function _createDownload($key, $file) {
+  public function _createDownload($key, $file) {
     $basedir = $this->createTempDir('ext-dl-');
     file_put_contents("$basedir/info.xml", "<extension key='$key' type='".self::TESTING_TYPE."'><file>$file</file></extension>");
     file_put_contents("$basedir/$file.php", "<?php\n");

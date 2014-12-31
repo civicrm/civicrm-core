@@ -52,9 +52,8 @@ class CRM_Member_Form_Task_Delete extends CRM_Member_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     //check for delete
     if (!CRM_Core_Permission::checkActionPermission('CiviMember', CRM_Core_Action::DELETE)) {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
@@ -65,18 +64,16 @@ class CRM_Member_Form_Task_Delete extends CRM_Member_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $this->addDefaultButtons(ts('Delete Memberships'), 'done');
   }
 
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -92,4 +89,3 @@ class CRM_Member_Form_Task_Delete extends CRM_Member_Form_Task {
     CRM_Core_Session::setStatus(ts('Total Selected Membership(s): %1', array(1 => count($this->_memberIds))), '', 'info');
   }
 }
-

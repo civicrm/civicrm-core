@@ -38,14 +38,14 @@ class CRM_Upgrade_Incremental_php_ThreeThree {
    *
    * @return bool
    */
-  function verifyPreDBstate(&$errors) {
+  public function verifyPreDBstate(&$errors) {
     return TRUE;
   }
 
   /**
    * @param $rev
    */
-  function upgrade_3_3_alpha1($rev) {
+  public function upgrade_3_3_alpha1($rev) {
     $config = CRM_Core_Config::singleton();
     if ($config->userSystem->is_drupal) {
       // CRM-6426 - make civicrm profiles permissioned on drupal my account
@@ -137,7 +137,7 @@ WHERE id = %2
   /**
    * @param $rev
    */
-  function upgrade_3_3_beta1($rev) {
+  public function upgrade_3_3_beta1($rev) {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
 
@@ -254,7 +254,7 @@ WHERE id = %2
   /**
    * @param $rev
    */
-  function upgrade_3_3_beta3($rev) {
+  public function upgrade_3_3_beta3($rev) {
     // get the duplicate Ids of line item entries
     $dupeLineItemIds = array();
     $fields          = array('entity_table', 'entity_id', 'price_field_id', 'price_field_value_id');
@@ -285,7 +285,7 @@ WHERE id = %2
   /**
    * @param $rev
    */
-  function upgrade_3_3_0($rev) {
+  public function upgrade_3_3_0($rev) {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
 
@@ -325,7 +325,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id )
   /**
    * @param $rev
    */
-  function upgrade_3_3_2($rev) {
+  public function upgrade_3_3_2($rev) {
     $dropMailingIndex = FALSE;
     $indexes = CRM_Core_DAO::executeQuery('SHOW INDEXES FROM civicrm_mailing_job');
     while ($indexes->fetch()) {
@@ -370,7 +370,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id )
   /**
    * @param $rev
    */
-  function upgrade_3_3_7($rev) {
+  public function upgrade_3_3_7($rev) {
     $dao = new CRM_Contact_DAO_Contact();
     $dbName = $dao->_database;
 
@@ -406,4 +406,3 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id )
     $upgrade->processSQL($rev);
   }
 }
-

@@ -48,7 +48,7 @@ class CRM_PCP_StateMachine_PCP extends CRM_Core_StateMachine {
    * @internal param \CRM_Contact_Import_Controller $object
    * @return \CRM_PCP_StateMachine_PCP CRM_Contact_Import_StateMachine
    */
-  function __construct($controller, $action = CRM_Core_Action::NONE) {
+  public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
     $session = CRM_Core_Session::singleton();
@@ -62,4 +62,3 @@ class CRM_PCP_StateMachine_PCP extends CRM_Core_StateMachine {
     $this->addSequentialPages($this->_pages, $action);
   }
 }
-

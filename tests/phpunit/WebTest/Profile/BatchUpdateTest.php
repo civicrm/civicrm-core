@@ -35,7 +35,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testBatchUpdateWithContactSubtypes() {
+  public function testBatchUpdateWithContactSubtypes() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -122,7 +122,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->verifyText($xpath, preg_quote("Staff"));
   }
 
-  function testBatchUpdate() {
+  public function testBatchUpdate() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -570,7 +570,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
    * @param $customDataArr
    * @param $profileFor
    */
-  function _addProfile($profileTitle, $customDataArr, $profileFor) {
+  public function _addProfile($profileTitle, $customDataArr, $profileFor) {
 
     $this->openCiviPage('admin/uf/group', 'reset=1');
 
@@ -605,7 +605,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
    *
    * @return array
    */
-  function _addCustomData($profileFor) {
+  public function _addCustomData($profileFor) {
     $returnArray = array();
     $customGroupTitle = 'Custom_' . substr(sha1(rand()), 0, 4);
 

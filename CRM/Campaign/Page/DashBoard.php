@@ -53,7 +53,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
    * @return array $_campaignActionLinks
    *
    */
-  function &campaignActionLinks() {
+  public function &campaignActionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_campaignActionLinks)) {
       $deleteExtra = ts('Are you sure you want to delete this Campaign?');
@@ -89,7 +89,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
   /**
    * @return array
    */
-  function &surveyActionLinks() {
+  public function &surveyActionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_surveyActionLinks)) {
       self::$_surveyActionLinks = array(
@@ -124,7 +124,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
   /**
    * @return array
    */
-  function &petitionActionLinks() {
+  public function &petitionActionLinks() {
     if (!isset(self::$_petitionActionLinks)) {
       self::$_petitionActionLinks = self::surveyActionLinks();
       self::$_petitionActionLinks[CRM_Core_Action::UPDATE] = array(
@@ -172,7 +172,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
   /**
    * @return mixed
    */
-  function browseCampaign() {
+  public function browseCampaign() {
     // ensure valid javascript (these must have a value set)
     $this->assign('searchParams', json_encode(NULL));
     $this->assign('campaignTypes', json_encode(NULL));
@@ -264,7 +264,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
   /**
    * @return mixed
    */
-  function browseSurvey() {
+  public function browseSurvey() {
     // ensure valid javascript - this must have a value set
     $this->assign('searchParams', json_encode(NULL));
     $this->assign('surveyTypes', json_encode(NULL));
@@ -293,7 +293,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
    *
    * @return array
    */
-  function getSurveySummary($params = array()) {
+  public function getSurveySummary($params = array()) {
     $surveysData = array();
 
     //get the survey.
@@ -365,7 +365,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     return $surveysData;
   }
 
-  function browsePetition() {
+  public function browsePetition() {
     // ensure valid javascript - this must have a value set
     $this->assign('searchParams', json_encode(NULL));
     $this->assign('petitionCampaigns', json_encode(NULL));
@@ -393,7 +393,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
    *
    * @return array
    */
-  function getPetitionSummary($params = array()) {
+  public function getPetitionSummary($params = array()) {
     $config = CRM_Core_Config::singleton();
     $petitionsData = array();
 
@@ -443,7 +443,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     return $petitionsData;
   }
 
-  function browse() {
+  public function browse() {
     $this->_tabs = array(
       'campaign' => ts('Campaigns'),
       'survey' => ts('Surveys'),
@@ -473,7 +473,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
   /**
    * @return string
    */
-  function run() {
+  public function run() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
       CRM_Utils_System::permissionDenied();
     }
@@ -483,7 +483,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     return parent::run();
   }
 
-  function buildTabs() {
+  public function buildTabs() {
     $allTabs = array();
     foreach ($this->_tabs as $name => $title) {
       $allTabs[$name] = array(
@@ -497,4 +497,3 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     $this->assign('tabHeader', $allTabs);
   }
 }
-

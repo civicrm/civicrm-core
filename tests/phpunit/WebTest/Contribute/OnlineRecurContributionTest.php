@@ -35,7 +35,7 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
     parent::setUp();
   }
 
-  function testOnlineRecurContribution() {
+  public function testOnlineRecurContribution() {
     require_once 'ContributionPageAddTest.php';
 
     // a random 7-char string and an even number to make this pass unique
@@ -153,4 +153,3 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
     }
   }
 }
-

@@ -45,7 +45,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->case_types = CRM_Case_PseudoConstant::caseType();
     $this->case_statuses = CRM_Core_OptionGroup::values('case_status');
     $rels = CRM_Core_PseudoConstant::relationshipType();
@@ -184,11 +184,11 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
@@ -225,7 +225,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     if (empty($fields['relationship_type_id_value']) &&
       (array_key_exists('sort_name', $fields['fields']) ||
@@ -243,7 +243,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
     return $errors;
   }
 
-  function from() {
+  public function from() {
 
     $cc = $this->_aliases['civicrm_case'];
     $c = $this->_aliases['civicrm_contact'];
@@ -271,7 +271,7 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
     }
   }
 
-  function where() {
+  public function where() {
     $clauses = array();
     $this->_having = '';
     foreach ($this->_columns as $tableName => $table) {
@@ -326,11 +326,11 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = "";
   }
 
-  function postProcess() {
+  public function postProcess() {
 
     $this->beginPostProcess();
 
@@ -347,7 +347,7 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
       if (array_key_exists('civicrm_case_status_id', $row)) {
@@ -410,4 +410,3 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
     }
   }
 }
-

@@ -7,7 +7,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  function get_info() {
+  public function get_info() {
     return array(
       'name' => 'VersionCheck Test',
       'description' => 'Test versionCheck functionality',
@@ -15,7 +15,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     );
   }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
@@ -104,7 +104,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
    * @param array $versionInfo
    * @param mixed $expectedResult
    */
-  function testNewerVersion($localVersion, $versionInfo, $expectedResult) {
+  public function testNewerVersion($localVersion, $versionInfo, $expectedResult) {
     $vc = CRM_Utils_VersionCheck::singleton();
     // These values are set by the constructor but for testing we override them
     $vc->localVersion = $localVersion;
@@ -116,7 +116,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
   /**
    * @return array (localVersion, versionInfo, expectedResult)
    */
-  function newerVersionDataProvider() {
+  public function newerVersionDataProvider() {
     $data = array();
 
     // Make sure we do not get unstable release updates for a stable localVersion
@@ -140,7 +140,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
    * @param array $versionInfo
    * @param bool $expectedResult
    */
-  function testSecurityUpdate($localVersion, $versionInfo, $expectedResult) {
+  public function testSecurityUpdate($localVersion, $versionInfo, $expectedResult) {
     $vc = CRM_Utils_VersionCheck::singleton();
     // These values are set by the constructor but for testing we override them
     $vc->localVersion = $localVersion;
@@ -152,7 +152,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
   /**
    * @return array (localVersion, versionInfo, expectedResult)
    */
-  function securityUpdateDataProvider() {
+  public function securityUpdateDataProvider() {
     $data = array();
 
     // Make sure we get alerted if a security release is available

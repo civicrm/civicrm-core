@@ -47,7 +47,7 @@ class CRM_Contribute_StateMachine_Contribution extends CRM_Core_StateMachine {
    *
    * @return CRM_Contribute_StateMachine_Contribution
    */
-  function __construct($controller, $action = CRM_Core_Action::NONE) {
+  public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
     $this->_pages = array(
@@ -59,4 +59,3 @@ class CRM_Contribute_StateMachine_Contribution extends CRM_Core_StateMachine {
     $this->addSequentialPages($this->_pages, $action);
   }
 }
-

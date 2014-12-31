@@ -40,7 +40,6 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
    *
-   * @access protected
    */
   protected function setUp() {
     parent::setUp();
@@ -51,14 +50,13 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
    *
-   * @access protected
    */
   protected function tearDown() {}
 
   /**
    *  create() and deletepledgeblock() method
    */
-  function testCreateAndDeletePledgeBlock() {
+  public function testCreateAndDeletePledgeBlock() {
 
     $pledgeFrequencyUnit = array(
       'week' => 1,
@@ -91,7 +89,7 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
   /**
    * Add() method (add and edit modes of pledge block)
    */
-  function testAddPledgeBlock() {
+  public function testAddPledgeBlock() {
 
     $pledgeFrequencyUnit = array(
       'week' => 1,
@@ -135,7 +133,7 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
   /**
    * Retrieve() and getPledgeBlock() method of  pledge block
    */
-  function testRetrieveAndGetPledgeBlock() {
+  public function testRetrieveAndGetPledgeBlock() {
 
     $pledgeFrequencyUnit = array(
       'week' => 1,
@@ -176,4 +174,3 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
     $this->assertEquals($pledgeBlock->id, $getPledgeBlock['id']);
   }
 }
-

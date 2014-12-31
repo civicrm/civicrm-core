@@ -38,7 +38,7 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
   /**
@@ -46,12 +46,11 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
    *
    * @param array $params reference array contains the values submitted by the form
    *
-   * @access public
    * @static
    *
    * @return object
    */
-  static function create($params) {
+  public static function create($params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'MembershipPayment', CRM_Utils_Array::value('id', $params), $params);
     $dao = new CRM_Member_DAO_MembershipPayment();
@@ -85,7 +84,7 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
    * @return bool
    * @static
    */
-  static function del($id) {
+  public static function del($id) {
     $dao = new CRM_Member_DAO_MembershipPayment();
     $dao->id = $id;
     $result = FALSE;
@@ -98,4 +97,3 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
 
 
 }
-

@@ -53,7 +53,7 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Contact_BAO_ContactType';
   }
 
@@ -62,7 +62,7 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
@@ -92,7 +92,7 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
     return self::$_links;
   }
 
-  function run() {
+  public function run() {
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 0);
     $this->assign('action', $action);
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
@@ -102,7 +102,7 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
     return parent::run();
   }
 
-  function browse() {
+  public function browse() {
     $rows = CRM_Contact_BAO_ContactType::contactTypeInfo(TRUE);
     foreach ($rows as $key => $value) {
       $mask = NULL;
@@ -135,7 +135,7 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
    *
    * @return string Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Admin_Form_ContactType';
   }
 
@@ -144,7 +144,7 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
    *
    * @return string name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Contact Types';
   }
 
@@ -155,8 +155,7 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/options/subtype';
   }
 }
-

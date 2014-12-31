@@ -35,7 +35,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
   }
 
   // CRM-13964 and CRM-13965
-  function testParticipantParitalPaymentInitiation() {
+  public function testParticipantParitalPaymentInitiation() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -211,7 +211,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
    * @param $feeAmt
    * @param int $amtPaid
    */
-  function _checkPaymentInfoTable($feeAmt, $amtPaid) {
+  public function _checkPaymentInfoTable($feeAmt, $amtPaid) {
     $this->assertElementContainsText("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td", "$ {$feeAmt}", 'Missing text: appropriate fee amount');
     $this->assertElementContainsText("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td[2]", "$ {$amtPaid}", 'Missing text: appropriate fee amount');
   }

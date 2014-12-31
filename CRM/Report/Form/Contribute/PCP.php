@@ -40,7 +40,7 @@ class CRM_Report_Form_Contribute_PCP extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -174,7 +174,7 @@ class CRM_Report_Form_Contribute_PCP extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
 FROM civicrm_pcp {$this->_aliases['civicrm_pcp']}
 
@@ -195,15 +195,15 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
              {$this->_aliases['civicrm_contribution_page']}.id";
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_pcp']}.id";
   }
 
-  function orderBy() {
+  public function orderBy() {
     $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name ";
   }
 
-  function where() {
+  public function where() {
     $whereClauses = $havingClauses = array();
 
     foreach ($this->_columns as $tableName => $table) {
@@ -264,7 +264,7 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
     $select =
@@ -301,7 +301,7 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
     $checkList = array();
@@ -344,4 +344,3 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
     }
   }
 }
-

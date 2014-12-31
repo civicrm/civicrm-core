@@ -6,7 +6,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Core_RegionTest
  */
 class CRM_Core_RegionTest extends CiviUnitTestCase {
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     require_once 'CRM/Core/Smarty.php';
     require_once 'CRM/Core/Region.php';
@@ -20,7 +20,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
    * When a {crmRegion} is blank and when there are no extra snippets, the
    * output is blank.
    */
-  function testBlank() {
+  public function testBlank() {
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testBlank}{/crmRegion}');
     $expected = '';
@@ -31,7 +31,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
    * When a {crmRegion} is not blank and when there are no extra snippets,
    * the output is only determined by the {crmRegion} block.
    */
-  function testDefault() {
+  public function testDefault() {
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testDefault}default<br/>{/crmRegion}');
     $expected = 'default<br/>';
@@ -41,7 +41,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   /**
    * Disable the normal content of a {crmRegion} and apply different content from a snippet
    */
-  function testOverride() {
+  public function testOverride() {
     CRM_Core_Region::instance('testOverride')->update('default', array(
        'disabled' => TRUE,
     ));
@@ -58,7 +58,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   /**
    * Test that each of the major content formats are correctly evaluated
    */
-  function testAllTypes() {
+  public function testAllTypes() {
     CRM_Core_Region::instance('testAllTypes')->add(array(
       'markup' => 'some-markup<br/>',
     ));
@@ -116,7 +116,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   /**
    * Test of nested arrangement in which one {crmRegion} directly includes another {crmRegion}
    */
-  function testDirectNest() {
+  public function testDirectNest() {
     CRM_Core_Region::instance('testDirectNestOuter')->add(array(
       'template' => 'string:O={$snippet.weight} ',
       'weight' => -5,
@@ -144,7 +144,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   /**
    * Test of nested arrangement in which one {crmRegion} is enhanced with a snippet which, in turn, includes another {crmRegion}
    */
-  function testIndirectNest() {
+  public function testIndirectNest() {
     CRM_Core_Region::instance('testIndirectNestOuter')->add(array(
       // Note: all three $snippet references are bound to the $snippet which caused this template to be included,
       // regardless of any nested {crmRegion}s
@@ -164,7 +164,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   /**
    * Output from an inner-region should not be executed verbatim; this is obvious but good to verify
    */
-  function testNoInjection() {
+  public function testNoInjection() {
     CRM_Core_Region::instance('testNoInjectionOuter')->add(array(
       'template' => 'string:{$snippet.scarystuff} ',
       'scarystuff' => '{$is_outer_scary}',
@@ -187,7 +187,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
    * Make sure that standard Smarty variables ($smarty->assign(...)) as well
    * as the magical $snippet variable both evaluate correctly.
    */
-  function testSmartyVars() {
+  public function testSmartyVars() {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('extrainfo', 'one');
     CRM_Core_Region::instance('testSmartyVars')->add(array(
@@ -204,7 +204,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  function testWeight() {
+  public function testWeight() {
     CRM_Core_Region::instance('testWeight')->add(array(
       'markup' => 'prepend-5<br/>',
       'weight' => -5,

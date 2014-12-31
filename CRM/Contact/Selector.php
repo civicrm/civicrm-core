@@ -76,7 +76,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * the HTML_QuickForm_Controller for that page.
    *
    * @var array
-   * @access protected
    */
   public $_formValues;
 
@@ -84,7 +83,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * The contextMenu
    *
    * @var array
-   * @access protected
    */
   protected $_contextMenu;
 
@@ -92,7 +90,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * Params is the array in a value used by the search query creator
    *
    * @var array
-   * @access protected
    */
   public $_params;
 
@@ -100,7 +97,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * The return properties used for search
    *
    * @var array
-   * @access protected
    */
   protected $_returnProperties;
 
@@ -108,7 +104,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * Represent the type of selector
    *
    * @var int
-   * @access protected
    */
   protected $_action;
 
@@ -127,7 +122,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * The public visible fields to be shown to the user
    *
    * @var array
-   * @access protected
    */
   protected $_fields;
 
@@ -146,7 +140,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param null $contextMenu
    *
    * @return CRM_Contact_Selector
-   * @access public
    */
   function __construct(
     $customSearchClass,
@@ -229,10 +222,9 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * - Edit
    *
    * @return array
-   * @access public
    *
    */
-  static function &links() {
+  public static function &links() {
     list($context, $contextMenu, $key) = func_get_args();
     $extraParams = ($key) ? "&key={$key}" : NULL;
     $searchContext = ($context) ? "&context=$context" : NULL;
@@ -305,9 +297,8 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param $action
    * @param array $params
    *
-   * @access public
    */
-  function getPagerParams($action, &$params) {
+  public function getPagerParams($action, &$params) {
     $params['status']    = ts('Contact %%StatusMessage%%');
     $params['csvString'] = NULL;
     $params['rowCount']  = CRM_Utils_Pager::ROWCOUNT;
@@ -322,7 +313,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    *
    * @return array
    */
-  function &getColHeads($action = NULL, $output = NULL) {
+  public function &getColHeads($action = NULL, $output = NULL) {
     $colHeads = self::_getColumnHeaders();
     $colHeads[] = array('desc' => ts('Actions'), 'name' => ts('Action'));
     return $colHeads;
@@ -336,9 +327,8 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param enum   $output what should the result set include (web/email/csv)
    *
    * @return array the column headers that need to be displayed
-   * @access public
    */
-  function &getColumnHeaders($action = NULL, $output = NULL) {
+  public function &getColumnHeaders($action = NULL, $output = NULL) {
     $headers = NULL;
 
     // unset return property elements that we don't care
@@ -488,9 +478,8 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param
    *
    * @return int Total number of rows
-   * @access public
    */
-  function getTotalCount($action) {
+  public function getTotalCount($action) {
     // Use count from cache during paging/sorting
     if (!empty($_GET['crmPID']) || !empty($_GET['crmSID'])) {
       $count = CRM_Core_BAO_Cache::getItem('Search Results Count', $this->_key);
@@ -513,7 +502,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    *
    * @return int   the total number of rows for this action
    */
-  function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
+  public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     $config = CRM_Core_Config::singleton();
 
     if (($output == CRM_Core_Selector_Controller::EXPORT ||
@@ -825,7 +814,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    *
    * @return string
    */
-  function buildPrevNextCache($sort) {
+  public function buildPrevNextCache($sort) {
     $cacheKey = 'civicrm search ' . $this->_key;
 
     // We should clear the cache in following conditions:
@@ -881,7 +870,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   /**
    * @param $rows
    */
-  function addActions(&$rows) {
+  public function addActions(&$rows) {
     $config = CRM_Core_Config::singleton();
 
     $permissions = array(CRM_Core_Permission::getPermission());
@@ -977,7 +966,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   /**
    * @param $rows
    */
-  function removeActions(&$rows) {
+  public function removeActions(&$rows) {
     foreach ($rows as $rid => & $rValue) {
       unset($rValue['contact_type']);
       unset($rValue['action']);
@@ -990,7 +979,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param int $start
    * @param int $end
    */
-  function fillupPrevNextCache($sort, $cacheKey, $start = 0, $end = 500) {
+  public function fillupPrevNextCache($sort, $cacheKey, $start = 0, $end = 500) {
     $coreSearch = TRUE;
     // For custom searches, use the contactIDs method
     if (is_a($this, 'CRM_Contact_Selector_Custom')) {
@@ -1052,7 +1041,7 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
    *
    * @return void
    */
-  function rebuildPreNextCache($start, $end, $sort, $cacheKey) {
+  public function rebuildPreNextCache($start, $end, $sort, $cacheKey) {
     // generate full SQL
     $sql = $this->_query->searchQuery($start, $end, $sort, FALSE, $this->_query->_includeContactIds,
       FALSE, FALSE, TRUE);
@@ -1082,7 +1071,6 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
      reference)   $formValues   submitted formValues
    *
    * @return array              $qill         which contains an array of strings
-   * @access public
    */
 
   // the current internationalisation is bad, but should more or less work
@@ -1098,7 +1086,7 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
    *
    * @return string name of the file
    */
-  function getExportFileName($output = 'csv') {
+  public function getExportFileName($output = 'csv') {
     return ts('CiviCRM Contact Search');
   }
 
@@ -1107,7 +1095,6 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
    *
    *
    * @return array $_columnHeaders
-   * @access private
    */
   private static function &_getColumnHeaders() {
     if (!isset(self::$_columnHeaders)) {
@@ -1168,14 +1155,14 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
   /**
    * @return CRM_Contact_BAO_Query
    */
-  function &getQuery() {
+  public function &getQuery() {
     return $this->_query;
   }
 
   /**
    * @return CRM_Contact_DAO_Contact
    */
-  function alphabetQuery() {
+  public function alphabetQuery() {
     return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
   }
 
@@ -1188,7 +1175,7 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
    *
    * @return CRM_Contact_DAO_Contact
    */
-  function contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
+  public function contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
     $sortOrder = &$this->getSortOrder($this->_action);
     $sort = new CRM_Utils_Sort($sortOrder, $sortID);
 
@@ -1225,7 +1212,7 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
    *
    * @return array
    */
-  function &makeProperties(&$returnProperties) {
+  public function &makeProperties(&$returnProperties) {
     $properties = array();
     foreach ($returnProperties as $name => $value) {
       if ($name != 'location') {
@@ -1255,4 +1242,3 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
     return $properties;
   }
 }
-

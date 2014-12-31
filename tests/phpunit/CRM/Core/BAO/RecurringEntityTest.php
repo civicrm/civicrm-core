@@ -37,7 +37,6 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
    *
-   * @access protected
    */
   protected function setUp() {
     parent::setUp();
@@ -47,14 +46,13 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
    *
-   * @access protected
    */
   protected function tearDown() {}
 
   /**
    * Testing Activity Generation through Entity Recursion
    */
-  function testActivityGeneration() {
+  public function testActivityGeneration() {
     //Activity set initial params
     $daoActivity = new CRM_Activity_DAO_Activity();
     $daoActivity->activity_type_id = 1;
@@ -113,7 +111,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
   /**
    * Testing Event Generation through Entity Recursion
    */
-  function testEventGeneration() {
+  public function testEventGeneration() {
        //Event set initial params
     $daoEvent = new CRM_Event_DAO_Event();
     $daoEvent->title = 'Test event for Recurring Entity';

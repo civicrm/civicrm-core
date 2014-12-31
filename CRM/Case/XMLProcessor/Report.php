@@ -54,7 +54,7 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
    *
    * @return mixed
    */
-  function run($clientID, $caseID, $activitySetName, $params) {
+  public function run($clientID, $caseID, $activitySetName, $params) {
     $contents = self::getCaseReport($clientID,
       $caseID,
       $activitySetName,
@@ -65,7 +65,7 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
     return CRM_Case_Audit_Audit::run($contents, $clientID, $caseID);
   }
 
-  function &getRedactionRules() {
+  public function &getRedactionRules() {
     foreach (array(
       'redactionStringRules', 'redactionRegexRules') as $key => $rule) {
       $$rule = CRM_Case_PseudoConstant::redactionRule($key);
@@ -152,7 +152,7 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
    *
    * @return array|bool
    */
-  function getActivityTypes($xml, $activitySetName) {
+  public function getActivityTypes($xml, $activitySetName) {
     foreach ($xml->ActivitySets as $activitySetsXML) {
       foreach ($activitySetsXML->ActivitySet as $activitySetXML) {
         if ((string ) $activitySetXML->name == $activitySetName) {
@@ -180,7 +180,7 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
    *
    * @return null|string
    */
-  function getActivitySetLabel($xml, $activitySetName) {
+  public function getActivitySetLabel($xml, $activitySetName) {
     foreach ($xml->ActivitySets as $activitySetsXML) {
       foreach ($activitySetsXML->ActivitySet as $activitySetXML) {
         if ((string ) $activitySetXML->name == $activitySetName) {
@@ -197,7 +197,7 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
    * @param $activityTypes
    * @param $activities
    */
-  function getActivities($clientID, $caseID, $activityTypes, &$activities) {
+  public function getActivities($clientID, $caseID, $activityTypes, &$activities) {
     // get all activities for this case that in this activityTypes set
     foreach ($activityTypes as $aType) {
       $map[$aType['id']] = $aType;
@@ -243,7 +243,7 @@ AND    ac.case_id = %1
    *
    * @return mixed
    */
-  function &getActivityInfo($clientID, $activityID, $anyActivity = FALSE, $redact = 0) {
+  public function &getActivityInfo($clientID, $activityID, $anyActivity = FALSE, $redact = 0) {
     static $activityInfos = array();
     if ($redact) {
       $this->_isRedact = 1;
@@ -311,7 +311,7 @@ WHERE      a.id = %1
    *
    * @return array
    */
-  function &getActivity($clientID, $activityDAO, &$activityTypeInfo) {
+  public function &getActivity($clientID, $activityDAO, &$activityTypeInfo) {
     if (empty($this->_redactionStringRules)) {
       $this->_redactionStringRules = array();
     }
@@ -540,7 +540,7 @@ WHERE      a.id = %1
    *
    * @return array|null
    */
-  function getCustomData($clientID, $activityDAO, &$activityTypeInfo) {
+  public function getCustomData($clientID, $activityDAO, &$activityTypeInfo) {
     list($typeValues, $options, $sql) = $this->getActivityTypeCustomSQL($activityTypeInfo['id'], '%Y-%m-%d');
 
     $params = array(1 => array($activityDAO->id, 'Integer'));
@@ -599,7 +599,7 @@ WHERE      a.id = %1
    *
    * @return mixed
    */
-  function getActivityTypeCustomSQL($activityTypeID, $dateFormat = NULL) {
+  public function getActivityTypeCustomSQL($activityTypeID, $dateFormat = NULL) {
     static $cache = array();
 
     if (is_null($activityTypeID)) {
@@ -700,7 +700,7 @@ WHERE  entity_id = %1
    *
    * @return null|string
    */
-  function getCreatedBy($activityID) {
+  public function getCreatedBy($activityID) {
     $query = "
 SELECT c.display_name
 FROM   civicrm_contact c,
@@ -742,7 +742,7 @@ LIMIT  1
    *
    * @return mixed
    */
-  static function getCaseReport($clientID, $caseID, $activitySetName, $params, $form) {
+  public static function getCaseReport($clientID, $caseID, $activitySetName, $params, $form) {
 
     $template = CRM_Core_Smarty::singleton();
 
@@ -804,7 +804,7 @@ LIMIT  1
     return $contents;
   }
 
-  static function printCaseReport() {
+  public static function printCaseReport() {
     $caseID            = CRM_Utils_Request::retrieve('caseID', 'Positive', CRM_Core_DAO::$_nullObject);
     $clientID          = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject);
     $activitySetName   = CRM_Utils_Request::retrieve('asn', 'String', CRM_Core_DAO::$_nullObject);
@@ -981,4 +981,3 @@ LIMIT  1
     CRM_Utils_System::civiExit();
   }
 }
-

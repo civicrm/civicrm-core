@@ -44,7 +44,7 @@ class CRM_Utils_Recent {
    *
    * @int
    */
-  CONST MAX_ITEMS = 10, STORE_NAME = 'CRM_Utils_Recent';
+  const MAX_ITEMS = 10, STORE_NAME = 'CRM_Utils_Recent';
 
   /**
    * The list of recently viewed items
@@ -58,10 +58,9 @@ class CRM_Utils_Recent {
    * Initialize this class and set the static variables
    *
    * @return void
-   * @access public
    * @static
    */
-  static function initialize() {
+  public static function initialize() {
     if (!self::$_recent) {
       $session = CRM_Core_Session::singleton();
       self::$_recent = $session->get(self::STORE_NAME);
@@ -75,10 +74,9 @@ class CRM_Utils_Recent {
    * Return the recently viewed array
    *
    * @return array the recently viewed array
-   * @access public
    * @static
    */
-  static function &get() {
+  public static function &get() {
     self::initialize();
     return self::$_recent;
   }
@@ -95,7 +93,6 @@ class CRM_Utils_Recent {
    * @param array $others
    *
    * @return void
-   * @access public
    * @static
    */
   static function add($title,
@@ -152,10 +149,9 @@ class CRM_Utils_Recent {
    * @param array $recentItem array of the recent Item to be removed
    *
    * @return void
-   * @access public
    * @static
    */
-  static function del($recentItem) {
+  public static function del($recentItem) {
     self::initialize();
     $tempRecent = self::$_recent;
 
@@ -180,10 +176,9 @@ class CRM_Utils_Recent {
    * @param string $id  contact id that had to be removed
    *
    * @return void
-   * @access public
    * @static
    */
-  static function delContact($id) {
+  public static function delContact($id) {
     self::initialize();
 
     $tempRecent = self::$_recent;
@@ -203,4 +198,3 @@ class CRM_Utils_Recent {
     $session->set(self::STORE_NAME, self::$_recent);
   }
 }
-

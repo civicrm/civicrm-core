@@ -58,7 +58,7 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
    * @return void
    * @acess protected
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_id = $this->get('id');
 
     $defaults = array();
@@ -85,7 +85,6 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -107,7 +106,6 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
    * Process the form when submitted
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $group = new CRM_Core_DAO_CustomGroup();
@@ -119,4 +117,3 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
     CRM_Core_Session::setStatus(ts("The Group '%1' has been deleted.", array(1 => $group->title)), '', 'success');
   }
 }
-

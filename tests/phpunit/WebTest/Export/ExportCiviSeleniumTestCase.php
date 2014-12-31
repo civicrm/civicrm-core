@@ -40,7 +40,7 @@ class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    *
    * @return string downloaded file path.
    */
-  function downloadCSV($selector, $fileName = 'CiviCRM_Contact_Search.csv', $downloadDir = '/tmp') {
+  public function downloadCSV($selector, $fileName = 'CiviCRM_Contact_Search.csv', $downloadDir = '/tmp') {
     // File download path.
     $file = "{$downloadDir}/{$fileName}";
 
@@ -85,7 +85,7 @@ class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    * @param int   $rowCount count rows (excluding header row).
    * @param array $settings used for override settings.
    */
-  function reviewCSV($file, $checkColumns = array(), $checkRows = array(), $rowCount = 0, $settings = array()) {
+  public function reviewCSV($file, $checkColumns = array(), $checkRows = array(), $rowCount = 0, $settings = array()) {
     // Check file exists before proceed.
     $this->assertTrue(($file && file_exists($file)), "Not able to locate {$file}.");
 
@@ -153,4 +153,3 @@ class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     }
   }
 }
-

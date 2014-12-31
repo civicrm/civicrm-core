@@ -19,7 +19,7 @@
  * begin at one, so always delete one from the "Position in Response"
  */
 class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
-  CONST CHARSET = 'iso-8859-1';
+  const CHARSET = 'iso-8859-1';
 
   protected $_mode = NULL;
 
@@ -51,7 +51,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    *
    * @return \CRM_Core_Payment_Dummy
    */
-  function __construct($mode, &$paymentProcessor) {
+  public function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('Dummy Processor');
@@ -69,7 +69,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    * @return object
    * @static
    */
-  static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
+  public static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     $processorName = $paymentProcessor['name'];
     if (CRM_Utils_Array::value($processorName, self::$_singleton) === NULL) {
       self::$_singleton[$processorName] = new CRM_Core_Payment_Dummy($mode, $paymentProcessor);
@@ -83,9 +83,8 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    * @param  array $params assoc array of input parameters for this transaction
    *
    * @return array the result in a nice formatted array (or an error object)
-   * @public
    */
-  function doDirectPayment(&$params) {
+  public function doDirectPayment(&$params) {
     // Invoke hook_civicrm_paymentProcessor
     // In Dummy's case, there is no translation of parameters into
     // the back-end's canonical set of parameters.  But if a processor
@@ -140,7 +139,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    *
    * @return object
    */
-  function &error($errorCode = NULL, $errorMessage = NULL) {
+  public function &error($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
     if ($errorCode) {
       $e->push($errorCode, 0, NULL, $errorMessage);
@@ -155,10 +154,8 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    * This function checks to see if we have the right config values
    *
    * @return string the error message if any
-   * @public
    */
-  function checkConfig() {
+  public function checkConfig() {
     return NULL;
   }
 }
-

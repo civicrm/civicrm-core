@@ -62,7 +62,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
   /**
    * Basic setup
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_id      = $this->get('id');
     $this->_BAOName = $this->get('BAOName');
     $this->_values  = array();
@@ -78,11 +78,10 @@ class CRM_Admin_Form extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if (isset($this->_id) && empty($this->_values)) {
       $this->_values = array();
       $params = array('id' => $this->_id);
@@ -109,7 +108,6 @@ class CRM_Admin_Form extends CRM_Core_Form {
    * Add standard buttons
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::VIEW || $this->_action & CRM_Core_Action::PREVIEW) {
@@ -138,4 +136,3 @@ class CRM_Admin_Form extends CRM_Core_Form {
     }
   }
 }
-

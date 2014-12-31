@@ -35,7 +35,7 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testTagAContact() {
+  public function testTagAContact() {
     $this->webtestLogin();
 
     $this->openCiviPage("admin/tag", "action=add&reset=1", "_qf_Tag_next");
@@ -76,7 +76,7 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     $this->checkCRMStatus();
   }
 
-  function testTagSetContact() {
+  public function testTagSetContact() {
     $this->webtestLogin();
 
     $this->openCiviPage("admin/tag", "action=add&reset=1&tagset=1");
@@ -151,4 +151,3 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     $this->waitForText('tags', "tagset1, tagset2");
   }
 }
-

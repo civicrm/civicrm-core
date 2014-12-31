@@ -82,7 +82,7 @@ class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
   /**
    * Build the list of modules to be processed for hooks.
    */
-  function buildModuleList() {
+  public function buildModuleList() {
     if ($this->isBuilt === FALSE) {
       if ($this->drupalModules === NULL) {
         if (function_exists('module_list')) {

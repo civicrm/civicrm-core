@@ -42,7 +42,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * The uf group id saved to the session for an update
    *
    * @var int
-   * @access protected
    */
   protected $_gid;
 
@@ -50,7 +49,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * The field id, used when editing the field
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
@@ -58,7 +56,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * The set of fields that we can view/edit in the user field framework
    *
    * @var array
-   * @access protected
    */
   protected $_fields;
 
@@ -66,7 +63,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * The title for field
    *
    * @var int
-   * @access protected
    */
   protected $_title;
 
@@ -74,7 +70,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * The set of fields sent to the select element
    *
    * @var array
-   * @access protected
    */
   protected $_selectFields;
 
@@ -82,7 +77,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * To store fields with if locationtype exits status
    *
    * @var array
-   * @access protected
    */
   protected $_hasLocationTypes;
 
@@ -91,7 +85,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * or is any field having in selector true.
    *
    * @var boolean.
-   * @access protected
    */
   protected $_hasSearchableORInSelector;
 
@@ -99,7 +92,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
@@ -186,7 +178,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -507,7 +498,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * Process the form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $ids = array('uf_group' => $this->_gid);
@@ -627,9 +617,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRuleSubType($fieldType, $groupType, $errors) {
+  public static function formRuleSubType($fieldType, $groupType, $errors) {
     if (in_array($fieldType, array(
       'Participant', 'Contribution', 'Membership', 'Activity'))) {
       $individualSubTypes = CRM_Contact_BAO_ContactType::subTypes('Individual');
@@ -670,9 +659,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    *
    * @return Array  list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRuleCustomDataExtentColumnValue($customField, $gid, $fieldType, &$errors) {
+  public static function formRuleCustomDataExtentColumnValue($customField, $gid, $fieldType, &$errors) {
     // fix me : check object $customField
     if (in_array($fieldType, array(
           'Participant', 'Contribution', 'Membership', 'Activity', 'Case'))) {
@@ -715,9 +703,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * @param Array   $errors            Collect errors
    *
    * @static
-   * @access public
    */
-  static function formRulePrimaryCheck($fields, $profileFieldName, $groupFields, &$errors) {
+  public static function formRulePrimaryCheck($fields, $profileFieldName, $groupFields, &$errors) {
     //FIXME: This may need to also apply to website fields if they are refactored to allow more than one per profile
     $checkPrimary = array('phone' => 'civicrm_phone.phone', 'phone_and_ext' => 'civicrm_phone.phone');
     $whereCheck = NULL;
@@ -755,9 +742,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $is_required     = CRM_Utils_Array::value('is_required', $fields, FALSE);
     $is_registration = CRM_Utils_Array::value('is_registration', $fields, FALSE);
     $is_view         = CRM_Utils_Array::value('is_view', $fields, FALSE);

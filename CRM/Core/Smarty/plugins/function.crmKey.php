@@ -48,4 +48,3 @@ function smarty_function_crmKey($params, &$smarty) {
       CRM_Utils_Array::value('addSequence', $params, 0)
     );
 }
-

@@ -47,10 +47,9 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param $ids
    *
    * @return CRM_Price_DAO_PriceFieldValue object
-   * @access public
    * @static
    */
-  static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = array()) {
 
     $fieldValueBAO = new CRM_Price_BAO_PriceFieldValue();
     $fieldValueBAO->copyValues($params);
@@ -76,10 +75,9 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param $ids
    *
    * @return CRM_Price_DAO_PriceFieldValue object
-   * @access public
    * @static
    */
-  static function create(&$params, $ids = array()) {
+  public static function create(&$params, $ids = array()) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
     if (!is_array($params) || empty($params)) {
       return;
@@ -114,7 +112,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * Get defaults for new entity
    * @return array
    */
-  static function getDefaults() {
+  public static function getDefaults() {
     return array(
       'is_active' => 1,
       'weight' => 1,
@@ -130,10 +128,9 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Price_DAO_PriceFieldValue object
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Price_DAO_PriceFieldValue', $params, $defaults);
   }
 
@@ -147,10 +144,9 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @return array $values
    *
-   * @access public
    * @static
    */
-  static function getValues($fieldId, &$values, $orderBy = 'weight', $isActive = FALSE) {
+  public static function getValues($fieldId, &$values, $orderBy = 'weight', $isActive = FALSE) {
     $fieldValueDAO = new CRM_Price_DAO_PriceFieldValue();
     $fieldValueDAO->price_field_id = $fieldId;
     $fieldValueDAO->orderBy($orderBy, 'label');
@@ -173,7 +169,6 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @return string name
    *
-   * @access public
    * @static
    *
    */
@@ -189,10 +184,9 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @return   Object            DAO object on sucess, null otherwise
    *
-   * @access public
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceFieldValue', $id, 'is_active', $is_active);
   }
 
@@ -202,10 +196,9 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param  int    $fieldId    Price field id
    *
    *
-   * @access public
    * @static
    */
-  static function deleteValues($fieldId) {
+  public static function deleteValues($fieldId) {
     if (!$fieldId) {
       return;
     }
@@ -222,10 +215,9 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @return  boolean
    *
-   * @access public
    * @static
    */
-  static function del($id) {
+  public static function del($id) {
     if (!$id) {
       return FALSE;
     }
@@ -243,10 +235,9 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param   String $entityTable entity table
    * @param   String $financialTypeID financial type id
    *
-   * @access public
    * @static
    */
-  static function updateFinancialType($entityId, $entityTable, $financialTypeID) {
+  public static function updateFinancialType($entityId, $entityTable, $financialTypeID) {
     if (!$entityId || !$entityTable || !$financialTypeID) {
       return;
     }
@@ -277,4 +268,3 @@ WHERE cpse.id IS NOT NULL {$where}";
     CRM_Core_DAO::executeQuery($sql, $params);
   }
 }
-

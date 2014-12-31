@@ -49,10 +49,9 @@ class CRM_UF_Form_Inline_PreviewById extends CRM_UF_Form_AbstractPreview {
    *
    * @return void
    *
-   * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     // Inline forms don't get menu-level permission checks
     if (!CRM_Core_Permission::check('access CiviCRM')) {
       CRM_Core_Error::fatal(ts('Permission Denied'));
@@ -63,4 +62,3 @@ class CRM_UF_Form_Inline_PreviewById extends CRM_UF_Form_AbstractPreview {
   }
 
 }
-

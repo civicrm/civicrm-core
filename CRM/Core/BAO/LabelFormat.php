@@ -160,7 +160,6 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @param void
    *
    * @return array   array of page orientations
-   * @access public
    * @static
    */
   public static function getPageOrientations() {
@@ -176,7 +175,6 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @param string $name group name
    *
    * @return array   array of font names
-   * @access public
    * @static
    */
   public static function getFontNames($name='label_format') {
@@ -190,7 +188,6 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @param void
    *
    * @return array   array of font sizes
-   * @access public
    * @static
    */
   public static function getFontSizes() {
@@ -208,7 +205,6 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @param void
    *
    * @return array   array of measurement units
-   * @access public
    * @static
    */
   public static function getUnits() {
@@ -226,7 +222,6 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @param void
    *
    * @return array   array of alignments
-   * @access public
    * @static
    */
   public static function getTextAlignments() {
@@ -243,7 +238,6 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @param void
    *
    * @return array   array of alignments
-   * @access public
    * @static
    */
   public static function getFontStyles() {
@@ -260,7 +254,6 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @param string $name
    *
    * @return int  Group ID (null if Group ID doesn't exist)
-   * @access private
    */
   private static function _getGid($name='label_format') {
     if (!isset(self::$_gid[$name]) || !self::$_gid[$name]) {
@@ -280,9 +273,8 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @return array  (reference)   List of Label Formats
    * @static
-   * @access public
    */
-  static function addOrder(&$list, $returnURL) {
+  public static function addOrder(&$list, $returnURL) {
     $filter = "option_group_id = " . self::_getGid();
     CRM_Utils_Weight::addOrder($list, 'CRM_Core_DAO_OptionValue', 'id', $returnURL, $filter);
   }
@@ -295,9 +287,8 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @return array  (reference)   label format list
    * @static
-   * @access public
    */
-  static function &getList($namesOnly = FALSE, $groupName='label_format') {
+  public static function &getList($namesOnly = FALSE, $groupName='label_format') {
     static $list = array();
     if (self::_getGid($groupName)) {
       // get saved label formats from Option Value table
@@ -325,9 +316,8 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @return array   Name/value pairs containing the default Label Format values.
    * @static
-   * @access public
    */
-  static function &getDefaultValues($groupName = 'label_format') {
+  public static function &getDefaultValues($groupName = 'label_format') {
     $params = array('is_active' => 1, 'is_default' => 1);
     $defaults = array();
     if (!self::retrieve($params, $defaults, $groupName)) {
@@ -349,9 +339,8 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @param string $groupName
    *
    * @return array  $values (reference) associative array of name/value pairs
-   * @access public
    */
-  static function &getLabelFormat($field, $val, $groupName = 'label_format') {
+  public static function &getLabelFormat($field, $val, $groupName = 'label_format') {
     $params = array('is_active' => 1, $field => $val);
     $labelFormat = array();
     if (self::retrieve($params, $labelFormat, $groupName)) {
@@ -368,9 +357,8 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @param int    $name   Label format name. Empty = get default label format
    *
    * @return array  $values (reference) associative array of name/value pairs
-   * @access public
    */
-  static function &getByName($name) {
+  public static function &getByName($name) {
     return self::getLabelFormat('name', $name);
   }
 
@@ -381,9 +369,8 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @param string $groupName group name
    *
    * @return array  $values (reference) associative array of name/value pairs
-   * @access public
    */
-  static function &getById($id, $groupName = 'label_format') {
+  public static function &getById($id, $groupName = 'label_format') {
     return self::getLabelFormat('id', $id, $groupName);
   }
 
@@ -397,10 +384,9 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @param null $default
    *
    * @return value
-   * @access public
    * @static
    */
-  static function getValue($field, &$values, $default = NULL) {
+  public static function getValue($field, &$values, $default = NULL) {
     if (array_key_exists($field, self::$optionValueFields)) {
       switch (self::$optionValueFields[$field]['type']) {
         case CRM_Utils_Type::T_INT:
@@ -430,10 +416,9 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @param string $groupName
    *
    * @return CRM_Core_DAO_OptionValue object
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$values, $groupName='label_format') {
+  public static function retrieve(&$params, &$values, $groupName='label_format') {
     $optionValue = new CRM_Core_DAO_OptionValue();
     $optionValue->copyValues($params);
     $optionValue->option_group_id = self::_getGid($groupName);
@@ -465,7 +450,6 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @param void
    *
    * @return void
-   * @access public
    */
   public static function customGroupName() {
     return ts('Custom');
@@ -479,9 +463,8 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @param string $groupName   group name of the label format
    *
    * @return void
-   * @access public
    */
-  function saveLabelFormat(&$values, $id = NULL, $groupName = 'label_format') {
+  public function saveLabelFormat(&$values, $id = NULL, $groupName = 'label_format') {
     // get the Option Group ID for Label Formats (create one if it doesn't exist)
     $group_id = self::_getGid($groupName);
 
@@ -543,10 +526,9 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @param  int  $id     ID of the label format to be deleted.
    * @param  string $groupName group name
-   * @access public
    * @static
    */
-  static function del($id, $groupName) {
+  public static function del($id, $groupName) {
     if ($id) {
       $dao = new CRM_Core_DAO_OptionValue();
       $dao->id = $id;
@@ -562,4 +544,3 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
     CRM_Core_Error::fatal(ts('Invalid value passed to delete function.'));
   }
 }
-

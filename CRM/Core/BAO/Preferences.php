@@ -41,7 +41,7 @@ class CRM_Core_BAO_Preferences {
   /**
    * @param array $params
    */
-  static function fixAndStoreDirAndURL(&$params) {
+  public static function fixAndStoreDirAndURL(&$params) {
     $sql = "
 SELECT v.name as valueName, g.name as optionName
 FROM   civicrm_option_value v,
@@ -81,7 +81,7 @@ AND    v.is_active = 1
    * @param array $params
    * @param string $type
    */
-  static function storeDirectoryOrURLPreferences(&$params, $type = 'directory') {
+  public static function storeDirectoryOrURLPreferences(&$params, $type = 'directory') {
     $optionName = ($type == 'directory') ? 'directory_preferences' : 'url_preferences';
 
     $sql = "
@@ -114,7 +114,7 @@ AND    v.name = %3
    * @param array $params
    * @param bool $setInConfig
    */
-  static function retrieveDirectoryAndURLPreferences(&$params, $setInConfig = FALSE) {
+  public static function retrieveDirectoryAndURLPreferences(&$params, $setInConfig = FALSE) {
     if ($setInConfig) {
       $config = CRM_Core_Config::singleton();
     }
@@ -149,4 +149,3 @@ AND    v.is_active = 1
     }
   }
 }
-

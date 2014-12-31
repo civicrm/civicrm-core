@@ -36,7 +36,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
- function testChangeContributionAmount() {
+ public function testChangeContributionAmount() {
    $this->webtestLogin();
    $amount = 100;
    //Offline Pay Later Contribution
@@ -83,7 +83,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->assertDBCompareValues('CRM_Contribute_DAO_Contribution', $searchParams, $compare);
  }
 
- function testPayLater() {
+ public function testPayLater() {
    $this->webtestLogin();
    $amount = 100.00;
    //Offline Pay Later Contribution
@@ -109,7 +109,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->assertEquals($status, '1', "Verify Completed Status");
  }
 
- function testChangePremium() {
+ public function testChangePremium() {
    $this->webtestLogin();
    $from = 'Premiums';
    $to = 'Premiums inventory';
@@ -180,7 +180,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->assertEquals($deletedAmount, $cost, "Verify actual cost for deleted premium");
  }
 
- function testDeletePremium() {
+ public function testDeletePremium() {
    $this->webtestLogin();
    $from = 'Premiums';
    $to = 'Premiums inventory';
@@ -242,7 +242,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->assertEquals($actualAmount, $cost, "Verify actual cost for deleted premium");
  }
 
- function testChangePaymentInstrument() {
+ public function testChangePaymentInstrument() {
    $this->webtestLogin();
    $label = 'TEST'.substr(sha1(rand()), 0, 7);
    $amount = 100.00;
@@ -267,7 +267,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->assertEquals($totalAmount, $amount, "Verify amount for newly inserted values");
  }
 
- function testRefundContribution() {
+ public function testRefundContribution() {
    $this->webtestLogin();
    $amount = 100.00;
    $this->_testOfflineContribution($amount);
@@ -292,7 +292,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->assertEquals($amount, '-100.00', 'Verify Financial Trxn Amount.');
  }
 
- function testCancelPayLater() {
+ public function testCancelPayLater() {
    $this->webtestLogin();
    $amount = 100.00;
    $this->_testOfflineContribution($amount, "Pending");
@@ -324,7 +324,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->assertEquals($totalAmount, "-$amount", 'Verify Amount for Financial Trxn');
  }
 
- function testChangeFinancialType() {
+ public function testChangeFinancialType() {
    $this->webtestLogin();
    $amount = 100.00;
    $this->_testOfflineContribution($amount);
@@ -448,7 +448,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    * @param string $status
    * @return array
    */
-  function _testOfflineContribution($amount, $status="Completed") {
+  public function _testOfflineContribution($amount, $status="Completed") {
 
    $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 

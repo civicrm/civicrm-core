@@ -74,11 +74,10 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
   /**
    * Set the default form values
    *
-   * @access protected
    *
    * @return array the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     foreach ($this->_fields as $name => $field) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($field['name'])) {
@@ -96,7 +95,6 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     foreach ($this->_fields as $name => $field) {
@@ -110,7 +108,6 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   /**
    * @return string

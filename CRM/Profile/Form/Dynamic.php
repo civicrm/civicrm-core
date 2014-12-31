@@ -50,10 +50,9 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
    *
    * @return void
    *
-   * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     if ($this->get('register')) {
       $this->_mode = CRM_Profile_Form::MODE_REGISTER;
     }
@@ -75,7 +74,6 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addButtons(array(
@@ -103,10 +101,9 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
    *
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
-  static function formRule($fields, $files, $form) {
+  public static function formRule($fields, $files, $form) {
     $errors = array();
 
     // if no values, return
@@ -120,7 +117,6 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
   /**
    * Process the user submitted custom data values.
    *
-   * @access public
    *
    * @return void
    */
@@ -128,4 +124,3 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
     parent::postProcess();
   }
 }
-

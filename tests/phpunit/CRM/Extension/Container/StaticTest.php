@@ -6,25 +6,25 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Extension_Container_StaticTest
  */
 class CRM_Extension_Container_StaticTest extends CiviUnitTestCase {
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function tearDown() {
+  public function tearDown() {
     parent::tearDown();
   }
 
-  function testGetKeysEmpty() {
+  public function testGetKeysEmpty() {
     $c = new CRM_Extension_Container_Static(array());
     $this->assertEquals($c->getKeys(), array());
   }
 
-  function testGetKeys() {
+  public function testGetKeys() {
     $c = $this->_createContainer();
     $this->assertEquals($c->getKeys(), array('test.foo', 'test.foo.bar'));
   }
 
-  function testGetPath() {
+  public function testGetPath() {
     $c = $this->_createContainer();
     try {
       $c->getPath('un.kno.wn');
@@ -37,7 +37,7 @@ class CRM_Extension_Container_StaticTest extends CiviUnitTestCase {
     $this->assertEquals("/path/to/bar", $c->getPath('test.foo.bar'));
   }
 
-  function testGetResUrl() {
+  public function testGetResUrl() {
     $c = $this->_createContainer();
     try {
       $c->getResUrl('un.kno.wn');
@@ -53,7 +53,7 @@ class CRM_Extension_Container_StaticTest extends CiviUnitTestCase {
   /**
    * @return CRM_Extension_Container_Static
    */
-  function _createContainer() {
+  public function _createContainer() {
     return new CRM_Extension_Container_Static(array(
       'test.foo' => array(
         'path' => '/path/to/foo',

@@ -33,7 +33,7 @@
  *
  */
 class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
-  function run() {
+  public function run() {
     if (!preg_match('/^[^\/]+\.(jpg|jpeg|png|gif)$/i', $_GET['photo'])) {
       CRM_Core_Error::fatal('Malformed photo name');
     }
@@ -63,5 +63,3 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
     }
   }
 }
-
-

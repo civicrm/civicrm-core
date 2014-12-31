@@ -41,9 +41,7 @@
  * @param mixed $data
  *
  * @return string JSON
- * @access public
  */
 function smarty_modifier_json($data) {
   return json_encode($data);
 }
-

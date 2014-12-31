@@ -42,7 +42,7 @@ class CRM_Extension_Upgrades {
    *
    * @return bool
    */
-  static function hasPending() {
+  public static function hasPending() {
     $checks = CRM_Utils_Hook::upgrade('check');
     if (is_array($checks)) {
       foreach ($checks as $check) {
@@ -60,7 +60,7 @@ class CRM_Extension_Upgrades {
    *
    * @return CRM_Queue_Queue
    */
-  static function createQueue() {
+  public static function createQueue() {
     $queue = CRM_Queue_Service::singleton()->create(array(
       'type' => 'Sql',
       'name' => self::QUEUE_NAME,

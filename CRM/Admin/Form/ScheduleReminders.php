@@ -51,7 +51,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -267,10 +266,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    * @param array $fields  the input form values
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     if ((array_key_exists(1, $fields['entity']) && $fields['entity'][1][0] === 0) ||
       (array_key_exists(2, $fields['entity']) && $fields['entity'][2][0] == 0)
@@ -327,7 +325,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   /**
    * @return int
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['is_active'] = 1;
       $defaults['mode'] = 'Email';
@@ -375,7 +373,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

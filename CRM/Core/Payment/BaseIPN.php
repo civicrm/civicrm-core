@@ -49,7 +49,7 @@ class CRM_Core_Payment_BaseIPN {
   /**
    * Constructor
    */
-  function __construct() {
+  public function __construct() {
     self::$_now = date('YmdHis');
   }
 
@@ -60,7 +60,7 @@ class CRM_Core_Payment_BaseIPN {
    *
    * @throws CRM_Core_Exception
    */
-  function setInputParameters($parameters) {
+  public function setInputParameters($parameters) {
     if(!is_array($parameters)) {
       throw new CRM_Core_Exception('Invalid input parameters');
     }
@@ -81,7 +81,7 @@ class CRM_Core_Payment_BaseIPN {
    * @param integer $paymentProcessorID Id of the payment processor ID in use
    * @return boolean
    */
-  function validateData(&$input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
+  public function validateData(&$input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
 
     // make sure contact exists and is valid
     $contact = new CRM_Contact_BAO_Contact();
@@ -130,7 +130,7 @@ class CRM_Core_Payment_BaseIPN {
    *
    * @return multitype:number NULL |boolean
    */
-  function loadObjects(&$input, &$ids, &$objects, $required, $paymentProcessorID, $error_handling = NULL) {
+  public function loadObjects(&$input, &$ids, &$objects, $required, $paymentProcessorID, $error_handling = NULL) {
     if (empty($error_handling)) {
       // default options are that we log an error & echo it out
       // note that we should refactor this error handling into error code @ some point
@@ -180,7 +180,7 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $input
    * @return boolean
    */
-  function failed(&$objects, &$transaction, $input = array()) {
+  public function failed(&$objects, &$transaction, $input = array()) {
     $contribution = &$objects['contribution'];
     $memberships = array();
     if (!empty($objects['membership'])) {
@@ -251,7 +251,7 @@ class CRM_Core_Payment_BaseIPN {
    * @param object $transaction
    * @return boolean
    */
-  function pending(&$objects, &$transaction) {
+  public function pending(&$objects, &$transaction) {
     $transaction->commit();
     CRM_Core_Error::debug_log_message("returning since contribution status is pending");
     echo "Success: Returning since contribution status is pending<p>";
@@ -265,7 +265,7 @@ class CRM_Core_Payment_BaseIPN {
    *
    * @return bool
    */
-  function cancelled(&$objects, &$transaction, $input = array()) {
+  public function cancelled(&$objects, &$transaction, $input = array()) {
     $contribution = &$objects['contribution'];
     $memberships = &$objects['membership'];
     if (is_numeric($memberships)) {
@@ -331,7 +331,7 @@ class CRM_Core_Payment_BaseIPN {
    *
    * @return bool
    */
-  function unhandled(&$objects, &$transaction) {
+  public function unhandled(&$objects, &$transaction) {
     $transaction->rollback();
     CRM_Core_Error::debug_log_message("returning since contribution status: is not handled");
     echo "Failure: contribution status is not handled<p>";
@@ -345,7 +345,7 @@ class CRM_Core_Payment_BaseIPN {
    * @param $transaction
    * @param bool $recur
    */
-  function completeTransaction(&$input, &$ids, &$objects, &$transaction, $recur = FALSE) {
+  public function completeTransaction(&$input, &$ids, &$objects, &$transaction, $recur = FALSE) {
     $contribution = &$objects['contribution'];
 
     $primaryContributionID = isset($contribution->id) ? $contribution->id : $objects['first_contribution']->id;
@@ -680,7 +680,7 @@ LIMIT 1;";
    *
    * @return bool
    */
-  function getBillingID(&$ids) {
+  public function getBillingID(&$ids) {
     // get the billing location type
     $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
     // CRM-8108 remove the ts around the Billing locationtype
@@ -708,7 +708,7 @@ LIMIT 1;";
    *
    * @return array
    */
-  function sendMail(&$input, &$ids, &$objects, &$values, $recur = FALSE, $returnMessageText = FALSE) {
+  public function sendMail(&$input, &$ids, &$objects, &$values, $recur = FALSE, $returnMessageText = FALSE) {
     $contribution = &$objects['contribution'];
     $input['is_recur'] = $recur;
     // set receipt from e-mail and name in value
@@ -729,7 +729,7 @@ LIMIT 1;";
    * @param $ids
    * @param $recur
    */
-  function sendRecurringStartOrEndNotification($ids, $recur) {
+  public function sendRecurringStartOrEndNotification($ids, $recur) {
     if ($this->_isFirstOrLastRecurringPayment) {
       $autoRenewMembership = FALSE;
       if ($recur->id &&
@@ -755,7 +755,7 @@ LIMIT 1;";
    * @param unknown_type $params
    * @return void|Ambigous <value, unknown, array>
    */
-  function updateContributionStatus(&$params) {
+  public function updateContributionStatus(&$params) {
     // get minimum required values.
     $statusId       = CRM_Utils_Array::value('contribution_status_id', $params);
     $componentId    = CRM_Utils_Array::value('component_id', $params);
@@ -874,7 +874,7 @@ LIMIT 1;";
   /**
    * @param $contribution
    */
-  function updateRecurLinkedPledge(&$contribution) {
+  public function updateRecurLinkedPledge(&$contribution) {
     $returnProperties = array('id', 'pledge_id');
     $paymentDetails   = $paymentIDs = array();
 
@@ -940,7 +940,7 @@ LIMIT 1;";
    *
    * @return array
    */
-  function addRecurLineItems($recurId, $contribution) {
+  public function addRecurLineItems($recurId, $contribution) {
     $lineSets = array();
 
     $originalContributionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
@@ -974,7 +974,7 @@ LIMIT 1;";
    * @param int $recurId
    * @param int $targetContributionId
    */
-  function copyCustomValues($recurId, $targetContributionId) {
+  public function copyCustomValues($recurId, $targetContributionId) {
     if ($recurId && $targetContributionId) {
       // get the initial contribution id of recur id
       $sourceContributionId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
@@ -1019,7 +1019,7 @@ LIMIT 1;";
    * @param int $recurId
    * @param int $targetContributionId
    */
-  function addrecurSoftCredit($recurId, $targetContributionId) {
+  public function addrecurSoftCredit($recurId, $targetContributionId) {
     $contriID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
 
     $soft_contribution = new CRM_Contribute_DAO_ContributionSoft();

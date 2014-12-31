@@ -35,7 +35,7 @@ class WebTest_Generic_CheckActivityTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCheckDashboardElements() {
+  public function testCheckDashboardElements() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -83,4 +83,3 @@ class WebTest_Generic_CheckActivityTest extends CiviSeleniumTestCase {
     $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']","$contactFirstName2");
   }
 }
-

@@ -39,7 +39,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
    *
    * Used by both profile and edit contact
    */
-  CONST GROUP = 1, TAG = 2, ALL = 3;
+  const GROUP = 1, TAG = 2, ALL = 3;
 
   /**
    * This function is to build form elements
@@ -57,7 +57,6 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
    * @param string $groupElementType
    *
    * @static
-   * @access public
    */
   static function buildQuickForm(&$form,
     $contactId = 0,
@@ -178,7 +177,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
     $form->assign('tagGroup', $form->_tagGroup);
   }
 
-  static function climbtree($form, $tree, &$elements) {
+  public static function climbtree($form, $tree, &$elements) {
     foreach ($tree as $tagID => $varValue) {
       $tagAttribute = array(
       'onclick' => "return changeRowColor(\"rowidtag_$tagID\")",
@@ -205,10 +204,9 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
    * @param string $groupElementType
    *
    * @return void
-   * @access public
    * @static
    */
-  static function setDefaults($id, &$defaults, $type = self::ALL, $fieldName = NULL, $groupElementType = 'checkbox') {
+  public static function setDefaults($id, &$defaults, $type = self::ALL, $fieldName = NULL, $groupElementType = 'checkbox') {
     $type = (int ) $type;
     if ($type & self::GROUP) {
       $fName = 'group';
@@ -248,7 +246,6 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @param $defaults

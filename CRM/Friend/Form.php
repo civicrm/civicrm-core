@@ -42,13 +42,12 @@ class CRM_Friend_Form extends CRM_Core_Form {
   /**
    * Constants for number of friend contacts
    */
-  CONST NUM_OPTION = 3;
+  const NUM_OPTION = 3;
 
   /**
    * The id of the entity that we are proceessing
    *
    * @var int
-   * @protected
    */
   protected $_entityId;
 
@@ -56,7 +55,6 @@ class CRM_Friend_Form extends CRM_Core_Form {
    * The table name of the entity that we are proceessing
    *
    * @var string
-   * @protected
    */
   protected $_entityTable;
 
@@ -66,7 +64,6 @@ class CRM_Friend_Form extends CRM_Core_Form {
    * The contact ID
    *
    * @var int
-   * @protected
    */
   protected $_contactID;
 
@@ -148,7 +145,6 @@ class CRM_Friend_Form extends CRM_Core_Form {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
@@ -178,7 +174,6 @@ class CRM_Friend_Form extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // Details of User
@@ -234,10 +229,9 @@ class CRM_Friend_Form extends CRM_Core_Form {
    * @param array $fields
    *
    * @return mixed true or array of errors
-   * @access public
    * @static
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
 
     $errors = array();
 
@@ -270,7 +264,6 @@ class CRM_Friend_Form extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -327,4 +320,3 @@ class CRM_Friend_Form extends CRM_Core_Form {
     $this->assign('thankYouText', $defaults['thankyou_text']);
   }
 }
-

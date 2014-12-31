@@ -44,7 +44,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    *
    * @return array
    */
-  static function getMapping($id = NULL) {
+  public static function getMapping($id = NULL) {
     static $_action_mapping;
 
     if ($id && !is_null($_action_mapping) && isset($_action_mapping[$id])) {
@@ -72,7 +72,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    * Get all fields of the type Date
    */
 
-  static function getDateFields() {
+  public static function getDateFields() {
     $allFields = CRM_Core_BAO_CustomField::getFields('');
     $dateFields = array('birth_date' => ts('Birth Date'));
     foreach ($allFields as $fieldID => $field) {
@@ -90,9 +90,8 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    *
    * @return array  associated array of all the drop downs in the form
    * @static
-   * @access public
    */
-  static function getSelection($id = NULL) {
+  public static function getSelection($id = NULL) {
     $mapping = self::getMapping();
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     $activityType   = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
@@ -266,7 +265,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    *
    * @return array
    */
-  static function getSelection1($id = NULL) {
+  public static function getSelection1($id = NULL) {
     $mapping = self::getMapping($id);
     $sel4 = $sel5 = array();
     $options = array(
@@ -323,9 +322,8 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    *
    * @return array  (reference)   reminder list
    * @static
-   * @access public
    */
-  static function &getList($namesOnly = FALSE, $entityValue = NULL, $id = NULL) {
+  public static function &getList($namesOnly = FALSE, $entityValue = NULL, $id = NULL) {
     $activity_type = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
     $activity_status = CRM_Core_PseudoConstant::activityStatus();
 
@@ -423,7 +421,7 @@ AND   cas.entity_value = $id AND
    * @return bool|null
    * @throws CRM_Core_Exception
    */
-  static function sendReminder($contactId, $to, $scheduleID, $from, $tokenParams) {
+  public static function sendReminder($contactId, $to, $scheduleID, $from, $tokenParams) {
     $email = $to['email'];
     $phoneNumber = $to['phone'];
     $schedule = new CRM_Core_DAO_ActionSchedule();
@@ -584,11 +582,10 @@ AND   cas.entity_value = $id AND
    * @param array $ids    the array that holds all the db ids
    *
    * @return CRM_Core_DAO_ActionSchedule
-   * @access public
    * @static
    *
    */
-  static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = array()) {
     $actionSchedule = new CRM_Core_DAO_ActionSchedule();
     $actionSchedule->copyValues($params);
 
@@ -604,10 +601,9 @@ AND   cas.entity_value = $id AND
    * @param array $values (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_DAO_ActionSchedule object on success, null otherwise
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$values) {
+  public static function retrieve(&$params, &$values) {
     if (empty($params)) {
       return NULL;
     }
@@ -630,10 +626,9 @@ AND   cas.entity_value = $id AND
    *
    * @param  int  $id     ID of the Reminder to be deleted.
    *
-   * @access public
    * @static
    */
-  static function del($id) {
+  public static function del($id) {
     if ($id) {
       $dao = new CRM_Core_DAO_ActionSchedule();
       $dao->id = $id;
@@ -654,7 +649,7 @@ AND   cas.entity_value = $id AND
    * @return Object             DAO object on success, null otherwise
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_ActionSchedule', $id, 'is_active', $is_active);
   }
 
@@ -664,7 +659,7 @@ AND   cas.entity_value = $id AND
    *
    * @throws CRM_Core_Exception
    */
-  static function sendMailings($mappingID, $now) {
+  public static function sendMailings($mappingID, $now) {
     $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
     $fromEmailAddress = "$domainValues[0] <$domainValues[1]>";
 
@@ -918,7 +913,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
    *
    * @throws API_Exception
    */
-  static function buildRecipientContacts($mappingID, $now, $params = array()) {
+  public static function buildRecipientContacts($mappingID, $now, $params = array()) {
     $actionSchedule = new CRM_Core_DAO_ActionSchedule();
     $actionSchedule->mapping_id = $mappingID;
     $actionSchedule->is_active = 1;
@@ -1357,7 +1352,7 @@ GROUP BY reminder.contact_id
    *
    * @return null|string
    */
-  static function permissionedRelationships($field) {
+  public static function permissionedRelationships($field) {
     $query = '
 SELECT    cm.id AS owner_id, cm.contact_id AS owner_contact, m.id AS slave_id, m.contact_id AS slave_contact, cmt.relationship_type_id AS relation_type, rel.contact_id_a, rel.contact_id_b, rel.is_permission_a_b, rel.is_permission_b_a
 FROM      civicrm_membership m
@@ -1393,7 +1388,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
    *
    * @return array
    */
-  static function processQueue($now = NULL, $params = array()) {
+  public static function processQueue($now = NULL, $params = array()) {
     $now = $now ? CRM_Utils_Time::setTime($now) : CRM_Utils_Time::getTime();
 
     $mappings = self::getMapping();
@@ -1415,7 +1410,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
    *
    * @return null|string
    */
-  static function isConfigured($id, $mappingID) {
+  public static function isConfigured($id, $mappingID) {
     $queryString = "SELECT count(id) FROM civicrm_action_schedule
                         WHERE  mapping_id = %1 AND
                                entity_value = %2";
@@ -1433,7 +1428,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
    *
    * @return array
    */
-  static function getRecipientListing($mappingID, $recipientType) {
+  public static function getRecipientListing($mappingID, $recipientType) {
     $options = array();
     if (!$mappingID || !$recipientType) {
       return $options;

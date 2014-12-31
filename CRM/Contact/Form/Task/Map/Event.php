@@ -44,9 +44,8 @@ class CRM_Contact_Form_Task_Map_Event extends CRM_Contact_Form_Task_Map {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $ids = CRM_Utils_Request::retrieve('eid', 'Positive',
       $this, TRUE
     );
@@ -63,13 +62,11 @@ class CRM_Contact_Form_Task_Map_Event extends CRM_Contact_Form_Task_Map {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     return 'CRM/Contact/Form/Task/Map.tpl';
   }
 }
-

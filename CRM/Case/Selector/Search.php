@@ -80,7 +80,6 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_single = FALSE;
@@ -88,7 +87,6 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_limit = NULL;
@@ -96,7 +94,6 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * What context are we being invoked from
    *
-   * @access protected
    * @var string
    */
   protected $_context = NULL;
@@ -106,7 +103,6 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    * the HTML_QuickForm_Controller for that page.
    *
    * @var array
-   * @access protected
    */
   public $_queryParams;
 
@@ -114,7 +110,6 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    * Represent the type of selector
    *
    * @var int
-   * @access protected
    */
   protected $_action;
 
@@ -188,10 +183,9 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    * @param null $key
    *
    * @return array
-   * @access public
    */
   static
-  function &links($isDeleted = FALSE, $key = NULL) {
+  public function &links($isDeleted = FALSE, $key = NULL) {
     $extraParams = ($key) ? "&key={$key}" : NULL;
 
     if ($isDeleted) {
@@ -252,9 +246,8 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    * @param $action
    * @param array $params
    *
-   * @access public
    */
-  function getPagerParams($action, &$params) {
+  public function getPagerParams($action, &$params) {
     $params['status'] = ts('Case') . ' %%StatusMessage%%';
     $params['csvString'] = NULL;
     if ($this->_limit) {
@@ -274,9 +267,8 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    * @param
    *
    * @return int Total number of rows
-   * @access public
    */
-  function getTotalCount($action) {
+  public function getTotalCount($action) {
     return $this->_query->searchQuery(0, 0, NULL,
       TRUE, FALSE,
       FALSE, FALSE,
@@ -296,7 +288,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    *
    * @return int   the total number of rows for this action
    */
-  function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
+  public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     $result = $this->_query->searchQuery($offset, $rowCount, $sort,
       FALSE, FALSE,
       FALSE, FALSE,
@@ -411,7 +403,6 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
 
   /**
    * @return array              $qill         which contains an array of strings
-   * @access public
    */
 
   // the current internationalisation is bad, but should more or less work
@@ -428,7 +419,6 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    * @param enum   $output what should the result set include (web/email/csv)
    *
    * @return array the column headers that need to be displayed
-   * @access public
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     if (!isset(self::$_columnHeaders)) {
@@ -487,14 +477,14 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * @return mixed
    */
-  function alphabetQuery() {
+  public function alphabetQuery() {
     return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
   }
 
   /**
    * @return string
    */
-  function &getQuery() {
+  public function &getQuery() {
     return $this->_query;
   }
 
@@ -505,8 +495,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    *
    * @return string name of the file
    */
-  function getExportFileName($output = 'csv') {
+  public function getExportFileName($output = 'csv') {
     return ts('Case Search');
   }
 }
-

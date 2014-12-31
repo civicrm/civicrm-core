@@ -43,7 +43,7 @@ class CRM_Core_QuickForm_Action_Cancel extends CRM_Core_QuickForm_Action {
    * @return \CRM_Core_QuickForm_Action_Cancel
   @access public
    */
-  function __construct(&$stateMachine) {
+  public function __construct(&$stateMachine) {
     parent::__construct($stateMachine);
   }
 
@@ -54,13 +54,11 @@ class CRM_Core_QuickForm_Action_Cancel extends CRM_Core_QuickForm_Action {
    * @param  string    $actionName Current action name, as one Action object can serve multiple actions
    *
    * @return void
-   * @access public
    */
-  function perform(&$page, $actionName) {
+  public function perform(&$page, $actionName) {
     // conditional actions if cancelAction is defined
     $this->_stateMachine->cancelAction();
 
     $this->popUserContext();
   }
 }
-

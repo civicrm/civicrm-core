@@ -50,7 +50,7 @@ class CRM_Contribute_BAO_Query {
    * @return array self::$_contributionFields  associative array of contribution fields
    * @static
    */
-  static function &getFields() {
+  public static function &getFields() {
     if (!self::$_contributionFields) {
       self::$_contributionFields = array();
 
@@ -69,9 +69,8 @@ class CRM_Contribute_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
-  static function select(&$query) {
+  public static function select(&$query) {
     // if contribute mode add contribution id
     if ($query->_mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
       $query->_select['contribution_id'] = "civicrm_contribution.id as contribution_id";
@@ -207,7 +206,7 @@ class CRM_Contribute_BAO_Query {
   /**
    * @param $query
    */
-  static function where(&$query) {
+  public static function where(&$query) {
     $grouping = NULL;
 
     self::initializeAnySoftCreditClause($query);
@@ -242,7 +241,7 @@ class CRM_Contribute_BAO_Query {
    * @param $values
    * @param $query
    */
-  static function whereClauseSingle(&$values, &$query) {
+  public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
     $quoteValue = NULL;
@@ -690,7 +689,7 @@ class CRM_Contribute_BAO_Query {
    *
    * @return null|string
    */
-  static function from($name, $mode, $side) {
+  public static function from($name, $mode, $side) {
     $from = NULL;
     switch ($name) {
     case 'civicrm_contribution':
@@ -824,7 +823,7 @@ class CRM_Contribute_BAO_Query {
   /**
    * @param $query
    */
-  static function initializeAnySoftCreditClause(&$query) {
+  public static function initializeAnySoftCreditClause(&$query) {
     if (self::isSoftCreditOptionEnabled($query->_params)) {
       if ($query->_mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
         unset($query->_distinctComponentClause);
@@ -839,7 +838,7 @@ class CRM_Contribute_BAO_Query {
    *
    * @return bool
    */
-  static function isSoftCreditOptionEnabled($queryParams = array()) {
+  public static function isSoftCreditOptionEnabled($queryParams = array()) {
     static $tempTableFilled = FALSE;
     if (!empty($queryParams)) {
       foreach (array_keys($queryParams) as $id) {
@@ -878,7 +877,7 @@ class CRM_Contribute_BAO_Query {
    *
    * @return array
    */
-  static function softCreditReturnProperties($isExportMode = False) {
+  public static function softCreditReturnProperties($isExportMode = False) {
     $properties = array(
       'contribution_soft_credit_name'   => 1,
       'contribution_soft_credit_amount' => 1,
@@ -896,7 +895,7 @@ class CRM_Contribute_BAO_Query {
    *
    * @return array|null
    */
-  static function defaultReturnProperties($mode, $includeCustomFields = TRUE) {
+  public static function defaultReturnProperties($mode, $includeCustomFields = TRUE) {
     $properties = NULL;
     if ($mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
       $properties = array(
@@ -956,14 +955,13 @@ class CRM_Contribute_BAO_Query {
   /**
    * Add all the elements shared between contribute search and advnaced search
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
    * @return void
    * @static
    */
-  static function buildSearchForm(&$form) {
+  public static function buildSearchForm(&$form) {
 
     // Added contribution source
     $form->addElement('text', 'contribution_source', ts('Contribution Source'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'source'));
@@ -1111,13 +1109,13 @@ class CRM_Contribute_BAO_Query {
    * @param $row
    * @param int $id
    */
-  static function searchAction(&$row, $id) {
+  public static function searchAction(&$row, $id) {
   }
 
   /**
    * @param $tables
    */
-  static function tableNames(&$tables) {
+  public static function tableNames(&$tables) {
     // Add contribution table
     if (!empty($tables['civicrm_product'])) {
       $tables = array_merge(array('civicrm_contribution' => 1), $tables);
@@ -1139,7 +1137,7 @@ class CRM_Contribute_BAO_Query {
    *
    * @return bool
    */
-  static function buildDateWhere(&$values, $query, $name, $field, $title) {
+  public static function buildDateWhere(&$values, $query, $name, $field, $title) {
     $fieldPart = strpos($name, $field);
     if($fieldPart === FALSE) {
       return;
@@ -1156,7 +1154,7 @@ class CRM_Contribute_BAO_Query {
   /**
    * @return array
    */
-  static function getRecurringFields() {
+  public static function getRecurringFields() {
     return array(
       'contribution_recur_start_date' => ts('Recurring Contribution Start Date'),
       'contribution_recur_next_sched_contribution_date' => ts('Next Scheduled Recurring Contribution'),
@@ -1168,4 +1166,3 @@ class CRM_Contribute_BAO_Query {
     );
   }
 }
-

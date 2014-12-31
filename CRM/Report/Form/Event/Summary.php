@@ -56,7 +56,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
 
     $this->_columns = array(
       'civicrm_event' => array(
@@ -112,11 +112,11 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
@@ -133,11 +133,11 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
     $this->_select = 'SELECT ' . implode(', ', $select);
   }
 
-  function from() {
+  public function from() {
     $this->_from = " FROM civicrm_event {$this->_aliases['civicrm_event']} ";
   }
 
-  function where() {
+  public function where() {
     $clauses = array();
     $this->_participantWhere = "";
     foreach ($this->_columns as $tableName => $table) {
@@ -178,7 +178,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
     $this->_where = 'WHERE  ' . implode(' AND ', $clauses);
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->assign('chartSupported', TRUE);
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_event']}.id";
   }
@@ -187,7 +187,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
   /**
    * @return array
    */
-  function participantInfo() {
+  public function participantInfo() {
 
     $statusType1 = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1');
     $statusType2 = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 0');
@@ -246,7 +246,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
   }
 
   //build header for table
-  function buildColumnHeaders() {
+  public function buildColumnHeaders() {
 
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
@@ -286,7 +286,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
     );
   }
 
-  function postProcess() {
+  public function postProcess() {
 
     $this->beginPostProcess();
 
@@ -340,7 +340,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
   /**
    * @param $rows
    */
-  function buildChart(&$rows) {
+  public function buildChart(&$rows) {
     $this->_interval = 'events';
     $countEvent = NULL;
     if (!empty($this->_params['charts'])) {
@@ -380,7 +380,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
 
     if (is_array($rows)) {
       $eventType = CRM_Core_OptionGroup::values('event_type');
@@ -413,4 +413,3 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
     }
   }
 }
-

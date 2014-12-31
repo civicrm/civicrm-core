@@ -36,7 +36,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testStandaloneContributeAdd() {
+  public function testStandaloneContributeAdd() {
     $this->webtestLogin();
 
     // Create a contact to be used as soft creditor
@@ -206,7 +206,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     }
   }
 
-  function testDeductibleAmount() {
+  public function testDeductibleAmount() {
     $this->webtestLogin();
 
     //add authorize .net payment processor
@@ -317,7 +317,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
    * @param string $lastName
    * @param $processorName
    */
-  function _doOfflineContribution($params, $firstName, $lastName, $processorName) {
+  public function _doOfflineContribution($params, $firstName, $lastName, $processorName) {
 
     $this->waitForElementPresent("css=li#tab_contribute a");
     $this->click("css=li#tab_contribute a");
@@ -370,7 +370,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
   /**
    * @param $verifyData
    */
-  function _verifyAmounts($verifyData) {
+  public function _verifyAmounts($verifyData) {
     // since we are doing test contributions we need to search for test contribution and select first contribution
     // record for the contact
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
@@ -400,7 +400,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     'crm-contact-actions-link', FALSE);
   }
 
-  function testOnlineContributionWithZeroAmount() {
+  public function testOnlineContributionWithZeroAmount() {
     $this->webtestLogin();
 
     // Create a contact to be used as soft creditor

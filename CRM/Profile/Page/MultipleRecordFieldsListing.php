@@ -59,7 +59,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
    *
    * @return string Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return '';
   }
 
@@ -68,7 +68,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links[$this->_pageViewType])) {
       // helper variable for nicer formatting
       $links = array();
@@ -137,10 +137,9 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
    * method.
    *
    * @return void
-   * @access public
    *
    */
-  function run() {
+  public function run() {
     // get the requested action, default to 'browse'
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, FALSE);
 
@@ -168,9 +167,8 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
    * Browse the listing
    *
    * @return void
-   * @access public
    */
-  function browse() {
+  public function browse() {
     $dateFields = NULL;
     $cgcount = 0;
     $dateFieldsVals = NULL;
@@ -368,7 +366,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
    *
    * @return string  classname of edit form
    */
-  function editForm() {
+  public function editForm() {
     return '';
   }
 
@@ -377,7 +375,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
    *
    * @return string  name of this page
    */
-  function editName() {
+  public function editName() {
     return '';
   }
 
@@ -388,8 +386,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
    *
    * @return string  user context
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return '';
   }
 }
-

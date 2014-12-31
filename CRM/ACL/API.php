@@ -39,12 +39,12 @@ class CRM_ACL_API {
    *
    * @var int
    */
-  CONST EDIT = 1;
-  CONST VIEW = 2;
-  CONST DELETE = 3;
-  CONST CREATE = 4;
-  CONST SEARCH = 5;
-  CONST ALL = 6;
+  const EDIT = 1;
+  const VIEW = 2;
+  const DELETE = 3;
+  const CREATE = 4;
+  const SEARCH = 5;
+  const ALL = 6;
 
   /**
    * Given a permission string, check for access requirements
@@ -54,9 +54,8 @@ class CRM_ACL_API {
    *
    * @return boolean true if yes, else false
    * @static
-   * @access public
    */
-  static function check($str, $contactID = NULL) {
+  public static function check($str, $contactID = NULL) {
     if ($contactID == NULL) {
       $session = CRM_Core_Session::singleton();
       $contactID = $session->get('userID');
@@ -82,7 +81,6 @@ class CRM_ACL_API {
    *               this means it is handled by generating query
    *
    * @return string the group where clause for this user
-   * @access public
    */
   public static function whereClause($type,
     &$tables,
@@ -145,7 +143,6 @@ class CRM_ACL_API {
    * @param null $includedGroups
    *
    * @return array the ids of the groups for which the user has permissions
-   * @access public
    */
   public static function group(
     $type,
@@ -180,7 +177,6 @@ class CRM_ACL_API {
    * @param bool $flush
    *
    * @return array the ids of the groups for which the user has permissions
-   * @access public
    */
   public static function groupPermission(
     $type,
@@ -219,4 +215,3 @@ class CRM_ACL_API {
     return in_array($groupID, $groups) ? TRUE : FALSE;
   }
 }
-

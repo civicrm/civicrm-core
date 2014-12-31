@@ -35,7 +35,7 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testStandaloneMemberAdd() {
+  public function testStandaloneMemberAdd() {
 
     $this->webtestLogin();
 
@@ -88,7 +88,7 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($expected);
   }
 
-  function testStandaloneGiftMembership() {
+  public function testStandaloneGiftMembership() {
 
     $this->webtestLogin();
 
@@ -156,7 +156,7 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
 
   }
 
-  function testStandaloneMemberOverrideAdd() {
+  public function testStandaloneMemberOverrideAdd() {
 
     $this->webtestLogin();
 
@@ -235,7 +235,7 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($expected);
   }
 
-  function testAjaxCustomGroupLoad() {
+  public function testAjaxCustomGroupLoad() {
     $this->webtestLogin();
     $triggerElement = array('name' => 'membership_type_id_1', 'type' => 'select');
     $customSets = array(

@@ -43,7 +43,6 @@
  * @param string $attribute the attribute to modify
  *
  * @return string        the new modified html string
- * @access public
  */
 function smarty_modifier_crmDelete($string, $attribute) {
   static $endOfElement = '/>';
@@ -54,4 +53,3 @@ function smarty_modifier_crmDelete($string, $attribute) {
   $pattern = '/' . $attribute . '="([^"]+?)"/';
   return preg_replace($pattern, '', $string);
 }
-

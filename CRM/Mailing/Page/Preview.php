@@ -43,7 +43,7 @@ class CRM_Mailing_Page_Preview extends CRM_Core_Page {
    *
    * @return void
    */
-  function run() {
+  public function run() {
 
     $session = CRM_Core_Session::singleton();
 
@@ -102,4 +102,3 @@ class CRM_Mailing_Page_Preview extends CRM_Core_Page {
     CRM_Utils_System::civiExit();
   }
 }
-

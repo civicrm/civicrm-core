@@ -364,7 +364,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $this->assertEquals($trials, $freq['<h1>Two</h1>']);
   }
 
-  function testEvalMarkup() {
+  public function testEvalMarkup() {
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
       $this->expectNoHttpRequest()

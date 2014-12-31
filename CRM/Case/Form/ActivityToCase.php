@@ -43,9 +43,8 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
    * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_activityId = CRM_Utils_Request::retrieve('activityId', 'Positive', CRM_Core_DAO::$_nullObject);
     if (!$this->_activityId) {
       CRM_Core_Error::fatal('required activity id is missing.');
@@ -60,11 +59,10 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $params = array('id' => $this->_activityId);
 
@@ -94,7 +92,6 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->add('text', 'file_on_case_unclosed_case_id', ts('Select Case'), array('class' => 'huge'), TRUE);
@@ -102,4 +99,3 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
     $this->add('text', 'file_on_case_activity_subject', ts('Subject'), array('size' => 50));
   }
 }
-

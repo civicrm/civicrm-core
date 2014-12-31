@@ -42,9 +42,8 @@ class CRM_Contact_Form_ProfileContact {
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access public
    */
-  static function preProcess(&$form) {
+  public static function preProcess(&$form) {
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
 
@@ -81,7 +80,7 @@ class CRM_Contact_Form_ProfileContact {
    *
    * @static
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     $ufGroup = new CRM_Core_DAO_UFGroup();
     $ufGroup->id = $form->_honoreeProfileId;
     if (!$ufGroup->find(TRUE)) {
@@ -111,7 +110,7 @@ class CRM_Contact_Form_ProfileContact {
   /**
    * @param $form
    */
-  static function postProcess($form) {
+  public static function postProcess($form) {
     $params = $form->_params;
     if (!empty($form->_honor_block_is_active) && !empty($params['soft_credit_type_id'])) {
       $honorId = null;
@@ -157,4 +156,3 @@ class CRM_Contact_Form_ProfileContact {
     }
   }
 }
-

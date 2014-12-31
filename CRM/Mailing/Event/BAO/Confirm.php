@@ -43,7 +43,7 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -55,7 +55,6 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
    * @param string $hash          The hash
    *
    * @return boolean              True on success
-   * @access public
    * @static
    */
   public static function confirm($contact_id, $subscribe_id, $hash) {
@@ -156,4 +155,3 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     return $group->title;
   }
 }
-

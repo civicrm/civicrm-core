@@ -44,9 +44,8 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
 
     //check permission for update.
@@ -58,11 +57,10 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $grantStatus = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'status_id');
     $this->addElement('select', 'status_id', ts('Grant Status'), array('' => '') + $grantStatus);
 
@@ -80,7 +78,6 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -113,4 +110,3 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
     CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/grant/search', 'force=1&qfKey=' . $qfKey));
   }
 }
-

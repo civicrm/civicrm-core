@@ -36,7 +36,7 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCheckDashboardElements() {
+  public function testCheckDashboardElements() {
 
     $this->webtestLogin();
 
@@ -55,7 +55,7 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
    * @param $widgetEnabledSelector
    * @param $widgetTitle
    */
-  function _testAddDashboardElement($widgetConfigureID, $widgetEnabledSelector, $widgetTitle) {
+  public function _testAddDashboardElement($widgetConfigureID, $widgetEnabledSelector, $widgetTitle) {
     // Check if desired widget is already loaded on dashboard and remove it if it is so we can test adding it.
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
@@ -101,7 +101,7 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
    * @param int $widgetConfigureID
    * @param $widgetEnabledSelector
    */
-  function _testRemoveDashboardElement($widgetConfigureID, $widgetEnabledSelector) {
+  public function _testRemoveDashboardElement($widgetConfigureID, $widgetEnabledSelector) {
     $this->click("link=Configure Your Dashboard");
     $this->waitForElementPresent("dashlets-header-col-0");
     $this->mouseDownAt("{$widgetConfigureID}", "");
@@ -129,7 +129,7 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     $this->assertFalse($this->isElementPresent($widgetEnabledSelector));
   }
 
-  function _testActivityDashlet() {
+  public function _testActivityDashlet() {
     // Add an activity that will show up in the widget
     $this->WebtestAddActivity();
     $widgetTitle = "Activities";
@@ -168,4 +168,3 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     $this->_testRemoveDashboardElement($widgetConfigureID, $widgetEnabledSelector);
   }
 }
-

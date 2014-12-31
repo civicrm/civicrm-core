@@ -8,11 +8,11 @@ require_once 'CiviTest/Custom.php';
  */
 class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function testCreateCustomfield() {
+  public function testCreateCustomfield() {
     $customGroup = Custom::createGroup(array(), 'Individual');
     $fields = array(
       'label' => 'testFld',
@@ -45,7 +45,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     Custom::deleteGroup($customGroup);
   }
 
-  function testCreateCustomfieldColumnName() {
+  public function testCreateCustomfieldColumnName() {
     $customGroup = Custom::createGroup(array(), 'Individual');
     $fields = array(
       'label' => 'testFld 2',
@@ -65,7 +65,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     Custom::deleteGroup($customGroup);
   }
 
-  function testCreateCustomfieldName() {
+  public function testCreateCustomfieldName() {
     $customGroup = Custom::createGroup(array(), 'Individual');
     $fields = array(
       'label' => 'testFld 2',
@@ -86,7 +86,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
   }
 
 
-  function testGetFields() {
+  public function testGetFields() {
     $customGroup = Custom::createGroup(array(), 'Individual');
     $fields = array(
       'label' => 'testFld1',
@@ -119,7 +119,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     Custom::deleteGroup($customGroup);
   }
 
-  function testGetDisplayedValues() {
+  public function testGetDisplayedValues() {
     $customGroup = Custom::createGroup(array(), 'Individual');
     $fields = array(
       'label' => 'testCountryFld1',
@@ -146,7 +146,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     Custom::deleteGroup($customGroup);
   }
 
-  function testDeleteCustomfield() {
+  public function testDeleteCustomfield() {
     $customGroup = Custom::createGroup(array(), 'Individual');
     $fields = array(
       'groupId' => $customGroup->id,
@@ -168,7 +168,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
    * Move a custom field from $groupA to $groupB. Make sure that data records are
    * correctly matched and created.
    */
-  function testMoveField() {
+  public function testMoveField() {
     $countriesByName = array_flip(CRM_Core_PseudoConstant::country(FALSE, FALSE));
     $this->assertTrue($countriesByName['Andorra'] > 0);
     $groups = array(
@@ -288,5 +288,3 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     Custom::deleteGroup($groups['B']);
   }
 }
-
-

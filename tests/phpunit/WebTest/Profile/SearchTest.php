@@ -35,7 +35,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testSearchProfile() {
+  public function testSearchProfile() {
     $this->webtestLogin();
 
     // enable county field

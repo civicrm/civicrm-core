@@ -8,10 +8,10 @@ require_once 'CRM/Utils/DeprecatedUtils.php';
  */
 class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
-  function tearDown() {
+  public function tearDown() {
     // truncate a few tables
     $tablesToTruncate = array(
         'civicrm_contact',
@@ -25,7 +25,7 @@ class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
   /**
    *  Test civicrm_contact_check_params with no contact type
    */
-  function testCheckParamsWithNoContactType() {
+  public function testCheckParamsWithNoContactType() {
     $params = array('foo' => 'bar');
     $contact = _civicrm_api3_deprecated_contact_check_params($params, FALSE);
     $this->assertEquals(1, $contact['is_error'], "In line " . __LINE__);
@@ -35,7 +35,7 @@ class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
   /**
    *  Test civicrm_contact_check_params with a duplicate
    */
-  function testCheckParamsWithDuplicateContact() {
+  public function testCheckParamsWithDuplicateContact() {
     //  Insert a row in civicrm_contact creating individual contact
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
@@ -67,7 +67,7 @@ class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
    *  Test civicrm_contact_check_params with a duplicate
    *  and request the error in array format
    */
-  function testCheckParamsWithDuplicateContact2() {
+  public function testCheckParamsWithDuplicateContact2() {
     //  Insert a row in civicrm_contact creating individual contact
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
@@ -97,7 +97,7 @@ class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
    *  Test civicrm_contact_check_params with check for required
    *  params and no params
    */
-  function testCheckParamsWithNoParams() {
+  public function testCheckParamsWithNoParams() {
     $params = array();
     $contact = _civicrm_api3_deprecated_contact_check_params($params, FALSE);
     $this->assertEquals(1, $contact['is_error'], "In line " . __LINE__);

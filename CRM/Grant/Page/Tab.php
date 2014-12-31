@@ -53,7 +53,6 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
    * This function is called when action is browse
    *
    * return null
-   * @access public
    */ function browse() {
     $controller = new CRM_Core_Controller_Simple('CRM_Grant_Form_Search', ts('Grants'), $this->_action);
     $controller->setEmbedded(TRUE);
@@ -74,9 +73,8 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
    * This function is called when action is view
    *
    * return null
-   * @access public
    */
-  function view() {
+  public function view() {
     $controller = new CRM_Core_Controller_Simple('CRM_Grant_Form_GrantView', 'View Grant', $this->_action);
     $controller->setEmbedded(TRUE);
     $controller->set('id', $this->_id);
@@ -89,9 +87,8 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
    * This function is called when action is update or new
    *
    * return null
-   * @access public
    */
-  function edit() {
+  public function edit() {
     $controller = new CRM_Core_Controller_Simple('CRM_Grant_Form_Grant', 'Create grant', $this->_action);
     $controller->setEmbedded(TRUE);
     $controller->set('id', $this->_id);
@@ -104,9 +101,8 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $context       = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id     = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -137,9 +133,8 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
    * it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $this->setContext();
@@ -156,7 +151,7 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
     return parent::run();
   }
 
-  function setContext() {
+  public function setContext() {
     $context   = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->_id = CRM_Utils_Request::retrieve('id', 'Integer', $this);
     $session   = CRM_Core_Session::singleton();
@@ -212,4 +207,3 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
     }
   }
 }
-

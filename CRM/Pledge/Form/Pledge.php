@@ -44,7 +44,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * The id of the pledge that we are proceessing
    *
    * @var int
-   * @public
    */
   public $_id;
 
@@ -52,25 +51,21 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * The id of the contact associated with this pledge
    *
    * @var int
-   * @public
    */
   public $_contactID;
 
   /**
    * The Pledge values if an existing pledge
-   * @public
    */
   public $_values;
 
   /**
    * The Pledge frequency Units
-   * @public
    */
   public $_freqUnits;
 
   /**
    * Is current pledge pending.
-   * @public
    */
   public $_isPending = FALSE;
 
@@ -78,7 +73,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
@@ -135,11 +129,10 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * Set default values for the form.
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = $this->_values;
 
     $fields = array();
@@ -222,7 +215,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -454,10 +446,9 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    *
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
 
     if ($fields['amount'] <= 0) {
@@ -483,7 +474,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -662,4 +652,3 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
   }
 }
-

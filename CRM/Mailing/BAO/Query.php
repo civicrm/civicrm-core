@@ -38,7 +38,7 @@ class CRM_Mailing_BAO_Query {
   /**
    * @return array|null
    */
-  static function &getFields() {
+  public static function &getFields() {
     if (!self::$_mailingFields) {
       self::$_mailingFields = array();
       $_mailingFields['mailing_id'] = array(
@@ -56,9 +56,8 @@ class CRM_Mailing_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
-  static function select(&$query) {
+  public static function select(&$query) {
     // if Mailing mode add mailing id
     if ($query->_mode & CRM_Contact_BAO_Query::MODE_MAILING) {
       $query->_select['mailing_id'] = "civicrm_mailing.id as mailing_id";
@@ -128,7 +127,7 @@ class CRM_Mailing_BAO_Query {
   /**
    * @param $query
    */
-  static function where(&$query) {
+  public static function where(&$query) {
     $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
       if (empty($query->_params[$id][0])) {
@@ -151,7 +150,7 @@ class CRM_Mailing_BAO_Query {
    *
    * @return null|string
    */
-  static function from($name, $mode, $side) {
+  public static function from($name, $mode, $side) {
     $from = NULL;
 
     switch ($name) {
@@ -226,7 +225,7 @@ class CRM_Mailing_BAO_Query {
    * @param $values
    * @param $query
    */
-  static function whereClauseSingle(&$values, &$query) {
+  public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
     $fields = array();
@@ -377,13 +376,12 @@ class CRM_Mailing_BAO_Query {
   /**
    * Add all the elements shared between Mailing search and advnaced search
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @return void
    * @static
    */
-  static function buildSearchForm(&$form) {
+  public static function buildSearchForm(&$form) {
     // mailing selectors
     $mailings = CRM_Mailing_BAO_Mailing::getMailingsList();
 
@@ -429,12 +427,12 @@ class CRM_Mailing_BAO_Query {
    * @param $row
    * @param int $id
    */
-  static function searchAction(&$row, $id) {}
+  public static function searchAction(&$row, $id) {}
 
   /**
    * @param $tables
    */
-  static function tableNames(&$tables) {
+  public static function tableNames(&$tables) {
   }
 
   /**
@@ -450,7 +448,7 @@ class CRM_Mailing_BAO_Query {
    *
    * @return void
    */
-  static function mailingEventQueryBuilder(&$query, &$values, $tableName, $fieldName, $fieldTitle, &$valueTitles) {
+  public static function mailingEventQueryBuilder(&$query, &$values, $tableName, $fieldName, $fieldTitle, &$valueTitles) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
     if (empty($value) || $value == 'A') {
@@ -480,4 +478,3 @@ class CRM_Mailing_BAO_Query {
     $query->_tables[$tableName] = $query->_whereTables[$tableName] = 1;
   }
 }
-

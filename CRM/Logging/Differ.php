@@ -43,7 +43,7 @@ class CRM_Logging_Differ {
    * @param $log_date
    * @param string $interval
    */
-  function __construct($log_conn_id, $log_date, $interval = '10 SECOND') {
+  public function __construct($log_conn_id, $log_date, $interval = '10 SECOND') {
     $dsn               = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
     $this->db          = $dsn['database'];
     $this->log_conn_id = $log_conn_id;
@@ -56,7 +56,7 @@ class CRM_Logging_Differ {
    *
    * @return array
    */
-  function diffsInTables($tables) {
+  public function diffsInTables($tables) {
     $diffs = array();
     foreach ($tables as $table) {
       $diff = $this->diffsInTable($table);
@@ -73,7 +73,7 @@ class CRM_Logging_Differ {
    *
    * @return array
    */
-  function diffsInTable($table, $contactID = null) {
+  public function diffsInTable($table, $contactID = null) {
     $diffs = array();
 
     $params = array(
@@ -244,7 +244,7 @@ WHERE lt.log_conn_id = %1 AND
    *
    * @return array
    */
-  function titlesAndValuesForTable($table) {
+  public function titlesAndValuesForTable($table) {
     // static caches for subsequent calls with the same $table
     static $titles = array();
     static $values = array();
@@ -393,4 +393,3 @@ ORDER BY log_date
     return array($titles, $values);
   }
 }
-

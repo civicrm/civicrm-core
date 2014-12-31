@@ -59,7 +59,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    * Pre-process
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
@@ -118,11 +117,10 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    * Set default values for the form.
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
 
     if (!isset($defaults['weight']) || !$defaults['weight']) {
@@ -146,7 +144,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -328,10 +325,9 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    * @param array $self   current form object.
    *
    * @return array array of errors / empty array.
-   * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     if ($self->_gName == 'case_status' && empty($fields['grouping'])) {
       $errors['grouping'] = ts('Status class is a required field');
@@ -370,7 +366,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

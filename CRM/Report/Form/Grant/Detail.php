@@ -47,7 +47,7 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -212,7 +212,7 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function select() {
+  public function select() {
     $select = array();
 
     $this->_columnHeaders = array();
@@ -238,7 +238,7 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
         FROM civicrm_grant {$this->_aliases['civicrm_grant']}
                         LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
@@ -252,7 +252,7 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
     }
   }
 
-  function where() {
+  public function where() {
     $clauses = array();
     $this->_where = '';
     foreach ($this->_columns as $tableName => $table) {
@@ -289,7 +289,7 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = "";
     if (!empty($this->_params['group_bys']) &&
       is_array($this->_params['group_bys']) &&
@@ -317,7 +317,7 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
@@ -364,4 +364,3 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
     }
   }
 }
-

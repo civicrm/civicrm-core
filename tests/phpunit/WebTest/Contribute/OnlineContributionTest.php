@@ -35,7 +35,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testOnlineContributionAdd() {
+  public function testOnlineContributionAdd() {
     $this->webtestLogin();
 
     // Use default payment processor
@@ -178,7 +178,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
 
     }
 
-  function testOnlineContributionWithZeroAmount () {
+  public function testOnlineContributionWithZeroAmount () {
     $this->webtestLogin();
 
     // Use default payment processor
@@ -255,7 +255,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
    * @param int $pageId
    * @param bool $priceSet
    */
-  function _doContributionAndVerifyData($pageId, $priceSet = FALSE) {
+  public function _doContributionAndVerifyData($pageId, $priceSet = FALSE) {
     //logout
     $this->webtestLogout();
     $amountLabel = 'Total Amount';
@@ -316,4 +316,3 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($expected);
   }
 }
-

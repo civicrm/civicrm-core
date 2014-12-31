@@ -37,7 +37,7 @@ class CRM_Report_Form_Contribute_LoggingDetail extends CRM_Logging_ReportDetail 
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $logging        = new CRM_Logging_Schema;
     $this->tables[] = 'civicrm_contribution';
     $this->tables   = array_merge($this->tables, array_keys($logging->customDataLogTables()));
@@ -48,11 +48,10 @@ class CRM_Report_Form_Contribute_LoggingDetail extends CRM_Logging_ReportDetail 
     parent::__construct();
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
 
     // link back to summary report
     $this->assign('backURL', CRM_Report_Utils_Report::getNextUrl('logging/contribute/summary', 'reset=1', FALSE, TRUE));
   }
 }
-

@@ -49,10 +49,9 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
    *
    * @return void
    *
-   * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     $flag = FALSE;
     $gid = $this->get('id');
     $this->set('gid', $gid);
@@ -129,7 +128,6 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();

@@ -43,9 +43,8 @@ class CRM_Contact_Form_Task_Merge extends CRM_Contact_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
     $statusMsg = NULL;
     $contactIds = array();
@@ -91,4 +90,3 @@ class CRM_Contact_Form_Task_Merge extends CRM_Contact_Form_Task {
     CRM_Utils_System::redirect($url);
   }
 }
-

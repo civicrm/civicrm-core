@@ -49,7 +49,6 @@ class CRM_Badge_BAO_Badge {
    * @param   array $layoutInfo   associated array which contains meta data about format/layout
    *
    * @return  void
-   * @access  public
    */
   public function createLabels(&$participants, &$layoutInfo) {
     $this->pdf = new CRM_Utils_PDF_Label($layoutInfo['format'], 'mm');
@@ -81,7 +80,7 @@ class CRM_Badge_BAO_Badge {
    *
    * @return array $formattedRow row with meta data
    */
-  static function formatLabel(&$row, &$layout) {
+  public static function formatLabel(&$row, &$layout) {
     $formattedRow = array('labelFormat' => $layout['label_format_name']);
     $formattedRow['labelTitle'] = $layout['title'];
     $formattedRow['labelId'] = $layout['id'];
@@ -356,9 +355,8 @@ class CRM_Badge_BAO_Badge {
    * @param null $h
    *
    * @return void
-   * @access public
    */
-  function printImage($img, $x = '', $y = '', $w = NULL, $h = NULL) {
+  public function printImage($img, $x = '', $y = '', $w = NULL, $h = NULL) {
     if (!$x) {
       $x = $this->pdf->GetAbsX();
     }
@@ -385,7 +383,7 @@ class CRM_Badge_BAO_Badge {
    *
    * @return array
    */
-  static function getImageProperties($img, $imgRes = 300, $w = NULL, $h = NULL) {
+  public static function getImageProperties($img, $imgRes = 300, $w = NULL, $h = NULL) {
     $imgsize = getimagesize($img);
     $f = $imgRes / 25.4;
     $w = !empty($w) ? $w : $imgsize[0] / $f;
@@ -400,7 +398,6 @@ class CRM_Badge_BAO_Badge {
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access public
    * @static
    */
   public static function buildBadges(&$params, &$form) {
@@ -485,4 +482,3 @@ class CRM_Badge_BAO_Badge {
     $eventBadgeClass->createLabels($rows, $layoutInfo);
   }
 }
-

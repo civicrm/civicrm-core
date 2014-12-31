@@ -53,9 +53,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @paqram string $pageTitle
    *
    * @return void
-   * @access public
    */
-  function setTitle($title, $pageTitle) {
+  public function setTitle($title, $pageTitle) {
     return;
   }
 
@@ -66,9 +65,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    *
    * @return boolean true if yes, else false
    * @static
-   * @access public
    */
-  function checkPermission($str) {
+  public function checkPermission($str) {
     return TRUE;
   }
 
@@ -79,9 +77,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @param string $url
    *
    * @return void
-   * @access public
    */
-  function appendBreadCrumb($title, $url) {
+  public function appendBreadCrumb($title, $url) {
     return;
   }
 
@@ -91,9 +88,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @param string $head the new string to be appended
    *
    * @return void
-   * @access public
    */
-  function addHTMLHead($head) {
+  public function addHTMLHead($head) {
     return;
   }
 
@@ -108,10 +104,9 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @param $fragment string   A fragment identifier (named anchor) to append to the link.
    *
    * @return string            an HTML string containing a link to the given path.
-   * @access public
    *
    */
-  function url($path = NULL, $query = NULL, $absolute = TRUE, $fragment = NULL) {
+  public function url($path = NULL, $query = NULL, $absolute = TRUE, $fragment = NULL) {
     if (isset(self::$ufClass)) {
       $className = self::$ufClass;
       $url = $className::url($path, $query, $absolute, $fragment);
@@ -128,9 +123,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @param the default action if one is pre-specified
    *
    * @return string the url to post the form
-   * @access public
    */
-  function postURL($action) {
+  public function postURL($action) {
     return NULL;
   }
 
@@ -140,9 +134,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @param object $user handle to the user object
    *
    * @return void
-   * @access public
    */
-  function setEmail(&$user) {}
+  public function setEmail(&$user) {}
 
   /**
    * Authenticate a user against the real UF
@@ -151,9 +144,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @param string $pass      Login password
    *
    * @return array            Result array
-   * @access public
    */
-  function &authenticate($name, $pass) {
+  public function &authenticate($name, $pass) {
     if (isset(self::$ufClass)) {
       $className = self::$ufClass;
       $result =& $className::authenticate($name, $pass);
@@ -167,7 +159,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   /**
    * Swap the current UF for soap
    *
-   * @access public
    */
   public function swapUF() {
     $config = CRM_Core_Config::singleton();
@@ -184,7 +175,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    *
    * @return null  as the language is set elsewhere
    */
-  function getUFLocale() {
+  public function getUFLocale() {
     return NULL;
   }
 
@@ -201,4 +192,3 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
     throw new Exception("Method not implemented: getLoginURL");
   }
 }
-

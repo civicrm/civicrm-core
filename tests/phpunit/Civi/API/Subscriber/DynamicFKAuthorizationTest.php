@@ -103,7 +103,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
     \CRM_Core_DAO_AllCoreTables::init(TRUE);
   }
 
-  function okDataProvider() {
+  public function okDataProvider() {
     $cases = array();
 
     $cases[] = array('Widget', 'create', array('id' => self::WIDGET_ID));
@@ -121,7 +121,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
     return $cases;
   }
 
-  function badDataProvider() {
+  public function badDataProvider() {
     $cases = array();
 
     $cases[] = array('Forbidden', 'create', array('id' => self::FORBIDDEN_ID), '/Authorization failed/');
@@ -161,7 +161,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
    * @param $params
    * @dataProvider okDataProvider
    */
-  function testOk($entity, $action, $params) {
+  public function testOk($entity, $action, $params) {
     $params['version'] = 3;
     $params['debug'] = 1;
     $params['check_permissions'] = 1;
@@ -180,7 +180,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
    * @param $params
    * @dataProvider badDataProvider
    */
-  function testBad($entity, $action, $params, $expectedError) {
+  public function testBad($entity, $action, $params, $expectedError) {
     $params['version'] = 3;
     $params['debug'] = 1;
     $params['check_permissions'] = 1;

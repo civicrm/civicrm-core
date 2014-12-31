@@ -9,7 +9,7 @@ class PHPUnitScanner {
   /**
    * @return array<string> class names
    */
-  static function _findTestClasses($path) {
+  public static function _findTestClasses($path) {
 //    print_r(array(
 //      'loading' => $path,
 //      get_included_files()
@@ -28,7 +28,7 @@ class PHPUnitScanner {
   /**
    * @return array (string $file => string $class)
    */
-  static function findTestClasses($paths) {
+  public static function findTestClasses($paths) {
     $testClasses = array();
     $finder = new Finder();
 
@@ -71,7 +71,7 @@ class PHPUnitScanner {
    *   - class: string
    *   - method: string
    */
-  static function findTestsByPath($paths) {
+  public static function findTestsByPath($paths) {
     $r = array();
     $testClasses = self::findTestClasses($paths);
     foreach ($testClasses as $testFile => $testClass) {

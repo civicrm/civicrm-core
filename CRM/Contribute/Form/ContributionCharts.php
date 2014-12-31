@@ -48,7 +48,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
    */
   protected $_chartType = NULL;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_year = CRM_Utils_Request::retrieve('year', 'Int', $this);
     $this->_chartType = CRM_Utils_Request::retrieve('type', 'String', $this);
 
@@ -64,7 +64,6 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
@@ -101,7 +100,6 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -244,4 +242,3 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
     $this->assign('openFlashChartData', json_encode($chartData));
   }
 }
-

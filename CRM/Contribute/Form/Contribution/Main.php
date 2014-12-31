@@ -69,7 +69,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
@@ -188,12 +187,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * Set the default values
    *
    * @return void
-   * @access public
    */
   /**
    *
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     // check if the user is registered and we have a contact ID
     $contactID = $this->getContactID();
 
@@ -377,7 +375,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // build profiles first so that we can determine address fields etc
@@ -630,9 +627,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    * Build elements to enable pay on behalf of an organization.
    *
-   * @access public
    */
-  function buildOnBehalfOrganization() {
+  public function buildOnBehalfOrganization() {
     if ($this->_membershipContactID) {
       $entityBlock = array('contact_id' => $this->_membershipContactID);
       CRM_Core_BAO_Location::getValues($entityBlock, $this->_defaults);
@@ -652,7 +648,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    * Build elements to collect information for recurring contributions
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    */
@@ -731,10 +726,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     $amount = self::computeAmount($fields, $self);
 
@@ -1129,7 +1123,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -1392,7 +1385,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * @param CRM_Contribute_Form_Contribution_Main|CRM_Event_Form_Registration_Register $form
    * @param bool $noFees
    */
-  static function preProcessPaymentOptions(&$form, $noFees = FALSE) {
+  public static function preProcessPaymentOptions(&$form, $noFees = FALSE) {
     $form->_snippet = CRM_Utils_Array::value('snippet', $_GET);
 
     $form->_paymentProcessors = $noFees ? array() : $form->get('paymentProcessors');
@@ -1447,4 +1440,3 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $form->assign('paymentProcessorID', $form->_paymentProcessorID);
   }
 }
-

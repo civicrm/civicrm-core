@@ -50,7 +50,7 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
    */
   protected $_group = NULL;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_id = $this->get('id');
     $this->_group = CRM_Utils_Request::retrieve('group', 'String', $this, FALSE, 'label_format');
     $this->_values = array();
@@ -64,7 +64,6 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -156,7 +155,7 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
   /**
    * @return int
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['weight'] = CRM_Utils_Array::value('weight', CRM_Core_BAO_LabelFormat::getDefaultValues($this->_group), 0);
     }
@@ -182,7 +181,6 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

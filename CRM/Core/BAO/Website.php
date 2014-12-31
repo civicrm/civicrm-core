@@ -44,10 +44,9 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return object       CRM_Core_BAO_Website object on success, null otherwise
-   * @access public
    * @static
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Website', CRM_Utils_Array::value('id', $params), $params);
 
@@ -68,10 +67,9 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param $skipDelete
    *
    * @return void
-   * @access public
    * @static
    */
-  static function create(&$params, $contactID, $skipDelete) {
+  public static function create(&$params, $contactID, $skipDelete) {
     if (empty($params)) {
       return FALSE;
     }
@@ -118,7 +116,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @return void
    * @static
    */
-  static function del($ids) {
+  public static function del($ids) {
     $query = 'DELETE FROM civicrm_website WHERE id IN ( ' . implode(',', $ids) . ')';
     CRM_Core_DAO::executeQuery($query);
     // FIXME: we should return false if the del was unsuccessful
@@ -133,10 +131,9 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param $values
    *
    * @return boolean
-   * @access public
    * @static
    */
-  static function &getValues(&$params, &$values) {
+  public static function &getValues(&$params, &$values) {
     $websites            = array();
     $website             = new CRM_Core_DAO_Website();
     $website->contact_id = $params['contact_id'];
@@ -162,10 +159,9 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param bool $updateBlankLocInfo
    *
    * @return array  the array of website details
-   * @access public
    * @static
    */
-  static function allWebsites($id, $updateBlankLocInfo = FALSE) {
+  public static function allWebsites($id, $updateBlankLocInfo = FALSE) {
     if (!$id) {
       return NULL;
     }
@@ -195,4 +191,3 @@ SELECT  id, website_type_id
     return $websites;
   }
 }
-

@@ -42,7 +42,6 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     //when user come from search context.
@@ -59,11 +58,10 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $count = $this->get('count');
     $this->assign('count', $count);
   }
@@ -177,9 +175,8 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
    * @param array $self an current this object
    *
    * @return boolean          true on successful SMTP handoff
-   * @access public
    */
-  static function testMail($testParams, $files, $self) {
+  public static function testMail($testParams, $files, $self) {
     $error = NULL;
 
     $urlString = 'civicrm/mailing/send';
@@ -374,7 +371,6 @@ ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
   /**
    * Display Name of the form
    *
-   * @access public
    *
    * @return string
    */
@@ -386,4 +382,3 @@ ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
   }
 
 }
-

@@ -59,10 +59,9 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @throws CRM_Core_Exception
    *
    * @return CRM_Case_BAO_CaseType object
-   * @access public
    * @static
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $caseTypeDAO = new CRM_Case_DAO_CaseType();
 
     // form the name only if missing: CRM-627
@@ -104,9 +103,8 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @param array $definition the case-type defintion expressed as an array-tree
    * @return string XML
    * @static
-   * @access public
    */
-  static function convertDefinitionToXML($name, $definition) {
+  public static function convertDefinitionToXML($name, $definition) {
     $xmlFile = '<?xml version="1.0" encoding="utf-8" ?>' . "\n\n<CaseType>\n";
     $xmlFile .= "<name>{$name}</name>\n";
 
@@ -186,7 +184,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @return array the definition of the case-type, expressed as PHP array-tree
    * @static
    */
-  static function convertXmlToDefinition($xml) {
+  public static function convertXmlToDefinition($xml) {
     // build PHP array based on definition
     $definition = array();
 
@@ -246,10 +244,9 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @param array $values output values of the object
    *
    * @return CRM_Case_BAO_CaseType|null the found object or null
-   * @access public
    * @static
    */
-  static function &getValues(&$params, &$values) {
+  public static function &getValues(&$params, &$values) {
     $caseType = new CRM_Case_BAO_CaseType();
 
     $caseType->copyValues($params);
@@ -267,10 +264,9 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @return CRM_Case_BAO_CaseType object
-   * @access public
    * @static
    */
-  static function &create(&$params) {
+  public static function &create(&$params) {
     $transaction = new CRM_Core_Transaction();
 
     if (!empty($params['id'])) {
@@ -310,10 +306,9 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    *                        in a hierarchical manner
    *
    * @return CRM_Case_BAO_CaseType object
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $caseType = CRM_Case_BAO_CaseType::getValues($params, $defaults);
     return $caseType;
   }
@@ -324,7 +319,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @throws CRM_Core_Exception
    * @return mixed
    */
-  static function del($caseTypeId) {
+  public static function del($caseTypeId) {
     $caseType = new CRM_Case_DAO_CaseType();
     $caseType->id = $caseTypeId;
     $refCounts = $caseType->getReferenceCounts();
@@ -343,7 +338,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @param string $caseType
    * @return bool
    */
-  static function isValidName($caseType) {
+  public static function isValidName($caseType) {
     return preg_match('/^[a-zA-Z0-9_]+$/',  $caseType);
   }
 
@@ -353,7 +348,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @param int $caseTypeId
    * @return bool|null TRUE if there are *both* DB and file-based definitions
    */
-  static function isForked($caseTypeId) {
+  public static function isForked($caseTypeId) {
     $caseTypeName = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseTypeId, 'name', 'id', TRUE);
     if ($caseTypeName) {
       $dbDefinition = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseTypeId, 'definition', 'id', TRUE);
@@ -369,7 +364,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @param int $caseTypeId
    * @return bool TRUE if the definition can be modified
    */
-  static function isForkable($caseTypeId) {
+  public static function isForkable($caseTypeId) {
     $caseTypeName = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseTypeId, 'name', 'id', TRUE);
     if ($caseTypeName) {
       // if file-based definition explicitly disables "forkable" option, then don't allow changes to definition

@@ -37,7 +37,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -52,10 +52,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Contact_BAO_Group object
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $group = new CRM_Contact_DAO_Group();
     $group->copyValues($params);
     if ($group->find(TRUE)) {
@@ -73,11 +72,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param int $id group id
    *
    * @return null
-   * @access public
    * @static
    *
    */
-  static function discard($id) {
+  public static function discard($id) {
     CRM_Utils_Hook::pre('delete', 'Group', $id, CRM_Core_DAO::$_nullArray);
 
     $transaction = new CRM_Core_Transaction();
@@ -145,7 +143,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * Returns an array of the contacts in the given group.
    *
    */
-  static function getGroupContacts($id) {
+  public static function getGroupContacts($id) {
     $params = array(array('group', 'IN', array($id => 1), 0, 0));
     list($contacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, array('contact_id'));
     return $contacts;
@@ -160,9 +158,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param bool $countChildGroups
    *
    * @return int count of members in the group with above status
-   * @access public
    */
-  static function memberCount($id, $status = 'Added', $countChildGroups = FALSE) {
+  public static function memberCount($id, $status = 'Added', $countChildGroups = FALSE) {
     $groupContact = new CRM_Contact_DAO_GroupContact();
     $groupIds = array($id);
     if ($countChildGroups) {
@@ -205,10 +202,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param bool $useCache
    *
    * @return array $aMembers this array contains the list of members for this group id
-   * @access public
    * @static
    */
-  static function &getMember($groupID, $useCache = TRUE) {
+  public static function &getMember($groupID, $useCache = TRUE) {
     $params = array(array('group', 'IN', array($groupID => 1), 0, 0));
     $returnProperties = array('contact_id');
     list($contacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, 0, $useCache);
@@ -234,7 +230,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @return array of group objects.
    *
-   * @access public
    *
    * @todo other BAO functions that use returnProperties (e.g. Query Objects) receive the array flipped & filled with 1s and
    * add in essential fields (e.g. id). This should follow a regular pattern like the others
@@ -308,10 +303,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param int $id   the id of the object
    *
    * @return string   the permission that the user has (or null)
-   * @access public
    * @static
    */
-  static function checkPermission($id) {
+  public static function checkPermission($id) {
     $allGroups = CRM_Core_PseudoConstant::allGroup();
 
     $permissions = NULL;
@@ -347,7 +341,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $params     Associative array of parameters
    *
    * @return object|null      The new group BAO (if created)
-   * @access public
    * @static
    */
   public static function &create(&$params) {
@@ -506,7 +499,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * Given a saved search compute the clause and the tables
    * and store it for future use
    */
-  function buildClause() {
+  public function buildClause() {
     $params = array(array('group', 'IN', array($this->id => 1), 0, 0));
 
     if (!empty($params)) {
@@ -529,7 +522,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $params     Associative array of parameters
    *
    * @return object|null      The new group BAO (if created)
-   * @access public
    * @static
    */
   public static function createSmartGroup(&$params) {
@@ -560,7 +552,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @return Object             DAO object on sucess, null otherwise
    * @static
    */
-  static function setIsActive($id, $isActive) {
+  public static function setIsActive($id, $isActive) {
     return CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Group', $id, 'is_active', $isActive);
   }
 
@@ -573,7 +565,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @return string $condition
    * @static
    */
-  static function groupTypeCondition($groupType = NULL, $excludeHidden = TRUE) {
+  public static function groupTypeCondition($groupType = NULL, $excludeHidden = TRUE) {
     $value = NULL;
     if ($groupType == 'Mailing') {
       $value = CRM_Core_DAO::VALUE_SEPARATOR . '2' . CRM_Core_DAO::VALUE_SEPARATOR;
@@ -643,10 +635,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param  array $params ( reference ) an assoc array of name/value pairs
    *
    * @return array ( smartGroupId, ssId ) smart group id and saved search id
-   * @access public
    * @static
    */
-  static function createHiddenSmartGroup($params) {
+  public static function createHiddenSmartGroup($params) {
     $ssId = CRM_Utils_Array::value('saved_search_id', $params);
 
     //add mapping record only for search builder saved search
@@ -717,7 +708,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *  -page= offset
    *  @todo there seems little reason for the small number of functions that call this to pass in
    *  params that then need to be translated in this function since they are coding them when calling
-   * @access public
    */
   static public function getGroupListSelector(&$params) {
     // format the params
@@ -782,9 +772,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param  array $params associated array for params
    *
    * @return array
-   * @access public
    */
-  static function getGroupList(&$params) {
+  public static function getGroupList(&$params) {
     $config = CRM_Core_Config::singleton();
 
     $whereClause = self::whereClause($params, FALSE);
@@ -989,7 +978,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param bool $titleOnly
    *
    * @return array
-   * @access public
    */
   static function getGroupsHierarchy(
     $groupIDs,
@@ -1119,7 +1107,7 @@ WHERE  id IN $groupIdString
    *
    * @return null|string
    */
-  static function getGroupCount(&$params) {
+  public static function getGroupCount(&$params) {
     $whereClause = self::whereClause($params, FALSE);
     $query = "SELECT COUNT(*) FROM civicrm_group groups";
 
@@ -1141,7 +1129,7 @@ WHERE {$whereClause}";
    *
    * @return string
    */
-  static function whereClause(&$params, $sortBy = TRUE, $excludeHidden = TRUE) {
+  public static function whereClause(&$params, $sortBy = TRUE, $excludeHidden = TRUE) {
     $values = array();
     $title = CRM_Utils_Array::value('title', $params);
     if ($title) {
@@ -1229,9 +1217,8 @@ WHERE {$whereClause}";
    * Define action links
    *
    * @return array $links array of action links
-   * @access public
    */
-  static function actionLinks() {
+  public static function actionLinks() {
     $links = array(
       CRM_Core_Action::VIEW => array(
         'name' => ts('Contacts'),
@@ -1272,7 +1259,7 @@ WHERE {$whereClause}";
    *
    * @return string
    */
-  function pagerAtoZ($whereClause, $whereParams) {
+  public function pagerAtoZ($whereClause, $whereParams) {
     $query = "
         SELECT DISTINCT UPPER(LEFT(groups.title, 1)) as sort_name
         FROM  civicrm_group groups
@@ -1284,4 +1271,3 @@ WHERE {$whereClause}";
     return CRM_Utils_PagerAToZ::getAToZBar($dao, $this->_sortByCharacter, TRUE);
   }
 }
-

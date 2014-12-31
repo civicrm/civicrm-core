@@ -40,7 +40,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->is_drupal = FALSE;
     $this->supports_form_extensions = False;
   }
@@ -54,13 +54,12 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @paqram string $pageTitle
    *
    * @return void
-   * @access public
    */
   /**
    * @param string $title
    * @param null $pageTitle
    */
-  function setTitle($title, $pageTitle = NULL) {
+  public function setTitle($title, $pageTitle = NULL) {
     return;
   }
 
@@ -75,7 +74,6 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @return mixed false if no auth
    *               array(
    *  contactID, ufID, unique string ) if success
-   * @access public
    */
   /**
    * @param string $name
@@ -85,7 +83,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    *
    * @return mixed
    */
-  static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
+  public static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     $retVal = array(1, 1, 12345);
     return $retVal;
   }
@@ -99,16 +97,15 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @internal param string $url
    *
    * @return void
-   * @access public
    */
   /**
    * @param $breadCrumbs
    */
-  function appendBreadCrumb($breadCrumbs) {
+  public function appendBreadCrumb($breadCrumbs) {
     return;
   }
 
-  function resetBreadCrumb() {
+  public function resetBreadCrumb() {
     return;
   }
 
@@ -118,16 +115,15 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @param string $header the new string to be appended
    *
    * @return void
-   * @access public
    */
   /**
    * @param string $head
    */
-  function addHTMLHead($head) {
+  public function addHTMLHead($head) {
     return;
   }
 
-  function mapConfigToSSL() {
+  public function mapConfigToSSL() {
     global $base_url;
     $base_url = str_replace('http://', 'https://', $base_url);
   }
@@ -138,14 +134,13 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @param mix $action the default action if one is pre-specified
    *
    * @return string the url to post the form
-   * @access public
    */
   /**
    * @param mix $action
    *
    * @return string
    */
-  function postURL($action) {
+  public function postURL($action) {
     return;
   }
 
@@ -163,7 +158,6 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @param $forceBackend boolean  a gross joomla hack
    *
    * @return string an HTML string containing a link to the given path.
-   * @access public
    *
    */
   /**
@@ -237,7 +231,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   /**
    * @param $user
    */
-  function getUserID($user) {
+  public function getUserID($user) {
     //FIXME: look here a bit closer when testing UFMatch
 
     // this puts the appropriate values in the session, so
@@ -250,7 +244,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    *
    * @return bool
    */
-  function getAllowedToLogin($user) {
+  public function getAllowedToLogin($user) {
     return TRUE;
   }
 
@@ -259,20 +253,19 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    *
    * @param string $message the message to set
    *
-   * @access public
    */
   /**
    * @param string $message
    */
-  function setMessage($message) {
+  public function setMessage($message) {
     return;
   }
 
-  function permissionDenied() {
+  public function permissionDenied() {
     CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
   }
 
-  function logout() {
+  public function logout() {
     session_destroy();
     header("Location:index.php");
   }
@@ -285,7 +278,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   /**
    * @return string
    */
-  function getUFLocale() {
+  public function getUFLocale() {
     return NULL;
   }
 
@@ -297,7 +290,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   /**
    * @return array
    */
-  function getModules() {
+  public function getModules() {
     return array();
   }
 
@@ -318,14 +311,13 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * Over-ridable function to get timezone as a string eg.
    * @return string Timezone e.g. 'America/Los_Angeles'
    */
-  function getTimeZoneString() {
+  public function getTimeZoneString() {
     // This class extends Drupal, but we don't want Drupal's behavior; reproduce CRM_Utils_System_Base::getTimeZoneString
     return date_default_timezone_get();
   }
 
-  function clearResourceCache() {
+  public function clearResourceCache() {
     // UGH. Obscure Drupal-specific implementation. Why does UnitTests extend Drupal?
     // You should delete this function if the base-classes are properly rearranged.
   }
 }
-

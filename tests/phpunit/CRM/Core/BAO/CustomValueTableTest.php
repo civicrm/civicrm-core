@@ -8,7 +8,7 @@ require_once 'CiviTest/Custom.php';
  */
 class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
@@ -17,7 +17,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
    * Test store function for country
    *
    */
-  function testStoreCountry() {
+  public function testStoreCountry() {
     $params      = array();
     $contactID   = Contact::createIndividual();
     $customGroup = Custom::createGroup($params, 'Individual');
@@ -52,7 +52,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
    * Test store function for file
    *
    */
-  function atestStoreFile() {
+  public function atestStoreFile() {
     $params      = array();
     $contactID   = Contact::createIndividual();
     $customGroup = Custom::createGroup($params, 'Individual');
@@ -87,7 +87,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
    * Test store function for state province
    *
    */
-  function testStoreStateProvince() {
+  public function testStoreStateProvince() {
     $params      = array();
     $contactID   = Contact::createIndividual();
     $customGroup = Custom::createGroup($params, 'Individual');
@@ -121,7 +121,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
    * Test store function for date
    *
    */
-  function testStoreDate() {
+  public function testStoreDate() {
     $params      = array();
     $contactID   = Contact::createIndividual();
     $customGroup = Custom::createGroup($params, 'Individual');
@@ -156,7 +156,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
    * Test store function for rich text editor
    *
    */
-  function testStoreRichTextEditor() {
+  public function testStoreRichTextEditor() {
     $params      = array();
     $contactID   = Contact::createIndividual();
     $customGroup = Custom::createGroup($params, 'Individual');
@@ -191,7 +191,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
    * Test getEntityValues function for stored value
    *
    */
-  function testgetEntityValues() {
+  public function testgetEntityValues() {
 
     $params      = array();
     $contactID   = Contact::createIndividual();
@@ -228,7 +228,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
     Contact::delete($contactID);
   }
 
-  function testCustomGroupMultiple() {
+  public function testCustomGroupMultiple() {
     $params      = array();
     $contactID   = Contact::createIndividual();
     $customGroup = Custom::createGroup($params, 'Individual');
@@ -261,4 +261,3 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
     Contact::delete($contactID);
   }
 }
-

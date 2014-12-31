@@ -37,7 +37,7 @@
  */
 class CRM_Campaign_Page_AJAX {
 
-  static function registerInterview() {
+  public static function registerInterview() {
     $fields = array(
       'result',
       'voter_id',
@@ -104,7 +104,7 @@ class CRM_Campaign_Page_AJAX {
     CRM_Utils_JSON::output($result);
   }
 
-  static function loadOptionGroupDetails() {
+  public static function loadOptionGroupDetails() {
 
     $id       = CRM_Utils_Array::value('option_group_id', $_POST);
     $status   = 'fail';
@@ -144,7 +144,7 @@ class CRM_Campaign_Page_AJAX {
     CRM_Utils_JSON::output($result);
   }
 
-  function voterList() {
+  public function voterList() {
     //get the search criteria params.
     $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
 
@@ -351,7 +351,7 @@ class CRM_Campaign_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 
-  function processVoterData() {
+  public function processVoterData() {
     $status = NULL;
     $operation = CRM_Utils_Type::escape($_POST['operation'], 'String');
     if ($operation == 'release') {
@@ -479,7 +479,7 @@ class CRM_Campaign_Page_AJAX {
     CRM_Utils_JSON::output(array('status' => $status));
   }
 
-  function allActiveCampaigns() {
+  public function allActiveCampaigns() {
     $currentCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns();
     $campaigns        = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
     $options          = array(
@@ -510,7 +510,7 @@ class CRM_Campaign_Page_AJAX {
     CRM_Utils_JSON::output($results);
   }
 
-  function campaignGroups() {
+  public function campaignGroups() {
     $surveyId = CRM_Utils_Request::retrieve('survey_id', 'Positive',
       CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST'
     );
@@ -549,7 +549,7 @@ class CRM_Campaign_Page_AJAX {
    * Retrieve campaigns as for campaign dashboard.
    *
    **/
-  function campaignList() {
+  public function campaignList() {
     //get the search criteria params.
     $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
 
@@ -645,7 +645,7 @@ class CRM_Campaign_Page_AJAX {
    * Retrieve survey for survey dashboard.
    *
    **/
-  function surveyList() {
+  public function surveyList() {
     //get the search criteria params.
     $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
 
@@ -743,7 +743,7 @@ class CRM_Campaign_Page_AJAX {
    * Retrieve petitions for petition dashboard.
    *
    **/
-  function petitionList() {
+  public function petitionList() {
     //get the search criteria params.
     $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
 
@@ -832,4 +832,3 @@ class CRM_Campaign_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 }
-

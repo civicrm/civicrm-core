@@ -37,13 +37,13 @@ require_once 'CiviTest/Participant.php';
  */
 class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->_contactId = Contact::createIndividual();
     $this->_eventId = Event::create($this->_contactId);
   }
 
-  function tearDown() {
+  public function tearDown() {
     $this->eventDelete($this->_eventId);
     $this->quickCleanup(
       array(
@@ -68,7 +68,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
    * @return array
    * @throws Exception
    */
-  function _addParticipantWithPayment($feeTotal, $actualPaidAmt) {
+  public function _addParticipantWithPayment($feeTotal, $actualPaidAmt) {
     // creating price set, price field
     $paramsSet['title'] = 'Price Set';
     $paramsSet['name'] = CRM_Utils_String::titleToVar('Price Set');
@@ -165,7 +165,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
   }
 
   // CRM-13964
-  function testAddPartialPayment() {
+  public function testAddPartialPayment() {
     $feeAmt = 100;
     $amtPaid = 60;
     $balance = $feeAmt - $amtPaid;
@@ -182,4 +182,3 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->assertEquals($contribution->contribution_status_id, 8, 'Status record is not proper for contribution');
   }
 }
-

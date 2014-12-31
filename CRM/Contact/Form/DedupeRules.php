@@ -38,7 +38,7 @@
  *
  */
 class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
-  CONST RULES_COUNT = 5;
+  const RULES_COUNT = 5;
   protected $_contactType;
   protected $_defaults = array();
   protected $_fields = array();
@@ -48,9 +48,8 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    * Pre processing
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     // Ensure user has permission to be here
     if (!CRM_Core_Permission::check('administer dedupe rules')) {
       CRM_Utils_System::permissionDenied();
@@ -98,7 +97,6 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $foo = CRM_Core_DAO::getAttribute('CRM_Dedupe_DAO_Rule', 'title');
@@ -151,9 +149,8 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     if (!empty($fields['is_reserved'])) {
       return TRUE;
@@ -178,21 +175,19 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array
    */
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return $this->_defaults;
   }
 
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -314,4 +309,3 @@ UPDATE civicrm_dedupe_rule_group
     CRM_Core_Session::setStatus(ts("The rule '%1' has been saved.", array(1 => $rgDao->title)), ts('Saved'), 'success');
   }
 }
-

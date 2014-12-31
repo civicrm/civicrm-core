@@ -35,7 +35,7 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
     parent::setUp();
   }
 
-  function testDeceasedContactsAdvanceSearch() {
+  public function testDeceasedContactsAdvanceSearch() {
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -96,7 +96,7 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
    * @param string $groupName
    * @param bool $deceased
    */
-  function _testAddContact($firstName, $lastName, $email, $groupName, $deceased = FALSE) {
+  public function _testAddContact($firstName, $lastName, $email, $groupName, $deceased = FALSE) {
     $this->webtestAddContact($firstName, $lastName, $email);
     if ($deceased) {
       $this->click('link=Edit');
@@ -119,4 +119,3 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
     $this->click('_qf_GroupContact_next');
   }
 }
-

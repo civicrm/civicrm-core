@@ -56,4 +56,3 @@ class CRM_Upgrade_Controller extends CRM_Core_Controller {
     $this->addActions();
   }
 }
-

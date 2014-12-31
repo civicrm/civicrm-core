@@ -46,7 +46,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * The values for the contribution db object
    *
    * @var array
-   * @protected
    */
   public $_values;
 
@@ -54,7 +53,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * The values for the quickconfig for priceset
    *
    * @var boolean
-   * @protected
    */
   public $_quickConfig = NULL;
 
@@ -62,7 +60,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Price Set ID, if the new price set method is used
    *
    * @var int
-   * @protected
    */
   public $_priceSetId;
 
@@ -70,7 +67,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Array of fields for the price set
    *
    * @var array
-   * @protected
    */
   public $_priceSet;
 
@@ -78,7 +74,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * The id of the participation that we are proceessing
    *
    * @var int
-   * @protected
    */
   public $_id;
 
@@ -86,7 +81,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * The id of the note
    *
    * @var int
-   * @protected
    */
   protected $_noteId = NULL;
 
@@ -94,7 +88,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * The id of the contact associated with this participation
    *
    * @var int
-   * @protected
    */
   public $_contactId;
 
@@ -102,7 +95,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Array of event values
    *
    * @var array
-   * @protected
    */
   protected $_event;
 
@@ -201,7 +193,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_showFeeBlock = CRM_Utils_Array::value('eventId', $_GET);
@@ -420,7 +411,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * This function sets the default values for the form in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -594,7 +584,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
@@ -787,11 +776,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Add local and global form rules
    *
-   * @access protected
    *
    * @return void
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Event_Form_Participant', 'formRule'), $this);
   }
 
@@ -804,9 +792,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($values, $files, $self) {
+  public static function formRule($values, $files, $self) {
     // If $values['_qf_Participant_next'] is Delete or
     // $values['event_id'] is empty, then return
     // instead of proceeding further.
@@ -874,7 +861,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Process the form submission
    *
-   * @access public
    */
   public function postProcess() {
     // get the submitted form values.

@@ -112,4 +112,3 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
   }
 
 }
-

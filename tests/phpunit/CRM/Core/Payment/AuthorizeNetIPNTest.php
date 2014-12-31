@@ -14,7 +14,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   protected $_contributionPageID;
   protected $_paymentProcessorID;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->_paymentProcessorID = $this->paymentProcessorCreate(array(
       'payment_processor_type_id' => 'AuthNet',
@@ -29,14 +29,14 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->_contributionPageID = $contributionPage['id'];
   }
 
-  function tearDown() {
+  public function tearDown() {
     $this->quickCleanUpFinancialEntities();
   }
 
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
    */
-  function testIPNPaymentRecurSuccess() {
+  public function testIPNPaymentRecurSuccess() {
     $this->setupRecurringPaymentProcessorTransaction();
     $paypalIPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
     $paypalIPN->main();
@@ -57,7 +57,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
    */
-  function testIPNPaymentMembershipRecurSuccess() {
+  public function testIPNPaymentMembershipRecurSuccess() {
     $this->setupMembershipRecurringPaymentProcessorTransaction();
     $paypalIPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
     $paypalIPN->main();
@@ -80,7 +80,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   /**
    *
    */
-  function getRecurTransaction() {
+  public function getRecurTransaction() {
     return array(
       "x_amount" => "200.00",
       "x_country" => 'US',
@@ -132,7 +132,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  function getRecurSubsequentTransaction() {
+  public function getRecurSubsequentTransaction() {
     return array_merge($this->getRecurTransaction(), array(
       'x_trans_id' => 'second_one',
       'x_MD5_Hash' => 'EA7A3CD65A85757827F51212CA1486A8',

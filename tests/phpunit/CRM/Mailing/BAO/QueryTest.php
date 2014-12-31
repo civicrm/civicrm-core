@@ -14,11 +14,11 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
     return new CRM_Mailing_BAO_QueryTestDataProvider;
   }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function tearDown() {
+  public function tearDown() {
     $tablesToTruncate = array(
       'civicrm_mailing_event_bounce',
       'civicrm_mailing_event_delivered',
@@ -40,7 +40,7 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
    *  Test CRM_Contact_BAO_Query::searchQuery()
    *  @dataProvider dataProvider
    */
-  function testSearch($fv, $count, $ids, $full) {
+  public function testSearch($fv, $count, $ids, $full) {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
@@ -66,4 +66,3 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
     $this->assertEquals($ids, $contacts, 'In line ' . __LINE__);
   }
 }
-

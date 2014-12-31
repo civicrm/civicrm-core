@@ -30,7 +30,7 @@ require_once 'CiviTest/CiviSeleniumTestCase.php';
  * Class WebTest_Contribute_ContributionPageAddTest
  */
 class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
-  function testContributionPageAdd() {
+  public function testContributionPageAdd() {
     // open browser, login
     $this->webtestLogin();
 
@@ -86,7 +86,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
   }
 
   // CRM-12510 Test copy contribution page
-  function testContributionPageCopy() {
+  public function testContributionPageCopy() {
     // open browser, login
     $this->webtestLogin();
 
@@ -144,7 +144,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
   /**
    * Check CRM-7943
    */
-  function testContributionPageSeparatePayment() {
+  public function testContributionPageSeparatePayment() {
     // open browser, login
     $this->webtestLogin();
 
@@ -190,7 +190,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
   /**
    * Check CRM-7949
    */
-  function testContributionPageSeparatePaymentPayLater() {
+  public function testContributionPageSeparatePaymentPayLater() {
     // open browser, login
     $this->webtestLogin();
 
@@ -287,7 +287,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
   /**
    * CRM-12994
    */
-  function testContributionPageAddPremiumRequiredField() {
+  public function testContributionPageAddPremiumRequiredField() {
     // open browser, login
     $this->webtestLogin();
 
@@ -438,4 +438,3 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent($premiumSavedText));
   }
 }
-

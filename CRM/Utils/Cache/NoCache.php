@@ -51,7 +51,7 @@ class CRM_Utils_Cache_NoCache implements CRM_Utils_Cache_Interface {
    *
    * @return \CRM_Utils_Cache_NoCache
    */
-  function __construct($config) {
+  public function __construct($config) {
   }
 
   /**
@@ -60,7 +60,7 @@ class CRM_Utils_Cache_NoCache implements CRM_Utils_Cache_Interface {
    *
    * @return bool
    */
-  function set($key, &$value) {
+  public function set($key, &$value) {
     return FALSE;
   }
 
@@ -69,7 +69,7 @@ class CRM_Utils_Cache_NoCache implements CRM_Utils_Cache_Interface {
    *
    * @return null
    */
-  function get($key) {
+  public function get($key) {
     return NULL;
   }
 
@@ -78,15 +78,14 @@ class CRM_Utils_Cache_NoCache implements CRM_Utils_Cache_Interface {
    *
    * @return bool
    */
-  function delete($key) {
+  public function delete($key) {
     return FALSE;
   }
 
   /**
    * @return bool
    */
-  function flush() {
+  public function flush() {
     return FALSE;
   }
 }
-

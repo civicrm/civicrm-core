@@ -44,7 +44,6 @@ class CRM_Utils_Wrapper {
    *
    * The controller which will handle the display and processing of this page.
    *
-   * @access protected
    */
   protected $_controller;
 
@@ -61,9 +60,8 @@ class CRM_Utils_Wrapper {
    * @param boolean ignoreKey   should we not set a qfKey for this controller (for standalone forms)
    *
    * @return void.
-   * @access public
    */
-  function run($formName, $formLabel = NULL, $arguments = NULL) {
+  public function run($formName, $formLabel = NULL, $arguments = NULL) {
     if (is_array($arguments)) {
       $mode         = CRM_Utils_Array::value('mode', $arguments);
       $imageUpload  = (bool) CRM_Utils_Array::value('imageUpload', $arguments, FALSE);
@@ -117,4 +115,3 @@ class CRM_Utils_Wrapper {
     return $this->_controller->run();
   }
 }
-

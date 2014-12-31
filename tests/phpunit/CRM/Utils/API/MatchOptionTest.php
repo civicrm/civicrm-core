@@ -11,7 +11,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
    */
   var $noise;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->assertDBQuery(0, "SELECT count(*) FROM civicrm_contact WHERE first_name='Jeffrey' and last_name='Lebowski'");
 
@@ -27,7 +27,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
     ));
   }
 
-  function tearDown() {
+  public function tearDown() {
     $noise = $this->callAPISuccess('Contact', 'get', array(
       'id' => $this->noise['individual'],
       'return' => array('email'),
@@ -50,7 +50,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
   /**
    * If there's no pre-existing record, then insert a new one.
    */
-  function testCreateMatch_none() {
+  public function testCreateMatch_none() {
     $result = $this->callAPISuccess('contact', 'create', array(
       'options' => array(
         'match' => array('first_name', 'last_name'),
@@ -68,7 +68,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
   /**
    * If there's no pre-existing record, then throw an error.
    */
-  function testCreateMatchMandatory_none() {
+  public function testCreateMatchMandatory_none() {
     $this->callAPIFailure('contact', 'create', array(
       'options' => array(
         'match-mandatory' => array('first_name', 'last_name'),
@@ -84,7 +84,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  function apiOptionNames() {
+  public function apiOptionNames() {
     return array(
       array('match'),
       array('match-mandatory'),
@@ -97,7 +97,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
    * @dataProvider apiOptionNames
    * @param string $apiOptionName e.g. "match" or "match-mandatory"
    */
-  function testCreateMatch_one($apiOptionName) {
+  public function testCreateMatch_one($apiOptionName) {
     // create basic record
     $result1 = $this->callAPISuccess('contact', 'create', array(
       'contact_type' => 'Individual',
@@ -135,7 +135,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
    * @dataProvider apiOptionNames
    * @param string $apiOptionName e.g. "match" or "match-mandatory"
    */
-  function testCreateMatch_many($apiOptionName) {
+  public function testCreateMatch_many($apiOptionName) {
     // create the first Lebowski
     $result1 = $this->callAPISuccess('contact', 'create', array(
       'contact_type' => 'Individual',
@@ -173,7 +173,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
    * When replacing one set with another set, match items within
    * the set using a key.
    */
-  function testReplaceMatch_Email() {
+  public function testReplaceMatch_Email() {
     // Create contact with two emails (j1,j2)
     $createResult = $this->callAPISuccess('contact', 'create', array(
       'contact_type' => 'Individual',
@@ -250,7 +250,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
    * When replacing one set with another set, match items within
    * the set using a key.
    */
-  function testReplaceMatch_Address() {
+  public function testReplaceMatch_Address() {
     // Create contact with two addresses (j1,j2)
     $createResult = $this->callAPISuccess('contact', 'create', array(
       'contact_type' => 'Individual',

@@ -39,7 +39,7 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
   /**
    * @param $formValues
    */
-  function __construct(&$formValues) {
+  public function __construct(&$formValues) {
     $this->_formValues = $formValues;
 
     /**
@@ -57,7 +57,7 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
   /**
    * @param CRM_Core_Form $form
    */
-  function buildForm(&$form) {
+  public function buildForm(&$form) {
 
     /**
      * You can define a custom title for the search form
@@ -87,7 +87,7 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
    *
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     // Setting default search state to California
     return array(
       'state_province_id' => 1004,
@@ -97,7 +97,7 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
   /**
    * Define the smarty template used to layout the search form and results listings.
    */
-  function templateFile() {
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
@@ -159,7 +159,7 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
   /**
    * @return string
    */
-  function from() {
+  public function from() {
     return "
             civicrm_relationship cR,
             civicrm_contact cInd
@@ -180,7 +180,7 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
    *
    * @return string
    */
-  function where($includeContactIDs = FALSE) {
+  public function where($includeContactIDs = FALSE) {
     $clauses = array();
 
     // These are required filters for our query.
@@ -232,7 +232,7 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
    *
    * @return string
    */
-  function having($includeContactIDs = FALSE) {
+  public function having($includeContactIDs = FALSE) {
     $clauses = array();
     return implode(' AND ', $clauses);
   }
@@ -240,7 +240,7 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
   /*
    * Functions below generally don't need to be modified
    */
-  function count() {
+  public function count() {
     $sql = $this->all();
 
     $dao = CRM_Core_DAO::executeQuery($sql,
@@ -256,21 +256,21 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
    *
    * @return string
    */
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL) {
+  public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL) {
     return $this->all($offset, $rowcount, $sort);
   }
 
   /**
    * @return array
    */
-  function &columns() {
+  public function &columns() {
     return $this->_columns;
   }
 
   /**
    * @param $title
    */
-  function setTitle($title) {
+  public function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
     }
@@ -282,8 +282,7 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
   /**
    * @return null
    */
-  function summary() {
+  public function summary() {
     return NULL;
   }
 }
-

@@ -42,7 +42,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * The id of the contribution that we are processing
    *
    * @var int
-   * @public
    */
   public $_id;
 
@@ -50,7 +49,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * The id of the premium that we are processing
    *
    * @var int
-   * @public
    */
   public $_premiumID = NULL;
 
@@ -63,7 +61,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * The id of the note
    *
    * @var int
-   * @public
    */
   public $_noteID;
 
@@ -71,7 +68,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * The id of the contact associated with this contribution
    *
    * @var int
-   * @public
    */
   public $_contactID;
 
@@ -79,7 +75,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * The id of the pledge payment that we are processing
    *
    * @var int
-   * @public
    */
   public $_ppID;
 
@@ -87,7 +82,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * The id of the pledge that we are processing
    *
    * @var int
-   * @public
    */
   public $_pledgeID;
 
@@ -96,7 +90,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * financial transaction
    *
    * @var boolean
-   * @public
    */
   public $_online = FALSE;
 
@@ -104,7 +97,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Stores all product option
    *
    * @var array
-   * @public
    */
   public $_options;
 
@@ -112,7 +104,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Storage of parameters from form
    *
    * @var array
-   * @public
    */
   public $_params;
 
@@ -235,7 +226,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
 
@@ -343,7 +333,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
   }
 
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if ($this->_cdType) {
       return CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
@@ -493,7 +483,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     //@todo document the purpose of cdType (if still in use)
@@ -946,10 +935,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
 
     //check for Credit Card Contribution.
@@ -1005,7 +993,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */

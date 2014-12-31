@@ -61,9 +61,8 @@ class CRM_Event_Form_Task_PickProfile extends CRM_Event_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     // initialize the task and row fields
     parent::preProcess();
 
@@ -88,11 +87,10 @@ class CRM_Event_Form_Task_PickProfile extends CRM_Event_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $types = array('Participant');
     $profiles = CRM_Core_BAO_UFGroup::getProfiles($types, TRUE);
 
@@ -111,11 +109,10 @@ class CRM_Event_Form_Task_PickProfile extends CRM_Event_Form_Task {
   /**
    * Add local and global form rules
    *
-   * @access protected
    *
    * @return void
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Event_Form_Task_PickProfile', 'formRule'));
   }
 
@@ -126,16 +123,14 @@ class CRM_Event_Form_Task_PickProfile extends CRM_Event_Form_Task {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     return TRUE;
   }
 
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -148,4 +143,3 @@ class CRM_Event_Form_Task_PickProfile extends CRM_Event_Form_Task {
     $this->controller->resetPage('Batch');
   }
 }
-

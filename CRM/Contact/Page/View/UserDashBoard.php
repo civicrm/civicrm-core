@@ -60,7 +60,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   /**
    * @throws Exception
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
 
     $check = CRM_Core_Permission::check('access Contact Dashboard');
@@ -92,9 +92,8 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     if (!$this->_contactId) {
       CRM_Core_Error::fatal(ts('You must be logged in to view this page.'));
     }
@@ -113,9 +112,8 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
    * Build user dashboard
    *
    * @return void
-   * @access public
    */
-  function buildUserDashBoard() {
+  public function buildUserDashBoard() {
     //build component selectors
     $dashboardElements = array();
     $config = CRM_Core_Config::singleton();
@@ -205,9 +203,8 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
    *
    * @return void
    *
-   * @access public
    */
-  function run() {
+  public function run() {
     $this->preProcess();
     $this->buildUserDashBoard();
     return parent::run();
@@ -220,7 +217,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
    * @static
    */
   static
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       $disableExtra = ts('Are you sure you want to disable this relationship?');
 

@@ -35,7 +35,7 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     parent::setUp();
   }
 
-  function testOnlineAutoRenewMembershipAnonymous() {
+  public function testOnlineAutoRenewMembershipAnonymous() {
     //configure membership signup page.
     $pageId = $this->_configureMembershipPage();
 
@@ -64,7 +64,7 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]/strong[3]", $text, 'Missing text: ' . $text);
   }
 
-  function testOnlineAutoRenewMembershipAuthenticated() {
+  public function testOnlineAutoRenewMembershipAuthenticated() {
     //configure membership signup page.
     $pageId = $this->_configureMembershipPage();
 
@@ -97,7 +97,7 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]/strong[3]", $text, 'Missing text: ' . $text);
   }
 
-  function testOnlinePendingAutoRenewMembershipAnonymous() {
+  public function testOnlinePendingAutoRenewMembershipAnonymous() {
     //configure membership signup page.
     $pageId = $this->_configureMembershipPage();
 
@@ -128,7 +128,7 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
   /**
    * @return null
    */
-  function _configureMembershipPage() {
+  public function _configureMembershipPage() {
     static $pageId = NULL;
 
     if (!$pageId) {
@@ -212,4 +212,3 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     return $pageId;
   }
 }
-

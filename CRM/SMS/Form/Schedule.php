@@ -42,7 +42,6 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
 
@@ -56,11 +55,10 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     $count = $this->get('count');
@@ -76,7 +74,6 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
    * @param
    *
    * @return void
-   * @access public
    */
   public function buildQuickform() {
     $this->addDateTime('start_date', ts('Schedule SMS'), FALSE, array('formatType' => 'mailing'));
@@ -153,7 +150,6 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
    * @param
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = array();
@@ -206,7 +202,6 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
   /**
    * Display Name of the form
    *
-   * @access public
    *
    * @return string
    */
@@ -214,4 +209,3 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
     return ts('Schedule or Send');
   }
 }
-

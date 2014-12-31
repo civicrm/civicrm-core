@@ -52,7 +52,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     // don’t display the ‘Add these Contacts to Group’ button
     $this->_add2groupSupported = FALSE;
 
@@ -115,13 +115,13 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
   /**
    * @param bool $applyLimit
    */
-  function buildQuery($applyLimit = TRUE) {}
+  public function buildQuery($applyLimit = TRUE) {}
 
   /**
    * @param $sql
    * @param $rows
    */
-  function buildRows($sql, &$rows) {
+  public function buildRows($sql, &$rows) {
     // safeguard for when there aren’t any log entries yet
     if (!$this->log_conn_id or !$this->log_date) {
       return;
@@ -214,7 +214,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     return $rows;
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
 
     $params = array(
@@ -234,4 +234,3 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     $this->assign('revertConfirm', ts('Are you sure you want to revert all these changes?'));
   }
 }
-

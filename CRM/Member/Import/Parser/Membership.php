@@ -58,7 +58,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
   /**
    * Class constructor
    */
-  function __construct(&$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL) {
+  public function __construct(&$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL) {
     parent::__construct();
     $this->_mapperKeys = &$mapperKeys;
   }
@@ -67,9 +67,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * The initializer code, called before the processing
    *
    * @return void
-   * @access public
    */
-  function init() {
+  public function init() {
     $fields = CRM_Member_BAO_Membership::importableFields($this->_contactType, FALSE);
 
     foreach ($fields as $name => $field) {
@@ -113,9 +112,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean
-   * @access public
    */
-  function mapField(&$values) {
+  public function mapField(&$values) {
     return CRM_Import_Parser::VALID;
   }
 
@@ -125,9 +123,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
-  function preview(&$values) {
+  public function preview(&$values) {
     return $this->summary($values);
   }
 
@@ -137,9 +134,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
-  function summary(&$values) {
+  public function summary(&$values) {
     $erroneousField = NULL;
     $response = $this->setActiveFieldValues($values, $erroneousField);
 
@@ -252,9 +248,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * @param array $values the array of values belonging to this line
    *
    * @return boolean      the result of this processing
-   * @access public
    */
-  function import($onDuplicate, &$values) {
+  public function import($onDuplicate, &$values) {
     try{
       // first make sure this is a valid line
       $response = $this->summary($values);
@@ -569,9 +564,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * Get the array of successfully imported membership id's
    *
    * @return array
-   * @access public
    */
-  function &getImportedMemberships() {
+  public function &getImportedMemberships() {
     return $this->_newMemberships;
   }
 
@@ -579,9 +573,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * The initializer code, called before the processing
    *
    * @return void
-   * @access public
    */
-  function fini() {}
+  public function fini() {}
 
   /**
    *  to calculate join, start and end dates
@@ -592,9 +585,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    *
    * @return Array formatted containing date values
    *
-   * @access public
    */
-  function formattedDates($calcDates, &$formatted) {
+  public function formattedDates($calcDates, &$formatted) {
     $dates = array(
       'join_date',
       'start_date',
@@ -628,9 +620,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    *
    * @throws Exception
    * @return array|error
-   * @access public
    */
-  function membership_format_params($params, &$values, $create = FALSE) {
+  public function membership_format_params($params, &$values, $create = FALSE) {
     require_once 'api/v3/utils.php';
     $fields = CRM_Member_DAO_Membership::fields();
     _civicrm_api3_store_values($fields, $params, $values);
@@ -762,4 +753,3 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
     return NULL;
   }
 }
-

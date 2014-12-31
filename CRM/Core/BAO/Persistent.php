@@ -41,10 +41,9 @@ class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_BAO_Persistent object
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $dao = new CRM_Core_DAO_Persistent();
     $dao->copyValues($params);
 
@@ -64,12 +63,11 @@ class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
    *
-   * @access public
    * @static
    *
    * @return object
    */
-  static function add(&$params, &$ids) {
+  public static function add(&$params, &$ids) {
     if (CRM_Utils_Array::value('is_config', $params) == 1) {
       $params['data'] = serialize(explode(',', $params['data']));
     }
@@ -87,7 +85,7 @@ class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
    *
    * @return mixed
    */
-  static function getContext($context, $name = NULL) {
+  public static function getContext($context, $name = NULL) {
     static $contextNameData = array();
 
     if (!array_key_exists($context, $contextNameData)) {
@@ -108,4 +106,3 @@ class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
     }
   }
 }
-

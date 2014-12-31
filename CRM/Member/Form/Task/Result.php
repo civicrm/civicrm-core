@@ -44,15 +44,13 @@ class CRM_Member_Form_Task_Result extends CRM_Member_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */
-  function preProcess() {}
+  public function preProcess() {}
 
   /**
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addButtons(array(
@@ -65,4 +63,3 @@ class CRM_Member_Form_Task_Result extends CRM_Member_Form_Task {
     );
   }
 }
-

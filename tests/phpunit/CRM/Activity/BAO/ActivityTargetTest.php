@@ -39,7 +39,6 @@ class CRM_Activity_BAO_ActivityTargetTest extends CiviUnitTestCase {
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
    *
-   * @access protected
    */
   protected function setUp() {
     parent::setUp();
@@ -49,7 +48,6 @@ class CRM_Activity_BAO_ActivityTargetTest extends CiviUnitTestCase {
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
    *
-   * @access protected
    */
   protected function tearDown() {}
 
@@ -71,4 +69,3 @@ class CRM_Activity_BAO_ActivityTargetTest extends CiviUnitTestCase {
     $this->assertEquals($targetIDs[0], $activity['target_contact_id'], 'The returned target contacts ids match');
   }
 }
-

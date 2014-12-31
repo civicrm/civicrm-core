@@ -39,7 +39,7 @@
  *
  */
 class CRM_Contribute_Task {
-  CONST DELETE_CONTRIBUTIONS = 1, PRINT_CONTRIBUTIONS = 2, EXPORT_CONTRIBUTIONS = 3, BATCH_CONTRIBUTIONS = 4, EMAIL_CONTACTS = 5, UPDATE_STATUS = 6, PDF_RECEIPT = 7;
+  const DELETE_CONTRIBUTIONS = 1, PRINT_CONTRIBUTIONS = 2, EXPORT_CONTRIBUTIONS = 3, BATCH_CONTRIBUTIONS = 4, EMAIL_CONTACTS = 5, UPDATE_STATUS = 6, PDF_RECEIPT = 7;
 
   /**
    * The task array
@@ -63,9 +63,8 @@ class CRM_Contribute_Task {
    *
    * @return array the set of tasks for a group of contacts
    * @static
-   * @access public
    */
-  static function &tasks() {
+  public static function &tasks() {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
         1 => array(
@@ -149,9 +148,8 @@ class CRM_Contribute_Task {
    *
    * @return array the set of task titles
    * @static
-   * @access public
    */
-  static function &taskTitles() {
+  public static function &taskTitles() {
     self::tasks();
     $titles = array();
     foreach (self::$_tasks as $id => $value) {
@@ -169,9 +167,8 @@ class CRM_Contribute_Task {
    * @param bool $softCreditFiltering
    *
    * @return array set of tasks that are valid for the user
-   * @access public
    */
-  static function &permissionedTaskTitles($permission, $softCreditFiltering = FALSE) {
+  public static function &permissionedTaskTitles($permission, $softCreditFiltering = FALSE) {
     $tasks = array();
     if (($permission == CRM_Core_Permission::EDIT)
       || CRM_Core_Permission::check('edit contributions')
@@ -204,9 +201,8 @@ class CRM_Contribute_Task {
    *
    * @return array the set of tasks for a group of contributors
    * @static
-   * @access public
    */
-  static function getTask($value) {
+  public static function getTask($value) {
     self::tasks();
     if (!$value || !CRM_Utils_Array::value($value, self::$_tasks)) {
       // make the print task by default
@@ -223,4 +219,3 @@ class CRM_Contribute_Task {
     );
   }
 }
-

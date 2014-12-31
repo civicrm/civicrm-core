@@ -50,7 +50,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   protected $_params;
 
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
 
@@ -88,7 +88,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
    * Test get methods
    * @todo - this might be better broken down into more smaller tests
    */
-  function testGetContributionSoft() {
+  public function testGetContributionSoft() {
     //We don't test for PCP fields because there's no PCP API, so we can't create campaigns.
     $p = array(
       'contribution_id' => $this->_contributionId,
@@ -156,19 +156,19 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
 
 
   ///////////////// civicrm_contribution_soft
-  function testCreateEmptyParamsContributionSoft() {
+  public function testCreateEmptyParamsContributionSoft() {
     $softcontribution = $this->callAPIFailure('contribution_soft', 'create', array(),
       'Mandatory key(s) missing from params array: contribution_id, amount, contact_id'
     );
   }
 
-  function testCreateParamsWithoutRequiredKeysContributionSoft() {
+  public function testCreateParamsWithoutRequiredKeysContributionSoft() {
     $softcontribution = $this->callAPIFailure('contribution_soft', 'create', array(),
       'Mandatory key(s) missing from params array: contribution_id, amount, contact_id'
     );
   }
 
-  function testCreateContributionSoftInvalidContact() {
+  public function testCreateContributionSoftInvalidContact() {
 
     $params = array(
       'contact_id' => 999,
@@ -182,7 +182,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     );
   }
 
-  function testCreateContributionSoftInvalidContributionId() {
+  public function testCreateContributionSoftInvalidContributionId() {
 
     $params = array(
       'contribution_id' => 999999,
@@ -199,7 +199,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   /*
    * Function tests that additional financial records are created when fee amount is recorded
    */
-  function testCreateContributionSoft() {
+  public function testCreateContributionSoft() {
     $params = array(
       'contribution_id' => $this->_contributionId,
       'contact_id' => $this->_softIndividual1Id,
@@ -217,7 +217,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   }
 
   //To Update Soft Contribution
-  function testCreateUpdateContributionSoft() {
+  public function testCreateUpdateContributionSoft() {
     //create a soft credit
     $params = array(
       'contribution_id' => $this->_contributionId,
@@ -278,19 +278,19 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_contribution_soft_delete methods
-  function testDeleteEmptyParamsContributionSoft() {
+  public function testDeleteEmptyParamsContributionSoft() {
     $params = array();
     $softcontribution = $this->callAPIFailure('contribution_soft', 'delete', $params);
   }
 
-  function testDeleteWrongParamContributionSoft() {
+  public function testDeleteWrongParamContributionSoft() {
     $params = array(
       'contribution_source' => 'SSF',
     );
     $softcontribution = $this->callAPIFailure('contribution_soft', 'delete', $params);
   }
 
-  function testDeleteContributionSoft() {
+  public function testDeleteContributionSoft() {
     //create a soft credit
     $params = array(
       'contribution_id' => $this->_contributionId,
@@ -313,7 +313,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
    *  Test civicrm_contribution_search with empty params.
    *  All available contributions expected.
    */
-  function testSearchEmptyParams() {
+  public function testSearchEmptyParams() {
     $p = array(
       'contribution_id' => $this->_contributionId,
       'contact_id' => $this->_softIndividual1Id,
@@ -335,7 +335,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   /**
    *  Test civicrm_contribution_soft_search. Success expected.
    */
-  function testSearch() {
+  public function testSearch() {
     $p1 = array(
       'contribution_id' => $this->_contributionId,
       'contact_id' => $this->_softIndividual1Id,
@@ -364,4 +364,3 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $this->assertEquals($p2['currency'], $res['currency'], 'In line ' . __LINE__ );
   }
 }
-

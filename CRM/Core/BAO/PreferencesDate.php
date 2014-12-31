@@ -42,7 +42,7 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -53,10 +53,9 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Core_BAO_PreferencesDate object on success, null otherwise
-   * @access public
    * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $dao = new CRM_Core_DAO_PreferencesDate();
     $dao->copyValues($params);
     if ($dao->find(TRUE)) {
@@ -74,10 +73,9 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
    *
    * @return Object             DAO object on sucess, null otherwise
    *
-   * @access public
    * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     CRM_Core_Error::fatal();
   }
 
@@ -86,11 +84,9 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
    *
    * @param  int  $id
    *
-   * @access public
    * @static
    */
-  static function del($id) {
+  public static function del($id) {
     CRM_Core_Error::fatal();
   }
 }
-

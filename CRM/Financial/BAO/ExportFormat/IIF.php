@@ -53,7 +53,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
     self::$SEPARATOR = chr(9);
   }
@@ -61,7 +61,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
   /**
    * @param array $exportParams
    */
-  function export( $exportParams ) {
+  public function export( $exportParams ) {
     parent::export( $exportParams );
 
     foreach( self::$complementaryTables as $rct ) {
@@ -80,7 +80,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
    *
    * @return string
    */
-  function putFile($out) {
+  public function putFile($out) {
     $config = CRM_Core_Config::singleton();
     $fileName = $config->uploadDir.'Financial_Transactions_'.$this->_batchIds.'_'.date('YmdHis').'.'.$this->getFileExtension();
     $this->_downloadFile[] = $config->customFileUploadDir.CRM_Utils_File::cleanFileName(basename($fileName));
@@ -95,7 +95,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
    *
    * @return Object
    */
-  function generateExportQuery($batchId) {
+  public function generateExportQuery($batchId) {
 
     $sql = "SELECT
       ft.id as financial_trxn_id,
@@ -147,7 +147,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
   /**
    * @param $export
    */
-  function makeIIF($export) {
+  public function makeIIF($export) {
     // Keep running list of accounts and contacts used in this batch, since we need to
     // include those in the output. Only want to include ones used in the batch, not everything in the db,
     // since would increase the chance of messing up user's existing Quickbooks entries.
@@ -298,36 +298,36 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
     parent::initiateDownload();
   }
 
-  function exportACCNT() {
+  public function exportACCNT() {
     self::assign( 'accounts', $this->_exportParams['accounts'] );
   }
 
-  function exportCUST() {
+  public function exportCUST() {
     self::assign( 'contacts', $this->_exportParams['contacts'] );
   }
 
-  function exportTRANS() {
+  public function exportTRANS() {
     self::assign( 'journalEntries', $this->_exportParams['journalEntries'] );
   }
 
   /**
    * @return string
    */
-  function getMimeType() {
+  public function getMimeType() {
     return 'application/octet-stream';
   }
 
   /**
    * @return string
    */
-  function getFileExtension() {
+  public function getFileExtension() {
     return 'iif';
   }
 
   /**
    * @return string
    */
-  function getHookedTemplateFileName() {
+  public function getHookedTemplateFileName() {
     return 'CRM/Financial/ExportFormat/IIF.tpl';
   }
 
@@ -341,7 +341,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
    *
    * @return bool|mixed|string
    */
-  static function format($s, $type = 'string') {
+  public static function format($s, $type = 'string') {
     // If I remember right there's a couple things:
     // NOTEPAD field needs to be surrounded by quotes and then get rid of double quotes inside, also newlines should be literal \n, and ditch any ascii 0x0d's.
     // Date handling has changed over the years. It used to only understand mm/dd/yy but I think now it might depend on your OS settings. Sometimes mm/dd/yyyy works but sometimes it wants yyyy/mm/dd, at least where I had used it.

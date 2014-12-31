@@ -43,7 +43,6 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
   /**
    * Making this public so we can reference it in the formRule
    * @var int
-   * @public
    */
   public $_surveyId;
 
@@ -127,9 +126,8 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
    * @param null
    *
    * @return array    array of default values
-   * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = $this->_values;
 
     $ufContactJoinParams = array(
@@ -256,7 +254,7 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
    * Global validation rules for the form
    *
    */
-  static function formRule($fields, $files, $form) {
+  public static function formRule($fields, $files, $form) {
     $errors = array();
     // Petitions should be unique by: title, campaign ID (if assigned) and activity type ID
     // NOTE: This class is called for both Petition create / update AND for Survey Results tab, but this rule is only for Petition.
@@ -368,7 +366,3 @@ WHERE  $whereClause
     }
   }
 }
-
-
-
-

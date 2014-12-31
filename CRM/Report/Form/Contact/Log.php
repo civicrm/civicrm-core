@@ -43,7 +43,7 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
 
     $this->activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
     asort($this->activityTypes);
@@ -143,11 +143,11 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
@@ -175,12 +175,12 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     return $errors;
   }
 
-  function from() {
+  public function from() {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $this->_from = "
@@ -194,7 +194,7 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
         ";
   }
 
-  function where() {
+  public function where() {
     $clauses = array();
     $this->_having = '';
     foreach ($this->_columns as $tableName => $table) {
@@ -233,7 +233,7 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
     $this->_where = "WHERE " . implode(' AND ', $clauses);
   }
 
-  function orderBy() {
+  public function orderBy() {
     $this->_orderBy = "
 ORDER BY {$this->_aliases['civicrm_log']}.modified_date DESC, {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact_touched']}.sort_name
 ";
@@ -242,7 +242,7 @@ ORDER BY {$this->_aliases['civicrm_log']}.modified_date DESC, {$this->_aliases['
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
@@ -302,4 +302,3 @@ ORDER BY {$this->_aliases['civicrm_log']}.modified_date DESC, {$this->_aliases['
     }
   }
 }
-

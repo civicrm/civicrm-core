@@ -49,7 +49,7 @@ class api_v3_DashboardContactTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
   }
 
-  function testDashboardContactCreate() {
+  public function testDashboardContactCreate() {
     $dashParams = array(
       'version' => 3,
       'label' => 'New Dashlet element',

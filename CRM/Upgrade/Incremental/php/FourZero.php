@@ -38,15 +38,14 @@ class CRM_Upgrade_Incremental_php_FourZero {
    *
    * @return bool
    */
-  function verifyPreDBstate(&$errors) {
+  public function verifyPreDBstate(&$errors) {
     return TRUE;
   }
 
   /**
    * @param $rev
    */
-  function upgrade_4_0_alpha1($rev) {
+  public function upgrade_4_0_alpha1($rev) {
     // do nothing, db is already upgraded to 3.4.alpha1.
   }
 }
-

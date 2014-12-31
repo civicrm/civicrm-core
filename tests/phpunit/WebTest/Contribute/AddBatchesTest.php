@@ -35,7 +35,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testBatchAddContribution() {
+  public function testBatchAddContribution() {
     $this->webtestLogin();
     $itemCount = 5;
     // create contact
@@ -73,7 +73,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
     $this->_verifyData($data, "Contribution");
   }
 
-  function testBatchAddMembership() {
+  public function testBatchAddMembership() {
     $this->webtestLogin();
     $itemCount = 5;
     $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
@@ -117,7 +117,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
   }
 
 
-  function testBatchAddPledge() {
+  public function testBatchAddPledge() {
     $this->webtestLogin();
 
     // create a new pledge for contact
@@ -174,7 +174,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
    * @param $row
    * @param $type
    */
-  function _fillData($data, $row, $type) {
+  public function _fillData($data, $row, $type) {
     if (!empty($data['contact'])) {
       $this->select2("s2id_primary_contact_id_{$row}", $data['contact']['email']);
     }
@@ -264,7 +264,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
    * @param $data
    * @param $type
    */
-  function _checkResult($data, $type) {
+  public function _checkResult($data, $type) {
     if ($type == "Contribution") {
       $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
       $this->type("sort_name", "{$data['last_name']} {$data['first_name']}");
@@ -329,7 +329,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
    * @param $data
    * @param $type
    */
-  function _verifyData($data, $type) {
+  public function _verifyData($data, $type) {
     $this->waitForElementPresent("xpath=//table[@id='DataTables_Table_0']/tbody//tr/td[7]/span/a[1][text()='Enter records']");
     $this->click("xpath=//table[@id='DataTables_Table_0']/tbody//tr/td[7]/span/a[1][text()='Enter records']");
     $this->waitForElementPresent('_qf_Entry_upload');

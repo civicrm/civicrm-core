@@ -46,7 +46,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
 
   protected $_ppDAO;
 
-  function preProcess() {
+  public function preProcess() {
     if(!CRM_Core_Permission::check('administer payment processors')) {
       CRM_Core_Error::statusBounce('The \'administer payment processors\' permission is required to add or edit a payment processor.');
     }
@@ -167,7 +167,6 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * @param bool $check
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm($check = FALSE) {
     parent::buildQuickForm();
@@ -233,7 +232,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    *
    * @return array|bool
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
 
     // make sure that at least one of live or test is present
     // and we have at least name and url_site
@@ -260,7 +259,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    *
    * @return bool
    */
-  static function checkSection(&$fields, &$errors, $section = NULL) {
+  public static function checkSection(&$fields, &$errors, $section = NULL) {
     $names = array('user_name');
 
     $present = FALSE;
@@ -288,7 +287,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     if ($this->_ppType) {
     $defaults['payment_processor_type_id'] = $this->_ppType;
@@ -337,7 +336,6 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return Void
    */
@@ -372,7 +370,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    *
    * @return Void
    */
-  function updatePaymentProcessor(&$values, $domainID, $test) {
+  public function updatePaymentProcessor(&$values, $domainID, $test) {
     $dao = new CRM_Financial_DAO_PaymentProcessor( );
 
     $dao->id         = $test ? $this->_testID : $this->_id;

@@ -52,7 +52,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    * Are we in single form mode or wizard mode?
    *
    * @var boolean
-   * @access protected
    */
   public $_single;
 
@@ -60,7 +59,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    * The default values for the form
    *
    * @var array
-   * @protected
    */
   protected $_defaults;
 
@@ -119,7 +117,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $this->_defaults = array();
     if ($this->_contactID) {
       foreach ($this->_fields as $name => $dontcare) {
@@ -145,7 +143,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $id = CRM_PCP_BAO_PCP::getSupporterProfileId($this->_pageId, $this->_component);
@@ -231,10 +228,9 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    *
    *
    * @return true if no errors, else array of errors
-   * @access public
    * @static
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     foreach ($fields as $key => $value) {
       if (strpos($key, 'email-') !== FALSE && !empty($value)) {
@@ -250,7 +246,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -295,4 +290,3 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     CRM_Contribute_BAO_Contribution_Utils::createCMSUser($params, $contactID, 'email');
   }
 }
-

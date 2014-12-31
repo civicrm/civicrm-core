@@ -52,7 +52,6 @@ class CRM_Case_Form_Task_Restore extends CRM_Case_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   * @access public
    */ function preProcess() {
     parent::preProcess();
   }
@@ -60,18 +59,16 @@ class CRM_Case_Form_Task_Restore extends CRM_Case_Form_Task {
   /**
    * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $this->addDefaultButtons(ts('Restore Cases'), 'done');
   }
 
   /**
    * Process the form after the input has been submitted and validated
    *
-   * @access public
    *
    * @return void
    */
@@ -87,4 +84,3 @@ class CRM_Case_Form_Task_Restore extends CRM_Case_Form_Task {
     CRM_Core_Session::setStatus('', ts('Total Selected Case(s): %1', array(1 => count($this->_caseIds))), 'info');
   }
 }
-

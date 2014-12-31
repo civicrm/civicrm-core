@@ -61,7 +61,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    *
    * @return array  a table-keyed array of field-keyed arrays holding supported fields' titles
    */
-  static function &supportedFields($requestedType) {
+  public static function &supportedFields($requestedType) {
     static $fields = NULL;
     if (!$fields) {
       // this is needed, as we're piggy-backing importableFields() below
@@ -115,7 +115,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
   /**
    * Return the SQL query for dropping the temporary table.
    */
-  function tableDropQuery() {
+  public function tableDropQuery() {
     return 'DROP TEMPORARY TABLE IF EXISTS dedupe';
   }
 
@@ -123,7 +123,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    * Return a set of SQL queries whose cummulative weights will mark matched
    * records for the RuleGroup::threasholdQuery() to retrieve.
    */
-  function tableQuery() {
+  public function tableQuery() {
     // make sure we've got a fetched dbrecord, not sure if this is enforced
     if (!$this->name == NULL || $this->is_reserved == NULL) {
       $this->find(TRUE);
@@ -174,7 +174,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
     return $queries;
   }
 
-  function fillTable() {
+  public function fillTable() {
     // get the list of queries handy
     $tableQueries = $this->tableQuery();
 
@@ -274,7 +274,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    *
    * @return array
    */
-  static function isQuerySetInclusive($tableQueries, $threshold, $exclWeightSum = array()) {
+  public static function isQuerySetInclusive($tableQueries, $threshold, $exclWeightSum = array()) {
     $input = array();
     foreach ($tableQueries as $key => $query) {
       $input[] = substr($key, strrpos($key, '.') + 1);
@@ -310,7 +310,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
   /**
    * @param $tableQueries
    */
-  static function orderByTableCount(&$tableQueries) {
+  public static function orderByTableCount(&$tableQueries) {
     static $tableCount = array();
 
     $tempArray = array();
@@ -340,7 +340,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    * Multi-Site dedupe for public pages.
    *
    */
-  function thresholdQuery($checkPermission = TRUE) {
+  public function thresholdQuery($checkPermission = TRUE) {
     $this->_aclFrom = '';
     // CRM-6603: anonymous dupechecks side-step ACLs
     $this->_aclWhere = ' AND is_deleted = 0 ';
@@ -381,7 +381,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    *
    * @return array (rule field => weight) array and threshold associated to rule group@access public
    */
-  static function dedupeRuleFieldsWeight($params) {
+  public static function dedupeRuleFieldsWeight($params) {
     $rgBao               = new CRM_Dedupe_BAO_RuleGroup();
     $rgBao->contact_type = $params['contact_type'];
     if (CRM_Utils_Array::value('id', $params)) {
@@ -408,7 +408,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    * Get all of the combinations of fields that would work with a rule
    */
 
-  static function combos($rgFields, $threshold, &$combos, $running = array()) {
+  public static function combos($rgFields, $threshold, &$combos, $running = array()) {
     foreach ($rgFields as $rgField => $weight) {
       unset($rgFields[$rgField]);
       $diff = $threshold - $weight;
@@ -434,7 +434,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    *
    * @return array id => "nice name" of rule group
    */
-  static function getByType($contactType = NULL) {
+  public static function getByType($contactType = NULL) {
     $dao = new CRM_Dedupe_DAO_RuleGroup();
 
     if ($contactType) {
@@ -454,4 +454,3 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
     return $result;
   }
 }
-

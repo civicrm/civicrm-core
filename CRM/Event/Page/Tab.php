@@ -41,9 +41,8 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
    * This function is called when action is browse
    *
    * return null
-   * @access public
    */
-  function browse() {
+  public function browse() {
     $controller = new CRM_Core_Controller_Simple(
       'CRM_Event_Form_Search',
       ts('Events'),
@@ -74,9 +73,8 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
    * This function is called when action is view
    *
    * return null
-   * @access public
    */
-  function view() {
+  public function view() {
     // build associated contributions
     $this->associatedContribution();
 
@@ -96,9 +94,8 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
    * This function is called when action is update or new
    *
    * return null
-   * @access public
    */
-  function edit() {
+  public function edit() {
     // set https for offline cc transaction
     $mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
     if ($mode == 'test' || $mode == 'live') {
@@ -123,7 +120,7 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
     return $controller->run();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $context       = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id     = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -152,9 +149,8 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
    * This function is the main function that is called when the page loads, it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     // check if we can process credit card registration
@@ -186,7 +182,7 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
     return parent::run();
   }
 
-  function setContext() {
+  public function setContext() {
     $context = CRM_Utils_Request::retrieve('context',
       'String', $this, FALSE, 'search'
     );
@@ -288,9 +284,8 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
    * contribution for the participant
    *
    * return null
-   * @access public
    */
-  function associatedContribution() {
+  public function associatedContribution() {
     if (CRM_Core_Permission::access('CiviContribute')) {
       $this->assign('accessContribution', TRUE);
       $controller = new CRM_Core_Controller_Simple(
@@ -312,4 +307,3 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
     }
   }
 }
-

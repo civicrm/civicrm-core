@@ -43,10 +43,9 @@ class CRM_Pledge_Page_DashBoard extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
    *
    */
-  function preProcess() {
+  public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviPledge'));
 
     $startToDate    = array();
@@ -100,9 +99,8 @@ class CRM_Pledge_Page_DashBoard extends CRM_Core_Page {
    * it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_Search',
@@ -120,4 +118,3 @@ class CRM_Pledge_Page_DashBoard extends CRM_Core_Page {
     return parent::run();
   }
 }
-

@@ -42,7 +42,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * The page id saved to the session for an update
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
@@ -50,7 +49,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * The pledgeBlock id saved to the session for an update
    *
    * @var int
-   * @access protected
    */
   protected $_pledgeBlockID;
 
@@ -58,7 +56,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * Are we in single form mode or wizard mode?
    *
    * @var boolean
-   * @access protected
    */
   protected $_single;
 
@@ -66,7 +63,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * Is this the first page?
    *
    * @var boolean
-   * @access protected
    */
   protected $_first = FALSE;
 
@@ -74,7 +70,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * Store price set id.
    *
    * @var int
-   * @access protected
    */
   protected $_priceSetID = NULL;
 
@@ -84,7 +79,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * Set variables up before form is built
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     // current contribution page id
@@ -145,7 +139,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->applyFilter('__ALL__', 'trim');
@@ -243,11 +236,10 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array defaults
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     //some child classes calling setdefaults directly w/o preprocess.
     $this->_values = $this->get('values');
     if (!is_array($this->_values)) {
@@ -346,7 +338,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * Process the form
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $pageId = $this->get('id');
@@ -357,7 +348,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     }
   }
 
-  function endPostProcess() {
+  public function endPostProcess() {
     // make submit buttons keep the current working tab opened, or save and next tab
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $className = CRM_Utils_String::getClassName($this->_name);
@@ -439,12 +430,11 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * Use the form name to create the tpl file name
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     if ($this->controller->getPrint() || $this->getVar('_id') <= 0 ||
       ($this->_action & CRM_Core_Action::DELETE) ||
       (CRM_Utils_String::getClassName($this->_name) == 'AddProduct')
@@ -458,4 +448,3 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     }
   }
 }
-

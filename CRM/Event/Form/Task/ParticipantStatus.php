@@ -33,7 +33,7 @@
  *
  */
 class CRM_Event_Form_Task_ParticipantStatus extends CRM_Event_Form_Task_Batch {
-  function buildQuickForm() {
+  public function buildQuickForm() {
     // CRM_Event_Form_Task_Batch::buildQuickForm() gets ufGroupId
     // from the form, so set it here to the id of the reserved profile
     $dao = new CRM_Core_DAO_UFGroup;
@@ -58,4 +58,3 @@ class CRM_Event_Form_Task_ParticipantStatus extends CRM_Event_Form_Task_Batch {
     parent::buildQuickForm();
   }
 }
-

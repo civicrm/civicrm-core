@@ -41,7 +41,7 @@ class CRM_Core_SelectValues {
    * Preferred mail format
    * @static
    */
-  static function pmf() {
+  public static function pmf() {
     return array(
       'Both' => ts('Both'),
       'HTML' => ts('HTML'),
@@ -53,7 +53,7 @@ class CRM_Core_SelectValues {
    * Privacy options
    * @static
    */
-  static function privacy() {
+  public static function privacy() {
     return array(
       'do_not_phone' => ts('Do not phone'),
       'do_not_email' => ts('Do not email'),
@@ -68,7 +68,7 @@ class CRM_Core_SelectValues {
    * Various pre defined contact super types
    * @static
    */
-  static function contactType() {
+  public static function contactType() {
     static $contactType = NULL;
     if (!$contactType) {
       $contactType = CRM_Contact_BAO_ContactType::basicTypePairs();
@@ -80,7 +80,7 @@ class CRM_Core_SelectValues {
    * Various pre defined unit list
    * @static
    */
-  static function unitList($unitType = NULL) {
+  public static function unitList($unitType = NULL) {
     $unitList = array(
       'day' => ts('day'),
       'month' => ts('month'),
@@ -96,7 +96,7 @@ class CRM_Core_SelectValues {
    * Membership type unit
    * @static
    */
-  static function membershipTypeUnitList( ) {
+  public static function membershipTypeUnitList( ) {
     return self::unitList('duration');
   }
 
@@ -104,7 +104,7 @@ class CRM_Core_SelectValues {
    * Various pre defined period types
    * @static
    */
-  static function periodType() {
+  public static function periodType() {
     return array(
       'rolling' => ts('Rolling'),
       'fixed' => ts('Fixed'),
@@ -115,7 +115,7 @@ class CRM_Core_SelectValues {
    * Various pre defined email selection methods
    * @static
    */
-  static function emailSelectMethods() {
+  public static function emailSelectMethods() {
     return array(
       'automatic' => ts("Automatic"),
       'location-only' => ts("Only send to email addresses assigned to the specified location"),
@@ -128,7 +128,7 @@ class CRM_Core_SelectValues {
    * Various pre defined member visibility options
    * @static
    */
-  static function memberVisibility() {
+  public static function memberVisibility() {
     return array(
       'Public' => ts('Public'),
       'Admin' => ts('Admin'),
@@ -139,7 +139,7 @@ class CRM_Core_SelectValues {
    * Various pre defined event dates
    * @static
    */
-  static function eventDate() {
+  public static function eventDate() {
     return array(
       'start_date' => ts('start date'),
       'end_date' => ts('end date'),
@@ -151,7 +151,7 @@ class CRM_Core_SelectValues {
    * Custom form field types
    * @static
    */
-  static function customHtmlType() {
+  public static function customHtmlType() {
     return array(
       'Text' => ts('Single-line input field (text or numeric)'),
       'TextArea' => ts('Multi-line text box (textarea)'),
@@ -178,7 +178,7 @@ class CRM_Core_SelectValues {
    *
    * @static
    */
-  static function customGroupExtends() {
+  public static function customGroupExtends() {
     $customGroupExtends = array(
       'Activity' => ts('Activities'),
       'Relationship' => ts('Relationships'),
@@ -207,7 +207,7 @@ class CRM_Core_SelectValues {
    *
    * @static
    */
-  static function customGroupStyle() {
+  public static function customGroupStyle() {
     return array(
       'Tab' => ts('Tab'),
       'Inline' => ts('Inline'),
@@ -220,7 +220,7 @@ class CRM_Core_SelectValues {
    *
    * @static
    */
-  static function ufGroupTypes() {
+  public static function ufGroupTypes() {
     $ufGroupType = array(
       'Profile' => ts('Standalone Form or Directory'),
       'Search Profile' => ts('Search Views'),
@@ -240,7 +240,7 @@ class CRM_Core_SelectValues {
    *
    * @static
    */
-  static function groupContactStatus() {
+  public static function groupContactStatus() {
     return array(
       'Added' => ts('Added'),
       'Removed' => ts('Removed'),
@@ -252,7 +252,7 @@ class CRM_Core_SelectValues {
    * List of Group Types
    * @static
    */
-  static function groupType() {
+  public static function groupType() {
     return array(
       'query' => ts('Dynamic'),
       'static' => ts('Static'),
@@ -271,7 +271,7 @@ class CRM_Core_SelectValues {
    * @return array         the date array
    * @static
    */
-  static function date($type = NULL, $format = NULL, $minOffset = NULL, $maxOffset = NULL) {
+  public static function date($type = NULL, $format = NULL, $minOffset = NULL, $maxOffset = NULL) {
 
     $date = array(
       'addEmptyOption' => TRUE,
@@ -316,7 +316,7 @@ class CRM_Core_SelectValues {
    *
    * @static
    */
-  static function ufVisibility() {
+  public static function ufVisibility() {
     return array(
       'User and User Admin Only' => ts('User and User Admin Only'),
       'Public Pages' => ts('Public Pages'),
@@ -329,7 +329,7 @@ class CRM_Core_SelectValues {
    *
    * @static
    */
-  static function groupVisibility() {
+  public static function groupVisibility() {
     return array(
       'User and User Admin Only' => ts('User and User Admin Only'),
       'Public Pages' => ts('Public Pages'),
@@ -342,7 +342,7 @@ class CRM_Core_SelectValues {
    * @static
    * return array
    */
-  static function mailingComponents() {
+  public static function mailingComponents() {
     return array('Header' => ts('Header'),
       'Footer' => ts('Footer'),
       'Reply' => ts('Reply Auto-responder'),
@@ -360,7 +360,7 @@ class CRM_Core_SelectValues {
    *
    * @static
    */
-  function getHours() {
+  public function getHours() {
     $hours = array();
     for ($i = 0; $i <= 6; $i++) {
       $hours[$i] = $i;
@@ -374,7 +374,7 @@ class CRM_Core_SelectValues {
    *
    * @static
    */
-  function getMinutes() {
+  public function getMinutes() {
     $minutes = array();
     for ($i = 0; $i < 60; $i = $i + 15) {
       $minutes[$i] = $i;
@@ -388,7 +388,7 @@ class CRM_Core_SelectValues {
    * @return array $map array of map providers
    * @static
    */
-  static function mapProvider() {
+  public static function mapProvider() {
     static $map = NULL;
     if (!$map) {
       $map = CRM_Utils_System::getPluginList('templates/CRM/Contact/Form/Task/Map', ".tpl");
@@ -402,7 +402,7 @@ class CRM_Core_SelectValues {
    * @return array $geo array of geocoder providers
    * @static
    */
-  static function geoProvider() {
+  public static function geoProvider() {
     static $geo = NULL;
     if (!$geo) {
       $geo = CRM_Utils_System::getPluginList('CRM/Utils/Geocode');
@@ -417,7 +417,7 @@ class CRM_Core_SelectValues {
    * @return array $addr array of address standardization providers
    * @static
    */
-  static function addressProvider() {
+  public static function addressProvider() {
     static $addr = NULL;
     if (!$addr) {
       $addr = CRM_Utils_System::getPluginList('CRM/Utils/Address', '.php', array('BatchUpdate'));
@@ -431,7 +431,7 @@ class CRM_Core_SelectValues {
    * @static
    * return array
    */
-  static function mailingTokens() {
+  public static function mailingTokens() {
     return array(
       '{action.unsubscribe}' => ts('Unsubscribe via email'),
       '{action.unsubscribeUrl}' => ts('Unsubscribe via web page'),
@@ -458,7 +458,7 @@ class CRM_Core_SelectValues {
    * @static
    * return array
    */
-  static function activityTokens() {
+  public static function activityTokens() {
     return array(
       '{activity.activity_id}' => ts('Activity ID'),
       '{activity.subject}' => ts('Activity Subject'),
@@ -473,7 +473,7 @@ class CRM_Core_SelectValues {
    * @static
    * return array
    */
-  static function membershipTokens() {
+  public static function membershipTokens() {
     return array(
       '{membership.id}' => ts('Membership ID'),
       '{membership.status}' => ts('Membership Status'),
@@ -491,7 +491,7 @@ class CRM_Core_SelectValues {
    * @static
    * return array
    */
-  static function eventTokens() {
+  public static function eventTokens() {
     return array(
       '{event.event_id}' => ts('Event ID'),
       '{event.title}' => ts('Event Title'),
@@ -516,7 +516,7 @@ class CRM_Core_SelectValues {
    * @static
    * return array
    */
-  static function contributionTokens() {
+  public static function contributionTokens() {
     return array(
       '{contribution.contribution_id}' => ts('Contribution ID'),
       '{contribution.total_amount}' => ts('Total Amount'),
@@ -550,7 +550,7 @@ class CRM_Core_SelectValues {
    * @static
    * return array
    */
-  static function contactTokens() {
+  public static function contactTokens() {
     static $tokens = NULL;
     if (!$tokens) {
       $additionalFields = array('checksum' => array('title' => ts('Checksum')),
@@ -617,7 +617,7 @@ class CRM_Core_SelectValues {
    * @static
    * return array
    */
-  static function participantTokens() {
+  public static function participantTokens() {
     static $tokens = NULL;
     if (!$tokens) {
       $exportFields = CRM_Event_BAO_Participant::exportableFields();
@@ -652,7 +652,7 @@ class CRM_Core_SelectValues {
   /**
    *  CiviCRM supported date input formats
    */
-  static function getDatePluginInputFormats() {
+  public static function getDatePluginInputFormats() {
     $dateInputFormats = array(
       "mm/dd/yy" => ts('mm/dd/yyyy (12/31/2009)'),
       "dd/mm/yy" => ts('dd/mm/yyyy (31/12/2009)'),
@@ -691,7 +691,7 @@ class CRM_Core_SelectValues {
   /**
    * Map date plugin and actual format that is used by PHP
    */
-  static function datePluginToPHPFormats() {
+  public static function datePluginToPHPFormats() {
     $dateInputFormats = array(
       "mm/dd/yy" => 'm/d/Y',
       "dd/mm/yy" => 'd/m/Y',
@@ -715,7 +715,7 @@ class CRM_Core_SelectValues {
   /**
    * Time formats
    */
-  static function getTimeFormats() {
+  public static function getTimeFormats() {
     return array(
       '1' => ts('12 Hours'),
       '2' => ts('24 Hours'),
@@ -740,7 +740,7 @@ class CRM_Core_SelectValues {
    * Barcode types
    * @static
    */
-  static function getBarcodeTypes() {
+  public static function getBarcodeTypes() {
     return array(
       'barcode' => ts('Linear (1D)'),
       'qrcode' => ts('QR code'),
@@ -750,7 +750,7 @@ class CRM_Core_SelectValues {
   /**
    * Dedupe rule types
    */
-  static function getDedupeRuleTypes() {
+  public static function getDedupeRuleTypes() {
     return array(
       'Unsupervised' => ts('Unsupervised'),
       'Supervised' => ts('Supervised'),
@@ -761,7 +761,7 @@ class CRM_Core_SelectValues {
   /**
    * Campaign group types
    */
-  static function getCampaignGroupTypes() {
+  public static function getCampaignGroupTypes() {
     return array(
       'Include' => ts('Include'),
       'Exclude' => ts('Exclude'),
@@ -771,7 +771,7 @@ class CRM_Core_SelectValues {
   /**
    * Subscription history method
    */
-  static function getSubscriptionHistoryMethods() {
+  public static function getSubscriptionHistoryMethods() {
     return array(
       'Admin' => ts('Admin'),
       'Email' => ts('Email'),
@@ -783,7 +783,7 @@ class CRM_Core_SelectValues {
   /**
    * Premium units
    */
-  static function getPremiumUnits() {
+  public static function getPremiumUnits() {
     return array(
       'day' => ts('Day'),
       'week' => ts('Week'),
@@ -795,7 +795,7 @@ class CRM_Core_SelectValues {
   /**
    * Extension types
    */
-  static function getExtensionTypes() {
+  public static function getExtensionTypes() {
     return  array(
       'payment' => ts('Payment'),
       'search' => ts('Search'),
@@ -808,7 +808,7 @@ class CRM_Core_SelectValues {
   /**
    * Job frequency
    */
-  static function getJobFrequency() {
+  public static function getJobFrequency() {
     return array(
       'Daily' => ts('Daily'),
       'Hourly' => ts('Hourly'),
@@ -819,7 +819,7 @@ class CRM_Core_SelectValues {
   /**
    * Search builder operators
    */
-  static function getSearchBuilderOperators() {
+  public static function getSearchBuilderOperators() {
     return array(
       '=' => '=',
       '!=' => '≠',
@@ -842,7 +842,7 @@ class CRM_Core_SelectValues {
    *
    * @static
    */
-  static function getProfileGroupType() {
+  public static function getProfileGroupType() {
     $profileGroupType = array(
       'Activity' => ts('Activities'),
       'Contribution' => ts('Contributions'),
@@ -860,7 +860,7 @@ class CRM_Core_SelectValues {
   /**
    * Word replacement match type
    */
-  static function getWordReplacementMatchType() {
+  public static function getWordReplacementMatchType() {
     return array(
         'exactMatch' => ts('Exact Match'),
         'wildcardMatch' => ts('Wildcard Match'),
@@ -870,7 +870,7 @@ class CRM_Core_SelectValues {
   /**
    * Mailing group types
    */
-  static function getMailingGroupTypes() {
+  public static function getMailingGroupTypes() {
     return array(
       'Include' => ts('Include'),
       'Exclude' => ts('Exclude'),
@@ -881,7 +881,7 @@ class CRM_Core_SelectValues {
   /**
    * Mailing Job Status
    */
-  static function getMailingJobStatus() {
+  public static function getMailingJobStatus() {
     return array(
       'Scheduled' => ts('Scheduled'),
       'Running' => ts('Running'),
@@ -891,7 +891,7 @@ class CRM_Core_SelectValues {
     );
   }
 
-  static function billingMode() {
+  public static function billingMode() {
     return array(
       CRM_Core_Payment::BILLING_MODE_FORM => 'form',
       CRM_Core_Payment::BILLING_MODE_BUTTON => 'button',
@@ -902,7 +902,7 @@ class CRM_Core_SelectValues {
   /**
    * Frequency unit for schedule reminders
    */
-  static function getScheduleReminderFrequencyUnits() {
+  public static function getScheduleReminderFrequencyUnits() {
     //@todo update schema to refer to option group direct & remove this
     static $scheduleReminderFrequencyUnits = NULL;
     if (!$scheduleReminderFrequencyUnits) {

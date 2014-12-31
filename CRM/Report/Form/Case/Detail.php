@@ -59,7 +59,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->case_statuses = CRM_Core_OptionGroup::values('case_status');
     $this->case_types = CRM_Case_PseudoConstant::caseType();
     $rels = CRM_Core_PseudoConstant::relationshipType();
@@ -266,16 +266,16 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
     $this->caseDetailSpecialColumnsAdd();
   }
 
-  function caseDetailSpecialColumnsAdd() {
+  public function caseDetailSpecialColumnsAdd() {
     $elements = array();
     $elements[] = &$this->createElement('select', 'case_activity_all_dates', NULL,
       array(
@@ -294,7 +294,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     $this->assign('caseDetailExtra', $this->_caseDetailExtra);
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
@@ -340,7 +340,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     $this->_select = 'SELECT ' . implode(', ', $select) . ' ';
   }
 
-  function from() {
+  public function from() {
 
     $case = $this->_aliases['civicrm_case'];
     $conact = $this->_aliases['civicrm_contact'];
@@ -393,7 +393,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     }
   }
 
-  function where() {
+  public function where() {
     $clauses = array();
     $this->_having = '';
     foreach ($this->_columns as $tableName => $table) {
@@ -458,7 +458,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_case']}.id";
   }
 
@@ -467,7 +467,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
     $select = "select COUNT( DISTINCT( {$this->_aliases['civicrm_address']}.country_id))";
@@ -497,11 +497,11 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     return $statistics;
   }
 
-  function orderBy() {
+  public function orderBy() {
     $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_case']}.start_date DESC ";
   }
 
-  function caseDetailSpecialColumnProcess() {
+  public function caseDetailSpecialColumnProcess() {
     if (!$this->_includeCaseDetailExtra) {
       return;
     }
@@ -526,7 +526,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     $this->_from .= ' ' . implode(' ', $from) . ' ';
   }
 
-  function postProcess() {
+  public function postProcess() {
 
     $this->beginPostProcess();
 
@@ -547,7 +547,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     $this->endPostProcess($rows);
   }
 
-  function checkEnabledFields() {
+  public function checkEnabledFields() {
     if (isset($this->_params['worldregion_id_value']) &&
       !empty($this->_params['worldregion_id_value'])
     ) {
@@ -579,7 +579,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     $entryFound = FALSE;
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
 
@@ -679,4 +679,3 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     }
   }
 }
-

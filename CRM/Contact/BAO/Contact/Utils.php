@@ -43,10 +43,9 @@ class CRM_Contact_BAO_Contact_Utils {
    * @param boolean $addProfileOverlay  if profile overlay class should be added
    *
    * @return string
-   * @access public
    * @static
    */
-  static function getImage($contactType, $urlOnly = FALSE, $contactId = NULL, $addProfileOverlay = TRUE) {
+  public static function getImage($contactType, $urlOnly = FALSE, $contactId = NULL, $addProfileOverlay = TRUE) {
     static $imageInfo = array();
 
     $contactType = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($contactType, CRM_Core_DAO::VALUE_SEPARATOR));
@@ -118,7 +117,6 @@ class CRM_Contact_BAO_Contact_Utils {
    *
    * @return boolen true or false true if mix contact array else fale
    *
-   * @access public
    * @static
    */
   public static function checkContactType(&$contactIds) {
@@ -151,9 +149,8 @@ WHERE  id IN ( $idString )
    *
    * @return array ( $cs, $ts, $live )
    * @static
-   * @access public
    */
-  static function generateChecksum($entityId, $ts = NULL, $live = NULL, $hash = NULL, $entityType = 'contact', $hashSize = NULL) {
+  public static function generateChecksum($entityId, $ts = NULL, $live = NULL, $hash = NULL, $entityType = 'contact', $hashSize = NULL) {
     // return a warning message if we dont get a entityId
     // this typically happens when we do a message preview
     // or an anon mailing view - CRM-8298
@@ -219,9 +216,8 @@ WHERE  id IN ( $idString )
    *
    * @return boolean           true if valid, else false
    * @static
-   * @access public
    */
-  static function validChecksum($contactID, $inputCheck) {
+  public static function validChecksum($contactID, $inputCheck) {
 
     $input = CRM_Utils_System::explode('_', $inputCheck, 3);
 
@@ -252,9 +248,8 @@ WHERE  id IN ( $idString )
    *
    * @return int $locationCount max locations for the contact
    * @static
-   * @access public
    */
-  static function maxLocations($contactId) {
+  public static function maxLocations($contactId) {
     $contactLocations = array();
 
     // find number of location blocks for this contact and adjust value accordinly
@@ -280,10 +275,9 @@ UNION
    * @param int $previousEmployerID
    * @param bool $newContact
    *
-   * @access public
    * @static
    */
-  static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL, $newContact = FALSE) {
+  public static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL, $newContact = FALSE) {
     //if organization name is passed. CRM-15368,CRM-15547
     if ($organization && !is_numeric($organization)) {
       $organizationParams['organization_name'] = $organization;
@@ -360,10 +354,9 @@ UNION
    * @param int $previousEmpID
    *
    * @throws CiviCRM_API3_Exception
-   * @access public
    * @static
    */
-  static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE, $previousEmpID = NULL) {
+  public static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE, $previousEmpID = NULL) {
     $ids = array();
     $action = CRM_Core_Action::ADD;
 
@@ -395,7 +388,7 @@ UNION
    * @param array $currentEmployerParams associated array of contact id and its employer id
    *
    */
-  static function setCurrentEmployer($currentEmployerParams) {
+  public static function setCurrentEmployer($currentEmployerParams) {
     foreach ($currentEmployerParams as $contactId => $orgId) {
       $query = "UPDATE civicrm_contact contact_a,civicrm_contact contact_b
 SET contact_a.employer_id=contact_b.id, contact_a.organization_name=contact_b.organization_name
@@ -413,7 +406,7 @@ WHERE contact_a.id ={$contactId} AND contact_b.id={$orgId}; ";
    * @param int $organizationId current employer id
    *
    */
-  static function updateCurrentEmployer($organizationId) {
+  public static function updateCurrentEmployer($organizationId) {
     $query = "UPDATE civicrm_contact contact_a,civicrm_contact contact_b
 SET contact_a.organization_name=contact_b.organization_name
 WHERE contact_a.employer_id=contact_b.id AND contact_b.id={$organizationId}; ";
@@ -428,7 +421,7 @@ WHERE contact_a.employer_id=contact_b.id AND contact_b.id={$organizationId}; ";
    * @param int $employerId contact id ( mostly organization contact id)
    *
    */
-  static function clearCurrentEmployer($contactId, $employerId = NULL) {
+  public static function clearCurrentEmployer($contactId, $employerId = NULL) {
     $query = "UPDATE civicrm_contact
 SET organization_name=NULL, employer_id = NULL
 WHERE id={$contactId}; ";
@@ -478,7 +471,7 @@ WHERE id={$contactId}; ";
    *
    * @static
    */
-  static function buildOnBehalfForm(&$form, $contactType, $countryID, $stateID, $title) {
+  public static function buildOnBehalfForm(&$form, $contactType, $countryID, $stateID, $title) {
 
     $config = CRM_Core_Config::singleton();
 
@@ -549,7 +542,7 @@ WHERE id={$contactId}; ";
    * @param int $employerId contact id of employer ( organization id )
    *
    */
-  static function clearAllEmployee($employerId) {
+  public static function clearAllEmployee($employerId) {
     $query = "
 UPDATE civicrm_contact
    SET organization_name=NULL, employer_id = NULL
@@ -569,9 +562,8 @@ UPDATE civicrm_contact
    *
    * @return array $contactViewLinks returns array with links to contact view
    * @static
-   * @access public
    */
-  static function formatContactIDSToLinks($contactIDs, $addViewLink = TRUE, $addEditLink = TRUE, $originalId = NULL) {
+  public static function formatContactIDSToLinks($contactIDs, $addViewLink = TRUE, $addEditLink = TRUE, $originalId = NULL) {
     $contactLinks = array();
     if (!is_array($contactIDs) || empty($contactIDs)) {
       return $contactLinks;
@@ -674,7 +666,7 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
    *
    * @return array $contactDetails array of contact info.@static
    */
-  static function contactDetails($componentIds, $componentName, $returnProperties = array()) {
+  public static function contactDetails($componentIds, $componentName, $returnProperties = array()) {
     $contactDetails = array();
     if (empty($componentIds) ||
       !in_array($componentName, array('CiviContribute', 'CiviMember', 'CiviEvent', 'Activity'))
@@ -799,9 +791,8 @@ Group By  componentId";
    *
    * @return void
    * @static
-   * @access public
    */
-  static function processSharedAddress(&$address) {
+  public static function processSharedAddress(&$address) {
     if (!is_array($address)) {
       return;
     }
@@ -850,7 +841,7 @@ Group By  componentId";
    *
    * @return array $contactNames associated array of contact names@static
    */
-  static function getAddressShareContactNames(&$addresses) {
+  public static function getAddressShareContactNames(&$addresses) {
     $contactNames = array();
     // get the list of master id's for address
     $masterAddressIds = array();
@@ -889,7 +880,7 @@ Group By  componentId";
    * @return void
    * @static
    */
-  static function clearContactCaches($contactID = NULL) {
+  public static function clearContactCaches($contactID = NULL) {
     // clear acl cache if any.
     CRM_ACL_BAO_Cache::resetCache();
 
@@ -1061,7 +1052,7 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    *
    * @return int or null
    */
-  static function defaultGreeting($contactType, $greetingType) {
+  public static function defaultGreeting($contactType, $greetingType) {
     $contactTypeFilters = array('Individual' => 1, 'Household' => 2, 'Organization' => 3);
     if (!isset($contactTypeFilters[$contactType])) {
       return;
@@ -1100,7 +1091,7 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    * @return void
    * @static
    */
-  static function processGreetingTemplate(&$templateString, $contactDetails, $contactID, $className) {
+  public static function processGreetingTemplate(&$templateString, $contactDetails, $contactID, $className) {
     CRM_Utils_Token::replaceGreetingTokens($templateString, $contactDetails, $contactID, $className, TRUE);
 
     $smarty = CRM_Core_Smarty::singleton();

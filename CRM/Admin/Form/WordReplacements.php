@@ -39,7 +39,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
 
   protected $_defaults = NULL;
 
-  function preProcess() {
+  public function preProcess() {
     // This controller was originally written to CRUD $config->locale_custom_strings,
     // but that's no longer the canonical store. Re-sync from canonical store to ensure
     // that we display that latest data. This is inefficient - at some point, we
@@ -114,7 +114,6 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
    * Build the form object
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $config    = CRM_Core_Config::singleton();
@@ -181,9 +180,8 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
    *
    * @return array list of errors to be posted back to the form
    * @static
-   * @access public
    */
-  static function formRule($values) {
+  public static function formRule($values) {
     $errors = array();
 
     $oldValues  = CRM_Utils_Array::value('old', $values);
@@ -212,7 +210,6 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
   /**
    * Process the form submission
    *
-   * @access public
    *
    * @return void
    */
@@ -281,4 +278,3 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     }
   }
 }
-

@@ -8,14 +8,14 @@ require_once 'CiviTest/Custom.php';
  */
 class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
   /**
    * Test setValues() and GetValues() methods with custom Date field
    */
-  function testSetGetValuesDate() {
+  public function testSetGetValuesDate() {
     $params = array();
     $contactID = Contact::createIndividual();
 
@@ -114,7 +114,7 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
    * Test setValues() and getValues() methods with custom field YesNo(Boolean) Radio
    *
    */
-  function testSetGetValuesYesNoRadio() {
+  public function testSetGetValuesYesNoRadio() {
     $params = array();
     $contactID = Contact::createIndividual();
 
@@ -197,4 +197,3 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     Contact::delete($contactID);
   }
 }
-

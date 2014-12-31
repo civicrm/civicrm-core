@@ -43,7 +43,7 @@ class PostDelete extends \Symfony\Component\EventDispatcher\Event {
    */
   public $result;
 
-  function __construct($object, $result) {
+  public function __construct($object, $result) {
     $this->object = $object;
     $this->result = $result;
   }
