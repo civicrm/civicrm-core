@@ -443,8 +443,7 @@ class CRM_Core_Component {
   static function getComponentsFromFile($crmFolderDir) {
     $components = array();
     //traverse CRM folder and check for Info file
-    if (is_dir($crmFolderDir)) {
-      $dir = opendir($crmFolderDir);
+    if (is_dir($crmFolderDir) && $dir = opendir($crmFolderDir)) {
       while ($subDir = readdir($dir)) {
         // skip the extensions diretory since it has an Info.php file also
         if ($subDir == 'Extension') {
@@ -465,4 +464,3 @@ class CRM_Core_Component {
     return $components;
   }
 }
-

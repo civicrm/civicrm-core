@@ -791,15 +791,13 @@ AND    u.status = 1
     //lets remove sript name to reduce one iteration.
     array_pop($pathVars);
 
-    //CRM-7429 --do check for upper most 'includes' dir,
-    //which would effectually work for multisite installation.
+    // CRM-7429 -- do check for uppermost 'includes' dir, which would
+    // work for multisite installation.
     do {
       $cmsRoot = $firstVar . '/' . implode('/', $pathVars);
       $cmsIncludePath = "$cmsRoot/includes";
-      //stop as we found bootstrap.
-      if (@opendir($cmsIncludePath) &&
-        file_exists("$cmsIncludePath/bootstrap.inc")
-      ) {
+      // Stop if we find bootstrap.
+      if (file_exists("$cmsIncludePath/bootstrap.inc")) {
         $valid = TRUE;
         break;
       }

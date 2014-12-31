@@ -292,8 +292,7 @@ WHERE id = %2
     //CRM-7123 -lets activate needful languages.
     $config = CRM_Core_Config::singleton();
     $locales = array();
-    if (is_dir($config->gettextResourceDir)) {
-      $dir = opendir($config->gettextResourceDir);
+    if (is_dir($config->gettextResourceDir) && $dir = opendir($config->gettextResourceDir)) {
       while ($filename = readdir($dir)) {
         if (preg_match('/^[a-z][a-z]_[A-Z][A-Z]$/', $filename)) {
           $locales[$filename] = $filename;
@@ -406,4 +405,3 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id )
     $upgrade->processSQL($rev);
   }
 }
-

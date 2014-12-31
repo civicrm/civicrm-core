@@ -131,8 +131,7 @@ class CRM_Core_I18n {
       // check which ones are available; add them to $all if not there already
       $config = CRM_Core_Config::singleton();
       $codes = array();
-      if (is_dir($config->gettextResourceDir)) {
-        $dir = opendir($config->gettextResourceDir);
+      if (is_dir($config->gettextResourceDir) && $dir = opendir($config->gettextResourceDir)) {
         while ($filename = readdir($dir)) {
           if (preg_match('/^[a-z][a-z]_[A-Z][A-Z]$/', $filename)) {
             $codes[] = $filename;
@@ -520,4 +519,3 @@ function ts($text, $params = array()) {
     return $i18n->crm_translate($text, $params);
   }
 }
-
