@@ -95,8 +95,8 @@ class CRM_Core_Config_Defaults {
       }
 
       if ($checkForPostMax) {
-        $config     = CRM_Core_Config::singleton();
-        if($config->maxImportFileSize > $size) {
+        $maxImportFileSize = self::formatUnitSize(ini_get('upload_max_filesize'));
+        if($maxImportFileSize > $size) {
           CRM_Core_Session::setStatus(ts("Note: Upload max filesize ('upload_max_filesize') should not exceed Post max size ('post_max_size') as defined in PHP.ini, please check with your system administrator."), ts("Warning"), "alert");
         }
       }
