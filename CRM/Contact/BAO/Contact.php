@@ -3217,7 +3217,8 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
         break;
       case 'contact_type':
         if ($context == 'search') {
-          // CRM-15495 - EntityRef filters expect this format
+          // CRM-15495 - EntityRef filters and basic search forms expect this format
+          // FIXME: Search builder does not
           return CRM_Contact_BAO_ContactType::getSelectElements();
         }
         break;

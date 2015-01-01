@@ -81,20 +81,15 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
       );
     }
 
+    // add select for groups
     if (!empty($searchOptions['groups'])) {
-      // Arrange groups into hierarchical listing (child groups follow their parents and have indentation spacing in title)
-      $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($this->_group, NULL, '&nbsp;&nbsp;', TRUE);
-
-      // add select for groups
-      $group = array('' => ts('- any group -')) + $groupHierarchy;
-      $this->add('select', 'group', ts('in'), $group, FALSE, array('class' => 'crm-select2'));
+      $this->addSelect('group', array('entity' => 'group_contact', 'label' => ts('in'), 'context' => 'search', 'placeholder' => ts('- any group -')));
     }
 
     if (!empty($searchOptions['tags'])) {
       // tag criteria
       if (!empty($this->_tag)) {
-        $tag = array('' => ts('- any tag -')) + $this->_tag;
-        $this->add('select', 'tag', ts('with'), $tag, FALSE, array('class' => 'crm-select2'));
+        $this->addSelect('tag', array('entity' => 'entity_tag', 'label' => ts('with'), 'context' => 'search', 'placeholder' => ts('- any tag -')));
       }
     }
 
