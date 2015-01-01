@@ -177,20 +177,22 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
     $payLaterInstructionsText = "Pay later instructions $hash";
-    $this->assertTrue($this->isTextPresent($payLaterInstructionsText));
+    $this->verifyText("xpath=//div[@class='bold pay_later_receipt-section']/p", $payLaterInstructionsText);
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent($payLaterInstructionsText));
+    $this->verifyText("xpath=//div[@id='help']/div/p", $payLaterInstructionsText);
 
     //login to check contribution
     $this->openCiviPage("contribute/search", "reset=1", 'contribution_date_low');
 
-    $this->type('sort_name', "$firstName $lastName");
+    $this->type('sort_name', "$lastName $firstName");
     $this->check('contribution_test');
-    $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom', FALSE);
+    $this->click('_qf_Search_refresh');
+    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->click("xpath=//div[@id='contributionSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
     $expected = array(
       'From'            => "{$firstName} {$lastName}",
       'Financial Type'  => 'Donation',
