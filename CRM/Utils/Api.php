@@ -31,6 +31,7 @@
 class CRM_Utils_Api {
   /**
    * Attempts to retrieve the API entity name from any calling class.
+   * FIXME: This is a bit hackish but the naming convention for forms is not very strict
    *
    * @param string|object $classNameOrObject
    *
@@ -63,6 +64,17 @@ class CRM_Utils_Api {
       $daoName = "CRM_Core_DAO_$child";
       $shortName = CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
     }
+
+    // If that didn't work, try using just the trailing name
+    if (!$shortName) {
+      $shortName = CRM_Core_DAO_AllCoreTables::getFullName($child) ? $child : NULL;
+    }
+
+    // If that didn't work, try using just the leading name
+    if (!$shortName) {
+      $shortName = CRM_Core_DAO_AllCoreTables::getFullName($parent) ? $parent : NULL;
+    }
+
     if (!$shortName) {
       throw new CRM_Core_Exception('Could not find api name for supplied class');
     }
