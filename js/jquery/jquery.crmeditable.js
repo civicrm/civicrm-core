@@ -1,5 +1,10 @@
 // https://civicrm.org/licensing
 (function($) {
+  // TODO: We'll need a way to clear this cache if options are edited.
+  // Maybe it should be stored in the CRM object so other parts of the app can use it.
+  // Note that if we do move it, we should also change the format of option lists to our standard sequential arrays
+  var optionsCache = {};
+
   /**
    * Helper fn to retrieve semantic data from markup
    */
@@ -31,8 +36,8 @@
    * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Structure+convention+for+automagic+edit+in+place
    */
   $.fn.crmEditable = function(options) {
-    var checkable = function() {
-      $(this).change(function() {
+    function checkable() {
+      $(this).off('.crmEditable').on('change.crmEditable', function() {
         var $el = $(this),
           info = $el.crmEditableEntity();
         if (!info.field) {
@@ -52,26 +57,22 @@
             editableSettings.success.call($el[0], info.entity, info.field, checked, data);
           });
       });
-    };
+    }
 
     var defaults = {
-      form: {},
-      callBack: function(data) {
-        if (data.is_error) {
-          editableSettings.error.call(this, data);
-        } else {
-          return editableSettings.success.call(this, data);
-        }
-      },
       error: function(entity, field, value, data) {
         $(this).crmError(data.error_message, ts('Error'));
         $(this).removeClass('crm-editable-saving');
       },
       success: function(entity, field, value, data, settings) {
         var $i = $(this);
-        $i.removeClass('crm-editable-saving crm-error');
-        value = value === '' ? settings.placeholder : value;
-        $i.html(value);
+        if ($i.data('refresh')) {
+          CRM.refreshParent($i);
+        } else {
+          $i.removeClass('crm-editable-saving crm-error');
+          value = value === '' ? settings.placeholder : value;
+          $i.html(value);
+        }
       }
     };
 
@@ -79,6 +80,10 @@
     return this.each(function() {
       var $i,
         fieldName = "";
+
+      if ($(this).hasClass('crm-editable-enabled')) {
+        return;
+      }
 
       if (this.nodeName == "INPUT" && this.type == "checkbox") {
         checkable.call(this, this);
@@ -109,11 +114,35 @@
         submit: '<button type="submit"><span class="ui-icon ui-icon-check"></span></button>',
         cssclass: 'crm-editable-form',
         data: function(value, settings) {
+          if ($i.data('type') == 'select' && !$i.data('options')) {
+            var result,
+              info = $i.crmEditableEntity(),
+              hash = info.entity + '.' + info.field,
+              params = {
+                field: info.field,
+                context: 'create'
+              };
+            $i.data('optionsHashKey', hash);
+            if (optionsCache[hash]) {
+              return optionsCache[hash];
+            }
+            $.ajax({
+              url: CRM.url('civicrm/ajax/rest'),
+              data: {entity: info.entity, action: 'getoptions', json: JSON.stringify(params)},
+              async: false,
+              success: function(data) {optionsCache[hash] = data.values;}
+            });
+            return optionsCache[hash];
+          }
           return value.replace(/<(?:.|\n)*?>/gm, '');
         }
       };
       if ($i.data('type')) {
         settings.type = $i.data('type');
+        if (settings.type == 'boolean') {
+          settings.type = 'select';
+          $i.data('options', {'0': ts('No'), '1': ts('Yes')});
+        }
       }
       if ($i.data('options')) {
         settings.data = $i.data('options');
@@ -121,9 +150,7 @@
       if (settings.type == 'textarea') {
         $i.addClass('crm-editable-textarea-enabled');
       }
-      else {
-        $i.addClass('crm-editable-enabled');
-      }
+      $i.addClass('crm-editable-enabled');
 
       $i.editable(function(value, settings) {
         $i.addClass('crm-editable-saving');
@@ -149,6 +176,10 @@
           .done(function(data) {
             if ($el.data('options')) {
               value = $el.data('options')[value];
+            }
+            else if ($el.data('optionsHashKey')) {
+              var options = optionsCache[$el.data('optionsHashKey')];
+              value = options ? options[value] : '';
             }
             $el.trigger('crmFormSuccess');
             editableSettings.success.call($el[0], info.entity, info.field, value, data, settings);

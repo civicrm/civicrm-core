@@ -4067,12 +4067,10 @@ div.m ul#civicrm-menu,
   border: 2px dashed transparent;
 }
 .crm-container .crm-editable-textarea-enabled {
-  padding-left: 2px;
-  border: 2px dashed transparent;
+  white-space: normal;
 }
 
-.crm-container .crm-editable-enabled:hover,
-.crm-container .crm-editable-textarea-enabled:hover {
+.crm-container .crm-editable-enabled:hover {
   border: 2px dashed lightgrey;
   cursor: pointer;
 }
