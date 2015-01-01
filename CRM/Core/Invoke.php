@@ -38,11 +38,15 @@
 class CRM_Core_Invoke {
 
   /**
-   * This is the main function that is called on every click action and based on the argument
-   * respective functions are called
+   * This is the main front-controller that integrates with the CMS. Any
+   * page-request that is sent to the CMS and intended for CiviCRM should
+   * be processed by invoke().
    *
-   * @param $args array this array contains the arguments of the url
-   * @return string, HTML
+   * @param array $args
+   *   The parts of the URL which identify the intended CiviCRM page
+   *   (e.g. array('civicrm', 'event', 'register')).
+   * @return string
+   *   HTML. For non-HTML content, invoke() may call print() and exit().
    *
    * @static
    */
@@ -50,61 +54,33 @@ class CRM_Core_Invoke {
     try {
       return self::_invoke($args);
     }
-
     catch (Exception $e) {
-      return CRM_Core_Error::handleUnhandledException($e);
+      CRM_Core_Error::handleUnhandledException($e);
     }
   }
 
   /**
-   * @param $args
+   * This is the same as invoke(), but it does *not* include exception
+   * handling.
+   *
+   * @param array $args
+   *   The parts of the URL which identify the intended CiviCRM page
+   *   (e.g. array('civicrm', 'event', 'register')).
+   * @return string
+   *   HTML. For non-HTML content, invoke() may call print() and exit().
    */
-  protected static function _invoke($args) {
+  public static function _invoke($args) {
     if ($args[0] !== 'civicrm') {
       return;
     }
 
     if (!defined('CIVICRM_SYMFONY_PATH')) {
-      try {
-        // Traditional Civi invocation path
-        self::hackMenuRebuild($args); // may exit
-        self::init($args);
-        self::hackStandalone($args);
-        $item = self::getItem($args);
-        return self::runItem($item);
-      }
-      catch (CRM_Core_EXCEPTION $e) {
-        $params = $e->getErrorData();
-        $message = $e->getMessage();
-        $session = CRM_Core_Session::singleton();
-        $session->setStatus(
-          $message,
-          CRM_Utils_Array::value('message_title', $params),
-          CRM_Utils_Array::value('message_type', $params, 'error')
-        );
-
-        // @todo remove this code - legacy redirect path is an interim measure for moving redirects out of BAO
-        // to somewhere slightly more acceptable. they should not be part of the exception class & should
-        // be managed @ the form level - if you find a form that is triggering this piece of code
-        // you should log a ticket for it to be removed with details about the form you were on.
-        if (!empty($params['legacy_redirect_path'])) {
-          if (CRM_Utils_System::isDevelopment()) {
-            // here we could set a message telling devs to log it per above
-          }
-          CRM_Utils_System::redirect($params['legacy_redirect_path'], $params['legacy_redirect_query']);
-        }
-      }
-      catch (Exception $e) {
-        // Recall: CRM_Core_Config is initialized before calling CRM_Core_Invoke
-        $config = CRM_Core_Config::singleton();
-        return CRM_Core_Error::handleUnhandledException($e);
-        /*
-        if ($config->backtrace) {
-          return CRM_Core_Error::formatHtmlException($e);
-        } else {
-         // TODO
-        }*/
-      }
+      // Traditional Civi invocation path
+      self::hackMenuRebuild($args); // may exit
+      self::init($args);
+      self::hackStandalone($args);
+      $item = self::getItem($args);
+      return self::runItem($item);
     } else {
       // Symfony-based invocation path
       require_once CIVICRM_SYMFONY_PATH . '/app/bootstrap.php.cache';
