@@ -989,6 +989,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   - option_url - path to edit this option list - usually retrieved automatically - set to NULL to disable link
    *   - placeholder - set to NULL to disable
    *   - multiple - bool
+   *   - context - @see CRM_Core_DAO::buildOptionsContext
    * @param bool $required
    * @throws CRM_Core_Exception
    * @return HTML_QuickForm_Element
@@ -1005,18 +1006,20 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $options = $props['options'];
     }
     else {
-      $info = civicrm_api3($props['entity'], 'getoptions', array('field' => $props['field']));
+      $info = civicrm_api3($props['entity'], 'getoptions', $props);
       $options = $info['values'];
     }
     if (!array_key_exists('placeholder', $props)) {
-      $props['placeholder'] = $required ? ts('- select -') : ts('- none -');
+      $props['placeholder'] = $required ? ts('- select -') : CRM_Utils_Array::value('context', $props) == 'search' ? ts('- any -') : ts('- none -');
     }
     // Handle custom field
     if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
       list(, $id) = explode('_', $name);
       $label = isset($props['label']) ? $props['label'] : CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'label', $id);
       $gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'option_group_id', $id);
-      $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $gid);
+      if (CRM_Utils_Array::value('context', $props) != 'search') {
+        $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $gid);
+      }
     }
     // Core field
     else {
@@ -1031,12 +1034,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
       }
       $label = isset($props['label']) ? $props['label'] : $fieldSpec['title'];
-      $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : $props['data-option-edit-path'] = CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
+      if (CRM_Utils_Array::value('context', $props) != 'search') {
+        $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : $props['data-option-edit-path'] = CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
+      }
     }
     $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
     $props['data-api-entity'] = $props['entity'];
     $props['data-api-field'] = $props['field'];
-    CRM_Utils_Array::remove($props, 'label', 'entity', 'field', 'option_url', 'options');
+    CRM_Utils_Array::remove($props, 'label', 'entity', 'field', 'option_url', 'options', 'context');
     return $this->add('select', $name, $label, $options, $required, $props);
   }
 

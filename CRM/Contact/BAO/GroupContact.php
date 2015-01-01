@@ -766,4 +766,28 @@ AND    contact_id IN ( $contactStr )
 
     return array($numContactsAdded, $numContactsNotAdded);
   }
+
+  /**
+   * Get options for a given field.
+   * @see CRM_Core_DAO::buildOptions
+   *
+   * @param String $fieldName
+   * @param String $context : @see CRM_Core_DAO::buildOptionsContext
+   * @param Array $props : whatever is known about this dao object
+   *
+   * @return Array|bool
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    $params = array();
+
+    $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+
+    // Sort group list by hierarchy
+    // TODO: This will only work when api.entity is "group_contact". What about others?
+    if (($fieldName == 'group' || $fieldName == 'group_id') && ($context == 'search' || $context == 'create')) {
+      $options = CRM_Contact_BAO_Group::getGroupsHierarchy($options, NULL, '- ', TRUE);
+    }
+
+    return $options;
+  }
 }
