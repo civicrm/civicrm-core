@@ -400,6 +400,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       CRM_Utils_Hook::unhandledException($exception);
     } catch (Exception $other) {
       // if the exception-handler generates an exception, then that sucks! oh, well. carry on.
+      CRM_Core_Error::debug_var('handleUnhandledException_nestedException', self::formatTextException($other));
     }
     $config = CRM_Core_Config::singleton();
     $vars = array(
