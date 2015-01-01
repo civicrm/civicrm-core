@@ -259,7 +259,7 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addGroup($commPreff, 'preferred_communication_method', ts('Preferred Communication Method'));
 
     //CRM-6138 Preferred Language
-    $form->addSelect('preferred_language', array('class' => 'twenty', 'option_url' => NULL));
+    $form->addSelect('preferred_language', array('class' => 'twenty', 'context' => 'search'));
 
     // Phone search
     $form->addElement('text', 'phone_numeric', ts('Phone Number'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone'));
@@ -357,7 +357,7 @@ class CRM_Contact_Form_Search_Criteria {
       $form->addRule('prox_distance', ts('Please enter positive number as a distance'), 'numeric');
     }
 
-    $form->addSelect('world_region', array('entity' => 'address', 'placeholder' => ts('- any -'), 'option_url' => NULL));
+    $form->addSelect('world_region', array('entity' => 'address', 'context' => 'search'));
 
     // select for location type
     $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');

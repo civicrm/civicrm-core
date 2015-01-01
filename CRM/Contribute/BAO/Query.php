@@ -985,7 +985,7 @@ class CRM_Contribute_BAO_Query {
 
     // CRM-13848
     $form->addSelect('financial_type_id',
-      array('entity' => 'contribution', 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))
+      array('entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search')
     );
 
     $form->add('select', 'contribution_page_id',
@@ -1064,9 +1064,8 @@ class CRM_Contribute_BAO_Query {
       array(
         'entity'      => 'contribution_soft',
         'field'       => 'soft_credit_type_id',
-        'multiple'    => 'multiple',
-        'option_url'  => NULL,
-        'placeholder' => ts('- any -')
+        'multiple'    => TRUE,
+        'context'     => 'search',
       )
     );
 
