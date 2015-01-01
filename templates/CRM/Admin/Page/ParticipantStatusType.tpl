@@ -24,9 +24,9 @@
  +--------------------------------------------------------------------+
 *}
 {if $action eq 1 or $action eq 2 or $action eq 8}
-  {include file="CRM/Admin/Form/ParticipantStatus.tpl"}
+  {include file="CRM/Admin/Form/ParticipantStatusType.tpl"}
 {else}
-  <div id="help">{ts}Manage event participant statuses below. Enable selected statuses to allow event waitlisting and/or participant approval.{/ts} {help id="id-disabled_statuses" file="CRM/Admin/Page/ParticipantStatus.hlp"}</div>
+  <div id="help">{ts}Manage event participant statuses below. Enable selected statuses to allow event waitlisting and/or participant approval.{/ts} {help id="id-disabled_statuses"}</div>
 
 <div class="crm-section participant-status">
   {strip}

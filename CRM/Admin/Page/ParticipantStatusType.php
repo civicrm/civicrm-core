@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-class CRM_Admin_Page_ParticipantStatus extends CRM_Core_Page_Basic {
+class CRM_Admin_Page_ParticipantStatusType extends CRM_Core_Page_Basic {
 
   public $useLivePageJS = TRUE;
 
@@ -118,7 +118,7 @@ class CRM_Admin_Page_ParticipantStatus extends CRM_Core_Page_Basic {
    * @return string
    */
   public function editForm() {
-    return 'CRM_Admin_Form_ParticipantStatus';
+    return 'CRM_Admin_Form_ParticipantStatusType';
   }
 
   /**
