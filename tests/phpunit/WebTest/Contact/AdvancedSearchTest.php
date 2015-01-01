@@ -107,6 +107,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->select2("relationship_type_id", "Employee of");
     $this->waitForElementPresent("xpath=//input[@id='related_contact_id'][@placeholder='- select organization -']");
     $this->select2("related_contact_id", "Default", TRUE);
+    $this->waitForAjaxContent();
     $this->webtestFillDate("start_date", "-1 day");
     $this->webtestFillDate("end_date", "+1 day");
     $this->clickAjaxLink('_qf_Relationship_upload-bottom', NULL);
@@ -217,6 +218,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   public function submitSearch($firstName) {
     $this->clickLink("_qf_Advanced_refresh");
     // verify unique name
+    $this->waitForAjaxContent();
     $this->waitForText("xpath=//div[@class='crm-search-results']/table/tbody", preg_quote("adv$firstName, $firstName"));
     // should give 1 result only as we are searching with unique name
     $this->waitForText("xpath=//div[@id='search-status']/table/tbody/tr/td", preg_quote("1 Contact"));
