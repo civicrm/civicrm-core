@@ -166,6 +166,9 @@ dm_git_checkout "$DM_SOURCEDIR/packages" "$DM_REF_PACKAGES"
 ## in theory, this shouldn't matter, but GenCode is CMS-dependent, and we've been doing our past builds based on D7
 dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
 
+## Get latest dependencies
+dm_generate_vendor "$DM_SOURCEDIR"
+
 # Before anything - regenerate DAOs
 
 cd $DM_SOURCEDIR/xml

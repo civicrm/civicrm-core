@@ -20,6 +20,7 @@ cp $SRC/drupal/civicrm.config.php.drupal $TRG/civicrm.config.php
 dm_generate_version "$TRG/civicrm-version.php" Drupal
 dm_install_core "$SRC" "$TRG"
 dm_install_packages "$SRC/packages" "$TRG/packages"
+dm_install_vendor "$SRC/vendor" "$TRG/vendor"
 dm_install_drupal "$SRC/drupal" "$TRG/drupal"
 
 # gen tarball
