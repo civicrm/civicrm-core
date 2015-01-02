@@ -427,7 +427,9 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $expected = array(
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => $financialType,
-      'Net Amount' => '$ 590.00',
+      // as per changes made in CRM-15407
+      'Fee Amount' => '$ 1.50',
+      'Net Amount' => '$ 588.50',
       'Contribution Status' => 'Completed',
     );
     $this->webtestVerifyTabularData($expected);
@@ -543,7 +545,9 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $expected = array(
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => $financialType,
-      'Net Amount' => '$ 65.00',
+      // as per changes made in CRM-15407
+      'Fee Amount' => '$ 1.50',
+      'Net Amount' => '$ 63.50',
       'Contribution Status' => 'Completed',
     );
     $this->webtestVerifyTabularData($expected);
