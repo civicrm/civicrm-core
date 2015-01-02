@@ -38,7 +38,7 @@
             <th>{ts}Market Value{/ts}</th>
             <th>{ts}Min Contribution{/ts}</th>
       <th>{ts}Financial Type{/ts}</th>
-            <th>{ts}Weight{/ts}</th>
+            <th>{ts}Order{/ts}</th>
             <th></th>
         </tr>
         {foreach from=$rows item=row}

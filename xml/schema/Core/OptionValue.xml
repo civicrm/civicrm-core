@@ -94,7 +94,7 @@
   </field>
   <field>
     <name>weight</name>
-    <title>Option Weight</title>
+    <title>Order</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Controls display sort order.</comment>

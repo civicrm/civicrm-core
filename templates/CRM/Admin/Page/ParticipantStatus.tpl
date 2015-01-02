@@ -41,7 +41,7 @@
         <th>{ts}Reserved?{/ts}</th>
         <th>{ts}Active?{/ts}</th>
         <th>{ts}Counted?{/ts}</th>
-        <th>{ts}Weight{/ts}</th>
+        <th>{ts}Order{/ts}</th>
         <th>{ts}Visibility{/ts}</th>
         <th></th>
       </thead>

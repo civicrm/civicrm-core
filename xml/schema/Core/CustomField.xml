@@ -120,7 +120,7 @@
   <field>
     <name>weight</name>
     <type>int</type>
-    <title>Custom Field Weight</title>
+    <title>Order</title>
     <required>true</required>
     <default>1</default>
     <comment>Controls field display order within an extended property group.</comment>

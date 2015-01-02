@@ -102,6 +102,7 @@
   </field>
   <field>
     <name>weight</name>
+    <title>Order</title>
     <type>int</type>
     <default>1</default>
     <comment>Order in which the field options should appear</comment>
