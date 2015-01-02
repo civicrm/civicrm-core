@@ -49,7 +49,15 @@
  * @access public
  */
 function civicrm_api3_campaign_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  $value = array();
+  _civicrm_api3_custom_format_params($params, $values, 'Campaign');
+  $params = array_merge($values, $params);
+
+  $campaignBAO = CRM_Campaign_BAO_Campaign::create($params);
+
+  _civicrm_api3_object_to_array($campaignBAO, $campaign[$campaignBAO->id]);
+
+  return civicrm_api3_create_success($campaign, $params, 'campaign', 'create', $campaignBAO);
 }
 
 /**
