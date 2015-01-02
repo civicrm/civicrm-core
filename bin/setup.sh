@@ -49,8 +49,12 @@ if [ -z $DBPASS ] ; then
   DBPASS=$REPLY
 fi
 
-# Install npm and bower modules
-npm install
+# download any PHP dependencies
+pushd "$CALLEDPATH/.."
+  composer install
+  # Install npm and bower modules
+  npm install
+popd
 
 # run code generator if it's there - which means it's
 # checkout, not packaged code
