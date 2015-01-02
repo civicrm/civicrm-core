@@ -860,7 +860,13 @@ AND
    * it?
    * @return bool
    */
-  public static function isEnabledBackOfficeCreditCardPayments() {
-    return CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('BackOffice'));
+  public static function isEnabledBackOfficeCreditCardPayments($mode = 'test', $capabilities = array('BackOffice')) {
+    if (strtolower($mode) === 'live') {
+      $isExcludeTest = TRUE;
+    }
+    else {
+      $isExcludeTest = FALSE;
+    }
+    return CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting($capabilities, $isExcludeTest);
   }
 }

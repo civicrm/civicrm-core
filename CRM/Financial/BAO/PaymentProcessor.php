@@ -295,6 +295,9 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     if ($isExcludeTest) {
       $retrievalParameters['is_test'] = 0;
     }
+    else {
+      $retrievalParameters['is_test'] = 1;
+    }
     $processors = civicrm_api3('payment_processor', 'get', $retrievalParameters);
     foreach ($processors['values'] as $processor) {
       $processors['values'][$processor['id']]['payment_processor_type'] = $processor['payment_processor_type'] = $processors['values'][$processor['id']]['api.payment_processor_type.getsingle']['name'];
@@ -319,7 +322,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return array available processors
    */
   public static function getPaymentProcessors($capabilities = array(), $isIncludeTest = FALSE, $ids = array()) {
-    $processors = self::getAllPaymentProcessors(!$isIncludeTest);
+    $processors = self::getAllPaymentProcessors($isIncludeTest);
     if ($capabilities) {
       foreach ($processors as $index => $processor) {
         if (!empty($ids) && !in_array($processor['id'], $ids)) {
