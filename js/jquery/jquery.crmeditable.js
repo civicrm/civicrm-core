@@ -197,15 +197,14 @@
               context: 'create'
             };
           $i.data('optionsHashKey', hash);
-          if (optionsCache[hash]) {
-            return formatOptions(optionsCache[hash]);
+          if (!optionsCache[hash]) {
+            $.ajax({
+              url: CRM.url('civicrm/ajax/rest'),
+              data: {entity: info.entity, action: 'getoptions', json: JSON.stringify(params)},
+              async: false, // jeditable lacks support for async options lookup
+              success: function(data) {optionsCache[hash] = data.values;}
+            });
           }
-          $.ajax({
-            url: CRM.url('civicrm/ajax/rest'),
-            data: {entity: info.entity, action: 'getoptions', json: JSON.stringify(params)},
-            async: false, // jeditable lacks support for async options lookup
-            success: function(data) {optionsCache[hash] = data.values;}
-          });
           return formatOptions(optionsCache[hash]);
 
         }
