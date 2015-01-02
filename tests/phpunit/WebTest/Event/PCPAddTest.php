@@ -533,6 +533,9 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//form[@id='Search']/div[@class='view-content']/table[2]/tbody/tr[@id='rowid']/td/a[text()='$displayName']");
     $this->click("xpath=//form[@id='Search']/div[@class='view-content']/table[2]/tbody/tr[@id='rowid']/td[8]/a[text()='View']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
+    // as per changes made in CRM-15407
+    $feeAmount = 1.50;
+    $amount = $amount - $feeAmount;
 
     $this->webtestVerifyTabularData(
       array(
