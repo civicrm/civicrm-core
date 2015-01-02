@@ -59,7 +59,7 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
     //Setting Upload File Size
     $config = CRM_Core_Config::singleton();
 
-    $uploadFileSize = CRM_Core_Config_Defaults::formatUnitSize($config->maxFileSize.'m');
+    $uploadFileSize = CRM_Core_Config_Defaults::formatUnitSize($config->maxFileSize.'m', TRUE);
     $uploadSize = round(($uploadFileSize / (1024 * 1024)), 2);
 
     $this->assign('uploadSize', $uploadSize);
