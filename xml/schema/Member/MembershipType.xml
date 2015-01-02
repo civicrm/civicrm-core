@@ -214,7 +214,7 @@
   </field>
   <field>
     <name>weight</name>
-    <title>Weight</title>
+    <title>Order</title>
     <type>int</type>
     <add>1.5</add>
   </field>

@@ -77,7 +77,7 @@
   </field>
   <field>
     <name>weight</name>
-    <title>Status Weight</title>
+    <title>Order</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>controls sort order</comment>
