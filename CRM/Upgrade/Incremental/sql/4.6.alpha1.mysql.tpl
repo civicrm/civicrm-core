@@ -122,7 +122,7 @@ VALUES
 ALTER TABLE civicrm_line_item MODIFY COLUMN qty decimal(20,2);
 
 -- CRM-15740
-ALTER TABLE `civicrm_mailing_trackable_url` CHANGE `url` `url` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT;
+ALTER TABLE `civicrm_mailing_trackable_url` CHANGE `url` `url` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'The URL to be tracked.';
 
 -- CRM-15765 missing Indonesian provinces and revise outdated names
 INSERT INTO `civicrm_state_province` (`id`, `country_id`, `abbreviation`, `name`)
