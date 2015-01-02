@@ -155,7 +155,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     $options           = array();
     if (is_array($paymentProcessor) && !empty($paymentProcessor)) {
       $isAuthorize = TRUE;
-      $options = array(ts('No auto-renew option'), ts('Give option, but not required'), ts('Auto-renew required '));
+      $options = CRM_Core_SelectValues::memberAutoRenew();
     }
 
     $this->addRadio('auto_renew', ts('Auto-renew Option'), $options);

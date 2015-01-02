@@ -115,10 +115,12 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
     $dao->orderBy('weight');
     $dao->find();
 
-
     while ($dao->fetch()) {
       $membershipType[$dao->id] = array();
       CRM_Core_DAO::storeValues($dao, $membershipType[$dao->id]);
+
+      $membershipType[$dao->id]['period_type'] = CRM_Utils_Array::value($dao->period_type, CRM_Core_SelectValues::periodType(), '');
+      $membershipType[$dao->id]['visibility'] = CRM_Utils_Array::value($dao->visibility, CRM_Core_SelectValues::memberVisibility(), '');
 
       //adding column for relationship type label. CRM-4178.
       if ($dao->relationship_type_id) {
