@@ -2126,7 +2126,7 @@ function _civicrm_api3_field_value_check(&$params, $fieldName) {
   $fieldValue = CRM_Utils_Array::value($fieldName, $params);
   $op = NULL;
 
-  if (!empty($fieldValue) && is_array($fieldValue) && in_array(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators())) {
+  if (!empty($fieldValue) && is_array($fieldValue) && array_search(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators())) {
     $op = key($fieldValue);
     $fieldValue = CRM_Utils_Array::value($op, $fieldValue);
   }
