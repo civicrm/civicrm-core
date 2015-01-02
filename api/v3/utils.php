@@ -1827,7 +1827,7 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
       if ('unknown-user' === $realContactId) {
         throw new API_Exception("\"$fieldName\" \"{$fieldValue}\" cannot be resolved to a contact ID", 2002, array('error_field' => $fieldName,"type"=>"integer"));
       } elseif (is_numeric($realContactId)) {
-        $params[$fieldName]  = $fieldValue = $realContactId;
+        $fieldValue = $realContactId;
       }
     }
     if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options'])) {
@@ -1848,6 +1848,13 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
         2100, array('field' => $fieldName, "max_length"=>$fieldInfo['maxlength'])
       );
     }
+  }
+
+  if (!empty($op)) {
+    $params[$fieldName][$op] = $fieldValue;
+  }
+  else {
+    $params[$fieldName] = $fieldValue;
   }
 }
 
@@ -1956,6 +1963,13 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
         2100, array('field' => $fieldName)
       );
     }
+  }
+
+  if (!empty($op)) {
+    $params[$fieldName][$op] = $fieldValue;
+  }
+  else {
+    $params[$fieldName] = $fieldValue;
   }
 }
 
