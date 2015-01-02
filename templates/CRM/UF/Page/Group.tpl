@@ -85,13 +85,13 @@
             {foreach from=$rows item=row}
             {if !$row.is_reserved }
               <tr id="UFGroup-{$row.id}" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
-                <td><span class="crmf-title crm-editable">{$row.title}</span></td>
+                <td class="crmf-title crm-editable">{$row.title}</td>
                 <td>
                   {if $row.created_id && $row.created_by}
                     <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.created_id`"}">{ts}{$row.created_by}{/ts}</a>
                   {/if}
                 </td>
-                <td>{$row.description}</td>
+                <td class="crmf-description crm-editable" data-type="textarea">{$row.description}</td>
                 <td>{$row.group_type}</td>
                 <td>{$row.id}</td>
                 <td>{$row.module}</td>
