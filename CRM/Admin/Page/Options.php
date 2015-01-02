@@ -147,10 +147,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
       )) {
       $this->assign('showIsDefault', TRUE);
     }
-    if (self::$_gName == 'participant_status') {
-      $this->assign('showCounted', TRUE);
-      $this->assign('showVisibility', TRUE);
-    }
 
     if (self::$_gName == 'participant_role') {
       $this->assign('showCounted', TRUE);
