@@ -151,7 +151,6 @@ WHERE      e.id = %1
     $fullName  = $form->getVar('_name');
     $className = CRM_Utils_String::getClassName($fullName);
     $new       = '';
-    $action = 'update';
 
     // hack for special cases.
     switch ($className) {
@@ -189,6 +188,7 @@ WHERE      e.id = %1
           $tabs[$key]['qfKey'] = NULL;
         }
 
+        $action = 'update';
         if ($key == 'reminder') {
           $action = 'browse';
         }
