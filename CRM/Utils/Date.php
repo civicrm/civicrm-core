@@ -342,7 +342,7 @@ class CRM_Utils_Date {
       }
     }
 
-    if ($dateString) {
+    if (!CRM_Utils_System::isNull($dateString)) {
       if (strpos($dateString, '-')) {
         $year  = (int) substr($dateString, 0, 4);
         $month = (int) substr($dateString, 5, 2);
