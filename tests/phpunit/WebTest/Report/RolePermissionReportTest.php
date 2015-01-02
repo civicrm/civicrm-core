@@ -133,7 +133,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->openCiviPage('report/instance/1', 'reset=1');
 
     //check if the reserved report field is frozen
-    $this->assertTrue($this->isElementPresent("xpath=//div[@id='instanceForm']//table[3]/tbody//tr/td[2]/span/tt[text()='[ ]']"));
+    $this->assertTrue($this->isElementPresent("xpath=//div[@id='report-tab-access']/table/tbody//tr/td[2]/span/tt[text()='[ ]']"));
 
     // let's give full CiviReport permissions.
     $permissions = array(
@@ -156,8 +156,8 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->openCiviPage('report/instance/1', 'reset=1');
 
     //check if the report criteria and settings is accessible
-    $this->assertTrue($this->isElementPresent("xpath=//form[@id='Summary']//div[@id='id_default']//input[@id='fields_email']"));
-    $this->assertTrue($this->isElementPresent("xpath=//form[@id='Summary']//div[@id='instanceForm']/table//input[@id='title']"));
+    $this->assertTrue($this->isElementPresent("xpath=//div[@id='report-tab-col-groups']/table/tbody//tr/td[3]/input[@id='fields_email']"));
+    $this->assertTrue($this->isElementPresent("xpath=//div[@id='report-tab-format']/table/tbody//tr/td[2]/input[@id='title']"));
 
     //login as admin and remove reserved permission
     $this->webtestLogin('admin');
@@ -176,14 +176,14 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->webtestLogin($user, 'Test12345');
     $this->openCiviPage('report/instance/1', 'reset=1');
 
-    if ($this->isElementPresent("xpath=//form[@id='Summary']/div[2]/div/div/div")) {
-      $this->verifyNotText("xpath=//form[@id='Summary']/div[2]/div/div/div", "Report Criteria");
+    if ($this->isElementPresent("xpath=//div[@id='mainTabContainer']/ul/li")) {
+      $this->verifyNotText("xpath=//div[@id='mainTabContainer']/ul/li/a", "Columns");
     }
-    if ($this->isElementPresent("xpath=//form[@id='Summary']/div[2]/div[2]/div")) {
-      $this->verifyNotText("xpath=//form[@id='Summary']/div[2]/div[2]/div", "Report Settings");
+    if ($this->isElementPresent("xpath=//li[@id='tab_settings']")) {
+      $this->verifyNotText("xpath=//li[@id='tab_settings']/a", "Title and Format");
     }
 
-    $this->assertFalse($this->isElementPresent("xpath=//form[@id='Summary']//div[@id='instanceForm']//input[@id='title']"));
+    $this->assertFalse($this->isElementPresent("xpath=//div[@id='report-tab-format']/table/tbody//tr/td[2]/input[@id='title']"));
 
     //login as admin and turn the is_reserved flag off for the instance
     $this->webtestLogin('admin');
@@ -195,8 +195,8 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->webtestLogin($user, 'Test12345');
     $this->openCiviPage('report/instance/1', 'reset=1');
 
-    $this->assertTrue($this->isElementPresent("xpath=//form[@id='Summary']//div[@id='id_default']//input[@id='fields_email']"));
-    $this->assertTrue($this->isElementPresent("xpath=//form[@id='Summary']//div[@id='instanceForm']//input[@id='title']"));
+    $this->assertTrue($this->isElementPresent("xpath=//div[@id='report-tab-col-groups']/table/tbody//tr/td[3]/input[@id='fields_email']"));
+    $this->assertTrue($this->isElementPresent("xpath=//div[@id='report-tab-format']/table/tbody//tr/td[2]/input[@id='title']"));
 
     //login as admin and delete the role
     $this->webtestLogin('admin');
