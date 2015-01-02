@@ -121,7 +121,7 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
     // Thank-you page
     $this->waitForElementPresent("thankyou_footer");
     $this->assertTrue($this->isElementPresent('tell-a-friend'), 'Missing tell-a-friend div');
-    $text = 'This recurring contribution will be automatically processed every 1 month(s) for a total 12 installments';
+    $text = 'This recurring contribution will be automatically processed every month for a total 12 installments';
     $this->assertTrue($this->isTextPresent($text), 'Missing recurring contribution text (thank-you): ' . $text);
     $this->assertTrue($this->isTextPresent($contributionAmount), 'Missing contribution amount (thank-you): ' . $contributionAmount);
 
