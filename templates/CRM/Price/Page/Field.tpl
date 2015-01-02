@@ -77,7 +77,7 @@
         <td class="crm-editable" data-field="label">{$row.label}</td>
         <td>{$row.html_type_display}</td>
         <td class="nowrap">{$row.weight}</td>
-        <td>{if $row.is_required eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+        <td class="crm-editable" data-field="is_required" data-type="boolean">{if $row.is_required eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
         <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
         <td>{if $row.active_on}{$row.active_on|date_format:"%Y-%m-%d %T"}{/if}</td>
         <td>{if $row.expire_on}{$row.expire_on|date_format:"%Y-%m-%d %T"}{/if}</td>

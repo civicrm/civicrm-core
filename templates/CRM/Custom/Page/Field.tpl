@@ -51,14 +51,14 @@
         </thead>
         <tbody>
         {foreach from=$customField item=row}
-        <tr id="CustomField-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {if NOT $row.is_active} disabled{/if}">
-            <td><span class="crm-editable crmf-label">{$row.label}</span></td>
+        <tr id="CustomField-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if NOT $row.is_active} disabled{/if}">
+            <td class="crm-editable" data-field="label">{$row.label}</td>
             <td>{$row.data_type}</td>
             <td>{$row.html_type}</td>
             <td class="nowrap">{$row.weight}</td>
-            <td>{if $row.is_required eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-            <td>{if $row.is_searchable eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-            <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+            <td class="crm-editable" data-type="boolean" data-field="is_required">{if $row.is_required eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+            <td class="crm-editable" data-type="boolean" data-field="is_searchable">{if $row.is_searchable eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+            <td>{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}

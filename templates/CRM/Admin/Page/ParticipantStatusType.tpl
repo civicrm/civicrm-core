@@ -47,14 +47,14 @@
       </thead>
       {foreach from=$rows item=row}
        <tr id="participant_status_type-{$row.id}" class="crm-entity crm-participant_{$row.id} {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
-          <td class="crm-participant-label crm-editable" data-field="label">{$row.label}</td>
-          <td class="crm-participant-name">{$row.name} ({$row.id})</td>
-          <td class="crm-participant-class">{$row.class}</td>
-          <td class="yes-no crm-participant-is_reserved">{if $row.is_reserved}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Reserved{/ts}" />{/if}</td>
-        <td id="row_{$row.id}_status" class="crm-participant-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td class="yes-no crm-participant-is_counted">{if $row.is_counted} <img src="{$config->resourceBase}i/check.gif" alt="{ts}Counted{/ts}" />{/if}</td>
-          <td class="crm-participant-weight">{$row.weight}</td>
-          <td class="crm-participant-visibility">{$row.visibility}</td>
+          <td class="crmf-label crm-editable" data-field="label">{$row.label}</td>
+          <td class="crmf-name">{$row.name} ({$row.id})</td>
+          <td class="crmf-class crm-editable" data-type="select">{$row.class}</td>
+          <td class="yes-no crmf-is_reserved">{if $row.is_reserved}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Reserved{/ts}" />{/if}</td>
+        <td id="row_{$row.id}_status" class="crmf-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+          <td class="yes-no crmf-is_counted">{if $row.is_counted} <img src="{$config->resourceBase}i/check.gif" alt="{ts}Counted{/ts}" />{/if}</td>
+          <td class="crmf-weight">{$row.weight}</td>
+          <td class="crmf-visibility">{$row.visibility}</td>
           <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
       {/foreach}

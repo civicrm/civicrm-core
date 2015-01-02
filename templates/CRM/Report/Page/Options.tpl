@@ -65,7 +65,7 @@
               <td class="crm-report-optionList-default_value">{$row.default_value}</td>
             {/if}
             <td class="crm-report-optionList-is_reserved">{if $row.is_reserved eq 1}{ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-            <td class="crm-report-optionList-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+            <td class="crm-report-optionList-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td class="crm-report-optionList-component_name">{$row.component_name}</td>
             <td class="crm-report-optionList-action">{$row.action}</td>
           </tr>

@@ -178,7 +178,8 @@ CRM.$(function($) {
           $(nRow).addClass(cl).attr({id: 'row_' + id, 'data-id': id, 'data-entity': 'group'});
           $('td:eq(0)', nRow).wrapInner('<span class="crm-editable crmf-title" />');
           $('td:eq(1)', nRow).addClass('right');
-          $('td:eq(3)', nRow).wrapInner('<span class="crm-editable crmf-description" data-type="textarea" />');
+          $('td:eq(3)', nRow).wrapInner('<div class="crm-editable crmf-description" data-type="textarea" />');
+          $('td:eq(5)', nRow).wrapInner('<div class="crm-editable crmf-visibility" data-type="select" />');
           if (parentsOnly) {
             if ($(nRow).hasClass('crm-group-parent')) {
               $(nRow).find('td:first').prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}');
@@ -295,9 +296,9 @@ CRM.$(function($) {
               }
               appendHTML += '<td class="right">' + val.count + "</td>";
               appendHTML += "<td>" + val.created_by + "</td>";
-              appendHTML += '<td><span class="crm-editable crmf-description" data-type="textarea">' + (val.group_description || '') + "</span></td>";
+              appendHTML += '<td class="crm-editable crmf-description" data-type="textarea">' + (val.group_description || '') + "</td>";
               appendHTML += "<td>" + val.group_type + "</td>";
-              appendHTML += "<td>" + val.visibility + "</td>";
+              appendHTML += '<td class="crm-editable crmf-visibility" data-type="select">' + val.visibility + "</td>";
               if (showOrgInfo) {
                 appendHTML += "<td>" + val.org_info + "</td>";
               }
