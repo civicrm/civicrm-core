@@ -233,6 +233,6 @@
 
   $(document).on('crmLoad', function(e) {
     $('.crm-editable', e.target).crmEditable();
-  })
+  });
 
 })(jQuery);
