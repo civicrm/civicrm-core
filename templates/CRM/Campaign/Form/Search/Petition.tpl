@@ -42,7 +42,6 @@
        {* load petition selector *}
 
        {include file="CRM/common/enableDisableApi.tpl"}
-       {include file="CRM/common/crmeditable.tpl"}
 
        {literal}
        <script type="text/javascript">
@@ -199,6 +198,7 @@ function loadPetitionList( )
              "oLanguage":{"sEmptyTable"  : noRecordFoundMsg,
                  "sZeroRecords" : noRecordFoundMsg },
              "fnDrawCallback": function() {
+               // FIXME: trigger crmLoad and crmEditable would happen automatically
                CRM.$('.crm-editable').crmEditable();
              },
              "fnRowCallback": function( nRow, aData, iDisplayIndex ) {

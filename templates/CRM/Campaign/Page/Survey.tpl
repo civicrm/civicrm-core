@@ -30,7 +30,6 @@
     <a href="{$addSurveyUrl}" class="button"><span>&raquo; {ts}Add Survey{/ts}</span></a>
   </div>
  {include file="CRM/common/enableDisableApi.tpl"}
- {include file="CRM/common/crmeditable.tpl"}
  {include file="CRM/common/jsortable.tpl"}
   <div id="surveyList">
     <table id="options" class="display">
