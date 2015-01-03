@@ -149,7 +149,6 @@
         {/foreach}
         </tbody>
         </table>
-        {include file="CRM/common/crmeditable.tpl"}
         {/strip}
 
 </div>

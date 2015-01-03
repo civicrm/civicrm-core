@@ -29,7 +29,6 @@
       <a href="{$addCampaignUrl}" class="button"><span>&raquo; {ts}Add Campaign{/ts}</span></a>
   </div>
   {include file="CRM/common/enableDisableApi.tpl"}
-  {include file="CRM/common/crmeditable.tpl"}
   <div id="campaignType">
     <table id="options" class="display">
       <thead>

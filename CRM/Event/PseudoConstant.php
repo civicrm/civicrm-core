@@ -161,6 +161,15 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
     return self::$participantStatus[$index];
   }
 
+  public static function participantStatusClassOptions() {
+    return array(
+      'Positive' => ts('Positive'),
+      'Pending' => ts('Pending'),
+      'Waiting' => ts('Waiting'),
+      'Negative' => ts('Negative'),
+    );
+  }
+
   /**
    * Return a status-type-keyed array of status classes
    *

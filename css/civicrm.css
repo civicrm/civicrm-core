@@ -4067,14 +4067,17 @@ div.m ul#civicrm-menu,
   border: 2px dashed transparent;
 }
 .crm-container .crm-editable-textarea-enabled {
-  padding-left: 2px;
-  border: 2px dashed transparent;
+  white-space: normal;
 }
 
-.crm-container .crm-editable-enabled:hover,
-.crm-container .crm-editable-textarea-enabled:hover {
-  border: 2px dashed lightgrey;
+.crm-container .crm-editable-enabled:hover {
+  border: 2px dashed #d1d1d1;
   cursor: pointer;
+}
+
+.crm-container .crm-editable-enabled.crm-editable-editing:hover {
+  border: 2px dashed transparent;
+  cursor: auto;
 }
 
 .crm-container span.crm-editable-textarea-enabled {
@@ -4086,10 +4089,16 @@ div.m ul#civicrm-menu,
 }
 
 .crm-container .crm-editable-placeholder {
-  background: url("../i/icons/jquery-ui-2786C2.png") -66px -114px no-repeat;
+  background: url("../i/icons/jquery-ui-3E3E3E.png") -66px -114px no-repeat;
   text-indent: -10000px;
   display: block;
   width: 12px;
+  opacity: .5;
+}
+
+.crm-container .crm-editable-enabled:hover .crm-editable-placeholder {
+  background-image: url("../i/icons/jquery-ui-2786C2.png");
+  opacity: 1;
 }
 
 .crm-container .crm-editable-saving {
@@ -4113,6 +4122,7 @@ div.m ul#civicrm-menu,
 .crm-editable-form {
   margin: 0 !important;
   padding: 0 !important;
+  width: auto !important;
   position: relative;
   overflow: visible;
 }
