@@ -44,7 +44,6 @@
         {strip}
         {* handle enable/disable actions*}
    {include file="CRM/common/enableDisableApi.tpl"}
-   {include file="CRM/common/crmeditable.tpl"}
         <table id="options" class="row-highlight">
             <thead>
             <tr>

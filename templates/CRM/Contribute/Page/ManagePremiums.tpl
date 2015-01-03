@@ -43,7 +43,6 @@
     {strip}
   {* handle enable/disable actions*}
    {include file="CRM/common/enableDisableApi.tpl"}
-   {include file="CRM/common/crmeditable.tpl"}
   {include file="CRM/common/jsortable.tpl"}
         <table id="options" class="display">
           <thead>

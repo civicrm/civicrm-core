@@ -89,7 +89,6 @@
 
 {* handle enable/disable actions*}
 {include file="CRM/common/enableDisableApi.tpl"}
-{include file="CRM/common/crmeditable.tpl"}
 
 {literal}
 <script type="text/javascript">
@@ -188,6 +187,7 @@ CRM.$(function($) {
           return nRow;
         },
         "fnDrawCallback": function() {
+          // FIXME: trigger crmLoad and crmEditable would happen automatically
           $('.crm-editable').crmEditable();
         },
         "fnServerData": function ( sSource, aoData, fnCallback ) {
@@ -307,7 +307,6 @@ CRM.$(function($) {
             });
             $( rowID ).after( appendHTML );
             $( rowID ).next().trigger('crmLoad');
-            $('.crm-editable').crmEditable();
           }
       });
     }

@@ -168,4 +168,3 @@ CRM.$(function($) {
 {/literal}
 
 {/if}
-{include file="CRM/common/crmeditable.tpl"}

@@ -82,5 +82,4 @@
     </div>
 {/if}
 
-{include file="CRM/common/crmeditable.tpl"}
 
