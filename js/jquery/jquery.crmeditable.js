@@ -168,12 +168,15 @@
       // CRM-15759 - Workaround broken textarea handling in jeditable 1.7.1
       $i.click(function() {
         $('textarea', this).off()
-          .on('blur', function() {
-            $i.find('button[type=cancel]').click();
+          // Fix cancel-on-blur
+          .on('blur', function(e) {
+            if (!e.relatedTarget || !$(e.relatedTarget).is('.crm-editable-form button')) {
+              $i.find('button[type=cancel]').click();
+            }
           })
+          // Add support for ctrl-enter shortcut key
           .on('keydown', function (e) {
             if (e.ctrlKey && e.keyCode == 13) {
-              // Ctrl-Enter pressed
               $i.find('button[type=submit]').click();
               e.preventDefault();
             }
