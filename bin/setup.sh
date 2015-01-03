@@ -131,9 +131,18 @@ set -x
 
 if [ -n "$DO_DOWNLOAD" ]; then
   pushd "$CALLEDPATH/.."
-    composer install
-    # Install npm and bower modules
-    npm install
+    COMPOSER=$(pickcmd composer composer.phar)
+    $COMPOSER install
+
+    if has_commands bower karma ; then
+      ## dev dependencies have been installed globally; don't force developer to redownload
+      npm install --production
+    else
+      npm install
+    fi
+
+    BOWER=$(pickcmd node_modules/bower/bin/bower bower)
+    $BOWER install
   popd
 fi
 
