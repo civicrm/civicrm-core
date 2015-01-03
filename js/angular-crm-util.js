@@ -2,13 +2,76 @@
 (function (angular, $, _) {
   angular.module('crmUtil', []);
 
-  // Adapter for CRM.status which supports Angular promises (instead of jQuery promises)
-  // example: crmStatus('Saving', crmApi(...)).then(function(result){...})
-  angular.module('crmUtil').factory('crmStatus', function($q){
-    return function(options, aPromise){
-      return CRM.toAPromise($q, CRM.status(options, CRM.toJqPromise(aPromise)));
+  angular.module('crmUtil').factory('crmApi', function($q) {
+    return function(entity, action, params, message) {
+      // JSON serialization in CRM.api3 is not aware of Angular metadata like $$hash, so use angular.toJson()
+      var deferred = $q.defer();
+      var p;
+      if (_.isObject(entity)) {
+        p = CRM.api3(eval('('+angular.toJson(entity)+')'), message);
+      } else {
+        p = CRM.api3(entity, action, eval('('+angular.toJson(params)+')'), message);
+      }
+      // CRM.api3 returns a promise, but the promise doesn't really represent errors as errors, so we
+      // convert them
+      p.then(
+        function(result) {
+          if (result.is_error) {
+            deferred.reject(result);
+          } else {
+            deferred.resolve(result);
+          }
+        },
+        function(error) {
+          deferred.reject(error);
+        }
+      );
+      return deferred.promise;
     };
   });
+
+  angular.module('crmUtil').factory('crmLegacy', function() {
+    return CRM;
+  });
+
+  // example: scope.$watch('foo', crmLog.wrap(function(newValue, oldValue){ ... }));
+  angular.module('crmUtil').factory('crmLog', function(){
+    var level = 0;
+    var write = console.log;
+    function indent() {
+      var s = '>';
+      for (var i = 0; i < level; i++) s = s + '  ';
+      return s;
+    }
+    var crmLog = {
+      log: function(msg, vars) {
+        write(indent() + msg, vars);
+      },
+      wrap: function(label, f) {
+        return function(){
+          level++;
+          crmLog.log(label + ": start", arguments);
+          var r;
+          try {
+            r = f.apply(this, arguments);
+          } finally {
+            crmLog.log(label + ": end");
+            level--;
+          }
+          return r;
+        }
+      }
+    };
+    return crmLog;
+  });
+
+  angular.module('crmUtil').factory('crmNavigator', ['$window', function($window) {
+    return {
+      redirect: function(path) {
+        $window.location.href = path;
+      }
+    };
+  }]);
 
   angular.module('crmUtil').factory('crmNow', function($q){
     // FIXME: surely there's already some helper which can do this in one line?
@@ -27,6 +90,14 @@
       var sec = currentdate.getSeconds();
       sec = sec < 10 ? '0' + sec : sec;
       return yyyy + "-" + mm + "-" + dd + " " + hh + ":" + min + ":" + sec;
+    };
+  });
+
+  // Adapter for CRM.status which supports Angular promises (instead of jQuery promises)
+  // example: crmStatus('Saving', crmApi(...)).then(function(result){...})
+  angular.module('crmUtil').factory('crmStatus', function($q){
+    return function(options, aPromise){
+      return CRM.toAPromise($q, CRM.status(options, CRM.toJqPromise(aPromise)));
     };
   });
 
@@ -90,37 +161,6 @@
 
       return this;
     }
-  });
-
-  // example: scope.$watch('foo', crmLog.wrap(function(newValue, oldValue){ ... }));
-  angular.module('crmUtil').factory('crmLog', function(){
-    var level = 0;
-    var write = console.log;
-    function indent() {
-      var s = '>';
-      for (var i = 0; i < level; i++) s = s + '  ';
-      return s;
-    }
-    var crmLog = {
-      log: function(msg, vars) {
-        write(indent() + msg, vars);
-      },
-      wrap: function(label, f) {
-        return function(){
-          level++;
-          crmLog.log(label + ": start", arguments);
-          var r;
-          try {
-            r = f.apply(this, arguments);
-          } finally {
-            crmLog.log(label + ": end");
-            level--;
-          }
-          return r;
-        }
-      }
-    };
-    return crmLog;
   });
 
 })(angular, CRM.$, CRM._);
