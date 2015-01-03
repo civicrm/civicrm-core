@@ -156,6 +156,9 @@ case $1 in
 
 esac
 
+## Install npm packages
+dm_npm_install "$DM_SOURCEDIR"
+
 ## Make sure we have the right branch or tag
 dm_git_checkout "$DM_SOURCEDIR" "$DM_REF_CORE"
 dm_git_checkout "$DM_SOURCEDIR/packages" "$DM_REF_PACKAGES"
