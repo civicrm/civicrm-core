@@ -3,7 +3,7 @@
 describe('crmMailing', function() {
 
   beforeEach(function() {
-    module('crmApp');
+    module('crmUtil');
     module('crmMailing');
   });
 
