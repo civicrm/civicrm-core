@@ -1,5 +1,10 @@
 // https://civicrm.org/licensing
 (function($) {
+  // TODO: We'll need a way to clear this cache if options are edited.
+  // Maybe it should be stored in the CRM object so other parts of the app can use it.
+  // Note that if we do move it, we should also change the format of option lists to our standard sequential arrays
+  var optionsCache = {};
+
   /**
    * Helper fn to retrieve semantic data from markup
    */
@@ -31,8 +36,8 @@
    * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Structure+convention+for+automagic+edit+in+place
    */
   $.fn.crmEditable = function(options) {
-    var checkable = function() {
-      $(this).change(function() {
+    function checkable() {
+      $(this).off('.crmEditable').on('change.crmEditable', function() {
         var $el = $(this),
           info = $el.crmEditableEntity();
         if (!info.field) {
@@ -52,26 +57,22 @@
             editableSettings.success.call($el[0], info.entity, info.field, checked, data);
           });
       });
-    };
+    }
 
     var defaults = {
-      form: {},
-      callBack: function(data) {
-        if (data.is_error) {
-          editableSettings.error.call(this, data);
-        } else {
-          return editableSettings.success.call(this, data);
-        }
-      },
       error: function(entity, field, value, data) {
         $(this).crmError(data.error_message, ts('Error'));
         $(this).removeClass('crm-editable-saving');
       },
       success: function(entity, field, value, data, settings) {
         var $i = $(this);
-        $i.removeClass('crm-editable-saving crm-error');
-        value = value === '' ? settings.placeholder : value;
-        $i.html(value);
+        if ($i.data('refresh')) {
+          CRM.refreshParent($i);
+        } else {
+          $i.removeClass('crm-editable-saving crm-error crm-editable-editing');
+          value = value === '' ? settings.placeholder : value;
+          $i.html(value);
+        }
       }
     };
 
@@ -79,6 +80,10 @@
     return this.each(function() {
       var $i,
         fieldName = "";
+
+      if ($(this).hasClass('crm-editable-enabled')) {
+        return;
+      }
 
       if (this.nodeName == "INPUT" && this.type == "checkbox") {
         checkable.call(this, this);
@@ -108,22 +113,20 @@
         cancel: '<button type="cancel"><span class="ui-icon ui-icon-closethick"></span></button>',
         submit: '<button type="submit"><span class="ui-icon ui-icon-check"></span></button>',
         cssclass: 'crm-editable-form',
-        data: function(value, settings) {
-          return value.replace(/<(?:.|\n)*?>/gm, '');
-        }
+        data: getData,
+        onreset: restoreContainer
       };
       if ($i.data('type')) {
         settings.type = $i.data('type');
-      }
-      if ($i.data('options')) {
-        settings.data = $i.data('options');
+        if (settings.type == 'boolean') {
+          settings.type = 'select';
+          $i.data('options', {'0': ts('No'), '1': ts('Yes')});
+        }
       }
       if (settings.type == 'textarea') {
         $i.addClass('crm-editable-textarea-enabled');
       }
-      else {
-        $i.addClass('crm-editable-enabled');
-      }
+      $i.addClass('crm-editable-enabled');
 
       $i.editable(function(value, settings) {
         $i.addClass('crm-editable-saving');
@@ -148,7 +151,11 @@
         CRM.api3(info.entity, action, params, true)
           .done(function(data) {
             if ($el.data('options')) {
-              value = $el.data('options')[value];
+              value = $el.data('options')[value] || '';
+            }
+            else if ($el.data('optionsHashKey')) {
+              var options = optionsCache[$el.data('optionsHashKey')];
+              value = options && options[value] ? options[value] : '';
             }
             $el.trigger('crmFormSuccess');
             editableSettings.success.call($el[0], info.entity, info.field, value, data, settings);
@@ -161,18 +168,69 @@
       // CRM-15759 - Workaround broken textarea handling in jeditable 1.7.1
       $i.click(function() {
         $('textarea', this).off()
-          .on('blur', function() {
-            $i.find('button[type=cancel]').click();
+          // Fix cancel-on-blur
+          .on('blur', function(e) {
+            if (!e.relatedTarget || !$(e.relatedTarget).is('.crm-editable-form button')) {
+              $i.find('button[type=cancel]').click();
+            }
           })
+          // Add support for ctrl-enter shortcut key
           .on('keydown', function (e) {
             if (e.ctrlKey && e.keyCode == 13) {
-              // Ctrl-Enter pressed
               $i.find('button[type=submit]').click();
               e.preventDefault();
             }
           });
       });
+
+      function getData(value, settings) {
+        // Add css class to wrapper
+        // FIXME: This should be a response to an event instead of coupled with this function but jeditable 1.7.1 doesn't trigger any events :(
+        $i.addClass('crm-editable-editing');
+
+        if ($i.data('type') == 'select' || $i.data('type') == 'boolean') {
+          if ($i.data('options')) {
+            return formatOptions($i.data('options'));
+          }
+          var result,
+            info = $i.crmEditableEntity(),
+            hash = info.entity + '.' + info.field,
+            params = {
+              field: info.field,
+              context: 'create'
+            };
+          $i.data('optionsHashKey', hash);
+          if (!optionsCache[hash]) {
+            $.ajax({
+              url: CRM.url('civicrm/ajax/rest'),
+              data: {entity: info.entity, action: 'getoptions', json: JSON.stringify(params)},
+              async: false, // jeditable lacks support for async options lookup
+              success: function(data) {optionsCache[hash] = data.values;}
+            });
+          }
+          return formatOptions(optionsCache[hash]);
+
+        }
+        return value.replace(/<(?:.|\n)*?>/gm, '');
+      }
+
+      function formatOptions(options) {
+        if (typeof $i.data('emptyOption') === 'string') {
+          // Using 'null' because '' is broken in jeditable 1.7.1
+          return $.extend({'null': $i.data('emptyOption')}, options);
+        }
+        return options;
+      }
+
+      function restoreContainer() {
+        $i.removeClass('crm-editable-editing');
+      }
+
     });
   };
+
+  $(document).on('crmLoad', function(e) {
+    $('.crm-editable', e.target).crmEditable();
+  })
 
 })(jQuery);

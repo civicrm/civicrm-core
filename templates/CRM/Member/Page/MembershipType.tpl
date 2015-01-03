@@ -35,7 +35,6 @@
   {strip}
   {* handle enable/disable actions*}
   {include file="CRM/common/enableDisableApi.tpl"}
-  {include file="CRM/common/crmeditable.tpl"}
     <table id="options" class="row-highlight">
       <thead>
       <tr>
@@ -55,17 +54,17 @@
       </thead>
       {foreach from=$rows item=row}
         <tr id="membership_type-{$row.id}" class="crm-entity {cycle values='odd-row,even-row'} {$row.class} crm-membership-type {if NOT $row.is_active} disabled{/if}">
-          <td class="crm-membership-type-type_name crm-editable" data-field="name">{$row.name}</td>
-          <td class="crm-memberhip-type-period_type">{$row.period_type}</td>
-          <td class="crm-membership-type-fixed_period_start_day">{$row.fixed_period_start_day}</td>
-          <td class="crm-membership-type-minimum_fee" align="right">{$row.minimum_fee|crmMoney}</td>
-          <td class="crm-membership-type-duration_interval_unit">{$row.duration_interval} {$row.duration_unit}</td>
-          <td class="crm-membership-type-auto-renew">{if $row.auto_renew EQ 2}{ts}Required{/ts}{elseif $row.auto_renew EQ 1}{ts}Optional{/ts}{else}{ts}No{/ts}{/if}</td>
-          <td class="crm-membership-type-relationship_type_name">{$row.relationshipTypeName}</td>
-          <td class="crm-membership-type-max_related" align="right">{$row.maxRelated}</td>
-          <td class="crm-membership-type-visibility">{$row.visibility}</td>
-          <td class="nowrap crm-membership_type-order">{$row.weight}</td>
-          <td class="crm-membership-type-status_{$row.id}" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+          <td class="crmf-name crm-editable" data-field="name">{$row.name}</td>
+          <td class="crmf-period_type crm-editable" data-type="select">{$row.period_type}</td>
+          <td class="crmf-fixed_period_start_day">{$row.fixed_period_start_day}</td>
+          <td class="crmf-minimum_fee" align="right">{$row.minimum_fee|crmMoney}</td>
+          <td class="crmf-duration_interval_unit">{$row.duration_interval} {$row.duration_unit}</td>
+          <td class="crmf-auto_renew">{if $row.auto_renew EQ 2}{ts}Required{/ts}{elseif $row.auto_renew EQ 1}{ts}Optional{/ts}{else}{ts}No{/ts}{/if}</td>
+          <td class="crmf-relationship_type">{$row.relationshipTypeName}</td>
+          <td class="crmf-max_related" align="right">{$row.maxRelated}</td>
+          <td class="crmf-visibility crm-editable" data-type="select">{$row.visibility}</td>
+          <td class="nowrap crmf-weight">{$row.weight}</td>
+          <td class="crmf-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
       {/foreach}

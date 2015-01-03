@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {if $outputMode neq 'print'}
-  {include file="CRM/common/crmeditable.tpl"}
 {/if}
 {* this div is being used to apply special css *}
 {if $section eq 1}

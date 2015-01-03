@@ -78,7 +78,6 @@
           </div>
         {/if}
       </div>
-      {include file="CRM/common/crmeditable.tpl"}
     {else}
       <div class="messages status no-popup">
         <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>

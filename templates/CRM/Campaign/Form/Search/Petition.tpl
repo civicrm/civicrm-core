@@ -42,7 +42,6 @@
        {* load petition selector *}
 
        {include file="CRM/common/enableDisableApi.tpl"}
-       {include file="CRM/common/crmeditable.tpl"}
 
        {literal}
        <script type="text/javascript">
@@ -178,17 +177,18 @@ function loadPetitionList( )
              "bProcessing": false,
              "bLengthChange": false,
              "aaSorting": [],
-             "aoColumns":[{sClass:'crm-petition-id                          hiddenElement' },
-                 {sClass:'crm-petition-title'                                     },
-           {sClass:'crm-petition-campaign_id                 hiddenElement' },
-           {sClass:'crm-petition-campaign'                                  },
-           {sClass:'crm-petition-activity_type_id            hiddenElement' },
-           {sClass:'crm-petition-activity_type               hiddenElement' },
-           {sClass:'crm-petition-is_default'                                },
-           {sClass:'crm-petition-is_active                   hiddenElement' },
-           {sClass:'crm-petition-isActive'                                  },
-           {sClass:'crm-petition-action',                    bSortable:false}
-           ],
+             "aoColumns":[
+                 {sClass:'crm-petition-id                          hiddenElement' },
+                 {sClass:'crmf-title crm-editable'                                     },
+                 {sClass:'crm-petition-campaign_id                 hiddenElement' },
+                 {sClass:'crmf-campaign_id'                                  },
+                 {sClass:'crm-petition-activity_type_id            hiddenElement' },
+                 {sClass:'crm-petition-activity_type               hiddenElement' },
+                 {sClass:'crm-petition-is_default'                                },
+                 {sClass:'crm-petition-is_active                   hiddenElement' },
+                 {sClass:'crm-petition-isActive'                                  },
+                 {sClass:'crm-petition-action',                    bSortable:false}
+             ],
              "sPaginationType": "full_numbers",
              "sDom"       : 'rt<"crm-datatable-pager-bottom"ip>',
              "bServerSide": true,
@@ -197,7 +197,10 @@ function loadPetitionList( )
              "asStripClasses" : [ "odd-row", "even-row" ],
              "oLanguage":{"sEmptyTable"  : noRecordFoundMsg,
                  "sZeroRecords" : noRecordFoundMsg },
-             "fnDrawCallback": function() { CRM.$().crmtooltip(); },
+             "fnDrawCallback": function() {
+               // FIXME: trigger crmLoad and crmEditable would happen automatically
+               CRM.$('.crm-editable').crmEditable();
+             },
              "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
          //insert the id for each row for enable/disable.
          var rowId = 'survey-' + aData[0];

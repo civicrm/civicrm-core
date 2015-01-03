@@ -25,7 +25,6 @@
 *}
 
 {include file="CRM/common/enableDisableApi.tpl"}
-{include file="CRM/common/crmeditable.tpl"}
 
 {if $action eq 4} {* when action is view *}
     {if $recur}
