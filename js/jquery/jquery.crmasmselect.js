@@ -195,7 +195,7 @@
 				// add an <option> to the <select>
 				// used only by buildSelect()
 
-				if(disabled == undefined) var disabled = false;
+				if(disabled == undefined) disabled = false;
 
 				var $O = $('#' + optionId);
 				var $option = $("<option>" + $O.text() + "</option>")
@@ -299,8 +299,8 @@
 					parentName = parentName.split(' ')[0];
 					parentId = $('.option-'+parentName).attr('rel');
 					addListItem(parentId);
-					};
-				};
+					}
+				}
 			}
 
 			function addListItemShow($item) {
@@ -330,7 +330,7 @@
 
 				// remove an item from the html list
 
-				if(highlightItem == undefined) var highlightItem = true;
+				if(highlightItem == undefined) highlightItem = true;
 				var $O = $('#' + optionId);
 
 				$O.prop('selected', false);
