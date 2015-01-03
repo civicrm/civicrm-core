@@ -1,6 +1,6 @@
 (function (angular, $, _) {
   var partialUrl = function (relPath) {
-    return CRM.resourceUrls['civicrm'] + '/partials/crmMailingAB/' + relPath;
+    return CRM.resourceUrls.civicrm + '/partials/crmMailingAB/' + relPath;
   };
 
   // example:
@@ -150,9 +150,10 @@
               var m = t[0];
               var year = t[2];
               var day = t[1].substr(0, t[1].length - 3);
+              var t1, hur, hour, min;
               if (t[3] == "") {
-                var t1 = t[4].split(":");
-                var hur = t1[0];
+                t1 = t[4].split(":");
+                hur = t1[0];
                 if (t[5] == "AM") {
                   hour = hur;
                   if (hour == 12) {
@@ -162,11 +163,11 @@
                 if (t[5] == "PM") {
                   hour = parseInt(hur) + 12;
                 }
-                var min = t1[1];
+                min = t1[1];
               }
               else {
-                var t1 = t[3].split(":");
-                var hur = t1[0];
+                t1 = t[3].split(":");
+                hur = t1[0];
                 if (t[4] == "AM") {
                   hour = hur;
                   if (hour == 12) {
@@ -176,7 +177,7 @@
                 if (t[4] == "PM") {
                   hour = parseInt(hur) + 12;
                 }
-                var min = t1[1];
+                min = t1[1];
               }
               var month = 0;
               switch (m) {
@@ -227,7 +228,7 @@
 
               if (keep_cnt == options.split_count) {
                 scope.graphload = true;
-                var data = scope.graph_data;
+                data = scope.graph_data;
 
                 // set up a colour variable
                 var color = d3.scale.category10();
@@ -320,13 +321,13 @@
                 svg.append("text")      // text label for the x axis
                   .style("text-anchor", "middle")
                   .text(scope.winnercriteria).attr("transform",function (d) {
-                    return "rotate(-90)"
+                    return "rotate(-90)";
                   }).attr("x", -height / 2)
                   .attr("y", -30);
 
                 // create a variable called series and bind the date
                 // for each series append a g element and class it as series for css styling
-                var series = svg.selectAll(".series")
+                series = svg.selectAll(".series")
                   .data(series)
                   .enter().append("g")
                   .attr("class", "series");

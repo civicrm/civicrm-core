@@ -71,13 +71,13 @@
           crmMailingAB.mailings.b = crmMailingMgr.create();
           crmMailingAB.mailings.c = crmMailingMgr.create();
           crmMailingAB.attachments.a = new CrmAttachments(function () {
-            return {entity_table: 'civicrm_mailing', entity_id: crmMailingAB.ab['mailing_id_a']};
+            return {entity_table: 'civicrm_mailing', entity_id: crmMailingAB.ab.mailing_id_a};
           });
           crmMailingAB.attachments.b = new CrmAttachments(function () {
-            return {entity_table: 'civicrm_mailing', entity_id: crmMailingAB.ab['mailing_id_b']};
+            return {entity_table: 'civicrm_mailing', entity_id: crmMailingAB.ab.mailing_id_b};
           });
           crmMailingAB.attachments.c = new CrmAttachments(function () {
-            return {entity_table: 'civicrm_mailing', entity_id: crmMailingAB.ab['mailing_id_c']};
+            return {entity_table: 'civicrm_mailing', entity_id: crmMailingAB.ab.mailing_id_c};
           });
 
           var dfr = $q.defer();

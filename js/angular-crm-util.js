@@ -59,7 +59,7 @@
             level--;
           }
           return r;
-        }
+        };
       }
     };
     return crmLog;
@@ -160,7 +160,7 @@
       };
 
       return this;
-    }
+    };
   });
 
 })(angular, CRM.$, CRM._);
