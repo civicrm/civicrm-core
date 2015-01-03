@@ -12,7 +12,8 @@
   var tplURL;
   CRM.url = function (path, query, mode) {
     if (typeof path === 'object') {
-      return tplURL = path;
+      tplURL = path;
+      return path;
     }
     if (!tplURL) {
       CRM.console('error', 'Error: CRM.url called before initialization');
@@ -206,7 +207,7 @@
     },
     _onFailure: function(data, status) {
       var msg, title = ts('Network Error');
-      this.options.block && this.element.unblock();
+      if (this.options.block) this.element.unblock();
       this.element.trigger('crmAjaxFail', data);
       switch (status) {
         case 'Forbidden':
@@ -239,7 +240,7 @@
     _handleOrderLinks: function() {
       var that = this;
       $('a.crm-weight-arrow', that.element).click(function(e) {
-        that.options.block && that.element.block();
+        if (that.options.block) that.element.block();
         $.getJSON(that._formatUrl(this.href)).done(function() {
           that.refresh();
         });
@@ -250,13 +251,13 @@
     refresh: function() {
       var that = this;
       var url = this._formatUrl(this.options.url);
-      this.options.crmForm && $('form', this.element).ajaxFormUnbind();
+      if (this.options.crmForm) $('form', this.element).ajaxFormUnbind();
       if (this._originalContent === null) {
         this._originalContent = this.element.contents().detach();
       }
-      this.options.block && this.element.block();
+      if (this.options.block) this.element.block();
       $.getJSON(url, function(data) {
-        that.options.block && that.element.unblock();
+        if (that.options.block) that.element.unblock();
         if (!$.isPlainObject(data)) {
           that._onFailure(data);
           return;
@@ -271,7 +272,7 @@
         that.element.html(data.content);
         that._handleOrderLinks();
         that.element.trigger('crmLoad', data);
-        that.options.crmForm && that.element.trigger('crmFormLoad', data);
+        if (that.options.crmForm) that.element.trigger('crmFormLoad', data);
       }).fail(function(data, msg, status) {
         that._onFailure(data, status);
       });
@@ -286,7 +287,7 @@
           }
         });
       }
-      this.options.crmForm && $('form', this.element).ajaxFormUnbind();
+      if (this.options.crmForm) $('form', this.element).ajaxFormUnbind();
     },
     _destroy: function() {
       this.element.removeClass('crm-ajax-container').trigger('crmUnload');
@@ -312,7 +313,7 @@
         height: '75%'
       };
     }
-    options && $.extend(true, settings, options);
+    if (options) $.extend(true, settings, options);
     settings.url = url;
     // Create new dialog
     if (settings.dialog) {
@@ -377,7 +378,7 @@
       }
     };
     // Move options that belong to crmForm. Others will be passed through to crmSnippet
-    options && $.each(options, function(key, value) {
+    if (options) $.each(options, function(key, value) {
       if (typeof(settings.crmForm[key]) !== 'undefined') {
         settings.crmForm[key] = value;
       }
@@ -403,7 +404,7 @@
       }
     }
 
-    widget.data('uiDialog') && widget.on('dialogbeforeclose', function(e) {
+    if (widget.data('uiDialog')) widget.on('dialogbeforeclose', function(e) {
       // CRM-14353 - Warn unsaved changes if user clicks close button or presses "esc"
       if (e.originalEvent) {
         cancelAction();
@@ -413,7 +414,7 @@
     widget.on('crmFormLoad.crmForm', function(event, data) {
       var $el = $(this).attr('data-unsaved-changes', 'false'),
         settings = $el.crmSnippet('option', 'crmForm');
-      settings.cancelButton && $(settings.cancelButton, this).click(function(e) {
+      if (settings.cancelButton) $(settings.cancelButton, this).click(function(e) {
         e.preventDefault();
         var returnVal = settings.onCancel.call($el, e);
         if (returnVal !== false) {
@@ -451,7 +452,7 @@
             }
           }
           else {
-            $el.crmSnippet('option', 'block') && $el.unblock();
+            if ($el.crmSnippet('option', 'block')) $el.unblock();
             response.url = data.url;
             $el.html(response.content).trigger('crmLoad', response).trigger('crmFormLoad', response);
             if (response.status === 'form_error') {
@@ -466,7 +467,7 @@
         beforeSerialize: function(form, options) {
           if (window.CKEDITOR && window.CKEDITOR.instances) {
             $.each(CKEDITOR.instances, function() {
-              this.updateElement && this.updateElement();
+              if (this.updateElement) this.updateElement();
             });
           }
           if (window.tinyMCE && tinyMCE.editors) {
@@ -477,9 +478,9 @@
         },
         beforeSubmit: function(submission) {
           $.each(formErrors, function() {
-            this && this.close && this.close();
+            if (this && this.close) this.close();
           });
-          $el.crmSnippet('option', 'block') && $el.block();
+          if ($el.crmSnippet('option', 'block')) $el.block();
           $el.trigger('crmFormSubmit', submission);
         }
       }, settings.ajaxForm));
@@ -575,7 +576,7 @@
     if ($table.length && $.fn.DataTable.fnIsDataTable($table[0]) && $table.dataTable().fnSettings().sAjaxSource) {
       // Refresh ALL datatables - needed for contact relationship tab
       $.each($.fn.dataTable.fnTables(), function() {
-        $(this).dataTable().fnSettings().sAjaxSource && $(this).unblock().dataTable().fnDraw();
+        if ($(this).dataTable().fnSettings().sAjaxSource) $(this).unblock().dataTable().fnDraw();
       });
     }
     // Otherwise refresh the nearest crmSnippet
