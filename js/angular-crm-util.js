@@ -2,12 +2,35 @@
 (function (angular, $, _) {
   angular.module('crmUtil', []);
 
-  // Adapter for CRM.status which supports Angular promises (instead of jQuery promises)
-  // example: crmStatus('Saving', crmApi(...)).then(function(result){...})
-  angular.module('crmUtil').factory('crmStatus', function($q){
-    return function(options, aPromise){
-      return CRM.toAPromise($q, CRM.status(options, CRM.toJqPromise(aPromise)));
+  // example: scope.$watch('foo', crmLog.wrap(function(newValue, oldValue){ ... }));
+  angular.module('crmUtil').factory('crmLog', function(){
+    var level = 0;
+    var write = console.log;
+    function indent() {
+      var s = '>';
+      for (var i = 0; i < level; i++) s = s + '  ';
+      return s;
+    }
+    var crmLog = {
+      log: function(msg, vars) {
+        write(indent() + msg, vars);
+      },
+      wrap: function(label, f) {
+        return function(){
+          level++;
+          crmLog.log(label + ": start", arguments);
+          var r;
+          try {
+            r = f.apply(this, arguments);
+          } finally {
+            crmLog.log(label + ": end");
+            level--;
+          }
+          return r;
+        }
+      }
     };
+    return crmLog;
   });
 
   angular.module('crmUtil').factory('crmNow', function($q){
@@ -27,6 +50,14 @@
       var sec = currentdate.getSeconds();
       sec = sec < 10 ? '0' + sec : sec;
       return yyyy + "-" + mm + "-" + dd + " " + hh + ":" + min + ":" + sec;
+    };
+  });
+
+  // Adapter for CRM.status which supports Angular promises (instead of jQuery promises)
+  // example: crmStatus('Saving', crmApi(...)).then(function(result){...})
+  angular.module('crmUtil').factory('crmStatus', function($q){
+    return function(options, aPromise){
+      return CRM.toAPromise($q, CRM.status(options, CRM.toJqPromise(aPromise)));
     };
   });
 
@@ -90,37 +121,6 @@
 
       return this;
     }
-  });
-
-  // example: scope.$watch('foo', crmLog.wrap(function(newValue, oldValue){ ... }));
-  angular.module('crmUtil').factory('crmLog', function(){
-    var level = 0;
-    var write = console.log;
-    function indent() {
-      var s = '>';
-      for (var i = 0; i < level; i++) s = s + '  ';
-      return s;
-    }
-    var crmLog = {
-      log: function(msg, vars) {
-        write(indent() + msg, vars);
-      },
-      wrap: function(label, f) {
-        return function(){
-          level++;
-          crmLog.log(label + ": start", arguments);
-          var r;
-          try {
-            r = f.apply(this, arguments);
-          } finally {
-            crmLog.log(label + ": end");
-            level--;
-          }
-          return r;
-        }
-      }
-    };
-    return crmLog;
   });
 
 })(angular, CRM.$, CRM._);
