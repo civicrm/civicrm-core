@@ -2,6 +2,38 @@
 (function (angular, $, _) {
   angular.module('crmUtil', []);
 
+  angular.module('crmUtil').factory('crmApi', function($q) {
+    return function(entity, action, params, message) {
+      // JSON serialization in CRM.api3 is not aware of Angular metadata like $$hash, so use angular.toJson()
+      var deferred = $q.defer();
+      var p;
+      if (_.isObject(entity)) {
+        p = CRM.api3(eval('('+angular.toJson(entity)+')'), message);
+      } else {
+        p = CRM.api3(entity, action, eval('('+angular.toJson(params)+')'), message);
+      }
+      // CRM.api3 returns a promise, but the promise doesn't really represent errors as errors, so we
+      // convert them
+      p.then(
+        function(result) {
+          if (result.is_error) {
+            deferred.reject(result);
+          } else {
+            deferred.resolve(result);
+          }
+        },
+        function(error) {
+          deferred.reject(error);
+        }
+      );
+      return deferred.promise;
+    };
+  });
+
+  angular.module('crmUtil').factory('crmLegacy', function() {
+    return CRM;
+  });
+
   // example: scope.$watch('foo', crmLog.wrap(function(newValue, oldValue){ ... }));
   angular.module('crmUtil').factory('crmLog', function(){
     var level = 0;
@@ -32,6 +64,14 @@
     };
     return crmLog;
   });
+
+  angular.module('crmUtil').factory('crmNavigator', ['$window', function($window) {
+    return {
+      redirect: function(path) {
+        $window.location.href = path;
+      }
+    };
+  }]);
 
   angular.module('crmUtil').factory('crmNow', function($q){
     // FIXME: surely there's already some helper which can do this in one line?

@@ -6,7 +6,6 @@ CRM.angular = {
     'unsavedChanges',
     'angularFileUpload',
     'dialogService',
-    'crmApp',
     'crmAttachment',
     'crmUi',
     'crmUtil',
