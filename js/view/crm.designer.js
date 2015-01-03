@@ -52,7 +52,7 @@
       CRM.designerApp.vent.on('ufSaved', this.onUfSaved, this);
     },
     onClose: function() {
-      this.undoAlert && this.undoAlert.close && this.undoAlert.close();
+      if (this.undoAlert && this.undoAlert.close) this.undoAlert.close();
       CRM.designerApp.vent.off('ufUnsaved', this.onUfChanged, this);
     },
     onUfChanged: function(isUfUnsaved) {
@@ -69,7 +69,7 @@
         title: ts('Edit Profile'),
         modal: true,
         width: '75%',
-        height: parseInt($(window).height() *.8, 10),
+        height: parseInt($(window).height() * 0.8, 10),
         minWidth: 500,
         minHeight: 600, // to allow dropping in big whitespace, coordinate with min-height of .crm-designer-fields
         open: function() {
@@ -84,11 +84,11 @@
               return designerDialog.oldOnBeforeUnload.apply(arguments);
             }
           };
-          designerDialog.undoAlert && designerDialog.undoAlert.close && designerDialog.undoAlert.close();
+          if (designerDialog.undoAlert && designerDialog.undoAlert.close) designerDialog.undoAlert.close();
           designerDialog.isDialogOpen = true;
           // Initialize new dialog if we are not re-opening unsaved changes
           if (designerDialog.undoState === false) {
-            designerDialog.designerRegion && designerDialog.designerRegion.close && designerDialog.designerRegion.close();
+            if (designerDialog.designerRegion && designerDialog.designerRegion.close) designerDialog.designerRegion.close();
             designerDialog.$el.block();
             designerDialog.options.findCreateUfGroupModel({
               onLoad: function(ufGroupModel) {
@@ -112,7 +112,7 @@
           window.onbeforeunload = designerDialog.oldOnBeforeUnload;
           designerDialog.isDialogOpen = false;
 
-          designerDialog.undoAlert && designerDialog.undoAlert.close && designerDialog.undoAlert.close();
+          if (designerDialog.undoAlert && designerDialog.undoAlert.close) designerDialog.undoAlert.close();
           if (designerDialog.isUfUnsaved) {
             designerDialog.undoAlert = CRM.alert('<p>' + ts('%1 has not been saved.', {1: designerDialog.model.get('title')}) + '</p><a href="#" class="crm-undo">' + ts('Restore') + '</a>', ts('Unsaved Changes'), 'alert', {expires: 60000});
             $('.ui-notify-message a.crm-undo').button({icons: {primary: 'ui-icon-arrowreturnthick-1-w'}}).click(function(e) {
@@ -254,7 +254,7 @@
       if (!this.previewMode) {
         $('.crm-designer-preview-canvas').html('');
         $('.crm-designer-canvas > *, .crm-designer-palette-region').show();
-        $('.crm-designer-preview').button('option', {icons: {primary: 'ui-icon-search'}}).find('span').text(ts('Preview'));;
+        $('.crm-designer-preview').button('option', {icons: {primary: 'ui-icon-search'}}).find('span').text(ts('Preview'));
         return;
       }
       if (this.model.getRel('ufFieldCollection').hasDuplicates()) {
@@ -357,7 +357,7 @@
               }
             });
           }
-        })
+        });
       });
 
       this.$('.crm-designer-palette-tree').jstree({
@@ -381,7 +381,7 @@
           connectToSortable: '.crm-designer-fields' // FIXME: tight canvas/palette coupling
         });
         paletteView.model.getRel('ufFieldCollection').each(function(ufFieldModel) {
-          paletteView.toggleActive(ufFieldModel, paletteView.model.getRel('ufFieldCollection'))
+          paletteView.toggleActive(ufFieldModel, paletteView.model.getRel('ufFieldCollection'));
         });
         paletteView.$('.crm-designer-palette-add a').replaceWith('<button>' + $('.crm-designer-palette-add a').first().text() + '</<button>');
         paletteView.$('.crm-designer-palette-tree > ul').append('<li><button id="crm-designer-add-custom-set">+ ' + ts('Add Set of Custom Fields') + '</button></li>');
@@ -452,7 +452,7 @@
       CRM.loadForm(url, {refreshAction: ['next']})
         .on('crmFormSuccess', function(e, data) {
           // When form switches to create custom field context, modify button behavior to only continue for "save and new"
-          data.customField && ($(this).data('civiCrmSnippet').options.crmForm.refreshAction = ['next_new']);
+          if (data.customField) ($(this).data('civiCrmSnippet').options.crmForm.refreshAction = ['next_new']);
           paletteView.doRefresh(data.customField ? 'custom_' + data.id : null);
         });
     },
@@ -494,7 +494,7 @@
       this.openTreeNodes = [];
       this.$('.crm-designer-palette-section.jstree-open').each(function() {
         paletteView.openTreeNodes.push($(this).data('section'));
-      })
+      });
     }
   });
 
@@ -623,7 +623,7 @@
         model: this.model,
         fieldSchema: this.model.getFieldSchema()
       }));
-      this.onChangeIsDuplicate(this.model, this.model.get('is_duplicate'))
+      this.onChangeIsDuplicate(this.model, this.model.get('is_duplicate'));
       if (!this.expanded) {
         this.detail.$el.hide();
       }

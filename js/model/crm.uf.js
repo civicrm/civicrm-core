@@ -111,7 +111,7 @@
           throw "Cannot guess entity name for field_type=" + field_type;
         }
     }
-  }
+  };
 
   /**
    * Represents a field in a customizable form.
@@ -245,10 +245,10 @@
      * @return {String}
      */
     getSignature: function() {
-      return this.get("entity_name")
-        + '::' + this.get("field_name")
-        + '::' + (this.get("location_type_id") ? this.get("location_type_id") : '')
-        + '::' + (this.get("phone_type_id") ? this.get("phone_type_id") : '');
+      return this.get("entity_name") +
+        '::' + this.get("field_name") +
+        '::' + (this.get("location_type_id") ? this.get("location_type_id") : '') +
+        '::' + (this.get("phone_type_id") ? this.get("phone_type_id") : '');
     },
 
     /**
@@ -496,14 +496,14 @@
       },
       'help_post': {
         title: ts('Post-form Help'),
-        help: ts('Explanatory text displayed at the end of the form.')
-          + ts('Note that this help text is displayed on profile create/edit screens only.'),
+        help: ts('Explanatory text displayed at the end of the form.') +
+        ts('Note that this help text is displayed on profile create/edit screens only.'),
         type: 'TextArea'
       },
       'help_pre': {
         title: ts('Pre-form Help'),
-        help: ts('Explanatory text displayed at the beginning of the form.')
-          + ts('Note that this help text is displayed on profile create/edit screens only.'),
+        help: ts('Explanatory text displayed at the beginning of the form.') +
+        ts('Note that this help text is displayed on profile create/edit screens only.'),
         type: 'TextArea'
       },
       'is_active': {
@@ -598,7 +598,7 @@
           ufGroupModel: this
         });
         paletteFieldCollection.sync = function(method, model, options) {
-          options || (options = {});
+          if (!options) options = {};
           // console.log(method, model, options);
           switch (method) {
             case 'read':
