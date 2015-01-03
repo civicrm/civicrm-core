@@ -51,7 +51,7 @@ function dm_install_core() {
   local repo="$1"
   local to="$2"
 
-  for dir in css i js PEAR templates bin CRM api extern Reports install settings Civi partials ; do
+  for dir in css i js PEAR templates bin CRM api extern Reports install settings Civi partials node_modules bower_components ; do
     [ -d "$repo/$dir" ] && dm_install_dir "$repo/$dir" "$to/$dir"
   done
 
@@ -175,5 +175,13 @@ function dm_git_checkout() {
   pushd "$1"
     git checkout .
     git checkout "$2"
+  popd
+}
+
+## Install npm packages
+## usage: dm_npm_install <path>
+function dm_npm_install() {
+  pushd "$1"
+    $DM_NPM install
   popd
 }

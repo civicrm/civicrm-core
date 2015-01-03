@@ -49,6 +49,9 @@ if [ -z $DBPASS ] ; then
   DBPASS=$REPLY
 fi
 
+# Install npm and bower modules
+npm install
+
 # run code generator if it's there - which means it's
 # checkout, not packaged code
 if [ -d "$CALLEDPATH/../xml" ]; then
