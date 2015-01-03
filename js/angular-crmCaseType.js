@@ -1,7 +1,7 @@
 (function(angular, $, _) {
 
   var partialUrl = function(relPath) {
-    return CRM.resourceUrls['civicrm'] + '/partials/crmCaseType/' + relPath;
+    return CRM.resourceUrls.civicrm + '/partials/crmCaseType/' + relPath;
   };
 
   var crmCaseType = angular.module('crmCaseType', ['ngRoute', 'ui.utils', 'crmUi', 'unsavedChanges', 'crmUtil']);
@@ -222,7 +222,7 @@
     };
 
     $scope.isForkable = function() {
-      return !$scope.caseType.id || $scope.caseType.is_forkable
+      return !$scope.caseType.id || $scope.caseType.is_forkable;
     };
 
     $scope.isNewActivitySetAllowed = function(workflow) {

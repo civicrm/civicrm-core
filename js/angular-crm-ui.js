@@ -4,7 +4,7 @@
   var uidCount = 0;
 
   var partialUrl = function (relPath) {
-    return CRM.resourceUrls['civicrm'] + '/partials/crmUi/' + relPath;
+    return CRM.resourceUrls.civicrm + '/partials/crmUi/' + relPath;
   };
 
   angular.module('crmUi', [])
@@ -92,8 +92,8 @@
 
           updateChildren();
           scope.$parent.$watch(attrs.crmUiDateTime, updateChildren);
-          scope.$watch('dtparts.date', updateParent),
-          scope.$watch('dtparts.time', updateParent)
+          scope.$watch('dtparts.date', updateParent);
+          scope.$watch('dtparts.time', updateParent);
         }
       };
     })
@@ -191,7 +191,7 @@
               });
             }
             else {
-              scope.crmIsRequired = input.prop('required')
+              scope.crmIsRequired = input.prop('required');
             }
 
             ngModel = $parse(attrs.crmUiFor)(tgtScope);
@@ -220,7 +220,7 @@
               ids[name] = "crmUiId_" + (++uidCount);
             }
             return ids[name];
-          }
+          };
         },
         link: function (scope, element, attrs) {}
       };
@@ -252,7 +252,7 @@
             doc.open();
             doc.writeln(iframeHtml);
             doc.close();
-          }
+          };
 
           scope.$parent.$watch(attrs.crmUiIframe, refresh);
           //setTimeout(function () { refresh(); }, 50);
@@ -299,10 +299,10 @@
       var defaultVal = function (defaultValue) {
         var f = function (scope) {
           return defaultValue;
-        }
+        };
         f.assign = function (scope, value) {
           // ignore changes
-        }
+        };
         return f;
       };
 
@@ -314,9 +314,9 @@
       return {
         template: '',
         link: function (scope, element, attrs) {
-          var binding = parse(attrs['binding'], true);
-          var titleLocked = parse(attrs['titleLocked'], ts('Locked'));
-          var titleUnlocked = parse(attrs['titleUnlocked'], ts('Unlocked'));
+          var binding = parse(attrs.binding, true);
+          var titleLocked = parse(attrs.titleLocked, ts('Locked'));
+          var titleUnlocked = parse(attrs.titleUnlocked, ts('Unlocked'));
 
           $(element).addClass('ui-icon lock-button');
           var refresh = function () {
@@ -459,7 +459,7 @@
           scope.$parent.$watch(attrs.crmUiTime, updateChildren);
           element.on('change', updateParent);
         }
-      }
+      };
     })
 
     // like ng-show, but hides/displays elements using "visibility" which maintains positioning
@@ -514,12 +514,12 @@
           this.$first = function() { return this.$index() === 0; };
           /// @return bool whether the current step is last
           this.$last = function() { return this.$index() === steps.length -1; };
-          this.$maxVisit = function() { return maxVisited; }
+          this.$maxVisit = function() { return maxVisited; };
           this.iconFor = function(index) {
             if (index < this.$index()) return '√';
             if (index === this.$index()) return '»';
             return ' ';
-          }
+          };
           this.isSelectable = function(step) {
             if (step.selected) return false;
             var result = false;
@@ -566,7 +566,7 @@
           this.previous = function() { this.goto(this.$index()-1); };
           this.next = function() { this.goto(this.$index()+1); };
           if ($scope.crmUiWizard) {
-            $parse($scope.crmUiWizard).assign($scope.$parent, this)
+            $parse($scope.crmUiWizard).assign($scope.$parent, this);
           }
         },
         link: function (scope, element, attrs) {}
@@ -656,11 +656,11 @@
         template: '',
         link: function (scope, element, attrs) {
           $(element).click(function () {
-            var options = scope.$eval(attrs['crmConfirm']);
+            var options = scope.$eval(attrs.crmConfirm);
             var defaults = (options.type) ? defaultFuncs[options.type](options) : {};
             CRM.confirm(_.extend(defaults, options))
-              .on('crmConfirm:yes', function () { scope.$apply(attrs['onYes']); })
-              .on('crmConfirm:no', function () { scope.$apply(attrs['onNo']); });
+              .on('crmConfirm:yes', function () { scope.$apply(attrs.onYes); })
+              .on('crmConfirm:no', function () { scope.$apply(attrs.onNo); });
           });
         }
       };

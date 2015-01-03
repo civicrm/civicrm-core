@@ -85,7 +85,7 @@
             tpl.id = '' + response.id; //parseInt(response.id);
             tpls.push(tpl);
           }
-          lastModifiedTpl = tpl
+          lastModifiedTpl = tpl;
           return tpl;
         });
       },
@@ -162,7 +162,6 @@
           from_email: crmFromAddresses.getDefault().email,
           replyto_email: "",
           subject: "For {contact.display_name}", // fixme
-          dedupe_email: "1",
           groups: {include: [2], exclude: [4]}, // fixme
           mailings: {include: [], exclude: []},
           body_html: "<b>Hello</b> {contact.display_name}", // fixme
@@ -233,7 +232,7 @@
           if (!_.contains(excludes, field)) {
             mailingTgt[field] = mailingFrom[field];
           }
-        })
+        });
       },
 
       // @param mailing Object (per APIv3)

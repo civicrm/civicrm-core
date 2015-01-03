@@ -1,6 +1,6 @@
 (function (angular, $, _) {
   var partialUrl = function partialUrl(relPath) {
-    return CRM.resourceUrls['civicrm'] + '/partials/crmMailing/' + relPath;
+    return CRM.resourceUrls.civicrm + '/partials/crmMailing/' + relPath;
   };
 
   angular.module('crmMailing', [
@@ -132,7 +132,7 @@
       return crmStatus({start: ts('Deleting...'), success: ts('Deleted')},
         crmMailingMgr.delete($scope.mailing)
           .then(function () {
-            leave('unscheduled')
+            leave('unscheduled');
           })
       );
     };
@@ -158,7 +158,7 @@
             scheduled: 'false'
           });
       }
-    };
+    }
 
     // Transition URL "/mailing/new" => "/mailing/123"
     function updateUrl() {
