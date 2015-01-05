@@ -1414,7 +1414,8 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
             }
           }
           else {
-            $sqlColumns[$fieldName] = "$fieldName varchar(64)";
+            if($query->_fields[$field]['name'] == 'participant_note') $sqlColumns[$fieldName] = "$fieldName text";
+            else $sqlColumns[$fieldName] = "$fieldName varchar(64)";
           }
         }
       }
