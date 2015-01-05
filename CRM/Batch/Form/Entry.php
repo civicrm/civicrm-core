@@ -507,7 +507,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         //finally call contribution create for all the magic
         $contribution = CRM_Contribute_BAO_Contribution::create($value, CRM_Core_DAO::$_nullArray);
         $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id', array('flip' => 1), 'validate');
-        if ($this->_batchInfo['type_id'] == $batchTypes['Pledge Payment']) {
+        if (!empty($this->_batchInfo['type_id']) && ($this->_batchInfo['type_id'] == $batchTypes['Pledge Payment'])) {
           $adjustTotalAmount = FALSE;
           if (isset($params['option_type'][$key])) {
             if ($params['option_type'][$key] == 2) {
