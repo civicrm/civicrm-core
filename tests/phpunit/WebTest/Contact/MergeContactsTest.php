@@ -240,7 +240,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_DedupeFind_submit-bottom');
     $this->click("_qf_DedupeFind_next-bottom");
 
-    $this->waitForElementPresent("xpath=//table[@id='option51']/tbody/tr[1]/td[4]/a[text()='merge']");
+    $this->waitForElementPresent("xpath=div[@id='DedupeFind']/div[2]/div/table/tbody/tr[1]/td[4]/a[text()='merge']");
     $this->waitForElementPresent("xpath=//*[@id='DedupeFind']/a[3]/span[contains(text(),'Done')]");
     $this->isElementPresent("xpath=//table[@id='option51']/tbody/tr/td[1]/a[text()='{$firstName} {$lastName}']/../td[2]/a[text()='{$fName} {$lName}']");
     $this->click("xpath=//table[@id='option51']/tbody/tr[1]/td[4]/a[text()='merge']");
