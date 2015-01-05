@@ -49,37 +49,33 @@
           field: info.field,
           value: $el.is(':checked') ? 1 : 0
         };
-        CRM.api3(info.entity, info.action, params, true)
-          .fail(function(data) {
-            editableSettings.error.call($el[0], info.entity, info.field, checked, data);
-          })
-          .done(function(data) {
-            editableSettings.success.call($el[0], info.entity, info.field, checked, data);
-          });
+        CRM.api3(info.entity, info.action, params, true);
       });
     }
 
-    var defaults = {
-      error: function(entity, field, value, data) {
-        $(this).crmError(data.error_message, ts('Error'));
-        $(this).removeClass('crm-editable-saving');
-      },
-      success: function(entity, field, value, data, settings) {
-        var $i = $(this);
-        if ($i.data('refresh')) {
-          CRM.refreshParent($i);
-        } else {
-          $i.removeClass('crm-editable-saving crm-error crm-editable-editing');
-          value = value === '' ? settings.placeholder : value;
-          $i.html(value);
-        }
-      }
-    };
-
-    var editableSettings = $.extend({}, defaults, options);
     return this.each(function() {
       var $i,
-        fieldName = "";
+        fieldName = "",
+        defaults = {
+          error: function(entity, field, value, data) {
+            restoreContainer();
+            $(this).html(originalValue || settings.placeholder).click();
+            var msg = $.isPlainObject(data) && data.error_message;
+            errorMsg = $(':input', this).first().crmError(msg || ts('Sorry an error occurred and your information was not saved'), ts('Error'));
+          },
+          success: function(entity, field, value, data, settings) {
+            restoreContainer();
+            if ($i.data('refresh')) {
+              CRM.refreshParent($i);
+            } else {
+              value = value === '' ? settings.placeholder : value;
+              $i.html(value);
+            }
+          }
+        },
+        originalValue = '',
+        errorMsg,
+        editableSettings = $.extend({}, defaults, options);
 
       if ($(this).hasClass('crm-editable-enabled')) {
         return;
@@ -148,8 +144,11 @@
         else {
           params[info.field] = value;
         }
-        CRM.api3(info.entity, action, params, true)
+        CRM.api3(info.entity, action, params, {error: null})
           .done(function(data) {
+            if (data.is_error) {
+              return editableSettings.error.call($el[0], info.entity, info.field, value, data);
+            }
             if ($el.data('options')) {
               value = $el.data('options')[value] || '';
             }
@@ -188,6 +187,8 @@
         // FIXME: This should be a response to an event instead of coupled with this function but jeditable 1.7.1 doesn't trigger any events :(
         $i.addClass('crm-editable-editing');
 
+        originalValue = value;
+
         if ($i.data('type') == 'select' || $i.data('type') == 'boolean') {
           if ($i.data('options')) {
             return formatOptions($i.data('options'));
@@ -223,7 +224,8 @@
       }
 
       function restoreContainer() {
-        $i.removeClass('crm-editable-editing');
+        errorMsg && errorMsg.close && errorMsg.close();
+        $i.removeClass('crm-editable-saving crm-editable-editing');
       }
 
     });
