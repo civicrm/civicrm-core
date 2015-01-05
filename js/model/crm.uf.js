@@ -48,14 +48,14 @@
     var coreTypesExpr = parts[0];
     var subTypesExpr = parts[1];
 
-    if (coreTypesExpr && coreTypesExpr != '') {
+    if (!_.isEmpty(coreTypesExpr)) {
       _.each(coreTypesExpr.split(','), function(coreType){
         typeList.coreTypes[coreType] = true;
       });
     }
 
     //CRM-15427 Allow Multiple subtype filtering
-    if (subTypesExpr && subTypesExpr != '') {
+    if (!_.isEmpty(subTypesExpr)) {
       if (subTypesExpr.indexOf(';;') !== -1) {
         var subTypeparts = subTypesExpr.replace(/;;/g,'\0').split('\0');
         _.each(subTypeparts, function(subTypepart) {
@@ -613,6 +613,8 @@
             case 'create':
             case 'update':
             case 'delete':
+              throw 'Unsupported method: ' + method;
+
             default:
               throw 'Unsupported method: ' + method;
           }
@@ -674,7 +676,7 @@
     checkGroupType: function(validTypesExpr, allowAllSubtypes) {
       var allMatched = true;
       allowAllSubtypes = allowAllSubtypes || false;
-      if (! this.get('group_type') || this.get('group_type') == '') {
+      if (_.isEmpty(this.get('group_type'))) {
         return true;
       }
 
