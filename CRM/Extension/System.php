@@ -80,15 +80,30 @@ class CRM_Extension_System {
 
   /**
    * @param array $parameters
+   *   List of configuration values required by the extension system.
+   *   Missing values will be guessed based on $config.
    */
   public function __construct($parameters = array()) {
     $config = CRM_Core_Config::singleton();
-    if (!array_key_exists('extensionsDir', $parameters)) {
-      $parameters['extensionsDir'] = $config->extensionsDir;
+    $configKeys = array(
+      'extensionsDir',
+      'extensionsURL',
+      'resourceBase',
+      'userFrameworkBaseURL',
+    );
+    foreach ($configKeys as $key) {
+      if (!array_key_exists($key, $parameters)) {
+        $parameters[$key] = $config->{$key};
+      }
     }
-    if (!array_key_exists('extensionsURL', $parameters)) {
-      $parameters['extensionsURL'] = $config->extensionsURL;
+    if (!array_key_exists('civicrm_root', $parameters)) {
+      $parameters['civicrm_root'] = $GLOBALS['civicrm_root'];
     }
+    if (!array_key_exists('cmsRootPath', $parameters)) {
+      $parameters['cmsRootPath'] = $config->userSystem->cmsRootPath();
+    }
+    ksort($parameters); // guaranteed ordering - useful for md5(serialize($parameters))
+
     $this->parameters = $parameters;
   }
 
@@ -105,9 +120,12 @@ class CRM_Extension_System {
         $containers['default'] = $this->getDefaultContainer();
       }
 
-      $config = CRM_Core_Config::singleton();
-      global $civicrm_root;
-      $containers['civiroot']  = new CRM_Extension_Container_Basic($civicrm_root, $config->resourceBase, $this->getCache(), 'civiroot');
+      $containers['civiroot'] = new CRM_Extension_Container_Basic(
+        $this->parameters['civicrm_root'],
+        $this->parameters['resourceBase'],
+        $this->getCache(),
+        'civiroot'
+      );
 
       // TODO: CRM_Extension_Container_Basic( /sites/all/modules )
       // TODO: CRM_Extension_Container_Basic( /sites/$domain/modules
@@ -115,11 +133,15 @@ class CRM_Extension_System {
       // TODO: CRM_Extension_Container_Basic( /vendors )
 
       // At time of writing, D6, D7, and WP support cmsRootPath() but J does not
-      $cmsRootPath = $config->userSystem->cmsRootPath();
-      if (NULL !== $cmsRootPath) {
-        $vendorPath = $cmsRootPath . DIRECTORY_SEPARATOR . 'vendor';
+      if (NULL !== $this->parameters['cmsRootPath']) {
+        $vendorPath = $this->parameters['cmsRootPath'] . DIRECTORY_SEPARATOR . 'vendor';
         if (is_dir($vendorPath)) {
-          $containers['cmsvendor'] = new CRM_Extension_Container_Basic($vendorPath, $config->userFrameworkBaseURL  . DIRECTORY_SEPARATOR . 'vendor', $this->getCache(), 'cmsvendor');
+          $containers['cmsvendor'] = new CRM_Extension_Container_Basic(
+            $vendorPath,
+            $this->parameters['userFrameworkBaseURL'] . DIRECTORY_SEPARATOR . 'vendor',
+            $this->getCache(),
+            'cmsvendor'
+          );
         }
       }
 
@@ -216,11 +238,13 @@ class CRM_Extension_System {
   public function getCache() {
     if ($this->cache === NULL) {
       if (defined('CIVICRM_DSN')) {
+        $cacheGroup = md5(serialize(array('ext', $this->parameters)));
         $this->cache = new CRM_Utils_Cache_SqlGroup(array(
-          'group' => 'ext',
+          'group' => $cacheGroup,
           'prefetch' => TRUE,
         ));
-      } else {
+      }
+      else {
         $this->cache = new CRM_Utils_Cache_ArrayCache(array());
       }
     }
