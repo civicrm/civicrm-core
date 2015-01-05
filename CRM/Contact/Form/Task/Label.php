@@ -138,7 +138,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
     $mailingFormatProperties = array();
     if ($mailingFormat) {
-      $mailingFormatProperties = self::getReturnProperties($mailingFormat);
+      $mailingFormatProperties = CRM_Utils_Token::getReturnProperties($mailingFormat);
       $returnProperties = array_merge($returnProperties, $mailingFormatProperties);
     }
     //we should not consider addressee for data exists, CRM-6025
@@ -395,33 +395,6 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       $val = '';
     }
     $pdf->Output($fileName, 'D');
-  }
-
-  /**
-   * Create the array of returnProperties
-   *
-   * @param   string   $format   format for which return properties build
-   *
-   * @return array of returnProperties
-   */
-  public function getReturnProperties(&$format) {
-    $returnProperties = array();
-    $matches = array();
-    preg_match_all('/(?<!\{|\\\\)\{(\w+\.\w+)\}(?!\})/',
-      $format,
-      $matches,
-      PREG_PATTERN_ORDER
-    );
-    if ($matches[1]) {
-      foreach ($matches[1] as $token) {
-        list($type, $name) = preg_split('/\./', $token, 2);
-        if ($name) {
-          $returnProperties["{$name}"] = 1;
-        }
-      }
-    }
-
-    return $returnProperties;
   }
 
   /**

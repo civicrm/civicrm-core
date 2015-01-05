@@ -489,6 +489,7 @@ AND   cas.entity_value = $id AND
         $$elem = $smarty->fetch("string:{$$elem}");
       }
 
+      //@todo - this next section is a duplicate of function CRM_Utils_Token::getTokens
       $matches = array();
       preg_match_all('/(?<!\{|\\\\)\{(\w+\.\w+)\}(?!\})/',
         $body_subject,
@@ -509,6 +510,7 @@ AND   cas.entity_value = $id AND
         }
       }
 
+      // @todo this (along with the copy-&-paste chunk above is a commonly repeated chunk of code & should be in a re-usable function
       $messageSubject = CRM_Utils_Token::replaceContactTokens($body_subject, $contact, FALSE, $subjectToken);
       $messageSubject = CRM_Utils_Token::replaceDomainTokens($messageSubject, $domain, TRUE, $subjectToken);
       $messageSubject = CRM_Utils_Token::replaceComponentTokens($messageSubject, $contact, $subjectToken, TRUE);
@@ -891,7 +893,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
             'source_record_id' => $dao->entityID,
           );
           $activity = CRM_Activity_BAO_Activity::create($activityParams);
-          
+
           //file reminder on case if source activity is a case activity
           if (!empty($dao->case_id)) {
             $caseActivityParams = array();
