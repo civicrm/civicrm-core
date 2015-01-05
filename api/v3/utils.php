@@ -1803,7 +1803,7 @@ function  _civicrm_api3_resolve_contactID($contactIdExpr) {
 function _civicrm_api3_validate_html(&$params, &$fieldName, $fieldInfo) {
   if ($value = CRM_Utils_Array::value($fieldName, $params)) {
     if (!CRM_Utils_Rule::xssString($value)) {
-      throw new API_Exception('Illegal characters in input (potential scripting attack)', array("field"=>$fieldName,"error_code"=>"xss"));
+      throw new API_Exception(ts('Illegal characters in input (potential scripting attack)'), array("field"=>$fieldName,"error_code"=>"xss"));
     }
   }
 }
@@ -1830,7 +1830,7 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
   }
   if ($value ) {
     if (!CRM_Utils_Rule::xssString($value)) {
-      throw new Exception('Illegal characters in input (potential scripting attack)');
+      throw new Exception(ts('Illegal characters in input (potential scripting attack)'));
     }
     if ($fieldName == 'currency') {
       if (!CRM_Utils_Rule::currencyCode($value)) {

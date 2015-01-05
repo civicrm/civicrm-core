@@ -841,8 +841,9 @@ CRM.strings = CRM.strings || {};
     var opts = $.extend({
       start: ts('Saving...'),
       success: ts('Saved'),
-      error: function() {
-        CRM.alert(ts('Sorry an error occurred and your information was not saved'), ts('Error'));
+      error: function(data) {
+        var msg = $.isPlainObject(data) && data.error_message;
+        CRM.alert(msg || ts('Sorry an error occurred and your information was not saved'), ts('Error'), 'error');
       }
     }, options || {});
     var $msg = $('<div class="crm-status-box-outer status-start"><div class="crm-status-box-inner"><div class="crm-status-box-msg">' + opts.start + '</div></div></div>')
@@ -1029,7 +1030,7 @@ CRM.strings = CRM.strings || {};
           title = $label.text();
         }
       }
-      $(this).addClass('error');
+      $(this).addClass('crm-error');
     }
     var msg = CRM.alert(text, title, 'error', $.extend(extra, options));
     if ($(this).length) {
