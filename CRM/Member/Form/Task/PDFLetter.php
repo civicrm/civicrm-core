@@ -108,7 +108,7 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    * {membership.join_date} => Membership Join Date
    * {membership.end_date} => Membership End Date
    * {membership.fee} => Membership Fee
-   * @return Ambigous <NULL, multitype:string Ambigous <string, string> >
+   * @return array
    */
   public function listTokens() {
     return CRM_Core_SelectValues::membershipTokens();
