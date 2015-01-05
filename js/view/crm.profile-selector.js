@@ -71,7 +71,7 @@
       this.$('.crm-profile-selector-edit,.crm-profile-selector-copy').prop('disabled', !this.hasUfGroupId());
     },
     hasUfGroupId: function() {
-      return (this.getUfGroupId() && this.getUfGroupId() != '') ? true : false;
+      return (this.getUfGroupId() && this.getUfGroupId() !== '') ? true : false;
     },
     setUfGroupId: function(value, options) {
       this.options.ufGroupId = value;
