@@ -80,7 +80,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     // function to format definition column
     if (isset($params['definition']) && is_array($params['definition'])) {
       $params['definition'] = self::convertDefinitionToXML($caseTypeName, $params['definition']);
-      CRM_Core_ManagedEntities::scheduleReconcilation();
+      CRM_Core_ManagedEntities::scheduleReconciliation();
     }
 
     $caseTypeDAO->copyValues($params);
