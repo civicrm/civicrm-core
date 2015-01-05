@@ -128,7 +128,7 @@ class CRM_Core_Payment_BaseIPN {
    * @param integer $paymentProcessorID
    * @param array $error_handling
    *
-   * @return multitype:number NULL |boolean
+   * @return boolean
    */
   public function loadObjects(&$input, &$ids, &$objects, $required, $paymentProcessorID, $error_handling = NULL) {
     if (empty($error_handling)) {

@@ -66,7 +66,7 @@ class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
    * @param mixed $arg6
    * @param string $fnSuffix function suffix, this is effectively the hook name
    *
-   * @return Ambigous <boolean, multitype:>
+   * @return array|bool
    */
   function invoke($numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
