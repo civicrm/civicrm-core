@@ -308,6 +308,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     }
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
+    $this->_tagFilterTable = 'civicrm_activity';
     parent::__construct();
   }
 
