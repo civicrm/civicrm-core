@@ -102,7 +102,7 @@ class CRM_Contact_Form_Task_LabelCommon {
     //get the address format sequence from the config file
     $addressReturnProperties = CRM_Contact_Form_Task_LabelCommon::getAddressReturnProperties();
 
-    //build the returnproperties
+    //build the return properties
     $returnProperties = array('display_name' => 1, 'contact_type' => 1, 'prefix_id' => 1);
     $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'mailing_format'
@@ -110,7 +110,7 @@ class CRM_Contact_Form_Task_LabelCommon {
 
     $mailingFormatProperties = array();
     if ($mailingFormat) {
-      $mailingFormatProperties = CRM_Contact_Form_Task_LabelCommon::regexReturnProperties($mailingFormat);
+      $mailingFormatProperties = CRM_Utils_Token::getReturnProperties($mailingFormat);
       $returnProperties = array_merge($returnProperties, $mailingFormatProperties);
     }
 
@@ -253,32 +253,6 @@ class CRM_Contact_Form_Task_LabelCommon {
     }
     // sigh couldn't extract out tokenfields yet
     return array($rows, $tokenFields);
-  }
-
-  /**
-   * Extract the return properties from the mailing format
-   * @todo I'm placing bets this is a duplicate of code elsewhere - find & merge
-   * @param unknown_type $format
-   * @return multitype:number
-   */
-  public function regexReturnProperties(&$format) {
-    $returnProperties = array();
-    $matches = array();
-    preg_match_all('/(?<!\{|\\\\)\{(\w+\.\w+)\}(?!\})/',
-    $format,
-    $matches,
-    PREG_PATTERN_ORDER
-    );
-    if ($matches[1]) {
-      foreach ($matches[1] as $token) {
-        list($type, $name) = preg_split('/\./', $token, 2);
-        if ($name) {
-          $returnProperties["{$name}"] = 1;
-        }
-      }
-    }
-
-    return $returnProperties;
   }
 
   /**

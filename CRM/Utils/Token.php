@@ -1060,6 +1060,33 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Function to determine which values to retrieve to insert into tokens. The heavy resemblance between this function
+   * and getTokens appears to be historical rather than intentional and should be reviewed
+   * @param $string
+   * @return array fields to pass in as return properties when populating token
+   *
+   */
+  public static function getReturnProperties(&$string) {
+      $returnProperties = array();
+      $matches = array();
+      preg_match_all('/(?<!\{|\\\\)\{(\w+\.\w+)\}(?!\})/',
+        $string,
+        $matches,
+        PREG_PATTERN_ORDER
+      );
+      if ($matches[1]) {
+        foreach ($matches[1] as $token) {
+          list($type, $name) = preg_split('/\./', $token, 2);
+          if ($name) {
+            $returnProperties["{$name}"] = 1;
+          }
+        }
+      }
+
+      return $returnProperties;
+  }
+
+  /**
    * Gives required details of contacts in an indexed array format so we
    * can iterate in a nice loop and do token evaluation
    *
