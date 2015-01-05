@@ -818,6 +818,29 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * per CRM-15746 check that the id can be altered in an update hook
+   */
+  function testMembershipUpdateCreateHookCRM15746() {
+    $this->hookClass->setHook('civicrm_pre', array($this, 'hook_civicrm_pre_update_create_membership'));
+    $result = $this->callAPISuccess('membership', 'create', $this->_params);
+    $this->callAPISuccess('membership', 'create', array('id' => $result['id'], 'end_date' => '1 year ago'));
+    $this->callAPISuccessGetCount('membership', array(), 2);
+    $this->hookClass->reset();
+    $this->callAPISuccess('membership', 'create', array('id' => $result['id'], 'end_date' => '1 year ago'));
+    $this->callAPISuccessGetCount('membership', array(), 2);
+  }
+
+  function hook_civicrm_pre_update_create_membership($op, $objectName, $id, &$params) {
+    if ($objectName == 'Membership' && $op == 'edit') {
+      $existingMembership = $this->callAPISuccessGetSingle('membership', array('id' => $params['id']));
+      unset($params['id'], $params['membership_id']);
+      $params['join_date'] = $params['membership_start_date'] = $params['start_date']= date('Ymd000000', strtotime($existingMembership['start_date']));
+      $params = array_merge($existingMembership, $params);
+      $params['id'] = NULL;
+    }
+  }
+
+  /**
    * Test civicrm_contact_memberships_create Invalid membership data
    * Error expected.
    */

@@ -125,6 +125,28 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   public $DBResetRequired = TRUE;
 
   /**
+   * @var CRM_Core_Transaction|NULL
+   */
+  private $tx = NULL;
+
+  /**
+   * @var CRM_Utils_Hook_UnitTests hookClass
+   * example of setting a method for a hook
+   * $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
+   */
+  public $hookClass = NULL;
+
+  /**
+   * @var array common values to be re-used multiple times within a class - usually to create the relevant entity
+   */
+  protected $_params = array();
+
+  /**
+   * @var CRM_Extension_System
+   */
+  protected $origExtensionSystem;
+
+  /**
    *  Constructor
    *
    *  Because we are overriding the parent class constructor, we
@@ -329,7 +351,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $session = CRM_Core_Session::singleton();
     $session->set('userID', NULL);
 
-    CRM_Utils_Hook::singleton(TRUE);
     $this->errorScope = CRM_Core_TemporaryErrorScope::useException(); // REVERT
     //  Use a temporary file for STDIN
     $GLOBALS['stdin'] = tmpfile();
@@ -353,7 +374,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     // when running unit tests, use mockup user framework
     $config->setUserFramework('UnitTests');
-
+    $this->hookClass = CRM_Utils_Hook::singleton(TRUE);
     // also fix the fatal error handler to throw exceptions,
     // rather than exit
     $config->fatalErrorHandler = 'CiviUnitTestCase_fatalErrorHandler';
@@ -441,6 +462,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   protected function tearDown() {
     error_reporting(E_ALL & ~E_NOTICE);
+    CRM_Utils_Hook::singleton()->reset();
+    $this->hookClass->reset();
     $session = CRM_Core_Session::singleton();
     $session->set('userID', NULL);
     $tablesToTruncate = array('civicrm_contact');
@@ -912,13 +935,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param null $count
    * @throws Exception
    * @return array|int
-   * @internal param string $type - per http://php.net/manual/en/function.gettype.php possible types
-   * - boolean
-   * - integer
-   * - double
-   * - string
-   * - array
-   * - object
    */
   function callAPISuccessGetCount($entity, $params, $count = NULL) {
     $params += array(
