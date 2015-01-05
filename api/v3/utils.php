@@ -960,7 +960,7 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
       if ($checkCheckBoxField && !empty($fields['custom_' . $customFieldID]) && $fields['custom_' . $customFieldID]['html_type'] == 'CheckBox') {
         formatCheckBoxField($value, 'custom_' . $customFieldID, $entity);
       }
-      
+
       CRM_Core_BAO_CustomField::formatCustomField($customFieldID, $values['custom'],
         $value, $extends, $customValueID, $entityId, FALSE, FALSE, TRUE
       );
@@ -1723,7 +1723,7 @@ function _civicrm_api3_swap_out_aliases(&$apiRequest, $fields) {
 
 /**
  * Validate integer fields being passed into API.
- * It currently converts the incoming value 'user_contact_id' into the id of the currenty logged in user
+ * It currently converts the incoming value 'user_contact_id' into the id of the currently logged in user
  *
  * @param array $params params from civicrm_api
  * @param string $fieldName uniquename of field being checked

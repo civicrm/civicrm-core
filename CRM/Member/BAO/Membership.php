@@ -977,12 +977,12 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     if (!$membershipId) {
       // CRM-15475
       $statusIds[] = array_search(
-        'Cancelled', 
+        'Cancelled',
         CRM_Member_PseudoConstant::membershipStatus(
-          NULL, 
-          " name = 'Cancelled' ", 
-          'name', 
-          FALSE, 
+          NULL,
+          " name = 'Cancelled' ",
+          'name',
+          FALSE,
           TRUE
         )
       );
@@ -2714,7 +2714,7 @@ WHERE      civicrm_membership.is_test = 0";
         !in_array($dao->status_id, array(array_search('Pending', $allStatus),
             // CRM-15475
             array_search(
-              'Cancelled', 
+              'Cancelled',
               CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)
             ),
             array_search('Expired', $allStatus),
@@ -2952,15 +2952,15 @@ WHERE      civicrm_membership.is_test = 0";
       2 => array(
         // CRM-15475
         array_search(
-          'Cancelled', 
+          'Cancelled',
           CRM_Member_PseudoConstant::membershipStatus(
-            NULL, 
-            " name = 'Cancelled' ", 
-            'name', 
-            FALSE, 
+            NULL,
+            " name = 'Cancelled' ",
+            'name',
+            FALSE,
             TRUE
           )
-        ), 
+        ),
         'Integer'
       ),
       3 => array($isTest, 'Boolean'),
