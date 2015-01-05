@@ -73,19 +73,23 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    */
   public static function add(&$params, $ids = array()) {
     $oldStatus = $oldType = NULL;
-     if (!empty($ids['membership'])) {
-      CRM_Utils_Hook::pre('edit', 'Membership', $ids['membership'], $params);
-
-      $membershipObj     = new CRM_Member_DAO_Membership();
-      $membershipObj->id = $ids['membership'];
+    $params['id'] = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membership', $ids));
+    if ($params['id']) {
+      CRM_Utils_Hook::pre('edit', 'Membership', $params['id'], $params);
+    }
+    else {
+      CRM_Utils_Hook::pre('create', 'Membership', $params['id'], $params);
+    }
+    $id = $params['id'];
+    // we do this after the hooks are called in case it has been altered
+    if ($id) {
+      $membershipObj = new CRM_Member_DAO_Membership();
+      $membershipObj->id = $id;
       $membershipObj->find();
       while ($membershipObj->fetch()) {
         $oldStatus = $membershipObj->status_id;
         $oldType = $membershipObj->membership_type_id;
       }
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'Membership', NULL, $params);
     }
 
     if (array_key_exists('is_override', $params) && !$params['is_override']) {
@@ -94,7 +98,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     $membership = new CRM_Member_BAO_Membership();
     $membership->copyValues($params);
-    $membership->id = CRM_Utils_Array::value('membership', $ids);
+    $membership->id = $id;
 
     $membership->save();
     $membership->free();
@@ -142,7 +146,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     // reset the group contact cache since smart groups might be affected due to this
     CRM_Contact_BAO_GroupContactCache::remove();
 
-    if (!empty($ids['membership'])) {
+    if ($id) {
       if ($membership->status_id != $oldStatus) {
         $allStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'get');
         $activityParam = array(
@@ -973,12 +977,12 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     if (!$membershipId) {
       // CRM-15475
       $statusIds[] = array_search(
-        'Cancelled', 
+        'Cancelled',
         CRM_Member_PseudoConstant::membershipStatus(
-          NULL, 
-          " name = 'Cancelled' ", 
-          'name', 
-          FALSE, 
+          NULL,
+          " name = 'Cancelled' ",
+          'name',
+          FALSE,
           TRUE
         )
       );
@@ -2710,7 +2714,7 @@ WHERE      civicrm_membership.is_test = 0";
         !in_array($dao->status_id, array(array_search('Pending', $allStatus),
             // CRM-15475
             array_search(
-              'Cancelled', 
+              'Cancelled',
               CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)
             ),
             array_search('Expired', $allStatus),
@@ -2948,15 +2952,15 @@ WHERE      civicrm_membership.is_test = 0";
       2 => array(
         // CRM-15475
         array_search(
-          'Cancelled', 
+          'Cancelled',
           CRM_Member_PseudoConstant::membershipStatus(
-            NULL, 
-            " name = 'Cancelled' ", 
-            'name', 
-            FALSE, 
+            NULL,
+            " name = 'Cancelled' ",
+            'name',
+            FALSE,
             TRUE
           )
-        ), 
+        ),
         'Integer'
       ),
       3 => array($isTest, 'Boolean'),

@@ -837,7 +837,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * then it probably means there is some functionality that needs to be moved
    * out of the form layer
    *
-   * @param unknown_type $params
+   * @param array $params
    *
    * @return bool
    */

@@ -218,12 +218,12 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * Mailing Contact Just doesn't support id. We have always insisted on finding a way to
-   * support id in API but in this case the underlying tables are crying out for a restructue
+   * support id in API but in this case the underlying tables are crying out for a restructure
    * & it just doesn't make sense
    *
-   * @param bool|\unknown_type $sequential
+   * @param bool $sequential
    *
-   * @return multitype:string |multitype:multitype:string
+   * @return array Entities that cannot be retrieved by ID
    */
   public static function toBeSkipped_getByID($sequential = FALSE) {
     return array('MailingContact');
@@ -283,7 +283,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 /**
  * Generate list of entities to test for get by id functions
  * @param boolean $sequential
- * @return multitype:string |multitype:multitype:string
+ * @return array Entities to be skipped
  */
   public static function toBeSkipped_automock($sequential = FALSE) {
     $entitiesWithoutGet = array('MailingContact', 'EntityTag', 'Participant', 'ParticipantPayment', 'Setting', 'SurveyRespondant', 'MailingRecipients',  'CustomSearch', 'Extension', 'ReportTemplate', 'System');

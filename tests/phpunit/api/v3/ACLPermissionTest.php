@@ -63,9 +63,8 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @see CiviUnitTestCase::tearDown()
    */
   public function tearDown() {
-    CRM_Utils_Hook::singleton()->reset();
+    parent::tearDown();
     $tablesToTruncate = array(
-      'civicrm_contact',
       'civicrm_group_contact',
       'civicrm_group',
       'civicrm_acl',
