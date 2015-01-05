@@ -43,6 +43,7 @@
     <import>true</import>
     <export>false</export>
     <title>Case Type</title>
+    <required>true</required>
     <comment>FK to civicrm_case_type.id</comment>
     <html>
       <type>Select</type>
