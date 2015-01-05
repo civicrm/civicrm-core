@@ -32,7 +32,7 @@
   {/if}
   {if $records and $headers}
     {include file="CRM/common/jsortable.tpl"}
-    <div id="custom-{$customGroupId}-table-wrapper">
+    <div id="custom-{$customGroupId}-table-wrapper" {if $pageViewType eq 'customDataView'}class="crm-entity" data-entity="contact" data-id="{$contactId}"{/if}>
       <div>
         {strip}
           <table id="records" class="display">
@@ -51,9 +51,9 @@
               <tr class="{cycle values="odd-row,even-row"}">
                 {foreach from=$headers key=hrecId item=head}
                   {if $dateFieldsVals.$hrecId.$recId}
-                    <td>{$rows.$hrecId|crmDate:"%b %d, %Y %l:%M %P"}</td>
+                    <td {crmAttributes a=$attributes.$hrecId.$recId}>{$rows.$hrecId|crmDate:"%b %d, %Y %l:%M %P"}</td>
                   {else}
-                    <td>{$rows.$hrecId}</td>
+                    <td {crmAttributes a=$attributes.$hrecId.$recId}>{$rows.$hrecId}</td>
                   {/if}
                 {/foreach}
                 <td>{$rows.action}</td>

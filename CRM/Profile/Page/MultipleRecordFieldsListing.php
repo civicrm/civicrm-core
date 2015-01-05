@@ -220,7 +220,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
     }
     if ($fieldIDs && !empty($fieldIDs) && $this->_contactId) {
       $options = array( );
-      $returnProperities = array('html_type', 'data_type', 'date_format', 'time_format');
+      $returnProperities = array('html_type', 'data_type', 'date_format', 'time_format', 'default_value', 'is_required');
       foreach ($fieldIDs as $key => $fieldID) {
         $fieldIDs[$key] = !is_numeric($fieldID) ? CRM_Core_BAO_CustomField::getKeyID($fieldID) : $fieldID;
         $param = array('id' => $fieldIDs[$key]);
@@ -239,6 +239,8 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
 
         $options[$fieldIDs[$key]]['attributes']['html_type'] = $returnValues['html_type'];
         $options[$fieldIDs[$key]]['attributes']['data_type'] = $returnValues['data_type'];
+        $options[$fieldIDs[$key]]['attributes']['is_required'] = !empty($returnValues['is_required']);
+        $options[$fieldIDs[$key]]['attributes']['default_value'] = CRM_Utils_Array::value('default_value', $returnValues);
 
         $options[$fieldIDs[$key]]['attributes']['format'] =
           $options[$fieldIDs[$key]]['attributes']['date_format'] = CRM_Utils_Array::value('date_format', $returnValues);
@@ -296,9 +298,45 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                 // assign to $result
                 $customValue = CRM_Core_BAO_CustomField::getDisplayValue($customValue, $fieldId, $options);
               }
-              if (!$customValue) {
+              // FIXME: getDisplayValue should always return a string so why is this necessary?
+              if (!$customValue && $customValue !== '0') {
                 $customValue = "";
               }
+
+              // Set field attributes to support crmEditable
+              // Note that $fieldAttributes[data-type] actually refers to the html type not the sql data type
+              // TODO: Not all widget types and validation rules are supported by crmEditable so some fields will not be in-place editable
+              $fieldAttributes = array('class' => "crmf-custom_{$fieldId}_$recId");
+              $editable = FALSE;
+              if ($linkAction & CRM_Core_Action::UPDATE) {
+                $spec = $options[$fieldId]['attributes'];
+                switch ($spec['html_type']) {
+                  case 'Text':
+                    // Other data types like money would require some extra validation
+                    // FIXME: crmEditable currently does not support any validation rules :(
+                    $supportedDataTypes = array('Float', 'String', 'Int');
+                    $editable = in_array($spec['data_type'], $supportedDataTypes);
+                    break;
+                  case 'TextArea':
+                    $editable = TRUE;
+                    $fieldAttributes['data-type'] = 'textarea';
+                    break;
+                  case 'Radio':
+                  case 'Select':
+                  case 'Select Country':
+                  case 'Select State/Province':
+                    $editable = TRUE;
+                    $fieldAttributes['data-type'] = $spec['data_type'] == 'Boolean' ? 'boolean' : 'select';
+                    if (!$spec['is_required']) {
+                      $fieldAttributes['data-empty-option'] = ts('- none -');
+                    }
+                    break;
+                }
+              }
+              if ($editable) {
+                $fieldAttributes['class'] .= ' crm-editable';
+              }
+              $attributes[$fieldId][$recId] = $fieldAttributes;
 
               $op = NULL;
               if ($this->_pageViewType == 'profileDataView') {
@@ -359,6 +397,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
     $this->assign('customGroupTitle', $this->_customGroupTitle);
     $this->assign('headers', $headers);
     $this->assign('records', $result);
+    $this->assign('attributes', $attributes);
   }
 
   /**
