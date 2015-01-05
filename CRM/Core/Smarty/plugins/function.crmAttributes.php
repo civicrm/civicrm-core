@@ -1,4 +1,5 @@
-{*
+<?php
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
@@ -22,34 +23,29 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
-{* this template is used for building tabbed custom data *}
-{if $cdType || $postedInfo}
-   {include file="CRM/Custom/Form/CustomData.tpl"}
-   {if $multiRecordDisplay eq 'single'}
-     <div class="crm-submit-buttons">{$form.buttons.html}</div>
-   {/if}
-{else}
-    <div id="customData"></div>
-    <div class="crm-submit-buttons">{$form.buttons.html}</div>
+*/
 
-    {*include custom data js file*}
-    {include file="CRM/common/customData.tpl"}
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC
+ * $Id$
+ *
+ */
 
-  {if $customValueCount}
-    {literal}
-    <script type="text/javascript">
-      var customValueCount = {/literal}"{$customValueCount}"{literal};
-      var groupID = {/literal}"{$groupID}"{literal};
-      var contact_type = {/literal}"{$contact_type}"{literal};
-      var contact_subtype = {/literal}"{$contact_subtype}"{literal};
-      CRM.buildCustomData( contact_type, contact_subtype );
-      for ( var i = 1; i < customValueCount; i++ ) {
-        CRM.buildCustomData( contact_type, contact_subtype, null, i, groupID, true );
-      }
-    </script>
-    {/literal}
-  {/if}
-{/if}
-
-{include file="CRM/Form/attachmentjs.tpl"}
+/**
+ * Add a stylesheet <LINK> to a specific part of the page
+ *
+ * @param array $params ['a'] array of attributes
+ * @param CRM_Core_Smarty $smarty
+ *
+ * @throws Exception
+ */
+function smarty_function_crmAttributes($params, &$smarty) {
+  $output = '';
+  $attributes = isset($params['a']) ? $params['a'] : array();
+  foreach ($attributes as $name => $vals) {
+    $output .= " $name=\"" . htmlspecialchars(implode(' ', (array) $vals)) . '"';
+  }
+  return $output;
+}
