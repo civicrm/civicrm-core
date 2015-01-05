@@ -230,7 +230,7 @@
         case 'timeline':
           return true;
         case 'sequence':
-          return 0 == _.where($scope.caseType.definition.activitySets, {sequence: '1'}).length;
+          return 0 === _.where($scope.caseType.definition.activitySets, {sequence: '1'}).length;
         default:
           CRM.console('warn', 'Denied access to unrecognized workflow: (' + workflow + ')');
           return false;
@@ -279,7 +279,7 @@
     $scope.save = function() {
       var result = crmApi('CaseType', 'create', $scope.caseType, true);
       result.success(function(data) {
-        if (data.is_error == 0) {
+        if (data.is_error === 0 || data.is_error == '0') {
           $scope.caseType.id = data.id;
           window.location.href = '#/caseType';
         }
