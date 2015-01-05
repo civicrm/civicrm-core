@@ -1188,7 +1188,9 @@ CRM.strings = CRM.strings || {};
   /**
    * @deprecated
    */
-  $.fn.crmAccordions = function () {};
+  $.fn.crmAccordions = function () {
+    CRM.console('warn', 'Warning: $.crmAccordions was called. This function is deprecated and should not be used.');
+  };
   /**
    * Collapse or expand an accordion
    * @param speed
