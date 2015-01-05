@@ -495,11 +495,12 @@
         var buttonContainers = '.crm-submit-buttons, .action-link',
           buttons = [],
           added = [];
+	  var skipButton =  $el.find('.skip-button').closest('div');
         $(buttonContainers, $el).find('input.crm-form-submit, a.button').each(function() {
           var $el = $(this),
             label = $el.is('input') ? $el.attr('value') : $el.text(),
             identifier = $el.attr('name') || $el.attr('href');
-          if (!identifier || identifier === '#' || $.inArray(identifier, added) < 0) {
+          if (!$el.hasClass("skip-button") && (!identifier || identifier === '#' || $.inArray(identifier, added) < 0)) {
             var $icon = $el.find('.icon'),
               button = {'data-identifier': identifier, text: label, click: function() {
                 $el.click();
@@ -517,6 +518,10 @@
           $el.parents(buttonContainers).css({height: 0, padding: 0, margin: 0, overflow: 'hidden'});
         });
         $el.dialog('option', 'buttons', buttons);
+	  if (skipButton.length > 0) {
+	    skipButton = skipButton.filter(function(a){if (!this[a]) {this[a] = 1; return a;}},{});
+	    $('.ui-dialog-buttons div:last').append(skipButton);
+	  }
       }
       // Allow a button to prevent ajax submit
       $('input[data-no-ajax-submit=true]').click(function() {
