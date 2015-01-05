@@ -768,10 +768,12 @@ ORDER BY civicrm_custom_group.weight,
             list($path) = CRM_Core_BAO_File::path($fileDAO->id, $entityId,
               NULL, NULL
             );
-            list($imageWidth, $imageHeight) = getimagesize($path);
-            list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
-            $customValue['imageThumbWidth'] = $imageThumbWidth;
-            $customValue['imageThumbHeight'] = $imageThumbHeight;
+            if ($path && file_exists($path)) {
+              list($imageWidth, $imageHeight) = getimagesize($path);
+              list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
+              $customValue['imageThumbWidth'] = $imageThumbWidth;
+              $customValue['imageThumbHeight'] = $imageThumbHeight;
+            }
           }
         }
       }
