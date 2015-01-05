@@ -54,14 +54,16 @@ class CRM_Extension_System {
 
   /**
    * @param bool $fresh
+   *   TRUE to force creation of a new system.
    *
    * @return CRM_Extension_System
    */
   public static function singleton($fresh = FALSE) {
-    if (! self::$singleton || $fresh) {
+    if (!self::$singleton || $fresh) {
       if (self::$singleton) {
         self::$singleton = new CRM_Extension_System(self::$singleton->parameters);
-      } else {
+      }
+      else {
         self::$singleton = new CRM_Extension_System();
       }
     }
@@ -70,6 +72,7 @@ class CRM_Extension_System {
 
   /**
    * @param CRM_Extension_System $singleton
+   *   The new, singleton extension system.
    */
   public static function setSingleton(CRM_Extension_System $singleton) {
     self::$singleton = $singleton;
@@ -136,7 +139,8 @@ class CRM_Extension_System {
     if ($this->defaultContainer === NULL) {
       if ($this->parameters['extensionsDir']) {
         $this->defaultContainer = new CRM_Extension_Container_Default($this->parameters['extensionsDir'], $this->parameters['extensionsURL'], $this->getCache(), 'default');
-      } else {
+      }
+      else {
         $this->defaultContainer = FALSE;
       }
     }
@@ -235,7 +239,7 @@ class CRM_Extension_System {
 
       // boolean false means don't try to check extensions
       // http://issues.civicrm.org/jira/browse/CRM-10575
-      if($url === FALSE) {
+      if ($url === FALSE) {
         $this->_repoUrl = FALSE;
       }
       else {
