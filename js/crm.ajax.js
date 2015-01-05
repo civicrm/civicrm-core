@@ -502,7 +502,7 @@
           if (!identifier || identifier === '#' || $.inArray(identifier, added) < 0) {
             var $icon = $el.find('.icon'),
               button = {'data-identifier': identifier, text: label, click: function() {
-                $el.click();
+                $el[0].click();
               }};
             if ($icon.length) {
               button.icons = {primary: $icon.attr('class')};
