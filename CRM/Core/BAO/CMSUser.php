@@ -238,15 +238,10 @@ class CRM_Core_BAO_CMSUser {
       isset($params['contactID'])
     ) {
       // create the UF Match record
-      $ufmatch             = new CRM_Core_DAO_UFMatch();
-      $ufmatch->domain_id  = CRM_Core_Config::domainID();
-      $ufmatch->uf_id      = $ufID;
-      $ufmatch->contact_id = $params['contactID'];
-      $ufmatch->uf_name    = $params[$mail];
-
-      if (!$ufmatch->find(TRUE)) {
-        $ufmatch->save();
-      }
+      $ufmatch['uf_id']      = $ufID;
+      $ufmatch['contact_id'] = $params['contactID'];
+      $ufmatch['uf_name']    = $params[$mail];
+      CRM_Core_BAO_UFMatch::create($ufmatch);
     }
 
     return $ufID;
