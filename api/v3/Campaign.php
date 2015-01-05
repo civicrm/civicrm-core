@@ -49,7 +49,7 @@
  * @access public
  */
 function civicrm_api3_campaign_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Campaign');
 }
 
 /**
@@ -74,7 +74,7 @@ function _civicrm_api3_campaign_create_spec(&$params) {
  * {@getfields campaign_get}
  */
 function civicrm_api3_campaign_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Campaign');
 }
 
 /**

@@ -47,7 +47,7 @@
  * @access public
  */
 function civicrm_api3_survey_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Survey');
 }
 
 /**
@@ -72,7 +72,7 @@ function _civicrm_api3_survey_create_spec(&$params) {
  * @access public
  */
 function civicrm_api3_survey_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Survey');
 }
 
 /**
