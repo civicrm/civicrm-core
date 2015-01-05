@@ -20,6 +20,7 @@ cp $SRC/civicrm.config.php $TRG
 dm_generate_version "$TRG/civicrm-version.php" Joomla
 dm_install_core "$SRC" "$TRG"
 dm_install_packages "$SRC/packages" "$TRG/packages"
+dm_install_vendor "$SRC/vendor" "$TRG/vendor"
 
 ## WTF: It's so good we'll install it twice!
 ## (The first is probably extraneous, but there could be bugs dependent on it.)

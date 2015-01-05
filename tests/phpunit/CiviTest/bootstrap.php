@@ -23,7 +23,7 @@ if ( file_exists( '/etc/timezone' ) ) {
 # Crank up the memory
 ini_set('memory_limit', '2G');
 
-require_once $GLOBALS['base_dir'] . '/packages/vendor/autoload.php';
+require_once $GLOBALS['base_dir'] . '/vendor/autoload.php';
 
 /*
 require $GLOBALS['base_dir'] . DIRECTORY_SEPARATOR .
