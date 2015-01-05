@@ -135,6 +135,26 @@ function dm_install_l10n() {
   dm_install_dir "$repo" "$to"
 }
 
+## Copy composer's "vendor" folder
+## usage: dm_install_vendor <from_path> <to_path>
+function dm_install_vendor() {
+  local repo="$1"
+  local to="$2"
+
+  local excludes_rsync=""
+  for exclude in .git .svn {T,t}est{,s} {D,d}oc{,s} {E,e}xample{,s} ; do
+    excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
+  done
+
+  ## Note: These small folders have items that previously were not published,
+  ## but there's no real cost to including them, and excluding them seems
+  ## likely to cause confusion as the codebase evolves:
+  ##   packages/Files packages/PHP packages/Text
+
+  [ ! -d "$to" ] && mkdir "$to"
+  $DM_RSYNC -avC $excludes_rsync --include=core "$repo/./" "$to/./"
+}
+
 ##  usage: dm_install_wordpress <wp_repo_path> <to_path>
 function dm_install_wordpress() {
   local repo="$1"
@@ -151,6 +171,15 @@ function dm_install_wordpress() {
     --exclude=civicrm \
     "$repo/./"  "$to/./"
   ## Need --exclude=civicrm for self-building on WP site
+}
+
+## Generate the composer "vendor" folder
+## usage: dm_generate_vendor <repo_path>
+function dm_generate_vendor() {
+  local repo="$1"
+  pushd "$repo"
+    composer install
+  popd
 }
 
 ## Generate civicrm-version.php
