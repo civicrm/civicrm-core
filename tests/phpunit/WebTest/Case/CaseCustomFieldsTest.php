@@ -246,7 +246,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
   /**
    * @param $customGrpId1
-   * @param int $customId
+   * @param array $customId
    */
   public function _testDeleteCustomData($customGrpId1, $customId) {
     // delete all custom data
