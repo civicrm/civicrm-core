@@ -1378,6 +1378,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           $sqlColumns[$fieldName] = "$fieldName varchar(16)";
         }
       }
+      elseif (substr($fieldName, -5, 5) == '_note') {
+        $sqlColumns[$fieldName] = "$fieldName text";
+      }
       else {
         $changeFields = array(
           'groups',
