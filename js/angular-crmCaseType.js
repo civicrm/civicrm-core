@@ -4,7 +4,7 @@
     return CRM.resourceUrls['civicrm'] + '/partials/crmCaseType/' + relPath;
   };
 
-  var crmCaseType = angular.module('crmCaseType', ['ngRoute', 'ui.utils', 'crmUi', 'unsavedChanges']);
+  var crmCaseType = angular.module('crmCaseType', ['ngRoute', 'ui.utils', 'crmUi', 'unsavedChanges', 'crmUtil']);
 
   // Note: This template will be passed to cloneDeep(), so don't put any funny stuff in here!
   var newCaseTypeTemplate = {

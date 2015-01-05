@@ -46,7 +46,6 @@
       {strip}
       {* handle enable/disable actions*}
        {include file="CRM/common/enableDisableApi.tpl"}
-       {include file="CRM/common/crmeditable.tpl"}
       <table id="crm-financial_accounts" class="display">
          <thead class="sticky">
           <th>{ts}Name{/ts}</th>

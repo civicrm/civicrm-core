@@ -40,8 +40,8 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
       );
     });
 
-    $res->addScriptFile('civicrm', 'packages/bower_components/angular/angular.min.js', 100, 'html-header', FALSE);
-    $res->addScriptFile('civicrm', 'packages/bower_components/angular-route/angular-route.min.js', 110, 'html-header', FALSE);
+    $res->addScriptFile('civicrm', 'bower_components/angular/angular.min.js', 100, 'html-header', FALSE);
+    $res->addScriptFile('civicrm', 'bower_components/angular-route/angular-route.min.js', 110, 'html-header', FALSE);
     $headOffset = 0;
     foreach ($modules as $module) {
       if (!empty($module['css'])) {
@@ -64,16 +64,17 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
    */
   public static function getAngularModules() {
     $angularModules = array();
-    $angularModules['ui.utils'] = array('ext' => 'civicrm', 'js' => array('packages/bower_components/angular-ui-utils/ui-utils.min.js'));
-    $angularModules['ui.sortable'] = array('ext' => 'civicrm', 'js' => array('packages/bower_components/angular-ui-sortable/sortable.min.js'));
-    $angularModules['unsavedChanges'] = array('ext' => 'civicrm', 'js' => array('packages/bower_components/angular-unsavedChanges/dist/unsavedChanges.min.js'));
-    // https://github.com/jwstadler/angular-jquery-dialog-service
-    $angularModules['angularFileUpload'] = array('ext' => 'civicrm', 'js' => array('packages/bower_components/angular-file-upload/angular-file-upload.min.js'));
-    $angularModules['dialogService'] = array('ext' => 'civicrm' , 'js' => array('packages/bower_components/angular-jquery-dialog-service/dialog-service.js'));
+    $angularModules['angularFileUpload'] = array('ext' => 'civicrm', 'js' => array('bower_components/angular-file-upload/angular-file-upload.min.js'));
+    $angularModules['crmApp'] = array('ext' => 'civicrm', 'js' => array('js/angular-crmApp.js'));
     $angularModules['crmAttachment'] = array('ext' => 'civicrm', 'js' => array('js/angular-crmAttachment.js'), 'css' => array('css/angular-crmAttachment.css'));
     $angularModules['crmUi'] = array('ext' => 'civicrm', 'js' => array('js/angular-crm-ui.js', 'packages/ckeditor/ckeditor.js'));
     $angularModules['crmUtil'] = array('ext' => 'civicrm', 'js' => array('js/angular-crm-util.js'));
+    // https://github.com/jwstadler/angular-jquery-dialog-service
+    $angularModules['dialogService'] = array('ext' => 'civicrm' , 'js' => array('bower_components/angular-jquery-dialog-service/dialog-service.js'));
     $angularModules['ngSanitize'] = array('ext' => 'civicrm', 'js' => array('js/angular-sanitize.js'));
+    $angularModules['ui.utils'] = array('ext' => 'civicrm', 'js' => array('bower_components/angular-ui-utils/ui-utils.min.js'));
+    $angularModules['ui.sortable'] = array('ext' => 'civicrm', 'js' => array('bower_components/angular-ui-sortable/sortable.min.js'));
+    $angularModules['unsavedChanges'] = array('ext' => 'civicrm', 'js' => array('bower_components/angular-unsavedChanges/dist/unsavedChanges.min.js'));
 
     foreach (CRM_Core_Component::getEnabledComponents() as $component) {
       $angularModules = array_merge($angularModules, $component->getAngularModules());

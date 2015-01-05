@@ -266,7 +266,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $allMembershipInfo = $membershipType = array();
 
     // auto renew options if enabled for the membership
-    $options = array(ts('No auto-renew option'), ts('Give option, but not required'), ts('Auto-renew required '));
+    $options = CRM_Core_SelectValues::memberAutoRenew();
 
     foreach( $allMemberships as $key => $values ) {
       if (!empty($values['is_active'])) {

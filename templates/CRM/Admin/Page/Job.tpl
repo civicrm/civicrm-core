@@ -45,7 +45,6 @@
     {strip}
         {* handle enable/disable actions*}
        {include file="CRM/common/enableDisableApi.tpl"}
-       {include file="CRM/common/crmeditable.tpl"}
         <br/><table class="selector row-highlight">
         <tr class="columnheader">
             <th >{ts}Name (Frequency)/Description{/ts}</th>

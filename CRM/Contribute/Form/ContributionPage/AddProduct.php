@@ -165,7 +165,7 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
 
     $this->add('select', 'product_id', ts('Select the Product') . ' ', $this->_products, TRUE);
 
-    $this->addElement('text', 'weight', ts('Weight'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_PremiumsProduct', 'weight'));
+    $this->addElement('text', 'weight', ts('Order'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_PremiumsProduct', 'weight'));
 
     $financialType = CRM_Contribute_PseudoConstant::financialType( );
     $premiumFinancialType = array();

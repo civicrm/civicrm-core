@@ -57,14 +57,12 @@
     }
   ]);
 
-  angular.module('crmMailing').controller('ListMailingsCtrl', function ListMailingsCtrl() {
+  angular.module('crmMailing').controller('ListMailingsCtrl', ['crmLegacy', 'crmNavigator', function ListMailingsCtrl(crmLegacy, crmNavigator) {
     // We haven't implemented this in Angular, but some users may get clever
     // about typing URLs, so we'll provide a redirect.
-    window.location = CRM.url('civicrm/mailing/browse/unscheduled', {
-      reset: 1,
-      scheduled: 'false'
-    });
-  });
+    var new_url = crmLegacy.url('civicrm/mailing/browse/unscheduled', {reset: 1, scheduled: 'false'});
+    crmNavigator.redirect(new_url);
+  }]);
 
   angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, CrmAttachments, crmMailingPreviewMgr) {
     $scope.mailing = selectedMail;

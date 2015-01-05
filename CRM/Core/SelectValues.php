@@ -136,6 +136,18 @@ class CRM_Core_SelectValues {
   }
 
   /**
+   * Member auto-renew options
+   * @static
+   */
+  public static function memberAutoRenew() {
+    return array(
+      ts('No auto-renew option'),
+      ts('Give option, but not required'),
+      ts('Auto-renew required')
+    );
+  }
+
+  /**
    * Various pre defined event dates
    * @static
    */

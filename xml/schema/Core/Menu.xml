@@ -153,6 +153,7 @@
   </field>
   <field>
     <name>weight</name>
+    <title>Order</title>
     <type>int</type>
     <required>true</required>
     <default>1</default>

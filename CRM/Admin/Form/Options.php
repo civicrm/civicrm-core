@@ -245,7 +245,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
     $this->add('text',
       'weight',
-      ts('Weight'),
+      ts('Order'),
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'weight'),
       TRUE
     );

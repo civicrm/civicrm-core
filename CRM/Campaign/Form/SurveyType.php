@@ -140,7 +140,7 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
     ) {
       $this->freeze(array('label', 'is_active'));
     }
-    $this->add('text', 'weight', ts('Weight'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'weight'), TRUE);
+    $this->add('text', 'weight', ts('Order'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'weight'), TRUE);
 
     $this->assign('id', $this->_id);
   }

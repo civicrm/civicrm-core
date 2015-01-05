@@ -41,7 +41,6 @@
 
   {* load survey selector *}
   {include file="CRM/common/enableDisableApi.tpl"}
-  {include file="CRM/common/crmeditable.tpl"}
 
   {literal}
   <script type="text/javascript">
@@ -189,7 +188,7 @@ function loadSurveyList( )
              "bLengthChange": false,
              "aaSorting": [],
              "aoColumns":[{sClass:'crm-survey-id                          hiddenElement' },
-                          {sClass:'crm-survey-title'                                     },
+                          {sClass:'crmf-title crm-editable'                                     },
                           {sClass:'crm-survey-campaign_id                 hiddenElement' },
                           {sClass:'crm-survey-campaign'                                  },
                           {sClass:'crm-survey-activity_type_id            hiddenElement' },
@@ -212,7 +211,10 @@ function loadSurveyList( )
              "asStripClasses" : [ "odd-row", "even-row" ],
              "oLanguage":{"sEmptyTable"  : noRecordFoundMsg,
                  "sZeroRecords" : noRecordFoundMsg },
-             "fnDrawCallback": function() { CRM.$().crmtooltip(); },
+             "fnDrawCallback": function() {
+               // FIXME: trigger crmLoad and crmEditable would happen automatically
+               CRM.$('.crm-editable').crmEditable();
+             },
              "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
          //insert the id for each row for enable/disable.
          var rowId = 'survey-' + aData[0];
@@ -267,7 +269,7 @@ function displayResultSet( surveyId, surveyTitle, OptionGroupId ) {
   data['survey_id']       = surveyId;
 
   var dataUrl  = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Campaign_Page_AJAX&fnName=loadOptionGroupDetails' }"{literal};
-  var content  = '<tr><th>{/literal}{ts escape='js'}Label{/ts}{literal}</th><th>{/literal}{ts escape='js'}Value{/ts}{literal}</th><th>{/literal}{ts escape='js'}Recontact Interval{/ts}{literal}</th><th>{/literal}{ts escape='js'}Weight{/ts}{literal}</th></tr>';
+  var content  = '<tr><th>{/literal}{ts escape='js'}Label{/ts}{literal}</th><th>{/literal}{ts escape='js'}Value{/ts}{literal}</th><th>{/literal}{ts escape='js'}Recontact Interval{/ts}{literal}</th><th>{/literal}{ts escape='js'}Order{/ts}{literal}</th></tr>';
   var setTitle = '{/literal}{ts escape='js'}Result Set for{/ts} {literal}' + surveyTitle;
 
   CRM.$.post( dataUrl, data, function( opGroup ) {

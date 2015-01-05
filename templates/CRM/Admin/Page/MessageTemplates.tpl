@@ -98,7 +98,6 @@
 
     {* create two selector tabs, first being the ‘user’ one, the second being the ‘workflow’ one *}
     {include file="CRM/common/enableDisableApi.tpl"}
-    {include file="CRM/common/crmeditable.tpl"}
     {include file="CRM/common/jsortable.tpl"}
     {foreach from=$rows item=template_row key=type}
       <div id="{if $type eq 'userTemplates'}user{else}workflow{/if}" class='ui-tabs-panel ui-widget-content ui-corner-bottom'>
