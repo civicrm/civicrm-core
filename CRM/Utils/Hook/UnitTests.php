@@ -36,10 +36,16 @@
 class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
 
   protected $mockObject;
+
+  /**
+   * @var array adhocHooks to call
+   */
   protected $adhocHooks;
   protected $civiModules = NULL;
 
-  // Call this in CiviUnitTestCase::setUp()
+  /**
+   * Call this in CiviUnitTestCase::setUp()
+   */
   public function reset() {
     $this->mockObject = NULL;
     $this->adhocHooks = array();
@@ -48,6 +54,7 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
   /**
    * Use a unit-testing mock object to handle hook invocations
    * e.g. hook_civicrm_foo === $mockObject->foo()
+   * @param object $mockObject
    */
   public function setMock($mockObject) {
     $this->mockObject = $mockObject;
@@ -55,6 +62,9 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
 
   /**
    * Register a piece of code to run when invoking a hook
+   * @param string $hook hook name, e.g civicrm_pre
+   * @param array $callable function to call ie array(class, method)
+   *  eg. array($this, mymethod)
    */
   public function setHook($hook, $callable) {
     $this->adhocHooks[$hook] = $callable;
