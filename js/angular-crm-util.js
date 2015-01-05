@@ -8,8 +8,12 @@
       var deferred = $q.defer();
       var p;
       if (_.isObject(entity)) {
+        // eval content is locally generated.
+        /*jshint -W061 */
         p = CRM.api3(eval('('+angular.toJson(entity)+')'), message);
       } else {
+        // eval content is locally generated.
+        /*jshint -W061 */
         p = CRM.api3(entity, action, eval('('+angular.toJson(params)+')'), message);
       }
       // CRM.api3 returns a promise, but the promise doesn't really represent errors as errors, so we
