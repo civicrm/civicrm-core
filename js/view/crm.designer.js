@@ -484,7 +484,7 @@
       }
     },
     toggleAll: function(e) {
-      if ($('.crm-designer-palette-search input').val() == '') {
+      if (_.isEmpty($('.crm-designer-palette-search input').val())) {
         $('.crm-designer-palette-tree').jstree($(e.target).attr('rel'));
       }
       e.preventDefault();
@@ -541,7 +541,7 @@
             ufFieldCanvasView.model.getRel('ufFieldCollection'),
             {skipWeights: true}
           );
-          if (null == ufFieldModel) {
+          if (_.isEmpty(ufFieldModel)) {
             ufFieldCanvasView.$('.crm-designer-fields .ui-draggable').remove();
           } else {
             // Move from end to the 'dropped' position
