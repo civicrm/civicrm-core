@@ -168,7 +168,7 @@
           // immediately for initialization. Use retries/retryDelay to initialize such elements.
           var init = function (retries, retryDelay) {
             var input = $('#' + id);
-            if (input.length == 0) {
+            if (input.length === 0) {
               if (retries) {
                 $timeout(function(){
                   init(retries-1, retryDelay);
@@ -554,7 +554,7 @@
             angular.forEach(steps, function(otherStep, otherKey) {
               if (otherStep === step) key = otherKey;
             });
-            if (key != null) {
+            if (key !== null) {
               steps.splice(key, 1);
             }
           };
