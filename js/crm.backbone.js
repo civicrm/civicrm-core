@@ -123,7 +123,7 @@
       },
       toCrmCriteria: function() {
         var result = (this.get('id')) ? {id: this.get('id')} : {};
-        if (this.crmReturn != null) {
+        if (!_.isEmpty(this.crmReturn)) {
           result.return = this.crmReturn;
         }
         return result;
@@ -323,9 +323,9 @@
       },
       toCrmCriteria: function() {
         var result = (this.crmCriteria) ? _.extend({}, this.crmCriteria) : {};
-        if (this.crmReturn != null) {
+        if (!_.isEmpty(this.crmReturn)) {
           result.return = this.crmReturn;
-        } else if (this.model && this.model.prototype.crmReturn != null) {
+        } else if (this.model && !_.isEmpty(this.model.prototype.crmReturn)) {
           result.return = this.model.prototype.crmReturn;
         }
         return result;
@@ -423,7 +423,7 @@
      });
      collection.fetch({
       success: function(collection) {
-        if (collection.length == 0) {
+        if (collection.length === 0) {
           var attrs = _.extend({}, collection.crmCriteria, options.defaults || {});
           var model = collection._prepareModel(attrs, options);
           options.success(model);
