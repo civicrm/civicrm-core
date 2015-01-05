@@ -36,12 +36,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 
 class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
-  protected $_params;
-  protected $hookClass = NULL;
   public $DBResetRequired = FALSE;
-
-
-
   protected $_entity;
 
   function setUp() {
@@ -49,7 +44,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $baoObj = new CRM_Core_DAO();
     $baoObj->createTestObject('CRM_Pledge_BAO_Pledge', array(), 1, 0);
     $baoObj->createTestObject('CRM_Core_BAO_Phone', array(), 1, 0);
-    $this->hookClass = CRM_Utils_Hook::singleton();
     $config = CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array();
   }
