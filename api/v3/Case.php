@@ -228,7 +228,7 @@ function civicrm_api3_case_get($params) {
   }
 
   //search by contacts
-  if ($contact = CRM_Utils_Array::value('contact_id', $params)) {
+  if (($contact = CRM_Utils_Array::value('contact_id', $params)) != FALSE) {
     if (!is_numeric($contact)) {
       throw new API_Exception('Invalid parameter: contact_id.  Must provide a numeric value.');
     }
