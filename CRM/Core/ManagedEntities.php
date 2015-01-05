@@ -27,6 +27,8 @@ class CRM_Core_ManagedEntities {
 
   /**
    * Get an instance
+   * @param bool $fresh
+   * @return \CRM_Core_ManagedEntities
    */
   public static function singleton($fresh = FALSE) {
     static $singleton;
@@ -39,7 +41,7 @@ class CRM_Core_ManagedEntities {
   /**
    * Perform an asynchronous reconciliation when the transaction ends.
    */
-  public static function scheduleReconcilation() {
+  public static function scheduleReconciliation() {
     CRM_Core_Transaction::addCallback(
       CRM_Core_Transaction::PHASE_POST_COMMIT,
       function () {

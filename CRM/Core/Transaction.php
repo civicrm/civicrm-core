@@ -156,7 +156,7 @@ class CRM_Core_Transaction {
    * Mark the transaction for rollback.
    *
    * (Note: Prior to 4.6, return void)
-   * @return \CRM_Core_Exception this
+   * @return \CRM_Core_Transaction
    */
   public function rollback() {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getFrame();
@@ -173,8 +173,8 @@ class CRM_Core_Transaction {
    * After calling run(), the CRM_Core_Transaction object is "used up"; do not
    * use it again.
    *
-   * @param mixed $callable Should exception one paramter (CRM_Core_Transaction $tx)
-   * @return \CRM_Core_Exception this
+   * @param string $callable Should exception one paramter (CRM_Core_Transaction $tx)
+   * @return CRM_Core_Transaction
    * @throws Exception
    */
   public function run($callable) {
@@ -233,10 +233,11 @@ class CRM_Core_Transaction {
    *
    * Pre-condition: isActive()
    *
-   * @param $phase A constant; one of: self::PHASE_{PRE,POST}_{COMMIT,ROLLBACK}
-   * @param $callback A PHP callback
+   * @param int $phase A constant; one of: self::PHASE_{PRE,POST}_{COMMIT,ROLLBACK}
+   * @param string $callback A PHP callback
    * @param mixed $params Optional values to pass to callback.
    *          See php manual call_user_func_array for details.
+   * @param int $id
    */
   static public function addCallback($phase, $callback, $params = null, $id = NULL) {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getBaseFrame();
