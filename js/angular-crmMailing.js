@@ -152,6 +152,7 @@
           });
           break;
         case 'unscheduled':
+          /* falls through */
         default:
           window.location = CRM.url('civicrm/mailing/browse/unscheduled', {
             reset: 1,
@@ -184,13 +185,13 @@
     $scope.recipients = null;
     $scope.getRecipientsEstimate = function () {
       var ts = $scope.ts;
-      if ($scope.recipients == null) {
+      if ($scope.recipients === null) {
         return ts('(Estimating)');
       }
-      if ($scope.recipients.length == 0) {
+      if ($scope.recipients.length === 0) {
         return ts('No recipients');
       }
-      if ($scope.recipients.length == 1) {
+      if ($scope.recipients.length === 1) {
         return ts('~1 recipient');
       }
       if (RECIPIENTS_PREVIEW_LIMIT > 0 && $scope.recipients.length >= RECIPIENTS_PREVIEW_LIMIT) {
