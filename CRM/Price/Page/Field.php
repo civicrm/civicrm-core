@@ -64,7 +64,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    *
    * @var boolean
    */
-  protected $_isSetReserved = false;
+  protected $_isSetReserved = FALSE;
 
   /**
    * Get the action links for this page.
@@ -131,7 +131,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
     $priceFieldBAO->find();
 
     // display taxTerm for priceFields
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
     $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $getTaxDetails = FALSE;
@@ -262,7 +262,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
     if ($this->_sid) {
       $usedBy = CRM_Price_BAO_PriceSet::getUsedBy($this->_sid);
       $this->assign('usedBy', $usedBy);
-      $this->_isSetReserved= CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'is_reserved');
+      $this->_isSetReserved = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'is_reserved');
       $this->assign('isReserved', $this->_isSetReserved);
 
       CRM_Price_BAO_PriceSet::checkPermission($this->_sid);

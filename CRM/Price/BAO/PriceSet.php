@@ -387,7 +387,8 @@ WHERE     ct.id = cp.financial_type_id AND
     if ($isQuickConfig) {
       $sql .= ' AND ps.is_quick_config = 0 ';
     }
-    $params = array(1 => array($entityTable, 'String'),
+    $params = array(
+    1 => array($entityTable, 'String'),
               2 => array($entityId, 'Integer'),
     );
     if ($usedFor) {
@@ -940,14 +941,14 @@ WHERE  id = %1";
     CRM_Utils_Hook::buildAmount($component, $form, $feeBlock);
 
     // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
-    $adminFieldVisible = false;
+    $adminFieldVisible = FALSE;
     if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $adminFieldVisible = true;
+      $adminFieldVisible = TRUE;
     }
 
     foreach ($feeBlock as $id => $field) {
       if (CRM_Utils_Array::value('visibility', $field) == 'public' ||
-        (CRM_Utils_Array::value('visibility', $field) == 'admin' && $adminFieldVisible == true) ||
+        (CRM_Utils_Array::value('visibility', $field) == 'admin' && $adminFieldVisible == TRUE) ||
         !$validFieldsOnly
       ) {
         $options = CRM_Utils_Array::value('options', $field);
@@ -1062,7 +1063,7 @@ WHERE  id = %1";
         // past price sets discounts are made inaccessible by this as the discount_id is set to NULL
         // on the participant record
         if (CRM_Price_BAO_PriceSet::removeFrom('civicrm_' . $entityName, $entity->id)) {
-          CRM_Core_BAO_Discount::del($entity->id,'civicrm_' . $entityName);
+          CRM_Core_BAO_Discount::del($entity->id, 'civicrm_' . $entityName);
         }
       }
     }
@@ -1110,7 +1111,8 @@ WHERE  id = %1";
 
     $title = ts('[Copy id %1]', array(1 => $maxId + 1));
     $fieldsFix = array(
-      'suffix' => array('title' => ' ' . $title,
+      'suffix' => array(
+    'title' => ' ' . $title,
                 'name' => '__Copy_id_' . ($maxId + 1) . '_',
       ),
     );
@@ -1309,7 +1311,7 @@ GROUP BY     mt.member_of_contact_id";
    *
    * @param int $id
    *   Id of the database record.
-   * @param boolean $isQuickConfig
+   * @param bool $isQuickConfigValue we want to set the is_quick_config field.
    *   Value we want to set the is_quick_config field.
    *
    * @return Object                   DAO object on sucess, null otherwise
@@ -1328,7 +1330,7 @@ GROUP BY     mt.member_of_contact_id";
    */
   public static function checkMembershipPriceSet($id) {
     $query =
-"
+    "
 SELECT      pfv.id, pfv.price_field_id, pfv.name, pfv.membership_type_id, pf.html_type, mt.auto_renew
 FROM        civicrm_price_field_value pfv
 LEFT JOIN   civicrm_price_field pf ON pf.id = pfv.price_field_id
@@ -1352,11 +1354,11 @@ WHERE       ps.id = %1
         $daoAutoRenew = 0;
       }
       if (!empty($autoRenew) && !in_array($daoAutoRenew, $autoRenew)) {
-        return true;
+        return TRUE;
       }
       $autoRenew[] = $daoAutoRenew;
     }
-    return false;
+    return FALSE;
   }
 
   /**
