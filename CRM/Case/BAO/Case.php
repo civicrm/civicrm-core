@@ -535,7 +535,7 @@ INNER JOIN civicrm_case ca ON cc.case_id = ca.id
 ";
     if (isset($caseType)) {
       $query .=
-"INNER JOIN civicrm_case_type ON civicrm_case_type.id = ca.case_type_id
+        "INNER JOIN civicrm_case_type ON civicrm_case_type.id = ca.case_type_id
 WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
     }
     if (!isset($caseType)) {
@@ -605,8 +605,8 @@ t_act.id as case_recent_activity_id,
 t_act.act_type_name as case_recent_activity_type_name,
 t_act.act_type AS case_recent_activity_type ";
     }
-    elseif ( $type == 'any' ) {
-      $query .=  "
+    elseif ($type == 'any') {
+      $query .= "
 t_act.desired_date as case_activity_date,
 t_act.id as case_activity_id,
 t_act.act_type_name as case_activity_type_name,
@@ -658,7 +658,7 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
   LEFT JOIN civicrm_option_value aov ON ( aov.option_group_id = aog.id AND aov.value = act.activity_type_id )
 ) AS t_act ";
     }
-    elseif ( $type == 'any' ) {
+    elseif ($type == 'any') {
       $query .= " LEFT JOIN
 (
   SELECT ca4.case_id, act4.id AS id, act4.activity_date_time AS desired_date, act4.activity_type_id, act4.status_id, aov.name AS act_type_name, aov.label AS act_type
@@ -707,7 +707,7 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
     elseif ($type == 'recent') {
       $query .= " ORDER BY case_recent_activity_date ASC ";
     }
-    elseif ( $type == 'any' ) {
+    elseif ($type == 'any') {
       $query .= " ORDER BY case_activity_date ASC ";
     }
 
@@ -755,7 +755,7 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
     if (!$allCases) {
       $condition .= " AND case_relationship.contact_id_b = {$userID} ";
     }
-    if ( $type == 'upcoming' || $type == 'any' ) {
+    if ($type == 'upcoming' || $type == 'any') {
       $closedId = CRM_Core_OptionGroup::getValue('case_status', 'Closed', 'name');
       $condition .= "
 AND civicrm_case.status_id != $closedId";
@@ -799,7 +799,7 @@ AND civicrm_case.status_id != $closedId";
       $resultFields[] = 'case_recent_activity_type';
       $resultFields[] = 'case_recent_activity_id';
     }
-    elseif ( $type == 'any' ) {
+    elseif ($type == 'any') {
       $resultFields[] = 'case_activity_date';
       $resultFields[] = 'case_activity_type_name';
       $resultFields[] = 'case_activity_type';
