@@ -1,7 +1,7 @@
 /// crmFile: Manage file attachments
 (function (angular, $, _) {
   var partialUrl = function (relPath) {
-    return CRM.resourceUrls['civicrm'] + '/partials/crmAttachment/' + relPath;
+    return CRM.resourceUrls.civicrm + '/partials/crmAttachment/' + relPath;
   };
 
   angular.module('crmAttachment', ['angularFileUpload']);
@@ -76,7 +76,7 @@
             var newItems = crmAttachments.uploader.getNotUploadedItems();
             if (newItems.length > 0) {
               _.each(newItems, function (item) {
-                item.formData = [_.extend({}, target, item.crmData)];
+                item.formData = [_.extend({crm_attachment_token: CRM.crmAttachment.token}, target, item.crmData)];
               });
               crmAttachments.uploader.onCompleteAll = function onCompleteAll() {
                 delete crmAttachments.uploader.onCompleteAll;

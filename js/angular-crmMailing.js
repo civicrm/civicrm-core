@@ -1,6 +1,6 @@
 (function (angular, $, _) {
   var partialUrl = function partialUrl(relPath) {
-    return CRM.resourceUrls['civicrm'] + '/partials/crmMailing/' + relPath;
+    return CRM.resourceUrls.civicrm + '/partials/crmMailing/' + relPath;
   };
 
   angular.module('crmMailing', [
@@ -132,7 +132,7 @@
       return crmStatus({start: ts('Deleting...'), success: ts('Deleted')},
         crmMailingMgr.delete($scope.mailing)
           .then(function () {
-            leave('unscheduled')
+            leave('unscheduled');
           })
       );
     };
@@ -152,13 +152,14 @@
           });
           break;
         case 'unscheduled':
+          /* falls through */
         default:
           window.location = CRM.url('civicrm/mailing/browse/unscheduled', {
             reset: 1,
             scheduled: 'false'
           });
       }
-    };
+    }
 
     // Transition URL "/mailing/new" => "/mailing/123"
     function updateUrl() {
@@ -184,13 +185,13 @@
     $scope.recipients = null;
     $scope.getRecipientsEstimate = function () {
       var ts = $scope.ts;
-      if ($scope.recipients == null) {
+      if ($scope.recipients === null) {
         return ts('(Estimating)');
       }
-      if ($scope.recipients.length == 0) {
+      if ($scope.recipients.length === 0) {
         return ts('No recipients');
       }
-      if ($scope.recipients.length == 1) {
+      if ($scope.recipients.length === 1) {
         return ts('~1 recipient');
       }
       if (RECIPIENTS_PREVIEW_LIMIT > 0 && $scope.recipients.length >= RECIPIENTS_PREVIEW_LIMIT) {
