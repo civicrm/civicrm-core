@@ -1080,8 +1080,6 @@ SELECT is_primary,
       $relationshipType = 'Household Member of';
     }
 
-    $cid = array('contact' => $currentContactId);
-
     $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $relationshipType, 'id', 'name_a_b');
 
     if (!$relTypeId) {
@@ -1091,13 +1089,16 @@ SELECT is_primary,
     // create relationship
     $relationshipParams = array(
       'is_active' => TRUE,
-      'relationship_type_id' => $relTypeId . '_a_b',
-      'contact_check' => array($sharedContactId => TRUE),
+      'relationship_type_id' => $relTypeId,
+      'contact_id_b' => $sharedContactId,
+      'contact_id_a' => $currentContactId,
     );
-
-    list($valid, $invalid, $duplicate,
-      $saved, $relationshipIds
-    ) = CRM_Contact_BAO_Relationship::create($relationshipParams, $cid);
+    try {
+      civicrm_api3('relationship', 'create', $relationshipParams);
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      // failing due to a duplicate here has traditionally been ignored. Other types of failure are (presumably) handled above
+    }
   }
 
   /**

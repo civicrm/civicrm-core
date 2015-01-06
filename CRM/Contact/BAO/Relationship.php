@@ -61,129 +61,150 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     // but in future should be tidied per ticket
     if(empty($relationshipId)){
       $hook = 'create';
-      $action = CRM_Core_Action::ADD;
     }
     else{
       $hook = 'edit';
-      $action = CRM_Core_Action::UPDATE;
+    }
+
+    if (!self::dataExists($params)) {
+      return array(FALSE, TRUE, FALSE, FALSE, NULL);
     }
 
     CRM_Utils_Hook::pre($hook, 'Relationship', $relationshipId, $params);
-
     if (!$relationshipId) {
-      // creating a new relationship
-      $dataExists = self::dataExists($params);
-      if (!$dataExists) {
-        return array(FALSE, TRUE, FALSE, FALSE, NULL);
-      }
-      $relationshipIds = array();
-      foreach ($params['contact_check'] as $key => $value) {
-        $errors = '';
-        // check if the relationship is valid between contacts.
-        // step 1: check if the relationship is valid if not valid skip and keep the count
-        // step 2: check the if two contacts already have a relationship if yes skip and keep the count
-        // step 3: if valid relationship then add the relation and keep the count
-
-        // step 1
-        $errors = self::checkValidRelationship($params, $ids, $key);
-        if ($errors) {
-          $invalid++;
-          continue;
+      if (isset($params['contact_check'])) {
+        // creating a new relationship - first we check that we have been giving some contacts to check
+        foreach (array_keys($params['contact_check']) as $key) {
+          $singleContactParams = $params;
+          self::setContactABFromIDs($singleContactParams, $ids, $key);
+          $outcome = self::validateRelationship($singleContactParams);
+          if ($outcome) {
+            $$outcome++;
+            continue;
+          }
+          $relationship = self::add($params, $ids, $key);
+          $relationshipIds[] = $relationship->id;
+          $relationships[$relationship->id] = $relationship;
+          $valid++;
         }
-
-        if (
-          self::checkDuplicateRelationship(
-            $params,
-            CRM_Utils_Array::value('contact', $ids),
-            // step 2
-            $key
-          )
-        ) {
-          $duplicate++;
-          continue;
-        }
-
-        $relationship = self::add($params, $ids, $key);
-        $relationshipIds[] = $relationship->id;
-        $relationships[$relationship->id] = $relationship;
-        $valid++;
       }
-      // editing the relationship
+      else {
+        //prior to this refactor $params['contact_check'] was mandatory. removed from api (only) so we can be sure that
+        // only api calls will hit this
+        return self::createSingle($params);
+      }
     }
     else {
-      // check for duplicate relationship
-      // @todo this code doesn't cope well with updates - causes e-Notices.
-      // API has a lot of code to work around
-      // this but should review this code & remove the extra handling from the api
-      // it seems doubtful any of this is relevant if the contact fields & relationship
-      // type fields are not set
-      if (
-        self::checkDuplicateRelationship(
-          $params,
-          CRM_Utils_Array::value('contact', $ids),
-          $ids['contactTarget'],
-          $relationshipId
-        )
-      ) {
-        $duplicate++;
-        return array($valid, $invalid, $duplicate, $saved, NULL);
-      }
-
-      $validContacts = TRUE;
-      //validate contacts in update mode also.
-      if (!empty($ids['contact']) && !empty($ids['contactTarget'])) {
-        if (self::checkValidRelationship($params, $ids, $ids['contactTarget'])) {
-          $validContacts = FALSE;
-          $invalid++;
+      //@todo started refactoring this but still doubtful as to the relevance of much of it
+      // if we have a relationship id we know we are dealing with a single entity
+      $isAPICall = empty($ids['contactTarget']);
+      self::setContactABFromIDs($params, CRM_Utils_Array::value('contact', $ids), CRM_Utils_Array::value('contactTarget', $ids));
+      $outcome = self::validateRelationship($params);
+      if ($outcome == 'duplicate') {
+        if ($isAPICall) {
+          throw new CRM_Core_Exception('Attempting to create Duplicate relationship');
         }
+        return array($valid, $invalid, 1, $saved, NULL);
       }
-      if ($validContacts) {
-        // editing an existing relationship
-        $relationship = self::add($params, $ids, $ids['contactTarget']);
-        $relationshipIds[] = $relationship->id;
-        $relationships[$relationship->id] = $relationship;
-        $saved++;
+      if ($outcome == 'invalid') {
+        if ($isAPICall) {
+          throw new CRM_Core_Exception('Attempting to create Invalid relationship');
+        }
+        return array($valid, 1, 0, $saved, NULL);
       }
+      // editing an existing relationship
+      if ($isAPICall) {
+        return self::createSingle($params);
+      }
+      $relationship = self::add($params);
+      $relationshipIds[] = $relationship->id;
+      $relationships[$relationship->id] = $relationship;
+      return array($valid, 0, 0, 1, NULL);
     }
 
     // do not add to recent items for import, CRM-4399
     if (!(!empty($params['skipRecentView']) || $invalid || $duplicate)) {
-      $url = CRM_Utils_System::url('civicrm/contact/view/rel',
-        "action=view&reset=1&id={$relationship->id}&cid={$relationship->contact_id_a}&context=home"
-      );
-
-
-      $session = CRM_Core_Session::singleton();
-      $recentOther = array();
-      if (($session->get('userID') == $relationship->contact_id_a) ||
-        CRM_Contact_BAO_Contact_Permission::allow($relationship->contact_id_a, CRM_Core_Permission::EDIT)
-      ) {
-        $rType = substr(CRM_Utils_Array::value('relationship_type_id', $params), -3);
-        $recentOther = array(
-          'editUrl' => CRM_Utils_System::url('civicrm/contact/view/rel',
-            "action=update&reset=1&id={$relationship->id}&cid={$relationship->contact_id_a}&rtype={$rType}&context=home"
-          ),
-          'deleteUrl' => CRM_Utils_System::url('civicrm/contact/view/rel',
-            "action=delete&reset=1&id={$relationship->id}&cid={$relationship->contact_id_a}&rtype={$rType}&context=home"
-          ),
-        );
-      }
-
-      $title = CRM_Contact_BAO_Contact::displayName($relationship->contact_id_a) . ' (' . CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType',
-        $relationship->relationship_type_id, 'label_a_b'
-      ) . ' ' . CRM_Contact_BAO_Contact::displayName($relationship->contact_id_b) . ')';
-      // add the recently created Relationship
-      CRM_Utils_Recent::add($title,
-        $url,
-        $relationship->id,
-        'Relationship',
-        $relationship->contact_id_a,
-        NULL,
-        $recentOther
-      );
+      self::addRecent($params, $relationship);
     }
 
     return array($valid, $invalid, $duplicate, $saved, $relationshipIds, $relationships);
+  }
+
+  public static function createSingle($params) {
+    $outcome = self::validateRelationship($params);
+    if ($outcome) {
+      throw new CRM_Core_Exception('failed to create relationship as it is ' . $outcome);
+    }
+    $relationship =  self::add($params);
+    if (empty($params['skipRecentView'])) {
+      self::addRecent($params, $relationship);
+    }
+    return $relationship;
+  }
+
+  /**
+   * Add relationship to recent links
+   * @param array $params
+   * @param CRM_Contact_DAO_Relationship $relationship
+   */
+  public static function addRecent($params, $relationship) {
+    $url = CRM_Utils_System::url('civicrm/contact/view/rel',
+      "action=view&reset=1&id={$relationship->id}&cid={$relationship->contact_id_a}&context=home"
+    );
+
+
+    $session = CRM_Core_Session::singleton();
+    $recentOther = array();
+    if (($session->get('userID') == $relationship->contact_id_a) ||
+      CRM_Contact_BAO_Contact_Permission::allow($relationship->contact_id_a, CRM_Core_Permission::EDIT)
+    ) {
+      $rType = substr(CRM_Utils_Array::value('relationship_type_id', $params), -3);
+      $recentOther = array(
+        'editUrl' => CRM_Utils_System::url('civicrm/contact/view/rel',
+          "action=update&reset=1&id={$relationship->id}&cid={$relationship->contact_id_a}&rtype={$rType}&context=home"
+        ),
+        'deleteUrl' => CRM_Utils_System::url('civicrm/contact/view/rel',
+          "action=delete&reset=1&id={$relationship->id}&cid={$relationship->contact_id_a}&rtype={$rType}&context=home"
+        ),
+      );
+    }
+
+    $title = CRM_Contact_BAO_Contact::displayName($relationship->contact_id_a) . ' (' . CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType',
+        $relationship->relationship_type_id, 'label_a_b'
+      ) . ' ' . CRM_Contact_BAO_Contact::displayName($relationship->contact_id_b) . ')';
+    // add the recently created Relationship
+    CRM_Utils_Recent::add($title,
+      $url,
+      $relationship->id,
+      'Relationship',
+      $relationship->contact_id_a,
+      NULL,
+      $recentOther
+    );
+
+  }
+
+  /**
+   * Check if relationship is valid
+   * @todo - this would probably be better as throwing a type of exception
+   * (as of writing this is only called from within the class & has been made private
+   * to ensure it doesn't get used widely as prefer this further refactor
+   * @param array $params
+   * @return string|NULL
+   */
+  private static function validateRelationship($params) {
+    $errors = self::checkValidRelationship($params, array(), NULL);
+    if ($errors) {
+      return 'invalid';
+    }
+    if (self::checkDuplicateRelationship(
+      $params,
+      $params['contact_id_a'],
+      $params['contact_id_b'],
+      CRM_Utils_Array::value('id', $params)
+    )) {
+      return 'duplicate';
+    }
   }
 
   /**
@@ -207,28 +228,20 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     //@todo hook are called from create and add - remove one
     CRM_Utils_Hook::pre($hook , 'Relationship', $relationshipId, $params);
 
-    $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
-
-    // explode the string with _ to get the relationship type id
-    // and to know which contact has to be inserted in
-    // contact_id_a and which one in contact_id_b
-    list($type, $first, $second) = explode('_', $relationshipTypes);
-
-    ${'contact_' . $first} = CRM_Utils_Array::value('contact', $ids);
-    ${'contact_' . $second} = $contactId;
+    self::setContactABFromIDs($params, $ids, $contactId);
 
     // check if the relationship type is Head of Household then update the
     // household's primary contact with this contact.
-    if ($type == 6) {
-      CRM_Contact_BAO_Household::updatePrimaryContact($contact_b, $contact_a);
+    if ($params['relationship_type_id'] == 6) {
+      CRM_Contact_BAO_Household::updatePrimaryContact($params['contact_id_b'], $params['contact_id_a']);
     }
 
     $relationship = new CRM_Contact_BAO_Relationship();
     //@todo this code needs to be updated for the possibility that not all fields are set
     // (update)
-    $relationship->contact_id_b = $contact_b;
-    $relationship->contact_id_a = $contact_a;
-    $relationship->relationship_type_id = $type;
+    $relationship->contact_id_b = $params['contact_id_b'];
+    $relationship->contact_id_a = $params['contact_id_a'];
+    $relationship->relationship_type_id = $params['relationship_type_id'];
     $relationship->id = $relationshipId;
 
     $dateFields = array('end_date', 'start_date');
@@ -291,11 +304,16 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @static
    */
   public static function dataExists(&$params) {
-    // return if no data present
-    if (!is_array(CRM_Utils_Array::value('contact_check', $params))) {
-      return FALSE;
+    if (!empty($params['id'])) {
+      return TRUE;
     }
-    return TRUE;
+    if (!empty($params['contact_id_a']) && !empty($params['contact_id_b'])) {
+      return TRUE;
+    }
+    if (!empty($params['contact_check']) && is_array($params['contact_check'])) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
@@ -616,20 +634,58 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   @access public
    * @static
    */
-  public static function checkValidRelationship(&$params, &$ids, $contactId) {
+  public static function checkValidRelationship(&$params, $ids, $contactId) {
     $errors = '';
 
-    // get the string of relationship type
-    $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
-    list($type, $first, $second) = explode('_', $relationshipTypes);
-    ${'contact_' . $first} = CRM_Utils_Array::value('contact', $ids);
-    ${'contact_' . $second} = $contactId;
+    self::setContactABFromIDs($params, $ids, $contactId);
     // function to check if the relationship selected is correct
     // i.e. employer relationship can exit between Individual and Organization (not between Individual and Individual)
-    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($contact_a, $contact_b, $type)) {
+    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($params['contact_id_a'], $params['contact_id_b'], $params['relationship_type_id'])) {
       $errors = 'Please select valid relationship between these two contacts.';
     }
     return $errors;
+  }
+
+  /**
+   * Resolve passed in contact IDs to contact_id_a & contact_id_b
+   * @param $params
+   * @param array $ids
+   * @param null $contactID
+   * @throws \CRM_Core_Exception
+   */
+  public static function setContactABFromIDs(&$params, $ids = array(), $contactID = NULL) {
+    if (!empty($params['contact_id_a']) && !empty($params['contact_id_b'])) {
+      return;
+    }
+    if (empty($ids['contact'])) {
+      if (!empty($params['id'])) {
+        //let's load the missing ids here since other things tend to rely on them.
+        $fieldsToFill = array('contact_id_a', 'contact_id_b', 'relationship_type_id');
+        $result = CRM_Core_DAO::executeQuery("SELECT " . implode(',', $fieldsToFill) . " FROM civicrm_relationship WHERE id = %1", array('Integer', $params['id']))->fetchRow();
+        foreach ($fieldsToFill as $field) {
+          $params[$field] = !empty($params[$field]) ? $params[$field] : $result->$field;
+        }
+        return;
+
+      }
+      throw new CRM_Core_Exception('Cannot create relationship, insufficient contact IDs provided');
+    }
+    $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
+    list($relationshipTypeID, $first, $second) = explode('_', $relationshipTypes);
+    if (empty($params['relationship_type_id'])) {
+      $params['relationship_type_id'] = $relationshipTypeID;
+    }
+
+    foreach (array('a', 'b') as $contactLetter) {
+      if (empty($params['contact_' . $contactLetter])) {
+        if ($first == $contactLetter) {
+          $params['contact_' . $contactLetter] = CRM_Utils_Array::value('contact', $ids);
+        }
+        else {
+          $params['contact_' . $contactLetter] = $contactID;
+        }
+      }
+    }
   }
 
   /**
@@ -1164,7 +1220,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    */
   public static function relatedMemberships($contactId, &$params, $ids, $action = CRM_Core_Action::ADD, $active = TRUE) {
     // Check the end date and set the status of the relationship
-    // accrodingly.
+    // accordingly.
     $status = self::CURRENT;
 
     if (!empty($params['end_date'])) {

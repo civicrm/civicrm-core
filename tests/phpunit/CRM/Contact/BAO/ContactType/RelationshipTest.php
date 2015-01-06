@@ -179,7 +179,7 @@ DELETE FROM civicrm_contact_type
   }
 
   /**
-   * Methods create relationshipe within diff contact type with invalid Relationships
+   * Methods create relationship within diff contact type with invalid Relationships
    *
    */
   public function testRelCreateInvalidWithinDiffTypeSpocorIndivi() {
