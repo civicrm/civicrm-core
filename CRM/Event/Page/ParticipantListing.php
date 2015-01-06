@@ -85,7 +85,7 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
       DIRECTORY_SEPARATOR,
       $className
     ) . '.php';
-    $error = include_once ($classFile);
+    $error = include_once $classFile;
     if ($error == FALSE) {
       CRM_Core_Error::fatal('Participant listing code file: ' . $classFile . ' does not exist. Please verify your custom particpant listing settings in CiviCRM administrative panel.');
     }

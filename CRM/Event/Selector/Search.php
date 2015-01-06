@@ -162,11 +162,11 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   @access public
    */
   function __construct(&$queryParams,
-    $action      = CRM_Core_Action::NONE,
+    $action = CRM_Core_Action::NONE,
     $eventClause = NULL,
-    $single      = FALSE,
-    $limit       = NULL,
-    $context     = 'search',
+    $single = FALSE,
+    $limit = NULL,
+    $context = 'search',
     $compContext = NULL
   ) {
     // submitted form values
@@ -229,7 +229,6 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     if ($qfKey) {
       $extraParams .= "&key={$qfKey}";
     }
-
 
     if (!(self::$_links)) {
       self::$_links = array(
@@ -399,9 +398,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
         $result->participant_id
       );
 
-
-      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-        $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
+      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
       );
 
       $row['paid'] = CRM_Event_BAO_Event::isMonetary($row['event_id']);
@@ -453,7 +450,8 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     if (!isset(self::$_columnHeaders)) {
       self::$_columnHeaders = array(
-        array('name' => ts('Event'),
+        array(
+      'name' => ts('Event'),
           'sort' => 'event_title',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),

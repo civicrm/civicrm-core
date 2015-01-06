@@ -674,7 +674,7 @@ GROUP BY  participant.event_id
         ));
 
       $tmpContactField = $contactFields = array();
-      $contactFields = array( );
+      $contactFields = array();
       if (!$onlyParticipant) {
         $contactFields = CRM_Contact_BAO_Contact::importableFields($contactType, NULL);
 
@@ -741,27 +741,32 @@ GROUP BY  participant.event_id
 
       $participantFields = CRM_Event_DAO_Participant::export();
       $noteField = array(
-        'participant_note' => array('title' => 'Participant Note',
+        'participant_note' => array(
+      'title' => 'Participant Note',
           'name' => 'participant_note',
         ));
 
       $participantStatus = array(
-        'participant_status' => array('title' => 'Participant Status',
+        'participant_status' => array(
+      'title' => 'Participant Status',
           'name' => 'participant_status',
         ));
 
       $participantRole = array(
-        'participant_role' => array('title' => 'Participant Role',
+        'participant_role' => array(
+      'title' => 'Participant Role',
           'name' => 'participant_role',
         ));
 
       //CRM-13595 add event id to participant export
       $eventid = array(
-        'event_id' => array('title' => 'Event ID',
+        'event_id' => array(
+      'title' => 'Event ID',
           'name' => 'event_id',
         ));
       $eventtitle = array(
-        'event_title' => array('title' => 'Event Title',
+        'event_title' => array(
+      'title' => 'Event Title',
           'name' => 'event_title',
         ));
 
@@ -1098,7 +1103,8 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         }
       }
       else {
-        foreach ($feeProperties as $property) $feeDetails[$feeInfo->id][$property] = $feeInfo->$property;
+        foreach ($feeProperties as $property) { $feeDetails[$feeInfo->id][$property] = $feeInfo->$property;
+        }
       }
     }
 
@@ -1299,7 +1305,8 @@ UPDATE  civicrm_participant
     if (empty($domainValues)) {
       // making all tokens available to templates.
       $domain = CRM_Core_BAO_Domain::getDomain();
-      $tokens = array('domain' => array('name', 'phone', 'address', 'email'),
+      $tokens = array(
+      'domain' => array('name', 'phone', 'address', 'email'),
         'contact' => CRM_Core_SelectValues::contactTokens(),
       );
 
@@ -1791,14 +1798,15 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
    */
   public static function createDiscountTrxn($eventID, $contributionParams, $feeLevel) {
     // CRM-11124
-    $checkDiscount = CRM_Core_BAO_Discount::findSet($eventID,'civicrm_event');
+    $checkDiscount = CRM_Core_BAO_Discount::findSet($eventID, 'civicrm_event');
     if (!empty($checkDiscount)) {
       $feeLevel = current($feeLevel);
       $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventID, NULL);
       $query = "SELECT cpfv.amount FROM `civicrm_price_field_value` cpfv
 LEFT JOIN civicrm_price_field cpf ON cpfv.price_field_id = cpf.id
 WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
-      $params = array(1 => array($priceSetId, 'Integer'),
+      $params = array(
+      1 => array($priceSetId, 'Integer'),
         2 => array($feeLevel, 'String'));
       $mainAmount = CRM_Core_DAO::singleValueQuery($query, $params);
       $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Discounts Account is' "));
@@ -2030,8 +2038,8 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     $partUpdateFeeAmt['id'] = $participantId;
     foreach ($lineItems as $lineValue) {
       if ($lineValue['price_field_value_id']) {
-        $line[$lineValue['price_field_value_id']] = $lineValue['label'] . ' - '. $lineValue['qty']; 
-      } 
+        $line[$lineValue['price_field_value_id']] = $lineValue['label'] . ' - '. $lineValue['qty'];
+      }
     }
 
     $partUpdateFeeAmt['fee_level'] = implode(', ', $line);

@@ -293,9 +293,9 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param bool|string $name pseudoconstant to be flushed
    */
   public static function flush($name = 'cache') {
-   if (isset(self::$$name)) {
+    if (isset(self::$$name)) {
       self::$$name = NULL;
-    }
+   }
   }
 
   /**

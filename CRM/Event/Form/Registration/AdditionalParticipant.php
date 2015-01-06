@@ -101,8 +101,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     if (!empty($this->_values['discount'])) {
       $discountId = CRM_Core_BAO_Discount::findSet($this->_eventId, 'civicrm_event');
       if ($discountId && !empty($this->_values['event']['default_discount_fee_id'])) {
-        $discountKey = CRM_Core_DAO::getFieldValue("CRM_Core_DAO_OptionValue", $this->_values['event']['default_discount_fee_id']
-          , 'weight', 'id'
+        $discountKey = CRM_Core_DAO::getFieldValue("CRM_Core_DAO_OptionValue", $this->_values['event']['default_discount_fee_id'], 'weight', 'id'
         );
         $defaults['amount'] = key(array_slice($this->_values['discount'][$discountId], $discountKey - 1, $discountKey, TRUE));
       }
@@ -329,7 +328,8 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     $this->assign('statusMessage', $statusMessage);
 
     $buttons = array(
-      array('type' => 'back',
+      array(
+    'type' => 'back',
         'name' => ts('<< Go Back'),
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp',
       ),
@@ -338,7 +338,8 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     //CRM-4320
     if ($allowToProceed) {
       $buttons = array_merge($buttons, array(
-        array('type' => 'next',
+        array(
+      'type' => 'next',
             'name' => ts('Continue >>'),
             'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
             'isDefault' => TRUE,
@@ -348,7 +349,8 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       );
       if ($includeSkipButton) {
         $buttons = array_merge($buttons, array(
-          array('type' => 'next',
+          array(
+        'type' => 'next',
               'name' => ts('Skip Participant >>|'),
               'subName' => 'skip',
             ),
@@ -412,11 +414,11 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
               $existingEmails = array();
               $additionalParticipantEmails = array();
               if (is_array($value)) {
-              foreach ($value as $key => $val) {
-                if (substr($key, 0, 6) == 'email-' && $val) {
-                  $existingEmails[] = $val;
+                foreach ($value as $key => $val) {
+                  if (substr($key, 0, 6) == 'email-' && $val) {
+                    $existingEmails[] = $val;
+                  }
                 }
-              }
               }
               foreach ($fields as $key => $val) {
                 if (substr($key, 0, 6) == 'email-' && $val) {
@@ -433,7 +435,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
             else {
               // check with first_name and last_name for additional participants
               if (!empty($value['first_name']) && ($value['first_name'] == CRM_Utils_Array::value('first_name', $fields)) &&
-                (CRM_Utils_Array::value('last_name',$value) == CRM_Utils_Array::value('last_name', $fields))
+                (CRM_Utils_Array::value('last_name', $value) == CRM_Utils_Array::value('last_name', $fields))
               ) {
                 $errors['first_name'] = ts('The first name and last name must be unique for each participant.');
                 break;
@@ -492,7 +494,6 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
         $errors['_qf_default'] = ts("You are going to skip the last participant, your event registration will be confirmed. Please go back to the main registration page, to complete payment information.");
       }
     }
-
 
     if ($button != 'skip' &&
       $self->_values['event']['is_monetary'] &&
