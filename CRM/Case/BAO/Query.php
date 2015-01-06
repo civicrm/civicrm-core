@@ -615,7 +615,8 @@ case_relation_type.id = case_relationship.relationship_type_id )";
    *
    * @return array|null
    */
-  static function defaultReturnProperties($mode,
+  static function defaultReturnProperties(
+    $mode,
     $includeCustomFields = TRUE
   ) {
 

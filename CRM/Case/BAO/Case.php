@@ -2359,8 +2359,9 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
    * @return integer|NULL
    * @static
    */
-  static function mergeCases($mainContactId, $mainCaseId = NULL, $otherContactId = NULL,
-                             $otherCaseId = NULL, $changeClient = FALSE) {
+  static function mergeCases(
+    $mainContactId, $mainCaseId = NULL, $otherContactId = NULL,
+    $otherCaseId = NULL, $changeClient = FALSE) {
     $moveToTrash = TRUE;
 
     $duplicateContacts = FALSE;

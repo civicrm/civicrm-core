@@ -95,7 +95,8 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
    *
    * @return array
    */
-  function &caseInfo($clientID,
+  function &caseInfo(
+    $clientID,
     $caseID
   ) {
     $case = $this->_redactionRegexRules = array();
