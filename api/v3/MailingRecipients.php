@@ -45,7 +45,8 @@
 /**
  * Returns array of Mailing Recipients
  *
- * @param array $params Array of one or more valid
+ * @param array $params
+ *   Array of one or more valid.
  * @param array $ids
  *
  * @return array API return Array of matching mailing jobs

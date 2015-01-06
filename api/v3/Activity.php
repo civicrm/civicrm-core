@@ -41,7 +41,8 @@
 /**
  * Creates or updates an Activity. See the example for usage
  *
- * @param array $params Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                             pairs for the activity.
  * {@getfields activity_create}
  *
@@ -177,7 +178,8 @@ function civicrm_api3_activity_create($params) {
 /**
  * Specify Meta data for create. Note that this data is retrievable via the getfields function
  * and is used for pre-filling defaults and ensuring mandatory requirements are met.
- * @param array $params (reference) array of parameters determined by getfields
+ * @param array $params
+ *   (reference) array of parameters determined by getfields.
  */
 function _civicrm_api3_activity_create_spec(&$params) {
 
@@ -212,7 +214,8 @@ function _civicrm_api3_activity_create_spec(&$params) {
 /**
  * Gets a CiviCRM activity according to parameters
  *
- * @param array  $params       Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                             pairs for the activity.
  *
  * @return array
@@ -248,7 +251,8 @@ function civicrm_api3_activity_get($params) {
  *
  * NOTE: Called by civicrm-core and CiviHR
  *
- * @param array $params API request parameters
+ * @param array $params
+ *   API request parameters.
  * @param array $activities
  * @return array new activities list
  */
@@ -303,7 +307,8 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
 /**
  * Delete a specified Activity.
  *
- * @param array $params array holding 'id' of activity to be deleted
+ * @param array $params
+ *   Array holding 'id' of activity to be deleted.
  * {@getfields activity_delete}
  *
  * @throws API_Exception
@@ -328,7 +333,8 @@ function civicrm_api3_activity_delete($params) {
 /**
  * Check for required params
  *
- * @param array $params associated array of fields
+ * @param array $params
+ *   Associated array of fields.
  *
  * @throws API_Exception
  * @throws Exception
@@ -438,7 +444,8 @@ SELECT  count(*)
 /**
  * @see _civicrm_api3_generic_getlist_params.
  *
- * @param $request array
+ * @param $request
+ *   Array.
  */
 function _civicrm_api3_activity_getlist_params(&$request) {
   $fieldsToReturn = array('activity_date_time', 'activity_type_id', 'subject', 'source_contact_id');
@@ -453,8 +460,10 @@ function _civicrm_api3_activity_getlist_params(&$request) {
 /**
  * @see _civicrm_api3_generic_getlist_output
  *
- * @param $result array
- * @param $request array
+ * @param $result
+ *   Array.
+ * @param $request
+ *   Array.
  *
  * @return array
  */

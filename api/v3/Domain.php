@@ -116,7 +116,8 @@ function civicrm_api3_domain_get($params) {
  * Adjust Metadata for Get action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_domain_get_spec(&$params) {
   $params['current_domain'] = array('title' => "get loaded domain");
@@ -140,7 +141,8 @@ function civicrm_api3_domain_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_domain_create_spec(&$params) {
   $params['domain_version'] = $params['version'];

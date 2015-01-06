@@ -3,11 +3,12 @@
 /**
  * Retrieve one or more phones
  *
- * @param  mixed[]  (reference ) input parameters
+ * @param mixed[] (reference ) input parameters
  *
  * {@schema Core/Phone.xml}
  * {@example PhoneDelete.php 0}
- * @param  array $params  an associative array of name/value pairs.
+ * @param array $params
+ *   An associative array of name/value pairs.
  *
  * @return  array details of found phones else error
  * @access public

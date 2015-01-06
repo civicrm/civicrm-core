@@ -95,7 +95,8 @@ function civicrm_api3_mailing_get_token($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_mailing_create_spec(&$params) {
   $params['name']['api.required'] = 1;
@@ -208,7 +209,8 @@ function civicrm_api3_mailing_event_bounce($params) {
  * Adjust Metadata for bounce_spec action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_mailing_event_bounce_spec(&$params) {
   $params['job_id']['api.required'] = 1;
@@ -272,7 +274,8 @@ function civicrm_api3_mailing_event_reply($params) {
  * Adjust Metadata for event_reply action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_mailing_event_reply_spec(&$params) {
   $params['job_id']['api.required'] = 1;
@@ -313,7 +316,8 @@ function civicrm_api3_mailing_event_forward($params) {
  * Adjust Metadata for event_forward action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_mailing_event_forward_spec(&$params) {
   $params['job_id']['api.required'] = 1;
@@ -511,7 +515,8 @@ function civicrm_api3_mailing_send_test($params) {
  * Adjust Metadata for send_mail action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_mailing_stats_spec(&$params) {
   $params['date']['api.default'] = 'now';

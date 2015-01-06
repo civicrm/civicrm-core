@@ -45,7 +45,8 @@
  * @todo possibly add ability to add payment if there are less payments than pledge installments
  * @todo possibly add ability to recalculate dates if the schedule is changed
  *
- * @param  array   $params    input parameters
+ * @param array $params
+ *   Input parameters.
  * {@getfields PledgePayment_create}
  * @example PledgePaymentCreate.php
  *
@@ -83,7 +84,8 @@ function civicrm_api3_pledge_payment_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_pledge_payment_create_spec(&$params) {
   $params['pledge_id']['api.required'] = 1;
@@ -93,7 +95,8 @@ function _civicrm_api3_pledge_payment_create_spec(&$params) {
 /**
  * Delete a pledge Payment - Note this deletes the contribution not just the link
  *
- * @param  array   $params     input parameters
+ * @param array $params
+ *   Input parameters.
  * {@getfields PledgePayment_delete}
  * @example PledgePaymentDelete.php
  *
@@ -114,7 +117,8 @@ function civicrm_api3_pledge_payment_delete($params) {
 /**
  * Retrieve a set of pledges, given a set of input params
  *
- * @param  array   $params     input parameters
+ * @param array $params
+ *   Input parameters.
  * {@getfields PledgePayment_get}
  * @example PledgePaymentGet.php *
  *

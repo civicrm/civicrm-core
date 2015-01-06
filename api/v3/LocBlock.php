@@ -38,7 +38,8 @@
 /**
  * Create or update a loc_block
  *
- * @param array $params  Associative array of property
+ * @param array $params
+ *   Associative array of property.
  *                       name/value pairs to insert in new 'loc_block'
  * @example LocBlockCreate.php Std Create example
  *
@@ -89,7 +90,8 @@ function civicrm_api3_loc_block_create($params) {
 /**
  * Returns array of loc_blocks matching a set of one or more properties
  *
- * @param array $params Array of one or more valid property_name=>value pairs. If $params is set
+ * @param array $params
+ *   Array of one or more valid property_name=>value pairs. If $params is set.
  *  as null, all loc_blocks will be returned (default limit is 25)
  *
  * @return array  Array of matching loc_blocks
@@ -127,7 +129,8 @@ function civicrm_api3_loc_block_get($params) {
  * This method is used to delete any existing loc_block.
  * id of the record to be deleted is required field in $params array
  *
- * @param array $params array containing id of the record to be deleted
+ * @param array $params
+ *   Array containing id of the record to be deleted.
  *
  * @return array API result array
  * {@getfields loc_block_delete}

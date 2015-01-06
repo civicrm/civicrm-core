@@ -40,7 +40,8 @@
 /**
  * Add or update a contribution
  *
- * @param  array $params (reference ) input parameters
+ * @param array $params
+ *   (reference ) input parameters.
  *
  * @throws API_Exception
  * @return array  Api result array
@@ -77,7 +78,8 @@ function civicrm_api3_contribution_create(&$params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_contribution_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
@@ -171,7 +173,8 @@ function _civicrm_api3_contribution_create_legacy_support_45(&$params){
 /**
  * Delete a contribution
  *
- * @param  array   $params           (reference ) input parameters
+ * @param array $params
+ *   (reference ) input parameters.
  *
  * @return boolean        true if success, else false
  * @static void
@@ -200,7 +203,8 @@ function _civicrm_api3_contribution_delete_spec(&$params) {
 /**
  * Retrieve a set of contributions, given a set of input params
  *
- * @param  array $params (reference ) input parameters
+ * @param array $params
+ *   (reference ) input parameters.
  *
  * @return array of contributions, if error an array with an error id and error message
  * @static void
@@ -245,7 +249,8 @@ function _civicrm_api3_format_soft_credit(&$contribution) {
  * Adjust Metadata for Get action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_contribution_get_spec(&$params) {
   $params['contribution_test']['api.default'] = 0;
@@ -260,9 +265,11 @@ function _civicrm_api3_contribution_get_spec(&$params) {
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object
  *
- * @param array $params Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  * pairs to insert in new contact.
- * @param array $values The reformatted properties that we can use internally
+ * @param array $values
+ *   The reformatted properties that we can use internally.
  * '
  *
  * @param bool $create
@@ -280,7 +287,8 @@ function _civicrm_api3_contribute_format_params($params, &$values, $create = FAL
  * Adjust Metadata for Transact action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_contribution_transact_spec(&$params) {
   $fields = civicrm_api3('contribution', 'getfields', array('action' => 'create'));
@@ -291,7 +299,8 @@ function _civicrm_api3_contribution_transact_spec(&$params) {
 /**
  * Process a transaction and record it against the contact.
  *
- * @param  array   $params           (reference ) input parameters
+ * @param array $params
+ *   (reference ) input parameters.
  *
  * @return array (reference )        contribution of created or updated record (or a civicrm error)
  * @static void
@@ -342,7 +351,8 @@ function civicrm_api3_contribution_transact($params) {
  * The appropriate online template will be used (the existence of related objects
  * (e.g. memberships ) will affect this selection
  *
- * @param array $params input parameters
+ * @param array $params
+ *   Input parameters.
  * {@getfields Contribution_sendconfirmation}
  *
  * @throws Exception
@@ -365,7 +375,8 @@ function civicrm_api3_contribution_sendconfirmation($params) {
  * Adjust Metadata for sendconfirmation action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
   $params['id'] = array(
@@ -397,7 +408,8 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
  * @todo - most of this should live in the BAO layer but as we want it to be an addition
  * to 4.3 which is already stable we should add it to the api layer & re-factor into the BAO layer later
  *
- * @param array $params input parameters
+ * @param array $params
+ *   Input parameters.
  * {@getfields Contribution_completetransaction}
  *
  * @throws API_Exception
