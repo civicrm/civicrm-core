@@ -858,6 +858,8 @@ AND
   /**
    * Is back office credit card processing enabled for this site - ie are there any installed processors that support
    * it?
+   * This function is used for determining whether to show the submit credit card link, not for determining which processors to show, hence
+   * it is a config var
    * @return bool
    */
   public static function isEnabledBackOfficeCreditCardPayments() {

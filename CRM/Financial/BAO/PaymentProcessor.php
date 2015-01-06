@@ -275,30 +275,42 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Get all payment processors as an array of objects.
    *
-   * @param $isExcludeTest
+   * @param string|NULL $mode
+   * only return this mode - test|live or NULL for all
    * @param bool $reset
    *
    * @throws CiviCRM_API3_Exception
    * @return array
    */
-  public static function getAllPaymentProcessors($isExcludeTest, $reset = FALSE) {
-    /**
-     * $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . ($isExcludeTest ? 'test' : 'all');
-    if (!$reset) {
-      $processors = CRM_Utils_Cache::singleton()->get($cacheKey);
-      if (!empty($processors)) {
-        return $processors;
-      }
-    }
+  public static function getAllPaymentProcessors($mode, $reset = FALSE) {
+   /**
+   * $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . ($mode ? 'test' : 'all');
+   if (!$reset) {
+     $processors = CRM_Utils_Cache::singleton()->get($cacheKey);
+     if (!empty($processors)) {
+       return $processors;
+     }
+   }
      * */
     $retrievalParameters = array('is_active' => TRUE, 'options' => array('sort' => 'is_default DESC, name'), 'api.payment_processor_type.getsingle' => 1);
-    if ($isExcludeTest) {
+    if ($mode == 'test') {
+      $retrievalParameters['is_test'] = 1;
+    }
+    elseif ($mode == 'live') {
       $retrievalParameters['is_test'] = 0;
     }
     $processors = civicrm_api3('payment_processor', 'get', $retrievalParameters);
     foreach ($processors['values'] as $processor) {
+      $fieldsToProvide = array('user_name', 'password', 'signature', 'subject');
+      foreach ($fieldsToProvide as $field) {
+        //prevent e-notices in processor classes when not configured
+        if (!isset($processor[$field])) {
+          $processor[$field] = NULL;
+        }
+      }
       $processors['values'][$processor['id']]['payment_processor_type'] = $processor['payment_processor_type'] = $processors['values'][$processor['id']]['api.payment_processor_type.getsingle']['name'];
-      $processors['values'][$processor['id']]['object'] = CRM_Core_Payment::singleton(empty($processor['is_test']) ? 'live' : 'test', $processor);
+      $mode = empty($processor['is_test']) ? 'live' : 'test';
+      $processors['values'][$processor['id']]['object'] = CRM_Core_Payment::singleton($mode, $processor);
     }
     /*
      CRM_Utils_Cache::singleton()->set($cacheKey, $processors);
@@ -312,14 +324,26 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * arguably this could go on the pseudoconstant class
    *
    * @param array $capabilities
-   * @param bool $isIncludeTest
+   * capabilities of processor e.g
+   *  - BackOffice
+   *  - TestMode
+   *  - LiveMode
+   *  - FutureStartDate
+   *  include test processors (we want to phase this out in favour of the testMode Capability)
    *
    * @param array $ids
    *
    * @return array available processors
    */
-  public static function getPaymentProcessors($capabilities = array(), $isIncludeTest = FALSE, $ids = array()) {
-    $processors = self::getAllPaymentProcessors(!$isIncludeTest);
+  public static function getPaymentProcessors($capabilities = array(), $ids = array()) {
+    $mode = NULL;
+    if (in_array('TestMode', $capabilities)) {
+      $mode = 'test';
+    }
+    elseif (in_array('LiveMode', $capabilities)) {
+      $mode = 'live';
+    }
+    $processors = self::getAllPaymentProcessors($mode);
     if ($capabilities) {
       foreach ($processors as $index => $processor) {
         if (!empty($ids) && !in_array($processor['id'], $ids)) {
@@ -348,7 +372,9 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return bool
    */
   public static function hasPaymentProcessorSupporting($capabilities = array(), $isIncludeTest = FALSE) {
-    $result = self::getPaymentProcessors($capabilities, $isIncludeTest);
+    $mode = $isIncludeTest ? 'Test' : 'Live';
+    $capabilities[] = $mode . 'Mode';
+    $result = self::getPaymentProcessors($capabilities);
     return (!empty($result)) ? TRUE : FALSE;
   }
 

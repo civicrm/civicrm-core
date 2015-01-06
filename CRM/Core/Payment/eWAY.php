@@ -113,7 +113,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    * @return \CRM_Core_Payment_eWAY *******************************************************
    */
   public function __construct($mode, &$paymentProcessor) {
-    // require Standaard eWAY API libraries
+    // require Standard eWAY API libraries
     require_once 'eWAY/eWAY_GatewayRequest.php';
     require_once 'eWAY/eWAY_GatewayResponse.php';
 
@@ -136,11 +136,18 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    * @static
    */
   public static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = false) {
-    $processorName = $paymentProcessor['name'];
-    if (self::$_singleton[$processorName] === NULL) {
-      self::$_singleton[$processorName] = new CRM_Core_Payment_eWAY($mode, $paymentProcessor);
+    if (!empty($paymentProcessor['id'])) {
+      $cacheKey = $paymentProcessor['id'];
     }
-    return self::$_singleton[$processorName];
+    else {
+      //@todo eliminated instances of this in favour of id-specific instances.
+      $cacheKey = $mode . '_' . $paymentProcessor['name'];
+    }
+
+    if (self::$_singleton[$cacheKey] === NULL) {
+      self::$_singleton[$cacheKey] = new CRM_Core_Payment_eWAY($mode, $paymentProcessor);
+    }
+    return self::$_singleton[$cacheKey];
   }
 
   /**********************************************************

@@ -86,14 +86,13 @@ abstract class CRM_Core_Payment {
   /**
    * Singleton function used to manage this object
    *
-   * @param string  $mode the mode of operation: live or test
-   * @param array  $paymentProcessor the details of the payment processor being invoked
+   * @param string $mode the mode of operation: live or test
+   * @param array $paymentProcessor the details of the payment processor being invoked
    * @param object $paymentForm deprecated - avoid referring to this if possible. If you have to use it document why as this is scary interaction
-   * @param boolean $force            should we force a reload of this payment object
-   *
-   * @return CRM_Core_Payment
+   * @param boolean $force should we force a reload of this payment object
+   * @return \CRM_Core_Payment
+   * @throws \CRM_Core_Exception
    * @static
-   *
    */
   public static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     // make sure paymentProcessor is not empty
@@ -178,10 +177,18 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
+   * Are live payments supported - e.g dummy doesn't support this
    * @return bool
    */
   protected function supportsLiveMode() {
+    return TRUE;
+  }
+
+  /**
+   * Are test payments supported
+   * @return bool
+   */
+  protected function supportsTestMode() {
     return TRUE;
   }
 
