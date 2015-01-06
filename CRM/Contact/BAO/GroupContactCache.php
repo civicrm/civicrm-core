@@ -40,7 +40,8 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * Check to see if we have cache entries for this group
    * if not, regenerate, else return
    *
-   * @param $groupIDs of group that we are checking against
+   * @param $groupIDs
+   *   Of group that we are checking against.
    *
    * @return boolean true if we did not regenerate, false if we did
    */
@@ -56,8 +57,10 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * Common function that formulates the query to see which groups needs to be refreshed
    * based on their cache date and the smartGroupCacheTimeOut
    *
-   * @param string $groupIDClause the clause which limits which groups we need to evaluate
-   * @param boolean $includeHiddenGroups hidden groups are excluded by default
+   * @param string $groupIDClause
+   *   The clause which limits which groups we need to evaluate.
+   * @param bool $includeHiddenGroups
+   *   Hidden groups are excluded by default.
    *
    * @return string the sql query which lists the groups that need to be refreshed
    * @static
@@ -93,8 +96,10 @@ AND     ( g.cache_date IS NULL OR
    * in a locking scenario when some other process might have refreshed things underneath
    * this process
    *
-   * @param int $groupID the group ID
-   * @param boolean $includeHiddenGroups hidden groups are excluded by default
+   * @param int $groupID
+   *   The group ID.
+   * @param bool $includeHiddenGroups
+   *   Hidden groups are excluded by default.
    *
    * @return string the sql query which lists the groups that need to be refreshed
    * @static
@@ -113,7 +118,8 @@ AND     ( g.cache_date IS NULL OR
    *
    * @param int/array $groupID groupID of group that we are checking against
    *                           if empty, all groups are checked
-   * @param int       $limit   limits the number of groups we evaluate
+   * @param int $limit
+   *   Limits the number of groups we evaluate.
    *
    * @return boolean true if we did not regenerate, false if we did
    */
@@ -238,8 +244,10 @@ AND    g.refresh_date IS NULL
   /**
    * Change the cache_date
    *
-   * @param $groupID array(int)
-   * @param $processed bool, whether the cache data was recently modified
+   * @param $groupID
+   *   Array(int).
+   * @param $processed
+   *   Bool, whether the cache data was recently modified.
    */
   public static function updateCacheTime($groupID, $processed) {
     // only update cache entry if we had any values
@@ -271,8 +279,10 @@ WHERE  id IN ( $groupIDs )
    * cache date, i.e. the removal is not done if the group was recently
    * loaded into the cache.
    *
-   * @param $groupID  int the groupID to delete cache entries, NULL for all groups
-   * @param $onceOnly boolean run the function exactly once for all groups.
+   * @param $groupID
+   *   Int the groupID to delete cache entries, NULL for all groups.
+   * @param $onceOnly
+   *   Boolean run the function exactly once for all groups.
    *
    * @return void
    * @static
@@ -408,8 +418,10 @@ WHERE  id = %1
   /**
    * Load the smart group cache for a saved search
    *
-   * @param object  $group - the smart group that needs to be loaded
-   * @param boolean $force - should we force a search through
+   * @param object $group
+   *   The smart group that needs to be loaded.
+   * @param bool $force
+   *   Should we force a search through.
    *
    */
   public static function load(&$group, $force = FALSE) {
@@ -591,8 +603,9 @@ AND  civicrm_group_contact.group_id = $groupID ";
    * Note that this could potentially be a super slow function since
    * it ensure that all contact groups are loaded in the cache
    *
-   * @param int     $contactID
-   * @param boolean $showHidden - hidden groups are shown only if this flag is set
+   * @param int $contactID
+   * @param bool $showHidden
+   *   Hidden groups are shown only if this flag is set.
    *
    * @return array an array of groups that this contact belongs to
    */

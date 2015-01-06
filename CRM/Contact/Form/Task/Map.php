@@ -142,7 +142,8 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
    * Assign smarty variables to the template that will be used by google api to plot the contacts
    *
    * @param $ids
-   * @param int $locationId location_id
+   * @param int $locationId
+   *   Location_id.
    * @param $page
    * @param $addBreadCrumb
    * @param string $type

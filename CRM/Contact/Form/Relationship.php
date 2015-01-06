@@ -539,7 +539,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   /**
    * Date validation
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return mixed true or array of errors
    * @static

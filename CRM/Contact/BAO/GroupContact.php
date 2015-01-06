@@ -48,7 +48,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * group object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Contact_BAO_Group object
    * @static
@@ -70,7 +71,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   /**
    * Check if there is data to create the object
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return boolean
    * @static
@@ -88,8 +90,10 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array $params input parameters to find object
-   * @param array $values output values of the object
+   * @param array $params
+   *   Input parameters to find object.
+   * @param array $values
+   *   Output values of the object.
    *
    * @return array (reference)   the values that could be potentially assigned to smarty
    * @static
@@ -116,8 +120,10 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   /**
    * Given an array of contact ids, add all the contacts to the group
    *
-   * @param array $contactIds the array of contact ids to be added
-   * @param int $groupId the id of the group
+   * @param array $contactIds
+   *   The array of contact ids to be added.
+   * @param int $groupId
+   *   The id of the group.
    * @param string $method
    * @param string $status
    * @param int $tracking
@@ -163,8 +169,10 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   /**
    * Given an array of contact ids, remove all the contacts from the group
    *
-   * @param array $contactIds (reference ) the array of contact ids to be removed
-   * @param int $groupId the id of the group
+   * @param array $contactIds
+   *   (reference ) the array of contact ids to be removed.
+   * @param int $groupId
+   *   The id of the group.
    *
    * @param string $method
    * @param string $status
@@ -263,7 +271,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   /**
    * Get list of all the groups and groups for a contact
    *
-   * @param  int $contactId contact id
+   * @param int $contactId
+   *   Contact id.
    *
    * @param bool $visibility
    *
@@ -305,14 +314,20 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   /**
    * Get the list of groups for contact based on status of group membership
    *
-   * @param int $contactId contact id
-   * @param string $status state of membership
-   * @param int $numGroupContact number of groups for a contact that should be shown
-   * @param boolean $count true if we are interested only in the count
-   * @param boolean $ignorePermission true if we should ignore permissions for the current user
+   * @param int $contactId
+   *   Contact id.
+   * @param string $status
+   *   State of membership.
+   * @param int $numGroupContact
+   *   Number of groups for a contact that should be shown.
+   * @param bool $count
+   *   True if we are interested only in the count.
+   * @param bool $ignorePermission
+   *   True if we should ignore permissions for the current user.
    *                                   useful in profile where permissions are limited for the user. If left
    *                                   at false only groups viewable by the current user are returned
-   * @param boolean $onlyPublicGroups true if we want to hide system groups
+   * @param bool $onlyPublicGroups
+   *   True if we want to hide system groups.
    *
    * @param bool $excludeHidden
    *
@@ -436,9 +451,12 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   /**
    * Returns membership details of a contact for a group
    *
-   * @param  int  $contactId id of the contact
-   * @param  int  $groupID   Id of a perticuler group
-   * @param  string $method    If we want the subscription history details for a specific method
+   * @param int $contactId
+   *   Id of the contact.
+   * @param int $groupID
+   *   Id of a perticuler group.
+   * @param string $method
+   *   If we want the subscription history details for a specific method.
    *
    * @return object of group contact
    * @static
@@ -477,7 +495,8 @@ SELECT    *
   /**
    * Method to get Group Id
    *
-   * @param  int  $groupContactID   Id of a perticuler group
+   * @param int $groupContactID
+   *   Id of a perticuler group.
    *
    *
    * @return groupID
@@ -495,8 +514,10 @@ SELECT    *
    * contacts from the groups
    *
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $contactId contact id
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $contactId
+   *   Contact id.
    *
    * @param bool $visibility
    * @param string $method
@@ -581,8 +602,10 @@ SELECT    *
    * Function merges the groups from otherContactID to mainContactID
    * along with subscription history
    *
-   * @param int $mainContactId    contact id of main contact record.
-   * @param int $otherContactId   contact id of record which is going to merge.
+   * @param int $mainContactId
+   *   Contact id of main contact record.
+   * @param int $otherContactId
+   *   Contact id of record which is going to merge.
    *
    * @see CRM_Dedupe_Merger::cpTables()
    *
@@ -688,8 +711,10 @@ AND       group_id IN ( $groupIDString )
   /**
    * Given an array of contact ids, add all the contacts to the group
    *
-   * @param array $contactIDs the array of contact ids to be added
-   * @param int $groupID the id of the group
+   * @param array $contactIDs
+   *   The array of contact ids to be added.
+   * @param int $groupID
+   *   The id of the group.
    * @param string $method
    * @param string $status
    * @param null $tracking
@@ -771,9 +796,11 @@ AND    contact_id IN ( $contactStr )
    * Get options for a given field.
    * @see CRM_Core_DAO::buildOptions
    *
-   * @param String $fieldName
-   * @param String $context : @see CRM_Core_DAO::buildOptionsContext
-   * @param Array $props : whatever is known about this dao object
+   * @param string $fieldName
+   * @param string $context
+   *   : @see CRM_Core_DAO::buildOptionsContext.
+   * @param array $props
+   *   : whatever is known about this dao object.
    *
    * @return Array|bool
    */

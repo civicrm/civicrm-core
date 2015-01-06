@@ -451,7 +451,8 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   /**
    * Set IM Service Provider type fields
    *
-   * @param array $elements IM service provider type ids
+   * @param array $elements
+   *   IM service provider type ids.
    *
    * @return void
    */
@@ -518,7 +519,8 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   /**
    * Set IM Service Provider type fields for related contacts
    *
-   * @param array $elements IM service provider type ids of related contact
+   * @param array $elements
+   *   IM service provider type ids of related contact.
    *
    * @return void
    */
