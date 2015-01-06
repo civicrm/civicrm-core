@@ -93,8 +93,8 @@ class CRM_ACL_API {
   public static function whereClause($type,
     &$tables,
     &$whereTables,
-    $contactID        = NULL,
-    $onlyDeleted      = FALSE,
+    $contactID = NULL,
+    $onlyDeleted = FALSE,
     $skipDeleteClause = FALSE
   ) {
     // the default value which is valid for rhe final AND
@@ -156,9 +156,9 @@ class CRM_ACL_API {
    */
   public static function group(
     $type,
-    $contactID      = NULL,
-    $tableName      = 'civicrm_saved_search',
-    $allGroups      = NULL,
+    $contactID = NULL,
+    $tableName = 'civicrm_saved_search',
+    $allGroups = NULL,
     $includedGroups = NULL
   ) {
     if ($contactID == NULL) {
@@ -193,9 +193,9 @@ class CRM_ACL_API {
   public static function groupPermission(
     $type,
     $groupID,
-    $contactID      = NULL,
-    $tableName      = 'civicrm_saved_search',
-    $allGroups      = NULL,
+    $contactID = NULL,
+    $tableName = 'civicrm_saved_search',
+    $allGroups = NULL,
     $includedGroups = NULL,
     $flush = FALSE
   ) {
