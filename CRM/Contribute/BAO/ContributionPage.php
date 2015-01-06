@@ -41,7 +41,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   /**
    * Takes an associative array and creates a contribution page object
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Contribute_DAO_ContributionPage object
    * @static
@@ -66,8 +67,10 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on success, null otherwise
    * @static
@@ -110,10 +113,14 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   /**
    * Send the emails
    *
-   * @param int $contactID contact id
-   * @param array $values associated array of fields
-   * @param boolean $isTest if in test mode
-   * @param boolean $returnMessageText return the message text instead of sending the mail
+   * @param int $contactID
+   *   Contact id.
+   * @param array $values
+   *   Associated array of fields.
+   * @param bool $isTest
+   *   If in test mode.
+   * @param bool $returnMessageText
+   *   Return the message text instead of sending the mail.
    *
    * @param null $fieldTypes
    *
@@ -456,10 +463,14 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   /**
    * Send the emails for Recurring Contribution Notication
    *
-   * @param string $type txnType
-   * @param int $contactID contact id for contributor
-   * @param int $pageID contribution page id
-   * @param object $recur object of recurring contribution table
+   * @param string $type
+   *   TxnType.
+   * @param int $contactID
+   *   Contact id for contributor.
+   * @param int $pageID
+   *   Contribution page id.
+   * @param object $recur
+   *   Object of recurring contribution table.
    * @param bool|object $autoRenewMembership is it a auto renew membership.
    *
    * @return void
@@ -553,11 +564,14 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   /**
    * Add the custom fields for contribution page (ie profile)
    *
-   * @param int $gid uf group id
+   * @param int $gid
+   *   Uf group id.
    * @param string $name
-   * @param int $cid contact id
+   * @param int $cid
+   *   Contact id.
    * @param $template
-   * @param array $params params to build component whereclause
+   * @param array $params
+   *   Params to build component whereclause.
    *
    * @param null $fieldTypes
    *
@@ -605,7 +619,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * This function is to make a copy of a contribution page, including
    * all the blocks in the page
    *
-   * @param int $id the contribution page id to copy
+   * @param int $id
+   *   The contribution page id to copy.
    *
    * @return the copy object
    * @static
@@ -699,7 +714,8 @@ WHERE entity_table = 'civicrm_contribution_page'
    * Check if contribution page contains payment
    * processor that supports recurring payment
    *
-   * @param int $contributionPageId Contribution Page Id
+   * @param int $contributionPageId
+   *   Contribution Page Id.
    *
    * @return boolean true if payment processor supports recurring
    * else false
@@ -798,9 +814,9 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
    * Get options for a given field.
    * @see CRM_Core_DAO::buildOptions
    *
-   * @param String $fieldName
-   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
-   * @param Array  $props: whatever is known about this dao object
+   * @param string $fieldName
+   * @param string $context: @see CRM_Core_DAO::buildOptionsContext
+   * @param array $props: whatever is known about this dao object
    *
    * @return array|bool
    */
@@ -819,8 +835,8 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
   /**
    * Get or Set multilingually affected honor params for processing module_data or setting default values.
    *
-   * @param Array|String $params: Array when we need to format it according to language state or String as a json encode
-   * @param Boolean      $setDefault: If yes then returns array to used for setting default value afterward
+   * @param array|String $params: Array when we need to format it according to language state or String as a json encode
+   * @param bool $setDefault: If yes then returns array to used for setting default value afterward
    *
    * @return array|string
    */
@@ -892,8 +908,10 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
 
    /**
    * Generate html for pdf in confirmation receipt email  attachment
-   * @param int $contributionId Contribution Page Id
-   * @param int $userID contact id for contributor
+   * @param int $contributionId
+   *   Contribution Page Id.
+   * @param int $userID
+   *   Contact id for contributor.
    * @return array $pdfHtml
    */
   public static function addInvoicePdfToEmail($contributionId, $userID) {
@@ -910,7 +928,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
 
   /**
    * Helper to determine if the page supports separate membership payments
-   * @param integer id form id
+   * @param int id form id
    *
    * @return bool isSeparateMembershipPayment
    */

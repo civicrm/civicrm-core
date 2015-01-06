@@ -333,7 +333,8 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @form object  of Contribution form.
    *
    * @param CRM_Core_Form $form
-   * @param array $params (reference ) an assoc array of name/value pairs.
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    * @$ccContribution boolen,  is it credit card contribution.
    * @param bool $ccContribution
    *

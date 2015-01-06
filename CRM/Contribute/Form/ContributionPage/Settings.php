@@ -213,7 +213,8 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
   /**
    * Global validation rules for the form
    *
-   * @param array $values posted values of the form
+   * @param array $values
+   *   Posted values of the form.
    *
    * @param $files
    * @param $self

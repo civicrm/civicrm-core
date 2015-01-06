@@ -44,7 +44,8 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   /**
    * Add contribution soft credit record
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return object soft contribution of object that is added
    *
@@ -64,8 +65,10 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Contribute_BAO_ContributionSoft object
    * @static
@@ -141,7 +144,8 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * Retrieve soft contributions for contribution record.
    *
    * @param int $contributionID
-   * @param boolean $all include PCP data
+   * @param bool $all
+   *   Include PCP data.
    *
    * @return array of soft contribution ids, amounts, and associated contact ids
    * @static
@@ -231,9 +235,11 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   /**
    *  Function to retrieve the list of soft contributions for given contact.
    *
-   * @param int     $contact_id contact id
-   * @param int     $isTest
-   * @param string  $filter  additional filter criteria, later used in where clause
+   * @param int $contact_id
+   *   Contact id.
+   * @param int $isTest
+   * @param string $filter
+   *   Additional filter criteria, later used in where clause.
    *
    * @return array
    * @static
