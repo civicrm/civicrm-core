@@ -96,8 +96,8 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param integer $count
-   * @param integer $groupID
+   * @param int $count
+   * @param int $groupID
    */
   public function createContactsInGroup($count, $groupID) {
     for($i = 1; $i <= $count; $i++ ) {
@@ -107,8 +107,8 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param integer $start
-   * @param integer $count
+   * @param int $start
+   * @param int $count
    *
    * @return array
    */

@@ -417,7 +417,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   * Implements ACLGroup hook
   * aclGroup function returns a list of permitted groups
   * @param string $type
-  * @param integer $contactID
+  * @param int $contactID
   * @param string $tableName
   * @param array $allGroups
   * @param array $currentGroups
