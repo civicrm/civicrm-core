@@ -61,7 +61,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
 
     $this->applyFilter('__ALL__', 'trim');
 
-    $this->add('text', 'title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'), true);
+    $this->add('text', 'title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'), TRUE);
 
     $labelStyle = CRM_Core_BAO_LabelFormat::getList(TRUE, 'name_badge');
     $this->add('select', 'label_format_name', ts('Label Format'), array('' => ts('- select -')) + $labelStyle, TRUE);
@@ -92,7 +92,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     unset($imageAlignment['C']);
 
     $rowCount = self::FIELD_ROWCOUNT;
-    for ( $i =1; $i <= $rowCount; $i++ ) {
+    for ( $i = 1; $i <= $rowCount; $i++ ) {
       $this->add('select', "token[$i]", ts('Token'), array('' => ts('- skip -')) + $tokens);
       $this->add('select', "font_name[$i]", ts('Font Name'), $fontNames);
       $this->add('select', "font_size[$i]", ts('Font Size'), $fontSizes);
@@ -107,8 +107,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $this->add('select', "barcode_type", ts('Type'), $barcodeTypes);
     $this->add('select', "barcode_alignment", ts('Alignment'), $textAlignment);
 
-
-    $attributes = array('readonly'=> true);
+    $attributes = array('readonly' => TRUE);
     $this->add('text', 'image_1', ts('Image (top left)'),
       $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
     $this->add('text', 'width_image_1', ts('Width (mm)'), array('size' => 6));
@@ -118,7 +117,6 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
       $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
     $this->add('text', 'width_image_2', ts('Width (mm)'), array('size' => 6));
     $this->add('text', 'height_image_2', ts('Height (mm)'), array('size' => 6));
-
 
     $this->add('checkbox', 'show_participant_image', ts('Use Participant Image?'));
     $this->add('text', 'width_participant_image', ts('Width (mm)'), array('size' => 6));
