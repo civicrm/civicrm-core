@@ -89,7 +89,6 @@ class CRM_Badge_BAO_Badge {
     $formattedRow['labelTitle'] = $layout['title'];
     $formattedRow['labelId'] = $layout['id'];
 
-
     if (!empty($layout['data']['rowElements'])) {
       foreach ($layout['data']['rowElements'] as $key => $element) {
         $value = '';
@@ -166,6 +165,7 @@ class CRM_Badge_BAO_Badge {
       case 'Hanging Badge 3-3/4" x 4-3"/4':
         self::labelCreator($formattedRow, 5);
         break;
+
       case 'Avery 5395':
       default:
         self::labelCreator($formattedRow);
@@ -212,9 +212,11 @@ class CRM_Badge_BAO_Badge {
         case 'R':
           $imageAlign = 68;
           break;
+
         case 'L':
           $imageAlign = 0;
           break;
+
         default:
           break;
       }
@@ -289,9 +291,11 @@ class CRM_Badge_BAO_Badge {
           case 'L':
             $xAlign += -14;
             break;
+
           case 'R':
             $xAlign += 27;
             break;
+
           case 'C':
             $xAlign += 9;
             break;
@@ -325,24 +329,26 @@ class CRM_Badge_BAO_Badge {
           case 'L':
             $xAlign += -5;
             break;
+
           case 'R':
             $xAlign += 56;
             break;
+
           case 'C':
             $xAlign += 29;
             break;
         }
 
         $style = array(
-          'border' => false,
+          'border' => FALSE,
           'hpadding' => 13.5,
           'vpadding' => 'auto',
-          'fgcolor' => array(0,0,0),
-          'bgcolor' => false,
+          'fgcolor' => array(0, 0, 0),
+          'bgcolor' => FALSE,
           'position' => '',
         );
 
-        $this->pdf->write2DBarcode($data['current_value'], 'QRCODE,H', $xAlign, $y  + $this->pdf->height - 26, 30,
+        $this->pdf->write2DBarcode($data['current_value'], 'QRCODE,H', $xAlign, $y + $this->pdf->height - 26, 30,
           30, $style, 'B');
       }
     }
