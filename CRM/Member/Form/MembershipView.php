@@ -106,6 +106,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
         CRM_Core_Session::setStatus(ts('Related membership for %1 has been deleted.', array(1 => $relatedDisplayName)),
           ts('Membership Deleted'), 'success');
         break;
+
       case 'create':
         $ids = array();
         $params = array(
@@ -127,6 +128,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
         CRM_Core_Session::setStatus(ts('Related membership for %1 has been created.', array(1 => $relatedDisplayName)),
           ts('Membership Added'), 'success');
         break;
+
       default:
         CRM_Core_Error::fatal(ts("Invalid action specified in URL"));
     }

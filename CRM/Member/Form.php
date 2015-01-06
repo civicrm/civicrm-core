@@ -59,7 +59,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   protected $_fromEmails = array();
 
   public function preProcess() {
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String',$this, FALSE, 'add');
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'membership');
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
@@ -212,7 +212,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     // here we store details in order to do that
     if (!empty($formValues['soft_credit_contact_id'])) {
       $this->_receiptContactId = $this->_contributorContactID = $formValues['soft_credit_contact_id'];
-       list( $this->_contributorDisplayName,
+      list( $this->_contributorDisplayName,
          $this->_contributorEmail ) = CRM_Contact_BAO_Contact_Location::getEmailDetails( $this->_contributorContactID );
     }
     else {

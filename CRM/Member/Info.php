@@ -102,7 +102,8 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    * @return array|null
    */
   public function getUserDashboardElement() {
-    return array('name' => ts('Memberships'),
+    return array(
+    'name' => ts('Memberships'),
       'title' => ts('Your Membership(s)'),
       // this is CiviContribute specific permission, since
       // there is no permission that could be checked for
@@ -125,7 +126,8 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    * @return array|null
    */
   public function registerTab() {
-    return array('title' => ts('Memberships'),
+    return array(
+    'title' => ts('Memberships'),
       'url' => 'membership',
       'weight' => 30,
     );
@@ -144,7 +146,8 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    * @return array|null
    */
   public function registerAdvancedSearchPane() {
-    return array('title' => ts('Memberships'),
+    return array(
+    'title' => ts('Memberships'),
       'weight' => 30,
     );
   }

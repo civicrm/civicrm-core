@@ -394,7 +394,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         // If so, set fixed_period_rollover TRUE so we increment end_date month below.
         $dateParts = explode('-', $actualStartDate);
         if ($dateParts[2] >= $membershipTypeDetails['fixed_period_rollover_day']){
-          $fixed_period_rollover = True;
+          $fixed_period_rollover = TRUE;
         }
 
         // Start date is always first day of actualStartDate month
@@ -510,7 +510,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       $date  = explode('-', $date);
       $logStartDate = date('Y-m-d', mktime(0, 0, 0,
           (double) $date[1],
-          (double)($date[2] + 1),
+          (double) ($date[2] + 1),
           (double) $date[0]
         ));
 
@@ -527,7 +527,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
             $day = substr($membershipTypeDetails['fixed_period_start_day'], -2);
             $year += 1;
           } else {
-          $year = $year + ($numRenewTerms * $membershipTypeDetails['duration_interval']);
+            $year = $year + ($numRenewTerms * $membershipTypeDetails['duration_interval']);
           }
           break;
 
@@ -750,9 +750,9 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   /** This function updates all price field value for quick config
    * price set which has membership type
    *
-   *  @param  integer      membership type id
+   * @param  integer      membership type id
    *
-   *  @param  integer      financial type id
+   * @param  integer      financial type id
    */
   public static function updateAllPriceFieldValue($membershipTypeId, $params) {
     if (!empty($params['minimum_fee'])){

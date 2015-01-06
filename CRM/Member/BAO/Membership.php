@@ -1333,7 +1333,6 @@ AND civicrm_membership.is_test = %2";
       $financialTypeID = $defaultContributionTypeID;
     }
 
-
     if (CRM_Utils_Array::value('membership_source', $form->_params)) {
       $membershipParams['contribution_source'] = $form->_params['membership_source'];
     }
@@ -2987,7 +2986,6 @@ WHERE      civicrm_membership.is_test = 0";
 
     // store contribution id
     $params['contribution_id'] = $contribution->id;
-
 
     //insert payment record for this membership
     if (empty($ids['contribution']) || !empty($params['is_recur'])) {
