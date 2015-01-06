@@ -496,8 +496,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    */
   public function addButtons($params) {
-    $prevnext = array();
-    $spacing = array();
+    $prevnext = $spacing = array();
     foreach ($params as $button) {
       $js = CRM_Utils_Array::value('js', $button);
       $isDefault = CRM_Utils_Array::value('isDefault', $button, FALSE);
@@ -512,8 +511,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $attrs = array_merge($js, $attrs);
       }
 
+      $defaultIcon = 'check';
+
       if ($button['type'] === 'cancel') {
         $attrs['class'] .= ' cancel';
+        $defaultIcon = 'close';
       }
 
       if ($button['type'] === 'reset') {
@@ -521,6 +523,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
       else {
         if (!empty($button['subName'])) {
+          if ($button['subName'] == 'new') {
+            $defaultIcon = 'plus';
+          }
           $buttonName = $this->getButtonName($button['type'], $button['subName']);
         }
         else {
@@ -529,6 +534,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
         if (in_array($button['type'], array('next', 'upload', 'done')) && $button['name'] === ts('Save')) {
           $attrs = array_merge($attrs, (array('accesskey' => 'S')));
+        }
+        $icon = CRM_Utils_Array::value('icon', $button, $defaultIcon);
+        if ($icon) {
+          $attrs['crm-icon'] = $icon;
         }
         $prevnext[] = $this->createElement('submit', $buttonName, $button['name'], $attrs);
       }

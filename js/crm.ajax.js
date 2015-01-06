@@ -508,7 +508,7 @@
             if ($icon.length) {
               button.icons = {primary: $icon.attr('class')};
             } else {
-              var action = $el.hasClass('cancel') ? 'close' : (identifier.substr(identifier.length-4) === '_new' ? 'plus' : 'check');
+              var action = $el.attr('crm-icon') || ($el.hasClass('cancel') ? 'close' : 'check');
               button.icons = {primary: 'ui-icon-' + action};
             }
             buttons.push(button);
