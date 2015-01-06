@@ -69,6 +69,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   public function tearDown() {
     $this->locationTypeDelete($this->_locationType->id);
     $this->contactDelete($this->_contactID);
+    $this->quickCleanup(array('civicrm_address', 'civicrm_relationship'));
   }
 
   public function testCreateAddress() {
@@ -111,11 +112,63 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   public function testCreateAddressTooLongSuffix() {
     $params = $this->_params;
     $params['street_number_suffix'] = 'really long string';
-    $result = $this->callAPIFailure('address', 'create', $params);
-   }
+    $this->callAPIFailure('address', 'create', $params);
+  }
 
   /**
-   * Is_primary shoule be set as a default. ie. create the address, unset the params & recreate.
+   * Create an address with a master ID and ensure that a relationship is created
+   */
+  public function testCreateAddressWithMasterRelationshipHousehold() {
+    $householdID = $this->householdCreate();
+    $address = $this->callAPISuccess('address', 'create', array_merge($this->_params, $this->_params, array('contact_id' => $householdID)));
+    $individualID = $this->individualCreate();
+    $individualParams = array(
+      'contact_id' => $individualID,
+      'master_id' => $address['id'],
+    );
+    $this->callAPISuccess('address', 'create', array_merge($this->_params, $individualParams));
+    $this->callAPISuccess('relationship', 'getcount', array('contact_id_a' => $individualID, 'contact_id_b' => $this->_contactID));
+  }
+
+  /**
+ * Create an address with a master ID and ensure that a relationship is created
+ */
+  public function testCreateAddressWithMasterRelationshipOrganization() {
+    $address = $this->callAPISuccess('address', 'create', $this->_params);
+    $individualID = $this->individualCreate();
+    $individualParams = array(
+      'contact_id' => $individualID,
+      'master_id' => $address['id'],
+    );
+    $this->callAPISuccess('address', 'create', array_merge($this->_params, $individualParams));
+    $this->callAPISuccess('relationship', 'getcount', array('contact_id_a' => $individualID, 'contact_id_b' => $this->_contactID));
+  }
+
+  /**
+   * Create an address with a master ID and ensure that a relationship is created
+   */
+  public function testCreateAddressWithMasterRelationshipChangingOrganization() {
+    $address = $this->callAPISuccess('address', 'create', $this->_params);
+    $organisation2ID = $this->organizationCreate();
+    $address2 = $this->callAPISuccess('address', 'create', array_merge($this->_params, array('contact_id' => $organisation2ID)));
+    $individualID = $this->individualCreate();
+    $individualParams = array_merge($this->_params, array(
+      'contact_id' => $individualID,
+      'master_id' => $address['id'],
+    ));
+    $individualAddress = $this->callAPISuccess('address', 'create', $individualParams);
+    $individualParams['master_id'] = $address2['id'];
+    $individualParams['id'] = $individualAddress['id'];
+    $this->callAPISuccess('address', 'create', $individualParams);
+    $this->callAPISuccessGetCount('relationship', array('contact_id_a' => $individualID,), 2);
+    $this->markTestIncomplete('Remainder of test checks that employer relationship is disabled when new one is created but turns out to be not happening - by design?');
+    $this->callAPISuccessGetCount('relationship', array('contact_id_a' => $individualID, 'is_active' => FALSE), 1);
+    $this->callAPISuccessGetCount('relationship', array('contact_id_a' => $individualID, 'is_active' => TRUE, 'contact_id_b' => $organisation2ID), 1);
+
+  }
+
+  /**
+   * Is_primary should be set as a default. ie. create the address, unset the params & recreate.
    * is_primary should be 0 before & after the update. ie - having no other address
    * is_primary is invalid
    */
@@ -126,18 +179,21 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     unset($params['is_primary']);
     $params['id'] = $result['id'];
     $result       = $this->callAPISuccess('address', 'create', $params);
-    $address      = $this->callAPISuccess('address', 'get', array('contact_id' => $params['contact_id']));
-   $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['values'][$result['id']]['is_primary'], 'In line ' . __LINE__);
+    $this->callAPISuccess('address', 'get', array('contact_id' => $params['contact_id']));
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(1, $result['values'][$result['id']]['is_primary']);
     $this->getAndCheck($params, $result['id'], 'address', __FUNCTION__);
   }
-  public function testDeleteAddress() {
 
-    //check there are no addresss to start with
+  /**
+   * test address deletion
+   */
+  public function testDeleteAddress() {
+    //check there are no address to start with
     $get = $this->callAPISuccess('address', 'get', array(
       'location_type_id' => $this->_locationType->id,
     ));
-    $this->assertEquals(0, $get['count'], 'Contact already exists ' . __LINE__);
+    $this->assertEquals(0, $get['count'], 'Contact already exists ');
 
     //create one
     $create = $this->callAPISuccess('address', 'create', $this->_params);
@@ -162,9 +218,9 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     );
     $result = $this->callAPIAndDocument('Address', 'Get', $params, __FUNCTION__, __FILE__);
     $this->callAPISuccess('Address', 'delete', array('id' => $result['id']));
-    $this->assertEquals($address['values'][$address['id']]['location_type_id'], $result['values'][$address['id']]['location_type_id'], 'In line ' . __LINE__);
-    $this->assertEquals($address['values'][$address['id']]['is_primary'], $result['values'][$address['id']]['is_primary'], 'In line ' . __LINE__);
-    $this->assertEquals($address['values'][$address['id']]['street_address'], $result['values'][$address['id']]['street_address'], 'In line ' . __LINE__);
+    $this->assertEquals($address['values'][$address['id']]['location_type_id'], $result['values'][$address['id']]['location_type_id']);
+    $this->assertEquals($address['values'][$address['id']]['is_primary'], $result['values'][$address['id']]['is_primary']);
+    $this->assertEquals($address['values'][$address['id']]['street_address'], $result['values'][$address['id']]['street_address']);
   }
 
   /**
@@ -221,8 +277,6 @@ class api_v3_AddressTest extends CiviUnitTestCase {
    */
   public function testGetAddressLikeFail() {
     $create = $this->callAPISuccess('address', 'create', $this->_params);
-    $subfile     = "AddressLike";
-    $description = "Demonstrates Use of Like";
     $params      = array('street_address' => array('LIKE' => "'%xy%'"),
       'sequential' => 1,
     );
@@ -231,6 +285,9 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'delete', array('id' => $create['id']));
   }
 
+  /**
+   *
+   */
   public function testGetWithCustom() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
 
@@ -249,6 +306,9 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'delete', array('id' => $result['id']));
   }
 
+  /**
+   *
+   */
   public function testCreateAddressPrimaryHandlingChangeToPrimary() {
     $params = $this->_params;
     unset($params['is_primary']);
@@ -262,9 +322,13 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->assertEquals(1, $check);
     $this->callAPISuccess('address', 'delete', array('id' => $address1['id']));
   }
+
+  /**
+   *
+   */
   public function testCreateAddressPrimaryHandlingChangeExisting() {
     $address1 = $this->callAPISuccess('address', 'create', $this->_params);
-    $address2 = $this->callAPISuccess('address', 'create', $this->_params);
+    $this->callAPISuccess('address', 'create', $this->_params);
     $check = $this->callAPISuccess('address', 'getcount', array(
         'is_primary' => 1,
         'contact_id' => $this->_contactID,

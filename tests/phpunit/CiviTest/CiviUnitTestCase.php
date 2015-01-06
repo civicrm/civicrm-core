@@ -1710,7 +1710,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Add a Location Type
    *
    * @param array $params
-   * @return int location id of created location
+   * @return CRM_Core_DAO_LocationType location id of created location
    */
   public function locationTypeCreate($params = NULL) {
     if ($params === NULL) {
