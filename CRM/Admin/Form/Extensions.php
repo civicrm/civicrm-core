@@ -57,7 +57,6 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
     $this->assign('id', $this->_id);
     $this->assign('key', $this->_key);
 
-
     switch ($this->_action) {
       case CRM_Core_Action::ADD:
       case CRM_Core_Action::DELETE:

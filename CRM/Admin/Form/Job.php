@@ -207,6 +207,5 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       CRM_Core_Session::setStatus($msg, ts('Warning: Update Greeting job enabled'), 'alert');
     }
 
-
   }
 }

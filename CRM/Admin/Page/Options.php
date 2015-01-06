@@ -125,7 +125,8 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     if (self::$_gName == 'acl_role') {
       CRM_Utils_System::setTitle(ts('Manage ACL Roles'));
       // set breadcrumb to append to admin/access
-      $breadCrumb = array(array('title' => ts('Access Control'),
+      $breadCrumb = array(array(
+      'title' => ts('Access Control'),
           'url' => CRM_Utils_System::url('civicrm/admin/access',
             'reset=1'
           ),
@@ -247,7 +248,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
 
     // retrieve financial account name for the payment instrument page
     if ($gName = "payment_instrument") {
-      foreach ($optionValue as  $key => $option) {
+      foreach ($optionValue as $key => $option) {
         $optionValue[$key]['financial_account'] = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount($key, 'civicrm_option_value');
       }
     }
