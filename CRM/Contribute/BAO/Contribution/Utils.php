@@ -61,7 +61,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
    *
    * @static
    */
-  static function processConfirm(&$form,
+  static function processConfirm(
+    &$form,
     &$paymentParams,
     &$premiumParams,
     $contactID,

@@ -914,7 +914,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
       if (CRM_Utils_Array::value('membership', $componentDetails) || CRM_Utils_Array::value('participant', $componentDetails)) {
         if ($totalAmount) {
-          $totalAmount->freeze();          
+          $totalAmount->freeze();
         }
         $financialType->freeze();
         $this->assign('freezeFinancialType', TRUE);
