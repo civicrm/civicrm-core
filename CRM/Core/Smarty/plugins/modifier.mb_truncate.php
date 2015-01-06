@@ -53,7 +53,7 @@
  * @param string
  * @param integer
  * @param string
- * @param boolean
+ * @param bool
  *
  * @return string
  */

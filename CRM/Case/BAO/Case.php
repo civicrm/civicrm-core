@@ -71,7 +71,8 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * case object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Case_BAO_Case object
    * @static
@@ -86,9 +87,12 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array $params input parameters to find object
-   * @param array $values output values of the object
-   * @param array $ids    the array that holds all the db ids
+   * @param array $params
+   *   Input parameters to find object.
+   * @param array $values
+   *   Output values of the object.
+   * @param array $ids
+   *   The array that holds all the db ids.
    *
    * @return CRM_Case_BAO_Case|null the found object or null
    * @static
@@ -109,7 +113,8 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   /**
    * Takes an associative array and creates a case object
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Case_BAO_Case object
    * @static
@@ -153,7 +158,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   /**
    * Create case contact record
    *
-   * @param array    case_id, contact_id
+   * @param array case_id, contact_id
    *
    * @return object
    */
@@ -195,7 +200,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   /**
    * Delet case contact record
    *
-   * @param int    case_id
+   * @param int case_id
    *
    * @return Void
    */
@@ -247,10 +252,13 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * full featured over a period of time. This is the inverse function of
    * create.  It also stores all the retrieved values in the default array
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the name / value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the name / value pairs.
    *                        in a hierarchical manner
-   * @param array $ids      (reference) the array that holds all the db ids
+   * @param array $ids
+   *   (reference) the array that holds all the db ids.
    *
    * @return CRM_Case_BAO_Case object
    * @static
@@ -264,7 +272,8 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * Process case activity add/delete
    * takes an associative array and
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @static
    */
@@ -280,7 +289,8 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   /**
    * Get the case subject for Activity
    *
-   * @param int $activityId  activity id
+   * @param int $activityId
+   *   Activity id.
    *
    * @return  case subject or null
    * @static
@@ -320,7 +330,8 @@ WHERE civicrm_case.id = %1";
    * Delete the record that are associated with this case
    * record are deleted from case
    *
-   * @param  int $caseId id of the case to delete
+   * @param int $caseId
+   *   Id of the case to delete.
    *
    * @param bool $moveToTrash
    *
@@ -373,8 +384,10 @@ WHERE civicrm_case.id = %1";
   /**
    * Enable disable case related relationships
    *
-   * @param int $caseId case id
-   * @param boolean $enable action
+   * @param int $caseId
+   *   Case id.
+   * @param bool $enable
+   *   Action.
    *
    * @return void
    * @static
@@ -398,7 +411,8 @@ WHERE civicrm_case.id = %1";
   /**
    * Delete the activities related to case
    *
-   * @param  int $activityId id of the activity
+   * @param int $activityId
+   *   Id of the activity.
    *
    * @return void
    * @static
@@ -412,7 +426,8 @@ WHERE civicrm_case.id = %1";
   /**
    * Retrieve contact_id by case_id
    *
-   * @param int $caseId ID of the case
+   * @param int $caseId
+   *   ID of the case.
    *
    * @param int $contactID
    *
@@ -459,7 +474,8 @@ WHERE civicrm_case.id = %1";
   /**
    * Retrieve contact names by caseId
    *
-   * @param int $caseId  ID of the case
+   * @param int $caseId
+   *   ID of the case.
    *
    * @return array
    *
@@ -504,7 +520,8 @@ WHERE civicrm_case.id = %1";
    * Retrieve case_id by contact_id
    *
    * @param int $contactID
-   * @param boolean $includeDeleted include the deleted cases in result
+   * @param bool $includeDeleted
+   *   Include the deleted cases in result.
    * @param null $caseType
    *
    * @return array
@@ -701,11 +718,12 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
    * Retrieve cases related to particular contact or whole contact
    * used in Dashboad and Tab
    *
-   * @param boolean $allCases
+   * @param bool $allCases
    *
    * @param int $userID
    *
-   * @param String $type /upcoming,recent,all/
+   * @param String $type
+   *   /upcoming,recent,all/.
    *
    * @param string $context
    *
@@ -954,8 +972,10 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   /**
    * Get Case roles
    *
-   * @param int $contactID contact id
-   * @param int $caseID case id
+   * @param int $contactID
+   *   Contact id.
+   * @param int $caseID
+   *   Case id.
    * @param int $relationshipID
    *
    * @return array case role / relationships
@@ -1011,9 +1031,12 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   /**
    * Get Case Activities
    *
-   * @param int $caseID case id
-   * @param array $params posted params
-   * @param int $contactID contact id
+   * @param int $caseID
+   *   Case id.
+   * @param array $params
+   *   Posted params.
+   * @param int $contactID
+   *   Contact id.
    *
    * @param null $context
    * @param int $userID
@@ -1356,8 +1379,10 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   /**
    * Get Case Related Contacts
    *
-   * @param int $caseID case id
-   * @param boolean $skipDetails if true include details of contacts
+   * @param int $caseID
+   *   Case id.
+   * @param bool $skipDetails
+   *   If true include details of contacts.
    *
    * @return array $searchRows array of return properties
    *
@@ -1404,8 +1429,10 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * Send e-mail copy of activity
    *
    * @param int $clientId
-   * @param int $activityId activity Id
-   * @param array $contacts array of related contact
+   * @param int $activityId
+   *   Activity Id.
+   * @param array $contacts
+   *   Array of related contact.
    *
    * @param null $attachments
    * @param int $caseId
@@ -1545,8 +1572,10 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * Retrieve count of activities having a particular type, and
    * associated with a particular case.
    *
-   * @param int $caseId          ID of the case
-   * @param int $activityTypeId  ID of the activity type
+   * @param int $caseId
+   *   ID of the case.
+   * @param int $activityTypeId
+   *   ID of the activity type.
    *
    * @return array
    *
@@ -1575,7 +1604,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   /**
    * Create an activity for a case via email
    *
-   * @param int $file email sent
+   * @param int $file
+   *   Email sent.
    *
    * @return array|void $activity object of newly creted activity via email@access public
    */
@@ -1663,7 +1693,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   /**
    * Retrieve the scheduled activity type and date
    *
-   * @param  array $cases Array of contact and case id
+   * @param array $cases
+   *   Array of contact and case id.
    *
    * @param string $type
    *
@@ -1734,7 +1765,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   /**
    * Restore the record that are associated with this case
    *
-   * @param  int $caseId id of the case to restore
+   * @param int $caseId
+   *   Id of the case to restore.
    *
    * @return true if success.
    * @static
@@ -1829,9 +1861,12 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   /**
    * Get Case ActivitiesDueDates with given criteria.
    *
-   * @param int $caseID case id
-   * @param array $criteriaParams given criteria
-   * @param boolean $latestDate if set newest or oldest date is selceted.
+   * @param int $caseID
+   *   Case id.
+   * @param array $criteriaParams
+   *   Given criteria.
+   * @param bool $latestDate
+   *   If set newest or oldest date is selceted.
    *
    * @return returns case activities due dates
    *
@@ -1881,8 +1916,10 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * Create activities when Case or Other roles assigned/modified/deleted.
    *
    * @param int $caseId
-   * @param int $relationshipId relationship id
-   * @param int $relContactId case role assignee contactId.
+   * @param int $relationshipId
+   *   Relationship id.
+   * @param int $relContactId
+   *   Case role assignee contactId.
    * @param int $contactId
    *
    * @return void on success creates activity and case activity
@@ -1974,8 +2011,10 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * Get case manger
    * contact which is assigned a case role of case manager.
    *
-   * @param int $caseType case type
-   * @param int $caseId   case id
+   * @param int $caseType
+   *   Case type.
+   * @param int $caseId
+   *   Case id.
    *
    * @return array $caseManagerContact array of contact on success otherwise empty
    *
@@ -2145,8 +2184,10 @@ LEFT JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.case
   /**
    * Retrieve cases related to particular contact.
    *
-   * @param int $contactId contact id
-   * @param boolean $excludeDeleted do not include deleted cases.
+   * @param int $contactId
+   *   Contact id.
+   * @param bool $excludeDeleted
+   *   Do not include deleted cases.
    *
    * @return an array of cases.
    *
@@ -2185,9 +2226,12 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
   /**
    * Retrieve related cases for give case.
    *
-   * @param int $mainCaseId     id of main case
-   * @param int $contactId      id of contact
-   * @param boolean $excludeDeleted do not include deleted cases.
+   * @param int $mainCaseId
+   *   Id of main case.
+   * @param int $contactId
+   *   Id of contact.
+   * @param bool $excludeDeleted
+   *   Do not include deleted cases.
    *
    * @return an array of related cases.
    *
@@ -2307,10 +2351,14 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
    * 1. Merge two duplicate contacts cases - follow CRM-5758 rules.
    * 2. Merge two cases of same contact - follow CRM-5598 rules.
    *
-   * @param int $mainContactId contact id of main contact record.
-   * @param int $mainCaseId case id of main case record.
-   * @param int $otherContactId contact id of record which is going to merge.
-   * @param int $otherCaseId case id of record which is going to merge.
+   * @param int $mainContactId
+   *   Contact id of main contact record.
+   * @param int $mainCaseId
+   *   Case id of main case record.
+   * @param int $otherContactId
+   *   Contact id of record which is going to merge.
+   * @param int $otherCaseId
+   *   Case id of record which is going to merge.
    *
    * @param bool $changeClient
    *
@@ -2724,8 +2772,10 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * Validate contact permission for
    * edit/view on activity record and build links.
    *
-   * @param array $tplParams       params to be sent to template for sending email.
-   * @param array $activityParams  info of the activity.
+   * @param array $tplParams
+   *   Params to be sent to template for sending email.
+   * @param array $activityParams
+   *   Info of the activity.
    *
    * @return void
    * @static
@@ -2763,11 +2813,16 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * Validate contact permission for
    * given operation on activity record.
    *
-   * @param int $activityId      activity record id.
-   * @param string $operation       user operation.
-   * @param int $actTypeId       activity type id.
-   * @param int $contactId       contact id/if not pass consider logged in
-   * @param boolean $checkComponent  do we need to check component enabled.
+   * @param int $activityId
+   *   Activity record id.
+   * @param string $operation
+   *   User operation.
+   * @param int $actTypeId
+   *   Activity type id.
+   * @param int $contactId
+   *   Contact id/if not pass consider logged in.
+   * @param bool $checkComponent
+   *   Do we need to check component enabled.
    *
    * @return boolean $allow  true/false
    * @static
@@ -3030,7 +3085,8 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * Verify user has permission to access a case
    *
    * @param int $caseId
-   * @param bool $denyClosed set TRUE if one wants closed cases to be treated as inaccessible
+   * @param bool $denyClosed
+   *   Set TRUE if one wants closed cases to be treated as inaccessible.
    *
    * @return bool
    */
@@ -3077,7 +3133,8 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   /**
    * Check whether activity is a case Activity
    *
-   * @param  int $activityID   activity id
+   * @param int $activityID
+   *   Activity id.
    *
    * @return boolean  $isCaseActivity true/false
    */
@@ -3277,8 +3334,10 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   /**
    * Add/copy relationships, when new client is added for a case
    *
-   * @param int $caseId case id
-   * @param int $contactId contact id / new client id
+   * @param int $caseId
+   *   Case id.
+   * @param int $contactId
+   *   Contact id / new client id.
    *
    * @return void
    */
@@ -3340,8 +3399,10 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * @see CRM_Core_DAO::buildOptions
    *
    * @param String $fieldName
-   * @param String $context : @see CRM_Core_DAO::buildOptionsContext
-   * @param Array $props : whatever is known about this dao object
+   * @param String $context
+   *   : @see CRM_Core_DAO::buildOptionsContext.
+   * @param Array $props
+   *   : whatever is known about this dao object.
    *
    * @return Array|bool
    */

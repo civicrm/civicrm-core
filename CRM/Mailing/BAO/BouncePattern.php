@@ -74,7 +74,8 @@ class CRM_Mailing_BAO_BouncePattern extends CRM_Mailing_DAO_BouncePattern {
   /**
    * Try to match the string to a bounce type.
    *
-   * @param string $message       The message to be matched
+   * @param string $message
+   *   The message to be matched.
    *
    * @return array                Tuple (bounce_type, bounce_reason)
    * @static

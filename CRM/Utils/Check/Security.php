@@ -210,8 +210,10 @@ class CRM_Utils_Check_Security {
   /**
    * Determine whether $url is a public, browsable listing for $dir
    *
-   * @param string $dir local dir path
-   * @param string $url public URL
+   * @param string $dir
+   *   Local dir path.
+   * @param string $url
+   *   Public URL.
    * @return bool
    */
   public function isBrowsable($dir, $url) {
@@ -237,8 +239,10 @@ class CRM_Utils_Check_Security {
    * Determine whether $url is a public version of $dir in which files
    * are remotely accessible.
    *
-   * @param string $dir local dir path
-   * @param string $url public URL
+   * @param string $dir
+   *   Local dir path.
+   * @param string $url
+   *   Public URL.
    * @return bool
    */
   public function isDirAccessible($dir, $url) {
@@ -279,7 +283,8 @@ class CRM_Utils_Check_Security {
   /**
    * Make a guess about the URL that corresponds to $targetDir.
    *
-   * @param string $targetDir local path to a directory
+   * @param string $targetDir
+   *   Local path to a directory.
    * @return string a guessed URL for $realDir
    */
   public function guessUrl($targetDir) {

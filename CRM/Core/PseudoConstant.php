@@ -538,12 +538,18 @@ class CRM_Core_PseudoConstant {
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @param array $var the associative array we will fill
-   * @param string $name the name of the DAO
-   * @param boolean $all get all objects. default is to get only active ones.
-   * @param string $retrieve the field that we are interested in (normally name, differs in some objects)
-   * @param string $filter the field that we want to filter the result set with
-   * @param string $condition the condition that gets passed to the final query as the WHERE clause
+   * @param array $var
+   *   The associative array we will fill.
+   * @param string $name
+   *   The name of the DAO.
+   * @param bool $all
+   *   Get all objects. default is to get only active ones.
+   * @param string $retrieve
+   *   The field that we are interested in (normally name, differs in some objects).
+   * @param string $filter
+   *   The field that we want to filter the result set with.
+   * @param string $condition
+   *   The condition that gets passed to the final query as the WHERE clause.
    *
    * @param null $orderby
    * @param string $key
@@ -604,7 +610,8 @@ class CRM_Core_PseudoConstant {
    *
    * @static
    *
-   * @param bool|string $name pseudoconstant to be flushed
+   * @param bool|string $name
+   *   Pseudoconstant to be flushed.
    */
   public static function flush($name = 'cache') {
     if (isset(self::$$name)) {
@@ -698,7 +705,8 @@ class CRM_Core_PseudoConstant {
    *
    * @static
    *
-   * @param bool|int $id -  Optional id to return
+   * @param bool|int $id
+   *   Optional id to return.
    *
    * @param bool $limit
    *
@@ -753,7 +761,8 @@ class CRM_Core_PseudoConstant {
    *
    * @static
    *
-   * @param bool|int $id -     Optional id to return
+   * @param bool|int $id
+   *   Optional id to return.
    *
    * @param bool $limit
    *
@@ -820,7 +829,8 @@ WHERE  id = %1";
    *
    * @static
    *
-   * @param bool|int $id - Optional id to return
+   * @param bool|int $id
+   *   Optional id to return.
    *
    * @param bool $applyLimit
    *
@@ -927,8 +937,10 @@ WHERE  id = %1";
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @param string $groupType type of group(Access/Mailing)
-   * @param bool $excludeHidden exclude hidden groups.
+   * @param string $groupType
+   *   Type of group(Access/Mailing).
+   * @param bool $excludeHidden
+   *   Exclude hidden groups.
    *
    * @static
    *
@@ -984,8 +996,10 @@ WHERE  id = %1";
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @param string $groupType type of group(Access/Mailing)
-   * @param bool $excludeHidden exclude hidden groups.
+   * @param string $groupType
+   *   Type of group(Access/Mailing).
+   * @param bool $excludeHidden
+   *   Exclude hidden groups.
    *
    * @static
    *
@@ -1054,8 +1068,10 @@ WHERE  id = %1";
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @param string $valueColumnName db column name/label.
-   * @param boolean $reset          reset relationship types if true
+   * @param string $valueColumnName
+   *   Db column name/label.
+   * @param bool $reset
+   *   Reset relationship types if true.
    *
    * @static
    *
@@ -1386,7 +1402,8 @@ WHERE  id = %1";
    *
    * @static
    *
-   * @param bool|int $id -  Optional id to return
+   * @param bool|int $id
+   *   Optional id to return.
    *
    * @return array - array reference of all Counties
    */
@@ -1416,8 +1433,10 @@ WHERE  id = %1";
    *
    * @static
    *
-   * @param boolean $all - get payment processors     - default is to get only active ones.
-   * @param boolean $test - get test payment processors
+   * @param bool $all
+   *   Get payment processors     - default is to get only active ones.
+   * @param bool $test
+   *   Get test payment processors.
    *
    * @param null $additionalCond
    *
@@ -1450,7 +1469,8 @@ WHERE  id = %1";
    *
    * @static
    *
-   * @param boolean $all - get payment processors     - default is to get only active ones.
+   * @param bool $all
+   *   Get payment processors     - default is to get only active ones.
    *
    * @param int $id
    * @param string $return
@@ -1662,7 +1682,8 @@ ORDER BY name";
    * Given a state ID return the country ID, this allows
    * us to populate forms and values for downstream code
    *
-   * @param $stateID int
+   * @param $stateID
+   *   Int.
    *
    * @return int the country id that the state belongs to
    * @static
@@ -1689,7 +1710,8 @@ WHERE  id = %1
    *
    * @static
    *
-   * @param $filter - get All Email Greetings - default is to get only active ones.
+   * @param $filter
+   *   Get All Email Greetings - default is to get only active ones.
    *
    * @param string $columnName
    *
@@ -1798,7 +1820,8 @@ WHERE  id = %1
    *
    * @static
    *
-   * @param boolean $optionGroupName - get All  Option Group values- default is to get only active ones.
+   * @param bool $optionGroupName
+   *   Get All  Option Group values- default is to get only active ones.
    *
    * @param int $id
    * @param null $condition
@@ -1820,7 +1843,8 @@ WHERE  id = %1
   /**
    * Fetch the list of active extensions of type 'module'
    *
-   * @param $fresh bool whether to forcibly reload extensions list from canonical store
+   * @param $fresh
+   *   Bool whether to forcibly reload extensions list from canonical store.
    * @static
    *
    * @return array - array(array('prefix' => $, 'file' => $))

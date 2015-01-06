@@ -501,7 +501,8 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
   /**
    * Validation
    *
-   * @param array $params (ref.) an assoc array of name/value pairs
+   * @param array $params
+   *   (ref.) an assoc array of name/value pairs.
    *
    * @param $files
    * @param $self

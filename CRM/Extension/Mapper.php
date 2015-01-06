@@ -113,7 +113,8 @@ class CRM_Extension_Mapper {
    * Given the class, provides extension's key.
    *
    *
-   * @param string $clazz extension class name
+   * @param string $clazz
+   *   Extension class name.
    *
    * @return string name of extension key
    */
@@ -139,7 +140,8 @@ class CRM_Extension_Mapper {
    * Given the string, returns true or false if it's an extension key.
    *
    *
-   * @param string $key a string which might be an extension key
+   * @param string $key
+   *   A string which might be an extension key.
    *
    * @return boolean true if given string is an extension name
    */
@@ -152,7 +154,8 @@ class CRM_Extension_Mapper {
    * Given the string, returns true or false if it's an extension class name.
    *
    *
-   * @param string $clazz a string which might be an extension class name
+   * @param string $clazz
+   *   A string which might be an extension class name.
    *
    * @return boolean true if given string is an extension class name
    */
@@ -165,7 +168,8 @@ class CRM_Extension_Mapper {
   }
 
   /**
-   * @param string $key extension fully-qualified-name
+   * @param string $key
+   *   Extension fully-qualified-name.
    * @param bool $fresh
    *
    * @throws CRM_Extension_Exception
@@ -191,7 +195,8 @@ class CRM_Extension_Mapper {
    * Given the key, provides extension's class name.
    *
    *
-   * @param string $key extension key
+   * @param string $key
+   *   Extension key.
    *
    * @return string name of extension's main class
    */
@@ -204,7 +209,8 @@ class CRM_Extension_Mapper {
    * extension's main class.
    *
    *
-   * @param string $key extension key
+   * @param string $key
+   *   Extension key.
    *
    * @return string path to file containing extension's main class
    */
@@ -217,7 +223,8 @@ class CRM_Extension_Mapper {
    * Given the key, provides the path to file containing
    * extension's main class.
    *
-   * @param string $key extension key
+   * @param string $key
+   *   Extension key.
    * @return string local path of the extension source tree
    */
   public function keyToBasePath($key) {
@@ -232,7 +239,8 @@ class CRM_Extension_Mapper {
    * extension's main class.
    *
    *
-   * @param string $key extension key
+   * @param string $key
+   *   Extension key.
    *
    * @return string url for resources in this extension
    */
@@ -253,7 +261,8 @@ class CRM_Extension_Mapper {
   /**
    * Fetch the list of active extensions of type 'module'
    *
-   * @param $fresh bool whether to forcibly reload extensions list from canonical store
+   * @param $fresh
+   *   Bool whether to forcibly reload extensions list from canonical store.
    * @return array - array(array('prefix' => $, 'file' => $))
    */
   public function getActiveModuleFiles($fresh = FALSE) {
@@ -355,7 +364,8 @@ class CRM_Extension_Mapper {
    * Given the class, provides the template path.
    *
    *
-   * @param string $clazz extension class name
+   * @param string $clazz
+   *   Extension class name.
    *
    * @return string path to extension's templates directory
    */
@@ -375,7 +385,8 @@ class CRM_Extension_Mapper {
    * @todo consider multiple templates, support for one template for now
    *
    *
-   * @param string $clazz extension class name
+   * @param string $clazz
+   *   Extension class name.
    *
    * @return string extension's template name
    */

@@ -269,7 +269,8 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @param $files
    * @param CRM_Core_Form $form

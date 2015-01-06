@@ -36,8 +36,10 @@
 /**
  * Format the given monetary amount (and currency) for display
  *
- * @param float $amount the monetary amount up for display
- * @param string $currency the (optional) currency
+ * @param float $amount
+ *   The monetary amount up for display.
+ * @param string $currency
+ *   The (optional) currency.
  *
  * @param null $format
  * @param bool $onlyNumber

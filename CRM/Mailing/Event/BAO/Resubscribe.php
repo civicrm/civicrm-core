@@ -43,9 +43,12 @@ class CRM_Mailing_Event_BAO_Resubscribe {
   /**
    * Resubscribe a contact to the groups, he/she was unsubscribed from.
    *
-   * @param int $job_id       The job ID
-   * @param int $queue_id     The Queue Event ID of the recipient
-   * @param string $hash      The hash
+   * @param int $job_id
+   *   The job ID.
+   * @param int $queue_id
+   *   The Queue Event ID of the recipient.
+   * @param string $hash
+   *   The hash.
    *
    * @return array|null $groups    Array of all groups to which the contact was added, or null if the queue event could not be found.
    * @static
@@ -187,10 +190,14 @@ class CRM_Mailing_Event_BAO_Resubscribe {
    * Send a reponse email informing the contact of the groups to which he/she
    * has been resubscribed.
    *
-   * @param string $queue_id      The queue event ID
-   * @param array $groups         List of group IDs
-   * @param bool $is_domain       Is this domain-level?
-   * @param int $job              The job ID
+   * @param string $queue_id
+   *   The queue event ID.
+   * @param array $groups
+   *   List of group IDs.
+   * @param bool $is_domain
+   *   Is this domain-level?.
+   * @param int $job
+   *   The job ID.
    *
    * @return void
    * @static

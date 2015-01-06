@@ -172,7 +172,8 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get font names supported by the TCPDF package used to create PDF labels.
    *
-   * @param string $name group name
+   * @param string $name
+   *   Group name.
    *
    * @return array   array of font names
    * @static
@@ -268,8 +269,10 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Add ordering fields to Label Format list
    *
-   * @param array (reference)   $list         List of Label Formats
-   * @param string              $returnURL    URL of page calling this function
+   * @param array (reference) $list
+   *   List of Label Formats.
+   * @param string $returnURL
+   *   URL of page calling this function.
    *
    * @return array  (reference)   List of Label Formats
    * @static
@@ -282,8 +285,10 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Retrieve list of Label Formats.
    *
-   * @param bool    $namesOnly    return simple list of names
-   * @param string  $groupName    group name of the label format option group
+   * @param bool $namesOnly
+   *   Return simple list of names.
+   * @param string $groupName
+   *   Group name of the label format option group.
    *
    * @return array  (reference)   label format list
    * @static
@@ -312,7 +317,8 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Retrieve the default Label Format values
    *
-   * @param string $groupName label format group name
+   * @param string $groupName
+   *   Label format group name.
    *
    * @return array   Name/value pairs containing the default Label Format values.
    * @static
@@ -333,8 +339,10 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get Label Format from the DB
    *
-   * @param string $field Field name to search by
-   * @param int $val Field value to search for
+   * @param string $field
+   *   Field name to search by.
+   * @param int $val
+   *   Field value to search for.
    *
    * @param string $groupName
    *
@@ -354,7 +362,8 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get Label Format by Name
    *
-   * @param int    $name   Label format name. Empty = get default label format
+   * @param int $name
+   *   Label format name. Empty = get default label format.
    *
    * @return array  $values (reference) associative array of name/value pairs
    */
@@ -365,8 +374,10 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get Label Format by ID
    *
-   * @param int    $id   label format id. 0 = get default label format
-   * @param string $groupName group name
+   * @param int $id
+   *   Label format id. 0 = get default label format.
+   * @param string $groupName
+   *   Group name.
    *
    * @return array  $values (reference) associative array of name/value pairs
    */
@@ -377,8 +388,10 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get Label Format field from associative array
    *
-   * @param string $field name of a label format field
-   * @param array (reference) $values associative array of name/value pairs containing
+   * @param string $field
+   *   Name of a label format field.
+   * @param array (reference) $values
+   *   Associative array of name/value pairs containing.
    *                                           label format field selections
    *
    * @param null $default
@@ -410,8 +423,10 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * retrieves the relevant objects. Typically the valid params are only
    * label id. It also stores all the retrieved values in the default array.
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $values (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $values
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @param string $groupName
    *
@@ -458,9 +473,12 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Save the Label Format in the DB
    *
-   * @param array (reference)   $values    associative array of name/value pairs
-   * @param int                 $id        id of the database record (null = new record)
-   * @param string $groupName   group name of the label format
+   * @param array (reference) $values
+   *   Associative array of name/value pairs.
+   * @param int $id
+   *   Id of the database record (null = new record).
+   * @param string $groupName
+   *   Group name of the label format.
    *
    * @return void
    */
@@ -524,8 +542,10 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Delete a Label Format
    *
-   * @param  int  $id     ID of the label format to be deleted.
-   * @param  string $groupName group name
+   * @param int $id
+   *   ID of the label format to be deleted.
+   * @param string $groupName
+   *   Group name.
    * @static
    */
   public static function del($id, $groupName) {

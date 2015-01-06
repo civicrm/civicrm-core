@@ -51,7 +51,7 @@ class CRM_Utils_String {
    * Convert a display name into a potential variable
    * name that we could use in forms/code
    *
-   * @param  name    Name of the string
+   * @param name Name of the string
    *
    * @param int $maxLength
    *
@@ -77,9 +77,12 @@ class CRM_Utils_String {
    * Given a string, replace all non alpha numeric characters and
    * spaces with the replacement character
    *
-   * @param string $name the name to be worked on
-   * @param string $char the character to use for non-valid chars
-   * @param int    $len  length of valid variables
+   * @param string $name
+   *   The name to be worked on.
+   * @param string $char
+   *   The character to use for non-valid chars.
+   * @param int $len
+   *   Length of valid variables.
    *
    *
    * @return string returns the manipulated string
@@ -124,8 +127,10 @@ class CRM_Utils_String {
    *
    * Takes a variable name and munges it randomly into another variable name
    *
-   * @param  string $name    Initial Variable Name
-   * @param int     $len  length of valid variables
+   * @param string $name
+   *   Initial Variable Name.
+   * @param int $len
+   *   Length of valid variables.
    *
    * @return string  Randomized Variable Name
    * @static
@@ -139,8 +144,10 @@ class CRM_Utils_String {
    * Takes a string and returns the last tuple of the string.
    * useful while converting file names to class names etc
    *
-   * @param string $string the input string
-   * @param \char|string $char $char   the character used to demarcate the componets
+   * @param string $string
+   *   The input string.
+   * @param \char|string $char $char
+   *   The character used to demarcate the componets.
    *
    *
    * @return string the last component
@@ -160,9 +167,12 @@ class CRM_Utils_String {
    * Appends a name to a string and seperated by delimiter.
    * does the right thing for an empty string
    *
-   * @param string $str   the string to be appended to
-   * @param string $delim the delimiter to use
-   * @param mixed  $name  the string (or array of strings) to append
+   * @param string $str
+   *   The string to be appended to.
+   * @param string $delim
+   *   The delimiter to use.
+   * @param mixed $name
+   *   The string (or array of strings) to append.
    *
    * @return void
    * @static
@@ -198,8 +208,10 @@ class CRM_Utils_String {
   /**
    * Determine if the string is composed only of ascii characters
    *
-   * @param string  $str input string
-   * @param boolean $utf8 attempt utf8 match on failure (default yes)
+   * @param string $str
+   *   Input string.
+   * @param bool $utf8
+   *   Attempt utf8 match on failure (default yes).
    *
    * @return boolean    true if string is ascii
    * @static
@@ -240,8 +252,10 @@ class CRM_Utils_String {
    * Determine the string replacements for redaction
    * on the basis of the regular expressions
    *
-   * @param string $str        input string
-   * @param array  $regexRules regular expression to be matched w/ replacements
+   * @param string $str
+   *   Input string.
+   * @param array $regexRules
+   *   Regular expression to be matched w/ replacements.
    *
    * @return array $match      array of strings w/ corresponding redacted outputs
    * @static
@@ -299,7 +313,8 @@ class CRM_Utils_String {
   /**
    * Determine if a string is composed only of utf8 characters
    *
-   * @param string $str  input string
+   * @param string $str
+   *   Input string.
    * @static
    *
    * @return boolean
@@ -327,8 +342,10 @@ class CRM_Utils_String {
   /**
    * Determine if two href's are equivalent (fuzzy match)
    *
-   * @param string $url1 the first url to be matched
-   * @param string $url2 the second url to be matched against
+   * @param string $url1
+   *   The first url to be matched.
+   * @param string $url2
+   *   The second url to be matched against.
    *
    * @return boolean true if the urls match, else false
    * @static
@@ -351,7 +368,8 @@ class CRM_Utils_String {
   /**
    * Extract variable values
    *
-   * @param  mix $query this is basically url
+   * @param mix $query
+   *   This is basically url.
    *
    * @return mix $v  returns civicrm url (eg: civicrm/contact/search/...)
    * @static
@@ -375,7 +393,8 @@ class CRM_Utils_String {
   /**
    * Translate a true/false/yes/no string to a 0 or 1 value
    *
-   * @param string $str  the string to be translated
+   * @param string $str
+   *   The string to be translated.
    *
    * @return boolean
    * @static
@@ -394,7 +413,8 @@ class CRM_Utils_String {
   /**
    * Returns string '1' for a true/yes/1 string, and '0' for no/false/0 else returns false
    *
-   * @param string $str  the string to be translated
+   * @param string $str
+   *   The string to be translated.
    *
    * @return boolean
    * @static
@@ -418,7 +438,8 @@ class CRM_Utils_String {
   /**
    * Convert a HTML string into a text one using html2text
    *
-   * @param string $html  the string to be converted
+   * @param string $html
+   *   The string to be converted.
    *
    * @return string       the converted string
    * @static
@@ -509,7 +530,8 @@ class CRM_Utils_String {
    * Given an ezComponents-parsed representation of
    * a text with alternatives return only the first one
    *
-   * @param string $full  all alternatives as a long string (or some other text)
+   * @param string $full
+   *   All alternatives as a long string (or some other text).
    *
    * @return string       only the first alternative found (or the text without alternatives)
    */
@@ -531,7 +553,8 @@ class CRM_Utils_String {
    * Strip leading, trailing, double spaces from string
    * used for postal/greeting/addressee
    *
-   * @param string  $string input string to be cleaned
+   * @param string $string
+   *   Input string to be cleaned.
    *
    * @return string the cleaned string
    * @static
@@ -544,9 +567,12 @@ class CRM_Utils_String {
    * This function is used to clean the URL 'path' variable that we use
    * to construct CiviCRM urls by removing characters from the path variable
    *
-   * @param string $string  the input string to be sanitized
-   * @param array  $search  the characters to be sanitized
-   * @param string $replace the character to replace it with
+   * @param string $string
+   *   The input string to be sanitized.
+   * @param array $search
+   *   The characters to be sanitized.
+   * @param string $replace
+   *   The character to replace it with.
    *
    * @return string the sanitized string
    * @static
@@ -590,7 +616,8 @@ class CRM_Utils_String {
    * xss attacks. This is primarily used in public facing pages which
    * accept html as the input string
    *
-   * @param string $string the input string
+   * @param string $string
+   *   The input string.
    *
    * @return string the cleaned up string
    * @static
@@ -650,7 +677,8 @@ class CRM_Utils_String {
    * "cms:admin foo" => array("cms", "admin foo")
    *
    * @param $delim
-   * @param string $string e.g. "view all contacts". Syntax: "[prefix:]name"
+   * @param string $string
+   *   E.g. "view all contacts". Syntax: "[prefix:]name".
    * @param null $defaultPrefix
    *
    * @return array (0 => string|NULL $prefix, 1 => string $value)
@@ -668,9 +696,12 @@ class CRM_Utils_String {
   /**
    * This function will mask part of the the user portion of an Email address (everything before the @)
    *
-   * @param string $email the email address to be masked
-   * @param string $maskChar the character used for masking
-   * @param integer $percent the percentage of the user portion to be masked
+   * @param string $email
+   *   The email address to be masked.
+   * @param string $maskChar
+   *   The character used for masking.
+   * @param integer $percent
+   *   The percentage of the user portion to be masked.
    *
    * @return string returns the masked Email address
    */
@@ -690,9 +721,12 @@ class CRM_Utils_String {
   /**
    * This function compares two strings
    *
-   * @param string $strOne string one
-   * @param string $strTwo string two
-   * @param boolean $case boolean indicating whether you want the comparison to be case sensitive or not
+   * @param string $strOne
+   *   String one.
+   * @param string $strTwo
+   *   String two.
+   * @param bool $case
+   *   Boolean indicating whether you want the comparison to be case sensitive or not.
    *
    * @return boolean TRUE (string are identical); FALSE (strings are not identical)
    */
@@ -727,7 +761,8 @@ class CRM_Utils_String {
    * (because most other odd characters are %-escaped in URLs; and %-escaped
    * strings don't need any extra escaping in HTML).
    *
-   * @param string $url URL with HTML entities
+   * @param string $url
+   *   URL with HTML entities.
    * @return string URL without HTML entities
    */
   public static function unstupifyUrl($htmlUrl) {

@@ -42,7 +42,8 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   /**
    * Insert/update a new entry in the database.
    *
-   * @param array $params (reference), array $ids
+   * @param array $params
+   *   (reference), array $ids.
    *
    * @param $ids
    *
@@ -70,7 +71,8 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   /**
    * Creates a new entry in the database.
    *
-   * @param array $params (reference), array $ids
+   * @param array $params
+   *   (reference), array $ids.
    *
    * @param $ids
    *
@@ -124,8 +126,10 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * Takes a bunch of params that are needed to match certain criteria and
    * retrieves the relevant objects.
    *
-   * @param array $params   (reference ) an assoc array
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Price_DAO_PriceFieldValue object
    * @static
@@ -137,10 +141,14 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   /**
    * Retrive the all values for given field id
    *
-   * @param int $fieldId price_field_id
-   * @param array $values (reference ) to hold the values
-   * @param string $orderBy for order by, default weight
-   * @param bool|int $isActive is_active, default false
+   * @param int $fieldId
+   *   Price_field_id.
+   * @param array $values
+   *   (reference ) to hold the values.
+   * @param string $orderBy
+   *   For order by, default weight.
+   * @param bool|int $isActive
+   *   Is_active, default false.
    *
    * @return array $values
    *
@@ -165,7 +173,8 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   /**
    * Get the price field option label.
    *
-   * @param int $id id of field option.
+   * @param int $id
+   *   Id of field option.
    *
    * @return string name
    *
@@ -179,8 +188,10 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id         Id of the database record
-   * @param boolean  $is_active  Value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return   Object            DAO object on sucess, null otherwise
    *
@@ -193,7 +204,8 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   /**
    * Delete all values of the given field id
    *
-   * @param  int    $fieldId    Price field id
+   * @param int $fieldId
+   *   Price field id.
    *
    *
    * @static
@@ -211,7 +223,8 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   /**
    * Delete the value.
    *
-   * @param   int   $id  Id
+   * @param int $id
+   *   Id.
    *
    * @return  boolean
    *
@@ -231,9 +244,12 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * Update civicrm_price_field_value.financial_type_id
    * when financial_type_id of contribution_page or event is changed
    *
-   * @param   int $entityId Id
-   * @param   String $entityTable entity table
-   * @param   String $financialTypeID financial type id
+   * @param int $entityId
+   *   Id.
+   * @param String $entityTable
+   *   Entity table.
+   * @param String $financialTypeID
+   *   Financial type id.
    *
    * @static
    */

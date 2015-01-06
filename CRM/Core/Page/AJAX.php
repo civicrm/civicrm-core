@@ -130,9 +130,12 @@ class CRM_Core_Page_AJAX {
   /**
    * Determine whether the request is for a valid class/method name.
    *
-   * @param string $type 'method'|'class'|''
-   * @param string $className 'Class_Name'
-   * @param string $fnName method name
+   * @param string $type
+   *   'method'|'class'|''.
+   * @param string $className
+   *   'Class_Name'.
+   * @param string $fnName
+   *   Method name.
    *
    * @return bool
    */
@@ -208,9 +211,12 @@ class CRM_Core_Page_AJAX {
 
   /**
    * Send autocomplete results to the client. Input can be a simple or nested array.
-   * @param array $results - If nested array, also provide:
-   * @param string $val - array key to use as the value
-   * @param string $key - array key to use as the key
+   * @param array $results
+   *   If nested array, also provide:.
+   * @param string $val
+   *   Array key to use as the value.
+   * @param string $key
+   *   Array key to use as the key.
    * @deprecated
    */
   public static function autocompleteResults($results, $val='label', $key='id') {

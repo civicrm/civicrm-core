@@ -93,7 +93,8 @@ class CRM_Utils_Token {
   /**
    * Check a string (mailing body) for required tokens.
    *
-   * @param string $str           The message
+   * @param string $str
+   *   The message.
    *
    * @return true|array           true if all required tokens are found,
    *                              else an array of the missing tokens
@@ -143,9 +144,12 @@ class CRM_Utils_Token {
   /**
    * Wrapper for token matching
    *
-   * @param string $type      The token type (domain,mailing,contact,action)
-   * @param string $var       The token variable
-   * @param string $str       The string to search
+   * @param string $type
+   *   The token type (domain,mailing,contact,action).
+   * @param string $var
+   *   The token variable.
+   * @param string $str
+   *   The string to search.
    *
    * @return boolean          Was there a match
    * @static
@@ -158,10 +162,14 @@ class CRM_Utils_Token {
   /**
    * Wrapper for token replacing
    *
-   * @param string $type The token type
-   * @param string $var The token variable
-   * @param string $value The value to substitute for the token
-   * @param string (reference) $str The string to replace in
+   * @param string $type
+   *   The token type.
+   * @param string $var
+   *   The token variable.
+   * @param string $value
+   *   The value to substitute for the token.
+   * @param string (reference) $str
+   *   The string to replace in.
    *
    * @param bool $escapeSmarty
    *
@@ -183,7 +191,8 @@ class CRM_Utils_Token {
   /**
    * Get< the regex for token replacement
    *
-   * @param string $token_type a string indicating the the type of token to be used in the expression
+   * @param string $token_type
+   *   A string indicating the the type of token to be used in the expression.
    *
    * @return string           regular expression sutiable for using in preg_replace
    * @static
@@ -195,7 +204,8 @@ class CRM_Utils_Token {
   /**
    * Escape the string so a malicious user cannot inject smarty code into the template
    *
-   * @param string $string    a string that needs to be escaped from smarty parsing
+   * @param string $string
+   *   A string that needs to be escaped from smarty parsing.
    *
    * @return string           the escaped string
    * @static
@@ -208,9 +218,12 @@ class CRM_Utils_Token {
    /**
    * Replace all the domain-level tokens in $str
    *
-   * @param string $str The string with tokens to be replaced
-   * @param object $domain The domain BAO
-   * @param boolean $html Replace tokens with HTML or plain text
+   * @param string $str
+   *   The string with tokens to be replaced.
+   * @param object $domain
+   *   The domain BAO.
+   * @param bool $html
+   *   Replace tokens with HTML or plain text.
    *
    * @param null $knownTokens
    * @param bool $escapeSmarty
@@ -306,9 +319,12 @@ class CRM_Utils_Token {
   /**
    * Replace all the org-level tokens in $str
    *
-   * @param string $str The string with tokens to be replaced
-   * @param object $org Associative array of org properties
-   * @param boolean $html Replace tokens with HTML or plain text
+   * @param string $str
+   *   The string with tokens to be replaced.
+   * @param object $org
+   *   Associative array of org properties.
+   * @param bool $html
+   *   Replace tokens with HTML or plain text.
    *
    * @param bool $escapeSmarty
    *
@@ -385,9 +401,12 @@ class CRM_Utils_Token {
   /**
    * Replace all mailing tokens in $str
    *
-   * @param string $str The string with tokens to be replaced
-   * @param object $mailing The mailing BAO, or null for validation
-   * @param boolean $html Replace tokens with HTML or plain text
+   * @param string $str
+   *   The string with tokens to be replaced.
+   * @param object $mailing
+   *   The mailing BAO, or null for validation.
+   * @param bool $html
+   *   Replace tokens with HTML or plain text.
    *
    * @param null $knownTokens
    * @param bool $escapeSmarty
@@ -513,11 +532,16 @@ class CRM_Utils_Token {
   /**
    * Replace all action tokens in $str
    *
-   * @param string $str The string with tokens to be replaced
-   * @param array $addresses Assoc. array of VERP event addresses
-   * @param array $urls Assoc. array of action URLs
-   * @param boolean $html Replace tokens with HTML or plain text
-   * @param array $knownTokens A list of tokens that are known to exist in the email body
+   * @param string $str
+   *   The string with tokens to be replaced.
+   * @param array $addresses
+   *   Assoc. array of VERP event addresses.
+   * @param array $urls
+   *   Assoc. array of action URLs.
+   * @param bool $html
+   *   Replace tokens with HTML or plain text.
+   * @param array $knownTokens
+   *   A list of tokens that are known to exist in the email body.
    *
    * @param bool $escapeSmarty
    *
@@ -601,11 +625,16 @@ class CRM_Utils_Token {
    * Replace all the contact-level tokens in $str with information from
    * $contact.
    *
-   * @param string $str The string with tokens to be replaced
-   * @param array $contact Associative array of contact properties
-   * @param boolean $html Replace tokens with HTML or plain text
-   * @param array $knownTokens A list of tokens that are known to exist in the email body
-   * @param boolean $returnBlankToken return unevaluated token if value is null
+   * @param string $str
+   *   The string with tokens to be replaced.
+   * @param array $contact
+   *   Associative array of contact properties.
+   * @param bool $html
+   *   Replace tokens with HTML or plain text.
+   * @param array $knownTokens
+   *   A list of tokens that are known to exist in the email body.
+   * @param bool $returnBlankToken
+   *   Return unevaluated token if value is null.
    *
    * @param bool $escapeSmarty
    *
@@ -743,10 +772,13 @@ class CRM_Utils_Token {
    * Replace all the hook tokens in $str with information from
    * $contact.
    *
-   * @param string $str The string with tokens to be replaced
-   * @param array $contact Associative array of contact properties (including hook token values)
+   * @param string $str
+   *   The string with tokens to be replaced.
+   * @param array $contact
+   *   Associative array of contact properties (including hook token values).
    * @param $categories
-   * @param boolean $html Replace tokens with HTML or plain text
+   * @param bool $html
+   *   Replace tokens with HTML or plain text.
    *
    * @param bool $escapeSmarty
    *
@@ -835,12 +867,17 @@ class CRM_Utils_Token {
   /**
    * Replace unsubscribe tokens
    *
-   * @param string $str           the string with tokens to be replaced
-   * @param object $domain        The domain BAO
-   * @param array $groups         The groups (if any) being unsubscribed
-   * @param boolean $html         Replace tokens with html or plain text
-   * @param int $contact_id       The contact ID
-   * @param string hash           The security hash of the unsub event
+   * @param string $str
+   *   The string with tokens to be replaced.
+   * @param object $domain
+   *   The domain BAO.
+   * @param array $groups
+   *   The groups (if any) being unsubscribed.
+   * @param bool $html
+   *   Replace tokens with html or plain text.
+   * @param int $contact_id
+   *   The contact ID.
+   * @param string hash The security hash of the unsub event
    *
    * @return string               The processed string
    * @static
@@ -876,12 +913,17 @@ class CRM_Utils_Token {
   /**
    * Replace resubscribe tokens
    *
-   * @param string $str           the string with tokens to be replaced
-   * @param object $domain        The domain BAO
-   * @param array $groups         The groups (if any) being resubscribed
-   * @param boolean $html         Replace tokens with html or plain text
-   * @param int $contact_id       The contact ID
-   * @param string hash           The security hash of the resub event
+   * @param string $str
+   *   The string with tokens to be replaced.
+   * @param object $domain
+   *   The domain BAO.
+   * @param array $groups
+   *   The groups (if any) being resubscribed.
+   * @param bool $html
+   *   Replace tokens with html or plain text.
+   * @param int $contact_id
+   *   The contact ID.
+   * @param string hash The security hash of the resub event
    *
    * @return string               The processed string
    * @static
@@ -901,10 +943,13 @@ class CRM_Utils_Token {
   /**
    * Replace subscription-confirmation-request tokens
    *
-   * @param string $str The string with tokens to be replaced
-   * @param string $group The name of the group being subscribed
+   * @param string $str
+   *   The string with tokens to be replaced.
+   * @param string $group
+   *   The name of the group being subscribed.
    * @param $url
-   * @param boolean $html Replace tokens with html or plain text
+   * @param bool $html
+   *   Replace tokens with html or plain text.
    *
    * @return string               The processed string
    * @static
@@ -922,7 +967,8 @@ class CRM_Utils_Token {
   /**
    * Replace subscription-invitation tokens
    *
-   * @param string $str           The string with tokens to be replaced
+   * @param string $str
+   *   The string with tokens to be replaced.
    *
    * @return string               The processed string
    * @static
@@ -964,9 +1010,12 @@ class CRM_Utils_Token {
   /**
    * Replace welcome/confirmation tokens
    *
-   * @param string $str           The string with tokens to be replaced
-   * @param string $group         The name of the group being subscribed
-   * @param boolean $html         Replace tokens with html or plain text
+   * @param string $str
+   *   The string with tokens to be replaced.
+   * @param string $group
+   *   The name of the group being subscribed.
+   * @param bool $html
+   *   Replace tokens with html or plain text.
    *
    * @return string               The processed string
    * @static
@@ -981,7 +1030,8 @@ class CRM_Utils_Token {
   /**
    * Find unprocessed tokens (call this last)
    *
-   * @param string $str       The string to search
+   * @param string $str
+   *   The string to search.
    *
    * @return array            Array of tokens that weren't replaced
    * @static
@@ -995,9 +1045,12 @@ class CRM_Utils_Token {
   /**
    * Find and replace tokens for each component
    *
-   * @param string $str The string to search
-   * @param array $contact Associative array of contact properties
-   * @param array $components A list of tokens that are known to exist in the email body
+   * @param string $str
+   *   The string to search.
+   * @param array $contact
+   *   Associative array of contact properties.
+   * @param array $components
+   *   A list of tokens that are known to exist in the email body.
    *
    * @param bool $escapeSmarty
    * @param bool $returnEmptyToken
@@ -1031,7 +1084,8 @@ class CRM_Utils_Token {
   /**
    * Get array of string tokens
    *
-   * @param  $string the input string to parse for tokens
+   * @param $string
+   *   The input string to parse for tokens.
    *
    * @return array $tokens array of tokens mentioned in field@access public
    * @static
@@ -1091,13 +1145,19 @@ class CRM_Utils_Token {
    * can iterate in a nice loop and do token evaluation
    *
    * @param $contactIDs
-   * @param  array $returnProperties of required properties
-   * @param  boolean $skipOnHold don't return on_hold contact info also.
-   * @param  boolean $skipDeceased don't return deceased contact info.
-   * @param  array $extraParams extra params
-   * @param  array $tokens the list of tokens we've extracted from the content
+   * @param array $returnProperties
+   *   Of required properties.
+   * @param bool $skipOnHold
+   *   Don't return on_hold contact info also.
+   * @param bool $skipDeceased
+   *   Don't return deceased contact info.
+   * @param array $extraParams
+   *   Extra params.
+   * @param array $tokens
+   *   The list of tokens we've extracted from the content.
    * @param null $className
-   * @param  int $jobID the mailing list jobID - this is a legacy param
+   * @param int $jobID
+   *   The mailing list jobID - this is a legacy param.
    *
    * @return array
    * @static
@@ -1216,14 +1276,16 @@ class CRM_Utils_Token {
    * Call hooks on tokens for anonymous users - contact id is set to 0 - this allows non-contact
    * specific tokens to be rendered
    *
-   * @param array $contactIDs - this should always be array(0) or its not anonymous - left to keep signature same
+   * @param array $contactIDs
+   *   This should always be array(0) or its not anonymous - left to keep signature same.
    * as main fn
    * @param string $returnProperties
-   * @param boolean $skipOnHold
-   * @param boolean $skipDeceased
+   * @param bool $skipOnHold
+   * @param bool $skipDeceased
    * @param string $extraParams
    * @param array $tokens
-   * @param string $className sent as context to the hook
+   * @param string $className
+   *   Sent as context to the hook.
    * @param string $jobID
    * @return array contactDetails with hooks swapped out
    */
@@ -1251,9 +1313,12 @@ class CRM_Utils_Token {
    * can iterate in a nice loop and do token evaluation
    *
    * @param array $contributionIDs
-   * @param array $returnProperties of required properties
-   * @param array $extraParams extra params
-   * @param array $tokens the list of tokens we've extracted from the content
+   * @param array $returnProperties
+   *   Of required properties.
+   * @param array $extraParams
+   *   Extra params.
+   * @param array $tokens
+   *   The list of tokens we've extracted from the content.
    * @param string $className
    *
    * @return array
@@ -1311,7 +1376,8 @@ class CRM_Utils_Token {
 
   /**
    * Get Membership Token Details
-   * @param array $membershipIDs array of membership IDS
+   * @param array $membershipIDs
+   *   Array of membership IDS.
    */
   public static function getMembershipTokenDetails($membershipIDs) {
     $memberships = civicrm_api3('membership', 'get', array('options' => array('limit' => 200000), 'membership_id' => array('IN' => (array) $membershipIDs)));
@@ -1422,7 +1488,8 @@ class CRM_Utils_Token {
   /**
    * Replace all user tokens in $str
    *
-   * @param string $str The string with tokens to be replaced
+   * @param string $str
+   *   The string with tokens to be replaced.
    *
    * @param null $knownTokens
    * @param bool $escapeSmarty
@@ -1506,10 +1573,13 @@ class CRM_Utils_Token {
   /**
    * Replace tokens for an entity
    * @param string $entity
-   * @param array $entityArray (e.g. in format from api)
-   * @param string $str string to replace in
-   * @param array $knownTokens array of tokens present
-   * @param boolean $escapeSmarty
+   * @param array $entityArray
+   *   (e.g. in format from api).
+   * @param string $str
+   *   String to replace in.
+   * @param array $knownTokens
+   *   Array of tokens present.
+   * @param bool $escapeSmarty
    * @return string string with replacements made
    */
   public static function replaceEntityTokens($entity, $entityArray, $str, $knownTokens = array(), $escapeSmarty = FALSE) {
@@ -1602,8 +1672,9 @@ class CRM_Utils_Token {
    * Get replacement strings for any membership tokens (only a small number of tokens are implemnted in the first instance
    * - this is used by the pdfLetter task from membership search
    * @param string $token
-   * @param array $membership an api result array for a single membership
-   * @param boolean $escapeSmarty
+   * @param array $membership
+   *   An api result array for a single membership.
+   * @param bool $escapeSmarty
    * @return string token replacement
    */
   public static function getMembershipTokenReplacement($token, $membership, $escapeSmarty = FALSE) {

@@ -49,7 +49,8 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
   /**
    * Add activity assignment.
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return object activity type of object that is added
    */
@@ -100,9 +101,12 @@ AND        civicrm_contact.is_deleted = 0
   /**
    * Retrieve assignee names by activity_id
    *
-   * @param array    $activityIDs    IDs of the activities
-   * @param boolean  $isDisplayName  if set returns display names of assignees
-   * @param boolean  $skipDetails    if false returns all details of assignee contact.
+   * @param array $activityIDs
+   *   IDs of the activities.
+   * @param bool $isDisplayName
+   *   If set returns display names of assignees.
+   * @param bool $skipDetails
+   *   If false returns all details of assignee contact.
    *
    * @return array
    *

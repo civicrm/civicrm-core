@@ -40,7 +40,8 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
   /**
    * Given a permission string, check for access requirements
    *
-   * @param string $str the permission to check
+   * @param string $str
+   *   The permission to check.
    *
    * @return boolean true if yes, else false
    */
@@ -96,7 +97,8 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
   /**
    * Given a roles array, check for access requirements
    *
-   * @param array $array the roles to check
+   * @param array $array
+   *   The roles to check.
    *
    * @return boolean true if yes, else false
    * @static

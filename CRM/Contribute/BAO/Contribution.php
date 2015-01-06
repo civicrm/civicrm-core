@@ -88,8 +88,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * contribution object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
-   * @param array $ids    the array that holds all the db ids
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $ids
+   *   The array that holds all the db ids.
    *
    * @return CRM_Contribute_BAO_Contribution object
    * @static
@@ -217,9 +219,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array $params input parameters to find object
-   * @param array $values output values of the object
-   * @param array $ids    the array that holds all the db ids
+   * @param array $params
+   *   Input parameters to find object.
+   * @param array $values
+   *   Output values of the object.
+   * @param array $ids
+   *   The array that holds all the db ids.
    *
    * @return CRM_Contribute_BAO_Contribution|null the found object or null
    * @static
@@ -288,8 +293,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   /**
    * Takes an associative array and creates a contribution object
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $ids    the array that holds all the db ids
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $ids
+   *   The array that holds all the db ids.
    *
    * @return CRM_Contribute_BAO_Contribution object
    * @static
@@ -476,8 +483,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   /**
    * Get the values for pseudoconstants for name->value and reverse.
    *
-   * @param array   $defaults (reference) the default values, some of which need to be resolved.
-   * @param boolean $reverse  true if we want to resolve the values in the reverse direction (value -> name)
+   * @param array $defaults
+   *   (reference) the default values, some of which need to be resolved.
+   * @param bool $reverse
+   *   True if we want to resolve the values in the reverse direction (value -> name).
    *
    * @return void
    * @static
@@ -524,10 +533,13 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * full featured over a period of time. This is the inverse function of
    * create.  It also stores all the retrieved values in the default array
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the name / value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the name / value pairs.
    *                        in a hierarchical manner
-   * @param array $ids      (reference) the array that holds all the db ids
+   * @param array $ids
+   *   (reference) the array that holds all the db ids.
    *
    * @return CRM_Contribute_BAO_Contribution object
    * @static
@@ -826,8 +838,10 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   /**
    * Check if there is a contribution with the same trxn_id or invoice_id
    *
-   * @param array $input an assoc array of name/value pairs
-   * @param array $duplicates (reference ) store ids of duplicate contribs
+   * @param array $input
+   *   An assoc array of name/value pairs.
+   * @param array $duplicates
+   *   (reference ) store ids of duplicate contribs.
    *
    * @param int $id
    *
@@ -881,7 +895,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    * contribution_product object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Contribute_BAO_ContributionProduct object
    * @static
@@ -897,7 +912,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    * For now we only allow custom contribution fields to be in
    * profile
    *
-   * @param boolean $addExtraFields true if special fields needs to be added
+   * @param bool $addExtraFields
+   *   True if special fields needs to be added.
    *
    * @return array the list of contribution fields
    * @static
@@ -993,7 +1009,8 @@ GROUP BY p.id
   /**
    * Get list of contribution In Honor of contact Ids
    *
-   * @param int $honorId In Honor of Contact ID
+   * @param int $honorId
+   *   In Honor of Contact ID.
    *
    * @return return the list of contribution fields
    *
@@ -1030,7 +1047,8 @@ GROUP BY p.id
   /**
    * Get the sort name of a contact for a particular contribution
    *
-   * @param  int    $id      id of the contribution
+   * @param int $id
+   *   Id of the contribution.
    *
    * @return null|string     sort name of the contact if found
    * @static
@@ -1129,7 +1147,8 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
    * Check if there is a contribution with the params passed in.
    * Used for trxn_id,invoice_id and contribution_id
    *
-   * @param array  $params an assoc array of name/value pairs
+   * @param array $params
+   *   An assoc array of name/value pairs.
    *
    * @return array contribution id if success else NULL
    * static
@@ -1158,8 +1177,10 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
   /**
    * Get the contribution details for component export
    *
-   * @param int     $exportMode export mode
-   * @param string  $componentIds  component ids
+   * @param int $exportMode
+   *   Export mode.
+   * @param string $componentIds
+   *   Component ids.
    *
    * @return array associated array
    *
@@ -1221,7 +1242,8 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
   /**
    * Create address associated with contribution record.
    *
-   * @param array $params an associated array
+   * @param array $params
+   *   An associated array.
    * @param int $billingLocationTypeID
    *
    * @return address id
@@ -1301,8 +1323,10 @@ WHERE      $condition
    * This function check online pending contribution associated w/
    * Online Event Registration or Online Membership signup.
    *
-   * @param int    $componentId   participant/membership id.
-   * @param string $componentName Event/Membership.
+   * @param int $componentId
+   *   Participant/membership id.
+   * @param string $componentName
+   *   Event/Membership.
    *
    * @return $contributionId pending contribution id.
    * @static
@@ -1796,8 +1820,10 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
   /**
    * Get individual id for onbehalf contribution
    *
-   * @param int $contributionId contribution id
-   * @param int $contributorId  contributor id
+   * @param int $contributionId
+   *   Contribution id.
+   * @param int $contributorId
+   *   Contributor id.
    *
    * @return array $ids containing organization id and individual id
    */
@@ -1905,10 +1931,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * In the first instance we are just moving functionality from BASEIpn -
    * see http://issues.civicrm.org/jira/browse/CRM-9996
    *
-   * @param array $input Input as delivered from Payment Processor
-   * @param array $ids Ids as Loaded by Payment Processor
-   * @param boolean $required Is Payment processor / contribution page required
-   * @param boolean $loadAll - load all related objects - even where id not passed in? (allows API to call this)
+   * @param array $input
+   *   Input as delivered from Payment Processor.
+   * @param array $ids
+   *   Ids as Loaded by Payment Processor.
+   * @param bool $required
+   *   Is Payment processor / contribution page required.
+   * @param bool $loadAll
+   *   Load all related objects - even where id not passed in? (allows API to call this).
    * Note that the unit test for the BaseIPN class tests this function
    */
   /**
@@ -2078,14 +2108,18 @@ WHERE  contribution_id = %1 ";
   /*
    * Create array of message information - ie. return html version, txt version, to field
    *
-   * @param array $input incoming information
+   * @param array $input
+   *   Incoming information.
    *  - is_recur - should this be treated as recurring (not sure why you wouldn't
    *    just check presence of recur object but maintaining legacy approach
    *    to be careful)
-   * @param array $ids IDs of related objects
-   * @param array $values any values that may have already been compiled by calling process
+   * @param array $ids
+   *   IDs of related objects.
+   * @param array $values
+   *   Any values that may have already been compiled by calling process.
    *   This is augmented by values 'gathered' by gatherMessageValues
-   * @param bool $returnMessageText distinguishes between whether to send message or return
+   * @param bool $returnMessageText
+   *   Distinguishes between whether to send message or return.
    *   message text. We are working towards this function ALWAYS returning message text & calling
    *   function doing emails / pdfs with it
    * @return array $messageArray - messages
@@ -2225,8 +2259,10 @@ WHERE  contribution_id = %1 ";
    * as part of CRM-9996 refactoring as a step towards simplifying the composeMessage function
    * Values related to the contribution in question are gathered
    *
-   * @param array $input input into function (probably from payment processor)
-   * @param array $ids   the set of ids related to the inpurt
+   * @param array $input
+   *   Input into function (probably from payment processor).
+   * @param array $ids
+   *   The set of ids related to the inpurt.
    *
    * @return array $values
    *
@@ -2349,7 +2385,8 @@ WHERE  contribution_id = %1 ";
    *
    * @param $values
    * @param $input
-   * @param $template CRM_Core_SMARTY
+   * @param $template
+   *   CRM_Core_SMARTY.
    * @param bool $recur
    * @param bool $returnMessageText
    *
@@ -2535,7 +2572,8 @@ WHERE  contribution_id = %1 ";
    * Check whether payment processor supports
    * cancellation of contribution subscription
    *
-   * @param int $contributionId contribution id
+   * @param int $contributionId
+   *   Contribution id.
    *
    * @param bool $isNotCancelled
    *
@@ -2567,7 +2605,8 @@ WHERE  contribution_id = %1 ";
   /**
    * Check whether subscription is already cancelled
    *
-   * @param int $contributionId contribution id
+   * @param int $contributionId
+   *   Contribution id.
    *
    * @return string $status contribution status
    * @static
@@ -2590,7 +2629,8 @@ WHERE  contribution_id = %1 ";
   /**
    * Create all financial accounts entry
    *
-   * @param array $params contribution object, line item array and params for trxn
+   * @param array $params
+   *   Contribution object, line item array and params for trxn.
    *
    *
    * @param array $financialTrxnValues
@@ -2876,9 +2916,11 @@ WHERE  contribution_id = %1 ";
   /**
    * Update all financial accounts entry
    *
-   * @param array $params contribution object, line item array and params for trxn
+   * @param array $params
+   *   Contribution object, line item array and params for trxn.
    *
-   * @param string $context update scenarios
+   * @param string $context
+   *   Update scenarios.
    *
    * @param null $skipTrxn
    *
@@ -3042,11 +3084,14 @@ WHERE  contribution_id = %1 ";
   /**
    * Check status validation on update of a contribution
    *
-   * @param array $values previous form values before submit
+   * @param array $values
+   *   Previous form values before submit.
    *
-   * @param array $fields the input form values
+   * @param array $fields
+   *   The input form values.
    *
-   * @param array $errors list of errors
+   * @param array $errors
+   *   List of errors.
    *
    * @return bool
    * @static
@@ -3077,7 +3122,8 @@ WHERE  contribution_id = %1 ";
    *
    * CRM-12155
    *
-   * @param integer $contactId contact id
+   * @param integer $contactId
+   *   Contact id.
    *
    * @static
    */
@@ -3095,8 +3141,10 @@ WHERE  contribution_id = %1 ";
    * @see CRM_Core_DAO::buildOptions
    *
    * @param String $fieldName
-   * @param String $context : @see CRM_Core_DAO::buildOptionsContext
-   * @param Array $props : whatever is known about this dao object
+   * @param String $context
+   *   : @see CRM_Core_DAO::buildOptionsContext.
+   * @param Array $props
+   *   : whatever is known about this dao object.
    *
    * @return Array|bool
    */
@@ -3132,7 +3180,8 @@ WHERE  contribution_id = %1 ";
    *
    * CRM-13231
    *
-   * @param integer $financialTypeId Financial Type id
+   * @param integer $financialTypeId
+   *   Financial Type id.
    *
    * @param string $relationName
    *
@@ -3153,9 +3202,12 @@ WHERE  contribution_id = %1 ";
   /*
    * Function to record additional payment for partial and refund contributions
    *
-   * @param integer $contributionId : is the invoice contribution id (got created after processing participant payment)
-   * @param array $trxnData : to take user provided input of transaction details.
-   * @param string $paymentType 'owed' for purpose of recording partial payments, 'refund' for purpose of recording refund payments
+   * @param integer $contributionId
+   *   : is the invoice contribution id (got created after processing participant payment).
+   * @param array $trxnData
+   *   : to take user provided input of transaction details.
+   * @param string $paymentType
+   *   'owed' for purpose of recording partial payments, 'refund' for purpose of recording refund payments.
    */
   /**
    * @param int $contributionId

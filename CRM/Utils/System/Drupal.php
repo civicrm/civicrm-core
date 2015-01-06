@@ -41,8 +41,10 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   /**
    * Create a user in Drupal.
    *
-   * @param array  $params associated array
-   * @param string $mail email id for cms user
+   * @param array $params
+   *   Associated array.
+   * @param string $mail
+   *   Email id for cms user.
    *
    * @return uid if user exists, false otherwise
    *
@@ -121,9 +123,12 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   /**
    * Check if username and email exists in the drupal db
    *
-   * @param array $params array of name and mail values
-   * @param array $errors array of errors
-   * @param string $emailName  field label for the 'email'
+   * @param array $params
+   *   Array of name and mail values.
+   * @param array $errors
+   *   Array of errors.
+   * @param string $emailName
+   *   Field label for the 'email'.
    *
    * @return void
    */
@@ -177,7 +182,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * Get the drupal destination string. When this is passed in the
    * URL the user will be directed to it after filling in the drupal form
    *
-   * @param CRM_Core_Form $form Form object representing the 'current' form - to which the user will be returned
+   * @param CRM_Core_Form $form
+   *   Form object representing the 'current' form - to which the user will be returned.
    * @return string $destination destination value for URL
    *
    */
@@ -219,7 +225,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
-   * @param string $destination - if present, add destination to querystring (works for Drupal only)
+   * @param string $destination
+   *   If present, add destination to querystring (works for Drupal only).
    *
    * @return string - loginURL for the current CMS
    * @static
@@ -294,7 +301,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   /**
    * Append a string to the head of the html file
    *
-   * @param string $header the new string to be appended
+   * @param string $header
+   *   The new string to be appended.
    *
    * @return void
    */
@@ -314,7 +322,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * Add a script file
    *
    * @param $url: string, absolute path to file
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -341,7 +350,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * Add an inline script
    *
    * @param $code: string, javascript code
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -366,7 +376,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * Add a css file
    *
    * @param $url: string, absolute path to file
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -388,7 +399,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * Add an inline style
    *
    * @param $code: string, css code
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -419,7 +431,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   /**
    * Figure out the post url for the form
    *
-   * @param mix $action the default action if one is pre-specified
+   * @param mix $action
+   *   The default action if one is pre-specified.
    *
    * @return string the url to post the form
    */
@@ -435,10 +448,14 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   /**
    * Authenticate the user against the drupal db
    *
-   * @param string $name     the user name
-   * @param string $password the password for the above user name
-   * @param boolean $loadCMSBootstrap load cms bootstrap?
-   * @param NULL|string $realPath filename of script
+   * @param string $name
+   *   The user name.
+   * @param string $password
+   *   The password for the above user name.
+   * @param bool $loadCMSBootstrap
+   *   Load cms bootstrap?.
+   * @param NULL|string $realPath
+   *   Filename of script.
    *
    * @return mixed false if no auth
    *               array(
@@ -572,7 +589,8 @@ AND    u.status = 1
   /**
    * Set a message in the UF to display to a user
    *
-   * @param string $message the message to set
+   * @param string $message
+   *   The message to set.
    *
    */
   public function setMessage($message) {
@@ -643,10 +661,14 @@ AND    u.status = 1
   /**
    * Load drupal bootstrap
    *
-   * @param array $params Either uid, or name & pass.
-   * @param boolean $loadUser boolean Require CMS user load.
-   * @param boolean $throwError If true, print error on failure and exit.
-   * @param boolean|string $realPath path to script
+   * @param array $params
+   *   Either uid, or name & pass.
+   * @param bool $loadUser
+   *   Boolean Require CMS user load.
+   * @param bool $throwError
+   *   If true, print error on failure and exit.
+   * @param bool|string $realPath
+   *   Path to script.
    *
    * @return bool
    */
@@ -903,8 +925,10 @@ AND    u.status = 1
    * Find any users/roles/security-principals with the given permission
    * and replace it with one or more permissions.
    *
-   * @param $oldPerm string
-   * @param $newPerms array, strings
+   * @param $oldPerm
+   *   String.
+   * @param $newPerms
+   *   Array, strings.
    *
    * @return void
    */
@@ -935,8 +959,10 @@ AND    u.status = 1
   /**
    * Wrapper for og_membership creation
    *
-   * @param integer $ogID Organic Group ID
-   * @param integer $drupalID drupal User ID
+   * @param integer $ogID
+   *   Organic Group ID.
+   * @param integer $drupalID
+   *   Drupal User ID.
    */
   public function og_membership_create($ogID, $drupalID){
     if (function_exists('og_entity_query_alter')) {
@@ -956,8 +982,10 @@ AND    u.status = 1
   /**
    * Wrapper for og_membership deletion
    *
-   * @param integer $ogID Organic Group ID
-   * @param integer $drupalID drupal User ID
+   * @param integer $ogID
+   *   Organic Group ID.
+   * @param integer $drupalID
+   *   Drupal User ID.
    */
   public function og_membership_delete($ogID, $drupalID) {
     if (function_exists('og_entity_query_alter')) {

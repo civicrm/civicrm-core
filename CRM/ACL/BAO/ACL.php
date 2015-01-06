@@ -92,12 +92,18 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   /**
    * Construct a WHERE clause to handle permissions to $object_*
    *
-   * @param array $tables -   Any tables that may be needed in the FROM
-   * @param string $operation -   The operation being attempted
-   * @param string $object_table -    The table of the object in question
-   * @param int $object_id -   The ID of the object in question
-   * @param int $acl_id -       If it's a grant/revoke operation, the ACL ID
-   * @param boolean $acl_role -  For grant operations, this flag determines if we're granting a single acl (false) or an entire group.
+   * @param array $tables
+   *   Any tables that may be needed in the FROM.
+   * @param string $operation
+   *   The operation being attempted.
+   * @param string $object_table
+   *   The table of the object in question.
+   * @param int $object_id
+   *   The ID of the object in question.
+   * @param int $acl_id
+   *   If it's a grant/revoke operation, the ACL ID.
+   * @param bool $acl_role
+   *   For grant operations, this flag determines if we're granting a single acl (false) or an entire group.
    *
    * @return string           -   The WHERE clause, or 0 on failure
    * @static
@@ -326,9 +332,12 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   /**
    * Given a table and id pair, return the filter clause
    *
-   * @param string $table -   The table owning the object
-   * @param int $id -       The ID of the object
-   * @param array $tables - Tables that will be needed in the FROM
+   * @param string $table
+   *   The table owning the object.
+   * @param int $id
+   *   The ID of the object.
+   * @param array $tables
+   *   Tables that will be needed in the FROM.
    *
    * @return string|null  -   WHERE-style clause to filter results,
    * or null if $table or $id is null
@@ -357,8 +366,10 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   /**
    * Construct an associative array of an ACL rule's properties
    *
-   * @param   string $format sprintf format for array
-   * @param   bool $hideEmpty only return elements that have a value set.
+   * @param string $format
+   *   Sprintf format for array.
+   * @param bool $hideEmpty
+   *   Only return elements that have a value set.
    *
    * @return array    - Assoc. array of the ACL rule's properties
    */
@@ -382,9 +393,12 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    * directly to the contact, but not those granted to the contact through
    * any/all of his group memberships.
    *
-   * @param int $contact_id       -   ID of a contact to search for
-   * @param int $group_id         -   ID of a group to search for
-   * @param boolean $aclRoles    -   Should we include ACL Roles
+   * @param int $contact_id
+   *   ID of a contact to search for.
+   * @param int $group_id
+   *   ID of a group to search for.
+   * @param bool $aclRoles
+   *   Should we include ACL Roles.
    *
    * @return array                -   Array of assoc. arrays of ACL rules
    * @static
@@ -447,8 +461,10 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   /**
    * Get all of the ACLs through ACL groups
    *
-   * @param int $contact_id   -   ID of a contact to search for
-   * @param int $group_id     -   ID of a group to search for
+   * @param int $contact_id
+   *   ID of a contact to search for.
+   * @param int $group_id
+   *   ID of a group to search for.
    *
    * @return array            -   Array of assoc. arrays of ACL rules
    * @static
@@ -511,8 +527,10 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   /**
    * Get all ACLs granted to a contact through all group memberships
    *
-   * @param int $contact_id       -   The contact's ID
-   * @param boolean $aclRoles     -   Include ACL Roles?
+   * @param int $contact_id
+   *   The contact's ID.
+   * @param bool $aclRoles
+   *   Include ACL Roles?.
    *
    * @return array                -   Assoc array of ACL rules
    * @static
@@ -556,7 +574,8 @@ SELECT      $acl.*
    * Get all of the ACLs for a contact through ACL groups owned by Contact
    * groups.
    *
-   * @param int $contact_id   -   ID of a contact to search for
+   * @param int $contact_id
+   *   ID of a contact to search for.
    *
    * @return array            -   Array of assoc. arrays of ACL rules
    * @static
@@ -628,7 +647,8 @@ SELECT $acl.*
   /**
    * Get all ACLs owned by a given contact, including domain and group-level.
    *
-   * @param int $contact_id   -   The contact ID
+   * @param int $contact_id
+   *   The contact ID.
    *
    * @return array            -   Assoc array of ACL rules
    * @static
@@ -668,8 +688,10 @@ SELECT $acl.*
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on sucess, null otherwise
    * @static
@@ -957,7 +979,8 @@ ORDER BY a.object_id
   /**
    * Delete ACL records
    *
-   * @param  int  $aclId     ID of the ACL record to be deleted.
+   * @param int $aclId
+   *   ID of the ACL record to be deleted.
    *
    * @static
    */

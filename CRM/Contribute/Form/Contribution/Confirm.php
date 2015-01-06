@@ -1593,11 +1593,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   /**
    * Add on behalf of organization and it's location
    *
-   * @param $behalfOrganization array  array of organization info
-   * @param $contactID          int    individual contact id. One
+   * @param $behalfOrganization
+   *   Array  array of organization info.
+   * @param $contactID
+   *   Int    individual contact id. One.
    * who is doing the process of signup / contribution.
    *
-   * @param $values             array  form values array
+   * @param $values
+   *   Array  form values array.
    * @param array $params
    * @param null $fields
    *
@@ -1703,8 +1706,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Function used to save pcp / soft credit entry
    * This is used by contribution and also event pcps
    *
-   * @param array  $params         associated array
-   * @param object $contribution   contribution object
+   * @param array $params
+   *   Associated array.
+   * @param object $contribution
+   *   Contribution object.
    *
    * @static
    */
@@ -1735,8 +1740,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Function used to se pcp related defaults / params
    * This is used by contribution and also event pcps
    *
-   * @param CRM_Core_Form $page   form object
-   * @param array  $params associated array
+   * @param CRM_Core_Form $page
+   *   Form object.
+   * @param array $params
+   *   Associated array.
    *
    * @return array
    * @static
@@ -1771,7 +1778,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $customFieldsFormatted
    * @param array $fieldTypes
    * @param array $premiumParams
-   * @param array $membershipLineItems line items specifically relating to memberships
+   * @param array $membershipLineItems
+   *   Line items specifically relating to memberships.
    * @param $isPayLater
    */
   public function processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams, $membershipLineItems, $isPayLater) {

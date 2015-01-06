@@ -38,11 +38,14 @@ require_once 'api/v3/utils.php';
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object
  *
- * @param array $params Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                             pairs to insert in new contact.
- * @param array $values The reformatted properties that we can use internally
+ * @param array $values
+ *   The reformatted properties that we can use internally.
  *
- * @param array|bool $create Is the formatted Values array going to
+ * @param array|bool $create
+ *   Is the formatted Values array going to.
  *                             be used for CRM_vent_BAO_Participant:create()
  *
  * @return array|CRM_Error
@@ -208,9 +211,11 @@ function _civicrm_api3_deprecated_participant_formatted_param($params, &$values,
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object
  *
- * @param array $params Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                             pairs to insert in new contact.
- * @param array $values The reformatted properties that we can use internally
+ * @param array $values
+ *   The reformatted properties that we can use internally.
  *                            '
  *
  * @param bool $create
@@ -668,11 +673,14 @@ function _civicrm_api3_deprecated_check_contact_dedupe($params) {
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object
  *
- * @param array $params Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                             pairs to insert in new contact.
- * @param array $values The reformatted properties that we can use internally
+ * @param array $values
+ *   The reformatted properties that we can use internally.
  *
- * @param array|bool $create Is the formatted Values array going to
+ * @param array|bool $create
+ *   Is the formatted Values array going to.
  *                             be used for CRM_Activity_BAO_Activity::create()
  *
  * @return array|CRM_Error
@@ -748,8 +756,10 @@ function _civicrm_api3_deprecated_activity_formatted_param(&$params, &$values, $
  * the variable being added is a child of Location, a location_type_id must
  * also be included.  If it is a child of phone, a phone_type must be included.
  *
- * @param array  $values    The variable(s) to be added
- * @param array  $params    The structured parameter list
+ * @param array $values
+ *   The variable(s) to be added.
+ * @param array $params
+ *   The structured parameter list.
  *
  * @return bool|CRM_Utils_Error
  */
@@ -962,8 +972,10 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
 /**
  * This function format location blocks w/ v3.0 format.
  *
- * @param array  $values    The variable(s) to be added
- * @param array  $params    The structured parameter list
+ * @param array $values
+ *   The variable(s) to be added.
+ * @param array $params
+ *   The structured parameter list.
  *
  * @return bool
  */
@@ -1152,7 +1164,8 @@ function _civicrm_api3_deprecated_duplicate_formatted_contact($params) {
 /**
  * Validate a formatted contact parameter list.
  *
- * @param array $params  Structured parameter list (as in crm_format_params)
+ * @param array $params
+ *   Structured parameter list (as in crm_format_params).
  *
  * @return bool|CRM_Core_Error
  */
@@ -1284,9 +1297,11 @@ function _civicrm_api3_deprecated_participant_check_params($params, $checkDuplic
 /**
  * Ensure that we have the right input parameters for custom data
  *
- * @param array   $params          Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                                 pairs to insert in new contact.
- * @param string  $csType          contact subtype if exists/passed.
+ * @param string $csType
+ *   Contact subtype if exists/passed.
  *
  * @return null on success, error message otherwise
  */

@@ -50,7 +50,8 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   /**
    * Class constructor
    *
-   * @param object $stateMachine reference to state machine object
+   * @param object $stateMachine
+   *   Reference to state machine object.
    *
    * @return \CRM_Core_QuickForm_Action_Display
   @access public
@@ -62,8 +63,10 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   /**
    * Processes the request.
    *
-   * @param  CRM_Core_Form    $page       CRM_Core_Form the current form-page
-   * @param  string    $actionName Current action name, as one Action object can serve multiple actions
+   * @param CRM_Core_Form $page
+   *   CRM_Core_Form the current form-page.
+   * @param string $actionName
+   *   Current action name, as one Action object can serve multiple actions.
    *
    * @return void
    */
@@ -102,7 +105,8 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   /**
    * Render the page using a custom templating system
    *
-   * @param CRM_Core_Form $page the CRM_Core_Form page
+   * @param CRM_Core_Form $page
+   *   The CRM_Core_Form page.
    *
    *
    * @return void
@@ -186,7 +190,8 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   /**
    * Set the various rendering templates
    *
-   * @param CRM_Core_Form  $page the CRM_Core_Form page
+   * @param CRM_Core_Form $page
+   *   The CRM_Core_Form page.
    *
    * @return void
    */

@@ -36,7 +36,8 @@
 /**
  * Add a Javascript file to a specific part of the page
  *
- * @param $params array with keys:
+ * @param $params
+ *   Array with keys:.
  *  - ext: string, extension name. see CRM_Core_Resources::addScriptFile
  *  - file: string, relative file path. see CRM_Core_Resources::addScriptFile
  *  - url: string. see CRM_Core_Resources::addScriptURL

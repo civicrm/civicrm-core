@@ -127,7 +127,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @todo - this only provides a limited amount of flexiblity - it still expects a 'civicrm' folder with a 'drupal' folder
    * and is only flexible as to the name of the civicrm folder.
    *
-   * @param string $url potential resource url based on standard folder assumptions
+   * @param string $url
+   *   Potential resource url based on standard folder assumptions.
    * @return string $url with civicrm-core directory appended if not standard civi dir
    */
   public function appendCoreDirectoryToResourceBase($url) {
@@ -142,15 +143,22 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * Generate an internal CiviCRM URL (copied from DRUPAL/includes/common.inc#url)
    *
-   * @param $path     string   The path being linked to, such as "civicrm/add"
-   * @param $query    string   A query string to append to the link.
-   * @param $absolute boolean  Whether to force the output to be an absolute link (beginning with http:).
+   * @param $path
+   *   String   The path being linked to, such as "civicrm/add".
+   * @param $query
+   *   String   A query string to append to the link.
+   * @param $absolute
+   *   Boolean  Whether to force the output to be an absolute link (beginning with http:).
    *                           Useful for links that will be displayed outside the site, such as in an
    *                           RSS feed.
-   * @param $fragment string   A fragment identifier (named anchor) to append to the link.
-   * @param $htmlize  boolean  whether to convert to html eqivalant
-   * @param $frontend boolean  a gross joomla hack
-   * @param $forceBackend boolean  a gross joomla hack
+   * @param $fragment
+   *   String   A fragment identifier (named anchor) to append to the link.
+   * @param $htmlize
+   *   Boolean  whether to convert to html eqivalant.
+   * @param $frontend
+   *   Boolean  a gross joomla hack.
+   * @param $forceBackend
+   *   Boolean  a gross joomla hack.
    *
    * @return string an HTML string containing a link to the given path.
    *
@@ -216,7 +224,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
   /**
    * Get User ID from UserFramework system (Drupal)
-   * @param object $user object as described by the CMS
+   * @param object $user
+   *   Object as described by the CMS.
    * @return mixed <NULL, number>
    */
   public function getUserIDFromUserObject($user) {
@@ -225,7 +234,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
   /**
    * Get Unique Identifier from UserFramework system (CMS)
-   * @param object $user object as described by the User Framework
+   * @param object $user
+   *   Object as described by the User Framework.
    * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
    *
    */
@@ -252,7 +262,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
   /**
    * Get Url to view user record
-   * @param integer $contactID Contact ID
+   * @param integer $contactID
+   *   Contact ID.
    *
    * @return string
    */
@@ -324,8 +335,10 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * Find any users/roles/security-principals with the given permission
    * and replace it with one or more permissions.
    *
-   * @param $oldPerm string
-   * @param $newPerms array, strings
+   * @param $oldPerm
+   *   String.
+   * @param $newPerms
+   *   Array, strings.
    *
    * @return void
    */
@@ -466,7 +479,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * Figure out the post url for the form
    *
-   * @param mix $action the default action if one is pre-specified
+   * @param mix $action
+   *   The default action if one is pre-specified.
    *
    * @return string the url to post the form
    */

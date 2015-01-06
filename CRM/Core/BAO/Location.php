@@ -46,8 +46,10 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
   /**
    * Create various elements of location block
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param boolean $fixAddress true if you need to fix (format) address values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param bool $fixAddress
+   *   True if you need to fix (format) address values.
    *                               before inserting in db
    *
    * @param null $entity
@@ -151,7 +153,8 @@ WHERE e.id = %1";
   /**
    * Takes an associative array and adds location block
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return object       CRM_Core_BAO_locBlock object on success, null otherwise
    * @static
@@ -167,7 +170,8 @@ WHERE e.id = %1";
   /**
    * Delete the Location Block
    *
-   * @param  int  $locBlockId    id of the Location Block
+   * @param int $locBlockId
+   *   Id of the Location Block.
    *
    * @return void
    * @static
@@ -209,7 +213,8 @@ WHERE e.id = %1";
   /**
    * Check if there is data to create the object
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return boolean
    * @static
@@ -261,8 +266,10 @@ WHERE e.id = %1";
   /**
    * Delete all the block associated with the location
    *
-   * @param  int  $contactId      contact id
-   * @param  int  $locationTypeId id of the location to delete
+   * @param int $contactId
+   *   Contact id.
+   * @param int $locationTypeId
+   *   Id of the location to delete.
    *
    * @return void
    * @static
@@ -294,8 +301,10 @@ WHERE e.id = %1";
   /**
    * Copy or update location block.
    *
-   * @param  int  $locBlockId  location block id.
-   * @param  int  $updateLocBlockId update location block id
+   * @param int $locBlockId
+   *   Location block id.
+   * @param int $updateLocBlockId
+   *   Update location block id.
    *
    * @return int  newly created/updated location block id.
    */
@@ -342,7 +351,8 @@ WHERE e.id = %1";
    * If contact has data for any location block, make sure
    * contact should have only one primary block, CRM-5051
    *
-   * @param  int $contactId - contact id
+   * @param int $contactId
+   *   Contact id.
    *
    * @static
    */

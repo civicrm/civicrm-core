@@ -44,7 +44,8 @@ class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
   /**
    * Connect to the supplied dir and make sure the two mail dirs exist
    *
-   * @param string $dir dir to operate upon
+   * @param string $dir
+   *   Dir to operate upon.
    *
    * @return \CRM_Mailing_MailStore_Localdir
    */
@@ -59,7 +60,8 @@ class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
    * Return the next X messages from the mail store
    * FIXME: in CiviCRM 2.2 this always returns all the emails
    *
-   * @param int $count  number of messages to fetch FIXME: ignored in CiviCRM 2.2 (assumed to be 0, i.e., fetch all)
+   * @param int $count
+   *   Number of messages to fetch FIXME: ignored in CiviCRM 2.2 (assumed to be 0, i.e., fetch all).
    *
    * @return array      array of ezcMail objects
    */
@@ -113,7 +115,8 @@ class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
   /**
    * Fetch the specified message to the local ignore folder
    *
-   * @param integer $file file location of the message to fetch
+   * @param integer $file
+   *   File location of the message to fetch.
    *
    * @throws Exception
    * @return void
@@ -131,7 +134,8 @@ class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
   /**
    * Fetch the specified message to the local processed folder
    *
-   * @param integer $file file location of the message to fetch
+   * @param integer $file
+   *   File location of the message to fetch.
    *
    * @throws Exception
    * @return void

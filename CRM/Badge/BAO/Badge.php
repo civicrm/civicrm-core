@@ -45,8 +45,10 @@ class CRM_Badge_BAO_Badge {
   /**
    *  This function is called to create name label pdf
    *
-   * @param   array $participants associated array with participant info
-   * @param   array $layoutInfo   associated array which contains meta data about format/layout
+   * @param array $participants
+   *   Associated array with participant info.
+   * @param array $layoutInfo
+   *   Associated array which contains meta data about format/layout.
    *
    * @return  void
    */
@@ -75,8 +77,10 @@ class CRM_Badge_BAO_Badge {
   /**
    * Funtion to create structure and add meta data according to layout
    *
-   * @param array $row row element that needs to be formatted
-   * @param array $layout layout meta data
+   * @param array $row
+   *   Row element that needs to be formatted.
+   * @param array $layout
+   *   Layout meta data.
    *
    * @return array $formattedRow row with meta data
    */
@@ -347,7 +351,8 @@ class CRM_Badge_BAO_Badge {
   /**
    * Helper function to print images
    *
-   * @param string $img image url
+   * @param string $img
+   *   Image url.
    *
    * @param string $x
    * @param string $y
@@ -394,7 +399,8 @@ class CRM_Badge_BAO_Badge {
   /**
    * Build badges parameters before actually creating badges.
    *
-   * @param  array $params associated array of submitted values
+   * @param array $params
+   *   Associated array of submitted values.
    * @param CRM_Core_Form $form
    *
    * @return void

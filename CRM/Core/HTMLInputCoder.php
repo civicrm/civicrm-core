@@ -43,7 +43,8 @@ class CRM_Core_HTMLInputCoder {
    * submitted values across XSS vulnerability.
    *
    * @param array|string $values
-   * @param bool $castToString If TRUE, all scalars will be filtered (and therefore cast to strings)
+   * @param bool $castToString
+   *   If TRUE, all scalars will be filtered (and therefore cast to strings).
    *    If FALSE, then non-string values will be preserved
    */
   public static function encodeInput(&$values, $castToString = TRUE) {

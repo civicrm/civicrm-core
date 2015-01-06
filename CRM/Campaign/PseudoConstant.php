@@ -154,7 +154,8 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @static
    *
-   * @param bool|string $name pseudoconstant to be flushed
+   * @param bool|string $name
+   *   Pseudoconstant to be flushed.
    */
   public static function flush($name = 'cache') {
    if (isset(self::$$name)) {

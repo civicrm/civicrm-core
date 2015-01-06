@@ -44,10 +44,14 @@ class CRM_Mailing_MailStore_Pop3 extends CRM_Mailing_MailStore {
   /**
    * Connect to the supplied POP3 server and make sure the two mail dirs exist
    *
-   * @param string $host host to connect to
-   * @param string $username authentication username
-   * @param string $password authentication password
-   * @param bool $ssl whether to use POP3 or POP3S
+   * @param string $host
+   *   Host to connect to.
+   * @param string $username
+   *   Authentication username.
+   * @param string $password
+   *   Authentication password.
+   * @param bool $ssl
+   *   Whether to use POP3 or POP3S.
    *
    * @return \CRM_Mailing_MailStore_Pop3
    */
@@ -67,7 +71,8 @@ class CRM_Mailing_MailStore_Pop3 extends CRM_Mailing_MailStore {
   /**
    * Fetch the specified message to the local ignore folder
    *
-   * @param integer $nr  number of the message to fetch
+   * @param integer $nr
+   *   Number of the message to fetch.
    *
    * @return void
    */
@@ -84,7 +89,8 @@ class CRM_Mailing_MailStore_Pop3 extends CRM_Mailing_MailStore {
   /**
    * Fetch the specified message to the local processed folder
    *
-   * @param integer $nr  number of the message to fetch
+   * @param integer $nr
+   *   Number of the message to fetch.
    *
    * @return void
    */

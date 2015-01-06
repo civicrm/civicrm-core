@@ -53,8 +53,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Create a user of Joomla.
    *
-   * @param array  $params associated array
-   * @param string $mail email id for cms user
+   * @param array $params
+   *   Associated array.
+   * @param string $mail
+   *   Email id for cms user.
    *
    * @return uid if user exists, false otherwise
    *
@@ -121,9 +123,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Check if username and email exists in the drupal db
    *
-   * @param array $params array of name and mail values
-   * @param array $errors array of errors
-   * @param string $emailName  field label for the 'email'
+   * @param array $params
+   *   Array of name and mail values.
+   * @param array $errors
+   *   Array of errors.
+   * @param string $emailName
+   *   Field label for the 'email'.
    *
    * @return void
    */
@@ -176,7 +181,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Sets the title of the page
    *
-   * @param string $title title to set
+   * @param string $title
+   *   Title to set.
    * @param string $pageTitle
    *
    * @return void
@@ -260,7 +266,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * Add a script file
    *
    * @param $url: string, absolute path to file
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -275,7 +282,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * Add an inline script
    *
    * @param $code: string, javascript code
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -290,7 +298,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * Add a css file
    *
    * @param $url: string, absolute path to file
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -310,7 +319,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * Add an inline style
    *
    * @param $code: string, css code
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -329,14 +339,20 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Generate an internal CiviCRM URL
    *
-   * @param $path     string   The path being linked to, such as "civicrm/add"
-   * @param $query    string   A query string to append to the link.
-   * @param $absolute boolean  Whether to force the output to be an absolute link (beginning with http:).
+   * @param $path
+   *   String   The path being linked to, such as "civicrm/add".
+   * @param $query
+   *   String   A query string to append to the link.
+   * @param $absolute
+   *   Boolean  Whether to force the output to be an absolute link (beginning with http:).
    *                           Useful for links that will be displayed outside the site, such as in an
    *                           RSS feed.
-   * @param $fragment string   A fragment identifier (named anchor) to append to the link.
-   * @param $htmlize  boolean  whether to convert to html eqivalant
-   * @param $frontend boolean  a gross joomla hack
+   * @param $fragment
+   *   String   A fragment identifier (named anchor) to append to the link.
+   * @param $htmlize
+   *   Boolean  whether to convert to html eqivalant.
+   * @param $frontend
+   *   Boolean  a gross joomla hack.
    *
    * @param bool $forceBackend
    *
@@ -414,7 +430,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Figure out the post url for the form
    *
-   * @param $action the default action if one is pre-specified
+   * @param $action
+   *   The default action if one is pre-specified.
    *
    * @return string the url to post the form
    */
@@ -431,7 +448,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Set the email address of the user
    *
-   * @param object $user handle to the user object
+   * @param object $user
+   *   Handle to the user object.
    *
    * @return void
    */
@@ -445,9 +463,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Authenticate the user against the joomla db
    *
-   * @param string $name     the user name
-   * @param string $password the password for the above user name
-   * @param $loadCMSBootstrap boolean load cms bootstrap?
+   * @param string $name
+   *   The user name.
+   * @param string $password
+   *   The password for the above user name.
+   * @param $loadCMSBootstrap
+   *   Boolean load cms bootstrap?.
    *
    * @return mixed false if no auth
    *               array(
@@ -543,7 +564,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Set a init session with user object
    *
-   * @param array $data  array with user specific data
+   * @param array $data
+   *   Array with user specific data.
    *
    */
   public function setUserSession($data) {
@@ -558,7 +580,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Set a message in the UF to display to a user
    *
-   * @param string $message  the message to set
+   * @param string $message
+   *   The message to set.
    *
    */
   public function setMessage($message) {
@@ -613,9 +636,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Load joomla bootstrap
    *
-   * @param $params array with uid or name and password
-   * @param $loadUser boolean load cms user?
-   * @param bool|\throw $throwError throw error on failure?
+   * @param $params
+   *   Array with uid or name and password.
+   * @param $loadUser
+   *   Boolean load cms user?.
+   * @param bool|\throw $throwError
+   *   Throw error on failure?.
    * @param null $realPath
    * @param bool $loadDefines
    *
@@ -698,7 +724,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
   /**
    * Get User ID from UserFramework system (Joomla)
-   * @param object $user object as described by the CMS
+   * @param object $user
+   *   Object as described by the CMS.
    * @return mixed <NULL, number>
    */
   public function getUserIDFromUserObject($user) {
@@ -707,7 +734,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
   /**
    * Get Unique Identifier from UserFramework system (CMS)
-   * @param object $user object as described by the User Framework
+   * @param object $user
+   *   Object as described by the User Framework.
    * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
    *
    */
@@ -741,7 +769,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
-   * @param string $destination - if present, add destination to querystring (works for Drupal only)
+   * @param string $destination
+   *   If present, add destination to querystring (works for Drupal only).
    *
    * @return string - loginURL for the current CMS
    * @static
@@ -821,7 +850,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
   /**
    * Get Url to view user record
-   * @param integer $contactID Contact ID
+   * @param integer $contactID
+   *   Contact ID.
    *
    * @return string
    */

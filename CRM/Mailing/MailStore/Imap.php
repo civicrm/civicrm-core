@@ -44,11 +44,16 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
   /**
    * Connect to the supplied IMAP server and make sure the two mailboxes exist
    *
-   * @param string $host host to connect to
-   * @param string $username authentication username
-   * @param string $password authentication password
-   * @param bool $ssl whether to use IMAP or IMAPS
-   * @param string $folder name of the inbox folder
+   * @param string $host
+   *   Host to connect to.
+   * @param string $username
+   *   Authentication username.
+   * @param string $password
+   *   Authentication password.
+   * @param bool $ssl
+   *   Whether to use IMAP or IMAPS.
+   * @param string $folder
+   *   Name of the inbox folder.
    *
    * @return \CRM_Mailing_MailStore_Imap
    */
@@ -96,7 +101,8 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
   /**
    * Move the specified message to the ignored folder
    *
-   * @param integer $nr  number of the message to move
+   * @param integer $nr
+   *   Number of the message to move.
    *
    * @return void
    */
@@ -112,7 +118,8 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
   /**
    * Move the specified message to the processed folder
    *
-   * @param integer $nr  number of the message to move
+   * @param integer $nr
+   *   Number of the message to move.
    *
    * @return void
    */

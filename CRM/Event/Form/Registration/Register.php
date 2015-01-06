@@ -542,9 +542,12 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   /**
    * Build the radio/text form elements for the amount field
    *
-   * @param CRM_Core_Form   $form form object
-   * @param boolean  $required  true if you want to add formRule
-   * @param int      $discountId discount id for the event
+   * @param CRM_Core_Form $form
+   *   Form object.
+   * @param bool $required
+   *   True if you want to add formRule.
+   * @param int $discountId
+   *   Discount id for the event.
    *
    * @return void
    * @static
@@ -791,8 +794,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   /**
    * Global form rule
    *
-   * @param array $fields the input form values
-   * @param array $files the uploaded files if any
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
    * @param $self
    *
    *
@@ -1198,8 +1203,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   /*
    * process Registration of free event
    *
-   * @param  array $param Form valuess
-   * @param  int contactID
+   * @param array $param
+   *   Form valuess.
+   * @param int contactID
    *
    * @return void
    * access public
@@ -1384,11 +1390,16 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * Method to check if the user is already registered for the event
    * and if result found redirect to the event info page
    *
-   * @param array $fields  the input form values(anonymous user)
-   * @param array $self    event data
-   * @param boolean $isAdditional treat isAdditional participants a bit differently
-   * @param boolean $returnContactId just find and return the contactID match to use
-   * @param boolean $useDedupeRules force usage of dedupe rules
+   * @param array $fields
+   *   The input form values(anonymous user).
+   * @param array $self
+   *   Event data.
+   * @param bool $isAdditional
+   *   Treat isAdditional participants a bit differently.
+   * @param bool $returnContactId
+   *   Just find and return the contactID match to use.
+   * @param bool $useDedupeRules
+   *   Force usage of dedupe rules.
    *
    * @return void
    */

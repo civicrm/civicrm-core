@@ -52,9 +52,11 @@ class CRM_Utils_JSON {
    * Create JSON object
    * @deprecated
    *
-   * @param  array  $params     associated array, that needs to be
+   * @param array $params
+   *   Associated array, that needs to be.
    *                            converted to JSON array
-   * @param  string $identifier identifier for the JSON array
+   * @param string $identifier
+   *   Identifier for the JSON array.
    *
    * @return string $jsonObject JSON array
    * @static
@@ -74,10 +76,13 @@ class CRM_Utils_JSON {
   /**
    * Encode json format for flexigrid, NOTE: "id" should be present in $params for each row
    *
-   * @param array $params associated array of values rows
-   * @param int $page page no for selector
+   * @param array $params
+   *   Associated array of values rows.
+   * @param int $page
+   *   Page no for selector.
    * @param $total
-   * @param array $selectorElements selector rows
+   * @param array $selectorElements
+   *   Selector rows.
    *
    * @return json encode string
    */
@@ -117,11 +122,16 @@ class CRM_Utils_JSON {
   /**
    * This function is used to encode data for dataTable plugin
    *
-   * @param array $params associated array of row elements
-   * @param int $sEcho datatable needs this to make it more secure
-   * @param int $iTotal total records
-   * @param int $iFilteredTotal total records on a page
-   * @param array $selectorElements selector elements
+   * @param array $params
+   *   Associated array of row elements.
+   * @param int $sEcho
+   *   Datatable needs this to make it more secure.
+   * @param int $iTotal
+   *   Total records.
+   * @param int $iFilteredTotal
+   *   Total records on a page.
+   * @param array $selectorElements
+   *   Selector elements.
    * @return string
    *
    */

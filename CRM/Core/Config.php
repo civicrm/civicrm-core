@@ -187,8 +187,10 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   /**
    * Singleton function used to manage this object.
    *
-   * @param $loadFromDB boolean  whether to load from the database
-   * @param $force      boolean  whether to force a reconstruction
+   * @param $loadFromDB
+   *   Boolean  whether to load from the database.
+   * @param $force
+   *   Boolean  whether to force a reconstruction.
    *
    * @return CRM_Core_Config
    * @static
@@ -534,7 +536,8 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   /**
    * Retrieve a mailer to send any mail from the application
    *
-   * @param boolean $persist open a persistent smtp connection, should speed up mailings
+   * @param bool $persist
+   *   Open a persistent smtp connection, should speed up mailings.
    * @return object
    */
   public static function &getMailer($persist = FALSE) {
@@ -612,7 +615,8 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   /**
    * Create a new instance of a PEAR Mail driver
    *
-   * @param string $driver 'CRM_Mailing_BAO_Spool' or a name suitable for Mail::factory()
+   * @param string $driver
+   *   'CRM_Mailing_BAO_Spool' or a name suitable for Mail::factory().
    * @param array $params
    * @return Mail (More specifically, a class which implements the "send()" function)
    */
@@ -661,7 +665,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * Verify that the needed parameters are not null in the config
    *
    * @param CRM_Core_Config (reference ) the system config object
-   * @param array           (reference ) the parameters that need a value
+   * @param array (reference ) the parameters that need a value
    *
    * @return boolean
    * @static

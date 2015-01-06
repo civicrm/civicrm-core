@@ -45,14 +45,21 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
    * This function is to build form elements
    * params object $form object of the form
    *
-   * @param CRM_Core_Form $form the form object that we are operating on
-   * @param int $contactId contact id
-   * @param int $type what components are we interested in
-   * @param boolean $visibility visibility of the field
+   * @param CRM_Core_Form $form
+   *   The form object that we are operating on.
+   * @param int $contactId
+   *   Contact id.
+   * @param int $type
+   *   What components are we interested in.
+   * @param bool $visibility
+   *   Visibility of the field.
    * @param null $isRequired
-   * @param string $groupName if used for building group block
-   * @param string $tagName if used for building tag block
-   * @param string $fieldName this is used in batch profile(i.e to build multiple blocks)
+   * @param string $groupName
+   *   If used for building group block.
+   * @param string $tagName
+   *   If used for building tag block.
+   * @param string $fieldName
+   *   This is used in batch profile(i.e to build multiple blocks).
    *
    * @param string $groupElementType
    *
@@ -196,10 +203,14 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
   /**
    * Set defaults for relevant form elements
    *
-   * @param int $id the contact id
-   * @param array $defaults the defaults array to store the values in
-   * @param int $type what components are we interested in
-   * @param string $fieldName this is used in batch profile(i.e to build multiple blocks)
+   * @param int $id
+   *   The contact id.
+   * @param array $defaults
+   *   The defaults array to store the values in.
+   * @param int $type
+   *   What components are we interested in.
+   * @param string $fieldName
+   *   This is used in batch profile(i.e to build multiple blocks).
    *
    * @param string $groupElementType
    *

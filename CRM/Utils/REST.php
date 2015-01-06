@@ -61,7 +61,8 @@ class CRM_Utils_REST {
   /**
    * Simple ping function to test for liveness.
    *
-   * @param string $var   The string to be echoed
+   * @param string $var
+   *   The string to be echoed.
    *
    * @return string       $var
    */

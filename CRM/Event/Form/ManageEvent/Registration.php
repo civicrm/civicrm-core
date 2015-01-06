@@ -204,7 +204,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * Fix what blocks to show/hide based on the default values set
    *
-   * @param array $defaults the array of default values
+   * @param array $defaults
+   *   The array of default values.
    *
    * @return void
    */
@@ -346,10 +347,14 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * depends on getProfileSelectorTypes
    *
    * @param array &$form
-   * @param int $count unique index
-   * @param string $prefix dom element ID prefix
-   * @param string $label Label
-   * @param array $configs Optional, for addProfileSelector(), defaults to using getProfileSelectorTypes()
+   * @param int $count
+   *   Unique index.
+   * @param string $prefix
+   *   Dom element ID prefix.
+   * @param string $label
+   *   Label.
+   * @param array $configs
+   *   Optional, for addProfileSelector(), defaults to using getProfileSelectorTypes().
    **/
   public function buildMultipleProfileBottom(&$form, $count, $prefix = '', $label = 'Include Profile', $configs = null) {
     extract( ( is_null($configs) ) ? self::getProfileSelectorTypes() : $configs );

@@ -299,9 +299,12 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Display an error page with an error message describing what happened
    *
-   * @param string $message the error message
-   * @param string $code the error code if any
-   * @param string $email the email address to notify of this situation
+   * @param string $message
+   *   The error message.
+   * @param string $code
+   *   The error code if any.
+   * @param string $email
+   *   The email address to notify of this situation.
    *
    * @throws Exception
    *
@@ -465,11 +468,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Outputs pre-formatted debug information. Flushes the buffers
    * so we can interrupt a potential POST/redirect
    *
-   * @param  string name of debug section
-   * @param  mixed  reference to variables that we need a trace of
-   * @param  bool   should we log or return the output
-   * @param  bool   whether to generate a HTML-escaped output
-   * @param  bool   should we check permissions before displaying output
+   * @param string name of debug section
+   * @param mixed reference to variables that we need a trace of
+   * @param bool should we log or return the output
+   * @param bool whether to generate a HTML-escaped output
+   * @param bool should we check permissions before displaying output
    *                useful when we die during initialization and permissioning
    *                subsystem is not initialized - CRM-13765
    *
@@ -515,9 +518,12 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @param string $variable_name
    * @param mixed $variable
-   * @param bool $print should we use print_r ? (else we use var_dump)
-   * @param bool $log should we log or return the output
-   * @param string $comp variable name
+   * @param bool $print
+   *   Should we use print_r ? (else we use var_dump).
+   * @param bool $log
+   *   Should we log or return the output.
+   * @param string $comp
+   *   Variable name.
    *
    * @return string the generated output
    *
@@ -562,9 +568,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Display the error message on terminal
    *
    * @param $message
-   * @param bool $out should we log or return the output
+   * @param bool $out
+   *   Should we log or return the output.
    *
-   * @param string $comp message to be output
+   * @param string $comp
+   *   Message to be output.
    * @return string format of the backtrace
    *
    *
@@ -671,9 +679,12 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Render a backtrace array as a string
    *
-   * @param array $backTrace array of stack frames
-   * @param boolean $showArgs TRUE if we should try to display content of function arguments (which could be sensitive); FALSE to display only the type of each function argument
-   * @param int $maxArgLen maximum number of characters to show from each argument string
+   * @param array $backTrace
+   *   Array of stack frames.
+   * @param bool $showArgs
+   *   TRUE if we should try to display content of function arguments (which could be sensitive); FALSE to display only the type of each function argument.
+   * @param int $maxArgLen
+   *   Maximum number of characters to show from each argument string.
    * @return string printable plain-text
    */
   public static function formatBacktrace($backTrace, $showArgs = TRUE, $maxArgLen = 80) {
@@ -688,9 +699,12 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Render a backtrace array as an array
    *
-   * @param array $backTrace array of stack frames
-   * @param boolean $showArgs TRUE if we should try to display content of function arguments (which could be sensitive); FALSE to display only the type of each function argument
-   * @param int $maxArgLen maximum number of characters to show from each argument string
+   * @param array $backTrace
+   *   Array of stack frames.
+   * @param bool $showArgs
+   *   TRUE if we should try to display content of function arguments (which could be sensitive); FALSE to display only the type of each function argument.
+   * @param int $maxArgLen
+   *   Maximum number of characters to show from each argument string.
    * @return array
    * @see debug_backtrace
    * @see Exception::getTrace()
@@ -826,7 +840,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Set a status message in the session, then bounce back to the referrer.
    *
-   * @param string $status The status message to set
+   * @param string $status
+   *   The status message to set.
    *
    * @param null $redirect
    * @param string $title
@@ -873,7 +888,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * PEAR error-handler to quietly catch otherwise fatal errors. Intended for use with smtp transport.
    *
-   * @param object $obj       The PEAR_ERROR object
+   * @param object $obj
+   *   The PEAR_ERROR object.
    * @return object $obj
    * @static
    */

@@ -274,8 +274,10 @@ class CRM_Core_SelectValues {
   /**
    * Compose the parameters for a date select object
    *
-   * @param  string|NULL $type the type of date
-   * @param  string|NULL $format date format ( QF format)
+   * @param string|NULL $type
+   *   The type of date.
+   * @param string|NULL $format
+   *   Date format ( QF format).
    *
    * @param null $minOffset
    * @param null $maxOffset

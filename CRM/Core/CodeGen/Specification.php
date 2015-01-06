@@ -13,7 +13,8 @@ class CRM_Core_CodeGen_Specification {
    * Read and parse.
    *
    * @param $schemaPath
-   * @param string $buildVersion which version of the schema to build
+   * @param string $buildVersion
+   *   Which version of the schema to build.
    */
   public function parse($schemaPath, $buildVersion) {
     $this->buildVersion = $buildVersion;

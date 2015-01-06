@@ -238,7 +238,8 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   }
 
   /**
-   * @param string $type eg 'Contribution'
+   * @param string $type
+   *   Eg 'Contribution'.
    * @param string $subType
    * @param int $entityId
    */

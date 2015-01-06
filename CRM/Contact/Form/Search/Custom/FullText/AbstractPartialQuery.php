@@ -69,12 +69,17 @@ abstract class CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
    *
    * TODO: Understand why $queryLimit and $detailLimit are different
    *
-   * @param string $queryText a string of text to search for
-   * @param string $entityIDTableName a temporary table into which we can write a list of all matching IDs
-   * @param string $detailTable a table into which we can write details about a page worth of matches
-   * @param array|NULL $queryLimit overall limit (applied when building $entityIDTableName)
+   * @param string $queryText
+   *   A string of text to search for.
+   * @param string $entityIDTableName
+   *   A temporary table into which we can write a list of all matching IDs.
+   * @param string $detailTable
+   *   A table into which we can write details about a page worth of matches.
+   * @param array|NULL $queryLimit
+   *   Overall limit (applied when building $entityIDTableName).
    *                   NULL if no limit; or array(0 => $limit, 1 => $offset)
-   * @param array|NULL $detailLimit final limit (applied when building $detailTable)
+   * @param array|NULL $detailLimit
+   *   Final limit (applied when building $detailTable).
    *                   NULL if no limit; or array(0 => $limit, 1 => $offset)
    * @return array keys: match-descriptor
    *   - count: int
@@ -119,7 +124,8 @@ AND        cf.html_type IN ( 'Text', 'TextArea', 'RichTextEditor' )
 
   /**
    * @param string $queryText
-   * @param array $tables a list of places to query. Keys may be:
+   * @param array $tables
+   *   A list of places to query. Keys may be:.
    *   - sql: an array of SQL queries to execute
    *   - final: an array of SQL queries to execute at the end
    *   - *: All other keys are treated as table names
@@ -231,8 +237,10 @@ GROUP BY {$tableValues['id']}
    * Create a SQL expression for matching against a list of
    * text columns.
    *
-   * @param string $table eg "civicrm_note" or "civicrm_note mynote"
-   * @param array|string $fullTextFields list of field names
+   * @param string $table
+   *   Eg "civicrm_note" or "civicrm_note mynote".
+   * @param array|string $fullTextFields
+   *   List of field names.
    * @param string $queryText
    * @return string SQL, eg "MATCH (col1) AGAINST (queryText)" or "col1 LIKE '%queryText%'"
    */
@@ -286,7 +294,8 @@ GROUP BY {$tableValues['id']}
    *
    * @param string $toTable
    * @param string $parentIdColumn
-   * @param array $files see return format of CRM_Core_FileSearchInterface::search
+   * @param array $files
+   *   See return format of CRM_Core_FileSearchInterface::search.
    */
   public function moveFileIDs($toTable, $parentIdColumn, $files) {
     if (empty($files)) {

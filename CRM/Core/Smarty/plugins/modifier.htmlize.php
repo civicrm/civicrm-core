@@ -36,7 +36,8 @@
 /**
  * Convert a given text part a better HTML representation (add paragraphs and make URLs clickable)
  *
- * @param string $text text to HTML-ize
+ * @param string $text
+ *   Text to HTML-ize.
  *
  * @return string HTML-ized version of $text
  */

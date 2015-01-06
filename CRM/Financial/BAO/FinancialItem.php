@@ -45,8 +45,10 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Contribute_BAO_FinancialItem object
    * @static
@@ -64,9 +66,11 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   /**
    * Add the financial items and financial trxn
    *
-   * @param object $lineItem     line item object
-   * @param object $contribution contribution object
-   * @param boolean $taxTrxnID
+   * @param object $lineItem
+   *   Line item object.
+   * @param object $contribution
+   *   Contribution object.
+   * @param bool $taxTrxnID
    *
    * @static
    * @return void
@@ -127,9 +131,12 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   /**
    * Create the financial Items and financial enity trxn
    *
-   * @param array $params  associated array to create financial items
-   * @param array $ids financial item ids
-   * @param array $trxnIds financial item ids
+   * @param array $params
+   *   Associated array to create financial items.
+   * @param array $ids
+   *   Financial item ids.
+   * @param array $trxnIds
+   *   Financial item ids.
    *
    * @static
    * @return object
@@ -177,7 +184,8 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   /**
    * Takes an associative array and creates a entity financial transaction object
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Core_BAO_FinancialTrxn object
    * @static
@@ -192,8 +200,10 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   /**
    * Retrive entity financial trxn details
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param bool $maxId to retrive max id
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param bool $maxId
+   *   To retrive max id.
    *
    * @return array
    * @static
@@ -229,9 +239,11 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    *
    * CRM-12929
    *
-   * @param array $contactIds  an array contact id's
+   * @param array $contactIds
+   *   An array contact id's.
    *
-   * @param array $error error to display
+   * @param array $error
+   *   Error to display.
    *
    * @return array
    * @static

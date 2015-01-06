@@ -19,7 +19,8 @@ class CRM_Core_Reference_Dynamic extends CRM_Core_Reference_Basic {
   /**
    * Create a query to find references to a particular record
    *
-   * @param CRM_Core_DAO $targetDao the instance for which we want references
+   * @param CRM_Core_DAO $targetDao
+   *   The instance for which we want references.
    * @return CRM_Core_DAO a query-handle (like the result of CRM_Core_DAO::executeQuery)
    */
   public function findReferences($targetDao) {

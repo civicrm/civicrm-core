@@ -382,8 +382,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Helper function to add all the needed default actions. Note that the framework
    * redefines all of the default QFC actions
    *
-   * @param string   directory to store all the uploaded files
-   * @param array    names for the various upload buttons (note u can have more than 1 upload)
+   * @param string directory to store all the uploaded files
+   * @param array names for the various upload buttons (note u can have more than 1 upload)
    *
    *
    * @return void
@@ -436,7 +436,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * the order in which the pages are added
    *
    * @param CRM_Core_StateMachine $stateMachine
-   * @param \const|int $action the mode in which the state machine is operating
+   * @param \const|int $action
+   *   The mode in which the state machine is operating.
    *                              typicaly this will be add/view/edit
    *
    * @return void
@@ -519,8 +520,10 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * Store the variable with the value in the form scope
    *
-   * @param  string|array $name  name  of the variable or an assoc array of name/value pairs
-   * @param  mixed        $value value of the variable if string
+   * @param string|array $name
+   *   Name  of the variable or an assoc array of name/value pairs.
+   * @param mixed $value
+   *   Value of the variable if string.
    *
    *
    * @return void
@@ -533,7 +536,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * Get the variable from the form scope
    *
-   * @param  string $name  : name  of the variable
+   * @param string $name
+   *   : name  of the variable.
    *
 
    *
@@ -548,7 +552,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Create the header for the wizard from the list of pages
    * Store the created header in smarty
    *
-   * @param string $currentPageName name of the page being displayed
+   * @param string $currentPageName
+   *   Name of the page being displayed.
    *
    * @return array
    */
@@ -604,7 +609,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Assign value to name in template
    *
    * @param string $var
-   * @param mixed $value value of varaible
+   * @param mixed $value
+   *   Value of varaible.
    *
    * @return void
    */
@@ -616,7 +622,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Assign value to name in template by reference
    *
    * @param string $var
-   * @param mixed $value (reference) value of varaible
+   * @param mixed $value
+   *   (reference) value of varaible.
    *
    * @return void
    */
@@ -627,8 +634,10 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * Appends values to template variables
    *
-   * @param array|string $tpl_var the template variable name(s)
-   * @param mixed $value the value to append
+   * @param array|string $tpl_var
+   *   The template variable name(s).
+   * @param mixed $value
+   *   The value to append.
    * @param bool $merge
    */
   public function append($tpl_var, $value=NULL, $merge=FALSE) {
@@ -649,7 +658,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * Setter for embedded
    *
-   * @param boolean $embedded
+   * @param bool $embedded
    *
    * @return void
    */
@@ -669,7 +678,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * Setter for skipRedirection
    *
-   * @param boolean $skipRedirection
+   * @param bool $skipRedirection
    *
    * @return void
    */
@@ -718,7 +727,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * Setter for print
    *
-   * @param boolean $print
+   * @param bool $print
    *
    * @return void
    */

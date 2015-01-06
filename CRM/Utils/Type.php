@@ -149,7 +149,7 @@ class CRM_Utils_Type {
    *   The value to be verified/escaped.
    * @param string $type
    *   The type to verify against.
-   * @param boolean $abort
+   * @param bool $abort
    *   If TRUE, the operation will CRM_Core_Error::fatal() on invalid data.
    *
    * @return mixed
@@ -269,7 +269,7 @@ class CRM_Utils_Type {
    *   The value to validate.
    * @param string $type
    *   The type to validate against.
-   * @param boolean $abort
+   * @param bool $abort
    *   If TRUE, the operation will CRM_Core_Error::fatal() on invalid data.
    * @name string $name
    *   The name of the attribute

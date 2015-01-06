@@ -49,7 +49,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
   /**
    * Takes an associative array and creates a price set object
    *
-   * @param array $params (reference) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set object
    * @static
@@ -66,8 +67,10 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set object
    * @static
@@ -79,8 +82,10 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
   /**
    * Update the is_active flag in the db
    *
-   * @param int $id id of the database record
-   * @param bool $isActive value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $isActive
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on sucess, null otherwise
    * @static
@@ -132,7 +137,8 @@ WHERE       ps.name = '{$entityName}'
   /**
    * Get the price set title.
    *
-   * @param int $id   id of price set
+   * @param int $id
+   *   Id of price set.
    *
    * @return string   title
    *
@@ -146,8 +152,10 @@ WHERE       ps.name = '{$entityName}'
   /**
    * Return a list of all forms which use this price set.
    *
-   * @param int $id id of price set
-   * @param bool|\str $simpleReturn - get raw data. Possible values: 'entity', 'table'
+   * @param int $id
+   *   Id of price set.
+   * @param bool|\str $simpleReturn
+   *   Get raw data. Possible values: 'entity', 'table'.
    *
    * @return array
    */
@@ -247,7 +255,8 @@ WHERE     ct.id = cp.contribution_type_id AND
   /**
    * Delete the price set
    *
-   * @param int $id Price Set id
+   * @param int $id
+   *   Price Set id.
    *
    * @return boolean false if fields exist for this set, true if the
    * set could be deleted
@@ -332,7 +341,8 @@ WHERE     ct.id = cp.contribution_type_id AND
    *
    * @param string $entityTable
    * @param int $entityId
-   * @param int $usedFor ( price set that extends/used for particular component )
+   * @param int $usedFor
+   *   ( price set that extends/used for particular component ).
    *
    * @param null $isQuickConfig
    * @param null $setName
@@ -368,7 +378,8 @@ WHERE     ct.id = cp.contribution_type_id AND
   /**
    * Find a price_set_id associatied with the given option value or  field ID
    *
-   * @param array $params (reference) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
    *                      array may contain either option id or
    *                      price field id
    *
@@ -399,8 +410,10 @@ WHERE     ct.id = cp.contribution_type_id AND
   /**
    * Return an associative array of all price sets
    *
-   * @param bool $withInactive whether or not to include inactive entries
-   * @param bool|string $extendComponentName name of the component like 'CiviEvent','CiviContribute'
+   * @param bool $withInactive
+   *   Whether or not to include inactive entries.
+   * @param bool|string $extendComponentName
+   *   Name of the component like 'CiviEvent','CiviContribute'.
    *
    * @return array associative array of id => name
    */
@@ -444,7 +457,8 @@ WHERE     ct.id = cp.contribution_type_id AND
    *
    * An array containing price set details (including price fields) is returned
    *
-   * @param int $setID price set id whose details are needed
+   * @param int $setID
+   *   Price set id whose details are needed.
    * @param bool $required
    * @param bool $validOnly
    *
@@ -907,7 +921,8 @@ return $var;
  * This function is to make a copy of a price set, including
  * all the fields
  *
- * @param int $id the price set id to copy
+ * @param int $id
+ *   The price set id to copy.
  *
  * @return the copy object
  * @static
@@ -953,7 +968,8 @@ return $copy;
   /**
    * This function is to check price set permission
    *
-   * @param int $sid the price set id
+   * @param int $sid
+   *   The price set id.
    *
    * @return bool
    */
@@ -973,7 +989,8 @@ return TRUE;
    * Get the sum of participant count
    * for all fields of given price set.
    *
-   * @param int $sid the price set id
+   * @param int $sid
+   *   The price set id.
    *
    * @param bool $onlyActive
    *
@@ -1033,7 +1050,8 @@ return $count;
 /**
  * Function to check if auto renew option should be shown
  *
- * @param int $priceSetId price set id
+ * @param int $priceSetId
+ *   Price set id.
  *
  * @return int $autoRenewOption ( 0:hide, 1:optional 2:required )
  */
@@ -1080,7 +1098,8 @@ return 0;
   /**
    * Retrieve auto renew frequency and interval
    *
-   * @param int $priceSetId price set id
+   * @param int $priceSetId
+   *   Price set id.
    *
    * @return array associate array of frequency interval and unit
    * @static
@@ -1111,8 +1130,10 @@ return 0;
   /**
    * Update the is_quick_config flag in the db
    *
-   * @param  int      $id             id of the database record
-   * @param  boolean  $isQuickConfig  value we want to set the is_quick_config field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $isQuickConfig
+   *   Value we want to set the is_quick_config field.
    *
    * @return Object                   DAO object on sucess, null otherwise
    * @static

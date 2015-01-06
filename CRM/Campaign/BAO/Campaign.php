@@ -41,7 +41,8 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    * contact object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Campaign_DAO_Campaign object
    * @static
@@ -100,7 +101,8 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
   /**
    * Delete the campaign
    *
-   * @param  int $id id of the campaign
+   * @param int $id
+   *   Id of the campaign.
    *
    * @return bool|mixed
    */
@@ -118,8 +120,10 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    * retrieves the relevant objects. Typically the valid params are only
    * campaign_id.
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return \CRM_Campaign_DAO_Campaign|null
    */
@@ -138,9 +142,12 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
   /**
    * Return the all eligible campaigns w/ cache.
    *
-   * @param int $includeId lets inlcude this campaign by force.
-   * @param int $excludeId do not include this campaign.
-   * @param boolean $onlyActive consider only active campaigns.
+   * @param int $includeId
+   *   Lets inlcude this campaign by force.
+   * @param int $excludeId
+   *   Do not include this campaign.
+   * @param bool $onlyActive
+   *   Consider only active campaigns.
    *
    * @param bool $onlyCurrent
    * @param bool $appendDatesToTitle
@@ -465,7 +472,8 @@ SELECT  campaign.id               as id,
   /**
    * Get Campaigns groups
    *
-   * @param int $campaignId campaign id
+   * @param int $campaignId
+   *   Campaign id.
    *
    * @return array
    * @static
@@ -499,8 +507,10 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on sucess, null otherwise
    * @static

@@ -52,7 +52,8 @@ class CRM_Utils_Mail {
    *   mime_type: mime type of the attachment
    *   cleanName: the user friendly name of the attachmment
    *
-   * @param array $params (by reference)
+   * @param array $params
+   *   (by reference).
    *
    *
    * @return boolean true if a mail was sent, else false
@@ -253,7 +254,8 @@ class CRM_Utils_Mail {
    *
    * Ugly but working.
    *
-   * @param  string $header  the full name + email address string
+   * @param string $header
+   *   The full name + email address string.
    *
    * @return string          the plucked email address
    * @static

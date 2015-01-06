@@ -51,7 +51,8 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   /**
    * Handle the values in mapField mode
    *
-   * @param array $values the array of values belonging to this line
+   * @param array $values
+   *   The array of values belonging to this line.
    *
    * @return boolean
    */
@@ -62,7 +63,8 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   /**
    * Handle the values in preview mode
    *
-   * @param array $values the array of values belonging to this line
+   * @param array $values
+   *   The array of values belonging to this line.
    *
    * @return boolean      the result of this processing
    */
@@ -71,7 +73,8 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   }
 
   /**
-   * @param array $values the array of values belonging to this line
+   * @param array $values
+   *   The array of values belonging to this line.
    *
    * @return boolean      the result of this processing
    * It is called from both the preview & the import actions
@@ -121,8 +124,10 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   /**
    * Handle the values in import mode
    *
-   * @param int $onDuplicate the code for what action to take on duplicates
-   * @param array $values the array of values belonging to this line
+   * @param int $onDuplicate
+   *   The code for what action to take on duplicates.
+   * @param array $values
+   *   The array of values belonging to this line.
    *
    * @return boolean      the result of this processing
    */
@@ -203,7 +208,8 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   /**
    * Return the field ids and names (with groups) for import purpose.
    *
-   * @param int      $id     Custom group ID
+   * @param int $id
+   *   Custom group ID.
    *
    * @return array   $importableFields
    *

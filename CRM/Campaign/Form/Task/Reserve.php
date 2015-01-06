@@ -201,7 +201,8 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @param $files
    * @param $self

@@ -45,9 +45,12 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
    * Given a url, mailing id and queue event id, find or construct a
    * trackable url and redirect url.
    *
-   * @param string $url       The target url to track
-   * @param int $mailing_id   The id of the mailing
-   * @param int $queue_id     The queue event id (contact clicking through)
+   * @param string $url
+   *   The target url to track.
+   * @param int $mailing_id
+   *   The id of the mailing.
+   * @param int $queue_id
+   *   The queue event id (contact clicking through).
    *
    * @return string $redirect The redirect/tracking url
    * @static

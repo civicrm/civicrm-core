@@ -93,9 +93,12 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
   /**
    * Confirm email verification
    *
-   * @param int $contact_id The id of the contact
-   * @param int $subscribe_id The id of the subscription event
-   * @param string $hash The hash
+   * @param int $contact_id
+   *   The id of the contact.
+   * @param int $subscribe_id
+   *   The id of the subscription event.
+   * @param string $hash
+   *   The hash.
    *
    * @param int $activity_id
    * @param int $petition_id

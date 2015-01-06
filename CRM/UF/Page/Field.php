@@ -205,7 +205,8 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    *
    * editing would involved modifying existing fields + adding data to new fields.
    *
-   * @param string $action the action to be invoked
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
    */
@@ -278,7 +279,8 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
   /**
    * Preview custom field
    *
-   * @param int $fieldId custom field id
+   * @param int $fieldId
+   *   Custom field id.
    * @param int $groupId
    *
    * @return void

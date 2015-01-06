@@ -51,8 +51,10 @@ class CRM_Core_BAO_Block {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param string $blockName name of the above object
-   * @param array $params input parameters to find object
+   * @param string $blockName
+   *   Name of the above object.
+   * @param array $params
+   *   Input parameters to find object.
    *
    * @return array of $block objects.
    * @static
@@ -95,8 +97,10 @@ class CRM_Core_BAO_Block {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param Object $block typically a Phone|Email|IM|OpenID object
-   * @param string $blockName name of the above object
+   * @param Object $block
+   *   Typically a Phone|Email|IM|OpenID object.
+   * @param string $blockName
+   *   Name of the above object.
    *
    * @return array of $block objects.
    * @static
@@ -124,8 +128,10 @@ class CRM_Core_BAO_Block {
   /**
    * Check if the current block object has any valid data
    *
-   * @param array  $blockFields   array of fields that are of interest for this object
-   * @param array  $params        associated array of submitted fields
+   * @param array $blockFields
+   *   Array of fields that are of interest for this object.
+   * @param array $params
+   *   Associated array of submitted fields.
    *
    * @return boolean              true if the block has data, otherwise false
    * @static
@@ -142,8 +148,10 @@ class CRM_Core_BAO_Block {
   /**
    * Check if the current block exits
    *
-   * @param string  $blockName   bloack name
-   * @param array   $params      associated array of submitted fields
+   * @param string $blockName
+   *   Bloack name.
+   * @param array $params
+   *   Associated array of submitted fields.
    *
    * @return boolean             true if the block exits, otherwise false
    * @static
@@ -160,8 +168,10 @@ class CRM_Core_BAO_Block {
   /**
    * Get all block ids for a contact
    *
-   * @param string $blockName block name
-   * @param int $contactId contact id
+   * @param string $blockName
+   *   Block name.
+   * @param int $contactId
+   *   Contact id.
    *
    * @param null $entityElements
    * @param bool $updateBlankLocInfo
@@ -202,8 +212,10 @@ class CRM_Core_BAO_Block {
   /**
    * Takes an associative array and creates a block
    *
-   * @param string $blockName block name
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param string $blockName
+   *   Block name.
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    * @param null $entity
    * @param int $contactId
    *
@@ -382,8 +394,10 @@ class CRM_Core_BAO_Block {
   /**
    * Delete block
    *
-   * @param  string $blockName       block name
-   * @param  int    $params          associates array
+   * @param string $blockName
+   *   Block name.
+   * @param int $params
+   *   Associates array.
    *
    * @return void
    * @static

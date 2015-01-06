@@ -87,7 +87,8 @@ class CRM_Core_InnoDBIndexer {
    *
    * @param bool $oldValue
    * @param bool $newValue
-   * @param array $metadata Specification of the setting (per *.settings.php)
+   * @param array $metadata
+   *   Specification of the setting (per *.settings.php).
    */
   public static function onToggleFts($oldValue, $newValue, $metadata) {
     $indexer = CRM_Core_InnoDBIndexer::singleton();
@@ -128,7 +129,8 @@ class CRM_Core_InnoDBIndexer {
    * Determine if an index is expected to exist
    *
    * @param string $table
-   * @param array $fields list of field names that must be in the index
+   * @param array $fields
+   *   List of field names that must be in the index.
    * @return bool
    */
   public function hasDeclaredIndex($table, $fields) {
@@ -261,7 +263,7 @@ class CRM_Core_InnoDBIndexer {
   }
 
   /**
-   * @param boolean $isActive
+   * @param bool $isActive
    */
   public function setActive($isActive) {
     $this->isActive = $isActive;

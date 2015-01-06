@@ -200,7 +200,8 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    * editing would involved modifying existing financial Account Type + adding data
    * to new financial Account Type.
    *
-   * @param string $action the action to be invoked
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
    */

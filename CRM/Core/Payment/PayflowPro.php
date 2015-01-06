@@ -29,7 +29,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
   /*
    * Constructor
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @return void
    */
@@ -47,7 +48,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
   /**
    * Singleton function used to manage this object
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param object $paymentProcessor
    *
@@ -71,7 +73,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * This function collects all the information from a web/api form and invokes
    * the relevant payment processor specific functions to perform the transaction
    *
-   * @param  array $params assoc array of input parameters for this transaction
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
    *
    * @return array the result in an nice formatted array (or an error object)
    * @abstract
@@ -369,7 +372,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
   /**
    * Checks to see if invoice_id already exists in db
    *
-   * @param  int     $invoiceId   The ID to check
+   * @param int $invoiceId
+   *   The ID to check.
    *
    * @return bool                  True if ID exists, else false
    */
@@ -420,7 +424,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * NOTE: Called by Events and Contribute to check config params are set prior to trying
    *  register any credit card details
    *
-   * @param string $mode the mode we are operating in (live or test) - not used
+   * @param string $mode
+   *   The mode we are operating in (live or test) - not used.
    *
    * returns string $errorMsg if any errors found - null if OK
    *

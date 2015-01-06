@@ -82,10 +82,14 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    * We should not use QuickForm directly. This class provides a lot
    * of default convenient functions, rules and buttons
    *
-   * @param object $state State associated with this form
-   * @param \const|\enum $action The mode the form is operating in (None/Create/View/Update/Delete)
-   * @param string $method The type of http method used (GET/POST)
-   * @param string $name The name of the form if different from class name
+   * @param object $state
+   *   State associated with this form.
+   * @param \const|\enum $action
+   *   The mode the form is operating in (None/Create/View/Update/Delete).
+   * @param string $method
+   *   The type of http method used (GET/POST).
+   * @param string $name
+   *   The name of the form if different from class name.
    *
    * @return \CRM_Core_Form
   @access public
@@ -545,9 +549,12 @@ SET    version = '$version'
   /**
    * Fill the queue with upgrade tasks
    *
-   * @param $currentVer string, the original revision
-   * @param $latestVer string, the target (final) revision
-   * @param $postUpgradeMessageFile string, path of a modifiable file which lists the post-upgrade messages
+   * @param $currentVer
+   *   String, the original revision.
+   * @param $latestVer
+   *   String, the target (final) revision.
+   * @param $postUpgradeMessageFile
+   *   String, path of a modifiable file which lists the post-upgrade messages.
    *
    * @return CRM_Queue
    */
@@ -610,7 +617,8 @@ SET    version = '$version'
    * Perform an incremental version update
    *
    * @param CRM_Queue_TaskContext $ctx
-   * @param $rev string, the target (intermediate) revision e.g '3.2.alpha1'
+   * @param $rev
+   *   String, the target (intermediate) revision e.g '3.2.alpha1'.
    *
    * @return bool
    */
@@ -628,10 +636,14 @@ SET    version = '$version'
    * Perform an incremental version update
    *
    * @param CRM_Queue_TaskContext $ctx
-   * @param $rev string, the target (intermediate) revision e.g '3.2.alpha1'
-   * @param $originalVer string, the original revision
-   * @param $latestVer string, the target (final) revision
-   * @param $postUpgradeMessageFile string, path of a modifiable file which lists the post-upgrade messages
+   * @param $rev
+   *   String, the target (intermediate) revision e.g '3.2.alpha1'.
+   * @param $originalVer
+   *   String, the original revision.
+   * @param $latestVer
+   *   String, the target (final) revision.
+   * @param $postUpgradeMessageFile
+   *   String, path of a modifiable file which lists the post-upgrade messages.
    *
    * @return bool
    */
@@ -688,10 +700,14 @@ SET    version = '$version'
    * Perform an incremental version update
    *
    * @param CRM_Queue_TaskContext $ctx
-   * @param $rev string, the target (intermediate) revision e.g '3.2.alpha1'
-   * @param $currentVer string, the original revision
-   * @param $latestVer string, the target (final) revision
-   * @param $postUpgradeMessageFile string, path of a modifiable file which lists the post-upgrade messages
+   * @param $rev
+   *   String, the target (intermediate) revision e.g '3.2.alpha1'.
+   * @param $currentVer
+   *   String, the original revision.
+   * @param $latestVer
+   *   String, the target (final) revision.
+   * @param $postUpgradeMessageFile
+   *   String, path of a modifiable file which lists the post-upgrade messages.
    *
    * @return bool
    */
@@ -735,7 +751,8 @@ SET    version = '$version'
    * by calling the 'setPreUpgradeMessage' on each incremental upgrade
    * object.
    *
-   * @param $preUpgradeMessage string, alterable
+   * @param $preUpgradeMessage
+   *   String, alterable.
    * @param $currentVer
    * @param $latestVer
    */

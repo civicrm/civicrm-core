@@ -37,15 +37,22 @@ class CRM_Contribute_BAO_Contribution_Utils {
   /**
    * Process payment after confirmation
    *
-   * @param CRM_Core_Form $form form object
-   * @param array $paymentParams array with payment related key
+   * @param CRM_Core_Form $form
+   *   Form object.
+   * @param array $paymentParams
+   *   Array with payment related key.
    * value pairs
-   * @param array $premiumParams array with premium related key
+   * @param array $premiumParams
+   *   Array with premium related key.
    * value pairs
-   * @param int $contactID contact id
-   * @param int $contributionTypeId financial type id
-   * @param int|string $component component id
-   * @param array $fieldTypes presumably relates to custom field types - used when building data for sendMail
+   * @param int $contactID
+   *   Contact id.
+   * @param int $contributionTypeId
+   *   Financial type id.
+   * @param int|string $component
+   *   Component id.
+   * @param array $fieldTypes
+   *   Presumably relates to custom field types - used when building data for sendMail.
    * @param $isTest
    * @param $isPayLater
    *
@@ -371,7 +378,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * Get the contribution details by month
    * of the year
    *
-   * @param int     $param year
+   * @param int $param
+   *   Year.
    *
    * @return array associated array
    *
@@ -880,8 +888,10 @@ LIMIT 1
   /**
    * Calculate the tax amount based on given tax rate.
    *
-   * @param float $amount amount of field.
-   * @param float $taxRate tax rate of selected financial account for field.
+   * @param float $amount
+   *   Amount of field.
+   * @param float $taxRate
+   *   Tax rate of selected financial account for field.
    *
    * @return array array of tax amount
    *

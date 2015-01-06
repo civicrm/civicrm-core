@@ -10,7 +10,8 @@ class CRM_Core_Region {
    * Obtain the content for a given region
    *
    * @param string $name
-   * @param bool $autocreate whether to automatically create an empty region
+   * @param bool $autocreate
+   *   Whether to automatically create an empty region.
    * @return CRM_Core_Region
    */
   public static function &instance($name, $autocreate = TRUE) {
@@ -83,7 +84,8 @@ class CRM_Core_Region {
    * Note: This function does not perform any extra encoding of markup, script code, or etc. If
    * you're passing in user-data, you must clean it yourself.
    *
-   * @param $snippet array; keys:
+   * @param $snippet
+   *   Array; keys:.
    *   - type: string (auto-detected for markup, template, callback, script, scriptUrl, jquery, style, styleUrl)
    *   - name: string, optional
    *   - weight: int, optional; default=1
@@ -146,8 +148,10 @@ class CRM_Core_Region {
   /**
    * Render all the snippets in a region
    *
-   * @param string $default HTML, the initial content of the region
-   * @param bool $allowCmsOverride allow CMS to override rendering of region
+   * @param string $default
+   *   HTML, the initial content of the region.
+   * @param bool $allowCmsOverride
+   *   Allow CMS to override rendering of region.
    * @return string, HTML
    */
   public function render($default, $allowCmsOverride = TRUE) {
@@ -233,7 +237,8 @@ class CRM_Core_Region {
   /**
    * Add block of static HTML to a region
    *
-   * @param string $markup HTML
+   * @param string $markup
+   *   HTML.
    *
   public function addMarkup($markup) {
     return $this->add(array(
@@ -247,7 +252,8 @@ class CRM_Core_Region {
    *
    * Note: File is not evaluated until the page is rendered
    *
-   * @param string $template path to the Smarty template file
+   * @param string $template
+   *   Path to the Smarty template file.
    *
   public function addTemplate($template) {
     return $this->add(array(
@@ -260,7 +266,8 @@ class CRM_Core_Region {
    * Use a callback function to extend a region
    *
    * @param mixed $callback
-   * @param array $arguments optional, array of parameters for callback; if omitted, the default arguments are ($snippetSpec, $html)
+   * @param array $arguments
+   *   Optional, array of parameters for callback; if omitted, the default arguments are ($snippetSpec, $html).
    *
   public function addCallback($callback, $arguments = FALSE) {
     return $this->add(array(

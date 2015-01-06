@@ -66,8 +66,10 @@ class CRM_Utils_Mail_EmailProcessor {
   /**
    * Delete old files from a given directory (recursively)
    *
-   * @param string $dir  directory to cleanup
-   * @param int    $age  files older than this many seconds will be deleted (default: 60 days)
+   * @param string $dir
+   *   Directory to cleanup.
+   * @param int $age
+   *   Files older than this many seconds will be deleted (default: 60 days).
    *
    * @return void
    */
@@ -116,7 +118,8 @@ class CRM_Utils_Mail_EmailProcessor {
   /**
    * Process the mailbox for all the settings from civicrm_mail_settings
    *
-   * @param bool|string $civiMail if true, processing is done in CiviMail context, or Activities otherwise.
+   * @param bool|string $civiMail
+   *   If true, processing is done in CiviMail context, or Activities otherwise.
    *
    * @return void
    */

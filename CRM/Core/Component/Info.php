@@ -98,8 +98,10 @@ abstract class CRM_Core_Component_Info {
   protected $keyword;
 
   /**
-   * @param string $name name of the component
-   * @param string $namespace namespace prefix for component's files
+   * @param string $name
+   *   Name of the component.
+   * @param string $namespace
+   *   Namespace prefix for component's files.
    * @param int $componentID
    */
   public function __construct($name, $namespace, $componentID) {
@@ -167,7 +169,8 @@ abstract class CRM_Core_Component_Info {
   /**
    * Determine how many other records refer to a given record
    *
-   * @param CRM_Core_DAO $dao the item for which we want a reference count
+   * @param CRM_Core_DAO $dao
+   *   The item for which we want a reference count.
    * @return array each item in the array is an array with keys:
    *   - name: string, eg "sql:civicrm_email:contact_id"
    *   - type: string, eg "sql"

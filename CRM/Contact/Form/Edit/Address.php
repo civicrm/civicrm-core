@@ -42,9 +42,12 @@ class CRM_Contact_Form_Edit_Address {
    * Build form for address input fields
    *
    * @param CRM_Core_Form $form
-   * @param int     $addressBlockCount - the index of the address array (if multiple addresses on a page)
-   * @param boolean $sharing - false, if we want to skip the address sharing features
-   * @param boolean $inlineEdit true when edit used in inline edit
+   * @param int $addressBlockCount
+   *   The index of the address array (if multiple addresses on a page).
+   * @param bool $sharing
+   *   False, if we want to skip the address sharing features.
+   * @param bool $inlineEdit
+   *   True when edit used in inline edit.
    *
    * @return void
    *
@@ -312,8 +315,10 @@ class CRM_Contact_Form_Edit_Address {
   /**
    * Set default values for address block
    *
-   * @param array  $defaults  defaults associated array
-   * @param CRM_Core_Form $form     form object
+   * @param array $defaults
+   *   Defaults associated array.
+   * @param CRM_Core_Form $form
+   *   Form object.
    *
    * @static
    */

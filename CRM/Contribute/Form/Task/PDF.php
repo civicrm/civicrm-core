@@ -236,9 +236,12 @@ AND    {$this->_componentClause}";
    * Declaration of common variables for Invoice and PDF
    *
    *
-   * @param array $contribIds Contribution Id
-   * @param array $params parameter for pdf or email invoices
-   * @param array $contactIds Contact Id
+   * @param array $contribIds
+   *   Contribution Id.
+   * @param array $params
+   *   Parameter for pdf or email invoices.
+   * @param array $contactIds
+   *   Contact Id.
    *
    * @return array array of common elements
    *

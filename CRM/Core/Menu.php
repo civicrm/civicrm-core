@@ -71,7 +71,8 @@ class CRM_Core_Menu {
   /**
    * This function fetches the menu items from xml and xmlMenu hooks
    *
-   * @param boolen $fetchFromXML fetch the menu items from xml and not from cache
+   * @param boolen $fetchFromXML
+   *   Fetch the menu items from xml and not from cache.
    *
    * @return array
    */
@@ -162,7 +163,8 @@ class CRM_Core_Menu {
   /**
    * This function defines information for various menu items
    *
-   * @param boolen $fetchFromXML fetch the menu items from xml and not from cache
+   * @param boolen $fetchFromXML
+   *   Fetch the menu items from xml and not from cache.
    *
    * @static
    */
@@ -479,8 +481,10 @@ class CRM_Core_Menu {
   /**
    * Get the breadcrumb for a given path.
    *
-   * @param  array   $menu   An array of all the menu items.
-   * @param  string  $path   Path for which breadcrumb is to be build.
+   * @param array $menu
+   *   An array of all the menu items.
+   * @param string $path
+   *   Path for which breadcrumb is to be build.
    *
    * @return array  The breadcrumb for this path
    *

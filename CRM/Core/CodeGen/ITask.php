@@ -7,7 +7,8 @@ interface CRM_Core_CodeGen_ITask {
   /**
    * Make configuration object available to the task.
    *
-   * @param $config is currently the CRM_Core_CodeGen_Main object.
+   * @param $config
+   *   Is currently the CRM_Core_CodeGen_Main object.
    */
   public function setConfig($config);
 

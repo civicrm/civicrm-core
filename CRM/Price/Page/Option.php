@@ -197,7 +197,8 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    *
    * editing would involved modifying existing fields + adding data to new fields.
    *
-   * @param string  $action   the action to be invoked
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
    */

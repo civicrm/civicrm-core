@@ -11,7 +11,8 @@
  * Note: This will perform like a dog, but who cares -- at most, we deal with O(100) iterations
  * as part of a background task.
  *
- * @param $params , array with keys:
+ * @param $params
+ *   , array with keys:.
  *  - activity_id: int, required
  *  - target_var: string, optional; name of a variable which will store the first/only target contact; default "target"
  *  - assignee_var: string, optional; name of a variable which will store the first/only assignee contact; default "assignee"

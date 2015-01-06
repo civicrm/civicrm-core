@@ -109,7 +109,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
   /**
    * Handle the values in mapField mode
    *
-   * @param array $values the array of values belonging to this line
+   * @param array $values
+   *   The array of values belonging to this line.
    *
    * @return boolean
    */
@@ -120,7 +121,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
   /**
    * Handle the values in preview mode
    *
-   * @param array $values the array of values belonging to this line
+   * @param array $values
+   *   The array of values belonging to this line.
    *
    * @return boolean      the result of this processing
    */
@@ -131,7 +133,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
   /**
    * Handle the values in summary mode
    *
-   * @param array $values the array of values belonging to this line
+   * @param array $values
+   *   The array of values belonging to this line.
    *
    * @return boolean      the result of this processing
    */
@@ -244,8 +247,10 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
   /**
    * Handle the values in import mode
    *
-   * @param int $onDuplicate the code for what action to take on duplicates
-   * @param array $values the array of values belonging to this line
+   * @param int $onDuplicate
+   *   The code for what action to take on duplicates.
+   * @param array $values
+   *   The array of values belonging to this line.
    *
    * @return boolean      the result of this processing
    */
@@ -579,7 +584,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
   /**
    *  to calculate join, start and end dates
    *
-   * @param Array $calcDates array of dates returned by getDatesForMembershipType()
+   * @param Array $calcDates
+   *   Array of dates returned by getDatesForMembershipType().
    *
    * @param $formatted
    *
@@ -611,11 +617,14 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * take the input parameter list as specified in the data model and
    * convert it into the same format that we use in QF and BAO object
    *
-   * @param array $params Associative array of property name/value
+   * @param array $params
+   *   Associative array of property name/value.
    *                             pairs to insert in new contact.
-   * @param array $values The reformatted properties that we can use internally
+   * @param array $values
+   *   The reformatted properties that we can use internally.
    *
-   * @param array|bool $create Is the formatted Values array going to
+   * @param array|bool $create
+   *   Is the formatted Values array going to.
    *                             be used for CRM_Member_BAO_Membership:create()
    *
    * @throws Exception

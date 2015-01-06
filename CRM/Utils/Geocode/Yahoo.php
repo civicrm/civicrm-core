@@ -60,8 +60,10 @@ class CRM_Utils_Geocode_Yahoo {
    * and postal code for this address. Note that at a later stage, we could
    * make this function also clean up the address into a more valid format
    *
-   * @param array $values associative array of address data: country, street_address, city, state_province, postal code
-   * @param boolean $stateName this parameter currently has no function
+   * @param array $values
+   *   Associative array of address data: country, street_address, city, state_province, postal code.
+   * @param bool $stateName
+   *   This parameter currently has no function.
    *
    * @return boolean true if we modified the address, false otherwise
    * @static

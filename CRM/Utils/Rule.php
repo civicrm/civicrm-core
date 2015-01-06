@@ -222,7 +222,8 @@ class CRM_Utils_Rule {
    * specified has to be beyond today. (i.e today or later)
    *
    * @param array $date
-   * @param bool  $monthRequired check whether month is mandatory
+   * @param bool $monthRequired
+   *   Check whether month is mandatory.
    *
    * @return bool true if valid date
    * @static
@@ -554,7 +555,7 @@ class CRM_Utils_Rule {
    * See how file rules are written in HTML/QuickForm/file.php
    * Checks to make sure the uploaded file is ascii
    *
-   * @param     array     Uploaded file info (from $_FILES)
+   * @param array Uploaded file info (from $_FILES)
    *
    * @return    bool      true if file has been uploaded, false otherwise
    */
@@ -570,7 +571,7 @@ class CRM_Utils_Rule {
   /**
    * Checks to make sure the uploaded file is in UTF-8, recodes if it's not
    *
-   * @param     array     Uploaded file info (from $_FILES)
+   * @param array Uploaded file info (from $_FILES)
    *
    * @return    bool      whether file has been uploaded properly and is now in UTF-8
    */
@@ -599,7 +600,7 @@ class CRM_Utils_Rule {
    * See how file rules are written in HTML/QuickForm/file.php
    * Checks to make sure the uploaded file is html
    *
-   * @param     array     Uploaded file info (from $_FILES)
+   * @param array Uploaded file info (from $_FILES)
    *
    * @return    bool      true if file has been uploaded, false otherwise
    */
@@ -615,8 +616,10 @@ class CRM_Utils_Rule {
   /**
    * Check if there is a record with the same name in the db
    *
-   * @param string $value     the value of the field we are checking
-   * @param array  $options   the daoName and fieldName (optional )
+   * @param string $value
+   *   The value of the field we are checking.
+   * @param array $options
+   *   The daoName and fieldName (optional ).
    *
    * @return boolean     true if object exists
    * @static

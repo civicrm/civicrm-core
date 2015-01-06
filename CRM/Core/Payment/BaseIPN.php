@@ -74,11 +74,16 @@ class CRM_Core_Payment_BaseIPN {
    * Paypal allows you to resend Instant Payment Notifications if you, for example, moved site
    * and didn't update your IPN URL.
    *
-   * @param array $input interpreted values from the values returned through the IPN
-   * @param array $ids more interpreted values (ids) from the values returned through the IPN
-   * @param array $objects an empty array that will be populated with loaded object
-   * @param boolean $required boolean Return FALSE if the relevant objects don't exist
-   * @param integer $paymentProcessorID Id of the payment processor ID in use
+   * @param array $input
+   *   Interpreted values from the values returned through the IPN.
+   * @param array $ids
+   *   More interpreted values (ids) from the values returned through the IPN.
+   * @param array $objects
+   *   An empty array that will be populated with loaded object.
+   * @param bool $required
+   *   Boolean Return FALSE if the relevant objects don't exist.
+   * @param integer $paymentProcessorID
+   *   Id of the payment processor ID in use.
    * @return boolean
    */
   public function validateData(&$input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
@@ -124,7 +129,7 @@ class CRM_Core_Payment_BaseIPN {
    * @param $input
    * @param array $ids
    * @param array $objects
-   * @param boolean $required
+   * @param bool $required
    * @param integer $paymentProcessorID
    * @param array $error_handling
    *
@@ -698,12 +703,17 @@ LIMIT 1;";
    * Send receipt from contribution. Note that the compose message part has been moved to contribution
    * In general LoadObjects is called first to get the objects but the composeMessageArray function now calls it
    *
-   * @param array $input Incoming data from Payment processor
-   * @param array $ids Related object IDs
+   * @param array $input
+   *   Incoming data from Payment processor.
+   * @param array $ids
+   *   Related object IDs.
    * @param $objects
-   * @param array $values values related to objects that have already been loaded
-   * @param bool $recur is it part of a recurring contribution
-   * @param bool $returnMessageText Should text be returned instead of sent. This
+   * @param array $values
+   *   Values related to objects that have already been loaded.
+   * @param bool $recur
+   *   Is it part of a recurring contribution.
+   * @param bool $returnMessageText
+   *   Should text be returned instead of sent. This.
    *  is because the function is also used to generate pdfs
    *
    * @return array

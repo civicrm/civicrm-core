@@ -50,8 +50,10 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_BAO_LocaationType object on success, null otherwise
    * @static
@@ -69,8 +71,10 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on sucess, null otherwise
    *
@@ -116,7 +120,8 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
   /**
    * Add a Location Type
    *
-   * @param array $params reference array contains the values submitted by the form
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
    *
    * @static
    *
@@ -143,7 +148,8 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
   /**
    * Delete location Types
    *
-   * @param  int  $locationTypeId     ID of the location type to be deleted.
+   * @param int $locationTypeId
+   *   ID of the location type to be deleted.
    *
    * @static
    */

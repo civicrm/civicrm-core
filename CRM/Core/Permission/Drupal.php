@@ -65,7 +65,8 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
   /**
    * Given a permission string, check for access requirements
    *
-   * @param string $str the permission to check
+   * @param string $str
+   *   The permission to check.
    *
    * @param int $contactID
    *
@@ -91,7 +92,8 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
   /**
    * Given a roles array, check for access requirements
    *
-   * @param array $array the roles to check
+   * @param array $array
+   *   The roles to check.
    *
    * @return boolean true if yes, else false
    */
@@ -131,7 +133,8 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
   /**
    * Get all the contact emails for users that have a specific permission
    *
-   * @param string $permissionName name of the permission we are interested in
+   * @param string $permissionName
+   *   Name of the permission we are interested in.
    *
    * @return string a comma separated list of email addresses
    */

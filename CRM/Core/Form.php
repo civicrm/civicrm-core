@@ -157,10 +157,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * We should not use QuickForm directly. This class provides a lot
    * of default convenient functions, rules and buttons
    *
-   * @param object $state State associated with this form
-   * @param \const|\enum|int $action The mode the form is operating in (None/Create/View/Update/Delete)
-   * @param string $method The type of http method used (GET/POST)
-   * @param string $name The name of the form if different from class name
+   * @param object $state
+   *   State associated with this form.
+   * @param \const|\enum|int $action
+   *   The mode the form is operating in (None/Create/View/Update/Delete).
+   * @param string $method
+   *   The type of http method used (GET/POST).
+   * @param string $name
+   *   The name of the form if different from class name.
    *
    * @return \CRM_Core_Form
    */
@@ -241,9 +245,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $type
    * @param string $name
    * @param string $label
-   * @param string|array $attributes (options for select elements)
+   * @param string|array $attributes
+   *   (options for select elements).
    * @param bool $required
-   * @param array $extra (attributes for select elements)
+   * @param array $extra
+   *   (attributes for select elements).
    *
    * @return HTML_QuickForm_Element could be an error object
    */
@@ -316,7 +322,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * This function is just a wrapper, so that we can call all the hook functions
-   * @param bool $allowAjax - FIXME: This feels kind of hackish, ideally we would take the json-related code from this function
+   * @param bool $allowAjax
+   *   FIXME: This feels kind of hackish, ideally we would take the json-related code from this function.
    *                          and bury it deeper down in the controller
    */
   public function mainProcess($allowAjax = TRUE) {
@@ -475,7 +482,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Add default Next / Back buttons
    *
-   * @param array   array of associative arrays in the order in which the buttons should be
+   * @param array array of associative arrays in the order in which the buttons should be
    *                displayed. The associate array has 3 fields: 'type', 'name' and 'isDefault'
    *                The base form class will define a bunch of static arrays for commonly used
    *                formats
@@ -576,7 +583,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Setter function for title.
    *
-   * @param string $title the title of the form
+   * @param string $title
+   *   The title of the form.
    *
    * @return void
    */
@@ -708,9 +716,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Error reporting mechanism
    *
-   * @param string  $message Error Message
-   * @param int     $code    Error Code
-   * @param CRM_Core_DAO $dao     A data access object on which we perform a rollback if non - empty
+   * @param string $message
+   *   Error Message.
+   * @param int $code
+   *   Error Code.
+   * @param CRM_Core_DAO $dao
+   *   A data access object on which we perform a rollback if non - empty.
    *
    * @return void
    */
@@ -727,8 +738,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Store the variable with the value in the form scope
    *
-   * @param  string name  : name  of the variable
-   * @param  mixed  value : value of the variable
+   * @param string name : name of the variable
+   * @param mixed value : value of the variable
    *
    *
    * @return void
@@ -741,7 +752,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Get the variable from the form scope
    *
-   * @param  string name  : name  of the variable
+   * @param string name : name of the variable
    *
    *
    * @return mixed
@@ -763,7 +774,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Setter for action
    *
-   * @param  int  $action the mode we want to set the form
+   * @param int $action
+   *   The mode we want to set the form.
    *
    * @return void
    */
@@ -774,8 +786,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Assign value to name in template
    *
-   * @param string $var name of variable
-   * @param mixed $value value of variable
+   * @param string $var
+   *   Name of variable.
+   * @param mixed $value
+   *   Value of variable.
    *
    * @return void
    */
@@ -786,8 +800,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Assign value to name in template by reference
    *
-   * @param string $var name of variable
-   * @param mixed $value value of varaible
+   * @param string $var
+   *   Name of variable.
+   * @param mixed $value
+   *   Value of varaible.
    *
    * @return void
    */
@@ -798,8 +814,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Appends values to template variables
    *
-   * @param array|string $tpl_var the template variable name(s)
-   * @param mixed $value the value to append
+   * @param array|string $tpl_var
+   *   The template variable name(s).
+   * @param mixed $value
+   *   The value to append.
    * @param bool $merge
    */
   public function append($tpl_var, $value=NULL, $merge=FALSE) {
@@ -930,10 +948,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Simple shell that derived classes can call to add buttons to
    * the form with a customized title for the main Submit
    *
-   * @param string $title title of the main button
-   * @param string $nextType button type for the form after processing
+   * @param string $title
+   *   Title of the main button.
+   * @param string $nextType
+   *   Button type for the form after processing.
    * @param string $backType
-   * @param bool|string $submitOnce If true, add javascript to next button submit which prevents it from being clicked more than once
+   * @param bool|string $submitOnce
+   *   If true, add javascript to next button submit which prevents it from being clicked more than once.
    *
    * @return void
    */
@@ -982,8 +1003,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Adds a select based on field metadata
    * TODO: This could be even more generic and widget type (select in this case) could also be read from metadata
    * Perhaps a method like $form->bind($name) which would look up all metadata for named field
-   * @param $name - field name to go on the form
-   * @param array $props - mix of html attributes and special properties, namely
+   * @param $name
+   *   Field name to go on the form.
+   * @param array $props
+   *   Mix of html attributes and special properties, namely.
    *   - entity (api entity name, can usually be inferred automatically from the form class)
    *   - field (field name - only needed if different from name used on the form)
    *   - option_url - path to edit this option list - usually retrieved automatically - set to NULL to disable link
@@ -1048,12 +1071,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Add a widget for selecting/editing/creating/copying a profile form
    *
-   * @param string $name HTML form-element name
-   * @param string $label Printable label
-   * @param string $allowCoreTypes only present a UFGroup if its group_type includes a subset of $allowCoreTypes; e.g. 'Individual', 'Activity'
-   * @param string $allowSubTypes only present a UFGroup if its group_type is compatible with $allowSubypes
+   * @param string $name
+   *   HTML form-element name.
+   * @param string $label
+   *   Printable label.
+   * @param string $allowCoreTypes
+   *   Only present a UFGroup if its group_type includes a subset of $allowCoreTypes; e.g. 'Individual', 'Activity'.
+   * @param string $allowSubTypes
+   *   Only present a UFGroup if its group_type is compatible with $allowSubypes.
    * @param array $entities
-   * @param bool $default //CRM-15427
+   * @param bool $default
+   *   //CRM-15427.
    */
   public function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes, $entities, $default = FALSE) {
     // Output widget
@@ -1225,16 +1253,20 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Add date
-   * @param string $name   name of the element
-   * @param string $label  label of the element
-   * @param array  $attributes key / value pair
+   * @param string $name
+   *   Name of the element.
+   * @param string $label
+   *   Label of the element.
+   * @param array $attributes
+   *   Key / value pair.
    *
    * // if you need time
    * $attributes = array(
    *   'addTime' => true,
    *   'formatType' => 'relative' or 'birth' etc check advanced date settings
    * );
-   * @param boolean $required  true if required
+   * @param bool $required
+   *   True if required.
    *
    */
   public function addDate($name, $label, $required = FALSE, $attributes = NULL) {
@@ -1382,7 +1414,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Create a single or multiple entity ref field
    * @param string $name
    * @param string $label
-   * @param array $props mix of html and widget properties, including:
+   * @param array $props
+   *   Mix of html and widget properties, including:.
    *  - select - params to give to select2 widget
    *  - entity - defaults to contact
    *  - create - can the user create a new entity on-the-fly?
@@ -1440,7 +1473,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * BAO layer. In this case fields are checked against the $_datefields defined for the form
    * and if time is defined it is incorporated
    *
-   * @param array $params input params from the form
+   * @param array $params
+   *   Input params from the form.
    *
    * @todo it would probably be better to work on $this->_params than a passed array
    * @todo standardise the format which dates are passed to the BAO layer in & remove date
@@ -1575,7 +1609,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * </div>
    * {/if}
    *
-   * @param array $profiles ids of profiles that are on the form (to be autofilled)
+   * @param array $profiles
+   *   Ids of profiles that are on the form (to be autofilled).
    * @param array $autoCompleteField
    *
    *  - name_field
@@ -1642,7 +1677,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Set default values on form for given contact (or no contact defaults)
    *
-   * @param mixed $profile_id (can be id, or profile name)
+   * @param mixed $profile_id
+   *   (can be id, or profile name).
    * @param integer $contactID
    *
    * @return array

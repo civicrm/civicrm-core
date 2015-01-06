@@ -60,9 +60,12 @@ class CRM_Contact_Form_Task_LabelCommon {
   /**
    * Create labels (pdf)
    *
-   * @param   array    $contactRows   assciated array of contact data
-   * @param   string   $format   format in which labels needs to be printed
-   * @param   string   $fileName    The name of the file to save the label in
+   * @param array $contactRows
+   *   Assciated array of contact data.
+   * @param string $format
+   *   Format in which labels needs to be printed.
+   * @param string $fileName
+   *   The name of the file to save the label in.
    *
    * @return  null
    */
@@ -90,9 +93,10 @@ class CRM_Contact_Form_Task_LabelCommon {
    *
    * @param $contactIDs
    * @param integer $locationTypeID
-   * @param boolean $respectDoNotMail
+   * @param bool $respectDoNotMail
    * @param $mergeSameAddress
-   * @param bool $mergeSameHousehold UNUSED
+   * @param bool $mergeSameHousehold
+   *   UNUSED.
    *
    * @return array of rows for labels
    */

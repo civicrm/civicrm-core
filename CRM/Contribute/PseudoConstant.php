@@ -189,7 +189,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @static
    *
-   * @param bool|string $name pseudoconstant to be flushed
+   * @param bool|string $name
+   *   Pseudoconstant to be flushed.
    */
   public static function flush($name = 'cache') {
    if (isset(self::$$name)) {
@@ -202,8 +203,10 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * Get all the contribution pages
    *
-   * @param integer $id  id of the contribution page
-   * @param boolean $all do we want all pages or only active pages
+   * @param integer $id
+   *   Id of the contribution page.
+   * @param bool $all
+   *   Do we want all pages or only active pages.
    *
    *
    * @return array - array reference of all contribution pages if any

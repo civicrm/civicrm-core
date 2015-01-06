@@ -86,10 +86,14 @@ abstract class CRM_Core_Payment {
   /**
    * Singleton function used to manage this object
    *
-   * @param string  $mode the mode of operation: live or test
-   * @param array  $paymentProcessor the details of the payment processor being invoked
-   * @param object $paymentForm deprecated - avoid referring to this if possible. If you have to use it document why as this is scary interaction
-   * @param boolean $force            should we force a reload of this payment object
+   * @param string $mode
+   *   The mode of operation: live or test.
+   * @param array $paymentProcessor
+   *   The details of the payment processor being invoked.
+   * @param object $paymentForm
+   *   Deprecated - avoid referring to this if possible. If you have to use it document why as this is scary interaction.
+   * @param bool $force
+   *   Should we force a reload of this payment object.
    *
    * @return CRM_Core_Payment
    * @static
@@ -151,7 +155,8 @@ abstract class CRM_Core_Payment {
 
   /**
    * Check if capability is supported
-   * @param string $capability e.g BackOffice, LiveMode, FutureRecurStartDate
+   * @param string $capability
+   *   E.g BackOffice, LiveMode, FutureRecurStartDate.
    *
    * @return bool
    */
@@ -419,7 +424,8 @@ abstract class CRM_Core_Payment {
    * This function collects all the information from a web/api form and invokes
    * the relevant payment processor specific functions to perform the transaction
    *
-   * @param  array $params assoc array of input parameters for this transaction
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
    *
    * @return array the result in an nice formatted array (or an error object)
    * @abstract
@@ -595,7 +601,8 @@ abstract class CRM_Core_Payment {
   /**
    * Check whether a method is present ( & supported ) by the payment processor object.
    *
-   * @param  string $method method to check for.
+   * @param string $method
+   *   Method to check for.
    *
    * @return boolean
    */

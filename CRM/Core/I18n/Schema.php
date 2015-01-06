@@ -60,7 +60,8 @@ class CRM_Core_I18n_Schema {
    * Switch database from single-lang to multi (by adding
    * the first language and dropping the original columns).
    *
-   * @param $locale string  the first locale to create (migrate to)
+   * @param $locale
+   *   String  the first locale to create (migrate to).
    *
    * @return void
    */
@@ -114,7 +115,8 @@ class CRM_Core_I18n_Schema {
    * Switch database from multi-lang back to single (by dropping
    * additional columns and views and retaining only the selected locale).
    *
-   * @param $retain string  the locale to retain
+   * @param $retain
+   *   String  the locale to retain.
    *
    * @return void
    */
@@ -153,9 +155,12 @@ class CRM_Core_I18n_Schema {
   /**
    * Switch a given table from multi-lang to single (by retaining only the selected locale).
    *
-   * @param $retain string  the locale to retain
-   * @param $table  string  the table containing the column
-   * @param $class  string  schema structure class to use to recreate indices
+   * @param $retain
+   *   String  the locale to retain.
+   * @param $table
+   *   String  the table containing the column.
+   * @param $class
+   *   String  schema structure class to use to recreate indices.
    *
    * @param array $triggers
    *
@@ -235,8 +240,10 @@ class CRM_Core_I18n_Schema {
    * Add a new locale to a multi-lang db, setting
    * its values to the current default locale.
    *
-   * @param $locale string  the new locale to add
-   * @param $source string  the locale to copy from
+   * @param $locale
+   *   String  the new locale to add.
+   * @param $source
+   *   String  the locale to copy from.
    *
    * @return void
    */
@@ -292,8 +299,10 @@ class CRM_Core_I18n_Schema {
   /**
    * Rebuild multilingual indices, views and triggers (useful for upgrades)
    *
-   * @param $locales array  locales to be rebuilt
-   * @param $version string version of schema structure to use
+   * @param $locales
+   *   Array  locales to be rebuilt.
+   * @param $version
+   *   String version of schema structure to use.
    *
    * @return void
    */
@@ -356,7 +365,8 @@ class CRM_Core_I18n_Schema {
   /**
    * Rewrite SQL query to use views to access tables with localized columns.
    *
-   * @param $query string  the query for rewrite
+   * @param $query
+   *   String  the query for rewrite.
    *
    * @return string        the rewritten query
    */
@@ -426,9 +436,12 @@ class CRM_Core_I18n_Schema {
   /**
    * CREATE INDEX queries for a given locale and table
    *
-   * @param $locale string  locale for which the queries should be created (null to create original indices)
-   * @param $table string   table for which the queries should be created
-   * @param $class string   schema structure class to use
+   * @param $locale
+   *   String  locale for which the queries should be created (null to create original indices).
+   * @param $table
+   *   String   table for which the queries should be created.
+   * @param $class
+   *   String   schema structure class to use.
    *
    * @return array          array of CREATE INDEX queries
    */
@@ -465,10 +478,14 @@ class CRM_Core_I18n_Schema {
   /**
    * CREATE VIEW query for a given locale and table
    *
-   * @param $locale string  locale of the view
-   * @param $table string   table of the view
-   * @param CRM_Core_DAO $dao     a DAO object to run DESCRIBE queries
-   * @param $class string   schema structure class to use
+   * @param $locale
+   *   String  locale of the view.
+   * @param $table
+   *   String   table of the view.
+   * @param CRM_Core_DAO $dao
+   *   A DAO object to run DESCRIBE queries.
+   * @param $class
+   *   String   schema structure class to use.
    *
    * @return array          array of CREATE INDEX queries
    */

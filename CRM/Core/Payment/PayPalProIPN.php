@@ -63,7 +63,8 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * Constructor function
    *
-   * @param array $inputData contents of HTTP REQUEST
+   * @param array $inputData
+   *   Contents of HTTP REQUEST.
    *
    * @throws CRM_Core_Exception
    */
@@ -76,8 +77,10 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * Function exists to get the values from the rp_invoice_id string
    *
-   * @param string $name e.g. i, values are stored in the string with letter codes
-   * @param boolean $abort fatal if not found?
+   * @param string $name
+   *   E.g. i, values are stored in the string with letter codes.
+   * @param bool $abort
+   *   Fatal if not found?.
    *
    * @throws CRM_Core_Exception
    * @return unknown
@@ -128,12 +131,16 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * @param string $name of variable to return
-   * @param string $type data type
+   * @param string $name
+   *   Of variable to return.
+   * @param string $type
+   *   Data type.
    *   - String
    *   - Integer
-   * @param string $location - deprecated
-   * @param boolean $abort abort if empty
+   * @param string $location
+   *   Deprecated.
+   * @param bool $abort
+   *   Abort if empty.
    *
    * @throws CRM_Core_Exception
    * @return Ambigous <mixed, NULL, value, unknown, array, number>
@@ -155,7 +162,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @param array $input
    * @param array $ids
    * @param array $objects
-   * @param boolean $first
+   * @param bool $first
    * @return void|boolean
    */
   public function recur(&$input, &$ids, &$objects, $first) {

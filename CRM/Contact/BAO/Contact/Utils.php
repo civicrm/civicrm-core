@@ -37,10 +37,14 @@ class CRM_Contact_BAO_Contact_Utils {
   /**
    * Given a contact type, get the contact image
    *
-   * @param string  $contactType contact type
-   * @param boolean $urlOnly  if we need to return only image url
-   * @param int     $contactId contact id
-   * @param boolean $addProfileOverlay  if profile overlay class should be added
+   * @param string $contactType
+   *   Contact type.
+   * @param bool $urlOnly
+   *   If we need to return only image url.
+   * @param int $contactId
+   *   Contact id.
+   * @param bool $addProfileOverlay
+   *   If profile overlay class should be added.
    *
    * @return string
    * @static
@@ -113,7 +117,8 @@ class CRM_Contact_BAO_Contact_Utils {
   /**
    * Function check for mix contact ids(individual+household etc...)
    *
-   * @param array $contactIds array of contact ids
+   * @param array $contactIds
+   *   Array of contact ids.
    *
    * @return boolen true or false true if mix contact array else fale
    *
@@ -140,9 +145,12 @@ WHERE  id IN ( $idString )
    * Generate a checksum for a $entityId of type $entityType
    *
    * @param int $entityId
-   * @param int $ts timestamp that checksum was generated
-   * @param int $live life of this checksum in hours/ 'inf' for infinite
-   * @param string $hash contact hash, if sent, prevents a query in inner loop
+   * @param int $ts
+   *   Timestamp that checksum was generated.
+   * @param int $live
+   *   Life of this checksum in hours/ 'inf' for infinite.
+   * @param string $hash
+   *   Contact hash, if sent, prevents a query in inner loop.
    *
    * @param string $entityType
    * @param null $hashSize
@@ -211,8 +219,9 @@ WHERE  id IN ( $idString )
   /**
    * Make sure the checksum is valid for the passed in contactID
    *
-   * @param int    $contactID
-   * @param string $inputCheck checksum to match against
+   * @param int $contactID
+   * @param string $inputCheck
+   *   Checksum to match against.
    *
    * @return boolean           true if valid, else false
    * @static
@@ -244,7 +253,8 @@ WHERE  id IN ( $idString )
   /**
    * Get the count of  contact loctions
    *
-   * @param int $contactId contact id
+   * @param int $contactId
+   *   Contact id.
    *
    * @return int $locationCount max locations for the contact
    * @static
@@ -270,8 +280,10 @@ UNION
   /**
    * Create Current employer relationship for a individual
    *
-   * @param int $contactID contact id of the individual
-   * @param $organization (id or name)
+   * @param int $contactID
+   *   Contact id of the individual.
+   * @param $organization
+   *   (id or name).
    * @param int $previousEmployerID
    * @param bool $newContact
    *
@@ -346,10 +358,14 @@ UNION
   /**
    * Create related memberships for current employer
    *
-   * @param int $contactID contact id of the individual
-   * @param int $employerID contact id of the organization.
-   * @param array $relationshipParams relationship params.
-   * @param boolean $duplicate are we triggered existing relationship.
+   * @param int $contactID
+   *   Contact id of the individual.
+   * @param int $employerID
+   *   Contact id of the organization.
+   * @param array $relationshipParams
+   *   Relationship params.
+   * @param bool $duplicate
+   *   Are we triggered existing relationship.
    *
    * @param int $previousEmpID
    *
@@ -385,7 +401,8 @@ UNION
   /**
    * Set current employer id and organization name
    *
-   * @param array $currentEmployerParams associated array of contact id and its employer id
+   * @param array $currentEmployerParams
+   *   Associated array of contact id and its employer id.
    *
    */
   public static function setCurrentEmployer($currentEmployerParams) {
@@ -403,7 +420,8 @@ WHERE contact_a.id ={$contactId} AND contact_b.id={$orgId}; ";
   /**
    * Update cached current employer name
    *
-   * @param int $organizationId current employer id
+   * @param int $organizationId
+   *   Current employer id.
    *
    */
   public static function updateCurrentEmployer($organizationId) {
@@ -417,8 +435,10 @@ WHERE contact_a.employer_id=contact_b.id AND contact_b.id={$organizationId}; ";
   /**
    * Clear cached current employer name
    *
-   * @param int $contactId contact id ( mostly individual contact id)
-   * @param int $employerId contact id ( mostly organization contact id)
+   * @param int $contactId
+   *   Contact id ( mostly individual contact id).
+   * @param int $employerId
+   *   Contact id ( mostly organization contact id).
    *
    */
   public static function clearCurrentEmployer($contactId, $employerId = NULL) {
@@ -464,10 +484,12 @@ WHERE id={$contactId}; ";
    * Build form for related contacts / on behalf of organization.
    *
    * @param CRM_Core_Form $form
-   * @param $contactType       string  contact type
+   * @param $contactType
+   *   String  contact type.
    * @param int $countryID
    * @param int $stateID
-   * @param $title             string  fieldset title
+   * @param $title
+   *   String  fieldset title.
    *
    * @static
    */
@@ -539,7 +561,8 @@ WHERE id={$contactId}; ";
    * Clear cache employer name and employer id
    * of all employee when employer get deleted.
    *
-   * @param int $employerId contact id of employer ( organization id )
+   * @param int $employerId
+   *   Contact id of employer ( organization id ).
    *
    */
   public static function clearAllEmployee($employerId) {
@@ -554,10 +577,12 @@ UPDATE civicrm_contact
   /**
    * Given an array of contact ids this function will return array with links to view contact page
    *
-   * @param array $contactIDs associated contact id's
+   * @param array $contactIDs
+   *   Associated contact id's.
    * @param bool $addViewLink
    * @param bool $addEditLink
-   * @param int $originalId associated with the contact which is edited
+   * @param int $originalId
+   *   Associated with the contact which is edited.
    *
    *
    * @return array $contactViewLinks returns array with links to contact view
@@ -660,9 +685,11 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
   /**
    * This function retrieve component related contact information.
    *
-   * @param array $componentIds array of component Ids.
+   * @param array $componentIds
+   *   Array of component Ids.
    * @param string $componentName
-   * @param array $returnProperties array of return elements.
+   * @param array $returnProperties
+   *   Array of return elements.
    *
    * @return array $contactDetails array of contact info.@static
    */
@@ -787,7 +814,8 @@ Group By  componentId";
    * has same address as shared contact address. We copy the address so that search etc will be
    * much efficient.
    *
-   * @param array $address this is associated array which contains submitted form values
+   * @param array $address
+   *   This is associated array which contains submitted form values.
    *
    * @return void
    * @static
@@ -837,7 +865,8 @@ Group By  componentId";
   /**
    * Get the list of contact name give address associated array
    *
-   * @param array $addresses associated array of
+   * @param array $addresses
+   *   Associated array of.
    *
    * @return array $contactNames associated array of contact names@static
    */
@@ -875,7 +904,8 @@ Group By  componentId";
    * caches, but are backing off from this with every release. Compromise between ease of coding versus
    * performance versus being accurate at that very instant
    *
-   * @param $contactID - the contactID that was edited / deleted
+   * @param $contactID
+   *   The contactID that was edited / deleted.
    *
    * @return void
    * @static
@@ -1047,8 +1077,10 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
   /**
    * Fetch the default greeting for a given contact type
    *
-   * @param string $contactType contact type
-   * @param string $greetingType greeting type
+   * @param string $contactType
+   *   Contact type.
+   * @param string $greetingType
+   *   Greeting type.
    *
    * @return int or null
    */
@@ -1082,7 +1114,8 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    * by the token substitution mechanism,
    * before Smarty is invoked.
    *
-   * @param string $templateString the greeting template string with contact tokens + Smarty syntax
+   * @param string $templateString
+   *   The greeting template string with contact tokens + Smarty syntax.
    *
    * @param $contactDetails
    * @param int $contactID
