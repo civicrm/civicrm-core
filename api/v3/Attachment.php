@@ -210,7 +210,7 @@ function civicrm_api3_attachment_delete($params) {
   $filePaths = array();
   $fileIds = array();
   while ($dao->fetch()) {
-    $filePaths [] = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $dao->uri;
+    $filePaths[] = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $dao->uri;
     $fileIds[] = $dao->id;
   }
 

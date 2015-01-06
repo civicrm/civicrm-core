@@ -174,4 +174,3 @@ SELECT start_date, end_date, join_date, membership_type_id
   $dao->free();
   return $result;
 }
-

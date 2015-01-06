@@ -281,8 +281,8 @@ function civicrm_api3_extension_get($params) {
     //try {
     //  $info = (array) $mapper->keyToInfo($key);
     //} catch (CRM_Extension_Exception $e) {
-      $info = array();
-      $info['key'] = $key;
+    $info = array();
+    $info['key'] = $key;
     //}
     $info['status'] = $status;
     $result[] = $info;

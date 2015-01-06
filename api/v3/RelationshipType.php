@@ -116,4 +116,3 @@ function civicrm_api3_relationship_type_get($params) {
 function civicrm_api3_relationship_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

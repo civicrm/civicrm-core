@@ -118,4 +118,3 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
 function civicrm_api3_activity_type_delete($params) {
   return civicrm_api3_create_success(CRM_Core_BAO_OptionValue::del($params['id']), $params);
 }
-

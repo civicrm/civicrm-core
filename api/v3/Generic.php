@@ -17,7 +17,7 @@
  *  - version: string
  *  - function: callback (mixed)
  *  - params: array, varies
- *  @return array API success object
+ * @return array API success object
  */
 function civicrm_api3_generic_getfields($apiRequest) {
   static $results = array();
@@ -55,6 +55,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
     case 'getfields':
       $values = _civicrm_api_get_fields($entity, FALSE, $apiRequest['params']);
       return civicrm_api3_create_success($values, $apiRequest['params'], $entity, 'getfields');
+
     case 'create':
     case 'update':
     case 'replace':
@@ -104,7 +105,8 @@ function civicrm_api3_generic_getfields($apiRequest) {
           'title' => 'Context',
         ),
       );
-        break;
+      break;
+
     default:
       // oddballs are on their own
       $metadata = array();
@@ -150,7 +152,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
 function civicrm_api3_generic_getcount($apiRequest) {
   $apiRequest['params']['options']['is_count'] = TRUE;
   $result = civicrm_api($apiRequest['entity'], 'get', $apiRequest['params']);
-  if(is_numeric (CRM_Utils_Array::value('values', $result))) {
+  if(is_numeric(CRM_Utils_Array::value('values', $result))) {
     return (int) $result['values'];
   }
   if(!isset($result['count'])) {

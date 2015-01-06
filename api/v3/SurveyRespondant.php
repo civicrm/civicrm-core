@@ -66,7 +66,7 @@ function civicrm_api3_survey_respondant_get(&$params) {
   $interviewerID = NULL;
   if (array_key_exists('interviewer_id', $params)) {
     $interviewerID = $params['interviewer_id'];
-}
+  }
 
   $statusIds = array();
   if (array_key_exists('status_id', $params)) {
@@ -94,4 +94,3 @@ function &civicrm_api3_survey_respondant_count($params) {
   }
   return ($signaturesCount);
 }
-

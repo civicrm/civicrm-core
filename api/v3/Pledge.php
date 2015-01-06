@@ -199,4 +199,3 @@ function _civicrm_api3_pledge_format_params(&$values, $create = FALSE) {
     $values['scheduled_date'] = $values['start_date'];
   }
 }
-

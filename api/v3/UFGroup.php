@@ -95,4 +95,3 @@ function civicrm_api3_uf_group_get($params) {
 function civicrm_api3_uf_group_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

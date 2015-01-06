@@ -143,7 +143,6 @@ function _civicrm_api3_job_execute_spec(&$params) {
 function civicrm_api3_job_geocode($params) {
   $gc = new CRM_Utils_Address_BatchUpdate($params);
 
-
   $result = $gc->run();
 
   if ($result['is_error'] == 0) {
@@ -287,11 +286,11 @@ function civicrm_api3_job_update_greeting($params) {
 
 /**
  * Adjust Metadata for Get action
-*
-* The metadata is used for setting defaults, documentation & validation
-* @param array $params
-*   Array or parameters determined by getfields.
-*/
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params
+ *   Array or parameters determined by getfields.
+ */
 function _civicrm_api3_job_update_greeting_spec(&$params) {
   $params['ct'] = array(
     'api.required' => 1,
@@ -403,9 +402,9 @@ function civicrm_api3_job_fetch_activities($params) {
 
   try {
     CRM_Utils_Mail_EmailProcessor::processActivities();
-    $values = array( );
+    $values = array();
     $lock->release();
-    return civicrm_api3_create_success($values, $params,'mailing','activities');
+    return civicrm_api3_create_success($values, $params, 'mailing', 'activities');
   } catch (Exception $e) {
     $lock->release();
     return civicrm_api3_create_error('Process Activities failed');
@@ -566,13 +565,13 @@ function civicrm_api3_job_run_payment_cron($params) {
  * @static void
  * @access public
  */
-function civicrm_api3_job_cleanup( $params ) {
-  $session   = CRM_Utils_Array::value( 'session'   , $params, true  );
-  $tempTable = CRM_Utils_Array::value( 'tempTables', $params, true  );
-  $jobLog    = CRM_Utils_Array::value( 'jobLog'    , $params, true  );
-  $prevNext  = CRM_Utils_Array::value( 'prevNext'  , $params, true  );
-  $dbCache   = CRM_Utils_Array::value( 'dbCache'   , $params, false );
-  $memCache  = CRM_Utils_Array::value( 'memCache'  , $params, false );
+function civicrm_api3_job_cleanup($params) {
+  $session   = CRM_Utils_Array::value( 'session', $params, TRUE  );
+  $tempTable = CRM_Utils_Array::value( 'tempTables', $params, TRUE  );
+  $jobLog    = CRM_Utils_Array::value( 'jobLog', $params, TRUE  );
+  $prevNext  = CRM_Utils_Array::value( 'prevNext', $params, TRUE  );
+  $dbCache   = CRM_Utils_Array::value( 'dbCache', $params, FALSE );
+  $memCache  = CRM_Utils_Array::value( 'memCache', $params, FALSE );
 
   if ( $session || $tempTable || $prevNext ) {
     CRM_Core_BAO_Cache::cleanup( $session, $tempTable, $prevNext );
@@ -626,7 +625,7 @@ function civicrm_api3_job_group_rebuild($params) {
 
   $limit = CRM_Utils_Array::value( 'limit', $params, 0 );
 
-  CRM_Contact_BAO_GroupContactCache::loadAll(null, $limit);
+  CRM_Contact_BAO_GroupContactCache::loadAll(NULL, $limit);
   $lock->release();
 
   return civicrm_api3_create_success();

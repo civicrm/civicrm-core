@@ -70,7 +70,6 @@ function civicrm_api3_mailing_event_unsubscribe_create($params) {
     return civicrm_api3_create_success($params);
   }
 
-
   return civicrm_api3_create_error('Queue event could not be found');
 }
 
@@ -89,4 +88,3 @@ function _civicrm_api3_mailing_event_unsubscribe_create_spec(&$params) {
   $params['event_queue_id']['api.required'] = 1;
   $params['event_queue_id']['title'] = 'Mailing Queue ID';
 }
-

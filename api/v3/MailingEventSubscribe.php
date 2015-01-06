@@ -56,7 +56,7 @@ function civicrm_api3_mailing_event_subscribe_create($params) {
 
   $group            = new CRM_Contact_DAO_Group();
   $group->is_active = 1;
-  $group->id        = (int)$group_id;
+  $group->id        = (int) $group_id;
   if (!$group->find(TRUE)) {
     throw new API_Exception('Invalid Group id');
   }
@@ -65,7 +65,6 @@ function civicrm_api3_mailing_event_subscribe_create($params) {
 
   if ($subscribe !== NULL) {
     /* Ask the contact for confirmation */
-
 
     $subscribe->send_confirm_request($email);
 
@@ -92,4 +91,3 @@ function _civicrm_api3_mailing_event_subscribe_create_spec(&$params) {
   $params['group_id']['api.required'] = 1;
   $params['group_id']['title'] = 'Unsubscribe From Group';
 }
-

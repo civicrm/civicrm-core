@@ -89,4 +89,3 @@ function civicrm_api3_payment_processor_delete($params) {
 function civicrm_api3_payment_processor_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-
