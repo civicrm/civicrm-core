@@ -181,7 +181,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $enabledComponents = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
     $customDataEntities = array();
     $invalidEntities = array('Individual', 'Organization', 'Household');
-    $entitiesToFix = array('Relationship');
+    $entitiesToFix = array('Case', 'Relationship');
     foreach ($entities as $entityName => $entity ) {
       if(!in_array($entityName, $invalidEntities)
         && !in_array($entityName, $entitiesToFix)) {
