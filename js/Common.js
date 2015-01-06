@@ -39,12 +39,14 @@ function ts(text, params) {
  */
 function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
   if (elementType == null) {
-    var elementType = 'block';
+    elementType = 'block';
   }
 
+  var myElement, i;
+
   /* This loop is used to display the blocks whose IDs are present within the showBlocks array */
-  for (var i = 0; i < showBlocks.length; i++) {
-    var myElement = document.getElementById(showBlocks[i]);
+  for (i = 0; i < showBlocks.length; i++) {
+    myElement = document.getElementById(showBlocks[i]);
     /* getElementById returns null if element id doesn't exist in the document */
     if (myElement != null) {
       myElement.style.display = elementType;
@@ -55,8 +57,8 @@ function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
   }
 
   /* This loop is used to hide the blocks whose IDs are present within the hideBlocks array */
-  for (var i = 0; i < hideBlocks.length; i++) {
-    var myElement = document.getElementById(hideBlocks[i]);
+  for (i = 0; i < hideBlocks.length; i++) {
+    myElement = document.getElementById(hideBlocks[i]);
     /* getElementById returns null if element id doesn't exist in the document */
     if (myElement != null) {
       myElement.style.display = 'none';
@@ -80,13 +82,14 @@ function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
  * @param  invert               Boolean - if true, we HIDE target on value match; if false, we SHOW target on value match
  */
 function showHideByValue(trigger_field_id, trigger_value, target_element_id, target_element_type, field_type, invert) {
+  var target, j;
 
   if (field_type == 'select') {
     var trigger = trigger_value.split("|");
     var selectedOptionValue = cj('#' + trigger_field_id).val();
 
-    var target = target_element_id.split("|");
-    for (var j = 0; j < target.length; j++) {
+    target = target_element_id.split("|");
+    for (j = 0; j < target.length; j++) {
       if (invert) {
         cj('#' + target[j]).show();
       }
@@ -108,8 +111,8 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
   }
   else {
     if (field_type == 'radio') {
-      var target = target_element_id.split("|");
-      for (var j = 0; j < target.length; j++) {
+      target = target_element_id.split("|");
+      for (j = 0; j < target.length; j++) {
         if (cj('[name="' + trigger_field_id + '"]:first').is(':checked')) {
           if (invert) {
             cj('#' + target[j]).hide();
@@ -854,7 +857,9 @@ CRM.strings = CRM.strings || {};
       if (endMsg) {
         $msg.removeClass('status-start').addClass('status-' + status).find('.crm-status-box-msg').html(endMsg);
         window.setTimeout(function() {
-          $msg.fadeOut('slow', function() {$msg.remove()});
+          $msg.fadeOut('slow', function() {
+            $msg.remove();
+          });
         }, 2000);
       } else {
         $msg.remove();
@@ -1037,7 +1042,7 @@ CRM.strings = CRM.strings || {};
       var ele = $(this);
       setTimeout(function () {
         ele.one('change', function () {
-          msg && msg.close && msg.close();
+          if (msg && msg.close) msg.close();
           ele.removeClass('error');
           label.removeClass('crm-error');
         });
@@ -1107,7 +1112,7 @@ CRM.strings = CRM.strings || {};
         if (typeof(response.crmMessages) == 'object') {
           $.each(response.crmMessages, function(n, msg) {
             CRM.alert(msg.text, msg.title, msg.type, msg.options);
-          })
+          });
         }
         if (response.backtrace) {
           CRM.console('log', response.backtrace);

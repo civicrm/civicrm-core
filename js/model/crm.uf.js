@@ -48,14 +48,14 @@
     var coreTypesExpr = parts[0];
     var subTypesExpr = parts[1];
 
-    if (coreTypesExpr && coreTypesExpr != '') {
+    if (!_.isEmpty(coreTypesExpr)) {
       _.each(coreTypesExpr.split(','), function(coreType){
         typeList.coreTypes[coreType] = true;
       });
     }
 
     //CRM-15427 Allow Multiple subtype filtering
-    if (subTypesExpr && subTypesExpr != '') {
+    if (!_.isEmpty(subTypesExpr)) {
       if (subTypesExpr.indexOf(';;') !== -1) {
         var subTypeparts = subTypesExpr.replace(/;;/g,'\0').split('\0');
         _.each(subTypeparts, function(subTypepart) {
@@ -111,7 +111,7 @@
           throw "Cannot guess entity name for field_type=" + field_type;
         }
     }
-  }
+  };
 
   /**
    * Represents a field in a customizable form.
@@ -245,10 +245,10 @@
      * @return {String}
      */
     getSignature: function() {
-      return this.get("entity_name")
-        + '::' + this.get("field_name")
-        + '::' + (this.get("location_type_id") ? this.get("location_type_id") : '')
-        + '::' + (this.get("phone_type_id") ? this.get("phone_type_id") : '');
+      return this.get("entity_name") +
+        '::' + this.get("field_name") +
+        '::' + (this.get("location_type_id") ? this.get("location_type_id") : '') +
+        '::' + (this.get("phone_type_id") ? this.get("phone_type_id") : '');
     },
 
     /**
@@ -496,14 +496,14 @@
       },
       'help_post': {
         title: ts('Post-form Help'),
-        help: ts('Explanatory text displayed at the end of the form.')
-          + ts('Note that this help text is displayed on profile create/edit screens only.'),
+        help: ts('Explanatory text displayed at the end of the form.') +
+        ts('Note that this help text is displayed on profile create/edit screens only.'),
         type: 'TextArea'
       },
       'help_pre': {
         title: ts('Pre-form Help'),
-        help: ts('Explanatory text displayed at the beginning of the form.')
-          + ts('Note that this help text is displayed on profile create/edit screens only.'),
+        help: ts('Explanatory text displayed at the beginning of the form.') +
+        ts('Note that this help text is displayed on profile create/edit screens only.'),
         type: 'TextArea'
       },
       'is_active': {
@@ -598,7 +598,7 @@
           ufGroupModel: this
         });
         paletteFieldCollection.sync = function(method, model, options) {
-          options || (options = {});
+          if (!options) options = {};
           // console.log(method, model, options);
           switch (method) {
             case 'read':
@@ -613,6 +613,8 @@
             case 'create':
             case 'update':
             case 'delete':
+              throw 'Unsupported method: ' + method;
+
             default:
               throw 'Unsupported method: ' + method;
           }
@@ -674,7 +676,7 @@
     checkGroupType: function(validTypesExpr, allowAllSubtypes) {
       var allMatched = true;
       allowAllSubtypes = allowAllSubtypes || false;
-      if (! this.get('group_type') || this.get('group_type') == '') {
+      if (_.isEmpty(this.get('group_type'))) {
         return true;
       }
 

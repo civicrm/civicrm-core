@@ -1,7 +1,7 @@
 (function(angular, $, _) {
 
   var partialUrl = function(relPath) {
-    return CRM.resourceUrls['civicrm'] + '/partials/crmCaseType/' + relPath;
+    return CRM.resourceUrls.civicrm + '/partials/crmCaseType/' + relPath;
   };
 
   var crmCaseType = angular.module('crmCaseType', ['ngRoute', 'ui.utils', 'crmUi', 'unsavedChanges', 'crmUtil']);
@@ -222,7 +222,7 @@
     };
 
     $scope.isForkable = function() {
-      return !$scope.caseType.id || $scope.caseType.is_forkable
+      return !$scope.caseType.id || $scope.caseType.is_forkable;
     };
 
     $scope.isNewActivitySetAllowed = function(workflow) {
@@ -230,7 +230,7 @@
         case 'timeline':
           return true;
         case 'sequence':
-          return 0 == _.where($scope.caseType.definition.activitySets, {sequence: '1'}).length;
+          return 0 === _.where($scope.caseType.definition.activitySets, {sequence: '1'}).length;
         default:
           CRM.console('warn', 'Denied access to unrecognized workflow: (' + workflow + ')');
           return false;
@@ -278,8 +278,8 @@
 
     $scope.save = function() {
       var result = crmApi('CaseType', 'create', $scope.caseType, true);
-      result.success(function(data) {
-        if (data.is_error == 0) {
+      result.then(function(data) {
+        if (data.is_error === 0 || data.is_error == '0') {
           $scope.caseType.id = data.id;
           window.location.href = '#/caseType';
         }

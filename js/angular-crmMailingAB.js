@@ -4,7 +4,7 @@
     if (!module) {
       module = 'crmMailingAB';
     }
-    return CRM.resourceUrls['civicrm'] + '/partials/' + module + '/' + relPath;
+    return CRM.resourceUrls.civicrm + '/partials/' + module + '/' + relPath;
   };
 
   angular.module('crmMailingAB', ['ngRoute', 'ui.utils', 'ngSanitize', 'crmUi', 'crmAttachment', 'crmMailing', 'crmD3']);
@@ -151,7 +151,7 @@
     }
 
     function updateCriteriaName() {
-      var criteria = crmMailingABCriteria.get($scope.abtest.ab.testing_criteria_id)
+      var criteria = crmMailingABCriteria.get($scope.abtest.ab.testing_criteria_id);
       $scope.criteriaName = criteria ? criteria.name : null;
     }
 
