@@ -67,20 +67,27 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    * Singleton function used to manage this object
    *
    * @param string $mode the mode of operation: live or test
-   * @param object  $paymentProcessor the details of the payment processor being invoked
-   * @param CRM_Core_Form  $paymentForm      reference to the form object if available
-   * @param boolean $force            should we force a reload of this payment object
+   * @param array  $paymentProcessor the details of the payment processor being invoked
+   * @param CRM_Core_Form  $paymentForm reference (deprecated)
+   * @param boolean $force
+   *   should we force a reload of this payment object
    *
    * @return object
    * @static
    *
    */
   public static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
-    $processorName = $paymentProcessor['name'];
-    if (!isset(self::$_singleton[$processorName]) || self::$_singleton[$processorName] === NULL) {
-      self::$_singleton[$processorName] = new CRM_Core_Payment_AuthorizeNet($mode, $paymentProcessor);
+    if (!empty($paymentProcessor['id'])) {
+      $cacheKey = $paymentProcessor['id'];
     }
-    return self::$_singleton[$processorName];
+    else {
+      //@todo eliminated instances of this in favour of id-specific instances.
+      $cacheKey = $mode . '_' . $paymentProcessor['name'];
+    }
+    if (!isset(self::$_singleton[$cacheKey]) || self::$_singleton[$cacheKey] === NULL) {
+      self::$_singleton[$cacheKey] = new CRM_Core_Payment_AuthorizeNet($mode, $paymentProcessor);
+    }
+    return self::$_singleton[$cacheKey];
   }
 
   /**

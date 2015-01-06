@@ -64,11 +64,17 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
    * @static
    */
   public static function &singleton($mode, &$paymentProcessor) {
-    $processorName = $paymentProcessor['name'];
-    if (self::$_singleton[$processorName] === NULL) {
-      self::$_singleton[$processorName] = new CRM_Core_Payment_Elavon($mode, $paymentProcessor);
+    if (!empty($paymentProcessor['id'])) {
+      $cacheKey = $paymentProcessor['id'];
     }
-    return self::$_singleton[$processorName];
+    else {
+      //@todo eliminated instances of this in favour of id-specific instances.
+      $cacheKey = $mode . '_' . $paymentProcessor['name'];
+    }
+    if (self::$_singleton[$cacheKey] === NULL) {
+      self::$_singleton[$cacheKey] = new CRM_Core_Payment_Elavon($mode, $paymentProcessor);
+    }
+    return self::$_singleton[$cacheKey];
   }
 
   /**********************************************************
