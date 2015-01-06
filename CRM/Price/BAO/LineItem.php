@@ -48,7 +48,8 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
   /**
    * Creates a new entry in the database.
    *
-   * @param array $params (reference) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Price_DAO_LineItem object
    * @static
@@ -89,8 +90,10 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * price_field_id.  This is the inverse function of create.  It also
    * stores all of the retrieved values in the default array.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Price_BAO_LineItem object
    * @static
@@ -135,14 +138,17 @@ AND li.entity_id = {$entityId}
    * Given a participant id/contribution id,
    * return contribution/fee line items
    *
-   * @param $entityId  int    participant/contribution id
-   * @param $entity    string participant/contribution.
+   * @param $entityId
+   *   Int participant/contribution id.
+   * @param $entity
+   *   String participant/contribution.
    *
    * @param null $isQuick
    * @param bool $isQtyZero
    * @param bool $relatedEntity
    *
-   * @param string $overrideWhereClause e.g "WHERE contribution id = 7 " per the getLineItemsByContributionID wrapper.
+   * @param string $overrideWhereClause
+   *   E.g "WHERE contribution id = 7 " per the getLineItemsByContributionID wrapper.
    * this function precedes the convenience of the contribution id but since it does quite a bit more than just a db retrieval we need to be able to use it even
    * when we don't want it's entity-id magix
    *
@@ -257,11 +263,15 @@ AND li.entity_id = {$entityId}
    * This method will create the lineItem array required for
    * processAmount method
    *
-   * @param  int   $fid       price set field id
-   * @param  array $params    reference to form values
-   * @param  array $fields    reference to array of fields belonging
+   * @param int $fid
+   *   Price set field id.
+   * @param array $params
+   *   Reference to form values.
+   * @param array $fields
+   *   Reference to array of fields belonging.
    *                          to the price set used for particular event
-   * @param  array $values    reference to the values array(
+   * @param array $values
+   *   Reference to the values array(.
      this is
    *                          lineItem array)
    *
@@ -349,9 +359,11 @@ AND li.entity_id = {$entityId}
    * Process price set and line items.
    *
    * @param int $entityId
-   * @param array $lineItem line item array
+   * @param array $lineItem
+   *   Line item array.
    * @param object $contributionDetails
-   * @param string $entityTable entity table
+   * @param string $entityTable
+   *   Entity table.
    *
    * @param bool $update
    *
@@ -457,11 +469,14 @@ AND li.entity_id = {$entityId}
 
    /**
    * Build line items array.
-   * @param array $params form values
+   * @param array $params
+   *   Form values.
    *
-   * @param string $entityId entity id
+   * @param string $entityId
+   *   Entity id.
    *
-   * @param string $entityTable entity Table
+   * @param string $entityTable
+   *   Entity Table.
    *
    * @return void
    * @static
@@ -519,7 +534,8 @@ AND li.entity_id = {$entityId}
   /**
    * Calculate tax rate in percentage
    *
-   * @param $lineItemId an assoc array of lineItem
+   * @param $lineItemId
+   *   An assoc array of lineItem.
    *
    * @return tax rate
    *

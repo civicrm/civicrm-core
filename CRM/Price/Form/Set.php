@@ -79,9 +79,12 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
   /**
    * Global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param array $options
+   *   Additional user data.
    *
    * @return true if no errors, else array of errors
    * @static
