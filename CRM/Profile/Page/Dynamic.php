@@ -103,8 +103,10 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   /**
    * Class constructor
    *
-   * @param int $id the contact id
-   * @param int $gid the group id
+   * @param int $id
+   *   The contact id.
+   * @param int $gid
+   *   The group id.
    *
    * @param $restrict
    * @param bool $skipPermission

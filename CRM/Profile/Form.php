@@ -866,9 +866,12 @@ class CRM_Profile_Form extends CRM_Core_Form {
   /**
    * Global form rule
    *
-   * @param array  $fields the input form values
-   * @param array  $files  the uploaded files if any
-   * @param CRM_Core_Form $form   the form object
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param CRM_Core_Form $form
+   *   The form object.
    *
    * @return true if no errors, else array of errors
    * @static
