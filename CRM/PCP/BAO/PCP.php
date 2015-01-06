@@ -52,8 +52,10 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
   /**
    * Add or update either a Personal Campaign Page OR a PCP Block
    *
-   * @param array $params reference array contains the values submitted by the form
-   * @param bool $pcpBlock if true, create or update PCPBlock, else PCP
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
+   * @param bool $pcpBlock
+   *   If true, create or update PCPBlock, else PCP.
    *
    * @static
    *
@@ -90,7 +92,8 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
   /**
    * Get the Display  name of a contact for a PCP
    *
-   * @param  int $id      id for the PCP
+   * @param int $id
+   *   Id for the PCP.
    *
    * @return null|string     Dispaly name of the contact if found
    * @static
@@ -228,7 +231,8 @@ ORDER BY target_entity_type, target_entity_id
   /**
    * Show the total amount for Personal Campaign Page on thermometer
    *
-   * @param array $pcpId  contains the pcp ID
+   * @param array $pcpId
+   *   Contains the pcp ID.
    *
    * @static
    *
@@ -249,7 +253,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Show the amount, nickname on honor roll
    *
-   * @param array $pcpId contains the pcp ID
+   * @param array $pcpId
+   *   Contains the pcp ID.
    *
    * @static
    *
@@ -346,7 +351,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Delete the campaign page
    *
-   * @param int $id campaign page id
+   * @param int $id
+   *   Campaign page id.
    *
    * @return null
    * @static
@@ -370,7 +376,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Build the form object
    *
-   * @param CRM_Core_Form $form form object
+   * @param CRM_Core_Form $form
+   *   Form object.
    *
    * @return void
    */
@@ -423,7 +430,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * Add PCP form elements to a form
    */
   /**
-   * @param integer $pcpId
+   * @param int $pcpId
    * @param CRM_Core_Page $page
    * @param null $elements
    */
@@ -578,7 +585,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Approve / Reject the campaign page
    *
-   * @param int $id campaign page id
+   * @param int $id
+   *   Campaign page id.
    *
    * @param $is_active
    *
@@ -622,8 +630,10 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * 1. when their PCP status is changed by site admin.
    * 2. when supporter initially creates a Personal Campaign Page ($isInitial set to true).
    *
-   * @param int $pcpId campaign page id
-   * @param int $newStatus pcp status id
+   * @param int $pcpId
+   *   Campaign page id.
+   * @param int $newStatus
+   *   Pcp status id.
    * @param bool|int $isInitial is it the first time, campaign page has been created by the user
    *
    * @param string $component
@@ -718,7 +728,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Enable / Disable the campaign page
    *
-   * @param int $id campaign page id
+   * @param int $id
+   *   Campaign page id.
    *
    * @param $is_active
    * @return null
@@ -777,7 +788,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Find out if the PCP block is in use by one or more PCP page
    *
-   * @param int $id pcp block id
+   * @param int $id
+   *   Pcp block id.
    *
    * @return Boolean
    * @static
@@ -797,7 +809,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Get email is enabled for supporter's profile
    *
-   * @param int $profileId supporter's profile id
+   * @param int $profileId
+   *   Supporter's profile id.
    *
    * @return boolean
    * @static
