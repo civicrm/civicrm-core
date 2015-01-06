@@ -4594,10 +4594,6 @@ span.crm-status-icon {
   text-decoration: line-through;
 }
 
-.crm-printButton {
-  float: right;
-}
-
 .crm-container input.ng-invalid.ng-dirty,
 .crm-container select.ng-invalid.ng-dirty,
 .crm-container textarea.ng-invalid.ng-dirty {

@@ -48,14 +48,16 @@
     {assign var='pdfUrlParams' value="reset=1&id=$id&cid=$contact_id"}
     {assign var='emailUrlParams' value="reset=1&id=$id&cid=$contact_id&select=email"}
     {if $invoicing && $cancelledStatus}
-      <div class="crm-printButton">
+      <div class="css_right">
         <a class="button no-popup" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
+          <div class="icon ui-icon-print"></div>
         {if $contribution_status != 'Refunded'}
           {ts}Print Invoice{/ts}</a>
         {else}
           {ts}Print Invoice and Credit Note{/ts}</a>
         {/if}
         <a class="button" href="{crmURL p='civicrm/contribute/invoice/email' q=$emailUrlParams}">
+          <div class="icon ui-icon-mail-closed"></div>
           {ts}Email Invoice{/ts}</a>
       </div>
     {/if}
@@ -324,17 +326,5 @@
           class="icon delete-icon"></div>{ts}Delete{/ts}</span></a>
   {/if}
   {include file="CRM/common/formButtons.tpl" location="bottom"}
-  {if $invoicing && $cancelledStatus}
-    <div class="crm-printButton">
-      <a class="button no-popup" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
-      {if $contribution_status != 'Refunded'}
-        {ts}Print Invoice{/ts}</a>
-      {else}
-        {ts}Print Invoice and Credit Note{/ts}</a>
-      {/if}
-      <a class="button" href="{crmURL p='civicrm/contribute/invoice/email' q=$emailUrlParams}">
-        {ts}Email Invoice{/ts}</a>
-    </div>
-  {/if}
 </div>
 </div>
