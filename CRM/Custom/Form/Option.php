@@ -218,7 +218,6 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
         )
       );
 
-
       // if view mode pls freeze it with the done button.
       if ($this->_action & CRM_Core_Action::VIEW) {
         $this->freeze();

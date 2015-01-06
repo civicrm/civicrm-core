@@ -132,18 +132,28 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
     if (self::$_dataToLabels == NULL) {
       self::$_dataToLabels = array(
-        array('Text' => ts('Text'), 'Select' => ts('Select'),
-          'Radio' => ts('Radio'), 'CheckBox' => ts('CheckBox'), 'Multi-Select' => ts('Multi-Select'),
+        array(
+      'Text' => ts('Text'),
+      'Select' => ts('Select'),
+          'Radio' => ts('Radio'),
+      'CheckBox' => ts('CheckBox'),
+      'Multi-Select' => ts('Multi-Select'),
           'AdvMulti-Select' => ts('Adv Multi-Select (obsolete)'),
           'Autocomplete-Select' => ts('Autocomplete-Select'),
         ),
-        array('Text' => ts('Text'), 'Select' => ts('Select'),
+        array(
+      'Text' => ts('Text'),
+      'Select' => ts('Select'),
           'Radio' => ts('Radio'),
         ),
-        array('Text' => ts('Text'), 'Select' => ts('Select'),
+        array(
+      'Text' => ts('Text'),
+      'Select' => ts('Select'),
           'Radio' => ts('Radio'),
         ),
-        array('Text' => ts('Text'), 'Select' => ts('Select'),
+        array(
+      'Text' => ts('Text'),
+      'Select' => ts('Select'),
           'Radio' => ts('Radio'),
         ),
         array('TextArea' => ts('TextArea'), 'RichTextEditor' => ts('Rich Text Editor')),
@@ -322,7 +332,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $optionTypes = array('1' => ts('Create a new set of options'));
     }
     else {
-      $optionTypes = array('1' => ts('Create a new set of options'),
+      $optionTypes = array(
+      '1' => ts('Create a new set of options'),
         '2' => ts('Reuse an existing set'),
       );
 
@@ -340,7 +351,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       array(
         'onclick' => "showOptionSelect();"), '<br/>'
     );
-
 
     $contactGroups = CRM_Core_PseudoConstant::group();
     asort($contactGroups);
@@ -575,9 +585,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $name   = CRM_Utils_String::munge($title, '_', 64);
     $gId    = $self->_gid;  // CRM-7564
     $query  = 'select count(*) from civicrm_custom_field where ( name like %1 OR label like %2 ) and id != %3 and custom_group_id = %4';
-    $fldCnt = CRM_Core_DAO::singleValueQuery($query, array(1 => array($name, 'String'),
+    $fldCnt = CRM_Core_DAO::singleValueQuery($query, array(
+    1 => array($name, 'String'),
         2 => array($title, 'String'),
-        3 => array((int)$self->_id, 'Integer'),
+        3 => array((int) $self->_id, 'Integer'),
         4 => array($gId, 'Integer'),
       ));
     if ($fldCnt) {

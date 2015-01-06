@@ -231,7 +231,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    */
   public function run() {
 
-
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE, 0
     );
