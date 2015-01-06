@@ -90,7 +90,8 @@ class CRM_ACL_API {
    *
    * @return string the group where clause for this user
    */
-  public static function whereClause($type,
+  public static function whereClause(
+    $type,
     &$tables,
     &$whereTables,
     $contactID = NULL,
