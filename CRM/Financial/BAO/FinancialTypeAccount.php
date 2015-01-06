@@ -38,7 +38,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   /**
    * Class constructor
    */
-  public function __construct( ) {
+  public function __construct() {
     parent::__construct( );
   }
 
@@ -111,9 +111,9 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    *
    * @static
    */
-  public static function del($financialTypeAccountId, $accountId = null) {
+  public static function del($financialTypeAccountId, $accountId = NULL) {
     //checking if financial type is present
-    $check = false;
+    $check = FALSE;
     $relationValues = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
 
     $financialTypeId = CRM_Core_DAO::getFieldValue( 'CRM_Financial_DAO_EntityFinancialAccount', $financialTypeAccountId, 'entity_id' );
@@ -134,8 +134,8 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
       $daoString = 'CRM_' . $name[0] . '_DAO_' . $name[1];
       $dao = new $daoString();
       $dao->financial_type_id = $financialTypeId;
-      if ($dao->find(true)) {
-        $check = true;
+      if ($dao->find(TRUE)) {
+        $check = TRUE;
         break;
       }
     }
@@ -146,7 +146,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
       }
       else {
         $accountRelationShipId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $financialTypeAccountId, 'account_relationship');
-        CRM_Core_Session::setStatus(ts('You cannot remove an account with a %1 relationship because it is being referenced by one or more of the following types of records: Contributions, Contribution Pages, or Membership Types. Consider disabling this type instead if you no longer want it used.', array(1 => $relationValues[$accountRelationShipId])), NUll, 'error');
+        CRM_Core_Session::setStatus(ts('You cannot remove an account with a %1 relationship because it is being referenced by one or more of the following types of records: Contributions, Contribution Pages, or Membership Types. Consider disabling this type instead if you no longer want it used.', array(1 => $relationValues[$accountRelationShipId])), NULL, 'error');
       }
       return CRM_Utils_System::redirect( CRM_Utils_System::url( 'civicrm/admin/financial/financialType/accounts', "reset=1&action=browse&aid={$accountId}" ));
     }
@@ -235,14 +235,14 @@ WHERE cog.name = 'payment_instrument' ";
     $titles = array();
     $financialAccountTypeID = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type');
     $accountRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship');
-    $relationships = array (
+    $relationships = array(
       array_search('Accounts Receivable Account is', $accountRelationship) => array_search('Asset', $financialAccountTypeID),
       array_search('Expense Account is', $accountRelationship) => array_search('Expenses', $financialAccountTypeID),
       array_search('Cost of Sales Account is', $accountRelationship) => array_search('Cost of Sales', $financialAccountTypeID),
       array_search('Income Account is', $accountRelationship) => array_search('Revenue', $financialAccountTypeID),
     );
 
-    $dao =  CRM_Core_DAO::executeQuery('SELECT id, financial_account_type_id FROM civicrm_financial_account WHERE name LIKE %1',
+    $dao = CRM_Core_DAO::executeQuery('SELECT id, financial_account_type_id FROM civicrm_financial_account WHERE name LIKE %1',
       array(1 => array($financialType->name, 'String'))
     );
     $dao->fetch();
@@ -261,7 +261,7 @@ WHERE cog.name = 'payment_instrument' ";
     else {
       $existingFinancialAccount[$dao->financial_account_type_id] = $dao->id;
     }
-    $params = array (
+    $params = array(
       'entity_table' => 'civicrm_financial_type',
       'entity_id' => $financialType->id,
     );
@@ -294,8 +294,8 @@ WHERE cog.name = 'payment_instrument' ";
         }
       }
       else {
-         $params['financial_account_id'] = $existingFinancialAccount[$value];
-         $titles[] = $financialType->name;
+        $params['financial_account_id'] = $existingFinancialAccount[$value];
+        $titles[] = $financialType->name;
       }
       $params['account_relationship'] = $key;
       self::add($params);

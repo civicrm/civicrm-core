@@ -199,13 +199,13 @@ class CRM_Financial_Page_AJAX {
     if ($recordClass[0] == 'CRM' && count($recordClass) >= 3) {
       foreach ($records as $recordID) {
         $params = array();
-        $ids = null;
+        $ids = NULL;
         switch ($op) {
           case 'assign':
           case 'remove':
             $recordPID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $recordID, 'payment_instrument_id');
             $batchPID = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $entityID, 'payment_instrument_id');
-            $paymentInstrument =  CRM_Core_OptionGroup::getLabel('payment_instrument',$batchPID);
+            $paymentInstrument = CRM_Core_OptionGroup::getLabel('payment_instrument', $batchPID);
             if ($op == 'remove' || ($recordPID == $batchPID && $op == 'assign') || !isset($batchPID)) {
               $params = array(
                 'entity_id' => $recordID,
@@ -217,6 +217,7 @@ class CRM_Financial_Page_AJAX {
               $response = array('status' => ts("This batch is configured to include only transactions using %1 payment method. If you want to include other transactions, please edit the batch first and modify the Payment Method.", array( 1 => $paymentInstrument)));
             }
             break;
+
           case 'close':
             // Update totals when closing a batch
             $params = $totals[$recordID];
@@ -261,8 +262,15 @@ class CRM_Financial_Page_AJAX {
   public static function getFinancialTransactionsList() {
     $sortMapper =
       array(
-        0 => '', 1 => '', 2 => 'sort_name',
-        3 => 'amount', 4 => 'trxn_id', 5 => 'transaction_date', 6 => 'payment_method', 7 => 'status', 8 => 'name',
+        0 => '',
+    1 => '',
+    2 => 'sort_name',
+        3 => 'amount',
+    4 => 'trxn_id',
+    5 => 'transaction_date',
+    6 => 'payment_method',
+    7 => 'status',
+    8 => 'name',
       );
 
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -373,19 +381,19 @@ class CRM_Financial_Page_AJAX {
           $row[$financialItem->id][$columnKey] = CRM_Utils_Money::format($financialItem->$columnKey, $financialItem->currency);
         }
         elseif ($columnKey == 'transaction_date' && $financialItem->$columnKey) {
-          $row[$financialItem->id][$columnKey] =  CRM_Utils_Date::customFormat($financialItem->$columnKey);
+          $row[$financialItem->id][$columnKey] = CRM_Utils_Date::customFormat($financialItem->$columnKey);
         }
         elseif ($columnKey == 'status' && $financialItem->$columnKey) {
           $row[$financialItem->id][$columnKey] = CRM_Core_OptionGroup::getLabel('contribution_status', $financialItem->$columnKey);
         }
       }
-      if ($statusID == CRM_Core_OptionGroup::getValue('batch_status','Open')) {
+      if ($statusID == CRM_Core_OptionGroup::getValue('batch_status', 'Open')) {
         if (isset($notPresent)) {
           $js = "enableActions('x')";
           $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_x_". $financialItem->id."' name='mark_x_". $financialItem->id."' value='1' onclick={$js}></input>";
           $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
             CRM_Financial_Form_BatchTransaction::links(),
-            null,
+            NULL,
             array(
               'id' => $financialItem->id,
               'contid' => $financialItem->contributionID,
@@ -403,7 +411,7 @@ class CRM_Financial_Page_AJAX {
           $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_y_". $financialItem->id."' name='mark_y_". $financialItem->id."' value='1' onclick={$js}></input>";
           $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
             CRM_Financial_Page_BatchTransaction::links(),
-            null,
+            NULL,
             array(
               'id' => $financialItem->id,
               'contid' => $financialItem->contributionID,
@@ -423,7 +431,7 @@ class CRM_Financial_Page_AJAX {
         unset($links['remove']);
         $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
           $links,
-          null,
+          NULL,
           array(
             'id' => $financialItem->id,
             'contid' => $financialItem->contributionID,
@@ -436,11 +444,11 @@ class CRM_Financial_Page_AJAX {
           $financialItem->id
         );
       }
-      $row[$financialItem->id]['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage(CRM_Utils_Array::value('contact_sub_type',$row[$financialItem->id]) ? CRM_Utils_Array::value('contact_sub_type',$row[$financialItem->id]) : CRM_Utils_Array::value('contact_type',$row[$financialItem->id]) ,false, $financialItem->contact_id);
+      $row[$financialItem->id]['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage(CRM_Utils_Array::value('contact_sub_type', $row[$financialItem->id]) ? CRM_Utils_Array::value('contact_sub_type', $row[$financialItem->id]) : CRM_Utils_Array::value('contact_type', $row[$financialItem->id]), FALSE, $financialItem->contact_id);
       $financialitems = $row;
     }
 
-    $iFilteredTotal = $iTotal =  $params['total'];
+    $iFilteredTotal = $iTotal = $params['total'];
     $selectorElements =
       array(
         'check', 'contact_type', 'sort_name',
@@ -456,14 +464,14 @@ class CRM_Financial_Page_AJAX {
     $entityID = CRM_Utils_Type::escape($_REQUEST['entityID'], 'String');
     $action   = CRM_Utils_Type::escape($_REQUEST['action'], 'String');
     foreach ($checkIDs as $key => $value) {
-      if ((substr($value,0,7) == "mark_x_" && $action == 'Assign') || (substr($value,0,7) == "mark_y_" && $action == 'Remove')) {
-        $contributions = explode("_",$value);
+      if ((substr($value, 0, 7) == "mark_x_" && $action == 'Assign') || (substr($value, 0, 7) == "mark_y_" && $action == 'Remove')) {
+        $contributions = explode("_", $value);
         $cIDs[] = $contributions[2];
       }
     }
 
     $batchPID = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $entityID, 'payment_instrument_id');
-    $paymentInstrument =  CRM_Core_OptionGroup::getLabel('payment_instrument',$batchPID);
+    $paymentInstrument = CRM_Core_OptionGroup::getLabel('payment_instrument', $batchPID);
     foreach ($cIDs as $key => $value) {
       $recordPID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $value, 'payment_instrument_id');
       if ($action == 'Remove' || ($recordPID == $batchPID && $action == 'Assign')  || !isset($batchPID)) {
