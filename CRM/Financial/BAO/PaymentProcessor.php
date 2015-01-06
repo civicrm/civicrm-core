@@ -283,14 +283,14 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return array
    */
   public static function getAllPaymentProcessors($mode, $reset = FALSE) {
-    /**
-     * $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . ($mode ? 'test' : 'all');
-    if (!$reset) {
-      $processors = CRM_Utils_Cache::singleton()->get($cacheKey);
-      if (!empty($processors)) {
-        return $processors;
-      }
-    }
+   /**
+   * $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . ($mode ? 'test' : 'all');
+   if (!$reset) {
+     $processors = CRM_Utils_Cache::singleton()->get($cacheKey);
+     if (!empty($processors)) {
+       return $processors;
+     }
+   }
      * */
     $retrievalParameters = array('is_active' => TRUE, 'options' => array('sort' => 'is_default DESC, name'), 'api.payment_processor_type.getsingle' => 1);
     if ($mode == 'test') {
