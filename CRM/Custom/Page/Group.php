@@ -155,8 +155,10 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   /**
    * Edit custom group
    *
-   * @param int    $id       custom group id
-   * @param string $action   the action to be invoked
+   * @param int $id
+   *   Custom group id.
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
    */
@@ -176,7 +178,8 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   /**
    * Preview custom group
    *
-   * @param int $id custom group id
+   * @param int $id
+   *   Custom group id.
    *
    * @return void
    */
@@ -193,7 +196,8 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   /**
    * Browse all custom data groups.
    *
-   * @param string $action   the action to be invoked
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
    */

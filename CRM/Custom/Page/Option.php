@@ -237,7 +237,8 @@ ORDER BY weight, label
    *
    * editing would involved modifying existing fields + adding data to new fields.
    *
-   * @param string  $action   the action to be invoked
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
    */
