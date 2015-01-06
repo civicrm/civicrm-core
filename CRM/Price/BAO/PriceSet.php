@@ -66,6 +66,9 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
     if(empty($params['id']) && empty($params['name'])) {
       $params['name'] = CRM_Utils_String::munge($params['title'], '_', 242);
     }
+    if (!empty($params['extends']) && is_array($params['extends'])) {
+      $params['extends'] = CRM_Utils_Array::implodePadded($params['extends']);
+    }
     $priceSetBAO = new CRM_Price_BAO_PriceSet();
     $priceSetBAO->copyValues($params);
     if (self::eventPriceSetDomainID()) {
