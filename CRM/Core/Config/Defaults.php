@@ -95,9 +95,15 @@ class CRM_Core_Config_Defaults {
       }
 
       if ($checkForPostMax) {
-        $config     = CRM_Core_Config::singleton();
-        if($config->maxImportFileSize > $size) {
+        $maxImportFileSize = self::formatUnitSize(ini_get('upload_max_filesize'));
+        $postMaxSize = self::formatUnitSize(ini_get('post_max_size'));
+        if ($maxImportFileSize > $postMaxSize && $postMaxSize == $size) {
           CRM_Core_Session::setStatus(ts("Note: Upload max filesize ('upload_max_filesize') should not exceed Post max size ('post_max_size') as defined in PHP.ini, please check with your system administrator."), ts("Warning"), "alert");
+        }
+        //respect php.ini upload_max_filesize
+        if ($size > $maxImportFileSize) {
+          $size = $maxImportFileSize;
+          CRM_Core_Session::setStatus(ts("Note: Please verify your configuration for Maximum File Size (in MB) <a href='%1'>Administrator >> System Settings >> Misc</a>. It should support 'upload_max_size' as defined in PHP.ini.Please check with your system administrator.", array(1 => CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1'))), ts("Warning"), "alert");
         }
       }
       return $size;
