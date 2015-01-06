@@ -190,7 +190,8 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * The static array activityType is returned
    *
-   * @param boolean $indexName - true return activity name in array
+   * @param bool $indexName
+   *   True return activity name in array.
    * key else activity id as array key.
    *
    * @param bool $all
