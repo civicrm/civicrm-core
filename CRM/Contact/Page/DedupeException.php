@@ -57,7 +57,8 @@ class CRM_Contact_Page_DedupeException extends CRM_Core_Page {
       $key = "{$exception->contact_id1}_{$exception->contact_id2}";
       $contactIds[$exception->contact_id1] = $exception->contact_id1;
       $contactIds[$exception->contact_id2] = $exception->contact_id2;
-      $dedupeExceptions[$key] = array('main' => array('id' => $exception->contact_id1),
+      $dedupeExceptions[$key] = array(
+      'main' => array('id' => $exception->contact_id1),
         'other' => array('id' => $exception->contact_id2),
       );
     }

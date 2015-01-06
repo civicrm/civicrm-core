@@ -123,14 +123,14 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    */
   function __construct(
     $customSearchClass,
-    $formValues        = NULL,
-    $params            = NULL,
-    $returnProperties  = NULL,
-    $action            = CRM_Core_Action::NONE,
+    $formValues = NULL,
+    $params = NULL,
+    $returnProperties = NULL,
+    $action = CRM_Core_Action::NONE,
     $includeContactIds = FALSE,
     $searchChildGroups = TRUE,
-    $searchContext     = 'search',
-    $contextMenu       = NULL
+    $searchContext = 'search',
+    $contextMenu = NULL
   ) {
     $this->_customSearchClass = $customSearchClass;
     $this->_formValues = $formValues;
@@ -141,10 +141,10 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     if (!$ext->isExtensionKey($customSearchClass)) {
       if ($ext->isExtensionClass($customSearchClass)) {
         $customSearchFile = $ext->classToPath($customSearchClass);
-        require_once ($customSearchFile);
+        require_once $customSearchFile;
       }
       else {
-        require_once (str_replace('_', DIRECTORY_SEPARATOR, $customSearchClass) . '.php');
+        require_once str_replace('_', DIRECTORY_SEPARATOR, $customSearchClass) . '.php';
       }
       $this->_search = new $customSearchClass( $formValues );
     }
@@ -360,8 +360,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
         }
 
         if ($image) {
-          $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($dao->contact_sub_type ?
-            $dao->contact_sub_type : $dao->contact_type, FALSE, $contactID
+          $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($dao->contact_sub_type ? $dao->contact_sub_type : $dao->contact_type, FALSE, $contactID
           );
         }
         $rows[] = $row;
@@ -378,7 +377,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * language
    *
    * @param array(
-     reference)   $formValues   submitted formValues
+  reference)   $formValues   submitted formValues
    *
    * @return array              $qill         which contains an array of strings
    */
