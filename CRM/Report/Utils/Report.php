@@ -130,12 +130,14 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
    */
   public static function getNextUrl($urlValue, $query = 'reset=1', $absolute = FALSE, $instanceID = NULL, $drilldownReport = array()) {
     if ($instanceID) {
-      $drilldownInstanceID = false;
-      if (array_key_exists($urlValue, $drilldownReport))
+      $drilldownInstanceID = FALSE;
+      if (array_key_exists($urlValue, $drilldownReport)) {
         $drilldownInstanceID = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $instanceID, 'drilldown_id', 'id');
+      }
 
-      if (!$drilldownInstanceID)
+      if (!$drilldownInstanceID) {
         $drilldownInstanceID = self::getInstanceIDForValue($urlValue);
+      }
 
       if ($drilldownInstanceID) {
         return CRM_Utils_System::url("civicrm/report/instance/{$drilldownInstanceID}",
@@ -160,7 +162,8 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
    * @return int|null|string
    */
   public static function getInstanceCount($optionVal) {
-    if (empty($optionVal)) return 0;
+    if (empty($optionVal)) { return 0;
+    }
 
     $sql = "
 SELECT count(inst.id)

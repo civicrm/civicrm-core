@@ -365,7 +365,6 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
       ),
     );
 
-
     $this->_options = array(
       'blank_column_begin' => array(
         'title' => ts('Blank column at the Begining'),
@@ -599,7 +598,6 @@ ORDER BY  cv.label
     $this->buildACLClause($this->_aliases['civicrm_contact']);
     // build query
     $sql = $this->buildQuery(TRUE);
-
 
     // build array of result based on column headers. This method also allows
     // modifying column headers before using it to build result set i.e $rows.

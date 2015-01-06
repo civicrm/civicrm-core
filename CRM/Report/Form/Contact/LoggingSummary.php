@@ -40,7 +40,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
     parent::__construct();
 
     $logTypes = array();
-    foreach ( array_keys($this->_logTables) as  $table ) {
+    foreach ( array_keys($this->_logTables) as $table ) {
       $type = $this->getLogType($table);
       $logTypes[$type] = $type;
     }
@@ -177,8 +177,9 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
           CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $row['log_civicrm_entity_altered_contact_id']);
         $row['log_civicrm_entity_altered_contact_hover'] = ts("Go to contact summary");
         $entity = $this->getEntityValue($row['log_civicrm_entity_id'], $row['log_civicrm_entity_log_type'], $row['log_civicrm_entity_log_date']);
-        if ($entity)
+        if ($entity) {
           $row['log_civicrm_entity_altered_contact'] = $row['log_civicrm_entity_altered_contact'] . " [{$entity}]";
+        }
       }
       $row['altered_by_contact_display_name_link'] = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $row['log_civicrm_entity_log_user_id']);
       $row['altered_by_contact_display_name_hover'] = ts("Go to contact summary");
@@ -195,8 +196,9 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
       if ($newAction = $this->getEntityAction($row['log_civicrm_entity_id'],
                        $row['log_civicrm_entity_log_conn_id'],
                        $row['log_civicrm_entity_log_type'],
-                       CRM_Utils_Array::value('log_civicrm_entity_log_action', $row)))
+                       CRM_Utils_Array::value('log_civicrm_entity_log_action', $row))) {
         $row['log_civicrm_entity_log_action'] = $newAction;
+      }
 
       $row['log_civicrm_entity_log_type'] = $this->getLogType($row['log_civicrm_entity_log_type']);
 
@@ -207,12 +209,9 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
         if ($this->cid) {
           $q .= '&cid=' . $this->cid;
         }
-        $q .= (!empty($row['log_civicrm_entity_altered_contact'])) ?
-          '&alteredName='.$row['log_civicrm_entity_altered_contact'] : '';
-        $q .= (!empty($row['altered_by_contact_display_name'])) ?
-          '&alteredBy='.$row['altered_by_contact_display_name'] : '';
-        $q .= (!empty($row['log_civicrm_entity_log_user_id'])) ?
-          '&alteredById='.$row['log_civicrm_entity_log_user_id'] : '';
+        $q .= (!empty($row['log_civicrm_entity_altered_contact'])) ? '&alteredName='.$row['log_civicrm_entity_altered_contact'] : '';
+        $q .= (!empty($row['altered_by_contact_display_name'])) ? '&alteredBy='.$row['altered_by_contact_display_name'] : '';
+        $q .= (!empty($row['log_civicrm_entity_log_user_id'])) ? '&alteredById='.$row['log_civicrm_entity_log_user_id'] : '';
 
         $url1 = CRM_Report_Utils_Report::getNextUrl('logging/contact/detail', "{$q}&snippet=4&section=2&layout=overlay", FALSE, TRUE);
         $url2 = CRM_Report_Utils_Report::getNextUrl('logging/contact/detail', "{$q}&section=2", FALSE, TRUE);
@@ -237,8 +236,8 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
   /**
    * @param null $logTable
    */
-  public function from( $logTable = null ) {
-    static $entity = null;
+  public function from($logTable = NULL) {
+    static $entity = NULL;
     if ( $logTable ) {
       $entity = $logTable;
     }
@@ -246,7 +245,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
     $detail    = $this->_logTables[$entity];
     $tableName = CRM_Utils_Array::value('table_name', $detail, $entity);
     $clause = CRM_Utils_Array::value('entity_table', $detail);
-    $clause = $clause ? "AND entity_log_civireport.entity_table = 'civicrm_contact'" : null;
+    $clause = $clause ? "AND entity_log_civireport.entity_table = 'civicrm_contact'" : NULL;
 
     $joinClause = "
 INNER JOIN civicrm_contact modified_contact_civireport
@@ -254,7 +253,7 @@ INNER JOIN civicrm_contact modified_contact_civireport
 
     if (!empty($detail['joins'])) {
       $clause = CRM_Utils_Array::value('entity_table', $detail);
-      $clause = $clause ? "AND fk_table.entity_table = 'civicrm_contact'" : null;
+      $clause = $clause ? "AND fk_table.entity_table = 'civicrm_contact'" : NULL;
       $joinClause = "
 INNER JOIN `{$this->loggingDB}`.{$detail['joins']['table']} fk_table ON {$detail['joins']['join']}
 INNER JOIN civicrm_contact modified_contact_civireport

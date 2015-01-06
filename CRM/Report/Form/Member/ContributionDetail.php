@@ -700,7 +700,6 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
       if (!empty($this->_noRepeats) && $this->_outputMode != 'csv') {
         $repeatFound = FALSE;
 
-
         $display_flag = NULL;
         if (array_key_exists('civicrm_contact_id', $row)) {
           if ($cid = $row['civicrm_contact_id']) {
@@ -729,7 +728,6 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           }
         }
       }
-
 
       if (array_key_exists('civicrm_membership_membership_type_id', $row)) {
         if ($value = $row['civicrm_membership_membership_type_id']) {

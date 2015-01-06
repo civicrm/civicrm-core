@@ -146,7 +146,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
       ),
       'civicrm_financial_type' => array(
         'dao' => 'CRM_Financial_DAO_FinancialType',
-        'fields' => array('financial_type' => NULL,),
+        'fields' => array('financial_type' => NULL),
         'filters' => array(
           'id' => array(
             'name' => 'id',

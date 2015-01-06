@@ -353,8 +353,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
           if ($fieldName == 'this_year' || $fieldName == 'other_year') {
             continue;
           }
-          elseif (CRM_Utils_Array::value('type', $field) &
-            CRM_Utils_Type::T_DATE
+          elseif (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE
           ) {
             $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
             $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
@@ -737,7 +736,6 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     if (empty($rows)) {
       return;
     }
-
 
     $last_primary = NULL;
     foreach ($rows as $rowNum => $row) {
