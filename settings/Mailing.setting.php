@@ -49,7 +49,7 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
      'description' => 'When CiviMail is enabled, users who "subscribe" to a group from a profile Group(s) checkbox will receive a confirmation email. They must respond (opt-in) before they are added to the group.',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'track_civimail_replies' => array(
     'group_name' => 'Mailing Preferences',
@@ -63,7 +63,7 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'When CiviMail is enabled, users who "subscribe" to a group from a profile Group(s) checkbox will receive a confirmation email. They must respond (opt-in) before they are added to the group.',
-    'help_text' => null,
+    'help_text' => NULL,
     'validate_callback' => 'CRM_Core_BAO_Setting::validateBoolSetting',
   ),
   'civimail_workflow' => array(
@@ -78,7 +78,7 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'When CiviMail is enabled, users who "subscribe" to a group from a profile Group(s) checkbox will receive a confirmation email. They must respond (opt-in) before they are added to the group.',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'civimail_server_wide_lock' => array(
     'group_name' => 'Mailing Preferences',
@@ -91,8 +91,8 @@ return array(
     'title' => 'Lock Mails Server-Wide for Mail Sending',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'mailing_backend' => array(
     'group_name' => 'Mailing Preferences',
@@ -105,8 +105,8 @@ return array(
     'title' => 'Mailing Backend',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'profile_double_optin' => array(
     'group_name' => 'Mailing Preferences',
@@ -120,7 +120,7 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
      'description' => 'When CiviMail is enabled, users who "subscribe" to a group from a profile Group(s) checkbox will receive a confirmation email. They must respond (opt-in) before they are added to the group.',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'profile_add_to_group_double_optin' => array(
     'group_name' => 'Mailing Preferences',
@@ -134,7 +134,7 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'When CiviMail is enabled, users who "subscribe" to a group from a profile Group(s) checkbox will receive a confirmation email. They must respond (opt-in) before they are added to the group.',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'disable_mandatory_tokens_check' => array(
     'group_name' => 'Mailing Preferences',
@@ -148,7 +148,7 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'Don\'t check for presence of mandatory tokens (domain address; unsubscribe/opt-out) before sending mailings. WARNING: Mandatory tokens are a safe-guard which facilitate compliance with the US CAN-SPAM Act. They should only be disabled if your organization adopts other mechanisms for compliance or if your organization is not subject to CAN-SPAM.',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'dedupe_email_default' => array(
     'group_name' => 'Mailing Preferences',
@@ -162,7 +162,7 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'Set the "dedupe e-mail" option when sending a new mailing to "true" by default.',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'hash_mailing_url' => array(
     'group_name' => 'Mailing Preferences',
@@ -176,6 +176,6 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'If enabled, a randomized hash key will be used to reference the mailing URL in the mailing.viewUrl token, instead of the mailing ID',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
 );

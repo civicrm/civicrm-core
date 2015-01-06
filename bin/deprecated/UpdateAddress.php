@@ -176,7 +176,7 @@ WHERE      {$whereClause}
   $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
 
   if ($processGeocode) {
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $config->geocodeMethod) . '.php');
+    require_once str_replace('_', DIRECTORY_SEPARATOR, $config->geocodeMethod) . '.php';
   }
 
   require_once 'CRM/Core/DAO/Address.php';
@@ -278,4 +278,3 @@ WHERE      {$whereClause}
 }
 
 run();
-

@@ -75,4 +75,3 @@ class CiviReportMail {
 session_start();
 $obj = new CiviReportMail;
 $obj->run();
-

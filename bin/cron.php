@@ -52,4 +52,3 @@ else {
   $facility->setSingleRunParams('job', $job, $params, 'From cron.php');
   $facility->executeJobByAction('job', $job);
 }
-

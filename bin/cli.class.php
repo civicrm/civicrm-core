@@ -175,7 +175,7 @@ class civicrm_cli {
         $this->_joblog = TRUE;
       }
       else {
-        while(list($short, $long) = each ($this->_additional_arguments)) {
+        while(list($short, $long) = each($this->_additional_arguments)) {
           if ($arg == '-' . $short || $arg == '--' . $long) {
             $property = '_' . $long;
             $this->$property = $value;
@@ -211,7 +211,7 @@ class civicrm_cli {
 
     $civicrm_root = dirname(__DIR__);
     chdir($civicrm_root);
-    require_once ('civicrm.config.php');
+    require_once 'civicrm.config.php';
     // autoload
     if ( !class_exists('CRM_Core_ClassLoader') ) {
       require_once $civicrm_root . '/CRM/Core/ClassLoader.php';
@@ -223,7 +223,7 @@ class civicrm_cli {
     // HTTP_HOST will be 'localhost' unless overwritten with the -s argument.
     // Now we have a Config object, we can set it from the Base URL.
     if ($_SERVER['HTTP_HOST'] == 'localhost') {
-        $_SERVER['HTTP_HOST'] = preg_replace(
+      $_SERVER['HTTP_HOST'] = preg_replace(
                 '!^https?://([^/]+)/$!i',
                 '$1',
                 $this->_config->userFrameworkBaseURL);
@@ -332,18 +332,18 @@ class civicrm_cli_csv_exporter extends civicrm_cli {
 
     $this->row = 1;
     $result = civicrm_api($this->_entity, 'Get', $this->_params);
-    $first = true;
+    $first = TRUE;
     foreach ($result['values'] as $row) {
       if($first) {
         $columns = array_keys($row);
         fputcsv($out, $columns, $this->separator, '"');
-        $first = false;
+        $first = FALSE;
       }
       //handle values returned as arrays (i.e. custom fields that allow multiple selections) by inserting a control character
       foreach ($row as &$field) {
         if(is_array($field)) {
           //convert to string
-          $field = implode($field,CRM_Core_DAO::VALUE_SEPARATOR) . CRM_Core_DAO::VALUE_SEPARATOR;
+          $field = implode($field, CRM_Core_DAO::VALUE_SEPARATOR) . CRM_Core_DAO::VALUE_SEPARATOR;
         }
       }
       fputcsv($out, $row, $this->separator, '"');
@@ -368,7 +368,7 @@ class civicrm_cli_csv_file extends civicrm_cli {
    *
    */
   function __construct() {
-    $this->_required_arguments = array('entity','file');
+    $this->_required_arguments = array('entity', 'file');
     $this->_additional_arguments = array('f' => 'file');
     parent::initialize();
   }
@@ -397,7 +397,8 @@ class civicrm_cli_csv_file extends civicrm_cli {
     $this->header = $header;
     while (($data = fgetcsv($handle, 0, $this->separator)) !== FALSE) {
       // skip blank lines
-      if(count($data) == 1 && is_null($data[0])) continue;
+      if(count($data) == 1 && is_null($data[0])) { continue;
+      }
       $this->row++;
       $params = $this->convertLine($data);
       $this->processLine($params);
@@ -417,7 +418,7 @@ class civicrm_cli_csv_file extends civicrm_cli {
     foreach ($this->header as $i => $field) {
       //split any multiselect data, denoted with CRM_Core_DAO::VALUE_SEPARATOR
       if (strpos($data[$i], CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
-        $data[$i] = explode(CRM_Core_DAO::VALUE_SEPARATOR,$data[$i]);
+        $data[$i] = explode(CRM_Core_DAO::VALUE_SEPARATOR, $data[$i]);
         $data[$i] = array_combine($data[$i], $data[$i]);
       }
       $params[$field] = $data[$i];

@@ -53,7 +53,7 @@ function run() {
 
 // you can run this program either from an apache command, or from the cli
 if (php_sapi_name() == "cli") {
-  require_once ("bin/cli.php");
+  require_once "bin/cli.php";
   $cli = new civicrm_cli();
 
   require_once 'CRM/Mailing/BAO/Mailing.php';
@@ -64,4 +64,3 @@ if (php_sapi_name() == "cli") {
 else {
   run();
 }
-

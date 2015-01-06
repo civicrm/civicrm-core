@@ -28,7 +28,7 @@
 /**
  * A PHP script which deletes extraneous civicrm_membership_payment rows
  * in order to correct the condition where a contribution row is linked to > 1 membership.
-  */
+ */
 
 function initialize() {
   session_start();
