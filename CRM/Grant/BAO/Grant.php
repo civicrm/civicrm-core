@@ -225,7 +225,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
         );
       }
 
-    // add the recently created Grant
+      // add the recently created Grant
       CRM_Utils_Recent::add($title,
         $url,
         $grant->id,
@@ -401,7 +401,9 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
       );
 
       $fields = CRM_Grant_DAO_Grant::export();
-      $grantNote = array('grant_note' => array('title' => ts('Grant Note'),
+      $grantNote = array(
+      'grant_note' => array(
+      'title' => ts('Grant Note'),
           'name' => 'grant_note',
           'data_type' => CRM_Utils_Type::T_TEXT,
         ));

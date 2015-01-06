@@ -93,7 +93,8 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function registerTab() {
-    return array('title' => ts('Grants'),
+    return array(
+    'title' => ts('Grants'),
       'url' => 'grant',
       'weight' => 50,
     );
@@ -104,7 +105,8 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function registerAdvancedSearchPane() {
-    return array('title' => ts('Grants'),
+    return array(
+    'title' => ts('Grants'),
       'weight' => 50,
     );
   }
@@ -126,7 +128,8 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
       CRM_Core_Permission::check('edit grants')
     ) {
       $shortCuts = array_merge($shortCuts, array(
-        array('path' => 'civicrm/grant/add',
+        array(
+      'path' => 'civicrm/grant/add',
             'query' => "reset=1&action=add&context=standalone",
             'ref' => 'new-grant',
             'title' => ts('Grant'),
