@@ -1567,6 +1567,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @param int $contId
    *
    * @return null|string
+   */
   function _getFinancialTrxnAmount($contId) {
   $query = "SELECT
   SUM( ft.total_amount ) AS total
@@ -1583,7 +1584,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @param int $contId
    *
    * @return null|string
-  function _getFinancialItemAmount($contId) {
+   */function _getFinancialItemAmount($contId) {
   $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
   $query = "SELECT
   SUM(amount)
