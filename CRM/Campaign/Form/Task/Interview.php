@@ -597,7 +597,8 @@ WHERE {$clause}
         $statusIds
       );
       $this->_contactIds = array();
-      foreach ($surveyActivities as $val) { $this->_contactIds[$val['voter_id']] = $val['voter_id'];
+      foreach ($surveyActivities as $val) {
+        $this->_contactIds[$val['voter_id']] = $val['voter_id'];
       }
       $this->set('contactIds', $this->_contactIds);
     }

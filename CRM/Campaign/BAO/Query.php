@@ -101,7 +101,6 @@ class CRM_Campaign_BAO_Query {
       }
     }
 
-
     //get survey clause in force,
     //only when we have survey id.
     if (!self::$_applySurveyClause) {
@@ -270,7 +269,8 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
    *
    * @return array|null
    */
-  static function defaultReturnProperties($mode,
+  static function defaultReturnProperties(
+    $mode,
     $includeCustomFields = TRUE
   ) {
     $properties = NULL;
@@ -307,13 +307,15 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
   /**
    * @param $tables
    */
-  public static function tableNames(&$tables) {}
+  public static function tableNames(&$tables) {
+  }
 
   /**
    * @param $row
    * @param int $id
    */
-  public static function searchAction(&$row, $id) {}
+  public static function searchAction(&$row, $id) {
+  }
 
   /**
    * @param $tables
@@ -587,7 +589,8 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
       foreach (array(
         'current_campaign', 'past_campaign') as $ignore) {
         $index = array_search($ignore, $campaign);
-        if ($index !== FALSE)unset($campaign[$index]);
+        if ($index !== FALSE) { unset($campaign[$index]);
+        }
       }
     }
 
