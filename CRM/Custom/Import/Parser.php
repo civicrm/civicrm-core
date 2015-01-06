@@ -76,7 +76,8 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
    * @return mixed
    * @throws Exception
    */
-  function run($fileName,
+  function run(
+    $fileName,
     $separator = ',',
     &$mapper,
     $skipColumnHeader = FALSE,
