@@ -133,3 +133,6 @@ UPDATE `civicrm_state_province` SET `name`='Papua Barat', `abbreviation`='PB' WH
 UPDATE `civicrm_state_province` SET `name`='DKI Jakarta' WHERE `id` = 3083;
 UPDATE `civicrm_state_province` SET `name`='DI Yogyakarta' WHERE `id` = 3085;
 UPDATE `civicrm_state_province` SET `abbreviation`='KI' WHERE `id` = 3066;
+
+-- CRM-15203 Handle MembershipPayment records while upgrade
+INSERT INTO civicrm_membership_payment (contribution_id, membership_id) select cc.id, cm.id FROM civicrm_contribution cc LEFT JOIN civicrm_membership_payment cmp ON cc.id = cmp.contribution_id LEFT JOIN civicrm_membership cm ON cc.contribution_recur_id = cm.contribution_recur_id WHERE cc.contribution_recur_id IS NOT NULL AND cmp.id IS NULL AND cm.id IS NOT NULL;
