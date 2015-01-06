@@ -63,7 +63,8 @@ WHERE  mailing_id = %1
    *
    * @return Object
    */
-  static function mailingQuery($mailingID,
+  static function mailingQuery(
+    $mailingID,
     $offset = NULL, $limit = NULL
   ) {
     $limitString = NULL;

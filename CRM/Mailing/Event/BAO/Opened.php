@@ -81,7 +81,8 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    * @return int                  Number of rows in result set
    * @static
    */
-  public static function getTotalCount($mailing_id,
+  public static function getTotalCount(
+    $mailing_id,
     $job_id = NULL,
     $is_distinct = FALSE,
     $toDate = NULL
@@ -228,7 +229,8 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    * @return array                Result set
    * @static
    */
-  public static function &getRows($mailing_id, $job_id = NULL,
+  public static function &getRows(
+    $mailing_id, $job_id = NULL,
     $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL, $contact_id = NULL
   ) {
     $dao = new CRM_Core_Dao();
