@@ -57,9 +57,13 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       throw new CRM_Core_Exception('Duplicate Relationship');
     }
     if (self::checkValidRelationship($params, $params, 0)) {
-      throw new CRM_Core_Exception('Invalide Relationship');
+      throw new CRM_Core_Exception('Invalid Relationship');
     }
     $relationship = self::add($params);
+    if (!empty($params['contact_id_a'])) {
+      $ids = array('contactTarget' => $relationship->contact_id_b, 'contact' => $params['contact_id_a']);
+      CRM_Contact_BAO_Relationship::relatedMemberships($params['contact_id_a'], $values, $ids, (empty($params['id']) ? CRM_Core_Action::ADD : CRM_Core_Action::UPDATE));
+    }
     self::addRecent($params, $relationship);
     return $relationship;
   }
@@ -307,9 +311,11 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       if (!empty($params['id'])) {
         //let's load the missing ids here since other things tend to rely on them.
         $fieldsToFill = array('contact_id_a', 'contact_id_b', 'relationship_type_id');
-        $result = CRM_Core_DAO::executeQuery("SELECT " . implode(',', $fieldsToFill) . " FROM civicrm_relationship WHERE id = %1", array('Integer', $params['id']))->fetchRow();
-        foreach ($fieldsToFill as $field) {
-          $params[$field] = !empty($params[$field]) ? $params[$field] : $result->$field;
+        $result = CRM_Core_DAO::executeQuery("SELECT " . implode(',', $fieldsToFill) . " FROM civicrm_relationship WHERE id = %1", array(1 => array($params['id'], 'Integer')));
+        while ($result->fetch()) {
+          foreach ($fieldsToFill as $field) {
+            $params[$field] = !empty($params[$field]) ? $params[$field] : $result->$field;
+          }
         }
         return;
       }
@@ -712,7 +718,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    */
   public static function checkDuplicateRelationship(&$params, $id, $contactId = 0, $relationshipId = 0) {
     $relationshipTypeId = CRM_Utils_Array::value('relationship_type_id', $params);
-    list($type, $first, $second) = explode('_', $relationshipTypeId);
+    list($type) = explode('_', $relationshipTypeId);
 
     $queryString = "
 SELECT id
@@ -1231,7 +1237,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    */
   public static function relatedMemberships($contactId, &$params, $ids, $action = CRM_Core_Action::ADD, $active = TRUE) {
     // Check the end date and set the status of the relationship
-    // accrodingly.
+    // accordingly.
     $status = self::CURRENT;
 
     if (!empty($params['end_date'])) {
@@ -1255,7 +1261,14 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     $rel = explode('_', $params['relationship_type_id']);
 
     $relTypeId     = $rel[0];
-    $relDirection  = "_{$rel[1]}_{$rel[2]}";
+    if (!empty($rel[1])) {
+      $relDirection = "_{$rel[1]}_{$rel[2]}";
+    }
+    else {
+      // this call is coming from somewhere where the direction was resolved early on (e.g an api call)
+      // so we can assume _a_b
+      $relDirection = "_a_b";
+    }
     $targetContact = array();
     if (($action & CRM_Core_Action::ADD) ||
       ($action & CRM_Core_Action::DELETE)
