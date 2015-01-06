@@ -57,9 +57,13 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       throw new CRM_Core_Exception('Duplicate Relationship');
     }
     if (self::checkValidRelationship($params, $params, 0)) {
-      throw new CRM_Core_Exception('Invalide Relationship');
+      throw new CRM_Core_Exception('Invalid Relationship');
     }
     $relationship = self::add($params);
+    if (!empty($params['contact_id_a'])) {
+      $ids = array('contactTarget' => $relationship->contact_id_b, 'contact' => $params['contact_id_a']);
+      CRM_Contact_BAO_Relationship::relatedMemberships($params['contact_id_a'], $values, $ids, (empty($params['id']) ? CRM_Core_Action::ADD : CRM_Core_Action::UPDATE));
+    }
     self::addRecent($params, $relationship);
     return $relationship;
   }
