@@ -52,8 +52,10 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @param array $allValues
    *
@@ -74,8 +76,10 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   /**
    * Add the financial types
    *
-   * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
+   * @param array $ids
+   *   Reference array contains the id.
    *
    * @static
    * @return object
@@ -162,7 +166,8 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    *
    * @param string $entityTable
    *
-   * @param string $columnName Column to fetch
+   * @param string $columnName
+   *   Column to fetch.
    *
    * @return null|string
    * @static
@@ -186,7 +191,8 @@ AND entity_id = %2";
   /**
    * Financial Account for payment instrument
    *
-   * @param int $paymentInstrumentValue payment instrument value
+   * @param int $paymentInstrumentValue
+   *   Payment instrument value.
    *
    * @return array|null|string
    * @static
