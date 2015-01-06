@@ -46,7 +46,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Create Payment Processor
    *
-   * @param array $params parameters for Processor entity
+   * @param array $params
+   *   Parameters for Processor entity.
    *
    * @return CRM_Financial_DAO_PaymentProcessor
    * @throws Exception
@@ -96,8 +97,10 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * retrieves the relevant objects. It also stores all the retrieved
    * values in the default array
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
      * @return CRM_Financial_DAO_PaymentProcessor object on success, null otherwise
    * @static
@@ -115,8 +118,10 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on sucess, null otherwise
    *
@@ -174,8 +179,10 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Get the payment processor details
    *
-   * @param  int    $paymentProcessorID payment processor id
-   * @param  string $mode               payment mode ie test or live
+   * @param int $paymentProcessorID
+   *   Payment processor id.
+   * @param string $mode
+   *   Payment mode ie test or live.
    *
    * @return array  associated array with payment processor related fields
    * @static
@@ -248,8 +255,10 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Build payment processor details
    *
-   * @param object $dao   payment processor object
-   * @param  string $mode payment mode ie test or live
+   * @param object $dao
+   *   Payment processor object.
+   * @param string $mode
+   *   Payment mode ie test or live.
    *
    * @return array  associated array with payment processor related fields
    * @static
@@ -382,8 +391,10 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * Retrieve payment processor id / info/ object based on component-id.
    *
    * @param int $entityID
-   * @param string $component component
-   * @param string $type type of payment information to be retrieved
+   * @param string $component
+   *   Component.
+   * @param string $type
+   *   Type of payment information to be retrieved.
    *
    * @return int / array / object based on type
    * @static
