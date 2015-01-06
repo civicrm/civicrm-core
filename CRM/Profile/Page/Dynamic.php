@@ -320,7 +320,8 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
         //CRM-14338
         // Create a unique, non-empty index for each field.
         $index = $field['title'];
-        if ($index === '') { $index = ' ';
+        if ($index === '') {
+          $index = ' ';
         }
         while (array_key_exists($index, $labels)) {
           $index .= ' ';
