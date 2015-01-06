@@ -93,7 +93,8 @@ class CRM_Dedupe_Finder {
    *
    * @return array  matching contact ids
    */
-  static function dupesByParams($params,
+  static function dupesByParams(
+    $params,
     $ctype,
     $used = 'Unsupervised',
     $except = array(),
