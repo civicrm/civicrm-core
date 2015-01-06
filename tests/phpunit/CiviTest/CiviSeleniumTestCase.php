@@ -152,8 +152,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    * Authenticate as drupal user
-   * @param $user: (str) the key 'user' or 'admin', or a literal username
-   * @param $pass: (str) if $user is a literal username and not 'user' or 'admin', supply the password
+   * @param $user : (str) the key 'user' or 'admin', or a literal username
+   * @param $pass : (str) if $user is a literal username and not 'user' or 'admin', supply the password
    */
   public function webtestLogin($user = 'user', $pass = NULL) {
     // If already logged in as correct user, do nothing
@@ -667,7 +667,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     else {
       $params[strtolower($contactType) . '_name'] = "$name $contactType";
     }
-    foreach($params as $param => $val) {
+    foreach ($params as $param => $val) {
       $this->type($param, $val);
     }
     $this->type('email-Primary', $params['email'] = "{$name}@example.com");
@@ -684,8 +684,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * @deprecated in favor of createDialogContact
    */
-  function webtestNewDialogContact($fname = 'Anthony', $lname = 'Anderson', $email = 'anthony@anderson.biz',
-                                   $type = 4, $selectId = 's2id_contact_id', $row = 1, $prefix = '') {
+  function webtestNewDialogContact(
+    $fname = 'Anthony', $lname = 'Anderson', $email = 'anthony@anderson.biz',
+    $type = 4, $selectId = 's2id_contact_id', $row = 1, $prefix = '') {
     // 4 - Individual profile
     // 5 - Organization profile
     // 6 - Household profile
@@ -1037,32 +1038,33 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @return null $pageId of newly created online contribution page.
    */
-  function webtestAddContributionPage($hash = NULL,
-                                      $rand = NULL,
-                                      $pageTitle = NULL,
-                                      $processor = array('Test Processor' => 'Dummy'),
-                                      $amountSection = TRUE,
-                                      $payLater = TRUE,
-                                      $onBehalf = TRUE,
-                                      $pledges = TRUE,
-                                      $recurring = FALSE,
-                                      $membershipTypes = TRUE,
-                                      $memPriceSetId = NULL,
-                                      $friend = TRUE,
-                                      $profilePreId = 1,
-                                      $profilePostId = 7,
-                                      $premiums = TRUE,
-                                      $widget = TRUE,
-                                      $pcp = TRUE,
-                                      $isAddPaymentProcessor = TRUE,
-                                      $isPcpApprovalNeeded = FALSE,
-                                      $isSeparatePayment = FALSE,
-                                      $honoreeSection = TRUE,
-                                      $allowOtherAmount = TRUE,
-                                      $isConfirmEnabled = TRUE,
-                                      $financialType = 'Donation',
-                                      $fixedAmount = TRUE,
-                                      $membershipsRequired = TRUE
+  function webtestAddContributionPage(
+    $hash = NULL,
+    $rand = NULL,
+    $pageTitle = NULL,
+    $processor = array('Test Processor' => 'Dummy'),
+    $amountSection = TRUE,
+    $payLater = TRUE,
+    $onBehalf = TRUE,
+    $pledges = TRUE,
+    $recurring = FALSE,
+    $membershipTypes = TRUE,
+    $memPriceSetId = NULL,
+    $friend = TRUE,
+    $profilePreId = 1,
+    $profilePostId = 7,
+    $premiums = TRUE,
+    $widget = TRUE,
+    $pcp = TRUE,
+    $isAddPaymentProcessor = TRUE,
+    $isPcpApprovalNeeded = FALSE,
+    $isSeparatePayment = FALSE,
+    $honoreeSection = TRUE,
+    $allowOtherAmount = TRUE,
+    $isConfirmEnabled = TRUE,
+    $financialType = 'Donation',
+    $fixedAmount = TRUE,
+    $membershipsRequired = TRUE
   ) {
     if (!$hash) {
       $hash = substr(sha1(rand()), 0, 7);
@@ -1682,8 +1684,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param $expectedValue
    * @param string $message
    */
-  function assertDBCompareValue($daoName, $searchValue, $returnColumn, $searchColumn,
-                                $expectedValue, $message
+  function assertDBCompareValue(
+    $daoName, $searchValue, $returnColumn, $searchColumn,
+    $expectedValue, $message
   ) {
     if (!self::checkDoLocalDBTest()) {
       return;
@@ -1732,16 +1735,17 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * Add new Financial Account
    */
-  function _testAddFinancialAccount($financialAccountTitle,
-                                    $financialAccountDescription = FALSE,
-                                    $accountingCode = FALSE,
-                                    $firstName = FALSE,
-                                    $financialAccountType = FALSE,
-                                    $taxDeductible = FALSE,
-                                    $isActive = FALSE,
-                                    $isTax = FALSE,
-                                    $taxRate = FALSE,
-                                    $isDefault = FALSE
+  function _testAddFinancialAccount(
+    $financialAccountTitle,
+    $financialAccountDescription = FALSE,
+    $accountingCode = FALSE,
+    $firstName = FALSE,
+    $financialAccountType = FALSE,
+    $taxDeductible = FALSE,
+    $isActive = FALSE,
+    $isTax = FALSE,
+    $taxRate = FALSE,
+    $isDefault = FALSE
   ) {
 
     $this->openCiviPage("admin/financial/financialAccount", "reset=1");
@@ -1811,7 +1815,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * Edit Financial Account
    */
-  function _testEditFinancialAccount($editfinancialAccount,
+  function _testEditFinancialAccount(
+    $editfinancialAccount,
                                      $financialAccountTitle = FALSE,
                                      $financialAccountDescription = FALSE,
                                      $accountingCode = FALSE,
@@ -2096,11 +2101,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @param array $customSets
    *   Custom sets i.e entity wise sets want to be created and checked.
-  e.g    $customSets = array(array('entity' => 'Contribution', 'subEntity' => 'Donation',
-  'triggerElement' => $triggerElement))
-  array  $triggerElement:   the element which is responsible for custom group to load
-
-  which uses the entity info as its selection value
+   * e.g    $customSets = array(array('entity' => 'Contribution', 'subEntity' => 'Donation',
+   * 'triggerElement' => $triggerElement))
+   * array  $triggerElement:   the element which is responsible for custom group to load
+   *
+   * which uses the entity info as its selection value
    * @param array $pageUrl
    *   The url which on which the ajax custom group load takes place.
    * @param bool $beforeTriggering
@@ -2126,7 +2131,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->waitForAjaxContent();
     $this->checkForErrorsOnPage();
 
-    foreach($return as $values) {
+    foreach ($return as $values) {
       foreach ($values as $entityType => $customData) {
         //initiate necessary variables
         list($entity, $entityData) = explode('_', $entityType);
@@ -2146,7 +2151,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
           }
           elseif ($elementType == 'checkbox') {
             $val = explode(',', $entityData);
-            foreach($val as $v) {
+            foreach ($val as $v) {
               $checkId = $this->getAttribute("xpath=//label[text()='{$v}']/@for");
               $this->check($checkId);
             }
@@ -2211,7 +2216,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
       $customGroupTitle = preg_replace('/\s/', '_', trim($customGroupTitle));
       $return[] = array(
-        "{$customSet['entity']}_{$customSet['subEntity']}" => array('cgtitle' => $customGroupTitle, 'gid' => $gid, 'triggerElement' => $customSet['triggerElement']));
+        "{$customSet['entity']}_{$customSet['subEntity']}" => array(
+          'cgtitle' => $customGroupTitle,
+          'gid' => $gid,
+          'triggerElement' => $customSet['triggerElement']
+        )
+      );
 
       // Go home for a sec to give time for caches to clear
       $this->openCiviPage('');
@@ -2257,7 +2267,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   public function multiselect2($fieldid, $params) {
     // In the case of chainSelect, wait for options to load
     $this->waitForElementNotPresent('css=select.loading');
-    foreach($params as $value) {
+    foreach ($params as $value) {
       $this->clickAt("xpath=//*[@id='$fieldid']/../div/ul//li/input");
       $this->waitForElementPresent("xpath=//ul[@class='select2-results']");
       $this->clickAt("xpath=//ul[@class='select2-results']//li/div[text()='$value']");

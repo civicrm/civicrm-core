@@ -57,7 +57,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    *                             saveMappingName    : to override mapping name
    *
    */
-  function importCSVComponent($component,
+  function importCSVComponent(
+    $component,
     $headers,
     $rows,
     $contactType = 'Individual',

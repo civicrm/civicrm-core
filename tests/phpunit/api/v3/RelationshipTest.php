@@ -1,28 +1,28 @@
 <?php
 /**
- +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
- |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +--------------------------------------------------------------------+
+ * +--------------------------------------------------------------------+
+ * | CiviCRM version 4.6                                                |
+ * +--------------------------------------------------------------------+
+ * | Copyright CiviCRM LLC (c) 2004-2014                                |
+ * +--------------------------------------------------------------------+
+ * | This file is a part of CiviCRM.                                    |
+ * |                                                                    |
+ * | CiviCRM is free software; you can copy, modify, and distribute it  |
+ * | under the terms of the GNU Affero General Public License           |
+ * | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ * |                                                                    |
+ * | CiviCRM is distributed in the hope that it will be useful, but     |
+ * | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ * | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ * | See the GNU Affero General Public License for more details.        |
+ * |                                                                    |
+ * | You should have received a copy of the GNU Affero General Public   |
+ * | License and the CiviCRM Licensing Exception along                  |
+ * | with this program; if not, contact CiviCRM LLC                     |
+ * | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ * | GNU Affero General Public License or the licensing of CiviCRM,     |
+ * | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ * +--------------------------------------------------------------------+
  */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -52,7 +52,11 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->_cId_a = $this->individualCreate();
-    $this->_cId_a_2 = $this->individualCreate(array('last_name' => 'c2', 'email' => 'c@w.com', 'contact_type' => 'Individual'));
+    $this->_cId_a_2 = $this->individualCreate(array(
+        'last_name' => 'c2',
+        'email' => 'c@w.com',
+        'contact_type' => 'Individual'
+      ));
     $this->_cId_b = $this->organizationCreate();
     $this->_cId_b2 = $this->organizationCreate(array('organization_name' => ' Org 2'));
     $this->_entity = 'relationship';
@@ -178,7 +182,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'contact_id_b' => $this->_cId_b,
       'relationship_type_id' => $this->_relTypeID,
       'start_date' => '2008-12-20',
-    'end_date' => NULL,
+      'end_date' => NULL,
       'is_active' => 1,
     );
     $relationship = $this->callAPISuccess('relationship', 'create', $params);
@@ -248,7 +252,6 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
 
-
   /**
    * Check relationship creation
    */
@@ -282,6 +285,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $params['id'] = $result['id'];
     $this->callAPISuccess('relationship', 'delete', $params);
   }
+
   /**
    * Ensure disabling works
    */
@@ -301,6 +305,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->assertEquals('blah', $result['values'][$result['id']]['description']);
     $this->assertEquals(1, $result['values'][$result['id']]['is_permission_b_a']);
   }
+
   /**
    * Check relationship creation
    */
@@ -329,7 +334,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       if ($key == 'note') {
         continue;
       }
-      if($key == 'end_date'){
+      if ($key == 'end_date') {
         $this->assertTrue(empty($values[$key]));
         continue;
       }
@@ -711,39 +716,40 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $rel2Params['end_date'] = 'yesterday';
     $rel2 = $this->callAPISuccess('relationship', 'create', $rel2Params);
   }
+
   /*
    * Test using various operators
    */
   public function testGetTypeOperators() {
     $relTypeParams = array(
-        'name_a_b' => 'Relation 3 for delete',
-        'name_b_a' => 'Relation 6 for delete',
-        'description' => 'Testing relationship type 2',
-        'contact_type_a' => 'Individual',
-        'contact_type_b' => 'Organization',
-        'is_reserved' => 1,
-        'is_active' => 1,
+      'name_a_b' => 'Relation 3 for delete',
+      'name_b_a' => 'Relation 6 for delete',
+      'description' => 'Testing relationship type 2',
+      'contact_type_a' => 'Individual',
+      'contact_type_b' => 'Organization',
+      'is_reserved' => 1,
+      'is_active' => 1,
     );
     $relationType2 = $this->relationshipTypeCreate($relTypeParams);
     $relTypeParams = array(
-        'name_a_b' => 'Relation 8 for delete',
-        'name_b_a' => 'Relation 9 for delete',
-        'description' => 'Testing relationship type 7',
-        'contact_type_a' => 'Individual',
-        'contact_type_b' => 'Organization',
-        'is_reserved' => 1,
-        'is_active' => 1,
+      'name_a_b' => 'Relation 8 for delete',
+      'name_b_a' => 'Relation 9 for delete',
+      'description' => 'Testing relationship type 7',
+      'contact_type_a' => 'Individual',
+      'contact_type_b' => 'Organization',
+      'is_reserved' => 1,
+      'is_active' => 1,
     );
     $relationType3 = $this->relationshipTypeCreate($relTypeParams);
 
     $relTypeParams = array(
-        'name_a_b' => 'Relation 6 for delete',
-        'name_b_a' => 'Relation 88for delete',
-        'description' => 'Testing relationship type 00',
-        'contact_type_a' => 'Individual',
-        'contact_type_b' => 'Organization',
-        'is_reserved' => 1,
-        'is_active' => 1,
+      'name_a_b' => 'Relation 6 for delete',
+      'name_b_a' => 'Relation 88for delete',
+      'description' => 'Testing relationship type 00',
+      'contact_type_a' => 'Individual',
+      'contact_type_b' => 'Organization',
+      'is_reserved' => 1,
+      'is_active' => 1,
     );
     $relationType4 = $this->relationshipTypeCreate($relTypeParams);
 
@@ -751,9 +757,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $rel2 = $this->callAPISuccess('relationship', 'create', array_merge($this->_params,
       array('relationship_type_id' => $relationType2)));
     $rel3 = $this->callAPISuccess('relationship', 'create', array_merge($this->_params,
-        array('relationship_type_id' => $relationType3)));
+      array('relationship_type_id' => $relationType3)));
     $rel4 = $this->callAPISuccess('relationship', 'create', array_merge($this->_params,
-        array('relationship_type_id' => $relationType4)));
+      array('relationship_type_id' => $relationType4)));
 
     $getParams = array(
       'relationship_type_id' => array('IN' => array($relationType2, $relationType3))
@@ -769,7 +775,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $description = "demonstrates use of NOT IN filter";
     $subfile = 'NotInRelationshipType';
     $getParams = array(
-        'relationship_type_id' => array('NOT IN' => array($relationType2, $relationType3))
+      'relationship_type_id' => array('NOT IN' => array($relationType2, $relationType3))
     );
     $result = $this->callAPIAndDocument('relationship', 'get', $getParams, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals($result['count'], 2);
@@ -778,7 +784,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $description = "demonstrates use of BETWEEN filter";
     $subfile = 'BetweenRelationshipType';
     $getParams = array(
-        'relationship_type_id' => array('BETWEEN' => array($relationType2, $relationType4))
+      'relationship_type_id' => array('BETWEEN' => array($relationType2, $relationType4))
     );
     $result = $this->callAPIAndDocument('relationship', 'get', $getParams, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals($result['count'], 3);
@@ -787,13 +793,14 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $description = "demonstrates use of Not BETWEEN filter";
     $subfile = 'NotBetweenRelationshipType';
     $getParams = array(
-        'relationship_type_id' => array('NOT BETWEEN' => array($relationType2, $relationType4))
+      'relationship_type_id' => array('NOT BETWEEN' => array($relationType2, $relationType4))
     );
     $result = $this->callAPIAndDocument('relationship', 'get', $getParams, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals($result['count'], 1);
     $this->AssertEquals(array($rel1['id']), array_keys($result['values']));
 
   }
+
   /**
    * Check with invalid relationshipType Id
    */
@@ -897,8 +904,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   public function testGetRelationshipByTypeDAO() {
     $this->ids['relationship'] = $this->callAPISuccess($this->_entity, 'create', array('format.only_id' => TRUE) + $this->_params);
     $result = $this->callAPISuccess($this->_entity, 'getcount', array(
-      'contact_id_a' => $this->_cId_a,),
-    1);
+        'contact_id_a' => $this->_cId_a,
+      ),
+      1);
     $result = $this->callAPISuccess($this->_entity, 'get', array(
       'contact_id_a' => $this->_cId_a,
       'relationship_type_id' => $this->_relTypeID,
@@ -928,14 +936,16 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType2,
-        'contact_id_b' => $this->_cId_b2))
+        'contact_id_b' => $this->_cId_b2
+      ))
     );
 
     //relationshp 3
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType3,
-        'contact_id_b' => $org3))
+        'contact_id_b' => $org3
+      ))
     );
 
     $result = $this->callAPISuccess($this->_entity, 'get', array(
@@ -966,14 +976,16 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType2,
-        'contact_id_b' => $this->_cId_b2))
+        'contact_id_b' => $this->_cId_b2
+      ))
     );
 
     //relationshp 3
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType3,
-        'contact_id_b' => $org3))
+        'contact_id_b' => $org3
+      ))
     );
 
     $result = $this->callAPISuccess($this->_entity, 'get', array(
@@ -1010,14 +1022,16 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType2,
-        'contact_id_b' => $this->_cId_b2))
+        'contact_id_b' => $this->_cId_b2
+      ))
     );
 
     //relationshp 3
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType3,
-        'contact_id_b' => $org3))
+        'contact_id_b' => $org3
+      ))
     );
 
     //relationshp 4 with reveral
@@ -1025,7 +1039,8 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       array_merge($this->_params, array(
         'relationship_type_id' => $relType1,
         'contact_id_a' => $this->_cId_a,
-        'contact_id_b' => $this->_cId_a_2))
+        'contact_id_b' => $this->_cId_a_2
+      ))
     );
 
     $result = $this->callAPISuccess($this->_entity, 'get', array(
@@ -1062,14 +1077,16 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType2,
-        'contact_id_b' => $this->_cId_b2))
+        'contact_id_b' => $this->_cId_b2
+      ))
     );
 
     //relationshp 3
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType3,
-        'contact_id_b' => $org3))
+        'contact_id_b' => $org3
+      ))
     );
 
     //relationshp 4 with reveral
@@ -1077,7 +1094,8 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       array_merge($this->_params, array(
         'relationship_type_id' => $relType1,
         'contact_id_a' => $this->_cId_a,
-        'contact_id_b' => $this->_cId_a_2))
+        'contact_id_b' => $this->_cId_a_2
+      ))
     );
 
     $result = $this->callAPISuccess($this->_entity, 'get', array(

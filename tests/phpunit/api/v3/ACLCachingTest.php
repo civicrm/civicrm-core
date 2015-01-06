@@ -34,7 +34,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * @package CiviCRM_APIv3
  * @subpackage API_Contact
  */
-
 class api_v3_ACLCachingTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_params;
@@ -44,6 +43,7 @@ class api_v3_ACLCachingTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
   }
+
   /**
    * (non-PHPdoc)
    * @see CiviUnitTestCase::tearDown()

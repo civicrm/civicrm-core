@@ -47,9 +47,9 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction(TRUE);
 
-    $this->_contactID    = $this->organizationCreate();
-    $activity            = $this->activityCreate();
-    $this->_activityID   = $activity['id'];
+    $this->_contactID = $this->organizationCreate();
+    $activity = $this->activityCreate();
+    $this->_activityID = $activity['id'];
     CRM_Core_PseudoConstant::flush();
     $this->_params = array(
       'contact_id' => $this->_contactID,
