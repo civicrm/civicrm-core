@@ -814,8 +814,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   /**
    * Global form rule
    *
-   * @param array $fields the input form values
-   * @param array $files the uploaded files if any
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
    * @param $self
    *
    * @return true if no errors, else array of errors
@@ -995,7 +997,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   /**
    * Process activity creation
    *
-   * @param array $params associated array of submitted values
+   * @param array $params
+   *   Associated array of submitted values.
    *
    * @return $this|null|object
    */
