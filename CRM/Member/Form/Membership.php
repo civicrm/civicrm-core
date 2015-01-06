@@ -117,7 +117,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->set('priceSetId', $this->_priceSetId);
     $this->assign('priceSetId', $this->_priceSetId);
 
-
     // check for edit permission
     if (!CRM_Core_Permission::checkActionPermission('CiviMember', $this->_action)) {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
@@ -373,7 +372,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->assign('taxRates', json_encode(CRM_Core_PseudoConstant::getTaxRates()));
     $config = CRM_Core_Config::singleton();
     $this->assign('currency', $config->defaultCurrencySymbol);
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     if (isset($invoicing)){
       $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
@@ -686,7 +685,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     $this->addSelect('soft_credit_type_id', array('entity' => 'contribution_soft'));
     $this->addEntityRef('soft_credit_contact_id', ts('Payment From'), array('create' => TRUE));
 
-
     $this->addElement('checkbox',
       'send_receipt',
       ts('Send Confirmation and Receipt?'), NULL,
@@ -889,7 +887,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
             foreach($tmp_statuses as $cur_stat) {
               $status_ids[] = $cur_stat['id'];
             }
-            if (empty($params['status_id']) || in_array( $params['status_id'] , $status_ids) == false) {
+            if (empty($params['status_id']) || in_array( $params['status_id'], $status_ids) == FALSE) {
               $errors['status_id'] = ts('Please enter a status that does NOT represent a current membership status.');
               $errors['is_override']  = ts('This must be checked because you set an End Date for a lifetime membership');
             }
@@ -1108,7 +1106,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $$dateVariable = CRM_Utils_Date::processDate($formValues[$dateField]);
     }
 
-    $memTypeNumTerms =  empty($termsByType) ? CRM_Utils_Array::value('num_terms', $formValues) : NULL;
+    $memTypeNumTerms = empty($termsByType) ? CRM_Utils_Array::value('num_terms', $formValues) : NULL;
 
     $calcDates = array();
     foreach ($this->_memTypeSelected as $memType) {
@@ -1264,7 +1262,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       //get the payment processor id as per mode.
       $params['payment_processor_id'] = $this->_params['payment_processor_id'] = $formValues['payment_processor_id'] = $this->_paymentProcessor['id'];
-
 
       $now = date('YmdHis');
       $fields = array();
@@ -1579,7 +1576,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
     if (!empty($lineItem[$priceSetId])) {
-      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       $taxAmount = FALSE;
       $totalTaxAmount = 0;
@@ -1844,10 +1841,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
     if ((!empty($taxAmt) || isset($eventTaxAmt)) && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
-      $isEmailPdf = True;
+      $isEmailPdf = TRUE;
     }
     else {
-      $isEmailPdf = False;
+      $isEmailPdf = FALSE;
     }
 
     list($mailSend, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(

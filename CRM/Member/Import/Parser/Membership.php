@@ -316,10 +316,10 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
               break;
           }
           if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-                      if ( $customFields[$customFieldID]['data_type'] == 'Date' ) {
+            if ( $customFields[$customFieldID]['data_type'] == 'Date' ) {
               CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
               unset($params[$key]);
-                      } else if ( $customFields[$customFieldID]['data_type'] == 'Boolean' ) {
+            } else if ( $customFields[$customFieldID]['data_type'] == 'Boolean' ) {
               $params[$key] = CRM_Utils_String::strtoboolstr($val);
             }
           }
@@ -579,7 +579,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    *
    * @return void
    */
-  public function fini() {}
+  public function fini() {
+  }
 
   /**
    *  to calculate join, start and end dates
@@ -647,8 +648,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         $values[$key] = $value;
         $type = $customFields[$customFieldID]['html_type'];
         if( $type == 'CheckBox' || $type == 'Multi-Select' || $type == 'AdvMulti-Select') {
-          $mulValues = explode( ',' , $value );
-          $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, true);
+          $mulValues = explode( ',', $value );
+          $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
           $values[$key] = array();
           foreach( $mulValues as $v1 ) {
             foreach($customOption as $customValueID => $customLabel) {
@@ -737,7 +738,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
     }
 
     _civicrm_api3_custom_format_params($params, $values, 'Membership');
-
 
     if ($create) {
       // CRM_Member_BAO_Membership::create() handles membership_start_date,

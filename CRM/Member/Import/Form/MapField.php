@@ -170,7 +170,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     $dataPatterns     = $this->get('dataPatterns');
     $hasLocationTypes = $this->get('fieldTypes');
 
-
     /* Initialize all field usages to false */
 
     foreach ($mapperKeys as $key) {
@@ -372,7 +371,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
         }
       }
     }
-
 
     if (!empty($fields['saveMapping'])) {
       $nameField = CRM_Utils_Array::value('saveMappingName', $fields);

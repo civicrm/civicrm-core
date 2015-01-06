@@ -156,7 +156,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
             //CRM-15573
             if($autoRenew == 2) {
               $this->freeze("auto_renew_$k");
-              $params['id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipBlock', $this->_id , 'id', 'entity_id');
+              $params['id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipBlock', $this->_id, 'id', 'entity_id');
             }
             $this->_renewOption[$k] = $autoRenew;
           }
@@ -226,19 +226,19 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
 
     if (!empty($params['member_price_set_id'])) {
       //check if this price set has membership type both auto-renew and non-auto-renew memberships.
-      $bothTypes =  CRM_Price_BAO_PriceSet::checkMembershipPriceSet($params['member_price_set_id']);
+      $bothTypes = CRM_Price_BAO_PriceSet::checkMembershipPriceSet($params['member_price_set_id']);
 
       //check for supporting payment processors
       //if both auto-renew and non-auto-renew memberships
       if ($bothTypes) {
-          $paymentProcessorIds = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
+        $paymentProcessorIds = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
             $contributionPageId, 'payment_processor'
             );
 
-          $paymentProcessorId = explode(CRM_Core_DAO::VALUE_SEPARATOR, $paymentProcessorIds);
+        $paymentProcessorId = explode(CRM_Core_DAO::VALUE_SEPARATOR, $paymentProcessorIds);
 
         if (!empty($paymentProcessorId)) {
-          $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(false, null, 'name');
+          $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, NULL, 'name');
           foreach($paymentProcessorId as $pid) {
             if ($pid) {
               $paymentProcessorTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor',
@@ -359,7 +359,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
             $setParams['name'] = $pageTitle . '_' . $this->_id;
           }
           else {
-            $timeSec = explode(".", microtime(true));
+            $timeSec = explode(".", microtime(TRUE));
             $setParams['name'] = $pageTitle . '_' . date('is', $timeSec[0]) . $timeSec[1];
           }
           $setParams['is_quick_config'] = 1;
@@ -420,7 +420,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
           $fieldParams['option_weight'][$rowCount]      = CRM_Utils_Array::value('weight', $membetype);
           $fieldParams['option_description'][$rowCount] = CRM_Utils_Array::value('description', $membetype);
           $fieldParams['default_option']                = CRM_Utils_Array::value('membership_type_default', $params);
-          $fieldParams['option_financial_type_id'] [$rowCount] = CRM_Utils_Array::value('financial_type_id', $membetype);
+          $fieldParams['option_financial_type_id'][$rowCount] = CRM_Utils_Array::value('financial_type_id', $membetype);
 
           $fieldParams['membership_type_id'][$rowCount] = $memType;
           // [$rowCount] = $membetype[''];
