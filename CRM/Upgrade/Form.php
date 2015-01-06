@@ -102,7 +102,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   function __construct($state = NULL,
     $action = CRM_Core_Action::NONE,
     $method = 'post',
-    $name   = NULL
+    $name = NULL
   ) {
     $this->_config = CRM_Core_Config::singleton();
 
@@ -364,7 +364,6 @@ SET    version = '$version'
 
     /*                          '2.2.alpha3', '2.2.0', '2.2.2', '2.1.alpha1', '2.1.3'); */
 
-
     usort($revList, 'version_compare');
     return $revList;
   }
@@ -441,7 +440,7 @@ SET    version = '$version'
    */
   public function getUpgradeVersions() {
     $latestVer = CRM_Utils_System::version();
-    $currentVer = CRM_Core_BAO_Domain::version(true);
+    $currentVer = CRM_Core_BAO_Domain::version(TRUE);
     if (!$currentVer) {
       CRM_Core_Error::fatal(ts('Version information missing in civicrm database.'));
     }
@@ -511,7 +510,7 @@ SET    version = '$version'
                array(1 => $latestVer));
     }
 
-    if (CRM_Core_DAO::getGlobalSetting('thread_stack', 0) < (1024*self::MINIMUM_THREAD_STACK)) {
+    if (CRM_Core_DAO::getGlobalSetting('thread_stack', 0) < (1024 * self::MINIMUM_THREAD_STACK)) {
       $error = ts('CiviCRM %1 requires MySQL thread stack >= %2k', array(
         1 => $latestVer,
         2 => self::MINIMUM_THREAD_STACK
@@ -646,7 +645,7 @@ SET    version = '$version'
    *
    * @return bool
    */
-  public static function doIncrementalUpgradeStep(CRM_Queue_TaskContext$ctx, $rev, $originalVer, $latestVer, $postUpgradeMessageFile) {
+  public static function doIncrementalUpgradeStep(CRM_Queue_TaskContext $ctx, $rev, $originalVer, $latestVer, $postUpgradeMessageFile) {
     $upgrade = new CRM_Upgrade_Form();
 
     $phpFunctionName = 'upgrade_' . str_replace('.', '_', $rev);
@@ -767,10 +766,10 @@ SET    version = '$version'
         version_compare($rev, '3.2.alpha1') > 0
       ) {
         $versionObject = $this->incrementalPhpObject($rev);
-         if (is_callable(array(
+        if (is_callable(array(
           $versionObject, 'setPreUpgradeMessage'))) {
-           $versionObject->setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
-         }
+          $versionObject->setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
+        }
       }
     }
   }

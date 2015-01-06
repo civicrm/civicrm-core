@@ -182,7 +182,7 @@ WHERE     %2.id = %1";
    *                          to the price set used for particular event
    * @param array $values
    *   Reference to the values array(.
-     this is
+  this is
    *                          lineItem array)
    *
    * @return void
@@ -266,8 +266,9 @@ WHERE     %2.id = %1";
    * @param array $otherParams
    */
   public static function syncLineItems($entityId, $entityTable = 'civicrm_contribution', $amount, $otherParams = NULL) {
-    if (!$entityId || CRM_Utils_System::isNull($amount))
+    if (!$entityId || CRM_Utils_System::isNull($amount)) {
       return;
+    }
 
     $from = " civicrm_line_item li
 LEFT JOIN   civicrm_price_field pf ON pf.id = li.price_field_id
@@ -296,7 +297,7 @@ LEFT JOIN civicrm_price_field_value cpfv ON cpfv.price_field_id = pf.id and cpfv
       $set .= " ,li.label = %4,
                 li.price_field_value_id = cpfv.id ";
       $where .= " AND cpse.entity_table = 'civicrm_event' AND cpse.entity_id = %5 ";
-      $amount = empty($amount) ? 0: $amount;
+      $amount = empty($amount) ? 0 : $amount;
       $params += array(
         4 => array($otherParams['fee_label'], 'String'),
         5 => array($otherParams['event_id'], 'String'),

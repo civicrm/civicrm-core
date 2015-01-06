@@ -105,7 +105,6 @@ class CRM_Upgrade_Incremental_php_FourOne {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
 
-
     $this->transferPreferencesToSettings();
     $this->createNewSettings();
 
@@ -143,7 +142,6 @@ class CRM_Upgrade_Incremental_php_FourOne {
         'mailing_backend',
       ),
     );
-
 
     $userColumnNames = array(
       self::NAVIGATION_NAME => array(

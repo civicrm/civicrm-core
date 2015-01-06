@@ -67,7 +67,8 @@ class CRM_Upgrade_Incremental_php_ThreeThree {
     while ($customField->fetch()) {
       $name = CRM_Utils_String::munge($customField->label, '_', 64);
       $fldCnt = CRM_Core_DAO::singleValueQuery($customFldCntQuery,
-        array(1 => array($name, 'String'),
+        array(
+      1 => array($name, 'String'),
           2 => array($customField->id, 'Integer'),
         ), TRUE, FALSE
       );
@@ -79,7 +80,8 @@ Update `civicrm_custom_field`
 SET `name` = %1
 WHERE id = %2
 ";
-      $customFieldParams = array(1 => array($name, 'String'),
+      $customFieldParams = array(
+      1 => array($name, 'String'),
         2 => array($customField->id, 'Integer'),
       );
       CRM_Core_DAO::executeQuery($customFieldQuery, $customFieldParams, TRUE, NULL, FALSE, FALSE);
@@ -94,7 +96,8 @@ WHERE id = %2
     while ($customGroup->fetch()) {
       $name = CRM_Utils_String::munge($customGroup->title, '_', 64);
       $grpCnt = CRM_Core_DAO::singleValueQuery($customGrpCntQuery,
-        array(1 => array($name, 'String'),
+        array(
+      1 => array($name, 'String'),
           2 => array($customGroup->id, 'Integer'),
         )
       );
@@ -113,7 +116,8 @@ WHERE id = %2
     while ($ufGroup->fetch()) {
       $name = CRM_Utils_String::munge($ufGroup->title, '_', 64);
       $ufGrpCnt = CRM_Core_DAO::singleValueQuery($ufGrpCntQuery,
-        array(1 => array($name, 'String'),
+        array(
+      1 => array($name, 'String'),
           2 => array($ufGroup->id, 'Integer'),
         )
       );
@@ -147,7 +151,6 @@ WHERE id = %2
     // update line items.
     $updateLineItem1 = "ALTER TABLE civicrm_line_item ADD COLUMN price_field_value_id int(10) unsigned default NULL;";
     CRM_Core_DAO::executeQuery($updateLineItem1);
-
 
     $priceFieldDAO = new CRM_Price_DAO_PriceField();
     $priceFieldDAO->find();
@@ -217,7 +220,8 @@ WHERE id = %2
         // update civicrm_line_item for price_field_value_id.
         // Used query to avoid line by line update.
         if ($labelFound || $priceFound) {
-          $lineItemParams = array(1 => array($fieldValueDAO->id, 'Integer'),
+          $lineItemParams = array(
+          1 => array($fieldValueDAO->id, 'Integer'),
             2 => array($opValueDAO->label, 'String'),
           );
           $updateLineItems = "UPDATE civicrm_line_item SET price_field_value_id = %1 WHERE label = %2";
@@ -262,7 +266,8 @@ WHERE id = %2
     $mainLineItem->find(TRUE);
     while ($mainLineItem->fetch()) {
       $dupeLineItem = new CRM_Price_BAO_LineItem();
-      foreach ($fields as $fld) $dupeLineItem->$fld = $mainLineItem->$fld;
+      foreach ($fields as $fld) { $dupeLineItem->$fld = $mainLineItem->$fld;
+      }
       $dupeLineItem->find(TRUE);
       $dupeLineItem->addWhere("id != $mainLineItem->id");
       while ($dupeLineItem->fetch()) {
