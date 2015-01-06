@@ -52,9 +52,12 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Create a new batch
    *
-   * @param array  $params associated array
-   * @param array  $ids associated array of ids
-   * @param string $context string
+   * @param array $params
+   *   Associated array.
+   * @param array $ids
+   *   Associated array of ids.
+   * @param string $context
+   *   String.
    *
    * @return object $batch batch object
    */
@@ -76,8 +79,10 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Retrieve the information about the batch
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return array CRM_Batch_BAO_Batch object on success, null otherwise
    * @static
@@ -95,7 +100,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Get profile id associated with the batch type
    *
-   * @param int   $batchTypeId batch type id
+   * @param int $batchTypeId
+   *   Batch type id.
    *
    * @return int  $profileId   profile id
    * @static
@@ -133,7 +139,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
   /**
    * Create entity batch entry
-   * @param array $params associated array
+   * @param array $params
+   *   Associated array.
    * @return batch array
    */
   public static function addBatchEntity(&$params) {
@@ -145,7 +152,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
   /**
    * Remove entries from entity batch
-   * @param array $params associated array
+   * @param array $params
+   *   Associated array.
    * @return CRM_Batch_DAO_EntityBatch
    */
   public static function removeBatchEntity($params) {
@@ -158,7 +166,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Delete batch entry
    *
-   * @param int $batchId batch id
+   * @param int $batchId
+   *   Batch id.
    *
    * @return void
    */
@@ -173,7 +182,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * This function is a wrapper for ajax batch selector
    *
-   * @param  array   $params associated array for params record id.
+   * @param array $params
+   *   Associated array for params record id.
    *
    * @return array   $batchList associated array of batch list
    */
@@ -238,7 +248,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Get list of batches
    *
-   * @param  array $params associated array for params
+   * @param array $params
+   *   Associated array for params.
    *
    * @return array
    */
@@ -343,7 +354,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Get count of batches
    *
-   * @param  array $params associated array for params
+   * @param array $params
+   *   Associated array for params.
    *
    * @return null|string
    */
@@ -359,7 +371,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Format where clause for getting lists of batches
    *
-   * @param  array $params associated array for params
+   * @param array $params
+   *   Associated array for params.
    *
    * @return string
    */
@@ -555,8 +568,10 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * Function for exporting financial accounts, currently we support CSV and IIF format
    * @see http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+Specifications+-++Batches#CiviAccountsSpecifications-Batches-%C2%A0Overviewofimplementation
    *
-   * @param array  $batchIds associated array of batch ids
-   * @param string $exportFormat export format
+   * @param array $batchIds
+   *   Associated array of batch ids.
+   * @param string $exportFormat
+   *   Export format.
    *
    * @return void
    *
