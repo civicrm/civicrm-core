@@ -44,7 +44,8 @@ class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
   /**
    * Connect to and lock the supplied file and make sure the two mail dirs exist
    *
-   * @param string $file mbox to operate upon
+   * @param string $file
+   *   Mbox to operate upon.
    *
    * @return \CRM_Mailing_MailStore_Mbox
    */
@@ -77,7 +78,8 @@ class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
   /**
    * Fetch the specified message to the local ignore folder
    *
-   * @param integer $nr  number of the message to fetch
+   * @param int $nr
+   *   Number of the message to fetch.
    *
    * @return void
    */
@@ -94,7 +96,8 @@ class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
   /**
    * Fetch the specified message to the local processed folder
    *
-   * @param integer $nr  number of the message to fetch
+   * @param int $nr
+   *   Number of the message to fetch.
    *
    * @return void
    */

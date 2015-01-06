@@ -479,7 +479,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   /**
    * Send the mailing
    *
-   * @param object $mailer A Mail object to send the messages
+   * @param object $mailer
+   *   A Mail object to send the messages.
    *
    * @param array $testParams
    *
@@ -818,7 +819,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   /**
    * Cancel a mailing
    *
-   * @param int $mailingId  the id of the mailing to be canceled
+   * @param int $mailingId
+   *   The id of the mailing to be canceled.
    * @static
    */
   public static function cancel($mailingId) {
@@ -864,7 +866,8 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
   /**
    * Return a translated status enum string
    *
-   * @param string $status        The status enum
+   * @param string $status
+   *   The status enum.
    *
    * @return string               The translated version
    * @static

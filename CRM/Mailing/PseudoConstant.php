@@ -68,7 +68,8 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the mailing components of a particular type
    *
-   * @param $type the type of component needed
+   * @param $type
+   *   The type of component needed.
    *
    * @return array - array reference of all mailing components
    * @static
@@ -107,8 +108,10 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Determine the default mailing component of a given type
    *
-   * @param $type the type of component needed
-   * @param $undefined the value to use if no default is defined
+   * @param $type
+   *   The type of component needed.
+   * @param $undefined
+   *   The value to use if no default is defined.
    *
    * @return integer -The ID of the default mailing component.
    * @static
