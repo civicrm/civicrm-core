@@ -49,8 +49,12 @@ class CRM_Group_Page_AJAX {
     }
     else {
       $sortMapper = array(
-        0 => 'groups.title', 1 => 'count', 2 => 'createdBy.sort_name', 3 => '',
-        4 => 'groups.group_type', 5 => 'groups.visibility',
+        0 => 'groups.title',
+      1 => 'count',
+      2 => 'createdBy.sort_name',
+      3 => '',
+        4 => 'groups.group_type',
+      5 => 'groups.visibility',
       );
 
       $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -90,9 +94,9 @@ class CRM_Group_Page_AJAX {
       if (empty($params['showOrgInfo'])) {
         unset($selectorElements[6]);
       }
-     //add setting so this can be tested by unit test
-     //@todo - ideally the portion of this that retrieves the groups should be extracted into a function separate
-     // from the one which deals with web inputs & outputs so we have a properly testable & re-usable function
+      //add setting so this can be tested by unit test
+      //@todo - ideally the portion of this that retrieves the groups should be extracted into a function separate
+      // from the one which deals with web inputs & outputs so we have a properly testable & re-usable function
       if(!empty($params['is_unit_test'])) {
         return array($groups, $iFilteredTotal);
       }
