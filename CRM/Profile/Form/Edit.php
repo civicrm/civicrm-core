@@ -151,8 +151,7 @@ SELECT module,is_reserved
 
     // set the title
     if ($this->_multiRecord && $this->_customGroupTitle) {
-      $groupTitle = ($this->_multiRecord & CRM_Core_Action::UPDATE) ?
-        'Edit ' . $this->_customGroupTitle . ' Record' : $this->_customGroupTitle;
+      $groupTitle = ($this->_multiRecord & CRM_Core_Action::UPDATE) ? 'Edit ' . $this->_customGroupTitle . ' Record' : $this->_customGroupTitle;
 
     } else {
       $groupTitle = $this->_ufGroup['title'];

@@ -571,7 +571,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
       }
     }
 
-
     $multipleSelectFields = array('preferred_communication_method' => 1);
     $multiRecordTableId = NULL;
     if ($this->_multiRecordTableName) {
@@ -591,8 +590,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
       }
       $row   = array();
       $empty = TRUE;
-      $row[] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-        $result->contact_sub_type : $result->contact_type,
+      $row[] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type,
         FALSE,
         $result->contact_id,
         $showProfileOverlay
@@ -738,8 +736,8 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    *  according to multi record custom field values
    */
   public function setMultiRecordTableName($fields) {
-   $customGroupId = $multiRecordTableName = NULL;
-   $selectorSet = FALSE;
+    $customGroupId = $multiRecordTableName = NULL;
+    $selectorSet = FALSE;
 
     foreach ($fields as $field => $properties) {
       if (!CRM_Core_BAO_CustomField::getKeyID($field)) {
