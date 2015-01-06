@@ -443,13 +443,13 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *  contactID, ufID, unique string ) if success
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
-   //@todo this 'PEAR-y' stuff is only required when bookstrap is not being loaded which is rare
-   // if ever now.
-   // probably if bootstrap is loaded this call
-   // CRM_Utils_System::loadBootStrap($bootStrapParams, TRUE, TRUE, $realPath); would be
-   // sufficient to do what this fn does. It does exist as opposed to return which might need some hanky-panky to make
-   // safe in the unknown situation where authenticate might be called & it is important that
-   // false is returned
+    //@todo this 'PEAR-y' stuff is only required when bookstrap is not being loaded which is rare
+    // if ever now.
+    // probably if bootstrap is loaded this call
+    // CRM_Utils_System::loadBootStrap($bootStrapParams, TRUE, TRUE, $realPath); would be
+    // sufficient to do what this fn does. It does exist as opposed to return which might need some hanky-panky to make
+    // safe in the unknown situation where authenticate might be called & it is important that
+    // false is returned
     require_once 'DB.php';
 
     $config = CRM_Core_Config::singleton();
@@ -705,7 +705,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     // which means that define(CIVICRM_CLEANURL) was correctly set.
     // So we correct it
     $config = CRM_Core_Config::singleton();
-    $config->cleanURL = (int)variable_get('clean_url', '0');
+    $config->cleanURL = (int) variable_get('clean_url', '0');
 
     // CRM-8655: Drupal wasn't available during bootstrap, so hook_civicrm_config never executes
     CRM_Utils_Hook::config($config);
@@ -946,7 +946,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *   Drupal User ID.
    */
   public function og_membership_delete($ogID, $drupalID) {
-      og_delete_subscription( $ogID, $drupalID );
+    og_delete_subscription( $ogID, $drupalID );
   }
 
   /**
@@ -958,7 +958,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
       $timezone = $user->timezone;
     } else {
-      $timezone = variable_get('date_default_timezone', null);
+      $timezone = variable_get('date_default_timezone', NULL);
     }
     if (!$timezone) {
       $timezone = parent::getTimeZoneString();

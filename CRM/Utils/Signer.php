@@ -89,7 +89,7 @@ class CRM_Utils_Signer {
     if (empty($salt)) {
       $message['salt'] = $this->createSalt();
     } else {
-      $message['salt'] =  $salt;
+      $message['salt'] = $salt;
     }
     // recall: paramNames is pre-sorted for stability
     foreach ($this->paramNames as $paramName) {
@@ -100,8 +100,8 @@ class CRM_Utils_Signer {
       } else { // $paramName is not included or ===NULL
         $params[$paramName] = '';
       }
-        $message['payload'][$paramName] = $params[$paramName];
-      }
+      $message['payload'][$paramName] = $params[$paramName];
+    }
     $token = $message['salt'] . $this->signDelim . md5(serialize($message));
     return $token;
   }

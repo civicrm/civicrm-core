@@ -70,7 +70,8 @@ class CRM_Utils_ReCAPTCHA {
   /**
    *
    */
-  public function __construct() {}
+  public function __construct() {
+  }
 
   /**
    * Add element to form

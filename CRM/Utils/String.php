@@ -597,7 +597,6 @@ class CRM_Utils_String {
       $_replaceChar = '_';
     }
 
-
     if ($search == NULL) {
       $search = $_searchChars;
     }
@@ -622,13 +621,13 @@ class CRM_Utils_String {
    * @static
    */
   public static function purifyHTML($string) {
-    static $_filter = null;
+    static $_filter = NULL;
     if (!$_filter) {
       $config = HTMLPurifier_Config::createDefault();
       $config->set('Core.Encoding', 'UTF-8');
 
       // Disable the cache entirely
-      $config->set('Cache.DefinitionImpl', null);
+      $config->set('Cache.DefinitionImpl', NULL);
 
       $_filter = new HTMLPurifier($config);
     }
@@ -650,7 +649,7 @@ class CRM_Utils_String {
       return $string;
     }
     else {
-      return substr($string, 0, $maxLen-3) . '...';
+      return substr($string, 0, $maxLen - 3) . '...';
     }
   }
 
@@ -688,7 +687,7 @@ class CRM_Utils_String {
       return array($defaultPrefix, $string);
     }
     else {
-      return array(substr($string, 0, $pos), substr($string, 1+$pos));
+      return array(substr($string, 0, $pos), substr($string, 1 + $pos));
     }
   }
 
@@ -704,17 +703,17 @@ class CRM_Utils_String {
    *
    * @return string returns the masked Email address
    */
-  public static function maskEmail($email, $maskChar= '*', $percent=50) {
+  public static function maskEmail($email, $maskChar = '*', $percent = 50) {
     list($user, $domain) = preg_split("/@/", $email);
     $len = strlen($user);
-    $maskCount = floor($len * $percent /100);
+    $maskCount = floor($len * $percent / 100);
     $offset = floor(($len - $maskCount) / 2);
 
     $masked = substr($user, 0, $offset)
       .str_repeat($maskChar, $maskCount)
       .substr($user, $maskCount + $offset);
 
-    return($masked.'@'.$domain);
+    return ($masked.'@'.$domain);
   }
 
   /**

@@ -391,7 +391,7 @@ class CRM_Utils_Migrate_Export {
     $result = array();
     foreach (array_keys($this->_xml) as $key) {
       if (!empty($this->_xml[$key]['data'])) {
-        $result[ $this->_xml[$key]['name'] ] = array_values($this->_xml[$key]['data']);
+        $result[$this->_xml[$key]['name']] = array_values($this->_xml[$key]['data']);
       }
     }
     return $result;

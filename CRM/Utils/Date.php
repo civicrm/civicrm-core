@@ -496,7 +496,7 @@ class CRM_Utils_Date {
    * @static
    */
   public static function convertToDefaultDate(&$params, $dateType, $dateParam) {
-    $now     = getDate();
+    $now     = getdate();
     $cen     = substr($now['year'], 0, 2);
     $prevCen = $cen - 1;
 
@@ -558,7 +558,6 @@ class CRM_Utils_Date {
         return FALSE;
       }
     }
-
 
     if ($dateType == 2 || $dateType == 4) {
       $formattedDate = explode("/", $value);
@@ -718,10 +717,10 @@ class CRM_Utils_Date {
    * actuall today pass 'dayParams' as null. or else pass the day,
    * month, year values as array values
    * Example: $dayParams = array(
-   'day' => '25', 'month' => '10',
+  'day' => '25', 'month' => '10',
    *                              'year' => '2007' );
    *
-   * @param Array $dayParams
+   * @param array $dayParamsArray of the day, month, year.
    *   Array of the day, month, year.
    *                             values.
    * @param string $format
@@ -970,7 +969,7 @@ class CRM_Utils_Date {
    * @static
    */
   public static function relativeToAbsolute($relativeTerm, $unit) {
-    $now       = getDate();
+    $now       = getdate();
     $from      = $to = $dateRange = array();
     $from['H'] = $from['i'] = $from['s'] = 0;
 
@@ -1438,8 +1437,8 @@ class CRM_Utils_Date {
             $from['Y'] = $now['year'];
             $from['H'] = 00;
             $from['i'] = $to['s'] = 00;
-            $to    = self::intervalAdd('month', +1, $from);
-            $to    = self::intervalAdd('second',-1, $to);
+            $to    = self::intervalAdd('month', + 1, $from);
+            $to    = self::intervalAdd('second', -1, $to);
             break;
         }
         break;
@@ -1538,7 +1537,7 @@ class CRM_Utils_Date {
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
             $from      = self::intervalAdd('day', -1 * ($now['wday']) + 7, $from);
-            $to        = self::intervalAdd('day', +6, $from);
+            $to        = self::intervalAdd('day', + 6, $from);
             break;
 
           case 'starting':
@@ -1547,7 +1546,7 @@ class CRM_Utils_Date {
             $from['Y'] = $now['year'];
             $from['H'] = 00;
             $from['i'] = $to['s'] = 00;
-            $to        = self::intervalAdd('day', +7, $from);
+            $to        = self::intervalAdd('day', + 7, $from);
             $to        = self::intervalAdd('second', -1, $to);
             break;
         }
@@ -1607,7 +1606,7 @@ class CRM_Utils_Date {
             $to['d']   = $now['mday'];
             $to['M']   = $now['mon'];
             $to['Y']   = $now['year'];
-            $to        = self::intervalAdd('day', +1, $to);
+            $to        = self::intervalAdd('day', + 1, $to);
             $from['d'] = $to['d'];
             $from['M'] = $to['M'];
             $from['Y'] = $to['Y'];
@@ -1734,7 +1733,6 @@ class CRM_Utils_Date {
       $actualPHPFormats = CRM_Core_SelectValues::datePluginToPHPFormats( );
       $dateFormat       = CRM_Utils_Array::value( $format, $actualPHPFormats );
     */
-
 
     $dateFormat = 'm/d/Y';
     $date = date($dateFormat, strtotime($mysqlDate));

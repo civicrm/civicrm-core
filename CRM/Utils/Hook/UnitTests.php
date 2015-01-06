@@ -73,7 +73,7 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
   }
 
   /**
-   *Invoke hooks
+   * Invoke hooks
    *
    * @param int $numParams
    *   Number of parameters to pass to the hook.

@@ -156,9 +156,9 @@ class CRM_Utils_File {
           elseif (is_file($object)) {
             if (!unlink($object)) {
               CRM_Core_Session::setStatus(ts('Unable to remove file %1', array(1 => $object)), ts('Warning'), 'error');
+            }
           }
         }
-      }
       }
       closedir($sourcedir);
 
@@ -168,11 +168,11 @@ class CRM_Utils_File {
             CRM_Core_Session::setStatus(ts('Removed directory %1', array(1 => $target)), '', 'success');
           }
           return TRUE;
-      }
+        }
         else {
           CRM_Core_Session::setStatus(ts('Unable to remove directory %1', array(1 => $target)), ts('Warning'), 'error');
-    }
-  }
+        }
+      }
     }
   }
 
@@ -691,7 +691,7 @@ HTACCESS;
 
     CRM_Utils_File::copyDir($fromDir, $toDir);
     if (!CRM_Utils_File::cleanDir($fromDir, TRUE, FALSE)) {
-       CRM_Core_Session::setStatus(ts('Failed to clean temp dir: %1', array(1 => $fromDir)), '', 'alert');
+      CRM_Core_Session::setStatus(ts('Failed to clean temp dir: %1', array(1 => $fromDir)), '', 'alert');
       return FALSE;
     }
     return TRUE;

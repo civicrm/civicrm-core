@@ -102,7 +102,7 @@ abstract class CRM_Utils_System_Base {
         throw new \Exception('Constant "ABSPATH" is not defined, even though WordPress is the user framework.');
       }
       if (is_admin()) {
-        require_once (ABSPATH . 'wp-admin/admin-header.php');
+        require_once ABSPATH . 'wp-admin/admin-header.php';
       }
       else {
         // FIXME: we need to figure out to replace civicrm content on the frontend pages
@@ -269,7 +269,7 @@ abstract class CRM_Utils_System_Base {
         return FALSE;
       }
 
-      $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz/60)%60));
+      $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz / 60) % 60));
 
       if ($timeZoneOffset > 0) {
         $timeZoneOffset = '+' . $timeZoneOffset;
@@ -296,7 +296,8 @@ abstract class CRM_Utils_System_Base {
    * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
    *
    */
-  public function getUniqueIdentifierFromUserObject($user) {}
+  public function getUniqueIdentifierFromUserObject($user) {
+  }
 
   /**
    * Get User ID from UserFramework system (CMS)
@@ -305,21 +306,24 @@ abstract class CRM_Utils_System_Base {
    * @return mixed <NULL, number>
    *
    */
-  public function getUserIDFromUserObject($user) {}
+  public function getUserIDFromUserObject($user) {
+  }
 
   /**
    * Get currently logged in user uf id.
    *
    * @return int $userID logged in user uf id.
    */
-  public function getLoggedInUfID() {}
+  public function getLoggedInUfID() {
+  }
 
   /**
    * Get currently logged in user unique identifier - this tends to be the email address or user name.
    *
    * @return string $userID logged in user unique identifier
    */
-  public function getLoggedInUniqueIdentifier() {}
+  public function getLoggedInUniqueIdentifier() {
+  }
 
   /**
    * Return a UFID (user account ID from the UserFramework / CMS system being based on the user object
@@ -391,5 +395,6 @@ abstract class CRM_Utils_System_Base {
   /**
    * Append to coreResourcesList
    */
-  public function appendCoreResources(&$list) {}
+  public function appendCoreResources(&$list) {
+  }
 }

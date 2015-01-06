@@ -61,7 +61,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
 
     $admin = user_access('administer users');
     if (!variable_get('user_email_verification', TRUE) || $admin) {
-      $form_state['input']['pass'] = array('pass1'=>$params['cms_pass'],'pass2'=>$params['cms_pass']);
+      $form_state['input']['pass'] = array('pass1' => $params['cms_pass'], 'pass2' => $params['cms_pass']);
     }
 
     if(!empty($params['notify'])){
@@ -337,6 +337,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
       case 'page-footer':
         $params['scope'] = substr($region, 5);
         break;
+
       default:
         return FALSE;
     }
@@ -365,6 +366,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
       case 'page-footer':
         $params['scope'] = substr($region, 5);
         break;
+
       default:
         return FALSE;
     }
@@ -460,7 +462,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    *               array(
    *  contactID, ufID, unique string ) if success
    */
-   public static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
+  public static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     require_once 'DB.php';
 
     $config = CRM_Core_Config::singleton();
@@ -493,8 +495,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
       // Contact CiviSMTP folks if we run into issues with this :)
       $cmsPath = $config->userSystem->cmsRootPath($realPath);
 
-      require_once ("$cmsPath/includes/bootstrap.inc");
-      require_once ("$cmsPath/includes/password.inc");
+      require_once "$cmsPath/includes/bootstrap.inc";
+      require_once "$cmsPath/includes/password.inc";
 
       $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
       $name       = $dbDrupal->escapeSimple($strtolower($name));
@@ -759,7 +761,7 @@ AND    u.status = 1
     // which means that define(CIVICRM_CLEANURL) was correctly set.
     // So we correct it
     $config = CRM_Core_Config::singleton();
-    $config->cleanURL = (int)variable_get('clean_url', '0');
+    $config->cleanURL = (int) variable_get('clean_url', '0');
 
     // CRM-8655: Drupal wasn't available during bootstrap, so hook_civicrm_config never executes
     CRM_Utils_Hook::config($config);
@@ -1006,7 +1008,7 @@ AND    u.status = 1
     if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
       $timezone = $user->timezone;
     } else {
-      $timezone = variable_get('date_default_timezone', null);
+      $timezone = variable_get('date_default_timezone', NULL);
     }
     if (!$timezone) {
       $timezone = parent::getTimeZoneString();

@@ -104,6 +104,7 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
             $apiRequest['params'] = $this->match($apiRequest['entity'], $apiRequest['params'], $keys, $isMandatory);
           }
           break;
+
         case 'replace':
           // In addition to matching on the listed keys, also match on the set-definition keys.
           // For example, if the $apiRequest is to "replace the set of civicrm_emails for contact_id=123 while
@@ -122,6 +123,7 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
             $apiRequest['params']['values'][$offset] = $createParams;
           }
           break;
+
         default:
           // be forgiveful of sloppily api calls
       }
