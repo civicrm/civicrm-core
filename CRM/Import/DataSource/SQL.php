@@ -49,7 +49,8 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
    * Set variables up before form is built
    *
    */
-  public function preProcess(&$form) {}
+  public function preProcess(&$form) {
+  }
 
   /**
    * This is function is called by the form object to get the DataSource's
@@ -94,7 +95,7 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
   public function postProcess(&$params, &$db, &$form) {
     $importJob = new CRM_Contact_Import_ImportJob(
       CRM_Utils_Array::value( 'import_table_name', $params ),
-      $params['sqlQuery'], true
+      $params['sqlQuery'], TRUE
     );
 
     $form->set('importTableName', $importJob->getTableName());
