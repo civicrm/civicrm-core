@@ -107,7 +107,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext($url);
-      $breadCrumb = array(array('title' => ts('CiviCRM Profile Fields'),
+      $breadCrumb = array(array(
+      'title' => ts('CiviCRM Profile Fields'),
           'url' => $url,
         ));
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
@@ -527,7 +528,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $ids['uf_field'] = $this->_id;
     }
 
-
     $name = NULL;
     if (isset($params['field_name'][1]) && isset($this->_selectFields[$params['field_name'][1]])) {
       // we dont get a name for a html formatting element
@@ -731,7 +731,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
       foreach ($groupFields as $groupField) {
         // if it is a phone
-        if ($groupField['where'] == $whereCheck && is_null($groupField['location_type_id']) && $groupField['field_id']  != $fieldID) {
+        if ($groupField['where'] == $whereCheck && is_null($groupField['location_type_id']) && $groupField['field_id'] != $fieldID) {
           $primaryOfSameTypeFound = $groupField['title'];
           break;
         }

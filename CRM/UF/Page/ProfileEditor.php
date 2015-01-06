@@ -114,6 +114,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             $availableFields
           );
           break;
+
         case 'OrganizationModel':
           $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
             'Organization',
@@ -121,6 +122,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             $availableFields
           );
           break;
+
         case 'HouseholdModel':
           $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
             'Household',
@@ -128,6 +130,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             $availableFields
           );
           break;
+
         case 'ActivityModel':
           $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
             'Activity',
@@ -135,6 +138,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             $availableFields
           );
           break;
+
         case 'ContributionModel':
           $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
             'Contribution',
@@ -142,6 +146,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             $availableFields
           );
           break;
+
         case 'MembershipModel':
           $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
             'Membership',
@@ -149,6 +154,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             $availableFields
           );
           break;
+
         case 'ParticipantModel':
           $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
             'Participant',
@@ -156,6 +162,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             $availableFields
           );
           break;
+
         case 'CaseModel':
           $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
             'Case',
@@ -163,6 +170,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             $availableFields
           );
           break;
+
         default:
           throw new CRM_Core_Exception("Unrecognized entity type: $entityType");
       }
@@ -205,6 +213,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             continue 2;
           }
           break;
+
         default:
           if ($field['field_type'] != $extends) {
             continue 2;
