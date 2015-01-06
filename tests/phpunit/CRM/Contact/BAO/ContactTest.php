@@ -1561,7 +1561,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Create a contact and perform a series of steps with it; after each
    * step, ensure that the contact's modified_date has increased.
    *
-   * @param $callbacks array ($name => $callable)
+   * @param $callbacks
+   *   Array ($name => $callable).
    */
   public function _testTimestamps($callbacks) {
     CRM_Core_DAO::triggerRebuild();

@@ -148,7 +148,8 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
 
   /**
    * @param $input
-   * @param $expected bool
+   * @param $expected
+   *   Bool.
    * @dataProvider booleanDataProvider
    */
   public function testStrToBool($input, $expected) {

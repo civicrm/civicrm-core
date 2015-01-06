@@ -95,7 +95,8 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
    * If there's one pre-existing record, then update it.
    *
    * @dataProvider apiOptionNames
-   * @param string $apiOptionName e.g. "match" or "match-mandatory"
+   * @param string $apiOptionName
+   *   E.g. "match" or "match-mandatory".
    */
   public function testCreateMatch_one($apiOptionName) {
     // create basic record
@@ -133,7 +134,8 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
    * If there's more than one pre-existing record, throw an error.
    *
    * @dataProvider apiOptionNames
-   * @param string $apiOptionName e.g. "match" or "match-mandatory"
+   * @param string $apiOptionName
+   *   E.g. "match" or "match-mandatory".
    */
   public function testCreateMatch_many($apiOptionName) {
     // create the first Lebowski

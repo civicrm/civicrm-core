@@ -27,8 +27,10 @@ class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider translateData
-   * @param string $input the name of a permission which should be translated
-   * @param string $expected the name of an actual permission (based on translation matrix for "runtime")
+   * @param string $input
+   *   The name of a permission which should be translated.
+   * @param string $expected
+   *   The name of an actual permission (based on translation matrix for "runtime").
    */
   public function testTranslate($input, $expected) {
     $perm = new CRM_Core_Permission_Base();

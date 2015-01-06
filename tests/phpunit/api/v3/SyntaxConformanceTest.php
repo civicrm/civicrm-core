@@ -277,7 +277,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 /**
  * Generate list of entities to test for get by id functions
- * @param boolean $sequential
+ * @param bool $sequential
  * @return array Entities to be skipped
  */
   public static function toBeSkipped_automock($sequential = FALSE) {
@@ -774,9 +774,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   /**
    * Check that get fetches an appropriate number of results
    *
-   * @param string $entityName Name of entity to test
+   * @param string $entityName
+   *   Name of entity to test.
    * @param array $params
-   * @param integer $limit
+   * @param int $limit
    * @param string $message
    */
   public function checkLimitAgainstExpected($entityName, $params, $limit, $message) {

@@ -34,9 +34,12 @@ class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
   /**
    * Download CSV file.
    *
-   * @param string $selector element selector(download button in most of the cases).
-   * @param string  $fileName file name to be download.
-   * @param string $downloadDir download dir.
+   * @param string $selector
+   *   Element selector(download button in most of the cases).
+   * @param string $fileName
+   *   File name to be download.
+   * @param string $downloadDir
+   *   Download dir.
    *
    * @return string downloaded file path.
    */
@@ -65,10 +68,13 @@ class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
   /**
    * Read CSV file and fire provided assertions.
    *
-   * @param string $file         file path of CSV file.
-   * @param array  $checkColumns check first row of csv
+   * @param string $file
+   *   File path of CSV file.
+   * @param array $checkColumns
+   *   Check first row of csv.
    *                              independent of index.
-   * @param array  $checkRows    array of header and rows according to row index
+   * @param array $checkRows
+   *   Array of header and rows according to row index.
    *                              eg: array(
    *                                    1 => array(
       // Row index 1
@@ -82,8 +88,10 @@ class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    *                                      'Last Name'  => 'mayekar'
    *                                    ),
    *                                   );
-   * @param int   $rowCount count rows (excluding header row).
-   * @param array $settings used for override settings.
+   * @param int $rowCount
+   *   Count rows (excluding header row).
+   * @param array $settings
+   *   Used for override settings.
    */
   public function reviewCSV($file, $checkColumns = array(), $checkRows = array(), $rowCount = 0, $settings = array()) {
     // Check file exists before proceed.

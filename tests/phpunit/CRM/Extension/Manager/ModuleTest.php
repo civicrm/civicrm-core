@@ -219,7 +219,8 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
 
   /**
    * @param $module
-   * @param array $counts expected hook invocation counts ($hookName => $count)
+   * @param array $counts
+   *   Expected hook invocation counts ($hookName => $count).
    */
   public function assertHookCounts($module, $counts) {
     global $_test_extension_manager_moduletest_counts;

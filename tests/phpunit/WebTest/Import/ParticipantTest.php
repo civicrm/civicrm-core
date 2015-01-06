@@ -237,7 +237,8 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
   /**
    * Helper function to add new event
    *
-   * @param array $params parameters to create an event
+   * @param array $params
+   *   Parameters to create an event.
    *
    * @return array $params event details of newly created event
    */
