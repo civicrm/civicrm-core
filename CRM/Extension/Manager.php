@@ -119,7 +119,8 @@ class CRM_Extension_Manager {
    *
    * This only works if the extension is stored in the default container.
    *
-   * @param string $tmpCodeDir path to a local directory containing a copy of the new (inert) code
+   * @param string $tmpCodeDir
+   *   Path to a local directory containing a copy of the new (inert) code.
    * @return void
    * @throws CRM_Extension_Exception
    */
@@ -196,7 +197,8 @@ class CRM_Extension_Manager {
   /**
    * Add records of the extension to the database -- and enable it
    *
-   * @param array $keys list of extension keys
+   * @param array $keys
+   *   List of extension keys.
    * @return void
    * @throws CRM_Extension_Exception
    */
@@ -261,7 +263,8 @@ class CRM_Extension_Manager {
   /**
    * Add records of the extension to the database -- and enable it
    *
-   * @param array $keys list of extension keys
+   * @param array $keys
+   *   List of extension keys.
    * @return void
    * @throws CRM_Extension_Exception
    */
@@ -272,7 +275,8 @@ class CRM_Extension_Manager {
   /**
    * Add records of the extension to the database -- and enable it
    *
-   * @param array $keys list of extension keys
+   * @param array $keys
+   *   List of extension keys.
    * @return void
    * @throws CRM_Extension_Exception
    */
@@ -317,7 +321,8 @@ class CRM_Extension_Manager {
    *
    * Add records of the extension to the database -- and enable it
    *
-   * @param array $keys list of extension keys
+   * @param array $keys
+   *   List of extension keys.
    * @return void
    * @throws CRM_Extension_Exception
    */

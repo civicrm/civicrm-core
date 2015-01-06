@@ -46,7 +46,8 @@ class CRM_Extension_Downloader {
 
   /**
    * @param CRM_Extension_Manager $manager
-   * @param string $containerDir the place to store downloaded & extracted extensions
+   * @param string $containerDir
+   *   The place to store downloaded & extracted extensions.
    * @param string $tmpDir
    */
   public function __construct(CRM_Extension_Manager $manager, $containerDir, $tmpDir) {
@@ -96,8 +97,10 @@ class CRM_Extension_Downloader {
   /**
    * Install or upgrade an extension from a remote URL
    *
-   * @param string $key the name of the extension being installed
-   * @param string $downloadUrl URL of a .zip file
+   * @param string $key
+   *   The name of the extension being installed.
+   * @param string $downloadUrl
+   *   URL of a .zip file.
    * @return bool TRUE for success
    * @throws CRM_Extension_Exception
    */
@@ -130,8 +133,10 @@ class CRM_Extension_Downloader {
   /**
    * Download the remote zipfile.
    *
-   * @param string $remoteFile URL of a .zip file
-   * @param string $localFile path at which to store the .zip file
+   * @param string $remoteFile
+   *   URL of a .zip file.
+   * @param string $localFile
+   *   Path at which to store the .zip file.
    * @return boolean Whether the download was successful.
    */
   public function fetch($remoteFile, $localFile) {
@@ -147,8 +152,10 @@ class CRM_Extension_Downloader {
   /**
    * Extract an extension from a zip file
    *
-   * @param string $key the name of the extension being installed; this usually matches the basedir in the .zip
-   * @param string $zipFile the local path to a .zip file
+   * @param string $key
+   *   The name of the extension being installed; this usually matches the basedir in the .zip.
+   * @param string $zipFile
+   *   The local path to a .zip file.
    * @return string|FALSE zip file path
    */
   public function extractFiles($key, $zipFile) {

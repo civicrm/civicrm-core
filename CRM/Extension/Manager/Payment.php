@@ -162,7 +162,8 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
   }
 
   /**
-   * @param string $attr the attribute used to key the array
+   * @param string $attr
+   *   The attribute used to key the array.
    * @return array ($$attr => $id)
    */
   private function _getAllPaymentProcessorTypes($attr) {
@@ -180,7 +181,8 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
    * Load requested payment processor and call the method specified.
    *
    * @param CRM_Extension_Info $info
-   * @param string $method - the method to call in the payment processor class
+   * @param string $method
+   *   The method to call in the payment processor class.
    */
   private function _runPaymentHook(CRM_Extension_Info $info, $method) {
     // Not concerned about performance at this stage, as these are seldomly performed tasks
