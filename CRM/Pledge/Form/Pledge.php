@@ -183,7 +183,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $defaults['max_reminders'] = 1;
       $defaults['additional_reminder_day'] = 5;
       $defaults['frequency_unit'] = array_search('month', $this->_freqUnits);
-            $defaults['financial_type_id']    = array_search( 'Donation', CRM_Contribute_PseudoConstant::financialType() );
+      $defaults['financial_type_id']    = array_search( 'Donation', CRM_Contribute_PseudoConstant::financialType() );
     }
 
     $pledgeStatus = CRM_Contribute_PseudoConstant::contributionStatus();
@@ -248,7 +248,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     );
     foreach ($paneNames as $name => $type) {
       $urlParams = "snippet=4&formType={$type}";
-      $allPanes[$name] = array('url' => CRM_Utils_System::url('civicrm/contact/view/pledge', $urlParams),
+      $allPanes[$name] = array(
+      'url' => CRM_Utils_System::url('civicrm/contact/view/pledge', $urlParams),
         'open' => 'false',
         'id' => $type,
       );
@@ -377,9 +378,9 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     $this->addDate('acknowledge_date', ts('Acknowledgment Date'));
 
-        $this->add('select', 'financial_type_id',
+    $this->add('select', 'financial_type_id',
                    ts( 'Financial Type' ),
-                   array(''=>ts( '- select -' )) + CRM_Contribute_PseudoConstant::financialType( ),
+                   array('' => ts( '- select -' )) + CRM_Contribute_PseudoConstant::financialType( ),
       TRUE
     );
 

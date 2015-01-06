@@ -373,7 +373,7 @@ class CRM_Pledge_BAO_Query {
           $value,
           'Integer'
         );
-            $query->_qill[$grouping][] = ts( 'Financial Type - %1', array( 1 => $type ) );
+        $query->_qill[$grouping][] = ts( 'Financial Type - %1', array( 1 => $type ) );
         $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
         return;
 
@@ -440,7 +440,7 @@ class CRM_Pledge_BAO_Query {
         break;
 
       case 'pledge_financial_type':
-            $from .= " $side JOIN civicrm_financial_type ON civicrm_pledge.financial_type_id = civicrm_financial_type.id ";
+        $from .= " $side JOIN civicrm_financial_type ON civicrm_pledge.financial_type_id = civicrm_financial_type.id ";
         break;
 
       case 'civicrm_pledge_payment':
@@ -626,7 +626,8 @@ class CRM_Pledge_BAO_Query {
    * @param $row
    * @param int $id
    */
-  public static function searchAction(&$row, $id) {}
+  public static function searchAction(&$row, $id) {
+  }
 
   /**
    * @param $tables

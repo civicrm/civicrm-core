@@ -151,11 +151,11 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   @access public
    */
   function __construct(&$queryParams,
-    $action           = CRM_Core_Action::NONE,
+    $action = CRM_Core_Action::NONE,
     $additionalClause = NULL,
-    $single           = FALSE,
-    $limit            = NULL,
-    $context          = 'search'
+    $single = FALSE,
+    $limit = NULL,
+    $context = 'search'
   ) {
     // submitted form values
     $this->_queryParams = &$queryParams;
@@ -222,7 +222,6 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
         'title' => ts('Delete Pledge'),
       ),
     );
-
 
     if (in_array('Cancel', $hideOption)) {
       unset(self::$_links[CRM_Core_Action::DETACH]);
@@ -358,9 +357,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
         $result->pledge_id
       );
 
-
-      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-        $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
+      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
       );
       $rows[] = $row;
     }

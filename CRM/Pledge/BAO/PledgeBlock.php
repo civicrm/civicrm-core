@@ -283,7 +283,8 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       $pledgeBlock = self::getPledgeBlock($form->_id);
 
       //build form for pledge creation.
-      $pledgeOptions = array('0' => ts('I want to make a one-time contribution'),
+      $pledgeOptions = array(
+      '0' => ts('I want to make a one-time contribution'),
         '1' => ts('I pledge to contribute this amount every'),
       );
       $form->addRadio('is_pledge', ts('Pledge Frequency Interval'), $pledgeOptions,
