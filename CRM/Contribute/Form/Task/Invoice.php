@@ -641,7 +641,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @return string
    */
   static public function putFile($html) {
-    require_once("packages/dompdf/dompdf_config.inc.php");
+    require_once "packages/dompdf/dompdf_config.inc.php";
     spl_autoload_register('DOMPDF_autoload');
     $doc = new DOMPDF();
     $doc->load_html($html);

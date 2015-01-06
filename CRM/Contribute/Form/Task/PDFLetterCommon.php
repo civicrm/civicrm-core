@@ -170,30 +170,30 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     return ($within == $total);
   }
 
- /**
-  *
-  * @param string $html_message
-  * @param array $contact
-  * @param array $contribution
-  * @param array $messageToken
-  * @param array $categories
-  * @param bool $grouped
-  *   Does this letter represent more than one contribution.
-  * @param string $separator
-  *   What is the preferred letter separator.
-  * @return string
-  */
- private static function resolveTokens($html_message, $contact, $contribution, $messageToken, $categories, $grouped, $separator) {
-   $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contact, TRUE, $messageToken);
-   if($grouped) {
-     $tokenHtml = CRM_Utils_Token::replaceMultipleContributionTokens($separator, $tokenHtml, $contribution, TRUE, $messageToken);
-   }
-   else {
-     // no change to normal behaviour to avoid risk of breakage
-     $tokenHtml = CRM_Utils_Token::replaceContributionTokens($tokenHtml, $contribution, TRUE, $messageToken);
-   }
-   $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $contact, $categories, TRUE);
-   if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
+  /**
+   *
+   * @param string $html_message
+   * @param array $contact
+   * @param array $contribution
+   * @param array $messageToken
+   * @param array $categories
+   * @param bool $grouped
+   *   Does this letter represent more than one contribution.
+   * @param string $separator
+   *   What is the preferred letter separator.
+   * @return string
+   */
+  private static function resolveTokens($html_message, $contact, $contribution, $messageToken, $categories, $grouped, $separator) {
+    $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contact, TRUE, $messageToken);
+    if($grouped) {
+      $tokenHtml = CRM_Utils_Token::replaceMultipleContributionTokens($separator, $tokenHtml, $contribution, TRUE, $messageToken);
+    }
+    else {
+      // no change to normal behaviour to avoid risk of breakage
+      $tokenHtml = CRM_Utils_Token::replaceContributionTokens($tokenHtml, $contribution, TRUE, $messageToken);
+    }
+    $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $contact, $categories, TRUE);
+    if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
       $smarty = CRM_Core_Smarty::singleton();
       // also add the tokens to the template
       $smarty->assign_by_ref('contact', $contact);
@@ -237,9 +237,9 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         //@todo find out why this happens & add comments
         list($contactID) = explode('-', $item);
         $contactID = (int) $contactID;
-       }
+      }
       else {
-         $contactID = $contribution['contact_id'];
+        $contactID = $contribution['contact_id'];
       }
       if(!isset($contacts[$contactID])) {
         list($contact) = CRM_Utils_Token::getTokenDetails(array('contact_id' => $contactID),

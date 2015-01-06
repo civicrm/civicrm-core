@@ -126,7 +126,7 @@ class CRM_Contribute_Task {
       }
       //CRM-12920 - check for edit permission
       if( !CRM_Core_Permission::check('edit contributions') ){
-        unset(self::$_tasks[4],self::$_tasks[6]);
+        unset(self::$_tasks[4], self::$_tasks[6]);
       }
 
       // remove action "Print or Email Contribution Invoices"

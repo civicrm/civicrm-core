@@ -63,14 +63,14 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
     $this->add('text', 'thankyou_title', ts('Thank-you Page Title'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'thankyou_title'), TRUE);
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'thankyou_text');
-    $attributes['click_wysiwyg'] = true;
+    $attributes['click_wysiwyg'] = TRUE;
     $this->addWysiwyg('thankyou_text', ts('Thank-you Message'), $attributes);
     // FIXME: This hack forces height of editor to 175px. Need to modify QF classes for editors to allow passing
     // explicit height and width.
     $footerAttribs = array(
       'rows' => 2,
       'cols' => 40,
-      'click_wysiwyg' => true,
+      'click_wysiwyg' => TRUE,
     );
     $this->addWysiwyg('thankyou_footer', ts('Thank-you Footer'), $footerAttribs);
 

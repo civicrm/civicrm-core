@@ -165,10 +165,10 @@ class CRM_Contribute_Import_Field {
       case 'currency':
         return CRM_Utils_Rule::currencyCode($this->_value);
 
-        case 'financial_type':
+      case 'financial_type':
         static $contributionTypes = NULL;
         if (!$contributionTypes) {
-                $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
+          $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
         }
         if (in_array($this->_value, $contributionTypes)) {
           return TRUE;
@@ -176,7 +176,7 @@ class CRM_Contribute_Import_Field {
         else {
           return FALSE;
         }
-        break;
+          break;
 
       case 'payment_instrument':
         static $paymentInstruments = NULL;

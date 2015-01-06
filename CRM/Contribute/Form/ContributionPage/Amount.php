@@ -117,7 +117,6 @@ SELECT id
       array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>')
     );
 
-
     //check if selected payment processor supports recurring payment
     if (!empty($recurringPaymentProcessor)) {
       $this->addElement('checkbox', 'is_recur', ts('Recurring Contributions'), NULL,
@@ -390,7 +389,7 @@ SELECT id
           $paymentProcessorID,
           'payment_processor_type_id'
         );
-        $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(false, $paymentProcessorTypeId, 'name');
+        $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, $paymentProcessorTypeId, 'name');
         if ($paymentProcessorType == 'Google_Checkout') {
           $errors['is_recur_interval'] = ts('Google Checkout does not support recurring intervals');
           break;
@@ -527,7 +526,8 @@ SELECT id
             if (isset($values[$i]) &&
               (strlen(trim($values[$i])) > 0)
             ) {
-              $options[] = array('label' => trim($labels[$i]),
+              $options[] = array(
+              'label' => trim($labels[$i]),
                 'value' => CRM_Utils_Rule::cleanMoney(trim($values[$i])),
                 'weight' => $i,
                 'is_active' => 1,
@@ -535,7 +535,7 @@ SELECT id
               );
             }
           }
-            /* || !empty($params['price_field_value']) || CRM_Utils_Array::value( 'price_field_other', $params )*/
+          /* || !empty($params['price_field_value']) || CRM_Utils_Array::value( 'price_field_other', $params )*/
           if (!empty($options) || !empty($params['is_allow_other_amount'])) {
             $fieldParams['is_quick_config'] = 1;
             $noContriAmount = NULL;
@@ -550,7 +550,7 @@ SELECT id
                 $setParams['name'] = $pageTitle . '_' . $this->_id;
               }
               else {
-                $timeSec = explode(".", microtime(true));
+                $timeSec = explode(".", microtime(TRUE));
                 $setParams['name'] = $pageTitle . '_' . date('is', $timeSec[0]) . $timeSec[1];
               }
               $setParams['is_quick_config'] = 1;
@@ -579,7 +579,8 @@ SELECT id
                   CRM_Price_BAO_PriceField::setIsActive($priceFieldId, '0');
                 }
               }
-              else $priceFieldId = CRM_Utils_Array::value('price_field_other', $params);
+              else { $priceFieldId = CRM_Utils_Array::value('price_field_other', $params);
+              }
               $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $priceFieldId, 'price_set_id');
             }
             CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $this->_id, $priceSetId);
@@ -742,10 +743,10 @@ SELECT id
       }
 
       if ($deleteAmountBlk ) {
-        $priceField = !empty($params['price_field_id']) ?$params['price_field_id']:CRM_Utils_Array::value('price_field_other', $params);
+        $priceField = !empty($params['price_field_id']) ? $params['price_field_id'] : CRM_Utils_Array::value('price_field_other', $params);
         if ($priceField) {
           $priceSetID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $priceField, 'price_set_id');
-          CRM_Price_BAO_PriceSet::setIsQuickConfig($priceSetID,0);
+          CRM_Price_BAO_PriceSet::setIsQuickConfig($priceSetID, 0);
         }
       }
     }

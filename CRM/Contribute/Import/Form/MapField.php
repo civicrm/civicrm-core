@@ -289,11 +289,11 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
           );
         }
         if(!empty($mapperKeysValues) && $mapperKeysValues[$i][0] == 'soft_credit') {
-          $js .="cj('#mapper_".$i."_1').val($mapperKeysValues[$i][1]);\n";
-          $js .="cj('#mapper_".$i."_2').val($mapperKeysValues[$i][2]);\n";
+          $js .= "cj('#mapper_".$i."_1').val($mapperKeysValues[$i][1]);\n";
+          $js .= "cj('#mapper_".$i."_2').val($mapperKeysValues[$i][2]);\n";
         }
       }
-      $sel->setOptions(array($sel1, $sel2, $sel3,$sel4));
+      $sel->setOptions(array($sel1, $sel2, $sel3, $sel4));
     }
     $js .= "</script>\n";
     $this->assign('initHideBoxes', $js);
@@ -500,7 +500,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       if (isset($mapperKeys[$i][0]) && $mapperKeys[$i][0] == 'soft_credit') {
         $mapperSoftCredit[$i] = $mapperKeys[$i][1];
-        if (strpos($mapperSoftCredit[$i], '_') !== false) {
+        if (strpos($mapperSoftCredit[$i], '_') !== FALSE) {
           list($first, $second) = explode('_', $mapperSoftCredit[$i]);
           $softCreditFields[$i] = ucwords($first . " " . $second);
         }
@@ -513,7 +513,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
         );
       }
       else {
-        $mapperSoftCredit[$i] = $softCreditFields[$i] =  $mapperSoftCreditType[$i] = NULL;
+        $mapperSoftCredit[$i] = $softCreditFields[$i] = $mapperSoftCreditType[$i] = NULL;
       }
     }
 

@@ -61,11 +61,11 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   private static $financialAccount;
 
-    /**
-   * Contribution pages
-   * @var array
-   * @static
-   */
+  /**
+     * Contribution pages
+     * @var array
+     * @static
+     */
   private static $contributionPageActive = NULL;
 
   /**
@@ -158,7 +158,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @static
    */
   public static function &financialAccount($id = NULL, $financialAccountTypeId = NULL, $retrieveColumn = 'name', $key = 'id') {
-    $condition = NUll;
+    $condition = NULL;
     if ($financialAccountTypeId) {
       $condition = " financial_account_type_id = ". $financialAccountTypeId;
     }
@@ -192,9 +192,9 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param bool|string $name pseudoconstant to be flushed
    */
   public static function flush($name = 'cache') {
-   if (isset(self::$$name)) {
+    if (isset(self::$$name)) {
       self::$$name = NULL;
-    }
+   }
   }
 
   /**
@@ -407,7 +407,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
       CRM_Core_PseudoConstant::populate(
         self::$financialTypeAccount[$financialTypeId],
         'CRM_Financial_DAO_EntityFinancialAccount',
-        $all = true,
+        $all = TRUE,
         $retrieve = 'financial_account_id',
         $filter = NULL,
         $condition,

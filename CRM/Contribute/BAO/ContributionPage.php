@@ -108,7 +108,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     // if ($values ['financial_type_id']) {
     //   $values ['accountingCode'] = CRM_Core_DAO::getFieldValue( 'CRM_Financial_DAO_FinancialType', $values ['financial_type_id'], 'accounting_code' );
     // }
-    }
+  }
 
   /**
    * Send the emails
@@ -238,7 +238,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         if ($gId) {
           $email = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gId, 'notify');
           if ($email) {
-            $val = CRM_Core_BAO_UFGroup::checkFieldsEmptyValues($gId, $contactID, CRM_Utils_Array::value($key, $params), true );
+            $val = CRM_Core_BAO_UFGroup::checkFieldsEmptyValues($gId, $contactID, CRM_Utils_Array::value($key, $params), TRUE );
             CRM_Core_BAO_UFGroup::commonSendMail($contactID, $val);
           }
         }
@@ -407,7 +407,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
         $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
         if (count($taxAmt) > 0 && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
-          $sendTemplateParams['isEmailPdf'] = True;
+          $sendTemplateParams['isEmailPdf'] = TRUE;
           $sendTemplateParams['contributionId'] = $values['contribution_id'];
         }
         list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
@@ -827,7 +827,8 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
       case 'financial_type_id':
         // Fixme - this is going to ignore context, better to get conditions, add params, and call PseudoConstant::get
         return CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
-        break;
+
+      break;
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
@@ -835,7 +836,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
   /**
    * Get or Set multilingually affected honor params for processing module_data or setting default values.
    *
-   * @param array|String $params: Array when we need to format it according to language state or String as a json encode
+   * @param string $params:
    * @param bool $setDefault: If yes then returns array to used for setting default value afterward
    *
    * @return array|string
@@ -883,10 +884,10 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     else {
       //if in multilingual state then retrieve the module_data against this contribution and
       //merge with earlier module_data json data to current so not to lose earlier multilingual module_data information
-      $sctJson =  array(
+      $sctJson = array(
         'soft_credit' => array(
           'soft_credit_types' => $params['soft_credit_types'],
-          $config->lcMessages => array (
+          $config->lcMessages => array(
             'honor_block_title' => $params['honor_block_title'],
             'honor_block_text' => $params['honor_block_text']
           )
@@ -899,14 +900,14 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
       $ufJoinDAO->find(TRUE);
       $jsonData = json_decode($ufJoinDAO->module_data);
       if ($jsonData) {
-        $sctJson['soft_credit'] = array_merge((array)$jsonData->soft_credit, $sctJson['soft_credit']);
+        $sctJson['soft_credit'] = array_merge((array) $jsonData->soft_credit, $sctJson['soft_credit']);
       }
       $sctJson = json_encode($sctJson);
     }
     return $sctJson;
   }
 
-   /**
+  /**
    * Generate html for pdf in confirmation receipt email  attachment
    * @param int $contributionId
    *   Contribution Page Id.

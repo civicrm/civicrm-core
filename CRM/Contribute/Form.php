@@ -61,7 +61,7 @@ class CRM_Contribute_Form extends CRM_Admin_Form {
     }
     elseif ($this->_action == CRM_Core_Action::ADD) {
       $condition = " AND is_default = 1";
-      $values = CRM_Core_OptionGroup::values('financial_account_type', false, false, false, $condition);
+      $values = CRM_Core_OptionGroup::values('financial_account_type', FALSE, FALSE, FALSE, $condition);
       $defaults['financial_account_type_id'] = array_keys($values);
       $defaults['is_active'] = 1;
 

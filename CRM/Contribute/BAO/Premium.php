@@ -94,7 +94,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   public static function del($premiumID) {
     //check dependencies
 
-        //delete from financial Type table
+    //delete from financial Type table
     $premium = new CRM_Contribute_DAO_Premium();
     $premium->id = $premiumID;
     $premium->delete();

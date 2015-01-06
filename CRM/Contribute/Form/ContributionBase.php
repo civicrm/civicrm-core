@@ -176,11 +176,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   public $_action;
 
- /**
-   * Is honor block is enabled for this contribution?
-   *
-   * @var boolean
-   */
+  /**
+  * Is honor block is enabled for this contribution?
+  *
+  * @var boolean
+  */
   public $_honor_block_is_active = FALSE;
 
   /**
