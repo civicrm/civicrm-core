@@ -149,11 +149,11 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   @access public
    */
   function __construct(&$queryParams,
-    $action       = CRM_Core_Action::NONE,
+    $action = CRM_Core_Action::NONE,
     $memberClause = NULL,
-    $single       = FALSE,
-    $limit        = NULL,
-    $context      = 'search'
+    $single = FALSE,
+    $limit = NULL,
+    $context = 'search'
   ) {
     // submitted form values
     $this->_queryParams = &$queryParams;
@@ -198,9 +198,9 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   function &links($status = 'all',
     $isPaymentProcessor = NULL,
     $accessContribution = NULL,
-    $qfKey              = NULL,
-    $context            = NULL,
-    $isCancelSupported  = FALSE
+    $qfKey = NULL,
+    $context = NULL,
+    $isCancelSupported = FALSE
   ) {
     $extraParams = NULL;
     if ($context == 'search') {
@@ -438,8 +438,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
       }
       $row['auto_renew'] = $autoRenew;
 
-      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-        $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
+      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
       );
 
       $rows[] = $row;
@@ -477,7 +476,8 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
           'sort' => 'membership_type',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
-        array('name' => ts('Member Since'),
+        array(
+      'name' => ts('Member Since'),
           'sort' => 'join_date',
           'direction' => CRM_Utils_Sort::DESCENDING,
         ),

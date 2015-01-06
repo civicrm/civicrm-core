@@ -73,8 +73,8 @@ class CRM_Grant_Form_Task extends CRM_Core_Form {
    * @param
    *
    * @return void
-   */ function preProcess() {
-    self::preProcessCommon($this);
+  function preProcess() {
+  self::preProcessCommon($this);
   }
 
   /**
@@ -100,7 +100,7 @@ class CRM_Grant_Form_Task extends CRM_Core_Form {
     }
     else {
       $queryParams = $form->get('queryParams');
-      $sortOrder = null;
+      $sortOrder = NULL;
       if ( $form->get( CRM_Utils_Sort::SORT_ORDER  ) ) {
         $sortOrder = $form->get( CRM_Utils_Sort::SORT_ORDER );
       }

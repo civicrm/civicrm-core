@@ -112,7 +112,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         ),
         'civicrm_financial_type' => array(
           'dao' => 'CRM_Financial_DAO_FinancialType',
-          'fields' => array('financial_type' => NULL,),
+          'fields' => array('financial_type' => NULL),
           'grouping' => 'contri-fields',
           'group_bys' => array(
             'financial_type' => array('title' => ts('Financial Type')),
@@ -122,7 +122,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'dao' => 'CRM_Contribute_DAO_Contribution',
           //'bao'           => 'CRM_Contribute_BAO_Contribution',
           'fields' => array(
-            'contribution_source' => array('title' => ts('Source'),),
+            'contribution_source' => array('title' => ts('Source')),
             'currency' => array(
               'required' => TRUE,
               'no_display' => TRUE,

@@ -100,7 +100,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *   This is true if you want simple associated.
    * array of all the contact's dashlets whether or not they are enabled.
    *
-   * @param integer $contactID
+   * @param int $contactIDProvide the dashlets for the contact id.
    *   Provide the dashlets for the contact id.
    * passed rather than the current user.
    *
@@ -343,7 +343,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * @return void
    * @static
    */
-  public static function saveDashletChanges($columns, $contactID=NULL) {
+  public static function saveDashletChanges($columns, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();
     if (!$contactID) {
       $contactID = $session->get('userID');
@@ -545,8 +545,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * @return void
    * @static
    */
-  public static function resetDashletCache($contactID = null) {
-    $whereClause = null;
+  public static function resetDashletCache($contactID = NULL) {
+    $whereClause = NULL;
     $params = array();
     if ($contactID) {
       $whereClause = "WHERE contact_id = %1";

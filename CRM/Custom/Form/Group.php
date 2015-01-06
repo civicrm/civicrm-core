@@ -124,9 +124,10 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $title  = $fields['title'];
     $name   = CRM_Utils_String::munge($title, '_', 64);
     $query  = 'select count(*) from civicrm_custom_group where ( name like %1 OR title like %2 ) and id != %3';
-    $grpCnt = CRM_Core_DAO::singleValueQuery($query, array(1 => array($name, 'String'),
+    $grpCnt = CRM_Core_DAO::singleValueQuery($query, array(
+    1 => array($name, 'String'),
         2 => array($title, 'String'),
-        3 => array((int)$self->_id, 'Integer'),
+        3 => array((int) $self->_id, 'Integer'),
       ));
     if ($grpCnt) {
       $errors['title'] = ts('Custom group \'%1\' already exists in Database.', array(1 => $title));
@@ -149,7 +150,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     }
 
     if (!empty($fields['is_multiple'])) {
-        $self->assign('showMultiple', TRUE);
+      $self->assign('showMultiple', TRUE);
     }
 
     if (empty($fields['is_multiple']) && $fields['style'] == 'Tab with table') {

@@ -144,6 +144,7 @@ class CRM_Extension_Downloader {
     switch ($result) {
       case CRM_Utils_HttpClient::STATUS_OK:
         return TRUE;
+
       default:
         return FALSE;
     }

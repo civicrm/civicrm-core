@@ -46,7 +46,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *   Name of the entity table usually 'civicrm_contact'.
    *
    * @return array(
-     ) reference $tag array of category id's the contact belongs to.
+  ) reference $tag array of category id's the contact belongs to.
    *
    * @static
    */
@@ -345,7 +345,8 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * Merge two tags: tag B into tag A.
    */
   public function mergeTags($tagAId, $tagBId) {
-    $queryParams = array(1 => array($tagBId, 'Integer'),
+    $queryParams = array(
+    1 => array($tagBId, 'Integer'),
       2 => array($tagAId, 'Integer'),
     );
 
@@ -396,10 +397,10 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * Get options for a given field.
    * @see CRM_Core_DAO::buildOptions
    *
-   * @param String $fieldName
-   * @param String $context
+   * @param string $fieldName
+   * @param string $context: @see CRM_Core_DAO::buildOptionsContext.
    *   : @see CRM_Core_DAO::buildOptionsContext.
-   * @param Array $props
+   * @param array $props: whatever is known about this dao object.
    *   : whatever is known about this dao object.
    *
    * @return Array|bool

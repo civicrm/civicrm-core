@@ -793,15 +793,13 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         // allow components to add more actions
         CRM_Core_Component::searchAction($row, $result->contact_id);
 
-        $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-          $result->contact_sub_type : $result->contact_type,
+        $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type,
           FALSE,
           $result->contact_id
         );
 
         $row['contact_type_orig'] = $result->contact_sub_type ? $result->contact_sub_type : $result->contact_type;
-        $row['contact_sub_type']  = $result->contact_sub_type ?
-          CRM_Contact_BAO_ContactType::contactTypePairs(FALSE, $result->contact_sub_type, ', ') : $result->contact_sub_type;
+        $row['contact_sub_type']  = $result->contact_sub_type ? CRM_Contact_BAO_ContactType::contactTypePairs(FALSE, $result->contact_sub_type, ', ') : $result->contact_sub_type;
         $row['contact_id'] = $result->contact_id;
         $row['sort_name'] = $result->sort_name;
         if (array_key_exists('id', $row)) {
@@ -896,7 +894,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
     $links = self::links($this->_context, $this->_contextMenu, $this->_key);
 
-
     foreach ($rows as $id => & $row) {
       if (!empty($this->_formValues['deleted_contacts']) && CRM_Core_Permission::check('access deleted contacts')
       ) {
@@ -925,7 +922,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         }
         $row['action'] = CRM_Core_Action::formLink(
           $links,
-          null,
+          NULL,
           array('id' => $row['contact_id']),
           ts('more'),
           FALSE,
@@ -1081,7 +1078,7 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
    * language
    *
    * @param array(
-     reference)   $formValues   submitted formValues
+  reference)   $formValues   submitted formValues
    *
    * @return array              $qill         which contains an array of strings
    */

@@ -220,7 +220,7 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    * @param bool $ignoreCache
    *
    * @return  array of all subtypes OR list of subtypes associated to
-   *a given basic contact type
+   * a given basic contact type
    * @static
    */
   public static function subTypes($contactType = NULL, $all = FALSE, $columnName = 'name', $ignoreCache = FALSE) {
@@ -460,9 +460,9 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
   /**
    * Retrieve the basic contact type associated with given subType.
    *
-   *@param array/string $subType contact subType.
-   *@return array/string of basicTypes.
-   *@static
+   * @param array/string $subType contact subType.
+   * @return array/string of basicTypes.
+   * @static
    *
    */
   public static function getBasicType($subType) {

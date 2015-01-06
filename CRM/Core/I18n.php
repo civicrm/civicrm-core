@@ -150,7 +150,8 @@ class CRM_Core_I18n {
         if ($code == 'en_US') {
           continue;
         }
-        if (!in_array($code, $codes))unset($all[$code]);
+        if (!in_array($code, $codes)) { unset($all[$code]);
+        }
       }
     }
 

@@ -100,7 +100,6 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
         $this->_viewPermissionedGroups[$groupKey] = $groups;
       }
 
-
       $ids = CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_saved_search', $groups);
       if (!empty($ids)) {
         foreach (array_values($ids) as $id) {
@@ -245,7 +244,7 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
 
     $emails = array();
     while ($dao->fetch()) {
-    $emails[] = $dao->email;
+      $emails[] = $dao->email;
     }
 
     return implode(', ', $emails);

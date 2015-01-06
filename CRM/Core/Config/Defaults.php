@@ -237,7 +237,6 @@ class CRM_Core_Config_Defaults {
                   while running upgrade, to avoid any serious non-recoverable error
                   which might hinder the upgrade process. */
 
-
     $args = array();
     if (isset($_GET[$config->userFrameworkURLVar])) {
       $args = explode('/', $_GET[$config->userFrameworkURLVar]);

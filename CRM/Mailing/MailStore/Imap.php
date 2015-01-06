@@ -101,7 +101,7 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
   /**
    * Move the specified message to the ignored folder
    *
-   * @param integer $nr
+   * @param int $nrNumber of the message to move.
    *   Number of the message to move.
    *
    * @return void
@@ -118,7 +118,7 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
   /**
    * Move the specified message to the processed folder
    *
-   * @param integer $nr
+   * @param int $nrNumber of the message to move.
    *   Number of the message to move.
    *
    * @return void

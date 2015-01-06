@@ -271,7 +271,7 @@ WHERE  v.option_group_id = g.id
    *   Reference array of fieldnames we want transformed.
    *                           Array key = 'postName' (field name submitted by form in $params).
    *                           Array value = array(
-     'newName' => $newName, 'groupName' => $groupName).
+  'newName' => $newName, 'groupName' => $groupName).
    *
    *
    * @param bool $flip
@@ -358,7 +358,8 @@ WHERE  v.option_group_id = g.id
     if ($onlyActiveValue) {
       $query .= " AND  v.is_active = 1 ";
     }
-    $p = array(1 => array($groupName, 'String'),
+    $p = array(
+    1 => array($groupName, 'String'),
       2 => array($value, 'Integer'),
     );
     $dao = CRM_Core_DAO::executeQuery($query, $p);
@@ -380,7 +381,7 @@ WHERE  v.option_group_id = g.id
   static function getValue($groupName,
     $label,
     $labelField = 'label',
-    $labelType  = 'String',
+    $labelType = 'String',
     $valueField = 'value'
   ) {
     if (empty($label)) {
@@ -398,7 +399,8 @@ WHERE  v.option_group_id = g.id
   AND  v.$labelField     = %2
 ";
 
-    $p = array(1 => array($groupName, 'String'),
+    $p = array(
+    1 => array($groupName, 'String'),
       2 => array($label, $labelType),
     );
     $dao = CRM_Core_DAO::executeQuery($query, $p);
@@ -579,7 +581,8 @@ SELECT v.label
  WHERE g.id = v.option_group_id
    AND g.name  = %1
    AND v.value = %2";
-    $params = array(1 => array($groupName, 'String'),
+    $params = array(
+    1 => array($groupName, 'String'),
       2 => array($value, 'String'),
     );
     return CRM_Core_DAO::singleValueQuery($query, $params);
@@ -611,7 +614,8 @@ WHERE  v.option_group_id = g.id
       $query .= " AND  v.is_active = 1";
     }
 
-    $p = array(1 => array($groupName, 'String'),
+    $p = array(
+    1 => array($groupName, 'String'),
       2 => array($fieldValue, $fieldType),
     );
     $dao = CRM_Core_DAO::executeQuery($query, $p);

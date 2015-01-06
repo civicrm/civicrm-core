@@ -295,7 +295,7 @@ contact_a.sort_name    as sort_name,
           array('Radio', 'Select', 'Autocomplete-Select')
         )) {
         if ($values['attributes']['data_type'] == 'ContactReference' && $row["custom_{$fieldID}"]) {
-          $row["custom_{$fieldID}"] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', (int)$row["custom_{$fieldID}"], 'display_name');
+          $row["custom_{$fieldID}"] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', (int) $row["custom_{$fieldID}"], 'display_name');
         }
         elseif ($row["custom_{$fieldID}"] &&
           array_key_exists($row["custom_{$fieldID}"],

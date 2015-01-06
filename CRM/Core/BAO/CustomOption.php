@@ -271,7 +271,8 @@ WHERE  id = %2";
           $query     = "
 UPDATE {$dao->tableName}
 SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
-          $queryParams = array(1 => array($oldString, 'String'),
+          $queryParams = array(
+          1 => array($oldString, 'String'),
             2 => array($newString, 'String'),
           );
           break;

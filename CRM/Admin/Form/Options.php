@@ -101,7 +101,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       }
     }
 
-
     $session->pushUserContext(CRM_Utils_System::url($url, $params));
     $this->assign('id', $this->_id);
 
@@ -177,7 +176,8 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     }
 
     if ($this->_gName == 'case_status') {
-      $classes = array('Opened' => ts('Opened'),
+      $classes = array(
+      'Opened' => ts('Opened'),
         'Closed' => ts('Closed'),
       );
 
@@ -295,7 +295,8 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     //get contact type for which user want to create a new greeting/addressee type, CRM-4575
     if (in_array($this->_gName, array(
       'email_greeting', 'postal_greeting', 'addressee')) && !$isReserved) {
-      $values = array(1 => ts('Individual'),
+      $values = array(
+      1 => ts('Individual'),
         2 => ts('Household'),
         3 => ts('Organization'),
         4 => ts('Multiple Contact Merge'),

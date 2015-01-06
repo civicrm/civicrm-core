@@ -86,7 +86,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
     }
 
     if ($id = CRM_Utils_Array::value('id', $ids)) {
-      if (isset($params['name']))unset($params['name']);
+      if (isset($params['name'])) { unset($params['name']);
+      }
 
       $oldWeight = NULL;
       if ($id) {

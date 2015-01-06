@@ -63,7 +63,9 @@ function civicrm_smarty_resource_string_get_secure($tpl_name, &$smarty_obj) {
  * @param string $tpl_name
  * @param $smarty_obj
  */
-function civicrm_smarty_resource_string_get_trusted($tpl_name, &$smarty_obj) {}
+function civicrm_smarty_resource_string_get_trusted($tpl_name, &$smarty_obj) {
+
+}
 
 function civicrm_smarty_register_string_resource() {
   $template = CRM_Core_Smarty::singleton();

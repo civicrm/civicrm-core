@@ -64,7 +64,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    *
    * @var boolean
    */
-  protected $_isSetReserved = false;
+  protected $_isSetReserved = FALSE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -79,40 +79,40 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * @param null
    *
    * @return array  array of action links that we need to display for the browse screen
-   */ function &actionLinks() {
-    if (!isset(self::$_actionLinks)) {
-      self::$_actionLinks = array(
-        CRM_Core_Action::UPDATE => array(
-          'name' => ts('Edit Option'),
-          'url' => 'civicrm/admin/price/field/option',
-          'qs' => 'reset=1&action=update&oid=%%oid%%&fid=%%fid%%&sid=%%sid%%',
-          'title' => ts('Edit Price Option'),
-        ),
-        CRM_Core_Action::VIEW => array(
-          'name' => ts('View'),
-          'url' => 'civicrm/admin/price/field/option',
-          'qs' => 'action=view&oid=%%oid%%',
-          'title' => ts('View Price Option'),
-        ),
-        CRM_Core_Action::DISABLE => array(
-          'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Disable Price Option'),
-        ),
-        CRM_Core_Action::ENABLE => array(
-          'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Enable Price Option'),
-        ),
-        CRM_Core_Action::DELETE => array(
-          'name' => ts('Delete'),
-          'url' => 'civicrm/admin/price/field/option',
-          'qs' => 'action=delete&oid=%%oid%%',
-          'title' => ts('Disable Price Option'),
-        ),
-      );
-    }
-    return self::$_actionLinks;
+  function &actionLinks() {
+  if (!isset(self::$_actionLinks)) {
+  self::$_actionLinks = array(
+  CRM_Core_Action::UPDATE => array(
+  'name' => ts('Edit Option'),
+  'url' => 'civicrm/admin/price/field/option',
+  'qs' => 'reset=1&action=update&oid=%%oid%%&fid=%%fid%%&sid=%%sid%%',
+  'title' => ts('Edit Price Option'),
+  ),
+  CRM_Core_Action::VIEW => array(
+  'name' => ts('View'),
+  'url' => 'civicrm/admin/price/field/option',
+  'qs' => 'action=view&oid=%%oid%%',
+  'title' => ts('View Price Option'),
+  ),
+  CRM_Core_Action::DISABLE => array(
+  'name' => ts('Disable'),
+  'ref' => 'crm-enable-disable',
+  'title' => ts('Disable Price Option'),
+  ),
+  CRM_Core_Action::ENABLE => array(
+  'name' => ts('Enable'),
+  'ref' => 'crm-enable-disable',
+  'title' => ts('Enable Price Option'),
+  ),
+  CRM_Core_Action::DELETE => array(
+  'name' => ts('Delete'),
+  'url' => 'civicrm/admin/price/field/option',
+  'qs' => 'action=delete&oid=%%oid%%',
+  'title' => ts('Disable Price Option'),
+  ),
+  );
+  }
+  return self::$_actionLinks;
   }
 
   /**
@@ -129,7 +129,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     $financialType = CRM_Contribute_PseudoConstant::financialType();
     $taxRate = CRM_Core_PseudoConstant::getTaxRates();
     // display taxTerm for priceFields
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
     $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $getTaxDetails = FALSE;
@@ -270,11 +270,12 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
 
     if ($this->_sid) {
       CRM_Price_BAO_PriceSet::checkPermission($this->_sid);
-      $this->_isSetReserved= CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'is_reserved');
+      $this->_isSetReserved = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'is_reserved');
       $this->assign('isReserved', $this->_isSetReserved);
     }
     //as url contain $sid so append breadcrumb dynamically.
-    $breadcrumb = array(array('title' => ts('Price Fields'),
+    $breadcrumb = array(array(
+    'title' => ts('Price Fields'),
         'url' => CRM_Utils_System::url('civicrm/admin/price/field', 'reset=1&sid=' . $this->_sid),
       ));
     CRM_Utils_System::appendBreadCrumb($breadcrumb);

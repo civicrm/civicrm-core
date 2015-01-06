@@ -59,17 +59,17 @@ class CRM_Price_Form_DeleteField extends CRM_Core_Form {
    *
    * @return void
    * @acess protected
-   */ function preProcess() {
-    $this->_fid = $this->get('fid');
+  function preProcess() {
+  $this->_fid = $this->get('fid');
 
-    $this->_title = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField',
-      $this->_fid,
-      'label', 'id'
-    );
+  $this->_title = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField',
+  $this->_fid,
+  'label', 'id'
+  );
 
-    $this->assign('title', $this->_title);
+  $this->assign('title', $this->_title);
 
-    CRM_Utils_System::setTitle(ts('Confirm Price Field Delete'));
+  CRM_Utils_System::setTitle(ts('Confirm Price Field Delete'));
   }
 
   /**

@@ -83,14 +83,14 @@ abstract class CRM_Utils_Hook {
     if (self::$_singleton == NULL || $fresh) {
       $config = CRM_Core_Config::singleton();
       $class = $config->userHookClass;
-      require_once (str_replace('_', DIRECTORY_SEPARATOR, $config->userHookClass) . '.php');
+      require_once str_replace('_', DIRECTORY_SEPARATOR, $config->userHookClass) . '.php';
       self::$_singleton = new $class();
     }
     return self::$_singleton;
   }
 
   /**
-   *Invoke hooks
+   * Invoke hooks
    *
    * @param int $numParams
    *   Number of parameters to pass to the hook.
@@ -155,7 +155,7 @@ abstract class CRM_Utils_Hook {
       if (!empty($config->customPHPPathDir) &&
         file_exists("{$config->customPHPPathDir}/civicrmHooks.php")
       ) {
-        @include_once ("civicrmHooks.php");
+        @include_once "civicrmHooks.php";
       }
 
       if (!empty($fnPrefix)) {
@@ -253,8 +253,8 @@ abstract class CRM_Utils_Hook {
       }
       include_once $civiModule['filePath'];
       $moduleList[$civiModule['prefix']] = $civiModule['prefix'];
-      }
     }
+  }
 
   /**
    * This hook is called before a db write on some core objects.
@@ -663,8 +663,8 @@ abstract class CRM_Utils_Hook {
    */
   static function tokenValues(&$details,
     $contactIDs,
-    $jobID     = NULL,
-    $tokens    = array(),
+    $jobID = NULL,
+    $tokens = array(),
     $className = NULL
   ) {
     return self::singleton()->invoke(5, $details, $contactIDs, $jobID, $tokens, $className, self::$_nullObject, 'civicrm_tokenValues');
@@ -1596,7 +1596,7 @@ abstract class CRM_Utils_Hook {
    *   Reserved for future use.
    */
   static function unhandledException($exception, $request = NULL) {
-    self::singleton()->invoke(2, $exception, $request, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,'civicrm_unhandled_exception');
+    self::singleton()->invoke(2, $exception, $request, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_unhandled_exception');
     // == 4.4 ==
     //$event = new stdClass();
     //$event->exception = $exception;
@@ -1711,7 +1711,7 @@ abstract class CRM_Utils_Hook {
    *
    * @return mixed
    */
-  public static function alterBarcode( &$data, $type = 'barcode', $context = 'name_badge' ) {
+  public static function alterBarcode(&$data, $type = 'barcode', $context = 'name_badge') {
     return self::singleton()->invoke(3, $data, $type, $context, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, 'civicrm_alterBarcode');
   }
@@ -1764,10 +1764,10 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called before a case merge (or a case reassign)
    *
-   * @param integer $mainContactId
-   * @param integer $mainCaseId
-   * @param integer $otherContactId
-   * @param integer $otherCaseId
+   * @param int $mainContactId
+   * @param int $mainCaseId
+   * @param int $otherContactId
+   * @param int $otherCaseId
    * @param bool $changeClient
    *
    * @return void
@@ -1779,10 +1779,10 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called after a case merge (or a case reassign)
    *
-   * @param integer $mainContactId
-   * @param integer $mainCaseId
-   * @param integer $otherContactId
-   * @param integer $otherCaseId
+   * @param int $mainContactId
+   * @param int $mainCaseId
+   * @param int $otherContactId
+   * @param int $otherCaseId
    * @param bool $changeClient
    *
    * @return void

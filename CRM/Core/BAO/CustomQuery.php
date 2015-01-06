@@ -538,6 +538,7 @@ SELECT label, value
                 case 'IS EMPTY':
                   $op = 'IS NULL';
                   break;
+
                 case 'IS NOT EMPTY':
                   $op = 'IS NOT NULL';
                   break;

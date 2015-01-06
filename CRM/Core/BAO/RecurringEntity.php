@@ -171,7 +171,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *   Parent entity id.
    * @param int $entityId
    *   Child entity id.
-   * @param String $entityTable
+   * @param string $entityTableName of the entity table.
    *   Name of the entity table.
    *
    * @static
@@ -416,7 +416,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
 
     $queryParams = array(
-      1 => array($parentId,    'Integer'),
+      1 => array($parentId, 'Integer'),
       2 => array($entityTable, 'String'),
       3 => array($initiatorId, 'Integer'),
     );
@@ -999,21 +999,25 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         if ($scheduleReminderDetails['entity_status']) {
           $startActionDate = explode(" ", $scheduleReminderDetails['entity_status']);
           switch ($startActionDate[0]) {
-          case 'first':
-            $startActionDate1 = 1;
-            break;
-          case 'second':
-            $startActionDate1 = 2;
-            break;
-          case 'third':
-            $startActionDate1 = 3;
-            break;
-          case 'fourth':
-            $startActionDate1 = 4;
-            break;
-          case 'last':
-            $startActionDate1 = -1;
-            break;
+            case 'first':
+              $startActionDate1 = 1;
+              break;
+
+            case 'second':
+              $startActionDate1 = 2;
+              break;
+
+            case 'third':
+              $startActionDate1 = 3;
+              break;
+
+            case 'fourth':
+              $startActionDate1 = 4;
+              break;
+
+            case 'last':
+              $startActionDate1 = -1;
+              break;
           }
           $concatStartActionDateBits = $startActionDate1.strtoupper(substr($startActionDate[1], 0, 2));
           $r->byday(array($concatStartActionDateBits));

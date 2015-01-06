@@ -87,8 +87,9 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       elseif (array_key_exists($type, $validSubTypes)) {
         $cType = CRM_Utils_Array::value('parent', $validSubTypes[$type]);
       }
-      if ($cType)
-      break;
+      if ($cType) {
+        break;
+      }
     }
 
     return $cType;
@@ -202,11 +203,11 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     $action,
     $visibility,
     $considerSelector = FALSE,
-    $ufGroupIds       = NULL,
-    $searchable       = NULL,
-    $restrict         = NULL,
-    $skipPermission   = FALSE,
-    $permissionType   = CRM_Core_Permission::SEARCH
+    $ufGroupIds = NULL,
+    $searchable = NULL,
+    $restrict = NULL,
+    $skipPermission = FALSE,
+    $permissionType = CRM_Core_Permission::SEARCH
   ) {
     if ($ufGroupIds) {
       $subset = self::getFields($ufGroupIds, FALSE, $action,
@@ -241,7 +242,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         if ($considerSelector) {
           // drop the fields not meant for the selector
           foreach ($subset as $name => $field) {
-            if (!$field['in_selector'])unset($subset[$name]);
+            if (!$field['in_selector']) { unset($subset[$name]);
+            }
           }
         }
         $fields = array_merge($fields, $subset);
@@ -280,14 +282,14 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     $id,
     $register = FALSE,
     $action = NULL,
-    $visibility     = NULL,
+    $visibility = NULL,
     $searchable = NULL,
-    $showAll        = FALSE,
+    $showAll = FALSE,
     $restrict = NULL,
     $skipPermission = FALSE,
-    $ctype          = NULL,
+    $ctype = NULL,
     $permissionType = CRM_Core_Permission::CREATE,
-    $orderBy        = 'field_name',
+    $orderBy = 'field_name',
     $orderProfiles = NULL
   ) {
     if (!is_array($id)) {
@@ -395,8 +397,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     // used by calculateGroupType, but I don't think the missing fields matter, and -- if
     // they did -- the obvious fix would produce mutual recursion.
     $ufGroupType = self::_calculateGroupType($fieldArrs);
-    $profileType = CRM_Core_BAO_UFField::calculateProfileType(implode(',',$ufGroupType));
-    $contactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileTypeByGroupType(implode(',',$ufGroupType));
+    $profileType = CRM_Core_BAO_UFField::calculateProfileType(implode(',', $ufGroupType));
+    $contactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileTypeByGroupType(implode(',', $ufGroupType));
     $importableFields = self::getImportableFields($showAll, $profileType, $contactActivityProfile);
     list($customFields, $addressCustomFields) = self::getCustomFields($ctype);
 
@@ -764,12 +766,12 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    */
   static function getEditHTML($userID,
     $title,
-    $action       = NULL,
-    $register     = FALSE,
-    $reset        = FALSE,
-    $profileID    = NULL,
+    $action = NULL,
+    $register = FALSE,
+    $reset = FALSE,
+    $profileID = NULL,
     $doNotProcess = FALSE,
-    $ctype        = NULL
+    $ctype = NULL
   ) {
 
     if ($register) {
@@ -989,9 +991,11 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
 
       // Create a unique, non-empty index for each field.
       $index = $field['title'];
-      if ($index === '') $index = ' ';
-      while (array_key_exists($index, $values))
+      if ($index === '') { $index = ' ';
+      }
+      while (array_key_exists($index, $values)) {
         $index .= ' ';
+      }
 
       $params[$index] = $values[$index] = '';
       $customFieldName = NULL;
@@ -1125,12 +1129,12 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
                     $dao->data_type == 'Boolean'
                   )
                 ) {
-                  $customVal = (int )($details->{$name});
+                  $customVal = (int ) ($details->{$name});
                 }
                 elseif (isset($dao) && property_exists($dao, 'data_type')
                   && $dao->data_type == 'Float'
                 ) {
-                  $customVal = (float )($details->{$name});
+                  $customVal = (float ) ($details->{$name});
                 }
                 elseif (!CRM_Utils_System::isNull(explode(CRM_Core_DAO::VALUE_SEPARATOR,
                       $details->{$name}
@@ -1501,7 +1505,8 @@ SET    weight = %1
 WHERE  uf_group_id = %2
 AND    ( entity_id IS NULL OR entity_id <= 0 )
 ";
-    $p = array(1 => array($params['weight'], 'Integer'),
+    $p = array(
+    1 => array($params['weight'], 'Integer'),
       2 => array($ufGroupId, 'Integer'),
     );
     CRM_Core_DAO::executeQuery($query, $p);
@@ -1665,7 +1670,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $p[2] = array($moduleName, 'String');
     }
 
-
     // add permissioning for profiles only if not registration
     if (!$skipPermission) {
       $permissionClause = CRM_Core_Permission::ufGroupClause($op, 'civicrm_uf_group.');
@@ -1773,7 +1777,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     $contactId = NULL,
     $online = FALSE,
     $usedFor = NULL,
-    $rowNumber = NULL ,
+    $rowNumber = NULL,
     $prefix = ''
   ) {
     $defaultValues = array();
@@ -1827,7 +1831,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       );
       $deleteURL = CRM_Core_Action::formLink($deleteURL,
         CRM_Core_Action::DELETE,
-        array('id' => $form->get('id'),
+        array(
+      'id' => $form->get('id'),
           'gid' => $form->get('gid'),
         ),
         ts('more'),
@@ -1904,7 +1909,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       'membership_start_date', 'membership_end_date', 'join_date'))) {
       $form->addDate($name, $title, $required, array('formatType' => 'custom'));
     }
-    elseif (CRM_Utils_Array::value('name',$field) == 'membership_type') {
+    elseif (CRM_Utils_Array::value('name', $field) == 'membership_type') {
       list($orgInfo, $types) = CRM_Member_BAO_MembershipType::getMembershipTypeInfo();
       $sel = &$form->addElement('hierselect', $name, $title);
       $select = array('' => ts('- select -') );
@@ -1921,7 +1926,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
       $sel->setOptions(array($orgInfo, $types));
     }
-    elseif (CRM_Utils_Array::value('name',$field) == 'membership_status') {
+    elseif (CRM_Utils_Array::value('name', $field) == 'membership_status') {
       $form->add('select', $name, $title,
         array(
           '' => ts('- select -')) + CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label'), $required
@@ -2100,7 +2105,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
     elseif ($fieldName == 'payment_instrument') {
       $form->add('select', $name, $title,
-                       array(''=>ts( '- select -' )) + CRM_Contribute_PseudoConstant::paymentInstrument( ), $required );
+                       array('' => ts( '- select -' )) + CRM_Contribute_PseudoConstant::paymentInstrument( ), $required );
     }
     else if ($fieldName == 'financial_type' ) {
       $form->add('select', $name, $title,
@@ -2687,7 +2692,8 @@ SET    weight = %1
 WHERE  uf_group_id = %2
 AND    ( entity_id IS NULL OR entity_id <= 0 )
 ";
-    $p = array(1 => array($maxWeight + 1, 'Integer'),
+    $p = array(
+    1 => array($maxWeight + 1, 'Integer'),
       2 => array($copy->id, 'Integer'),
     );
     CRM_Core_DAO::executeQuery($query, $p);
@@ -2946,7 +2952,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $data['location'][$loc]['email'][$loc]['email'] = $primaryEmail;
     }
 
-
     return $data;
   }
 
@@ -3122,7 +3127,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     if ($subTypes) {
       //CRM-15427 Allow Multiple subtype filtering
       //if (count($subTypes) > 1) {
-        //throw new CRM_Core_Exception("Multiple subtype filtering is not currently supported by widget.");
+      //throw new CRM_Core_Exception("Multiple subtype filtering is not currently supported by widget.");
       //}
       foreach ($subTypes as $subType => $subTypeIds) {
         $groupTypeExpr .= $delim . $subType . ':' . implode(':', $subTypeIds);
@@ -3165,7 +3170,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       case 'Contribute':
         $componentBAO     = 'CRM_Contribute_BAO_Contribution';
         $componentBAOName = 'Contribution';
-            $componentSubType = array( 'financial_type_id' );
+        $componentSubType = array( 'financial_type_id' );
         break;
 
       case 'Event':
@@ -3214,7 +3219,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       elseif ($name == 'membership_type') {
         // since membership_type field is a hierselect -
         $defaults[$fldName][0] =
-          CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',$values['membership_type_id'],'member_of_contact_id','id');
+          CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $values['membership_type_id'], 'member_of_contact_id', 'id');
         $defaults[$fldName][1] = $values['membership_type_id'];
       }
       elseif ($name == 'membership_status') {
@@ -3321,7 +3326,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   /**
    * Retrieve groups of  profiles
    *
-   * @param integer $profileID
+   * @param int $profileIDId of the profile.
    *   Id of the profile.
    *
    * @return array  returns array
@@ -3593,7 +3598,7 @@ SELECT  group_id
    * @return array|null
    */
   public static function shiftMultiRecordFields(&$source, &$destination, $returnMultiSummaryFields = FALSE) {
-    $multiSummaryFields = $returnMultiSummaryFields ? array( ) : NULL;
+    $multiSummaryFields = $returnMultiSummaryFields ? array() : NULL;
     foreach ($source as $field => $properties) {
       if (!CRM_Core_BAO_CustomField::getKeyID($field)) {
         continue;

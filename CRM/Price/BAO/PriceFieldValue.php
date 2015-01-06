@@ -89,7 +89,8 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     }
 
     if ($id  && !empty($params['weight'])) {
-      if (isset($params['name']))unset($params['name']);
+      if (isset($params['name'])) { unset($params['name']);
+      }
 
       $oldWeight = NULL;
       if ($id) {
@@ -246,9 +247,9 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @param int $entityId
    *   Id.
-   * @param String $entityTable
+   * @param string $entityTableEntity table.
    *   Entity table.
-   * @param String $financialTypeID
+   * @param string $financialTypeIDFinancial type id.
    *   Financial type id.
    *
    * @static

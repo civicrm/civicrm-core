@@ -182,7 +182,7 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    *   The OpenID of the user.
    * @param string $uf
    *   The name of the user framework.
-   * @param integer $status
+   * @param int $statusReturns the status if user created or already exits (used for CMS sync).
    *   Returns the status if user created or already exits (used for CMS sync).
    *
    * @param null $ctype
@@ -628,7 +628,7 @@ AND    domain_id    = %4
    *   Uf id.
    *
    * return array  $ufValues uf values.
-   **
+   * *
    *
    * @return array
    */

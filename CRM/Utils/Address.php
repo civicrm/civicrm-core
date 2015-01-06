@@ -57,11 +57,11 @@ class CRM_Utils_Address {
    */
   static function format(
     $fields,
-    $format           = NULL,
-    $microformat      = FALSE,
-    $mailing          = FALSE,
+    $format = NULL,
+    $microformat = FALSE,
+    $mailing = FALSE,
     $individualFormat = FALSE,
-    $tokenFields      = NULL
+    $tokenFields = NULL
   ) {
     static $config = NULL;
 
@@ -110,7 +110,7 @@ class CRM_Utils_Address {
     }
 
     if (!$microformat) {
-        // replacements in case of Individual Name Format
+      // replacements in case of Individual Name Format
       $replacements = array(
         'contact.display_name' => CRM_Utils_Array::value('display_name', $fields),
         'contact.individual_prefix' => CRM_Utils_Array::value('individual_prefix', $fields),

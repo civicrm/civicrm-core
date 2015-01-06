@@ -214,9 +214,9 @@ class CRM_Core_PseudoConstant {
    * NOTE: Rather than calling this function directly use CRM_*_BAO_*::buildOptions()
    * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Pseudoconstant+%28option+list%29+Reference
    *
-   * @param String $daoName
-   * @param String $fieldName
-   * @param Array $params
+   * @param string $daoName
+   * @param string $fieldName
+   * @param array $params- name       string  name of the option group
    * - name       string  name of the option group
    * - flip       boolean results are return in id => label format if false
    *                            if true, the results are reversed
@@ -228,7 +228,7 @@ class CRM_Core_PseudoConstant {
    * - orderColumn string the column to use for sorting, defaults to 'weight' column if one exists, else defaults to labelColumn
    * - onlyActive boolean return only the action option values
    * - fresh      boolean ignore cache entries and go back to DB
-   * @param String $context: Context string
+   * @param string $context:
    *
    * @return Array|bool - array on success, FALSE on error.
    *
@@ -443,9 +443,9 @@ class CRM_Core_PseudoConstant {
   /**
    * Fetch the translated label for a field given its key
    *
-   * @param String $baoName
-   * @param String $fieldName
-   * @param String|Int $key
+   * @param string $baoName
+   * @param string $fieldName
+   * @param string $keyTODO: Accept multivalued input?
    *
    * TODO: Accept multivalued input?
    *
@@ -465,9 +465,9 @@ class CRM_Core_PseudoConstant {
   /**
    * Fetch the machine name for a field given its key
    *
-   * @param String $baoName
-   * @param String $fieldName
-   * @param String|Int $key
+   * @param string $baoName
+   * @param string $fieldName
+   * @param string $key
    *
    * @return bool|null|string
    *   FALSE if the given field has no associated option list
@@ -485,9 +485,9 @@ class CRM_Core_PseudoConstant {
   /**
    * Fetch the key for a field option given its name
    *
-   * @param String $baoName
-   * @param String $fieldName
-   * @param String|Int $value
+   * @param string $baoName
+   * @param string $fieldName
+   * @param string $value
    *
    * @return bool|null|string|number
    *   FALSE if the given field has no associated option list
@@ -1555,12 +1555,12 @@ WHERE  id = %1";
    */
   public static function &visibility($column = 'label') {
     if (!isset(self::$visibility)) {
-      self::$visibility = array( );
+      self::$visibility = array();
     }
 
     if (!isset(self::$visibility[$column])) {
       self::$visibility[$column] = CRM_Core_OptionGroup::values('visibility', FALSE, FALSE, FALSE, NULL, $column);
-  }
+    }
 
     return self::$visibility[$column];
   }
@@ -1828,10 +1828,10 @@ WHERE  id = %1
    *
    * @return array - array reference of all Option Group Name
    */
-  public static function accountOptionValues($optionGroupName, $id = null, $condition = null) {
+  public static function accountOptionValues($optionGroupName, $id = NULL, $condition = NULL) {
     $cacheKey = $optionGroupName . '_' . $condition;
     if (empty(self::$accountOptionValues[$cacheKey])) {
-      self::$accountOptionValues[$cacheKey] = CRM_Core_OptionGroup::values($optionGroupName, false, false, false, $condition);
+      self::$accountOptionValues[$cacheKey] = CRM_Core_OptionGroup::values($optionGroupName, FALSE, FALSE, FALSE, $condition);
     }
     if ($id) {
       return CRM_Utils_Array::value($id, self::$accountOptionValues[$cacheKey]);

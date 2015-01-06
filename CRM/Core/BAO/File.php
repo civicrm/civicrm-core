@@ -212,9 +212,9 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
    * The $useWhere is used so that the signature matches the parent class
    *
   public function delete($useWhere = FALSE) {
-    list($fileID, $entityID, $fieldID) = func_get_args();
+  list($fileID, $entityID, $fieldID) = func_get_args();
 
-    self::deleteFileReferences($fileID, $entityID, $fieldID);
+  self::deleteFileReferences($fileID, $entityID, $fieldID);
   } */
 
   /**

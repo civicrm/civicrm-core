@@ -118,7 +118,8 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    *
    * @return void
    */
-  public function addValues($controller) {}
+  public function addValues($controller) {
+  }
 
   /**
    * Class constructor
@@ -155,7 +156,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     // get 'id' if present
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
 
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $this->getBAOName()) . ".php");
+    require_once str_replace('_', DIRECTORY_SEPARATOR, $this->getBAOName()) . ".php";
 
     if ($id) {
       if (!$this->checkPermission($id, NULL)) {
@@ -163,8 +164,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
       }
     }
 
-    if ($this->_action &
-      (CRM_Core_Action::VIEW |
+    if ($this->_action & (CRM_Core_Action::VIEW |
         CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE |
         CRM_Core_Action::COPY |

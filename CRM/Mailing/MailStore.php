@@ -94,7 +94,8 @@ class CRM_Mailing_MailStore {
   /**
    * Expunge the messages marked for deletion; stub function to be redefined by IMAP store
    */
-  public function expunge() {}
+  public function expunge() {
+  }
 
   /**
    * Return the next X messages from the mail store

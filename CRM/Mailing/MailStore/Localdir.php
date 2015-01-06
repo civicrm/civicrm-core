@@ -80,8 +80,9 @@ class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
       if ($entry->isDot()) {
         continue;
       }
-      if (count($mails) >= $count)
-      break;
+      if (count($mails) >= $count) {
+        break;
+      }
 
       $file = $path . DIRECTORY_SEPARATOR . $entry->getFilename();
       if ($this->_debug) {
@@ -115,7 +116,7 @@ class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
   /**
    * Fetch the specified message to the local ignore folder
    *
-   * @param integer $file
+   * @param int $fileFile location of the message to fetch.
    *   File location of the message to fetch.
    *
    * @throws Exception
@@ -134,7 +135,7 @@ class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
   /**
    * Fetch the specified message to the local processed folder
    *
-   * @param integer $file
+   * @param int $fileFile location of the message to fetch.
    *   File location of the message to fetch.
    *
    * @throws Exception

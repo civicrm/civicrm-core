@@ -45,6 +45,7 @@ class CRM_Utils_Check_Security {
     switch ($config->userFramework) {
       case 'Joomla':
         return '/media/';
+
       default:
         return '/files/';
     }

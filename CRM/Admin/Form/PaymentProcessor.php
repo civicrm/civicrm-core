@@ -188,7 +188,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     );
 
     $types = CRM_Core_PseudoConstant::paymentProcessorType();
-    $this->add( 'select', 'payment_processor_type_id', ts('Payment Processor Type'), $types, true,
+    $this->add( 'select', 'payment_processor_type_id', ts('Payment Processor Type'), $types, TRUE,
       array('onchange' => "reload(true)")
     );
 
@@ -200,12 +200,11 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     }
     $this->add('select', 'financial_account_id', ts('Financial Account'),
       array('' => ts('- select -')) + $financialAccount,
-      true
+      TRUE
     );
     // is this processor active ?
     $this->add('checkbox', 'is_active', ts('Is this Payment Processor active?'));
     $this->add('checkbox', 'is_default', ts('Is this Payment Processor the default?'));
-
 
     foreach ($this->_fields as $field) {
       if (empty($field['label'])) {
@@ -290,7 +289,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   public function setDefaultValues() {
     $defaults = array();
     if ($this->_ppType) {
-    $defaults['payment_processor_type_id'] = $this->_ppType;
+      $defaults['payment_processor_type_id'] = $this->_ppType;
     }
     if (!$this->_id) {
       $defaults['is_active'] = $defaults['is_default'] = 1;

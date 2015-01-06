@@ -47,7 +47,8 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    *
    * @return array self::$_links array of action links
    */
-  public function &links() {}
+  public function &links() {
+  }
 
   /**
    * Return class name of edit form
@@ -149,8 +150,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   }
 
   public function search() {
-    if ($this->_action &
-      (CRM_Core_Action::ADD |
+    if ($this->_action & (CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE |
         CRM_Core_Action::DELETE
       )

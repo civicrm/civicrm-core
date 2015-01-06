@@ -78,7 +78,7 @@ abstract class CRM_SMS_Provider {
       $ext = CRM_Extension_System::singleton()->getMapper();
       if ($ext->isExtensionKey($providerName)) {
         $paymentClass = $ext->keyToClass($providerName);
-        require_once ("{$paymentClass}.php");
+        require_once "{$paymentClass}.php";
       } else {
         CRM_Core_Error::fatal("Could not locate extension for {$providerName}.");
       }
@@ -135,7 +135,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       $sourceContactID = CRM_Core_DAO::singleValueQuery($sql, array(1 => array($jobID, 'Integer')));
     }
     elseif($userID) {
-      $sourceContactID=$userID;
+      $sourceContactID = $userID;
     }
     else {
       $session = CRM_Core_Session::singleton();
@@ -146,7 +146,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       $sourceContactID = CRM_Utils_Array::value('Contact', $headers);
     }
     if (!$sourceContactID) {
-      return false;
+      return FALSE;
     }
 
     $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type', 'SMS delivery', 'name');
@@ -209,11 +209,13 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       $stripFrom = $this->stripPhone($from);
       $contactparams = array(
         'contact_type' => 'Individual',
-        'email' => array(1 => array(
+        'email' => array(
+      1 => array(
           'location_type_id' => $phoneloc,
           'email' => $stripFrom . '@mobile.sms'
         )),
-        'phone' => array(1 => array(
+        'phone' => array(
+      1 => array(
           'phone_type_id' => $phonetype,
           'location_type_id' => $phoneloc,
           'phone' => $stripFrom

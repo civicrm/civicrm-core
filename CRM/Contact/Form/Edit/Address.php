@@ -235,8 +235,7 @@ class CRM_Contact_Form_Edit_Address {
 
       $template     = CRM_Core_Smarty::singleton();
       $tplGroupTree = $template->get_template_vars('address_groupTree');
-      $tplGroupTree = empty($tplGroupTree) ? array(
-        ) : $tplGroupTree;
+      $tplGroupTree = empty($tplGroupTree) ? array() : $tplGroupTree;
 
       $form->assign('address_groupTree', $tplGroupTree + array($blockId => $groupTree));
       // unset the temp smarty var that got created
@@ -322,7 +321,7 @@ class CRM_Contact_Form_Edit_Address {
    *
    * @static
    */
-  public static function setDefaultValues( &$defaults, &$form ) {
+  public static function setDefaultValues(&$defaults, &$form) {
     $addressValues = array();
     if (isset($defaults['address']) && is_array($defaults['address']) &&
       !CRM_Utils_System::isNull($defaults['address'])

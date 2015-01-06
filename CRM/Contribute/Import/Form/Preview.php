@@ -134,7 +134,7 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
         $mapperSoftCreditType[$key] = $mapperSoftCreditType[$key]['value'];
       }
       else {
-        $mapperSoftCredit[$key] = $mapperSoftCreditType[$key] =  NULL;
+        $mapperSoftCredit[$key] = $mapperSoftCreditType[$key] = NULL;
       }
     }
 

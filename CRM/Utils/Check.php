@@ -131,6 +131,7 @@ class CRM_Utils_Check {
         case 'CiviCase':
           $checks[] = new CRM_Utils_Check_Case(CRM_Case_XMLRepository::singleton(), CRM_Case_PseudoConstant::caseType('name'));
           break;
+
         default:
       }
     }

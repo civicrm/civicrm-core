@@ -172,7 +172,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $state = NULL,
     $action = CRM_Core_Action::NONE,
     $method = 'post',
-    $name   = NULL
+    $name = NULL
   ) {
 
     if ($name) {
@@ -304,7 +304,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return void
    *
    */
-  public function preProcess() {}
+  public function preProcess() {
+  }
 
   /**
    * This function is called after the form is validated. Any
@@ -318,7 +319,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return void
    *
    */
-  public function postProcess() {}
+  public function postProcess() {
+  }
 
   /**
    * This function is just a wrapper, so that we can call all the hook functions
@@ -362,7 +364,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return void
    *
    */
-  public function buildQuickForm() {}
+  public function buildQuickForm() {
+  }
 
   /**
    * This virtual function is used to set the default values of
@@ -373,7 +376,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return array reference to the array of default values
    *
    */
-  public function setDefaultValues() {}
+  public function setDefaultValues() {
+  }
 
   /**
    * This is a virtual function that adds group and global rules to
@@ -384,7 +388,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return void
    *
    */
-  public function addRules() {}
+  public function addRules() {
+  }
 
   /**
    * Performs the server side validation
@@ -470,12 +475,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->addRules();
 
     //Set html data-attribute to enable warning user of unsaved changes
-    if ($this->unsavedChangesWarn === true
+    if ($this->unsavedChangesWarn === TRUE
         || (!isset($this->unsavedChangesWarn)
            && ($this->_action & CRM_Core_Action::ADD || $this->_action & CRM_Core_Action::UPDATE)
            )
         ) {
-          $this->setAttribute('data-warn-changes', 'true');
+      $this->setAttribute('data-warn-changes', 'true');
     }
   }
 
@@ -820,7 +825,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   The value to append.
    * @param bool $merge
    */
-  public function append($tpl_var, $value=NULL, $merge=FALSE) {
+  public function append($tpl_var, $value = NULL, $merge = FALSE) {
     self::$_template->append($tpl_var, $value, $merge);
   }
 
@@ -831,7 +836,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @return array
    */
-  public function get_template_vars($name=null) {
+  public function get_template_vars($name = NULL) {
     return self::$_template->get_template_vars($name);
   }
 
@@ -898,9 +903,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param bool $flipValues
    */
   function addCheckBox($id, $title, $values, $other = NULL,
-    $attributes       = NULL, $required = NULL,
+    $attributes = NULL, $required = NULL,
     $javascriptMethod = NULL,
-    $separator        = '<br />', $flipValues = FALSE
+    $separator = '<br />', $flipValues = FALSE
   ) {
     $options = array();
 
@@ -1367,12 +1372,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   function addMoney($name,
     $label,
-    $required        = FALSE,
-    $attributes      = NULL,
-    $addCurrency     = TRUE,
-    $currencyName    = 'currency',
+    $required = FALSE,
+    $attributes = NULL,
+    $addCurrency = TRUE,
+    $currencyName = 'currency',
     $defaultCurrency = NULL,
-    $freezeCurrency  = FALSE
+    $freezeCurrency = FALSE
   ) {
     $element = $this->add('text', $name, $label, $attributes, $required);
     $this->addRule($name, ts('Please enter a valid amount.'), 'money');
@@ -1388,10 +1393,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Add currency element to the form
    */
   function addCurrency($name = 'currency',
-    $label           = NULL,
-    $required        = TRUE,
+    $label = NULL,
+    $required = TRUE,
     $defaultCurrency = NULL,
-    $freezeCurrency  = FALSE
+    $freezeCurrency = FALSE
   ) {
     $currencies = CRM_Core_OptionGroup::values('currencies_enabled');
     $options = array('class' => 'crm-select2 eight');
@@ -1519,7 +1524,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * perform specific action on cancel action
    *
    */
-  public function cancelAction() {}
+  public function cancelAction() {
+  }
 
   /**
    * Helper function to verify that required fields have been filled
@@ -1587,9 +1593,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     return $userID;
   }
 
- /**
-  * Get the contact id of the logged in user
-  */
+  /**
+   * Get the contact id of the logged in user
+   */
   public function getLoggedInUserContactID() {
     // check if the user is logged in and has a contact ID
     $session = CRM_Core_Session::singleton();
@@ -1645,8 +1651,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public function canUseAjaxContactLookups() {
     if (0 < (civicrm_api3('contact', 'getcount', array('check_permissions' => 1))) &&
       CRM_Core_Permission::check(array(array('access AJAX API', 'access CiviCRM')))) {
-        return TRUE;
-      }
+      return TRUE;
+    }
   }
 
   /**
@@ -1679,7 +1685,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @param mixed $profile_id
    *   (can be id, or profile name).
-   * @param integer $contactID
+   * @param int $contactID
    *
    * @return array
    */
@@ -1723,13 +1729,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case CRM_Core_Action::ADD:
         CRM_Utils_System::setTitle(ts('New %1', array(1 => $entityLabel)));
         break;
+
       case CRM_Core_Action::UPDATE:
         CRM_Utils_System::setTitle(ts('Edit %1', array(1 => $entityLabel)));
         break;
+
       case CRM_Core_Action::VIEW:
       case CRM_Core_Action::PREVIEW:
         CRM_Utils_System::setTitle(ts('View %1', array(1 => $entityLabel)));
         break;
+
       case CRM_Core_Action::DELETE:
         CRM_Utils_System::setTitle(ts('Delete %1', array(1 => $entityLabel)));
         break;
@@ -1819,10 +1828,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   private function validateChainSelectFields() {
     foreach ($this->_chainSelectFields as $control => $target) {
       if ($this->elementExists($control)) {
-        $controlValue = (array)$this->getElementValue($control);
+        $controlValue = (array) $this->getElementValue($control);
         $targetField = $this->getElement($target);
         $controlType = $targetField->getAttribute('data-callback') == 'civicrm/ajax/jqCounty' ? 'stateProvince' : 'country';
-        $targetValue = array_filter((array)$targetField->getValue());
+        $targetValue = array_filter((array) $targetField->getValue());
         if ($targetValue || $this->getElementError($target)) {
           $options = CRM_Core_BAO_Location::getChainSelectValues($controlValue, $controlType, TRUE);
           if ($targetValue) {

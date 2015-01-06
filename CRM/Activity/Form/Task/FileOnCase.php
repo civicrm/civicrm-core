@@ -87,7 +87,8 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
    *
    * @return void
    */
-  public function addRules() {}
+  public function addRules() {
+  }
 
   /**
    * Process the form after the input has been submitted and validated

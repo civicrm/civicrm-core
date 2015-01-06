@@ -114,7 +114,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @return object
    * @static
    */
-   public static function &singleton($package = NULL, $msgCallback = FALSE, $contextCallback = FALSE, $throwPEAR_Error = FALSE, $stackClass = 'PEAR_ErrorStack') {
+  public static function &singleton($package = NULL, $msgCallback = FALSE, $contextCallback = FALSE, $throwPEAR_Error = FALSE, $stackClass = 'PEAR_ErrorStack') {
     if (self::$_singleton === NULL) {
       self::$_singleton = new CRM_Core_Error('CiviCRM');
     }
@@ -325,7 +325,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       $details = 'A fatal error was triggered';
       if ($message) {
         $details .= ': ' . $message;
-    }
+      }
       throw new Exception($details, $code);
     }
 
@@ -536,8 +536,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   static function debug_var($variable_name,
     $variable,
     $print = TRUE,
-    $log   = TRUE,
-    $comp  = ''
+    $log = TRUE,
+    $comp = ''
   ) {
     // check if variable is set
     if (!isset($variable)) {
@@ -605,9 +605,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   public static function debug_query($string) {
     if ( defined( 'CIVICRM_DEBUG_LOG_QUERY' ) ) {
       if ( CIVICRM_DEBUG_LOG_QUERY == 'backtrace' ) {
-        CRM_Core_Error::backtrace( $string, true );
+        CRM_Core_Error::backtrace( $string, TRUE );
       } else if ( CIVICRM_DEBUG_LOG_QUERY ) {
-        CRM_Core_Error::debug_var( 'Query', $string, false, true );
+        CRM_Core_Error::debug_var( 'Query', $string, FALSE, TRUE );
       }
     }
   }
@@ -621,7 +621,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $dao = CRM_Core_DAO::executeQuery($query);
     $results = array();
     while ($dao->fetch()) {
-      $results[] = (array)$dao;
+      $results[] = (array) $dao;
     }
     CRM_Core_Error::debug_var('dao result', array('query' => $query, 'results' => $results));
   }
@@ -692,7 +692,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     foreach (self::parseBacktrace($backTrace, $showArgs, $maxArgLen) as $idx => $trace) {
       $message .= sprintf("#%s %s\n", $idx, $trace);
     }
-    $message .= sprintf("#%s {main}\n", 1+$idx);
+    $message .= sprintf("#%s {main}\n", 1 + $idx);
     return $message;
   }
 
@@ -729,25 +729,32 @@ class CRM_Core_Error extends PEAR_ErrorStack {
             case 'boolean':
               $args[] = $arg ? 'TRUE' : 'FALSE';
               break;
+
             case 'integer':
             case 'double':
               $args[] = $arg;
               break;
+
             case 'string':
               $args[] = '"' . CRM_Utils_String::ellipsify(addcslashes((string) $arg, "\r\n\t\""), $maxArgLen). '"';
               break;
+
             case 'array':
               $args[] = '(Array:'.count($arg).')';
               break;
+
             case 'object':
               $args[] = 'Object(' . get_class($arg) . ')';
               break;
+
             case 'resource':
               $args[] = 'Resource';
               break;
+
             case 'NULL':
               $args[] = 'NULL';
               break;
+
             default:
               $args[] = "($type)";
               break;
@@ -788,11 +795,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
           $msg .= '<tbody>';
           foreach (array('Type', 'Code', 'Message', 'Mode', 'UserInfo', 'DebugInfo') as $f) {
             $msg .= sprintf('<tr><td>%s</td><td>%s</td></tr>', $f, call_user_func(array($ei->getCause(), "get$f")));
-    }
+          }
           $msg .= '</tbody></table>';
-    }
+        }
         $ei = $ei->getCause();
-  }
+      }
       $msg .= $e->toHtml();
     } else {
       $msg .= '<p><b>' . get_class($e) . ': "' . htmlentities($e->getMessage()) . '"</b></p>';

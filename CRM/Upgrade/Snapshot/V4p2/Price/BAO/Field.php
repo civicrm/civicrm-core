@@ -143,7 +143,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
           if ($opId = CRM_Utils_Array::value($index, $opIds)) {
             $optionsIds['id'] = $opId;
           }
-          else $optionsIds['id'] = NULL;
+          else { $optionsIds['id'] = NULL;
+          }
         }
         CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue::create($options, $optionsIds);
       }
@@ -222,8 +223,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
     $elementName,
     $fieldId,
     $inactiveNeeded,
-    $useRequired  = TRUE,
-    $label        = NULL,
+    $useRequired = TRUE,
+    $label = NULL,
     $fieldOptions = NULL,
     $freezeOptions = array()
   ) {
@@ -243,11 +244,11 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
     $currencyName = $config->defaultCurrency;
 
     if (!isset($label)) {
-      $label = (property_exists($qf,'_membershipBlock') && !empty($qf->_membershipBlock['is_separate_payment']) && $field->name == 'contribution_amount' && empty($otherAmount['is_allow_other_amount'])) ? ts('Additional Contribution') : $field->label;
+      $label = (property_exists($qf, '_membershipBlock') && !empty($qf->_membershipBlock['is_separate_payment']) && $field->name == 'contribution_amount' && empty($otherAmount['is_allow_other_amount'])) ? ts('Additional Contribution') : $field->label;
     }
 
     if ($field->name == 'contribution_amount') {
-        $qf->_contributionAmount = 1;
+      $qf->_contributionAmount = 1;
     }
 
     if (isset($qf->_online) && $qf->_online) {
@@ -270,17 +271,17 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
         $priceVal  = implode($seperator, array($customOption[$optionKey][$valueFieldName], $count, $max_value));
 
         $extra = array();
-        if (property_exists($qf,'_quickConfig') && $qf->_quickConfig && property_exists($qf,'_contributionAmount') && $qf->_contributionAmount) {
+        if (property_exists($qf, '_quickConfig') && $qf->_quickConfig && property_exists($qf, '_contributionAmount') && $qf->_contributionAmount) {
           $qf->assign('priceset', $elementName);
           $extra = array('onclick' => 'useAmountOther();');
         }
 
         // if seperate membership payment is used with quick config priceset then change the other amount label
-        if (property_exists($qf,'_membershipBlock') && !empty($qf->_membershipBlock['is_separate_payment']) && $qf->_quickConfig && $field->name == 'other_amount' && !property_exists($qf,'_contributionAmount')) {
-            $label = ts('Additional Contribution');
-            $useRequired = 0;
+        if (property_exists($qf, '_membershipBlock') && !empty($qf->_membershipBlock['is_separate_payment']) && $qf->_quickConfig && $field->name == 'other_amount' && !property_exists($qf, '_contributionAmount')) {
+          $label = ts('Additional Contribution');
+          $useRequired = 0;
         } elseif (!empty($fieldOptions[$optionKey]['label'])) {      //check for label.
-            $label = $fieldOptions[$optionKey]['label'];
+          $label = $fieldOptions[$optionKey]['label'];
         }
 
         if ($field->is_display_amounts) {
@@ -290,7 +291,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
 
         $element = &$qf->add('text', $elementName, $label,
           array_merge($extra,
-            array('price' => json_encode(array($optionKey, $priceVal)),
+            array(
+        'price' => json_encode(array($optionKey, $priceVal)),
               'size' => '4',
             )
           ),
@@ -317,7 +319,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
       case 'Radio':
         $choice = array();
 
-        if (property_exists($qf, '_quickConfig') && $qf->_quickConfig && property_exists($qf,'_contributionAmount') && $qf->_contributionAmount) {
+        if (property_exists($qf, '_quickConfig') && $qf->_quickConfig && property_exists($qf, '_contributionAmount') && $qf->_contributionAmount) {
           $qf->assign('contriPriceset', $elementName);
         }
 
@@ -329,17 +331,19 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
           $count     = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
           $priceVal  = implode($seperator, array($opt[$valueFieldName], $count, $max_value));
-          $extra = array('price' => json_encode(array($elementName, $priceVal)),
+          $extra = array(
+          'price' => json_encode(array($elementName, $priceVal)),
                          'data-amount' => $opt[$valueFieldName],
                          'data-currency' => $currencyName,
                          );
           if (property_exists($qf, '_quickConfig') && $qf->_quickConfig && $field->name == 'contribution_amount') {
             $extra += array('onclick' => 'clearAmountOther();');
           } elseif (property_exists($qf, '_quickConfig') && $qf->_quickConfig && $field->name == 'membership_amount') {
-            $extra += array('onclick' => "return showHideAutoRenew({$opt['membership_type_id']});",
+            $extra += array(
+            'onclick' => "return showHideAutoRenew({$opt['membership_type_id']});",
                             'membership-type' => $opt['membership_type_id'],
                             );
-            $qf->assign('membershipFieldID',$field->id);
+            $qf->assign('membershipFieldID', $field->id);
           }
           $choice[$opId] = $qf->createElement('radio', NULL, '', $opt['label'], $opt['id'], $extra);
 
@@ -429,7 +433,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
             $opt['label'] .= CRM_Utils_Money::format($opt[$valueFieldName]);
           }
           $check[$opId] = &$qf->createElement('checkbox', $opt['id'], NULL, $opt['label'],
-            array('price' => json_encode(array($opt['id'], $priceVal)),
+            array(
+          'price' => json_encode(array($opt['id'], $priceVal)),
               'data-amount' => $opt[$valueFieldName],
               'data-currency' => $currencyName,
             )

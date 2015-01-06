@@ -51,7 +51,8 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     $breadCrumbUrl = CRM_Utils_System::url('civicrm/admin/options/wordreplacements',
       "reset=1"
     );
-    $breadCrumb = array(array('title' => ts('Word Replacements'),
+    $breadCrumb = array(array(
+    'title' => ts('Word Replacements'),
         'url' => $breadCrumbUrl,
       ));
     CRM_Utils_System::appendBreadCrumb($breadCrumb);

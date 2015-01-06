@@ -56,13 +56,13 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * @return object
    * @static
    */
-   public static function &singleton($mode, &$paymentProcessor) {
+  public static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
     if (self::$_singleton[$processorName] === NULL) {
       self::$_singleton[$processorName] = new CRM_Core_Payment_PayflowPro($mode, $paymentProcessor);
     }
     return self::$_singleton[$processorName];
-   }
+  }
 
   /*
    * This function  sends request and receives response from
@@ -196,8 +196,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
 
         case '2 weeks':
           $params['next_sched_contribution_date'] = mktime(0, 0, 0, date("m"), date("d") + 14, date("Y"));
-          $params['end_date'] = mktime(0, 0, 0, date("m"), date("d") + (14 * $payflow_query_array['TERM'])
-            , date("Y ")
+          $params['end_date'] = mktime(0, 0, 0, date("m"), date("d") + (14 * $payflow_query_array['TERM']), date("Y ")
           );
           $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution_date']);
           $payflow_query_array['PAYPERIOD'] = "BIWK";
@@ -208,8 +207,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
         case '4 weeks':
           $params['next_sched_contribution_date'] = mktime(0, 0, 0, date("m"), date("d") + 28, date("Y")
           );
-          $params['end_date'] = mktime(0, 0, 0, date("m"), date("d") + (28 * $payflow_query_array['TERM'])
-            , date("Y")
+          $params['end_date'] = mktime(0, 0, 0, date("m"), date("d") + (28 * $payflow_query_array['TERM']), date("Y")
           );
           $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution_date']);
           $payflow_query_array['PAYPERIOD'] = "FRWK";
@@ -232,8 +230,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
           break;
 
         case '3 months':
-          $params['next_sched_contribution_date'] = mktime(0, 0, 0, date("m") + 3, date("d")
-            , date("Y")
+          $params['next_sched_contribution_date'] = mktime(0, 0, 0, date("m") + 3, date("d"), date("Y")
           );
           $params['end_date'] = mktime(0, 0, 0, date("m") +
             (3 * $payflow_query_array['TERM']),
@@ -253,8 +250,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
             (6 * $payflow_query_array['TERM']),
             date("d"), date("Y")
           );
-          $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution_date'
-            ]
+          $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution_date']
           );
           $payflow_query_array['PAYPERIOD'] = "SMYR";
           $params['frequency_unit'] = "month";
@@ -583,12 +579,14 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
       $errorDesc = curl_error($ch);
 
       //Paranoia - in the unlikley event that 'curl' errno fails
-      if ($errorNum == 0)
-      $errorNum = 9005;
+      if ($errorNum == 0) {
+        $errorNum = 9005;
+      }
 
       // Paranoia - in the unlikley event that 'curl' error fails
-      if (strlen($errorDesc) == 0)
-      $errorDesc = "Connection to payment gateway failed";
+      if (strlen($errorDesc) == 0) {
+        $errorDesc = "Connection to payment gateway failed";
+      }
       if ($errorNum = 60) {
         return self::errorExit($errorNum, "Curl error - " . $errorDesc .
           " Try this link for more information http://curl.haxx.se/d
@@ -653,7 +651,6 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     }
     //$recurringProfileID = "RT0000000001";
     //     c  $trythis =        $this->getRecurringTransactionStatus($recurringProfileID,17);
-
 
     /*
      *Create the array of variables to be sent to the processor from the $params array

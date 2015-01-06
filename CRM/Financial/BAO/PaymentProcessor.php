@@ -102,7 +102,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-     * @return CRM_Financial_DAO_PaymentProcessor object on success, null otherwise
+   * @return CRM_Financial_DAO_PaymentProcessor object on success, null otherwise
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -226,7 +226,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       CRM_Core_Error::fatal(ts('Invalid value passed to getPayment function'));
     }
 
-    $payments = array( );
+    $payments = array();
     foreach ($paymentProcessorIDs as $paymentProcessorID) {
       $payment = self::getPayment($paymentProcessorID, $mode);
       $payments[$payment['id']] = $payment;
@@ -243,14 +243,14 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param array_type $processor2
    * @return number
    */
-    public static function defaultComparison($processor1, $processor2){
-      $p1 = CRM_Utils_Array::value('is_default', $processor1);
-      $p2 = CRM_Utils_Array::value('is_default', $processor2);
-      if ($p1 == $p2) {
-        return 0;
-      }
-      return ($p1 > $p2) ? -1 : 1;
+  public static function defaultComparison($processor1, $processor2){
+    $p1 = CRM_Utils_Array::value('is_default', $processor1);
+    $p2 = CRM_Utils_Array::value('is_default', $processor2);
+    if ($p1 == $p2) {
+      return 0;
     }
+    return ($p1 > $p2) ? -1 : 1;
+  }
 
   /**
    * Build payment processor details
@@ -294,10 +294,10 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     /**
      * $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . ($isExcludeTest ? 'test' : 'all');
     if (!$reset) {
-      $processors = CRM_Utils_Cache::singleton()->get($cacheKey);
-      if (!empty($processors)) {
-        return $processors;
-      }
+    $processors = CRM_Utils_Cache::singleton()->get($cacheKey);
+    if (!empty($processors)) {
+    return $processors;
+    }
     }
      * */
     $retrievalParameters = array('is_active' => TRUE, 'options' => array('sort' => 'is_default DESC, name'), 'api.payment_processor_type.getsingle' => 1);

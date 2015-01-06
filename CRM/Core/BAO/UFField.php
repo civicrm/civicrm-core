@@ -454,7 +454,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * Find out whether given profile group uses $required
    * and/or $optional profile types
    *
-   * @param integer $ufGroupId
+   * @param int $ufGroupIdProfile id.
    *   Profile id.
    * @param array $required
    *   Array of types those are required.
@@ -607,7 +607,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * TODO Why is this function in this class? It seems to be about the UFGroup.
    */
-  public static function calculateProfileType($ufGroupType, $returnMixType = TRUE, $onlyPure = FALSE, $skipComponentType= FALSE) {
+  public static function calculateProfileType($ufGroupType, $returnMixType = TRUE, $onlyPure = FALSE, $skipComponentType = FALSE) {
     // profile types
     $contactTypes = array('Contact', 'Individual', 'Household', 'Organization');
     $subTypes = CRM_Contact_BAO_ContactType::subTypes();
@@ -808,7 +808,10 @@ SELECT  id
     list($prefixName, $index) = CRM_Utils_System::explode('-', $key, 2);
 
     $profileFields = civicrm_api3('uf_field', 'get', array_merge($profileFilter,
-      array('is_active' => 1, 'return' => 'field_name, is_required', 'options' => array(
+      array(
+    'is_active' => 1,
+    'return' => 'field_name, is_required',
+    'options' => array(
         'limit' => 0,
       ))
     ));
@@ -824,7 +827,7 @@ SELECT  id
       'postal_code',
       'country'
     );
-    $requiredBillingFields = array_diff($validBillingFields, array('middle_name','supplemental_address_1'));
+    $requiredBillingFields = array_diff($validBillingFields, array('middle_name', 'supplemental_address_1'));
     $validProfileFields = array();
     $requiredProfileFields = array();
 

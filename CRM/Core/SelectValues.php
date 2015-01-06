@@ -96,7 +96,7 @@ class CRM_Core_SelectValues {
    * Membership type unit
    * @static
    */
-  public static function membershipTypeUnitList( ) {
+  public static function membershipTypeUnitList() {
     return self::unitList('duration');
   }
 
@@ -357,7 +357,8 @@ class CRM_Core_SelectValues {
    * return array
    */
   public static function mailingComponents() {
-    return array('Header' => ts('Header'),
+    return array(
+    'Header' => ts('Header'),
       'Footer' => ts('Footer'),
       'Reply' => ts('Reply Auto-responder'),
       'OptOut' => ts('Opt-out Message'),
@@ -567,7 +568,8 @@ class CRM_Core_SelectValues {
   public static function contactTokens() {
     static $tokens = NULL;
     if (!$tokens) {
-      $additionalFields = array('checksum' => array('title' => ts('Checksum')),
+      $additionalFields = array(
+      'checksum' => array('title' => ts('Checksum')),
         'contact_id' => array('title' => ts('Internal Contact ID')),
       );
       $exportFields = array_merge(CRM_Contact_BAO_Contact::exportableFields(), $additionalFields);
@@ -698,7 +700,6 @@ class CRM_Core_SelectValues {
          gives proper result
         */
 
-
     return $dateInputFormats;
   }
 
@@ -745,7 +746,7 @@ class CRM_Core_SelectValues {
   public static function getNumericOptions($start = 0, $end = 10) {
     $numericOptions = array();
     for ($i = $start; $i <= $end; $i++) {
-        $numericOptions[$i] = $i;
+      $numericOptions[$i] = $i;
     }
     return $numericOptions;
   }
@@ -810,7 +811,7 @@ class CRM_Core_SelectValues {
    * Extension types
    */
   public static function getExtensionTypes() {
-    return  array(
+    return array(
       'payment' => ts('Payment'),
       'search' => ts('Search'),
       'report' => ts('Report'),

@@ -198,7 +198,7 @@ class CRM_Member_Import_Field {
       if (!array_key_exists($customFieldID, $customFields)) {
         return FALSE;
       }
-            return CRM_Core_BAO_CustomValue::typecheck($customFields[$customFieldID]['data_type'], $this->_value);
+      return CRM_Core_BAO_CustomValue::typecheck($customFields[$customFieldID]['data_type'], $this->_value);
     }
 
     return TRUE;

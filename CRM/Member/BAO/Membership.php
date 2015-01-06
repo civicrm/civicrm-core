@@ -444,7 +444,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @param int $contactId
    *   Contact id.
    *
-   * @param integer $action
+   * @param int $action
    *
    * @return Array    array of contact_id of all related contacts.
    * @static
@@ -624,8 +624,8 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
 
     $params = array();
-    $deleteActivity = false;
-    $membershipActivities =  array(
+    $deleteActivity = FALSE;
+    $membershipActivities = array(
       'Membership Signup',
       'Membership Renewal',
       'Change Membership Status',
@@ -636,7 +636,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
       $activityId = array_search($membershipActivity, $activityTypes);
       if ($activityId) {
         $params['activity_type_id'][] = $activityId;
-        $deleteActivity = true;
+        $deleteActivity = TRUE;
       }
     }
     if ($deleteActivity) {
@@ -825,14 +825,14 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
             if (is_array($form->_paymentProcessors)){
               foreach ($form->_paymentProcessors as $id => $val) {
                 if (!$val['is_recur']) {
-              $allowAutoRenewOpt = 0;
+                  $allowAutoRenewOpt = 0;
                   continue;
-            }
+                }
               }
             }
 
             $javascriptMethod = array('onclick' => "return showHideAutoRenew( this.value );");
-            $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = (int)$allowAutoRenewOpt * CRM_Utils_Array::value($value, CRM_Utils_Array::value('auto_renew', $form->_membershipBlock));;
+            $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = (int) $allowAutoRenewOpt * CRM_Utils_Array::value($value, CRM_Utils_Array::value('auto_renew', $form->_membershipBlock));;
 
             if ($allowAutoRenewOpt) {
               $allowAutoRenewMembership = TRUE;
@@ -1013,7 +1013,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
         )
       );
     }
-    $dao->whereAdd('status_id NOT IN ( ' . implode(',',  $statusIds) . ')');
+    $dao->whereAdd('status_id NOT IN ( ' . implode(',', $statusIds) . ')');
 
     // order by start date to find most recent membership first, CRM-4545
     $dao->orderBy('start_date DESC');
@@ -1143,7 +1143,8 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     $fields           = array_merge($expFieldMembership, $expFieldsMemType);
     $fields           = array_merge($fields, $expFieldMembership);
     $membershipStatus = array(
-      'membership_status' => array('title' => 'Membership Status',
+      'membership_status' => array(
+    'title' => 'Membership Status',
         'name' => 'membership_status',
         'type' => CRM_Utils_Type::T_STRING,
         'where' => 'civicrm_membership_status.name',
@@ -1208,7 +1209,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     );
 
     $memberCount = CRM_Core_DAO::singleValueQuery($query, $params);
-    return (int)$memberCount;
+    return (int) $memberCount;
   }
 
   /**
@@ -1241,7 +1242,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       CRM_Core_Error::fatal(ts('Invalid date "%1" (must have form yyyy-mm-dd).', array(1 => $date)));
     }
 
-    $params = array(1 => array($membershipTypeId, 'Integer'),
+    $params = array(
+    1 => array($membershipTypeId, 'Integer'),
       2 => array($isTest, 'Boolean'),
     );
     $query = "SELECT  count(civicrm_membership.id ) as member_count
@@ -1258,7 +1260,7 @@ AND civicrm_membership.is_test = %2";
     // LCD
     $query .= ($isOwner) ? ' AND owner_membership_id IS NULL' : '';
     $memberCount = CRM_Core_DAO::singleValueQuery($query, $params);
-    return (int)$memberCount;
+    return (int) $memberCount;
   }
 
   /**
@@ -1319,7 +1321,6 @@ AND civicrm_membership.is_test = %2";
     else {
       $financialTypeID = $defaultContributionTypeID;
     }
-
 
     if (CRM_Utils_Array::value('membership_source', $form->_params)) {
       $membershipParams['contribution_source'] = $form->_params['membership_source'];
@@ -1509,7 +1510,7 @@ AND civicrm_membership.is_test = %2";
    * @param null $customFieldsFormatted
    * @param int $numRenewTerms
    *   How many membership terms are being added to end date (default is 1).
-   * @param integer $membershipID
+   * @param int $membershipIDMembership ID, this should always be passed in & optionality should be removed.
    *   Membership ID, this should always be passed in & optionality should be removed.
    *
    * @throws CRM_Core_Exception
@@ -1665,7 +1666,7 @@ SELECT c.contribution_page_id as pageID
  WHERE mp.contribution_id = c.id
    AND c.contribution_page_id IS NOT NULL
    AND mp.membership_id = " . CRM_Utils_Type::escape($membershipID, 'Integer')
-   . " ORDER BY mp.id DESC";
+    . " ORDER BY mp.id DESC";
 
     return CRM_Core_DAO::singleValueQuery($query,
       CRM_Core_DAO::$_nullArray
@@ -1870,8 +1871,8 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         elseif ((CRM_Utils_Array::value('action', $params) & CRM_Core_Action::UPDATE) &&
           ($relationshipStatus == CRM_Contact_BAO_Relationship::PAST)
         ) {
-            $params['status_id'] = $expiredStatusId;
-          }
+          $params['status_id'] = $expiredStatusId;
+        }
 
         //don't calculate status again in create( );
         $params['skipStatusCal'] = TRUE;
@@ -1892,12 +1893,12 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
           // related membership already exists, so this is just an update
           if (isset($params['id'])) {
             if ($available > 0) {
-        CRM_Member_BAO_Membership::create($params, $relMemIds);
+              CRM_Member_BAO_Membership::create($params, $relMemIds);
               $available --;
             } else { // we have run out of inherited memberships, so delete extras
               self::deleteMembership($params['id']);
             }
-          // we need to first check if there will remain inherited memberships, so queue it up
+            // we need to first check if there will remain inherited memberships, so queue it up
           } else {
             $queue[] = $params;
           }
@@ -1964,7 +1965,7 @@ FROM   civicrm_membership_type
     $membershipTypeValues = array();
     $membershipTypeFields = array(
       'id', 'minimum_fee', 'name', 'is_active',
-      'description', 'financial_type_id', 'auto_renew','member_of_contact_id',
+      'description', 'financial_type_id', 'auto_renew', 'member_of_contact_id',
       'relationship_type_id', 'relationship_direction', 'max_related',
     );
 
@@ -2118,7 +2119,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
 
     $memberCount = CRM_Core_DAO::singleValueQuery($query, $params);
 
-    return (int)$memberCount;
+    return (int) $memberCount;
   }
 
   /**
@@ -2169,7 +2170,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     );
     $memberCount = CRM_Core_DAO::singleValueQuery($query, $params);
 
-    return (int)$memberCount;
+    return (int) $memberCount;
   }
 
   /**
@@ -2276,7 +2277,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @return array
    */
-  public static function createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution,  &$form) {
+  public static function createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution, &$form) {
     $membership = self::renewMembershipFormWrapper($contactID, $memType,
       $isTest, $form, NULL,
       CRM_Utils_Array::value('cms_contactID', $membershipParams),
@@ -2370,24 +2371,24 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   }
 
   /**
-   * @param integer $contactID
+   * @param int $contactID
    * @param int $membershipTypeID
    * @param bool $is_test
    * @param $changeToday
-   * @param integer $modifiedID
+   * @param int $modifiedID
    * @param $customFieldsFormatted
    * @param $numRenewTerms
    * @param int $membershipID
    * @param $pending
    * @param $allStatus
    * @param array $membershipTypeDetails
-   * @param integer $contributionRecurID
+   * @param int $contributionRecurID
    * @param $format
    * @param $membershipSource
    * @param $ids
    * @param $statusFormat
    * @param $isPayLater
-   * @param integer $campaignId
+   * @param int $campaignId
    *
    * @throws CRM_Core_Exception
    * @return array
@@ -2669,14 +2670,14 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   }
 
   /**
-     * The function checks and updates the status of all membership records for a given domain using the
-     * calc_membership_status and update_contact_membership APIs.
-     *
-     * IMPORTANT:
-     * Sending renewal reminders has been migrated from this job to the Scheduled Reminders function as of 4.3.
-     *
+   * The function checks and updates the status of all membership records for a given domain using the
+   * calc_membership_status and update_contact_membership APIs.
+   *
+   * IMPORTANT:
+   * Sending renewal reminders has been migrated from this job to the Scheduled Reminders function as of 4.3.
+   *
    * @return array $result
-     */
+   */
   public static function updateAllMembershipStatus() {
 
     //get all active statuses of membership, CRM-3984
@@ -2792,7 +2793,9 @@ WHERE      civicrm_membership.is_test = 0";
         //get the membership status as per id.
         $newStatus = civicrm_api('membership_status', 'calc',
           array(
-            'membership_id' => $dao->membership_id, 'version' => 3, 'ignore_admin_only'=> FALSE), TRUE
+            'membership_id' => $dao->membership_id,
+        'version' => 3,
+        'ignore_admin_only' => FALSE), TRUE
         );
         $statusId = CRM_Utils_Array::value('id', $newStatus);
 
@@ -2885,7 +2888,7 @@ WHERE      civicrm_membership.is_test = 0";
    * @return CRM_Contribute_BAO_Contribution
    * @static
    */
-  public static function recordMembershipContribution( &$params, $ids = array()) {
+  public static function recordMembershipContribution(&$params, $ids = array()) {
     $membershipId = $params['membership_id'];
     $contributionParams = array();
     $config = CRM_Core_Config::singleton();
@@ -2933,16 +2936,15 @@ WHERE      civicrm_membership.is_test = 0";
         }
       }
       else {
-       $contributionSoftParams['contribution_id'] = $contribution->id;
-       $contributionSoftParams['currency'] = $contribution->currency;
-       $contributionSoftParams['amount'] = $contribution->total_amount;
-       CRM_Contribute_BAO_ContributionSoft::add($contributionSoftParams);
+        $contributionSoftParams['contribution_id'] = $contribution->id;
+        $contributionSoftParams['currency'] = $contribution->currency;
+        $contributionSoftParams['amount'] = $contribution->total_amount;
+        CRM_Contribute_BAO_ContributionSoft::add($contributionSoftParams);
       }
     }
 
     // store contribution id
     $params['contribution_id'] = $contribution->id;
-
 
     //insert payment record for this membership
     if (empty($ids['contribution']) || !empty($params['is_recur'])) {

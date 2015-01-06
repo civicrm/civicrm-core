@@ -433,7 +433,7 @@ class CRM_Core_Permission {
    *
    * @param string $module
    *   Component name.
-   * @param integer $action
+   * @param int $actionAction to be check across component.
    *   Action to be check across component.
    *
    *

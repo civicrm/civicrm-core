@@ -151,7 +151,6 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
       throw new CRM_Core_Exception(ts('Invalid relationship type'));
     }
 
-
     //check dependencies
 
     // delete all relationships

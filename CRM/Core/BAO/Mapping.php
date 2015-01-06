@@ -377,7 +377,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       if (array_key_exists('note', $fields['Contact'])) {
         $noteTitle = $fields['Contact']['note']['title'];
         $fields['Contact']['note']['title'] = $noteTitle . ': ' . ts('Body and Subject');
-        $fields['Contact']['note_body']    = array( 'title' => $noteTitle . ': ' . ts('Body Only'),    'name' => 'note_body' );
+        $fields['Contact']['note_body']    = array( 'title' => $noteTitle . ': ' . ts('Body Only'), 'name' => 'note_body' );
         $fields['Contact']['note_subject'] = array( 'title' => $noteTitle . ': ' . ts('Subject Only'), 'name' => 'note_subject' );
       }
     }
@@ -605,11 +605,11 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
               if ($relationshipType->find(TRUE)) {
                 $direction = "contact_sub_type_$second";
                 if (isset($relationshipType->$direction)) {
-                  $relatedFields = array_merge((array)$relatedMapperFields[$relationshipType->$direction], (array)$relationshipCustomFields);
+                  $relatedFields = array_merge((array) $relatedMapperFields[$relationshipType->$direction], (array) $relationshipCustomFields);
                 }
                 else {
                   $target_type = 'contact_type_' . $second;
-                  $relatedFields = array_merge((array)$relatedMapperFields[$relationshipType->$target_type], (array)$relationshipCustomFields);
+                  $relatedFields = array_merge((array) $relatedMapperFields[$relationshipType->$target_type], (array) $relationshipCustomFields);
                 }
               }
               $relationshipType->free();
@@ -1037,10 +1037,10 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           }
 
           // CRM-14983: verify if values are comma separated convert to array
-          if (!is_array($value) && (strpos($value,',') !== false || strstr($value, '(')) && empty($isCustomField) && $params['operator'][$key][$k] == 'IN') {
+          if (!is_array($value) && (strpos($value, ',') !== FALSE || strstr($value, '(')) && empty($isCustomField) && $params['operator'][$key][$k] == 'IN') {
             preg_match('#\((.*?)\)#', $value, $match);
             $tmpArray = explode(',', $match[1]);
-            $value = array_combine(array_values($tmpArray),array_values($tmpArray));
+            $value = array_combine(array_values($tmpArray), array_values($tmpArray));
           }
 
           if ($row) {
@@ -1084,7 +1084,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
         0,
       );
     }
-
 
     return $fields;
   }

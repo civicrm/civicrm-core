@@ -48,7 +48,7 @@ class CRM_Core_Exception extends PEAR_Exception {
    * @param array $errorData
    * @param null $previous
    */
-  public function __construct($message, $error_code = 0, $errorData = array(), $previous = null) {
+  public function __construct($message, $error_code = 0, $errorData = array(), $previous = NULL) {
     parent::__construct(ts($message));
     $this->errorData = $errorData + array('error_code' => $error_code);
   }

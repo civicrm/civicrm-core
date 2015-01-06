@@ -60,14 +60,14 @@ class CRM_Activity_Form_Task_Email extends CRM_Activity_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   */ function preProcess() {
-    CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
-    parent::preProcess();
+  function preProcess() {
+  CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
+  parent::preProcess();
 
-    // we have all the contribution ids, so now we get the contact ids
-    parent::setContactIDs();
+  // we have all the contribution ids, so now we get the contact ids
+  parent::setContactIDs();
 
-    $this->assign('single', $this->_single);
+  $this->assign('single', $this->_single);
   }
 
   /**

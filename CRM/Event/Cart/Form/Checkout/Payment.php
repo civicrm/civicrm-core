@@ -338,8 +338,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       'isTest' => FALSE,
       'toEmail' => $contact_details[1],
       'toName' => $contact_details[0],
-      'tplParams' => array
-      (
+      'tplParams' => array(
         'billing_name' => "{$params['billing_first_name']} {$params['billing_last_name']}",
         'billing_city' => $params["billing_city-{$this->_bltID}"],
         'billing_country' => $country->name,

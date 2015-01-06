@@ -55,7 +55,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
     ),
     'stationery' => array(
       'name' => 'stationery',
-      'type' =>CRM_Utils_Type::T_STRING,
+      'type' => CRM_Utils_Type::T_STRING,
       'default' => '',
     ),
     'orientation' => array(
@@ -274,7 +274,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
     if (array_key_exists($field, self::$optionValueFields)) {
       switch (self::$optionValueFields[$field]['type']) {
         case CRM_Utils_Type::T_INT:
-          return (int)CRM_Utils_Array::value($field, $values, $default);
+          return (int) CRM_Utils_Array::value($field, $values, $default);
 
         case CRM_Utils_Type::T_FLOAT:
           // Round float values to three decimal places and trim trailing zeros.
@@ -282,7 +282,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
           $f = sprintf('%05.3f', $values[$field]);
           $f = rtrim($f, '0');
           $f = rtrim($f, '.');
-          return (float)(empty($f) ? '0' : $f);
+          return (float) (empty($f) ? '0' : $f);
       }
       return CRM_Utils_Array::value($field, $values, $default);
     }

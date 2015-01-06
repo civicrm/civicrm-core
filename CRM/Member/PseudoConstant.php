@@ -131,8 +131,8 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
    *   Pseudoconstant to be flushed.
    */
   public static function flush($name = 'cache') {
-   if (isset(self::$$name)) {
+    if (isset(self::$$name)) {
       self::$$name = NULL;
-    }
+   }
   }
 }

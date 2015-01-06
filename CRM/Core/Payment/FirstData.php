@@ -193,7 +193,6 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     $port = "1129";
     $host = $this->_paymentProcessor['url_site'] . ":" . $port . "/LSGSXML";
 
-
     //----------------------------------------------------------------------------------------------------
     // Check to see if we have a duplicate before we send
     //----------------------------------------------------------------------------------------------------
@@ -205,19 +204,15 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     //----------------------------------------------------------------------------------------------------
     $requestxml = lphp::buildXML($requestFields);
 
-
-
     /*----------------------------------------------------------------------------------------------------
          // Send to the payment information using cURL
          /----------------------------------------------------------------------------------------------------
         */
 
-
     $ch = curl_init($host);
     if (!$ch) {
       return self::errorExit(9004, 'Could not initiate connection to payment gateway');
     }
-
 
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $requestxml);
@@ -247,12 +242,14 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
       $errorDesc = curl_error($ch);
 
       // Paranoia - in the unlikley event that 'curl' errno fails
-      if ($errorNum == 0)
-      $errorNum = 9005;
+      if ($errorNum == 0) {
+        $errorNum = 9005;
+      }
 
       // Paranoia - in the unlikley event that 'curl' error fails
-      if (strlen($errorDesc) == 0)
-      $errorDesc = "Connection to payment gateway failed";
+      if (strlen($errorDesc) == 0) {
+        $errorDesc = "Connection to payment gateway failed";
+      }
       if ($errorNum == 60) {
         return self::errorExit($errorNum, "Curl error - " . $errorDesc . " Try this link for more information http://curl.haxx.se/docs/sslcerts.html");
       }

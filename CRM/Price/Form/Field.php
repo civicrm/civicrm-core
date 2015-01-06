@@ -149,7 +149,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     }
     $enabledComponents = CRM_Core_Component::getEnabledComponents();
     $eventComponentId = NULL;
-    if (array_key_exists('CiviEvent',$enabledComponents)) {
+    if (array_key_exists('CiviEvent', $enabledComponents)) {
       $eventComponentId  = CRM_Core_Component::getComponentID('CiviEvent');
     }
 
@@ -196,10 +196,10 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     }
     $enabledComponents = CRM_Core_Component::getEnabledComponents();
     $eventComponentId = $memberComponentId = NULL;
-    if (array_key_exists('CiviEvent',$enabledComponents)) {
+    if (array_key_exists('CiviEvent', $enabledComponents)) {
       $eventComponentId  = CRM_Core_Component::getComponentID('CiviEvent');
     }
-    if (array_key_exists('CiviMember',$enabledComponents)) {
+    if (array_key_exists('CiviMember', $enabledComponents)) {
       $memberComponentId = CRM_Core_Component::getComponentID('CiviMember');
     }
 
@@ -207,7 +207,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
     $this->add('select', 'financial_type_id',
       ts('Financial Type'),
-      array(' '=> ts('- select -')) + $financialType
+      array(' ' => ts('- select -')) + $financialType
     );
 
     $this->assign('useForMember', FALSE);
@@ -533,21 +533,21 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         if (!empty($memTypesIDS)) {
           // check for checkboxes allowing user to select multiple memberships from same membership organization
           if ($fields['html_type'] == 'CheckBox') {
-          $foundDuplicate = FALSE;
-          $orgIds = array();
-          foreach ($memTypesIDS as $key => $val) {
-            $org = CRM_Member_BAO_MembershipType::getMembershipTypeOrganization($val);
-            if (in_array($org[$val], $orgIds)) {
-              $foundDuplicate = TRUE;
-              break;
-            }
-            $orgIds[$val] = $org[$val];
+            $foundDuplicate = FALSE;
+            $orgIds = array();
+            foreach ($memTypesIDS as $key => $val) {
+              $org = CRM_Member_BAO_MembershipType::getMembershipTypeOrganization($val);
+              if (in_array($org[$val], $orgIds)) {
+                $foundDuplicate = TRUE;
+                break;
+              }
+              $orgIds[$val] = $org[$val];
 
+            }
+            if ($foundDuplicate) {
+              $errors['_qf_default'] = ts('You have selected multiple memberships for the same organization or entity. Please review your selections and choose only one membership per entity.');
+            }
           }
-          if ($foundDuplicate) {
-            $errors['_qf_default'] = ts('You have selected multiple memberships for the same organization or entity. Please review your selections and choose only one membership per entity.');
-          }
-        }
 
           // CRM-10390 - Only one price field in a set can include auto-renew membership options
           $foundAutorenew = FALSE;
@@ -614,7 +614,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     $params['is_display_amounts'] = CRM_Utils_Array::value('is_display_amounts', $params, FALSE);
     $params['is_required'] = CRM_Utils_Array::value('is_required', $params, FALSE);
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $params['financial_type_id']  = CRM_Utils_Array::value('financial_type_id', $params, false);
+    $params['financial_type_id']  = CRM_Utils_Array::value('financial_type_id', $params, FALSE);
     if (isset($params['active_on'])) {
       $params['active_on'] = CRM_Utils_Date::processDate($params['active_on'],
         CRM_Utils_Array::value('active_on_time', $params),

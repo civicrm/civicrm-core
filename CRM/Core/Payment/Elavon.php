@@ -116,7 +116,6 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     $requestFields['ssl_customer_code'] = '1111';
     $requestFields['ssl_salestax'] = 0.0;
 
-
     /************************************************************************************
      *  Fields available from civiCRM not implemented for Elavon
      *
@@ -220,12 +219,14 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
       $errorDesc = curl_error($ch);
 
       // Paranoia - in the unlikley event that 'curl' errno fails
-      if ($errorNum == 0)
-      $errorNum = 9005;
+      if ($errorNum == 0) {
+        $errorNum = 9005;
+      }
 
       // Paranoia - in the unlikley event that 'curl' error fails
-      if (strlen($errorDesc) == 0)
-      $errorDesc = "Connection to payment gateway failed";
+      if (strlen($errorDesc) == 0) {
+        $errorDesc = "Connection to payment gateway failed";
+      }
       if ($errorNum = 60) {
         return self::errorExit($errorNum, "Curl error - " . $errorDesc . " Try this link for more information http://curl.haxx.se/docs/sslcerts.html");
       }
@@ -266,7 +267,6 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
          * test mode always returns trxn_id = 0
          * fix for CRM-2566
          **********************************************************/
-
 
     if ($processorResponse['errorCode']) {
       return self::errorExit(9010, "Error: [" . $processorResponse['errorCode'] . " " . $processorResponse['errorName'] . " " . $processorResponse['errorMessage'] . "] - from payment processor");

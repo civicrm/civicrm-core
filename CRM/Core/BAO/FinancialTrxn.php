@@ -58,7 +58,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @return CRM_Core_BAO_FinancialTrxn object
    * @static
    */
-  public static function create(&$params, $trxnEntityTable = null ) {
+  public static function create(&$params, $trxnEntityTable = NULL) {
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->copyValues($params);
     $fids = array();
@@ -83,7 +83,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
       $entityFinancialTrxnParams['entity_id']    = $trxnEntityTable['entity_id'];
     }
     else {
-      $entityFinancialTrxnParams['entity_id'] =  $params['contribution_id'];
+      $entityFinancialTrxnParams['entity_id'] = $params['contribution_id'];
     }
 
     $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
@@ -130,14 +130,14 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @return CRM_Contribute_BAO_ContributionType object
    * @static
    */
-  public static function retrieve( &$params, &$defaults ) {
+  public static function retrieve(&$params, &$defaults) {
     $financialItem = new CRM_Financial_DAO_FinancialTrxn( );
     $financialItem->copyValues($params);
-    if ($financialItem->find(true)) {
+    if ($financialItem->find(TRUE)) {
       CRM_Core_DAO::storeValues( $financialItem, $defaults );
       return $financialItem;
     }
-    return null;
+    return NULL;
   }
 
   /**
@@ -205,7 +205,7 @@ WHERE ft.entity_table = 'civicrm_contribution' AND ft.entity_id = %1
         ";
 
     $sqlParams = array(1 => array($entity_id, 'Integer'));
-    return  CRM_Core_DAO::singleValueQuery($query, $sqlParams);
+    return CRM_Core_DAO::singleValueQuery($query, $sqlParams);
 
   }
 
@@ -280,7 +280,7 @@ LEFT JOIN civicrm_line_item AS lt ON lt.id = fi.entity_id AND lt.entity_table = 
 WHERE lt.entity_id = %1 ";
 
     $sqlParams = array(1 => array($entity_id, 'Integer'), 2 => array($entity_table, 'String'));
-    $dao =  CRM_Core_DAO::executeQuery($query, $sqlParams);
+    $dao = CRM_Core_DAO::executeQuery($query, $sqlParams);
     while($dao->fetch()){
       $result[$dao->financial_trxn_id][$dao->id] = $dao->amount;
     }
@@ -288,7 +288,7 @@ WHERE lt.entity_id = %1 ";
       return $result;
     }
     else {
-      return null;
+      return NULL;
     }
   }
 
@@ -327,7 +327,7 @@ WHERE ceft.entity_id = %1";
       $financialAccountType = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id']);
       $accountRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND label IN ('Premiums Inventory Account is', 'Cost of Sales Account is')");
       $toFinancialAccount = !empty($params['isDeleted']) ? 'Premiums Inventory Account is' : 'Cost of Sales Account is';
-      $fromFinancialAccount = !empty($params['isDeleted']) ? 'Cost of Sales Account is': 'Premiums Inventory Account is';
+      $fromFinancialAccount = !empty($params['isDeleted']) ? 'Cost of Sales Account is' : 'Premiums Inventory Account is';
       $accountRelationship = array_flip($accountRelationship);
       $financialtrxn = array(
         'to_financial_account_id' => $financialAccountType[$accountRelationship[$toFinancialAccount]],
@@ -392,7 +392,7 @@ WHERE ceft.entity_id = %1";
     $params['trxnParams']['total_amount'] = $amount;
     $params['trxnParams']['fee_amount'] =
       $params['trxnParams']['net_amount'] = 0;
-    $params['trxnParams']['status_id'] = CRM_Core_OptionGroup::getValue('contribution_status','Completed','name');
+    $params['trxnParams']['status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     $params['trxnParams']['contribution_id'] = $contributionId;
     $trxn = self::create($params['trxnParams']);
     if (empty($params['entity_id'])) {
@@ -407,7 +407,7 @@ WHERE ceft.entity_id = %1";
         'transaction_date' => date('YmdHis'),
         'amount' => $amount,
         'description' => 'Fee',
-        'status_id' => CRM_Core_OptionGroup::getValue('financial_item_status','Paid','name'),
+        'status_id' => CRM_Core_OptionGroup::getValue('financial_item_status', 'Paid', 'name'),
         'entity_table' => 'civicrm_financial_trxn',
         'entity_id' => $params['entity_id'],
         'currency' => $params['trxnParams']['currency'],

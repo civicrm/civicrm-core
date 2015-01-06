@@ -143,8 +143,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
       );
     }
 
-
-
     // action is taken depending upon the mode
     $membershipStatus = new CRM_Member_DAO_MembershipStatus();
     $membershipStatus->copyValues($params);
@@ -242,7 +240,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     $membershipDetails = array();
 
     if (!$statusDate || $statusDate == 'today') {
-      $statusDate = getDate();
+      $statusDate = getdate();
       $statusDate = date('Ymd',
         mktime($statusDate['hours'],
           $statusDate['minutes'],
@@ -309,7 +307,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
                     ${$dat . 'Month'} + $membershipStatus->{$eve . '_event_adjust_interval'},
                     ${$dat . 'Day'},
                     ${$dat . 'Year'}
-                  ));
+                ));
               }
               // add in days
               if ($membershipStatus->{$eve . '_event_adjust_unit'} == 'day') {
@@ -317,7 +315,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
                     ${$dat . 'Month'},
                     ${$dat . 'Day'} + $membershipStatus->{$eve . '_event_adjust_interval'},
                     ${$dat . 'Year'}
-                  ));
+                ));
               }
               // add in years
               if ($membershipStatus->{$eve . '_event_adjust_unit'} == 'year') {
@@ -325,7 +323,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
                     ${$dat . 'Month'},
                     ${$dat . 'Day'},
                     ${$dat . 'Year'} + $membershipStatus->{$eve . '_event_adjust_interval'}
-                  ));
+                ));
               }
               // if no interval and unit, present
             }

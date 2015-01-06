@@ -422,8 +422,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
       //replace retionship id by relationship name
       if (array_key_exists('civicrm_relationship_relationship_type_id', $row)) {
         if ($value = $row['civicrm_relationship_relationship_type_id']) {
-          $rows[$rowNum]['civicrm_relationship_relationship_type_id'] = $this->relationTypes[
-          $value . '_' . $type];
+          $rows[$rowNum]['civicrm_relationship_relationship_type_id'] = $this->relationTypes[$value . '_' . $type];
           $entryFound = TRUE;
         }
       }

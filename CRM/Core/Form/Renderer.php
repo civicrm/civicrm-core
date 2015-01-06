@@ -69,9 +69,9 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   /**
    * Constructor
    *
-   */ function __construct() {
-    $template = CRM_Core_Smarty::singleton();
-    parent::__construct($template);
+  function __construct() {
+  $template = CRM_Core_Smarty::singleton();
+  parent::__construct($template);
   }
 
   /**

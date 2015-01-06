@@ -150,8 +150,9 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
     $dao = new CRM_SMS_DAO_Provider();
     $dao->id = $this->_id;
 
-    if ($name)
+    if ($name) {
       $dao->name = $name;
+    }
 
     if (!$dao->find(TRUE)) {
       return $defaults;

@@ -121,6 +121,7 @@ class CRM_Report_Utils_Get {
       case 'nnll':
         $defaults["{$fieldName}_op"] = $fieldOP;
         break;
+
       case 'in':
       case 'notin':
       case 'mhas':

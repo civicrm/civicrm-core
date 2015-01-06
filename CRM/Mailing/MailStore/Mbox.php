@@ -78,7 +78,7 @@ class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
   /**
    * Fetch the specified message to the local ignore folder
    *
-   * @param integer $nr
+   * @param int $nrNumber of the message to fetch.
    *   Number of the message to fetch.
    *
    * @return void
@@ -96,7 +96,7 @@ class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
   /**
    * Fetch the specified message to the local processed folder
    *
-   * @param integer $nr
+   * @param int $nrNumber of the message to fetch.
    *   Number of the message to fetch.
    *
    * @return void

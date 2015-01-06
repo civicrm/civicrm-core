@@ -154,7 +154,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         "action=view&reset=1&id={$relationship->id}&cid={$relationship->contact_id_a}&context=home"
       );
 
-
       $session = CRM_Core_Session::singleton();
       $recentOther = array();
       if (($session->get('userID') == $relationship->contact_id_a) ||
@@ -193,7 +192,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   * @param integer $contactId
+   * @param int $contactIdThis is contact id for adding relationship.
    *   This is contact id for adding relationship.
    * @param array $ids
    *   The array that holds all the db ids.
@@ -210,7 +209,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       $hook = 'edit';
     }
     //@todo hook are called from create and add - remove one
-    CRM_Utils_Hook::pre($hook , 'Relationship', $relationshipId, $params);
+    CRM_Utils_Hook::pre($hook, 'Relationship', $relationshipId, $params);
 
     $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
 
@@ -438,12 +437,12 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         $sharedContact->id = $relationship->contact_id_a;
         $sharedContact->find(TRUE);
 
-          if ($relationship->relationship_type_id == 4 && $relationship->contact_id_b == $sharedContact->employer_id) {
+        if ($relationship->relationship_type_id == 4 && $relationship->contact_id_b == $sharedContact->employer_id) {
           CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($relationship->contact_id_a);
         }
       }
     }
-    return  $relationship;
+    return $relationship;
   }
 
   /**
@@ -632,7 +631,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *   This array contains the values there are subitted by the form.
    * @param array $ids
    *   The array that holds all the db ids.
-   * @param integer $contactId
+   * @param int $contactIdThis is contact id for adding relationship.
    *   This is contact id for adding relationship.
    *
    * @return string
@@ -660,11 +659,11 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   * @param integer $id
+   * @param int $idThis the id of the contact whom we are adding relationship.
    *   This the id of the contact whom we are adding relationship.
-   * @param integer $contactId
+   * @param int $contactIdThis is contact id for adding relationship.
    *   This is contact id for adding relationship.
-   * @param integer $relationshipId
+   * @param int $relationshipIdThis is relationship id for the contact.
    *   This is relationship id for the contact.
    *
    * @return boolean true if record exists else false
@@ -936,7 +935,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     }
     if(!empty($params['relationship_type_id'])) {
       if(is_array($params['relationship_type_id'])) {
-        $where .=  " AND " . CRM_Core_DAO::createSQLFilter('relationship_type_id', $params['relationship_type_id'], 'Integer');
+        $where .= " AND " . CRM_Core_DAO::createSQLFilter('relationship_type_id', $params['relationship_type_id'], 'Integer');
       }
       else {
         $where .= ' AND relationship_type_id = ' . CRM_Utils_Type::escape($params['relationship_type_id'], 'Positive');
@@ -979,9 +978,9 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    * @static
    */
   static function getRelationship($contactId = NULL,
-    $status              = 0, $numRelationship = 0,
-    $count               = 0, $relationshipId = 0,
-    $links               = NULL, $permissionMask = NULL,
+    $status = 0, $numRelationship = 0,
+    $count = 0, $relationshipId = 0,
+    $links = NULL, $permissionMask = NULL,
     $permissionedContact = FALSE,
     $params = array()
   ) {
@@ -1432,19 +1431,20 @@ SELECT count(*)
       return FALSE;
     }
 
-    $relParamas = array(1 => array($contactId, 'Integer'),
+    $relParamas = array(
+    1 => array($contactId, 'Integer'),
       2 => array($mainRelatedContactId, 'Integer'),
     );
 
     if ($contactId == $mainRelatedContactId) {
-      $recordsFound = (int)CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM civicrm_relationship WHERE relationship_type_id IN ( " . implode(',', $relTypeIds) . " )  AND contact_id_a IN ( %1 ) OR contact_id_b IN ( %1 ) AND id IN (" . implode(',', $relIds) . ")", $relParamas);
+      $recordsFound = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM civicrm_relationship WHERE relationship_type_id IN ( " . implode(',', $relTypeIds) . " )  AND contact_id_a IN ( %1 ) OR contact_id_b IN ( %1 ) AND id IN (" . implode(',', $relIds) . ")", $relParamas);
       if ($recordsFound) {
         return FALSE;
       }
       return TRUE;
     }
 
-    $recordsFound = (int)CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM civicrm_relationship WHERE relationship_type_id IN ( " . implode(',', $relTypeIds) . " ) AND contact_id_a IN ( %1, %2 ) AND contact_id_b IN ( %1, %2 ) AND id NOT IN (" . implode(',', $relIds) . ")", $relParamas);
+    $recordsFound = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM civicrm_relationship WHERE relationship_type_id IN ( " . implode(',', $relTypeIds) . " ) AND contact_id_a IN ( %1, %2 ) AND contact_id_b IN ( %1, %2 ) AND id NOT IN (" . implode(',', $relIds) . ")", $relParamas);
 
     if ($recordsFound) {
       return FALSE;
@@ -1504,20 +1504,20 @@ WHERE id IN ( {$contacts} )
   }
 
 
- /**
-  * Function to return list of permissioned contacts for a given contact and relationship type
-  *
-  * @param $contactID
-  *   Int contact id whose permissioned contacts are to be found.
-  * @param $relTypeId
-  *   String one or more relationship type id's.
-  * @param $name
-  *   String.
-  *
-  * @static
-  *
-  * @return array of contacts
-  */
+  /**
+   * Function to return list of permissioned contacts for a given contact and relationship type
+   *
+   * @param $contactID
+   *   Int contact id whose permissioned contacts are to be found.
+   * @param $relTypeId
+   *   String one or more relationship type id's.
+   * @param $name
+   *   String.
+   *
+   * @static
+   *
+   * @return array of contacts
+   */
   public static function getPermissionedContacts($contactID, $relTypeId, $name = NULL) {
     $contacts = array();
 

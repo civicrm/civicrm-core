@@ -383,7 +383,6 @@ class CRM_Utils_Mail_Incoming {
     $subParam['email'] = $address->email;
     $subParam['name'] = $address->name;
 
-
     $contactID = self::getContactID($subParam['email'],
       $subParam['name'],
       TRUE,

@@ -43,41 +43,41 @@ class CRM_Contact_StateMachine_Search extends CRM_Core_StateMachine {
 
   /**
    * Class constructor
-   */ function __construct($controller, $action = CRM_Core_Action::NONE) {
-    parent::__construct($controller, $action);
+  function __construct($controller, $action = CRM_Core_Action::NONE) {
+  parent::__construct($controller, $action);
 
-    $this->_pages = array();
-    if ($action == CRM_Core_Action::ADVANCED) {
-      $this->_pages['CRM_Contact_Form_Search_Advanced'] = NULL;
-      list($task, $result) = $this->taskName($controller, 'Advanced');
-    }
-    elseif ($action == CRM_Core_Action::PROFILE) {
-      $this->_pages['CRM_Contact_Form_Search_Builder'] = NULL;
-      list($task, $result) = $this->taskName($controller, 'Builder');
-    }
-    elseif ($action == CRM_Core_Action::COPY) {
-      $this->_pages['CRM_Contact_Form_Search_Custom'] = NULL;
-      list($task, $result) = $this->taskName($controller, 'Custom');
-    }
-    else {
-      $this->_pages['CRM_Contact_Form_Search_Basic'] = NULL;
-      list($task, $result) = $this->taskName($controller, 'Basic');
-    }
-    $this->_task = $task;
-    if (is_array($task)) {
-      foreach ($task as $t) {
-        $this->_pages[$t] = NULL;
-      }
-    }
-    else {
-      $this->_pages[$task] = NULL;
-    }
+  $this->_pages = array();
+  if ($action == CRM_Core_Action::ADVANCED) {
+  $this->_pages['CRM_Contact_Form_Search_Advanced'] = NULL;
+  list($task, $result) = $this->taskName($controller, 'Advanced');
+  }
+  elseif ($action == CRM_Core_Action::PROFILE) {
+  $this->_pages['CRM_Contact_Form_Search_Builder'] = NULL;
+  list($task, $result) = $this->taskName($controller, 'Builder');
+  }
+  elseif ($action == CRM_Core_Action::COPY) {
+  $this->_pages['CRM_Contact_Form_Search_Custom'] = NULL;
+  list($task, $result) = $this->taskName($controller, 'Custom');
+  }
+  else {
+  $this->_pages['CRM_Contact_Form_Search_Basic'] = NULL;
+  list($task, $result) = $this->taskName($controller, 'Basic');
+  }
+  $this->_task = $task;
+  if (is_array($task)) {
+  foreach ($task as $t) {
+  $this->_pages[$t] = NULL;
+  }
+  }
+  else {
+  $this->_pages[$task] = NULL;
+  }
 
-    if ($result) {
-      $this->_pages['CRM_Contact_Form_Task_Result'] = NULL;
-    }
+  if ($result) {
+  $this->_pages['CRM_Contact_Form_Task_Result'] = NULL;
+  }
 
-    $this->addSequentialPages($this->_pages, $action);
+  $this->addSequentialPages($this->_pages, $action);
   }
 
   /**

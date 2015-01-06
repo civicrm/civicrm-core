@@ -58,7 +58,6 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
     // since the pcm - preferred comminication method is logically
     // grouped hence we'll use groups of HTML_QuickForm
 
-
     // checkboxes for DO NOT phone, email, mail
     // we take labels from SelectValues
     $privacy = $commPreff = $commPreference = array();

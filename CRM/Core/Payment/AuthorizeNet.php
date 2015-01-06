@@ -371,7 +371,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $fields['x_customer_ip'] = $this->_getParam('ip_address');
     $fields['x_email'] = $this->_getParam('email');
     $fields['x_invoice_num'] = substr($this->_getParam('invoiceID'), 0, 20);
-        $fields['x_amount']         = $amount;
+    $fields['x_amount']         = $amount;
     $fields['x_currency_code'] = $this->_getParam('currencyID');
     $fields['x_description'] = $this->_getParam('description');
     $fields['x_cust_id'] = $this->_getParam('contactID');
@@ -595,10 +595,10 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   public function &error($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
     if ($errorCode) {
-      $e->push($errorCode, 0, array( ), $errorMessage);
+      $e->push($errorCode, 0, array(), $errorMessage);
     }
     else {
-      $e->push(9001, 0, array( ), 'Unknown System Error.');
+      $e->push(9001, 0, array(), 'Unknown System Error.');
     }
     return $e;
   }

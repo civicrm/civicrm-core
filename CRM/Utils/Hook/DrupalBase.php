@@ -57,7 +57,7 @@ class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
   /**
    * @see CRM_Utils_Hook::invoke()
    *
-   * @param integer $numParams
+   * @param int $numParamsNumber of parameters to pass to the hook.
    *   Number of parameters to pass to the hook.
    * @param unknown $arg1
    *   Parameter to be passed to the hook.

@@ -88,9 +88,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
     //CRM-15297 - contributionType is obsolete - pass financial type as well so people can deprecate it
     $paymentParams['financialType_name'] = $paymentParams['contributionType_name'] = $form->_params['contributionType_name'] = $contributionType->name;
     //CRM-11456
-    $paymentParams['financialType_accounting_code'] =  $paymentParams['contributionType_accounting_code'] = $form->_params['contributionType_accounting_code'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($contributionTypeId);
+    $paymentParams['financialType_accounting_code'] = $paymentParams['contributionType_accounting_code'] = $form->_params['contributionType_accounting_code'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($contributionTypeId);
     $paymentParams['contributionPageID'] = $form->_params['contributionPageID'] = $form->_values['id'];
-
 
     $payment = NULL;
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
@@ -122,7 +121,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
       );
 
       if ($contribution) {
-      $form->_params['contributionID'] = $contribution->id;
+        $form->_params['contributionID'] = $contribution->id;
       }
 
       $form->_params['contributionTypeID'] = $contributionTypeId;
@@ -351,12 +350,12 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
     // finally send an email receipt
     if ($contribution) {
-    $form->_values['contribution_id'] = $contribution->id;
+      $form->_values['contribution_id'] = $contribution->id;
       CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
         $form->_values, $contribution->is_test,
       FALSE, $fieldTypes
-    );
-  }
+      );
+    }
   }
 
   /**
@@ -508,7 +507,8 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     }
     if (!CRM_Utils_System::isNull($params['email'])) {
       $params['email'] = array(
-        1 => array('email' => $params['email'],
+        1 => array(
+      'email' => $params['email'],
           'location_type_id' => $billingLocTypeId,
         ));
     }
@@ -900,7 +900,7 @@ LIMIT 1
    */
   public static function calculateTaxAmount($amount, $taxRate) {
     $taxAmount = array();
-    $taxAmount['tax_amount'] = ($taxRate/100) * CRM_Utils_Rule::cleanMoney($amount);
+    $taxAmount['tax_amount'] = ($taxRate / 100) * CRM_Utils_Rule::cleanMoney($amount);
 
     return $taxAmount;
   }

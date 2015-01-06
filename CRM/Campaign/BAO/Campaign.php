@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
+class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
 
   /**
    * Takes an associative array and creates a campaign object
@@ -157,11 +157,11 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    */
   public static function getCampaigns(
     $includeId = NULL,
-    $excludeId          = NULL,
-    $onlyActive         = TRUE,
-    $onlyCurrent        = TRUE,
+    $excludeId = NULL,
+    $onlyActive = TRUE,
+    $onlyCurrent = TRUE,
     $appendDatesToTitle = FALSE,
-    $forceAll           = FALSE
+    $forceAll = FALSE
   ) {
     static $campaigns;
     $cacheKey = 0;
@@ -261,7 +261,8 @@ Order By  camp.title";
     static $validCampaigns;
     if (!isset($validCampaigns[$cacheKey])) {
       $isValid = TRUE;
-      $campaigns = array('campaigns' => array(),
+      $campaigns = array(
+      'campaigns' => array(),
         'hasAccessCampaign' => FALSE,
         'isCampaignEnabled' => FALSE,
       );
@@ -334,7 +335,6 @@ Order By  camp.title";
           $sortParams[$name] = $params[$name];
         }
       }
-
 
       //need to lookup tables.
       $orderOnCampaignTable = TRUE;
@@ -447,7 +447,7 @@ SELECT  campaign.id               as id,
 
     //in case of only count.
     if ($onlyCount) {
-      return (int)CRM_Core_DAO::singleValueQuery($query, $queryParams);
+      return (int) CRM_Core_DAO::singleValueQuery($query, $queryParams);
     }
 
     $campaign = CRM_Core_DAO::executeQuery($query, $queryParams);
@@ -466,7 +466,7 @@ SELECT  campaign.id               as id,
    * @static
    */
   public static function getCampaignCount() {
-    return (int)CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_campaign');
+    return (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_campaign');
   }
 
   /**
@@ -555,7 +555,8 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
 
     $campaignDetails = self::getPermissionedCampaigns($connectedCampaignId, NULL, TRUE, TRUE, $appendDates);
     $fields = array('campaigns', 'hasAccessCampaign', 'isCampaignEnabled');
-    foreach ($fields as $fld)$$fld = CRM_Utils_Array::value($fld, $campaignDetails);
+    foreach ($fields as $fld) { $$fld = CRM_Utils_Array::value($fld, $campaignDetails);
+    }
 
     //lets see do we have past campaigns.
     $hasPastCampaigns = FALSE;
@@ -618,7 +619,8 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
       'includePastCampaignURL',
       'alreadyIncludedPastCampaigns',
     );
-    foreach ($infoFields as $fld) $campaignInfo[$fld] = $$fld;
+    foreach ($infoFields as $fld) { $campaignInfo[$fld] = $$fld;
+    }
     $form->assign('campaignInfo', $campaignInfo);
   }
 
@@ -633,7 +635,8 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
     $campaignInfo    = array();
     $campaignDetails = self::getPermissionedCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
     $fields          = array('campaigns', 'hasAccessCampaign', 'isCampaignEnabled');
-    foreach ($fields as $fld)$$fld = CRM_Utils_Array::value($fld, $campaignDetails);
+    foreach ($fields as $fld) { $$fld = CRM_Utils_Array::value($fld, $campaignDetails);
+    }
     $showCampaignInSearch = FALSE;
     if ($isCampaignEnabled && $hasAccessCampaign && !empty($campaigns)) {
       //get the current campaign only.
@@ -658,7 +661,8 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
       'isCampaignEnabled',
       'showCampaignInSearch',
     );
-    foreach ($infoFields as $fld) $campaignInfo[$fld] = $$fld;
+    foreach ($infoFields as $fld) { $campaignInfo[$fld] = $$fld;
+    }
     $form->assign('campaignInfo', $campaignInfo);
   }
 }

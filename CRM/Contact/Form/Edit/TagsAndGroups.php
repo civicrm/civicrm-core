@@ -197,7 +197,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
         self::climbtree($form, $varValue['children'], $elements);
       }
     }
-   return $elements;
+    return $elements;
   }
 
   /**

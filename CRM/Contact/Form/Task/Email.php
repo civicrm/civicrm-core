@@ -118,7 +118,7 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
     }
 
     if ($cid) {
-      $cid = explode(',',$cid);
+      $cid = explode(',', $cid);
       $displayName = array();
 
       foreach ($cid as $val) {

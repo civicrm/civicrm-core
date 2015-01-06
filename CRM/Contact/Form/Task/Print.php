@@ -56,12 +56,12 @@ class CRM_Contact_Form_Task_Print extends CRM_Contact_Form_Task {
     if (!empty($this->_contactIds)) {
       //using _contactIds field for creating params for query so that multiple selections on multiple pages
       //can be printed.
-    foreach ($this->_contactIds as $contactId) {
+      foreach ($this->_contactIds as $contactId) {
         $params[] = array(
           CRM_Core_Form::CB_PREFIX . $contactId,
           '=',
           1, 0, 0);
-    }
+      }
     }
 
     // create the selector, controller and run - store results in session
@@ -81,7 +81,7 @@ class CRM_Contact_Form_Task_Print extends CRM_Contact_Form_Task {
     }
 
     $selectorName = $this->controller->selectorName();
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $selectorName) . '.php');
+    require_once str_replace('_', DIRECTORY_SEPARATOR, $selectorName) . '.php';
 
     $returnP = isset($returnPropeties) ? $returnPropeties : "";
     $customSearchClass = $this->get('customSearchClass');

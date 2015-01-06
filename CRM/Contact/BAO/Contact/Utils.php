@@ -335,7 +335,6 @@ UNION
         $saved, $relationshipIds
       ) = CRM_Contact_BAO_Relationship::create($relationshipParams, $cid);
 
-
       // In case we change employer, clean previous employer related records.
       if (!$previousEmployerID && !$newContact) {
         $previousEmployerID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id');
@@ -471,8 +470,7 @@ WHERE id={$contactId}; ";
         if ($relationship->find(TRUE)) {
           CRM_Contact_BAO_Relationship::setIsActive($relationship->id, FALSE);
           CRM_Contact_BAO_Relationship::relatedMemberships($contactId, $relMembershipParams,
-            $ids = array(
-              ), CRM_Core_Action::DELETE
+            $ids = array(), CRM_Core_Action::DELETE
           );
         }
         $relationship->free();
@@ -512,7 +510,7 @@ WHERE id={$contactId}; ";
         break;
 
       case 'Household':
-        $form->add('text', 'household_name', ts('Household Name'),  $attributes['household_name']);
+        $form->add('text', 'household_name', ts('Household Name'), $attributes['household_name']);
         break;
 
       default:
@@ -853,13 +851,13 @@ Group By  componentId";
       foreach ($values as $field => $submittedValue) {
         if (!in_array($field, $skipFields)){
           if (isset($masterAddress->$field)) {
-          $values[$field] = $masterAddress->$field;
+            $values[$field] = $masterAddress->$field;
           } else {
             $values[$field] = '';
+          }
         }
       }
     }
-  }
   }
 
   /**

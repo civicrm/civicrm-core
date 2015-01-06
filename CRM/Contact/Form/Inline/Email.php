@@ -74,9 +74,9 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     if (count($this->_emails) > 1) {
       $actualBlockCount = $totalBlocks = count($this->_emails);
       if ($totalBlocks < $this->_blockCount) {
-      $additionalBlocks = $this->_blockCount - $totalBlocks;
-      $totalBlocks += $additionalBlocks;
-    }
+        $additionalBlocks = $this->_blockCount - $totalBlocks;
+        $totalBlocks += $additionalBlocks;
+      }
       else {
         $actualBlockCount++;
         $totalBlocks++;
@@ -115,10 +115,9 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
           $hasData[] = $instance;
           if (!empty($blockValues['is_primary'])) {
             $hasPrimary[] = $instance;
-            }
           }
         }
-
+      }
 
       if (empty($hasPrimary) && !empty($hasData)) {
         $errors["email[1][is_primary]"] = ts('One email should be marked as primary.');

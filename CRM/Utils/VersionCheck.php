@@ -87,7 +87,7 @@ class CRM_Utils_VersionCheck {
    * @var array
    */
   protected $stats = array();
-  
+
   /**
    * Path to cache file
    *
@@ -107,7 +107,7 @@ class CRM_Utils_VersionCheck {
     $this->cacheFile = $config->uploadDir . self::CACHEFILE_NAME;
 
     if (file_exists($localFile)) {
-      require_once ($localFile);
+      require_once $localFile;
     }
     if (function_exists('civicrmVersion')) {
       $info = civicrmVersion();
@@ -245,7 +245,7 @@ class CRM_Utils_VersionCheck {
   public function versionAlert() {
     $versionAlertSetting = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'versionAlert', NULL, 1);
     $securityAlertSetting = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'securityUpdateAlert', NULL, 3);
-    $settingsUrl =  CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1', FALSE, NULL, FALSE, FALSE, TRUE);
+    $settingsUrl = CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1', FALSE, NULL, FALSE, FALSE, TRUE);
     if (CRM_Core_Permission::check('administer CiviCRM') && $securityAlertSetting > 1 && $this->isSecurityUpdateAvailable()) {
       $session = CRM_Core_Session::singleton();
       if ($session->timer('version_alert', 24 * 60 * 60)) {

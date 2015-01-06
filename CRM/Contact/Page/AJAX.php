@@ -483,7 +483,8 @@ ORDER BY sort_name ";
       else {
         while ($dao->fetch()) {
           if ($json) {
-            $elements[] = array('name' => addslashes($dao->sort_name),
+            $elements[] = array(
+            'name' => addslashes($dao->sort_name),
               'id' => $dao->id,
             );
           }
@@ -561,7 +562,7 @@ ORDER BY sort_name ";
       // make sure recordClass is namespaced (we cant check CRM since extensions can also use this)
       // but it should be at least 3 levels deep
       if (count($recordClass) >= 3) {
-        require_once (str_replace('_', DIRECTORY_SEPARATOR, $recordBAO) . ".php");
+        require_once str_replace('_', DIRECTORY_SEPARATOR, $recordBAO) . ".php";
         $method = 'setIsActive';
 
         if (method_exists($recordBAO, $method)) {
@@ -581,9 +582,9 @@ ORDER BY sort_name ";
   }
 
   /**
-     *  check the CMS username
-     *
-    */
+   *  check the CMS username
+   *
+   */
   static public function checkUserName() {
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), array('for', 'ts'));
     if (
@@ -711,11 +712,10 @@ LIMIT {$offset}, {$rowCount}
             CRM_Utils_Array::value('cid', $_GET)
           );
 
-
           $dao = CRM_Core_DAO::executeQuery($query);
 
           while ($dao->fetch()) {
-              //working here
+            //working here
             $result[] = array(
               'text' => '"' . $dao->name . '" <' . $dao->email . '>',
               'id' => (CRM_Utils_Array::value('id', $_GET)) ? "{$dao->id}::{$dao->email}" : '"' . $dao->name . '" <' . $dao->email . '>',
@@ -946,7 +946,6 @@ LIMIT {$offset}, {$rowCount}
     $cacheKeyString   = "merge {$contactType}_{$rgid}_{$gid}";
     $searchRows       = array();
     $selectorElements = array('src', 'dst', 'weight', 'actions');
-
 
     $join = "LEFT JOIN civicrm_dedupe_exception de ON ( pn.entity_id1 = de.contact_id1 AND
                                                              pn.entity_id2 = de.contact_id2 )";

@@ -80,7 +80,7 @@ class CRM_Core_BAO_SchemaHandler {
     if ($config->logging) {
       // logging support
       $logging = new CRM_Logging_Schema;
-      $logging->fixSchemaDifferencesFor($params['name'], null, FALSE);
+      $logging->fixSchemaDifferencesFor($params['name'], NULL, FALSE);
     }
 
     // always do a trigger rebuild for this table
@@ -363,7 +363,7 @@ ALTER TABLE {$tableName}
   /**
    * Delete a civiCRM-table
    *
-   * @param String $tableName
+   * @param string $tableNameName of the table to be created.
    *   Name of the table to be created.
    *
    * @return true if successfully deleted, false otherwise
@@ -481,7 +481,8 @@ UPDATE civicrm_custom_field
 SET    text_length = %1
 WHERE  id = %2
 ";
-    $params = array(1 => array($length, 'Integer'),
+    $params = array(
+    1 => array($length, 'Integer'),
       2 => array($customFieldID, 'Integer'),
     );
     CRM_Core_DAO::executeQuery($sql, $params);

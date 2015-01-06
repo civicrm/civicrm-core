@@ -53,7 +53,6 @@ class CRM_Utils_Address_USPS {
       return FALSE;
     }
 
-
     $userID = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME,
       'address_standardization_userid'
     );
@@ -110,14 +109,14 @@ class CRM_Utils_Address_USPS {
       return FALSE;
     }
 
-    $values['street_address'] = (string)$xml->Address->Address2;
-    $values['city'] = (string)$xml->Address->City;
-    $values['state_province'] = (string)$xml->Address->State;
-    $values['postal_code'] = (string)$xml->Address->Zip5;
-    $values['postal_code_suffix'] = (string)$xml->Address->Zip4;
+    $values['street_address'] = (string) $xml->Address->Address2;
+    $values['city'] = (string) $xml->Address->City;
+    $values['state_province'] = (string) $xml->Address->State;
+    $values['postal_code'] = (string) $xml->Address->Zip5;
+    $values['postal_code_suffix'] = (string) $xml->Address->Zip4;
 
     if (array_key_exists('Address1', $xml->Address)) {
-      $values['supplemental_address_1'] = (string)$xml->Address->Address1;
+      $values['supplemental_address_1'] = (string) $xml->Address->Address1;
     }
 
     return TRUE;

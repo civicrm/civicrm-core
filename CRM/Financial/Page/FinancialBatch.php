@@ -44,7 +44,7 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
    * @var array
    * @static
    */
-  static $_links = null;
+  static $_links = NULL;
 
   /**
    * Get BAO Name
@@ -81,17 +81,16 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->set("context", $context);
     // assign vars to templates
-    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, false, 0);
-    $action = CRM_Utils_Request::retrieve('action', 'String', $this, false, 'browse'); // default to 'browse'
+    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
+    $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse'); // default to 'browse'
 
     // what action to take ?
-    if ($action &
-      (CRM_Core_Action::UPDATE |
+    if ($action & (CRM_Core_Action::UPDATE |
         CRM_Core_Action::ADD |
         CRM_Core_Action::CLOSE |
         CRM_Core_Action::REOPEN |
         CRM_Core_Action::EXPORT)) {
-      $this->edit($action, $id) ;
+      $this->edit($action, $id);
     }
     // parent run
     return parent::run();
@@ -125,7 +124,7 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  public function userContext($mode = null) {
+  public function userContext($mode = NULL) {
     $context = $this->get("context");
     if ($mode == CRM_Core_Action::UPDATE || ($mode = CRM_Core_Action::ADD & isset($context))) {
       return "civicrm/financial/financialbatches";

@@ -126,7 +126,6 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
       )
     );
 
-
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_contactIds);
 

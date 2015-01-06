@@ -63,7 +63,6 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
     $this->add('select', 'label_name', ts('Select Label'), array('' => ts('- select label -')) + $label, TRUE);
 
-
     // add select for Location Type
     $this->addElement('select', 'location_type_id', ts('Select Location'),
       array(
@@ -278,7 +277,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         $valuesothers = CRM_Core_BAO_Location::getValues($paramsothers, $valuesothers);
         if (!empty($fv['location_type_id'])) {
           foreach ($valuesothers as $vals) {
-                        if ( CRM_Utils_Array::value('location_type_id', $vals) ==
+            if ( CRM_Utils_Array::value('location_type_id', $vals) ==
                              CRM_Utils_Array::value('location_type_id', $fv ) ) {
               foreach ($vals as $k => $v) {
                 if (in_array($k, array(
@@ -448,20 +447,20 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         if ($count > 2) {
           break;
         }
-          if(count($first_names) == 1){
-            $family = $first_names[current(array_keys($first_names))]['addressee_display'];
-          }
-          else {
-            // collapse the tree to summarize
-            $family = trim(implode(" & ", array_keys($first_names)) . " " . $last_name);
-          }
-          if ($count) {
-            $processedNames .= "\n" . $family;
-          }
-          else {
-            // build display_name string
-            $processedNames = $family;
-          }
+        if(count($first_names) == 1){
+          $family = $first_names[current(array_keys($first_names))]['addressee_display'];
+        }
+        else {
+          // collapse the tree to summarize
+          $family = trim(implode(" & ", array_keys($first_names)) . " " . $last_name);
+        }
+        if ($count) {
+          $processedNames .= "\n" . $family;
+        }
+        else {
+          // build display_name string
+          $processedNames = $family;
+        }
         $count++;
       }
       $rows[$data['ID']]['addressee'] = $rows[$data['ID']]['addressee_display'] = $rows[$data['ID']]['display_name'] = $processedNames;

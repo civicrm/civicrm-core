@@ -65,8 +65,8 @@ class CRM_Contact_Page_Inline_Phone extends CRM_Core_Page {
 
     $contact = new CRM_Contact_BAO_Contact( );
     $contact->id = $contactId;
-    $contact->find(true);
-    $privacy = array( );
+    $contact->find(TRUE);
+    $privacy = array();
     foreach ( CRM_Contact_BAO_Contact::$_commPrefs as $name ) {
       if ( isset( $contact->$name ) ) {
         $privacy[$name] = $contact->$name;

@@ -646,7 +646,7 @@ ORDER BY civicrm_custom_group.weight,
    * Check whether the custom group has any data for the given entity.
    *
    *
-   * @param integer $entityID
+   * @param int $entityIDId of entity for whom we are checking data for.
    *   Id of entity for whom we are checking data for.
    * @param string $table
    *   Table that we are checking.
@@ -677,7 +677,7 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @param array $groupTree
    *   (reference) group tree array which is being built.
-   * @param integer $entityID
+   * @param int $entityIDId of entity for whom the tree is being build up.
    *   Id of entity for whom the tree is being build up.
    * @param array $entitySingleSelectClauses
    *   Array of select clauses relevant to the entity.
@@ -706,7 +706,7 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @param array $groupTree
    *   (reference) group tree array which is being built.
-   * @param integer $entityID
+   * @param int $entityIDId of entity for whom the tree is being build up.
    *   Id of entity for whom the tree is being build up.
    * @param array $entityMultipleSelectClauses
    *   Array of select clauses relevant to the entity.
@@ -1120,6 +1120,7 @@ ORDER BY civicrm_custom_group.weight,
       case 'Group':
         $tableName = 'civicrm_group';
         break;
+
       // DRAFTING: Verify if we cannot make it pluggable
 
       case 'Activity':
@@ -1145,6 +1146,7 @@ ORDER BY civicrm_custom_group.weight,
       case 'Grant':
         $tableName = 'civicrm_grant';
         break;
+
       // need to add cases for Location, Address
     }
 
@@ -1453,7 +1455,6 @@ ORDER BY civicrm_custom_group.weight,
             $v = $val;
           }
         }
-
 
         if (!isset($groupTree[$groupID]['fields'][$fieldId]['customValue'])) {
           // field exists in db so populate value from "form".
@@ -2080,8 +2081,8 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
           $retValue = $value;
           break;
         }
-      // note that if its not text / textarea, the code falls thru and executes
-      // the below case also
+        // note that if its not text / textarea, the code falls thru and executes
+        // the below case also
       case 'StateProvince':
       case 'Country':
         $options = array();
@@ -2310,8 +2311,8 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
           }
 
           list($className) = explode('::', $callback);
-          require_once(str_replace('_', DIRECTORY_SEPARATOR, $className) .
-            '.php');
+          require_once str_replace('_', DIRECTORY_SEPARATOR, $className) .
+            '.php';
 
           $objTypes[$ovValues['value']] = call_user_func_array($callback, $args);
         }

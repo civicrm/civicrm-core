@@ -223,17 +223,17 @@ class CRM_Core_I18n_Schema {
 
     if ( !empty($triggers)) {
       if (CRM_Core_Config::isUpgradeMode()) {
-      foreach ($triggers as $triggerInfo) {
-        $when = $triggerInfo['when'];
-        $event = $triggerInfo['event'];
-        $triggerName = "{$table}_{$when}_{$event}";
-        CRM_Core_DAO::executeQuery("DROP TRIGGER IF EXISTS {$triggerName}");
+        foreach ($triggers as $triggerInfo) {
+          $when = $triggerInfo['when'];
+          $event = $triggerInfo['event'];
+          $triggerName = "{$table}_{$when}_{$event}";
+          CRM_Core_DAO::executeQuery("DROP TRIGGER IF EXISTS {$triggerName}");
+        }
       }
-    }
 
-    // invoke the meta trigger creation call
-    CRM_Core_DAO::triggerRebuild($table);
-  }
+      // invoke the meta trigger creation call
+      CRM_Core_DAO::triggerRebuild($table);
+    }
   }
 
   /**
@@ -570,7 +570,8 @@ class CRM_Core_I18n_Schema {
       }
 
       $sql = implode(' ', $trigger);
-      $info[] = array('table' => array($table),
+      $info[] = array(
+      'table' => array($table),
         'when' => 'BEFORE',
         'event' => array('UPDATE'),
         'sql' => $sql,
@@ -599,7 +600,8 @@ class CRM_Core_I18n_Schema {
       }
 
       $sql = implode(' ', $trigger);
-      $info[] = array('table' => array($table),
+      $info[] = array(
+      'table' => array($table),
         'when' => 'BEFORE',
         'event' => array('INSERT'),
         'sql' => $sql,

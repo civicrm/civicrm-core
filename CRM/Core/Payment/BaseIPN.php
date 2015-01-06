@@ -82,7 +82,7 @@ class CRM_Core_Payment_BaseIPN {
    *   An empty array that will be populated with loaded object.
    * @param bool $required
    *   Boolean Return FALSE if the relevant objects don't exist.
-   * @param integer $paymentProcessorID
+   * @param int $paymentProcessorIDId of the payment processor ID in use.
    *   Id of the payment processor ID in use.
    * @return boolean
    */
@@ -130,7 +130,7 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $ids
    * @param array $objects
    * @param bool $required
-   * @param integer $paymentProcessorID
+   * @param int $paymentProcessorID
    * @param array $error_handling
    *
    * @return boolean
@@ -391,7 +391,7 @@ class CRM_Core_Payment_BaseIPN {
       }
 
       if (!empty($memberships)) {
-        $membershipsUpdate = array( );
+        $membershipsUpdate = array();
         foreach ($memberships as $membershipTypeIdKey => $membership) {
           if ($membership) {
             $format = '%Y%m%d';
@@ -452,7 +452,8 @@ LIMIT 1;";
               (array) $membership
             );
 
-            $formatedParams = array('status_id' => CRM_Utils_Array::value('id', $calcStatus, 2),
+            $formatedParams = array(
+            'status_id' => CRM_Utils_Array::value('id', $calcStatus, 2),
               'join_date' => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('join_date', $dates), $format),
               'start_date' => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('start_date', $dates), $format),
               'end_date' => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('end_date', $dates), $format),
@@ -583,7 +584,7 @@ LIMIT 1;";
     //add lineitems for recurring payments
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id) {
       if ($addLineItems) {
-        $input ['line_item'] = $this->addRecurLineItems($objects['contributionRecur']->id, $contribution);
+        $input['line_item'] = $this->addRecurLineItems($objects['contributionRecur']->id, $contribution);
       }
       else {
         // this is just to prevent e-notices when we call recordFinancialAccounts - per comments on that line - intention is somewhat unclear
@@ -614,9 +615,8 @@ LIMIT 1;";
     // it would be good if someone added some comments or refactored this
     if ($contribution->id) {
       $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array('labelColumn' => 'name', 'flip' => 1));
-      if ((empty($input['prevContribution']) && $paymentProcessorId) || (!$input['prevContribution']->is_pay_later &&
--      $input['prevContribution']->contribution_status_id == $contributionStatuses['Pending'])) {
-       $input['payment_processor'] = $paymentProcessorId;
+      if ((empty($input['prevContribution']) && $paymentProcessorId) || (!$input['prevContribution']->is_pay_later && - $input['prevContribution']->contribution_status_id == $contributionStatuses['Pending'])) {
+        $input['payment_processor'] = $paymentProcessorId;
       }
       $input['contribution_status_id'] = $contributionStatuses['Completed'];
       $input['total_amount'] = $input['amount'];
@@ -821,7 +821,7 @@ LIMIT 1;";
 
     $contribution = &$objects['contribution'];
 
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array('labelColumn' => 'name','flip' => 1));
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array('labelColumn' => 'name', 'flip' => 1));
     $input['skipComponentSync'] = CRM_Utils_Array::value('skipComponentSync', $params);
     if ($statusId == $contributionStatuses['Cancelled']) {
       $baseIPN->cancelled($objects, $transaction, $input);

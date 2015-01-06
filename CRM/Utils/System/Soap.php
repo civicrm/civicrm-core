@@ -143,7 +143,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    *
    * @return void
    */
-  public function setEmail(&$user) {}
+  public function setEmail(&$user) {
+  }
 
   /**
    * Authenticate a user against the real UF

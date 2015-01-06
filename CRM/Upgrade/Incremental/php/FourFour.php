@@ -106,7 +106,7 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
       }
     }
     if ($rev == '4.4.6'){
-     $postUpgradeMessage .= '<br /><br /><strong>'. ts('Your contact image urls have been upgraded. If your contact image urls did not follow the standard format for image Urls they have not been upgraded. Please check the log to see image urls that were not upgraded.');
+      $postUpgradeMessage .= '<br /><br /><strong>'. ts('Your contact image urls have been upgraded. If your contact image urls did not follow the standard format for image Urls they have not been upgraded. Please check the log to see image urls that were not upgraded.');
     }
   }
 
@@ -234,12 +234,12 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
 
       $p[1] = array($acOptionGroupID, 'Integer');
       if ($avinc) {
-        $p[2] = array($avinc+$maxVal, 'Integer');
-        $p[3] = array($avinc+$maxWeight, 'Integer');
+        $p[2] = array($avinc + $maxVal, 'Integer');
+        $p[3] = array($avinc + $maxWeight, 'Integer');
       }
       if ($nsinc) {
-        $p[4] = array($nsinc+$maxVal, 'Integer');
-        $p[5] = array($nsinc+$maxWeight, 'Integer');
+        $p[4] = array($nsinc + $maxVal, 'Integer');
+        $p[5] = array($nsinc + $maxWeight, 'Integer');
       }
       $insertStatus = implode(',', $insertStatus);
 
@@ -275,13 +275,13 @@ VALUES {$insertStatus}";
 {$fkConstraint}
 ";
       // CRM-14036 : delete entries of un-mapped contacts
-        CRM_Core_DAO::executeQuery("DELETE ac FROM civicrm_activity_contact ac
+      CRM_Core_DAO::executeQuery("DELETE ac FROM civicrm_activity_contact ac
 LEFT JOIN civicrm_contact c
 ON c.id = ac.contact_id
 WHERE c.id IS NULL;
 ");
-        // delete entries of un-mapped activities
-        CRM_Core_DAO::executeQuery("DELETE ac FROM civicrm_activity_contact ac
+      // delete entries of un-mapped activities
+      CRM_Core_DAO::executeQuery("DELETE ac FROM civicrm_activity_contact ac
 LEFT JOIN civicrm_activity a
 ON a.id = ac.activity_id
 WHERE a.id IS NULL;
@@ -328,7 +328,6 @@ ALTER TABLE civicrm_dashboard
 
     // CRM-13998 : missing alter statements for civicrm_report_instance
     $this->addTask(ts('Confirm civicrm_report_instance sql table for upgrades'), 'updateReportInstanceTable');
-
 
     return TRUE;
   }
@@ -384,24 +383,24 @@ ALTER TABLE civicrm_dashboard
       $imageURL = $dao->image_url;
       $baseurl = CIVICRM_UF_BASEURL;
       $baselen = strlen($baseurl);
-      if (substr($imageURL, 0, $baselen)==$baseurl){
+      if (substr($imageURL, 0, $baselen) == $baseurl){
         $photo = basename($dao->image_url);
         $config = CRM_Core_Config::singleton();
         $fullpath = $config->customFileUploadDir.$photo;
-          if (file_exists($fullpath)){
-            // For anyone who upgraded 4.4.6 release (eg 4.4.0=>4.4.6), the $newImageUrl incorrectly used backend URLs.
-            // For anyone who skipped 4.4.6 (eg 4.4.0=>4.4.7), the $newImageUrl correctly uses frontend URLs
-            self::setContactImageUrl($dao->id,
+        if (file_exists($fullpath)){
+          // For anyone who upgraded 4.4.6 release (eg 4.4.0=>4.4.6), the $newImageUrl incorrectly used backend URLs.
+          // For anyone who skipped 4.4.6 (eg 4.4.0=>4.4.7), the $newImageUrl correctly uses frontend URLs
+          self::setContactImageUrl($dao->id,
               CRM_Utils_System::url('civicrm/contact/imagefile', 'photo='.$photo, TRUE, NULL, TRUE, TRUE));
-          }
-          else{
-            $failures[$dao->id] = $dao->image_url;
-          }
         }
         else{
-            $failures[$dao->id] = $dao->image_url;
+          $failures[$dao->id] = $dao->image_url;
         }
       }
+      else{
+        $failures[$dao->id] = $dao->image_url;
+      }
+    }
     CRM_Core_Error::debug_var('imageUrlsNotUpgraded', $failures);
     return TRUE;
   }
@@ -552,7 +551,7 @@ WHERE  option_group_id = {$optionGroupID} AND value IN ($ovValues)";
     }
 
     if (!$assigneeID || !$sourceID || !$targetID ) {
-      $insert =  "
+      $insert = "
 INSERT INTO civicrm_option_value
 (option_group_id, label, value, name, weight, is_reserved, is_active)
 VALUES
@@ -582,7 +581,6 @@ CREATE TABLE IF NOT EXISTS civicrm_activity_contact (
 
     $dao = CRM_Core_DAO::executeQuery($query);
 
-
     $query = "
 INSERT INTO civicrm_activity_contact (activity_id, contact_id, record_type_id)
 SELECT      activity_id, target_contact_id, {$targetID} as record_type_id
@@ -604,21 +602,21 @@ WHERE       source_contact_id IS NOT NULL";
 
     $dao = CRM_Core_DAO::executeQuery($query);
 
-   $query = "DROP TABLE civicrm_activity_target";
-   $dao = CRM_Core_DAO::executeQuery($query);
+    $query = "DROP TABLE civicrm_activity_target";
+    $dao = CRM_Core_DAO::executeQuery($query);
 
-   $query = "DROP TABLE civicrm_activity_assignment";
-   $dao = CRM_Core_DAO::executeQuery($query);
+    $query = "DROP TABLE civicrm_activity_assignment";
+    $dao = CRM_Core_DAO::executeQuery($query);
 
-   $query = "ALTER  TABLE civicrm_activity
+    $query = "ALTER  TABLE civicrm_activity
      DROP FOREIGN KEY FK_civicrm_activity_source_contact_id";
 
-   $dao = CRM_Core_DAO::executeQuery($query);
+    $dao = CRM_Core_DAO::executeQuery($query);
 
-   $query = "ALTER  TABLE civicrm_activity DROP COLUMN source_contact_id";
-   $dao = CRM_Core_DAO::executeQuery($query);
+    $query = "ALTER  TABLE civicrm_activity DROP COLUMN source_contact_id";
+    $dao = CRM_Core_DAO::executeQuery($query);
 
-   return TRUE;
+    return TRUE;
   }
 
   /**
@@ -745,7 +743,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
           foreach ($localeCustomArray as $localCustomData) {
             // Traverse status array "enabled" "disabled"
             foreach ($localCustomData as $status => $matchTypes) {
-              $params["is_active"] = ($status == "enabled")?TRUE:FALSE;
+              $params["is_active"] = ($status == "enabled") ? TRUE : FALSE;
               // Traverse Match Type array "wildcardMatch" "exactMatch"
               foreach ($matchTypes as $matchType => $words) {
                 $params["match_type"] = $matchType;

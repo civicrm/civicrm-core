@@ -98,8 +98,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     if (!self::$_dataToHtml) {
       self::$_dataToHtml = array(
         array(
-          'Text' => 'Text', 'Select' => 'Select',
-          'Radio' => 'Radio', 'CheckBox' => 'CheckBox',
+          'Text' => 'Text',
+      'Select' => 'Select',
+          'Radio' => 'Radio',
+      'CheckBox' => 'CheckBox',
           'Multi-Select' => 'Multi-Select',
           'AdvMulti-Select' => 'AdvMulti-Select',
           'Autocomplete-Select' => 'Autocomplete-Select',
@@ -164,6 +166,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $params['date_format'] = $config->dateInputFormat;
         }
         break;
+
       case 'CheckBox':
       case 'AdvMulti-Select':
       case 'Multi-Select':
@@ -187,7 +190,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
             $params['default_value'] = $params['option_value'][$params['default_option']];
           }
         }
-       break;
+        break;
     }
 
     $transaction = new CRM_Core_Transaction();
@@ -202,7 +205,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         'table_name'
       );
 
-
       if ($params['option_type'] == 1 && empty($params['option_group_id'])) {
         // first create an option group for this custom group
         $optionGroup = new CRM_Core_DAO_OptionGroup();
@@ -211,7 +213,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $optionGroup->is_active = 1;
         $optionGroup->save();
         $params['option_group_id'] = $optionGroup->id;
-          if(!empty($params['option_value']) && is_array($params['option_value'])){
+        if(!empty($params['option_value']) && is_array($params['option_value'])){
           foreach ($params['option_value'] as $k => $v) {
             if (strlen(trim($v))) {
               $optionValue = new CRM_Core_DAO_OptionValue();
@@ -610,11 +612,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @static
    */
   public static function &getFieldsForImport($contactType = 'Individual',
-    $showAll         = FALSE,
-    $onlyParent      = FALSE,
-    $search          = FALSE,
+    $showAll = FALSE,
+    $onlyParent = FALSE,
+    $search = FALSE,
     $checkPermission = TRUE,
-    $withMultiple    = FALSE
+    $withMultiple = FALSE
   ) {
     // Note: there are situations when we want getFieldsForImport() return fields related
     // ONLY to basic contact types, but NOT subtypes. And thats where $onlyParent is helpful
@@ -749,9 +751,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $elementName,
     $fieldId,
     $inactiveNeeded = FALSE,
-    $useRequired    = TRUE,
-    $search         = FALSE,
-    $label          = NULL
+    $useRequired = TRUE,
+    $search = FALSE,
+    $label = NULL
   ) {
     $field = self::getFieldObject($fieldId);
     $widget = $field->html_type;
@@ -885,7 +887,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'Radio':
         $choice = array();
         foreach ($options as $v => $l) {
-          $choice[] = $qf->createElement('radio', NULL, '', $l, (string)$v, $field->attributes);
+          $choice[] = $qf->createElement('radio', NULL, '', $l, (string) $v, $field->attributes);
         }
         $group = $qf->addGroup($choice, $elementName, $label);
         if ($useRequired && !$search) {
@@ -1139,9 +1141,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     &$option,
     $html_type,
     $data_type,
-    $format    = NULL,
+    $format = NULL,
     $contactID = NULL,
-    $fieldID   = NULL
+    $fieldID = NULL
   ) {
     $display = $value;
 
@@ -1165,7 +1167,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           if ($value) {
             $display = ts('Yes');
           }
-          elseif ((string)$value === '0') {
+          elseif ((string) $value === '0') {
             $display = ts('No');
           }
         }
@@ -1566,7 +1568,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $entityId = NULL,
     $inline = FALSE,
     $checkPermission = TRUE,
-    $includeViewOnly = false
+    $includeViewOnly = FALSE
   ) {
     //get the custom fields for the entity
     //subtype and basic type
@@ -1906,7 +1908,7 @@ SELECT $columnName
    *   FK to civicrm_custom_group.
    *
    * @return array(
-     string) or TRUE
+  string) or TRUE
    */
   public static function _moveFieldValidate($fieldID, $newGroupID) {
     $errors = array();
@@ -1966,7 +1968,8 @@ SELECT extends
 FROM   civicrm_custom_group
 WHERE  id IN ( %1, %2 )
 ";
-      $params = array(1 => array($oldGroup->id, 'Integer'),
+      $params = array(
+      1 => array($oldGroup->id, 'Integer'),
         2 => array($newGroup->id, 'Integer'),
       );
 
@@ -2358,7 +2361,6 @@ FROM       civicrm_custom_field f
 INNER JOIN civicrm_custom_group g ON f.custom_group_id = g.id
 WHERE      f.id IN ($ids)";
 
-
     $dao = CRM_Core_DAO::executeQuery($sql);
     $result = array();
     while ($dao->fetch()) {
@@ -2387,7 +2389,6 @@ WHERE      f.id IN ($ids)";
     if (!is_array($params) || empty($params)) {
       return $errors;
     }
-
 
     //pick up profile fields.
     $profileFields = array();

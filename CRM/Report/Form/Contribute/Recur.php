@@ -170,7 +170,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
           'frequency_unit' => array(
             'title' => ts('Frequency Unit'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' =>  CRM_Core_OptionGroup::values('recur_frequency_units'),
+            'options' => CRM_Core_OptionGroup::values('recur_frequency_units'),
             'type' => CRM_Utils_Type::T_INT,
           ),
           'frequency_interval' => array(
@@ -209,7 +209,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
     parent::__construct();
   }
   public function getTemplateName() {
-    return 'CRM/Report/Form.tpl' ;
+    return 'CRM/Report/Form.tpl';
   }
 
   public function from() {
@@ -241,7 +241,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
     // installments * intervals using the mysql date_add function, along
     // with the interval unit (e.g. DATE_ADD(start_date, INTERVAL 12 * 1 MONTH)
     $date_suffixes = array('relative', 'from', 'to');
-    while(list(,$suffix) = each($date_suffixes)) {
+    while(list(, $suffix) = each($date_suffixes)) {
       // Check to see if the user wants to search by calculated date.
       if(!empty($this->_params['calculated_end_date_' . $suffix])) {
         // The calculated date field is in use - spring into action
@@ -317,11 +317,11 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
       if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_contribution_status_id', $row)) {
         $rows[$rowNum]['civicrm_contribution_recur_contribution_status_id'] = $contributionStatus[$value];
       }
-      
+
       if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_amount', $row)) {
-        $rows[$rowNum]['civicrm_contribution_recur_amount'] = CRM_Utils_Money::format($rows[$rowNum]['civicrm_contribution_recur_amount'],$rows[$rowNum]['civicrm_contribution_recur_currency']);
+        $rows[$rowNum]['civicrm_contribution_recur_amount'] = CRM_Utils_Money::format($rows[$rowNum]['civicrm_contribution_recur_amount'], $rows[$rowNum]['civicrm_contribution_recur_currency']);
       }
-      
+
     }
   }
 }

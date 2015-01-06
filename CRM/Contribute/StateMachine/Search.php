@@ -43,27 +43,27 @@ class CRM_Contribute_StateMachine_Search extends CRM_Core_StateMachine {
 
   /**
    * Class constructor
-   */ function __construct($controller, $action = CRM_Core_Action::NONE) {
-    parent::__construct($controller, $action);
+  function __construct($controller, $action = CRM_Core_Action::NONE) {
+  parent::__construct($controller, $action);
 
-    $this->_pages = array();
+  $this->_pages = array();
 
-    $this->_pages['CRM_Contribute_Form_Search'] = NULL;
-    list($task, $result) = $this->taskName($controller, 'Search');
-    $this->_task = $task;
+  $this->_pages['CRM_Contribute_Form_Search'] = NULL;
+  list($task, $result) = $this->taskName($controller, 'Search');
+  $this->_task = $task;
 
-    if (is_array($task)) {
-      foreach ($task as $t) {
-        $this->_pages[$t] = NULL;
-      }
-    }
-    else {
-      $this->_pages[$task] = NULL;
-    }
-    if ($result) {
-      $this->_pages['CRM_Contribute_Form_Task_Result'] = NULL;
-    }
-    $this->addSequentialPages($this->_pages, $action);
+  if (is_array($task)) {
+  foreach ($task as $t) {
+  $this->_pages[$t] = NULL;
+  }
+  }
+  else {
+  $this->_pages[$task] = NULL;
+  }
+  if ($result) {
+  $this->_pages['CRM_Contribute_Form_Task_Result'] = NULL;
+  }
+  $this->addSequentialPages($this->_pages, $action);
   }
 
   /**

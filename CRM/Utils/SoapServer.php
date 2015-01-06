@@ -101,7 +101,6 @@ class CRM_Utils_SoapServer {
       throw new SoapFault('Client', 'Invalid key');
     }
 
-
     if (self::$soap_timeout &&
       $t > ($session->get('soap_time') + self::$soap_timeout)
     ) {
@@ -128,10 +127,10 @@ class CRM_Utils_SoapServer {
    * @static
    */
   public function authenticate($name, $pass, $loadCMSBootstrap = FALSE) {
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $this->ufClass) . '.php');
+    require_once str_replace('_', DIRECTORY_SEPARATOR, $this->ufClass) . '.php';
 
     if ($this->ufClass == 'CRM_Utils_System_Joomla'){
-      $loadCMSBootstrap = true;
+      $loadCMSBootstrap = TRUE;
     }
 
     $className = $this->ufClass;

@@ -36,7 +36,7 @@
 class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
 
   /**
-   @var CRM_Extension_Mapper
+  @var CRM_Extension_Mapper
    */
   protected $mapper;
 
@@ -235,7 +235,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
           1 => array($info->name, 'String'),
         )
       );
-      if ($dao->fetch()) $paymentProcessor = array(
+      if ($dao->fetch()) { $paymentProcessor = array(
         'id' => -1,
         'name' => $dao->title,
         'payment_processor_type_id' => $dao->id,
@@ -251,8 +251,10 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
         'is_recur' => $dao->is_recur,
         'billing_mode' => $dao->billing_mode,
         'payment_type' => $dao->payment_type,
-      );
-      else CRM_Core_Error::fatal("Unable to find payment processor in " . __CLASS__ . '::' . __METHOD__);
+        );
+      }
+      else { CRM_Core_Error::fatal("Unable to find payment processor in " . __CLASS__ . '::' . __METHOD__);
+      }
     }
 
     // In the case of uninstall, check for instances of PP first.
@@ -280,7 +282,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
 
       default:
         CRM_Core_Session::setStatus(ts( "Unrecognized payment hook (%1) in %2::%3",
-                        array(1 => $method, 2 =>  __CLASS__ , 3 => __METHOD__) ),
+                        array(1 => $method, 2 => __CLASS__ , 3 => __METHOD__) ),
                         '', 'error');
     }
   }

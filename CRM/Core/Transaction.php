@@ -245,7 +245,7 @@ class CRM_Core_Transaction {
    *          See php manual call_user_func_array for details.
    * @param int $id
    */
-  static public function addCallback($phase, $callback, $params = null, $id = NULL) {
+  static public function addCallback($phase, $callback, $params = NULL, $id = NULL) {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getBaseFrame();
     $frame->addCallback($phase, $callback, $params, $id);
   }

@@ -960,10 +960,10 @@ class CRM_Report_Form extends CRM_Core_Form {
                 $fieldName == 'county_id'
               ) {
                 $this->addChainSelect($fieldName . '_value', array(
-                    'multiple' => TRUE,
-                    'label' => NULL,
-                    'class' => 'huge'
-                  ));
+                  'multiple' => TRUE,
+                  'label' => NULL,
+                  'class' => 'huge'
+                ));
               }
               else {
                 $this->addElement('select', "{$fieldName}_value", NULL, $field['options'], array(
@@ -1119,9 +1119,9 @@ class CRM_Report_Form extends CRM_Core_Form {
       for ($i = 1; $i <= 5; $i++) {
         $this->addElement('select', "order_bys[{$i}][column]", ts('Order by Column'), $options);
         $this->addElement('select', "order_bys[{$i}][order]", ts('Order by Order'), array(
-            'ASC' => 'Ascending',
-            'DESC' => 'Descending'
-          ));
+          'ASC' => 'Ascending',
+          'DESC' => 'Descending'
+        ));
         $this->addElement('checkbox', "order_bys[{$i}][section]", ts('Order by Section'), FALSE, array('id' => "order_by_section_$i"));
         $this->addElement('checkbox', "order_bys[{$i}][pageBreak]", ts('Page Break'), FALSE, array('id' => "order_by_pagebreak_$i"));
       }
@@ -3306,11 +3306,11 @@ ORDER BY cg.weight, cf.weight";
             if ($this->_customGroupFilters) {
               $curFilters[$fieldName]['options'] = array();
               $ogDAO = CRM_Core_DAO::executeQuery("SELECT ov.value, ov.label FROM civicrm_option_value ov WHERE ov.option_group_id = %1 ORDER BY ov.weight", array(
-                  1 => array(
-                    $customDAO->option_group_id,
-                    'Integer'
-                  )
-                ));
+                1 => array(
+                  $customDAO->option_group_id,
+                  'Integer'
+                )
+              ));
               while ($ogDAO->fetch()) {
                 $curFilters[$fieldName]['options'][$ogDAO->value] = $ogDAO->label;
               }

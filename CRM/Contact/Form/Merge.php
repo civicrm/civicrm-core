@@ -257,7 +257,8 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     return array('deleteOther' => 1);
   }
 
-  public function addRules() {}
+  public function addRules() {
+  }
 
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Merge %1s', array(1 => $this->_contactType)));
@@ -354,7 +355,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       );
       CRM_Utils_System::redirect($lisitingURL);
     }
-     if (!empty($formValues['_qf_Merge_done'])) {
+    if (!empty($formValues['_qf_Merge_done'])) {
       CRM_Utils_System::redirect($url);
     }
 

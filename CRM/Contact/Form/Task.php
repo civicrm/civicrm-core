@@ -258,7 +258,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
       }
     }
 
-
     if (CRM_Utils_Array::value('radio_ts', self::$_searchFormValues) == 'ts_sel'
       && ($form->_action != CRM_Core_Action::COPY)
     ) {
@@ -291,7 +290,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     }
 
     $selectorName = $this->controller->selectorName();
-    require_once(str_replace('_', DIRECTORY_SEPARATOR, $selectorName) . '.php');
+    require_once str_replace('_', DIRECTORY_SEPARATOR, $selectorName) . '.php';
 
     $fv = $this->get('formValues');
     $customClass = $this->get('customSearchClass');

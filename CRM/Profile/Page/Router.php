@@ -74,7 +74,6 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
         $profileGID = CRM_Utils_Request::retrieve('gid', 'Integer', $controller, TRUE);
       }
 
-
       // make sure that this profile enables mapping
       // CRM-8609
       $isMap =

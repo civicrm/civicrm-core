@@ -178,7 +178,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @return array   array of font names
    * @static
    */
-  public static function getFontNames($name='label_format') {
+  public static function getFontNames($name = 'label_format') {
     $label = new CRM_Utils_PDF_Label(self::getDefaultValues($name));
     return $label->getFontNames();
   }
@@ -256,7 +256,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @return int  Group ID (null if Group ID doesn't exist)
    */
-  private static function _getGid($name='label_format') {
+  private static function _getGid($name = 'label_format') {
     if (!isset(self::$_gid[$name]) || !self::$_gid[$name]) {
       self::$_gid[$name] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $name, 'id', 'name');
       if (!self::$_gid[$name]) {
@@ -293,7 +293,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @return array  (reference)   label format list
    * @static
    */
-  public static function &getList($namesOnly = FALSE, $groupName='label_format') {
+  public static function &getList($namesOnly = FALSE, $groupName = 'label_format') {
     static $list = array();
     if (self::_getGid($groupName)) {
       // get saved label formats from Option Value table
@@ -403,7 +403,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
     if (array_key_exists($field, self::$optionValueFields)) {
       switch (self::$optionValueFields[$field]['type']) {
         case CRM_Utils_Type::T_INT:
-          return (int)CRM_Utils_Array::value($field, $values, $default);
+          return (int) CRM_Utils_Array::value($field, $values, $default);
 
         case CRM_Utils_Type::T_FLOAT:
           // Round float values to three decimal places and trim trailing zeros.
@@ -411,7 +411,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
           $f = sprintf('%05.3f', $values[$field]);
           $f = rtrim($f, '0');
           $f = rtrim($f, '.');
-          return (float)(empty($f) ? '0' : $f);
+          return (float) (empty($f) ? '0' : $f);
       }
       return CRM_Utils_Array::value($field, $values, $default);
     }
@@ -433,7 +433,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @return CRM_Core_DAO_OptionValue object
    * @static
    */
-  public static function retrieve(&$params, &$values, $groupName='label_format') {
+  public static function retrieve(&$params, &$values, $groupName = 'label_format') {
     $optionValue = new CRM_Core_DAO_OptionValue();
     $optionValue->copyValues($params);
     $optionValue->option_group_id = self::_getGid($groupName);
@@ -500,9 +500,10 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
     }
     else {
       // new record
-      $list = self::getList(TRUE,$groupName);
+      $list = self::getList(TRUE, $groupName);
       $cnt = 1;
-      while (array_key_exists("custom_$cnt", $list)) $cnt++;
+      while (array_key_exists("custom_$cnt", $list)) { $cnt++;
+      }
       $values['name'] = "custom_$cnt";
       $values['grouping'] = self::customGroupName();
     }

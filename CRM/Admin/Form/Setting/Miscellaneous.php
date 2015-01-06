@@ -80,8 +80,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     // FIXME: for now, disable logging for multilingual sites OR if triggers are not permittted
     $domain = new CRM_Core_DAO_Domain;
     $domain->find(TRUE);
-    $attribs = $domain->locales || !$validTriggerPermission ?
-      array('disabled' => 'disabled') : array();
+    $attribs = $domain->locales || !$validTriggerPermission ? array('disabled' => 'disabled') : array();
 
     $this->assign('validTriggerPermission', $validTriggerPermission);
     $this->addYesNo('logging', ts('Logging'), NULL, NULL, $attribs);

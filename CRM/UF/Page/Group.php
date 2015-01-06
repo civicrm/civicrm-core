@@ -87,14 +87,14 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'url' => 'civicrm/profile/create',
           'qs' => 'gid=%%id%%&reset=1',
           'title' => ts('Use Profile-Create Mode'),
-          'fe' => true,
+          'fe' => TRUE,
         ),
         CRM_Core_Action::BASIC => array(
           'name' => ts('Use Profile-Listings Mode'),
           'url' => 'civicrm/profile',
           'qs' => 'gid=%%id%%&reset=1',
           'title' => ts('Use Profile-Listings Mode'),
-          'fe' => true,
+          'fe' => TRUE,
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
@@ -471,6 +471,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
             $typeName = 'Activity';
             $valueLabels = CRM_Core_PseudoConstant::ActivityType(TRUE, TRUE, FALSE, 'label', TRUE);
             break;
+
           case 'CaseType':
             $typeName = 'Case';
             $valueLabels = CRM_Case_PseudoConstant::caseType();

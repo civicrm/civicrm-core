@@ -71,7 +71,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
         array_search('Closed', $batchStatus) => ts('Closed'),
         array_search('Exported', $batchStatus) => ts('Exported'),
       ),
-      false
+      FALSE
     );
 
     $this->add(
@@ -79,7 +79,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
       'payment_instrument_id',
       ts('Payment Instrument'),
       array('' => ts('- any -' )) + CRM_Contribute_PseudoConstant::paymentInstrument(),
-      false
+      FALSE
     );
 
     $this->add('text', 'total', ts('Total Amount'), $attributes['total']);
@@ -101,7 +101,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
       ts('Task' ),
       array('' => ts('- actions -')) + $batchAction);
 
-    $this->add('submit','submit', ts('Go'),
+    $this->add('submit', 'submit', ts('Go'),
       array(
         'class' => 'crm-form-submit',
         'id' => 'Go',
@@ -122,8 +122,8 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
   public function postProcess() {
     $batchIds = array();
     foreach ($_POST as $key => $value) {
-      if (substr($key,0,6) == "check_") {
-        $batch = explode("_",$key);
+      if (substr($key, 0, 6) == "check_") {
+        $batch = explode("_", $key);
         $batchIds[] = $batch[1];
       }
     }

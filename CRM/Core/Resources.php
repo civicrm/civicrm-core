@@ -261,9 +261,9 @@ class CRM_Core_Resources {
       $region = self::isAjaxMode() ? 'ajax-snippet' : 'html-header';
       $resources = $this;
       CRM_Core_Region::instance($region)->add(array(
-        'callback' => function(&$snippet, &$html) use ($resources) {
-          $html .= "\n" . $resources->renderSetting();
-        },
+      'callback' => function(&$snippet, &$html) use ($resources) {
+        $html .= "\n" . $resources->renderSetting();
+      },
         'weight' => -100000,
       ));
       $this->addedSettings = TRUE;
@@ -533,7 +533,8 @@ class CRM_Core_Resources {
       $this->addScriptUrl(CRM_Utils_System::url('civicrm/ajax/l10n-js/' . $config->lcMessages, array('r' => $this->getCacheCode())), $jsWeight++, $region);
 
       // Add global settings
-      $settings = array('config' => array(
+      $settings = array(
+      'config' => array(
         'ajaxPopupsEnabled' => $this->ajaxPopupsEnabled,
         'isFrontend' => $config->userFrameworkFrontend,
       ));
@@ -736,7 +737,10 @@ class CRM_Core_Resources {
 
     $filters['event'] = array(
       array('key' => 'event_type_id', 'value' => ts('Event Type')),
-      array('key' => 'start_date', 'value' => ts('Start Date'), 'options' => array(
+      array(
+    'key' => 'start_date',
+    'value' => ts('Start Date'),
+    'options' => array(
         array('key' => '{">":"now"}', 'value' => ts('Upcoming')),
         array('key' => '{"BETWEEN":["now - 3 month","now"]}', 'value' => ts('Past 3 Months')),
         array('key' => '{"BETWEEN":["now - 6 month","now"]}', 'value' => ts('Past 6 Months')),

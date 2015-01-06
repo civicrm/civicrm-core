@@ -40,18 +40,18 @@
  */
 class CRM_Contact_Form_Edit_Organization {
 
- /**
-   * This function provides the HTML form elements that are specific
-   * to the Organization Contact Type
-   *
-   * @param CRM_Core_Form $form
-   *   Form object.
-   * @param int $inlineEditMode
-   *   ( 1 for contact summary.
-   * top bar form and 2 for display name edit )
-   *
-   * @return void
-   */
+  /**
+  * This function provides the HTML form elements that are specific
+  * to the Organization Contact Type
+  *
+  * @param CRM_Core_Form $form
+  *   Form object.
+  * @param int $inlineEditMode
+  *   ( 1 for contact summary.
+  * top bar form and 2 for display name edit )
+  *
+  * @return void
+  */
   public static function buildQuickForm(&$form, $inlineEditMode = NULL) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact');
 

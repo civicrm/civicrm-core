@@ -45,7 +45,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    * @var array
    * @static
    */
-  static $_links = null;
+  static $_links = NULL;
 
   /**
    * Get BAO Name
@@ -109,15 +109,15 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    */
   public function run() {
     // get the requested action
-    $action = CRM_Utils_Request::retrieve('action', 'String', $this, false, 'browse'); // default to 'browse'
+    $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse'); // default to 'browse'
 
     // assign vars to templates
     $this->assign('action', $action);
-    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, false, 0);
+    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
 
     // what action to take ?
     if ($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {
-      $this->edit($action, $id) ;
+      $this->edit($action, $id);
     }
 
     // parent run
@@ -216,7 +216,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  public function userContext($mode = null) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/financial/financialType';
   }
 }

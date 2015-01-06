@@ -262,7 +262,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
   /**
    * Get Url to view user record
-   * @param integer $contactID
+   * @param int $contactIDContact ID.
    *   Contact ID.
    *
    * @return string

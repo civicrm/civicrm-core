@@ -42,7 +42,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    */
   public function __construct() {
     $this->is_drupal = FALSE;
-    $this->supports_form_extensions = False;
+    $this->supports_form_extensions = FALSE;
   }
 
   /**

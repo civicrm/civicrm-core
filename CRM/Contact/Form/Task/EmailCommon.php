@@ -178,9 +178,11 @@ class CRM_Contact_Form_Task_EmailCommon {
                 $form->_contactIds[] = $form->_toContactIds[] = $contactId;
                 $form->_toContactEmails[] = $email;
                 break;
+
               case 'cc':
                 $form->_ccContactIds[] = $contactId;
                 break;
+
               case 'bcc':
                 $form->_bccContactIds[] = $contactId;
                 break;
@@ -376,14 +378,15 @@ class CRM_Contact_Form_Task_EmailCommon {
         $allEmails = explode(',', $formValues[$element]);
         foreach ($allEmails as $value) {
           list($contactId, $email) = explode('::', $value);
-          $contactURL = CRM_Utils_System::url('civicrm/contact/view', "reset=1&force=1&cid={$contactId}", true);
+          $contactURL = CRM_Utils_System::url('civicrm/contact/view', "reset=1&force=1&cid={$contactId}", TRUE);
           switch ($element) {
             case 'cc_id':
               $ccValues['email'][] = '"' . $form->_contactDetails[$contactId]['sort_name'] . '" <' . $email . '>';
               $ccValues['details'][] = "<a href='{$contactURL}'>" . $form->_contactDetails[$contactId]['display_name'] . "</a>";
               break;
+
             case 'bcc_id':
-              $bccValues['email'][]= '"' . $form->_contactDetails[$contactId]['sort_name'] . '" <' . $email . '>';
+              $bccValues['email'][] = '"' . $form->_contactDetails[$contactId]['sort_name'] . '" <' . $email . '>';
               $bccValues['details'][] = "<a href='{$contactURL}'>" . $form->_contactDetails[$contactId]['display_name'] . "</a>";
               break;
           }

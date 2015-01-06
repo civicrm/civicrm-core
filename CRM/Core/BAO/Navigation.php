@@ -301,7 +301,8 @@ ORDER BY parent_id, weight";
 
       // for each menu get their children
       $navigationTree[$navigation->id] = array(
-        'attributes' => array('label' => $label,
+        'attributes' => array(
+      'label' => $label,
           'name' => $navigation->name,
           'url' => $navigation->url,
           'permission' => $navigation->permission,
@@ -640,7 +641,7 @@ ORDER BY parent_id, weight";
   /**
    * Reset navigation for all contacts or a specified contact
    *
-   * @param integer $contactID
+   * @param int $contactIDReset only entries belonging to that contact ID.
    *   Reset only entries belonging to that contact ID.
    * @return string
    */
@@ -684,8 +685,8 @@ ORDER BY parent_id, weight";
    * @static
    */
   public static function processNavigation(&$params) {
-    $nodeID      = (int)str_replace("node_", "", $params['id']);
-    $referenceID = (int)str_replace("node_", "", $params['ref_id']);
+    $nodeID      = (int) str_replace("node_", "", $params['id']);
+    $referenceID = (int) str_replace("node_", "", $params['ref_id']);
     $position    = $params['ps'];
     $type        = $params['type'];
     $label       = CRM_Utils_Array::value('data', $params);
@@ -739,7 +740,7 @@ ORDER BY parent_id, weight";
       $parentClause = 'parent_id IS NULL';
     }
 
-    $incrementOtherNodes = true;
+    $incrementOtherNodes = TRUE;
     $sql    = "SELECT weight from civicrm_navigation WHERE {$parentClause} ORDER BY weight LIMIT %1, 1";
     $params = array(1 => array( $position, 'Positive'));
     $newWeight = CRM_Core_DAO::singleValueQuery($sql, $params);
@@ -755,7 +756,7 @@ ORDER BY parent_id, weight";
       $newWeight = $newWeight + 1;
 
       // since this is a last node we don't need to increment other nodes
-      $incrementOtherNodes = false;
+      $incrementOtherNodes = FALSE;
     }
 
     $transaction = new CRM_Core_Transaction();

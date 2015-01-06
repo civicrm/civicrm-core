@@ -722,7 +722,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @return array   $groupList associated array of group list
    *  -rp = rowcount
    *  -page= offset
-   *  @todo there seems little reason for the small number of functions that call this to pass in
+   * @todo there seems little reason for the small number of functions that call this to pass in
    *  params that then need to be translated in this function since they are coding them when calling
    */
   static public function getGroupListSelector(&$params) {
@@ -940,10 +940,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         );
 
         // If group has children, add class for link to view children
-        $values[$object->id]['is_parent'] = false;
+        $values[$object->id]['is_parent'] = FALSE;
         if (array_key_exists('children', $values[$object->id])) {
           $values[$object->id]['class'][] = "crm-group-parent";
-          $values[$object->id]['is_parent'] = true;
+          $values[$object->id]['is_parent'] = TRUE;
         }
 
         // If group is a child, add child class
@@ -1223,10 +1223,8 @@ WHERE {$whereClause}";
 
     if ($excludeHidden) {
       $clauses[] = 'groups.is_hidden = 0';
-    }
-    ;
+    };
     $clauses[] = self::getPermissionClause();
-
 
     return implode(' AND ', $clauses);
   }

@@ -443,8 +443,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    *
    * @return bool
    */
-  public function loadUser( $user ) {
-    return true;
+  public function loadUser($user) {
+    return TRUE;
   }
 
   public function permissionDenied() {
@@ -460,7 +460,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     wp_redirect(wp_login_url());
   }
 
-  public function updateCategories() {}
+  public function updateCategories() {
+  }
 
   /**
    * Get the locale set in the hosting CMS
@@ -500,13 +501,13 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       CRM_Core_Error::fatal("Could not find the install directory for WordPress");
     }
 
-    require_once ($cmsRootPath . DIRECTORY_SEPARATOR . 'wp-load.php');
+    require_once $cmsRootPath . DIRECTORY_SEPARATOR . 'wp-load.php';
     $wpUserTimezone = get_option('timezone_string');
     if ($wpUserTimezone) {
       date_default_timezone_set($wpUserTimezone);
       CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
     }
-    require_once ($cmsRootPath . DIRECTORY_SEPARATOR . 'wp-includes/pluggable.php');
+    require_once $cmsRootPath . DIRECTORY_SEPARATOR . 'wp-includes/pluggable.php';
     $uid = CRM_Utils_Array::value('uid', $name);
     if ($uid) {
       $account = wp_set_current_user($uid);
@@ -516,7 +517,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         return TRUE;
       }
     }
-    return true;
+    return TRUE;
   }
 
   /**
@@ -613,7 +614,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Change user name in host CMS
    *
-   * @param integer $ufID
+   * @param int $ufIDUser ID in CMS.
    *   User ID in CMS.
    * @param string $ufName
    *   User name.
@@ -624,9 +625,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       $ufID   = CRM_Utils_Type::escape($ufID, 'Integer');
       $ufName = CRM_Utils_Type::escape($ufName, 'String');
 
-      $values = array ('ID' => $ufID, 'user_email' => $ufName);
+      $values = array('ID' => $ufID, 'user_email' => $ufName);
       if( $ufID ) {
-        wp_update_user( $values ) ;
+        wp_update_user( $values );
       }
     }
   }
@@ -779,7 +780,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   /**
    * Get Url to view user record
-   * @param integer $contactID
+   * @param int $contactIDContact ID.
    *   Contact ID.
    *
    * @return string

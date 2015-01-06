@@ -144,9 +144,7 @@ class CRM_Utils_Mail_EmailProcessor {
     $usedfor = $dao->is_default;
 
     $emailActivityTypeId =
-      (defined('EMAIL_ACTIVITY_TYPE_ID') && EMAIL_ACTIVITY_TYPE_ID) ?
-      EMAIL_ACTIVITY_TYPE_ID :
-      CRM_Core_OptionGroup::getValue(
+      (defined('EMAIL_ACTIVITY_TYPE_ID') && EMAIL_ACTIVITY_TYPE_ID) ? EMAIL_ACTIVITY_TYPE_ID : CRM_Core_OptionGroup::getValue(
         'activity_type',
       'Inbound Email',
       'name'
@@ -185,7 +183,6 @@ class CRM_Utils_Mail_EmailProcessor {
       $message .= '<pre>' . $e->getMessage() . '</pre><p>';
       CRM_Core_Error::fatal($message);
     }
-
 
     // process fifty at a time, CRM-4002
     while ($mails = $store->fetchNext(MAIL_BATCH_SIZE)) {

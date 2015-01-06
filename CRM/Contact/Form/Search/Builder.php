@@ -295,7 +295,8 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     return TRUE;
   }
 
-  public function normalizeFormValues() {}
+  public function normalizeFormValues() {
+  }
 
   /**
    * @param $formValues
@@ -337,7 +338,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       $addMore = CRM_Utils_Array::value('addMore', $params);
       for ($x = 1; $x <= $this->_blockCount; $x++) {
         if (!empty($addMore[$x])) {
-          $this->set('newBlock',  $x);
+          $this->set('newBlock', $x);
           $this->_columnCount[$x] = $this->_columnCount[$x] + 5;
           $this->set('columnCount', $this->_columnCount);
           $this->set('showSearchForm', TRUE);
@@ -472,14 +473,14 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    */
   public static function checkArrayKeyEmpty($val) {
     if (is_array($val)) {
-      $v2empty = true;
+      $v2empty = TRUE;
       foreach ($val as $vk => $vv) {
         if (!empty($vk)) {
-          $v2empty = false;
+          $v2empty = FALSE;
         }
       }
       if ($v2empty) {
-        $val = null;
+        $val = NULL;
       }
     }
     return $val;

@@ -419,7 +419,7 @@ WHERE e.id = %1";
 
       // Format for js
       else {
-       // Option-groups for multiple categories
+        // Option-groups for multiple categories
         if ($result && count($values) > 1) {
           $elements[] = array(
             'value' => CRM_Core_PseudoConstant::$valueType($val, FALSE),

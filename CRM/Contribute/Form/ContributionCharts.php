@@ -87,7 +87,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
         krsort($this->_years);
       }
       foreach ($this->_years as $k => $v) {
-        $years[substr($k,0,4)] = substr($k,0,4);
+        $years[substr($k, 0, 4)] = substr($k, 0, 4);
       }
     }
 
@@ -172,9 +172,9 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
       if ($chartKey == 'by_year') {
         $yearlyChart = TRUE;
         if (!empty($config->fiscalYearStart) && ($config->fiscalYearStart['M'] !== 1 || $config->fiscalYearStart['d'] !== 1)) {
-          $values['xLabelAngle'] = 45 ;
+          $values['xLabelAngle'] = 45;
         } else {
-          $values['xLabelAngle'] = 0 ;
+          $values['xLabelAngle'] = 0;
         }
       }
       if ($chartKey == 'by_month') {
@@ -199,12 +199,12 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
         }
         elseif ($chartKey == 'by_year') {
           if (!empty($config->fiscalYearStart) && ($config->fiscalYearStart['M'] != 1 || $config->fiscalYearStart['d'] != 1)) {
-            $startDate = date('Ymd', mktime(0, 0, 0, $config->fiscalYearStart['M'], $config->fiscalYearStart['d'], substr($index,0,4)));
-            $endDate   = date('Ymd', mktime(0, 0, 0, $config->fiscalYearStart['M'], $config->fiscalYearStart['d'], (substr($index,0,4)) + 1));
+            $startDate = date('Ymd', mktime(0, 0, 0, $config->fiscalYearStart['M'], $config->fiscalYearStart['d'], substr($index, 0, 4)));
+            $endDate   = date('Ymd', mktime(0, 0, 0, $config->fiscalYearStart['M'], $config->fiscalYearStart['d'], (substr($index, 0, 4)) + 1));
           }
           else {
-            $startDate = CRM_Utils_Date::format(array('Y' => substr($index,0,4)));
-            $endDate   = date('Ymd', mktime(0, 0, 0, 13, 0, substr($index,0,4)));
+            $startDate = CRM_Utils_Date::format(array('Y' => substr($index, 0, 4)));
+            $endDate   = date('Ymd', mktime(0, 0, 0, 13, 0, substr($index, 0, 4)));
           }
           $urlParams = "reset=1&force=1&status=1&start={$startDate}&end={$endDate}&test=0";
         }

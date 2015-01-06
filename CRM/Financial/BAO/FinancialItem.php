@@ -38,7 +38,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   /**
    * Class constructor
    */
-  public function __construct( ) {
+  public function __construct() {
     parent::__construct( );
   }
 
@@ -143,14 +143,14 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    */
   public static function create(&$params, $ids = NULL, $trxnIds = NULL) {
     $financialItem = new CRM_Financial_DAO_FinancialItem();
-    
+
     if (!empty($ids['id'])) {
       CRM_Utils_Hook::pre('edit', 'FinancialItem', $ids['id'], $params);
     }
     else {
       CRM_Utils_Hook::pre('create', 'FinancialItem', NULL, $params);
     }
-    
+
     $financialItem->copyValues($params);
     if (!empty($ids['id'])) {
       $financialItem->id = $ids['id'];
@@ -175,7 +175,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     if (!empty($ids['id'])) {
       CRM_Utils_Hook::post('edit', 'FinancialItem', $financialItem->id, $financialItem);
     }
-    else {      
+    else {
       CRM_Utils_Hook::post('create', 'FinancialItem', $financialItem->id, $financialItem);
     }
     return $financialItem;
@@ -230,7 +230,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       return $financialItems;
     }
     else {
-      return null;
+      return NULL;
     }
   }
 
@@ -258,7 +258,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     if (!$allowPermDelete) {
       $sql = 'SELECT DISTINCT(cc.id), cc.display_name FROM civicrm_contact cc
 INNER JOIN civicrm_contribution con ON con.contact_id = cc.id
-WHERE cc.id IN (' . implode (',', $contactIds) . ') AND con.is_test = 0';
+WHERE cc.id IN (' . implode(',', $contactIds) . ') AND con.is_test = 0';
       $dao = CRM_Core_DAO::executeQuery($sql);
       if ($dao->N) {
         while ($dao->fetch()) {

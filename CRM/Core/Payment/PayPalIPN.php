@@ -286,7 +286,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   public function main() {
-   //@todo - this could be refactored like PayPalProIPN & a test could be added
+    //@todo - this could be refactored like PayPalProIPN & a test could be added
 
     $objects = $ids = $input = array();
     $component = CRM_Utils_Array::value('module', $_GET);

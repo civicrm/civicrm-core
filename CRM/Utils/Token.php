@@ -215,7 +215,7 @@ class CRM_Utils_Token {
     return preg_replace(array('/{/', '/(?<!{ldelim)}/'), array('{ldelim}', '{rdelim}'), $string);
   }
 
-   /**
+  /**
    * Replace all the domain-level tokens in $str
    *
    * @param string $str
@@ -247,7 +247,7 @@ class CRM_Utils_Token {
     $str = preg_replace_callback(
       self::tokenRegex($key),
       function ($matches) use(&$domain, $html, $escapeSmarty) {
-        return CRM_Utils_Token::getDomainTokenReplacement($matches[1], $domain, $html, $escapeSmarty);
+      return CRM_Utils_Token::getDomainTokenReplacement($matches[1], $domain, $html, $escapeSmarty);
       },
       $str
     );
@@ -429,7 +429,7 @@ class CRM_Utils_Token {
     $str = preg_replace_callback(
       self::tokenRegex($key),
       function ($matches) use(&$mailing, $escapeSmarty) {
-        return CRM_Utils_Token::getMailingTokenReplacement($matches[1], $mailing, $escapeSmarty);
+      return CRM_Utils_Token::getMailingTokenReplacement($matches[1], $mailing, $escapeSmarty);
       },
       $str
     );
@@ -568,7 +568,7 @@ class CRM_Utils_Token {
     $str = preg_replace_callback(
       self::tokenRegex($key),
       function ($matches) use(&$addresses, &$urls, $html, $escapeSmarty) {
-        return CRM_Utils_Token::getActionTokenReplacement($matches[1], $addresses, $urls, $html, $escapeSmarty);
+      return CRM_Utils_Token::getActionTokenReplacement($matches[1], $addresses, $urls, $html, $escapeSmarty);
       },
       $str
     );
@@ -671,7 +671,7 @@ class CRM_Utils_Token {
     $str = preg_replace_callback(
       self::tokenRegex($key),
       function ($matches) use(&$contact, $html, $returnBlankToken, $escapeSmarty) {
-        return CRM_Utils_Token::getContactTokenReplacement($matches[1], $contact, $html, $returnBlankToken, $escapeSmarty);
+      return CRM_Utils_Token::getContactTokenReplacement($matches[1], $contact, $html, $returnBlankToken, $escapeSmarty);
       },
       $str
     );
@@ -796,7 +796,7 @@ class CRM_Utils_Token {
       $str = preg_replace_callback(
         self::tokenRegex($key),
         function ($matches) use(&$contact, $key, $html, $escapeSmarty) {
-          return CRM_Utils_Token::getHookTokenReplacement($matches[1], $contact, $key, $html, $escapeSmarty);
+        return CRM_Utils_Token::getHookTokenReplacement($matches[1], $contact, $key, $html, $escapeSmarty);
         },
         $str
       );
@@ -829,24 +829,24 @@ class CRM_Utils_Token {
    * @param bool $escapeSmarty
    *
    * @return mixed|string
-   */public static function getHookTokenReplacement(
-    $token,
-    &$contact,
-    $category,
-    $html = FALSE,
-    $escapeSmarty = FALSE
+  public static function getHookTokenReplacement(
+  $token,
+  &$contact,
+  $category,
+  $html = FALSE,
+  $escapeSmarty = FALSE
   ) {
-    $value = CRM_Utils_Array::value("{$category}.{$token}", $contact);
+  $value = CRM_Utils_Array::value("{$category}.{$token}", $contact);
 
-    if ($value && !$html) {
-      $value = str_replace('&amp;', '&', $value);
-    }
+  if ($value && !$html) {
+  $value = str_replace('&amp;', '&', $value);
+  }
 
-    if ($escapeSmarty) {
-      $value = self::tokenEscapeSmarty($value);
-    }
+  if ($escapeSmarty) {
+  $value = self::tokenEscapeSmarty($value);
+  }
 
-    return $value;
+  return $value;
   }
 
   /**
@@ -855,10 +855,10 @@ class CRM_Utils_Token {
    *
    *  this routine will remove the extra backslashes and braces
    *
-   *  @param $str ref to the string that will be scanned and modified
-   *  @return void  this function works directly on the string that is passed
-   *  @access public
-   *  @static
+   * @param $str ref to the string that will be scanned and modified
+   * @return void  this function works directly on the string that is passed
+   * @access public
+   * @static
    */
   public static function unescapeTokens(&$str) {
     $str = preg_replace('/\\\\|\{(\{\w+\.\w+\})\}/', '\\1', $str);
@@ -1121,23 +1121,23 @@ class CRM_Utils_Token {
    *
    */
   public static function getReturnProperties(&$string) {
-      $returnProperties = array();
-      $matches = array();
-      preg_match_all('/(?<!\{|\\\\)\{(\w+\.\w+)\}(?!\})/',
+    $returnProperties = array();
+    $matches = array();
+    preg_match_all('/(?<!\{|\\\\)\{(\w+\.\w+)\}(?!\})/',
         $string,
         $matches,
         PREG_PATTERN_ORDER
       );
-      if ($matches[1]) {
-        foreach ($matches[1] as $token) {
-          list($type, $name) = preg_split('/\./', $token, 2);
-          if ($name) {
-            $returnProperties["{$name}"] = 1;
-          }
+    if ($matches[1]) {
+      foreach ($matches[1] as $token) {
+        list($type, $name) = preg_split('/\./', $token, 2);
+        if ($name) {
+          $returnProperties["{$name}"] = 1;
         }
       }
+    }
 
-      return $returnProperties;
+    return $returnProperties;
   }
 
   /**
@@ -1164,12 +1164,12 @@ class CRM_Utils_Token {
    */
   static function getTokenDetails($contactIDs,
     $returnProperties = NULL,
-    $skipOnHold       = TRUE,
-    $skipDeceased     = TRUE,
-    $extraParams      = NULL,
-    $tokens           = array(),
-    $className        = NULL,
-    $jobID            = NULL
+    $skipOnHold = TRUE,
+    $skipDeceased = TRUE,
+    $extraParams = NULL,
+    $tokens = array(),
+    $className = NULL,
+    $jobID = NULL
   ) {
     if (empty($contactIDs)) {
       // putting a fatal here so we can track if/when this happens
@@ -1291,15 +1291,15 @@ class CRM_Utils_Token {
    */
   public function getAnonymousTokenDetails($contactIDs = array(0),
     $returnProperties = NULL,
-    $skipOnHold       = TRUE,
-    $skipDeceased     = TRUE,
-    $extraParams      = NULL,
-    $tokens           = array(),
-    $className        = NULL,
-    $jobID            = NULL) {
+    $skipOnHold = TRUE,
+    $skipDeceased = TRUE,
+    $extraParams = NULL,
+    $tokens = array(),
+    $className = NULL,
+    $jobID = NULL) {
     $details = array(0 => array());
-      // also call a hook and get token details
-      CRM_Utils_Hook::tokenValues($details[0],
+    // also call a hook and get token details
+    CRM_Utils_Hook::tokenValues($details[0],
       $contactIDs,
       $jobID,
       $tokens,
@@ -1326,9 +1326,9 @@ class CRM_Utils_Token {
    */
   static function getContributionTokenDetails($contributionIDs,
     $returnProperties = NULL,
-    $extraParams      = NULL,
-    $tokens           = array(),
-    $className        = NULL
+    $extraParams = NULL,
+    $tokens = array(),
+    $className = NULL
   ) {
     //@todo - this function basically replications calling civicrm_api3('contribution', 'get', array('id' => array('IN' => array())
     if (empty($contributionIDs)) {
@@ -1508,7 +1508,7 @@ class CRM_Utils_Token {
     $str = preg_replace_callback(
       self::tokenRegex($key),
       function ($matches) use($escapeSmarty) {
-        return CRM_Utils_Token::getUserTokenReplacement($matches[1], $escapeSmarty);
+      return CRM_Utils_Token::getUserTokenReplacement($matches[1], $escapeSmarty);
       },
       $str
     );
@@ -1587,7 +1587,7 @@ class CRM_Utils_Token {
       return $str;
     }
 
-    $fn = 'get' . ucFirst($entity) . 'tokenReplacement';
+    $fn = 'get' . ucfirst($entity) . 'tokenReplacement';
     //since we already know the tokens lets just use them & do str_replace which is faster & simpler than preg_replace
     foreach ($knownTokens[$entity] as $token) {
       $replaceMent = CRM_Utils_Token::$fn($token, $entityArray, $escapeSmarty);
@@ -1623,7 +1623,7 @@ class CRM_Utils_Token {
     $str = preg_replace_callback(
       self::tokenRegex($key),
       function ($matches) use(&$contribution, $html, $escapeSmarty) {
-        return CRM_Utils_Token::getContributionTokenReplacement($matches[1], $contribution, $html, $escapeSmarty);
+      return CRM_Utils_Token::getContributionTokenReplacement($matches[1], $contribution, $html, $escapeSmarty);
       },
       $str
     );
@@ -1680,33 +1680,36 @@ class CRM_Utils_Token {
   public static function getMembershipTokenReplacement($token, $membership, $escapeSmarty = FALSE) {
     $entity = 'membership';
     self::_buildMembershipTokens();
-   switch ($token) {
-     case 'type':
-       $value = $membership['membership_name'];
-       break;
-     case 'status':
-       $statuses = CRM_Member_BAO_Membership::buildOptions('status_id');
-       $value = $statuses[$membership['status_id']];
-       break;
-     case 'fee':
-       try{
-         $value = civicrm_api3('membership_type', 'getvalue', array('id' => $membership['membership_type_id'], 'return' => 'minimum_fee'));
-       }
-       catch (CiviCRM_API3_Exception $e) {
-         // we can anticipate we will get an error if the minimum fee is set to 'NULL' because of the way the
-         // api handles NULL (4.4)
-         $value = 0;
-       }
-       break;
-     default:
-       if (in_array($token, self::$_tokens[$entity])) {
-         $value = $membership[$token];
-       }
-       else {
-         //ie unchanged
-         $value = "{$entity}.{$token}";
-       }
-       break;
+    switch ($token) {
+      case 'type':
+        $value = $membership['membership_name'];
+        break;
+
+      case 'status':
+        $statuses = CRM_Member_BAO_Membership::buildOptions('status_id');
+        $value = $statuses[$membership['status_id']];
+        break;
+
+      case 'fee':
+        try{
+          $value = civicrm_api3('membership_type', 'getvalue', array('id' => $membership['membership_type_id'], 'return' => 'minimum_fee'));
+        }
+        catch (CiviCRM_API3_Exception $e) {
+          // we can anticipate we will get an error if the minimum fee is set to 'NULL' because of the way the
+          // api handles NULL (4.4)
+          $value = 0;
+        }
+        break;
+
+      default:
+        if (in_array($token, self::$_tokens[$entity])) {
+          $value = $membership[$token];
+        }
+        else {
+          //ie unchanged
+          $value = "{$entity}.{$token}";
+        }
+        break;
     }
 
     if ($escapeSmarty) {
@@ -1748,7 +1751,6 @@ class CRM_Utils_Token {
         }
         break;
     }
-
 
     if ($escapeSmarty) {
       $value = self::tokenEscapeSmarty($value);

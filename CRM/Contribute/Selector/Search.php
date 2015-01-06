@@ -169,12 +169,12 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
   @access public
    */
   function __construct(&$queryParams,
-    $action             = CRM_Core_Action::NONE,
+    $action = CRM_Core_Action::NONE,
     $contributionClause = NULL,
-    $single             = FALSE,
-    $limit              = NULL,
-    $context            = 'search',
-    $compContext        = NULL
+    $single = FALSE,
+    $limit = NULL,
+    $context = 'search',
+    $compContext = NULL
   ) {
 
     // submitted form values
@@ -360,7 +360,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     //get all campaigns.
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
 
-    While ($result->fetch()) {
+    while ($result->fetch()) {
       $row = array();
       // the columns we are interested in
       foreach (self::$_properties as $property) {
@@ -411,8 +411,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
         $result->contribution_id
       );
 
-      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-          $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
+      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
       );
 
       if (!empty($row['amount_level'])) {

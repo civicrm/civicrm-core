@@ -135,7 +135,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
       array('Financial', 'FinancialTypeAccount', 'financial_account_id'),
       );
     foreach ($dependancy as $name) {
-      require_once (str_replace('_', DIRECTORY_SEPARATOR, "CRM_" . $name[0] . "_BAO_" . $name[1]) . ".php");
+      require_once str_replace('_', DIRECTORY_SEPARATOR, "CRM_" . $name[0] . "_BAO_" . $name[1]) . ".php";
       $className = "CRM_{$name[0]}_BAO_{$name[1]}";
       $bao = new $className();
       $bao->$name[2] = $financialAccountId;
@@ -207,6 +207,6 @@ WHERE cft.id = %1
       2 => array(strtolower($accountTypeCode), 'String'),
       3 => array($financialAccountId, 'Integer'),
     );
-     return CRM_Core_DAO::singleValueQuery($query, $params);
+    return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 }

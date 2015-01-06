@@ -125,12 +125,15 @@ class CRM_Utils_QueryFormatter {
       case self::LANG_SQL_FTS:
         $text = $this->_formatFts($text, $this->mode);
         break;
+
       case self::LANG_SQL_FTSBOOL:
         $text = $this->_formatFtsBool($text, $this->mode);
         break;
+
       case self::LANG_SQL_LIKE:
         $text = $this->_formatLike($text, $this->mode);
         break;
+
       default:
         $text = NULL;
     }

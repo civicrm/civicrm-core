@@ -527,7 +527,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       $this->geocodeMethod = 'CRM_Utils_Geocode_' . $this->mapProvider;
     }
 
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $this->userFrameworkClass) . '.php');
+    require_once str_replace('_', DIRECTORY_SEPARATOR, $this->userFrameworkClass) . '.php';
     $class = $this->userFrameworkClass;
     // redundant with _setUserFrameworkConfig
     $this->userSystem = new $class();

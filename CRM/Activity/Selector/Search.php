@@ -154,12 +154,12 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
   @access public
    */
   function __construct(&$queryParams,
-    $action         = CRM_Core_Action::NONE,
+    $action = CRM_Core_Action::NONE,
     $activityClause = NULL,
-    $single         = FALSE,
-    $limit          = NULL,
-    $context        = 'search',
-    $compContext    = NULL
+    $single = FALSE,
+    $limit = NULL,
+    $context = 'search',
+    $compContext = NULL
   ) {
     // submitted form values
     $this->_queryParams = &$queryParams;
@@ -278,8 +278,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
       if ($this->_context == 'search') {
         $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $result->activity_id;
       }
-      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-        $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
+      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
       );
       $accessMailingReport = FALSE;
       $activityTypeId      = $row['activity_type_id'];

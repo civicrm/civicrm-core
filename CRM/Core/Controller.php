@@ -170,7 +170,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *   Name of session if we want unique scope, used only by Controller_Simple.
    * @param bool $addSequence
    *   Should we add a unique sequence number to the end of the key.
-   * @param bool $ignoreKey 
+   * @param bool $ignoreKey
    *   Should we not set a qfKey for this controller (for standalone forms).
    *
    * @internal param bool $whether controller is modal
@@ -252,7 +252,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       }
     }
 
-   // if the request has a reset value, initialize the controller session
+    // if the request has a reset value, initialize the controller session
     if (!empty($_GET['reset'])) {
       $this->reset();
 
@@ -266,7 +266,6 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     // do this at the end so we have initialized the object
     // and created the scope etc
     $this->set('qfKey', $this->_key);
-
 
     // also retrieve and store destination in session
     $this->_destination = CRM_Utils_Request::retrieve(
@@ -458,10 +457,10 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
 
       $ext = CRM_Extension_System::singleton()->getMapper();
       if ($ext->isExtensionClass($className)) {
-        require_once ($ext->classToPath($className));
+        require_once $ext->classToPath($className);
       }
       else {
-        require_once (str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php');
+        require_once str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
       }
       $$stateName = new $className($stateMachine->find($className), $action, 'post', $formName);
       if ($title) {
@@ -515,7 +514,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *
    * @return void
    */
-  public function process() {}
+  public function process() {
+  }
 
   /**
    * Store the variable with the value in the form scope
@@ -640,7 +640,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *   The value to append.
    * @param bool $merge
    */
-  public function append($tpl_var, $value=NULL, $merge=FALSE) {
+  public function append($tpl_var, $value = NULL, $merge = FALSE) {
     self::$_template->append($tpl_var, $value, $merge);
   }
 
@@ -651,7 +651,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *
    * @return array
    */
-  public function get_template_vars($name=null) {
+  public function get_template_vars($name = NULL) {
     return self::$_template->get_template_vars($name);
   }
 

@@ -389,7 +389,8 @@ AND        ca.case_id = %2
 AND        a.is_deleted = 0
 ";
 
-    $sqlParams = array(1 => array($params['activityTypeID'], 'Integer'),
+    $sqlParams = array(
+    1 => array($params['activityTypeID'], 'Integer'),
       2 => array($params['caseID'], 'Integer'),
     );
     $count = CRM_Core_DAO::singleValueQuery($query, $sqlParams);

@@ -106,21 +106,21 @@ abstract class CRM_Core_Payment {
       return CRM_Core_DAO::$_nullObject;
     }
 
-    $cacheKey = "{$mode}_{$paymentProcessor['id']}_" . (int)isset($paymentForm);
+    $cacheKey = "{$mode}_{$paymentProcessor['id']}_" . (int) isset($paymentForm);
 
     if (!isset(self::$_singleton[$cacheKey]) || $force) {
       $config = CRM_Core_Config::singleton();
       $ext = CRM_Extension_System::singleton()->getMapper();
       if ($ext->isExtensionKey($paymentProcessor['class_name'])) {
         $paymentClass = $ext->keyToClass($paymentProcessor['class_name'], 'payment');
-        require_once ($ext->classToPath($paymentClass));
+        require_once $ext->classToPath($paymentClass);
       }
       else {
         $paymentClass = 'CRM_Core_' . $paymentProcessor['class_name'];
         if (empty($paymentClass)) {
           throw new CRM_Core_Exception('no class provided');
         }
-        require_once (str_replace('_', DIRECTORY_SEPARATOR, $paymentClass) . '.php');
+        require_once str_replace('_', DIRECTORY_SEPARATOR, $paymentClass) . '.php';
       }
 
       //load the object.
@@ -129,7 +129,7 @@ abstract class CRM_Core_Payment {
 
     //load the payment form for required processor.
     //if ($paymentForm !== NULL) {
-      //self::$_singleton[$cacheKey]->setForm($paymentForm);
+    //self::$_singleton[$cacheKey]->setForm($paymentForm);
     //}
 
     return self::$_singleton[$cacheKey];
@@ -587,10 +587,11 @@ abstract class CRM_Core_Payment {
       $extension_instance_found = TRUE;
     }
 
-    if (!$extension_instance_found) CRM_Core_Error::fatal(
+    if (!$extension_instance_found) { CRM_Core_Error::fatal(
       "No extension instances of the '{$params['processor_name']}' payment processor were found.<br />" .
       "$method method is unsupported in legacy payment processors."
-    );
+      );
+    }
 
     // Exit here on web requests, allowing just the plain text response to be echoed
     if ($method == 'handlePaymentNotification') {
@@ -620,17 +621,19 @@ abstract class CRM_Core_Payment {
   public function subscriptionURL($entityID = NULL, $entity = NULL, $action = 'cancel') {
     // Set URL
     switch ($action) {
-      case 'cancel' :
+      case 'cancel':
         $url = 'civicrm/contribute/unsubscribe';
         break;
-      case 'billing' :
+
+      case 'billing':
         //in notify mode don't return the update billing url
         if (!$this->isSupported('updateSubscriptionBillingInfo')) {
           return NULL;
         }
         $url = 'civicrm/contribute/updatebilling';
         break;
-      case 'update' :
+
+      case 'update':
         $url = 'civicrm/contribute/updaterecur';
         break;
     }
@@ -644,17 +647,17 @@ abstract class CRM_Core_Payment {
     // Find related Contact
     if ($entityID) {
       switch ($entity) {
-        case 'membership' :
+        case 'membership':
           $contactID = CRM_Core_DAO::getFieldValue("CRM_Member_DAO_Membership", $entityID, "contact_id");
           $entityArg = 'mid';
           break;
 
-        case 'contribution' :
+        case 'contribution':
           $contactID = CRM_Core_DAO::getFieldValue("CRM_Contribute_DAO_Contribution", $entityID, "contact_id");
           $entityArg = 'coid';
           break;
 
-        case 'recur' :
+        case 'recur':
           $sql = "
     SELECT con.contact_id
       FROM civicrm_contribution_recur rec

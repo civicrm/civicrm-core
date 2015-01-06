@@ -646,7 +646,6 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
             )
           ) . "@$emailDomain";
 
-
         $confirmUrl = CRM_Utils_System::url('civicrm/petition/confirm',
           "reset=1&cid={$se->contact_id}&sid={$se->id}&h={$se->hash}&a={$params['activityId']}&pid={$params['sid']}",
           TRUE

@@ -64,40 +64,40 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    *
    * @return array $_actionLinks
    *
-   */ function &actionLinks() {
-    if (!isset(self::$_actionLinks)) {
-      self::$_actionLinks = array(
-        CRM_Core_Action::UPDATE => array(
-          'name' => ts('Edit'),
-          'url' => 'civicrm/admin/uf/group/field/update',
-          'qs' => 'reset=1&action=update&id=%%id%%&gid=%%gid%%',
-          'title' => ts('Edit CiviCRM Profile Field'),
-        ),
-        CRM_Core_Action::PREVIEW => array(
-          'name' => ts('Preview'),
-          'url' => 'civicrm/admin/uf/group/field',
-          'qs' => 'action=preview&id=%%id%%&field=1',
-          'title' => ts('Preview CiviCRM Profile Field'),
-        ),
-        CRM_Core_Action::DISABLE => array(
-          'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Disable CiviCRM Profile Field'),
-        ),
-        CRM_Core_Action::ENABLE => array(
-          'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Enable CiviCRM Profile Field'),
-        ),
-        CRM_Core_Action::DELETE => array(
-          'name' => ts('Delete'),
-          'url' => 'civicrm/admin/uf/group/field',
-          'qs' => 'action=delete&id=%%id%%',
-          'title' => ts('Enable CiviCRM Profile Field'),
-        ),
-      );
-    }
-    return self::$_actionLinks;
+  function &actionLinks() {
+  if (!isset(self::$_actionLinks)) {
+  self::$_actionLinks = array(
+  CRM_Core_Action::UPDATE => array(
+  'name' => ts('Edit'),
+  'url' => 'civicrm/admin/uf/group/field/update',
+  'qs' => 'reset=1&action=update&id=%%id%%&gid=%%gid%%',
+  'title' => ts('Edit CiviCRM Profile Field'),
+  ),
+  CRM_Core_Action::PREVIEW => array(
+  'name' => ts('Preview'),
+  'url' => 'civicrm/admin/uf/group/field',
+  'qs' => 'action=preview&id=%%id%%&field=1',
+  'title' => ts('Preview CiviCRM Profile Field'),
+  ),
+  CRM_Core_Action::DISABLE => array(
+  'name' => ts('Disable'),
+  'ref' => 'crm-enable-disable',
+  'title' => ts('Disable CiviCRM Profile Field'),
+  ),
+  CRM_Core_Action::ENABLE => array(
+  'name' => ts('Enable'),
+  'ref' => 'crm-enable-disable',
+  'title' => ts('Enable CiviCRM Profile Field'),
+  ),
+  CRM_Core_Action::DELETE => array(
+  'name' => ts('Delete'),
+  'url' => 'civicrm/admin/uf/group/field',
+  'qs' => 'action=delete&id=%%id%%',
+  'title' => ts('Enable CiviCRM Profile Field'),
+  ),
+  );
+  }
+  return self::$_actionLinks;
   }
 
   /**

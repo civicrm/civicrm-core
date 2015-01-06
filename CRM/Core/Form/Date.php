@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-Class CRM_Core_Form_Date {
+class CRM_Core_Form_Date {
 
   /**
    * Various Date Formats
@@ -77,7 +77,7 @@ Class CRM_Core_Form_Date {
    * @param CRM_Core_Form $form
    *   The form the dates should be added to.
    * @param string $fieldName
-   * @param integer $count
+   * @param int $count
    * @param string $from
    * @param string $to
    * @param string $fromLabel
@@ -118,15 +118,15 @@ Class CRM_Core_Form_Date {
    * @param CRM_Core_Form $form
    *   The form object that we are operating on.
    * @param string $fieldName
-   * @param integer $count
-   * @param String $from
-   * @param String $to
-   * @param String $fromLabel
-   * @param Boolean $required
-   * @param Array $operators
+   * @param int $count
+   * @param string $from
+   * @param string $to
+   * @param string $fromLabel
+   * @param bool $required
+   * @param array $operatorsAdditional Operator Selections to add.
    *   Additional Operator Selections to add.
-   * @param String $dateFormat
-   * @param Boolean $displayTime
+   * @param string $dateFormat
+   * @param bool $displayTime
    * @return array Values for Selector
    */
   static function returnDateRangeSelector(
@@ -232,7 +232,7 @@ Class CRM_Core_Form_Date {
    * @param CRM_Core_Form $form
    *   The form object that we are operating on.
    * @param string $fieldName
-   * @param Array $selector
+   * @param array $selectorArray of option values to add.
    *   Array of option values to add.
    * @param string $from
    *   Label.
@@ -253,7 +253,7 @@ Class CRM_Core_Form_Date {
       array('class' => 'crm-select2')
       );
 
-      $form->addDateRange($fieldName, $from, $to, $fromLabel, $dateFormat, FALSE, $displayTime);
+    $form->addDateRange($fieldName, $from, $to, $fromLabel, $dateFormat, FALSE, $displayTime);
   }
 
 }

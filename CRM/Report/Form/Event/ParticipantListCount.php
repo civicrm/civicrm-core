@@ -537,7 +537,6 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
         $entryFound = TRUE;
       }
 
-
       // skip looking further in rows, if first row itself doesn't
       // have the column we need
       if (!$entryFound) {

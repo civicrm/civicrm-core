@@ -473,7 +473,7 @@ ORDER BY  modified_date desc";
    */
   private static function buildNoteTree($parentId, $maxDepth = 0, $snippet = FALSE, &$tree = array(), $depth = 0) {
     if ($maxDepth && $depth > $maxDepth) {
-      return false;
+      return FALSE;
     }
 
     // get direct children of given parentId note
