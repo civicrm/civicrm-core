@@ -104,8 +104,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    *  Change user name in host CMS
    *
-   *  @param integer $ufID User ID in CMS
-   *  @param string $ufName User name
+   * @param int $ufID
+   * @param string $ufName User name
    */
   public function updateCMSName($ufID, $ufName) {
     $ufID = CRM_Utils_Type::escape($ufID, 'Integer');
@@ -144,7 +144,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     if ($isNotValid || strlen($name) < 2) {
       $errors['cms_name'] = ts('Your username contains invalid characters or is too short');
     }
-
 
     $JUserTable = &JTable::getInstance('User', 'JTable');
 
@@ -472,7 +471,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *
    * @return mixed false if no auth
    *               array(
-      contactID, ufID, unique string ) if success
+  contactID, ufID, unique string ) if success
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE) {
     require_once 'DB.php';
@@ -540,7 +539,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         }
       }
       else {
-        if (!JUserHelper::verifyPassword($password, $dbPassword, $dbId)) return FALSE;
+        if (!JUserHelper::verifyPassword($password, $dbPassword, $dbId)) { return FALSE;
+        }
 
         //include additional files required by Joomla 3.2.1+
         if ( version_compare(JVERSION, '3.2.1', 'ge') ) {
@@ -751,7 +751,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $result = array();
 
     $db = JFactory::getDbo();
-    $query = $db->getQuery(true);
+    $query = $db->getQuery(TRUE);
     $query->select('type, folder, element, enabled')
       ->from('#__extensions')
       ->where('type =' . $db->Quote('plugin'));
@@ -892,7 +892,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       parent::outputError($content);
     }
   }
-  
+
   /**
    * Append to coreResourcesList
    */

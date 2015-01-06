@@ -112,7 +112,7 @@ class CRM_Utils_Type {
         $string = 'Blob';
         break;
 
-        // CRM-10404
+      // CRM-10404
       case 12:
       case 256:
         $string = 'Timestamp';
@@ -165,7 +165,7 @@ class CRM_Utils_Type {
         break;
 
       case 'Positive':
-      // CRM-8925 the 3 below are for custom fields of this type
+        // CRM-8925 the 3 below are for custom fields of this type
       case 'Country':
       case 'StateProvince':
         // Checked for multi valued state/country value

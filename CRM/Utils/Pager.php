@@ -165,7 +165,6 @@ class CRM_Utils_Pager extends Pager_Sliding {
     $params['prevImg'] = ' ' . ts('&lt; Previous');
     $params['nextImg'] = ts('Next &gt;') . ' ';
 
-
     // set first and last text fragments
     $params['firstPagePre'] = '';
     $params['firstPageText'] = ' ' . ts('&lt;&lt; First');
@@ -203,20 +202,20 @@ class CRM_Utils_Pager extends Pager_Sliding {
     $currentPage = $defaultPageId;
     if (!empty($_POST)) {
       if (isset($_POST[CRM_Utils_Array::value('buttonTop', $params)]) && isset($_POST[self::PAGE_ID])) {
-        $currentPage = max((int )@$_POST[self::PAGE_ID], 1);
+        $currentPage = max((int ) @$_POST[self::PAGE_ID], 1);
       }
       elseif (isset($_POST[$params['buttonBottom']]) && isset($_POST[self::PAGE_ID_BOTTOM])) {
-        $currentPage = max((int )@$_POST[self::PAGE_ID_BOTTOM], 1);
+        $currentPage = max((int ) @$_POST[self::PAGE_ID_BOTTOM], 1);
       }
       elseif (isset($_POST[self::PAGE_ID])) {
-        $currentPage = max((int )@$_POST[self::PAGE_ID], 1);
+        $currentPage = max((int ) @$_POST[self::PAGE_ID], 1);
       }
       elseif (isset($_POST[self::PAGE_ID_BOTTOM])) {
-        $currentPage = max((int )@$_POST[self::PAGE_ID_BOTTOM]);
+        $currentPage = max((int ) @$_POST[self::PAGE_ID_BOTTOM]);
       }
     }
     elseif (isset($_GET[self::PAGE_ID])) {
-      $currentPage = max((int )@$_GET[self::PAGE_ID], 1);
+      $currentPage = max((int ) @$_GET[self::PAGE_ID], 1);
     }
     return $currentPage;
   }
@@ -233,10 +232,10 @@ class CRM_Utils_Pager extends Pager_Sliding {
   public function getPageRowCount($defaultPageRowCount = self::ROWCOUNT) {
     // POST has higher priority than GET vars
     if (isset($_POST[self::PAGE_ROWCOUNT])) {
-      $rowCount = max((int )@$_POST[self::PAGE_ROWCOUNT], 1);
+      $rowCount = max((int ) @$_POST[self::PAGE_ROWCOUNT], 1);
     }
     elseif (isset($_GET[self::PAGE_ROWCOUNT])) {
-      $rowCount = max((int )@$_GET[self::PAGE_ROWCOUNT], 1);
+      $rowCount = max((int ) @$_GET[self::PAGE_ROWCOUNT], 1);
     }
     else {
       $rowCount = $defaultPageRowCount;

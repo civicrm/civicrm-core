@@ -526,7 +526,7 @@ WHERE ac.contact_id IN ( $ids )
         DIRECTORY_SEPARATOR,
         $daoName
       ) . '.php';
-      include_once ($daoFile);
+      include_once $daoFile;
 
       $daoFields = & $daoName::fields();
 
@@ -614,7 +614,6 @@ WHERE  date >= $lastExportTime
 )
 ";
     }
-
 
     $dao = & CRM_Core_DAO::executeQuery($sql);
 

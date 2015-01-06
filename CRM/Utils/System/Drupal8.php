@@ -101,9 +101,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       case $user_register_conf == 'admin_only' || $user->isAuthenticated():
         _user_mail_notify('register_admin_created', $account);
         break;
+
       case $user_register_conf == 'visitors':
         _user_mail_notify('register_no_approval_required', $account);
         break;
+
       case 'visitors_admin_approval':
         _user_mail_notify('register_pending_approval', $account);
         break;
@@ -155,7 +157,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       // This checks for both username uniqueness and validity.
       $violations = iterator_to_array($user->validate());
       // We only care about violations on the username field; discard the rest.
-      $violations = array_filter($violations, function ($v) { return $v->getPropertyPath() == 'name.0.value'; });
+      $violations = array_filter($violations, function ($v) { return $v->getPropertyPath() == 'name.0.value';
+      });
       if (count($violations) > 0) {
         $errors['cms_name'] = $violations[0]->getMessage();
       }
@@ -171,7 +174,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       // This checks for both email uniqueness.
       $violations = iterator_to_array($user->validate());
       // We only care about violations on the email field; discard the rest.
-      $violations = array_filter($violations, function ($v) { return $v->getPropertyPath() == 'mail.0.value'; });
+      $violations = array_filter($violations, function ($v) { return $v->getPropertyPath() == 'mail.0.value';
+      });
       if (count($violations) > 0) {
         $errors[$emailName] = $violations[0]->getMessage();
       }
@@ -305,6 +309,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       case 'page-footer':
         $options['scope'] = substr($region, 5);
         break;
+
       default:
         return FALSE;
     }
@@ -333,6 +338,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       case 'page-footer':
         $options['scope'] = substr($region, 5);
         break;
+
       default:
         return FALSE;
     }
@@ -557,7 +563,9 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    */
   public function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     static $run_once = FALSE;
-    if ($run_once) return TRUE; else $run_once = TRUE;
+    if ($run_once) { return TRUE;
+    } else { $run_once = TRUE;
+    }
 
     if (!($root = $this->cmsRootPath())) {
       return FALSE;

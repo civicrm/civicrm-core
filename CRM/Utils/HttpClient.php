@@ -174,9 +174,9 @@ class CRM_Utils_HttpClient {
     }
 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POST,count($params));
-    curl_setopt($ch, CURLOPT_POSTFIELDS,$params);
+    curl_setopt($ch, CURLOPT_POST, TRUE);
+    curl_setopt($ch, CURLOPT_POST, count($params));
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
     $data = curl_exec($ch);
     if (curl_errno($ch)) {
       return array(self::STATUS_DL_ERROR, $data);

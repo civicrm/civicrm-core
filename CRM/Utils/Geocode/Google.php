@@ -142,8 +142,8 @@ class CRM_Utils_Geocode_Google {
       ) {
         $ret = $xml->result->geometry->location->children();
         if ($ret->lat && $ret->lng) {
-          $values['geo_code_1'] = (float)$ret->lat;
-          $values['geo_code_2'] = (float)$ret->lng;
+          $values['geo_code_1'] = (float) $ret->lat;
+          $values['geo_code_2'] = (float) $ret->lng;
           return TRUE;
         }
       }

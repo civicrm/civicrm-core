@@ -142,7 +142,7 @@ class CRM_Utils_Zip {
       }
       $zip->close();
     } else {
-       return FALSE;
+      return FALSE;
     }
     return TRUE;
   }
