@@ -132,7 +132,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @return string
    */
-  static function setCache($values,
+  static function setCache(
+    $values,
     $group,
     $componentID = NULL,
     $contactID = NULL,
@@ -161,7 +162,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @return CRM_Core_DAO_Domain|CRM_Core_DAO_Setting
    */
-  static function dao($group,
+  static function dao(
+    $group,
     $name        = NULL,
     $componentID = NULL,
     $contactID   = NULL,
@@ -828,7 +830,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @return array
    */
-  static function valueOptions($group,
+  static function valueOptions(
+    $group,
     $name,
     $system              = TRUE,
     $userID              = NULL,
@@ -886,7 +889,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param int $userID
    * @param string $keyField
    */
-  static function setValueOption($group,
+  static function setValueOption(
+    $group,
     $name,
     $value,
     $system   = TRUE,

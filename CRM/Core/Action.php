@@ -207,7 +207,8 @@ class CRM_Core_Action {
    * @return string       the html string
    * @static
    */
-  static function formLink($links,
+  static function formLink(
+    $links,
     $mask,
     $values,
     $extraULName = 'more',

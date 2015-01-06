@@ -327,7 +327,8 @@ class CRM_Core_Component {
    *
    * @return null
    */
-  static function &defaultReturnProperties($mode,
+  static function &defaultReturnProperties(
+    $mode,
     $includeCustomFields = TRUE
   ) {
     $info = self::_info();

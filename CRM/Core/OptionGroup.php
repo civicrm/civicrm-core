@@ -378,7 +378,8 @@ WHERE  v.option_group_id = g.id
    *
    * @return null
    */
-  static function getValue($groupName,
+  static function getValue(
+    $groupName,
     $label,
     $labelField = 'label',
     $labelType = 'String',
@@ -597,7 +598,8 @@ SELECT v.label
    *
    * @return array
    */
-  static function getRowValues($groupName, $fieldValue, $field = 'name',
+  static function getRowValues(
+    $groupName, $fieldValue, $field = 'name',
     $fieldType = 'String', $active = TRUE
   ) {
     $query = "

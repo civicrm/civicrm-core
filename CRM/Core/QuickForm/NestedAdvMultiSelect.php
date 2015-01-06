@@ -61,7 +61,8 @@ class CRM_Core_QuickForm_NestedAdvMultiSelect extends HTML_QuickForm_advmultisel
    * @throws     PEAR_Error
    * @see        loadArray()
    */
-  function load(&$options, $param1 = NULL, $param2 = NULL,
+  function load(
+    &$options, $param1 = NULL, $param2 = NULL,
     $param3 = NULL, $param4 = NULL
   ) {
     switch (TRUE) {

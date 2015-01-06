@@ -1180,7 +1180,8 @@ FROM   civicrm_domain
    *
    * @static
    */
-  static function &singleValueQuery($query,
+  static function &singleValueQuery(
+    $query,
     $params      = array(),
     $abort       = TRUE,
     $i18nRewrite = TRUE

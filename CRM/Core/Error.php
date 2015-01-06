@@ -533,7 +533,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @see CRM_Core_Error::debug()
    * @see CRM_Core_Error::debug_log_message()
    */
-  static function debug_var($variable_name,
+  static function debug_var(
+    $variable_name,
     $variable,
     $print = TRUE,
     $log = TRUE,
