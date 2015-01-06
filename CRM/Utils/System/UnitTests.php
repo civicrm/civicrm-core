@@ -66,9 +66,12 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   /**
    * Authenticate the user against the drupal db
    *
-   * @param string $name     the user name
-   * @param string $password the password for the above user name
-   * @param boolean $loadCMSBootstrap load cms bootstrap?
+   * @param string $name
+   *   The user name.
+   * @param string $password
+   *   The password for the above user name.
+   * @param bool $loadCMSBootstrap
+   *   Load cms bootstrap?.
    * @param NULL|string $realPath filename of script
    *
    * @return mixed false if no auth
@@ -112,7 +115,8 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   /**
    * Append a string to the head of the html file
    *
-   * @param string $header the new string to be appended
+   * @param string $header
+   *   The new string to be appended.
    *
    * @return void
    */
@@ -131,7 +135,8 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   /**
    * Figure out the post url for the form
    *
-   * @param mix $action the default action if one is pre-specified
+   * @param mix $action
+   *   The default action if one is pre-specified.
    *
    * @return string the url to post the form
    */
@@ -147,15 +152,22 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   /**
    * Generate an internal CiviCRM URL (copied from DRUPAL/includes/common.inc#url)
    *
-   * @param $path     string   The path being linked to, such as "civicrm/add"
-   * @param $query    string   A query string to append to the link.
-   * @param $absolute boolean  Whether to force the output to be an absolute link (beginning with http:).
+   * @param $path
+   *   String The path being linked to, such as "civicrm/add".
+   * @param $query
+   *   String A query string to append to the link.
+   * @param $absolute
+   *   Boolean Whether to force the output to be an absolute link (beginning with http:).
    *                           Useful for links that will be displayed outside the site, such as in an
    *                           RSS feed.
-   * @param $fragment string   A fragment identifier (named anchor) to append to the link.
-   * @param $htmlize  boolean  whether to convert to html eqivalant
-   * @param $frontend boolean  a gross joomla hack
-   * @param $forceBackend boolean  a gross joomla hack
+   * @param $fragment
+   *   String A fragment identifier (named anchor) to append to the link.
+   * @param $htmlize
+   *   Boolean whether to convert to html eqivalant.
+   * @param $frontend
+   *   Boolean a gross joomla hack.
+   * @param $forceBackend
+   *   Boolean a gross joomla hack.
    *
    * @return string an HTML string containing a link to the given path.
    *
@@ -251,7 +263,8 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   /**
    * Set a message in the UF to display to a user
    *
-   * @param string $message the message to set
+   * @param string $message
+   *   The message to set.
    *
    */
   /**
@@ -297,7 +310,8 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
-   * @param string $destination - if present, add destination to querystring (works for Drupal only)
+   * @param string $destination
+   *   If present, add destination to querystring (works for Drupal only).
    *
    * @throws Exception
    * @return string - loginURL for the current CMS

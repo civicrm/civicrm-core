@@ -47,7 +47,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   /**
    * Sets the title of the page
    *
-   * @param string $title title  for page
+   * @param string $title
+   *   Title for page.
    * @param $pageTitle
    *
    * @paqram string $pageTitle
@@ -61,7 +62,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   /**
    * Given a permission string, check for access requirements
    *
-   * @param string $str the permission to check
+   * @param string $str
+   *   The permission to check.
    *
    * @return boolean true if yes, else false
    * @static
@@ -85,7 +87,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   /**
    * Append a string to the head of the html file
    *
-   * @param string $head the new string to be appended
+   * @param string $head
+   *   The new string to be appended.
    *
    * @return void
    */
@@ -96,12 +99,16 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   /**
    * Generate an internal CiviCRM URL
    *
-   * @param $path     string   The path being linked to, such as "civicrm/add"
-   * @param $query    string   A query string to append to the link.
-   * @param $absolute boolean  Whether to force the output to be an absolute link (beginning with http:).
+   * @param $path
+   *   String The path being linked to, such as "civicrm/add".
+   * @param $query
+   *   String A query string to append to the link.
+   * @param $absolute
+   *   Boolean Whether to force the output to be an absolute link (beginning with http:).
    *                           Useful for links that will be displayed outside the site, such as in an
    *                           RSS feed.
-   * @param $fragment string   A fragment identifier (named anchor) to append to the link.
+   * @param $fragment
+   *   String A fragment identifier (named anchor) to append to the link.
    *
    * @return string            an HTML string containing a link to the given path.
    *
@@ -131,7 +138,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   /**
    * Set the email address of the user
    *
-   * @param object $user handle to the user object
+   * @param object $user
+   *   Handle to the user object.
    *
    * @return void
    */
@@ -140,8 +148,10 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   /**
    * Authenticate a user against the real UF
    *
-   * @param string $name      Login name
-   * @param string $pass      Login password
+   * @param string $name
+   *   Login name.
+   * @param string $pass
+   *   Login password.
    *
    * @return array            Result array
    */
@@ -182,7 +192,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
-   * @param string $destination - if present, add destination to querystring (works for Drupal only)
+   * @param string $destination
+   *   If present, add destination to querystring (works for Drupal only).
    *
    * @throws Exception
    * @return string - loginURL for the current CMS

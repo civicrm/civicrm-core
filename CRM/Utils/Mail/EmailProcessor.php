@@ -66,8 +66,10 @@ class CRM_Utils_Mail_EmailProcessor {
   /**
    * Delete old files from a given directory (recursively)
    *
-   * @param string $dir  directory to cleanup
-   * @param int    $age  files older than this many seconds will be deleted (default: 60 days)
+   * @param string $dir
+   *   Directory to cleanup.
+   * @param int $age
+   *   Files older than this many seconds will be deleted (default: 60 days).
    *
    * @return void
    */

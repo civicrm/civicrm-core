@@ -118,7 +118,8 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
    * submitted values across XSS vulnerability.
    *
    * @param array|string $values
-   * @param bool $castToString If TRUE, all scalars will be filtered (and therefore cast to strings)
+   * @param bool $castToString
+   *   If TRUE, all scalars will be filtered (and therefore cast to strings).
    *    If FALSE, then non-string values will be preserved
    */
   public function encodeInput(&$values, $castToString = FALSE) {

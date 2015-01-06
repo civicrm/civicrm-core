@@ -93,7 +93,8 @@ class CRM_Utils_PDF_Label extends TCPDF {
   /**
    * Constructor
    *
-   * @param $format   Either the name of a Label Format in the Option Value table
+   * @param $format
+   *   Either the name of a Label Format in the Option Value table.
    *                  or an array of Label Format values.
    * @param string|\Unit $unit Unit of measure for the PDF document
    *

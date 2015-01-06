@@ -132,7 +132,8 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * Helper function to assign remaining pager options as good default
    * values
    *
-   * @param array   $params      the set of options needed to initialize the parent
+   * @param array $params
+   *   The set of options needed to initialize the parent.
    *                             constructor
    *
    *
@@ -189,7 +190,8 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * POST over-rides a GET, a POST at the top overrides
    * a POST at the bottom (of the page)
    *
-   * @param int $defaultPageId defaultPageId   current pageId
+   * @param int $defaultPageId
+   *   DefaultPageId current pageId.
    *
    * @param array $params
    *
@@ -222,7 +224,8 @@ class CRM_Utils_Pager extends Pager_Sliding {
   /**
    * Get the number of rows to display from either a GET / POST variable
    *
-   * @param int $defaultPageRowCount the default value if not set
+   * @param int $defaultPageRowCount
+   *   The default value if not set.
    *
    * @return int                     the rowCount value to use
    *

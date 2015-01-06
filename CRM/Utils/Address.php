@@ -38,11 +38,16 @@ class CRM_Utils_Address {
    * Format an address basing on the address fields provided.
    * Use Setting's address_format if there's no format specified.
    *
-   * @param array $fields the address fields
-   * @param string $format the desired address format
-   * @param boolean $microformat if true indicates, the address to be built in hcard-microformat standard.
-   * @param boolean $mailing if true indicates, the call has been made from mailing label
-   * @param boolean $individualFormat if true indicates, the call has been made for the contact of type 'individual'
+   * @param array $fields
+   *   The address fields.
+   * @param string $format
+   *   The desired address format.
+   * @param bool $microformat
+   *   If true indicates, the address to be built in hcard-microformat standard.
+   * @param bool $mailing
+   *   If true indicates, the call has been made from mailing label.
+   * @param bool $individualFormat
+   *   If true indicates, the call has been made for the contact of type 'individual'.
    *
    * @param null $tokenFields
    *

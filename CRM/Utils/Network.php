@@ -42,8 +42,10 @@ class CRM_Utils_Network {
    *
    * @param $host
    * @param $port
-   * @param int $serverStartupTimeOut seconds
-   * @param float $interval seconds to wait in between pollings
+   * @param int $serverStartupTimeOut
+   *   Seconds.
+   * @param float $interval
+   *   Seconds to wait in between pollings.
    *
    * @return bool TRUE if service is online
    */

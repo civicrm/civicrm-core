@@ -84,9 +84,12 @@ class CRM_Utils_Recent {
   /**
    * Add an item to the recent stack
    *
-   * @param string $title the title to display
-   * @param string $url the link for the above title
-   * @param string $id object id
+   * @param string $title
+   *   The title to display.
+   * @param string $url
+   *   The link for the above title.
+   * @param string $id
+   *   Object id.
    * @param $type
    * @param int $contactId
    * @param string $contactName
@@ -146,7 +149,8 @@ class CRM_Utils_Recent {
   /**
    * Delete an item from the recent stack
    *
-   * @param array $recentItem array of the recent Item to be removed
+   * @param array $recentItem
+   *   Array of the recent Item to be removed.
    *
    * @return void
    * @static
@@ -173,7 +177,8 @@ class CRM_Utils_Recent {
   /**
    * Delete an item from the recent stack
    *
-   * @param string $id  contact id that had to be removed
+   * @param string $id
+   *   Contact id that had to be removed.
    *
    * @return void
    * @static

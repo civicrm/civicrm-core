@@ -118,9 +118,12 @@ class CRM_Utils_Zip {
    * An inefficient helper for creating a ZIP file from data in memory.
    * This is only intended for building temp files for unit-testing.
    *
-   * @param $zipName string, file name
-   * @param $dirs array, list of directory paths
-   * @param $files array, keys are file names and values are file contents
+   * @param $zipName
+   *   String, file name.
+   * @param $dirs
+   *   Array, list of directory paths.
+   * @param $files
+   *   Array, keys are file names and values are file contents.
    * @return bool
    */
   static public function createTestZip($zipName, $dirs, $files) {
