@@ -39,12 +39,12 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   /**
    * Static holder for the default LT
    */
-  static $_defaultContributionType = null;
+  static $_defaultContributionType = NULL;
 
   /**
    * Class constructor
    */
-  public function __construct( ) {
+  public function __construct() {
     parent::__construct( );
   }
 
@@ -59,14 +59,14 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @return CRM_Contribute_BAO_ContributionType object
    * @static
    */
-  public static function retrieve( &$params, &$defaults ) {
+  public static function retrieve(&$params, &$defaults) {
     $financialType = new CRM_Financial_DAO_FinancialType( );
     $financialType->copyValues( $params );
-    if ($financialType->find(true)) {
+    if ($financialType->find(TRUE)) {
       CRM_Core_DAO::storeValues( $financialType, $defaults );
       return $financialType;
     }
-    return null;
+    return NULL;
   }
 
   /**
@@ -80,7 +80,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @return Object             DAO object on sucess, null otherwise
    * @static
    */
-  public static function setIsActive( $id, $is_active ) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue( 'CRM_Financial_DAO_FinancialType', $id, 'is_active', $is_active );
   }
 
@@ -97,9 +97,9 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    */
   public static function add(&$params, &$ids = array()) {
     if(empty($params['id'])) {
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, false);
-      $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, false);
-      $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, false);
+      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+      $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, FALSE);
+      $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
     }
 
     // action is taken depending upon the mode
@@ -128,7 +128,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   public static function del($financialTypeId) {
     $financialType = new CRM_Financial_DAO_FinancialType( );
     $financialType->id = $financialTypeId;
-    $financialType->find(true);
+    $financialType->find(TRUE);
     // tables to ingore checks for financial_type_id
     $ignoreTables = array('CRM_Financial_DAO_EntityFinancialAccount');
 
@@ -141,7 +141,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
       foreach ($occurrences as $occurence) {
         $className = get_class($occurence);
         if (!in_array($className, $ignoreTables)) {
-        $tables[] = $className;
+          $tables[] = $className;
         }
       }
       if (!empty($tables)) {
@@ -179,9 +179,9 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     CRM_Core_PseudoConstant::populate(
       $revenueFinancialType,
       'CRM_Financial_DAO_EntityFinancialAccount',
-      $all = True,
+      $all = TRUE,
       $retrieve = 'entity_id',
-      $filter = null,
+      $filter = NULL,
       "account_relationship = $relationTypeId AND entity_table = 'civicrm_financial_type' "
     );
 

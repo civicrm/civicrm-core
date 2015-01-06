@@ -44,11 +44,11 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
    * @var array
    * @static
    */
-  static $_links = null;
+  static $_links = NULL;
   static $_entityID;
 
-  static $_columnHeader = null;
-  static $_returnvalues = null;
+  static $_columnHeader = NULL;
+  static $_returnvalues = NULL;
   /**
    * Get BAO Name
    *
@@ -94,12 +94,12 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
    */
   public function run() {
     // get the requested action
-    $action = CRM_Utils_Request::retrieve('action', 'String', $this, false, 'browse'); // default to 'browse'
+    $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse'); // default to 'browse'
 
     // assign vars to templates
     $this->assign('action', $action);
 
-    self::$_entityID = CRM_Utils_Request::retrieve('bid' , 'Positive');
+    self::$_entityID = CRM_Utils_Request::retrieve('bid', 'Positive');
     if (isset(self::$_entityID)) {
       $statusID = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'status_id');
     }
@@ -152,7 +152,7 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  public function userContext($mode = null) {
+  public function userContext($mode = NULL) {
     return 'civicrm/batchtransaction';
   }
 }

@@ -45,7 +45,7 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
    * @var array
    * @static
    */
-  static $_links = null;
+  static $_links = NULL;
 
   /**
    * Get BAO Name
@@ -103,15 +103,15 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
    */
   public function run() {
     // get the requested action
-    $action = CRM_Utils_Request::retrieve('action', 'String', $this, false, 'browse'); // default to 'browse'
+    $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse'); // default to 'browse'
 
     // assign vars to templates
     $this->assign('action', $action);
-    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, false, 0);
+    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
 
     // what action to take ?
     if ($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {
-      $this->edit($action, $id) ;
+      $this->edit($action, $id);
     }
 
     // parent run
@@ -136,7 +136,7 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
     while ($dao->fetch()) {
       $contributionType[$dao->id] = array();
       CRM_Core_DAO::storeValues( $dao, $contributionType[$dao->id]);
-      $contributionType[$dao->id]['financial_account_type_id'] =  $financialAccountType[$dao->financial_account_type_id];
+      $contributionType[$dao->id]['financial_account_type_id'] = $financialAccountType[$dao->financial_account_type_id];
       // form all action links
       $action = array_sum(array_keys($this->links()));
 
@@ -190,7 +190,7 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
    *
    * @return string user context.
    */
-  public function userContext($mode = null) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/financial/financialAccount';
   }
 }

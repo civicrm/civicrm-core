@@ -43,7 +43,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    * @var array
    * @static
    */
-  static $_links = null;
+  static $_links = NULL;
 
   /**
    * The account id that we need to display for the browse screen
@@ -51,7 +51,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    * @var array
    * @static
    */
-  protected $_aid = null;
+  protected $_aid = NULL;
 
   /**
    * Get BAO Name
@@ -99,16 +99,16 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    */
   public function run() {
     // get the requested action
-    $action = CRM_Utils_Request::retrieve('action', 'String', $this, false, 'browse'); // default to 'browse'
+    $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse'); // default to 'browse'
 
     // assign vars to templates
     $this->assign('action', $action);
-    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, false, 0);
-    $this->_aid = CRM_Utils_Request::retrieve('aid', 'Positive', $this, false, 0);
+    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
+    $this->_aid = CRM_Utils_Request::retrieve('aid', 'Positive', $this, FALSE, 0);
 
     // what action to take ?
     if ($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD | CRM_Core_Action::DELETE)) {
-      $this->edit($action, $id) ;
+      $this->edit($action, $id);
     }
     else {
       $this->browse($action, $id);
@@ -147,7 +147,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
         $defaults = array();
         $financialAccount = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
         if (!empty($financialAccount)) {
-          $financialType[$dao->id]['financial_account'] =  $financialAccount->name;
+          $financialType[$dao->id]['financial_account'] = $financialAccount->name;
           $financialType[$dao->id]['accounting_code'] = $financialAccount->accounting_code;
           $financialType[$dao->id]['account_type_code'] = $financialAccount->account_type_code;
           $financialType[$dao->id]['is_active'] = $financialAccount->is_active;
@@ -175,7 +175,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
         $financialType[$dao->id]['action'] = CRM_Core_Action::formLink($links, $action,
           array(
             'id' => $dao->id,
-            'aid'=> $dao->entity_id,
+            'aid' => $dao->entity_id,
           ),
           ts('more'),
           FALSE,
@@ -190,7 +190,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
     }
     else {
       CRM_Core_Error::fatal( );
-      return null;
+      return NULL;
     }
   }
 
@@ -205,7 +205,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    *
    * @return void
    */
-  public function edit( $action ) {
+  public function edit($action) {
     // create a simple controller for editing CiviCRM Profile data
     $controller = new CRM_Core_Controller_Simple( 'CRM_Financial_Form_FinancialTypeAccount', ts('Financial Account Types'), $action );
 
@@ -215,7 +215,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
       'reset=1&action=browse&aid=' . $this->_aid ) );
     $controller->set( 'aid', $this->_aid );
 
-    $controller->setEmbedded( true );
+    $controller->setEmbedded( TRUE );
     $controller->process();
     $controller->run();
   }
