@@ -182,7 +182,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
       return;
     }
 
-    $params['id'] = null;
+    $params['id'] = NULL;
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $params['id'] = $this->_id;
     }
