@@ -57,7 +57,8 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
   /**
    * Return a structure holding the supported tables, fields and their titles
    *
-   * @param string $requestedType  the requested contact type
+   * @param string $requestedType
+   *   The requested contact type.
    *
    * @return array  a table-keyed array of field-keyed arrays holding supported fields' titles
    */
@@ -428,7 +429,8 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    * for all th groups for that contactType. If contactType
    * not specified, do it for all
    *
-   * @param string $contactType Individual, Household or Organization
+   * @param string $contactType
+   *   Individual, Household or Organization.
    *
    * @static
    *

@@ -258,7 +258,8 @@ WHERE
 
   /**
    * We treat multi-valued custom sets as "related tables" similar to activities, contributions, etc.
-   * @param string $request 'relTables' or 'cidRefs'
+   * @param string $request
+   *   'relTables' or 'cidRefs'.
    * @see CRM-13836
    */
   public static function getMultiValueCustomSets($request) {
@@ -517,8 +518,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * Find differences between contacts.
    *
-   * @param array $main contact details
-   * @param array $other contact details
+   * @param array $main
+   *   Contact details.
+   * @param array $other
+   *   Contact details.
    *
    * @return array
    * @static
@@ -554,12 +557,16 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * Batch merge a set of contacts based on rule-group and group.
    *
-   * @param  int $rgid rule group id
-   * @param  int $gid group id
-   * @param  string $mode helps decide how to behave when there are conflicts.
+   * @param int $rgid
+   *   Rule group id.
+   * @param int $gid
+   *   Group id.
+   * @param string $mode
+   *   Helps decide how to behave when there are conflicts.
    *                              A 'safe' value skips the merge if there are any un-resolved conflicts.
    *                              Does a force merge otherwise.
-   * @param  boolean $autoFlip wether to let api decide which contact to retain and which to delete.
+   * @param boolean $autoFlip
+   *   Wether to let api decide which contact to retain and which to delete.
    * @param bool $redirectForPerformance
    *
    * @return array|bool
@@ -595,13 +602,17 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * Merge given set of contacts. Performs core operation.
    *
-   * @param  array $dupePairs set of pair of contacts for whom merge is to be done.
-   * @param  array $cacheParams prev-next-cache params based on which next pair of contacts are computed.
+   * @param array $dupePairs
+   *   Set of pair of contacts for whom merge is to be done.
+   * @param array $cacheParams
+   *   Prev-next-cache params based on which next pair of contacts are computed.
    *                              Generally used with batch-merge.
-   * @param  string $mode helps decide how to behave when there are conflicts.
+   * @param string $mode
+   *   Helps decide how to behave when there are conflicts.
    *                             A 'safe' value skips the merge if there are any un-resolved conflicts.
    *                             Does a force merge otherwise (aggressive mode).
-   * @param  boolean $autoFlip wether to let api decide which contact to retain and which to delete.
+   * @param boolean $autoFlip
+   *   Wether to let api decide which contact to retain and which to delete.
    *
    *
    * @param bool $redirectForPerformance
@@ -685,10 +696,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * A function which uses various rules / algorithms for choosing which contact to bias to
    * when there's a conflict (to handle "gotchas"). Plus the safest route to merge.
    *
-   * @param  int $mainId main contact with whom merge has to happen
-   * @param  int $otherId duplicate contact which would be deleted after merge operation
-   * @param  array $migrationInfo array of information about which elements to merge.
-   * @param  string $mode helps decide how to behave when there are conflicts.
+   * @param int $mainId
+   *   Main contact with whom merge has to happen.
+   * @param int $otherId
+   *   Duplicate contact which would be deleted after merge operation.
+   * @param array $migrationInfo
+   *   Array of information about which elements to merge.
+   * @param string $mode
+   *   Helps decide how to behave when there are conflicts.
    *                                 A 'safe' value skips the merge if there are any un-resolved conflicts.
    *                                 Does a force merge otherwise (aggressive mode).
    *
@@ -796,8 +811,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * A function to build an array of information required by merge function and the merge UI.
    *
-   * @param  int $mainId main contact with whom merge has to happen
-   * @param  int $otherId duplicate contact which would be deleted after merge operation
+   * @param int $mainId
+   *   Main contact with whom merge has to happen.
+   * @param int $otherId
+   *   Duplicate contact which would be deleted after merge operation.
    *
    * @return array|bool|int
    * @static
@@ -1191,8 +1208,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * other contact to the main one - be it Location / CustomFields or Contact .. related info.
    * A superset of moveContactBelongings() function.
    *
-   * @param  int $mainId main contact with whom merge has to happen
-   * @param  int $otherId duplicate contact which would be deleted after merge operation
+   * @param int $mainId
+   *   Main contact with whom merge has to happen.
+   * @param int $otherId
+   *   Duplicate contact which would be deleted after merge operation.
    *
    * @param $migrationInfo
    *
