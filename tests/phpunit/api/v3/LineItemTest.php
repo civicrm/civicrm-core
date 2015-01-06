@@ -85,7 +85,8 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
   }
 
   public function testDeleteLineItem() {
-    $getParams = array(        'entity_table' => 'civicrm_contribution',
+    $getParams = array(
+      'entity_table' => 'civicrm_contribution',
     );
     $getResult = $this->callAPISuccess($this->_entity, 'get', $getParams);
     $deleteParams = array('id' => $getResult['id']);

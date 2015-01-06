@@ -53,21 +53,21 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $params = array(
       'name' => 'Default Domain Name',
     );
-    $result = $this->callAPISuccess( 'domain', 'get', $params);
-    if(empty($result['id'])){
-      $result = $this->callAPISuccess( 'domain', 'create', $params );
+    $result = $this->callAPISuccess('domain', 'get', $params);
+    if (empty($result['id'])) {
+      $result = $this->callAPISuccess('domain', 'create', $params);
     }
 
     $params['name'] = 'Second Domain';
-    $result = $this->callAPISuccess( 'domain', 'get', $params);
-    if(empty($result['id'])){
-      $result = $this->callAPISuccess( 'domain', 'create', $params );
+    $result = $this->callAPISuccess('domain', 'get', $params);
+    if (empty($result['id'])) {
+      $result = $this->callAPISuccess('domain', 'create', $params);
     }
     $this->_domainID2 = $result['id'];
     $params['name'] = 'A-team domain';
-    $result = $this->callAPISuccess( 'domain', 'get', $params);
-    if(empty($result['id'])){
-      $result = $this->callAPISuccess( 'domain', 'create', $params );
+    $result = $this->callAPISuccess('domain', 'get', $params);
+    if (empty($result['id'])) {
+      $result = $this->callAPISuccess('domain', 'create', $params);
     }
     $this->_domainID3 = $result['id'];
     $this->_currentDomain = CRM_Core_Config::domainID();
@@ -89,8 +89,9 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     global $civicrm_root;
     $metaDataFolders[] = $civicrm_root . '/tests/phpunit/api/v3/settings';
   }
+
   /**
-  /**
+   * /**
    * Check getfields works
    */
   public function testGetFields() {
@@ -271,7 +272,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $getResult = $this->callAPISuccess('setting', 'get', $params);
     $this->assertEquals(0, $getResult['values'][$this->_currentDomain]['track_civimail_replies']);
     $params = array(
-    'domain_id' => $this->_domainID2,
+      'domain_id' => $this->_domainID2,
       'track_civimail_replies' => '1',
     );
     $result = $this->callAPISuccess('setting', 'create', $params);
@@ -398,7 +399,8 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   public function testGetConfigSetting() {
     $settings = $this->callAPISuccess('setting', 'get', array(
         'name' => 'defaultCurrency',
-    'sequential' => 1,)
+        'sequential' => 1,
+      )
     );
     $this->assertEquals('USD', $settings['values'][0]['defaultCurrency']);
   }
@@ -409,15 +411,17 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   public function testGetSetConfigSettingMultipleDomains() {
     $settings = $this->callAPISuccess('setting', 'create', array(
         'defaultCurrency' => 'USD',
-    'domain_id' => $this->_currentDomain)
+        'domain_id' => $this->_currentDomain
+      )
     );
     $settings = $this->callAPISuccess('setting', 'create', array(
         'defaultCurrency' => 'CAD',
-    'domain_id' => $this->_domainID2)
+        'domain_id' => $this->_domainID2
+      )
     );
     $settings = $this->callAPISuccess('setting', 'get', array(
         'return' => 'defaultCurrency',
-    'domain_id' => 'all',
+        'domain_id' => 'all',
       )
     );
     $this->assertEquals('USD', $settings['values'][$this->_currentDomain]['defaultCurrency']);
@@ -431,7 +435,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
    */
   public function testGetValueConfigSetting() {
     $params = array(
-    'name' => 'monetaryThousandSeparator',
+      'name' => 'monetaryThousandSeparator',
       'group' => 'Localization Setting',
     );
     $result = $this->callAPISuccess('setting', 'getvalue', $params);
@@ -440,7 +444,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
 
   public function testGetValue() {
     $params = array(
-    'name' => 'petition_contacts',
+      'name' => 'petition_contacts',
       'group' => 'Campaign Preferences'
     );
     $description = "Demonstrates getvalue action - intended for runtime use as better caching than get";
@@ -468,13 +472,13 @@ class api_v3_SettingTest extends CiviUnitTestCase {
    */
   public function testRevert() {
     $params = array(
-    'address_format' => 'xyz',
+      'address_format' => 'xyz',
       'mailing_format' => 'bcs',
     );
     $result = $this->callAPISuccess('setting', 'create', $params);
     $this->assertAPISuccess($result, "in line " . __LINE__);
     $revertParams = array(
-    'name' => 'address_format'
+      'name' => 'address_format'
     );
     $result = $this->callAPISuccess('setting', 'get', $params);
     //make sure it's set
@@ -485,7 +489,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('setting', 'get', $params);
     $this->assertEquals("{contact.address_name}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}", $result['values'][CRM_Core_Config::domainID()]['address_format']);
     $params = array(
-    'return' => array('mailing_format'),
+      'return' => array('mailing_format'),
     );
     $result = $this->callAPISuccess('setting', 'get', $params);
     //make sure it's unchanged
@@ -497,7 +501,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
    */
   public function testRevertAll() {
     $params = array(
-    'address_format' => 'xyz',
+      'address_format' => 'xyz',
       'mailing_format' => 'bcs',
     );
     $result = $this->callAPISuccess('setting', 'create', $params);
@@ -521,17 +525,18 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'name' => 'B Team Domain',
     );
     $dom = $this->callAPISuccess('domain', 'create', $domparams);
-    $params = array(      'domain_id' => 'all',
+    $params = array(
+      'domain_id' => 'all',
     );
     $result = $this->callAPISuccess('setting', 'get', $params);
     $params = array(
-    'address_format' => 'xyz',
+      'address_format' => 'xyz',
       'mailing_format' => 'bcs',
       'domain_id' => $this->_domainID2,
     );
     $result = $this->callAPISuccess('setting', 'create', $params);
     $params = array(
-    'domain_id' => $dom['id'],
+      'domain_id' => $dom['id'],
     );
     $result = $this->callAPISuccess('setting', 'get', $params);
     $this->assertAPISuccess($result, "in line " . __LINE__);

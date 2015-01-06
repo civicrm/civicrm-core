@@ -109,8 +109,9 @@ class CiviTestSuite extends PHPUnit_Framework_TestSuite {
    * @internal param \Directory $object to scan
    * @return Test suite has been updated
    */
-  protected function addAllTests(PHPUnit_Framework_TestSuite & $suite,
-                                 $myfile, SplFileInfo $dirInfo
+  protected function addAllTests(
+    PHPUnit_Framework_TestSuite &$suite,
+    $myfile, SplFileInfo $dirInfo
   ) {
     //echo get_class($this)."::addAllTests($myfile,".$dirInfo->getRealPath().")\n";
     if (!$dirInfo->isReadable()

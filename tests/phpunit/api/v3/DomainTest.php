@@ -39,7 +39,6 @@ class api_v3_DomainTest extends CiviUnitTestCase {
        where cleanDB() is called. */
 
 
-
   public $DBResetRequired = FALSE;
 
   protected $_apiversion = 3;
@@ -61,27 +60,27 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
     $location = array();
     $domContact = $this->callAPISuccess('contact', 'create', array(
-      'contact_type' => 'Organization',
-      'organization_name' => 'new org',
-      'api.phone.create' => array(
-        'location_type_id' => $defaultLocationType->id,
-        'phone_type_id' => 1,
-        'phone' => '456-456',
-       ),
-      'api.address.create' => array(
-        'location_type_id' => $defaultLocationType->id,
-        'street_address' => '45 Penny Lane',
+        'contact_type' => 'Organization',
+        'organization_name' => 'new org',
+        'api.phone.create' => array(
+          'location_type_id' => $defaultLocationType->id,
+          'phone_type_id' => 1,
+          'phone' => '456-456',
         ),
-      'api.email.create' => array(
-        'location_type_id' => $defaultLocationType->id,
-        'email' => 'my@email.com',
-      )
+        'api.address.create' => array(
+          'location_type_id' => $defaultLocationType->id,
+          'street_address' => '45 Penny Lane',
+        ),
+        'api.email.create' => array(
+          'location_type_id' => $defaultLocationType->id,
+          'email' => 'my@email.com',
+        )
       )
     );
 
     $this->callAPISuccess('domain', 'create', array(
-      'id' => 1,
-      'contact_id' => $domContact['id'],
+        'id' => 1,
+        'contact_id' => $domContact['id'],
       )
     );
     $this->params = array(
@@ -150,17 +149,16 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     */
 
 
-
   public function testGetCurrentDomainTwice() {
     $domain = $this->callAPISuccess('domain', 'getvalue', array(
-        'current_domain' => 1,
-        'return' => 'name',
-      ));
+      'current_domain' => 1,
+      'return' => 'name',
+    ));
     $this->assertEquals('Default Domain Name', $domain, print_r($domain, TRUE));
     $domain = $this->callAPISuccess('domain', 'getvalue', array(
-        'current_domain' => 1,
-        'return' => 'name',
-      ));
+      'current_domain' => 1,
+      'return' => 'name',
+    ));
     $this->assertEquals('Default Domain Name', $domain, print_r($domain, TRUE));
   }
 

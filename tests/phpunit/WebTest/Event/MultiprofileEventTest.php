@@ -636,8 +636,9 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
    * @param $email1
    * @param $email2
    */
-  function _testEventRegistration($eventPageId, $customId, $firstName, $lastName,
-                                  $participantfname, $participantlname, $email1, $email2
+  function _testEventRegistration(
+    $eventPageId, $customId, $firstName, $lastName,
+    $participantfname, $participantlname, $email1, $email2
   ) {
     $this->openCiviPage("event/register", "id={$eventPageId}&reset=1", "_qf_Register_upload-bottom");
     $this->select("additional_participants", "value=1");

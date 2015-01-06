@@ -47,8 +47,8 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction();
 
-    $this->_contactID    = $this->organizationCreate();
-    $loc                 = $this->locationTypeCreate();
+    $this->_contactID = $this->organizationCreate();
+    $loc = $this->locationTypeCreate();
     $this->_locationType = $loc->id;
     CRM_Core_PseudoConstant::flush();
     $this->_params = array(
@@ -138,11 +138,12 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     $phone1 = $this->callAPISuccess('phone', 'create', $params);
     //now we check & make sure it has been set to primary
     $check = $this->callAPISuccess('phone', 'getcount', array(
-        'is_primary' => 1,
-        'id' => $phone1['id'],
-      ));
+      'is_primary' => 1,
+      'id' => $phone1['id'],
+    ));
     $this->assertEquals(1, $check);
   }
+
   public function testCreatePhonePrimaryHandlingChangeExisting() {
     $phone1 = $this->callAPISuccess('phone', 'create', $this->_params);
     $phone2 = $this->callAPISuccess('phone', 'create', $this->_params);
