@@ -52,7 +52,8 @@ class CRM_Upgrade_Incremental_php_FourFour {
    * revision to the database.
    *
    * @param $preUpgradeMessage
-   * @param $rev string, a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'
+   * @param $rev
+   *   String, a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'.
    * @param null $currentVer
    *
    * @return void
@@ -77,8 +78,10 @@ class CRM_Upgrade_Incremental_php_FourFour {
   /**
    * Compute any messages which should be displayed after upgrade
    *
-   * @param $postUpgradeMessage string, alterable
-   * @param $rev string, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs
+   * @param $postUpgradeMessage
+   *   String, alterable.
+   * @param $rev
+   *   String, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
@@ -715,7 +718,8 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
    * However, if there's a bug in here prior to 4.4.0, we should apply the
    * bugfix in both places.
    *
-   * @param bool $rebuildEach whether to perform rebuild after each individual API call
+   * @param bool $rebuildEach
+   *   Whether to perform rebuild after each individual API call.
    * @return array Each item is $params for WordReplacement.create
    * @see CRM_Core_BAO_WordReplacement::convertConfigArraysToAPIParams
    */
