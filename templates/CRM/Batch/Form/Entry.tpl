@@ -30,7 +30,7 @@
   {if $batchAmountMismatch}
     <div class="status message status-warning">
       <div
-        class="icon alert-icon"></div> {ts}Total for amounts entered below does not match the expected batch total.{/ts}
+        class="icon ui-icon-alert"></div> {ts}Total for amounts entered below does not match the expected batch total.{/ts}
     </div>
     <div class="crm-button crm-button_qf_Entry_upload_force-save">
       {$form._qf_Entry_upload_force.html}

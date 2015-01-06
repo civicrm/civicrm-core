@@ -32,7 +32,7 @@
         {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&key=$searchKey"}
       {/if}
       <a class="button" href="{crmURL p='civicrm/contact/view/contribution' q=$urlParams}" accesskey="e"><span>
-          <div class="icon edit-icon"></div>{ts}Edit{/ts}</span>
+          <div class="icon ui-icon-pencil"></div>{ts}Edit{/ts}</span>
       </a>
     {/if}
     {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviContribute')}
@@ -315,7 +315,7 @@
       {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&key=$searchKey"}
     {/if}
     <a class="button" href="{crmURL p='civicrm/contact/view/contribution' q=$urlParams}" accesskey="e"><span><div
-          class="icon edit-icon"></div>{ts}Edit{/ts}</span></a>
+          class="icon ui-icon-pencil"></div>{ts}Edit{/ts}</span></a>
   {/if}
   {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviContribute')}
     {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=delete&context=$context"}

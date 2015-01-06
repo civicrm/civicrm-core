@@ -4,7 +4,7 @@
       <div class="action-link">
         <a href="{crmURL p='civicrm/admin/tplstrings/add' q='reset=1&action=add'}"  class="button">
           <span>
-             <div class="icon add-icon"></div>{ts}Add New String{/ts}
+             <div class="icon ui-icon-circle-plus"></div>{ts}Add New String{/ts}
           </span>
         </a>
       </div>
@@ -39,7 +39,7 @@
       <div class="action-link">
          <a href="{crmURL p='civicrm/admin/tplstrings/add' q='reset=1&action=add&config=1'}"  class="button">
            <span>
-              <div class="icon add-icon"></div>{ts}Add New Config{/ts}
+              <div class="icon ui-icon-circle-plus"></div>{ts}Add New Config{/ts}
            </span>
          </a>
       </div>

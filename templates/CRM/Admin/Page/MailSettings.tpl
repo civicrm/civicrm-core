@@ -75,7 +75,7 @@
     </div>
 {/if}
   <div class="action-link">
-    <a href="{crmURL q="action=add&reset=1"}" id="newMailSettings" class="button"><span><div class="icon add-icon"></div>{ts}Add Mail Account{/ts}</span></a>
+    <a href="{crmURL q="action=add&reset=1"}" id="newMailSettings" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Mail Account{/ts}</span></a>
     <a href="{crmURL p="civicrm/admin" q="reset=1"}" class="button cancel no-popup"><span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span></a>
   </div>
 {/if}

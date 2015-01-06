@@ -68,6 +68,6 @@
 
   {/if}
   <div class="action-link">
-    <a href="{crmURL p='civicrm/admin/sms/provider' q="action=add&reset=1"}" class="button"><span><div class="icon add-icon"></div>{ts}Add SMS Provider{/ts}</span></a>
+    <a href="{crmURL p='civicrm/admin/sms/provider' q="action=add&reset=1"}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add SMS Provider{/ts}</span></a>
   </div>
 {/if}

@@ -237,15 +237,15 @@ input.crm-form-entityref {
   background: rgba(255,255,255,0.8);
 }
 
-.crm-container .replace-plain .icon.edit-icon {
+.crm-container .replace-plain .icon.ui-icon-pencil {
   position: absolute;
   top: .5em;
   right: .5em;
 }
 
-.crm-container .replace-plain a:active .icon.edit-icon,
-.crm-container .replace-plain:focus .icon.edit-icon,
-.crm-container .replace-plain:hover .icon.edit-icon {
+.crm-container .replace-plain a:active .icon.ui-icon-pencil,
+.crm-container .replace-plain:focus .icon.ui-icon-pencil,
+.crm-container .replace-plain:hover .icon.ui-icon-pencil {
   background-image: url("../i/icons/jquery-ui-2786C2.png");
 }
 
@@ -2628,26 +2628,8 @@ div.grippie {
 .crm-container .dark-icon {
   background-image: url("../packages/jquery/jquery-ui/images/ui-icons_222222_256x240.png")
 }
-.crm-container .edit-icon {
-  background-position: -64px -112px;
-}
-.crm-container .previous-icon {
-  background-position: -80px -160px;
-}
-.crm-container .next-icon {
-  background-position: -64px -160px;
-}
-.crm-container .add-icon {
-  background-position: 0 -192px;
-}
-.crm-container .back-icon {
-  background-position: 0 -64px;
-}
 .crm-container .delete-icon {
   background-position: -176px -96px;
-}
-.crm-container .details-icon {
-  background-position: -128px -112px;
 }
 .crm-container .red-icon,
 .crm-container a:hover .icon.delete-icon,
@@ -2663,71 +2645,9 @@ div.grippie {
   background-image: url("../i/icons/jquery-ui-91CE00.png");
 }
 
-.crm-container .vcard-icon {
-  background-position: -32px -80px;
-}
-
-.crm-container .print-icon {
-  background-position: -160px -96px;
-}
-
-.crm-container .dashboard-icon {
-  background-position: -192px -128px;
-}
-
-.crm-container .Individual-profile-icon,
-.crm-container .user-record-icon {
-  background-position: -144px -96px;
-}
-.crm-container .Household-profile-icon {
-  background-position: 0 -112px;
-}
-.crm-container .Organization-profile-icon {
-  background-position: -112px -112px;
-}
 .crm-container .inform-icon {
   background-position: -16px -144px;
   margin-right: 5px;
-}
-
-.crm-container .dropdown-icon {
-  background-position: -48px -32px;
-  float: right;
-}
-
-.crm-container .tip-icon {
-  background-position: -128px -128px;
-}
-
-.crm-container .alert-icon {
-  background-position: 0 -144px;
-}
-.crm-container .check-icon {
-  background-position: -64px -144px;
-}
-.crm-container .refresh-icon {
-  background-position: -64px -80px;
-}
-.crm-container .settings-icon {
-  background-position: -176px -112px;
-}
-.crm-container .search-icon {
-  background-position: -160px -112px;
-}
-.crm-container .email-icon {
-  background-position: -80px -96px;
-}
-.crm-container .preview-icon {
-  background-position: -224px -128px;
-}
-.crm-container .play-icon {
-  background-position: 0 -160px;
-}
-.crm-container .close-icon {
-  background-position: -80px -128px;
-}
-.crm-container .swap-icon {
-  background-position: -80px -80px;
 }
 
 #crm-container .geotag {
@@ -3736,6 +3656,16 @@ div.m ul#civicrm-menu,
 .select2-drop .crm-entityref-filters select:focus,
 .select2-drop .crm-entityref-filters select.active {
   border: 1px solid #808080;
+}
+/* Icons used by entityRef create buttons */
+.crm-container .Individual-profile-icon {
+  background-position: -144px -96px;
+}
+.crm-container .Household-profile-icon {
+  background-position: 0 -112px;
+}
+.crm-container .Organization-profile-icon {
+  background-position: -112px -112px;
 }
 /* Style autocomplete results */
 .crm-container .select2-results {

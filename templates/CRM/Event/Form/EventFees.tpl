@@ -41,7 +41,7 @@
                 <tr>
                   <td></td>
                   <td>
-                    <a class="button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}' title="{ts}Change Selections{/ts}"><span><div class="icon edit-icon"></div> {ts}Change Selections{/ts}</span></a>
+                    <a class="button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}' title="{ts}Change Selections{/ts}"><span><div class="icon ui-icon-pencil"></div> {ts}Change Selections{/ts}</span></a>
                   </td>
                 </tr>
             {else}
