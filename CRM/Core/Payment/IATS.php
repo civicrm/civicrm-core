@@ -51,7 +51,8 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
   /**
    * Constructor
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param $paymentProcessor
    *
@@ -92,7 +93,8 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
    * This function collects all the information from a web/api form and invokes
    * the relevant payment processor specific functions to perform the transaction
    *
-   * @param  array $params assoc array of input parameters for this transaction
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
    *
    * @return array the result in an nice formatted array (or an error object)
    * @abstract
@@ -117,11 +119,11 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
     // beginning of modified sample code from IATS php api include IATS supplied api library
 
     if ($isRecur) {
-      include_once ('Services/IATS/iats_reoccur.php');
+      include_once 'Services/IATS/iats_reoccur.php';
       $iatslink1 = new iatslinkReoccur;
     }
     else {
-      include_once ('Services/IATS/iatslink.php');
+      include_once 'Services/IATS/iatslink.php';
       $iatslink1 = new iatslink;
     }
 
@@ -216,7 +218,7 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
 
         default:
           die('Invalid frequency unit!');
-          break;
+        break;
       }
       $endDate = date('Y-m-d', $endTime);
       $startDate = date('Y-m-d', $startTime);

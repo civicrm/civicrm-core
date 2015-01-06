@@ -43,10 +43,12 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
    *
    * @param null $path
    * @param bool $title
-   * @param string  path        the class Path of the form being implemented
+   * @param string path the class Path of the form being implemented
    * @param bool $imageUpload
-   * @param bool $addSequence should we add a unique sequence number to the end of the key
-   * @param bool $ignoreKey should we not set a qfKey for this controller (for standalone forms)
+   * @param bool $addSequence
+   *   Should we add a unique sequence number to the end of the key.
+   * @param bool $ignoreKey
+   *   Should we not set a qfKey for this controller (for standalone forms).
    * @param bool $attachUpload
    *
    *
@@ -55,10 +57,10 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
   function __construct(
     $path,
     $title,
-    $mode         = NULL,
-    $imageUpload  = FALSE,
-    $addSequence  = FALSE,
-    $ignoreKey    = FALSE,
+    $mode = NULL,
+    $imageUpload = FALSE,
+    $addSequence = FALSE,
+    $ignoreKey = FALSE,
     $attachUpload = FALSE
   ) {
     // by definition a single page is modal :). We use the form name as the scope for this controller
@@ -74,7 +76,6 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
     ) {
       $mode = $savedAction;
     }
-
 
     $this->_stateMachine->addSequentialPages($params, $mode);
 

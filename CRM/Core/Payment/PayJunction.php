@@ -31,7 +31,8 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
   /**
    * Constructor
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param $paymentProcessor
    *
@@ -49,7 +50,8 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
   /**
    * Singleton function used to manage this object
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param object $paymentProcessor
    * @param null $paymentForm
@@ -58,7 +60,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
    * @return object
    * @static
    */
-  public static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = false) {
+  public static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     $processorName = $paymentProcessor['name'];
     if (self::$_singleton[$processorName] === NULL) {
       self::$_singleton[$processorName] = new CRM_Core_Payment_PayJunction($mode, $paymentProcessor);
@@ -74,7 +76,8 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
    * This function collects all the information from a web/api form and invokes
    * the relevant payment processor specific functions to perform the transaction
    *
-   * @param  array $params assoc array of input parameters for this transaction
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
    *
    * @return array the result in an nice formatted array (or an error object)
    * @abstract
@@ -125,7 +128,6 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
 
     // set customer info (level 3 data) for the transaction
     $pjpgTxn->setCustInfo($pjpgCustInfo);
-
 
     // empty installments convert to 999 because PayJunction do not allow open end donation
     if ($params['installments'] == "") {
@@ -229,7 +231,8 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
   /**
    * Get the value of a field if set
    *
-   * @param string $field the field
+   * @param string $field
+   *   The field.
    *
    * @return mixed value of the field, or empty string if the field is
    * not set

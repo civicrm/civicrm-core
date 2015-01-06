@@ -152,7 +152,6 @@ class CRM_Event_Form_EventFees {
       //             $defaults[$form->_pId]['credit_card_exp_date'] = array( 'Y' => '2012', 'M' => '05' );
     }
 
-
     // if user has selected discount use that to set default
     if (isset($form->_discountId)) {
       $defaults[$form->_pId]['discount_id'] = $form->_discountId;
@@ -179,9 +178,8 @@ class CRM_Event_Form_EventFees {
 
     if (($form->_action == CRM_Core_Action::ADD) && $form->_eventId && $discountId) {
       // this case is for add mode, where we show discount automatically
-        $defaults[$form->_pId]['discount_id'] = $discountId;
+      $defaults[$form->_pId]['discount_id'] = $discountId;
     }
-
 
     if ($priceSetId) {
       // get price set default values, CRM-4090
@@ -235,8 +233,8 @@ class CRM_Event_Form_EventFees {
     if ($contriId = $form->get('onlinePendingContributionId')) {
       $contribution = new CRM_Contribute_DAO_Contribution();
       $contribution->id = $contriId;
-      $contribution->find( true );
-      foreach( array('financial_type_id', 'payment_instrument_id','contribution_status_id', 'receive_date', 'total_amount' ) as $f ) {
+      $contribution->find( TRUE );
+      foreach( array('financial_type_id', 'payment_instrument_id', 'contribution_status_id', 'receive_date', 'total_amount' ) as $f ) {
         if ($f == 'receive_date') {
           list($defaults[$form->_pId]['receive_date']) = CRM_Utils_Date::setDateDefaults($contribution->$f);
         }
@@ -373,7 +371,7 @@ SELECT  id, html_type
       CRM_Event_Form_Registration::initEventFee($form, $event['id']);
       CRM_Event_Form_Registration_Register::buildAmount($form, TRUE, $form->_discountId);
       $lineItem = array();
-      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       $totalTaxAmount = 0;
       if (!CRM_Utils_System::isNull(CRM_Utils_Array::value('line_items', $form->_values))) {

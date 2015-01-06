@@ -51,7 +51,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *
    * This function is invoked from within the web form layer and also from the api layer
    *
-   * @param array $params (reference) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Core_DAO_CustomGroup object
    * @static
@@ -225,8 +226,10 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_DAO_CustomGroup object
    * @static
@@ -238,8 +241,10 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
   /**
    * Update the is_active flag in the db
    *
-   * @param  int $id id of the database record
-   * @param  boolean $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on sucess, null otherwise
    * @static
@@ -258,9 +263,12 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
   /**
    * Determine if given entity (sub)type has any custom groups
    *
-   * @param string $extends e.g. "Individual", "Activity"
-   * @param int $columnId e.g. custom-group matching mechanism (usu NULL for matching on sub type-id); see extends_entity_column_id
-   * @param string $columnValue e.g. "Student" or "3" or "3\05"; see extends_entity_column_value
+   * @param string $extends
+   *   E.g. "Individual", "Activity".
+   * @param int $columnId
+   *   E.g. custom-group matching mechanism (usu NULL for matching on sub type-id); see extends_entity_column_id.
+   * @param string $columnValue
+   *   E.g. "Student" or "3" or "3\05"; see extends_entity_column_value.
    *
    * @return bool
    */
@@ -308,8 +316,10 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *
    * An array containing all custom groups and their custom fields is returned.
    *
-   * @param string $entityType - of the contact whose contact type is needed
-   * @param CRM_Core_Form $form - not used but required
+   * @param string $entityType
+   *   Of the contact whose contact type is needed.
+   * @param CRM_Core_Form $form
+   *   Not used but required.
    * @param int $entityID
    * @param int $groupID
    * @param string $subType
@@ -636,8 +646,10 @@ ORDER BY civicrm_custom_group.weight,
    * Check whether the custom group has any data for the given entity.
    *
    *
-   * @param integer $entityID id of entity for whom we are checking data for
-   * @param string $table table that we are checking
+   * @param int $entityIDId of entity for whom we are checking data for.
+   *   Id of entity for whom we are checking data for.
+   * @param string $table
+   *   Table that we are checking.
    *
    * @param bool $getCount
    *
@@ -663,10 +675,14 @@ ORDER BY civicrm_custom_group.weight,
    * multiple fields. These now have a new behaviour (one at a time) but the single fields still use this
    * mechanism as it seemed to be acceptable in this context
    *
-   * @param array $groupTree (reference) group tree array which is being built
-   * @param integer $entityID id of entity for whom the tree is being build up.
-   * @param array $entitySingleSelectClauses array of select clauses relevant to the entity
-   * @param array $singleFieldTablesWithEntityData array of tables in which this entity has data
+   * @param array $groupTree
+   *   (reference) group tree array which is being built.
+   * @param int $entityIDId of entity for whom the tree is being build up.
+   *   Id of entity for whom the tree is being build up.
+   * @param array $entitySingleSelectClauses
+   *   Array of select clauses relevant to the entity.
+   * @param array $singleFieldTablesWithEntityData
+   *   Array of tables in which this entity has data.
    */
   static public function buildEntityTreeSingleFields(&$groupTree, $entityID, $entitySingleSelectClauses, $singleFieldTablesWithEntityData) {
     $select = implode(', ', $entitySingleSelectClauses);
@@ -688,10 +704,14 @@ ORDER BY civicrm_custom_group.weight,
    *
    * This is done one table at a time to avoid Cross-Joins resulting in too many rows being returned
    *
-   * @param array $groupTree (reference) group tree array which is being built
-   * @param integer $entityID id of entity for whom the tree is being build up.
-   * @param array $entityMultipleSelectClauses array of select clauses relevant to the entity
-   * @param array $multipleFieldTablesWithEntityData array of tables in which this entity has data
+   * @param array $groupTree
+   *   (reference) group tree array which is being built.
+   * @param int $entityIDId of entity for whom the tree is being build up.
+   *   Id of entity for whom the tree is being build up.
+   * @param array $entityMultipleSelectClauses
+   *   Array of select clauses relevant to the entity.
+   * @param array $multipleFieldTablesWithEntityData
+   *   Array of tables in which this entity has data.
    */
   static public function buildEntityTreeMultipleFields(&$groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData) {
     foreach ($entityMultipleSelectClauses as $table => $selectClauses) {
@@ -711,9 +731,11 @@ ORDER BY civicrm_custom_group.weight,
    *
    * This function represents shared code between the buildEntityTreeMultipleFields & the buildEntityTreeSingleFields function
    *
-   * @param array $groupTree (reference) group tree array which is being built
+   * @param array $groupTree
+   *   (reference) group tree array which is being built.
    * @param string $query
-   * @param array $includedTables tables to include - required because the function (for historical reasons)
+   * @param array $includedTables
+   *   Tables to include - required because the function (for historical reasons).
    * iterates through the group tree
    */
   static public function buildTreeEntityDataFromQuery(&$groupTree, $query, $includedTables) {
@@ -740,11 +762,16 @@ ORDER BY civicrm_custom_group.weight,
   /**
    * Build the entity-specific custom data into the group tree on a per-field basis
    *
-   * @param object $dao object representing the custom field to be populated into the groupTree
-   * @param array $groupTree (reference) the group tree being build
-   * @param string $table table name
-   * @param unknown_type $groupID custom group ID
-   * @param unknown_type $fieldID custom field ID
+   * @param object $dao
+   *   Object representing the custom field to be populated into the groupTree.
+   * @param array $groupTree
+   *   (reference) the group tree being build.
+   * @param string $table
+   *   Table name.
+   * @param unknown_type $groupID
+   *   Custom group ID.
+   * @param unknown_type $fieldID
+   *   Custom field ID.
    */
   static public function buildCustomFieldData($dao, &$groupTree, $table, $groupID, $fieldID) {
     $column = $groupTree[$groupID]['fields'][$fieldID]['column_name'];
@@ -844,7 +871,8 @@ ORDER BY civicrm_custom_group.weight,
   /**
    * Get the group title.
    *
-   * @param int $id id of group.
+   * @param int $id
+   *   Id of group.
    *
    * @return string title
    *
@@ -860,9 +888,12 @@ ORDER BY civicrm_custom_group.weight,
    *
    * An array containing custom group details (including their custom field) is returned.
    *
-   * @param int $groupId - group id whose details are needed
-   * @param boolean $searchable - is this field searchable
-   * @param array $extends - which table does it extend if any
+   * @param int $groupId
+   *   Group id whose details are needed.
+   * @param bool $searchable
+   *   Is this field searchable.
+   * @param array $extends
+   *   Which table does it extend if any.
    *
    * @param null $inSelector
    *
@@ -1063,7 +1094,8 @@ ORDER BY civicrm_custom_group.weight,
    * currently if entity type is 'Contact', 'Individual', 'Household', 'Organization'
    * tableName is 'civicrm_contact'
    *
-   * @param string $entityType what entity are we extending here ?
+   * @param string $entityType
+   *   What entity are we extending here ?.
    *
    * @return string $tableName
    *
@@ -1088,6 +1120,7 @@ ORDER BY civicrm_custom_group.weight,
       case 'Group':
         $tableName = 'civicrm_group';
         break;
+
       // DRAFTING: Verify if we cannot make it pluggable
 
       case 'Activity':
@@ -1113,6 +1146,7 @@ ORDER BY civicrm_custom_group.weight,
       case 'Grant':
         $tableName = 'civicrm_grant';
         break;
+
       // need to add cases for Location, Address
     }
 
@@ -1124,7 +1158,8 @@ ORDER BY civicrm_custom_group.weight,
    * If there are custom-groups which only apply to certain subtypes,
    * those WILL be included.
    *
-   * @param $entityType string
+   * @param $entityType
+   *   String.
    *
    * @return CRM_Core_DAO_CustomGroup
    */
@@ -1139,7 +1174,8 @@ ORDER BY civicrm_custom_group.weight,
    * the custom group is extending.
    *
    * @param $customGroupDAO
-   * @param string $entityType - what entity are we extending here ?
+   * @param string $entityType
+   *   What entity are we extending here ?.
    *
    * @param object CRM_Core_DAO_CustomGroup (reference) - Custom Group DAO.
    * @param bool $allSubtypes
@@ -1206,8 +1242,10 @@ ORDER BY civicrm_custom_group.weight,
   /**
    * Delete the Custom Group.
    *
-   * @param $group object   the DAO custom group object
-   * @param $force boolean  whether to force the deletion, even if there are custom fields
+   * @param $group
+   *   Object   the DAO custom group object.
+   * @param $force
+   *   Boolean  whether to force the deletion, even if there are custom fields.
    *
    * @return boolean   false if field exists for this group, true if group gets deleted.
    *
@@ -1418,7 +1456,6 @@ ORDER BY civicrm_custom_group.weight,
           }
         }
 
-
         if (!isset($groupTree[$groupID]['fields'][$fieldId]['customValue'])) {
           // field exists in db so populate value from "form".
           $groupTree[$groupID]['fields'][$fieldId]['customValue'] = array();
@@ -1513,10 +1550,14 @@ ORDER BY civicrm_custom_group.weight,
   /**
    * Generic function to build all the form elements for a specific group tree
    *
-   * @param CRM_Core_Form $form             the form object
-   * @param array     $groupTree        the group tree object
-   * @param boolean   $inactiveNeeded   return inactive custom groups
-   * @param string    $prefix           prefix for custom grouptree assigned to template
+   * @param CRM_Core_Form $form
+   *   The form object.
+   * @param array $groupTree
+   *   The group tree object.
+   * @param bool $inactiveNeeded
+   *   Return inactive custom groups.
+   * @param string $prefix
+   *   Prefix for custom grouptree assigned to template.
    *
    * @return void
    * @static
@@ -1549,8 +1590,10 @@ ORDER BY civicrm_custom_group.weight,
    * Extract the get params from the url, validate
    * and store it in session
    *
-   * @param CRM_Core_Form $form the form object
-   * @param string $type the type of custom group we are using
+   * @param CRM_Core_Form $form
+   *   The form object.
+   * @param string $type
+   *   The type of custom group we are using.
    *
    * @return array
    * @static
@@ -1655,8 +1698,10 @@ ORDER BY civicrm_custom_group.weight,
    * Check the type of custom field type (eg: Used for Individual, Contribution, etc)
    * this function is used to get the custom fields of a type (eg: Used for Individual, Contribution, etc )
    *
-   * @param  int $customFieldId custom field id
-   * @param  array $removeCustomFieldTypes remove custom fields of a type eg: array("Individual") ;
+   * @param int $customFieldId
+   *   Custom field id.
+   * @param array $removeCustomFieldTypes
+   *   Remove custom fields of a type eg: array("Individual") ;.
    *
    *
    * @return boolean false if it matches else true
@@ -1764,8 +1809,10 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
   /**
    * Function returns formatted groupTree, sothat form can be easily build in template
    *
-   * @param array $groupTree associated array
-   * @param int $groupCount group count by default 1, but can varry for multiple value custom data
+   * @param array $groupTree
+   *   Associated array.
+   * @param int $groupCount
+   *   Group count by default 1, but can varry for multiple value custom data.
    * @param object form object
    *
    * @return array $formattedGroupTree
@@ -1834,9 +1881,12 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
   /**
    * Build custom data view
    *
-   * @param CRM_Core_Form $form page object
-   * @param array $groupTree associated array
-   * @param boolean $returnCount true if customValue count needs to be returned
+   * @param CRM_Core_Form $form
+   *   Page object.
+   * @param array $groupTree
+   *   Associated array.
+   * @param bool $returnCount
+   *   True if customValue count needs to be returned.
    * @param int $gID
    * @param null $prefix
    * @param int $customValueId
@@ -1924,9 +1974,12 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
   /**
    * Format custom value according to data, view mode
    *
-   * @param array $values associated array of custom values
-   * @param array $field associated array
-   * @param boolean $dncOptionPerLine true if optionPerLine should not be consider
+   * @param array $values
+   *   Associated array of custom values.
+   * @param array $field
+   *   Associated array.
+   * @param bool $dncOptionPerLine
+   *   True if optionPerLine should not be consider.
    *
    * @return array|null|string
    */
@@ -2028,8 +2081,8 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
           $retValue = $value;
           break;
         }
-      // note that if its not text / textarea, the code falls thru and executes
-      // the below case also
+        // note that if its not text / textarea, the code falls thru and executes
+        // the below case also
       case 'StateProvince':
       case 'Country':
         $options = array();
@@ -2158,7 +2211,8 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
   /**
    * Get the custom group titles by custom field ids.
    *
-   * @param  array $fieldIds - array of custom field ids.
+   * @param array $fieldIds
+   *   Array of custom field ids.
    *
    * @return array $groupLabels - array consisting of groups and fields labels with ids.
    */
@@ -2203,7 +2257,8 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
   /**
    * Check whether custom group is empty or not.
    *
-   * @param   int $gID - custom group id.
+   * @param int $gID
+   *   Custom group id.
    *
    * @return boolean true if empty otherwise false.
    */
@@ -2230,7 +2285,8 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
   /**
    * Get the list of types for objects that a custom group extends to.
    *
-   * @param  array $types - var which should have the list appended.
+   * @param array $types
+   *   Var which should have the list appended.
    *
    * @return array of types.
    */
@@ -2255,8 +2311,8 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
           }
 
           list($className) = explode('::', $callback);
-          require_once(str_replace('_', DIRECTORY_SEPARATOR, $className) .
-            '.php');
+          require_once str_replace('_', DIRECTORY_SEPARATOR, $className) .
+            '.php';
 
           $objTypes[$ovValues['value']] = call_user_func_array($callback, $args);
         }

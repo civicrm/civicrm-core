@@ -31,8 +31,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_report_instance_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Report
+ * @package CiviCRM_APIv3
+ * @subpackage API_Report
  */
 
 class api_v3_ReportTemplateTest extends CiviUnitTestCase {
@@ -63,7 +63,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       WHERE name = "CRM_Report_Form_Examplez"');
 
     // change component to null
-    $result = $this->callAPISuccess('ReportTemplate', 'create', array(      'id' => $entityId,
+    $result = $this->callAPISuccess('ReportTemplate', 'create', array(
+    'id' => $entityId,
       'component' => '',
     ));
     $this->assertAPISuccess($result);
@@ -76,7 +77,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       AND component_id IS NULL');
 
     // deactivate
-    $result = $this->callAPISuccess('ReportTemplate', 'create', array(      'id' => $entityId,
+    $result = $this->callAPISuccess('ReportTemplate', 'create', array(
+    'id' => $entityId,
       'is_active' => 0,
     ));
     $this->assertAPISuccess($result);
@@ -88,7 +90,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       WHERE name = "CRM_Report_Form_Examplez"');
 
     // activate
-    $result = $this->callAPISuccess('ReportTemplate', 'create', array(      'id' => $entityId,
+    $result = $this->callAPISuccess('ReportTemplate', 'create', array(
+    'id' => $entityId,
       'is_active' => 1,
     ));
     $this->assertAPISuccess($result);
@@ -139,7 +142,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     if(stristr($reportID, 'has existing issues')) {
       $this->markTestIncomplete($reportID);
     }
-     $result = $this->callAPISuccess('report_template', 'getrows', array(
+    $result = $this->callAPISuccess('report_template', 'getrows', array(
        'report_id' => $reportID,
     ));
   }
@@ -151,7 +154,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     if(stristr($reportID, 'has existing issues')) {
       $this->markTestIncomplete($reportID);
     }
-    if(in_array($reportID , array('contribute/softcredit', 'contribute/bookkeeping'))) {
+    if(in_array($reportID, array('contribute/softcredit', 'contribute/bookkeeping'))) {
       $this->markTestIncomplete($reportID . " has non enotices when calling statistics fn");
     }
     $description = "Get Statistics from a report (note there isn't much data to get in the test DB :-(";
@@ -166,7 +169,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    */
   public static function getReportTemplates() {
     $reportsToSkip = array(
-        'activity' =>  'does not respect function signature on from clause',
+        'activity' => 'does not respect function signature on from clause',
         'walklist' => 'Notice: Undefined index: type in CRM_Report_Form_Walklist_Walklist line 155.
                        (suspect the select function should be removed in favour of the parent (state province field)
                       also, type should be added to state province & others? & potentially getAddressColumns fn should be
@@ -195,8 +198,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
         $reportTemplates[] = array($report['value']. " has existing issues :  " . $reportsToSkip[$report['value']]);
       }
     }
-
-
 
     return $reportTemplates;
   }

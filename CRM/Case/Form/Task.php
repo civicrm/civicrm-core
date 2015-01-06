@@ -152,8 +152,10 @@ class CRM_Case_Form_Task extends CRM_Core_Form {
    * Simple shell that derived classes can call to add buttons to
    * the form with a customized title for the main Submit
    *
-   * @param string $title title of the main button
-   * @param string $nextType button type for the form after processing
+   * @param string $title
+   *   Title of the main button.
+   * @param string $nextType
+   *   Button type for the form after processing.
    * @param string $backType
    * @param bool $submitOnce
    *

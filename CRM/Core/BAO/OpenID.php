@@ -41,7 +41,8 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
   /**
    * Takes an associative array and adds OpenID
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return object       CRM_Core_BAO_OpenID object on success, null otherwise
    * @static
@@ -62,7 +63,8 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array $entityBlock   input parameters to find object
+   * @param array $entityBlock
+   *   Input parameters to find object.
    *
    * @return mixed
    * @static
@@ -74,7 +76,8 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
   /**
    * Returns whether or not this OpenID is allowed to login
    *
-   * @param  string  $identity_url the OpenID to check
+   * @param string $identity_url
+   *   The OpenID to check.
    *
    * @return boolean
    * @static
@@ -91,7 +94,8 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
   /**
    * Get all the openids for a specified contact_id, with the primary openid being first
    *
-   * @param int $id the contact id
+   * @param int $id
+   *   The contact id.
    *
    * @param bool $updateBlankLocInfo
    *

@@ -31,8 +31,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_custom_group* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_CustomGroup
+ * @package CiviCRM_APIv3
+ * @subpackage API_CustomGroup
  */
 
 class api_v3_CustomGroupTest extends CiviUnitTestCase {
@@ -231,7 +231,8 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
    * Check without title
    */
   public function testCustomGroupCreateNoTitle() {
-    $params = array('extends' => array('Contact'),
+    $params = array(
+    'extends' => array('Contact'),
       'weight' => 5,
       'collapse_display' => 1,
       'style' => 'Tab',

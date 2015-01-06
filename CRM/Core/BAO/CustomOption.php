@@ -42,8 +42,10 @@ class CRM_Core_BAO_CustomOption {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_BAO_CustomOption object
    * @static
@@ -61,8 +63,10 @@ class CRM_Core_BAO_CustomOption {
   /**
    * Returns all active options ordered by weight for a given field
    *
-   * @param int $fieldID field whose options are needed
-   * @param  boolean $inactiveNeeded do we need inactive options ?
+   * @param int $fieldID
+   *   Field whose options are needed.
+   * @param bool $inactiveNeeded
+   *   Do we need inactive options ?.
    *
    * @return array $customOption all active options for fieldId
    * @static
@@ -106,11 +110,14 @@ class CRM_Core_BAO_CustomOption {
    * Returns the option label for a custom field with a specific value. Handles all
    * custom field data and html types
    *
-   * @param $fieldId  int    the custom field ID
+   * @param $fieldId
+   *   Int    the custom field ID.
    * @pram  $value    string the value (typically from the DB) of this custom field
    * @param $value
-   * @param $htmlType string the html type of the field (optional)
-   * @param $dataType string the data type of the field (optional)
+   * @param $htmlType
+   *   String the html type of the field (optional).
+   * @param $dataType
+   *   String the data type of the field (optional).
    *
    * @return string          the label to display for this custom field
    * @static
@@ -264,7 +271,8 @@ WHERE  id = %2";
           $query     = "
 UPDATE {$dao->tableName}
 SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
-          $queryParams = array(1 => array($oldString, 'String'),
+          $queryParams = array(
+          1 => array($oldString, 'String'),
             2 => array($newString, 'String'),
           );
           break;

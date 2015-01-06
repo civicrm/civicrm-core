@@ -136,7 +136,8 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @return array list of errors to be posted back to the form
    * @static

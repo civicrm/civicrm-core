@@ -65,8 +65,10 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   /**
    * Class constructor
    *
-   * @param int $contactId - contact whose activities we want to display
-   * @param int $permission - the permission we have for this contact
+   * @param int $contactId
+   *   Contact whose activities we want to display.
+   * @param int $permission
+   *   The permission we have for this contact.
    *
    * @param bool $admin
    * @param string $context
@@ -77,8 +79,8 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    */
   function __construct($contactId,
                        $permission,
-                       $admin           = FALSE,
-                       $context         = 'activity',
+                       $admin = FALSE,
+                       $context = 'activity',
                        $activityTypeIDs = NULL) {
     $this->_contactId = $contactId;
     $this->_permission = $permission;
@@ -108,11 +110,11 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    * @return array
    */
   public static function actionLinks($activityTypeId,
-                                     $sourceRecordId      = NULL,
+                                     $sourceRecordId = NULL,
                                      $accessMailingReport = FALSE,
-                                     $activityId          = NULL,
-                                     $key                 = NULL,
-                                     $compContext         = NULL) {
+                                     $activityId = NULL,
+                                     $key = NULL,
+                                     $compContext = NULL) {
     static $activityActTypes = NULL;
     //CRM-14277 added addtitional param to handle activity search
     $extraParams = "&searchContext=activity";
@@ -212,7 +214,9 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
     $actionLinks = array();
 
     if ($showView) {
-      $actionLinks += array(CRM_Core_Action::VIEW => array('name' => ts('View'),
+      $actionLinks += array(CRM_Core_Action::
+      VIEW => array(
+      'name' => ts('View'),
         'url' => $url,
         'qs' => $qsView,
         'title' => ts('View Activity'),
@@ -228,7 +232,9 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
         $updateUrl = 'civicrm/activity/pdf/add';
       }
       if ( CRM_Activity_BAO_Activity::checkPermission($activityId, CRM_Core_Action::UPDATE) ) {
-        $actionLinks += array(CRM_Core_Action::UPDATE => array('name' => ts('Edit'),
+        $actionLinks += array(CRM_Core_Action::
+        UPDATE => array(
+        'name' => ts('Edit'),
           'url' => $updateUrl,
           'qs' => $qsUpdate,
           'title' => ts('Update Activity'),
@@ -240,7 +246,9 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
       $activityTypeName &&
       CRM_Case_BAO_Case::checkPermission($activityId, 'File On Case', $activityTypeId)
     ) {
-      $actionLinks += array(CRM_Core_Action::ADD => array('name' => ts('File on Case'),
+      $actionLinks += array(CRM_Core_Action::
+      ADD => array(
+      'name' => ts('File on Case'),
         'url' => '#',
         'extra' => 'onclick="javascript:fileOnCase( \'file\', \'%%id%%\', null, this ); return false;"',
         'title' => ts('File on Case'),
@@ -251,7 +259,9 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
       if (!isset($delUrl) || !$delUrl) {
         $delUrl = $url;
       }
-      $actionLinks += array(CRM_Core_Action::DELETE => array('name' => ts('Delete'),
+      $actionLinks += array(CRM_Core_Action::
+      DELETE => array(
+      'name' => ts('Delete'),
         'url' => $delUrl,
         'qs' => $qsDelete,
         'title' => ts('Delete Activity'),
@@ -259,7 +269,9 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
     }
 
     if ($accessMailingReport) {
-      $actionLinks += array(CRM_Core_Action::BROWSE => array('name' => ts('Mailing Report'),
+      $actionLinks += array(CRM_Core_Action::
+      BROWSE => array(
+      'name' => ts('Mailing Report'),
         'url' => 'civicrm/mailing/report',
         'qs' => "mid={$sourceRecordId}&reset=1&cid=%%cid%%&context=activitySelector",
         'title' => ts('View Mailing Report'),
@@ -289,8 +301,10 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    * Returns the column headers as an array of tuples:
    * (name, sortName (key to the sort array))
    *
-   * @param string $action the action being performed
-   * @param enum   $output what should the result set include (web/email/csv)
+   * @param string $action
+   *   The action being performed.
+   * @param enum $output
+   *   What should the result set include (web/email/csv).
    *
    * @return array the column headers that need to be displayed
    */
@@ -312,7 +326,8 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   /**
    * Returns total number of rows for the query.
    *
-   * @param string $action - action being performed
+   * @param string $action
+   *   Action being performed.
    *
    * @param null $case
    *
@@ -335,11 +350,16 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   /**
    * Returns all the rows in the given offset and rowCount
    *
-   * @param enum $action the action being performed
-   * @param int $offset the row number to start from
-   * @param int $rowCount the number of rows to return
-   * @param string $sort the sql string that describes the sort order
-   * @param enum $output what should the result set include (web/email/csv)
+   * @param enum $action
+   *   The action being performed.
+   * @param int $offset
+   *   The row number to start from.
+   * @param int $rowCount
+   *   The number of rows to return.
+   * @param string $sort
+   *   The sql string that describes the sort order.
+   * @param enum $output
+   *   What should the result set include (web/email/csv).
    *
    * @param null $case
    *
@@ -461,7 +481,8 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   /**
    * Name of export file.
    *
-   * @param string $output type of output
+   * @param string $output
+   *   Type of output.
    *
    * @return string name of the file
    */
@@ -478,15 +499,18 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   private static function &_getColumnHeaders() {
     if (!isset(self::$_columnHeaders)) {
       self::$_columnHeaders = array(
-        array('name' => ts('Type'),
+        array(
+      'name' => ts('Type'),
           'sort' => 'activity_type',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
-        array('name' => ts('Subject'),
+        array(
+      'name' => ts('Subject'),
           'sort' => 'subject',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
-        array('name' => ts('Added By'),
+        array(
+      'name' => ts('Added By'),
           'sort' => 'source_contact_name',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),

@@ -46,17 +46,28 @@ class CRM_Export_BAO_Export {
   /**
    * Get the list the export fields
    *
-   * @param int $selectAll user preference while export
-   * @param array $ids contact ids
-   * @param array $params associated array of fields
-   * @param string $order order by clause
-   * @param array $fields associated array of fields
-   * @param array $moreReturnProperties additional return fields
-   * @param int $exportMode export mode
-   * @param string $componentClause component clause
-   * @param string $componentTable component table
-   * @param bool $mergeSameAddress merge records if they have same address
-   * @param bool $mergeSameHousehold merge records if they belong to the same household
+   * @param int $selectAll
+   *   User preference while export.
+   * @param array $ids
+   *   Contact ids.
+   * @param array $params
+   *   Associated array of fields.
+   * @param string $order
+   *   Order by clause.
+   * @param array $fields
+   *   Associated array of fields.
+   * @param array $moreReturnProperties
+   *   Additional return fields.
+   * @param int $exportMode
+   *   Export mode.
+   * @param string $componentClause
+   *   Component clause.
+   * @param string $componentTable
+   *   Component table.
+   * @param bool $mergeSameAddress
+   *   Merge records if they have same address.
+   * @param bool $mergeSameHousehold
+   *   Merge records if they belong to the same household.
    *
    * @param array $exportParams
    * @param string $queryOperator
@@ -1172,8 +1183,10 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
   /**
    * Name of the export file based on mode
    *
-   * @param string  $output type of output
-   * @param int     $mode export mode
+   * @param string $output
+   *   Type of output.
+   * @param int $mode
+   *   Export mode.
    *
    * @return string name of the file
    */
@@ -1794,10 +1807,14 @@ WHERE  id IN ( $deleteIDString )
    * Merge household record into the individual record
    * if exists
    *
-   * @param string $exportTempTable temporary temp table that stores the records
-   * @param array  $headerRows array of headers for the export file
-   * @param array  $sqlColumns array of names of the table columns of the temp table
-   * @param string $prefix name of the relationship type that is prefixed to the table columns
+   * @param string $exportTempTable
+   *   Temporary temp table that stores the records.
+   * @param array $headerRows
+   *   Array of headers for the export file.
+   * @param array $sqlColumns
+   *   Array of names of the table columns of the temp table.
+   * @param string $prefix
+   *   Name of the relationship type that is prefixed to the table columns.
    */
   public static function mergeSameHousehold($exportTempTable, &$headerRows, &$sqlColumns, $prefix) {
     $prefixColumn = $prefix . '_';

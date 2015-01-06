@@ -53,14 +53,15 @@ class CRM_Upgrade_Incremental_php_FourTwo {
    * revision to the database.
    *
    * @param $preUpgradeMessage
-   * @param $rev string, a version number, e.g. '4.2.alpha1', '4.2.beta3', '4.2.0'
+   * @param $rev
+   *   String, a version number, e.g. '4.2.alpha1', '4.2.beta3', '4.2.0'.
    * @param null $currentVer
    *
    * @return void
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '4.2.alpha1') {
-      $tables = array('civicrm_contribution_page','civicrm_event','civicrm_group','civicrm_contact');
+      $tables = array('civicrm_contribution_page', 'civicrm_event', 'civicrm_group', 'civicrm_contact');
       if (!CRM_Core_DAO::schemaRequiresRebuilding($tables)){
         $errors = ts("The upgrade has identified some schema integrity issues in the database. It seems some of your constraints are missing. You will have to rebuild your schema before re-trying the upgrade. Please refer to %1.", array(1 => CRM_Utils_System::docURL2("Ensuring Schema Integrity on Upgrades", FALSE, "Ensuring Schema Integrity on Upgrades", NULL, NULL, "wiki")));
         CRM_Core_Error::fatal($errors);
@@ -96,12 +97,12 @@ ORDER BY mp.contribution_id, mp.membership_id";
           $invalidDataMessage .= "<td>{$invalidData->end_date}</td>";
           $invalidDataMessage .= "<td>" . CRM_Utils_Array::value($invalidData->status_id, $membershipStatus) . "</td>";
           $invalidDataMessage .= "</tr>";
-          }
+        }
         $invalidDataMessage .= "</table><p>" . ts('If you have reviewed the cleanup script documentation on the wiki and you are ready to run the cleanup now - <a href="%1">click here</a>.', array(1 => CRM_Utils_System::url('civicrm/upgrade/cleanup425', 'reset=1'))) . "</p>";
         CRM_Core_Error::fatal($invalidDataMessage);
         return FALSE;
-        }
       }
+    }
 
     if ($rev == '4.2.beta2') {
       // note: error conditions are also checked in upgrade_4_2_beta2()
@@ -139,15 +140,17 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
         $errors = ts("We found unexpected data values from an older version of CiviCRM in your database. The upgrade can not be run until this condition is corrected.<br /><br />Details: One or more rows are present in the civicrm_option_group with name like 'civicrm_price_field.amount.%'. <a href='%1'>Check here for information on diagnosing and correcting this problem.</a>", array(1 => 'http://forum.civicrm.org/index.php/topic,27744.msg118748.html#msg118748'));
         CRM_Core_Error::fatal($errors);
         return FALSE;
-  }
+      }
     }
   }
 
   /**
    * Compute any messages which should be displayed after upgrade
    *
-   * @param $postUpgradeMessage string, alterable
-   * @param $rev string, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs
+   * @param $postUpgradeMessage
+   *   String, alterable.
+   * @param $rev
+   *   String, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
@@ -157,11 +160,11 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
         $postUpgradeMessage .= '<br />' . ts('Please <a href="%1" target="_blank">configure the Extension Resource URL</a>.', array(
           1 => CRM_Utils_System::url('civicrm/admin/setting/url', 'reset=1')
         ));
-  }
+      }
     }
     if ($rev == '4.2.7') {
       $postUpgradeMessage .= '<br />' . ts('If you have configured a report instance to allow anonymous access, you will need to reset the permission to Everyone for that instance (under the Report Settings pane).');
-  }
+    }
   }
 
   /**
@@ -171,12 +174,13 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
     //checking whether the foreign key exists before dropping it
     //drop foreign key queries of CRM-9850
     $params = array();
-    $tables = array('civicrm_contribution_page' =>'FK_civicrm_contribution_page_payment_processor_id',
+    $tables = array(
+    'civicrm_contribution_page' => 'FK_civicrm_contribution_page_payment_processor_id',
                     'civicrm_event' => 'FK_civicrm_event_payment_processor_id',
                     'civicrm_group' => 'FK_civicrm_group_saved_search_id',
                     );
     foreach($tables as $tableName => $fKey){
-      $foreignKeyExists = CRM_Core_DAO::checkConstraintExists($tableName,$fKey);
+      $foreignKeyExists = CRM_Core_DAO::checkConstraintExists($tableName, $fKey);
       if ($foreignKeyExists){
         CRM_Core_DAO::executeQuery("ALTER TABLE {$tableName} DROP FOREIGN KEY {$fKey}", $params, TRUE, NULL, FALSE, FALSE);
         CRM_Core_DAO::executeQuery("ALTER TABLE {$tableName} DROP INDEX {$fKey}", $params, TRUE, NULL, FALSE, FALSE);
@@ -408,7 +412,7 @@ WHERE  name LIKE '%.amount.%' ";
     while ($dao->fetch()) {
       $addTo = explode('.', $dao->name);
       if (!empty($addTo[2])) {
-        $options = array ('optionGroup' => $dao->name);
+        $options = array('optionGroup' => $dao->name);
         self::createPriceSet($daoName, $addTo, $options);
       }
       CRM_Core_OptionGroup::deleteAssoc($dao->name);
@@ -425,7 +429,8 @@ WHERE     cpse.price_set_id IS NULL";
     $addTo = array('civicrm_contribution_page');
     while ($dao->fetch()) {
       $addTo[2] = $dao->contribution_page_id;
-      $options = array ('otherAmount' =>$dao->is_allow_other_amount,
+      $options = array(
+      'otherAmount' => $dao->is_allow_other_amount,
                       'membership' => $dao->membership_block_id );
       self::createPriceSet($daoName, $addTo, $options);
     }
@@ -437,21 +442,21 @@ WHERE     cpse.price_set_id IS NULL";
    * (Queue Task Callback)
    */
   public static function task_4_2_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
-      $upgrade = new CRM_Upgrade_Form();
-      $upgrade->processSQL($rev);
+    $upgrade = new CRM_Upgrade_Form();
+    $upgrade->processSQL($rev);
 
-      // now rebuild all the triggers
-      // CRM-9716
-      // FIXME // CRM_Core_DAO::triggerRebuild();
+    // now rebuild all the triggers
+    // CRM-9716
+    // FIXME // CRM_Core_DAO::triggerRebuild();
 
-      return TRUE;
+    return TRUE;
   }
 
   /**
    *
    * create price sets
    */
-  public static function createPriceSet($daoName, $addTo,  $options = array()) {
+  public static function createPriceSet($daoName, $addTo, $options = array()) {
     $query = "SELECT title FROM {$addTo[0]} where id =%1";
     $setParams['title']  = CRM_Core_DAO::singleValueQuery($query,
       array(1 => array($addTo[2], 'Integer'))
@@ -468,8 +473,9 @@ WHERE     cpse.price_set_id IS NULL";
     $optionValue = array();
     if (!empty($options['optionGroup'])) {
       CRM_Core_OptionGroup::getAssoc($options['optionGroup'], $optionValue);
-      if (empty($optionValue))
+      if (empty($optionValue)) {
         return;
+      }
     }
     elseif (empty($options['otherAmount']) && empty($options['membership'])) {
       //CRM-12273
@@ -477,11 +483,11 @@ WHERE     cpse.price_set_id IS NULL";
       return;
     }
 
-    if (! CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set', $pageTitle, 'id', 'name', true)) {
+    if (! CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set', $pageTitle, 'id', 'name', TRUE)) {
       $setParams['name'] = $pageTitle;
     }
     else {
-      $timeSec = explode(".", microtime(true));
+      $timeSec = explode(".", microtime(TRUE));
       $setParams['name'] = $pageTitle . '_' . date('is', $timeSec[0]) . $timeSec[1];
     }
     $setParams['extends'] = $daoName[$addTo[0]][1];
@@ -587,8 +593,10 @@ WHERE     cpse.price_set_id IS NULL";
    * records.
    *
    * @param CRM_Queue_TaskContext $ctx
-   * @param $startId int, the first/lowest contribution ID to convert
-   * @param $endId int, the last/highest contribution ID to convert
+   * @param $startId
+   *   Int, the first/lowest contribution ID to convert.
+   * @param $endId
+   *   Int, the last/highest contribution ID to convert.
    *
    * @return bool
    */
@@ -733,8 +741,10 @@ WHERE     cpf.price_set_id = %1
    * records.
    *
    * @param CRM_Queue_TaskContext $ctx
-   * @param $startId int, the first/lowest participant ID to convert
-   * @param $endId int, the last/highest participant ID to convert
+   * @param $startId
+   *   Int, the first/lowest participant ID to convert.
+   * @param $endId
+   *   Int, the last/highest participant ID to convert.
    *
    * @return bool
    */
@@ -943,7 +953,7 @@ VALUES
         $contribStatus  = CRM_Utils_Array::value($dao->contribution_status_id, $contributionStatus);
         $processedRecords[] = array($dao->contact_id, $dao->contribution_id, $contribStatus, $dao->membership_id,
                                     $memType, $dao->start_date, $dao->end_date, $memStatus, $status);
-}
+      }
     }
 
     if ( !empty($processedRecords) ) {

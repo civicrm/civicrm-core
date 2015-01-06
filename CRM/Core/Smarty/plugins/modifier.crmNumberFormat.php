@@ -37,10 +37,14 @@
  * Add thousands separator to numeric strings using
  * PHP number_format() function.
  *
- * @param float  $number        numeric value to be formatted
- * @param int    $decimals      number of decimal places
- * @param string $dec_point     decimal point character (if other than ".")
- * @param string $thousands_sep thousands sep character (if other than ",")
+ * @param float $number
+ *   Numeric value to be formatted.
+ * @param int $decimals
+ *   Number of decimal places.
+ * @param string $dec_point
+ *   Decimal point character (if other than ".").
+ * @param string $thousands_sep
+ *   Thousands sep character (if other than ",").
  *
  * @return string        the formatted string
  *

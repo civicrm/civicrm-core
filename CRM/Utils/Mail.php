@@ -52,7 +52,8 @@ class CRM_Utils_Mail {
    *   mime_type: mime type of the attachment
    *   cleanName: the user friendly name of the attachmment
    *
-   * @param array $params (by reference)
+   * @param array $params
+   *   (by reference).
    *
    *
    * @return boolean true if a mail was sent, else false
@@ -159,20 +160,20 @@ class CRM_Utils_Mail {
     $headers = &$msg->headers($headers);
 
     $to = array($params['toEmail']);
-    $result = null;
+    $result = NULL;
     $mailer =& CRM_Core_Config::getMailer( );
 
     // Mail_smtp and Mail_sendmail mailers require Bcc anc Cc emails
     // be included in both $to and $headers['Cc', 'Bcc']
     if (get_class($mailer) != "Mail_mail") {
-        //get emails from headers, since these are
-        //combination of name and email addresses.
-        if (!empty($headers['Cc'])) {
-            $to[] = CRM_Utils_Array::value( 'Cc', $headers );
-        }
-        if (!empty($headers['Bcc'])) {
-            $to[] = CRM_Utils_Array::value( 'Bcc', $headers );
-        }
+      //get emails from headers, since these are
+      //combination of name and email addresses.
+      if (!empty($headers['Cc'])) {
+        $to[] = CRM_Utils_Array::value( 'Cc', $headers );
+      }
+      if (!empty($headers['Bcc'])) {
+        $to[] = CRM_Utils_Array::value( 'Bcc', $headers );
+      }
     }
     if (is_object($mailer)) {
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
@@ -253,7 +254,8 @@ class CRM_Utils_Mail {
    *
    * Ugly but working.
    *
-   * @param  string $header  the full name + email address string
+   * @param string $header
+   *   The full name + email address string.
    *
    * @return string          the plucked email address
    * @static

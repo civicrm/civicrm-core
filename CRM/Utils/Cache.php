@@ -50,7 +50,8 @@ class CRM_Utils_Cache {
   /**
    * Constructor
    *
-   * @param array $config an array of configuration params
+   * @param array $config
+   *   An array of configuration params.
    *
    * @return \CRM_Utils_Cache
    */
@@ -85,7 +86,7 @@ class CRM_Utils_Cache {
 
       // a generic method for utilizing any of the available db caches.
       $dbCacheClass = 'CRM_Utils_Cache_' . $className;
-      require_once(str_replace('_', DIRECTORY_SEPARATOR, $dbCacheClass) . '.php');
+      require_once str_replace('_', DIRECTORY_SEPARATOR, $dbCacheClass) . '.php';
       $settings = self::getCacheSettings($className);
       self::$_singleton = new $dbCacheClass($settings);
     }

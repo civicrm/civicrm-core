@@ -64,7 +64,8 @@ function civicrm_api3_activity_type_get($params) {
 /**
  * create activity type (
  *
- * @param array   $params  associated array of fields
+ * @param array $params
+ *   Associated array of fields.
  *                 $params['option_value_id'] is required for updation of activity type
  *
  * @return array $activityType created / updated activity type
@@ -92,7 +93,8 @@ function civicrm_api3_activity_type_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_activity_type_create_spec(&$params) {
   $params['label']['api.required'] = 1;
@@ -104,7 +106,8 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
 /**
  * delete activity type
  *
- * @param array $params array including id of activity_type to delete
+ * @param array $params
+ *   Array including id of activity_type to delete.
 
  * @return array API result array
  *
@@ -115,4 +118,3 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
 function civicrm_api3_activity_type_delete($params) {
   return civicrm_api3_create_success(CRM_Core_BAO_OptionValue::del($params['id']), $params);
 }
-

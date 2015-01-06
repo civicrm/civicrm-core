@@ -47,7 +47,8 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   /**
    * Given a note id, retrieve the note text
    *
-   * @param int  $id   id of the note to retrieve
+   * @param int $id
+   *   Id of the note to retrieve.
    *
    * @return string   the note text or null if note not found
    *
@@ -60,7 +61,8 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   /**
    * Given a note id, retrieve the note subject
    *
-   * @param int  $id   id of the note to retrieve
+   * @param int $id
+   *   Id of the note to retrieve.
    *
    * @return string   the note subject or null if note not found
    *
@@ -73,7 +75,8 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   /**
    * Given a note id, decide if the note should be displayed based on privacy setting
    *
-   * @param object  $note Either the id of the note to retrieve, or the CRM_Core_DAO_Note object itself
+   * @param object $note
+   *   Either the id of the note to retrieve, or the CRM_Core_DAO_Note object itself.
    *
    * @return boolean TRUE if the note should be displayed, otherwise FALSE
    *
@@ -128,8 +131,10 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * note object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array $params  (reference) an assoc array of name/value pairs
-   * @param array $ids (deprecated) associated array with note id - preferably set $params['id']
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
+   * @param array $ids
+   *   (deprecated) associated array with note id - preferably set $params['id'].
    *
    * @return object $note CRM_Core_BAO_Note object
    * @static
@@ -215,7 +220,8 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   /**
    * Check if there is data to create the object
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return boolean
    * @static
@@ -232,9 +238,12 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array $params input parameters to find object
-   * @param array $values output values of the object
-   * @param int $numNotes the maximum number of notes to return (0 if all)
+   * @param array $params
+   *   Input parameters to find object.
+   * @param array $values
+   *   Output values of the object.
+   * @param int $numNotes
+   *   The maximum number of notes to return (0 if all).
    *
    * @return object $notes  Object of CRM_Core_BAO_Note
    * @static
@@ -275,8 +284,10 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   /**
    * Delete the notes
    *
-   * @param int $id note id
-   * @param boolean $showStatus do we need to set status or not
+   * @param int $id
+   *   Note id.
+   * @param bool $showStatus
+   *   Do we need to set status or not.
    *
    * @return mixed|null $return no of deleted notes on success, false otherwise@access public
    * @static
@@ -324,7 +335,8 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   /**
    * Delete all records for this contact id
    *
-   * @param int  $id ID of the contact for which note needs to be deleted.
+   * @param int $id
+   *   ID of the contact for which note needs to be deleted.
    *
    * @return void
    *
@@ -346,7 +358,8 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   /**
    * Retrieve all records for this entity-id
    *
-   * @param int $id ID of the relationship for which records needs to be retrieved.
+   * @param int $id
+   *   ID of the relationship for which records needs to be retrieved.
    *
    * @param string $entityTable
    *
@@ -402,9 +415,12 @@ ORDER BY  modified_date desc";
   /**
    * Get all descendent notes of the note with given ID
    *
-   * @param int $parentId ID of the note to start from
-   * @param int $maxDepth Maximum number of levels to descend into the tree; if not given, will include all descendents.
-   * @param bool $snippet If TRUE, returned values will be pre-formatted for display in a table of notes.
+   * @param int $parentId
+   *   ID of the note to start from.
+   * @param int $maxDepth
+   *   Maximum number of levels to descend into the tree; if not given, will include all descendents.
+   * @param bool $snippet
+   *   If TRUE, returned values will be pre-formatted for display in a table of notes.
    *
    * @return array Nested associative array beginning with direct children of given note.
    *
@@ -417,7 +433,8 @@ ORDER BY  modified_date desc";
   /**
    * Get total count of direct children visible to the current user
    *
-   * @param int $id Note ID
+   * @param int $id
+   *   Note ID.
    *
    * @return int $count Number of notes having the give note as parent
    *
@@ -440,18 +457,23 @@ ORDER BY  modified_date desc";
   /**
    * Recursive function to get all descendent notes of the note with given ID
    *
-   * @param int $parentId ID of the note to start from
-   * @param int $maxDepth Maximum number of levels to descend into the tree; if not given, will include all descendents.
-   * @param bool $snippet If TRUE, returned values will be pre-formatted for display in a table of notes.
-   * @param array $tree (Reference) Variable to store all found descendents
-   * @param int $depth Depth of current iteration within the descendent tree (used for comparison against maxDepth)
+   * @param int $parentId
+   *   ID of the note to start from.
+   * @param int $maxDepth
+   *   Maximum number of levels to descend into the tree; if not given, will include all descendents.
+   * @param bool $snippet
+   *   If TRUE, returned values will be pre-formatted for display in a table of notes.
+   * @param array $tree
+   *   (Reference) Variable to store all found descendents.
+   * @param int $depth
+   *   Depth of current iteration within the descendent tree (used for comparison against maxDepth).
    *
    * @return array Nested associative array beginning with direct children of given note.
    * @static
    */
   private static function buildNoteTree($parentId, $maxDepth = 0, $snippet = FALSE, &$tree = array(), $depth = 0) {
     if ($maxDepth && $depth > $maxDepth) {
-      return false;
+      return FALSE;
     }
 
     // get direct children of given parentId note
@@ -505,8 +527,10 @@ ORDER BY  modified_date desc";
   /**
    * Given a note id, get a list of the ids of all notes that are descendents of that note
    *
-   * @param int $parentId Id of the given note
-   * @param array $ids (reference) one-dimensional array to store found descendent ids
+   * @param int $parentId
+   *   Id of the given note.
+   * @param array $ids
+   *   (reference) one-dimensional array to store found descendent ids.
    *
    * @return array $ids One-dimensional array containing ids of all desendent notes
    */
@@ -527,7 +551,8 @@ ORDER BY  modified_date desc";
   /**
    * Delete all note related to contact when contact is deleted
    *
-   * @param int $contactID contact id whose notes to be deleted
+   * @param int $contactID
+   *   Contact id whose notes to be deleted.
    *
    * @return void
    * @static

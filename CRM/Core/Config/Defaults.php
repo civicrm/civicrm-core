@@ -113,8 +113,10 @@ class CRM_Core_Config_Defaults {
   /**
    * Set the default values
    *
-   * @param array $defaults associated array of form elements
-   * @param bool|\boolena $formMode this funtion is called to set default
+   * @param array $defaults
+   *   Associated array of form elements.
+   * @param bool|\boolena $formMode
+   *   This funtion is called to set default.
    *                           values in an empty db, also called when setting component using GUI
    *                           this variable is set true for GUI
    *                           mode (eg: Global setting >> Components)
@@ -234,7 +236,6 @@ class CRM_Core_Config_Defaults {
     /* FIXME: hack to bypass the step for generating defaults for components,
                   while running upgrade, to avoid any serious non-recoverable error
                   which might hinder the upgrade process. */
-
 
     $args = array();
     if (isset($_GET[$config->userFrameworkURLVar])) {

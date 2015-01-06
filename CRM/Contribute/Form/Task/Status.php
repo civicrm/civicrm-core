@@ -141,7 +141,6 @@ AND    co.id IN ( $contribIDs )";
         array('CRM_Contribute_DAO_Contribution', $dao->contribution_id, 'trxn_id')
       );
 
-
       $row['fee_amount'] = &$this->add('text', "fee_amount_{$row['contribution_id']}", ts('Fee Amount'),
         $attributes['fee_amount']
       );
@@ -183,7 +182,8 @@ AND    co.id IN ( $contribIDs )";
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @return array list of errors to be posted back to the form
    * @static

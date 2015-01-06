@@ -271,7 +271,6 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
         on (civicrm_entity_financial_trxn.entity_id = civicrm_participant_payment.contribution_id and civicrm_entity_financial_trxn.entity_table='civicrm_contribution')";
     }
 
-
     $where = $this->where();
 
     $sql = "

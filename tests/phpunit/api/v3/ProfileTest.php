@@ -34,7 +34,7 @@ require_once 'tests/phpunit/CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_profile_* functions
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class api_v3_ProfileTest extends CiviUnitTestCase {
   protected $_apiversion;
@@ -173,8 +173,8 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   public function testProfileGetMultipleHasBillingLocation() {
     $individual = $this->_createIndividualContact();
     $contactId  = key($individual);
-    $this->callAPISuccess('address', 'create', array('contact_id' => $contactId , 'street_address' => '25 Big Street', 'city' => 'big city', 'location_type_id' => 5));
-    $this->callAPISuccess('email', 'create', array('contact_id' => $contactId , 'email' => 'big@once.com', 'location_type_id' => 2, 'is_billing' => 1));
+    $this->callAPISuccess('address', 'create', array('contact_id' => $contactId, 'street_address' => '25 Big Street', 'city' => 'big city', 'location_type_id' => 5));
+    $this->callAPISuccess('email', 'create', array('contact_id' => $contactId, 'email' => 'big@once.com', 'location_type_id' => 2, 'is_billing' => 1));
 
     $expected = current($individual);
 
@@ -439,7 +439,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     }
     unset($params['email-primary']);
     $params['email-Primary'] = 'my@mail.com';
-    $this->callAPISuccess('profile', 'submit',  $params);
+    $this->callAPISuccess('profile', 'submit', $params);
     $profileDetails = $this->callAPISuccess('profile', 'get', $getParams);
     $this->assertEquals('my@mail.com', $profileDetails['values']['email-Primary']);
   }
@@ -458,7 +458,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->assertEquals(array_keys($membershipTypes['values']), array_keys($getoptions['values']));
     $this->assertEquals(array_keys($membershipTypes['values']), array_keys($profileFields['values']['membership_type_id']['options']));
 
-}
+  }
 
   /**
    * Test that the fields are returned in the right order despite the faffing around that goes on
@@ -827,7 +827,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     // via the api
 
     $ufGroupParams = array(
-      'group_type' => 'Individual,Contact',// really we should remove this & test the ufField create sets it
+      'group_type' => 'Individual,Contact', // really we should remove this & test the ufField create sets it
       'name' => 'test_individual_contact_profile',
       'title' => 'Flat Coffee',
       'api.uf_field.create' => array(

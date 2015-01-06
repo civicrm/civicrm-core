@@ -87,8 +87,10 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   /**
    * Add ordering fields to Paper Size list
    *
-   * @param array (reference)   $list         List of Paper Sizes
-   * @param string              $returnURL    URL of page calling this function
+   * @param array (reference) $list
+   *   List of Paper Sizes.
+   * @param string $returnURL
+   *   URL of page calling this function.
    *
    * @return array  (reference)   List of Paper Sizes
    * @static
@@ -101,7 +103,8 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   /**
    * Retrieve list of Paper Sizes.
    *
-   * @param bool    $namesOnly    return simple list of names
+   * @param bool $namesOnly
+   *   Return simple list of names.
    *
    * @return array  (reference)   Paper Size list
    * @static
@@ -151,8 +154,10 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   /**
    * Get Paper Size from the DB
    *
-   * @param string $field   Field name to search by
-   * @param int    $val     Field value to search for
+   * @param string $field
+   *   Field name to search by.
+   * @param int $val
+   *   Field value to search for.
    *
    * @return array  $values (reference) associative array of name/value pairs
    */
@@ -170,7 +175,8 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   /**
    * Get Paper Size by Name
    *
-   * @param int    $name   Paper Size name. Empty = get default Paper Size
+   * @param int $name
+   *   Paper Size name. Empty = get default Paper Size.
    *
    * @return array  $values (reference) associative array of name/value pairs
    */
@@ -181,7 +187,8 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   /**
    * Get Paper Size by ID
    *
-   * @param int    $id   Paper Size id. 0 = get default Paper Size
+   * @param int $id
+   *   Paper Size id. 0 = get default Paper Size.
    *
    * @return array  $values (reference) associative array of name/value pairs
    */
@@ -192,8 +199,10 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   /**
    * Get Paper Size field from associative array
    *
-   * @param string $field name of a Paper Size field
-   * @param array (reference) $values associative array of name/value pairs containing
+   * @param string $field
+   *   Name of a Paper Size field.
+   * @param array (reference) $values
+   *   Associative array of name/value pairs containing.
    *                                           Paper Size field selections
    *
    * @param null $default
@@ -205,7 +214,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
     if (array_key_exists($field, self::$optionValueFields)) {
       switch (self::$optionValueFields[$field]['type']) {
         case CRM_Utils_Type::T_INT:
-          return (int)CRM_Utils_Array::value($field, $values, $default);
+          return (int) CRM_Utils_Array::value($field, $values, $default);
 
         case CRM_Utils_Type::T_FLOAT:
           // Round float values to three decimal places and trim trailing zeros.
@@ -213,7 +222,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
           $f = sprintf('%05.3f', $values[$field]);
           $f = rtrim($f, '0');
           $f = rtrim($f, '.');
-          return (float)(empty($f) ? '0' : $f);
+          return (float) (empty($f) ? '0' : $f);
       }
       return CRM_Utils_Array::value($field, $values, $default);
     }
@@ -225,8 +234,10 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    * retrieves the relevant objects. Typically the valid params are only
    * paper size id. It also stores all the retrieved values in the default array.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $values   (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $values
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_DAO_OptionValue object
    * @static
@@ -260,8 +271,10 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   /**
    * Save the Paper Size in the DB
    *
-   * @param array (reference)   $values    associative array of name/value pairs
-   * @param int                 $id        id of the database record (null = new record)
+   * @param array (reference) $values
+   *   Associative array of name/value pairs.
+   * @param int $id
+   *   Id of the database record (null = new record).
    *
    * @return void
    */
@@ -319,7 +332,8 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   /**
    * Delete a Paper Size
    *
-   * @param  int  $id     ID of the Paper Size to be deleted.
+   * @param int $id
+   *   ID of the Paper Size to be deleted.
    *
    * @static
    */

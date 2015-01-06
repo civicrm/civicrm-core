@@ -44,7 +44,8 @@ function _civicrm_api3_survey_respondant_deprecation() {
 /**
  * Get the list of signatories
  *
- * @param  array   $params           (reference ) input parameters
+ * @param array $params
+ *   (reference ) input parameters.
  *
  * @return array (reference )        contribution_id of created or updated record
  * @static void
@@ -65,7 +66,7 @@ function civicrm_api3_survey_respondant_get(&$params) {
   $interviewerID = NULL;
   if (array_key_exists('interviewer_id', $params)) {
     $interviewerID = $params['interviewer_id'];
-}
+  }
 
   $statusIds = array();
   if (array_key_exists('status_id', $params)) {
@@ -93,4 +94,3 @@ function &civicrm_api3_survey_respondant_count($params) {
   }
   return ($signaturesCount);
 }
-

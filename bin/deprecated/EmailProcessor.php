@@ -34,7 +34,7 @@
  */
 
 /**
- *When runing script from cli :
+ * When runing script from cli :
  * 1. By default script is being used for civimail processing.
  * eg : nice -19 php bin/EmailProcessor.php -u<login> -p<password> -s<sites(or default)>
  *
@@ -46,7 +46,7 @@
 // bootstrap the environment and run the processor
 // you can run this program either from an apache command, or from the cli
 if (php_sapi_name() == "cli") {
-  require_once ("bin/cli.php");
+  require_once "bin/cli.php";
   $cli = new civicrm_cli();
   //if it doesn't die, it's authenticated
   //log the execution of script
@@ -108,4 +108,3 @@ else {
 
   $lock->release();
 }
-

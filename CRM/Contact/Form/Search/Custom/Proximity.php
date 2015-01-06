@@ -287,7 +287,8 @@ AND cgc.group_id = {$this->_group}
   /**
    * @param $row
    */
-  public function alterRow(&$row) {}
+  public function alterRow(&$row) {
+  }
 
   /**
    * @param $title

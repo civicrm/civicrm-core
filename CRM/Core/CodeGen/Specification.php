@@ -13,7 +13,8 @@ class CRM_Core_CodeGen_Specification {
    * Read and parse.
    *
    * @param $schemaPath
-   * @param string $buildVersion which version of the schema to build
+   * @param string $buildVersion
+   *   Which version of the schema to build.
    */
   public function parse($schemaPath, $buildVersion) {
     $this->buildVersion = $buildVersion;
@@ -36,7 +37,7 @@ class CRM_Core_CodeGen_Specification {
     $this->tables = $this->orderTables($this->tables);
 
     // add archive tables here
-    $archiveTables = array( );
+    $archiveTables = array();
     foreach ($this->tables as $name => $table ) {
       if ( $table['archive'] == 'true' ) {
         $name = 'archive_' . $table['name'];
@@ -301,7 +302,8 @@ class CRM_Core_CodeGen_Specification {
         $field['rows'] = isset($fieldXML->html) ? $this->value('rows', $fieldXML->html) : NULL;
         $field['cols'] = isset($fieldXML->html) ? $this->value('cols', $fieldXML->html) : NULL;
         break;
-        break;
+
+      break;
 
       case 'datetime':
         $field['sqlType'] = $field['phpType'] = $type;
@@ -450,7 +452,7 @@ class CRM_Core_CodeGen_Specification {
 
     /** need to make sure there is a field of type name */
     if (!array_key_exists($name, $fields)) {
-        echo "primary key $name in $table->name does not have a field definition, ignoring\n";
+      echo "primary key $name in $table->name does not have a field definition, ignoring\n";
       return;
     }
 
@@ -475,14 +477,14 @@ class CRM_Core_CodeGen_Specification {
 
     $index = array();
     // empty index name is fine
-    $indexName      = trim((string)$indexXML->name);
+    $indexName      = trim((string) $indexXML->name);
     $index['name']  = $indexName;
     $index['field'] = array();
 
     // populate fields
     foreach ($indexXML->fieldName as $v) {
-      $fieldName = (string)($v);
-      $length = (string)($v['length']);
+      $fieldName = (string) ($v);
+      $length = (string) ($v['length']);
       if (strlen($length) > 0) {
         $fieldName = "$fieldName($length)";
       }
@@ -541,7 +543,7 @@ class CRM_Core_CodeGen_Specification {
 
     /** need to make sure there is a field of type name */
     if (!array_key_exists($name, $fields)) {
-        echo "foreign $name in $currentTableName does not have a field definition, ignoring\n";
+      echo "foreign $name in $currentTableName does not have a field definition, ignoring\n";
       return;
     }
 

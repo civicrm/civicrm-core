@@ -72,7 +72,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
     $locBlockNo = CRM_Utils_Request::retrieve('locno', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
     $name = "Address_{$locBlockNo}";
 
-    parent::__construct(null, CRM_Core_Action::NONE, 'post', $name);
+    parent::__construct(NULL, CRM_Core_Action::NONE, 'post', $name);
   }
 
   /**

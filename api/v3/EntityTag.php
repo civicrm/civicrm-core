@@ -68,7 +68,8 @@ function civicrm_api3_entity_tag_get($params) {
  * Adjust Metadata for Get action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_entity_tag_get_spec(&$params) {
   $params['entity_id']['api.aliases'] = array('contact_id');
@@ -88,7 +89,7 @@ function civicrm_api3_entity_tag_create($params) {
 }
 
 /**
- *{@getfields EntityTag_delete}
+ * {@getfields EntityTag_delete}
  * @example EntityTagGet.php
  *
  * @param array $params
@@ -162,4 +163,3 @@ function _civicrm_api3_entity_tag_common($params, $op = 'add') {
   }
   return $values;
 }
-

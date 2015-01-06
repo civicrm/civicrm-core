@@ -45,7 +45,8 @@
  * If no status mentioned in params, by default 'added' will be used
  * to fetch the records
  *
- * @param  array $params  name value pair of contact information
+ * @param array $params
+ *   Name value pair of contact information.
  * {@getfields GroupContact_get}
  *
  * @return  array  list of groups, given contact subsribed to
@@ -72,7 +73,8 @@ function civicrm_api3_group_contact_get($params) {
  *
  * @access public
  *
- * @param  array $params Input parameters
+ * @param array $params
+ *   Input parameters.
  *
  * Allowed @params array keys are:<br>
  * "contact_id" (required) : first contact to add<br>
@@ -185,7 +187,7 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
   $tracking = CRM_Utils_Array::value('tracking', $params);
 
   if ($op == 'Added' || $op == 'Pending') {
-    $extraReturnValues= array(
+    $extraReturnValues = array(
       'total_count' => 0,
       'added' => 0,
       'not_added' => 0
@@ -203,7 +205,7 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
     }
   }
   else {
-    $extraReturnValues= array(
+    $extraReturnValues = array(
       'total_count' => 0,
       'removed' => 0,
       'not_removed' => 0
@@ -215,8 +217,8 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
       $extraReturnValues['not_removed'] += $nr;
     }
   }
-  $dao = null;// can't pass this by reference
-  return civicrm_api3_create_success(1,$params,'group_contact','create',$dao,$extraReturnValues);
+  $dao = NULL;// can't pass this by reference
+  return civicrm_api3_create_success(1, $params, 'group_contact', 'create', $dao, $extraReturnValues);
 }
 
 /**
@@ -248,4 +250,3 @@ function _civicrm_api3_group_contact_deprecation() {
     'update_status' => 'GroupContact "update_status" action is deprecated in favor of "create".',
   );
 }
-

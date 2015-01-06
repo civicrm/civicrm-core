@@ -38,9 +38,12 @@
  * The string passed in $text is repeated locale-number times, with the
  * param field (if provided) appended with a different locale every time.
  *
- * @param array  $params   template call's parameters
- * @param string $text     {ts} block contents from the template
- * @param object $smarty   the Smarty object
+ * @param array $params
+ *   Template call's parameters.
+ * @param string $text
+ *   {ts} block contents from the template.
+ * @param object $smarty
+ *   The Smarty object.
  *
  * @return string  multilingualized query
  */

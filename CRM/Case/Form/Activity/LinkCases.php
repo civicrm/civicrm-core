@@ -92,7 +92,8 @@ class CRM_Case_Form_Activity_LinkCases {
   /**
    * Global validation rules for the form
    *
-   * @param array $values posted values of the form
+   * @param array $values
+   *   Posted values of the form.
    *
    * @param $files
    * @param CRM_Core_Form $form

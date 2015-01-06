@@ -86,7 +86,8 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   /**
    * Retrieve list of selections/drop downs for Scheduled Reminder form
    *
-   * @param bool    $id    mapping id
+   * @param bool $id
+   *   Mapping id.
    *
    * @return array  associated array of all the drop downs in the form
    * @static
@@ -315,7 +316,8 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   /**
    * Retrieve list of Scheduled Reminders
    *
-   * @param bool $namesOnly return simple list of names
+   * @param bool $namesOnly
+   *   Return simple list of names.
    *
    * @param null $entityValue
    * @param int $id
@@ -580,8 +582,10 @@ AND   cas.entity_value = $id AND
   /**
    * Add the schedules reminders in the db
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $ids    the array that holds all the db ids
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $ids
+   *   The array that holds all the db ids.
    *
    * @return CRM_Core_DAO_ActionSchedule
    * @static
@@ -599,8 +603,10 @@ AND   cas.entity_value = $id AND
    * retrieves the relevant objects. It also stores all the retrieved
    * values in the default array
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $values (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $values
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_DAO_ActionSchedule object on success, null otherwise
    * @static
@@ -626,7 +632,8 @@ AND   cas.entity_value = $id AND
   /**
    * Delete a Reminder
    *
-   * @param  int  $id     ID of the Reminder to be deleted.
+   * @param int $id
+   *   ID of the Reminder to be deleted.
    *
    * @static
    */
@@ -645,8 +652,10 @@ AND   cas.entity_value = $id AND
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on success, null otherwise
    * @static

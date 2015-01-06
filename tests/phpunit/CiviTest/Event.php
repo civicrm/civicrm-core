@@ -28,7 +28,6 @@ class Event extends PHPUnit_Framework_Testcase {
       'contact_id' => $contactId,
     );
 
-
     $event = CRM_Event_BAO_Event::create($params);
     return $event->id;
   }

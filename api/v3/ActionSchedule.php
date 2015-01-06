@@ -67,19 +67,21 @@ function civicrm_api3_action_schedule_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_action_schedule_create_spec(&$params) {
   $params['title']['api.required'] = TRUE;
   $params['mapping_id']['api.required'] = TRUE;
-//  $params['entity_status']['api.required'] = TRUE;
+  //  $params['entity_status']['api.required'] = TRUE;
   $params['entity_value']['api.required'] = TRUE;
 }
 
 /**
  * delete an existing action_schedule
  *
- * @param array $params array containing id of the action_schedule
+ * @param array $params
+ *   Array containing id of the action_schedule.
  * to be deleted
  *
  * @return array API result array
@@ -89,5 +91,3 @@ function _civicrm_api3_action_schedule_create_spec(&$params) {
 function civicrm_api3_action_schedule_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-
-

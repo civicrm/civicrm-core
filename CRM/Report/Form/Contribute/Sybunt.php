@@ -113,8 +113,8 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           ),
         ),
       )
-      + $this->addAddressFields()
-      + array(
+    + $this->addAddressFields()
+    + array(
         'civicrm_contribution' => array(
           'dao' => 'CRM_Contribute_DAO_Contribution',
           'fields' => array(
@@ -273,8 +273,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
               self::fiscalYearOffset('contri.receive_date') .
               " = {$this->_params['yid_value']} AND contri.is_test = 0 )";
           }
-          elseif (CRM_Utils_Array::value('type', $field) &
-            CRM_Utils_Type::T_DATE
+          elseif (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE
           ) {
             $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
             $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);

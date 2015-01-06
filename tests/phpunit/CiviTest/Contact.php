@@ -85,7 +85,8 @@ class Contact extends CiviUnitTestCase {
   /**
    * Helper function to delete a contact
    *
-   * @param  int  $contactID   id of the contact to delete
+   * @param int $contactID
+   *   Id of the contact to delete.
    * @return boolean true if contact deleted, false otherwise
    */
   public static function delete($contactID) {

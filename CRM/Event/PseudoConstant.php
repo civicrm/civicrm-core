@@ -134,7 +134,8 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param int $id
    * @param null $cond
-   * @param string $retColumn tells populate() whether to return 'name' (default) or 'label' values
+   * @param string $retColumn
+   *   Tells populate() whether to return 'name' (default) or 'label' values.
    *
    * @return array  - array reference of all participant statuses if any
    * @static
@@ -289,7 +290,8 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @static
    *
-   * @param bool|string $name pseudoconstant to be flushed
+   * @param bool|string $name
+   *   Pseudoconstant to be flushed.
    */
   public static function flush($name = 'cache') {
    if (isset(self::$$name)) {

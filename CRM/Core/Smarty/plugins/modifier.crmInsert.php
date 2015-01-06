@@ -39,10 +39,14 @@
  * no replacement is mentioned the value is inserted at the end of
  * the form element
  *
- * @param string $string       the html to be tweaked with
- * @param string $attribute    the attribute to insert
- * @param string $value        the new attribute value
- * @param string $insertBefore the string before which we want this tag inserted
+ * @param string $string
+ *   The html to be tweaked with.
+ * @param string $attribute
+ *   The attribute to insert.
+ * @param string $value
+ *   The new attribute value.
+ * @param string $insertBefore
+ *   The string before which we want this tag inserted.
  *
  * @return string        the new modified html string
  */

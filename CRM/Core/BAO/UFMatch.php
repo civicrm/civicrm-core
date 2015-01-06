@@ -42,7 +42,8 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    * Create UF Match, Note that thsi function is here in it's simplest form @ the moment
    *
    *
-   * @param array $params input parameters
+   * @param array $params
+   *   Input parameters.
    */
   /**
    * @param array $params
@@ -68,8 +69,10 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    * object for this user. If the user has new values, we need
    * to update the CRM DB with the new values
    *
-   * @param Object $user the drupal user object
-   * @param boolean $update has the user object been edited
+   * @param Object $user
+   *   The drupal user object.
+   * @param bool $update
+   *   Has the user object been edited.
    * @param $uf
    *
    * @param $ctype
@@ -171,11 +174,16 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    * Synchronize the object with the UF Match entry. Can be called stand-alone from
    * the drupalUsers script
    *
-   * @param Object $user the drupal user object
-   * @param string $userKey the id of the user from the uf object
-   * @param string $uniqId the OpenID of the user
-   * @param string $uf the name of the user framework
-   * @param integer $status returns the status if user created or already exits (used for CMS sync)
+   * @param Object $user
+   *   The drupal user object.
+   * @param string $userKey
+   *   The id of the user from the uf object.
+   * @param string $uniqId
+   *   The OpenID of the user.
+   * @param string $uf
+   *   The name of the user framework.
+   * @param int $statusReturns the status if user created or already exits (used for CMS sync).
+   *   Returns the status if user created or already exits (used for CMS sync).
    *
    * @param null $ctype
    * @param bool $isLogin
@@ -357,7 +365,8 @@ AND    domain_id    = %4
   /**
    * Update the uf_name in the user object
    *
-   * @param int    $contactId id of the contact to update
+   * @param int $contactId
+   *   Id of the contact to update.
    *
    * @return void
    * @static
@@ -410,8 +419,10 @@ AND    domain_id    = %4
   /**
    * Update the email value for the contact and user profile
    *
-   * @param  $contactId  Int     Contact ID of the user
-   * @param $emailAddress email to be modified for the user
+   * @param $contactId
+   *   Int     Contact ID of the user.
+   * @param $emailAddress
+   *   Email to be modified for the user.
    *
    * @return void
    * @static
@@ -465,7 +476,8 @@ AND    domain_id    = %4
   /**
    * Delete the object records that are associated with this cms user
    *
-   * @param  int  $ufID id of the user to delete
+   * @param int $ufID
+   *   Id of the user to delete.
    *
    * @return void
    * @static
@@ -481,7 +493,8 @@ AND    domain_id    = %4
   /**
    * Get the contact_id given a uf_id
    *
-   * @param int  $ufID  Id of UF for which related contact_id is required
+   * @param int $ufID
+   *   Id of UF for which related contact_id is required.
    *
    * @return int    contact_id on success, null otherwise
    * @static
@@ -504,7 +517,8 @@ AND    domain_id    = %4
   /**
    * Get the uf_id given a contact_id
    *
-   * @param int  $contactID   ID of the contact for which related uf_id is required
+   * @param int $contactID
+   *   ID of the contact for which related uf_id is required.
    *
    * @return int    uf_id of the given contact_id on success, null otherwise
    * @static
@@ -610,10 +624,11 @@ AND    domain_id    = %4
   /**
    * Get uf match values for given uf id or logged in user.
    *
-   * @param int $ufID uf id.
+   * @param int $ufID
+   *   Uf id.
    *
    * return array  $ufValues uf values.
-   **
+   * *
    *
    * @return array
    */

@@ -49,8 +49,10 @@ class CRM_ACL_API {
   /**
    * Given a permission string, check for access requirements
    *
-   * @param string $str       the permission to check
-   * @param int    $contactID the contactID for whom the check is made
+   * @param string $str
+   *   The permission to check.
+   * @param int $contactID
+   *   The contactID for whom the check is made.
    *
    * @return boolean true if yes, else false
    * @static
@@ -72,12 +74,18 @@ class CRM_ACL_API {
   /**
    * Get the permissioned where clause for the user
    *
-   * @param int $type the type of permission needed
-   * @param  array $tables (reference ) add the tables that are needed for the select clause
-   * @param  array $whereTables (reference ) add the tables that are needed for the where clause
-   * @param int    $contactID the contactID for whom the check is made
-   * @param bool   $onlyDeleted  whether to include only deleted contacts
-   * @param bool   $skipDeleteClause don't add delete clause if this is true,
+   * @param int $type
+   *   The type of permission needed.
+   * @param array $tables
+   *   (reference ) add the tables that are needed for the select clause.
+   * @param array $whereTables
+   *   (reference ) add the tables that are needed for the where clause.
+   * @param int $contactID
+   *   The contactID for whom the check is made.
+   * @param bool $onlyDeleted
+   *   Whether to include only deleted contacts.
+   * @param bool $skipDeleteClause
+   *   Don't add delete clause if this is true,.
    *               this means it is handled by generating query
    *
    * @return string the group where clause for this user
@@ -135,8 +143,10 @@ class CRM_ACL_API {
   /**
    * Get all the groups the user has access to for the given operation
    *
-   * @param int $type the type of permission needed
-   * @param int $contactID the contactID for whom the check is made
+   * @param int $type
+   *   The type of permission needed.
+   * @param int $contactID
+   *   The contactID for whom the check is made.
    *
    * @param string $tableName
    * @param null $allGroups
@@ -167,9 +177,11 @@ class CRM_ACL_API {
   /**
    * Check if the user has access to this group for operation $type
    *
-   * @param int $type the type of permission needed
+   * @param int $type
+   *   The type of permission needed.
    * @param int $groupID
-   * @param int $contactID the contactID for whom the check is made
+   * @param int $contactID
+   *   The contactID for whom the check is made.
    *
    * @param string $tableName
    * @param null $allGroups

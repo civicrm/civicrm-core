@@ -68,7 +68,8 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the mailing components of a particular type
    *
-   * @param $type the type of component needed
+   * @param $type
+   *   The type of component needed.
    *
    * @return array - array reference of all mailing components
    * @static
@@ -88,7 +89,6 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
         // we need to add an additional filter for $type
         self::$component[$name] = array();
 
-
         $object = new CRM_Mailing_DAO_Component();
         $object->component_type = $type;
         $object->selectAdd();
@@ -107,8 +107,10 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Determine the default mailing component of a given type
    *
-   * @param $type the type of component needed
-   * @param $undefined the value to use if no default is defined
+   * @param $type
+   *   The type of component needed.
+   * @param $undefined
+   *   The value to use if no default is defined.
    *
    * @return integer -The ID of the default mailing component.
    * @static
@@ -183,19 +185,24 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
     if (!$options) {
       $options = array(
         'bounce' => array(
-          'N' => ts('Successful '), 'Y' => ts('Bounced '),
+          'N' => ts('Successful '),
+      'Y' => ts('Bounced '),
         ),
         'delivered' => array(
-          'Y' => ts('Successful '), 'N' => ts('Bounced '),
+          'Y' => ts('Successful '),
+      'N' => ts('Bounced '),
         ),
         'open' => array(
-          'Y' => ts('Opened '), 'N' => ts('Unopened/Hidden '),
+          'Y' => ts('Opened '),
+      'N' => ts('Unopened/Hidden '),
         ),
         'click' => array(
-          'Y' => ts('Clicked '), 'N' => ts('Not Clicked '),
+          'Y' => ts('Clicked '),
+      'N' => ts('Not Clicked '),
         ),
         'reply' => array(
-          'Y' => ts('Replied '), 'N' => ts('No Reply '),
+          'Y' => ts('Replied '),
+      'N' => ts('No Reply '),
         ),
       );
     }
@@ -208,10 +215,11 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @static
    *
-   * @param bool|string $name pseudoconstant to be flushed
+   * @param bool|string $name
+   *   Pseudoconstant to be flushed.
    */
   public static function flush($name = 'template') {
-   if (isset(self::$$name)) {
+    if (isset(self::$$name)) {
       self::$$name = NULL;
     }
   }

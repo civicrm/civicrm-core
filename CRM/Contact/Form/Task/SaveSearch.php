@@ -50,27 +50,27 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   */ function preProcess() {
-    $this->_id = NULL;
+  function preProcess() {
+  $this->_id = NULL;
 
-    // get the submitted values of the search form
-    // we'll need to get fv from either search or adv search in the future
-    if ($this->_action == CRM_Core_Action::ADVANCED) {
-      $values = $this->controller->exportValues('Advanced');
-    }
-    elseif ($this->_action == CRM_Core_Action::PROFILE) {
-      $values = $this->controller->exportValues('Builder');
-    }
-    elseif ($this->_action == CRM_Core_Action::COPY) {
-      $values = $this->controller->exportValues('Custom');
-    }
-    else {
-      $values = $this->controller->exportValues('Basic');
-    }
+  // get the submitted values of the search form
+  // we'll need to get fv from either search or adv search in the future
+  if ($this->_action == CRM_Core_Action::ADVANCED) {
+  $values = $this->controller->exportValues('Advanced');
+  }
+  elseif ($this->_action == CRM_Core_Action::PROFILE) {
+  $values = $this->controller->exportValues('Builder');
+  }
+  elseif ($this->_action == CRM_Core_Action::COPY) {
+  $values = $this->controller->exportValues('Custom');
+  }
+  else {
+  $values = $this->controller->exportValues('Basic');
+  }
 
-    $this->_task = CRM_Utils_Array::value('task', $values);
-    $crmContactTaskTasks = CRM_Contact_Task::taskTitles();
-    $this->assign('taskName', CRM_Utils_Array::value($this->_task, $crmContactTaskTasks));
+  $this->_task = CRM_Utils_Array::value('task', $values);
+  $crmContactTaskTasks = CRM_Contact_Task::taskTitles();
+  $this->assign('taskName', CRM_Utils_Array::value($this->_task, $crmContactTaskTasks));
   }
 
   /**
@@ -93,7 +93,6 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     $this->add('text', 'title', ts('Name'),
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Group', 'title'), TRUE
     );
-
 
     $this->addElement('textarea', 'description', ts('Description'),
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Group', 'description')

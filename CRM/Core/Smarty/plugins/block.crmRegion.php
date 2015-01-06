@@ -5,9 +5,12 @@
  *
  * @see CRM_Core_Regions
  *
- * @param array $params must define 'name'
- * @param string $content Default content
- * @param object $smarty the Smarty object
+ * @param array $params
+ *   Must define 'name'.
+ * @param string $content
+ *   Default content.
+ * @param object $smarty
+ *   The Smarty object.
  *
  * @param $repeat
  *
@@ -15,7 +18,8 @@
  */
 function smarty_block_crmRegion($params, $content, &$smarty, &$repeat)
 {
-  if ($repeat) return;
+  if ($repeat) { return;
+  }
   require_once 'CRM/Core/Region.php';
   $region = CRM_Core_Region::instance($params['name'], FALSE);
   if ($region) {

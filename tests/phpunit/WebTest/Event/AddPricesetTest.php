@@ -118,7 +118,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
         case 'Select':
           $options = array(
-            1 => array('label' => 'Chicken',
+            1 => array(
+          'label' => 'Chicken',
               'amount' => '30.00',
               'financial_type_id' => 'Donation'
             ),
@@ -136,7 +137,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
         case 'Radio':
           $options = array(
-            1 => array('label' => 'Yes',
+            1 => array(
+          'label' => 'Yes',
               'amount' => '50.00',
               'financial_type_id' => 'Donation'
 
@@ -156,7 +158,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
         case 'CheckBox':
           $options = array(
-            1 => array('label' => 'First Night',
+            1 => array(
+          'label' => 'First Night',
               'amount' => '15.00',
               'financial_type_id' => 'Donation'
             ),
@@ -261,9 +264,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Fee_upload_done-bottom');
     $this->click('CIVICRM_QFID_1_is_monetary');
     $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='$processorName']");
-    $this->select('financial_type_id','label=Event Fee');
+    $this->select('financial_type_id', 'label=Event Fee');
     $this->select('price_set_id', 'label=' . $setTitle);
-
 
     // intro text for registration page
     $registerIntro = 'Fill in all the fields below and click Continue.';
@@ -422,7 +424,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Fee_upload-bottom');
     $this->click('CIVICRM_QFID_1_is_monetary');
     $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='$processorName']");
-    $this->select('financial_type_id','label=Event Fee');
+    $this->select('financial_type_id', 'label=Event Fee');
     $this->select('price_set_id', 'label=' . $setTitle);
 
     $this->clickLink('_qf_Fee_upload-bottom', 'link=Online Registration', FALSE);
@@ -573,11 +575,11 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->click('link=Fees');
     $this->waitForElementPresent('_qf_Fee_upload-bottom');
     $this->click('CIVICRM_QFID_1_is_monetary');
-    $this->select('financial_type_id','label=Event Fee');
+    $this->select('financial_type_id', 'label=Event Fee');
     $this->select('price_set_id', 'label=' . $setTitle);
 
     $this->click('_qf_Fee_upload-bottom');
-    $this->waitForText("crm-notification-container","'Fees' information has been saved.");
+    $this->waitForText("crm-notification-container", "'Fees' information has been saved.");
 
     $this->openCiviPage('participant/add', 'reset=1&action=add&context=standalone', '_qf_Participant_upload-bottom');
 
@@ -719,7 +721,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->click('link=Fees');
     $this->waitForElementPresent('_qf_Fee_upload-bottom');
     $this->click('CIVICRM_QFID_1_is_monetary');
-    $this->select('financial_type_id','label=Event Fee');
+    $this->select('financial_type_id', 'label=Event Fee');
     $this->select('price_set_id', 'label=' . $setTitle);
     $templateId = $this->urlArg('id');
     $this->click('_qf_Fee_upload-bottom');
@@ -736,7 +738,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->openCiviPage("admin/price", "reset=1");
     $this->click("xpath=//table[@id='option11']/tbody/tr/td[4]/span[2]/ul/li[3]/a");
     // Check confirmation alert.
-    $this->assertTrue((bool)preg_match("/^Are you sure you want to delete this price set?/",
+    $this->assertTrue((bool) preg_match("/^Are you sure you want to delete this price set?/",
       $this->getConfirmation()
     ));
     $this->chooseOkOnNextConfirmation();

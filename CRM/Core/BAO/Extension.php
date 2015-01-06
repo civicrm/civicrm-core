@@ -42,8 +42,10 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_BAO_LocationType object on success, null otherwise
    * @static
@@ -61,7 +63,8 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
   /**
    * Delete an extension
    *
-   * @param  int  $id     Id of the extension to be deleted.
+   * @param int $id
+   *   Id of the extension to be deleted.
    *
    * @return void
    *
@@ -76,8 +79,10 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
   /**
    * Change the schema version of an extension
    *
-   * @param $fullName string, the fully-qualified name (eg "com.example.myextension")
-   * @param $schemaVersion string
+   * @param $fullName
+   *   String, the fully-qualified name (eg "com.example.myextension").
+   * @param $schemaVersion
+   *   String.
    * @return void
    */
   public static function setSchemaVersion($fullName, $schemaVersion) {
@@ -92,7 +97,8 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
   /**
    * Determine the schema version of an extension
    *
-   * @param $fullName string, the fully-qualified name (eg "com.example.myextension")
+   * @param $fullName
+   *   String, the fully-qualified name (eg "com.example.myextension").
    * @return string
    */
   public static function getSchemaVersion($fullName) {

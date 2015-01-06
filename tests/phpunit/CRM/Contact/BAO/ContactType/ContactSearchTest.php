@@ -42,7 +42,6 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
     $result = CRM_Contact_BAO_ContactType::add($params);
     $this->sponsor = $params['name'];
 
-
     $this->indiviParams = array(
       'first_name' => 'Anne',
       'last_name' => 'Grant',
@@ -253,24 +252,20 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
     $result   = civicrm_api('contact', 'get', $params);
     $this->assertEquals(empty($result['values']), TRUE, 'In line ' . __LINE__);
 
-
     // for invalid subtype
     $params = array('contact_sub_type' => 'Invalid', 'version' => 3);
     $result = civicrm_api('contact', 'get', $params);
     $this->assertEquals(empty($result['values']), TRUE, 'In line ' . __LINE__);
-
 
     // for invalid contact type as well as subtype
     $params = array('contact_type' => 'Invalid' . CRM_Core_DAO::VALUE_SEPARATOR . 'Invalid', 'version' => 3);
     $result = civicrm_api('contact', 'get', $params);
     $this->assertEquals(empty($result['values']), TRUE, 'In line ' . __LINE__);
 
-
     // for valid type and invalid subtype
     $params = array('contact_type' => 'Individual' . CRM_Core_DAO::VALUE_SEPARATOR . 'Invalid', 'version' => 3);
     $result = civicrm_api('contact', 'get', $params);
     $this->assertEquals(empty($result['values']), TRUE, 'In line ' . __LINE__);
-
 
     // for invalid type and valid subtype
     $params = array('contact_type' => 'Invalid' . CRM_Core_DAO::VALUE_SEPARATOR . 'indivi_student', 'version' => 3);
@@ -294,12 +289,10 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
     $result = civicrm_api('contact', 'get', $params, $defaults);
     $this->assertEquals(empty($result['values']), TRUE, 'In line ' . __LINE__);
 
-
     // for type:Household subtype:Sponsor
     $params = array('contact_type' => 'Household' . CRM_Core_DAO::VALUE_SEPARATOR . $this->sponsor, 'version' => 3);
     $result = civicrm_api('contact', 'get', $params, $defaults);
     $this->assertEquals(empty($result['values']), TRUE, 'In line ' . __LINE__);
-
 
     // for type:Household subtype:Student
     $params = array('contact_type' => 'Household' . CRM_Core_DAO::VALUE_SEPARATOR . $this->student, 'version' => 3);

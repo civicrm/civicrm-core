@@ -219,7 +219,7 @@ class CRM_Contact_Form_Task_SMSCommon {
             $contactPhones = CRM_Core_BAO_Phone::allPhones($contactId, FALSE, 'Mobile', $filter);
             if (count($contactPhones) > 0) {
               $mobilePhone = CRM_Utils_Array::retrieveValueRecursive($contactPhones, 'phone');
-              $form->_contactDetails[$contactId]['phone_id'] =  CRM_Utils_Array::retrieveValueRecursive($contactPhones, 'id');
+              $form->_contactDetails[$contactId]['phone_id'] = CRM_Utils_Array::retrieveValueRecursive($contactPhones, 'id');
               $form->_contactDetails[$contactId]['phone'] = $mobilePhone;
               $form->_contactDetails[$contactId]['phone_type_id'] = CRM_Utils_Array::value('Mobile', $phoneTypes);
             }
@@ -267,7 +267,6 @@ class CRM_Contact_Form_Task_SMSCommon {
       $form->assign('extendTargetContacts', $extendTargetContacts);
     }
 
-
     $form->assign('toContact', json_encode($toArray));
     $form->assign('suppressedSms', $suppressedSms);
     $form->assign('totalSelectedContacts', count($form->_contactIds));
@@ -301,9 +300,11 @@ class CRM_Contact_Form_Task_SMSCommon {
   /**
    * Form rule
    *
-   * @param array $fields    the input form values
+   * @param array $fields
+   *   The input form values.
    * @param array $dontCare
-   * @param array $self      additional values form 'this'
+   * @param array $self
+   *   Additional values form 'this'.
    *
    * @return true if no errors, else array of errors
    *

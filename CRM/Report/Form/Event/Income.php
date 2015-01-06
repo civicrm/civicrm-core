@@ -291,7 +291,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
 
     //if pageId is greator than last page then display last page.
     if ((($pageId * self::ROW_COUNT_LIMIT) - 1) > $this->_rowsFound) {
-      $pageId = ceil((float)$this->_rowsFound / (float)self::ROW_COUNT_LIMIT);
+      $pageId = ceil((float) $this->_rowsFound / (float) self::ROW_COUNT_LIMIT);
       $this->set(CRM_Utils_Pager::PAGE_ID, $pageId);
     }
     $this->_limit = ($pageId - 1) * self::ROW_COUNT_LIMIT;

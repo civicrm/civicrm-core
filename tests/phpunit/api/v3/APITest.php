@@ -31,12 +31,12 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  * Test class for API functions
  *
- *  @package CiviCRM_APIv3
+ * @package CiviCRM_APIv3
  */
 class api_v3_APITest extends CiviUnitTestCase {
   public $DBResetRequired = FALSE;
 
-  protected $_apiversion =3;
+  protected $_apiversion = 3;
 
   public function testAPIReplaceVariables() {
     $result = array();
@@ -72,7 +72,6 @@ class api_v3_APITest extends CiviUnitTestCase {
     * test that error doesn't occur for non-existant file
     */
   public function testAPIWrapperIncludeNoFile() {
-
 
     $result = $this->callAPIFailure('RandomFile', 'get', array(), 'API (RandomFile,get) does not exist (join the API team and implement it!)');
   }
@@ -132,9 +131,9 @@ class api_v3_APITest extends CiviUnitTestCase {
       $this->assertEquals($expected, $actual, sprintf('input=%s expected=%s actual=%s', $input, $expected, $actual));
     }
   }
-/**
- * Test that calling via wrapper works
- */
+  /**
+   * Test that calling via wrapper works
+   */
   public function testv3Wrapper() {
     try{
       $result = civicrm_api3('contact', 'get', array());

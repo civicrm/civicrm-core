@@ -622,7 +622,6 @@ INNER JOIN  civicrm_option_value val ON ( val.option_group_id = survey.result_id
     //format the survey response data.
     $this->_formatSurveyResponseData($rows);
 
-
     // custom code to alter rows
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
@@ -655,14 +654,12 @@ INNER JOIN  civicrm_option_value val ON ( val.option_group_id = survey.result_id
         $entryFound = TRUE;
       }
 
-
       if (array_key_exists('civicrm_activity_contact_contact_id', $row)) {
         $rows[$rowNum]['civicrm_activity_contact_contact_id'] = CRM_Utils_Array::value($row['civicrm_activity_contact_contact_id'],
           CRM_Campaign_BAO_Survey::getInterviewers()
         );
         $entryFound = TRUE;
       }
-
 
       if (array_key_exists('civicrm_activity_survey_id', $row)) {
         $rows[$rowNum]['civicrm_activity_survey_id'] = CRM_Utils_Array::value($row['civicrm_activity_survey_id'],
@@ -961,8 +958,7 @@ INNER  JOIN  civicrm_custom_field cf ON ( cg.id = cf.custom_group_id )
         'dataType' => $response->data_type,
         'htmlType' => $response->html_type,
         'required' => TRUE,
-        'alias' => ($response->data_type == 'ContactReference') ?
-          $this->_columns[$resTable]['alias'] .
+        'alias' => ($response->data_type == 'ContactReference') ? $this->_columns[$resTable]['alias'] .
           '_contact' : $this->_columns[$resTable]['alias'],
         'dbAlias' => $this->_columns[$resTable]['alias'] . '.' .
           $response->column_name,

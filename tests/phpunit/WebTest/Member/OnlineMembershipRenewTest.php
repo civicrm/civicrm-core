@@ -69,9 +69,9 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("new_title");
 
     if ($this->isElementPresent("member_price_set_id")) {
-    $this->waitForElementPresent("member_price_set_id");
+      $this->waitForElementPresent("member_price_set_id");
 
-    $this->select("member_price_set_id", "label=- none -");
+      $this->select("member_price_set_id", "label=- none -");
     }
 
     $this->waitForElementPresent("membership_type-block");
@@ -243,9 +243,9 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent("new_title");
     if ($this->isElementPresent("member_price_set_id")) {
-    $this->waitForElementPresent("member_price_set_id");
+      $this->waitForElementPresent("member_price_set_id");
 
-    $this->select("member_price_set_id", "label=- none -");
+      $this->select("member_price_set_id", "label=- none -");
     }
 
     $this->waitForElementPresent("membership_type-block");

@@ -37,7 +37,8 @@ class CRM_Contact_BAO_Contact_Location {
   /**
    * Get the display name, primary email, location type and location id of a contact
    *
-   * @param  int $id id of the contact
+   * @param int $id
+   *   Id of the contact.
    *
    * @param bool $isPrimary
    * @param int $locationTypeID
@@ -50,7 +51,6 @@ class CRM_Contact_BAO_Contact_Location {
     if ($isPrimary) {
       $primaryClause = " AND civicrm_email.is_primary = 1";
     }
-
 
     $locationClause = NULL;
     if ($locationTypeID) {
@@ -77,7 +77,8 @@ WHERE     civicrm_contact.id = %1";
   /**
    * Get the sms number and display name of a contact
    *
-   * @param  int $id id of the contact
+   * @param int $id
+   *   Id of the contact.
    *
    * @param null $type
    *
@@ -93,7 +94,6 @@ WHERE     civicrm_contact.id = %1";
     if ($type) {
       $cond = " AND civicrm_phone.phone_type_id = '$type'";
     }
-
 
     $sql = "
    SELECT civicrm_contact.display_name, civicrm_phone.phone, civicrm_contact.do_not_sms
@@ -114,7 +114,8 @@ LEFT JOIN civicrm_phone ON ( civicrm_phone.contact_id = civicrm_contact.id )
   /**
    * Get the information to map a contact
    *
-   * @param  array $ids the list of ids for which we want map info
+   * @param array $ids
+   *   The list of ids for which we want map info.
    * $param  int    $locationTypeID
    *
    * @param int $locationTypeID
@@ -194,8 +195,7 @@ AND civicrm_contact.id IN $idString ";
       $location['displayAddress'] = str_replace('<br />', ', ', addslashes($address));
       $location['url'] = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $dao->contact_id);
       $location['location_type'] = $dao->location_type;
-      $location['image'] = CRM_Contact_BAO_Contact_Utils::getImage(isset($dao->contact_sub_type) ?
-        $dao->contact_sub_type : $dao->contact_type, $imageUrlOnly, $dao->contact_id
+      $location['image'] = CRM_Contact_BAO_Contact_Utils::getImage(isset($dao->contact_sub_type) ? $dao->contact_sub_type : $dao->contact_type, $imageUrlOnly, $dao->contact_id
       );
       $locations[] = $location;
     }

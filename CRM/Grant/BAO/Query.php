@@ -423,10 +423,12 @@ class CRM_Grant_BAO_Query {
    * @param $row
    * @param int $id
    */
-  public static function searchAction(&$row, $id) {}
+  public static function searchAction(&$row, $id) {
+  }
 
   /**
    * @param $tables
    */
-  public static function tableNames(&$tables) {}
+  public static function tableNames(&$tables) {
+  }
 }

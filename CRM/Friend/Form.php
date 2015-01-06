@@ -303,18 +303,18 @@ class CRM_Friend_Form extends CRM_Core_Form {
         $this->assign('linkTextUrl', $linkTextUrl);
         $this->assign('linkText', $linkText);
       }
-        } else if ( $this->_entityTable == 'civicrm_event' ) {
-            // If this is tell a friend after registering for an event, give donor link to create their own fundraising page
-            require_once 'CRM/PCP/BAO/PCP.php';
-            if ( $linkText = CRM_PCP_BAO_PCP::getPcpBlockStatus( $defaults['entity_id'], $defaults['entity_table'] ) ) {
-                $linkTextUrl = CRM_Utils_System::url( 'civicrm/contribute/campaign',
+    } else if ( $this->_entityTable == 'civicrm_event' ) {
+      // If this is tell a friend after registering for an event, give donor link to create their own fundraising page
+      require_once 'CRM/PCP/BAO/PCP.php';
+      if ( $linkText = CRM_PCP_BAO_PCP::getPcpBlockStatus( $defaults['entity_id'], $defaults['entity_table'] ) ) {
+        $linkTextUrl = CRM_Utils_System::url( 'civicrm/contribute/campaign',
                                                       "action=add&reset=1&pageId={$defaults['entity_id']}&component=event",
-                                                      false, null, true,
-                                                      true );
-                $this->assign( 'linkTextUrl', $linkTextUrl );
-                $this->assign( 'linkText', $linkText );
+                                                      FALSE, NULL, TRUE,
+                                                      TRUE );
+        $this->assign( 'linkTextUrl', $linkTextUrl );
+        $this->assign( 'linkText', $linkText );
+      }
     }
-        }
 
     CRM_Utils_System::setTitle($defaults['thankyou_title']);
     $this->assign('thankYouText', $defaults['thankyou_text']);

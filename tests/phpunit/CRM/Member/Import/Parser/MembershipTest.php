@@ -5,7 +5,7 @@
  *
  *  (PHP 5)
  *
- *   @package   CiviCRM
+ * @package   CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -31,7 +31,7 @@ require_once 'CiviTest/Membership.php';
 /**
  *  Test CRM/Member/BAO Membership Log add , delete functions
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   /**
@@ -131,7 +131,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'mapper[1][0]' => 'membership_type_id',
       'mapper[2][0]' => 'membership_start_date',
     );
-/*
+    /*
 
     $params = array(
       'contact_id' => $contactId,

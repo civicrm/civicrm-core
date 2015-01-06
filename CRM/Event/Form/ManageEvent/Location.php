@@ -138,7 +138,8 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -196,7 +197,8 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $events = array();
     if (!empty($locationEvents)) {
       $this->assign('locEvents', TRUE);
-      $optionTypes = array('1' => ts('Create new location'),
+      $optionTypes = array(
+      '1' => ts('Create new location'),
         '2' => ts('Use existing location'),
       );
 

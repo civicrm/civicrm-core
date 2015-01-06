@@ -340,7 +340,8 @@ INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.i
   /**
    * @param $row
    */
-  public function alterRow(&$row) {}
+  public function alterRow(&$row) {
+  }
 
   /**
    * @param $title

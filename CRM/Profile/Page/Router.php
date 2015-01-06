@@ -41,7 +41,8 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
   /**
    * This is some kind of special-purpose router/front-controller for the various profile URLs.
    *
-   * @param $args array this array contains the arguments of the url
+   * @param $args
+   *   Array this array contains the arguments of the url.
    *
    * @return string|void
    * @static
@@ -72,7 +73,6 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
       else {
         $profileGID = CRM_Utils_Request::retrieve('gid', 'Integer', $controller, TRUE);
       }
-
 
       // make sure that this profile enables mapping
       // CRM-8609

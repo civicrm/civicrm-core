@@ -54,16 +54,17 @@ function civicrm_api3_website_create($params) {
   //DO NOT USE THIS FUNCTION AS THE BASIS FOR A NEW API http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
 
   $websiteBAO = CRM_Core_BAO_Website::add($params);
-    $values = array();
-    _civicrm_api3_object_to_array($websiteBAO, $values[$websiteBAO->id]);
-    return civicrm_api3_create_success($values, $params, 'website', 'get');
+  $values = array();
+  _civicrm_api3_object_to_array($websiteBAO, $values[$websiteBAO->id]);
+  return civicrm_api3_create_success($values, $params, 'website', 'get');
 }
 
 /**
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_website_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
@@ -72,7 +73,7 @@ function _civicrm_api3_website_create_spec(&$params) {
 /**
  * Deletes an existing Website
  *
- * @param  array  $params
+ * @param array $params
  * {@getfields website_delete}
  * @example WebsiteDelete.php Std Delete Example
  *
@@ -100,11 +101,12 @@ function civicrm_api3_website_delete($params) {
 /**
  * Retrieve one or more websites
  *
- * @param  mixed[]  (reference ) input parameters
+ * @param mixed[] (reference ) input parameters
  * {@getfields website_get}
  * {@example WebsiteGet.php 0}
  * @example WebsiteGet.php
- * @param  array $params  an associative array of name/value pairs.
+ * @param array $params
+ *   An associative array of name/value pairs.
  *
  * @return  array details of found websites
  *
@@ -113,4 +115,3 @@ function civicrm_api3_website_delete($params) {
 function civicrm_api3_website_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'website');
 }
-

@@ -56,58 +56,58 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * @param null
    *
    * @return  array   array of action links that we need to display for the browse screen
-   */ function &actionLinks() {
-    // check if variable _actionsLinks is populated
-    if (!isset(self::$_actionLinks)) {
-      // helper variable for nicer formatting
-      $deleteExtra = ts('Are you sure you want to delete this price set?');
-      $copyExtra = ts('Are you sure you want to make a copy of this price set?');
-      self::$_actionLinks = array(
-        CRM_Core_Action::BROWSE => array(
-          'name' => ts('View and Edit Price Fields'),
-          'url' => 'civicrm/admin/price/field',
-          'qs' => 'reset=1&action=browse&sid=%%sid%%',
-          'title' => ts('View and Edit Price Fields'),
-        ),
-        CRM_Core_Action::PREVIEW => array(
-          'name' => ts('Preview'),
-          'url' => 'civicrm/admin/price',
-          'qs' => 'action=preview&reset=1&sid=%%sid%%',
-          'title' => ts('Preview Price Set'),
-        ),
-        CRM_Core_Action::UPDATE => array(
-          'name' => ts('Settings'),
-          'url' => 'civicrm/admin/price',
-          'qs' => 'action=update&reset=1&sid=%%sid%%',
-          'title' => ts('Edit Price Set'),
-        ),
-        CRM_Core_Action::DISABLE => array(
-          'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Disable Price Set'),
-        ),
-        CRM_Core_Action::ENABLE => array(
-          'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Enable Price Set'),
-        ),
-        CRM_Core_Action::DELETE => array(
-          'name' => ts('Delete'),
-          'url' => 'civicrm/admin/price',
-          'qs' => 'action=delete&reset=1&sid=%%sid%%',
-          'title' => ts('Delete Price Set'),
-          'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
-        ),
-        CRM_Core_Action::COPY => array(
-          'name' => ts('Copy Price Set'),
-          'url' => CRM_Utils_System::currentPath(),
-          'qs' => 'action=copy&sid=%%sid%%',
-          'title' => ts('Make a Copy of Price Set'),
-          'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
-        ),
-      );
-    }
-    return self::$_actionLinks;
+  function &actionLinks() {
+  // check if variable _actionsLinks is populated
+  if (!isset(self::$_actionLinks)) {
+  // helper variable for nicer formatting
+  $deleteExtra = ts('Are you sure you want to delete this price set?');
+  $copyExtra = ts('Are you sure you want to make a copy of this price set?');
+  self::$_actionLinks = array(
+  CRM_Core_Action::BROWSE => array(
+  'name' => ts('View and Edit Price Fields'),
+  'url' => 'civicrm/admin/price/field',
+  'qs' => 'reset=1&action=browse&sid=%%sid%%',
+  'title' => ts('View and Edit Price Fields'),
+  ),
+  CRM_Core_Action::PREVIEW => array(
+  'name' => ts('Preview'),
+  'url' => 'civicrm/admin/price',
+  'qs' => 'action=preview&reset=1&sid=%%sid%%',
+  'title' => ts('Preview Price Set'),
+  ),
+  CRM_Core_Action::UPDATE => array(
+  'name' => ts('Settings'),
+  'url' => 'civicrm/admin/price',
+  'qs' => 'action=update&reset=1&sid=%%sid%%',
+  'title' => ts('Edit Price Set'),
+  ),
+  CRM_Core_Action::DISABLE => array(
+  'name' => ts('Disable'),
+  'ref' => 'crm-enable-disable',
+  'title' => ts('Disable Price Set'),
+  ),
+  CRM_Core_Action::ENABLE => array(
+  'name' => ts('Enable'),
+  'ref' => 'crm-enable-disable',
+  'title' => ts('Enable Price Set'),
+  ),
+  CRM_Core_Action::DELETE => array(
+  'name' => ts('Delete'),
+  'url' => 'civicrm/admin/price',
+  'qs' => 'action=delete&reset=1&sid=%%sid%%',
+  'title' => ts('Delete Price Set'),
+  'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
+  ),
+  CRM_Core_Action::COPY => array(
+  'name' => ts('Copy Price Set'),
+  'url' => CRM_Utils_System::currentPath(),
+  'qs' => 'action=copy&sid=%%sid%%',
+  'title' => ts('Make a Copy of Price Set'),
+  'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
+  ),
+  );
+  }
+  return self::$_actionLinks;
   }
 
   /**
@@ -199,8 +199,10 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   /**
    * Edit price set
    *
-   * @param int $sid price set id
-   * @param string $action the action to be invoked
+   * @param int $sid
+   *   Price set id.
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
    */
@@ -220,7 +222,8 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   /**
    * Preview price set
    *
-   * @param int $sid price set id
+   * @param int $sid
+   *   Price set id.
    *
    * @return void
    */
@@ -243,14 +246,16 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   /**
    * Browse all price sets
    *
-   * @param string $action   the action to be invoked
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
    */
   public function browse($action = NULL) {
     // get all price sets
     $priceSet = array();
-    $comps = array('CiviEvent' => ts('Event'),
+    $comps = array(
+    'CiviEvent' => ts('Event'),
       'CiviContribute' => ts('Contribution'),
       'CiviMember' => ts('Membership'),
     );
@@ -275,7 +280,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
           $extends[] = $comps[CRM_Core_Component::getComponentName($compId)];
         }
       }
-     $priceSet[$dao->id]['extends'] = implode(', ', $extends);
+      $priceSet[$dao->id]['extends'] = implode(', ', $extends);
 
       // form all action links
       $action = array_sum(array_keys($this->actionLinks()));

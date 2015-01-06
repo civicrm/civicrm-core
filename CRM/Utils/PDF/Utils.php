@@ -79,7 +79,7 @@ class CRM_Utils_PDF_Utils {
       $stationery_path = $doc_root . "/" . $stationery_path_partial;
     }
 
-    $margins     = array($metric,$t,$r,$b,$l);
+    $margins     = array($metric, $t, $r, $b, $l);
 
     $config = CRM_Core_Config::singleton();
     $html = "
@@ -129,7 +129,7 @@ class CRM_Utils_PDF_Utils {
     // This function also uses the FPDI library documented at: http://www.setasign.com/products/fpdi/about/
     // Syntax borrowed from https://github.com/jake-mw/CDNTaxReceipts/blob/master/cdntaxreceipts.functions.inc
     require_once 'tcpdf/tcpdf.php';
-    require_once('FPDI/fpdi.php'); // This library is only in the 'packages' area as of version 4.5
+    require_once 'FPDI/fpdi.php'; // This library is only in the 'packages' area as of version 4.5
 
     $paper_size_arr  = array( $paper_size[2], $paper_size[3]);
 
@@ -142,19 +142,19 @@ class CRM_Utils_PDF_Utils {
 
     $pdf->SetAuthor('');
     $pdf->SetKeywords('CiviCRM.org');
-    $pdf->setPageUnit( $margins[0] ) ;
-    $pdf->SetMargins($margins[4], $margins[1], $margins[2], true);
+    $pdf->setPageUnit( $margins[0] );
+    $pdf->SetMargins($margins[4], $margins[1], $margins[2], TRUE);
 
     $pdf->setJPEGQuality('100');
-    $pdf->SetAutoPageBreak(true, $margins[3]);
+    $pdf->SetAutoPageBreak(TRUE, $margins[3]);
 
     $pdf->AddPage();
 
-    $ln = true ;
-    $fill = false ;
-    $reset_parm = false;
-    $cell = false;
-    $align = '' ;
+    $ln = TRUE;
+    $fill = FALSE;
+    $reset_parm = FALSE;
+    $cell = FALSE;
+    $align = '';
 
     // output the HTML content
     $pdf->writeHTML($html, $ln, $fill, $reset_parm, $cell, $align);
@@ -164,7 +164,7 @@ class CRM_Utils_PDF_Utils {
 
     // close and output the PDF
     $pdf->Close();
-    $pdf_file =  'CiviLetter'.'.pdf';
+    $pdf_file = 'CiviLetter'.'.pdf';
     $pdf->Output($pdf_file, 'D');
     CRM_Utils_System::civiExit(1);
   }
@@ -306,11 +306,11 @@ class CRM_Utils_PDF_Utils {
     $searchPath,
     &$values,
     $numPages = 1,
-    $echo     = TRUE,
-    $output   = 'College_Match_App',
-    $creator  = 'CiviCRM',
-    $author   = 'http://www.civicrm.org/',
-    $title    = '2006 College Match Scholarship Application'
+    $echo = TRUE,
+    $output = 'College_Match_App',
+    $creator = 'CiviCRM',
+    $author = 'http://www.civicrm.org/',
+    $title = '2006 College Match Scholarship Application'
   ) {
     try {
       $pdf = new PDFlib();
@@ -354,7 +354,6 @@ class CRM_Utils_PDF_Utils {
         /* This will adjust the page size to the block container's size. */
 
         $pdf->fit_pdi_page($page, 0, 0, 'adjustpage');
-
 
         $status = array();
         /* Fill all text blocks with dynamic data */

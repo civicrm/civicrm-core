@@ -48,7 +48,8 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
   /**
    * Build the form object elements for Communication Preferences object
    *
-   * @param CRM_Core_Form $form       reference to the form object
+   * @param CRM_Core_Form $form
+   *   Reference to the form object.
    *
    * @return void
    * @static
@@ -56,7 +57,6 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
   public static function buildQuickForm(&$form) {
     // since the pcm - preferred comminication method is logically
     // grouped hence we'll use groups of HTML_QuickForm
-
 
     // checkboxes for DO NOT phone, email, mail
     // we take labels from SelectValues
@@ -132,8 +132,10 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
   /**
    * Global form rule
    *
-   * @param array $fields the input form values
-   * @param array $files the uploaded files if any
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
    * @param $self
    *
    * @return true if no errors, else array of errors

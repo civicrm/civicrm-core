@@ -52,7 +52,8 @@ function civicrm_api3_mailing_job_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_mailing_job_create_spec(&$params) {
   $params['status']['api.default'] = 'Scheduled';
@@ -63,7 +64,8 @@ function _civicrm_api3_mailing_job_create_spec(&$params) {
 /**
  * Returns array of Mailing Jobs  matching a set of one or more group properties
  *
- * @param array $params Array of one or more valid
+ * @param array $params
+ *   Array of one or more valid.
  * @param array $ids
  *
  * @return array API return Array of matching mailing jobs
@@ -80,4 +82,3 @@ function civicrm_api3_mailing_job_get($params, $ids = array()) {
 function civicrm_api3_mailing_job_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

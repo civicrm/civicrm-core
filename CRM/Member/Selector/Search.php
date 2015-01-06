@@ -132,11 +132,16 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   /**
    * Class constructor
    *
-   * @param array $queryParams array of parameters for query
-   * @param \const|int $action - action of search basic or advanced.
-   * @param string $memberClause if the caller wants to further restrict the search (used in memberships)
-   * @param boolean $single are we dealing only with one contact?
-   * @param int $limit how many memberships do we want returned
+   * @param array $queryParams
+   *   Array of parameters for query.
+   * @param \const|int $action
+   *   Action of search basic or advanced.
+   * @param string $memberClause
+   *   If the caller wants to further restrict the search (used in memberships).
+   * @param bool $single
+   *   Are we dealing only with one contact?.
+   * @param int $limit
+   *   How many memberships do we want returned.
    *
    * @param string $context
    *
@@ -144,11 +149,11 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   @access public
    */
   function __construct(&$queryParams,
-    $action       = CRM_Core_Action::NONE,
+    $action = CRM_Core_Action::NONE,
     $memberClause = NULL,
-    $single       = FALSE,
-    $limit        = NULL,
-    $context      = 'search'
+    $single = FALSE,
+    $limit = NULL,
+    $context = 'search'
   ) {
     // submitted form values
     $this->_queryParams = &$queryParams;
@@ -193,9 +198,9 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   function &links($status = 'all',
     $isPaymentProcessor = NULL,
     $accessContribution = NULL,
-    $qfKey              = NULL,
-    $context            = NULL,
-    $isCancelSupported  = FALSE
+    $qfKey = NULL,
+    $context = NULL,
+    $isCancelSupported = FALSE
   ) {
     $extraParams = NULL;
     if ($context == 'search') {
@@ -305,11 +310,16 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   /**
    * Returns all the rows in the given offset and rowCount
    *
-   * @param enum   $action   the action being performed
-   * @param int    $offset   the row number to start from
-   * @param int    $rowCount the number of rows to return
-   * @param string $sort     the sql string that describes the sort order
-   * @param enum   $output   what should the result set include (web/email/csv)
+   * @param enum $action
+   *   The action being performed.
+   * @param int $offset
+   *   The row number to start from.
+   * @param int $rowCount
+   *   The number of rows to return.
+   * @param string $sort
+   *   The sql string that describes the sort order.
+   * @param enum $output
+   *   What should the result set include (web/email/csv).
    *
    * @return int   the total number of rows for this action
    */
@@ -428,8 +438,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
       }
       $row['auto_renew'] = $autoRenew;
 
-      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-        $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
+      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
       );
 
       $rows[] = $row;
@@ -452,8 +461,10 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    * Returns the column headers as an array of tuples:
    * (name, sortName (key to the sort array))
    *
-   * @param string $action the action being performed
-   * @param enum   $output what should the result set include (web/email/csv)
+   * @param string $action
+   *   The action being performed.
+   * @param enum $output
+   *   What should the result set include (web/email/csv).
    *
    * @return array the column headers that need to be displayed
    */
@@ -465,7 +476,8 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
           'sort' => 'membership_type',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
-        array('name' => ts('Member Since'),
+        array(
+      'name' => ts('Member Since'),
           'sort' => 'join_date',
           'direction' => CRM_Utils_Sort::DESCENDING,
         ),
@@ -527,7 +539,8 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   /**
    * Name of export file.
    *
-   * @param string $output type of output
+   * @param string $output
+   *   Type of output.
    *
    * @return string name of the file
    */

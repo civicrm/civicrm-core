@@ -31,8 +31,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_contribute_recur* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Contribution
+ * @package CiviCRM_APIv3
+ * @subpackage API_Contribution
  */
 
 
@@ -80,8 +80,7 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $deleteParams = array('id' => $result['id']);
     $result = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
-    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array(
-      ));
+    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(0, $checkDeleted['count']);
   }
 

@@ -90,7 +90,6 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
       CRM_Utils_System::setTitle(ts('Include Profiles') . " ($title)");
     }
 
-
     $ufJoinParams = array(
       'module' => 'CiviContribute',
       'entity_table' => 'civicrm_contribution_page',
@@ -99,7 +98,6 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
     list($defaults['custom_pre_id'],
       $second) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
     $defaults['custom_post_id'] = $second ? array_shift($second) : '';
-
 
     return $defaults;
   }
@@ -160,7 +158,8 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
   /**
    * Global form rule
    *
-   * @param array $fields the input form values
+   * @param array $fields
+   *   The input form values.
    *
    * @param $files
    * @param int $contributionPageId

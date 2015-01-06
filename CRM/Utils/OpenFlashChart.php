@@ -54,7 +54,8 @@ class CRM_Utils_OpenFlashChart {
   /**
    * Build The Bar Gharph.
    *
-   * @param  array  $params  assoc array of name/value pairs
+   * @param array $params
+   *   Assoc array of name/value pairs.
    *
    * @return object $chart   object of open flash chart.
    * @static
@@ -108,7 +109,7 @@ class CRM_Utils_OpenFlashChart {
       }
 
       if ($barKey = CRM_Utils_Array::value($barCount, CRM_Utils_Array::value('barKeys', $params))) {
-        $bars[$barCount]->key($barKey,12);
+        $bars[$barCount]->key($barKey, 12);
       }
 
       // call user define function to handle on click event.
@@ -126,8 +127,8 @@ class CRM_Utils_OpenFlashChart {
     // set_labels function requires xValues array of string or x_axis_label
     // so type casting array values to string values
     array_walk($xValues, function(&$value, $index) {
-        $value = (string)$value;
-      });
+      $value = (string) $value;
+    });
     $xLabels->set_labels($xValues);
 
     // set angle for labels.
@@ -183,7 +184,8 @@ class CRM_Utils_OpenFlashChart {
   /**
    * Build The Pie Gharph.
    *
-   * @param  array  $params  assoc array of name/value pairs
+   * @param array $params
+   *   Assoc array of name/value pairs.
    *
    * @return object $chart   object of open flash chart.
    * @static
@@ -201,7 +203,7 @@ class CRM_Utils_OpenFlashChart {
     // get the required data.
     $values = array();
     foreach ($allValues as $label => $value) {
-      $values[] = new pie_value((double)$value, $label);
+      $values[] = new pie_value((double) $value, $label);
     }
     $graphTitle = !empty($params['legend']) ? $params['legend'] : ts('Pie Chart');
 
@@ -246,7 +248,8 @@ class CRM_Utils_OpenFlashChart {
   /**
    * Build The 3-D Bar Gharph.
    *
-   * @param  array  $params  assoc array of name/value pairs
+   * @param array $params
+   *   Assoc array of name/value pairs.
    *
    * @return object $chart   object of open flash chart.
    * @static
@@ -273,10 +276,10 @@ class CRM_Utils_OpenFlashChart {
         continue;
       }
 
-      $xValueLabels[] = (string)$xVal;
+      $xValueLabels[] = (string) $xVal;
       foreach ($criterias as $criteria) {
-        $xReferences[$criteria][$xVal] = (double)CRM_Utils_Array::value($criteria, $yVal, 0);
-        $yValues[] = (double)CRM_Utils_Array::value($criteria, $yVal, 0);
+        $xReferences[$criteria][$xVal] = (double) CRM_Utils_Array::value($criteria, $yVal, 0);
+        $yValues[] = (double) CRM_Utils_Array::value($criteria, $yVal, 0);
       }
     }
 
@@ -306,7 +309,7 @@ class CRM_Utils_OpenFlashChart {
       // set colour pattel
       $xValues[$count]->set_colour(self::$_colours[$count]);
       // define colur pattel with bar criterias
-      $xValues[$count]->key((string)$criteria, 12);
+      $xValues[$count]->key((string) $criteria, 12);
       // define bar chart values
       $xValues[$count]->set_values(array_values($values));
 

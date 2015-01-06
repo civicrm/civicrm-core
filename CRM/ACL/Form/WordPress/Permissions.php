@@ -44,7 +44,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
    *
    * @return void
    */
-  public function buildQuickForm( ) {
+  public function buildQuickForm() {
 
     CRM_Utils_System::setTitle( 'Wordpress Access Control' );
 
@@ -63,7 +63,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
         $roleObj = $wp_roles->get_role($role);
         if (!empty($roleObj->capabilities)) {
           foreach ($roleObj->capabilities as $ckey => $cname) {
-            if (array_key_exists($ckey , $permissionsArray)) {
+            if (array_key_exists($ckey, $permissionsArray)) {
               $elementName = $role.'['.$ckey.']';
               $defaults[$elementName] = 1;
             }
@@ -74,7 +74,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
         $rolePerms[$role] = $permissionsArray;
         foreach ( $rolePerms[$role] as $key => $value) {
           $elementName = $role.'['.$key.']';
-          $this->add('checkbox' , $elementName , $value);
+          $this->add('checkbox', $elementName, $value);
         }
         $roles[$role] = $name;
       }
@@ -87,11 +87,11 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
 
     $this->addButtons(
       array(
-        array (
+        array(
           'type'      => 'next',
           'name'      => ts('Save'),
           'spacing'   => '',
-          'isDefault' => false   ),
+          'isDefault' => FALSE   ),
       )
     );
 
@@ -131,7 +131,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
       if ($role == 'anonymous_user') {
         // Get the permissions into a format that matches what we get from WP
         $allWarningPermissions = CRM_Core_Permission::getAnonymousPermissionsWarnings();
-        foreach ($allWarningPermissions  as $key => $permission) {
+        foreach ($allWarningPermissions as $key => $permission) {
           $allWarningPermissions[$key] = CRM_utils_String::munge(strtolower($permission));
         }
         $warningPermissions = array_intersect($allWarningPermissions, array_keys($rolePermissions));

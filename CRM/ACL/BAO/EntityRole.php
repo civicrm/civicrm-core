@@ -75,8 +75,10 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on sucess, null otherwise
    * @static
@@ -88,7 +90,8 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
   /**
    * Delete Entity Role records
    *
-   * @param  int  $entityRoleId ID of the EntityRole record to be deleted.
+   * @param int $entityRoleId
+   *   ID of the EntityRole record to be deleted.
    *
    * @static
    */

@@ -41,7 +41,7 @@ class CRM_UpdateMembershipReminderDate {
   function __construct() {
     // you can run this program either from an apache command, or from the cli
     if (php_sapi_name() == "cli") {
-      require_once ("cli.php");
+      require_once "cli.php";
       $cli = new civicrm_cli();
       //if it doesn't die, it's authenticated
     }
@@ -114,4 +114,3 @@ $reminderDate = new CRM_UpdateMembershipReminderDate();
 echo "\n Updating... ";
 $reminderDate->updateMembershipReminderDate();
 echo "\n\n Membership(s) reminder date updated. (Done) \n";
-

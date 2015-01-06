@@ -52,9 +52,12 @@ class CRM_Mailing_Event_BAO_Subscribe extends CRM_Mailing_Event_DAO_Subscribe {
    * Register a subscription event.  Create a new contact if one does not
    * already exist.
    *
-   * @param int $group_id The group id to subscribe to
-   * @param string $email The email address of the (new) contact
-   * @param int $contactId Currently used during event registration/contribution.
+   * @param int $group_id
+   *   The group id to subscribe to.
+   * @param string $email
+   *   The email address of the (new) contact.
+   * @param int $contactId
+   *   Currently used during event registration/contribution.
    *   Specifically to avoid linking group to wrong duplicate contact
    *   during event registration.
    * @param string $context
@@ -175,9 +178,12 @@ SELECT     civicrm_email.id as email_id
   /**
    * Verify the hash of a subscription event
    *
-   * @param int $contact_id       ID of the contact
-   * @param int $subscribe_id     ID of the subscription event
-   * @param string $hash          Hash to verify
+   * @param int $contact_id
+   *   ID of the contact.
+   * @param int $subscribe_id
+   *   ID of the subscription event.
+   * @param string $hash
+   *   Hash to verify.
    *
    * @return object|null          The subscribe event object, or null on failure
    * @static
@@ -197,7 +203,8 @@ SELECT     civicrm_email.id as email_id
   /**
    * Ask a contact for subscription confirmation (opt-in)
    *
-   * @param string $email         The email address
+   * @param string $email
+   *   The email address.
    *
    * @return void
    */
@@ -296,7 +303,8 @@ SELECT     civicrm_email.id as email_id
   /**
    * Get the domain object given a subscribe event
    *
-   * @param int $subscribe_id     ID of the subscribe event
+   * @param int $subscribe_id
+   *   ID of the subscribe event.
    *
    * @return object $domain       The domain owning the event
    * @static
@@ -308,8 +316,10 @@ SELECT     civicrm_email.id as email_id
   /**
    * Get the group details to which given email belongs
    *
-   * @param string $email     email of the contact
-   * @param int    $contactID contactID if we want an exact match
+   * @param string $email
+   *   Email of the contact.
+   * @param int $contactID
+   *   ContactID if we want an exact match.
    *
    * @return array $groups    array of group ids
    */
@@ -356,9 +366,12 @@ SELECT     civicrm_email.id as email_id
   /**
    * Send subscribe mail
    *
-   * @param  array  $groups the list of group ids for subscribe
-   * @param  array  $params the list of email
-   * @param  int    $contactId  Currently used during event registration/contribution.
+   * @param array $groups
+   *   The list of group ids for subscribe.
+   * @param array $params
+   *   The list of email.
+   * @param int $contactId
+   *   Currently used during event registration/contribution.
    *  Specifically to avoid linking group to wrong duplicate contact
    *  during event registration.
    * @param string $context

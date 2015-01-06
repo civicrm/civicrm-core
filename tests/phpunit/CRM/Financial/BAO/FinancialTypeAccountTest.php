@@ -99,7 +99,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     CRM_Financial_BAO_FinancialTypeAccount::del($financialAccountType->id);
     $params = array('id' => $financialAccountType->id );
     $result = CRM_Financial_BAO_FinancialType::retrieve($params, $defaults);
-    $this->assertEquals( empty($result), true, 'Verify financial types record deletion.');
+    $this->assertEquals( empty($result), TRUE, 'Verify financial types record deletion.');
   }
 
   /**

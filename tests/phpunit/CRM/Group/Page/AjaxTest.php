@@ -414,14 +414,14 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-  * Implements ACLGroup hook
-  * aclGroup function returns a list of permitted groups
-  * @param string $type
-  * @param integer $contactID
-  * @param string $tableName
-  * @param array $allGroups
-  * @param array $currentGroups
-  */
+   * Implements ACLGroup hook
+   * aclGroup function returns a list of permitted groups
+   * @param string $type
+   * @param int $contactID
+   * @param string $tableName
+   * @param array $allGroups
+   * @param array $currentGroups
+   */
   public function hook_civicrm_aclGroup($type, $contactID, $tableName, &$allGroups, &$currentGroups) {
     //don't use api - you will get a loop
     $sql = " SELECT * FROM civicrm_group WHERE name LIKE '%pick%'";

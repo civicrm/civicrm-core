@@ -40,9 +40,12 @@
  *
  * See CRM_Core_I18n class documentation for details.
  *
- * @param array $params   template call's parameters
- * @param string $text    {ts} block contents from the template
- * @param object $smarty  the Smarty object
+ * @param array $params
+ *   Template call's parameters.
+ * @param string $text
+ *   {ts} block contents from the template.
+ * @param object $smarty
+ *   The Smarty object.
  *
  * @return string  the string, translated by gettext
  */

@@ -44,7 +44,8 @@
 /**
  * Creates or updates an Activity. See the example for usage
  *
- * @param array  $params       Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                             pairs for the activity.
  * {@getfields pledge_create}
  *
@@ -64,7 +65,8 @@ function civicrm_api3_pledge_create($params) {
 /**
  * Delete a pledge
  *
- * @param  array   $params           array included 'pledge_id' of pledge to delete
+ * @param array $params
+ *   Array included 'pledge_id' of pledge to delete.
  *
  * @return boolean        true if success, else false
  * @static void
@@ -124,7 +126,8 @@ function _civicrm_api3_pledge_create_spec(&$params) {
 /**
  * Retrieve a set of pledges, given a set of input params
  *
- * @param  array $params input parameters. Use interrogate for possible fields
+ * @param array $params
+ *   Input parameters. Use interrogate for possible fields.
  *
  * @return array  array of pledges, if error an array with an error id and error message
  * {@getfields pledge_get}
@@ -158,7 +161,8 @@ function _civicrm_api3_pledge_get_defaults() {
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object
  *
- * @param array $values The reformatted properties that we can use internally
+ * @param array $values
+ *   The reformatted properties that we can use internally.
  * @param bool $create
  *
  * @return array|CRM_Error
@@ -195,4 +199,3 @@ function _civicrm_api3_pledge_format_params(&$values, $create = FALSE) {
     $values['scheduled_date'] = $values['start_date'];
   }
 }
-

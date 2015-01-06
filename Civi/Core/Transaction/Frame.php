@@ -73,9 +73,12 @@ class Frame {
 
   /**
    * @param \CRM_Core_DAO $dao
-   * @param string|null $beginStmt e.g. "BEGIN" or "SAVEPOINT foo"
-   * @param string|null $commitStmt e.g. "COMMIT"
-   * @param string|null $rollbackStmt e.g. "ROLLBACK" or "ROLLBACK TO SAVEPOINT foo"
+   * @param string|null $beginStmt
+   *   E.g. "BEGIN" or "SAVEPOINT foo".
+   * @param string|null $commitStmt
+   *   E.g. "COMMIT".
+   * @param string|null $rollbackStmt
+   *   E.g. "ROLLBACK" or "ROLLBACK TO SAVEPOINT foo".
    */
   public function __construct($dao, $beginStmt, $commitStmt, $rollbackStmt) {
     $this->dao = $dao;
@@ -156,9 +159,12 @@ class Frame {
    *
    * Pre-condition: isActive()
    *
-   * @param int $phase A constant; one of: self::PHASE_{PRE,POST}_{COMMIT,ROLLBACK}
-   * @param mixed $callback A PHP callback
-   * @param array|NULL $params Optional values to pass to callback.
+   * @param int $phase
+   *   A constant; one of: self::PHASE_{PRE,POST}_{COMMIT,ROLLBACK}.
+   * @param mixed $callback
+   *   A PHP callback.
+   * @param array|NULL $params
+   *   Optional values to pass to callback.
    *          See php manual call_user_func_array for details.
    */
   public function addCallback($phase, $callback, $params = null, $id = NULL) {

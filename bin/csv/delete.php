@@ -33,9 +33,7 @@
  *
  **/
 
-require_once (dirname(__DIR__) . '/cli.class.php');
+require_once dirname(__DIR__) . '/cli.class.php';
 
 $entityImporter = new civicrm_cli_csv_deleter();
 $entityImporter->run();
-
-

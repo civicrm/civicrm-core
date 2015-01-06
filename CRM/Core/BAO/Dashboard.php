@@ -40,7 +40,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   /**
    * Add Dashboard
    *
-   * @param array $params values
+   * @param array $params
+   *   Values.
    *
    * @static
    *
@@ -57,8 +58,10 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   /**
    * Get the list of dashlets enabled by admin
    *
-   * @param boolean $all all or only active
-   * @param boolean $checkPermission all or only authorized for the current user
+   * @param bool $all
+   *   All or only active.
+   * @param bool $checkPermission
+   *   All or only authorized for the current user.
    *
    * @return array $widgets  array of dashlets
    * @static
@@ -93,10 +96,12 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * Additionlly, initializes the dashboard with defaults if this is the
    * user's first visit to their dashboard.
    *
-   * @param boolean $flatFormat this is true if you want simple associated
+   * @param bool $flatFormat
+   *   This is true if you want simple associated.
    * array of all the contact's dashlets whether or not they are enabled.
    *
-   * @param integer $contactID provide the dashlets for the contact id
+   * @param int $contactIDProvide the dashlets for the contact id.
+   *   Provide the dashlets for the contact id.
    * passed rather than the current user.
    *
    * @return array $dashlets array of dashlets
@@ -185,7 +190,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   /**
    * Check dashlet permission for current user
    *
-   * @param string $permission comma separated list
+   * @param string $permission
+   *   Comma separated list.
    * @param string $operator
    *
    * @return boolean true if use has permission else false
@@ -259,7 +265,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   /**
    * Get details of each dashlets
    *
-   * @param int $dashletID widget ID
+   * @param int $dashletID
+   *   Widget ID.
    *
    * @return array associted array title and content
    * @static
@@ -327,7 +334,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   /**
    * Save changes made by use to the Dashlet
    *
-   * @param array $columns associated array
+   * @param array $columns
+   *   Associated array.
    *
    * @param int $contactID
    *
@@ -335,7 +343,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * @return void
    * @static
    */
-  public static function saveDashletChanges($columns, $contactID=NULL) {
+  public static function saveDashletChanges($columns, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();
     if (!$contactID) {
       $contactID = $session->get('userID');
@@ -395,7 +403,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   /**
    * Add dashlets
    *
-   * @param array $params associated array
+   * @param array $params
+   *   Associated array.
    *
    * @return object $dashlet returns dashlet object
    * @static
@@ -510,7 +519,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * @param array $params each item is a spec for a dashlet on the contact's dashboard
+   * @param array $params
+   *   Each item is a spec for a dashlet on the contact's dashboard.
    * @return bool
    */
   public static function addContactDashletToDashboard(&$params) {
@@ -529,13 +539,14 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   /**
    * Reset dashlet cache
    *
-   * @param int $contactID reset cache only for specific contact
+   * @param int $contactID
+   *   Reset cache only for specific contact.
    *
    * @return void
    * @static
    */
-  public static function resetDashletCache($contactID = null) {
-    $whereClause = null;
+  public static function resetDashletCache($contactID = NULL) {
+    $whereClause = NULL;
     $params = array();
     if ($contactID) {
       $whereClause = "WHERE contact_id = %1";

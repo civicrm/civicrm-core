@@ -380,14 +380,14 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
       $this->type('first_name', $params['firstname']);
       $params['lastname'] = 'Anderson' . substr(sha1(rand()), 0, 3);
       $this->type('last_name', $params['lastname']);
-      $params['email'] =  $params['firstname'].$params['lastname'].'@exa.com';
+      $params['email'] = $params['firstname'].$params['lastname'].'@exa.com';
       $this->type('email-Primary', $params['email']);
       $this->waitForElementPresent("//div[@id='crm-profile-block']//div/div[2]/select");
-      $this->select("//div[@id='crm-profile-block']//div/div[2]/select",'value=1');
+      $this->select("//div[@id='crm-profile-block']//div/div[2]/select", 'value=1');
     }
     else {
       $this->waitForElementPresent("//div[@id='crm-profile-block']//div/div[2]/select");
-      $this->select("//div[@id='crm-profile-block']//div/div[2]/select",'value=1');
+      $this->select("//div[@id='crm-profile-block']//div/div[2]/select", 'value=1');
 
     }
     if ($dialog) {

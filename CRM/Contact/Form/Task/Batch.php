@@ -126,7 +126,6 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
       )
     );
 
-
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_contactIds);
 
@@ -195,7 +194,8 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   /**
    * Global form rule
    *
-   * @param array $fields  the input form values
+   * @param array $fields
+   *   The input form values.
    *
    * @return true if no errors, else array of errors
    * @static
@@ -262,8 +262,10 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
   /**
    * Parse street address
-   * @param array $contactValues contact values
-   * @param CRM_Core_Form $form form object
+   * @param array $contactValues
+   *   Contact values.
+   * @param CRM_Core_Form $form
+   *   Form object.
    */
   public static function parseStreetAddress(&$contactValues, &$form) {
     if (!is_array($contactValues) || !is_array($form->_fields)) {

@@ -346,7 +346,8 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
    * Retrieve event template custom data values
    * and set as default values for current new event.
    *
-   * @param int $templateId event template id.
+   * @param int $templateId
+   *   Event template id.
    *
    * @return array of custom data defaults.
    */

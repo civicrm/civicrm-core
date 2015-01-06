@@ -130,8 +130,8 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
    */
   public function browse($action = NULL) {
     // Get list of configured Label Formats
-    $labelFormatList= CRM_Core_BAO_LabelFormat::getList();
-    $nameFormatList= CRM_Core_BAO_LabelFormat::getList(false, 'name_badge');
+    $labelFormatList = CRM_Core_BAO_LabelFormat::getList();
+    $nameFormatList = CRM_Core_BAO_LabelFormat::getList(FALSE, 'name_badge');
 
     // Add action links to each of the Label Formats
     foreach ($labelFormatList as & $format) {

@@ -58,31 +58,33 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   */ function preProcess() {
-    // get the controller vars
-    $groupId = $this->get('groupId');
-    $fieldId = $this->get('fieldId');
+  function preProcess() {
+  // get the controller vars
+  $groupId = $this->get('groupId');
+  $fieldId = $this->get('fieldId');
 
-    if ($fieldId) {
-      $groupTree = CRM_Price_BAO_PriceSet::getSetDetail($groupId);
-      $this->_groupTree[$groupId]['fields'][$fieldId] = $groupTree[$groupId]['fields'][$fieldId];
-      $this->assign('preview_type', 'field');
-      $url = CRM_Utils_System::url('civicrm/admin/price/field', "reset=1&action=browse&sid={$groupId}");
-      $breadCrumb = array(array('title' => ts('Price Set Fields'),
-          'url' => $url,
-        ));
-    }
-    else {
-      // group preview
-      $this->_groupTree = CRM_Price_BAO_PriceSet::getSetDetail($groupId);
-      $this->assign('preview_type', 'group');
-      $this->assign('setTitle', CRM_Price_BAO_PriceSet::getTitle($groupId));
-      $url = CRM_Utils_System::url('civicrm/admin/price', 'reset=1');
-      $breadCrumb = array(array('title' => ts('Price Sets'),
-          'url' => $url,
-        ));
-    }
-    CRM_Utils_System::appendBreadCrumb($breadCrumb);
+  if ($fieldId) {
+  $groupTree = CRM_Price_BAO_PriceSet::getSetDetail($groupId);
+  $this->_groupTree[$groupId]['fields'][$fieldId] = $groupTree[$groupId]['fields'][$fieldId];
+  $this->assign('preview_type', 'field');
+  $url = CRM_Utils_System::url('civicrm/admin/price/field', "reset=1&action=browse&sid={$groupId}");
+  $breadCrumb = array(array(
+  'title' => ts('Price Set Fields'),
+  'url' => $url,
+  ));
+  }
+  else {
+  // group preview
+  $this->_groupTree = CRM_Price_BAO_PriceSet::getSetDetail($groupId);
+  $this->assign('preview_type', 'group');
+  $this->assign('setTitle', CRM_Price_BAO_PriceSet::getTitle($groupId));
+  $url = CRM_Utils_System::url('civicrm/admin/price', 'reset=1');
+  $breadCrumb = array(array(
+  'title' => ts('Price Sets'),
+  'url' => $url,
+  ));
+  }
+  CRM_Utils_System::appendBreadCrumb($breadCrumb);
   }
 
   /**

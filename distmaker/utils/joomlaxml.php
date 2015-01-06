@@ -41,7 +41,8 @@ generateJoomlaConfig($version);
 /**
  * This function creates destination directory
  *
- * @param $dir directory name to be created
+ * @param $dir
+ *   Directory name to be created.
  * @param int $perm
  *
  * @internal param \mode $peram for that directory
@@ -109,4 +110,3 @@ function generateJoomlaConfig($version) {
   fputs($fd, $xml);
   fclose($fd);
 }
-

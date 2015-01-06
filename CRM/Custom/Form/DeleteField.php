@@ -63,7 +63,6 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
   public function preProcess() {
     $this->_id = $this->get('id');
 
-
     $defaults = array();
     $params = array('id' => $this->_id);
     CRM_Core_BAO_CustomField::retrieve($params, $defaults);

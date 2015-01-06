@@ -108,8 +108,10 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    * mail settings id. It also stores all the retrieved
    * values in the default array
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_BAO_MailSettings object
    * @static
@@ -130,7 +132,8 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   /**
    * Add new mail Settings.
    *
-   * @param array $params reference array contains the values submitted by the form
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
    *
    * @static
    *
@@ -164,7 +167,8 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   /**
    * Takes an associative array and creates a mail settings object
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Core_BAO_MailSettings object
    * @static
@@ -186,7 +190,8 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   /**
    * Delete the mail settings.
    *
-   * @param int $id mail settings id
+   * @param int $id
+   *   Mail settings id.
    *
    * @return mixed|null
    * @static

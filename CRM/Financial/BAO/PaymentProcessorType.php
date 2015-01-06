@@ -49,8 +49,10 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_BAO_LocaationType object on success, null otherwise
    * @static
@@ -68,8 +70,10 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on sucess, null otherwise
    *
@@ -100,7 +104,8 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   /**
    * Add the payment-processor type in the db
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @throws Exception
    * @return CRM_Financial_DAO_PaymentProcessorType
@@ -168,7 +173,8 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   /**
    * Delete payment processor
    *
-   * @param  int $paymentProcessorTypeId ID of the processor to be deleted.
+   * @param int $paymentProcessorTypeId
+   *   ID of the processor to be deleted.
    *
    * @return bool
    * @static

@@ -30,7 +30,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  * Test class for Pledge API - civicrm_pledge_*
  *
- *  @package CiviCRM_APIv3
+ * @package CiviCRM_APIv3
  */
 class api_v3_PledgeTest extends CiviUnitTestCase {
 
@@ -43,7 +43,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   protected $_params;
   protected $_entity;
   protected $scheduled_date;
-  public $DBResetRequired = True;
+  public $DBResetRequired = TRUE;
 
   public function setUp() {
     $this->_apiversion = 3;
@@ -91,7 +91,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $this->assertAPISuccess($result, " testCreateWithCustom ");
-    $this->assertAPISuccess($result,  ' in line ' . __LINE__);
+    $this->assertAPISuccess($result, ' in line ' . __LINE__);
     $getparams = array('id' => $result['id'], 'return.custom_' . $ids['custom_field_id'] => 1);
     $check = $this->callAPISuccess($this->_entity, 'get', $getparams);
     $this->callAPISuccess('pledge', 'delete', array('id' => $check['id']));
@@ -111,7 +111,6 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
 
   public function testGetPledge() {
 
-
     $this->_pledge = $this->callAPISuccess('pledge', 'create', $this->_params);
     $params = array(
       'pledge_id' => $this->_pledge['id'],
@@ -129,7 +128,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals($pledge['pledge_next_pay_amount'], 20.00, 'in line' . __LINE__);
 
     $params2 = array(
-      'pledge_id' => $this->_pledge['id'],    );
+      'pledge_id' => $this->_pledge['id'], );
     $pledge = $this->callAPISuccess('pledge', 'delete', $params2);
   }
   /**
@@ -139,7 +138,8 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
 
     $this->_pledge = $this->callAPISuccess('pledge', 'create', $this->_params);
     $params = array(
-      'pledge_id' => $this->_pledge['id'],      'return.pledge_financial_type' => 1,
+      'pledge_id' => $this->_pledge['id'],
+    'return.pledge_financial_type' => 1,
     );
     $result = $this->callAPISuccess('pledge', 'get', $params);
     $pledge = $result['values'][$this->_pledge['id']];
@@ -149,12 +149,13 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   /**
    * Test  'return.pledge_contribution_type' => 1 works
    * This is for legacy compatibility
-  */
+   */
   public function testGetPledgewithReturnLegacy() {
 
     $this->_pledge = $this->callAPISuccess('pledge', 'create', $this->_params);
     $params = array(
-      'pledge_id' => $this->_pledge['id'],      'return.pledge_financial_type' => 1,
+      'pledge_id' => $this->_pledge['id'],
+    'return.pledge_financial_type' => 1,
     );
     $result = $this->callAPISuccess('pledge', 'get', $params);
     $pledge = $result['values'][$this->_pledge['id']];
@@ -212,15 +213,18 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
       'create_date' => 'first saturday of march last year',
     );
     $pledge2 = $this->callAPISuccess('pledge', 'create', array_merge($this->_params, $overdueParams));
-    $params = array(      'pledge_is_test' => 0,
+    $params = array(
+    'pledge_is_test' => 0,
       'rowCount' => 1,
     );
     $result = $this->callAPISuccess('pledge', 'get', $params);
 
-    $resultSortedAsc = $this->callAPISuccess('pledge', 'get', array(      'rowCount' => 1,
+    $resultSortedAsc = $this->callAPISuccess('pledge', 'get', array(
+    'rowCount' => 1,
       'sort' => 'start_date ASC',
     ));
-    $resultSortedDesc = $this->callAPISuccess('pledge', 'get', array(      'rowCount' => 1,
+    $resultSortedDesc = $this->callAPISuccess('pledge', 'get', array(
+    'rowCount' => 1,
       'sort' => 'start_date DESC',
     ));
 
@@ -322,9 +326,9 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   }
 
   /*
- * test that using original_installment_amount rather than pledge_original_installment_amount works
- * Pledge field behaviour is a bit random & so pledge has come to try to handle both unique & non -unique fields
- */
+  * test that using original_installment_amount rather than pledge_original_installment_amount works
+  * Pledge field behaviour is a bit random & so pledge has come to try to handle both unique & non -unique fields
+  */
   public function testCreatePledgeWithNonUnique() {
     $params = $this->_params;
     $params['original_installment_amount'] = $params['pledge_original_installment_amount'];
@@ -343,7 +347,6 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   }
 
   public function testCreateCancelPledge() {
-
 
     $result = $this->callAPISuccess('pledge', 'create', $this->_params);
     $this->assertEquals(2, $result['values'][0]['status_id'], "in line " . __LINE__);
@@ -377,7 +380,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $pledgeID = $this->pledgeCreate($this->_individualId);
     $old_params = array(
       'id' => $pledgeID,
-      'sequential' => 1,    );
+      'sequential' => 1, );
     $original = $this->callAPISuccess('pledge', 'get', $old_params);
     //Make sure it came back
     $this->assertEquals($original['values'][0]['pledge_id'], $pledgeID, 'In line ' . __LINE__);
@@ -386,7 +389,6 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $old_frequency_unit = $original['values'][0]['pledge_frequency_unit'];
     $old_frequency_interval = $original['values'][0]['pledge_frequency_interval'];
     $old_status_id = $original['values'][0]['pledge_status'];
-
 
     //check against values in CiviUnitTestCase::createPledge()
     $this->assertEquals($old_contact_id, $this->_individualId, 'In line ' . __LINE__);
@@ -400,7 +402,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
       'amount' => 100,
       'financial_type_id' => 1,
       'start_date' => date('Ymd'),
-      'installments' => 10,    );
+      'installments' => 10, );
 
     $pledge = $this->callAPISuccess('pledge', 'create', $params);
     $new_params = array(
@@ -422,7 +424,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $pledgeID = $this->pledgeCreate($this->_individualId);
     $old_params = array(
       'id' => $pledgeID,
-      'sequential' => 1,    );
+      'sequential' => 1, );
     $original = $this->callAPISuccess('pledge', 'get', $old_params);
     //Make sure it came back
     $this->assertEquals($original['values'][0]['pledge_id'], $pledgeID, 'In line ' . __LINE__);
@@ -431,7 +433,6 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $old_frequency_unit = $original['values'][0]['pledge_frequency_unit'];
     $old_frequency_interval = $original['values'][0]['pledge_frequency_interval'];
     $old_status_id = $original['values'][0]['pledge_status'];
-
 
     //check against values in CiviUnitTestCase::createPledge()
     $this->assertEquals($old_contact_id, $this->_individualId, 'In line ' . __LINE__);

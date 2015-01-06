@@ -102,7 +102,8 @@ class CRM_Core_JobManager {
    * @param void
    *
    */
-  public function __destruct() {}
+  public function __destruct() {
+  }
 
   /**
    * @param $entity

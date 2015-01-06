@@ -31,7 +31,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  * Test class for CRM_Event_BAO_ParticipantStatus BAO
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
 
@@ -49,7 +49,8 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    *
    */
-  protected function tearDown() {}
+  protected function tearDown() {
+  }
 
   /**
    *  create() and deleteParticipantStatusType() method

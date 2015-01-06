@@ -45,7 +45,7 @@ class CRM_Core_ManagedEntities {
     CRM_Core_Transaction::addCallback(
       CRM_Core_Transaction::PHASE_POST_COMMIT,
       function () {
-        CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+      CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
       },
       array(),
       'ManagedEntities::reconcile'
@@ -53,8 +53,10 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * @param array $modules CRM_Core_Module
-   * @param array $declarations per hook_civicrm_managed
+   * @param array $modules
+   *   CRM_Core_Module.
+   * @param array $declarations
+   *   Per hook_civicrm_managed.
    */
   public function __construct($modules, $declarations) {
     $this->moduleIndex = self::createModuleIndex($modules);
@@ -122,8 +124,10 @@ class CRM_Core_ManagedEntities {
   /**
    * Create, update, and delete entities declared by an active module
    *
-   * @param \CRM_Core_Module|string $module string
-   * @param $todos array $name => array()
+   * @param \CRM_Core_Module|string $module
+   *   String.
+   * @param $todos array $name
+   *   => array().
    */
   public function reconcileEnabledModule(CRM_Core_Module $module, $todos) {
     $dao = new CRM_Core_DAO_Managed();
@@ -185,7 +189,8 @@ class CRM_Core_ManagedEntities {
   /**
    * Create a new entity
    *
-   * @param array $todo entity specification (per hook_civicrm_managedEntities)
+   * @param array $todo
+   *   Entity specification (per hook_civicrm_managedEntities).
    */
   public function insertNewEntity($todo) {
     $result = civicrm_api($todo['entity'], 'create', $todo['params']);
@@ -206,7 +211,8 @@ class CRM_Core_ManagedEntities {
    * Update an entity which (a) is believed to exist and which (b) ought to be active.
    *
    * @param CRM_Core_DAO_Managed $dao
-   * @param array $todo entity specification (per hook_civicrm_managedEntities)
+   * @param array $todo
+   *   Entity specification (per hook_civicrm_managedEntities).
    */
   public function updateExistingEntity($dao, $todo) {
     $policy = CRM_Utils_Array::value('update', $todo, 'always');
@@ -220,7 +226,7 @@ class CRM_Core_ManagedEntities {
       $params = array_merge($defaults, $todo['params']);
       $result = civicrm_api($dao->entity_type, 'create', $params);
       if ($result['is_error']) {
-        $this->onApiError($dao->entity_type, 'create',$params, $result);
+        $this->onApiError($dao->entity_type, 'create', $params, $result);
       }
     }
 
@@ -247,7 +253,7 @@ class CRM_Core_ManagedEntities {
       );
       $result = civicrm_api($dao->entity_type, 'create', $params);
       if ($result['is_error']) {
-        $this->onApiError($dao->entity_type, 'create',$params, $result);
+        $this->onApiError($dao->entity_type, 'create', $params, $result);
       }
     }
   }
@@ -263,9 +269,11 @@ class CRM_Core_ManagedEntities {
       case 'always':
         $doDelete = TRUE;
         break;
+
       case 'never':
         $doDelete = FALSE;
         break;
+
       case 'unused':
         $getRefCount = civicrm_api3($dao->entity_type, 'getrefcount', array(
           'debug' => 1,
@@ -279,6 +287,7 @@ class CRM_Core_ManagedEntities {
 
         $doDelete = ($total == 0);
         break;
+
       default:
         throw new \Exception('Unrecognized cleanup policy: ' . $policy);
     }

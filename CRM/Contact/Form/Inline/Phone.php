@@ -74,9 +74,9 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
     if (count($this->_phones) > 1) {
       $actualBlockCount = $totalBlocks = count($this->_phones);
       if ($totalBlocks < $this->_blockCount) {
-      $additionalBlocks = $this->_blockCount - $totalBlocks;
-      $totalBlocks += $additionalBlocks;
-    }
+        $additionalBlocks = $this->_blockCount - $totalBlocks;
+        $totalBlocks += $additionalBlocks;
+      }
       else {
         $actualBlockCount++;
         $totalBlocks++;
@@ -98,15 +98,17 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
-   * @param array $errors list of errors to be posted back to the form
+   * @param array $fields
+   *   Posted values of the form.
+   * @param array $errors
+   *   List of errors to be posted back to the form.
    *
    * @return array $errors@static
    */
   public static function formRule($fields, $errors) {
     $hasData = $hasPrimary = $errors = array();
     if (!empty($fields['phone']) && is_array($fields['phone'])) {
-      $primaryID = null;
+      $primaryID = NULL;
       foreach ($fields['phone'] as $instance => $blockValues) {
         $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
 
@@ -115,7 +117,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
           if (!empty($blockValues['is_primary'])) {
             $hasPrimary[] = $instance;
             if (!$primaryID && !empty($blockValues['phone'])) {
-                $primaryID = $blockValues['phone'];
+              $primaryID = $blockValues['phone'];
             }
           }
         }

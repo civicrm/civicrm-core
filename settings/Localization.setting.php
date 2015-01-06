@@ -41,7 +41,7 @@ return array(
     'group_name' => 'Localization Preferences',
     'group' => 'localization',
     'name' => 'monetaryThousandSeparator',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
@@ -54,14 +54,14 @@ return array(
     'title' => 'Thousands Separator',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'monetaryDecimalPoint' => array(
     'group_name' => 'Localization Preferences',
     'group' => 'localization',
     'name' => 'monetaryDecimalPoint',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
@@ -74,14 +74,14 @@ return array(
     'title' => 'Decimal Delimiter',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'moneyformat' => array(
     'group_name' => 'Localization Preferences',
     'group' => 'localization',
     'name' => 'moneyformat',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
@@ -91,14 +91,14 @@ return array(
     'title' => 'Monetary Amount Display',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'moneyvalueformat' => array(
     'group_name' => 'Localization Preferences',
     'group' => 'localization',
     'name' => 'moneyvalueformat',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
@@ -108,14 +108,14 @@ return array(
     'title' => 'Monetary Amount Display',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'defaultCurrency' => array(
     'group_name' => 'Localization Preferences',
     'group' => 'localization',
     'name' => 'defaultCurrency',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
@@ -129,13 +129,13 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'Default currency assigned to contributions and other monetary transactions.',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'defaultContactCountry' => array(
     'group_name' => 'Localization Preferences',
     'group' => 'localization',
     'name' => 'defaultContactCountry',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
@@ -149,13 +149,13 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'This value is selected by default when adding a new contact address.',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'countryLimit' => array(
     'group_name' => 'Localization Preferences',
     'group' => 'localization',
     'name' => 'countryLimit',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Array',
     'quick_form_type' => 'Element',
@@ -171,13 +171,13 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => '',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'provinceLimit' => array(
     'group_name' => 'Localization Preferences',
     'group' => 'localization',
     'name' => 'provinceLimit',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Array',
     'quick_form_type' => 'Element',
@@ -193,13 +193,13 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => '',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'inheritLocale' => array(
     'group_name' => 'Localization Preferences',
     'group' => 'localization',
     'name' => 'inheritLocale',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
@@ -209,13 +209,13 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => '',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'dateformatDatetime' => array(
     'group_name' => 'Localization Preferences',
     'group' => 'localization',
     'name' => 'dateformatDatetime',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'default' => '%B %E%f, %Y %l:%M %P',
@@ -224,13 +224,13 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => '',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'dateformatFull' => array(
     'group_name' => 'Localization Preferences',
     'group' => 'localization',
     'name' => 'dateformatFull',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'default' => '%B %E%f, %Y',
@@ -239,13 +239,13 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => '',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'dateformatPartial' => array(
     'group_name' => 'Localization Preferences',
     'group' => 'localization',
     'name' => 'dateformatPartial',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'default' => '%B %Y',
@@ -254,13 +254,13 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => '',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'lcMessages' => array(
     'group_name' => 'Localization Preferences',
     'group' => 'localization',
     'name' => 'lcMessages',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'default' => 'en_US',
@@ -269,6 +269,6 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => '',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
 );

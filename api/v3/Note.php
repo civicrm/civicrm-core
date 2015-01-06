@@ -47,7 +47,8 @@
  * This API is used for creating a note.
  * Required parameters : entity_id AND note
  *
- * @param   array  $params  an associative array of name/value property values of civicrm_note
+ * @param array $params
+ *   An associative array of name/value property values of civicrm_note.
  * {@getfields note_create}
  *
  * @return array API result array
@@ -64,7 +65,8 @@ function civicrm_api3_note_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_note_create_spec(&$params) {
   $params['entity_table']['api.default'] = "civicrm_contact";
@@ -78,7 +80,8 @@ function _civicrm_api3_note_create_spec(&$params) {
  *
  * This API is used for deleting a note
  *
- * @param array $params including id of the note to be deleted
+ * @param array $params
+ *   Including id of the note to be deleted.
  * {@getfields note_delete}
  *
  * @return null
@@ -93,7 +96,8 @@ function civicrm_api3_note_delete($params) {
 /**
  * Retrieve a specific note, given a set of input params
  *
- * @param  array   $params  input parameters
+ * @param array $params
+ *   Input parameters.
  *
  * @return array  array of properties,
  * if error an array with an error id and error message
@@ -110,7 +114,8 @@ function civicrm_api3_note_get($params) {
  * Adjust Metadata for Get action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_note_get_spec(&$params) {
   $params['entity_table']['api.default'] = "civicrm_contact";
@@ -119,7 +124,8 @@ function _civicrm_api3_note_get_spec(&$params) {
 /**
  * Get all descendents of given note
  *
- * @param array $params Associative array; only required 'id' parameter is used
+ * @param array $params
+ *   Associative array; only required 'id' parameter is used.
  *
  * @return array Nested associative array beginning with direct children of given note.
  */
@@ -139,4 +145,3 @@ function &civicrm_api3_note_tree_get($params) {
   $noteTree = CRM_Core_BAO_Note::getNoteTree($params['id'], $params['max_depth'], $params['snippet']);
   return civicrm_api3_create_success($noteTree, $params);
 }
-

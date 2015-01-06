@@ -60,7 +60,8 @@ class CRM_Batch_Page_Batch extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  public function &links() {}
+  public function &links() {
+  }
 
   /**
    * Get name of edit form
@@ -103,8 +104,7 @@ class CRM_Batch_Page_Batch extends CRM_Core_Page_Basic {
   }
 
   public function search() {
-    if ($this->_action &
-      (CRM_Core_Action::ADD |
+    if ($this->_action & (CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE |
         CRM_Core_Action::DELETE
       )

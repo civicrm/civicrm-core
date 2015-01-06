@@ -40,7 +40,7 @@
 /**
  * Open a new case, add client and manager roles, and add standard timeline
  *
- * @param  array (
+ * @param array (
  * //REQUIRED:
  * 'case_type_id' => int OR
  * 'case_type' => str (provide one or the other)
@@ -130,7 +130,8 @@ function civicrm_api3_case_create($params) {
 /**
  * Adjust Metadata for Get Action
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_case_get_spec(&$params) {
   $params['contact_id']['api.aliases'] = array('client_id');
@@ -140,7 +141,8 @@ function _civicrm_api3_case_get_spec(&$params) {
 /**
  * Adjust Metadata for Create Action
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_case_create_spec(&$params) {
   $params['contact_id']['api.aliases'] = array('client_id');
@@ -161,7 +163,8 @@ function _civicrm_api3_case_create_spec(&$params) {
 /**
  * Adjust Metadata for Update action
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_case_update_spec(&$params) {
   $params['id']['api.required'] = 1;
@@ -170,7 +173,8 @@ function _civicrm_api3_case_update_spec(&$params) {
 /**
  * Adjust Metadata for Delete action
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_case_delete_spec(&$params) {
   $params['id']['api.required'] = 1;
@@ -254,13 +258,13 @@ SELECT DISTINCT case_id
     $options['return'] = array('contacts' => 1, 'activities' => 1);
   }
 
-  $foundcases =  _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Case');
+  $foundcases = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Case');
   $cases = array();
   foreach ($foundcases['values'] as $foundcase) {
-      if ($case = _civicrm_api3_case_read($foundcase['id'], $options)) {
-        $cases[$foundcase['id']] = $case;
-      }
+    if ($case = _civicrm_api3_case_read($foundcase['id'], $options)) {
+      $cases[$foundcase['id']] = $case;
     }
+  }
 
   return civicrm_api3_create_success($cases, $params, 'case', 'get');
 }
@@ -291,7 +295,7 @@ function _civicrm_api3_case_deprecation() {
 /**
  * Update a specified case.
  *
- * @param  array (
+ * @param array (
  * //REQUIRED:
  * 'case_id' => int
  *
@@ -359,7 +363,7 @@ function civicrm_api3_case_update($params) {
 /**
  * Delete a specified case.
  *
- * @param  array (
+ * @param array (
  * //REQUIRED:
  * 'id' => int
  *

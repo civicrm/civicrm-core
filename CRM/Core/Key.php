@@ -75,7 +75,8 @@ class CRM_Core_Key {
    * and a private key. Modelled after drupal's form API
    *
    * @param string $name
-   * @param bool $addSequence should we add a unique sequence number to the end of the key
+   * @param bool $addSequence
+   *   Should we add a unique sequence number to the end of the key.
    *
    * @return string       valid formID
    * @static

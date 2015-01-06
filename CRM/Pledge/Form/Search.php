@@ -295,7 +295,8 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @return void
    * @static

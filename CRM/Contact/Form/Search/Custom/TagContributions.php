@@ -71,7 +71,6 @@ class CRM_Contact_Form_Search_Custom_TagContributions implements CRM_Contact_For
      * Define the search form fields here
      */
 
-
     $form->addDate('start_date', ts('Contribution Date From'), FALSE, array('formatType' => 'custom'));
     $form->addDate('end_date', ts('...through'), FALSE, array('formatType' => 'custom'));
     $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));

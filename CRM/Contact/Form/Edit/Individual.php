@@ -44,8 +44,10 @@ class CRM_Contact_Form_Edit_Individual {
    * This function provides the HTML form elements that are specific
    * to the Individual Contact Type
    *
-   * @param CRM_Core_Form $form form object
-   * @param int $inlineEditMode ( 1 for contact summary
+   * @param CRM_Core_Form $form
+   *   Form object.
+   * @param int $inlineEditMode
+   *   ( 1 for contact summary.
    * top bar form and 2 for display name edit )
    *
    * @return void
@@ -121,7 +123,7 @@ class CRM_Contact_Form_Edit_Individual {
         TRUE
       );
 
-      if ( $checkSimilar == null ) {
+      if ( $checkSimilar == NULL ) {
         $checkSimilar = 0;
       }
       $form->assign('checkSimilar', $checkSimilar);
@@ -144,8 +146,10 @@ class CRM_Contact_Form_Edit_Individual {
   /**
    * Global form rule
    *
-   * @param array $fields the input form values
-   * @param array $files the uploaded files if any
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
    * @param int $contactID
    *
    * @return true if no errors, else array of errors

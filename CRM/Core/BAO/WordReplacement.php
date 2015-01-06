@@ -53,8 +53,10 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * Takes a bunch of params that are needed to match certain criteria and
    * retrieves the relevant objects.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_DAO_WordRepalcement object
    * @static
@@ -112,7 +114,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @return WordReplacement array
    */
   public static function create($params) {
-    if(array_key_exists("domain_id",$params) === FALSE) {
+    if(array_key_exists("domain_id", $params) === FALSE) {
       $params["domain_id"] = CRM_Core_Config::domainID();
     }
     $wordReplacement = new CRM_Core_DAO_WordReplacement();
@@ -127,7 +129,8 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   /**
    * Delete website
    *
-   * @param int $id WordReplacement id
+   * @param int $id
+   *   WordReplacement id.
    *
    * @return object
    * @static
@@ -145,7 +148,8 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   /**
    * Get all word-replacements in the form of an array
    *
-   * @param int $id domain ID
+   * @param int $id
+   *   Domain ID.
    * @return array
    * @see civicrm_domain.locale_custom_strings
    */
@@ -162,7 +166,7 @@ WHERE  domain_id = %1
     $overrides = array();
 
     while ($dao->fetch()) {
-      if ($dao->is_active==1) {
+      if ($dao->is_active == 1) {
         $overrides['enabled'][$dao->match_type][$dao->find_word] = $dao->replace_word;
       }
       else {
@@ -222,7 +226,8 @@ WHERE  domain_id = %1
    * However, if there's a bug in here prior to 4.4.0, we should apply the
    * bugfix in both places.
    *
-   * @param bool $rebuildEach whether to perform rebuild after each individual API call
+   * @param bool $rebuildEach
+   *   Whether to perform rebuild after each individual API call.
    * @return array Each item is $params for WordReplacement.create
    * @see CRM_Core_BAO_WordReplacement::convertConfigArraysToAPIParams
    */
@@ -243,9 +248,9 @@ WHERE  domain_id = %1
           $wordMatchArray = array();
           // Traverse Language array
           foreach ($localeCustomArray as $localCustomData) {
-          // Traverse status array "enabled" "disabled"
+            // Traverse status array "enabled" "disabled"
             foreach ($localCustomData as $status => $matchTypes) {
-              $params["is_active"] = ($status == "enabled")?TRUE:FALSE;
+              $params["is_active"] = ($status == "enabled") ? TRUE : FALSE;
               // Traverse Match Type array "wildcardMatch" "exactMatch"
               foreach ($matchTypes as $matchType => $words) {
                 $params["match_type"] = $matchType;

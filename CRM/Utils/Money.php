@@ -49,11 +49,15 @@ class CRM_Utils_Money {
    * %C - the currency ISO code (e.g., 'USD') if provided
    * %c - the currency symbol (e.g., '$') if available
    *
-   * @param float $amount the monetary amount to display (1234.56)
-   * @param string $currency the three-letter ISO currency code ('USD')
-   * @param string $format the desired currency format
+   * @param float $amount
+   *   The monetary amount to display (1234.56).
+   * @param string $currency
+   *   The three-letter ISO currency code ('USD').
+   * @param string $format
+   *   The desired currency format.
    * @param bool $onlyNumber
-   * @param string $valueFormat the desired monetary value display format (e.g. '%!i')
+   * @param string $valueFormat
+   *   The desired monetary value display format (e.g. '%!i').
    *
    * @return string  formatted monetary string
    *

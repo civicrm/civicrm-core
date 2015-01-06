@@ -47,24 +47,27 @@ class CRM_Activity_BAO_ICalendar {
   /**
    * Constructor
    *
-   * @param object $act Reference to an activity object
+   * @param object $act
+   *   Reference to an activity object.
    *
    * @return \CRM_Activity_BAO_ICalendar
   @access public
    */
-  public function __construct( &$act ) {
+  public function __construct(&$act) {
     $this->activity = $act;
   }
 
   /**
    * Add an ics attachment to the input array
    *
-   * @param array $attachments  Reference to array in same format returned from CRM_Core_BAO_File::getEntityFile()
-   * @param array $contacts     Array of contacts (attendees)
+   * @param array $attachments
+   *   Reference to array in same format returned from CRM_Core_BAO_File::getEntityFile().
+   * @param array $contacts
+   *   Array of contacts (attendees).
    *
    * @return string   Array index of the added attachment in the $attachments array, or else null.
    */
-  public function addAttachment( &$attachments, $contacts ) {
+  public function addAttachment(&$attachments, $contacts) {
     // Check preferences setting
     if ( CRM_Core_BAO_Setting::getItem( CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'activity_assignee_notification_ics' ) ) {
       $config = &CRM_Core_Config::singleton();
@@ -98,7 +101,7 @@ class CRM_Activity_BAO_ICalendar {
         }
       }
     }
-    return null;
+    return NULL;
   }
 
   public function cleanup() {

@@ -173,7 +173,8 @@ SELECT  petition.id                         as id,
   /**
    * Takes an associative array and creates a petition signature activity
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Campaign_BAO_Petition
    * @static
@@ -462,7 +463,8 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   /**
    * This function returns all entities assigned to a specific tag
    *
-   * @param object $tag    an object of a tag.
+   * @param object $tag
+   *   An object of a tag.
    *
    * @return  array   $contactIds    array of contact ids
    */
@@ -534,7 +536,8 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   /**
    * Takes an associative array and sends a thank you or email verification email
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @param $sendEmailMode
    *
@@ -642,7 +645,6 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
               $se->hash,
             )
           ) . "@$emailDomain";
-
 
         $confirmUrl = CRM_Utils_System::url('civicrm/petition/confirm',
           "reset=1&cid={$se->contact_id}&sid={$se->id}&h={$se->hash}&a={$params['activityId']}&pid={$params['sid']}",

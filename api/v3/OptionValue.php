@@ -59,7 +59,8 @@ function civicrm_api3_option_value_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_option_value_create_spec(&$params) {
   $params['is_active']['api.default'] = 1;
@@ -72,7 +73,7 @@ function _civicrm_api3_option_value_create_spec(&$params) {
 /**
  * Deletes an existing OptionValue
  *
- * @param  array  $params
+ * @param array $params
  *
  * {@example OptionValueDelete.php 0}
  *
@@ -91,4 +92,3 @@ function civicrm_api3_option_value_delete($params) {
     civicrm_api3_create_error('Could not delete OptionValue ' . $params['id']);
   }
 }
-

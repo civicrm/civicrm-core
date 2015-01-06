@@ -43,7 +43,7 @@ class CRM_Custom_Form_CustomData {
    * @param null|string $subName
    * @param null|string $subType
    * @param null|int $groupCount
-   * @param null|String $type
+   * @param string $type
    * @param null|int $entityID
    * @param null $onlySubType
    *

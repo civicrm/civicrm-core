@@ -122,7 +122,6 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
     $this->add('file', 'uploadFile', ts('Image File Name'), 'onChange="select_option();"');
 
-
     $this->add('text', 'price', ts('Market Value'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'price'), TRUE);
     $this->addRule('price', ts('Please enter the Market Value for this product.'), 'money');
 
@@ -152,9 +151,9 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     CRM_Core_PseudoConstant::populate(
       $premiumFinancialType,
       'CRM_Financial_DAO_EntityFinancialAccount',
-      $all = True,
+      $all = TRUE,
       $retrieve = 'entity_id',
-      $filter = null,
+      $filter = NULL,
       'account_relationship = 8'
     );
 
@@ -162,15 +161,16 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     CRM_Core_PseudoConstant::populate(
       $costFinancialType,
       'CRM_Financial_DAO_EntityFinancialAccount',
-      $all = True,
+      $all = TRUE,
       $retrieve = 'entity_id',
-      $filter = null,
+      $filter = NULL,
       'account_relationship = 7'
     );
     $productFinancialType = array_intersect($costFinancialType, $premiumFinancialType);
     foreach( $financialType as $key => $financialTypeName ){
-      if(!in_array( $key, $productFinancialType))
+      if(!in_array( $key, $productFinancialType)) {
         unset( $financialType[$key] );
+      }
     }
     if( count( $financialType ) ){
       $this->assign( 'financialType', $financialType );
@@ -179,7 +179,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       'select',
       'financial_type_id',
       ts( 'Financial Type' ),
-      array(''=>ts('- select -')) + $financialType
+      array('' => ts('- select -')) + $financialType
     );
 
     $this->add('checkbox', 'is_active', ts('Enabled?'));
@@ -204,7 +204,8 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   /**
    * Function for validation
    *
-   * @param array $params (ref.) an assoc array of name/value pairs
+   * @param array $params
+   *   (ref.) an assoc array of name/value pairs.
    *
    * @param $files
    *
@@ -263,7 +264,6 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       $errors['frequency_interval'] = ts('Please enter the Frequency Interval for this subscription or service.');
     }
 
-
     return empty($errors) ? TRUE : $errors;
   }
 
@@ -303,12 +303,12 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
           $gdSupport = CRM_Utils_System::getModuleSetting('gd', 'GD Support');
           if($gdSupport) {
             if($imageFile) {
-              $error = false;
+              $error = FALSE;
               $params['image'] = $this->_resizeImage($imageFile, "_full", 200, 200);
               $params['thumbnail'] = $this->_resizeImage($imageFile, "_thumb", 50, 50);
             }
           } else {
-            $error = true;
+            $error = TRUE;
             $params['image'] = $config->resourceBase . 'i/contribute/default_premium.jpg';
             $params['thumbnail'] = $config->resourceBase . 'i/contribute/default_premium_thumb.jpg';
           }
@@ -380,10 +380,10 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     // save the resized image
     $fp = fopen($newFilename, 'w+');
     ob_start();
-    ImageJPEG($image);
+    imagejpeg($image);
     $image_buffer = ob_get_contents();
     ob_end_clean();
-    ImageDestroy($image);
+    imagedestroy($image);
     fwrite($fp, $image_buffer);
     rewind($fp);
     fclose($fp);

@@ -479,8 +479,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
       foreach ($statistics['filters'] as $id => $value) {
         if ($value['title'] == 'Case Type') {
           $statistics['filters'][$id]['value'] = 'Is ' .
-            $this->case_types[substr($statistics['filters'][$id]
-              ['value'], -3, -2
+            $this->case_types[substr($statistics['filters'][$id]['value'], -3, -2
             )];
         }
       }

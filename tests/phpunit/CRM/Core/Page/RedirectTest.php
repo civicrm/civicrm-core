@@ -34,10 +34,14 @@ class CRM_Core_Page_RedirectTest extends CiviUnitTestCase {
    * Note: Expected URL is htmlized because that's what CRM_Utils_System::url()
    * and CRM_Utils_System::redirect() work with.
    *
-   * @param string $requestPath eg "civicrm/requested/path"
-   * @param string $requestArgs eg "foo=bar&whiz=bang"
-   * @param string $pageArgs eg "url=civicrm/foo/bar?whiz=bang"
-   * @param string $expectedUrl eg "/index.php?q=civicrm/foo/bar&whiz=bang"
+   * @param string $requestPath
+   *   Eg "civicrm/requested/path".
+   * @param string $requestArgs
+   *   Eg "foo=bar&whiz=bang".
+   * @param string $pageArgs
+   *   Eg "url=civicrm/foo/bar?whiz=bang".
+   * @param string $expectedUrl
+   *   Eg "/index.php?q=civicrm/foo/bar&whiz=bang".
    * @dataProvider examples
    */
   public function testCreateUrl($requestPath, $requestArgs, $pageArgs, $expectedUrl) {

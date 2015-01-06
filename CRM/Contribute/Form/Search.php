@@ -75,7 +75,8 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * Processing needed for buildForm and later
    *
    * @return void
-   */ function preProcess() {
+   */
+  function preProcess() {
     $this->set('searchFormName', 'Search');
 
     /**
@@ -92,9 +93,9 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
      * driven by the wizard framework
      */
 
-    $this->_reset   = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
-    $this->_force   = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
-    $this->_limit   = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
+    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
+    $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
 
     $this->assign("context", $this->_context);
@@ -162,8 +163,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
   }
 
   public function setDefaultValues() {
-    if (empty($this->_defaults
-['contribution_status'])) {
+    if (empty($this->_defaults['contribution_status'])) {
       $this->_defaults['contribution_status'][1] = 1;
     }
     return $this->_defaults;
@@ -260,7 +260,9 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     }
 
     foreach (array(
-      'contribution_amount_low', 'contribution_amount_high') as $f) {
+               'contribution_amount_low',
+               'contribution_amount_high'
+             ) as $f) {
       if (isset($this->_formValues[$f])) {
         $this->_formValues[$f] = CRM_Utils_Rule::cleanMoney($this->_formValues[$f]);
       }
@@ -272,7 +274,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       $financialType = CRM_Utils_Array::value('financial_type_id', $this->_formValues);
       if ($financialType && is_array($financialType)) {
         unset($this->_formValues['financial_type_id']);
-        foreach($financialType as $notImportant => $typeID) {
+        foreach ($financialType as $notImportant => $typeID) {
           $this->_formValues['financial_type_id'][$typeID] = 1;
         }
       }
@@ -285,11 +287,10 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
       if ($tags && is_array($tags)) {
         unset($this->_formValues['contact_tags']);
-        foreach($tags as $notImportant => $tagID) {
+        foreach ($tags as $notImportant => $tagID) {
           $this->_formValues['contact_tags'][$tagID] = 1;
         }
       }
-
 
       if (!$config->groupTree) {
         $group = CRM_Utils_Array::value('group', $this->_formValues);
@@ -300,7 +301,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
         if ($group && is_array($group)) {
           unset($this->_formValues['group']);
-          foreach($group as $notImportant => $groupID) {
+          foreach ($group as $notImportant => $groupID) {
             $this->_formValues['group'][$groupID] = 1;
           }
         }
@@ -324,7 +325,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       $this->controller->resetPage($formName);
       return;
     }
-
 
     $sortID = NULL;
     if ($this->get(CRM_Utils_Sort::SORT_ID)) {
@@ -358,11 +358,11 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     );
     $controller->setEmbedded(TRUE);
 
-    $query = &$selector->getQuery();
+    $query = & $selector->getQuery();
     if ($this->_context == 'user') {
       $query->setSkipPermission(TRUE);
     }
-    $summary = &$query->summaryContribution($this->_context);
+    $summary = & $query->summaryContribution($this->_context);
     $this->set('summary', $summary);
     $this->assign('contributionSummary', $summary);
     $controller->run();

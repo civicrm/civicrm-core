@@ -45,7 +45,8 @@ class CRM_Utils_ICalendar {
   /**
    * Escape text elements for safe ICalendar use
    *
-   * @param $text Text to escape
+   * @param $text
+   *   Text to escape.
    *
    * @return  Escaped text
    *
@@ -64,7 +65,8 @@ class CRM_Utils_ICalendar {
   /**
    * Escape date elements for safe ICalendar use
    *
-   * @param $date Date to escape
+   * @param $date
+   *   Date to escape.
    *
    * @param bool $gdata
    *
@@ -91,11 +93,15 @@ class CRM_Utils_ICalendar {
    * - 'text/xml'      : used for gData or rss formatted feeds
    *
    *
-   * @param string $calendar The calendar data to be published.
+   * @param string $calendar
+   *   The calendar data to be published.
    * @param string $content_type
-   * @param string $charset The character set to use, defaults to 'us-ascii'.
-   * @param string $fileName The file name (for downloads)
-   * @param string $disposition How the file should be sent ('attachment' for downloads)
+   * @param string $charset
+   *   The character set to use, defaults to 'us-ascii'.
+   * @param string $fileName
+   *   The file name (for downloads).
+   * @param string $disposition
+   *   How the file should be sent ('attachment' for downloads).
    *
    * @return void
    */

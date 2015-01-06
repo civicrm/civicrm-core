@@ -48,7 +48,7 @@ function _civicrm_api3_constant_deprecation() {
  * @deprecated as of CiviCRM 4.4.
  * It's recommended to use the api getoptions action instead
  *
- *  @param  string  Name of a public static method of
+ * @param  string  Name of a public static method of
  *                  CRM_Core_PseudoConstant: one of
  *  <ul>
  *    <li>activityStatus</li>
@@ -93,7 +93,7 @@ function _civicrm_api3_constant_deprecation() {
  *    <li>wysiwygEditor</li>
  *  </ul>
  * @return array
- *  @example ConstantGet.php
+ * @example ConstantGet.php
  *  {@getfields constant_get}
  */
 function civicrm_api3_constant_get($params) {
@@ -102,7 +102,6 @@ function civicrm_api3_constant_get($params) {
   // all the stuff about classes should be adequately replaced by the bit in the 'else'
   //ie $values = call_user_func(array('CRM_Utils_PseudoConstant', 'getConstant'), $name);
   // once tests are 100% can try removing the first block & a similar block from Generic:getoptions
-
 
   // Whitelist approach is safer
   $allowedClasses = array(
@@ -183,8 +182,8 @@ function _civicrm_api3_constant_get_spec(&$params) {
     'worldRegion',
     'wysiwygEditor',
   );
-  $params = (array
-    ('name' => array(
+  $params = (array(
+  'name' => array(
       'title' => 'Constant Name',
       'name' => 'name',
       'api.required' => 1,
@@ -192,4 +191,3 @@ function _civicrm_api3_constant_get_spec(&$params) {
       ))
   );
 }
-

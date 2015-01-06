@@ -52,12 +52,13 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
   public function buildQuickForm() {
     parent::buildQuickForm();
     $this->addFormRule(array('CRM_Custom_Import_Form_MapField', 'formRule'));
-   }
+  }
 
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @return array list of errors to be posted back to the form
    * @static

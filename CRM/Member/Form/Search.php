@@ -300,7 +300,6 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
       $this->_defaults['member_membership_type_id'] = array($membershipType => 1);
     }
 
-
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive',
       CRM_Core_DAO::$_nullObject
     );

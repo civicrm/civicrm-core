@@ -42,7 +42,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
   /**
    * Insert/update a new entry in the database.
    *
-   * @param array $params (reference), array $ids
+   * @param array $params
+   *   (reference), array $ids.
    *
    * @param $ids
    *
@@ -70,7 +71,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
   /**
    * Creates a new entry in the database.
    *
-   * @param array $params (reference), array $ids
+   * @param array $params
+   *   (reference), array $ids.
    *
    * @param $ids
    *
@@ -84,7 +86,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
     }
 
     if ($id = CRM_Utils_Array::value('id', $ids)) {
-      if (isset($params['name']))unset($params['name']);
+      if (isset($params['name'])) { unset($params['name']);
+      }
 
       $oldWeight = NULL;
       if ($id) {
@@ -111,8 +114,10 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * Takes a bunch of params that are needed to match certain criteria and
    * retrieves the relevant objects.
    *
-   * @param array $params   (reference ) an assoc array
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
    * @static
@@ -124,10 +129,14 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
   /**
    * Retrive the all values for given field id
    *
-   * @param int $fieldId price_field_id
-   * @param array $values (reference ) to hold the values
-   * @param string $orderBy for order by, default weight
-   * @param bool|int $isActive is_active, default false
+   * @param int $fieldId
+   *   Price_field_id.
+   * @param array $values
+   *   (reference ) to hold the values.
+   * @param string $orderBy
+   *   For order by, default weight.
+   * @param bool|int $isActive
+   *   Is_active, default false.
    *
    * @return array $values
    *
@@ -152,7 +161,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
   /**
    * Get the price field option label.
    *
-   * @param int $id id of field option.
+   * @param int $id
+   *   Id of field option.
    *
    * @return string name
    *
@@ -166,8 +176,10 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id         Id of the database record
-   * @param boolean  $is_active  Value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return   Object            DAO object on sucess, null otherwise
    *
@@ -180,7 +192,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
   /**
    * Delete all values of the given field id
    *
-   * @param  int    $fieldId    Price field id
+   * @param int $fieldId
+   *   Price field id.
    *
    * @return boolean
    *
@@ -199,7 +212,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
   /**
    * Delete the value.
    *
-   * @param   int   $id  Id
+   * @param int $id
+   *   Id.
    *
    * @return  boolean
    *

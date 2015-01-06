@@ -224,7 +224,8 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    * Store the NACK and retry after the default time period (DEFAULT_RETRY).
    *
    * @dataProvider badWebResponses
-   * @param array $badWebResponse Description of a web request that returns some kind of failure
+   * @param array $badWebResponse
+   *   Description of a web request that returns some kind of failure.
    */
   public function testGetDocument_NewFailure_CacheOK_UpdateOK($badWebResponse) {
     $this->assertNotEmpty($badWebResponse);
@@ -268,7 +269,8 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    * A new update succeeds.
    *
    * @dataProvider badWebResponses
-   * @param array $badWebResponse Description of a web request that returns some kind of failure
+   * @param array $badWebResponse
+   *   Description of a web request that returns some kind of failure.
    */
   public function testGetDocument_NewOK_UpdateFailure_CacheOK_UpdateOK($badWebResponse) {
     $this->assertNotEmpty($badWebResponse);

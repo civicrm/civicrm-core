@@ -37,7 +37,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
   protected $id = 0;
   protected $contactIds = array();
   protected $_entity = 'line_item';
-  protected $contribution_result = null;
+  protected $contribution_result = NULL;
 
   public $DBResetRequired = TRUE;
   protected $_financialTypeId = 1;
@@ -57,7 +57,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
       'source' => 'SSF',
       'contribution_status_id' => 1,
     );
-    $contribution = $this->callAPISuccess('contribution','create', $contributionParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
     $this->params = array(
       'price_field_value_id' => 1,
       'price_field_id' => 1,
@@ -95,7 +95,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
   }
 
   public function testGetFieldsLineItem() {
-    $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create',));
+    $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create'));
     $this->assertEquals(1, $result['values']['entity_id']['api.required']);
   }
 

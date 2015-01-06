@@ -62,7 +62,8 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
    * Constructor
    *
    * @param CiviSeleniumTestCase|CiviUnitTestCase $unit_test The currently running test
-   * @param bool $startImmediately Start writing to db now or wait until start() is called
+   * @param bool $startImmediately
+   *   Start writing to db now or wait until start() is called.
    */
   public function __construct(&$unit_test, $startImmediately = TRUE) {
     $this->_ut = $unit_test;
@@ -180,6 +181,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       case 'raw':
         // nothing to do
         break;
+
       case 'ezc':
         $msg = $this->convertToEzc($msg);
         break;
@@ -188,7 +190,8 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   * @param string $type 'raw'|'ezc'
+   * @param string $type
+   *   'raw'|'ezc'.
    *
    * @throws Exception
    * @return array(ezcMail)|array(string)
@@ -211,6 +214,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       case 'raw':
         // nothing to do
         break;
+
       case 'ezc':
         foreach ($msgs as $i => $msg) {
           $msgs[$i] = $this->convertToEzc($msg);
@@ -246,8 +250,10 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
   /**
    * Check contents of mail log
    *
-   * @param array $strings strings that should be included
-   * @param array $absentStrings strings that should not be included
+   * @param array $strings
+   *   Strings that should be included.
+   * @param array $absentStrings
+   *   Strings that should not be included.
    * @param string $prefix
    *
    * @return \ezcMail|string
@@ -275,7 +281,8 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
   /**
    * Assert that $expectedRecipients (and no else) have received emails
    *
-   * @param array $expectedRecipients array($msgPos => array($recipPos => $emailAddr))
+   * @param array $expectedRecipients
+   *   Array($msgPos => array($recipPos => $emailAddr)).
    */
   public function assertRecipients($expectedRecipients) {
     $recipients = array();
@@ -304,7 +311,8 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   * @param string $msg email header and body
+   * @param string $msg
+   *   Email header and body.
    * @return ezcMail
    */
   private function convertToEzc($msg) {

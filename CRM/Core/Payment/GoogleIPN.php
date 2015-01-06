@@ -87,7 +87,8 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * Constructor
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param $paymentProcessor
    *
@@ -103,8 +104,10 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * The function gets called when a new order takes place.
    *
-   * @param xml $dataRoot response send by google in xml format
-   * @param array $privateData contains the name value pair of <merchant-private-data>
+   * @param xml $dataRoot
+   *   Response send by google in xml format.
+   * @param array $privateData
+   *   Contains the name value pair of <merchant-private-data>.
    *
    * @param $component
    *
@@ -243,9 +246,11 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * The function gets called when the state(CHARGED, CANCELLED..) changes for an order
    *
-   * @param string $status status of the transaction send by google
+   * @param string $status
+   *   Status of the transaction send by google.
    * @param $dataRoot
-   * @param array $privateData contains the name value pair of <merchant-private-data>
+   * @param array $privateData
+   *   Contains the name value pair of <merchant-private-data>.
    *
    * @param $component
    *
@@ -293,9 +298,9 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
       $ids['related_contact'] = NULL;
       $ids['onbehalf_dupe_alert'] = NULL;
       if ($contribution->trxn_id) {
-      list($ids['membership'], $ids['related_contact'], $ids['onbehalf_dupe_alert']) = explode(CRM_Core_DAO::VALUE_SEPARATOR,
+        list($ids['membership'], $ids['related_contact'], $ids['onbehalf_dupe_alert']) = explode(CRM_Core_DAO::VALUE_SEPARATOR,
         $contribution->trxn_id
-      );
+        );
       }
       foreach (array(
         'membership', 'related_contact', 'onbehalf_dupe_alert') as $fld) {
@@ -394,7 +399,8 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
   /**
    * Singleton function used to manage this object
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param $component
    * @param $paymentProcessor
@@ -412,7 +418,8 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
   /**
    * The function retrieves the amount the contribution is for, based on the order-no google sends
    *
-   * @param int $orderNo <order-total> send by google
+   * @param int $orderNo
+   *   <order-total> send by google.
    *
    * @return amount
    */
@@ -430,9 +437,12 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
   /**
    * The function returns the component(Event/Contribute..), given the google-order-no and merchant-private-data
    *
-   * @param array $privateData contains the name value pair of <merchant-private-data>
-   * @param int $orderNo <order-total> send by google
-   * @param string $root root of xml-response
+   * @param array $privateData
+   *   Contains the name value pair of <merchant-private-data>.
+   * @param int $orderNo
+   *   <order-total> send by google.
+   * @param string $root
+   *   Root of xml-response.
    *
    * @param $response
    * @param $serial
@@ -533,7 +543,7 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
     // lets retrieve the private-data & order-no
     $privateData = NULL;
     if (array_key_exists('shopping-cart', $data[$root])) {
-    $privateData = $data[$root]['shopping-cart']['merchant-private-data']['VALUE'];
+      $privateData = $data[$root]['shopping-cart']['merchant-private-data']['VALUE'];
     }
     if (empty($privateData) && array_key_exists('order-summary', $data[$root])
         && array_key_exists('shopping-cart', $data[$root]['order-summary'])) {
@@ -573,65 +583,65 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
       case "merchant-calculation-callback":
         break;
 
-      case "new-order-notification": {
-          $response->SendAck($serial, FALSE);
-          $ipn->newOrderNotify($data[$root], $privateData, $module);
-          break;
+      case "new-order-notification":{
+        $response->SendAck($serial, FALSE);
+        $ipn->newOrderNotify($data[$root], $privateData, $module);
+        break;
         }
 
-      case "order-state-change-notification": {
-          $response->SendAck($serial, FALSE);
-          $new_financial_state = $data[$root]['new-financial-order-state']['VALUE'];
-          $new_fulfillment_order = $data[$root]['new-fulfillment-order-state']['VALUE'];
+      case "order-state-change-notification":{
+        $response->SendAck($serial, FALSE);
+        $new_financial_state = $data[$root]['new-financial-order-state']['VALUE'];
+        $new_fulfillment_order = $data[$root]['new-fulfillment-order-state']['VALUE'];
 
-          switch ($new_financial_state) {
-            case 'CHARGEABLE':
-              break;
+        switch ($new_financial_state) {
+          case 'CHARGEABLE':
+            break;
 
-            case 'CHARGED':
-            case 'PAYMENT_DECLINED':
-            case 'CANCELLED':
-            case 'CANCELLED_BY_GOOGLE':
-              $ipn->orderStateChange($new_financial_state, $data[$root], $privateData, $module);
-              break;
+          case 'CHARGED':
+          case 'PAYMENT_DECLINED':
+          case 'CANCELLED':
+          case 'CANCELLED_BY_GOOGLE':
+            $ipn->orderStateChange($new_financial_state, $data[$root], $privateData, $module);
+            break;
 
-            case 'REVIEWING':
-            case 'CHARGING':
-              break;
+          case 'REVIEWING':
+          case 'CHARGING':
+            break;
 
-            default:
-              break;
-          }
-          break;
+          default:
+            break;
+        }
+        break;
         }
 
-      case "authorization-amount-notification": {
-          $response->SendAck($serial, FALSE);
-          $new_financial_state = $data[$root]['order-summary']['financial-order-state']['VALUE'];
-          $new_fulfillment_order = $data[$root]['order-summary']['fulfillment-order-state']['VALUE'];
+      case "authorization-amount-notification":{
+        $response->SendAck($serial, FALSE);
+        $new_financial_state = $data[$root]['order-summary']['financial-order-state']['VALUE'];
+        $new_fulfillment_order = $data[$root]['order-summary']['fulfillment-order-state']['VALUE'];
 
-          switch ($new_financial_state) {
-            case 'CHARGEABLE':
-              // For google-handled subscriptions chargeorder needn't be initiated,
-              // assuming auto-charging is turned on.
-              //$request->SendProcessOrder($data[$root]['google-order-number']['VALUE']);
-              //$request->SendChargeOrder($data[$root]['google-order-number']['VALUE'],'');
-              break;
+        switch ($new_financial_state) {
+          case 'CHARGEABLE':
+            // For google-handled subscriptions chargeorder needn't be initiated,
+            // assuming auto-charging is turned on.
+            //$request->SendProcessOrder($data[$root]['google-order-number']['VALUE']);
+            //$request->SendChargeOrder($data[$root]['google-order-number']['VALUE'],'');
+            break;
 
-            case 'CHARGED':
-            case 'PAYMENT_DECLINED':
-            case 'CANCELLED':
-              break;
+          case 'CHARGED':
+          case 'PAYMENT_DECLINED':
+          case 'CANCELLED':
+            break;
 
-            case 'REVIEWING':
-            case 'CHARGING':
-            case 'CANCELLED_BY_GOOGLE':
-              break;
+          case 'REVIEWING':
+          case 'CHARGING':
+          case 'CANCELLED_BY_GOOGLE':
+            break;
 
-            default:
-              break;
-          }
-          break;
+          default:
+            break;
+        }
+        break;
         }
 
       case "charge-amount-notification":
@@ -672,7 +682,7 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
 
     foreach ($lookup as $name => $googleName) {
       if (array_key_exists($googleName, $dataRoot['buyer-billing-address'])) {
-      $value = $dataRoot['buyer-billing-address'][$googleName]['VALUE'];
+        $value = $dataRoot['buyer-billing-address'][$googleName]['VALUE'];
       }
       $input[$name] = $value ? $value : NULL;
     }

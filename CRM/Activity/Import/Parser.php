@@ -229,7 +229,6 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
 
     fclose($fd);
 
-
     if ($mode == self::MODE_PREVIEW || $mode == self::MODE_IMPORT) {
       $customHeaders = $mapper;
 

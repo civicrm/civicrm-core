@@ -70,7 +70,8 @@ class CRM_Core_ClassLoader {
   /**
    * Registers this instance as an autoloader.
    *
-   * @param Boolean $prepend Whether to prepend the autoloader or not
+   * @param bool $prependWhether to prepend the autoloader or not.
+   *   Whether to prepend the autoloader or not.
    *
    * @api
    */
@@ -163,7 +164,7 @@ class CRM_Core_ClassLoader {
       // "require_once" is nice because it's simple and throws
       // intelligible errors.  The down side is that autoloaders
       // down the chain cannot try to find the file if we fail.
-      require_once ($file);
+      require_once $file;
     }
   }
 }

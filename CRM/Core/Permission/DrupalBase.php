@@ -65,8 +65,10 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    * Get all groups from database, filtered by permissions
    * for this user
    *
-   * @param string $groupType type of group(Access/Mailing)
-   * @param bool $excludeHidden exclude hidden groups.
+   * @param string $groupType
+   *   Type of group(Access/Mailing).
+   * @param bool $excludeHidden
+   *   Exclude hidden groups.
    *
    *
    * @return array - array reference of all groups.
@@ -97,7 +99,6 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
         $this->_viewPermission = TRUE;
         $this->_viewPermissionedGroups[$groupKey] = $groups;
       }
-
 
       $ids = CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_saved_search', $groups);
       if (!empty($ids)) {
@@ -135,9 +136,12 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    * @todo the history of this function is that there was some confusion as to
    * whether it was filtering contacts or groups & some cruft may remain
    *
-   * @param int $type the type of permission needed
-   * @param  array $tables (reference) add the tables that are needed for the select clause
-   * @param  array $whereTables (reference) add the tables that are needed for the where clause
+   * @param int $type
+   *   The type of permission needed.
+   * @param array $tables
+   *   (reference) add the tables that are needed for the select clause.
+   * @param array $whereTables
+   *   (reference) add the tables that are needed for the where clause.
    *
    * @return string the clause to add to the query retrieving viewable groups
    */
@@ -240,7 +244,7 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
 
     $emails = array();
     while ($dao->fetch()) {
-    $emails[] = $dao->email;
+      $emails[] = $dao->email;
     }
 
     return implode(', ', $emails);
@@ -249,7 +253,8 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
   /**
    * Given a roles array, check for access requirements
    *
-   * @param array $array the roles to check
+   * @param array $array
+   *   The roles to check.
    *
    * @return boolean true if yes, else false
    *
@@ -277,7 +282,8 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
   /**
    * Get all the contact emails for users that have a specific permission
    *
-   * @param string $permissionName name of the permission we are interested in
+   * @param string $permissionName
+   *   Name of the permission we are interested in.
    *
    * @return string a comma separated list of email addresses
    */

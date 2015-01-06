@@ -46,7 +46,8 @@ class CRM_Core_Permission_Base {
    *
    * @param $perm
    * @param string $nativePrefix
-   * @param array $map array($portableName => $nativeName)
+   * @param array $map array($portableName
+   *   => $nativeName).
    *
    * @internal param string $name e.g. "administer CiviCRM", "cms:access user record", "Drupal:administer content", "Joomla:action:com_asset"
    * @return NULL|string a permission name
@@ -55,11 +56,15 @@ class CRM_Core_Permission_Base {
     list ($civiPrefix, $name) = CRM_Utils_String::parsePrefix(':', $perm, NULL);
     switch ($civiPrefix) {
       case $nativePrefix:
-        return $name; // pass through
+        return $name;
+
+      // pass through
       case 'cms':
         return CRM_Utils_Array::value($name, $map, CRM_Core_Permission::ALWAYS_DENY_PERMISSION);
+
       case NULL:
         return $name;
+
       default:
         return CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
     }
@@ -77,9 +82,12 @@ class CRM_Core_Permission_Base {
   /**
    * Get the permissioned where clause for the user
    *
-   * @param int $type the type of permission needed
-   * @param  array $tables (reference ) add the tables that are needed for the select clause
-   * @param  array $whereTables (reference ) add the tables that are needed for the where clause
+   * @param int $type
+   *   The type of permission needed.
+   * @param array $tables
+   *   (reference ) add the tables that are needed for the select clause.
+   * @param array $whereTables
+   *   (reference ) add the tables that are needed for the where clause.
    *
    * @return string the group where clause for this user
    */
@@ -89,9 +97,12 @@ class CRM_Core_Permission_Base {
   /**
    * Get the permissioned where clause for the user when trying to see groups
    *
-   * @param int $type the type of permission needed
-   * @param  array $tables (reference ) add the tables that are needed for the select clause
-   * @param  array $whereTables (reference ) add the tables that are needed for the where clause
+   * @param int $type
+   *   The type of permission needed.
+   * @param array $tables
+   *   (reference ) add the tables that are needed for the select clause.
+   * @param array $whereTables
+   *   (reference ) add the tables that are needed for the where clause.
    *
    * @return string the group where clause for this user
    */
@@ -104,8 +115,10 @@ class CRM_Core_Permission_Base {
    * Get all groups from database, filtered by permissions
    * for this user
    *
-   * @param string $groupType type of group(Access/Mailing)
-   * @param bool|\boolen $excludeHidden exclude hidden groups.
+   * @param string $groupType
+   *   Type of group(Access/Mailing).
+   * @param bool|\boolen $excludeHidden
+   *   Exclude hidden groups.
    *
    *
    * @return array - array reference of all groups.
@@ -117,9 +130,12 @@ class CRM_Core_Permission_Base {
   /**
    * Get group clause for this user
    *
-   * @param int $type the type of permission needed
-   * @param  array $tables (reference ) add the tables that are needed for the select clause
-   * @param  array $whereTables (reference ) add the tables that are needed for the where clause
+   * @param int $type
+   *   The type of permission needed.
+   * @param array $tables
+   *   (reference ) add the tables that are needed for the select clause.
+   * @param array $whereTables
+   *   (reference ) add the tables that are needed for the where clause.
    *
    * @return string the group where clause for this user
    */
@@ -130,7 +146,8 @@ class CRM_Core_Permission_Base {
   /**
    * Given a permission string, check for access requirements
    *
-   * @param string $str the permission to check
+   * @param string $str
+   *   The permission to check.
    *
    * @return boolean true if yes, else false
    */
@@ -142,7 +159,8 @@ class CRM_Core_Permission_Base {
   /**
    * Given a roles array, check for access requirements
    *
-   * @param array $array the roles to check
+   * @param array $array
+   *   The roles to check.
    *
    * @return boolean true if yes, else false
    */
@@ -154,7 +172,8 @@ class CRM_Core_Permission_Base {
   /**
    * Get all the contact emails for users that have a specific permission
    *
-   * @param string $permissionName name of the permission we are interested in
+   * @param string $permissionName
+   *   Name of the permission we are interested in.
    *
    * @return string a comma separated list of email addresses
    */
@@ -165,7 +184,8 @@ class CRM_Core_Permission_Base {
   /**
    * Get all the contact emails for users that have a specific role
    *
-   * @param string $roleName name of the role we are interested in
+   * @param string $roleName
+   *   Name of the role we are interested in.
    *
    * @return string a comma separated list of email addresses
    */
@@ -190,7 +210,8 @@ class CRM_Core_Permission_Base {
    * deleted. This is useful during module upgrade when the newer module
    * version has removed permission that were defined in the older version.
    *
-   * @param array $permissions same format as CRM_Core_Permission::getCorePermissions().
+   * @param array $permissions
+   *   Same format as CRM_Core_Permission::getCorePermissions().
    *
    * @throws CRM_Core_Exception
    * @see CRM_Core_Permission::getCorePermissions

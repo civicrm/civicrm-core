@@ -102,11 +102,16 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   /**
    * Create a table that matches the CSV file and populate it with the file's contents
    *
-   * @param object $db     handle to the database connection
-   * @param string $file   file name to load
-   * @param bool   $headers  whether the first row contains headers
-   * @param string $table  Name of table from which data imported.
-   * @param string $fieldSeparator Character that seperates the various columns in the file
+   * @param object $db
+   *   Handle to the database connection.
+   * @param string $file
+   *   File name to load.
+   * @param bool $headers
+   *   Whether the first row contains headers.
+   * @param string $table
+   *   Name of table from which data imported.
+   * @param string $fieldSeparator
+   *   Character that seperates the various columns in the file.
    *
    * @return string  name of the created table
    */

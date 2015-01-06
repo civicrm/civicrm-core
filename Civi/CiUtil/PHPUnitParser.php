@@ -6,7 +6,8 @@ namespace Civi\CiUtil;
  */
 class PHPUnitParser {
   /**
-   * @param string $content phpunit streaming JSON
+   * @param string $content
+   *   Phpunit streaming JSON.
    * @return array(string "$class::$func" => $status)
    */
   protected static function parseJsonStream($content) {
@@ -17,7 +18,8 @@ class PHPUnitParser {
   }
 
   /**
-   * @param string $content json stream
+   * @param string $content
+   *   Json stream.
    * @return array (string $testName => string $status)
    */
   public static function parseJsonResults($content) {

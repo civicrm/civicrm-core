@@ -40,7 +40,8 @@
 /**
  * Unsubscribe from mailing group
  *
- * @param array $params  Associative array of property
+ * @param array $params
+ *   Associative array of property.
  *                       name/value pairs to insert in new 'survey'
  *
  * @return array api result array
@@ -69,7 +70,6 @@ function civicrm_api3_mailing_event_unsubscribe_create($params) {
     return civicrm_api3_create_success($params);
   }
 
-
   return civicrm_api3_create_error('Queue event could not be found');
 }
 
@@ -77,7 +77,8 @@ function civicrm_api3_mailing_event_unsubscribe_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_mailing_event_unsubscribe_create_spec(&$params) {
   $params['job_id']['api.required'] = 1;
@@ -87,4 +88,3 @@ function _civicrm_api3_mailing_event_unsubscribe_create_spec(&$params) {
   $params['event_queue_id']['api.required'] = 1;
   $params['event_queue_id']['title'] = 'Mailing Queue ID';
 }
-

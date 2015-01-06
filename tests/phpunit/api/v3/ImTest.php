@@ -31,8 +31,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_im_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Contact
+ * @package CiviCRM_APIv3
+ * @subpackage API_Contact
  */
 
 class api_v3_ImTest extends CiviUnitTestCase {

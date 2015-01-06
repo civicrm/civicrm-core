@@ -61,7 +61,8 @@ class CRM_Utils_Check {
   /**
    * Execute "checkAll"
    *
-   * @param array|NULL $messages list of CRM_Utils_Check_Message; or NULL if the default list should be fetched
+   * @param array|NULL $messages
+   *   List of CRM_Utils_Check_Message; or NULL if the default list should be fetched.
    */
   public function showPeriodicAlerts($messages = NULL) {
     if (CRM_Core_Permission::check('administer CiviCRM')
@@ -87,7 +88,8 @@ class CRM_Utils_Check {
   /**
    * Throw an exception if any of the checks fail
    *
-   * @param array|NULL $messages list of CRM_Utils_Check_Message; or NULL if the default list should be fetched
+   * @param array|NULL $messages
+   *   List of CRM_Utils_Check_Message; or NULL if the default list should be fetched.
    *
    * @throws Exception
    */
@@ -129,6 +131,7 @@ class CRM_Utils_Check {
         case 'CiviCase':
           $checks[] = new CRM_Utils_Check_Case(CRM_Case_XMLRepository::singleton(), CRM_Case_PseudoConstant::caseType('name'));
           break;
+
         default:
       }
     }

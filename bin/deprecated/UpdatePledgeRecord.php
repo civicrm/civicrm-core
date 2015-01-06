@@ -170,7 +170,8 @@ SELECT  pledge.contact_id              as contact_id,
       require_once 'CRM/Core/BAO/Domain.php';
       require_once 'CRM/Core/SelectValues.php';
       $domain = CRM_Core_BAO_Domain::getDomain();
-      $tokens = array('domain' => array('name', 'phone', 'address', 'email'),
+      $tokens = array(
+      'domain' => array('name', 'phone', 'address', 'email'),
         'contact' => CRM_Core_SelectValues::contactTokens(),
       );
 
@@ -303,5 +304,3 @@ $obj = new CRM_UpdatePledgeRecord();
 echo "Updating<br />";
 $obj->updatePledgeStatus();
 echo "<br />Pledge records update script finished.";
-
-

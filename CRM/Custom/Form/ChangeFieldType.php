@@ -272,7 +272,8 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
         continue;
       }
       $value = CRM_Core_DAO::VALUE_SEPARATOR . $dao->{$column} . CRM_Core_DAO::VALUE_SEPARATOR;
-      $params = array(1 => array((string)$value, 'String'),
+      $params = array(
+      1 => array((string) $value, 'String'),
         2 => array($dao->id, 'Integer'),
       );
       CRM_Core_DAO::executeQuery($updateSql, $params);
@@ -289,7 +290,8 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
     $dao       = CRM_Core_DAO::executeQuery($selectSql);
     while ($dao->fetch()) {
       $values = self::explode($dao->{$column});
-      $params = array(1 => array((string)array_shift($values), 'String'),
+      $params = array(
+      1 => array((string) array_shift($values), 'String'),
         2 => array($dao->id, 'Integer'),
       );
       CRM_Core_DAO::executeQuery($updateSql, $params);

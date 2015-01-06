@@ -44,7 +44,8 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   /**
    * Queue a new recipient
    *
-   * @param array $params values of the new EventQueue
+   * @param array $params
+   *   Values of the new EventQueue.
    *
    * @return CRM_Mailing_Event_BAO_Queue   The new EventQueue
    * @static
@@ -62,7 +63,7 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   /**
    * Create a security hash from the job, email and contact ids
    *
-   * @param array     The ids to be hashed
+   * @param array The ids to be hashed
    *
    * @return int      The hash
    * @static
@@ -80,9 +81,12 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   /**
    * Verify that a queue event exists with the specified id/job id/hash
    *
-   * @param int $job_id       The job ID of the event to find
-   * @param int $queue_id     The Queue Event ID to find
-   * @param string $hash      The hash to validate against
+   * @param int $job_id
+   *   The job ID of the event to find.
+   * @param int $queue_id
+   *   The Queue Event ID to find.
+   * @param string $hash
+   *   The hash to validate against.
    *
    * @return object|null      The queue event if verified, or null
    * @static
@@ -104,7 +108,8 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   /**
    * Given a queue event ID, find the corresponding email address.
    *
-   * @param int $queue_id         The queue event ID
+   * @param int $queue_id
+   *   The queue event ID.
    *
    * @return string               The email address
    * @static
@@ -130,8 +135,10 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   /**
    * Count up events given a mailing id and optional job id
    *
-   * @param int $mailing_id       ID of the mailing to count
-   * @param int $job_id           Optional ID of a job to limit results
+   * @param int $mailing_id
+   *   ID of the mailing to count.
+   * @param int $job_id
+   *   Optional ID of a job to limit results.
    *
    * @return int                  Number of matching events
    * @static
@@ -163,11 +170,16 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   /**
    * Get rows for the event browser
    *
-   * @param int $mailing_id       ID of the mailing
-   * @param int $job_id           optional ID of the job
-   * @param int $offset           Offset
-   * @param int $rowCount         Number of rows
-   * @param array $sort           sort array
+   * @param int $mailing_id
+   *   ID of the mailing.
+   * @param int $job_id
+   *   Optional ID of the job.
+   * @param int $offset
+   *   Offset.
+   * @param int $rowCount
+   *   Number of rows.
+   * @param array $sort
+   *   Sort array.
    *
    * @return array                Result set
    * @static

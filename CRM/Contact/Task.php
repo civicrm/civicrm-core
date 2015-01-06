@@ -313,7 +313,8 @@ class CRM_Contact_Task {
    * of the user
    *
    * @param int $permission
-   * @param bool $deletedContacts  are these tasks for operating on deleted contacts?
+   * @param bool $deletedContacts
+   *   Are these tasks for operating on deleted contacts?.
    *
    * @return array set of tasks that are valid for the user
    */

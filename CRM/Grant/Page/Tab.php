@@ -53,20 +53,20 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
    * This function is called when action is browse
    *
    * return null
-   */ function browse() {
-    $controller = new CRM_Core_Controller_Simple('CRM_Grant_Form_Search', ts('Grants'), $this->_action);
-    $controller->setEmbedded(TRUE);
-    $controller->reset();
-    $controller->set('cid', $this->_contactId);
-    $controller->set('context', 'grant');
-    $controller->process();
-    $controller->run();
+  function browse() {
+  $controller = new CRM_Core_Controller_Simple('CRM_Grant_Form_Search', ts('Grants'), $this->_action);
+  $controller->setEmbedded(TRUE);
+  $controller->reset();
+  $controller->set('cid', $this->_contactId);
+  $controller->set('context', 'grant');
+  $controller->process();
+  $controller->run();
 
-    if ($this->_contactId) {
-      $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
-      $this->assign('displayName', $displayName);
-      $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('grant', $this->_contactId);
-    }
+  if ($this->_contactId) {
+  $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
+  $this->assign('displayName', $displayName);
+  $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('grant', $this->_contactId);
+  }
   }
 
   /**

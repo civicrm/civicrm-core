@@ -39,7 +39,8 @@
 /**
  * Get all the mailings and details that a contact was involved with
  *
- * @param array    $params input parameters
+ * @param array $params
+ *   Input parameters.
  *                    - key: contact_id, value: int - required
  *                    - key: type, value: Delivered | Bounced - optional, defaults to Delivered
  *                    - Future extensions will include: Opened, Clicked, Forwarded
@@ -57,7 +58,7 @@ function civicrm_api3_mailing_contact_get($params) {
  * This is a wrapper for the functions that return the results from the 'quasi-entity'
  * mailing contact
  * @param array $params
- * @param Boolean $count
+ * @param bool $count
  * @throws Exception
  */
 function _civicrm_api3_mailing_contact_getresults($params, $count){
@@ -65,7 +66,7 @@ function _civicrm_api3_mailing_contact_getresults($params, $count){
     //ie. because the api is an anomoly & passing in id is not valid
     throw new Exception('This api call does not accept api as a parameter');
   }
-  $options  = _civicrm_api3_get_options_from_params($params, TRUE,'contribution','get');
+  $options  = _civicrm_api3_get_options_from_params($params, TRUE, 'contribution', 'get');
   $fnName = '_civicrm_api3_mailing_contact_get_' . strtolower($params['type']);
   return $fnName(
       $params['contact_id'],
@@ -78,14 +79,15 @@ function _civicrm_api3_mailing_contact_getresults($params, $count){
 /**
  * Adjust Metadata for Get action
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_mailing_contact_get_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
   $params['contact_id']['title'] = 'Contact ID';
   $params['type'] = array(
     'api.default' => 'Delivered',
-    'title' => 'Type',// doesn't really explain the field - but not sure I understand it to explain it better
+    'title' => 'Type', // doesn't really explain the field - but not sure I understand it to explain it better
     'type' => CRM_Utils_Type::T_STRING,
     'options' => array(
       'Delivered' => 'Delivered',
@@ -285,7 +287,8 @@ INNER JOIN civicrm_mailing_event_bounce meb ON meb.event_queue_id = meq.id
 /**
  * Get count of all the mailings that a contact was involved with
  *
- * @param array    $params input parameters
+ * @param array $params
+ *   Input parameters.
  *                    - key: contact_id, value: int - required
  *                    - key: type, value: Delivered | Bounced - optional, defaults to Delivered
  *                    - Future extensions will include: Opened, Clicked, Forwarded

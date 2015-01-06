@@ -77,7 +77,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $contactID = $session->get('userID');
     $civiMails = civicrm_api3('Mailing', 'get', array());
     $campNames = civicrm_api3('Campaign', 'get', array());
-    $mailingabNames = civicrm_api3('MailingAB','get',array());
+    $mailingabNames = civicrm_api3('MailingAB', 'get', array());
     $mailStatus = civicrm_api3('MailingJob', 'get', array());
     $groupNames = civicrm_api3('Group', 'get', array());
     $headerfooterList = civicrm_api3('MailingComponent', 'get', array());
@@ -88,7 +88,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       $emailAdd = civicrm_api3('Email', 'get', array());
       $mesTemplate = civicrm_api3('MessageTemplate', 'get', array(
         'sequential' => 1,
-        'return' => array("msg_html", "id", "msg_title","msg_subject"),
+        'return' => array("msg_html", "id", "msg_title", "msg_subject"),
         'id' => array('>' => 58),
       ));
     } else {
@@ -98,12 +98,13 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'return' => "email",
         'contact_id' => $contactID,
       ));
-      $mesTemplate = civicrm_api3('MessageTemplate', 'get', array(  'sequential' => 1,
+      $mesTemplate = civicrm_api3('MessageTemplate', 'get', array(
+      'sequential' => 1,
         'return' => array("msg_html", "id", "msg_title", "msg_subject", "msg_text"),
         'workflow_id' => array('IS NULL' => ""),
       ));
     }
-    $mailGrp = civicrm_api3('MailingGroup','get', array());
+    $mailGrp = civicrm_api3('MailingGroup', 'get', array());
     $mailTokens = civicrm_api3('Mailing', 'get_token', array( 'usage' => 'Mailing'));
     $fromAddress = civicrm_api3('OptionGroup', 'get', array(
       'sequential' => 1,
@@ -112,7 +113,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     ));
     CRM_Core_Resources::singleton()->addSetting(array(
       'crmMailing' => array(
-        'mailingabNames'=>array_values($mailingabNames['values']),
+        'mailingabNames' => array_values($mailingabNames['values']),
         'civiMails' => array_values($civiMails['values']),
         'campNames' => array_values($campNames['values']),
         'mailStatus' => array_values($mailStatus['values']),
@@ -223,7 +224,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function registerAdvancedSearchPane() {
-    return array('title' => ts('Mailings'),
+    return array(
+    'title' => ts('Mailings'),
       'weight' => 20,
     );
   }
@@ -240,5 +242,6 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
   /**
    * @param $shortCuts
    */
-  public function creatNewShortcut(&$shortCuts) {}
+  public function creatNewShortcut(&$shortCuts) {
+  }
 }

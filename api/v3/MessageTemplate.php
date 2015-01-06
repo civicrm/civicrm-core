@@ -43,19 +43,20 @@ function civicrm_api3_message_template_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_message_template_create_spec(&$params) {
   $params['msg_title']['api.required'] = 1;
-  $params['is_active']['api.default'] = true;
-/*  $params['entity_id']['api.required'] = 1;
+  $params['is_active']['api.default'] = TRUE;
+  /*  $params['entity_id']['api.required'] = 1;
   $params['entity_table']['api.default'] = "civicrm_contribution_recur";
   $params['type']['api.default'] = "R";
-*/
+  */
 }
 
 /**
- * @param  array  $params
+ * @param array $params
  *
  * @return boolean | error  true if successfull, error otherwise
  * {@getfields message_template_delete}
@@ -74,12 +75,13 @@ function _civicrm_api3_message_template_get_spec(&$params) {
 /**
  * Retrieve one or more message_template
  *
- * @param  array input parameters
+ * @param array input parameters
  *
  *
  * @example SepaCreditorGet.php Standard Get Example
  *
- * @param  array $params  an associative array of name/value pairs.
+ * @param array $params
+ *   An associative array of name/value pairs.
  *
  * @return  array api result array
  * {@getfields message_template_get}
@@ -102,7 +104,8 @@ function civicrm_api3_message_template_send($params) {
  * The metadata is used for setting defaults, documentation &
  * validation.
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_message_template_send_spec(&$params) {
   $params['messageTemplateID']['api.required'] = 1;

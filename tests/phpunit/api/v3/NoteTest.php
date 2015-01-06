@@ -54,7 +54,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
       'note' => 'Hello!!! m testing Note',
       'contact_id' => $this->_contactID,
       'modified_date' => '2011-01-31',
-      'subject' => 'Test Note',    );
+      'subject' => 'Test Note', );
     $this->_note = $this->noteCreate($this->_contactID);
     $this->_noteID = $this->_note['id'];
   }
@@ -136,7 +136,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
 
     $this->assertArrayHasKey('id', $result);
     $note = array(
-      'id' => $result['id'],    );
+      'id' => $result['id'], );
     $this->noteDelete($note);
   }
 
@@ -148,7 +148,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
       'modified_date' => '2011-01-31',
       'subject' => "With a '",
-      'sequential' => 1,    );
+      'sequential' => 1, );
     $result = $this->callAPISuccess('Note', 'Create', $params);
     $this->assertAPISuccess($result, 'in line ' . __LINE__);
     $this->assertEquals($result['values'][0]['note'], "Hello!!! ' testing Note", 'in line ' . __LINE__);
@@ -157,7 +157,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
 
     //CleanUP
     $note = array(
-      'id' => $result['id'],    );
+      'id' => $result['id'], );
     $this->noteDelete($note);
   }
 
@@ -170,7 +170,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     $this->assertAPISuccess($apiResult);
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($apiResult['values'][$apiResult['id']]['modified_date'])));
     $this->noteDelete(array(
-      'id' => $apiResult['id'],      ));
+      'id' => $apiResult['id'], ));
   }
 
 
@@ -192,7 +192,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   public function testUpdateWithoutContactId() {
     $params = array(
       'entity_id' => $this->_contactID,
-      'entity_table' => 'civicrm_contact',    );
+      'entity_table' => 'civicrm_contact', );
     $note = $this->callAPIFailure('note', 'create', $params,
       'Mandatory key(s) missing from params array: note'
     );
@@ -206,7 +206,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
       'id' => $this->_noteID,
       'contact_id' => $this->_contactID,
       'note' => 'Note1',
-      'subject' => 'Hello World',    );
+      'subject' => 'Hello World', );
 
     //Update Note
     $this->callAPISuccess('note', 'create', $params);
@@ -237,8 +237,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     $params = array(
       'id' => 0,
     );
-    $deleteNote = $this->callAPIFailure('note', 'delete', $params
-      , 'Mandatory key(s) missing from params array: id');
+    $deleteNote = $this->callAPIFailure('note', 'delete', $params, 'Mandatory key(s) missing from params array: id');
   }
 
   /**

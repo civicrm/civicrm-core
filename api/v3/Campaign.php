@@ -41,7 +41,8 @@
  * In case of updating existing campaign, id of that particular campaign must
  * be in $params array.
  *
- * @param array $params  (reference) Associative array of property
+ * @param array $params
+ *   (reference) Associative array of property.
  *                       name/value pairs to insert in new 'campaign'
  *
  * @return array   campaign array
@@ -56,7 +57,8 @@ function civicrm_api3_campaign_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_campaign_create_spec(&$params) {
   $params['title']['api.required'] = 1;
@@ -65,7 +67,8 @@ function _civicrm_api3_campaign_create_spec(&$params) {
 /**
  * Returns array of campaigns  matching a set of one or more group properties
  *
- * @param array $params Array of one or more valid
+ * @param array $params
+ *   Array of one or more valid.
  *                       property_name=>value pairs. If $params is set
  *                       as null, all campaigns will be returned
  *
@@ -83,7 +86,8 @@ function civicrm_api3_campaign_get($params) {
  * This method is used to delete any existing campaign. id of the group
  * to be deleted is required field in $params array
  *
- * @param array $params  (reference) array containing id of the group
+ * @param array $params
+ *   (reference) array containing id of the group.
  *                       to be deleted
  *
  * @return array  (reference) returns flag true if successful, error
@@ -94,4 +98,3 @@ function civicrm_api3_campaign_get($params) {
 function civicrm_api3_campaign_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

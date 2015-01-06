@@ -53,9 +53,12 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
   /**
    * Register a reply event.
    *
-   * @param int $job_id The job ID of the reply
-   * @param int $queue_id The queue event id
-   * @param string $hash The hash
+   * @param int $job_id
+   *   The job ID of the reply.
+   * @param int $queue_id
+   *   The queue event id.
+   * @param string $hash
+   *   The hash.
    *
    * @param null $replyto
    *
@@ -102,12 +105,18 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
   /**
    * Forward a mailing reply
    *
-   * @param int $queue_id     Queue event ID of the sender
-   * @param string $mailing   The mailing object
-   * @param string $bodyTxt   text part of the body (ignored if $fullEmail provided)
-   * @param string $replyto   Reply-to of the incoming message
-   * @param string $bodyHTML  HTML part of the body (ignored if $fullEmail provided)
-   * @param string $fullEmail whole email to forward in one string
+   * @param int $queue_id
+   *   Queue event ID of the sender.
+   * @param string $mailing
+   *   The mailing object.
+   * @param string $bodyTxt text part of the body (ignored if $fullEmail
+   *   Provided).
+   * @param string $replyto
+   *   Reply-to of the incoming message.
+   * @param string $bodyHTML HTML part of the body (ignored if $fullEmail
+   *   Provided).
+   * @param string $fullEmail
+   *   Whole email to forward in one string.
    *
    * @return void
    * @static
@@ -205,9 +214,12 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
   /**
    * Send an automated response
    *
-   * @param object $mailing       The mailing object
-   * @param int $queue_id         The queue ID
-   * @param string $replyto       Optional reply-to from the reply
+   * @param object $mailing
+   *   The mailing object.
+   * @param int $queue_id
+   *   The queue ID.
+   * @param string $replyto
+   *   Optional reply-to from the reply.
    *
    * @return void
    * @static
@@ -294,9 +306,12 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
   /**
    * Get row count for the event selector
    *
-   * @param int $mailing_id       ID of the mailing
-   * @param int $job_id           Optional ID of a job to filter on
-   * @param boolean $is_distinct  Group by queue ID?
+   * @param int $mailing_id
+   *   ID of the mailing.
+   * @param int $job_id
+   *   Optional ID of a job to filter on.
+   * @param bool $is_distinct
+   *   Group by queue ID?.
    *
    * @return int                  Number of rows in result set
    * @static
@@ -344,12 +359,18 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
   /**
    * Get rows for the event browser
    *
-   * @param int $mailing_id       ID of the mailing
-   * @param int $job_id           optional ID of the job
-   * @param boolean $is_distinct  Group by queue id?
-   * @param int $offset           Offset
-   * @param int $rowCount         Number of rows
-   * @param array $sort           sort array
+   * @param int $mailing_id
+   *   ID of the mailing.
+   * @param int $job_id
+   *   Optional ID of the job.
+   * @param bool $is_distinct
+   *   Group by queue id?.
+   * @param int $offset
+   *   Offset.
+   * @param int $rowCount
+   *   Number of rows.
+   * @param array $sort
+   *   Sort array.
    *
    * @return array                Result set
    * @static

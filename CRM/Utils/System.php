@@ -186,7 +186,7 @@ class CRM_Utils_System {
    */
   static function theme(
     &$content,
-    $print       = FALSE,
+    $print = FALSE,
     $maintenance = FALSE
   ) {
     $config = &CRM_Core_Config::singleton();
@@ -232,10 +232,10 @@ class CRM_Utils_System {
    */
   static function url(
     $path = NULL,
-    $query    = NULL,
+    $query = NULL,
     $absolute = FALSE,
     $fragment = NULL,
-    $htmlize  = TRUE,
+    $htmlize = TRUE,
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
@@ -429,8 +429,8 @@ class CRM_Utils_System {
    *
    */
   static function jsRedirect(
-    $url     = NULL,
-    $title   = NULL,
+    $url = NULL,
+    $title = NULL,
     $message = NULL
   ) {
     if (!$url) {
@@ -751,7 +751,7 @@ class CRM_Utils_System {
       if (preg_match('/<h2>([^<]+)<\/h2>/', $vTmp[$i], $vMat)) {
         $vName = trim($vMat[1]);
         $vTmp2 = explode("\n", $vTmp[$i + 1]);
-        foreach ($vTmp2 AS $vOne) {
+        foreach ($vTmp2 as $vOne) {
           $vPat  = '<info>([^<]+)<\/info>';
           $vPat3 = "/$vPat\s*$vPat\s*$vPat/";
           $vPat2 = "/$vPat\s*$vPat/";
@@ -847,7 +847,7 @@ class CRM_Utils_System {
    *   (optional) Whether to log the memory usage information.
    */
   public static function xMemory($title = NULL, $log = FALSE) {
-    $mem = (float ) xdebug_memory_usage() / (float )(1024);
+    $mem = (float ) xdebug_memory_usage() / (float ) (1024);
     $mem = number_format($mem, 5) . ", " . time();
     if ($log) {
       echo "<p>$title: $mem<p>";
@@ -901,7 +901,7 @@ class CRM_Utils_System {
         list($className, $methodName) = explode('::', $callback);
         $fileName = str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
         // ignore errors if any
-        @include_once ($fileName);
+        @include_once $fileName;
         if (!class_exists($className)) {
           self::$_callbacks[$callback] = FALSE;
         }
@@ -1063,7 +1063,7 @@ class CRM_Utils_System {
         array(dirname(__FILE__), '..', '..', 'civicrm-version.php')
       );
       if (file_exists($verFile)) {
-        require_once ($verFile);
+        require_once $verFile;
         if (function_exists('civicrmVersion')) {
           $info = civicrmVersion();
           $version = $info['version'];
@@ -1144,7 +1144,7 @@ class CRM_Utils_System {
    * Note that we inline this function in install/civicrm.php, so if you change
    * this function, please go and change the code in the install script as well.
    */
-  public static function isSSL( ) {
+  public static function isSSL() {
     return
       (isset($_SERVER['HTTPS']) &&
         !empty($_SERVER['HTTPS']) &&
@@ -1167,7 +1167,7 @@ class CRM_Utils_System {
           CRM_Core_Error::fatal('HTTPS is not set up on this machine');
         }
         else {
-      CRM_Core_Session::setStatus(ts('HTTPS is not set up on this machine'), ts('Warning'), 'alert');
+          CRM_Core_Session::setStatus(ts('HTTPS is not set up on this machine'), ts('Warning'), 'alert');
           // admin should be the only one following this
           // since we dont want the user stuck in a bad place
           return;
@@ -1202,7 +1202,7 @@ class CRM_Utils_System {
     if ($config->userSystem->is_drupal && function_exists('ip_address')) {
       //drupal function handles the server being behind a proxy securely. We still have legacy ipn methods
       // that reach this point without bootstrapping hence the check that the fn exists
-        $address = ip_address();
+      $address = ip_address();
     }
 
     // hack for safari
@@ -1262,7 +1262,7 @@ class CRM_Utils_System {
    *
    * @param string $page
    *   Title of documentation wiki page.
-   * @param boolean $URLonly
+   * @param bool $URLonly
    *   (optional) Whether to return URL only or full HTML link (default).
    * @param string $text
    *   (optional) Text of HTML link (no effect if $URLonly = false).
@@ -1281,7 +1281,7 @@ class CRM_Utils_System {
     // return just the URL, no matter what other parameters are defined
     if (!function_exists('ts')) {
       if ($resource == 'wiki') {
-          $docBaseURL = self::getWikiBaseURL();
+        $docBaseURL = self::getWikiBaseURL();
       } else {
         $docBaseURL = self::getDocBaseURL();
       }
@@ -1456,7 +1456,7 @@ class CRM_Utils_System {
   /**
    * Reset the various system caches and some important static variables.
    */
-  public static function flushCache( ) {
+  public static function flushCache() {
     // flush out all cache entries so we can reload new data
     // a bit aggressive, but livable for now
     $cache = CRM_Utils_Cache::singleton();
@@ -1833,7 +1833,8 @@ class CRM_Utils_System {
    * This function delegates the decision-making to (a) the hook system and
    * (b) the BAO system.
    *
-   * @param array $crudLinkSpec with keys:
+   * @param array $crudLinkSpec
+   *   With keys:.
    *  - action: int, CRM_Core_Action::UPDATE or CRM_Core_Action::VIEW [default: VIEW]
    *  - entity_table: string, eg "civicrm_contact"
    *  - entity_id: int
