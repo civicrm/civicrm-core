@@ -924,7 +924,8 @@ WHERE  v.option_group_id = g.id
 
   /* Calculate the total participant count as per params.
    *
-   * @param  array $params user params.
+   * @param array $params
+   *   User params.
    *
    * @return $totalCount total participant count.
    */
@@ -1021,7 +1022,8 @@ WHERE  v.option_group_id = g.id
   /* Format user submitted price set params.
    * Convert price set each param as an array.
    *
-   * @param $params an array of user submitted params.
+   * @param $params
+   *   An array of user submitted params.
    *
    *
    * @return array $formatted, formatted price set params.
@@ -1070,7 +1072,8 @@ WHERE  v.option_group_id = g.id
   /* Calculate total count for each price set options.
    * those are currently selected by user.
    *
-   * @param $form form object.
+   * @param $form
+   *   Form object.
    *
    *
    * @return array $optionsCount, array of each option w/ count total.

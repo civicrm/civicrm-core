@@ -73,7 +73,7 @@ class CRM_Event_Badge {
    * Create the labels (pdf)
    * It assumes the participants are from the same event
    *
-   * @param   array    $participants
+   * @param array $participants
    *
    * @return  null
    */

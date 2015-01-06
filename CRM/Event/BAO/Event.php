@@ -44,8 +44,10 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Event_BAO_ManageEvent object
    * @static
@@ -63,8 +65,10 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on sucess, null otherwise
    * @static
@@ -76,7 +80,8 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   /**
    * Add the event
    *
-   * @param array $params reference array contains the values submitted by the form
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
    *
    * @static
    *
@@ -115,7 +120,8 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   /**
    * Create the event
    *
-   * @param array $params reference array contains the values submitted by the form
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
    *
    * @return object
    * @static
@@ -173,7 +179,8 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   /**
    * Delete the event
    *
-   * @param int $id event id
+   * @param int $id
+   *   Event id.
    *
    * @return mixed|null
    * @static
@@ -223,8 +230,10 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * Delete the location block associated with an event,
    * if not being used by any other event.
    *
-   * @param $locBlockId location block id to be deleted
-   * @param int $eventId event with which loc block is associated
+   * @param $locBlockId
+   *   Location block id to be deleted.
+   * @param int $eventId
+   *   Event with which loc block is associated.
    *
    * @static
    */
@@ -245,12 +254,15 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   /**
    * Get current/future Events
    *
-   * @param $all              int     0 returns current and future events
+   * @param $all
+   *   Int 0 returns current and future events.
    *                                  1 if events all are required
    *                                  2 returns events since 3 months ago
-   * @param bool|int $id int     id of a specific event to return
-   * @param $isActive         boolean true if you need only active events
-   * @param $checkPermission  boolean true if you need to check permission else false
+   * @param bool|int $id int id of a specific event to return
+   * @param $isActive
+   *   Boolean true if you need only active events.
+   * @param $checkPermission
+   *   Boolean true if you need to check permission else false.
    *
    * @return array
    * @static
@@ -572,10 +584,14 @@ $event_summary_limit
    * Get participant count
    *
    * @param int $eventId
-   * @param  boolean $considerStatus consider status for participant count.
-   * @param  boolean $status consider counted participant.
-   * @param  boolean $considerRole consider role for participant count.
-   * @param  boolean $role consider counted( is filter role) participant.
+   * @param boolean $considerStatus
+   *   Consider status for participant count.
+   * @param boolean $status
+   *   Consider counted participant.
+   * @param boolean $considerRole
+   *   Consider role for participant count.
+   * @param boolean $role
+   *   Consider counted( is filter role) participant.
    *
    *
    * @return array array with count of participants for each event based on status/role
@@ -631,7 +647,8 @@ $event_summary_limit
   /**
    * Get the information to map a event
    *
-   * @param int $id for which we want map info
+   * @param int $id
+   *   For which we want map info.
    *
    * @return null|string     title of the event
    * @static
@@ -694,11 +711,16 @@ WHERE civicrm_address.geo_code_1 IS NOT NULL
   /**
    * Get the complete information for one or more events
    *
-   * @param  date    $start      get events with start date >= this date
-   * @param  integer $type       get events on the a specific event type (by event_type_id)
-   * @param  integer $eventId    return a single event - by event id
-   * @param  date    $end        also get events with end date >= this date
-   * @param  boolean $onlyPublic include public events only, default TRUE
+   * @param date $start
+   *   Get events with start date >= this date.
+   * @param integer $type
+   *   Get events on the a specific event type (by event_type_id).
+   * @param integer $eventId
+   *   Return a single event - by event id.
+   * @param date $end
+   *   Also get events with end date >= this date.
+   * @param boolean $onlyPublic
+   *   Include public events only, default TRUE.
    *
    * @return  array  $all      array of all the events that are searched
    * @static
@@ -881,7 +903,8 @@ WHERE civicrm_event.is_active = 1
    * This function is to make a copy of a Event, including
    * all the fields in the event Wizard
    *
-   * @param int $id the event id to copy
+   * @param int $id
+   *   The event id to copy.
    *        obj     $newEvent    object of CRM_Event_DAO_Event
    *        boolean $afterCreate call to copy after the create function
    * @param null $newEvent
@@ -1404,10 +1427,14 @@ WHERE civicrm_event.is_active = 1
   /**
    * Build the array for display the profile fields
    *
-   * @param array $params key value.
-   * @param int $gid profile Id
-   * @param array $groupTitle Profile Group Title.
-   * @param array $values formatted array of key value
+   * @param array $params
+   *   Key value.
+   * @param int $gid
+   *   Profile Id.
+   * @param array $groupTitle
+   *   Profile Group Title.
+   * @param array $values
+   *   Formatted array of key value.
    *
    * @param array $profileFields
    *
@@ -1667,11 +1694,16 @@ WHERE  id = $cfID
   /**
    * Build the array for Additional participant's information  array of priamry and additional Ids
    *
-   * @param int $participantId id of Primary participant
-   * @param array $values key/value event info
-   * @param int $contactId contact id of Primary participant
-   * @param boolean $isTest whether test or live transaction
-   * @param boolean $isIdsArray to return an array of Ids
+   * @param int $participantId
+   *   Id of Primary participant.
+   * @param array $values
+   *   Key/value event info.
+   * @param int $contactId
+   *   Contact id of Primary participant.
+   * @param bool $isTest
+   *   Whether test or live transaction.
+   * @param bool $isIdsArray
+   *   To return an array of Ids.
    *
    * @param bool $skipCancel
    *
@@ -1835,7 +1867,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    * Check if event registration is valid according to permissions AND Dates
    *
    * @param array $values
-   * @param integer $eventID
+   * @param int $eventID
    * @return boolean
    */
   public static function validRegistrationRequest($values, $eventID) {
@@ -1874,7 +1906,8 @@ WHERE  ce.loc_block_id = $locBlockId";
 
   /* Function to Show - Hide the Registration Link.
    *
-   * @param  array   $values key/value event info
+   * @param array $values
+   *   Key/value event info.
    * @return boolean true if allow registration otherwise false
    */
   /**
@@ -1910,7 +1943,8 @@ WHERE  ce.loc_block_id = $locBlockId";
 
   /* Function to check if given contact is already registered.
    *
-   * @param  array   $params key/value participant info
+   * @param array $params
+   *   Key/value participant info.
    * @return boolean $alreadyRegistered true/false
    */
   /**
@@ -2006,7 +2040,8 @@ WHERE  ce.loc_block_id = $locBlockId";
    * Build From Email as the combination of all the email ids of the logged in user,
    * the domain email id and the email id configured for the event
    *
-   * @param int $eventId   the id of the event
+   * @param int $eventId
+   *   The id of the event.
    *
    * @return array         an array of email ids
    * @static
@@ -2038,8 +2073,10 @@ WHERE  ce.loc_block_id = $locBlockId";
   /**
    * Calculate event total seats occupied.
    *
-   * @param int    $eventId          event id.
-   * @param sting  $extraWhereClause extra filter on participants.
+   * @param int $eventId
+   *   Event id.
+   * @param sting $extraWhereClause
+   *   Extra filter on participants.
    *
    * @return int   event total seats w/ given criteria.
    * @static
@@ -2084,7 +2121,8 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
    * Retrieve event template default values to be set
    *  as default values for current new event.
    *
-   * @param int $templateId event template id.
+   * @param int $templateId
+   *   Event template id.
    *
    * @return array of custom data defaults.
    */
@@ -2123,8 +2161,10 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
   /**
    * Update the Campaign Id of all the participants of the given event
    *
-   * @param int $eventID event id.
-   * @param int $eventCampaignID campaign id of that event
+   * @param int $eventID
+   *   Event id.
+   * @param int $eventCampaignID
+   *   Campaign id of that event.
    */
   public static function updateParticipantCampaignID($eventID, $eventCampaignID) {
     $params = array();
@@ -2144,9 +2184,9 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
    * Get options for a given field.
    * @see CRM_Core_DAO::buildOptions
    *
-   * @param String $fieldName
-   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
-   * @param Array  $props: whatever is known about this dao object
+   * @param string $fieldName
+   * @param string $context: @see CRM_Core_DAO::buildOptionsContext
+   * @param array $props: whatever is known about this dao object
    *
    * @return array|bool
    */
