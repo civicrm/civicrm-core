@@ -718,7 +718,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     }
 
     CRM_Core_Form_Date::buildDateRange($form, 'case_from', 1, '_start_date_low', '_start_date_high', ts('From'), FALSE);
-    CRM_Core_Form_Date::buildDateRange($form, 'case_to',   1, '_end_date_low',   '_end_date_high',   ts('From'), FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'case_to', 1, '_end_date_low', '_end_date_high', ts('From'), FALSE);
 
     $form->assign('validCiviCase', TRUE);
 
@@ -770,5 +770,6 @@ case_relation_type.id = case_relationship.relationship_type_id )";
    * @param $row
    * @param int $id
    */
-  public static function searchAction(&$row, $id) {}
+  public static function searchAction(&$row, $id) {
+  }
 }

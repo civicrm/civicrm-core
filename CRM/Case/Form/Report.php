@@ -84,7 +84,8 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
       return;
     }
 
-    $includeActivites = array(1 => ts('All Activities'),
+    $includeActivites = array(
+    1 => ts('All Activities'),
       2 => ts('Exclude Completed Activities'),
     );
     $includeActivitesGroup = $this->addRadio('include_activities',

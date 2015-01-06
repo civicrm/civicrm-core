@@ -89,7 +89,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   }
 
   protected function assignTestValue($fieldName, &$fieldDef, $counter) {
-    if ($fieldName  == 'definition') {
+    if ($fieldName == 'definition') {
       $this->{$fieldName} = "<CaseType><name>TestCaseType{$counter}</name></CaseType>";
     } else {
       parent::assignTestValue($fieldName, $fieldDef, $counter);
@@ -145,12 +145,14 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
                 $xmlFile .= "</ActivityTypes>\n";
               }
               break;
+
             case 'sequence': // passthrough
             case 'timeline':
               if ($setVal) {
                 $xmlFile .= "<{$index}>true</{$index}>\n";
               }
               break;
+
             default:
               $xmlFile .= "<{$index}>{$setVal}</{$index}>\n";
           }
@@ -347,7 +349,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @return bool
    */
   public static function isValidName($caseType) {
-    return preg_match('/^[a-zA-Z0-9_]+$/',  $caseType);
+    return preg_match('/^[a-zA-Z0-9_]+$/', $caseType);
   }
 
   /**
@@ -378,7 +380,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       // if file-based definition explicitly disables "forkable" option, then don't allow changes to definition
       $fileDefinition = CRM_Case_XMLRepository::singleton()->retrieveFile($caseTypeName);
       if ($fileDefinition && isset($fileDefinition->forkable)) {
-        return CRM_Utils_String::strtobool((string)$fileDefinition->forkable);
+        return CRM_Utils_String::strtobool((string) $fileDefinition->forkable);
       }
     }
     return TRUE;

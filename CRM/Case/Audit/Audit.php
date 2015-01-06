@@ -220,10 +220,10 @@ class CRM_Case_Audit_Audit {
   static
   public function run($xmlString, $clientID, $caseID, $printReport = FALSE) {
     /*
-$fh = fopen('C:/temp/audit2.xml', 'w');
-fwrite($fh, $xmlString);
-fclose($fh);
-*/
+    $fh = fopen('C:/temp/audit2.xml', 'w');
+    fwrite($fh, $xmlString);
+    fclose($fh);
+    */
 
     $audit = new CRM_Case_Audit_Audit($xmlString, 'audit.conf.xml');
     $activities = $audit->getActivities($printReport);

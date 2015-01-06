@@ -146,11 +146,11 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   @access public
    */
   function __construct(&$queryParams,
-    $action           = CRM_Core_Action::NONE,
+    $action = CRM_Core_Action::NONE,
     $additionalClause = NULL,
-    $single           = FALSE,
-    $limit            = NULL,
-    $context          = 'search'
+    $single = FALSE,
+    $limit = NULL,
+    $context = 'search'
   ) {
     // submitted form values
     $this->_queryParams = &$queryParams;
@@ -369,8 +369,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
         $result->case_id
       );
 
-      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-        $result->contact_sub_type : $result->contact_type
+      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type
       );
 
       //adding case manager to case selector.CRM-4510.
