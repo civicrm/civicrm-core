@@ -84,7 +84,6 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
       'name'
     );
 
-
     switch ($activityTypeId) {
       case $emailTypeValue:
         $wrapper = new CRM_Utils_Wrapper();
@@ -190,8 +189,7 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
     }
 
     // route behaviour of contact/view/activity based on action defined
-    if ($this->_action &
-      (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD | CRM_Core_Action::VIEW)
+    if ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD | CRM_Core_Action::VIEW)
     ) {
       $this->edit();
       $activityTypeId = CRM_Utils_Request::retrieve('atype', 'Positive', $this);

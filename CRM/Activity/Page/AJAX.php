@@ -43,8 +43,12 @@ class CRM_Activity_Page_AJAX {
     $context   = CRM_Utils_Type::escape(CRM_Utils_Array::value('context', $_GET), 'String');
 
     $sortMapper = array(
-      0 => 'display_date', 1 => 'ca.subject', 2 => 'ca.activity_type_id',
-      3 => 'acc.sort_name', 4 => 'cc.sort_name', 5 => 'ca.status_id',
+      0 => 'display_date',
+    1 => 'ca.subject',
+    2 => 'ca.activity_type_id',
+      3 => 'acc.sort_name',
+    4 => 'cc.sort_name',
+    5 => 'ca.status_id',
     );
 
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -73,7 +77,9 @@ class CRM_Activity_Page_AJAX {
 
   public static function getCaseGlobalRelationships() {
     $sortMapper = array(
-      0 => 'sort_name', 1 => 'phone', 2 => 'email',
+      0 => 'sort_name',
+    1 => 'phone',
+    2 => 'email',
     );
 
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -109,7 +115,10 @@ class CRM_Activity_Page_AJAX {
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
 
     $sortMapper = array(
-      0 => 'relation', 1 => 'name', 2 => 'phone', 3 => 'email'
+      0 => 'relation',
+    1 => 'name',
+    2 => 'phone',
+    3 => 'email'
     );
 
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -170,7 +179,11 @@ class CRM_Activity_Page_AJAX {
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
 
     $sortMapper = array(
-      0 => 'relation', 1 => 'name', 2 => 'phone', 3 => 'email', 4 => 'actions'
+      0 => 'relation',
+    1 => 'name',
+    2 => 'phone',
+    3 => 'email',
+    4 => 'actions'
     );
 
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -269,22 +282,22 @@ class CRM_Activity_Page_AJAX {
         $contactType = empty($row['relation_type']) ? '' : (string) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $row['relation_type'], 'contact_type_b');
         $contactType = $contactType == 'Contact' ? '' : $contactType;
         switch($row['source']) {
-        case 'caseRel':
-          $row['actions'] =
+          case 'caseRel':
+            $row['actions'] =
             '<a href="#editCaseRoleDialog" title="'. ts('Reassign %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="'. $row['relation_type'] .'" data-rel_id="'. $row['rel_id'] .'"data-key="'. CRM_Core_Key::get('civicrm/ajax/relation') .'">'.
               '<span class="icon edit-icon"></span>'.
             '</a>'.
             '<a href="#deleteCaseRoleDialog" title="'. ts('Remove %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="'.$row['relation_type'].'" data-key="'. CRM_Core_Key::get('civicrm/ajax/delcaserole') .'">'.
               '<span class="icon delete-icon"></span>'.
             '</a>';
-          break;
+            break;
 
-        case 'caseRoles':
-          $row['actions'] =
+          case 'caseRoles':
+            $row['actions'] =
             '<a href="#editCaseRoleDialog" title="'. ts('Assign %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="'. $row['relation_type'] .'" data-key="'. CRM_Core_Key::get('civicrm/ajax/relation') .'">'.
               '<span class="icon edit-icon"></span>'.
             '</a>';
-          break;
+            break;
         }
       }
       $idx++;
@@ -491,10 +504,8 @@ class CRM_Activity_Page_AJAX {
       }
 
       $activityFilter = array(
-        'activity_type_filter_id' => empty($params['activity_type_id']) ? '' :
-          CRM_Utils_Type::escape($params['activity_type_id'], 'Integer'),
-        'activity_type_exclude_filter_id' => empty($params['activity_type_exclude_id']) ? '' :
-          CRM_Utils_Type::escape($params['activity_type_exclude_id'], 'Integer'),
+        'activity_type_filter_id' => empty($params['activity_type_id']) ? '' : CRM_Utils_Type::escape($params['activity_type_id'], 'Integer'),
+        'activity_type_exclude_filter_id' => empty($params['activity_type_exclude_id']) ? '' : CRM_Utils_Type::escape($params['activity_type_exclude_id'], 'Integer'),
       );
 
       CRM_Core_BAO_Setting::setItem(
@@ -511,7 +522,7 @@ class CRM_Activity_Page_AJAX {
     $selectorElements = array(
       'activity_type', 'subject', 'source_contact',
       'target_contact', 'assignee_contact',
-      'activity_date', 'status','links', 'class',
+      'activity_date', 'status', 'links', 'class',
     );
 
     echo CRM_Utils_JSON::encodeDataTableSelector($activities, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
