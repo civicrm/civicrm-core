@@ -247,7 +247,8 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
       CRM_Price_BAO_PriceSet::retrieve($params, $defaults);
       $extends = explode(CRM_Core_DAO::VALUE_SEPARATOR, $defaults['extends']);
       unset($defaults['extends']);
-      foreach ($extends as $compId) { $defaults['extends'][$compId] = 1;
+      foreach ($extends as $compId) {
+        $defaults['extends'][$compId] = 1;
       }
     }
 
