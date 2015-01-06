@@ -46,7 +46,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
   public function preProcess() {
     //when user come from search context.
     $ssID = $this->get('ssID');
-    $this->assign('ssid',$ssID);
+    $this->assign('ssid', $ssID);
     $this->_searchBasedMailing = CRM_Contact_Form_Search::isSearchContext($this->get('context'));
     if(CRM_Contact_Form_Search::isSearchContext($this->get('context')) && !$ssID){
       $params = array();
@@ -90,7 +90,8 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
     }
 
     $buttons = array(
-      array('type' => 'back',
+      array(
+    'type' => 'back',
         'name' => ts('<< Previous'),
       ),
       array(
@@ -319,7 +320,8 @@ ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
           $params = array(
             'contact_type' => 'Individual',
             'email' => array(
-              1 => array('email' => $email,
+              1 => array(
+          'email' => $email,
                 'is_primary' => 1,
                 'location_type_id' => 1,
               )),

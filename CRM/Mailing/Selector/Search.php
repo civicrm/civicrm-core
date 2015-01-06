@@ -194,11 +194,11 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    */
   public static function &links() {
     if (!(self::$_links)) {
-    list($context, $key) = func_get_args();
-    $extraParams = ($key) ? "&key={$key}" : NULL;
-    $searchContext = ($context) ? "&context=$context" : NULL;
+      list($context, $key) = func_get_args();
+      $extraParams = ($key) ? "&key={$key}" : NULL;
+      $searchContext = ($context) ? "&context=$context" : NULL;
 
-    self::$_links = array(
+      self::$_links = array(
       CRM_Core_Action::VIEW => array(
         'name' => ts('View'),
         'url' => 'civicrm/contact/view',
@@ -217,7 +217,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
         'qs' => "reset=1&delete=1&cid=%%cid%%{$searchContext}{$extraParams}",
         'title' => ts('Delete Contact'),
       ),
-    );
+      );
     }
     return self::$_links;
   }
@@ -292,7 +292,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
     $mask = CRM_Core_Action::mask($permissions);
     $qfKey = $this->_key;
 
-    While ($result->fetch()) {
+    while ($result->fetch()) {
       $row = array();
       // the columns we are interested in
       foreach (self::$_properties as $property) {
@@ -318,8 +318,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
         'Contact',
         $result->contact_id
       );
-      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-        $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
+      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
       );
 
       $rows[] = $row;

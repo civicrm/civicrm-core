@@ -161,37 +161,40 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     // INSERT'ing INTO a table with a primary id so that last record
     // over writes any previous record.
     switch($email_selection_method) {
-    case 'location-exclude':
-      $location_filter = "($email.location_type_id != $location_type_id)";
-      // If there is more than one email that doesn't match the location,
-      // prefer the one marked is_bulkmail, followed by is_primary.
-      $order_by = "ORDER BY $email.is_bulkmail, $email.is_primary";
-      break;
-    case 'location-only':
-      $location_filter = "($email.location_type_id = $location_type_id)";
-      // If there is more than one email of the desired location, prefer
-      // the one marked is_bulkmail, followed by is_primary.
-      $order_by = "ORDER BY $email.is_bulkmail, $email.is_primary";
-      break;
-    case 'location-prefer':
-      $location_filter = "($email.is_bulkmail = 1 OR $email.is_primary = 1 OR $email.location_type_id = $location_type_id)";
+      case 'location-exclude':
+        $location_filter = "($email.location_type_id != $location_type_id)";
+        // If there is more than one email that doesn't match the location,
+        // prefer the one marked is_bulkmail, followed by is_primary.
+        $order_by = "ORDER BY $email.is_bulkmail, $email.is_primary";
+        break;
 
-      // ORDER BY is more complicated because we have to set an arbitrary
-      // order that prefers the location that we want. We do that using
-      // the FIELD function. For more info, see:
-      // https://dev.mysql.com/doc/refman/5.5/en/string-functions.html#function_field
-      // We assign the location type we want the value "1" by putting it
-      // in the first position after we name the field. All other location
-      // types are left out, so they will be assigned the value 0. That
-      // means, they will all be equally tied for first place, with our
-      // location being last.
-      $order_by = "ORDER BY FIELD($email.location_type_id, $location_type_id), $email.is_bulkmail, $email.is_primary";
-      break;
-    case 'automatic':
-      // fall through to default
-    default:
-      $location_filter = "($email.is_bulkmail = 1 OR $email.is_primary = 1)";
-      $order_by = "ORDER BY $email.is_bulkmail";
+      case 'location-only':
+        $location_filter = "($email.location_type_id = $location_type_id)";
+        // If there is more than one email of the desired location, prefer
+        // the one marked is_bulkmail, followed by is_primary.
+        $order_by = "ORDER BY $email.is_bulkmail, $email.is_primary";
+        break;
+
+      case 'location-prefer':
+        $location_filter = "($email.is_bulkmail = 1 OR $email.is_primary = 1 OR $email.location_type_id = $location_type_id)";
+
+        // ORDER BY is more complicated because we have to set an arbitrary
+        // order that prefers the location that we want. We do that using
+        // the FIELD function. For more info, see:
+        // https://dev.mysql.com/doc/refman/5.5/en/string-functions.html#function_field
+        // We assign the location type we want the value "1" by putting it
+        // in the first position after we name the field. All other location
+        // types are left out, so they will be assigned the value 0. That
+        // means, they will all be equally tied for first place, with our
+        // location being last.
+        $order_by = "ORDER BY FIELD($email.location_type_id, $location_type_id), $email.is_bulkmail, $email.is_primary";
+        break;
+
+      case 'automatic':
+        // fall through to default
+      default:
+        $location_filter = "($email.is_bulkmail = 1 OR $email.is_primary = 1)";
+        $order_by = "ORDER BY $email.is_bulkmail";
     }
 
     /* Create a temp table for contact exclusion */
@@ -654,9 +657,9 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    *  returns an array that denotes the type of token that we are dealing with
    *  we use the type later on when we are doing a token replcement lookup
    *
-   *  @param string $token       The token for which we will be doing adata lookup
+   * @param string $token       The token for which we will be doing adata lookup
    *
-   *  @return array $funcStruct  An array that holds the token itself and the type.
+   * @return array $funcStruct  An array that holds the token itself and the type.
    *                             the type will tell us which function to use for the data lookup
    *                             if we need to do a lookup at all
    */
@@ -888,7 +891,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    *  structures to represent the order in which tokens were found from left to right, top to bottom.
    *
    *
-   * @param str $prop
+   * @param string $propName of the property that holds the text that we want to scan for tokens (html, text).
    *   Name of the property that holds the text that we want to scan for tokens (html, text).
    *
    * @return void
@@ -918,8 +921,8 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    */
   public function getTestRecipients($testParams) {
     if (array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {
-      $contacts = civicrm_api('contact','get', array(
-        'version' =>3,
+      $contacts = civicrm_api('contact', 'get', array(
+        'version' => 3,
         'group' => $testParams['test_group'],
          'return' => 'id',
            'options' => array('limit' => 100000000000,
@@ -1734,7 +1737,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $values[] = array('entity_id' => $entityId);
     }
     civicrm_api3('mailing_group', 'replace', array(
-      'mailing_id' =>  $mailingId,
+      'mailing_id' => $mailingId,
       'group_type' => $type,
       'entity_table' => ($entity == 'groups') ? CRM_Contact_BAO_Group::getTableName() : CRM_Mailing_BAO_Mailing::getTableName(),
       'values' => $values,
@@ -1789,7 +1792,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'component' => CRM_Mailing_BAO_Component::getTableName(),
       'spool' => CRM_Mailing_BAO_Spool::getTableName(),
     );
-
 
     $report = array();
     $additionalWhereClause = " AND ";
@@ -2150,7 +2152,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         "reset=1&event=opened&mid=$mailing_id"
       ),
     );
-
 
     $actionLinks = array(CRM_Core_Action::VIEW => array('name' => ts('Report')));
     if (CRM_Core_Permission::check('view all contacts')) {
@@ -2569,7 +2570,8 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       $form->addWysiwyg('html_message',
         ts('HTML Format'),
         array(
-          'cols' => '80', 'rows' => '8',
+          'cols' => '80',
+      'rows' => '8',
           'onkeyup' => "return verify(this)",
         )
       );
@@ -2592,7 +2594,8 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       }
       $form->add('textarea', $id, $label,
         array(
-          'cols' => '80', 'rows' => '8',
+          'cols' => '80',
+      'rows' => '8',
           'onkeyup' => "return verify(this, '{$prefix}')",
         )
       );
@@ -2663,11 +2666,11 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     );
     $form->add('text', 'saveTemplateName', ts('Template Title'));
 
-
     $form->addWysiwyg('html_message',
       ts('Your Letter'),
       array(
-        'cols' => '80', 'rows' => '8',
+        'cols' => '80',
+    'rows' => '8',
         'onkeyup' => "return verify(this)",
       )
     );
@@ -2979,7 +2982,7 @@ AND        m.id = %1
 
       $contactMailings[$mailingId]['links'] = CRM_Core_Action::formLink(
         $actionLinks,
-        null,
+        NULL,
         array(
           'mid' => $values['mailing_id'],
           'cid' => $params['contact_id'],

@@ -48,7 +48,6 @@ class CRM_Mailing_Form_Subscribe extends CRM_Core_Form {
       $this->controller->setDestination(NULL, TRUE);
     }
 
-
     if ($this->_groupID) {
       $groupTypeCondition = CRM_Contact_BAO_Group::groupTypeCondition('Mailing');
 

@@ -137,7 +137,6 @@ LEFT JOIN civicrm_email      ON contact_a.id = civicrm_email.contact_id
       return $success;
     }
 
-
     /* Get the primary email id from the contact to use as a hash input */
 
     $dao = new CRM_Core_DAO();
@@ -147,7 +146,8 @@ SELECT     civicrm_email.id as email_id
   FROM     civicrm_email
      WHERE civicrm_email.email = %1
        AND civicrm_email.contact_id = %2";
-    $params = array(1 => array($email, 'String'),
+    $params = array(
+    1 => array($email, 'String'),
       2 => array($contact_id, 'Integer'),
     );
     $dao = CRM_Core_DAO::executeQuery($query, $params);

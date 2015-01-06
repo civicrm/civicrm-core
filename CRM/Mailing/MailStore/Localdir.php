@@ -80,8 +80,9 @@ class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
       if ($entry->isDot()) {
         continue;
       }
-      if (count($mails) >= $count)
-      break;
+      if (count($mails) >= $count) {
+        break;
+      }
 
       $file = $path . DIRECTORY_SEPARATOR . $entry->getFilename();
       if ($this->_debug) {

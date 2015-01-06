@@ -130,7 +130,6 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       $job->query($query);
     }
 
-
     while ($job->fetch()) {
       // still use job level lock for each child job
       $lockName = "civimail.job.{$job->id}";
@@ -308,7 +307,6 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     $currentTime = date('YmdHis');
     $mailingACL = CRM_Mailing_BAO_Mailing::mailingACL('m');
 
-
     $workflowClause = CRM_Mailing_BAO_MailingJob::workflowClause();
 
     $domainID = CRM_Core_Config::domainID();
@@ -336,9 +334,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     ORDER BY j.scheduled_date,
          j.start_date";
 
-
     $job->query($query);
-
 
     // For each of the "Parent Jobs" we find, we split them into
     // X Number of child jobs
@@ -394,7 +390,6 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
     $jobTable = CRM_Mailing_DAO_MailingJob::getTableName();
 
-
     $dao = new CRM_Core_DAO();
 
     $sql = "
@@ -402,7 +397,8 @@ INSERT INTO civicrm_mailing_job
 (`mailing_id`, `scheduled_date`, `status`, `job_type`, `parent_id`, `job_offset`, `job_limit`)
 VALUES (%1, %2, %3, %4, %5, %6, %7)
 ";
-    $params = array(1 => array($this->mailing_id, 'Integer'),
+    $params = array(
+    1 => array($this->mailing_id, 'Integer'),
       2 => array($this->scheduled_date, 'String'),
       3 => array('Scheduled', 'String'),
       4 => array('child', 'String'),
@@ -639,9 +635,9 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
      * CRM-15702: Sending bulk sms to contacts without e-mail addres fails.
      * Solution is to skip checking for on hold
      */
-    $skipOnHold = true; //do include a statement to check wether e-mail address is on hold
+    $skipOnHold = TRUE; //do include a statement to check wether e-mail address is on hold
     if ($mailing->sms_provider_id) {
-      $skipOnHold = false; //do not include a statement to check wether e-mail address is on hold
+      $skipOnHold = FALSE; //do not include a statement to check wether e-mail address is on hold
     }
 
     foreach ($fields as $key => $field) {
@@ -854,7 +850,8 @@ AND    is_test = 0
 AND    job_type = 'child'
 AND    status IN ( 'Scheduled', 'Running', 'Paused' )
 ";
-      $params = array(1 => array($job->id, 'Integer'),
+      $params = array(
+      1 => array($job->id, 'Integer'),
         2 => array(date('YmdHis'), 'Timestamp'),
       );
       CRM_Core_DAO::executeQuery($sql, $params);
