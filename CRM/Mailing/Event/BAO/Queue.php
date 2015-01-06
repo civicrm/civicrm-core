@@ -184,7 +184,8 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    * @return array                Result set
    * @static
    */
-  public static function &getRows($mailing_id, $job_id = NULL, $offset = NULL,
+  public static function &getRows(
+    $mailing_id, $job_id = NULL, $offset = NULL,
     $rowCount = NULL, $sort = NULL
   ) {
     $dao = new CRM_Core_Dao();

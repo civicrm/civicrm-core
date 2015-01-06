@@ -151,7 +151,8 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    * @return \CRM_Mailing_Selector_Search
   @access public
    */
-  function __construct(&$queryParams,
+  function __construct(
+    &$queryParams,
     $action = CRM_Core_Action::NONE,
     $mailingClause = NULL,
     $single = FALSE,

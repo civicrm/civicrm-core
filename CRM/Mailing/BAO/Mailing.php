@@ -1173,7 +1173,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @return Mail_mime               The mail object
    */
-  public function &compose($job_id, $event_queue_id, $hash, $contactId,
+  public function &compose(
+    $job_id, $event_queue_id, $hash, $contactId,
     $email, &$recipient, $test,
     $contactDetails, &$attachments, $isForward = FALSE,
     $fromEmail = NULL, $replyToEmail = NULL

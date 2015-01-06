@@ -427,7 +427,8 @@ WHERE  email = %2
    * @return int                  Number of rows in result set
    * @static
    */
-  public static function getTotalCount($mailing_id, $job_id = NULL,
+  public static function getTotalCount(
+    $mailing_id, $job_id = NULL,
     $is_distinct = FALSE, $org_unsubscribe = NULL, $toDate = NULL
   ) {
     $dao = new CRM_Core_DAO();
@@ -498,7 +499,8 @@ WHERE  email = %2
    * @return array                Result set
    * @static
    */
-  public static function &getRows($mailing_id, $job_id = NULL,
+  public static function &getRows(
+    $mailing_id, $job_id = NULL,
     $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL,
     $org_unsubscribe = NULL
   ) {
