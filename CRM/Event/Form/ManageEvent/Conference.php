@@ -85,7 +85,7 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
       FALSE
     );
 
-    $this->addEntityRef('parent_event_id', ts('Parent Event'),  array(
+    $this->addEntityRef('parent_event_id', ts('Parent Event'), array(
         'entity' => 'event',
         'placeholder' => ts('- any -'),
         'select' => array('minimumInputLength' => 0),

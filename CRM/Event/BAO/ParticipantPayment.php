@@ -58,7 +58,7 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
     $participantPayment->copyValues($params);
     if (isset($ids['id'])) {
       $participantPayment->id = CRM_Utils_Array::value('id', $ids);
-  }
+    }
     else {
       $participantPayment->find(TRUE);
     }

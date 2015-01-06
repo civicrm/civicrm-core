@@ -197,7 +197,8 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $events = array();
     if (!empty($locationEvents)) {
       $this->assign('locEvents', TRUE);
-      $optionTypes = array('1' => ts('Create new location'),
+      $optionTypes = array(
+      '1' => ts('Create new location'),
         '2' => ts('Use existing location'),
       );
 

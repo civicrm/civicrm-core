@@ -5,9 +5,8 @@
  */
 class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   public $associations_loaded = FALSE;
-    /* event_in_cart_id => $event_in_cart */
-  public $events_in_carts = array(
-    );
+  /* event_in_cart_id => $event_in_cart */
+  public $events_in_carts = array();
 
   /**
    * @param array $params

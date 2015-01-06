@@ -70,7 +70,8 @@ class CRM_Event_Task {
    */
   public static function &tasks() {
     if (!(self::$_tasks)) {
-      self::$_tasks = array(1 => array(
+      self::$_tasks = array(
+      1 => array(
         'title' => ts('Delete Participants'),
           'class' => 'CRM_Event_Form_Task_Delete',
           'result' => FALSE,
@@ -139,7 +140,7 @@ class CRM_Event_Task {
       }
       //CRM-12920 - check for edit permission
       if( !CRM_Core_Permission::check('edit event participants') ){
-        unset(self::$_tasks[4],self::$_tasks[5],self::$_tasks[15]);
+        unset(self::$_tasks[4], self::$_tasks[5], self::$_tasks[15]);
       }
     }
 

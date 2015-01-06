@@ -82,8 +82,8 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     }
 
     $this->assign('rows', $reminderList);
-    $this->assign('setTab' , $setTab);
-    $this->assign('component' , 'event');
+    $this->assign('setTab', $setTab);
+    $this->assign('component', 'event');
 
     // Update tab "disabled" css class
     $this->ajaxResponse['tabValid'] = is_array($reminderList) && (count($reminderList) > 0);

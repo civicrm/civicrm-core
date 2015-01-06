@@ -155,15 +155,18 @@ SELECT count( civicrm_contact.id )
     static $headers = NULL;
     if (!$headers) {
       $headers = array();
-      $headers[1] = array('name' => ts('Name'),
+      $headers[1] = array(
+      'name' => ts('Name'),
         'sort' => 'civicrm_contact.sort_name',
         'direction' => CRM_Utils_Sort::ASCENDING,
       );
-      $headers[2] = array('name' => ts('Status'),
+      $headers[2] = array(
+      'name' => ts('Status'),
         'sort' => 'civicrm_participant.status_id',
         'direction' => CRM_Utils_Sort::DONTCARE,
       );
-      $headers[3] = array('name' => ts('Register Date'),
+      $headers[3] = array(
+      'name' => ts('Register Date'),
         'sort' => 'civicrm_participant.register_date',
         'direction' => CRM_Utils_Sort::DONTCARE,
       );

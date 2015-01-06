@@ -51,9 +51,18 @@ class CRM_Event_Badge_NameTent extends CRM_Event_Badge {
     $w             = $pw - 2 * $this->lMargin;
     $h             = $ph - 2 * $this->tMargin;
     $this->format  = array(
-      'name' => 'A4 horiz', 'paper-size' => 'A4', 'metric' => 'mm', 'lMargin' => 0,
-      'tMargin' => 0, 'NX' => 1, 'NY' => 1, 'SpaceX' => 0, 'SpaceY' => 0,
-      'width' => $w, 'height' => $h, 'font-size' => 36,
+      'name' => 'A4 horiz',
+    'paper-size' => 'A4',
+    'metric' => 'mm',
+    'lMargin' => 0,
+      'tMargin' => 0,
+    'NX' => 1,
+    'NY' => 1,
+    'SpaceX' => 0,
+    'SpaceY' => 0,
+      'width' => $w,
+    'height' => $h,
+    'font-size' => 36,
     );
     //      $this->setDebug ();
   }

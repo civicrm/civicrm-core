@@ -96,7 +96,6 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
 
     $values[$participantID]['note'] = array_values($noteValue);
 
-
     // Get Line Items
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($participantID);
 
@@ -178,7 +177,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $displayName = CRM_Contact_BAO_Contact::displayName($values[$participantID]['contact_id']);
 
     $participantCount = array();
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $totalTaxAmount = 0;
     foreach ($lineItem as $k => $v) {

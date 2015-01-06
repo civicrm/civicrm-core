@@ -15,9 +15,18 @@ class CRM_Event_Badge_Logo5395 extends CRM_Event_Badge {
     $h            = 59.2;
     $w            = 85.7;
     $this->format = array(
-      'name' => 'Avery 5395', 'paper-size' => 'A4', 'metric' => 'mm', 'lMargin' => 13.5,
-      'tMargin' => 3, 'NX' => 2, 'NY' => 4, 'SpaceX' => 15, 'SpaceY' => 8.5,
-      'width' => $w, 'height' => $h, 'font-size' => 12,
+      'name' => 'Avery 5395',
+    'paper-size' => 'A4',
+    'metric' => 'mm',
+    'lMargin' => 13.5,
+      'tMargin' => 3,
+    'NX' => 2,
+    'NY' => 4,
+    'SpaceX' => 15,
+    'SpaceY' => 8.5,
+      'width' => $w,
+    'height' => $h,
+    'font-size' => 12,
     );
     $this->lMarginLogo = 20;
     $this->tMarginName = 20;

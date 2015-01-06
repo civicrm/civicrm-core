@@ -154,12 +154,12 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       CRM_Utils_System::redirect(CRM_Utils_System::url($url, $urlParams));
     }
     else {
-        CRM_Core_Error::fatal("Could not find Event ID");
+      CRM_Core_Error::fatal("Could not find Event ID");
     }
     parent::endPostProcess();
   }
 
-   /**
+  /**
    * This function gets the number of participant count for the list of related event ids
    *
    * @param array $listOfRelatedEntities
@@ -195,9 +195,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
   /**
    * This function checks if there was any registraion for related event ids,
    * and returns array of ids with no regsitrations
-   * @param type $eventID
-   *   Event ID .
-   * @return type
+   * @param string or int or object... $eventID
    */
   public static function checkRegistrationForEvents($eventID) {
     $eventIdsWithNoRegistration = array();
