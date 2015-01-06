@@ -44,7 +44,8 @@ function _civicrm_api3_survey_respondant_deprecation() {
 /**
  * Get the list of signatories
  *
- * @param  array   $params           (reference ) input parameters
+ * @param array $params
+ *   (reference ) input parameters.
  *
  * @return array (reference )        contribution_id of created or updated record
  * @static void

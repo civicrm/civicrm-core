@@ -63,7 +63,8 @@ function civicrm_api3_dashboard_contact_create($params) {
 /**
  * Gets a CiviCRM Dashlets of Contacts according to parameters
  *
- * @param array  $params       Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                             pairs for the activity.
  *
  * @return array
@@ -77,7 +78,8 @@ function civicrm_api3_dashboard_contact_get($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_dashboard_contact_create_spec(&$params) {
   unset($params['version']);

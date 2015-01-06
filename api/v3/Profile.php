@@ -39,7 +39,8 @@
 /**
  * Retrieve Profile field values.
  *
- * @param array $params       Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                             pairs to get profile field values
  *
  * @throws API_Exception
@@ -292,7 +293,8 @@ function civicrm_api3_profile_submit($params) {
  * so we accept 'email-primary' but pass 'email-Primary' to the BAO
  * we could make the BAO handle email-primary but this would alter the fieldname seen by hooks
  * & we would need to consider that change
- * @param string $fieldName API field name
+ * @param string $fieldName
+ *   API field name.
  *
  * @return string BAO Field Name
  */
@@ -330,7 +332,8 @@ function _civicrm_api3_profile_submit_spec(&$params, $apirequest) {
  * use submit
  * Update Profile field values.
  *
- * @param array  $params       Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                             pairs to update profile field values
  *
  * @return array Updated Contact/ Activity object|CRM_Error
@@ -345,7 +348,8 @@ function civicrm_api3_profile_set($params) {
  * @deprecated - appears to be an internal function - should not be accessible via api
  * Provide formatted values for profile fields.
  *
- * @param array $params       Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                             pairs to profile field values
  *
  * @throws API_Exception
@@ -479,7 +483,8 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
  * find the oddities, 'mask them' at this layer, add tests & work to standardise over time so we can remove this handling
  *
  * @param integer $profileID
- * @param integer $optionsBehaviour 0 = don't resolve, 1 = resolve non-aggressively, 2 = resolve aggressively - ie include country & state
+ * @param integer $optionsBehaviour
+ *   0 = don't resolve, 1 = resolve non-aggressively, 2 = resolve aggressively - ie include country & state.
  * @param $is_flush
  *
  * @return

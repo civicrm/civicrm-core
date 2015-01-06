@@ -40,7 +40,8 @@
 /**
  * Defines 'uf field' within a group.
  *
- * @param $params  array  Associative array of property name/value pairs to create new uf field.
+ * @param $params
+ *   Array  Associative array of property name/value pairs to create new uf field.
  *
  * @throws API_Exception
  *
@@ -129,7 +130,8 @@ function _civicrm_api3_uf_field_create_spec(&$params) {
 /**
  * Returns array of uf groups (profiles)  matching a set of one or more group properties
  *
- * @param array $params  (reference) Array of one or more valid
+ * @param array $params
+ *   (reference) Array of one or more valid.
  *                       property_name=>value pairs. If $params is set
  *                       as null, all surveys will be returned
  *

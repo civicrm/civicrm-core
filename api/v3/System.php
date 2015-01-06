@@ -40,7 +40,8 @@
 /**
  * Flush all system caches
  *
- * @param  array       $params input parameters
+ * @param array $params
+ *   Input parameters.
  *                          - triggers: bool, whether to drop/create SQL triggers; default: FALSE
  *                          - session:  bool, whether to reset the CiviCRM session data; defaul: FALSE
  *
@@ -62,7 +63,8 @@ function civicrm_api3_system_flush($params) {
  * Adjust Metadata for Flush action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_system_flush_spec(&$params){
   $params['triggers'] = array('title' => 'rebuild triggers (boolean)');
@@ -73,7 +75,8 @@ function _civicrm_api3_system_flush_spec(&$params){
  * System.Check API specification (optional)
  * This is used for documentation and validation.
  *
- * @param array $spec description of fields supported by this API call
+ * @param array $spec
+ *   Description of fields supported by this API call.
  * @return void
  * @see http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
  */

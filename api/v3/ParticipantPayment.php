@@ -47,7 +47,8 @@
  * This API is used for creating a Participant Payment of Event.
  * Required parameters : participant_id, contribution_id.
  *
- * @param   array  $params     an associative array of name/value property values of civicrm_participant_payment
+ * @param array $params
+ *   An associative array of name/value property values of civicrm_participant_payment.
  * @example ParticipantPaymentCreate.php
  * {@example ParticipantPaymentCreate.php 0}
  *
@@ -73,7 +74,8 @@ function civicrm_api3_participant_payment_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_participant_payment_create_spec(&$params) {
   $params['participant_id']['api.required'] = 1;
@@ -101,7 +103,8 @@ function civicrm_api3_participant_payment_delete($params) {
  * Retrieve one / all contribution(s) / participant(s) linked to a
  * contribution.
  *
- * @param  array   $params  input parameters
+ * @param array $params
+ *   Input parameters.
  *
  * @return array  array of properties, if error an array with an error id and error message
  *  @example ParticipantPaymentGet

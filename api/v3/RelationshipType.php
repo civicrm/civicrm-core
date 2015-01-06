@@ -39,7 +39,8 @@
 /**
  * create relationship type
  *
- * @param  array $params   Associative array of property name/value pairs to insert in new relationship type.
+ * @param array $params
+ *   Associative array of property name/value pairs to insert in new relationship type.
  *
  * @return Newly created Relationship_type object
  * {@getfields RelationshipType_create}
@@ -80,7 +81,8 @@ function civicrm_api3_relationship_type_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_relationship_type_create_spec(&$params) {
   $params['contact_type_a']['api.required'] = 1;
@@ -104,7 +106,7 @@ function civicrm_api3_relationship_type_get($params) {
 /**
  * Delete a relationship type delete
  *
- * @param  id of relationship type  $id
+ * @param id of relationship type $id
  *
  * @return array API Result Array
  * {@getfields RelationshipType_delete}

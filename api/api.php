@@ -28,9 +28,12 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
 /**
  * Version 3 wrapper for civicrm_api. Throws exception
  *
- * @param string $entity type of entities to deal with
- * @param string $action create, get, delete or some special action name.
- * @param array $params array to be passed to function
+ * @param string $entity
+ *   Type of entities to deal with.
+ * @param string $action
+ *   Create, get, delete or some special action name.
+ * @param array $params
+ *   Array to be passed to function.
  *
  * @throws CiviCRM_API3_Exception
  * @return array
@@ -150,7 +153,8 @@ function _civicrm_api_replace_variables($entity, $action, &$params, &$parentResu
 /**
  * Convert possibly camel name to underscore separated entity name
  *
- * @param string $entity entity name in various formats e.g. Contribution, contribution, OptionValue, option_value, UFJoin, uf_join
+ * @param string $entity
+ *   Entity name in various formats e.g. Contribution, contribution, OptionValue, option_value, UFJoin, uf_join.
  * @return string $entity entity name in underscore separated format
  *
  * FIXME: Why isn't this called first thing in civicrm_api wrapper?
@@ -171,7 +175,8 @@ function _civicrm_api_get_entity_name_from_camel($entity) {
 
 /**
  * Having a DAO object find the entity name
- * @param object $bao DAO being passed in
+ * @param object $bao
+ *   DAO being passed in.
  * @return string
  */
 function _civicrm_api_get_entity_name_from_dao($bao){

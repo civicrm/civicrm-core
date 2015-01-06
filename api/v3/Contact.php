@@ -40,7 +40,8 @@
 /**
  * Create or update a contact (note you should always call this via civicrm_api() & never directly)
  *
- * @param  array $params input parameters
+ * @param array $params
+ *   Input parameters.
  *
  * Allowed @params array keys are:
  * {@getfields contact_create}
@@ -116,7 +117,8 @@ function civicrm_api3_contact_create($params) {
 /**
  * Adjust Metadata for Create action
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_contact_create_spec(&$params) {
   $params['contact_type']['api.required'] = 1;
@@ -137,7 +139,7 @@ function _civicrm_api3_contact_create_spec(&$params) {
 /**
  * Retrieve one or more contacts, given a set of search params
  *
- * @param  array  input parameters
+ * @param array input parameters
  *
  * @return array API Result Array
  * (@getfields contact_get}
@@ -169,7 +171,8 @@ function civicrm_api3_contact_getcount($params) {
 /**
  * Adjust Metadata for Get action
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_contact_get_spec(&$params) {
   $params['contact_is_deleted']['api.default'] = 0;
@@ -221,8 +224,10 @@ function _civicrm_api3_contact_get_spec(&$params) {
  *
  * We also support 'filter_group_id' & 'filter.group_id'
  *
- * @param array $params as passed into api get or getcount function
- * @param array $options array of options (so we can modify the filter)
+ * @param array $params
+ *   As passed into api get or getcount function.
+ * @param array $options
+ *   Array of options (so we can modify the filter).
  */
 function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
   if (isset($params['showAll'])) {
@@ -257,7 +262,8 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
 /**
  * Delete a contact with given contact id
  *
- * @param  array       $params (reference ) input parameters, contact_id element required
+ * @param array $params
+ *   (reference ) input parameters, contact_id element required.
  *
  * @return array API Result Array
  * @access public
@@ -393,8 +399,10 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
  * Takes an associative array and creates a contact object and all the associated
  * derived objects (i.e. individual, location, email, phone etc)
  *
- * @param array $params (reference ) an assoc array of name/value pairs
- * @param  int     $contactID        if present the contact with that ID is updated
+ * @param array $params
+ *   (reference ) an assoc array of name/value pairs.
+ * @param int $contactID
+ *   If present the contact with that ID is updated.
  *
  * @return CRM_Contact_BAO_Contact object
  * @access public
@@ -412,7 +420,8 @@ function _civicrm_api3_contact_update($params, $contactID = NULL) {
 /**
  * Validate the addressee or email or postal greetings
  *
- * @param  array $params  Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                                   pairs to insert in new contact.
  *
  * @throws API_Exception
@@ -849,7 +858,8 @@ function _civicrm_api3_contact_deprecation() {
 /**
  * Merges given pair of duplicate contacts.
  *
- * @param  array   $params   input parameters
+ * @param array $params
+ *   Input parameters.
  *
  * Allowed @params array keys are:
  * {int     main_id     main contact id with whom merge has to happen}
@@ -946,7 +956,8 @@ WHERE     $whereClause
 /**
  * @see _civicrm_api3_generic_getlist_params
  *
- * @param $request array
+ * @param $request
+ *   Array.
  */
 function _civicrm_api3_contact_getlist_params(&$request) {
   // get the autocomplete options from settings
@@ -989,8 +1000,10 @@ function _civicrm_api3_contact_getlist_params(&$request) {
 /**
  * @see _civicrm_api3_generic_getlist_output
  *
- * @param $result array
- * @param $request array
+ * @param $result
+ *   Array.
+ * @param $request
+ *   Array.
  *
  * @return array
  */

@@ -42,7 +42,8 @@
  *
  * This API is used for creating a Membership Status
  *
- * @param   array  $params  an associative array of name/value property values of civicrm_membership_status
+ * @param array $params
+ *   An associative array of name/value property values of civicrm_membership_status.
  *
  * @return array of newly created membership status property values.
  * {@getfields MembershipStatus_create}
@@ -57,7 +58,8 @@ function civicrm_api3_membership_status_create($params) {
  *
  * This api is used for finding an existing membership status.
  *
- * @param  array $params  an associative array of name/value property values of civicrm_membership_status
+ * @param array $params
+ *   An associative array of name/value property values of civicrm_membership_status.
  *
  * @return  Array of all found membership status property values.
  * {@getfields MembershipStatus_get}
@@ -73,7 +75,8 @@ function civicrm_api3_membership_status_get($params) {
  * This api is used for updating an existing membership status.
  * Required parameters : id of a membership status
  *
- * @param  Array   $params  an associative array of name/value property values of civicrm_membership_status
+ * @param array $params
+ *   An associative array of name/value property values of civicrm_membership_status.
  * @deprecated - should just use create
  *
  * @return array of updated membership status property values
@@ -114,7 +117,7 @@ function &civicrm_api3_membership_status_update($params) {
  *
  * This API is used for deleting a membership status
  *
- * @param  array  Params array containing 'id' -    Id of the membership status to be deleted
+ * @param array Params array containing 'id' - Id of the membership status to be deleted
  * {@getfields MembershipStatus_delete}
  *
  * @return array i

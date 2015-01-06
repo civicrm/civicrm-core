@@ -41,7 +41,8 @@
  * as parameters. Some of the most commonly used parameters are
  * described below
  *
- * @param array $params           an associative array used in construction
+ * @param array $params
+ *   An associative array used in construction.
  * retrieval of the object
  *
  */
@@ -52,7 +53,8 @@
  * function after deletion so that the field is available for us (getfields manages date conversion
  * among other things
  *
- * @param $params array  Associative array of property name/value pairs to create new custom field.
+ * @param $params
+ *   Array  Associative array of property name/value pairs to create new custom field.
  *
  * @return Newly API success object
  *
@@ -91,7 +93,8 @@ function _civicrm_api3_custom_field_flush_static_caches(){
 /**
  * Adjust Metadata for Create action
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_custom_field_create_spec(&$params) {
   $params['label']['api.required'] = 1;
@@ -109,7 +112,8 @@ function _civicrm_api3_custom_field_create_spec(&$params) {
 /**
  * Use this API to delete an existing custom group field.
  *
- * @param $params     Array id of the field to be deleted
+ * @param $params
+ *   Array id of the field to be deleted.
  *
  * @return array
  * @example CustomFieldDelete.php
@@ -131,7 +135,8 @@ function civicrm_api3_custom_field_delete($params) {
 /**
  * Use this API to get existing custom fields.
  *
- * @param array $params Array to search on
+ * @param array $params
+ *   Array to search on.
  *{*
  *
  * @return array
@@ -147,10 +152,14 @@ function civicrm_api3_custom_field_get($params) {
  * Helper function to validate custom field value
  * @deprecated
  *
- * @param String $fieldName    Custom field name (eg: custom_8 )
- * @param Mixed  $value        Field value to be validate
- * @param Array  $fieldDetails Field Details
- * @param Array  $errors       Collect validation  errors
+ * @param string $fieldName
+ *   Custom field name (eg: custom_8 ).
+ * @param mixed $value
+ *   Field value to be validate.
+ * @param array $fieldDetails
+ *   Field Details.
+ * @param array $errors
+ *   Collect validation  errors.
  *
  * @return array  Validation errors
  * @todo remove this function - not in use but need to review functionality before

@@ -39,7 +39,8 @@
 /**
  * Get all the mailings and details that a contact was involved with
  *
- * @param array    $params input parameters
+ * @param array $params
+ *   Input parameters.
  *                    - key: contact_id, value: int - required
  *                    - key: type, value: Delivered | Bounced - optional, defaults to Delivered
  *                    - Future extensions will include: Opened, Clicked, Forwarded
@@ -78,7 +79,8 @@ function _civicrm_api3_mailing_contact_getresults($params, $count){
 /**
  * Adjust Metadata for Get action
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_mailing_contact_get_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
@@ -285,7 +287,8 @@ INNER JOIN civicrm_mailing_event_bounce meb ON meb.event_queue_id = meq.id
 /**
  * Get count of all the mailings that a contact was involved with
  *
- * @param array    $params input parameters
+ * @param array $params
+ *   Input parameters.
  *                    - key: contact_id, value: int - required
  *                    - key: type, value: Delivered | Bounced - optional, defaults to Delivered
  *                    - Future extensions will include: Opened, Clicked, Forwarded

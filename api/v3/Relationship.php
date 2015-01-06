@@ -40,7 +40,8 @@
 /**
  * Add or update a relationship
  *
- * @param  array $params input parameters
+ * @param array $params
+ *   Input parameters.
  *
  * @throws API_Exception
  * @example RelationshipCreate.php Std Create example
@@ -90,7 +91,8 @@ function civicrm_api3_relationship_create($params) {
 /**
  * Adjust Metadata for Create action
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_relationship_create_spec(&$params) {
   $params['contact_id_a']['api.required'] = 1;
@@ -102,7 +104,7 @@ function _civicrm_api3_relationship_create_spec(&$params) {
 /**
  * Delete a relationship
  *
- * @param  array $params
+ * @param array $params
  *
  * @return array API Result Array
  * {@getfields relationship_delete}
@@ -131,7 +133,8 @@ function civicrm_api3_relationship_delete($params) {
 /**
  * get the relationship
  *
- * @param array   $params input parameters.
+ * @param array $params
+ *   Input parameters.
  * @todo  Result is inconsistent depending on whether contact_id is passed in :
  * -  if you pass in contact_id - it just returns all relationships for 'contact_id'
  * -  if you don't pass in contact_id then it does a filter on the relationship table (DAO based search)
@@ -176,9 +179,11 @@ function civicrm_api3_relationship_get($params) {
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object
  *
- * @param array $params Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                             pairs to insert in new contact.
- * @param array $values The reformatted properties that we can use internally
+ * @param array $values
+ *   The reformatted properties that we can use internally.
  *                            '
  *
  * @throws Exception

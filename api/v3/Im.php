@@ -53,7 +53,8 @@ function civicrm_api3_im_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_im_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
@@ -62,7 +63,7 @@ function _civicrm_api3_im_create_spec(&$params) {
 /**
  * Deletes an existing IM
  *
- * @param  array  $params
+ * @param array $params
  * {@getfields im_delete}
  *
  * @return array API result Array
@@ -76,9 +77,10 @@ function civicrm_api3_im_delete($params) {
 /**
  * Retrieve one or more IM
  *
- * @param  mixed[]  (reference ) input parameters
+ * @param mixed[] (reference ) input parameters
  * {@getfields im_get}
- * @param  array $params  an associative array of name/value pairs.
+ * @param array $params
+ *   An associative array of name/value pairs.
  *
  * @return  array details of found IM
  *

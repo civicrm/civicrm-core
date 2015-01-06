@@ -67,7 +67,7 @@ function _civicrm_api3_tag_create_spec(&$params) {
 /**
  * Deletes an existing Tag
  *
- * @param  array  $params
+ * @param array $params
  *
  * @example TagDelete.ph
  *
@@ -87,7 +87,8 @@ function civicrm_api3_tag_delete($params) {
  *
  * @example TagGet.php
  *
- * @param  array $params  an associative array of name/value pairs.
+ * @param array $params
+ *   An associative array of name/value pairs.
  *
  * @return  array details of found tags else error
  * {@getfields tag_get}

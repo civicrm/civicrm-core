@@ -58,7 +58,8 @@ function civicrm_api3_country_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_country_create_spec(&$params) {
   $params['name']['api.required'] = 1;
@@ -67,7 +68,7 @@ function _civicrm_api3_country_create_spec(&$params) {
 /**
  * Deletes an existing Country
  *
- * @param  array  $params
+ * @param array $params
  *
  * @example CountryDelete.php Standard Delete Example
  *
@@ -82,12 +83,13 @@ function civicrm_api3_country_delete($params) {
 /**
  * Retrieve one or more countrys
  *
- * @param  array input parameters
+ * @param array input parameters
  *
  *
  * @example CountryGet.php Standard Get Example
  *
- * @param  array $params  an associative array of name/value pairs.
+ * @param array $params
+ *   An associative array of name/value pairs.
  *
  * @return  array api result array
  * {@getfields country_get}
