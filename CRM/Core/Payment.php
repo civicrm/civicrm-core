@@ -260,10 +260,7 @@ abstract class CRM_Core_Payment {
       }
       else {
         // Legacy or extension as module instance
-        if(empty($paymentClass)) {
-          $paymentClass = 'CRM_Core_' . $dao->class_name;
-
-        }
+        $paymentClass = 'CRM_Core_' . $dao->class_name;
       }
 
       $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($dao->processor_id, $mode);
