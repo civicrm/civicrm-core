@@ -57,7 +57,8 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   /**
    * Takes an associative array and creates a price set object
    *
-   * @param array $params (reference) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Price_DAO_PriceSet object
    * @static
@@ -80,8 +81,10 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Price_DAO_PriceSet object
    * @static
@@ -93,7 +96,8 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   /**
    * Update the is_active flag in the db
    *
-   * @param  int $id id of the database record
+   * @param int $id
+   *   Id of the database record.
    * @param $isActive
    *
    * @internal param bool $is_active value we want to set the is_active field
@@ -154,7 +158,8 @@ WHERE       ps.name = '{$entityName}'
   /**
    * Get the price set title.
    *
-   * @param int $id   id of price set
+   * @param int $id
+   *   Id of price set.
    *
    * @return string   title
    *
@@ -168,7 +173,8 @@ WHERE       ps.name = '{$entityName}'
   /**
    * Return a list of all forms which use this price set.
    *
-   * @param int $id id of price set
+   * @param int $id
+   *   Id of price set.
    * @param bool|string $simpleReturn - get raw data. Possible values: 'entity', 'table'
    *
    * @return array
@@ -275,7 +281,8 @@ WHERE     ct.id = cp.financial_type_id AND
   /**
    * Delete the price set
    *
-   * @param int $id Price Set id
+   * @param int $id
+   *   Price Set id.
    *
    * @return boolean false if fields exist for this set, true if the
    * set could be deleted
@@ -314,8 +321,8 @@ WHERE     ct.id = cp.financial_type_id AND
    * Link the price set with the specified table and id
    *
    * @param string $entityTable
-   * @param integer $entityId
-   * @param integer $priceSetId
+   * @param int $entityId
+   * @param int $priceSetId
    *
    * @return bool
    */
@@ -343,7 +350,7 @@ WHERE     ct.id = cp.financial_type_id AND
    * Delete price set for the given entity and id
    *
    * @param string $entityTable
-   * @param integer $entityId
+   * @param int $entityId
    *
    * @return mixed
    */
@@ -360,7 +367,8 @@ WHERE     ct.id = cp.financial_type_id AND
    *
    * @param string $entityTable
    * @param int $entityId
-   * @param int $usedFor ( price set that extends/used for particular component )
+   * @param int $usedFor
+   *   ( price set that extends/used for particular component ).
    *
    * @param null $isQuickConfig
    * @param null $setName
@@ -396,7 +404,8 @@ WHERE     ct.id = cp.financial_type_id AND
   /**
    * Find a price_set_id associated with the given option value or  field ID
    *
-   * @param array $params (reference) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
    *                      array may contain either option id or
    *                      price field id
    *
@@ -427,7 +436,8 @@ WHERE     ct.id = cp.financial_type_id AND
   /**
    * Return an associative array of all price sets
    *
-   * @param bool $withInactive whether or not to include inactive entries
+   * @param bool $withInactive
+   *   Whether or not to include inactive entries.
    * @param bool|string $extendComponentName name of the component like 'CiviEvent','CiviContribute'
    *
    * @return array associative array of id => name
@@ -1024,9 +1034,12 @@ WHERE  id = %1";
   /**
    * Supports event create function by setting up required price sets, not tested but expect
    * it will work for contribution page
-   * @param array $params as passed to api/bao create fn
-   * @param CRM_Core_DAO $entity object for given entity
-   * @param string $entityName name of entity - e.g event
+   * @param array $params
+   *   As passed to api/bao create fn.
+   * @param CRM_Core_DAO $entity
+   *   Object for given entity.
+   * @param string $entityName
+   *   Name of entity - e.g event.
    */
   public static function setPriceSets(&$params, $entity, $entityName) {
     if(empty($params['price_set_id']) || !is_array($params['price_set_id'])) {
@@ -1065,7 +1078,8 @@ WHERE  id = %1";
   /**
    * Get field ids of a price set
    *
-   * @param int $id Price Set id
+   * @param int $id
+   *   Price Set id.
    *
    * @return array of the field ids
    *
@@ -1085,7 +1099,8 @@ WHERE  id = %1";
    * This function is to make a copy of a price set, including
    * all the fields
    *
-   * @param int $id the price set id to copy
+   * @param int $id
+   *   The price set id to copy.
    *
    * @return the copy object
    * @static
@@ -1131,7 +1146,8 @@ WHERE  id = %1";
   /**
    * This function is to check price set permission
    *
-   * @param int $sid the price set id
+   * @param int $sid
+   *   The price set id.
    *
    * @return bool
    */
@@ -1149,7 +1165,8 @@ WHERE  id = %1";
    * Get the sum of participant count
    * for all fields of given price set.
    *
-   * @param int $sid the price set id
+   * @param int $sid
+   *   The price set id.
    *
    * @param bool $onlyActive
    *
@@ -1210,7 +1227,8 @@ GROUP BY     mt.member_of_contact_id";
   /**
    * Check if auto renew option should be shown
    *
-   * @param int $priceSetId price set id
+   * @param int $priceSetId
+   *   Price set id.
    *
    * @return int $autoRenewOption ( 0:hide, 1:optional 2:required )
    */
@@ -1257,7 +1275,8 @@ GROUP BY     mt.member_of_contact_id";
   /**
    * Retrieve auto renew frequency and interval
    *
-   * @param int $priceSetId price set id
+   * @param int $priceSetId
+   *   Price set id.
    *
    * @return array associate array of frequency interval and unit
    * @static
@@ -1288,8 +1307,10 @@ GROUP BY     mt.member_of_contact_id";
   /**
    * Update the is_quick_config flag in the db
    *
-   * @param  int      $id             id of the database record
-   * @param  boolean  $isQuickConfig  value we want to set the is_quick_config field
+   * @param int $id
+   *   Id of the database record.
+   * @param boolean $isQuickConfig
+   *   Value we want to set the is_quick_config field.
    *
    * @return Object                   DAO object on sucess, null otherwise
    * @static
@@ -1341,9 +1362,12 @@ WHERE       ps.id = %1
   /**
    * Copy priceSet when event/contibution page is copied
    *
-   * @param string $baoName  BAO name
-   * @param int $id old event/contribution page id
-   * @param int $newId newly created event/contribution page id
+   * @param string $baoName
+   *   BAO name.
+   * @param int $id
+   *   Old event/contribution page id.
+   * @param int $newId
+   *   Newly created event/contribution page id.
    */
   public static function copyPriceSet($baoName, $id, $newId) {
     $priceSetId = CRM_Price_BAO_PriceSet::getFor($baoName, $id);
