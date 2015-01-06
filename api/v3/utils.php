@@ -1653,7 +1653,7 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
     // Regular fields have a 'name' property
     $value['name'] = 'custom_' . $key;
     $value['title'] = $value['label'];
-    $value['type'] = _getStandardTypeFromCustomDataType($value['data_type']);
+    $value['type'] = _getStandardTypeFromCustomDataType($value['data_type'], $value);
     $ret['custom_' . $key] = $value;
   }
   return $ret;
@@ -1661,7 +1661,10 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
 /**
  * Translate the custom field data_type attribute into a std 'type'
  */
-function _getStandardTypeFromCustomDataType($dataType) {
+function _getStandardTypeFromCustomDataType($dataType, $value) {
+  if ($dataType == 'Date' && isset($value['time_format']) && $value['time_format'] > 0) {
+    $dataType = 'DateTime';
+  }
   $mapping = array(
     'String' => CRM_Utils_Type::T_STRING,
     'Int' => CRM_Utils_Type::T_INT,
@@ -1669,6 +1672,7 @@ function _getStandardTypeFromCustomDataType($dataType) {
     'Memo' => CRM_Utils_Type::T_LONGTEXT,
     'Float' => CRM_Utils_Type::T_FLOAT,
     'Date' => CRM_Utils_Type::T_DATE,
+    'DateTime' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
     'Boolean' => CRM_Utils_Type::T_BOOLEAN,
     'StateProvince' => CRM_Utils_Type::T_INT,
     'File' => CRM_Utils_Type::T_STRING,
