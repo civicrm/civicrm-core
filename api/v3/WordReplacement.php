@@ -44,8 +44,8 @@
  */
 function civicrm_api3_word_replacement_get($params) {
   $bao = new CRM_Core_BAO_WordReplacement();
-  _civicrm_api3_dao_set_filter($bao, $params, true, 'WordReplacement');
-  $wordReplacements = _civicrm_api3_dao_to_array($bao, $params, true,'WordReplacement');
+  _civicrm_api3_dao_set_filter($bao, $params, TRUE, 'WordReplacement');
+  $wordReplacements = _civicrm_api3_dao_to_array($bao, $params, TRUE, 'WordReplacement');
 
   return civicrm_api3_create_success($wordReplacements, $params, 'word_replacement', 'get', $bao);
 }

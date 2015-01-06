@@ -258,13 +258,13 @@ SELECT DISTINCT case_id
     $options['return'] = array('contacts' => 1, 'activities' => 1);
   }
 
-  $foundcases =  _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Case');
+  $foundcases = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Case');
   $cases = array();
   foreach ($foundcases['values'] as $foundcase) {
-      if ($case = _civicrm_api3_case_read($foundcase['id'], $options)) {
-        $cases[$foundcase['id']] = $case;
-      }
+    if ($case = _civicrm_api3_case_read($foundcase['id'], $options)) {
+      $cases[$foundcase['id']] = $case;
     }
+  }
 
   return civicrm_api3_create_success($cases, $params, 'case', 'get');
 }

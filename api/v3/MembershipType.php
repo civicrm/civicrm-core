@@ -72,7 +72,7 @@ function _civicrm_api3_membership_type_create_spec(&$params) {
   // todo could set default here probably
   $params['domain_id']['api.required'] = 1;
   $params['member_of_contact_id']['api.required'] = 1;
-  $params['financial_type_id']['api.required'] =1;
+  $params['financial_type_id']['api.required'] = 1;
   $params['name']['api.required'] = 1;
   $params['duration_unit']['api.required'] = 1;
   $params['duration_interval']['api.required'] = 1;
@@ -109,4 +109,3 @@ function civicrm_api3_membership_type_get($params) {
 function civicrm_api3_membership_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

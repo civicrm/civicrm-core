@@ -92,4 +92,3 @@ function civicrm_api3_option_value_delete($params) {
     civicrm_api3_create_error('Could not delete OptionValue ' . $params['id']);
   }
 }
-

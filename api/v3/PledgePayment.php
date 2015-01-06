@@ -69,10 +69,9 @@ function civicrm_api3_pledge_payment_create($params) {
 
   $dao = CRM_Pledge_BAO_PledgePayment::add($paymentParams);
   if(empty($dao->pledge_id)){
-    $dao->find(True);
+    $dao->find(TRUE);
   }
   _civicrm_api3_object_to_array($dao, $result[$dao->id]);
-
 
   //update pledge status
   CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($dao->pledge_id);
@@ -107,7 +106,7 @@ function _civicrm_api3_pledge_payment_create_spec(&$params) {
 function civicrm_api3_pledge_payment_delete($params) {
 
   if (CRM_Pledge_BAO_PledgePayment::del($params['id'])) {
-    return civicrm_api3_create_success(array('id' => $params['id']), $params,'pledge_payment','delete');
+    return civicrm_api3_create_success(array('id' => $params['id']), $params, 'pledge_payment', 'delete');
   }
   else {
     return civicrm_api3_create_error('Could not delete payment');
@@ -127,7 +126,6 @@ function civicrm_api3_pledge_payment_delete($params) {
  * @access public
  */
 function civicrm_api3_pledge_payment_get($params) {
-
 
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
@@ -155,4 +153,3 @@ function updatePledgePayments($pledgeId, $paymentStatusId, $paymentIds) {
 function civicrm_api3_pledge_payment_get_spec(&$params) {
   $params['option.create_new'] = array('title' => "Create new field rather than update an unpaid payment");
 }
-

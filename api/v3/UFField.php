@@ -179,4 +179,3 @@ function _civicrm_api3_uf_field_delete_spec(&$params) {
   // legacy support for field_id
   $params['id']['api.aliases'] = array('field_id');
 }
-

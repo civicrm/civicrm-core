@@ -48,11 +48,11 @@ function civicrm_api3_message_template_create($params) {
  */
 function _civicrm_api3_message_template_create_spec(&$params) {
   $params['msg_title']['api.required'] = 1;
-  $params['is_active']['api.default'] = true;
-/*  $params['entity_id']['api.required'] = 1;
+  $params['is_active']['api.default'] = TRUE;
+  /*  $params['entity_id']['api.required'] = 1;
   $params['entity_table']['api.default'] = "civicrm_contribution_recur";
   $params['type']['api.default'] = "R";
-*/
+  */
 }
 
 /**

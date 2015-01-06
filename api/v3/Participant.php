@@ -128,7 +128,7 @@ function _civicrm_api3_participant_createlineitem(&$params, $participant){
         'qty' => $qty,
         'participant_count' => 0,
         'unit_price' => $dao->amount,
-        'line_total' => $qty*$dao->amount,
+        'line_total' => $qty * $dao->amount,
         'version' => 3,
       );
       civicrm_api('line_item', 'create', $lineItemparams);
@@ -219,4 +219,3 @@ function civicrm_api3_participant_delete($params) {
     throw new Exception('Error while deleting participant');
   }
 }
-

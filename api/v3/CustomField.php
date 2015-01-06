@@ -137,7 +137,7 @@ function civicrm_api3_custom_field_delete($params) {
  *
  * @param array $params
  *   Array to search on.
- *{*
+ * {*
  *
  * @return array
 @getfields CustomField_get}
@@ -166,8 +166,8 @@ function civicrm_api3_custom_field_get($params) {
  * removing as it might be useful in wrapper layer
  */
 function _civicrm_api3_custom_field_validate_field($fieldName, $value, $fieldDetails, &$errors = array()) {
-    return;
-    //see comment block
+  return;
+  //see comment block
   if (!$value) {
     return $errors;
   }

@@ -73,7 +73,7 @@ function civicrm_api3_action_schedule_create($params) {
 function _civicrm_api3_action_schedule_create_spec(&$params) {
   $params['title']['api.required'] = TRUE;
   $params['mapping_id']['api.required'] = TRUE;
-//  $params['entity_status']['api.required'] = TRUE;
+  //  $params['entity_status']['api.required'] = TRUE;
   $params['entity_value']['api.required'] = TRUE;
 }
 
@@ -91,5 +91,3 @@ function _civicrm_api3_action_schedule_create_spec(&$params) {
 function civicrm_api3_action_schedule_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-
-

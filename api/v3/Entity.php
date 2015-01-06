@@ -39,4 +39,3 @@ function civicrm_api3_entity_getfields($params) {
   // without putting an exception in for entity
   return civicrm_api3_create_success(array());
 }
-

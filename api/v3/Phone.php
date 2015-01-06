@@ -86,4 +86,3 @@ function civicrm_api3_phone_delete($params) {
  *  Could have been implemented here in this file too, but we moved it to illustrate the feature with a real usage.
  *
  */
-

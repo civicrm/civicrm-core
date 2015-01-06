@@ -174,4 +174,3 @@ function civicrm_api3_system_get($params) {
   );
   return civicrm_api3_create_success($returnValues, $params, 'System', 'get');
 }
-
