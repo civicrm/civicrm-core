@@ -48,8 +48,10 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * of time. This is the inverse function of create. It also stores all the retrieved
    * values in the default array
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Pledge_BAO_PledgeBlock object
    * @static
@@ -67,7 +69,8 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   /**
    * Takes an associative array and creates a pledgeBlock object
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Pledge_BAO_PledgeBlock object
    * @static
@@ -91,7 +94,8 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   /**
    * Add pledgeBlock
    *
-   * @param array $params reference array contains the values submitted by the form
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
    *
    * @static
    *
@@ -146,7 +150,8 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   /**
    * Delete the pledgeBlock
    *
-   * @param int $id pledgeBlock id
+   * @param int $id
+   *   PledgeBlock id.
    *
    * @return mixed|null
    * @static
@@ -172,7 +177,8 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   /**
    * Return Pledge  Block info in Contribution Pages
    *
-   * @param int $pageID contribution page id
+   * @param int $pageID
+   *   Contribution page id.
    *
    * @return array
    * @static

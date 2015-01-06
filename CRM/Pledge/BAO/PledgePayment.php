@@ -44,7 +44,8 @@ class CRM_Pledge_BAO_PledgePayment extends CRM_Pledge_DAO_PledgePayment {
   /**
    * Get pledge payment details
    *
-   * @param int $pledgeId pledge id
+   * @param int $pledgeId
+   *   Pledge id.
    *
    * @return array associated array of pledge payment details
    * @static
@@ -163,7 +164,8 @@ WHERE     pledge_id = %1
   /**
    * Add pledge payment
    *
-   * @param array $params associate array of field
+   * @param array $params
+   *   Associate array of field.
    *
    * @return pledge payment id
    * @static
@@ -205,8 +207,10 @@ WHERE     pledge_id = %1
    * of time. This is the inverse function of create. It also stores all the retrieved
    * values in the default array
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Pledge_BAO_PledgePayment object
    * @static
@@ -251,7 +255,8 @@ WHERE     pledge_id = %1
   /**
    * Delete all pledge payments
    *
-   * @param int $id pledge id
+   * @param int $id
+   *   Pledge id.
    *
    * @return bool
    * @static
@@ -285,7 +290,8 @@ WHERE     pledge_id = %1
   /**
    * On delete contribution record update associated pledge payment and pledge.
    *
-   * @param int $contributionID contribution id
+   * @param int $contributionID
+   *   Contribution id.
    *
    * @return bool
    * @static
@@ -322,13 +328,19 @@ WHERE     pledge_id = %1
   /**
    * Update Pledge Payment Status
    *
-   * @param int $pledgeID , id of pledge
-   * @param array $paymentIDs , ids of pledge payment(s) to update
-   * @param int $paymentStatusID , payment status to set
-   * @param int $pledgeStatusID pledge status to change (if needed)
+   * @param int $pledgeID
+   *   , id of pledge.
+   * @param array $paymentIDs
+   *   , ids of pledge payment(s) to update.
+   * @param int $paymentStatusID
+   *   , payment status to set.
+   * @param int $pledgeStatusID
+   *   Pledge status to change (if needed).
    * @param float|int $actualAmount , actual amount being paid
-   * @param bool $adjustTotalAmount , is amount being paid different from scheduled amount?
-   * @param bool $isScriptUpdate , is function being called from bin script?
+   * @param bool $adjustTotalAmount
+   *   , is amount being paid different from scheduled amount?.
+   * @param bool $isScriptUpdate
+   *   , is function being called from bin script?.
    *
    * @return int $newStatus, updated status id (or 0)
    */
@@ -568,7 +580,8 @@ WHERE  civicrm_pledge.id = %2
   /**
    * Calculate the pledge status
    *
-   * @param int $pledgeId pledge id
+   * @param int $pledgeId
+   *   Pledge id.
    *
    * @return int $statusId calculated status id of pledge
    * @static
@@ -607,12 +620,17 @@ WHERE  civicrm_pledge.id = %2
   /**
    * Update pledge payment table
    *
-   * @param int $pledgeId pledge id
-   * @param int $paymentStatusId payment status id to set
-   * @param array $paymentIds payment ids to be updated
+   * @param int $pledgeId
+   *   Pledge id.
+   * @param int $paymentStatusId
+   *   Payment status id to set.
+   * @param array $paymentIds
+   *   Payment ids to be updated.
    * @param float|int $actualAmount , actual amount being paid
-   * @param int $contributionId , Id of associated contribution when payment is recorded
-   * @param bool $isScriptUpdate , is function being called from bin script?
+   * @param int $contributionId
+   *   , Id of associated contribution when payment is recorded.
+   * @param bool $isScriptUpdate
+   *   , is function being called from bin script?.
    *
    * @static
    */
@@ -653,7 +671,8 @@ WHERE  civicrm_pledge_payment.pledge_id = %1
   /**
    * Update pledge payment table when reminder is sent
    *
-   * @param int $paymentId payment id
+   * @param int $paymentId
+   *   Payment id.
    *
    * @static
    */
@@ -670,7 +689,8 @@ WHERE  civicrm_pledge_payment.id = {$paymentId}
   /**
    * Get oldest pending or in progress pledge payments
    *
-   * @param int $pledgeID pledge id
+   * @param int $pledgeID
+   *   Pledge id.
    *
    * @param int $limit
    *
