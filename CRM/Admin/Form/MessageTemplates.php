@@ -158,10 +158,6 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
     $this->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
 
-    $this->add('textarea', 'msg_text', ts('Text Message'),
-      "cols=50 rows=6"
-    );
-
     // if not a system message use a wysiwyg editor, CRM-5971
     if ($this->_id &&
       CRM_Core_DAO::getFieldValue('CRM_Core_DAO_MessageTemplate',
@@ -181,6 +177,10 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
         )
       );
     }
+
+    $this->add('textarea', 'msg_text', ts('Text Message'),
+      "cols=50 rows=6"
+    );
 
     $this->add('select', 'pdf_format_id', ts('PDF Page Format'),
       array(
