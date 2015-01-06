@@ -69,8 +69,10 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    * Takes a bunch of params that are needed to match certain criteria and
    * retrieves the relevant objects.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Contact_BAO_SavedSearch
    * @static
@@ -88,7 +90,8 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   /**
    * Given an id, extract the formValues of the saved search
    *
-   * @param int $id the id of the saved search
+   * @param int $id
+   *   The id of the saved search.
    *
    * @return array the values of the posted saved search
    * @static
@@ -149,9 +152,12 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   /**
    * Get the where clause for a saved search
    *
-   * @param int $id saved search id
-   * @param  array $tables (reference ) add the tables that are needed for the select clause
-   * @param  array $whereTables (reference ) add the tables that are needed for the where clause
+   * @param int $id
+   *   Saved search id.
+   * @param array $tables
+   *   (reference ) add the tables that are needed for the select clause.
+   * @param array $whereTables
+   *   (reference ) add the tables that are needed for the where clause.
    *
    * @return string the where clause for this saved search
    * @static
@@ -262,7 +268,8 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   /**
    * Given an id, get the name of the saved search
    *
-   * @param int $id the id of the saved search
+   * @param int $id
+   *   The id of the saved search.
    *
    * @param string $value
    *

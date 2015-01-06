@@ -68,7 +68,8 @@ class CRM_Contact_Form_Edit_CustomData {
   /**
    * Build the form object elements for CustomData object
    *
-   * @param CRM_Core_Form $form       reference to the form object
+   * @param CRM_Core_Form $form
+   *   Reference to the form object.
    *
    * @return void
    * @static

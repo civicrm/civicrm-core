@@ -245,7 +245,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * Handle the values in mapField mode
    *
-   * @param array $values the array of values belonging to this line
+   * @param array $values
+   *   The array of values belonging to this line.
    *
    * @return boolean
    */
@@ -256,7 +257,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * Handle the values in preview mode
    *
-   * @param array $values the array of values belonging to this line
+   * @param array $values
+   *   The array of values belonging to this line.
    *
    * @return boolean      the result of this processing
    */
@@ -267,7 +269,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * Handle the values in summary mode
    *
-   * @param array $values the array of values belonging to this line
+   * @param array $values
+   *   The array of values belonging to this line.
    *
    * @return boolean      the result of this processing
    */
@@ -435,8 +438,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * Handle the values in import mode
    *
-   * @param int $onDuplicate the code for what action to take on duplicates
-   * @param array $values the array of values belonging to this line
+   * @param int $onDuplicate
+   *   The code for what action to take on duplicates.
+   * @param array $values
+   *   The array of values belonging to this line.
    *
    * @param bool $doGeocodeAddress
    *
@@ -1091,7 +1096,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * Check if an error in custom data
    *
    * @param array $params
-   * @param String $errorMessage A string containing all the error-fields.
+   * @param string $errorMessage
+   *   A string containing all the error-fields.
    *
    * @param null $csType
    * @param null $relationships
@@ -1278,7 +1284,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * eg value might be  m/M, ma/MA, mal/MAL, male return 'Male'
    * but if value is 'maleabc' than return false
    *
-   * @param string $gender check this value across gender values.
+   * @param string $gender
+   *   Check this value across gender values.
    *
    * retunr gender value / false
    *
@@ -1310,7 +1317,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * Check if an error in Core( non-custom fields ) field
    *
    * @param array $params
-   * @param String $errorMessage A string containing all the error-fields.
+   * @param string $errorMessage
+   *   A string containing all the error-fields.
    *
    */
   public function isErrorInCoreData($params, &$errorMessage) {
@@ -1598,8 +1606,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * Build error-message containing error-fields
    *
-   * @param String   $errorName      A string containing error-field name.
-   * @param String   $errorMessage   A string containing all the error-fields, where the new errorName is concatenated.
+   * @param string $errorName
+   *   A string containing error-field name.
+   * @param string $errorMessage
+   *   A string containing all the error-fields, where the new errorName is concatenated.
    *
    * @static
    */
@@ -1677,10 +1687,13 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * Format params for update and fill mode
    *
-   * @param $params       array  reference to an array containing all the
+   * @param $params
+   *   Array reference to an array containing all the.
    * values for import
-   * @param $onDuplicate  int
-   * @param $cid          int    contact id
+   * @param $onDuplicate
+   *   Int.
+   * @param $cid
+   *   Int contact id.
    */
   public function formatParams(&$params, $onDuplicate, $cid) {
     if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
@@ -1785,10 +1798,14 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * Convert any given date string to default date array.
    *
-   * @param array  $params     has given date-format
-   * @param array  $formatted  store formatted date in this array
-   * @param int    $dateType   type of date
-   * @param string $dateParam  index of params
+   * @param array $params
+   *   Has given date-format.
+   * @param array $formatted
+   *   Store formatted date in this array.
+   * @param int $dateType
+   *   Type of date.
+   * @param string $dateParam
+   *   Index of params.
    * @static
    */
   public function formatCustomDate(&$params, &$formatted, $dateType, $dateParam) {
@@ -1800,9 +1817,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * Format common params data to proper format to store.
    *
-   * @param array  $params        contain record values.
-   * @param array  $formatted     array of formatted data.
-   * @param array  $contactFields contact DAO fields.
+   * @param array $params
+   *   Contain record values.
+   * @param array $formatted
+   *   Array of formatted data.
+   * @param array $contactFields
+   *   Contact DAO fields.
    * @static
    */
   public function formatCommonData($params, &$formatted, &$contactFields) {
@@ -2023,8 +2043,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * Generate status and error message for unparsed street address records.
    *
-   * @param array $values the array of values belonging to each row
-   * @param array $statusFieldName store formatted date in this array
+   * @param array $values
+   *   The array of values belonging to each row.
+   * @param array $statusFieldName
+   *   Store formatted date in this array.
    * @param $returnCode
    *
    * @return int

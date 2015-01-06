@@ -174,9 +174,12 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
   /**
    * Global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param object $self form object
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param object $self
+   *   Form object.
    *
    * @return true if no errors, else array of errors
    * @static

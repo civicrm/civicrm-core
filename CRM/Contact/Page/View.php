@@ -345,7 +345,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
   /**
    * Add urls for display in the actions menu
    * @param CRM_Core_Page $obj
-   * @param integer $cid
+   * @param int $cid
    */
   public static function addUrls(&$obj, $cid) {
      $uid = CRM_Core_BAO_UFMatch::getUFId($cid);

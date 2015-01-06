@@ -108,7 +108,8 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * contact object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Contact_BAO_Contact object
    * @static
@@ -265,9 +266,12 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    *
    * This function is invoked from within the web form layer and also from the api layer
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param boolean $fixAddress if we need to fix address
-   * @param boolean $invokeHooks if we need to invoke hooks
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param bool $fixAddress
+   *   If we need to fix address.
+   * @param bool $invokeHooks
+   *   If we need to invoke hooks.
    *
    * @param bool $skipDelete
    *
@@ -463,7 +467,8 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
   /**
    * Get the display name and image of a contact
    *
-   * @param int $id the contactId
+   * @param int $id
+   *   The contactId.
    *
    * @param bool $type
    *
@@ -511,7 +516,8 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
-   * @param array $crudLinkSpec with keys:
+   * @param array $crudLinkSpec
+   *   With keys:.
    *  - action: int, CRM_Core_Action::UPDATE or CRM_Core_Action::VIEW [default: VIEW]
    *  - entity_table: string, eg "civicrm_contact"
    *  - entity_id: int
@@ -549,8 +555,10 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   /**
    * Get the values for pseudoconstants for name->value and reverse.
    *
-   * @param array   $defaults (reference) the default values, some of which need to be resolved.
-   * @param boolean $reverse  true if we want to resolve the values in the reverse direction (value -> name)
+   * @param array $defaults
+   *   (reference) the default values, some of which need to be resolved.
+   * @param bool $reverse
+   *   True if we want to resolve the values in the reverse direction (value -> name).
    *
    * @return void
    * @static
@@ -678,10 +686,13 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   /**
    * Fetch object based on array of properties
    *
-   * @param array   $params   (reference ) an assoc array of name/value pairs
-   * @param array   $defaults (reference ) an assoc array to hold the name / value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the name / value pairs.
    *                        in a hierarchical manner
-   * @param boolean $microformat  for location in microformat
+   * @param bool $microformat
+   *   For location in microformat.
    *
    * @return CRM_Contact_BAO_Contact object
    * @static
@@ -726,7 +737,8 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   /**
    * Get the display name of a contact
    *
-   * @param  int    $id id of the contact
+   * @param int $id
+   *   Id of the contact.
    *
    * @return null|string     display name of the contact if found
    * @static
@@ -743,9 +755,12 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   /**
    * Delete a contact and all its associated records
    *
-   * @param  int  $id id of the contact to delete
-   * @param  bool $restore       whether to actually restore, not delete
-   * @param  bool $skipUndelete  whether to force contact delete or not
+   * @param int $id
+   *   Id of the contact to delete.
+   * @param bool $restore
+   *   Whether to actually restore, not delete.
+   * @param bool $skipUndelete
+   *   Whether to force contact delete or not.
    *
    * @return boolean true if contact deleted, false otherwise
    * @static
@@ -877,7 +892,8 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   /**
    * Delete the image of a contact
    *
-   * @param  int $id id of the contact
+   * @param int $id
+   *   Id of the contact.
    *
    * @return boolean true if contact image is deleted
    */
@@ -897,7 +913,8 @@ WHERE id={$id}; ";
    * Return relative path
    * @todo make this a method of $config->userSystem (i.e. UF classes) rather than a static function
    *
-   * @param string $absolutePath absolute path
+   * @param string $absolutePath
+   *   Absolute path.
    *
    * @return String $relativePath Relative url of uploaded image
    */
@@ -933,9 +950,11 @@ WHERE id={$id}; ";
   /**
    * Return proportional height and width of the image
    *
-   * @param  Integer $imageWidth  width of image
+   * @param Integer $imageWidth
+   *   Width of image.
    *
-   * @param  Integer $imageHeight height of image
+   * @param Integer $imageHeight
+   *   Height of image.
    *
    * @return Array thumb dimension of image
    */
@@ -963,9 +982,12 @@ WHERE id={$id}; ";
    * Validate type of contact image
    *
    * @param array $params
-   * @param  String $imageIndex index of image field
-   * @param  String $statusMsg status message to be set after operation
-   * @param string $opType type of operation like fatal, bounce etc
+   * @param String $imageIndex
+   *   Index of image field.
+   * @param String $statusMsg
+   *   Status message to be set after operation.
+   * @param string $opType
+   *   Type of operation like fatal, bounce etc.
    *
    * @return boolean true if valid image extension
    */
@@ -1057,7 +1079,8 @@ WHERE id={$id}; ";
   /**
    * Get contact type for a contact.
    *
-   * @param int $id - id of the contact whose contact type is needed
+   * @param int $id
+   *   Id of the contact whose contact type is needed.
    *
    * @return string contact_type if $id found else null ""
    *
@@ -1072,7 +1095,8 @@ WHERE id={$id}; ";
   /**
    * Get contact sub type for a contact.
    *
-   * @param int $id - id of the contact whose contact sub type is needed
+   * @param int $id
+   *   Id of the contact whose contact sub type is needed.
    *
    * @param null $implodeDelimiter
    *
@@ -1098,7 +1122,8 @@ WHERE id={$id}; ";
   /**
    * Get pair of contact-type and sub-type for a contact.
    *
-   * @param int $id - id of the contact whose contact sub/contact type is needed
+   * @param int $id
+   *   Id of the contact whose contact sub/contact type is needed.
    *
    * @return array
    *
@@ -1135,10 +1160,14 @@ WHERE id={$id}; ";
    * scheme. Adding weight is super important
    *
    * @param int|string $contactType contact Type
-   * @param boolean $status status is used to manipulate first title
-   * @param boolean $showAll if true returns all fields (includes disabled fields)
-   * @param boolean $isProfile if its profile mode
-   * @param boolean $checkPermission if false, do not include permissioning clause (for custom data)
+   * @param bool $status
+   *   Status is used to manipulate first title.
+   * @param bool $showAll
+   *   If true returns all fields (includes disabled fields).
+   * @param bool $isProfile
+   *   If its profile mode.
+   * @param bool $checkPermission
+   *   If false, do not include permissioning clause (for custom data).
    *
    * @param bool $withMultiCustomFields
    *
@@ -1328,9 +1357,12 @@ WHERE id={$id}; ";
    * currentlty we are using importable fields as exportable fields
    *
    * @param int|string $contactType contact Type
-   * @param boolean $status true while exporting primary contacts
-   * @param boolean $export true when used during export
-   * @param boolean $search true when used during search, might conflict with export param?
+   * @param bool $status
+   *   True while exporting primary contacts.
+   * @param bool $export
+   *   True when used during export.
+   * @param bool $search
+   *   True when used during search, might conflict with export param?.
    *
    * @param bool $withMultiRecord
    *
@@ -1563,8 +1595,10 @@ WHERE id={$id}; ";
   /**
    * Get the all contact details(Hierarchical)
    *
-   * @param int   $contactId contact id
-   * @param array $fields fields array
+   * @param int $contactId
+   *   Contact id.
+   * @param array $fields
+   *   Fields array.
    *
    * @return $values array contains the contact details
    * @static
@@ -1590,7 +1624,8 @@ WHERE id={$id}; ";
    * for query to use and crete the right sql
    *
    * @param $fields
-   * @param int $contactId contact id
+   * @param int $contactId
+   *   Contact id.
    *
    * @return array a hierarchical property tree if appropriate
    * @static
@@ -1722,7 +1757,8 @@ WHERE  civicrm_contact.id = %1 ";
   /**
    * Get the display name, primary email and location type of a contact
    *
-   * @param  int    $id id of the contact
+   * @param int $id
+   *   Id of the contact.
    *
    * @return array  of display_name, email if found, do_not_email or (null,null,null)
    * @static
@@ -1765,13 +1801,19 @@ ORDER BY civicrm_email.is_primary DESC";
   /**
    * Add/edit/register contacts through profile.
    *
-   * @param array $params Array of profile fields to be edited/added.
-   * @param array $fields Array of fields from UFGroup
-   * @param int $contactID id of the contact to be edited/added.
-   * @param int $addToGroupID specifies the default group to which contact is added.
-   * @param int $ufGroupId uf group id (profile id)
+   * @param array $params
+   *   Array of profile fields to be edited/added.
+   * @param array $fields
+   *   Array of fields from UFGroup.
+   * @param int $contactID
+   *   Id of the contact to be edited/added.
+   * @param int $addToGroupID
+   *   Specifies the default group to which contact is added.
+   * @param int $ufGroupId
+   *   Uf group id (profile id).
    * @param ctype
-   * @param boolean $visibility basically lets us know where this request is coming from
+   * @param bool $visibility
+   *   Basically lets us know where this request is coming from.
    *                                if via a profile from web, we restrict what groups are changed
    *
    * @return int contact id created/edited
@@ -2239,8 +2281,10 @@ ORDER BY civicrm_email.is_primary DESC";
    * does not respect ACLs for now, which might need to be rectified at some
    * stage based on how its used
    *
-   * @param string $mail  primary email address of the contact
-   * @param string $ctype contact type
+   * @param string $mail
+   *   Primary email address of the contact.
+   * @param string $ctype
+   *   Contact type.
    *
    * @return object $dao contact details
    * @static
@@ -2291,8 +2335,10 @@ WHERE      civicrm_email.email = %1 AND civicrm_contact.is_deleted=0";
   /**
    * Find the contact details associated with an OpenID
    *
-   * @param string $openId openId of the contact
-   * @param string $ctype  contact type
+   * @param string $openId
+   *   OpenId of the contact.
+   * @param string $ctype
+   *   Contact type.
    *
    * @return object $dao contact details
    * @static
@@ -2328,7 +2374,8 @@ WHERE      civicrm_openid.openid = %1";
   /**
    * Funtion to get primary email of the contact
    *
-   * @param int $contactID contact id
+   * @param int $contactID
+   *   Contact id.
    *
    * @return string $dao->email  email address if present else null
    * @static
@@ -2355,7 +2402,8 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
   /**
    * Funtion to get primary OpenID of the contact
    *
-   * @param int $contactID contact id
+   * @param int $contactID
+   *   Contact id.
    *
    * @return string $dao->openid   OpenID if present else null
    * @static
@@ -2383,8 +2431,10 @@ AND       civicrm_openid.is_primary = 1";
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array $params input parameters to find object
-   * @param array $values output values of the object
+   * @param array $params
+   *   Input parameters to find object.
+   * @param array $values
+   *   Output values of the object.
    *
    * @return CRM_Contact_BAO_Contact|null the found object or null
    * @static
@@ -2466,9 +2516,12 @@ AND       civicrm_openid.is_primary = 1";
    * Given the component name and returns
    * the count of participation of contact
    *
-   * @param string  $component input component name
-   * @param integer $contactId input contact id
-   * @param string  $tableName optional tableName if component is custom group
+   * @param string $component
+   *   Input component name.
+   * @param int $contactId
+   *   Input contact id.
+   * @param string $tableName
+   *   Optional tableName if component is custom group.
    *
    * @return total number of count of occurence in database
    * @static
@@ -2543,8 +2596,10 @@ AND       civicrm_openid.is_primary = 1";
   /**
    * Process greetings and cache
    *
-   * @param object  $contact contact object after save
-   * @param boolean $useDefaults use default greeting values
+   * @param object $contact
+   *   Contact object after save.
+   * @param bool $useDefaults
+   *   Use default greeting values.
    *
    * @return void
    * @static
@@ -2693,10 +2748,13 @@ AND       civicrm_openid.is_primary = 1";
   /**
    * Retrieve loc block ids w/ given condition.
    *
-   * @param  int    $contactId    contact id.
-   * @param  array  $criteria     key => value pair which should be
+   * @param int $contactId
+   *   Contact id.
+   * @param array $criteria
+   *   Key => value pair which should be.
    *                              fulfill by return record ids.
-   * @param  string $condOperator operator use for grouping multiple conditions.
+   * @param string $condOperator
+   *   Operator use for grouping multiple conditions.
    *
    * @return array  $locBlockIds  loc block ids which fulfill condition.
    * @static
@@ -3006,8 +3064,10 @@ AND       civicrm_openid.is_primary = 1";
    * Retrieve display name of contact that address is shared
    * based on $masterAddressId or $contactId .
    *
-   * @param  int    $masterAddressId    master id.
-   * @param  int    $contactId   contact id.
+   * @param int $masterAddressId
+   *   Master id.
+   * @param int $contactId
+   *   Contact id.
    *
    * @return display name |null the found display name or null.
    * @static
@@ -3176,7 +3236,8 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    * Check if contact is being used in civicrm_domain
    * based on $contactId
    *
-   * @param  int     $contactId   contact id.
+   * @param int $contactId
+   *   Contact id.
    *
    * @return bool true if present else false.
    * @static
@@ -3200,9 +3261,11 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    * TODO: Should we always assume chainselect? What fn should be responsible for controlling that flow?
    * TODO: In context of chainselect, what to return if e.g. a country has no states?
    *
-   * @param String $fieldName
-   * @param String $context : @see CRM_Core_DAO::buildOptionsContext
-   * @param Array $props : whatever is known about this dao object
+   * @param string $fieldName
+   * @param string $context
+   *   : @see CRM_Core_DAO::buildOptionsContext.
+   * @param array $props
+   *   : whatever is known about this dao object.
    *
    * @return Array|bool
    */

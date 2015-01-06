@@ -410,8 +410,8 @@ class CRM_Contact_BAO_Query {
    * @param array $params
    * @param array $returnProperties
    * @param array $fields
-   * @param boolean $includeContactIds
-   * @param boolean $strict
+   * @param bool $includeContactIds
+   * @param bool $strict
    * @param bool|int $mode - mode the search is operating on
    *
    * @param bool $skipPermission
@@ -1261,10 +1261,10 @@ class CRM_Contact_BAO_Query {
   /**
    * Generate the query based on what type of query we need
    *
-   * @param boolean $count
-   * @param boolean $sortByChar
-   * @param boolean $groupContacts
-   * @param boolean $onlyDeleted
+   * @param bool $count
+   * @param bool $sortByChar
+   * @param bool $groupContacts
+   * @param bool $onlyDeleted
    *
    * @return array sql query parts as an array
    */
@@ -2326,7 +2326,7 @@ class CRM_Contact_BAO_Query {
    * @param array $fields
    * @param array $tables
    * @param $whereTables
-   * @param boolean $strict
+   * @param bool $strict
    *
    * @return string
    * @static
@@ -2345,10 +2345,13 @@ class CRM_Contact_BAO_Query {
   /**
    * Create the from clause
    *
-   * @param array $tables tables that need to be included in this from clause
+   * @param array $tables
+   *   Tables that need to be included in this from clause.
    *                      if null, return mimimal from clause (i.e. civicrm_contact)
-   * @param array $inner tables that should be inner-joined
-   * @param array $right tables that should be right-joined
+   * @param array $inner
+   *   Tables that should be inner-joined.
+   * @param array $right
+   *   Tables that should be right-joined.
    *
    * @param bool $primaryLocation
    * @param int $mode
@@ -2848,7 +2851,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * @param array  $groups
+   * @param array $groups
    * @param string $tableAlias
    * @param string $joinTable
    *
@@ -4120,7 +4123,8 @@ civicrm_relationship.is_permission_a_b = 0
 /**
  * Add start & end date criteria in
  * @param string $grouping
- * @param array $where = array to add where clauses to, in case you are generating a temp table
+ * @param array $where
+ *   = array to add where clauses to, in case you are generating a temp table.
  * not the main query.
  */
   public function addRelationshipDateClauses($grouping, &$where){
@@ -4273,9 +4277,12 @@ civicrm_relationship.is_permission_a_b = 0
    * @param string $sort
    * @param int $offset
    * @param int $row_count
-   * @param bool $smartGroupCache  ?? update smart group cache?
-   * @param bool $count return count obnly
-   * @param bool $skipPermissions Should permissions be ignored or should the logged in user's permissions be applied
+   * @param bool $smartGroupCache
+   *   ?? update smart group cache?.
+   * @param bool $count
+   *   Return count obnly.
+   * @param bool $skipPermissions
+   *   Should permissions be ignored or should the logged in user's permissions be applied.
    *
    *
    * @return array
@@ -4360,17 +4367,27 @@ civicrm_relationship.is_permission_a_b = 0
   /**
    * Create and query the db for an contact search
    *
-   * @param int $offset the offset for the query
-   * @param int $rowCount the number of rows to return
-   * @param string $sort the order by string
-   * @param boolean $count is this a count only query ?
-   * @param boolean $includeContactIds should we include contact ids?
-   * @param boolean $sortByChar if true returns the distinct array of first characters for search results
-   * @param boolean $groupContacts if true, return only the contact ids
-   * @param boolean $returnQuery should we return the query as a string
-   * @param string $additionalWhereClause if the caller wants to further restrict the search (used for components)
+   * @param int $offset
+   *   The offset for the query.
+   * @param int $rowCount
+   *   The number of rows to return.
+   * @param string $sort
+   *   The order by string.
+   * @param bool $count
+   *   Is this a count only query ?.
+   * @param bool $includeContactIds
+   *   Should we include contact ids?.
+   * @param bool $sortByChar
+   *   If true returns the distinct array of first characters for search results.
+   * @param bool $groupContacts
+   *   If true, return only the contact ids.
+   * @param bool $returnQuery
+   *   Should we return the query as a string.
+   * @param string $additionalWhereClause
+   *   If the caller wants to further restrict the search (used for components).
    * @param null $sortOrder
-   * @param string $additionalFromClause should be clause with proper joins, effective to reduce where clause load.
+   * @param string $additionalFromClause
+   *   Should be clause with proper joins, effective to reduce where clause load.
    *
    * @param bool $skipOrderAndLimit
    *
@@ -4558,9 +4575,9 @@ civicrm_relationship.is_permission_a_b = 0
    * Fetch a list of contacts from the prev/next cache for displaying a search results page
    *
    * @param string $cacheKey
-   * @param int    $offset
-   * @param int    $rowCount
-   * @param bool   $includeContactIds
+   * @param int $offset
+   * @param int $rowCount
+   * @param bool $includeContactIds
    * @return CRM_Core_DAO
    */
   public function getCachedContacts($cacheKey, $offset, $rowCount, $includeContactIds) {
@@ -4585,8 +4602,10 @@ civicrm_relationship.is_permission_a_b = 0
    * Note that these 2 params were in the code when extracted from another function
    * and a second round extraction would be to make them properties of the class
    *
-   * @param bool $onlyDeleted Only get deleted contacts
-   * @param bool $count Return Count only
+   * @param bool $onlyDeleted
+   *   Only get deleted contacts.
+   * @param bool $count
+   *   Return Count only.
    *
    * @return null
    */
@@ -5062,10 +5081,14 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
    * builds the where Clause for the query
    * used for handling 'IS NULL'/'IS NOT NULL' operators
    *
-   * @param string  $field       fieldname
-   * @param string  $op          operator
-   * @param string  $value       value
-   * @param string  $dataType    data type of the field
+   * @param string $field
+   *   Fieldname.
+   * @param string $op
+   *   Operator.
+   * @param string $value
+   *   Value.
+   * @param string $dataType
+   *   Data type of the field.
    *
    * @return string where clause for the query
    */
@@ -5285,14 +5308,22 @@ AND   displayRelType.is_active = 1
   /**
    * Builds the necessary structures for all fields that are similar to option value lookups
    *
-   * @param $name     string the name of the field
-   * @param $op       string the sql operator, this function should handle ALL SQL operators
-   * @param $value string|integer|array depends on the operator and who's calling the query builder
-   * @param $grouping int    the index where to place the where clause
-   * @param $selectValues the key value pairs for this element. This allows us to use this function for things besides option-value pairs
-   * @param $field    array  an array that contains various properties of the field identified by $name
-   * @param $label    string The label for this field element
-   * @param $dataType string The data type for this element
+   * @param $name
+   *   String the name of the field.
+   * @param $op
+   *   String the sql operator, this function should handle ALL SQL operators.
+   * @param $value
+   *   String|integer|array depends on the operator and who's calling the query builder.
+   * @param $grouping
+   *   Int the index where to place the where clause.
+   * @param $selectValues
+   *   The key value pairs for this element. This allows us to use this function for things besides option-value pairs.
+   * @param $field
+   *   Array an array that contains various properties of the field identified by $name.
+   * @param $label
+   *   String The label for this field element.
+   * @param $dataType
+   *   String The data type for this element.
    * @param bool $useIDsOnly
    *
    * @return void     adds the where clause and qill to the query object
@@ -5370,7 +5401,8 @@ AND   displayRelType.is_active = 1
    * super nice js widgets to do the hard work
    *
    * @param string $string
-   * @param string $dataType the dataType we should check for the values, default integer
+   * @param string $dataType
+   *   The dataType we should check for the values, default integer.
    *
    * @return bool|array if string does not match the patter
    *         array of numeric values if string does match the pattern
@@ -5484,7 +5516,7 @@ AND   displayRelType.is_active = 1
 
   /**
    * Include pseudo fields LEFT JOIN
-   * @param string|array $sort  can be a object or string
+   * @param string|array $sort can be a object or string
    *
    * @return array
    */
