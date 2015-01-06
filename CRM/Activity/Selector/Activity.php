@@ -77,11 +77,12 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    * @return \CRM_Activity_Selector_Activity
   @access public
    */
-  function __construct($contactId,
-                       $permission,
-                       $admin = FALSE,
-                       $context = 'activity',
-                       $activityTypeIDs = NULL) {
+  function __construct(
+    $contactId,
+    $permission,
+    $admin = FALSE,
+    $context = 'activity',
+    $activityTypeIDs = NULL) {
     $this->_contactId = $contactId;
     $this->_permission = $permission;
     $this->_admin = $admin;
@@ -109,12 +110,13 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    *
    * @return array
    */
-  public static function actionLinks($activityTypeId,
-                                     $sourceRecordId = NULL,
-                                     $accessMailingReport = FALSE,
-                                     $activityId = NULL,
-                                     $key = NULL,
-                                     $compContext = NULL) {
+  public static function actionLinks(
+    $activityTypeId,
+    $sourceRecordId = NULL,
+    $accessMailingReport = FALSE,
+    $activityId = NULL,
+    $key = NULL,
+    $compContext = NULL) {
     static $activityActTypes = NULL;
     //CRM-14277 added addtitional param to handle activity search
     $extraParams = "&searchContext=activity";
