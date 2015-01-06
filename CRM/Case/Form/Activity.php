@@ -355,8 +355,10 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   /**
    * Global form rule
    *
-   * @param array $fields the input form values
-   * @param array $files the uploaded files if any
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
    * @param $self
    *
    * @return true if no errors, else array of errors

@@ -205,9 +205,12 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    *
    * If CiviCase is being enabled, load the case related sample data
    *
-   * @param array $oldValue List of component names
-   * @param array $newValue List of component names
-   * @param array $metadata Specification of the setting (per *.settings.php)
+   * @param array $oldValue
+   *   List of component names.
+   * @param array $newValue
+   *   List of component names.
+   * @param array $metadata
+   *   Specification of the setting (per *.settings.php).
    */
   public static function onToggleComponents($oldValue, $newValue, $metadata) {
     if (
