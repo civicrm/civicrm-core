@@ -112,10 +112,24 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $params = $this->_params;
     $params['street_number_suffix'] = 'really long string';
     $result = $this->callAPIFailure('address', 'create', $params);
-   }
+  }
+  /**
+   * Create an address with a master ID and ensure that a relationship is created
+   */
+  public function testCreateAddressWithMasterRelationshipHousehold() {
+    $householdID = $this->householdCreate();
+    $address = $this->callAPISuccess('address', 'create', array_merge($this->_params, $this->_params, array('contact_id' => $householdID)));
+    $individualID = $this->individualCreate();
+    $individualParams = array(
+      'contact_id' => $individualID,
+      'master_id' => $address['id'],
+    );
+    $this->callAPISuccess('address', 'create', array_merge($this->_params, $individualParams));
+    $this->callAPISuccess('relationship', 'getcount', array('contact_id_a' => $individualID, 'contact_id_b' => $this->_contactID));
+  }
 
   /**
-   * Is_primary shoule be set as a default. ie. create the address, unset the params & recreate.
+   * Is_primary should be set as a default. ie. create the address, unset the params & recreate.
    * is_primary should be 0 before & after the update. ie - having no other address
    * is_primary is invalid
    */
@@ -219,13 +233,9 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   /**
    * Test civicrm_address_get with sort option- success expected.
    */
-  public function testGetAddressLikeFail() {
+  public function testGetAddressLikeFindNone() {
     $create = $this->callAPISuccess('address', 'create', $this->_params);
-    $subfile     = "AddressLike";
-    $description = "Demonstrates Use of Like";
-    $params      = array('street_address' => array('LIKE' => "'%xy%'"),
-      'sequential' => 1,
-    );
+    $params      = array('street_address' => array('LIKE' => "'%xy%'"),);
     $result = $this->callAPISuccess('Address', 'Get', ($params));
     $this->assertEquals(0, $result['count'], 'In line ' . __LINE__);
     $this->callAPISuccess('address', 'delete', array('id' => $create['id']));
