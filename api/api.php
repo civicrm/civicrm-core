@@ -64,8 +64,8 @@ function _civicrm_api3_api_getfields(&$apiRequest) {
     // the main param getfields takes is 'action' - however this param is not compatible with REST
     // so we accept 'api_action' as an alias of action on getfields
     if (!empty($apiRequest['params']['api_action'])) {
-    //  $apiRequest['params']['action'] = $apiRequest['params']['api_action'];
-     // unset($apiRequest['params']['api_action']);
+      //  $apiRequest['params']['action'] = $apiRequest['params']['api_action'];
+      // unset($apiRequest['params']['api_action']);
     }
     return array('action' => array('api.aliases' => array('api_action')));
   }
@@ -115,7 +115,6 @@ function _civicrm_api_get_camel_name($entity) {
     'tag1_id' => '$value.api.entity.create.0.id'
  */
 function _civicrm_api_replace_variables($entity, $action, &$params, &$parentResult, $separator = '.') {
-
 
   foreach ($params as $field => $value) {
 
@@ -183,4 +182,3 @@ function _civicrm_api_get_entity_name_from_dao($bao){
   $daoName = str_replace("BAO", "DAO", get_class($bao));
   return _civicrm_api_get_entity_name_from_camel(CRM_Core_DAO_AllCoreTables::getBriefName($daoName));
 }
-

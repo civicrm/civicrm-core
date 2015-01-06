@@ -145,4 +145,3 @@ function &civicrm_api3_note_tree_get($params) {
   $noteTree = CRM_Core_BAO_Note::getNoteTree($params['id'], $params['max_depth'], $params['snippet']);
   return civicrm_api3_create_success($noteTree, $params);
 }
-

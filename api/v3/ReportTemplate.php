@@ -124,7 +124,7 @@ function _civicrm_api3_report_template_getrows($params) {
   $reportInstance->preProcess();
   $reportInstance->setDefaultValues(FALSE);
   $reportInstance->setParams(array_merge($reportInstance->getDefaultValues(), $params));
-  $options = _civicrm_api3_get_options_from_params($params, TRUE,'report_template','get');
+  $options = _civicrm_api3_get_options_from_params($params, TRUE, 'report_template', 'get');
   $reportInstance->setLimitValue($options['limit']);
   $reportInstance->setOffsetValue($options['offset']);
   $reportInstance->beginPostProcessCommon();

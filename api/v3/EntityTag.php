@@ -89,7 +89,7 @@ function civicrm_api3_entity_tag_create($params) {
 }
 
 /**
- *{@getfields EntityTag_delete}
+ * {@getfields EntityTag_delete}
  * @example EntityTagGet.php
  *
  * @param array $params
@@ -163,4 +163,3 @@ function _civicrm_api3_entity_tag_common($params, $op = 'add') {
   }
   return $values;
 }
-

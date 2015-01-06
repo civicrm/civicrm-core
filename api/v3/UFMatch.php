@@ -96,4 +96,3 @@ function _civicrm_api3_uf_match_create_spec(&$params) {
 function civicrm_api3_uf_match_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

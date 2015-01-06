@@ -107,11 +107,10 @@ function civicrm_api3_participant_payment_delete($params) {
  *   Input parameters.
  *
  * @return array  array of properties, if error an array with an error id and error message
- *  @example ParticipantPaymentGet
+ * @example ParticipantPaymentGet
  * {@getfields ParticipantPayment_get}
  * @access public
  */
 function civicrm_api3_participant_payment_get($params) {
   return _civicrm_api3_basic_get('CRM_Event_DAO_ParticipantPayment', $params);
 }
-

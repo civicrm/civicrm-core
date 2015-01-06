@@ -54,9 +54,9 @@ function civicrm_api3_website_create($params) {
   //DO NOT USE THIS FUNCTION AS THE BASIS FOR A NEW API http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
 
   $websiteBAO = CRM_Core_BAO_Website::add($params);
-    $values = array();
-    _civicrm_api3_object_to_array($websiteBAO, $values[$websiteBAO->id]);
-    return civicrm_api3_create_success($values, $params, 'website', 'get');
+  $values = array();
+  _civicrm_api3_object_to_array($websiteBAO, $values[$websiteBAO->id]);
+  return civicrm_api3_create_success($values, $params, 'website', 'get');
 }
 
 /**
@@ -115,4 +115,3 @@ function civicrm_api3_website_delete($params) {
 function civicrm_api3_website_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'website');
 }
-

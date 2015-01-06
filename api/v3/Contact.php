@@ -69,7 +69,8 @@ function civicrm_api3_contact_create($params) {
     if (($email = CRM_Utils_Array::value('email', $params)) && !is_array($params['email'])) {
       $defLocType = CRM_Core_BAO_LocationType::getDefault();
       $params['email'] = array(
-        1 => array('email' => $email,
+        1 => array(
+      'email' => $email,
           'is_primary' => 1,
           'location_type_id' => ($defLocType->id) ? $defLocType->id : 1,
         ),
@@ -79,7 +80,9 @@ function civicrm_api3_contact_create($params) {
 
   if (!empty($params['home_url'])) {
     $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
-    $params['website'] = array(1 => array('website_type_id' => key($websiteTypes),
+    $params['website'] = array(
+    1 => array(
+    'website_type_id' => key($websiteTypes),
         'url' => $params['home_url'],
       ),
     );
@@ -164,7 +167,7 @@ function civicrm_api3_contact_get($params) {
 function civicrm_api3_contact_getcount($params) {
   $options = array();
   _civicrm_api3_contact_get_supportanomalies($params, $options);
-  $count = _civicrm_api3_get_using_query_object('contact', $params, $options,1);
+  $count = _civicrm_api3_get_using_query_object('contact', $params, $options, 1);
   return (int) $count;
 }
 
@@ -212,7 +215,7 @@ function _civicrm_api3_contact_get_spec(&$params) {
   $params['tag']['title'] = 'Assigned tags (filter, array)';
   $params['birth_date_low'] = array('name' => 'birth_date_low', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birth Date is equal to or greater than'));
   $params['birth_date_high'] = array('name' => 'birth_date_high', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birth Date is equal to or less than'));
-  $params['deceased_date_low'] = array('name' => 'deceased_date_low','type' => CRM_Utils_Type::T_DATE, 'title' => ts('Deceased Date is equal to or greater than'));
+  $params['deceased_date_low'] = array('name' => 'deceased_date_low', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Deceased Date is equal to or greater than'));
   $params['deceased_date_high'] = array('name' => 'deceased_date_high', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Deceased Date is equal to or less than'));
 }
 
@@ -251,7 +254,8 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
     if (is_array($params['filter.group_id'])) {
       $groups = $params['filter.group_id'];
     }
-    else $groups = explode(',', $params['filter.group_id']);
+    else { $groups = explode(',', $params['filter.group_id']);
+    }
     unset($params['filter.group_id']);
     $groups = array_flip($groups);
     $groups[key($groups)] = 1;
@@ -308,25 +312,27 @@ function civicrm_api3_contact_delete($params) {
  * @throws API_Exception
  * @throws CiviCRM_API3_Exception
  */
-function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeErrorArray = false, $obsoletevalue = true, $dedupeRuleGroupID = null )
+function _civicrm_api3_contact_check_params(&$params, $dupeCheck = TRUE, $dupeErrorArray = FALSE, $obsoletevalue = TRUE, $dedupeRuleGroupID = NULL)
 {
 
   switch (strtolower(CRM_Utils_Array::value('contact_type', $params))) {
     case 'household':
-      civicrm_api3_verify_mandatory($params, null, array('household_name'));
+      civicrm_api3_verify_mandatory($params, NULL, array('household_name'));
       break;
+
     case 'organization':
-      civicrm_api3_verify_mandatory($params, null, array('organization_name'));
+      civicrm_api3_verify_mandatory($params, NULL, array('organization_name'));
       break;
+
     case 'individual':
-      civicrm_api3_verify_one_mandatory($params, null, array(
+      civicrm_api3_verify_one_mandatory($params, NULL, array(
         'first_name',
         'last_name',
         'email',
         'display_name',
       )
-    );
-    break;
+      );
+      break;
   }
 
   // Fixme: This really needs to be handled at a lower level. @See CRM-13123
@@ -335,10 +341,10 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
   }
 
   if (!empty($params['contact_sub_type']) && !empty($params['contact_type'])) {
-      if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $params['contact_type']))) {
-        throw new API_Exception("Invalid or Mismatched Contact Subtype: " . implode(', ', (array)$params['contact_sub_type']));
-      }
+    if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $params['contact_type']))) {
+      throw new API_Exception("Invalid or Mismatched Contact Subtype: " . implode(', ', (array) $params['contact_sub_type']));
     }
+  }
 
   if ($dupeCheck) {
     // check for record already existing
@@ -354,8 +360,8 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
 
     $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $params['contact_type'], 'Unsupervised', array());
 
-    if (count($ids) >0) {
-      throw new API_Exception("Found matching contacts: ". implode(',',$ids),"duplicate",array("ids"=>$ids));
+    if (count($ids) > 0) {
+      throw new API_Exception("Found matching contacts: ". implode(',', $ids), "duplicate", array("ids" => $ids));
     }
   }
 
@@ -510,13 +516,11 @@ function _civicrm_api3_greeting_format_params($params) {
       $greetingId = CRM_Utils_Array::key('Customized', $greetings);
     }
 
-    $customValue = isset($params['contact_id']) ?
-      CRM_Core_DAO::getFieldValue(
+    $customValue = isset($params['contact_id']) ? CRM_Core_DAO::getFieldValue(
         'CRM_Contact_DAO_Contact',
         $params['contact_id'],
         "{$key}{$greeting}_custom"
-      ) :
-      FALSE;
+      ) : FALSE;
 
     if (array_key_exists("{$key}{$greeting}_id", $params) && empty($params["{$key}{$greeting}_id"])) {
       $nullValue = TRUE;
@@ -810,7 +814,7 @@ LIMIT    0, {$limit}
   while ($dao->fetch()) {
     $t = array('id' => $dao->id);
     foreach ($as as $k) {
-      $t[$k] = isset($dao->$k)? $dao->$k: '';
+      $t[$k] = isset($dao->$k) ? $dao->$k : '';
     }
     $t['data'] = $dao->data;
     $contactList[] = $t;
@@ -877,7 +881,8 @@ function civicrm_api3_contact_merge($params) {
   $mode = CRM_Utils_Array::value('mode', $params, 'safe');
   $autoFlip = CRM_Utils_Array::value('auto_flip', $params, TRUE);
 
-  $dupePairs = array(array('srcID' => CRM_Utils_Array::value('main_id', $params),
+  $dupePairs = array(array(
+  'srcID' => CRM_Utils_Array::value('main_id', $params),
       'dstID' => CRM_Utils_Array::value('other_id', $params),
     ));
   $result = CRM_Dedupe_Merger::merge($dupePairs, array(), $mode, $autoFlip);

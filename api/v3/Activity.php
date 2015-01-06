@@ -76,7 +76,6 @@ function civicrm_api3_activity_create($params) {
     return $errors;
   }
 
-
   // processing for custom data
   $values = $activityArray = array();
   _civicrm_api3_custom_format_params($params, $values, 'Activity');
@@ -236,7 +235,7 @@ function civicrm_api3_activity_get($params) {
   else {
     $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
   }
-  $options = _civicrm_api3_get_options_from_params($params, FALSE,'activity','get');
+  $options = _civicrm_api3_get_options_from_params($params, FALSE, 'activity', 'get');
   if($options['is_count']) {
     return civicrm_api3_create_success($activities, $params, 'activity', 'get');
   }
@@ -278,16 +277,19 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
           $activities[$key]['assignee_contact_id'] = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId($activityArray['id']);
         }
         break;
+
       case 'target_contact_id':
         foreach ($activities as $key => $activityArray) {
           $activities[$key]['target_contact_id'] = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId($activityArray['id']);
         }
         break;
+
       case 'source_contact_id':
         foreach ($activities as $key => $activityArray) {
           $activities[$key]['source_contact_id'] = CRM_Activity_BAO_Activity::getSourceContactID($activityArray['id']);
         }
         break;
+
       default:
         if (substr($n, 0, 6) == 'custom') {
           $returnProperties[$n] = $v;
@@ -369,7 +371,6 @@ function _civicrm_api3_activity_check_params(&$params) {
       }
     }
 
-
     $sql = '
 SELECT  count(*)
   FROM  civicrm_contact
@@ -379,8 +380,8 @@ SELECT  count(*)
     }
   }
 
-
-  $activityIds = array('activity' => CRM_Utils_Array::value('id', $params),
+  $activityIds = array(
+  'activity' => CRM_Utils_Array::value('id', $params),
                  'parent' => CRM_Utils_Array::value('parent_id', $params),
                  'original' => CRM_Utils_Array::value('original_id', $params),
   );
@@ -409,7 +410,7 @@ SELECT  count(*)
     $activityTypeIdInList = array_search(($activityName ? $activityName : $activityLabel), $activityTypes);
 
     if (!$activityTypeIdInList) {
-      $errorString = $activityName ? "Invalid Activity Name : $activityName"  : "Invalid Activity Type Label";
+      $errorString = $activityName ? "Invalid Activity Name : $activityName" : "Invalid Activity Type Label";
       throw new Exception($errorString);
     }
     elseif ($activityTypeId && ($activityTypeId != $activityTypeIdInList)) {
@@ -429,7 +430,6 @@ SELECT  count(*)
   if (isset($params['duration_minutes']) && !is_numeric($params['duration_minutes'])) {
     throw new API_Exception('Invalid Activity Duration (in minutes)');
   }
-
 
   //if adding a new activity & date_time not set make it now
   // this should be managed by the wrapper layer & setting ['api.default'] in speces
@@ -490,4 +490,3 @@ function _civicrm_api3_activity_getlist_output($result, $request) {
   }
   return $output;
 }
-

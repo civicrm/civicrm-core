@@ -99,7 +99,7 @@ function civicrm_api3_file_get($params) {
  * This api is used for updating an existing file.
  * Required parameters : id of a file
  *
- * @param Array $params
+ * @param array $paramsAn array of name/value property values of civicrm_file.
  *   An array of name/value property values of civicrm_file.
  *
  * @return array of updated file object property values

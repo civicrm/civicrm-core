@@ -56,8 +56,8 @@ function civicrm_api3_domain_get($params) {
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
 
-  _civicrm_api3_dao_set_filter($bao, $params, true, 'domain');
-  $domains = _civicrm_api3_dao_to_array($bao, $params, true,'domain');
+  _civicrm_api3_dao_set_filter($bao, $params, TRUE, 'domain');
+  $domains = _civicrm_api3_dao_to_array($bao, $params, TRUE, 'domain');
 
   foreach ($domains as $domain) {
     if(!empty($domain['contact_id'])){
@@ -85,21 +85,21 @@ function civicrm_api3_domain_get($params) {
             'phone_type_id',
           $values['location']['phone'][1]
         )
-      ),
+        ),
         'phone' => CRM_Utils_Array::value(
           'phone',
         $values['location']['phone'][1]
         )
-    );
-    }
-
-    if ( !empty( $values['location']['address'] ) ) {
-      foreach ($address_array as $value) {
-        $domain['domain_address'][$value] = CRM_Utils_Array::value($value,
-          $values['location']['address'][1]
         );
       }
-    }
+
+      if ( !empty( $values['location']['address'] ) ) {
+        foreach ($address_array as $value) {
+          $domain['domain_address'][$value] = CRM_Utils_Array::value($value,
+          $values['location']['address'][1]
+          );
+        }
+      }
 
       list($domain['from_name'],
         $domain['from_email']
@@ -107,7 +107,6 @@ function civicrm_api3_domain_get($params) {
       $domains[$domain['id']] = array_merge($domains[$domain['id']], $domain);
     }
   }
-
 
   return civicrm_api3_create_success($domains, $params, 'domain', 'get', $bao);
 }
@@ -150,4 +149,3 @@ function _civicrm_api3_domain_create_spec(&$params) {
   unset($params['version']);
   $params['name']['api.required'] = 1;
 }
-
