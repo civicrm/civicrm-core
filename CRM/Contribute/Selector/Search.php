@@ -167,7 +167,8 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
    * @return \CRM_Contribute_Selector_Search
   @access public
    */
-  function __construct(&$queryParams,
+  function __construct(
+    &$queryParams,
     $action = CRM_Core_Action::NONE,
     $contributionClause = NULL,
     $single = FALSE,

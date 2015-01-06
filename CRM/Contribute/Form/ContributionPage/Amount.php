@@ -579,7 +579,8 @@ SELECT id
                   CRM_Price_BAO_PriceField::setIsActive($priceFieldId, '0');
                 }
               }
-              else { $priceFieldId = CRM_Utils_Array::value('price_field_other', $params);
+              else {
+                $priceFieldId = CRM_Utils_Array::value('price_field_other', $params);
               }
               $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $priceFieldId, 'price_set_id');
             }
