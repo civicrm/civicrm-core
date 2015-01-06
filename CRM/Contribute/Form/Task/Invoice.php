@@ -191,34 +191,18 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       'cols' => 40
     ));
 
-    if ($this->_selectedOutput == 'email') {
-      $this->addButtons(array(
-          array(
-            'type' => 'upload',
-            'name' => ts('Email Invoice'),
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
-    }
-    else {
-      $this->addButtons(array(
-          array(
-            'type' => 'upload',
-            'name' => ts('Process Invoice(s)'),
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
-    }
+    $this->addButtons(array(
+        array(
+          'type' => 'upload',
+          'name' => $this->_selectedOutput == 'email' ? ts('Send Email') : ts('Process Invoice(s)'),
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      )
+    );
   }
 
   /**
