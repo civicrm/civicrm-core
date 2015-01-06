@@ -102,7 +102,8 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
    * @param string $entity
    * @param string $action
    * @param array $params
-   * @param bool $throws whether we should pass any exceptions for authorization failures
+   * @param bool $throws
+   *   Whether we should pass any exceptions for authorization failures.
    *
    * @throws API_Exception
    * @throws Exception

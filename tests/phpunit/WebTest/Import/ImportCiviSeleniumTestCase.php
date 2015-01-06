@@ -35,13 +35,20 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
   /**
    * Test csv import for each component.
    *
-   * @param string $component   component name ( Event, Contribution, Membership, Activity etc)
-   * @param array  $headers     csv data headers
-   * @param array  $rows        csv data rows
-   * @param string $contactType contact type
-   * @param string $mode        import mode
-   * @param array  $fieldMapper select mapper fields while import
-   * @param array  $other       other parameters
+   * @param string $component
+   *   Component name ( Event, Contribution, Membership, Activity etc).
+   * @param array $headers
+   *   Csv data headers.
+   * @param array $rows
+   *   Csv data rows.
+   * @param string $contactType
+   *   Contact type.
+   * @param string $mode
+   *   Import mode.
+   * @param array $fieldMapper
+   *   Select mapper fields while import.
+   * @param array $other
+   *   Other parameters.
    *                             useMappingName     : to reuse mapping
 
    *                             dateFormat         : date format of data
@@ -161,12 +168,18 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
   /**
    * Test contact import.
    *
-   * @param array  $headers     csv data headers
-   * @param array  $rows        csv data rows
-   * @param string $contactType contact type
-   * @param string $mode        import mode
-   * @param array  $fieldMapper select mapper fields while import
-   * @param array  $other       other parameters
+   * @param array $headers
+   *   Csv data headers.
+   * @param array $rows
+   *   Csv data rows.
+   * @param string $contactType
+   *   Contact type.
+   * @param string $mode
+   *   Import mode.
+   * @param array $fieldMapper
+   *   Select mapper fields while import.
+   * @param array $other
+   *   Other parameters.
    *                             contactSubtype     : import for selected Contact Subtype
 
    *                             useMappingName     : to reuse mapping
@@ -182,7 +195,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    *                             selectTag          : select existing tag for contacts
    *                             callbackImportSummary : function to override default import summary assertions
    *
-   * @param string $type        import type (csv/sql)
+   * @param string $type
+   *   Import type (csv/sql).
    *                             @todo:currently only supports csv, need to work on sql import
    */
   public function importContacts($headers, $rows, $contactType = 'Individual', $mode = 'Skip', $fieldMapper = array(), $other = array(), $type = 'csv') {
@@ -417,7 +431,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
 
   /**
    * Helper function to get the import url of the component.
-   * @param string $component component name
+   * @param string $component
+   *   Component name.
    *
    * @return string import url
    */

@@ -914,7 +914,8 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $objects array DAO or BAO objects
+   * @param $objects
+   *   Array DAO or BAO objects.
    */
   public function registerTestObjects($objects) {
     //if (is_object($objects)) {

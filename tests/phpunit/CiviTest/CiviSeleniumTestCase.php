@@ -58,9 +58,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *  ReflectionClass of the Test class and checks the constructor
    *  of that class to decide how to set up the test.
    *
-   * @param  string $name
-   * @param  array $data
-   * @param  string $dataName
+   * @param string $name
+   * @param array $data
+   * @param string $dataName
    * @param array $browser
    */
   public function __construct($name = NULL, array$data = array(), $dataName = '', array$browser = array()) {
@@ -119,7 +119,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * @param array $cookies each item is an array with keys:
+   * @param array $cookies
+   *   Each item is an array with keys:.
    *  - name: string
    *  - value: string; note that RFC's don't define particular encoding scheme, so
    *    you must pick one yourself and pre-encode; does not allow values with
@@ -190,9 +191,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * Open an internal path beginning with 'civicrm/'
    *
-   * @param $url (str) omit the 'civicrm/' it will be added for you
-   * @param $args (str|array) optional url arguments
-   * @param $waitFor - page element to wait for - using this is recommended to ensure the document is fully loaded
+   * @param $url
+   *   (str) omit the 'civicrm/' it will be added for you.
+   * @param $args
+   *   (str|array) optional url arguments.
+   * @param $waitFor
+   *   Page element to wait for - using this is recommended to ensure the document is fully loaded.
    *
    * Although it doesn't seem to do much now, using this function is recommended for
    * opening all civi pages, and using the $args param is also strongly encouraged
@@ -411,9 +415,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * Add a contact with the given first and last names and either a given email
    * (when specified), a random email (when true) or no email (when unspecified or null).
    *
-   * @param string $fname contact’s first name
-   * @param string $lname contact’s last name
-   * @param mixed $email contact’s email (when string) or random email (when true) or no email (when null)
+   * @param string $fname
+   *   Contact’s first name.
+   * @param string $lname
+   *   Contact’s last name.
+   * @param mixed $email
+   *   Contact’s email (when string) or random email (when true) or no email (when null).
    *
    * @param null $contactSubtype
    *
@@ -553,10 +560,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * Verify that given label/value pairs are in *sibling* td cells somewhere on the page.
    *
-   * @param array $expected       Array of key/value pairs (like Status/Registered) to be checked
-   * @param string $xpathPrefix   Pass in an xpath locator to "get to" the desired table or tables. Will be prefixed to xpath
+   * @param array $expected
+   *   Array of key/value pairs (like Status/Registered) to be checked.
+   * @param string $xpathPrefix
+   *   Pass in an xpath locator to "get to" the desired table or tables. Will be prefixed to xpath.
    *                              table path. Include leading forward slashes (e.g. "//div[@id='activity-content']").
-   * @param string $tableId       Pass in the id attribute of a table to be verified if you want to only check a specific table
+   * @param string $tableId
+   *   Pass in the id attribute of a table to be verified if you want to only check a specific table.
    *                              on the web page.
    */
   public function webtestVerifyTabularData($expected, $xpathPrefix = NULL, $tableId = NULL) {
@@ -579,9 +589,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * Types text into a ckEditor rich text field in a form
    *
-   * @param string $fieldName form field name (as assigned by PHP buildForm class)
-   * @param string $text      text to type into the field
-   * @param string $editor    which text editor (valid values are 'CKEditor', 'TinyMCE')
+   * @param string $fieldName
+   *   Form field name (as assigned by PHP buildForm class).
+   * @param string $text
+   *   Text to type into the field.
+   * @param string $editor
+   *   Which text editor (valid values are 'CKEditor', 'TinyMCE').
    *
    * @return void
    */
@@ -610,8 +623,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * (for price set fields of type select, radio, or checkbox)
    * TODO: extend for custom field multiple choice table input
    *
-   * @param array  $options           form field name (as assigned by PHP buildForm class)
-   * @param array  $validateStrings   appends label and name strings to this array so they can be validated later
+   * @param array $options
+   *   Form field name (as assigned by PHP buildForm class).
+   * @param array $validateStrings
+   *   Appends label and name strings to this array so they can be validated later.
    *
    * @return void
    */
@@ -633,7 +648,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    * Use a contact EntityRef field to add a new contact
-   * @param string $field selector
+   * @param string $field
+   *   Selector.
    * @param string $contactType
    * @return array of contact attributes (id, names, email)
    */
@@ -753,9 +769,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * Define a payment processor for use by a webtest. Default is to create Dummy processor
    * which is useful for testing online public forms (online contribution pages and event registration)
    *
-   * @param string $processorName Name assigned to new processor
-   * @param string $processorType Name for processor type (e.g. PayPal, Dummy, etc.)
-   * @param array $processorSettings Array of fieldname => value for required settings for the processor
+   * @param string $processorName
+   *   Name assigned to new processor.
+   * @param string $processorType
+   *   Name for processor type (e.g. PayPal, Dummy, etc.).
+   * @param array $processorSettings
+   *   Array of fieldname => value for required settings for the processor.
    *
    * @param string $financialAccount
    * @throws PHPUnit_Framework_AssertionFailedError
@@ -933,7 +952,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * Create new relationship type w/ user specified params or default.
    *
-   * @param $params array of required params.
+   * @param $params
+   *   Array of required params.
    *
    * @return an array of saved params values.
    */
@@ -1334,8 +1354,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * Update default strict rule.
    *
    * @param string $contactType
-   * @param array $fields Fields to be set for strict rule
-   * @param int $threshold Rule's threshold value
+   * @param array $fields
+   *   Fields to be set for strict rule.
+   * @param int $threshold
+   *   Rule's threshold value.
    */
   public function webtestStrictDedupeRuleDefault($contactType = 'Individual', $fields = array(), $threshold = 10) {
     // set default strict rule.
@@ -2072,13 +2094,15 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * checks custom fields rendering / loading properly on the fly WRT entity passed as parameter
    *
    *
-   * @param array  $customSets       custom sets i.e entity wise sets want to be created and checked
+   * @param array $customSets
+   *   Custom sets i.e entity wise sets want to be created and checked.
                                      e.g    $customSets = array(array('entity' => 'Contribution', 'subEntity' => 'Donation',
                                      'triggerElement' => $triggerElement))
                                       array  $triggerElement:   the element which is responsible for custom group to load
 
                                      which uses the entity info as its selection value
-   * @param array  $pageUrl          the url which on which the ajax custom group load takes place
+   * @param array $pageUrl
+   *   The url which on which the ajax custom group load takes place.
    * @param callable|boolean $beforeTriggering fn to execute before actual element triggering
    * @return void
    */

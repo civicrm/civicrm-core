@@ -162,9 +162,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *  ReflectionClass of the Test class and checks the constructor
    *  of that class to decide how to set up the test.
    *
-   * @param  string $name
-   * @param  array  $data
-   * @param  string $dataName
+   * @param string $name
+   * @param array $data
+   * @param string $dataName
    */
   public function __construct($name = NULL, array$data = array(), $dataName = '') {
     parent::__construct($name, $data, $dataName);
@@ -781,8 +781,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Check that api returned 'is_error' => 0
    * else provide full message
-   * @param array $apiResult api result
-   * @param string $prefix extra test to add to message
+   * @param array $apiResult
+   *   Api result.
+   * @param string $prefix
+   *   Extra test to add to message.
    */
   public function assertAPISuccess($apiResult, $prefix = '') {
     if (!empty($prefix)) {
@@ -803,8 +805,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Check that api returned 'is_error' => 1
    * else provide full message
    *
-   * @param array $apiResult api result
-   * @param string $prefix extra test to add to message
+   * @param array $apiResult
+   *   Api result.
+   * @param string $prefix
+   *   Extra test to add to message.
    * @param null $expectedError
    */
   public function assertAPIFailure($apiResult, $prefix = '', $expectedError = NULL) {
@@ -841,7 +845,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $result
    * @param $expected
    * @param array $valuesToExclude
-   * @param string $prefix extra test to add to message
+   * @param string $prefix
+   *   Extra test to add to message.
    */
   public function assertAPIArrayComparison($result, $expected, $valuesToExclude = array(), $prefix = '') {
     $valuesToExclude = array_merge($valuesToExclude, array('debug', 'xdebug', 'sequential'));
@@ -875,7 +880,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $entity
    * @param string $action
    * @param array $params
-   * @param mixed $checkAgainst optional value to check result against, implemented for getvalue,
+   * @param mixed $checkAgainst
+   *   Optional value to check result against, implemented for getvalue,.
    *   getcount, getsingle. Note that for getvalue the type is checked rather than the value
    *   for getsingle the array is compared against an array passed in - the id is not compared (for
    *   better or worse )
@@ -909,7 +915,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param string $entity
    * @param array $params
-   * @param string $type - per http://php.net/manual/en/function.gettype.php possible types
+   * @param string $type
+   *   Per http://php.net/manual/en/function.gettype.php possible types.
    * - boolean
    * - integer
    * - double
@@ -943,7 +950,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param string $entity
    * @param array $params
-   * @param array $checkAgainst - array to compare result against
+   * @param array $checkAgainst
+   *   Array to compare result against.
    * - boolean
    * - integer
    * - double
@@ -1002,8 +1010,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $entity
    * @param string $action
    * @param array $params
-   * @param string $function - pass this in to create a generated example
-   * @param string $file - pass this in to create a generated example
+   * @param string $function
+   *   Pass this in to create a generated example.
+   * @param string $file
+   *   Pass this in to create a generated example.
    * @param string $description
    * @param string|null $subfile
    * @param string|null $actionName
@@ -1022,7 +1032,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $entity
    * @param string $action
    * @param array $params
-   * @param string $expectedErrorMessage error
+   * @param string $expectedErrorMessage
+   *   Error.
    * @param null $extraOutput
    * @return array|int
    */
@@ -1052,8 +1063,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Generic function to create Organisation, to be used in test cases
    *
-   * @param array   parameters for civicrm_contact_add api function call
-   * @param int     sequence number if creating multiple organizations
+   * @param array parameters for civicrm_contact_add api function call
+   * @param int sequence number if creating multiple organizations
    *
    * @return int    id of Organisation created
    */
@@ -1068,8 +1079,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Generic function to create Individual, to be used in test cases
    *
-   * @param array   parameters for civicrm_contact_add api function call
-   * @param int     sequence number if creating multiple individuals
+   * @param array parameters for civicrm_contact_add api function call
+   * @param int sequence number if creating multiple individuals
    *
    * @return int    id of Individual created
    */
@@ -1081,8 +1092,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Generic function to create Household, to be used in test cases
    *
-   * @param array   parameters for civicrm_contact_add api function call
-   * @param int     sequence number if creating multiple households
+   * @param array parameters for civicrm_contact_add api function call
+   * @param int sequence number if creating multiple households
    *
    * @return int    id of Household created
    */
@@ -1094,8 +1105,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Helper function for getting sample contact properties
    *
-   * @param enum     contact type: Individual, Organization
-   * @param int      sequence number for the values of this type
+   * @param enum contact type: Individual, Organization
+   * @param int sequence number for the values of this type
    *
    * @return array   properties of sample contact (ie. $params for API call)
    */
@@ -1131,7 +1142,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Private helper function for calling civicrm_contact_add
    *
-   * @param array $params for civicrm_contact_add api function call
+   * @param array $params
+   *   For civicrm_contact_add api function call.
    *
    * @throws Exception
    *
@@ -1339,7 +1351,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Create Participant
    *
-   * @param array $params  array of contact id and event id values
+   * @param array $params
+   *   Array of contact id and event id values.
    *
    * @return int $id of participant created
    */
@@ -1428,7 +1441,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Delete Tag
    *
-   * @param  int $tagId   id of the tag to be deleted
+   * @param int $tagId
+   *   Id of the tag to be deleted.
    */
   public function tagDelete($tagId) {
     require_once 'api/api.php';
@@ -1442,7 +1456,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Add entity(s) to the tag
    *
-   * @param  array $params
+   * @param array $params
    *
    * @return bool
    */
@@ -1454,7 +1468,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Create contribution
    *
-   * @param int $cID contact_id
+   * @param int $cID
+   *   Contact_id.
    *
    * @return int id of created contribution
    */
@@ -1493,8 +1508,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Create contribution
    *
-   * @param int $cID contact_id
-   * @param int $cTypeID id of financial type
+   * @param int $cID
+   *   Contact_id.
+   * @param int $cTypeID
+   *   Id of financial type.
    *
    * @param int $invoiceID
    * @param int $trxnID
@@ -1531,7 +1548,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Create online contribution
    *
    * @param array $params
-   * @param int $financialType id of financial type
+   * @param int $financialType
+   *   Id of financial type.
    *
    * @param int $invoiceID
    * @param int $trxnID
@@ -1572,7 +1590,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Create an Event
    *
-   * @param array $params  name-value pair for an event
+   * @param array $params
+   *   Name-value pair for an event.
    *
    * @return array $event
    */
@@ -1611,7 +1630,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Delete event
    *
-   * @param int $id ID of the event
+   * @param int $id
+   *   ID of the event.
    *
    * @return array|int
    */
@@ -1700,7 +1720,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Delete Locations of contact
    *
-   * @param array $params parameters
+   * @param array $params
+   *   Parameters.
    */
   public function locationDelete($params) {
     $this->callAPISuccess('Location', 'delete', $params);
@@ -1938,7 +1959,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Create an activity type
    *
-   * @param array $params parameters
+   * @param array $params
+   *   Parameters.
    */
   public function activityTypeCreate($params) {
     $result = $this->callAPISuccess('ActivityType', 'create', $params);
@@ -1948,7 +1970,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Delete activity type
    *
-   * @param int $activityTypeId id of the activity type
+   * @param int $activityTypeId
+   *   Id of the activity type.
    */
   public function activityTypeDelete($activityTypeId) {
     $params['activity_type_id'] = $activityTypeId;
@@ -2037,8 +2060,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Create a custom group with a single text custom field.  See
    * participant:testCreateWithCustom for how to use this
    *
-   * @param string $function __FUNCTION__
-   * @param $filename string $file __FILE__
+   * @param string $function
+   *   __FUNCTION__.
+   * @param $filename
+   *   String $file __FILE__.
    *
    * @return array $ids ids of created objects
    */
@@ -2068,7 +2093,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Create custom field
    *
-   * @param array $params (custom_group_id) is required
+   * @param array $params
+   *   (custom_group_id) is required.
    * @return array|int
    */
   public function customFieldCreate($params) {
@@ -2139,13 +2165,20 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * To turn this off (e.g. on the server) set
    * define(DONT_DOCUMENT_TEST_CONFIG ,1);
    * in your settings file
-   * @param array $params array as passed to civicrm_api function
-   * @param array $result array as received from the civicrm_api function
-   * @param string $function calling function - generally __FUNCTION__
-   * @param string $filename called from file - generally __FILE__
-   * @param string $description descriptive text for the example file
-   * @param string $subfile name for subfile - if this is completed the example will be put in a subfolder (named by the entity)
-   * @param string $action - optional action - otherwise taken from function name
+   * @param array $params
+   *   Array as passed to civicrm_api function.
+   * @param array $result
+   *   Array as received from the civicrm_api function.
+   * @param string $function
+   *   Calling function - generally __FUNCTION__.
+   * @param string $filename
+   *   Called from file - generally __FILE__.
+   * @param string $description
+   *   Descriptive text for the example file.
+   * @param string $subfile
+   *   Name for subfile - if this is completed the example will be put in a subfolder (named by the entity).
+   * @param string $action
+   *   Optional action - otherwise taken from function name.
    */
   public function documentMe($params, $result, $function, $filename, $description = "", $subfile = NULL, $action = NULL) {
     if (defined('DONT_DOCUMENT_TEST_CONFIG') && DONT_DOCUMENT_TEST_CONFIG) {
@@ -2344,7 +2377,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Create custom field with Option Values
    *
    * @param array $customGroup
-   * @param string $name name of custom field
+   * @param string $name
+   *   Name of custom field.
    *
    * @return array|int
    */
@@ -2476,11 +2510,16 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   /*
    * Function does a 'Get' on the entity & compares the fields in the Params with those returned
    * Default behaviour is to also delete the entity
-   * @param array $params params array to check agains
-   * @param int  $id id of the entity concerned
-   * @param string $entity name of entity concerned (e.g. membership)
-   * @param bool $delete should the entity be deleted as part of this check
-   * @param string $errorText text to print on error
+   * @param array $params
+   *   Params array to check agains.
+   * @param int $id
+   *   Id of the entity concerned.
+   * @param string $entity
+   *   Name of entity concerned (e.g. membership).
+   * @param bool $delete
+   *   Should the entity be deleted as part of this check.
+   * @param string $errorText
+   *   Text to print on error.
    *
    */
   /**
@@ -2555,8 +2594,10 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
   /**
    * Get formatted values in  the actual and expected result
-   * @param array $actual actual calculated values
-   * @param array $expected expected values
+   * @param array $actual
+   *   Actual calculated values.
+   * @param array $expected
+   *   Expected values.
    *
    */
   public function checkArrayEquals(&$actual, &$expected) {
@@ -2567,7 +2608,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
   /**
    * Unset the key 'id' from the array
-   * @param array $unformattedArray The array from which the 'id' has to be unset
+   * @param array $unformattedArray
+   *   The array from which the 'id' has to be unset.
    *
    */
   public static function unsetId(&$unformattedArray) {
@@ -2596,7 +2638,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   /**
    *  Helper to enable/disable custom directory support
    *
-   * @param array $customDirs with members:
+   * @param array $customDirs
+   *   With members:.
    *   'php_path' Set to TRUE to use the default, FALSE or "" to disable support, or a string path to use another path
    *   'template_path' Set to TRUE to use the default, FALSE or "" to disable support, or a string path to use another path
    */
@@ -3113,7 +3156,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * WISHLIST: Monitor SQL queries in unit-tests and generate an exception
    * if TRUNCATE or ALTER is called while using a transaction.
    *
-   * @param bool $nest whether to use nesting or reference-counting
+   * @param bool $nest
+   *   Whether to use nesting or reference-counting.
    */
   public function useTransaction($nest = TRUE) {
     if (!$this->tx) {

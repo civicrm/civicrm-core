@@ -7,7 +7,8 @@ class PCPBlock extends PHPUnit_Framework_Testcase {
   /**
    * Helper function to create a PCP Block for Contribution Page
    *
-   * @param  int $contributionPageId - id of the Contribution Page
+   * @param int $contributionPageId
+   *   Id of the Contribution Page.
    * to be deleted
    * @return array of created pcp block
    *
@@ -90,7 +91,7 @@ class PCPBlock extends PHPUnit_Framework_Testcase {
   /**
    * Helper function to delete a PCP related stuff viz. Profile, PCP Block Entry
    *
-   * @param  array key value pair
+   * @param array key value pair
    * pcpBlockId - id of the PCP Block Id, profileID - id of Supporter Profile
    * to be deleted
    * @return boolean true if success, false otherwise
