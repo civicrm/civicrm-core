@@ -178,7 +178,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
     $id = $this->_relationshipTypeCreate();
     // create sample relationship type.
     $params = array(
-      'id' =>  $id,
+      'id' => $id,
     );
     $result = $this->callAPIAndDocument('relationship_type', 'delete', $params, __FUNCTION__, __FILE__);
     $this->assertAPIDeleted('relationship_type', $id);

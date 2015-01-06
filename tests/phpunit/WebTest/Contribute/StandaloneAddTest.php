@@ -115,7 +115,6 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->type("invoice_id", time());
     $this->webtestFillDate('thankyou_date');
 
-
     //Premium section
     $this->click("Premium");
     $this->waitForElementPresent("fulfilled_date");
@@ -126,7 +125,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     // Clicking save.
     $this->click("_qf_Contribution_upload");
     // Ask for confirmation to send a receipt to the contributor on 'is_email_reciept' check
-    $this->assertTrue((bool)preg_match("/^Click OK to save this contribution record AND send a receipt to the contributor now./",$this->getConfirmation()));
+    $this->assertTrue((bool) preg_match("/^Click OK to save this contribution record AND send a receipt to the contributor now./", $this->getConfirmation()));
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 

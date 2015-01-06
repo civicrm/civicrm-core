@@ -176,11 +176,11 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
    * Make sure that the existence of a profile doesn't break listing all fields
    *
   public function testGetAvailable_mixed() {
-    // FIXME
-    $this->testGetAvailable_full();
-    // $this->testGetAvailable_byGid();
-    $this->testGetAvailable_full();
-    // $this->testGetAvailable_byGid();
+  // FIXME
+  $this->testGetAvailable_full();
+  // $this->testGetAvailable_byGid();
+  $this->testGetAvailable_full();
+  // $this->testGetAvailable_byGid();
   } // */
 
   /**

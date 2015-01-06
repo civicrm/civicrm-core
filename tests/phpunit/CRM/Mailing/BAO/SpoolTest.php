@@ -11,13 +11,13 @@ require_once 'CiviTest/CiviMailUtils.php';
  */
 class CRM_Mailing_BAO_SpoolTest extends CiviUnitTestCase {
 
-  protected $_mut = null;
+  protected $_mut = NULL;
 
   protected static $bodytext = 'Unit tests keep children safe.';
 
   public function setUp() {
     parent::setUp();
-    $this->_mut = new CiviMailUtils( $this, true );
+    $this->_mut = new CiviMailUtils( $this, TRUE );
   }
 
   public function tearDown() {
@@ -76,15 +76,16 @@ class CRM_Mailing_BAO_SpoolTest extends CiviUnitTestCase {
    * @param $context
    * @param $mailPart
    */
-  public static function mailWalkCallback( $context, $mailPart ) {
+  public static function mailWalkCallback($context, $mailPart) {
     if ( $mailPart instanceof ezcMailText ) {
       switch ( $mailPart->subType ) {
-      case 'plain':
-        self::assertContains( self::$bodytext, $mailPart->generateBody() );
-        break;
-      case 'html':
-        self::assertContains( self::$bodytext . '</p>', $mailPart->generateBody() );
-        break;
+        case 'plain':
+          self::assertContains( self::$bodytext, $mailPart->generateBody() );
+          break;
+
+        case 'html':
+          self::assertContains( self::$bodytext . '</p>', $mailPart->generateBody() );
+          break;
       }
     }
   }

@@ -67,7 +67,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testCreateWithoutName() {
     $params = array(
-      'is_active' => 1,    );
+      'is_active' => 1, );
     $result = $this->callAPIFailure('job', 'create', $params,
       'Mandatory key(s) missing from params array: run_frequency, name, api_entity, api_action'
     );
@@ -137,7 +137,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testDeleteWithIncorrectData() {
     $params = array(
-      'id' => 'abcd',    );
+      'id' => 'abcd', );
     $result = $this->callAPIFailure('job', 'delete', $params);
   }
 
@@ -146,7 +146,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testDelete() {
     $createResult = $this->callAPISuccess('job', 'create', $this->_params);
-    $params = array('id' => $createResult['id'],);
+    $params = array('id' => $createResult['id']);
     $result = $this->callAPIAndDocument('job', 'delete', $params, __FUNCTION__, __FILE__);
     $this->assertAPIDeleted($this->_entity, $createResult['id']);
   }
@@ -154,20 +154,20 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
 
   public function testCallUpdateGreetingMissingParams() {
-    $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 1));
-    $this->assertEquals('Mandatory key(s) missing from params array: ct', $result['error_message']);
+  $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 1));
+  $this->assertEquals('Mandatory key(s) missing from params array: ct', $result['error_message']);
   }
 
   public function testCallUpdateGreetingIncorrectParams() {
-    $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 1, 'ct' => 'djkfhdskjfhds'));
-    $this->assertEquals('ct `djkfhdskjfhds` is not valid.', $result['error_message']);
+  $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 1, 'ct' => 'djkfhdskjfhds'));
+  $this->assertEquals('ct `djkfhdskjfhds` is not valid.', $result['error_message']);
   }
-/*
- * Note that this test is about tesing the metadata / calling of the function & doesn't test the success of the called function
- */
+  /*
+   * Note that this test is about tesing the metadata / calling of the function & doesn't test the success of the called function
+   */
   public function testCallUpdateGreetingSuccess() {
     $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 'postal_greeting', 'ct' => 'Individual'));
-   }
+  }
 
   public function testCallUpdateGreetingCommaSeparatedParamsSuccess() {
     $gt = 'postal_greeting,email_greeting,addressee';
@@ -283,7 +283,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param int $id
    * @param array $params
    */
-  public function hookPreRelationship($op, $objectName, $id, &$params ) {
+  public function hookPreRelationship($op, $objectName, $id, &$params) {
     if($op == 'delete') {
       return;
     }

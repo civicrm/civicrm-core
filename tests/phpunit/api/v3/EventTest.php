@@ -82,11 +82,11 @@ class api_v3_EventTest extends CiviUnitTestCase {
       array(
         'title' => 'Annual CiviCRM meet',
         'event_type_id' => 1,
-        'start_date' => 20081021,      ),
+        'start_date' => 20081021, ),
       array(
         'title' => 'Annual CiviCRM meet 2',
         'event_type_id' => 1,
-        'start_date' => 20101021,      ),
+        'start_date' => 20101021, ),
     );
 
     $this->events = array();
@@ -139,14 +139,14 @@ class api_v3_EventTest extends CiviUnitTestCase {
   public function testGetEventByIdSort() {
     $params = array(
       'return.sort' => 'id ASC',
-      'return.max_results' => 1,    );
+      'return.max_results' => 1, );
     $result = $this->callAPISuccess('Event', 'Get', $params);
     $this->assertEquals(1, $result['id'], ' in line ' . __LINE__);
     $params = array(
       'options' => array(
         'sort' => 'id DESC',
         'limit' => 1,
-      ),    );
+      ), );
 
     $result = $this->callAPISuccess('Event', 'Get', $params);
     $this->assertAPISuccess($result, ' in line ' . __LINE__);
@@ -155,10 +155,9 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'options' => array(
         'sort' => 'id ASC',
         'limit' => 1,
-      ),    );
+      ), );
     $result = $this->callAPISuccess('Event', 'Get', $params);
     $this->assertEquals(1, $result['id'], ' in line ' . __LINE__);
-
 
   }
   /*
@@ -184,7 +183,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $params = array(
       'isCurrent' => 1,
     );
-    $currentEventParams = array('start_date' => date('Y-m-d', strtotime('+ 1 day')),
+    $currentEventParams = array(
+    'start_date' => date('Y-m-d', strtotime('+ 1 day')),
       'end_date' => date('Y-m-d', strtotime('+ 1 week')),
     );
     $currentEventParams = array_merge($this->_params[1], $currentEventParams);
@@ -205,17 +205,17 @@ class api_v3_EventTest extends CiviUnitTestCase {
   public function testGetPaymentProcessorId() {
     $params = $this->_params[0];
     $params['payment_processor_id'] = 1;
-    $params['sequential'] =1;
+    $params['sequential'] = 1;
     $result = $this->callAPISuccess('event', 'create', $params);
-    $this->assertEquals( 1,$result['values'][0]['payment_processor'][0], "handing of payment processor compatibility");
+    $this->assertEquals( 1, $result['values'][0]['payment_processor'][0], "handing of payment processor compatibility");
     $result = $this->callAPISuccess('event', 'get', $params);
-    $this->assertEquals($result['values'][0]['payment_processor_id'], 1,"handing get payment processor compatibility");
+    $this->assertEquals($result['values'][0]['payment_processor_id'], 1, "handing get payment processor compatibility");
   }
 
   public function testInvalidData() {
     $params = $this->_params[0];
-    $params['sequential'] =1;
-    $params['loc_block_id'] =100;
+    $params['sequential'] = 1;
+    $params['loc_block_id'] = 100;
     $result = $this->callAPIFailure('event', 'create', $params);
 
   }
@@ -226,12 +226,14 @@ class api_v3_EventTest extends CiviUnitTestCase {
   public function testGetSingleReturnIsFull() {
     $contactID = $this->individualCreate();
     $params = array(
-      'id' => $this->_eventIds[0],      'max_participants' => 1,
+      'id' => $this->_eventIds[0],
+    'max_participants' => 1,
     );
     $result = $this->callAPISuccess('Event', 'Create', $params);
 
     $getEventParams = array(
-      'id' => $this->_eventIds[0],      'return.is_full' => 1,
+      'id' => $this->_eventIds[0],
+    'return.is_full' => 1,
     );
 
     $currentEvent = $this->callAPISuccess('Event', 'getsingle', $getEventParams);
@@ -359,7 +361,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('event', 'create', $this->_params[1]);
 
     $params = array(
-      'id' => $result['id'], 'max_participants' => 150,
+      'id' => $result['id'],
+    'max_participants' => 150,
     );
     $this->callAPISuccess('Event', 'Create', $params);
     $updated = $this->callAPISuccess('Event', 'Get', $params, __FUNCTION__, __FILE__);
@@ -385,7 +388,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
    */
   public function testDeleteWithEventId() {
     $params = array(
-      'event_id' => $this->_eventIds[0],    );
+      'event_id' => $this->_eventIds[0], );
     $result = $this->callAPISuccess('Event', 'Delete', $params);
     $this->assertAPISuccess($result, 'in line ' . __LINE__);
   }
@@ -445,7 +448,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'event_type_id' => 1,
       'return.title' => 1,
       'return.id' => 1,
-      'return.start_date' => 1,    );
+      'return.start_date' => 1, );
     $result = $this->callAPISuccess('event', 'get', $params);
 
     $this->assertEquals($result['values'][$this->_eventIds[0]]['id'], $this->_eventIds[0], 'In line ' . __LINE__);
@@ -460,7 +463,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $maxEvents = 5;
     $events = array();
     while ($maxEvents > 0) {
-      $params = array(        'title' => 'Test Event' . $maxEvents,
+      $params = array(
+      'title' => 'Test Event' . $maxEvents,
         'event_type_id' => 2,
         'start_date' => 20081021,
       );
@@ -468,7 +472,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
       $events[$maxEvents] = $this->callAPISuccess('event', 'create', $params);
       $maxEvents--;
     }
-    $params = array(      'event_type_id' => 2,
+    $params = array(
+    'event_type_id' => 2,
       'return.id' => 1,
       'return.title' => 1,
       'return.offset' => 2,
@@ -481,7 +486,10 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   public function testEventCreationPermissions() {
     $params = array(
-      'event_type_id' => 1, 'start_date' => '2010-10-03', 'title' => 'le cake is a tie', 'check_permissions' => TRUE,    );
+      'event_type_id' => 1,
+    'start_date' => '2010-10-03',
+    'title' => 'le cake is a tie',
+    'check_permissions' => TRUE, );
     $config = &CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array('access CiviCRM');
     $result = $this->callAPIFailure('event', 'create', $params);

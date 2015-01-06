@@ -59,9 +59,9 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($expected, CRM_Utils_Array::collect('catWord', $arr));
 
     $arr = array();
-    $arr['en']= (object) array('catWord' => 'cat', 'dogWord' => 'dog');
-    $arr['fr']= (object) array('catWord' => 'chat', 'dogWord' => 'chien');
-    $arr['es']= (object) array('catWord' => 'gato');
+    $arr['en'] = (object) array('catWord' => 'cat', 'dogWord' => 'dog');
+    $arr['fr'] = (object) array('catWord' => 'chat', 'dogWord' => 'chien');
+    $arr['es'] = (object) array('catWord' => 'gato');
     $expected = array('en' => 'cat', 'fr' => 'chat', 'es' => 'gato');
     $this->assertEquals($expected, CRM_Utils_Array::collect('catWord', $arr));
   }
@@ -107,11 +107,11 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
   public function testIsSubset() {
     $this->assertTrue(CRM_Utils_Array::isSubset(array(), array()));
     $this->assertTrue(CRM_Utils_Array::isSubset(array('a'), array('a')));
-    $this->assertTrue(CRM_Utils_Array::isSubset(array('a'), array('b','a','c')));
-    $this->assertTrue(CRM_Utils_Array::isSubset(array('b','d'), array('a','b','c','d')));
+    $this->assertTrue(CRM_Utils_Array::isSubset(array('a'), array('b', 'a', 'c')));
+    $this->assertTrue(CRM_Utils_Array::isSubset(array('b', 'd'), array('a', 'b', 'c', 'd')));
     $this->assertFalse(CRM_Utils_Array::isSubset(array('a'), array()));
     $this->assertFalse(CRM_Utils_Array::isSubset(array('a'), array('b')));
-    $this->assertFalse(CRM_Utils_Array::isSubset(array('a'), array('b','c','d')));
+    $this->assertFalse(CRM_Utils_Array::isSubset(array('a'), array('b', 'c', 'd')));
   }
 
   public function testRemove() {

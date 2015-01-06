@@ -302,7 +302,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @return array
    */
   public static function entities() {
-    return array(array('contribution'), array('participant'),);// @todo array('pledge' => 'pledge')
+    return array(array('contribution'), array('participant'));// @todo array('pledge' => 'pledge')
   }
 
   /**

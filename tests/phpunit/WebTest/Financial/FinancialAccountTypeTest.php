@@ -42,8 +42,8 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
 
     //Add new Financial Type
     $financialType['name'] = 'FinancialType '.substr(sha1(rand()), 0, 4);
-    $financialType['is_deductible'] = true;
-    $financialType['is_reserved'] = false;
+    $financialType['is_deductible'] = TRUE;
+    $financialType['is_reserved'] = FALSE;
     $this->addeditFinancialType($financialType);
     $expected = array(
       array(
@@ -68,7 +68,7 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[name]']/../td[7]/span/a[text()='Accounts']");
     $this->waitForElementPresent('newfinancialTypeAccount');
 
-    foreach ($expected as  $value => $label) {
+    foreach ($expected as $value => $label) {
       $this->verifyText("xpath=//div[@id='ltype']/div/table/tbody/tr/td[2][text()='$label[financial_account]']/../td[1]", preg_quote($label['account_relationship']));
     }
 
@@ -93,10 +93,10 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     //edit financial type
     $financialType['oldname'] = $financialType['name'];
     $financialType['name'] = 'Edited FinancialType '.substr(sha1(rand()), 0, 4);
-    $financialType['is_deductible'] = true;
-    $financialType['is_reserved'] = false;
-    $this->addeditFinancialType($financialType , 'Edit');
+    $financialType['is_deductible'] = TRUE;
+    $financialType['is_reserved'] = FALSE;
+    $this->addeditFinancialType($financialType, 'Edit');
     //delete financialtype
-    $this->addeditFinancialType($financialType , 'Delete');
+    $this->addeditFinancialType($financialType, 'Delete');
   }
 }

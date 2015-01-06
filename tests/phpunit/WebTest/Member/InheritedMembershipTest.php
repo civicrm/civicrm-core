@@ -145,7 +145,6 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->click('relationship_type_id');
     $this->select('relationship_type_id', 'label=Employee of');
 
-
     $this->select2('related_contact_id', $title1, TRUE);
 
     $description = 'Well here is some description !!!!';

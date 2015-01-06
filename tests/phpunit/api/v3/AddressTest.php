@@ -28,8 +28,8 @@
 /**
  *  Test APIv3 civicrm_activity_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Contact
+ * @package CiviCRM_APIv3
+ * @subpackage API_Contact
  */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -38,7 +38,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class api_v3_AddressTest
  */
 class api_v3_AddressTest extends CiviUnitTestCase {
-  protected $_apiversion =3;
+  protected $_apiversion = 3;
   protected $_contactID;
   protected $_locationType;
   protected $_params;
@@ -112,7 +112,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $params = $this->_params;
     $params['street_number_suffix'] = 'really long string';
     $result = $this->callAPIFailure('address', 'create', $params);
-   }
+  }
 
   /**
    * Is_primary shoule be set as a default. ie. create the address, unset the params & recreate.
@@ -127,7 +127,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $params['id'] = $result['id'];
     $result       = $this->callAPISuccess('address', 'create', $params);
     $address      = $this->callAPISuccess('address', 'get', array('contact_id' => $params['contact_id']));
-   $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertEquals(1, $result['values'][$result['id']]['is_primary'], 'In line ' . __LINE__);
     $this->getAndCheck($params, $result['id'], 'address', __FUNCTION__);
   }
@@ -142,7 +142,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     //create one
     $create = $this->callAPISuccess('address', 'create', $this->_params);
 
-    $result = $this->callAPIAndDocument('address', 'delete', array('id' => $create['id'],), __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('address', 'delete', array('id' => $create['id']), __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $get = $this->callAPISuccess('address', 'get', array(
      'location_type_id' => $this->_locationType->id,
@@ -207,7 +207,8 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'create', $this->_params);
     $subfile     = "AddressLike";
     $description = "Demonstrates Use of Like";
-    $params      = array('street_address' => array('LIKE' => '%mb%'),
+    $params      = array(
+    'street_address' => array('LIKE' => '%mb%'),
       'sequential' => 1,
     );
     $result = $this->callAPIAndDocument('Address', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
@@ -223,7 +224,8 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $create = $this->callAPISuccess('address', 'create', $this->_params);
     $subfile     = "AddressLike";
     $description = "Demonstrates Use of Like";
-    $params      = array('street_address' => array('LIKE' => "'%xy%'"),
+    $params      = array(
+    'street_address' => array('LIKE' => "'%xy%'"),
       'sequential' => 1,
     );
     $result = $this->callAPISuccess('Address', 'Get', ($params));

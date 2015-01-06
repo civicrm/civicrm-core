@@ -31,7 +31,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  * Test class for CRM_PCP_BAO_PCPTest BAO
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
 
@@ -186,5 +186,6 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    *
    */
-  protected function tearDown() {}
+  protected function tearDown() {
+  }
 }

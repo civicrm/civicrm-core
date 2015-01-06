@@ -55,7 +55,7 @@ class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     $this->click($selector);
 
     // Wait for file to be downloaded
-    for ($i=1; $i<15; ++$i) {
+    for ($i = 1; $i < 15; ++$i) {
       sleep(2);
       if (file_exists($file)) {
         return $file;
@@ -77,13 +77,13 @@ class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    *   Array of header and rows according to row index.
    *                              eg: array(
    *                                    1 => array(
-      // Row index 1
-   // column name 'First Name', value 'Jones'
+  // Row index 1
+  // column name 'First Name', value 'Jones'
    *                                      'First Name' => 'Jones',
    *                                      'Last Name'  => 'Franklin'
    *                                    ),
    *                                    2 => array(
-      // Row index 2
+  // Row index 2
    *                                      'First Name' => 'Rajan',
    *                                      'Last Name'  => 'mayekar'
    *                                    ),

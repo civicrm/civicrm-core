@@ -64,7 +64,7 @@ class Custom extends CiviUnitTestCase {
    * @param array $params
    * @param null $fields
    * @return object of created field
-*/
+   */
   public static function createField($params, $fields = NULL) {
     if (empty($params)) {
       $params = array(

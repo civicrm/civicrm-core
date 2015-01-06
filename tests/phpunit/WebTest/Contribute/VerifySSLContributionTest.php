@@ -52,7 +52,7 @@ class WebTest_Contribute_VerifySSLContributionTest extends CiviSeleniumTestCase 
   public function _initialize() {
     if (!$this->initialized) {
       // log in
-        $this->webtestLogin();
+      $this->webtestLogin();
 
       // build names
       $hash = substr(sha1(rand()), 0, 7);

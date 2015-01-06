@@ -53,7 +53,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
     $result = $this->assertDBNotNull(
       'CRM_Financial_DAO_FinancialType',
-      $financialType->id ,
+      $financialType->id,
       'name',
       'id',
       'Database check on added financial type record.'
@@ -92,10 +92,10 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $ids = array();
     $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
     $result = CRM_Financial_BAO_FinancialType::setIsActive($financialType->id, 0);
-    $this->assertEquals($result, true , 'Verify financial type record updation for is_active.');
+    $this->assertEquals($result, TRUE, 'Verify financial type record updation for is_active.');
     $isActive = $this->assertDBNotNull(
       'CRM_Financial_DAO_FinancialType',
-      $financialType->id ,
+      $financialType->id,
       'is_active',
       'id',
       'Database check on updated for financial type is_active.'
@@ -118,6 +118,6 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     CRM_Financial_BAO_FinancialType::del($financialType->id);
     $params = array('id' => $financialType->id);
     $result = CRM_Financial_BAO_FinancialType::retrieve($params, $defaults);
-    $this->assertEquals(empty($result), true, 'Verify financial types record deletion.');
+    $this->assertEquals(empty($result), TRUE, 'Verify financial types record deletion.');
   }
 }

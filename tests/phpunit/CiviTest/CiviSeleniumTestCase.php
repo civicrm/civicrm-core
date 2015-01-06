@@ -134,7 +134,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         $cookie['path'] = '/';
       }
       if (!isset($cookie['max_age'])) {
-        $cookie['max_age'] = 7*24*60*60;
+        $cookie['max_age'] = 7 * 24 * 60 * 60;
       }
       $this->deleteCookie($cookie['name'], $cookie['path']);
       $optionExprs = array();
@@ -247,7 +247,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param string $element
    * @param string $waitFor
    */
-  public function clickPopupLink($element, $waitFor=NULL) {
+  public function clickPopupLink($element, $waitFor = NULL) {
     $this->clickAjaxLink($element, 'css=.ui-dialog');
     if ($waitFor) {
       $this->waitForElementPresent($waitFor);
@@ -259,7 +259,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param string $element
    * @param string $waitFor
    */
-  public function clickAjaxLink($element, $waitFor=NULL) {
+  public function clickAjaxLink($element, $waitFor = NULL) {
     $this->click($element);
     if ($waitFor) {
       $this->waitForElementPresent($waitFor);
@@ -495,7 +495,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    */
   public function webtestFillAutocomplete($sortName, $fieldName = 'contact_id') {
-    $this->select2($fieldName,$sortName);
+    $this->select2($fieldName, $sortName);
     //$this->assertContains($sortName, $this->getValue($fieldName), "autocomplete expected $sortName but didn’t find it in " . $this->getValue($fieldName));
   }
 
@@ -673,7 +673,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->type('email-Primary', $params['email'] = "{$name}@example.com");
     $this->clickAjaxLink('_qf_Edit_next');
 
-    $this->waitForText("xpath=//div[@id='$selectId']","$name");
+    $this->waitForText("xpath=//div[@id='$selectId']", "$name");
 
     $params['sort_name'] = $contactType == 'Individual' ? $params['last_name'] . ', ' . $params['first_name'] : "$name $contactType";
     $params['display_name'] = $contactType == 'Individual' ? $params['first_name'] . ' ' . $params['last_name'] : $params['sort_name'];
@@ -713,10 +713,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     // Is new contact created?
     if ($lname) {
-      $this->waitForText("xpath=//div[@id='$selectId']","$lname, $fname");
+      $this->waitForText("xpath=//div[@id='$selectId']", "$lname, $fname");
     }
     else {
-      $this->waitForText("xpath=//div[@id='$selectId']","$fname");
+      $this->waitForText("xpath=//div[@id='$selectId']", "$fname");
     }
   }
 
@@ -760,10 +760,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * Returns a single argument from the url query
    */
-   public function urlArg($arg, $url = NULL) {
-     $elements = $this->parseURL($url);
-     return isset($elements['queryString'][$arg]) ? $elements['queryString'][$arg] : NULL;
-   }
+  public function urlArg($arg, $url = NULL) {
+    $elements = $this->parseURL($url);
+    return isset($elements['queryString'][$arg]) ? $elements['queryString'][$arg] : NULL;
+  }
 
   /**
    * Define a payment processor for use by a webtest. Default is to create Dummy processor
@@ -841,7 +841,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->openCiviPage('admin/paymentProcessor', 'action=add&reset=1&pp=' . $pid, 'name');
     $this->type('name', $processorName);
     $this->select('financial_account_id', "label={$financialAccount}");
-    foreach ($processorSettings AS $f => $v) {
+    foreach ($processorSettings as $f => $v) {
       $this->type($f, $v);
     }
 
@@ -1461,7 +1461,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         break;
     }
 
-    $this->select2('member_of_contact_id',$membershipTitle);
+    $this->select2('member_of_contact_id', $membershipTitle);
 
     $this->type('minimum_fee', '100');
     $this->select('financial_type_id', "value={$memTypeParams['financial_type']}");
@@ -2096,14 +2096,16 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @param array $customSets
    *   Custom sets i.e entity wise sets want to be created and checked.
-                                     e.g    $customSets = array(array('entity' => 'Contribution', 'subEntity' => 'Donation',
-                                     'triggerElement' => $triggerElement))
-                                      array  $triggerElement:   the element which is responsible for custom group to load
-
-                                     which uses the entity info as its selection value
+   *
+   * e.g    $customSets = array(array('entity' => 'Contribution', 'subEntity' => 'Donation',
+   * 'triggerElement' => $triggerElement))
+   * array  $triggerElement:   the element which is responsible for custom group to load
+   * which uses the entity info as its selection value
+   *
    * @param array $pageUrl
    *   The url which on which the ajax custom group load takes place.
-   * @param callable|boolean $beforeTriggering fn to execute before actual element triggering
+   * @param bool $beforeTriggering
+   *   Triggering fn to execute before actual element triggering.
    * @return void
    */
   public function customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl, $beforeTriggering = NULL) {
@@ -2222,7 +2224,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * Type and select first occurance of autocomplete
    */
-  public function select2($fieldName,$label, $multiple = FALSE, $xpath=FALSE) {
+  public function select2($fieldName, $label, $multiple = FALSE, $xpath = FALSE) {
     // In the case of chainSelect, wait for options to load
     $this->waitForElementNotPresent('css=select.loading');
     if ($multiple) {
@@ -2270,7 +2272,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * Check for unobtrusive status message as set by CRM.status
    */
-  public function checkCRMStatus($text=NULL) {
+  public function checkCRMStatus($text = NULL) {
     $this->waitForElementPresent("css=.crm-status-box-outer.status-success");
     if ($text) {
       $this->assertElementContainsText("css=.crm-status-box-outer.status-success", $text);
@@ -2280,7 +2282,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * Check for obtrusive status message as set by CRM.alert
    */
-  public function checkCRMAlert($text, $type='success') {
+  public function checkCRMAlert($text, $type = 'success') {
     $this->waitForElementPresent("css=div.ui-notify-message.$type");
     $this->waitForText("css=div.ui-notify-message.$type", $text);
     // We got the message, now let's close it so the webtest doesn't get confused by lots of open alerts
@@ -2294,7 +2296,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->openCiviPage('admin/setting/preferences/display', 'reset=1');
     $isChecked = $this->isChecked('ajaxPopupsEnabled');
     if (($isChecked && !$enabled) || (!$isChecked && $enabled)) {
-        $this->click('ajaxPopupsEnabled');
+      $this->click('ajaxPopupsEnabled');
     }
     if ($enabled) {
       $this->assertChecked('ajaxPopupsEnabled');

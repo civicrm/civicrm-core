@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -177,7 +177,8 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'contact_id_a' => $this->_cId_a,
       'contact_id_b' => $this->_cId_b,
       'relationship_type_id' => $this->_relTypeID,
-      'start_date' => '2008-12-20', 'end_date' => NULL,
+      'start_date' => '2008-12-20',
+    'end_date' => NULL,
       'is_active' => 1,
     );
     $relationship = $this->callAPISuccess('relationship', 'create', $params);
@@ -427,7 +428,6 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
 
-
     $result = $this->callAPISuccess('CustomField', 'create', $params);
 
     $customField = NULL;
@@ -674,7 +674,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   public function testGetIsCurrent() {
-    $rel2Params =array(
+    $rel2Params = array(
       'contact_id_a' => $this->_cId_a,
       'contact_id_b' => $this->_cId_b2,
       'relationship_type_id' => $this->_relTypeID,
@@ -695,17 +695,17 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->AssertEquals($rel1['id'], $result['id']);
 
     // now try not started
-    $rel2Params['is_active'] =1;
-    $rel2Params['start_date'] ='tomorrow';
+    $rel2Params['is_active'] = 1;
+    $rel2Params['start_date'] = 'tomorrow';
     $rel2 = $this->callAPISuccess('relationship', 'create', $rel2Params);
     $result = $this->callAPISuccess('relationship', 'get', $getParams);
     $this->assertEquals($result['count'], 1);
     $this->AssertEquals($rel1['id'], $result['id']);
 
     // now try finished
-    $rel2Params['is_active'] =1;
-    $rel2Params['start_date'] ='last week';
-    $rel2Params['end_date'] ='yesterday';
+    $rel2Params['is_active'] = 1;
+    $rel2Params['start_date'] = 'last week';
+    $rel2Params['end_date'] = 'yesterday';
     $rel2 = $this->callAPISuccess('relationship', 'create', $rel2Params);
   }
   /*
@@ -746,11 +746,11 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
     $rel1 = $this->callAPISuccess('relationship', 'create', $this->_params);
     $rel2 = $this->callAPISuccess('relationship', 'create', array_merge($this->_params,
-      array('relationship_type_id' => $relationType2,)));
+      array('relationship_type_id' => $relationType2)));
     $rel3 = $this->callAPISuccess('relationship', 'create', array_merge($this->_params,
-        array('relationship_type_id' => $relationType3,)));
+        array('relationship_type_id' => $relationType3)));
     $rel4 = $this->callAPISuccess('relationship', 'create', array_merge($this->_params,
-        array('relationship_type_id' => $relationType4,)));
+        array('relationship_type_id' => $relationType4)));
 
     $getParams = array(
       'relationship_type_id' => array('IN' => array($relationType2, $relationType3))
@@ -788,7 +788,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     );
     $result = $this->callAPIAndDocument('relationship', 'get', $getParams, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals($result['count'], 1);
-    $this->AssertEquals(array($rel1['id'],), array_keys($result['values']));
+    $this->AssertEquals(array($rel1['id']), array_keys($result['values']));
 
   }
   /**
@@ -892,7 +892,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * an incorrect one
    */
   public function testGetRelationshipByTypeDAO() {
-    $this->ids['relationship'] = $this->callAPISuccess($this->_entity, 'create', array('format.only_id' => TRUE,)  + $this->_params);
+    $this->ids['relationship'] = $this->callAPISuccess($this->_entity, 'create', array('format.only_id' => TRUE) + $this->_params);
     $result = $this->callAPISuccess($this->_entity, 'getcount', array(
       'contact_id_a' => $this->_cId_a,),
     1);
@@ -1044,7 +1044,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * an incorrect one
    */
   public function testGetRelationshipByMembershipTypeReciprocal() {
-      $created = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $created = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $org3 = $this->organizationCreate();
 
     $relType2 = 5; // lets just assume built in ones aren't being messed with!

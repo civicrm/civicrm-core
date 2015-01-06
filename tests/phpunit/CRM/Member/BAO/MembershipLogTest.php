@@ -5,7 +5,7 @@
  *
  *  (PHP 5)
  *
- *   @package   CiviCRM
+ * @package   CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -31,7 +31,7 @@ require_once 'CiviTest/Membership.php';
 /**
  *  Test CRM/Member/BAO Membership Log add , delete functions
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
 
@@ -88,9 +88,9 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd',strtotime('2006-01-21')),
-      'start_date' => date('Ymd',strtotime('2006-01-21')),
-      'end_date' => date('Ymd',strtotime('2006-12-21')),
+      'join_date' => date('Ymd', strtotime('2006-01-21')),
+      'start_date' => date('Ymd', strtotime('2006-01-21')),
+      'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_mebershipStatusID,
@@ -116,9 +116,9 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd',strtotime('2006-01-21')),
-      'start_date' => date('Ymd',strtotime('2006-01-21')),
-      'end_date' => date('Ymd',strtotime('2006-12-21')),
+      'join_date' => date('Ymd', strtotime('2006-01-21')),
+      'start_date' => date('Ymd', strtotime('2006-01-21')),
+      'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_mebershipStatusID,
@@ -145,9 +145,9 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd',strtotime('2006-01-21')),
-      'start_date' => date('Ymd',strtotime('2006-01-21')),
-      'end_date' => date('Ymd',strtotime('2006-12-21')),
+      'join_date' => date('Ymd', strtotime('2006-01-21')),
+      'start_date' => date('Ymd', strtotime('2006-01-21')),
+      'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_mebershipStatusID,

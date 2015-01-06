@@ -292,7 +292,8 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     );
 
     //Now check DB for location elements.
-    $searchParams = array('id' => CRM_Utils_Array::value('address_id', $locElementIds),
+    $searchParams = array(
+    'id' => CRM_Utils_Array::value('address_id', $locElementIds),
       'location_type_id' => 1,
       'is_primary' => 1,
     );
@@ -309,15 +310,16 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     );
     $this->assertDBCompareValues('CRM_Core_DAO_Address', $searchParams, $compareParams);
 
-    $searchParams = array('id' => CRM_Utils_Array::value('email_id', $locElementIds),
+    $searchParams = array(
+    'id' => CRM_Utils_Array::value('email_id', $locElementIds),
       'location_type_id' => 1,
       'is_primary' => 1,
     );
     $compareParams = array('email' => 'john.smith@example.org');
     $this->assertDBCompareValues('CRM_Core_DAO_Email', $searchParams, $compareParams);
 
-
-    $searchParams = array('id' => CRM_Utils_Array::value('phone_id', $locElementIds),
+    $searchParams = array(
+    'id' => CRM_Utils_Array::value('phone_id', $locElementIds),
       'location_type_id' => 1,
       'is_primary' => 1,
       'phone_type_id' => 1,
@@ -325,14 +327,16 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     $compareParams = array('phone' => '303443689');
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
 
-    $searchParams = array('id' => CRM_Utils_Array::value('phone_2_id', $locElementIds),
+    $searchParams = array(
+    'id' => CRM_Utils_Array::value('phone_2_id', $locElementIds),
       'location_type_id' => 1,
       'phone_type_id' => 2,
     );
     $compareParams = array('phone' => '9833910234');
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
 
-    $searchParams = array('id' => CRM_Utils_Array::value('im_id', $locElementIds),
+    $searchParams = array(
+    'id' => CRM_Utils_Array::value('im_id', $locElementIds),
       'location_type_id' => 1,
       'is_primary' => 1,
     );

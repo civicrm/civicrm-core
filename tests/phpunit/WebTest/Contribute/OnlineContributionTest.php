@@ -146,7 +146,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
 
     $this->type("sort_name", "$lastName $firstName");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom",FALSE);
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 
     //View Contribution Record and verify data
     $expected = array(
@@ -176,7 +176,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     // Is contact present?
     $this->assertTrue($this->isTextPresent("$honorDisplayName"), "Honoree contact not found.");
 
-    }
+  }
 
   public function testOnlineContributionWithZeroAmount () {
     $this->webtestLogin();
@@ -293,13 +293,12 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
 
     $this->clickLink("_qf_Confirm_next-bottom", NULL);
 
-
     //login to check contribution
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-      //Find Contribution
+    //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->type("sort_name", "$lastName $firstName");

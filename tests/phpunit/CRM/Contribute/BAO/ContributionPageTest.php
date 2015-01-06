@@ -69,7 +69,6 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
       'is_credit_card_only' => '',
     );
 
-
     $contributionpage = CRM_Contribute_BAO_ContributionPage::create($params);
 
     $this->assertNotNull($contributionpage->id);
@@ -92,7 +91,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     $id               = $contributionpage->id;
     $is_active        = 1;
     $pageActive       = CRM_Contribute_BAO_ContributionPage::setIsActive($id, $is_active);
-    $this->assertEquals($pageActive, true, 'Verify financial types record deletion.');
+    $this->assertEquals($pageActive, TRUE, 'Verify financial types record deletion.');
     ContributionPage::delete($contributionpage->id);
   }
 
@@ -141,7 +140,6 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
       'end_date_time' => '',
       'is_credit_card_only' => '',
     );
-
 
     $contributionpage = CRM_Contribute_BAO_ContributionPage::create($params);
     $copycontributionpage = CRM_Contribute_BAO_ContributionPage::copy($contributionpage->id);

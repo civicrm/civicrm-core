@@ -31,8 +31,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_participant_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Event
+ * @package CiviCRM_APIv3
+ * @subpackage API_Event
  */
 
 class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
@@ -87,7 +87,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   public function testPaymentCreateMissingContributionId() {
     //Without Payment EntityID
     $params = array(
-      'participant_id' => $this->_participantID,    );
+      'participant_id' => $this->_participantID, );
 
     $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
   }
@@ -138,7 +138,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   public function testPaymentUpdateMissingParticipantId() {
     //WithoutParticipantId
     $params = array(
-      'contribution_id' => '3',    );
+      'contribution_id' => '3', );
 
     $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
   }
@@ -148,7 +148,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   public function testPaymentUpdateMissingContributionId() {
     $params = array(
-      'participant_id' => $this->_participantID,    );
+      'participant_id' => $this->_participantID, );
     $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
   }
 
@@ -164,7 +164,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'id' => $this->_participantPaymentID,
       'participant_id' => $this->_participantID,
-      'contribution_id' => $contributionID,    );
+      'contribution_id' => $contributionID, );
 
     // Update Payment
     $participantPayment = $this->callAPISuccess('participant_payment', 'create', $params);
@@ -197,7 +197,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'id' => $this->_participantPaymentID,
       'participant_id' => $this->_participantID,
-      'contribution_id' => $contributionID,    );
+      'contribution_id' => $contributionID, );
 
     // Update Payment
     $participantPayment = $this->callAPISuccess('participant_payment', 'create', $params);
@@ -232,7 +232,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'id' => $this->_participantPaymentID,
       'participant_id' => $this->_participantID,
-      'contribution_id' => $contributionID,    );
+      'contribution_id' => $contributionID, );
 
     // Update Payment
     $participantPayment = $this->callAPISuccess('participant_payment', 'create', $params);
@@ -270,7 +270,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   public function testPaymentDeleteWithWrongID() {
     $params = array(
-      'id' => 0,    );
+      'id' => 0, );
     $deletePayment = $this->callAPIFailure('participant_payment', 'delete', $params);
     $this->assertEquals($deletePayment['error_message'], 'Error while deleting participantPayment');
   }
@@ -342,6 +342,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
           'status_id' => 1,
         );
         break;
+
       case 'payLater':
         $compareParams = array(
           'to_financial_account_id' => 7,

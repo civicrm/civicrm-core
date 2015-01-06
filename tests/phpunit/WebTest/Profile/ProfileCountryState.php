@@ -54,7 +54,6 @@ class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
     $this->click('_qf_Group_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-
     //check for  profile create
     $this->waitForText('crm-notification-container', "Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
     $gid = $this->urlArg('gid');
@@ -102,7 +101,7 @@ class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
           $this->click("//option[@value='$countryID']");
           $this->click("xpath=//tr[@class='crm-localization-form-block-provinceLimit']/td[2]/table//tbody/tr/td[2]/input[@name='add']");
         }
-        $added = true;
+        $added = TRUE;
       }
       if ($added) {
         $this->click("_qf_Localization_next-bottom");
@@ -130,16 +129,16 @@ class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
       $this->openCiviPage("admin/setting/localization", "reset=1", "_qf_Localization_next-bottom");
       $enabledCountries = $this->getSelectOptions("countryLimit-t");
       $enabledStates = $this->getSelectOptions("provinceLimit-t");
-      $removed = false;
+      $removed = FALSE;
       foreach($newCountry as $countryID => $countryName) {
-          $this->addSelection("countryLimit-t", "label=$countryName");
-          $this->click("xpath=//select[@id='countryLimit-t']/option[@value='$countryID']");
-          $this->click("xpath=//tr[@class='crm-localization-form-block-countryLimit']/td[2]/table//tbody/tr/td[2]/input[@name='remove']");
+        $this->addSelection("countryLimit-t", "label=$countryName");
+        $this->click("xpath=//select[@id='countryLimit-t']/option[@value='$countryID']");
+        $this->click("xpath=//tr[@class='crm-localization-form-block-countryLimit']/td[2]/table//tbody/tr/td[2]/input[@name='remove']");
 
-          $this->addSelection("provinceLimit-t", "label=$countryName");
-          $this->click("//option[@value='$countryID']");
-          $this->click("xpath=//tr[@class='crm-localization-form-block-provinceLimit']/td[2]/table//tbody/tr/td[2]/input[@name='remove']");
-          $removed = true;
+        $this->addSelection("provinceLimit-t", "label=$countryName");
+        $this->click("//option[@value='$countryID']");
+        $this->click("xpath=//tr[@class='crm-localization-form-block-provinceLimit']/td[2]/table//tbody/tr/td[2]/input[@name='remove']");
+        $removed = TRUE;
       }
       if ($removed) {
         $this->click("_qf_Localization_next-bottom");
