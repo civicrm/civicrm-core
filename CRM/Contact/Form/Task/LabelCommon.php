@@ -39,24 +39,7 @@
  * components in CiviCRM (since they all have send email as a task)
  */
 class CRM_Contact_Form_Task_LabelCommon {
-  /**
-   * Check for presence of tokens to be swapped out
-   *
-   * @param array $contact
-   * @param array $mailingFormatProperties
-   * @param array $tokenFields
-   *
-   * @return bool
-   */
-  public function tokenIsFound($contact, $mailingFormatProperties, $tokenFields) {
-    foreach (array_merge($mailingFormatProperties, array_fill_keys($tokenFields, 1)) as $key => $dontCare) {
-      //we should not consider addressee for data exists, CRM-6025
-       if ($key != 'addressee' && !empty($contact[$key])) {
-        return TRUE;
-      }
-    }
-    return FALSE;
-  }
+
   /**
    * Create labels (pdf)
    *
@@ -196,7 +179,7 @@ class CRM_Contact_Form_Task_LabelCommon {
         // If location type is not primary, $contact contains
         // one more array as "$contact[$locName] = array( values... )"
 
-        if(!CRM_Contact_Form_Task_LabelCommon::tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
+        if (!CRM_Contact_Form_Task_Label::tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
           continue;
         }
 
@@ -234,7 +217,7 @@ class CRM_Contact_Form_Task_LabelCommon {
         }
       }
       else {
-        if(!CRM_Contact_Form_Task_LabelCommon::tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
+        if (!CRM_Contact_Form_Task_Label::tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
           continue;
         }
 
@@ -264,7 +247,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    * -  [supplemental_address_2] => 1
    * )
    */
-  public function getAddressReturnProperties() {
+  public static function getAddressReturnProperties() {
     $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'mailing_format'
     );
@@ -283,7 +266,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    * @param unknown_type $contacts
    * @return unknown
    */
-  public function getTokenData(&$contacts) {
+  public static function getTokenData(&$contacts) {
     $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'mailing_format'
     );

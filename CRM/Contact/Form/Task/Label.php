@@ -258,7 +258,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         // If location type is not primary, $contact contains
         // one more array as "$contact[$locName] = array( values... )"
 
-        if(!$this->tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
+        if (!self::tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
           continue;
         }
 
@@ -297,7 +297,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         }
       }
       else {
-        if(!$this->tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
+        if (!self::tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
           continue;
         }
 
@@ -316,7 +316,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     }
 
     if (isset($fv['merge_same_address'])) {
-      self::mergeSameAddress($rows);
+      CRM_Core_BAO_Address::mergeSameAddress($rows);
       $individualFormat = TRUE;
     }
 
@@ -362,9 +362,10 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    *
    * @return bool
    */
-  public function tokenIsFound($contact, $mailingFormatProperties, $tokenFields) {
+  public static function tokenIsFound($contact, $mailingFormatProperties, $tokenFields) {
     foreach (array_merge($mailingFormatProperties, array_fill_keys($tokenFields, 1)) as $key => $dontCare) {
-      if (!empty($contact[$key])) {
+      //we should not consider addressee for data exists, CRM-6025
+       if ($key != 'addressee' && !empty($contact[$key])) {
         return TRUE;
       }
     }
@@ -397,71 +398,5 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     $pdf->Output($fileName, 'D');
   }
 
-  /**
-   * @param array $rows
-   */
-  static public function mergeSameAddress(&$rows) {
-    $uniqueAddress = array();
-    foreach (array_keys($rows) as $rowID) {
-      // load complete address as array key
-      $address =
-      trim($rows[$rowID]['street_address']) . trim($rows[$rowID]['city']) . trim($rows[$rowID]['state_province']) . trim($rows[$rowID]['postal_code']) . trim($rows[$rowID]['country']);
-      if (isset($rows[$rowID]['last_name'])) {
-        $name = $rows[$rowID]['last_name'];
-      }
-      else {
-        $name = $rows[$rowID]['display_name'];
-      }
 
-      // CRM-15120
-      $formatted = array(
-        'first_name' => $rows[$rowID]['first_name'],
-        'individual_prefix' => $rows[$rowID]['individual_prefix']
-      );
-      $format = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'display_name_format');
-      $firstNameWithPrefix = CRM_Utils_Address::format($formatted, $format, FALSE, FALSE, TRUE);
-      $firstNameWithPrefix = trim($firstNameWithPrefix);
-
-      // fill uniqueAddress array with last/first name tree
-      if (isset($uniqueAddress[$address])) {
-        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['first_name'] = $rows[$rowID]['first_name'];
-        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'];
-        // drop unnecessary rows
-        unset($rows[$rowID]);
-        // this is the first listing at this address
-      }
-      else {
-        $uniqueAddress[$address]['ID'] = $rowID;
-        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['first_name'] = $rows[$rowID]['first_name'];
-        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'];
-      }
-    }
-    foreach ($uniqueAddress as $address => $data) {
-      // copy data back to $rows
-      $count = 0;
-      // one last name list per row
-      foreach ($data['names'] as $last_name => $first_names) {
-        // too many to list
-        if ($count > 2) {
-          break;
-        }
-          if(count($first_names) == 1){
-            $family = $first_names[current(array_keys($first_names))]['addressee_display'];
-          }
-          else {
-            // collapse the tree to summarize
-            $family = trim(implode(" & ", array_keys($first_names)) . " " . $last_name);
-          }
-          if ($count) {
-            $processedNames .= "\n" . $family;
-          }
-          else {
-            // build display_name string
-            $processedNames = $family;
-          }
-        $count++;
-      }
-      $rows[$data['ID']]['addressee'] = $rows[$data['ID']]['addressee_display'] = $rows[$data['ID']]['display_name'] = $processedNames;
-    }
-  }
 }
