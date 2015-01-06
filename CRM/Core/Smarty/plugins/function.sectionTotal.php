@@ -44,8 +44,10 @@
  * Smarty param:  int    $depth   the depth of the current section
  *                                (sections declared first have lesser depth, starting at 0)
  *
- * @param array $params   template call's parameters
- * @param object $smarty  the Smarty object
+ * @param array $params
+ *   Template call's parameters.
+ * @param object $smarty
+ *   The Smarty object.
  *
  * @return string  the string, translated by gettext
  */

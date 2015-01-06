@@ -49,8 +49,10 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_BAO_UFField object
    * @static
@@ -62,7 +64,8 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   /**
    * Get the form title.
    *
-   * @param int $id id of uf_form
+   * @param int $id
+   *   Id of uf_form.
    *
    * @return string title
    *
@@ -76,8 +79,10 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id         id of the database record
-   * @param boolean  $is_active  value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object              DAO object on sucess, null otherwise
    * @static
@@ -100,7 +105,8 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   /**
    * Delete the profile Field.
    *
-   * @param int  $id    Field Id
+   * @param int $id
+   *   Field Id.
    *
    * @return boolean
    *
@@ -118,7 +124,8 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   /**
    * Check duplicate for duplicate field in a group
    *
-   * @param array $params an associative array with field and values
+   * @param array $params
+   *   An associative array with field and values.
    * @param $ids
    *
    * @return mixed
@@ -191,8 +198,10 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   /**
    * Add the UF Field
    *
-   * @param array $params (reference) array containing the values submitted by the form
-   * @param array $ids array containing the id
+   * @param array $params
+   *   (reference) array containing the values submitted by the form.
+   * @param array $ids
+   *   Array containing the id.
    *
    * @return CRM_Core_BAO_UFField object
    *
@@ -247,7 +256,8 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   /**
    * Automatically determine one weight and modify others
    *
-   * @param array $params UFField record, e.g. with 'weight', 'uf_group_id', and 'field_id'
+   * @param array $params
+   *   UFField record, e.g. with 'weight', 'uf_group_id', and 'field_id'.
    * @return int
    */
   public static function autoWeight($params) {
@@ -264,8 +274,10 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   /**
    * Enable/disable profile field given a custom field id
    *
-   * @param int      $customFieldId     custom field id
-   * @param boolean  $is_active         set the is_active field
+   * @param int $customFieldId
+   *   Custom field id.
+   * @param bool $is_active
+   *   Set the is_active field.
    *
    * @return void
    * @static
@@ -286,8 +298,10 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * Copy existing profile fields to
    * new profile from the already built profile
    *
-   * @param int      $old_id  from which we need to copy
-   * @param boolean  $new_id  in which to copy
+   * @param int $old_id
+   *   From which we need to copy.
+   * @param bool $new_id
+   *   In which to copy.
    *
    * @return void
    * @static
@@ -307,7 +321,8 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   /**
    * Delete profile field given a custom field
    *
-   * @param int   $customFieldId      ID of the custom field to be deleted
+   * @param int $customFieldId
+   *   ID of the custom field to be deleted.
    *
    * @return void
    *
@@ -328,8 +343,10 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   /**
    * Enable/disable profile field given a custom group id
    *
-   * @param int      $customGroupId custom group id
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $customGroupId
+   *   Custom group id.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return void
    * @static
@@ -437,9 +454,12 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * Find out whether given profile group uses $required
    * and/or $optional profile types
    *
-   * @param integer $ufGroupId  profile id
-   * @param array   $required   array of types those are required
-   * @param array   $optional   array of types those are optional
+   * @param int $ufGroupId
+   *   Profile id.
+   * @param array $required
+   *   Array of types those are required.
+   * @param array $optional
+   *   Array of types those are optional.
    *
    * @return boolean $valid
    * @static
@@ -549,9 +569,12 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   /**
    * Get the profile type (eg: individual/organization/household)
    *
-   * @param int $ufGroupId     uf group id
-   * @param boolean $returnMixType this is true, then field type of  mix profile field is returned
-   * @param boolean $onlyPure      true if only pure profiles are required
+   * @param int $ufGroupId
+   *   Uf group id.
+   * @param bool $returnMixType
+   *   This is true, then field type of mix profile field is returned.
+   * @param bool $onlyPure
+   *   True if only pure profiles are required.
    *
    * @param bool $skipComponentType
    *
@@ -573,8 +596,10 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * Get the profile type (eg: individual/organization/household)
    *
    * @param string $ufGroupType
-   * @param boolean $returnMixType this is true, then field type of  mix profile field is returned
-   * @param boolean $onlyPure      true if only pure profiles are required
+   * @param bool $returnMixType
+   *   This is true, then field type of mix profile field is returned.
+   * @param bool $onlyPure
+   *   True if only pure profiles are required.
    * @param bool $skipComponentType
    *
    * @return string profile group_type
@@ -768,9 +793,12 @@ SELECT  id
    * transfer profile address data to billing fields
    * http://issues.civicrm.org/jira/browse/CRM-5869
    *
-   * @param string $key Field key - e.g. street_address-Primary, first_name
-   * @param array $profileAddressFields array of profile fields that relate to address fields
-   * @param array $profileFilter filter to apply to profile fields - expected usage is to only fill based on
+   * @param string $key
+   *   Field key - e.g. street_address-Primary, first_name.
+   * @param array $profileAddressFields
+   *   Array of profile fields that relate to address fields.
+   * @param array $profileFilter
+   *   Filter to apply to profile fields - expected usage is to only fill based on.
    * the bottom profile per CRM-13726
    *
    * @return bool Can the address block be hidden safe in the knowledge all fields are elsewhere collected (see CRM-15118)

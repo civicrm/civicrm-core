@@ -323,7 +323,8 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
   }
 
   /**
-   * @param string $entityTable table-name or "*" (to reference files directly by file-id)
+   * @param string $entityTable
+   *   Table-name or "*" (to reference files directly by file-id).
    * @param int $entityID
    * @param int $fileTypeID
    * @param int $fileID
@@ -461,9 +462,12 @@ AND       CEF.entity_id    = %2";
    * Return a clean url string and the number of attachment for a
    * given entityTable, entityID
    *
-   * @param $entityTable string The entityTable to which the file is attached
-   * @param $entityID    int    The id of the object in the above entityTable
-   * @param $separator   string The string separator where to implode the urls
+   * @param $entityTable
+   *   String The entityTable to which the file is attached.
+   * @param $entityID
+   *   Int The id of the object in the above entityTable.
+   * @param $separator
+   *   String The string separator where to implode the urls.
    *
    * @return array              An array with 2 elements. The string and the number of attachments
    * @static
@@ -647,9 +651,11 @@ AND       CEF.entity_id    = %2";
   /**
    * Display paper icon for a file attachment -- CRM-13624
    *
-   * @param $entityTable string  The entityTable to which the file is attached. eg "civicrm_contact", "civicrm_note", "civicrm_activity"
+   * @param $entityTable
+   *   String The entityTable to which the file is attached. eg "civicrm_contact", "civicrm_note", "civicrm_activity".
    *                             If you have the ID of a specific row in civicrm_file, use $entityTable='*'
-   * @param $entityID    int     The id of the object in the above entityTable
+   * @param $entityID
+   *   Int The id of the object in the above entityTable.
    *
    * @return array|NULL          list of HTML snippets; one HTML snippet for each attachment. If none found, then NULL
    *

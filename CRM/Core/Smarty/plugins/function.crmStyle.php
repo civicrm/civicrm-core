@@ -36,7 +36,8 @@
 /**
  * Add a stylesheet <LINK> to a specific part of the page
  *
- * @param $params array with keys:
+ * @param $params
+ *   Array with keys:.
  *  - ext: string, extension name. see CRM_Core_Resources::addStyleFile
  *  - file: string, relative file path. see CRM_Core_Resources::addStyleFile
  *  - url: string. see CRM_Core_Resources::addStyleURL

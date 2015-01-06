@@ -37,8 +37,10 @@ class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_BAO_Persistent object
    * @static
@@ -60,8 +62,10 @@ class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
   /**
    * Add the Persistent Record
    *
-   * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
+   * @param array $ids
+   *   Reference array contains the id.
    *
    * @static
    *

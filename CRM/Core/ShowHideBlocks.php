@@ -58,8 +58,10 @@ class CRM_Core_ShowHideBlocks {
   /**
    * Class constructor
    *
-   * @param array $show initial value of show array
-   * @param array $hide initial value of hide array
+   * @param array $show
+   *   Initial value of show array.
+   * @param array $hide
+   *   Initial value of hide array.
    *
    * @return \CRM_Core_ShowHideBlocks the newly created object@access public
    */
@@ -127,7 +129,8 @@ class CRM_Core_ShowHideBlocks {
   /**
    * Add a value to the show array
    *
-   * @param string $name id to be added
+   * @param string $name
+   *   Id to be added.
    *
    * @return void
    */
@@ -141,7 +144,8 @@ class CRM_Core_ShowHideBlocks {
   /**
    * Add a value to the hide array
    *
-   * @param string $name id to be added
+   * @param string $name
+   *   Id to be added.
    *
    * @return void
    */
@@ -155,7 +159,8 @@ class CRM_Core_ShowHideBlocks {
   /**
    * Create a well formatted html link from the smaller pieces
    *
-   * @param string $name name of the link
+   * @param string $name
+   *   Name of the link.
    * @param string $href
    * @param string $text
    * @param string $js
@@ -169,10 +174,14 @@ class CRM_Core_ShowHideBlocks {
   /**
    * Create links that we can use in the form
    *
-   * @param CRM_Core_Form $form the form object
-   * @param string $prefix the attribute that we are referencing
-   * @param string $showLinkText the text to be shown for the show link
-   * @param string $hideLinkText the text to be shown for the hide link
+   * @param CRM_Core_Form $form
+   *   The form object.
+   * @param string $prefix
+   *   The attribute that we are referencing.
+   * @param string $showLinkText
+   *   The text to be shown for the show link.
+   * @param string $hideLinkText
+   *   The text to be shown for the hide link.
    *
    * @param bool $assign
    *
@@ -200,14 +209,22 @@ class CRM_Core_ShowHideBlocks {
   /**
    * Create html link elements that we can use in the form
    *
-   * @param CRM_Core_Form $form          the form object
-   * @param int           $index         the current index of the element being processed
-   * @param int           $maxIndex      the max number of elements that will be processed
-   * @param string        $prefix        the attribute that we are referencing
-   * @param string        $showLinkText  the text to be shown for the show link
-   * @param string        $hideLinkText  the text to be shown for the hide link
-   * @param string        $elementType   the set the class
-   * @param string        $hideLink      the hide block string
+   * @param CRM_Core_Form $form
+   *   The form object.
+   * @param int $index
+   *   The current index of the element being processed.
+   * @param int $maxIndex
+   *   The max number of elements that will be processed.
+   * @param string $prefix
+   *   The attribute that we are referencing.
+   * @param string $showLinkText
+   *   The text to be shown for the show link.
+   * @param string $hideLinkText
+   *   The text to be shown for the hide link.
+   * @param string $elementType
+   *   The set the class.
+   * @param string $hideLink
+   *   The hide block string.
    *
    * @return void
    */

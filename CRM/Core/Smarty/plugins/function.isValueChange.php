@@ -46,8 +46,10 @@
  * Smarty param:  string $assign  name of template variable to which to assign result
  *
  *
- * @param array $params   template call's parameters
- * @param object $smarty  the Smarty object
+ * @param array $params
+ *   Template call's parameters.
+ * @param object $smarty
+ *   The Smarty object.
  *
  * @return NULL
  */

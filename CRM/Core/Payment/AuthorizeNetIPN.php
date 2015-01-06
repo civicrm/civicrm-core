@@ -37,7 +37,8 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * Constructor function
    *
-   * @param $inputData array contents of HTTP REQUEST
+   * @param $inputData
+   *   Array contents of HTTP REQUEST.
    *
    * @throws CRM_Core_Exception
    */
@@ -302,10 +303,14 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
   }
 
   /**
-   * @param string $name parameter name
-   * @param string $type parameter type
-   * @param bool $abort abort if not present
-   * @param null $default default value
+   * @param string $name
+   *   Parameter name.
+   * @param string $type
+   *   Parameter type.
+   * @param bool $abort
+   *   Abort if not present.
+   * @param null $default
+   *   Default value.
    *
    * @throws CRM_Core_Exception
    * @return mixed

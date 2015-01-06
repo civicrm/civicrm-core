@@ -79,11 +79,16 @@ class CRM_Core_State {
   /**
    * Constructor
    *
-   * @param string $name internal name of the state
-   * @param int $type state type
-   * @param CRM_Core_State $back state that precedes this state
-   * @param CRM_Core_State $next state that follows  this state
-   * @param CRM_Core_StateMachine $stateMachine statemachine that this states belongs to
+   * @param string $name
+   *   Internal name of the state.
+   * @param int $type
+   *   State type.
+   * @param CRM_Core_State $back
+   *   State that precedes this state.
+   * @param CRM_Core_State $next
+   *   State that follows this state.
+   * @param CRM_Core_StateMachine $stateMachine
+   *   Statemachine that this states belongs to.
    *
    * @return CRM_Core_State
    */

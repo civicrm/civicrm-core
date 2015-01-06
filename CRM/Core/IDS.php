@@ -96,7 +96,8 @@ class CRM_Core_IDS {
   /**
    * Create the default config file for the IDS system
    *
-   * @param boolean $force should we recreate it irrespective if it exists or not
+   * @param bool $force
+   *   Should we recreate it irrespective if it exists or not.
    *
    * @return string the full path to the config file
    * @static

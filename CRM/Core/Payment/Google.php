@@ -62,7 +62,8 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
   /**
    * Constructor
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param $paymentProcessor
    *
@@ -77,7 +78,8 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
   /**
    * Singleton function used to manage this object
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param object $paymentProcessor
    *
@@ -128,7 +130,8 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    * This function collects all the information from a web/api form and invokes
    * the relevant payment processor specific functions to perform the transaction
    *
-   * @param  array $params assoc array of input parameters for this transaction
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
    *
    * @return array the result in an nice formatted array (or an error object)
    * @abstract
@@ -140,7 +143,8 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
   /**
    * Sets appropriate parameters for checking out to google
    *
-   * @param array $params name value pair of contribution datat
+   * @param array $params
+   *   Name value pair of contribution datat.
    *
    * @param $component
    *
@@ -212,9 +216,12 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
   /**
    * Builds appropriate parameters for checking out to google and submits the post params
    *
-   * @param array  $params    name value pair of contribution data
-   * @param string $component event/contribution
-   * @param object $cart      object of googel cart
+   * @param array $params
+   *   Name value pair of contribution data.
+   * @param string $component
+   *   Event/contribution.
+   * @param object $cart
+   *   Object of googel cart.
    *
    * @return void
    *

@@ -44,7 +44,8 @@ class CRM_Core_BAO_ConfigSetting {
    * Create civicrm settings. This is the same as add but it clears the cache and
    * reloads the config object
    *
-   * @param array $params associated array of civicrm variables
+   * @param array $params
+   *   Associated array of civicrm variables.
    *
    * @return null
    * @static
@@ -60,7 +61,8 @@ class CRM_Core_BAO_ConfigSetting {
   /**
    * Add civicrm settings
    *
-   * @param array $params associated array of civicrm variables
+   * @param array $params
+   *   Associated array of civicrm variables.
    *
    * @return null
    * @static
@@ -141,7 +143,8 @@ class CRM_Core_BAO_ConfigSetting {
   /**
    * Fix civicrm setting variables
    *
-   * @param array $params associated array of civicrm variables
+   * @param array $params
+   *   Associated array of civicrm variables.
    *
    * @return null
    * @static
@@ -173,8 +176,10 @@ class CRM_Core_BAO_ConfigSetting {
   /**
    * Format the array containing before inserting in db
    *
-   * @param  array $params associated array of civicrm variables(submitted)
-   * @param  array $values associated array of civicrm variables stored in db
+   * @param array $params
+   *   Associated array of civicrm variables(submitted).
+   * @param array $values
+   *   Associated array of civicrm variables stored in db.
    *
    * @return null
    * @static
@@ -652,7 +657,8 @@ WHERE  option_group_id = (
    * Takes a componentName and enables it in the config
    * Primarily used during unit testing
    *
-   * @param string $componentName name of the component to be enabled, needs to be valid
+   * @param string $componentName
+   *   Name of the component to be enabled, needs to be valid.
    *
    * @return boolean - true if valid component name and enabling succeeds, else false
    * @static

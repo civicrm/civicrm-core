@@ -100,7 +100,8 @@ class CRM_Core_Invoke {
   /**
    * Hackish support /civicrm/menu/rebuild
    *
-   * @param array $args list of path parts
+   * @param array $args
+   *   List of path parts.
    * @void
    */
   static public function hackMenuRebuild($args) {
@@ -120,7 +121,8 @@ class CRM_Core_Invoke {
   /**
    * Perform general setup
    *
-   * @param array $args list of path parts
+   * @param array $args
+   *   List of path parts.
    * @void
    */
   static public function init($args) {
@@ -139,7 +141,8 @@ class CRM_Core_Invoke {
   /**
    * Hackish support for /standalone/*
    *
-   * @param array $args list of path parts
+   * @param array $args
+   *   List of path parts.
    * @void
    */
   static public function hackStandalone($args) {
@@ -158,7 +161,8 @@ class CRM_Core_Invoke {
   /**
    * Determine which menu $item corresponds to $args
    *
-   * @param array $args list of path parts
+   * @param array $args
+   *   List of path parts.
    * @return array; see CRM_Core_Menu
    */
   static public function getItem($args) {
@@ -183,7 +187,8 @@ class CRM_Core_Invoke {
   /**
    * Given a menu item, call the appropriate controller and return the response
    *
-   * @param array $item see CRM_Core_Menu
+   * @param array $item
+   *   See CRM_Core_Menu.
    * @return string, HTML
    */
   static public function runItem($item) {

@@ -36,8 +36,10 @@
 /**
  * Adds inline help
  *
- * @param array  $params the function params
- * @param object $smarty reference to the smarty object
+ * @param array $params
+ *   The function params.
+ * @param object $smarty
+ *   Reference to the smarty object.
  *
  * @return string the help html to be inserted
  */

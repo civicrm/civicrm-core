@@ -38,10 +38,13 @@ class CRM_Core_Report_Excel {
    * Outputs a result set with a given header
    * in the string buffer result
    *
-   * @param   string $header (reference ) column headers
-   * @param   string $rows (reference ) result set rows
+   * @param string $header
+   *   (reference ) column headers.
+   * @param string $rows
+   *   (reference ) result set rows.
    * @param null $titleHeader
-   * @param   boolean $print should the output be printed
+   * @param boolean $print
+   *   Should the output be printed.
    *
    * @param bool $outputHeader
    *
@@ -189,12 +192,18 @@ class CRM_Core_Report_Excel {
   /**
    * Write a CSV file to the browser output
    *
-   * @param string  $fileName - the name of the file that will be downloaded (this is sent to the browser)
-   * @param array   $header   - an array of the headers
-   * @param array   $rows     - an array of arrays of the table contents
-   * @param string  $titleHeader - if set this will be the title in the CSV
-   * @param boolean $outputHeader - should we output the header row
-   * @param boolean $saveFile -
+   * @param string $fileName
+   *   The name of the file that will be downloaded (this is sent to the browser).
+   * @param array $header
+   *   An array of the headers.
+   * @param array $rows
+   *   An array of arrays of the table contents.
+   * @param string $titleHeader
+   *   If set this will be the title in the CSV.
+   * @param bool $outputHeader
+   *   Should we output the header row.
+   * @param bool $saveFile
+   *   -.
    *
    * @return void
    * @static

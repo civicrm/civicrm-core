@@ -97,7 +97,8 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Initialize the DAO object
    *
-   * @param string $dsn   the database connection string
+   * @param string $dsn
+   *   The database connection string.
    *
    * @return void
    * @static
@@ -162,7 +163,8 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @param string $fieldName
    * @param array $fieldDef
-   * @param int $counter the globally-unique ID of the test object
+   * @param int $counter
+   *   The globally-unique ID of the test object.
    */
   protected function assignTestValue($fieldName, &$fieldDef, $counter) {
     $dbName = $fieldDef['name'];
@@ -308,8 +310,10 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Execute a query by the current DAO, localizing it along the way (if needed).
    *
-   * @param string $query        the SQL query for execution
-   * @param bool   $i18nRewrite  whether to rewrite the query
+   * @param string $query
+   *   The SQL query for execution.
+   * @param bool $i18nRewrite
+   *   Whether to rewrite the query.
    *
    * @return object              the current DAO object after the query execution
    */
@@ -326,7 +330,8 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Static function to set the factory instance for this class.
    *
-   * @param object $factory  the factory application object
+   * @param object $factory
+   *   The factory application object.
    *
    * @return void
    * @static
@@ -415,7 +420,7 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Get/set an associative array of table columns
    *
-   * @param  array key=>type array
+   * @param array key=>type array
    * @return array (associative)
    */
   public function table() {
@@ -498,7 +503,8 @@ class CRM_Core_DAO extends DB_DataObject {
    * Given an associative array of name/value pairs, extract all the values
    * that belong to this object and initialize the object with said values
    *
-   * @param array $params (reference ) associative array of name/value pairs
+   * @param array $params
+   *   (reference ) associative array of name/value pairs.
    *
    * @return boolean      did we copy all null values into the object
    */
@@ -538,8 +544,10 @@ class CRM_Core_DAO extends DB_DataObject {
    * this is a destructive store, calling function is responsible
    * for keeping sanity of id's.
    *
-   * @param object $object the object that we are extracting data from
-   * @param array  $values (reference ) associative array of name/value pairs
+   * @param object $object
+   *   The object that we are extracting data from.
+   * @param array $values
+   *   (reference ) associative array of name/value pairs.
    *
    * @return void
    * @static
@@ -560,7 +568,8 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Create an attribute for this specific field. We only do this for strings and text
    *
-   * @param array $field the field under task
+   * @param array $field
+   *   The field under task.
    *
    * @return array|null the attributes for the object
    * @static
@@ -609,8 +618,10 @@ class CRM_Core_DAO extends DB_DataObject {
    * Get the size and maxLength attributes for this text field
    * (or for all text fields) in the DAO object.
    *
-   * @param string $class     name of DAO class
-   * @param string $fieldName field that i'm interested in or null if
+   * @param string $class
+   *   Name of DAO class.
+   * @param string $fieldName
+   *   Field that i'm interested in or null if.
    *                          you want the attributes for all DAO text fields
    *
    * @return array assoc array of name => attribute pairs
@@ -651,11 +662,15 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Check if there is a record with the same name in the db
    *
-   * @param string $value     the value of the field we are checking
-   * @param string $daoName   the dao object name
-   * @param string $daoID     the id of the object being updated. u can change your name
+   * @param string $value
+   *   The value of the field we are checking.
+   * @param string $daoName
+   *   The dao object name.
+   * @param string $daoID
+   *   The id of the object being updated. u can change your name.
    *                          as long as there is no conflict
-   * @param string $fieldName the name of the field in the DAO
+   * @param string $fieldName
+   *   The name of the field in the DAO.
    *
    * @return boolean     true if object exists
    * @static
@@ -679,7 +694,8 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @param string $tableName
    * @param string $columnName
-   * @param bool   $i18nRewrite  whether to rewrite the query on multilingual setups
+   * @param bool $i18nRewrite
+   *   Whether to rewrite the query on multilingual setups.
    *
    * @return boolean true if exists, else false
    * @static
@@ -924,7 +940,8 @@ FROM   civicrm_domain
   /**
    * Find a DAO object for the given ID and return it.
    *
-   * @param int $id Id of the DAO object being searched for.
+   * @param int $id
+   *   Id of the DAO object being searched for.
    *
    * @return object Object of the type of the class that called this function.
    */
@@ -940,11 +957,16 @@ FROM   civicrm_domain
   /**
    * Given a DAO name, a column name and a column value, find the record and GET the value of another column in that record
    *
-   * @param string  $daoName       Name of the DAO (Example: CRM_Contact_DAO_Contact to retrieve value from a contact)
-   * @param int     $searchValue   Value of the column you want to search by
-   * @param string  $returnColumn  Name of the column you want to GET the value of
-   * @param string  $searchColumn  Name of the column you want to search by
-   * @param boolean $force         Skip use of the cache
+   * @param string $daoName
+   *   Name of the DAO (Example: CRM_Contact_DAO_Contact to retrieve value from a contact).
+   * @param int $searchValue
+   *   Value of the column you want to search by.
+   * @param string $returnColumn
+   *   Name of the column you want to GET the value of.
+   * @param string $searchColumn
+   *   Name of the column you want to search by.
+   * @param bool $force
+   *   Skip use of the cache.
    *
    * @return string|null          Value of $returnColumn in the retrieved record
    * @static
@@ -985,11 +1007,16 @@ FROM   civicrm_domain
   /**
    * Given a DAO name, a column name and a column value, find the record and SET the value of another column in that record
    *
-   * @param string $daoName       Name of the DAO (Example: CRM_Contact_DAO_Contact to retrieve value from a contact)
-   * @param int    $searchValue   Value of the column you want to search by
-   * @param string $setColumn     Name of the column you want to SET the value of
-   * @param string $setValue      SET the setColumn to this value
-   * @param string $searchColumn  Name of the column you want to search by
+   * @param string $daoName
+   *   Name of the DAO (Example: CRM_Contact_DAO_Contact to retrieve value from a contact).
+   * @param int $searchValue
+   *   Value of the column you want to search by.
+   * @param string $setColumn
+   *   Name of the column you want to SET the value of.
+   * @param string $setValue
+   *   SET the setColumn to this value.
+   * @param string $searchColumn
+   *   Name of the column you want to search by.
    *
    * @return boolean          true if we found and updated the object, else false
    * @static
@@ -1014,7 +1041,8 @@ FROM   civicrm_domain
    * Get sort string
    *
    * @param array|object $sort either array or CRM_Utils_Sort
-   * @param string $default - default sort value
+   * @param string $default
+   *   Default sort value.
    *
    * @return string - sortString
    * @static
@@ -1038,10 +1066,14 @@ FROM   civicrm_domain
   /**
    * Fetch object based on array of properties
    *
-   * @param string $daoName  name of the dao object
-   * @param array  $params   (reference ) an assoc array of name/value pairs
-   * @param array  $defaults (reference ) an assoc array to hold the flattened values
-   * @param array  $returnProperities     an assoc array of fields that need to be returned, eg array( 'first_name', 'last_name')
+   * @param string $daoName
+   *   Name of the dao object.
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
+   * @param array $returnProperities
+   *   An assoc array of fields that need to be returned, eg array( 'first_name', 'last_name').
    *
    * @return object an object of type referenced by daoName
    * @static
@@ -1066,8 +1098,10 @@ FROM   civicrm_domain
   /**
    * Delete the object records that are associated with this contact
    *
-   * @param string $daoName  name of the dao object
-   * @param  int  $contactId id of the contact to delete
+   * @param string $daoName
+   *   Name of the dao object.
+   * @param int $contactId
+   *   Id of the contact to delete.
    *
    * @return void
    * @static
@@ -1083,7 +1117,8 @@ FROM   civicrm_domain
   /**
    * Execute a query
    *
-   * @param string $query query to be executed
+   * @param string $query
+   *   Query to be executed.
    *
    * @param array $params
    * @param bool $abort
@@ -1136,7 +1171,8 @@ FROM   civicrm_domain
   /**
    * Execute a query and get the single result
    *
-   * @param string $query query to be executed
+   * @param string $query
+   *   Query to be executed.
    * @param array $params
    * @param bool $abort
    * @param bool $i18nRewrite
@@ -1256,13 +1292,18 @@ FROM   civicrm_domain
    * This function is to make a shallow copy of an object
    * and all the fields in the object
    *
-   * @param string $daoName                 name of the dao
-   * @param array  $criteria                array of all the fields & values
+   * @param string $daoName
+   *   Name of the dao.
+   * @param array $criteria
+   *   Array of all the fields & values.
    *                                        on which basis to copy
-   * @param array  $newData                 array of all the fields & values
+   * @param array $newData
+   *   Array of all the fields & values.
    *                                        to be copied besides the other fields
-   * @param string $fieldsFix               array of fields that you want to prefix/suffix/replace
-   * @param string $blockCopyOfDependencies fields that you want to block from
+   * @param string $fieldsFix
+   *   Array of fields that you want to prefix/suffix/replace.
+   * @param string $blockCopyOfDependencies
+   *   Fields that you want to block from.
    *                                        getting copied
    *
    *
@@ -1409,11 +1450,13 @@ SELECT contact_id
   /**
    * Fetch object based on array of properties
    *
-   * @param string $daoName name of the dao object
+   * @param string $daoName
+   *   Name of the dao object.
    * @param string $fieldIdName
    * @param int $fieldId
    * @param $details
-   * @param array $returnProperities an assoc array of fields that need to be returned, eg array( 'first_name', 'last_name')
+   * @param array $returnProperities
+   *   An assoc array of fields that need to be returned, eg array( 'first_name', 'last_name').
    *
    * @return object an object of type referenced by daoName
    * @static
@@ -1489,8 +1532,10 @@ SELECT contact_id
   /**
    * Escape a list of strings for use with "WHERE X IN (...)" queries.
    *
-   * @param $strings array
-   * @param $default string the value to use if $strings has no elements
+   * @param $strings
+   *   Array.
+   * @param $default
+   *   String the value to use if $strings has no elements.
    * @return string eg "abc","def","ghi"
    */
   public static function escapeStrings($strings, $default = NULL) {
@@ -1757,7 +1802,8 @@ SELECT contact_id
    * Build a list of triggers via hook and add them to (err, reconcile them
    * with) the database.
    *
-   * @param $tableName string the specific table requiring a rebuild; or NULL to rebuild all tables
+   * @param $tableName
+   *   String the specific table requiring a rebuild; or NULL to rebuild all tables.
    * @param bool $force
    *
    * @see CRM-9716
@@ -1800,7 +1846,8 @@ SELECT contact_id
   /**
    * Wrapper function to drop triggers
    *
-   * @param $tableName string the specific table requiring a rebuild; or NULL to rebuild all tables
+   * @param $tableName
+   *   String the specific table requiring a rebuild; or NULL to rebuild all tables.
    */
   public static function dropTriggers($tableName = NULL) {
     $info = array();
@@ -1813,8 +1860,10 @@ SELECT contact_id
   }
 
   /**
-   * @param $info array per hook_civicrm_triggerInfo
-   * @param $onlyTableName string the specific table requiring a rebuild; or NULL to rebuild all tables
+   * @param $info
+   *   Array per hook_civicrm_triggerInfo.
+   * @param $onlyTableName
+   *   String the specific table requiring a rebuild; or NULL to rebuild all tables.
    */
   public static function createTriggers(&$info, $onlyTableName = NULL) {
     // Validate info array, should probably raise errors?
@@ -1924,7 +1973,8 @@ SELECT contact_id
   /**
    * Given a list of fields, create a list of references.
    *
-   * @param string $className BAO/DAO class name
+   * @param string $className
+   *   BAO/DAO class name.
    * @return array<CRM_Core_Reference_Interface>
    */
   public static function createReferenceColumns($className) {
@@ -2007,7 +2057,8 @@ SELECT contact_id
    * schema metadata in dynamicForeignKey which enumerates a restricted
    * set of possible entity_table's.
    *
-   * @param string $tableName table referred to
+   * @param string $tableName
+   *   Table referred to.
    *
    * @return array structure of table and column, listing every table with a
    * foreign key reference to $tableName, and the column where the key appears.
@@ -2031,7 +2082,8 @@ SELECT contact_id
   /**
    * Lookup the value of a MySQL global configuration variable.
    *
-   * @param string $name e.g. "thread_stack"
+   * @param string $name
+   *   E.g. "thread_stack".
    * @param mixed $default
    * @return mixed
    */
@@ -2054,8 +2106,10 @@ SELECT contact_id
    * The overriding function will generally call the lower-level CRM_Core_PseudoConstant::get
    *
    * @param string $fieldName
-   * @param string $context : @see CRM_Core_DAO::buildOptionsContext
-   * @param array $props : whatever is known about this bao object
+   * @param string $context
+   *   : @see CRM_Core_DAO::buildOptionsContext.
+   * @param array $props
+   *   : whatever is known about this bao object.
    *
    * @return Array|bool
    */
@@ -2091,7 +2145,7 @@ SELECT contact_id
   /**
    * Provides documentation and validation for the buildOptions $context param
    *
-   * @param String $context
+   * @param string $context
    *
    * @throws Exception
    * @return array
@@ -2137,11 +2191,16 @@ SELECT contact_id
    * $field => array('LIKE' => array('%me%))
    * etc
    *
-   * @param string $fieldName name of fields
-   * @param $filter array filter to be applied indexed by operator
-   * @param $type String type of field (not actually used - nor in api @todo )
-   * @param $alias String alternative field name ('as') @todo- not actually used
-   * @param bool $returnSanitisedArray return a sanitised array instead of a clause
+   * @param string $fieldName
+   *   Name of fields.
+   * @param $filter
+   *   Array filter to be applied indexed by operator.
+   * @param $type
+   *   String type of field (not actually used - nor in api @todo ).
+   * @param $alias
+   *   String alternative field name ('as') @todo- not actually used.
+   * @param bool $returnSanitisedArray
+   *   Return a sanitised array instead of a clause.
    *  this is primarily so we can add filters @ the api level to the Query object based fields
    *
    * @throws Exception
@@ -2234,8 +2293,10 @@ SELECT contact_id
    * which can be longer than this length, this function helps with creating
    * strings that meet various criteria.
    *
-   * @param string $string - the string to be shortened
-   * @param int $length - the max length of the string
+   * @param string $string
+   *   The string to be shortened.
+   * @param int $length
+   *   The max length of the string.
    *
    * @param bool $makeRandom
    *

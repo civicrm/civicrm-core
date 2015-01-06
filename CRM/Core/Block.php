@@ -182,8 +182,10 @@ class CRM_Core_Block {
   /**
    * Returns the desired property from the $_properties array
    *
-   * @param int $id one of the class constants (ADD, SEARCH, etc.)
-   * @param string $property the desired property
+   * @param int $id
+   *   One of the class constants (ADD, SEARCH, etc.).
+   * @param string $property
+   *   The desired property.
    *
    * @return string  the value of the desired property
    */
@@ -197,9 +199,12 @@ class CRM_Core_Block {
   /**
    * Sets the desired property in the $_properties array
    *
-   * @param int    $id        one of the class constants (ADD, SEARCH, etc.)
-   * @param string $property  the desired property
-   * @param string $value     the value of the desired property
+   * @param int $id
+   *   One of the class constants (ADD, SEARCH, etc.).
+   * @param string $property
+   *   The desired property.
+   * @param string $value
+   *   The value of the desired property.
    *
    * @return void
    */
@@ -560,7 +565,8 @@ class CRM_Core_Block {
   /**
    * Given an id creates a subject/content array
    *
-   * @param int $id id of the block
+   * @param int $id
+   *   Id of the block.
    *
    * @return array
    */
@@ -637,9 +643,12 @@ class CRM_Core_Block {
   /**
    * Given an id and a template, fetch the contents
    *
-   * @param int    $id         id of the block
-   * @param string $fileName   name of the template file
-   * @param array  $properties template variables
+   * @param int $id
+   *   Id of the block.
+   * @param string $fileName
+   *   Name of the template file.
+   * @param array $properties
+   *   Template variables.
    *
    * @return array
    */

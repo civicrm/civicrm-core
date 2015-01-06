@@ -37,8 +37,10 @@
  * Given one of: ( page, title, text ) parameters, generates
  * an HTML link to documentation.
  *
- * @param array  $params the function params
- * @param object $smarty reference to the smarty object
+ * @param array $params
+ *   The function params.
+ * @param object $smarty
+ *   Reference to the smarty object.
  *
  * @return string HTML code of a link to documentation
  */

@@ -51,8 +51,10 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_DAO_Domain object
    * @static
@@ -90,7 +92,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   * the civicrm_domain.config_backend in multiple domains. When/if config_backend
   * goes away, this hack should be removed.
   *
-  * @param integer $domainID id for domain you want to set as current
+  * @param int $domainID
+  *   Id for domain you want to set as current.
   * @deprecated
   * @see http://issues.civicrm.org/jira/browse/CRM-11204
   */

@@ -51,9 +51,9 @@
  *          truncate (Smarty online manual)
  *
  * @param string
- * @param integer
+ * @param int
  * @param string
- * @param boolean
+ * @param bool
  *
  * @return string
  */

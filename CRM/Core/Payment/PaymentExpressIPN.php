@@ -84,7 +84,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * Constructor
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param $paymentProcessor
    *
@@ -100,7 +101,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * Singleton function used to manage this object
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param $paymentProcessor
    * @param null $paymentForm
@@ -120,7 +122,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    * The function gets called when a new order takes place.
    *
    * @param $success
-   * @param array $privateData contains the name value pair of <merchant-private-data>
+   * @param array $privateData
+   *   Contains the name value pair of <merchant-private-data>.
    *
    * @param $component
    * @param $amount
@@ -209,8 +212,10 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    /**
    * The function returns the component(Event/Contribute..)and whether it is Test or not
    *
-   * @param array   $privateData    contains the name-value pairs of transaction related data
-   * @param int     $orderNo        <order-total> send by google
+   * @param array $privateData
+   *   Contains the name-value pairs of transaction related data.
+   * @param int $orderNo
+   *   <order-total> send by google.
    *
    * @return array context of this call (test, component, payment processor id)
    * @static

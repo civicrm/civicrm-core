@@ -44,8 +44,10 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params      (reference ) an assoc array of name/value pairs
-   * @param array $defaults    (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return object     CRM_Core_DAO_Tag object on success, otherwise null
    * @static
@@ -180,11 +182,16 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   /**
    * Function to retrieve tags
    *
-   * @param string $usedFor which type of tag entity
-   * @param array $tags tags array
-   * @param int $parentId parent id if you want need only children
-   * @param string $separator separator to indicate children
-   * @param boolean $formatSelectable add special property for non-selectable
+   * @param string $usedFor
+   *   Which type of tag entity.
+   * @param array $tags
+   *   Tags array.
+   * @param int $parentId
+   *   Parent id if you want need only children.
+   * @param string $separator
+   *   Separator to indicate children.
+   * @param bool $formatSelectable
+   *   Add special property for non-selectable.
    *                tag, so they cannot be selected
    *
    * @return array
@@ -307,7 +314,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   /**
    * Delete the tag
    *
-   * @param int $id   tag id
+   * @param int $id
+   *   Tag id.
    *
    * @return boolean
    * @static
@@ -343,8 +351,10 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * contact object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params         (reference) an assoc array of name/value pairs
-   * @param array  $ids  (optional)  the array that holds all the db ids - we are moving away from this in bao
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
+   * @param array $ids
+   *   (optional) the array that holds all the db ids - we are moving away from this in bao.
    * signatures
    *
    * @return object    CRM_Core_DAO_Tag object on success, otherwise null
@@ -394,7 +404,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   /**
    * Check if there is data to create the object
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return boolean
    * @static
@@ -412,7 +423,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   /**
    * Get the tag sets for a entity object
    *
-   * @param string $entityTable entity_table
+   * @param string $entityTable
+   *   Entity_table.
    *
    * @return array $tagSets array of tag sets
    * @static
