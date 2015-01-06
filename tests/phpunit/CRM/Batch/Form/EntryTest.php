@@ -5,7 +5,7 @@
  *
  *  (PHP 5)
  *
- *   @package   CiviCRM
+ * @package   CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -30,7 +30,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test CRM/Member/BAO Membership Log add , delete functions
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 
@@ -184,11 +184,11 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('contribution', 'get', array('return' => 'total_amount'));
     $this->assertEquals(2, $result['count']);
     foreach($result['values'] as $contribution) {
-     $this-> assertEquals($this->callAPISuccess('line_item', 'getvalue', array(
+      $this-> assertEquals($this->callAPISuccess('line_item', 'getvalue', array(
        'contribution_id' => $contribution['id'],
        'return' => 'line_total',
 
-     )), $contribution['total_amount']);
+      )), $contribution['total_amount']);
     }
   }
   /**
@@ -200,14 +200,14 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     return array(
       'batch_id' => 4,
       'primary_profiles' => array(1 => NULL, 2 => NULL, 3 => NULL),
-      'primary_contact_id' => Array (
+      'primary_contact_id' => array(
         1 => $this->_contactID,
         2 => $this->_contactID2,
         3 => $this->_contactID3,
         ),
       'field' => array(
         1 => array(
-          'membership_type' => Array (0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
+          'membership_type' => array(0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
           'join_date' => '07/22/2013',
           'membership_start_date' => NULL,
           'membership_end_date' => NULL,
@@ -221,7 +221,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
           'contribution_status_id' => 1,
         ),
       2 => array(
-        'membership_type' => Array (0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
+        'membership_type' => array(0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
         'join_date' => '07/03/2013',
         'membership_start_date' => '02/03/2013',
         'membership_end_date' => NULL,
@@ -236,7 +236,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
        ),
         // no join date, coded end date
        3 => array(
-         'membership_type' => Array (0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
+         'membership_type' => array(0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
          'join_date' => NULL,
          'membership_start_date' => NULL,
          'membership_end_date' => '2013-12-01',
@@ -263,7 +263,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     return array(
       //'batch_id' => 4,
       'primary_profiles' => array(1 => NULL, 2 => NULL, 3 => NULL),
-      'primary_contact_id' => Array (
+      'primary_contact_id' => array(
         1 => $this->_contactID,
         2 => $this->_contactID2,
         3 => $this->_contactID3,

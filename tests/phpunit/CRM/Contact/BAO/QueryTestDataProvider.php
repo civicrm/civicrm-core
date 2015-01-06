@@ -6,12 +6,12 @@
  *
  *  (PHP 5)
  *
- *   @author Walt Haas <walt@dharmatech.org> (801) 534-1262
- *   @copyright Copyright CiviCRM LLC (C) 2009
- *   @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
+ * @author Walt Haas <walt@dharmatech.org> (801) 534-1262
+ * @copyright Copyright CiviCRM LLC (C) 2009
+ * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
  *              GNU Affero General Public License version 3
- *   @version   $Id: GroupTestDataProvider.php 23715 2009-09-21 06:35:47Z shot $
- *   @package CiviCRM
+ * @version   $Id: GroupTestDataProvider.php 23715 2009-09-21 06:35:47Z shot $
+ * @package CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -33,17 +33,17 @@
 /**
  *  Provide data to the CRM_Contact_BAO_QueryTest class
  *
- *  @package CiviCRM
+ * @package CiviCRM
  */
 class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
 
   /**
-   *  @var integer
+   * @var integer
    */
   private $i = 0;
 
   /**
-   *  @var mixed[]
+   * @var mixed[]
    *  This dataset describes various form values and what contact
    *  IDs should be selected when the form values are applied to the
    *  database in dataset.xml

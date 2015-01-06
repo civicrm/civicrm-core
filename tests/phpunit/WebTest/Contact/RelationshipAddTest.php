@@ -79,7 +79,6 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     //fill in the individual
     $this->select2('related_contact_id', $sortName, TRUE);
 
-
     //fill in the relationship start date
     $this->webtestFillDate('start_date', '-2 year');
     $this->webtestFillDate('end_date', '+1 year');
@@ -163,7 +162,6 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
 
     //fill in the individual
     $this->select2('related_contact_id', $sortName, TRUE);
-
 
     //fill in the relationship start date
     $this->webtestFillDate('start_date', '-2 year');
@@ -323,7 +321,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $this->type('organization_name', $orgName);
     $this->type('email-Primary', "info@" . $orgName . ".com");
     $this->click('_qf_Edit_next');
-    $this->waitForText("xpath=//div[@id='s2id_related_contact_id']","$orgName");
+    $this->waitForText("xpath=//div[@id='s2id_related_contact_id']", "$orgName");
 
     //fill in the relationship start date
     $this->webtestFillDate('start_date', '-2 year');
@@ -335,7 +333,6 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     //save the relationship
     //$this->click("_qf_Relationship_upload");
     $this->click("_qf_Relationship_upload-bottom");
-
 
     //check the status message
     $this->waitForText('crm-notification-container', 'Relationship created.');
@@ -402,7 +399,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $this->type('organization_name', $orgName);
     $this->type('email-Primary', "info@" . $orgName . ".com");
     $this->click('_qf_Edit_next');
-    $this->waitForText("xpath=//div[@id='s2id_related_contact_id']","$orgName");
+    $this->waitForText("xpath=//div[@id='s2id_related_contact_id']", "$orgName");
 
     //fill in the relationship start date
     $this->webtestFillDate('start_date', '-2 year');
@@ -410,7 +407,6 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
 
     $description = "Current employee test.";
     $this->type("description", $description);
-
 
     //save the relationship
     //$this->click("_qf_Relationship_upload");
@@ -429,6 +425,6 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
         'Status' => 'Enabled',
       )
     );
-    $this->assertTrue($this->isTextPresent("Employee of"),"Employee of relationship type not visible on View Relationship page.");
+    $this->assertTrue($this->isTextPresent("Employee of"), "Employee of relationship type not visible on View Relationship page.");
   }
 }

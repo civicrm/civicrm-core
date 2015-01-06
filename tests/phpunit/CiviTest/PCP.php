@@ -102,7 +102,6 @@ class PCPBlock extends PHPUnit_Framework_Testcase {
     $delete_params = array('id' => $params['profileId']);
     $resulProfile = civicrm_api('uf_group', 'delete', $delete_params);
 
-
     require_once 'CRM/Contribute/DAO/PCPBlock.php';
     $dao = new CRM_Contribute_DAO_PCPBlock();
     $dao->id = $params['blockId'];

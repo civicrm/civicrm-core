@@ -70,7 +70,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
     CRM_Core_Region::instance('testAllTypes')->add(array(
       // note: returns a value which gets appended to the region
       'callback' => 'implode',
-      'arguments' => array('-', array('callback','with','specific','args<br/>')),
+      'arguments' => array('-', array('callback', 'with', 'specific', 'args<br/>')),
     ));
     CRM_Core_Region::instance('testAllTypes')->add(array(
       // note: returns a value which gets appended to the region
@@ -108,8 +108,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
       . "<script type=\"text/javascript\">\nalert(\"hi\");\n</script>\n"
       . "<script type=\"text/javascript\">\nCRM.\$(function(\$) {\n\$(\"div\");\n});\n</script>\n"
       . "<link href=\"/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
-      . "<style type=\"text/css\">\nbody { background: black; }\n</style>\n"
-      ;
+      . "<style type=\"text/css\">\nbody { background: black; }\n</style>\n";
     $this->assertEquals($expected, $actual);
   }
 

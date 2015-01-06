@@ -56,7 +56,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'is_reserved' => 1,
     );
 
-    $price_set = $this->callAPISuccess('price_set', 'create',$priceSetparams);
+    $price_set = $this->callAPISuccess('price_set', 'create', $priceSetparams);
     $this->priceSetID = $price_set['id'];
 
     $priceFieldparams = array(
@@ -67,7 +67,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'is_enter_qty' => 1,
       'is_active' => 1,
     );
-    $priceField = $this->callAPISuccess('price_field','create', $priceFieldparams);
+    $priceField = $this->callAPISuccess('price_field', 'create', $priceFieldparams);
     $this->priceFieldID = $priceField['id'];
     $this->_params = array(
       'price_field_id' => $this->priceFieldID,
@@ -87,7 +87,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'is_quick_config' => 1,
       'is_reserved' => 1,
     );
-    $price_set1 = $this->callAPISuccess('price_set', 'create',$priceSetparams1);
+    $price_set1 = $this->callAPISuccess('price_set', 'create', $priceSetparams1);
     $this->priceSetID1 = $price_set1['id'];
     $priceFieldparams1 = array(
       'price_set_id' => $this->priceSetID1,
@@ -97,7 +97,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'is_enter_qty' => 1,
       'is_active' => 1,
     );
-    $priceField1 = $this->callAPISuccess('price_field','create', $priceFieldparams1);
+    $priceField1 = $this->callAPISuccess('price_field', 'create', $priceFieldparams1);
     $this->priceFieldID1 = $priceField1['id'];
   }
 
@@ -108,16 +108,16 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     );
     $this->quickCleanup($tablesToTruncate);
     $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
-    $this->callAPISuccess('PriceField','delete', array(
+    $this->callAPISuccess('PriceField', 'delete', array(
         'id' => $this->priceFieldID1,
     ));
-    $this->callAPISuccess('PriceSet','delete', array(
+    $this->callAPISuccess('PriceSet', 'delete', array(
       'id' => $this->priceSetID1,
     ));
-    $this->callAPISuccess('PriceField','delete', array(
+    $this->callAPISuccess('PriceField', 'delete', array(
         'id' => $this->priceFieldID,
     ));
-    $delete = $this->callAPISuccess('PriceSet','delete', array(
+    $delete = $this->callAPISuccess('PriceSet', 'delete', array(
       'id' => $this->priceSetID,
     ));
 
@@ -141,7 +141,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     );
     $getResult = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $getResult['count'], 'In line ' . __LINE__);
-    $this->callAPISuccess('price_field_value','delete', array('id' => $createResult['id']));
+    $this->callAPISuccess('price_field_value', 'delete', array('id' => $createResult['id']));
   }
 
   public function testDeletePriceFieldValue() {
@@ -162,7 +162,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
   public function testCreatePriceFieldValuewithMultipleTerms() {
     $params = array(
       'price_field_id' => $this->priceFieldID1,
-      'membership_type_id' =>  $this->_membershipTypeID,
+      'membership_type_id' => $this->_membershipTypeID,
       'name' => 'memType1',
       'label' => 'memType1',
       'amount' => 90,
@@ -178,7 +178,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
   public function testGetPriceFieldValuewithMultipleTerms() {
     $params1 = array(
       'price_field_id' => $this->priceFieldID1,
-      'membership_type_id' =>  $this->_membershipTypeID,
+      'membership_type_id' => $this->_membershipTypeID,
       'name' => 'memType1',
       'label' => 'memType1',
       'amount' => 90,
@@ -188,7 +188,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
      );
     $params2 = array(
       'price_field_id' => $this->priceFieldID1,
-      'membership_type_id' =>  $this->_membershipTypeID,
+      'membership_type_id' => $this->_membershipTypeID,
       'name' => 'memType2',
       'label' => 'memType2',
       'amount' => 120,
@@ -198,9 +198,9 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
      );
     $result1 = $this->callAPISuccess($this->_entity, 'create', $params1);
     $result2 = $this->callAPISuccess($this->_entity, 'create', $params2);
-    $result = $this->callAPISuccess($this->_entity, 'get', array('price_field_id' =>$this->priceFieldID1 ));
+    $result = $this->callAPISuccess($this->_entity, 'get', array('price_field_id' => $this->priceFieldID1 ));
     $this->assertEquals(2, $result['count'], 'In line ' . __LINE__);
-    $this->callAPISuccess($this->_entity,'delete', array('id' => $result1['id']));
-    $this->callAPISuccess($this->_entity,'delete', array('id' => $result2['id']));
+    $this->callAPISuccess($this->_entity, 'delete', array('id' => $result1['id']));
+    $this->callAPISuccess($this->_entity, 'delete', array('id' => $result2['id']));
   }
 }

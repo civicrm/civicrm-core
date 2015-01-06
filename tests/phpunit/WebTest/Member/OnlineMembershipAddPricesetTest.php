@@ -118,7 +118,8 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->type('label', $fields[0]);
     $this->select('html_type', "value={$fields[1]}");
     $options = array(
-            1 => array('label' => $memTypeTitle1."_1",
+            1 => array(
+    'label' => $memTypeTitle1."_1",
               'membership_type_id' => $memTypeId1,
               'amount' => 50.00,
               'membership_num_terms' => 1,
@@ -142,9 +143,9 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       $this->select("membership_type_id_{$index}", "value={$values['membership_type_id']}");
 
       $this->waitForElementPresent("xpath=//table[@id='optionField']/tbody/tr[$i]/td[4]/input");
-      $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[4]/input",$values['membership_num_terms']);
-      $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[5]/input",$values['label']);
-      $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[6]/input",$values['amount']);
+      $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[4]/input", $values['membership_num_terms']);
+      $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[5]/input", $values['label']);
+      $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[6]/input", $values['amount']);
       if($i > 3){
         $this->click('link=another choice');
       }
@@ -200,7 +201,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     }
     elseif ($usedFor == 'Membership') {
       $this->click('extends[3]');
-          $this->waitForElementPresent( 'financial_type_id' );
+      $this->waitForElementPresent( 'financial_type_id' );
       $this->select("css=select.crm-form-select", "label={$contributionType}");
     }
 
@@ -244,7 +245,8 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       switch ($type) {
         case 'Radio':
           $options = array(
-            1 => array('label' => "$memTypeTitle1",
+            1 => array(
+          'label' => "$memTypeTitle1",
               'membership_type_id' => $memTypeId1,
               'amount' => 100.00,
             ),
@@ -259,7 +261,8 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
 
         case 'CheckBox':
           $options = array(
-            1 => array('label' => "$memTypeTitle1",
+            1 => array(
+          'label' => "$memTypeTitle1",
               'membership_type_id' => $memTypeId1,
               'amount' => 100.00,
             ),

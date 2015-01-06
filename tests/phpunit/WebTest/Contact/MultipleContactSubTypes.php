@@ -198,7 +198,7 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Check confirmation alert.
-    $this->assertTrue((bool)preg_match("/One or more contact subtypes have been de-selected from the list for this contact. Any custom data associated with de-selected subtype will be removed. Click OK to proceed, or Cancel to review your changes before saving./", $this->getConfirmation()));
+    $this->assertTrue((bool) preg_match("/One or more contact subtypes have been de-selected from the list for this contact. Any custom data associated with de-selected subtype will be removed. Click OK to proceed, or Cancel to review your changes before saving./", $this->getConfirmation()));
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 

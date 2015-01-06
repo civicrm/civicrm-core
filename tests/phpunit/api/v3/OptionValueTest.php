@@ -74,7 +74,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('option_value', 'get', array(
       'option_group_id' => 1,
-       'value' => '1',      ));
+       'value' => '1', ));
     $result2 = $this->callAPISuccess('option_value', 'get', array(
       'option_group_id' => 1,
         'value' => '1',
@@ -90,13 +90,15 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     $description = "demonstrates use of Sort param (available in many api functions). Also, getsingle";
     $subfile     = 'SortOption';
     $result      = $this->callAPISuccess('option_value', 'getsingle', array(
-      'option_group_id' => 1,        'options' => array(
+      'option_group_id' => 1,
+    'options' => array(
           'sort' => 'label ASC',
           'limit' => 1,
         ),
       ));
     $params = array(
-      'option_group_id' => 1,      'options' => array(
+      'option_group_id' => 1,
+    'options' => array(
         'sort' => 'label DESC',
         'limit' => 1,
       ),
@@ -110,12 +112,13 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
    */
   public function testGetValueOptionPagination() {
     $pageSize = 10;
-    $page1 = $this->callAPISuccess('option_value', 'get', array('options' => array('limit' => $pageSize),      ));
+    $page1 = $this->callAPISuccess('option_value', 'get', array('options' => array('limit' => $pageSize) ));
     $page2 = $this->callAPISuccess('option_value', 'get', array(
-      'options' => array('limit' => $pageSize,
+      'options' => array(
+    'limit' => $pageSize,
           // if you use it for pagination, option.offset=pageSize*pageNumber
           'offset' => $pageSize - 1,
-        ),      ));
+        ), ));
     $this->assertEquals($pageSize, $page1['count'], "Check only 10 retrieved in the 1st page " . __LINE__);
     $this->assertEquals($pageSize, $page2['count'], "Check only 10 retrieved in the 2nd page " . __LINE__);
 
@@ -172,12 +175,14 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   public function testCreateOptionSpecifyComponentID() {
     $result = $this->callAPISuccess('option_group', 'get', array(
       'name' => 'from_email_address',
-      'sequential' => 1,      'api.option_value.create' => array('component_id' => 2, 'name' => 'my@y.com'),
+      'sequential' => 1,
+    'api.option_value.create' => array('component_id' => 2, 'name' => 'my@y.com'),
     ));
     $this->assertAPISuccess($result);
     $optionValueId = $result['values'][0]['api.option_value.create']['id'];
     $component_id = $this->callAPISuccess('option_value', 'getvalue', array(
-      'id' => $optionValueId,      'return' => 'component_id',
+      'id' => $optionValueId,
+    'return' => 'component_id',
     ));
     $this->assertEquals(2, $component_id);
   }
@@ -188,7 +193,8 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   public function testCreateOptionSpecifyComponent() {
     $result = $this->callAPISuccess('option_group', 'get', array(
       'name' => 'from_email_address',
-      'sequential' => 1,      'api.option_value.create' => array(
+      'sequential' => 1,
+    'api.option_value.create' => array(
         'component_id' => 'CiviContribute',
         'name' => 'my@y.com'
        ),
@@ -197,7 +203,8 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
     $optionValueId = $result['values'][0]['api.option_value.create']['id'];
     $component_id = $this->callAPISuccess('option_value', 'getvalue', array(
-      'id' => $optionValueId,      'return' => 'component_id',
+      'id' => $optionValueId,
+    'return' => 'component_id',
     ));
     $this->assertEquals(2, $component_id);
   }
@@ -208,7 +215,8 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   public function testCreateOptionSpecifyComponentString() {
     $result = $this->callAPISuccess('option_group', 'get', array(
       'name' => 'from_email_address',
-      'sequential' => 1,      'api.option_value.create' => array(
+      'sequential' => 1,
+    'api.option_value.create' => array(
         'component_id' => 'CiviContribute',
         'name' => 'my@y.com'),
 
@@ -216,7 +224,8 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
     $optionValueId = $result['values'][0]['api.option_value.create']['id'];
     $component_id = $this->callAPISuccess('option_value', 'getvalue', array(
-      'id' => $optionValueId,      'return' => 'component_id',
+      'id' => $optionValueId,
+    'return' => 'component_id',
     ));
     $this->assertEquals(2, $component_id);
   }
@@ -228,21 +237,22 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     $optionGroup = $this->callAPISuccess(
       'option_group', 'get', array(
       'name' => 'gender',
-      'sequential' => 1,    ));
+      'sequential' => 1, ));
     $this->assertAPISuccess($optionGroup);
     $params = array(
       'option_group_id' => $optionGroup['id'],
-      'label' => 'my@y.com',      'weight' => 3,
+      'label' => 'my@y.com',
+    'weight' => 3,
     );
-    $optionValue = $this->callAPISuccess('option_value', 'create',  $params);
+    $optionValue = $this->callAPISuccess('option_value', 'create', $params);
     $this->assertAPISuccess($optionValue);
     $params['weight'] = 4;
-    $optionValue2 = $this->callAPISuccess('option_value', 'create',  $params );
+    $optionValue2 = $this->callAPISuccess('option_value', 'create', $params );
     $this->assertAPISuccess($optionValue2);
     $options = $this->callAPISuccess('option_value', 'get', array('option_group_id' => $optionGroup['id']));
     $this->assertNotEquals($options['values'][$optionValue['id']]['value'], $options['values'][$optionValue2['id']]['value']);
 
-  //cleanup
+    //cleanup
     $this->callAPISuccess('option_value', 'delete', array('id' => $optionValue['id']));
     $this->callAPISuccess('option_value', 'delete', array('id' => $optionValue2['id']));
   }
@@ -253,10 +263,10 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   public function testCreateOptionNoName() {
     $optionGroup = $this->callAPISuccess('option_group', 'get', array(
       'name' => 'gender',
-      'sequential' => 1,    ));
+      'sequential' => 1, ));
 
     $params = array('option_group_id' => $optionGroup['id'], 'label' => 'my@y.com');
-    $optionValue = $this->callAPISuccess('option_value', 'create',  $params);
+    $optionValue = $this->callAPISuccess('option_value', 'create', $params);
     $this->assertAPISuccess($optionValue);
     $this->getAndCheck($params, $optionValue['id'], 'option_value');
   }
@@ -266,7 +276,8 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
    * and deleted
    */
   public function testCRM11876CreateOptionPseudoConstantUpdated() {
-    $optionGroupID = $this->callAPISuccess('option_group', 'getvalue', array(      'name' => 'payment_instrument',
+    $optionGroupID = $this->callAPISuccess('option_group', 'getvalue', array(
+    'name' => 'payment_instrument',
       'return' => 'id',
     ));
     $newOption = (string) time();
@@ -297,9 +308,10 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       array('option_group_id' => $og['id'], 'label' => 'test option value')
     );
     // update option value without 'option_group_id'
-    $res =     $this->callAPISuccess('option_value', 'create', array('id' => $ov['id'], 'is_active' => 0));
+    $res = $this->callAPISuccess('option_value', 'create', array('id' => $ov['id'], 'is_active' => 0));
     $val = $this->callAPISuccess('option_value', 'getvalue', array(
-      'id' => $ov['id'], 'return' => 'is_active',
+      'id' => $ov['id'],
+    'return' => 'is_active',
     ));
     $this->assertEquals($val, 0, "update with no group id is not proper" . __LINE__);
   }
@@ -318,7 +330,8 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     // update option value without 'option_group_id'
     $this->callAPISuccess('option_value', 'create', array('id' => $ov['id'], 'option_group_id' => $og['id'], 'is_active' => 0));
     $val = $this->callAPISuccess('option_value', 'getvalue', array(
-      'id' => $ov['id'], 'return' => 'is_active',
+      'id' => $ov['id'],
+    'return' => 'is_active',
     ));
     $this->assertEquals($val, 0, "update with group id is not proper " . __LINE__);
   }

@@ -139,7 +139,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@id='Contact']//table/tbody//tr/td/a/strong[text() = '$reportName']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-   // Is filter statistics present?
+    // Is filter statistics present?
     $this->assertElementContainsText("xpath=//tr/th[@class='statistics'][text()='Contact Name']/../td", "Contains $firstName", "Statistics did not found!");
 
     // Is Contact Name present in result?

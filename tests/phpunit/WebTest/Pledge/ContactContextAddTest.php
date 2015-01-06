@@ -74,7 +74,6 @@ class WebTest_Pledge_ContactContextAddTest extends CiviSeleniumTestCase {
 
     $this->select("contribution_page_id", "value=3");
 
-
     //PaymentReminders
     $this->click("PaymentReminders");
     $this->waitForElementPresent("additional_reminder_day");

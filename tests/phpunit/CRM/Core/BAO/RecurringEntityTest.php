@@ -47,7 +47,8 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    *
    */
-  protected function tearDown() {}
+  protected function tearDown() {
+  }
 
   /**
    * Testing Activity Generation through Entity Recursion
@@ -112,7 +113,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
    * Testing Event Generation through Entity Recursion
    */
   public function testEventGeneration() {
-       //Event set initial params
+    //Event set initial params
     $daoEvent = new CRM_Event_DAO_Event();
     $daoEvent->title = 'Test event for Recurring Entity';
     $daoEvent->event_type_id = 3;
@@ -138,7 +139,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $recursion->entity_id    = $daoEvent->id;
     $recursion->entity_table = 'civicrm_event';
     $recursion->dateColumns  = array('start_date');
-    $recursion->schedule     = array (
+    $recursion->schedule     = array(
       'entity_value'                  => $daoEvent->id,
       'start_action_date'             => $daoEvent->start_date,
       'start_action_condition'        => 'monday',

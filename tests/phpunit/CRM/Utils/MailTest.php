@@ -17,7 +17,8 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
   public function testFormatRFC822() {
 
     $values = array(
-      array('name' => "Test User",
+      array(
+    'name' => "Test User",
         'email' => "foo@bar.com",
         'result' => "Test User <foo@bar.com>",
       ),

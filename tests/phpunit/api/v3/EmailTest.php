@@ -141,7 +141,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     //create one
     $create = $this->callAPISuccess('email', 'create', $params);
 
-    $result = $this->callAPIAndDocument('email', 'delete', array('id' => $create['id'],), __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('email', 'delete', array('id' => $create['id']), __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $get = $this->callAPISuccess('email', 'get', array(
       'location_type_id' => $this->_locationType->id,

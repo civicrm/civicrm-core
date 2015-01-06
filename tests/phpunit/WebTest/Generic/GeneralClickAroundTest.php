@@ -257,7 +257,6 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->click("css=ul#civicrm-menu li.crm-Customize_Data_and_Screens");
     $this->clickLink("xpath=//div[@id='root-menu-div']//a[text()='Profiles']");
 
-
     $this->assertTextPresent("CiviCRM Profile");
     // Verify Reserved Profiles
 
@@ -314,7 +313,6 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->click("css=ul#civicrm-menu li.crm-Administer");
     $this->click("css=ul#civicrm-menu li.crm-Customize_Data_and_Screens");
     $this->clickLink("xpath=//div[@id='root-menu-div']//a[text()='Activity Types']");
-
 
     // Verify activity types
     $this->assertTextPresent("Meeting");

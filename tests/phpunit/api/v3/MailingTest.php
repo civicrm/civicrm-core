@@ -29,7 +29,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_mailing_* functions
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class api_v3_MailingTest extends CiviUnitTestCase {
   protected $_groupID;
@@ -128,7 +128,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   public function testMailerPreview() {
     // BEGIN SAMPLE DATA
-    $contactID =  $this->individualCreate();
+    $contactID = $this->individualCreate();
     $displayName = $this->callAPISuccess('contact', 'get', array('id' => $contactID));
     $displayName = $displayName['values'][$contactID]['display_name'];
     $this->assertTrue(!empty($displayName));
@@ -141,7 +141,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $params['options']['force_rollback'] = 1;
     // END SAMPLE DATA
 
-    $maxIDs =  array(
+    $maxIDs = array(
       'mailing' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing'),
       'job' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_job'),
       'group' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_group'),
@@ -186,7 +186,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     );
     // END SAMPLE DATA
 
-    $maxIDs =  array(
+    $maxIDs = array(
       'mailing' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing'),
       'job' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_job'),
       'group' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_group'),
@@ -198,11 +198,11 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
     $preview = $create['values'][$create['id']]['api.MailingRecipients.get'];
     $previewIds = array_values(CRM_Utils_Array::collect('contact_id', $preview['values']));
-    $this->assertEquals(array((string)$contactIDs['includeme']), $previewIds);
+    $this->assertEquals(array((string) $contactIDs['includeme']), $previewIds);
     $previewEmails = array_values(CRM_Utils_Array::collect('api.email.getvalue', $preview['values']));
     $this->assertEquals(array('include.me@example.org'), $previewEmails);
     $previewNames = array_values(CRM_Utils_Array::collect('api.contact.getvalue', $preview['values']));
-    $this->assertTrue((bool)preg_match('/Includer Person/', $previewNames[0]), "Name 'Includer Person' should appear in '" . $previewNames[0] . '"');
+    $this->assertTrue((bool) preg_match('/Includer Person/', $previewNames[0]), "Name 'Includer Person' should appear in '" . $previewNames[0] . '"');
   }
 
   public function testMailerSendTest_email() {
@@ -466,6 +466,6 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
     return $createResult['id'];
   }
 
-//----------- civicrm_mailing_create ----------
+  //----------- civicrm_mailing_create ----------
 
 }

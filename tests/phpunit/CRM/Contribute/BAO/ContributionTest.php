@@ -126,7 +126,6 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'thankyou_date' => '20080522',
     );
 
-
     $params['custom'] = array(
       $customField->id => array(
         -1 => array(
@@ -140,7 +139,6 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
         ),
       ),
     );
-
 
     $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
 
@@ -269,7 +267,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $annual = CRM_Contribute_BAO_Contribution::annual($contactId);
 
     $config = CRM_Core_Config::singleton();
-        $currencySymbol = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_Currency',$config->defaultCurrency,'symbol','name') ;
+    $currencySymbol = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_Currency', $config->defaultCurrency, 'symbol', 'name');
     $this->assertDBCompareValue('CRM_Contribute_DAO_Contribution', $id, 'total_amount',
       'id', ltrim($annual[2], $currencySymbol), 'Check DB for total amount of the contribution'
     );
@@ -351,7 +349,6 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $ids = array(
       'premium' => NULL,
     );
-
 
     $params = array(
       'name' => 'TEST Premium',

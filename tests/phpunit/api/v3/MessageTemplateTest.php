@@ -30,7 +30,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  * Test class for Template API - civicrm_msg_template*
  *
- *  @package CiviCRM_APIv3
+ * @package CiviCRM_APIv3
  */
 class api_v3_MessageTemplateTest extends CiviUnitTestCase {
   /**
@@ -56,7 +56,7 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
     );
   }
 
-   /**
+  /**
    * Test create function succeeds
    */
   public function testCreate() {
@@ -76,9 +76,9 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
     $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
   }
 
-/**
- * Check the delete function succeeds
- */
+  /**
+   * Check the delete function succeeds
+   */
   public function testDelete() {
     $entity = $this->createTestEntity();
     $result = $this->callAPIAndDocument('MessageTemplate', 'delete', array('id' => $entity['id']), __FUNCTION__, __FILE__);

@@ -302,7 +302,6 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     $this->assertEquals(end($result['contact_sub_type']), $updateParams['contact_sub_type'], "In line " . __LINE__);
     $this->callAPISuccess('contact', 'delete', $params);
 
-
     $params = array(
       'label' => 'sub2_organization',
       'name' => 'sub2_organization',

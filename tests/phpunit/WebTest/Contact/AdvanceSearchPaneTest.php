@@ -89,8 +89,7 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
   /**
    * @param array $openedPanes
    */
-  function _checkOpenedPanes($openedPanes = array(
-    )) {
+  function _checkOpenedPanes($openedPanes = array()) {
     if (!$this->isTextPresent('None found.')) {
       $this->click('css=div.crm-advanced_search_form-accordion div.crm-accordion-header');
     }
@@ -112,8 +111,7 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
    * @param $paneRef
    * @param array $selectFields
    */
-  function _selectPaneFields($paneRef, $selectFields = array(
-    )) {
+  function _selectPaneFields($paneRef, $selectFields = array()) {
     $pane = $this->_advanceSearchPanes($paneRef);
 
     $this->click("css=div.crm-accordion-wrapper {$pane['headerLocator']}");

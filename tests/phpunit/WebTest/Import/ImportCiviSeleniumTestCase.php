@@ -61,9 +61,9 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     $headers,
     $rows,
     $contactType = 'Individual',
-    $mode        = 'Skip',
+    $mode = 'Skip',
     $fieldMapper = array(),
-    $other       = array()
+    $other = array()
   ) {
 
     // Go to contact import page.
@@ -197,7 +197,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    *
    * @param string $type
    *   Import type (csv/sql).
-   *                             @todo:currently only supports csv, need to work on sql import
+   * @todo:currently only supports csv, need to work on sql import
    */
   public function importContacts($headers, $rows, $contactType = 'Individual', $mode = 'Skip', $fieldMapper = array(), $other = array(), $type = 'csv') {
 
@@ -364,7 +364,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Check confirmation alert.
-    $this->assertTrue((bool)preg_match("/^Are you sure you want to Import now[\s\S]$/", $this->getConfirmation()));
+    $this->assertTrue((bool) preg_match("/^Are you sure you want to Import now[\s\S]$/", $this->getConfirmation()));
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
