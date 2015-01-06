@@ -116,7 +116,8 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    *
    * @return string  name of the created table
    */
-  private static function _CsvToTable(&$db,
+  private static function _CsvToTable(
+    &$db,
     $file,
     $headers = FALSE,
     $table = NULL,
@@ -175,12 +176,14 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       }
 
       // CRM-4881: we need to quote column names, as they may be MySQL reserved words
-      foreach ($columns as & $column) { $column = "`$column`";
+      foreach ($columns as & $column) {
+        $column = "`$column`";
       }
     }
     else {
       $columns = array();
-      foreach ($firstrow as $i => $_) { $columns[] = "col_$i";
+      foreach ($firstrow as $i => $_) {
+        $columns[] = "col_$i";
       }
     }
 
