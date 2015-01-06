@@ -158,7 +158,8 @@ class CRM_Utils_REST {
     if (isset($result['count'])) {
       $count = ' count="' . $result['count'] . '" ';
     }
-    else { $count = "";
+    else {
+      $count = "";
     }
     $xml = "<?xml version=\"1.0\"?>
       <ResultSet xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" $count>
@@ -227,7 +228,8 @@ class CRM_Utils_REST {
             if ($inquote || $inarray) {
               $result .= $char;
             }
-            else { $result .= $char . $newline . str_repeat($tab, $tabcount);
+            else {
+              $result .= $char . $newline . str_repeat($tab, $tabcount);
             }
             break;
 
@@ -426,7 +428,8 @@ class CRM_Utils_REST {
       }
     }
     if (array_key_exists('return', $requestParams) && is_array($requestParams['return'])) {
-      foreach ($requestParams['return'] as $key => $v) { $params['return.' . $key] = 1;
+      foreach ($requestParams['return'] as $key => $v) {
+        $params['return.' . $key] = 1;
       }
     }
     return $params;

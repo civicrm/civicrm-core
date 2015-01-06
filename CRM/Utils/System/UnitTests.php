@@ -183,7 +183,8 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    *
    * @return string
    */
-  function url($path = NULL, $query = NULL, $absolute = FALSE,
+  function url(
+    $path = NULL, $query = NULL, $absolute = FALSE,
     $fragment = NULL, $htmlize = TRUE,
     $frontend = FALSE, $forceBackend = FALSE
   ) {

@@ -357,7 +357,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *
    * @return string            an HTML string containing a link to the given path.
    */
-  function url($path = NULL, $query = NULL, $absolute = TRUE,
+  function url(
+    $path = NULL, $query = NULL, $absolute = TRUE,
     $fragment = NULL, $htmlize = TRUE,
     $frontend = FALSE, $forceBackend = FALSE
   ) {

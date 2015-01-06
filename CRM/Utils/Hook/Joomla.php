@@ -68,7 +68,8 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
    *
    * @return mixed
    */
-  function invoke($numParams,
+  function invoke(
+    $numParams,
                   &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
                   $fnSuffix
   ) {
