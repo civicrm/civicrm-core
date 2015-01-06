@@ -121,7 +121,7 @@ class CRM_Core_DAO extends DB_DataObject {
     $required = CRM_Utils_Array::value('required', $fieldDef);
     $FKClassName = CRM_Utils_Array::value('FKClassName', $fieldDef);
     $dbName = $fieldDef['name'];
-    $daoName = get_class($this);
+    $daoName = str_replace('_BAO_', '_DAO_', get_class($this));
 
     // skip the FK if it is not required
     // if it's contact id we should create even if not required
