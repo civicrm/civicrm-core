@@ -191,7 +191,8 @@ class CRM_Campaign_Page_AJAX {
         $groups = CRM_Utils_Array::value('group', $params);
         if ($campaignId && CRM_Utils_System::isNull($groups)) {
           $campaignGroups = CRM_Campaign_BAO_Campaign::getCampaignGroups($campaignId);
-          foreach ($campaignGroups as $id => $group) { $params['group'][$id] = 1;
+          foreach ($campaignGroups as $id => $group) {
+            $params['group'][$id] = 1;
           }
         }
 
@@ -257,7 +258,8 @@ class CRM_Campaign_Page_AJAX {
       $$pName = $pValues['default'];
       if (!empty($_POST[$pValues['name']])) {
         $$pName = CRM_Utils_Type::escape($_POST[$pValues['name']], $pValues['type']);
-        if ($pName == 'sort') { $$pName = $selectorCols[$$pName];
+        if ($pName == 'sort') {
+          $$pName = $selectorCols[$$pName];
         }
       }
     }
