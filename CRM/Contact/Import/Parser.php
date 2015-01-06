@@ -103,7 +103,8 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    *
    * @return mixed
    */
-  function run($tableName,
+  function run(
+    $tableName,
     &$mapper,
     $mode = self::MODE_PREVIEW,
     $contactType = self::CONTACT_INDIVIDUAL,
@@ -647,7 +648,8 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    * @param string $dataPattern
    * @param bool $hasLocationType
    */
-  function addField($name, $title, $type = CRM_Utils_Type::T_INT,
+  function addField(
+    $name, $title, $type = CRM_Utils_Type::T_INT,
     $headerPattern = '//', $dataPattern = '//',
     $hasLocationType = FALSE
   ) {

@@ -5057,10 +5057,11 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
    * @param $fieldTitle
    * @param null $options
    */
-  function numberRangeBuilder(&$values,
-                              $tableName, $fieldName,
-                              $dbFieldName, $fieldTitle,
-                              $options = NULL
+  function numberRangeBuilder(
+    &$values,
+    $tableName, $fieldName,
+    $dbFieldName, $fieldTitle,
+    $options = NULL
   ) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
