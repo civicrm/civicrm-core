@@ -62,7 +62,7 @@ class CRM_Pledge_Page_Payment extends CRM_Core_Page {
       $this->assign('pledgeId', $pledgeId);
       $this->assign('contactId', $this->_contactId);
 
-      // check if we can process credit card contribs
+      // check if we can process credit card contributions
       $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
 
       // check is the user has view/edit signer permission

@@ -375,8 +375,8 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   public function getValidProcessors() {
     $defaultID = NULL;
     $capabilities = array('BackOffice');
-    if ($this->_mode == 'live') {
-      $capabilities[] = 'LiveMode';
+    if ($this->_mode) {
+      $capabilities[] = (ucfirst($this->_mode) . 'Mode');
     }
     $processors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors($capabilities);
     return $processors;
@@ -407,7 +407,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     //only valid processors get display to user
 
     if ($this->_mode) {
-      $this->assign(CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('supportsFutureRecurStartDate')), TRUE);
+      $this->assign('processorSupportsFutureStartDate', CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('supportsFutureRecurStartDate')));
       $this->_paymentProcessors = $this->getValidProcessors();
       if (!isset($this->_paymentProcessor['id'])) {
         // if the payment processor isn't set yet (as indicated by the presence of an id,) we'll grab the first one which should be the default
