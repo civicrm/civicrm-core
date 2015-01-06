@@ -120,7 +120,6 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
     $frndParams['entity_table'] = $params['entity_table'];
     self::getValues($frndParams);
 
-
     $activityTypeId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', 'Tell a Friend', 'value', 'name');
 
     //create activity
