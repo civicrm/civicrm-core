@@ -116,7 +116,7 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
 
       //get event type.
       if (isset($eventTypes[$eventTemplate->event_type_id])) {
-         $allEventTemplates[$eventTemplate->id]['event_type'] = $eventTypes[$eventTemplate->event_type_id];
+        $allEventTemplates[$eventTemplate->id]['event_type'] = $eventTypes[$eventTemplate->event_type_id];
       }
 
       //form all action links

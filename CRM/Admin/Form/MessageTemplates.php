@@ -138,7 +138,8 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       return;
     }
 
-    $breadCrumb = array(array('title' => ts('Message Templates'),
+    $breadCrumb = array(array(
+    'title' => ts('Message Templates'),
         'url' => CRM_Utils_System::url('civicrm/admin/messageTemplates',
           'action=browse&reset=1'
         ),
@@ -172,7 +173,8 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     else {
       $this->addWysiwyg('msg_html', ts('HTML Message'),
         array(
-          'cols' => '80', 'rows' => '8',
+          'cols' => '80',
+      'rows' => '8',
           'onkeyup' => "return verify(this)",
         )
       );

@@ -15,7 +15,7 @@ class CRM_Admin_Page_ExtensionsUpgrade extends CRM_Core_Page {
     $runner = new CRM_Queue_Runner(array(
       'title' => ts('Database Upgrades'),
       'queue' => $queue,
-      'errorMode'=> CRM_Queue_Runner::ERROR_ABORT,
+      'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
       'onEnd' => array('CRM_Admin_Page_ExtensionsUpgrade', 'onEnd'),
       'onEndUrl' => CRM_Utils_System::url(self::END_URL, self::END_PARAMS),
     ));

@@ -55,11 +55,11 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    */
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviCRM Extensions'));
-        $destination = CRM_Utils_System::url( 'civicrm/admin/extensions',
+    $destination = CRM_Utils_System::url( 'civicrm/admin/extensions',
                                               'reset=1' );
 
-        $destination = urlencode( $destination );
-        $this->assign( 'destination', $destination );
+    $destination = urlencode( $destination );
+    $this->assign( 'destination', $destination );
   }
 
   /**
@@ -174,17 +174,21 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
         case CRM_Extension_Manager::STATUS_UNINSTALLED:
           $action += CRM_Core_Action::ADD;
           break;
+
         case CRM_Extension_Manager::STATUS_DISABLED:
           $action += CRM_Core_Action::ENABLE;
           $action += CRM_Core_Action::DELETE;
           break;
+
         case CRM_Extension_Manager::STATUS_DISABLED_MISSING:
           $action += CRM_Core_Action::DELETE;
           break;
+
         case CRM_Extension_Manager::STATUS_INSTALLED:
         case CRM_Extension_Manager::STATUS_INSTALLED_MISSING:
           $action += CRM_Core_Action::DISABLE;
           break;
+
         default:
       }
       // TODO if extbrowser is enabled and extbrowser has newer version than extcontainer,
@@ -303,18 +307,23 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       case CRM_Extension_Manager::STATUS_UNINSTALLED:
         $extensionRow['statusLabel'] = ''; // ts('Uninstalled');
         break;
+
       case CRM_Extension_Manager::STATUS_DISABLED:
         $extensionRow['statusLabel'] = ts('Disabled');
         break;
+
       case CRM_Extension_Manager::STATUS_INSTALLED:
         $extensionRow['statusLabel'] = ts('Enabled'); // ts('Installed');
         break;
+
       case CRM_Extension_Manager::STATUS_DISABLED_MISSING:
         $extensionRow['statusLabel'] = ts('Disabled (Missing)');
         break;
+
       case CRM_Extension_Manager::STATUS_INSTALLED_MISSING:
         $extensionRow['statusLabel'] = ts('Enabled (Missing)'); // ts('Installed');
         break;
+
       default:
         $extensionRow['statusLabel'] = '(' . $extensionRow['status'] . ')';
     }
