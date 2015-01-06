@@ -196,7 +196,6 @@ WHERE     pledge_id = %1
       CRM_Utils_Hook::post('create', 'PledgePayment', $payment->id, $payment);
     }
 
-
     return $result;
   }
 

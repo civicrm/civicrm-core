@@ -203,7 +203,6 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
     // skip payment stuff inedit mode
     if (!isset($params['id']) || !empty($params['is_pledge_pending'])) {
 
-
       //if pledge is pending delete all payments and recreate.
       if (!empty($params['is_pledge_pending'])) {
         CRM_Pledge_BAO_PledgePayment::deletePayments($pledge->id);
@@ -365,7 +364,8 @@ GROUP BY  currency
       $pamount[] = CRM_Utils_Money::format($dao->pledge_amount, $dao->currency);
     }
 
-    $pledge_amount = array('pledge_amount' => implode(', ', $pamount),
+    $pledge_amount = array(
+    'pledge_amount' => implode(', ', $pamount),
       'pledge_count' => $pCount,
       'purl' => CRM_Utils_System::url('civicrm/pledge/search',
         "reset=1&force=1&pstatus={$statusId}&pstart={$start}&pend={$end}&test=0"
@@ -430,7 +430,8 @@ GROUP BY  currency
       }
 
       if ($count) {
-        return array_merge($pledge_amount, array('received_amount' => implode(', ', $amount),
+        return array_merge($pledge_amount, array(
+        'received_amount' => implode(', ', $amount),
             'received_count' => $count,
             'url' => CRM_Utils_System::url('civicrm/pledge/search',
               "reset=1&force=1&status={$statusId}&start={$start}&end={$end}&test=0"
@@ -524,7 +525,8 @@ GROUP BY  currency
           );
         }
         $payments[$payID] = array_merge($contributionValue,
-          array('amount' => CRM_Utils_Array::value('scheduled_amount', $values),
+          array(
+        'amount' => CRM_Utils_Array::value('scheduled_amount', $values),
             'due_date' => CRM_Utils_Array::value('scheduled_date', $values),
           )
         );
@@ -556,7 +558,8 @@ GROUP BY  currency
 
     //handle domain token values
     $domain = CRM_Core_BAO_Domain::getDomain();
-    $tokens = array('domain' => array('name', 'phone', 'address', 'email'),
+    $tokens = array(
+    'domain' => array('name', 'phone', 'address', 'email'),
       'contact' => CRM_Core_SelectValues::contactTokens(),
     );
     $domainValues = array();
@@ -702,21 +705,23 @@ GROUP BY  currency
       $fields = array_merge($fields, CRM_Pledge_DAO_PledgePayment::export());
 
       //set title to calculated fields
-      $calculatedFields = array('pledge_total_paid' => array('title' => ts('Total Paid')),
+      $calculatedFields = array(
+      'pledge_total_paid' => array('title' => ts('Total Paid')),
         'pledge_balance_amount' => array('title' => ts('Balance Amount')),
         'pledge_next_pay_date' => array('title' => ts('Next Payment Date')),
         'pledge_next_pay_amount' => array('title' => ts('Next Payment Amount')),
         'pledge_payment_paid_amount' => array('title' => ts('Paid Amount')),
         'pledge_payment_paid_date' => array('title' => ts('Paid Date')),
-        'pledge_payment_status' => array('title' => ts('Pledge Payment Status'),
+        'pledge_payment_status' => array(
+      'title' => ts('Pledge Payment Status'),
           'name' => 'pledge_payment_status',
           'data_type' => CRM_Utils_Type::T_STRING,
         ),
       );
 
-
       $pledgeFields = array(
-        'pledge_status' => array('title' => 'Pledge Status',
+        'pledge_status' => array(
+      'title' => 'Pledge Status',
           'name' => 'pledge_status',
           'data_type' => CRM_Utils_Type::T_STRING,
         ),
@@ -916,7 +921,8 @@ SELECT  pledge.contact_id              as contact_id,
     if ($sendReminders) {
       // retrieve domain tokens
       $domain = CRM_Core_BAO_Domain::getDomain();
-      $tokens = array('domain' => array('name', 'phone', 'address', 'email'),
+      $tokens = array(
+      'domain' => array('name', 'phone', 'address', 'email'),
         'contact' => CRM_Core_SelectValues::contactTokens(),
       );
 
@@ -1089,7 +1095,7 @@ SELECT  pledge.contact_id              as contact_id,
    * @param int $pledgeStatusID
    * @return bool do financial transactions exist for this pledge?
    */
-   public static function pledgeHasFinancialTransactions($pledgeID, $pledgeStatusID) {
+  public static function pledgeHasFinancialTransactions($pledgeID, $pledgeStatusID) {
     if (empty($pledgeStatusID)) {
       //why would this happen? If we can see where it does then we can see if we should look it up
       //but assuming from form code it CAN be empty
@@ -1100,7 +1106,7 @@ SELECT  pledge.contact_id              as contact_id,
     }
 
     return civicrm_api3('pledge_payment', 'getcount', array('pledge_id' => $pledgeID, 'status_id' => array('IN' => self::getTransactionalStatus())));
-    }
+  }
 
   /**
    * Does this pledge / pledge payment status mean that a financial transaction has taken place?
