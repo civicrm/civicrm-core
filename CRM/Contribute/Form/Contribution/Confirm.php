@@ -1659,7 +1659,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // create relationship
     $relParams['contact_check'][$orgID] = 1;
     $cid = array('contact' => $contactID);
-    CRM_Contact_BAO_Relationship::create($relParams, $cid);
+    CRM_Contact_BAO_Relationship::createMultiple($relParams, $cid);
 
     // if multiple match - send a duplicate alert
     if ($dupeIDs && (count($dupeIDs) > 1)) {
