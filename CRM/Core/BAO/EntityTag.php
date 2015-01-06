@@ -40,8 +40,10 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * Given a contact id, it returns an array of tag id's the
    * contact belongs to.
    *
-   * @param int $entityID id of the entity usually the contactID.
-   * @param string $entityTable name of the entity table usually 'civicrm_contact'
+   * @param int $entityID
+   *   Id of the entity usually the contactID.
+   * @param string $entityTable
+   *   Name of the entity table usually 'civicrm_contact'.
    *
    * @return array(
      ) reference $tag array of category id's the contact belongs to.
@@ -69,7 +71,8 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * group object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Core_BAO_EntityTag object
    * @static
@@ -99,7 +102,8 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   /**
    * Check if there is data to create the object
    *
-   * @param array  $params an assoc array of name/value pairs
+   * @param array $params
+   *   An assoc array of name/value pairs.
    *
    * @return boolean
    * @static
@@ -111,7 +115,8 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   /**
    * Delete the tag for a contact
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Core_BAO_EntityTag object
    * @static
@@ -130,9 +135,12 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   /**
    * Given an array of entity ids and entity table, add all the entity to the tags
    *
-   * @param array $entityIds (reference ) the array of entity ids to be added
-   * @param int $tagId the id of the tag
-   * @param string $entityTable name of entity table default:civicrm_contact
+   * @param array $entityIds
+   *   (reference ) the array of entity ids to be added.
+   * @param int $tagId
+   *   The id of the tag.
+   * @param string $entityTable
+   *   Name of entity table default:civicrm_contact.
    *
    * @return array (total, added, notAdded) count of enities added to tag
    * @static
@@ -172,9 +180,12 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   /**
    * Given an array of entity ids and entity table, remove entity(s) tags
    *
-   * @param array $entityIds (reference ) the array of entity ids to be removed
-   * @param int $tagId the id of the tag
-   * @param string $entityTable name of entity table default:civicrm_contact
+   * @param array $entityIds
+   *   (reference ) the array of entity ids to be removed.
+   * @param int $tagId
+   *   The id of the tag.
+   * @param string $entityTable
+   *   Name of entity table default:civicrm_contact.
    *
    * @return array (total, removed, notRemoved) count of entities removed from tags
    * @static
@@ -214,7 +225,8 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   /**
    * Takes an associative array and creates tag entity record for all tag entities
    *
-   * @param array $params (reference)  an assoc array of name/value pairs
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
    * @param $entityTable
    * @param int $entityID
    *
@@ -258,7 +270,8 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   /**
    * This function returns all entities assigned to a specific tag
    *
-   * @param object  $tag    an object of a tag.
+   * @param object $tag
+   *   An object of a tag.
    *
    * @return  array   $entityIds    array of entity ids
    */
@@ -383,9 +396,11 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * Get options for a given field.
    * @see CRM_Core_DAO::buildOptions
    *
-   * @param String $fieldName
-   * @param String $context : @see CRM_Core_DAO::buildOptionsContext
-   * @param Array $props : whatever is known about this dao object
+   * @param string $fieldName
+   * @param string $context
+   *   : @see CRM_Core_DAO::buildOptionsContext.
+   * @param array $props
+   *   : whatever is known about this dao object.
    *
    * @return Array|bool
    */

@@ -47,10 +47,14 @@ class CRM_Core_QuickForm_NestedAdvMultiSelect extends HTML_QuickForm_advmultisel
    * loading options with fancy attributes.
    *
    * @param mixed &$options Options source currently supports assoc array or DB_result
-   * @param mixed $param1   (optional) See function detail
-   * @param mixed $param2   (optional) See function detail
-   * @param mixed $param3   (optional) See function detail
-   * @param mixed $param4   (optional) See function detail
+   * @param mixed $param1
+   *   (optional) See function detail.
+   * @param mixed $param2
+   *   (optional) See function detail.
+   * @param mixed $param3
+   *   (optional) See function detail.
+   * @param mixed $param4
+   *   (optional) See function detail.
    *
    * @since      version 1.5.0 (2009-02-15)
    * @return     PEAR_Error|NULL on error and TRUE on success

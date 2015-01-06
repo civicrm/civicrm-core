@@ -39,8 +39,10 @@ class CRM_Core_CodeGen_Util_Template {
   }
 
   /**
-   * @param array $inputs template filenames
-   * @param string $outpath full path to the desired output file
+   * @param array $inputs
+   *   Template filenames.
+   * @param string $outpath
+   *   Full path to the desired output file.
    */
   public function runConcat($inputs, $outpath) {
     if (file_exists($outpath)) {
@@ -53,8 +55,10 @@ class CRM_Core_CodeGen_Util_Template {
   }
 
   /**
-   * @param string $infile filename of the template, without a path
-   * @param string $outpath full path to the desired output file
+   * @param string $infile
+   *   Filename of the template, without a path.
+   * @param string $outpath
+   *   Full path to the desired output file.
    */
   public function run($infile, $outpath) {
     $renderedContents = $this->smarty->fetch($infile);

@@ -44,7 +44,8 @@ class CRM_Core_Permission_UnitTests extends CRM_Core_Permission_Base {
   /**
    * Given a permission string, check for access requirements
    *
-   * @param string $str the permission to check
+   * @param string $str
+   *   The permission to check.
    *
    * @return boolean true if yes, else false
    */
@@ -63,9 +64,12 @@ class CRM_Core_Permission_UnitTests extends CRM_Core_Permission_Base {
   /**
    * Get the permissioned where clause for the user
    *
-   * @param int $type the type of permission needed
-   * @param  array $tables (reference ) add the tables that are needed for the select clause
-   * @param  array $whereTables (reference ) add the tables that are needed for the where clause
+   * @param int $type
+   *   The type of permission needed.
+   * @param array $tables
+   *   (reference ) add the tables that are needed for the select clause.
+   * @param array $whereTables
+   *   (reference ) add the tables that are needed for the where clause.
    *
    * @return string the group where clause for this user
    */

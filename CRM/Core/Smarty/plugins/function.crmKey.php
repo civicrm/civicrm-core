@@ -36,8 +36,10 @@
 /**
  * Generate a CRM_Core_Key of a given name
  *
- * @param string $params params of the {crmKey} call, with the ‘name’ key holding the name of the key
- * @param object $smarty the Smarty object
+ * @param string $params
+ *   Params of the {crmKey} call, with the ‘name’ key holding the name of the key.
+ * @param object $smarty
+ *   The Smarty object.
  *
  * @return string the generated key
  */

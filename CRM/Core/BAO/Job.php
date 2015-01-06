@@ -48,7 +48,8 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
   /**
    * Add the payment-processor type in the db
    *
-   * @param array $params an assoc array of name/value pairs
+   * @param array $params
+   *   An assoc array of name/value pairs.
    *
    * @return CRM_Financial_DAO_PaymentProcessorType
    * @static
@@ -64,8 +65,10 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    * retrieves the relevant objects. It also stores all the retrieved
    * values in the default array
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_DAO_Job object on success, null otherwise
    * @static
@@ -83,8 +86,10 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on sucess, null otherwise
    *
@@ -97,7 +102,8 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
   /**
    * Function  to delete scheduled job
    *
-   * @param $jobID ID of the job to be deleted.
+   * @param $jobID
+   *   ID of the job to be deleted.
    *
    * @return bool|null
    * @static

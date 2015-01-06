@@ -40,7 +40,8 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   /**********************************************************
    * Constructor
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param $paymentProcessor
    *
@@ -56,7 +57,8 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   /**
    * Singleton function used to manage this object
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param object $paymentProcessor
    *
@@ -315,7 +317,8 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   /**
    * Checks to see if invoice_id already exists in db
    *
-   * @param  int     $invoiceId   The ID to check
+   * @param int $invoiceId
+   *   The ID to check.
    *
    * @return bool                  True if ID exists, else false
    */

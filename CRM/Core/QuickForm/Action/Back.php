@@ -38,7 +38,8 @@ class CRM_Core_QuickForm_Action_Back extends CRM_Core_QuickForm_Action {
   /**
    * Class constructor
    *
-   * @param object $stateMachine reference to state machine object
+   * @param object $stateMachine
+   *   Reference to state machine object.
    *
    * @return \CRM_Core_QuickForm_Action_Back
    */
@@ -49,8 +50,10 @@ class CRM_Core_QuickForm_Action_Back extends CRM_Core_QuickForm_Action {
   /**
    * Processes the request.
    *
-   * @param  CRM_Core_Form    $page      the current form-page
-   * @param  string    $actionName Current action name, as one Action object can serve multiple actions
+   * @param CRM_Core_Form $page
+   *   The current form-page.
+   * @param string $actionName
+   *   Current action name, as one Action object can serve multiple actions.
    *
    * @return void
    */

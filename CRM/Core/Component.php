@@ -419,7 +419,8 @@ class CRM_Core_Component {
   /**
    * Handle table dependencies of components
    *
-   * @param array $tables  array of tables
+   * @param array $tables
+   *   Array of tables.
    *
    * @return null
    * @static

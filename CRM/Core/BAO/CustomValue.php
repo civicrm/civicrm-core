@@ -42,8 +42,10 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
   /**
    * Validate a value against a CustomField type
    *
-   * @param string $type  The type of the data
-   * @param string $value The data to be validated
+   * @param string $type
+   *   The type of the data.
+   * @param string $value
+   *   The data to be validated.
    *
    * @return boolean True if the value is of the specified type
    * @static
@@ -119,7 +121,8 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
   /**
    * Given a 'civicrm' type string, return the mysql data store area
    *
-   * @param string $type the civicrm type string
+   * @param string $type
+   *   The civicrm type string.
    *
    * @return the mysql data store placeholder
    * @static
@@ -190,8 +193,10 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
   /**
    * Delet option value give an option value and custom group id
    *
-   * @param int $customValueID custom value ID
-   * @param int $customGroupID custom group ID
+   * @param int $customValueID
+   *   Custom value ID.
+   * @param int $customGroupID
+   *   Custom group ID.
    *
    * @return void
    * @static

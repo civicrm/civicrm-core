@@ -41,9 +41,12 @@
 /**
  * Smarty block function providing edit-only display support
  *
- * @param array $params   template call's parameters
- * @param string $text    {edit} block contents from the template
- * @param object $smarty  the Smarty object
+ * @param array $params
+ *   Template call's parameters.
+ * @param string $text
+ *   {edit} block contents from the template.
+ * @param object $smarty
+ *   The Smarty object.
  *
  * @return string  the string, translated by gettext
  */

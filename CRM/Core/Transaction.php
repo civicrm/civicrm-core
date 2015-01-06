@@ -103,7 +103,8 @@ class CRM_Core_Transaction {
    *
    * This is a thin wrapper around __construct() which allows more fluent coding.
    *
-   * @param bool $nest Determines what to do if there's currently an active transaction:
+   * @param bool $nest
+   *   Determines what to do if there's currently an active transaction:.
    *   - If true, then make a new nested transaction ("SAVEPOINT")
    *   - If false, then attach to the existing transaction
    * @return \CRM_Core_Transaction
@@ -115,7 +116,8 @@ class CRM_Core_Transaction {
   /**
    * Ensure that an SQL transaction is started
    *
-   * @param bool $nest Determines what to do if there's currently an active transaction:
+   * @param bool $nest
+   *   Determines what to do if there's currently an active transaction:.
    *   - If true, then make a new nested transaction ("SAVEPOINT")
    *   - If false, then attach to the existing transaction
    */
@@ -173,7 +175,8 @@ class CRM_Core_Transaction {
    * After calling run(), the CRM_Core_Transaction object is "used up"; do not
    * use it again.
    *
-   * @param string $callable Should exception one paramter (CRM_Core_Transaction $tx)
+   * @param string $callable
+   *   Should exception one paramter (CRM_Core_Transaction $tx).
    * @return CRM_Core_Transaction
    * @throws Exception
    */
@@ -233,9 +236,12 @@ class CRM_Core_Transaction {
    *
    * Pre-condition: isActive()
    *
-   * @param int $phase A constant; one of: self::PHASE_{PRE,POST}_{COMMIT,ROLLBACK}
-   * @param string $callback A PHP callback
-   * @param mixed $params Optional values to pass to callback.
+   * @param int $phase
+   *   A constant; one of: self::PHASE_{PRE,POST}_{COMMIT,ROLLBACK}.
+   * @param string $callback
+   *   A PHP callback.
+   * @param mixed $params
+   *   Optional values to pass to callback.
    *          See php manual call_user_func_array for details.
    * @param int $id
    */

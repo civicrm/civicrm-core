@@ -92,16 +92,25 @@ class CRM_Core_OptionGroup {
    * (radio, select, checkbox etc). OptionGroups for most cases have the
    * 'label' in the label colum and the 'id' or 'name' in the value column
    *
-   * @param $name       string  name of the option group
-   * @param $flip       boolean results are return in id => label format if false
+   * @param $name
+   *   String name of the option group.
+   * @param $flip
+   *   Boolean results are return in id => label format if false.
    *                            if true, the results are reversed
-   * @param $grouping   boolean if true, return the value in 'grouping' column
-   * @param $localize   boolean if true, localize the results before returning
-   * @param $condition  string  add another condition to the sql query
-   * @param $labelColumnName string the column to use for 'label'
-   * @param $onlyActive boolean return only the action option values
-   * @param $fresh      boolean ignore cache entries and go back to DB
-   * @param $keyColumnName string the column to use for 'key'
+   * @param $grouping
+   *   Boolean if true, return the value in 'grouping' column.
+   * @param $localize
+   *   Boolean if true, localize the results before returning.
+   * @param $condition
+   *   String add another condition to the sql query.
+   * @param $labelColumnName
+   *   String the column to use for 'label'.
+   * @param $onlyActive
+   *   Boolean return only the action option values.
+   * @param $fresh
+   *   Boolean ignore cache entries and go back to DB.
+   * @param $keyColumnName
+   *   String the column to use for 'key'.
    *
    * @return array      the values as specified by the above params
    * @static
@@ -195,12 +204,17 @@ WHERE  v.option_group_id = g.id
    * (radio, select, checkbox etc). OptionGroups for most cases have the
    * 'label' in the label colum and the 'id' or 'name' in the value column
    *
-   * @param $id         integer id of the option group
-   * @param $flip       boolean results are return in id => label format if false
+   * @param $id
+   *   Integer id of the option group.
+   * @param $flip
+   *   Boolean results are return in id => label format if false.
    *                            if true, the results are reversed
-   * @param $grouping   boolean if true, return the value in 'grouping' column
-   * @param $localize   boolean if true, localize the results before returning
-   * @param $labelColumnName string the column to use for 'label'
+   * @param $grouping
+   *   Boolean if true, return the value in 'grouping' column.
+   * @param $localize
+   *   Boolean if true, localize the results before returning.
+   * @param $labelColumnName
+   *   String the column to use for 'label'.
    *
    * @param bool $onlyActive
    * @param bool $fresh
@@ -246,19 +260,21 @@ WHERE  v.option_group_id = g.id
    * is assigned a new fieldname by id or id's by title
    * (each within a specificied option_group)
    *
-   * @param  array   $params   Reference array of values submitted by the form. Based on
+   * @param array $params
+   *   Reference array of values submitted by the form. Based on.
    *                           $flip, creates new elements in $params for each field in
    *                           the $names array.
    *                           If $flip = false, adds     root field name     => title
    *                           If $flip = true, adds      actual field name   => id
    *
-   * @param  array   $names    Reference array of fieldnames we want transformed.
+   * @param array $names
+   *   Reference array of fieldnames we want transformed.
    *                           Array key = 'postName' (field name submitted by form in $params).
    *                           Array value = array(
      'newName' => $newName, 'groupName' => $groupName).
    *
    *
-   * @param  boolean $flip
+   * @param boolean $flip
    *
    * @return void
    *
@@ -397,7 +413,8 @@ WHERE  v.option_group_id = g.id
   /**
    * Get option_value.value from default option_value row for an option group
    *
-   * @param string $groupName the name of the option group
+   * @param string $groupName
+   *   The name of the option group.
    *
    * @static
    *
@@ -430,8 +447,10 @@ WHERE  v.option_group_id = g.id
    * @TODO: Should update the group if it already exists intelligently, so multi-lingual is
    * not messed up. Currently deletes the old group
    *
-   * @param string $groupName the name of the option group - make sure there is no conflict
-   * @param array $values the associative array that has information on the option values
+   * @param string $groupName
+   *   The name of the option group - make sure there is no conflict.
+   * @param array $values
+   *   The associative array that has information on the option values.
    *                          the keys of this array are:
    *                          string 'title'       (required)
    *                          string 'value'       (required)
@@ -440,8 +459,10 @@ WHERE  v.option_group_id = g.id
    *                          int    'weight'      (optional) - the order in which the value are displayed
    *                          bool   'is_default'  (optional) - is this the default one to display when rendered in form
    *                          bool   'is_active'   (optional) - should this element be rendered
-   * @param int $defaultID (reference) - the option value ID of the default element (if set) is returned else 'null'
-   * @param null $groupTitle the optional label of the option group else set to group name
+   * @param int $defaultID
+   *   (reference) - the option value ID of the default element (if set) is returned else 'null'.
+   * @param null $groupTitle
+   *   The optional label of the option group else set to group name.
    *
    * @static
    *

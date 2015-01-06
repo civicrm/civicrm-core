@@ -69,7 +69,8 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
   /**
    * Add log to civicrm_log table
    *
-   * @param array $params  array of name-value pairs of log table.
+   * @param array $params
+   *   Array of name-value pairs of log table.
    *
    * @static
    */

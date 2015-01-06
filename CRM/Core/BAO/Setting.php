@@ -66,10 +66,14 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   /**
    * Checks whether an item is present in the in-memory cache table
    *
-   * @param string $group (required) The group name of the item
-   * @param string $name (required) The name of the setting
-   * @param int $componentID The optional component ID (so components can share the same name space)
-   * @param int $contactID If set, this is a contactID specific setting, else its a global setting
+   * @param string $group
+   *   (required) The group name of the item.
+   * @param string $name
+   *   (required) The name of the setting.
+   * @param int $componentID
+   *   The optional component ID (so components can share the same name space).
+   * @param int $contactID
+   *   If set, this is a contactID specific setting, else its a global setting.
    * @param bool|int $load if true, load from local cache (typically memcache)
    *
    * @param int $domainID
@@ -196,11 +200,16 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   /**
    * Retrieve the value of a setting from the DB table
    *
-   * @param string $group (required) The group name of the item
-   * @param string $name (required) The name under which this item is stored
-   * @param int $componentID The optional component ID (so componenets can share the same name space)
-   * @param string $defaultValue The default value to return for this setting if not present in DB
-   * @param int $contactID If set, this is a contactID specific setting, else its a global setting
+   * @param string $group
+   *   (required) The group name of the item.
+   * @param string $name
+   *   (required) The name under which this item is stored.
+   * @param int $componentID
+   *   The optional component ID (so componenets can share the same name space).
+   * @param string $defaultValue
+   *   The default value to return for this setting if not present in DB.
+   * @param int $contactID
+   *   If set, this is a contactID specific setting, else its a global setting.
    *
    * @param int $domainID
    *
@@ -250,7 +259,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   /**
    * Store multiple items in the setting table
    *
-   * @param array $params (required) An api formatted array of keys and values
+   * @param array $params
+   *   (required) An api formatted array of keys and values.
    * @param null $domains
    * @param $settingsToReturn
    *
@@ -317,12 +327,17 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * _setItem() is the common logic shared by setItem() and setItems().
    *
-   * @param object $value (required) The value that will be serialized and stored
-   * @param string $group (required) The group name of the item
-   * @param string $name (required) The name of the setting
-   * @param int $componentID The optional component ID (so componenets can share the same name space)
+   * @param object $value
+   *   (required) The value that will be serialized and stored.
+   * @param string $group
+   *   (required) The group name of the item.
+   * @param string $name
+   *   (required) The name of the setting.
+   * @param int $componentID
+   *   The optional component ID (so componenets can share the same name space).
    * @param int $contactID
-   * @param int $createdID An optional ID to assign the creator to. If not set, retrieved from session
+   * @param int $createdID
+   *   An optional ID to assign the creator to. If not set, retrieved from session.
    *
    * @param int $domainID
    *
@@ -353,7 +368,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * _setItem() is the common logic shared by setItem() and setItems().
    *
-   * @param array $metadata metadata describing this field
+   * @param array $metadata
+   *   Metadata describing this field.
    * @param $value
    * @param $group
    * @param string $name
@@ -435,7 +451,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * _setItem() is the common logic shared by setItem() and setItems().
    *
-   * @param array $params (required) An api formatted array of keys and values
+   * @param array $params
+   *   (required) An api formatted array of keys and values.
    * @param null $domains
    *
    * @throws api_Exception
@@ -503,8 +520,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * This function filters on the fields like 'version' & 'debug' that are not settings
    *
-   * @param array $params Parameters as passed into API
-   * @param array $fields empty array to be populated with fields metadata
+   * @param array $params
+   *   Parameters as passed into API.
+   * @param array $fields
+   *   Empty array to be populated with fields metadata.
    * @param bool $createMode
    *
    * @throws api_Exception
@@ -608,7 +627,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * The following params will filter the result. If none are passed all settings will be returns
    *
-   * @param int $componentID id of relevant component
+   * @param int $componentID
+   *   Id of relevant component.
    * @param array $filters
    * @param int $domainID
    * @param null $profile
@@ -669,7 +689,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
   /**
    * Load the settings files defined in a series of folders
-   * @param array $metaDataFolders list of folder paths
+   * @param array $metaDataFolders
+   *   List of folder paths.
    * @return array
    */
   public static function loadSettingsMetaDataFolders($metaDataFolders) {
@@ -703,8 +724,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * Filter the settings metadata according to filters passed in. This is a convenience filter
    * and allows selective reverting / filling of settings
    *
-   * @param array $filters Filters to match against data
-   * @param array $settingSpec metadata to filter
+   * @param array $filters
+   *   Filters to match against data.
+   * @param array $settingSpec
+   *   Metadata to filter.
    */
   public static function _filterSettingsSpecification($filters, &$settingSpec) {
     if (empty($filters)) {

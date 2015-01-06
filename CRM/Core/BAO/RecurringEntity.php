@@ -135,7 +135,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * Save records in civicrm_recujrring_entity table
    *
-   * @param array $params reference array contains the values submitted by the form
+   * @param array $params
+   *   Reference array contains the values submitted by the form .
    *
    * @static
    *
@@ -166,9 +167,12 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * Wrapper for the function add() to add entry in recurring entity
    *
-   * @param int $parentId Parent entity id
-   * @param int $entityId Child entity id
-   * @param String $entityTable Name of the entity table
+   * @param int $parentId
+   *   Parent entity id .
+   * @param int $entityId
+   *   Child entity id .
+   * @param string $entityTable
+   *   Name of the entity table .
    *
    * @static
    *
@@ -187,7 +191,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * This function updates the mode column in the civicrm_recurring_entity table
    *
-   * @param int $mode Mode of the entity to cascade changes across parent/child relations eg 1 - only this entity, 2 - this and the following entities, 3 - All the entity
+   * @param int $mode
+   *   Mode of the entity to cascade changes across parent/child relations eg 1 - only this entity, 2 - this and the following entities, 3 - All the entity .
    *
    *
    * @return void
@@ -385,11 +390,16 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * This function gets all the children for a particular parent entity
    *
-   * @param int $parentId Parent entity id
-   * @param string $entityTable Name of the entity table
-   * @param boolean $includeParent If true parent id is included in result set and vice versa
-   * @param int $mode 1. retrieve only one entity. 2. retrieve all future entities in the repeating set. 3. all entities in the repeating set.
-   * @param int $initiatorId the instance where this function is invoked from
+   * @param int $parentId
+   *   Parent entity id .
+   * @param string $entityTable
+   *   Name of the entity table .
+   * @param bool $includeParent
+   *   If true parent id is included in result set and vice versa .
+   * @param int $mode
+   *   1. retrieve only one entity. 2. retrieve all future entities in the repeating set. 3. all entities in the repeating set. .
+   * @param int $initiatorId
+   *   The instance where this function is invoked from .
    *
    * @static
    *
@@ -450,10 +460,14 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * This function when passed an entity id checks if it has parent and
    * returns all other entities that are connected to same parent.
    *
-   * @param int $entityId entity id
-   * @param string $entityTable Entity table name
-   * @param boolean $includeParent Include parent in result set
-   * @param int $mode 1. retrieve only one entity. 2. retrieve all future entities in the repeating set. 3. all entities in the repeating set.
+   * @param int $entityId
+   *   Entity id .
+   * @param string $entityTable
+   *   Entity table name .
+   * @param bool $includeParent
+   *   Include parent in result set .
+   * @param int $mode
+   *   1. retrieve only one entity. 2. retrieve all future entities in the repeating set. 3. all entities in the repeating set. .
    *
    * @static
    *
@@ -470,9 +484,12 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * This function gets the parent for the entity id passed to it
    *
-   * @param int $entityId entity ID
-   * @param string $entityTable Entity table name
-   * @param boolean $includeParent Include parent in result set
+   * @param int $entityId
+   *   Entity ID .
+   * @param string $entityTable
+   *   Entity table name .
+   * @param bool $includeParent
+   *   Include parent in result set .
    *
    * @static
    *
@@ -503,10 +520,14 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * This function copies the information from parent entity and creates other entities with same information
    *
-   * @param string $entityTable Entity table name
-   * @param array $fromCriteria array of all the fields & values on which basis to copy
-   * @param array $newParams  array of all the fields & values to be copied besides the other fields
-   * @param boolean $createRecurringEntity if to create a record in recurring_entity table
+   * @param string $entityTable
+   *   Entity table name .
+   * @param array $fromCriteria
+   *   Array of all the fields & values on which basis to copy .
+   * @param array $newParams
+   *   Array of all the fields & values to be copied besides the other fields .
+   * @param bool $createRecurringEntity
+   *   If to create a record in recurring_entity table .
    *
    * @static
    *
@@ -535,7 +556,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * This function acts as a listener to dao->update whenever there is an update,
    * and propagates any changes to all related entities present in recurring entity table
    *
-   * @param object $event An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just updated
+   * @param object $event
+   *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just updated .
    *
    * @static
    *
@@ -607,7 +629,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * This function acts as a listener to dao->save,
    * and creates entries for linked entities in recurring entity table
    *
-   * @param object $event An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just inserted
+   * @param object $event
+   *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just inserted .
    *
    * @static
    *
@@ -716,7 +739,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * This function acts as a listener to dao->delete, and deletes an entry from recurring_entity table
    *
-   * @param object $event An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just deleted
+   * @param object $event
+   *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just deleted .
    *
    * @static
    *
@@ -757,8 +781,10 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * This function deletes main entity and related linked entities from recurring-entity table
    *
-   * @param int $entityId Entity id
-   * @param string $entityTable Name of the entity table
+   * @param int $entityId
+   *   Entity id .
+   * @param string $entityTable
+   *   Name of the entity table .
    *
    * @static
    *
@@ -799,7 +825,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * This function maps values posted from form to civicrm_action_schedule columns
    *
-   * @param array $formParams and array of form values posted
+   * @param array $formParams
+   *   And array of form values posted .
    *
    * @return array
    */
@@ -876,7 +903,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * This function gets all the columns of civicrm_action_schedule table based on id(primary key)
    *
-   * @param int $scheduleReminderId primary key of civicrm_action_schedule table
+   * @param int $scheduleReminderId
+   *   Primary key of civicrm_action_schedule table .
    *
    * @static
    *
@@ -901,7 +929,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * This function is a wrapper of getScheduleReminderDetailsById function
    *
-   * @param int $scheduleReminderId primary key of civicrm_action_schedule table
+   * @param int $scheduleReminderId
+   *   Primary key of civicrm_action_schedule table .
    *
    * @return array
    */
@@ -919,7 +948,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * This function takes criterias saved in civicrm_action_schedule table
    * and creates recursion rule
    *
-   * @param array $scheduleReminderDetails array of repeat criterias saved in civicrm_action_schedule table
+   * @param array $scheduleReminderDetails
+   *   Array of repeat criterias saved in civicrm_action_schedule table .
    *
    * @return object When object
    */
@@ -1022,8 +1052,10 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * This function gets time difference between the two datetime object
    *
-   * @param DateTime $startDate Start Date
-   * @param DateTime $endDate End Date
+   * @param DateTime $startDate
+   *   Start Date .
+   * @param DateTime $endDate
+   *   End Date .
    *
    * @static
    *
@@ -1040,8 +1072,10 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * This function gets all columns from civicrm_action_schedule on the basis of event id
    *
-   * @param int $entityId Entity ID
-   * @param string $used_for Specifies for which entity type it's used for
+   * @param int $entityId
+   *   Entity ID .
+   * @param string $used_for
+   *   Specifies for which entity type it's used for .
    *
    * @static
    *
@@ -1069,8 +1103,10 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * Update mode column in civicrm_recurring_entity table for event related tabs
    *
-   * @param int $entityId event id
-   * @param string $linkedEntityTable Linked entity table name for this event
+   * @param int $entityId
+   *   Event id .
+   * @param string $linkedEntityTable
+   *   Linked entity table name for this event .
    * @return array
    */
   public static function updateModeLinkedEntity($entityId, $linkedEntityTable, $mainEntityTable) {

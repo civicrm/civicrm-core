@@ -44,10 +44,13 @@ class CRM_Core_Lock {
   /**
    * Initialize the constants used during lock acquire / release
    *
-   * @param string $name name of the lock. Please prefix with component / functionality
+   * @param string $name
+   *   Name of the lock. Please prefix with component / functionality.
    *                      e.g. civimail.cronjob.JOB_ID
-   * @param int $timeout the number of seconds to wait to get the lock. 1 if not set
-   * @param boolean $serverWideLock should this lock be applicable across your entire mysql server
+   * @param int $timeout
+   *   The number of seconds to wait to get the lock. 1 if not set.
+   * @param bool $serverWideLock
+   *   Should this lock be applicable across your entire mysql server.
    *                                this is useful if you have multiple sites running on the same
    *                                mysql server and you want to limit the number of parallel cron
    *                                jobs - CRM-91XX

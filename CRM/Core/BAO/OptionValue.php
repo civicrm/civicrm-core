@@ -45,7 +45,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * Create option value - note that the create function calls 'add' but
    * has more business logic
    *
-   * @param array $params input parameters
+   * @param array $params
+   *   Input parameters.
    *
    * @return object
    */
@@ -124,8 +125,10 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_BAO_OptionValue object
    * @static
@@ -143,8 +146,10 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on sucess, null otherwise
    * @static
@@ -156,8 +161,10 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   /**
    * Add an Option Value
    *
-   * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
+   * @param array $ids
+   *   Reference array contains the id.
    *
    * @static
    *
@@ -241,7 +248,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   /**
    * Retrieve activity type label and description
    *
-   * @param int     $activityTypeId  activity type id
+   * @param int $activityTypeId
+   *   Activity type id.
    *
    * @return array  label and description
    * @static
@@ -263,7 +271,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   /**
    * Get the Option Value title.
    *
-   * @param int $id id of Option Value
+   * @param int $id
+   *   Id of Option Value.
    *
    * @return string title
    *
@@ -277,8 +286,10 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   /**
    * Updates contacts affected by the option value passed.
    *
-   * @param Integer $optionValueId     the option value id.
-   * @param int     $action            the action describing whether prefix/suffix was UPDATED or DELETED
+   * @param int $optionValueId
+   *   The option value id.
+   * @param int $action
+   *   The action describing whether prefix/suffix was UPDATED or DELETED.
    *
    * @return bool
    */
@@ -407,7 +418,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * Updates options values weights.
    *
    * @param int $opGroupId
-   * @param array $opWeights options value , weight pair
+   * @param array $opWeights
+   *   Options value , weight pair.
    *
    * @return void
    * @static
@@ -434,7 +446,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * Does not take any filtering arguments. The object is to avoid hitting the DB and retrieve
    * from memory
    *
-   * @param int $optionGroupID the option group for which we want the values from
+   * @param int $optionGroupID
+   *   The option group for which we want the values from.
    *
    * @return array an array of array of values for this option group
    * @static
@@ -466,7 +479,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * Get the values of all option values given an option group ID as a key => value pair
    * Use above cached function to make it super efficient
    *
-   * @param int $optionGroupID the option group for which we want the values from
+   * @param int $optionGroupID
+   *   The option group for which we want the values from.
    *
    * @return array an associative array of label, value pairs
    * @static
@@ -484,7 +498,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * Get the values of all option values given an option group Name as a key => value pair
    * Use above cached function to make it super efficient
    *
-   * @param string $optionGroupName the option group name for which we want the values from
+   * @param string $optionGroupName
+   *   The option group name for which we want the values from.
    *
    * @return array an associative array of label, value pairs
    * @static

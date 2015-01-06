@@ -47,7 +47,8 @@ class CRM_Core_BAO_CMSUser {
   /**
    * Synchronizing cms users with CiviCRM contacts
    *
-   * @param bool $is_interactive whether to show statuses & perform redirects
+   * @param bool $is_interactive
+   *   Whether to show statuses & perform redirects.
    *   This behavior is misplaced in the BAO layer, but we'll preserve it to avoid
    *   contract changes in the middle of the support cycle. In the next major
    *   release, we should remove & document it.
@@ -222,8 +223,10 @@ class CRM_Core_BAO_CMSUser {
   /**
    * Create CMS user using Profile
    *
-   * @param array  $params associated array
-   * @param string $mail email id for cms user
+   * @param array $params
+   *   Associated array.
+   * @param string $mail
+   *   Email id for cms user.
    *
    * @return int contact id that has been created
    * @static
@@ -251,8 +254,10 @@ class CRM_Core_BAO_CMSUser {
    * Create Form for CMS user using Profile
    *
    * @param CRM_Core_Form $form
-   * @param integer $gid id of group of profile
-   * @param bool $emailPresent true if the profile field has email(primary)
+   * @param int $gid
+   *   Id of group of profile.
+   * @param bool $emailPresent
+   *   True if the profile field has email(primary).
    * @param \const|int $action
    *
    * @return FALSE|void WTF
@@ -335,8 +340,10 @@ class CRM_Core_BAO_CMSUser {
    * Checks that there is a valid username & email
    * optionally checks password is present & matches DB & gets the CMS to validate
    *
-   * @param array $fields Posted values of form
-   * @param array $files uploaded files if any
+   * @param array $fields
+   *   Posted values of form.
+   * @param array $files
+   *   Uploaded files if any.
    * @param CRM_Core_Form $form
    *
    * @return array|bool
@@ -412,7 +419,8 @@ class CRM_Core_BAO_CMSUser {
   /**
    * Check if a cms user already exists.
    *
-   * @param  Array $contact array of contact-details
+   * @param Array $contact
+   *   Array of contact-details.
    *
    * @return uid if user exists, false otherwise
    *

@@ -397,11 +397,14 @@ WHERE  cacheKey LIKE %1 AND is_selected = 1
   /**
    * Get the selections
    *
-   * @param string $cacheKey cache key
-   * @param string $action action
+   * @param string $cacheKey
+   *   Cache key.
+   * @param string $action
+   *   Action.
    *  $action : get - get only selection records
    *            getall - get all the records of the specified cache key
-   * @param string $entity_table entity table
+   * @param string $entity_table
+   *   Entity table.
    *
    * @return array
    */

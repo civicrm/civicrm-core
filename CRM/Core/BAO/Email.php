@@ -42,7 +42,8 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
    * Create email address - note that the create function calls 'add' but
    * has more business logic
    *
-   * @param array $params input parameters
+   * @param array $params
+   *   Input parameters.
    *
    * @return object
    */
@@ -60,7 +61,8 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
   /**
    * Takes an associative array and adds email
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return object       CRM_Core_BAO_Email object on success, null otherwise
    * @static
@@ -112,7 +114,8 @@ WHERE  contact_id = {$params['contact_id']}
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array $entityBlock   input parameters to find object
+   * @param array $entityBlock
+   *   Input parameters to find object.
    *
    * @return boolean
    * @static
@@ -124,7 +127,8 @@ WHERE  contact_id = {$params['contact_id']}
   /**
    * Get all the emails for a specified contact_id, with the primary email being first
    *
-   * @param int $id the contact id
+   * @param int $id
+   *   The contact id.
    *
    * @param bool $updateBlankLocInfo
    *
@@ -181,7 +185,8 @@ ORDER BY  civicrm_email.is_primary DESC, email_id ASC ";
   /**
    * Get all the emails for a specified location_block id, with the primary email being first
    *
-   * @param array $entityElements the array containing entity_id and
+   * @param array $entityElements
+   *   The array containing entity_id and.
    * entity_table name
    *
    * @return array  the array of email id's
@@ -230,7 +235,8 @@ ORDER BY e.is_primary DESC, email_id ASC ";
   /**
    * Set / reset hold status for an email
    *
-   * @param object $email  email object
+   * @param object $email
+   *   Email object.
    *
    * @return void
    * @static

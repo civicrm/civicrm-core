@@ -42,7 +42,8 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * Create phone object - note that the create function calls 'add' but
    * has more business logic
    *
-   * @param array $params input parameters
+   * @param array $params
+   *   Input parameters.
    */
   /**
    * @param array $params
@@ -68,7 +69,8 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
   /**
    * Takes an associative array and adds phone
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return object       CRM_Core_BAO_Phone object on success, null otherwise
    * @static
@@ -105,7 +107,8 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
   /**
    * Get all the phone numbers for a specified contact_id, with the primary being first
    *
-   * @param int $id the contact id
+   * @param int $id
+   *   The contact id.
    *
    * @param bool $updateBlankLocInfo
    * @param null $type
@@ -177,7 +180,8 @@ ORDER BY civicrm_phone.is_primary DESC,  phone_id ASC ";
   /**
    * Get all the phone numbers for a specified location_block id, with the primary phone being first
    *
-   * @param array $entityElements the array containing entity_id and
+   * @param array $entityElements
+   *   The array containing entity_id and.
    * entity_table name
    *
    * @param null $type
@@ -233,7 +237,8 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
   /**
    * Set NULL to phone, mapping, uffield
    *
-   * @param $optionId value of option to be deleted
+   * @param $optionId
+   *   Value of option to be deleted.
    *
    * return void
    * @static
