@@ -60,7 +60,7 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
       $entityBlock = array('id' => $addressId);
       $address = CRM_Core_BAO_Address::getValues($entityBlock, FALSE, 'id');
       if (!empty($address)) {
-        foreach ($address as $key =>& $value) {
+        foreach ($address as $key => & $value) {
           $value['location_type'] = $locationTypes[$value['location_type_id']];
         }
       }
@@ -98,8 +98,8 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
     }
     $contact = new CRM_Contact_BAO_Contact( );
     $contact->id = $contactId;
-    $contact->find(true);
-    $privacy = array( );
+    $contact->find(TRUE);
+    $privacy = array();
     foreach ( CRM_Contact_BAO_Contact::$_commPrefs as $name ) {
       if ( isset( $contact->$name ) ) {
         $privacy[$name] = $contact->$name;

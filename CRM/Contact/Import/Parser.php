@@ -238,7 +238,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
             $estimatedTime = $estimatedTime - ($estMinutes * 60);
           }
           $timeFormatted .= round($estimatedTime) . ' ' . ts('seconds');
-          $processedPercent = (int )(($this->_rowCount * 100) / $totalRowCount);
+          $processedPercent = (int ) (($this->_rowCount * 100) / $totalRowCount);
           $statusMsg = ts('%1 of %2 records - %3 remaining',
             array(1 => $this->_rowCount, 2 => $totalRowCount, 3 => $timeFormatted)
           );
@@ -248,7 +248,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
 </div>
 ";
 
-          $contents = json_encode (array($processedPercent, $status));
+          $contents = json_encode(array($processedPercent, $status));
 
           file_put_contents($statusFile, $contents);
 
@@ -333,7 +333,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
                 do_something( );
             } */
     }
-
 
     if ($mode == self::MODE_PREVIEW || $mode == self::MODE_IMPORT) {
       $customHeaders = $mapper;
