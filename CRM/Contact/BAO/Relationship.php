@@ -1220,7 +1220,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    */
   public static function relatedMemberships($contactId, &$params, $ids, $action = CRM_Core_Action::ADD, $active = TRUE) {
     // Check the end date and set the status of the relationship
-    // accrodingly.
+    // accordingly.
     $status = self::CURRENT;
 
     if (!empty($params['end_date'])) {

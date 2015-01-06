@@ -315,13 +315,20 @@ UNION
 
       // create employee of relationship
       $relationshipParams = array(
-        'is_active' => TRUE,
-        'relationship_type_id' => $relTypeId . '_a_b',
-        'contact_check' => array($organization => TRUE),
+        'relationship_type_id' => $relTypeId,
+        'contact_id_b' => $organization,
+        'contact_id_a' => $contactID,
       );
-      list($valid, $invalid, $duplicate,
-        $saved, $relationshipIds
-      ) = CRM_Contact_BAO_Relationship::create($relationshipParams, $cid);
+      try {
+        $relationshipParams['id'] = civicrm_api3('relationship', 'getvalue', array_merge($relationshipParams, array('return' => 'id')));
+        $action = CRM_Core_Action::UPDATE;
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        $action = CRM_Core_Action::ADD;
+      }
+      $relationshipParams['is_active'] = TRUE;
+      $relationship = civicrm_api3('relationship', 'create', $relationshipParams);
+      $relationshipParams['relationship_type_id'] .= '_a_b';
 
 
       // In case we change employer, clean previous employer related records.
@@ -337,9 +344,9 @@ UNION
       // set current employer
       self::setCurrentEmployer(array($contactID => $organization));
 
-      $relationshipParams['relationship_ids'] = $relationshipIds;
-      // handle related meberships. CRM-3792
-      self::currentEmployerRelatedMembership($contactID, $organization, $relationshipParams, $duplicate, $previousEmployerID);
+      $relationshipParams['relationship_ids'] = $relationship['id'];
+      // handle related memberships. CRM-3792
+      self::currentEmployerRelatedMembership($contactID, $organization, $relationshipParams, $action, $previousEmployerID);
     }
   }
 
@@ -356,29 +363,10 @@ UNION
    * @throws CiviCRM_API3_Exception
    * @static
    */
-  public static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE, $previousEmpID = NULL) {
-    $ids = array();
-    $action = CRM_Core_Action::ADD;
-
-    //we do not know that triggered relationship record is active.
-    if ($duplicate) {
-      $relationship = new CRM_Contact_DAO_Relationship();
-      $relationship->contact_id_a = $contactID;
-      $relationship->contact_id_b = $employerID;
-      $relationship->relationship_type_id = $relationshipParams['relationship_type_id'];
-      if ($relationship->find(TRUE)) {
-        $action = CRM_Core_Action::UPDATE;
-        $ids['contact'] = $contactID;
-        $ids['contactTarget'] = $employerID;
-        $ids['relationship'] = $relationship->id;
-        CRM_Contact_BAO_Relationship::setIsActive($relationship->id, TRUE);
-      }
-      $relationship->free();
-    }
-
-    //need to handle related meberships. CRM-3792
+  public static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $action, $previousEmpID = NULL) {
+    //need to handle related memberships. CRM-3792
     if ($previousEmpID != $employerID) {
-      CRM_Contact_BAO_Relationship::relatedMemberships($contactID, $relationshipParams, $ids, $action);
+      CRM_Contact_BAO_Relationship::relatedMemberships($contactID, $relationshipParams, array(), $action);
     }
   }
 

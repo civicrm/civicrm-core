@@ -63,7 +63,7 @@ function civicrm_api3_relationship_create($params) {
 
   $values['relationship_type_id'] = $values['relationship_type_id'] . '_a_b';
 
-  $relationshipBAO = CRM_Contact_BAO_Relationship::create($values, $ids);
+  $relationshipBAO = CRM_Contact_BAO_Relationship::create($values);
 
   // Handle related memberships CRM-13652
   if (!empty($params['contact_id_a'])) {
