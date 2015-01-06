@@ -955,7 +955,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    *
    * @return void
    */
-  static function processContribution(&$form, $params, $result, $contactID,
+  static function processContribution(
+    &$form, $params, $result, $contactID,
     $pending = FALSE, $isAdditionalAmount = FALSE
   ) {
     $transaction = new CRM_Core_Transaction();

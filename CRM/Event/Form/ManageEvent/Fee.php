@@ -666,7 +666,8 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
               $fieldParams['option_label'] = $params['label'];
               $fieldParams['option_amount'] = $params['value'];
               $fieldParams['financial_type_id'] = $params['financial_type_id'];
-              foreach ($options as $value) { $fieldParams['option_weight'][$value['weight']] = $value['weight'];
+              foreach ($options as $value) {
+                $fieldParams['option_weight'][$value['weight']] = $value['weight'];
               }
               $fieldParams['default_option'] = $params['default'];
               $priceField = CRM_Price_BAO_PriceField::create($fieldParams);
