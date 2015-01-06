@@ -260,9 +260,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   /**
    * Form validations
    *
-   * @param array $params   posted values of the form
-   * @param array $files    list of errors to be posted back to the form
-   * @param array $self     form object
+   * @param array $params
+   *   Posted values of the form.
+   * @param array $files
+   *   List of errors to be posted back to the form.
+   * @param array $self
+   *   Form object.
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -405,7 +408,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   /**
    * Process contribution records
    *
-   * @param array $params associated array of submitted values
+   * @param array $params
+   *   Associated array of submitted values.
    *
    *
    * @return void
@@ -574,7 +578,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   /**
    * Process membership records
    *
-   * @param array $params associated array of submitted values
+   * @param array $params
+   *   Associated array of submitted values.
    *
    *
    * @return bool
@@ -816,7 +821,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   /**
    * Update contact information
    *
-   * @param array $value associated array of submitted values
+   * @param array $value
+   *   Associated array of submitted values.
    *
    *
    * @return void
