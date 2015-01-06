@@ -414,7 +414,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     //flush component settings
     CRM_Core_Component::getEnabledComponents(TRUE);
 
-
     if ($this->_eNoticeCompliant) {
       error_reporting(E_ALL);
     }
@@ -692,7 +691,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * array(1 => array("Whiz", "String")));
    */
   public function assertDBQuery($expected, $query, $params = array(), $message = '') {
-    if ($message) $message .= ': ';
+    if ($message) { $message .= ': ';
+    }
     $actual = CRM_Core_DAO::singleValueQuery($query, $params);
     $this->assertEquals($expected, $actual,
       sprintf('%sexpected=[%s] actual=[%s] query=[%s]',
@@ -896,12 +896,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       $params
     );
     switch (strtolower($action)) {
-      case 'getvalue' :
+      case 'getvalue':
         return $this->callAPISuccessGetValue($entity, $params, $checkAgainst);
-      case 'getsingle' :
+
+      case 'getsingle':
         return $this->callAPISuccessGetSingle($entity, $params, $checkAgainst);
-      case 'getcount' :
-          return $this->callAPISuccessGetCount($entity, $params, $checkAgainst);
+
+      case 'getcount':
+        return $this->callAPISuccessGetCount($entity, $params, $checkAgainst);
     }
     $result = $this->civicrm_api($entity, $action, $params);
     $this->assertAPISuccess($result, "Failure in api call for $entity $action");
@@ -1054,7 +1056,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * so the distinction between set
    * up & tested functions is clearer
    *
-   *  @return array api Result
+   * @return array api Result
    */
   public function createTestEntity(){
     return $entity = $this->callAPISuccess($this->entity, 'create', $this->params);
@@ -1130,11 +1132,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       $params[$key] = $values[$seq % sizeof($values)];
     }
     if ($contact_type == 'Individual' ) {
-        $params['email'] = strtolower(
+      $params['email'] = strtolower(
           $params['first_name'] . '_' . $params['last_name'] . '@civicrm.org'
         );
-        $params['prefix_id'] = 3;
-        $params['suffix_id'] = 3;
+      $params['prefix_id'] = 3;
+      $params['suffix_id'] = 3;
     }
     return $params;
   }
@@ -1176,7 +1178,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       return;
     }
     $result = $this->callAPISuccess('contact', 'delete', $params);
-    return  $result;
+    return $result;
   }
 
   /**
@@ -1434,7 +1436,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'domain_id' => '1',
     );
     $params = array_merge($defaults, $params);
-    $result =  $this->callAPISuccess('Tag', 'create', $params);
+    $result = $this->callAPISuccess('Tag', 'create', $params);
     return $result['values'][$result['id']];
   }
 
@@ -1788,7 +1790,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
 
- /**
+  /**
    * Function to add a Group
    *
    * @params array to add group
@@ -1798,7 +1800,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   public function groupContactCreate($groupID, $totalCount = 10) {
     $params = array('group_id' => $groupID);
-    for ($i=1; $i <= $totalCount; $i++) {
+    for ($i = 1; $i <= $totalCount; $i++) {
       $contactID = $this->individualCreate();
       if ($i == 1) {
         $params += array('contact_id' => $contactID);
@@ -1997,7 +1999,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $params = array_merge($defaults, $params);
 
     if (strlen($params['title']) > 13) {
-      $params['title'] =  substr($params['title'], 0, 13);
+      $params['title'] = substr($params['title'], 0, 13);
     }
 
     //have a crack @ deleting it first in the hope this will prevent derailing our tests
@@ -2070,7 +2072,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   public function entityCustomGroupWithSingleFieldCreate($function, $filename) {
     $params = array('title' => $function);
     $entity = substr(basename($filename), 0, strlen(basename($filename)) - 8);
-    $params['extends'] =  $entity ? $entity : 'Contact';
+    $params['extends'] = $entity ? $entity : 'Contact';
     $customGroup = $this->CustomGroupCreate($params);
     $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id'], 'label' => $function));
     CRM_Core_PseudoConstant::flush();
@@ -2312,7 +2314,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'decision_date' => '20130805000000',
     );
 
-    $keysToUnset = array('xdebug', 'undefined_fields',);
+    $keysToUnset = array('xdebug', 'undefined_fields');
     foreach ($keysToUnset as $unwantedKey) {
       if(isset($result[$unwantedKey])) {
         unset($result[$unwantedKey]);
@@ -2332,33 +2334,33 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
 
     foreach ($resultArray as $index => &$values) {
-        if(!is_array($values)) {
-          continue;
-        }
-        foreach($values as $key => &$value) {
-          if(substr($key, 0, 3)  == 'api' && is_array($value)) {
-            if(isset($value['is_error'])) {
-              // we have a std nested result format
-              $this->tidyExampleResult($value);
+      if(!is_array($values)) {
+        continue;
+      }
+      foreach($values as $key => &$value) {
+        if(substr($key, 0, 3) == 'api' && is_array($value)) {
+          if(isset($value['is_error'])) {
+            // we have a std nested result format
+            $this->tidyExampleResult($value);
+          }
+          else{
+            foreach ($value as &$nestedResult) {
+              // this is an alternative syntax for nested results a keyed array of results
+              $this->tidyExampleResult($nestedResult);
             }
-            else{
-              foreach ($value as &$nestedResult) {
-                // this is an alternative syntax for nested results a keyed array of results
-                $this->tidyExampleResult($nestedResult);
-              }
-            }
-          }
-          if(in_array($key, $keysToUnset)) {
-            unset($values[$key]);
-            break;
-          }
-          if(array_key_exists($key, $fieldsToChange) && !empty($value)) {
-            $value = $fieldsToChange[$key];
-          }
-          if(is_string($value)) {
-            $value =  addslashes($value);
           }
         }
+        if(in_array($key, $keysToUnset)) {
+          unset($values[$key]);
+          break;
+        }
+        if(array_key_exists($key, $fieldsToChange) && !empty($value)) {
+          $value = $fieldsToChange[$key];
+        }
+        if(is_string($value)) {
+          $value = addslashes($value);
+        }
+      }
     }
   }
 
@@ -2619,7 +2621,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     }
     if (!empty($unformattedArray['values']) && is_array($unformattedArray['values'])) {
       foreach ($unformattedArray['values'] as $key => $value) {
-        if (is_Array($value)) {
+        if (is_array($value)) {
           foreach ($value as $k => $v) {
             if ($k == 'id') {
               unset($value[$k]);
@@ -2719,7 +2721,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    */
   public function setMockSettingsMetaData($extras) {
     CRM_Core_BAO_Setting::$_cache = array();
-    $this->callAPISuccess('system','flush', array());
+    $this->callAPISuccess('system', 'flush', array());
     CRM_Core_BAO_Setting::$_cache = array();
 
     CRM_Utils_Hook::singleton()->setHook('civicrm_alterSettingsMetaData', function (&$metadata, $domainId, $profile) use ($extras) {
@@ -2935,11 +2937,11 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
     $optionGroupID = $this->callAPISuccessGetValue('option_group', array('return' => 'id', 'name' => 'acl_role'));
-    $optionValue = $this->callAPISuccess('option_value', 'create', array('option_group_id' => $optionGroupID,
+    $optionValue = $this->callAPISuccess('option_value', 'create', array(
+    'option_group_id' => $optionGroupID,
       'label' => 'pick me',
       'value' => 55,
     ));
-
 
     CRM_Core_DAO::executeQuery("
       TRUNCATE civicrm_acl_cache
@@ -2948,7 +2950,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     CRM_Core_DAO::executeQuery("
       TRUNCATE civicrm_acl_contact_cache
     ");
-
 
     CRM_Core_DAO::executeQuery("
     INSERT INTO civicrm_acl_entity_role (

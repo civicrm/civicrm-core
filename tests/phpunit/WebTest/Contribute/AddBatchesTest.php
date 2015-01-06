@@ -211,7 +211,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
         $this->click("css=span#{$row}.pledge-adjust-option a");
         $this->type("field_{$row}_total_amount", $data['amount']);
       }
-	  }
+    }
     elseif ($type == "Contribution") {
       $this->select("field_{$row}_financial_type", $data['financial_type']);
       $this->type("field_{$row}_total_amount", $data['amount']);

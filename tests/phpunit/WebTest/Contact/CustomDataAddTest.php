@@ -206,7 +206,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     //Get the customFieldsetID
     $this->openCiviPage('admin/custom/group', 'reset=1');
     $customFieldsetId = explode('&gid=', $this->getAttribute("xpath=//div[@id='custom_group']//table/tbody//tr/td/span[text()='$customGroupTitle']/../../td[7]/span/a@href"));
-    $customFieldsetId =  $customFieldsetId[1];
+    $customFieldsetId = $customFieldsetId[1];
 
     //create Individual contact
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
@@ -285,7 +285,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
 
     $this->click("xpath=//table//tr/td/label[text()=\"$customField\"]");
     $value = "custom".rand();
-    $this->type("xpath=//table//tr/td/label[text()=\"$customField\"]/../following-sibling::td/input",$value);
+    $this->type("xpath=//table//tr/td/label[text()=\"$customField\"]/../following-sibling::td/input", $value);
 
     //check for matching contact
     $this->click("_qf_Contact_refresh_dedupe");
@@ -318,7 +318,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->clickLink("xpath=//ul[@id='actions']/li[2]/a/span");
     $this->click("xpath=//table//tr/td/label[text()=\"$customField\"]");
     $value1 = "custom_1".rand();
-    $this->type("xpath=//table//tr/td/label[text()=\"$customField\"]/../following-sibling::td/input",$value1);
+    $this->type("xpath=//table//tr/td/label[text()=\"$customField\"]/../following-sibling::td/input", $value1);
     $this->click("_qf_Contact_upload_view-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("css=#tab_log a");

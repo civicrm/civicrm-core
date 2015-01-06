@@ -434,7 +434,6 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
       'version' => 3,
     );
 
-
     $customGroup = Custom::createGroup($groupParams);
     $activeGroup = CRM_Core_BAO_CustomGroup::getActiveGroups('Individual', 'civicrm/contact/view/cd', $contactId);
     foreach ($activeGroup as $key => $value) {

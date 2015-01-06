@@ -32,8 +32,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_country* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Contact
+ * @package CiviCRM_APIv3
+ * @subpackage API_Contact
  */
 class api_v3_CountryTest extends CiviUnitTestCase {
   protected $_apiversion;
@@ -64,7 +64,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
     //create one
     $create = $this->callAPISuccess('country', 'create', $this->_params);
 
-    $result = $this->callAPIAndDocument('country', 'delete', array('id' => $create['id'],), __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('country', 'delete', array('id' => $create['id']), __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $get = $this->callAPISuccess('country', 'get', array(
       'id' => $create['id'],
@@ -92,7 +92,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
   public function testGet() {
     $country = $this->callAPISuccess('Country', 'create', $this->_params);
     $params = array(
-      'iso_code' =>  $this->_params['iso_code'],
+      'iso_code' => $this->_params['iso_code'],
     );
     $result = $this->callAPIAndDocument('Country', 'Get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($country['values'][$country['id']]['name'], $result['values'][$country['id']]['name']);

@@ -30,7 +30,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  * Test class for Pledge API - civicrm_pledge_*
  *
- *  @package CiviCRM_APIv3
+ * @package CiviCRM_APIv3
  */
 
 class api_v3_PledgePaymentTest extends CiviUnitTestCase {
@@ -145,7 +145,6 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
     $params['contribution_id'] = $contribution['id'];
 
-
     $resultCont2 = $this->callAPISuccess('pledge_payment', 'create', $params);
     //make sure original is untouched & has not been updated
     $this->assertGreaterThan($result['id'], $resultCont2['id'], " in line " . __LINE__);
@@ -251,7 +250,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPIAndDocument('pledge_payment', 'update', $updateparams, __FUNCTION__, __FILE__);
-    $this->getAndCheck(array_merge($params,$updateparams), $result['id'], $this->_entity);
+    $this->getAndCheck(array_merge($params, $updateparams), $result['id'], $this->_entity);
   }
 
   public function testDeletePledgePayment() {

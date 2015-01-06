@@ -32,8 +32,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_activity_contact* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Activity
+ * @package CiviCRM_APIv3
+ * @subpackage API_Activity
  */
 class api_v3_ActivityContactTest extends CiviUnitTestCase {
   protected $_apiversion;
@@ -71,7 +71,7 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
     //create one
     $create = $this->callAPISuccess('activity_contact', 'create', $this->_params);
 
-    $result = $this->callAPIAndDocument('activity_contact', 'delete', array('id' => $create['id'],), __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('activity_contact', 'delete', array('id' => $create['id']), __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $get = $this->callAPISuccess('activity_contact', 'get', array(
       'id' => $create['id'],

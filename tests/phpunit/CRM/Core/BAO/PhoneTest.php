@@ -114,5 +114,6 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
    * AllEntityPhones() method - get all Phones for a location block, with primary Phone first
    * @todo FIXME: Fixing this test requires add helper functions in CiviTest to create location block and phone and link them to an event. Punting to 3.1 cycle. DGG
    */
-  public function SKIPPED_testAllEntityPhones() {}
+  public function SKIPPED_testAllEntityPhones() {
+  }
 }

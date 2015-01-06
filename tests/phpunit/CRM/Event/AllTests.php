@@ -6,12 +6,12 @@
  *
  *  (PHP 5)
  *
- *   @author Walt Haas <walt@dharmatech.org> (801) 534-1262
- *   @copyright Copyright CiviCRM LLC (C) 2009
- *   @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
+ * @author Walt Haas <walt@dharmatech.org> (801) 534-1262
+ * @copyright Copyright CiviCRM LLC (C) 2009
+ * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
  *              GNU Affero General Public License version 3
- *   @version   $Id: AllTests.php 40328 2012-05-11 23:06:13Z allen $
- *   @package   CiviCRM
+ * @version   $Id: AllTests.php 40328 2012-05-11 23:06:13Z allen $
+ * @package   CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -38,7 +38,7 @@ require_once 'CiviTest/CiviTestSuite.php';
 /**
  *  Class containing all test suites
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Event_AllTests extends CiviTestSuite {
   private static $instance = NULL;

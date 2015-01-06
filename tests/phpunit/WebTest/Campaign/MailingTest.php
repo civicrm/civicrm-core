@@ -227,7 +227,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // verify undelivered status message
-    $this->assertElementContainsText('crm-container',"Delivery has not yet begun for this mailing. If the scheduled delivery date and time is past, ask the system administrator or technical support contact for your site to verify that the automated mailer task ('cron job') is running - and how frequently.");
+    $this->assertElementContainsText('crm-container', "Delivery has not yet begun for this mailing. If the scheduled delivery date and time is past, ask the system administrator or technical support contact for your site to verify that the automated mailer task ('cron job') is running - and how frequently.");
 
     // do check for recipient group
     $this->assertElementContainsText('crm-container', "Members of $groupName");

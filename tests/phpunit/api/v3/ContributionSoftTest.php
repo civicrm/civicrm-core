@@ -30,8 +30,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_contribute_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_ContributionSoft
+ * @package CiviCRM_APIv3
+ * @subpackage API_ContributionSoft
  */
 
 class api_v3_ContributionSoftTest extends CiviUnitTestCase {
@@ -112,29 +112,29 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
 
     //create a second soft contribution on the same hard contribution - we are testing that 'id' gets the right soft contribution id (not the contribution id)
     $p['contact_id'] = $this->_softIndividual2Id;
-    $this->_softcontribution2 =  $this->callAPISuccess('contribution_soft', 'create', $p);
+    $this->_softcontribution2 = $this->callAPISuccess('contribution_soft', 'create', $p);
 
     // now we have 2 - test getcount
-    $softcontribution =  $this->callAPISuccess('contribution_soft', 'getcount', array());
+    $softcontribution = $this->callAPISuccess('contribution_soft', 'getcount', array());
     $this->assertEquals(2, $softcontribution);
 
     //check first contribution
-    $result =  $this->callAPISuccess('contribution_soft', 'get', array(
+    $result = $this->callAPISuccess('contribution_soft', 'get', array(
       'id' => $this->_softcontribution['id'],
     ));
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertEquals($this->_softcontribution['id'], $result['id']);
-    $this->assertEquals($this->_softcontribution['id'], $result['id'], print_r($softcontribution,true));
+    $this->assertEquals($this->_softcontribution['id'], $result['id'], print_r($softcontribution, TRUE));
 
     //test id only format - second soft credit
-    $resultID2 =  $this->callAPISuccess('contribution_soft', 'get', array(
+    $resultID2 = $this->callAPISuccess('contribution_soft', 'get', array(
       'id' => $this->_softcontribution2['id'],
       'format.only_id' => 1,
     ));
     $this->assertEquals($this->_softcontribution2['id'], $resultID2);
 
     //test get by contact id works
-    $result =  $this->callAPISuccess('contribution_soft', 'get', array(
+    $result = $this->callAPISuccess('contribution_soft', 'get', array(
       'contact_id' => $this->_softIndividual2Id)
     );
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
@@ -248,7 +248,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $this->assertEquals($old_contact_id, $this->_softIndividual1Id, 'In line ' . __LINE__);
     $this->assertEquals($old_amount, 10.00, 'In line ' . __LINE__);
     $this->assertEquals($old_currency, 'USD', 'In line ' . __LINE__);
-    $this->assertEquals($old_soft_credit_type_id, 6 , 'In line ' . __LINE__);
+    $this->assertEquals($old_soft_credit_type_id, 6, 'In line ' . __LINE__);
     $params = array(
       'id' => $softcontributionID,
       'contribution_id' => $this->_contributionId,

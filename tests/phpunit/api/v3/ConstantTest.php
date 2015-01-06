@@ -4,13 +4,13 @@
  *
  *  (PHP 5)
  *
- *   @author Walt Haas <walt@dharmatech.org> (801) 534-1262
- *   @copyright Copyright CiviCRM LLC (C) 2009
- *   @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
+ * @author Walt Haas <walt@dharmatech.org> (801) 534-1262
+ * @copyright Copyright CiviCRM LLC (C) 2009
+ * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
  *              GNU Affero General Public License version 3
- *   @version   $Id: ConstantTest.php 31254 2010-12-15 10:09:29Z eileen $
- *   @package CiviCRM_APIv3
- *   @subpackage API_Constant
+ * @version   $Id: ConstantTest.php 31254 2010-12-15 10:09:29Z eileen $
+ * @package CiviCRM_APIv3
+ * @subpackage API_Constant
  *
  *   This file is part of CiviCRM
  *
@@ -37,8 +37,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_activity_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Constant
+ * @package CiviCRM_APIv3
+ * @subpackage API_Constant
  */
 class api_v3_ConstantTest extends CiviUnitTestCase {
   protected $_apiversion = 3;

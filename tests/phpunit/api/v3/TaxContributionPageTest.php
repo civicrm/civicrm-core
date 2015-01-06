@@ -67,7 +67,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'pay_later_text' => 'I will pay later',
       'pay_later_receipt' => "I will pay later",
       'is_monetary' => TRUE,
-      'is_billing_required' => True
+      'is_billing_required' => TRUE
     );
 
     $this->_priceSetParams = array(
@@ -81,7 +81,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'is_quick_config' => 0,
       'is_reserved' => 0
     );
-     // Financial Account with 20% tax rate
+    // Financial Account with 20% tax rate
     $financialAccountSetparams = array(
       #[domain_id] =>
       'name' => 'vat full taxrate account'.substr(sha1(rand()), 0, 7),
@@ -103,7 +103,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'is_reserved' => 0,
       'is_active' => 1,
     );
-    $priceField = $this->callAPISuccess('financial_type','create', $financialType);
+    $priceField = $this->callAPISuccess('financial_type', 'create', $financialType);
     $this->financialtypeID = $priceField['id'];
     $financialRelationParams = array(
       'entity_table' => 'civicrm_financial_type',
@@ -133,7 +133,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     );
 
     $halfFinancialType = CRM_Financial_BAO_FinancialType::add($halfFinancialtypeHalftax);
-    $this->halfFinancialTypeId = $halfFinancialType->id ;
+    $this->halfFinancialTypeId = $halfFinancialType->id;
     $financialRelationHalftax = array(
       'entity_table' => 'civicrm_financial_type',
       'entity_id' => $this->halfFinancialTypeId,
@@ -144,7 +144,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $halfFinancialRelation = CRM_Financial_BAO_FinancialTypeAccount::add($financialRelationHalftax);
 
     // Enable component contribute setting
-    $contributeSetting = array (
+    $contributeSetting = array(
       'invoicing' => 1,
       'invoice_prefix' => 'INV_',
       'credit_notes_prefix' => 'CN_',
@@ -259,7 +259,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->_ids['contributionId'] = $contribution['id'];
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],$this->financialtypeID, 'In line ' . __LINE__ );
+    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID, 'In line ' . __LINE__ );
     $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
@@ -300,9 +300,9 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
 
     $description = "Create Contribution with Nested Line Items";
     $subfile = "CreateWithNestedLineItems";
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__,__FILE__, $description, $subfile);
+    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
 
-    $lineItems = $this->callAPISuccess('line_item','get',array(
+    $lineItems = $this->callAPISuccess('line_item', 'get', array(
       'entity_id' => $contribution['id'],
       'contribution_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
@@ -328,7 +328,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],$this->financialtypeID, 'In line ' . __LINE__ );
+    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID, 'In line ' . __LINE__ );
     $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
@@ -353,7 +353,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],$this->financialtypeID, 'In line ' . __LINE__ );
+    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID, 'In line ' . __LINE__ );
     $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
@@ -377,7 +377,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
     );
     $contribution = $this->callAPISuccess('contribution', 'create', $this->contributionParams);
-    $lineItems = $this->callAPISuccess('line_item','getvalue', array(
+    $lineItems = $this->callAPISuccess('line_item', 'getvalue', array(
       'entity_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
       'sequential' => 1,
@@ -393,7 +393,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     );
     $contribution = $this->callAPISuccess('contribution', 'update', $newParams);
 
-    $lineItems = $this->callAPISuccess('line_item','getvalue',array(
+    $lineItems = $this->callAPISuccess('line_item', 'getvalue', array(
       'entity_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
       'sequential' => 1,

@@ -37,8 +37,8 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
 
   public function testAddEditCaseType() {
     $caseRoles = array(1 => 'Parent of', 2 => 'Spouse of', 3 => 'Partner of');
-    $activityTypes = array(1 => 'Meeting',2 => 'Contribution',3 => 'Event Registration');
-    $timelineActivityTypes = array(1 => 'Meeting',2 => 'Phone Call',3 => 'Email');
+    $activityTypes = array(1 => 'Meeting', 2 => 'Contribution', 3 => 'Event Registration');
+    $timelineActivityTypes = array(1 => 'Meeting', 2 => 'Phone Call', 3 => 'Email');
     // Log in as admin first to verify permissions for CiviCase
     $this->webtestLogin('admin');
 

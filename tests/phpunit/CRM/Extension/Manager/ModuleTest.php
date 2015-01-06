@@ -254,7 +254,7 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
   public function assertModuleActiveByKey($expectedIsActive, $key) {
     foreach (CRM_Core_Module::getAll() as $module) {
       if ($module->name == $key) {
-        $this->assertEquals((bool)$expectedIsActive, (bool)$module->is_active);
+        $this->assertEquals((bool) $expectedIsActive, (bool) $module->is_active);
         return;
       }
     }

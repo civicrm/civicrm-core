@@ -45,12 +45,12 @@ class CRM_Utils_NumberTest extends CiviUnitTestCase {
   public function truncDecimalCases() {
     $cases = array();
     // array($value, $precision, $expectedValue)
-    $cases[] = array(523, array(1,0), 5);
-    $cases[] = array(523, array(5,2), 523);
-    $cases[] = array(523, array(10,8), 52.3);
-    $cases[] = array(12345, array(3,3), 0.123);
-    $cases[] = array(0.12345, array(10,0), 12345);
-    $cases[] = array(-123.45, array(4,2), -12.34);
+    $cases[] = array(523, array(1, 0), 5);
+    $cases[] = array(523, array(5, 2), 523);
+    $cases[] = array(523, array(10, 8), 52.3);
+    $cases[] = array(12345, array(3, 3), 0.123);
+    $cases[] = array(0.12345, array(10, 0), 12345);
+    $cases[] = array(-123.45, array(4, 2), -12.34);
     return $cases;
   }
 

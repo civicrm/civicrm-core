@@ -63,7 +63,6 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $params['contact_id'] = $contactId;
 
-
     $fixAddress = TRUE;
 
     CRM_Core_BAO_Address::create($params, $fixAddress, $entity = NULL);
@@ -90,7 +89,6 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'is_billing' => '0',
     );
     $params['contact_id'] = $contactId;
-
 
     $block = CRM_Core_BAO_Address::create($params, $fixAddress, $entity = NULL);
 

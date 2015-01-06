@@ -70,7 +70,8 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     $this->_groupId2 = $this->groupCreate($group);
 
     $this->_group = array(
-      $this->_groupId1 => array('title' => 'New Test Group Created',
+      $this->_groupId1 => array(
+    'title' => 'New Test Group Created',
         'visibility' => 'Public Pages',
         'in_method' => 'API',
       ),
@@ -121,7 +122,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
 
   public function testCreateWithoutGroupIdParams() {
     $params = array(
-      'contact_id' => $this->_contactId,    );
+      'contact_id' => $this->_contactId, );
 
     $groups = $this->callAPIFailure('group_contact', 'create', $params);
     $this->assertEquals($groups['error_message'], 'Mandatory key(s) missing from params array: group_id');
@@ -129,7 +130,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
 
   public function testCreateWithoutContactIdParams() {
     $params = array(
-      'group_id' => $this->_groupId1,    );
+      'group_id' => $this->_groupId1, );
     $groups = $this->callAPIFailure('group_contact', 'create', $params);
     $this->assertEquals($groups['error_message'], 'Mandatory key(s) missing from params array: contact_id');
   }
@@ -142,7 +143,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
       'prefix_id' => 3,
       'suffix_id' => 3,
       'email' => 'amiteshwar.prasad@civicrm.org',
-      'contact_type' => 'Individual',    );
+      'contact_type' => 'Individual', );
 
     $this->_contactId1 = $this->individualCreate($cont);
     $params = array(

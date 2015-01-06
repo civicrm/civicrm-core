@@ -232,7 +232,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->clickAt("xpath=//div[@class='select2-result-label']");
 
     // ...again, waiting for the box with contact name to show up...
-    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']","$firstName1");
+    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']", "$firstName1");
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertElementContainsText("xpath=//div[@id='s2id_assignee_contact_id']", "Summerson, $firstName1", 'Contact not found in line ' . __LINE__);

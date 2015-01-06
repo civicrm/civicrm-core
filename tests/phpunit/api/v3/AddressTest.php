@@ -28,8 +28,8 @@
 /**
  *  Test APIv3 civicrm_activity_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Contact
+ * @package CiviCRM_APIv3
+ * @subpackage API_Contact
  */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -38,7 +38,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class api_v3_AddressTest
  */
 class api_v3_AddressTest extends CiviUnitTestCase {
-  protected $_apiversion =3;
+  protected $_apiversion = 3;
   protected $_contactID;
   protected $_locationType;
   protected $_params;
@@ -131,8 +131,8 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   }
 
   /**
- * Create an address with a master ID and ensure that a relationship is created
- */
+   * Create an address with a master ID and ensure that a relationship is created
+   */
   public function testCreateAddressWithMasterRelationshipOrganization() {
     $address = $this->callAPISuccess('address', 'create', $this->_params);
     $individualID = $this->individualCreate();
@@ -160,7 +160,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $individualParams['master_id'] = $address2['id'];
     $individualParams['id'] = $individualAddress['id'];
     $this->callAPISuccess('address', 'create', $individualParams);
-    $this->callAPISuccessGetCount('relationship', array('contact_id_a' => $individualID,), 2);
+    $this->callAPISuccessGetCount('relationship', array('contact_id_a' => $individualID), 2);
     $this->markTestIncomplete('Remainder of test checks that employer relationship is disabled when new one is created but turns out to be not happening - by design?');
     $this->callAPISuccessGetCount('relationship', array('contact_id_a' => $individualID, 'is_active' => FALSE), 1);
     $this->callAPISuccessGetCount('relationship', array('contact_id_a' => $individualID, 'is_active' => TRUE, 'contact_id_b' => $organisation2ID), 1);
@@ -198,7 +198,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     //create one
     $create = $this->callAPISuccess('address', 'create', $this->_params);
 
-    $result = $this->callAPIAndDocument('address', 'delete', array('id' => $create['id'],), __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('address', 'delete', array('id' => $create['id']), __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $get = $this->callAPISuccess('address', 'get', array(
      'location_type_id' => $this->_locationType->id,
@@ -264,7 +264,8 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'create', $this->_params);
     $subfile     = "AddressLike";
     $description = "Demonstrates Use of Like";
-    $params      = array('street_address' => array('LIKE' => '%mb%'),
+    $params      = array(
+    'street_address' => array('LIKE' => '%mb%'),
       'sequential' => 1,
     );
     $result = $this->callAPIAndDocument('Address', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);

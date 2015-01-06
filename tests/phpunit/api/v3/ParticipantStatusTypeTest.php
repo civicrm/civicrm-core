@@ -76,8 +76,7 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
     $entity = $this->callAPISuccess('participant_status_type', 'get', array());
     $result = $this->callAPIAndDocument('participant_status_type', 'delete', array('id' => $ParticipantStatusType['id']), __FUNCTION__, __FILE__);
     $getCheck = $this->callAPISuccess('ParticipantStatusType', 'GET', array('id' => $ParticipantStatusType['id']));
-    $checkDeleted = $this->callAPISuccess('ParticipantStatusType', 'Get', array(
-           ));
+    $checkDeleted = $this->callAPISuccess('ParticipantStatusType', 'Get', array());
     $this->assertEquals($entity['count'] - 1, $checkDeleted['count'], 'In line ' . __LINE__);
   }
 }

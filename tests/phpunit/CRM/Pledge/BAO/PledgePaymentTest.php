@@ -31,7 +31,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  * Test class for CRM_Pledge_BAO_PledgePayment BAO
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
 
@@ -49,7 +49,8 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    *
    */
-  protected function tearDown() {}
+  protected function tearDown() {
+  }
 
   /**
    *  Test for Add/Update Pledge Payment.
@@ -146,7 +147,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    */
   public function testDeletePledgePaymentsNullId() {
     $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
-    $paymentid = CRM_Pledge_BAO_PledgePayment::deletePayments(Null);
+    $paymentid = CRM_Pledge_BAO_PledgePayment::deletePayments(NULL);
     $this->assertEquals(count($paymentid), 1, "No payments deleted");
     $result = CRM_Pledge_BAO_Pledge::deletePledge($payment->pledge_id);
   }

@@ -30,7 +30,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  * Test class for Batch API - civicrm_batch_*
  *
- *  @package CiviCRM_APIv3
+ * @package CiviCRM_APIv3
  */
 class api_v3_BatchTest extends CiviUnitTestCase {
 

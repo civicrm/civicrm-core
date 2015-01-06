@@ -181,6 +181,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       case 'raw':
         // nothing to do
         break;
+
       case 'ezc':
         $msg = $this->convertToEzc($msg);
         break;
@@ -213,6 +214,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       case 'raw':
         // nothing to do
         break;
+
       case 'ezc':
         foreach ($msgs as $i => $msg) {
           $msgs[$i] = $this->convertToEzc($msg);

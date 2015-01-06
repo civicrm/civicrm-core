@@ -90,8 +90,8 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
 
     //Check whether the next two payments are done or not
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='View Payment']");
-    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]","Completed");
-    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[4]/td[7]","Completed");
+    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]", "Completed");
+    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[4]/td[7]", "Completed");
 
     //Cancel the contribution made for amount of 300.00
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='View Payment']");
@@ -110,15 +110,15 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]");
 
     // verify that first paayment is cancelled and the rest two payments are revert back to the pending status
-    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[7]","Cancelled");
-    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]","Pending");
-    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[4]/td[7]","Pending");
+    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[7]", "Cancelled");
+    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]", "Pending");
+    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[4]/td[7]", "Pending");
 
     // Check whether a new payment with pending status is added at the last or not
-    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[14]/td[7]","Pending");
+    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[14]/td[7]", "Pending");
 
     // verify that Balance sum is correct
-    $this->verifyText("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[4]","1,200.00");
+    $this->verifyText("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[4]", "1,200.00");
 
   }
 }

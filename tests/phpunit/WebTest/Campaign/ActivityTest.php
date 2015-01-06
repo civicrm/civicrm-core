@@ -190,7 +190,7 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $this->type("followup_activity_subject", "This is subject of schedule follow-up activity");
 
     // Clicking save.
-    $this->clickLink("_qf_Activity_upload",'link=View',FALSE);
+    $this->clickLink("_qf_Activity_upload", 'link=View', FALSE);
 
     // Is status message correct?
     $this->waitForText('crm-notification-container', $subject);

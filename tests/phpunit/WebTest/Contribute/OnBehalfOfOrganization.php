@@ -537,7 +537,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $pageId = $this->webtestAddContributionPage($hash,
       $rand,
       $pageTitle,
-      null,
+      NULL,
       $amountSection,
       $payLater,
       $onBehalf,
@@ -557,7 +557,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
       $honoreeSection
     );
 
-     $this->_testOrganization($pageId, $cid, $pageTitle);
+    $this->_testOrganization($pageId, $cid, $pageTitle);
   }
 
   public function testWithContactSubtypeDupe() {
@@ -598,7 +598,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $pageId = $this->webtestAddContributionPage($hash,
       $rand,
       $pageTitle,
-      null,
+      NULL,
       $amountSection,
       $payLater,
       $onBehalf,
@@ -618,7 +618,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
       $honoreeSection
     );
 
-     //Open Live Contribution Page
+    //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
     $this->waitForElementPresent("onbehalf_state_province-3");
 
@@ -1368,7 +1368,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@id='current-relationships']/div/table/tbody//tr/td[2]/a[text()='{$orgName1}']/../../td[9]/span[2][text()='more ']/ul/li[2]/a[text()='Delete']");
 
     // Check confirmation alert.
-    $this->assertTrue((bool)preg_match("/^Are you sure you want to delete this relationship?/",
+    $this->assertTrue((bool) preg_match("/^Are you sure you want to delete this relationship?/",
         $this->getConfirmation()
       ));
     $this->chooseOkOnNextConfirmation();
@@ -1508,8 +1508,8 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
       or die("Cannot Initialize new GD image stream");
     $background_color = imagecolorallocate($im, 0, 0, 0);
     $text_color = imagecolorallocate($im, 233, 14, 91);
-    imagestring($im, 1, 5, 5,  "On Behalf-Org Logo", $text_color);
-    imagepng($im,"/tmp/file.png");
+    imagestring($im, 1, 5, 5, "On Behalf-Org Logo", $text_color);
+    imagepng($im, "/tmp/file.png");
 
     $imagePath = "/tmp/file.png";
     $this->webtestAttachFile('onbehalf_image_URL', $imagePath);

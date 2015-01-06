@@ -177,7 +177,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
    *
    * @return array
    */
-  public function _testGetCustomFieldId($customGrpId1, $noteRichEditor=FALSE) {
+  public function _testGetCustomFieldId($customGrpId1, $noteRichEditor = FALSE) {
     $customId = array();
     $this->openCiviPage('admin/custom/group/field/add', array('reset' => 1, 'action' => 'add', 'gid' => $customGrpId1));
 

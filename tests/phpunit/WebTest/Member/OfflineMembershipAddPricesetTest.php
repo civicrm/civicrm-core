@@ -80,7 +80,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->_testSignUpOrRenewMembership($sid, $contactParams, $memTypeTitle1, $memTypeTitle2, $renew = TRUE);
   }
 
-   public function testAddPriceSetWithMultipleTerms() {
+  public function testAddPriceSetWithMultipleTerms() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -107,7 +107,8 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->type('label', $fields[0]);
     $this->select('html_type', "value={$fields[1]}");
     $options = array(
-      1 => array('label' => $memTypeTitle1."_1",
+      1 => array(
+    'label' => $memTypeTitle1."_1",
          'membership_type_id' => $memTypeId1,
          'amount' => 50.00,
          'membership_num_terms' => 1,
@@ -132,9 +133,9 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
       // Sleep should never be used for wait for anything to load from the server
       // Justification for this instance: FIXME
       sleep(1);
-      $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[4]/input",$values['membership_num_terms']);
-      $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[5]/input",$values['label']);
-      $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[6]/input",$values['amount']);
+      $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[4]/input", $values['membership_num_terms']);
+      $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[5]/input", $values['label']);
+      $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[6]/input", $values['amount']);
       if($i > 3){
         $this->click('link=another choice');
       }
@@ -229,7 +230,8 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
       switch ($type) {
         case 'Radio':
           $options = array(
-            1 => array('label' => "$memTypeTitle1",
+            1 => array(
+          'label' => "$memTypeTitle1",
                'membership_type_id' => $memTypeId1,
                'amount' => 100.00,
             ),
@@ -244,7 +246,8 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
 
         case 'CheckBox':
           $options = array(
-            1 => array('label' => "$memTypeTitle1",
+            1 => array(
+          'label' => "$memTypeTitle1",
                'membership_type_id' => $memTypeId1,
                'amount' => 100.00,
             ),

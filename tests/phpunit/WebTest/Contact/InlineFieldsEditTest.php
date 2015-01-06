@@ -261,6 +261,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
         case 'boolean':
           $this->click($item);
           break;
+
         case 'string':
           if (substr($val, 0, 5) == 'date:') {
             $this->webtestFillDate($item, trim(substr($val, 5)));
@@ -269,10 +270,12 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
             $this->type($item, $val);
           }
           break;
+
         case 'integer':
           $method = $val ? 'check' : 'uncheck';
           $this->$method($item);
           break;
+
         case 'array':
           foreach ($val as $option) {
             $selector = is_int($option) ? 'value' : 'label';
@@ -282,7 +285,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
       }
     }
     $this->click("css=#$block input.crm-form-submit");
-    if ($valid !== 'error' && $valid !='errorJs') {
+    if ($valid !== 'error' && $valid != 'errorJs') {
       // Verify the form saved
       $this->waitForElementPresent("css=#$block > .crm-inline-block-content");
       $validate = FALSE;
@@ -316,10 +319,12 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
                 $this->assertElementValueEquals($item, $val);
               }
               break;
+
             case 'integer':
               $method = $val ? 'assertChecked' : 'assertNotChecked';
               $this->$method($item);
               break;
+
             case 'array':
               foreach ($val as $option) {
                 $method = is_int($option) ? 'assertIsSelected' : 'assertSelected';
@@ -339,6 +344,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
         case 'errorJs':
           $this->waitForElementPresent('css=label.error');
           break;
+
         default:
           $this->waitForElementPresent('css=#crm-notification-container .error.ui-notify-message');
           $this->click('css=#crm-notification-container .error .ui-notify-cross');

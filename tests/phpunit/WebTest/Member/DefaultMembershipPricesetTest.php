@@ -245,7 +245,8 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
       switch ($type) {
         case 'Radio':
           $options = array(
-            1 => array('label' => "$memTypeTitle1",
+            1 => array(
+          'label' => "$memTypeTitle1",
               'membership_type_id' => $memTypeId1,
               'amount' => '100.00',
             ),
@@ -265,7 +266,8 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
 
         case 'CheckBox':
           $options = array(
-            1 => array('label' => "$memTypeTitle1",
+            1 => array(
+          'label' => "$memTypeTitle1",
               'membership_type_id' => $memTypeId1,
               'amount' => '100.00',
             ),

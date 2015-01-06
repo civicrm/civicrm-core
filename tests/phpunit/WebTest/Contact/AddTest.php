@@ -409,7 +409,6 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     //create new current employer
     $currentEmployer = substr(sha1(rand()), 0, 7) . "Web Access";
 
-
     //fill in email
     $this->type("email_1_email", substr(sha1(rand()), 0, 7) . "john@gmail.com");
 

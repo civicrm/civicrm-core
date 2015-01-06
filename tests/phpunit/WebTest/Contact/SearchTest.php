@@ -117,7 +117,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForText("crm-notification-container","Contact has been added to '$groupName'.");
+    $this->waitForText("crm-notification-container", "Contact has been added to '$groupName'.");
 
     // tag a contact
     // visit tag tab
@@ -206,7 +206,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$parentGroupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForText("crm-notification-container","Contact has been added to '$parentGroupName'.");
+    $this->waitForText("crm-notification-container", "Contact has been added to '$parentGroupName'.");
 
     // Adding child group contact
     // We're using Quick Add block on the main page for this.
@@ -224,7 +224,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     // add to child group
     $this->select("group_id", "*$childGroupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForText("crm-notification-container","Contact has been added to '$childGroupName'.");
+    $this->waitForText("crm-notification-container", "Contact has been added to '$childGroupName'.");
 
     // visit contact search page
     $this->openCiviPage("contact/search", "reset=1");

@@ -31,7 +31,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  * Test class for CRM_Activity_BAO_ActivityTarget BAO
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Activity_BAO_ActivityTargetTest extends CiviUnitTestCase {
 
@@ -49,7 +49,8 @@ class CRM_Activity_BAO_ActivityTargetTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    *
    */
-  protected function tearDown() {}
+  protected function tearDown() {
+  }
 
   public function testRetrieveTargetIdsByActivityIdZeroID() {
     $activity = $this->activityCreate();

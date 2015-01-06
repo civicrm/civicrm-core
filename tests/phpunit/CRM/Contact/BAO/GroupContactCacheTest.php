@@ -32,7 +32,7 @@ require_once 'CiviTest/Contact.php';
 /**
  * Test class for CRM_Contact_BAO_GroupContact BAO
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
 
@@ -216,8 +216,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    *
    * @see CRM_Core_DAO::createTestObject
    */
-  function createTestObject($daoName, $params = array(
-    ), $numObjects = 1, $createOnly = FALSE) {
+  function createTestObject($daoName, $params = array(), $numObjects = 1, $createOnly = FALSE) {
     $objects = CRM_Core_DAO::createTestObject($daoName, $params, $numObjects, $createOnly);
     if (is_array($objects)) {
       $this->registerTestObjects($objects);

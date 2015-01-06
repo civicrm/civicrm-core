@@ -14,10 +14,10 @@ ini_set('include_path',
 #  Relying on system timezone setting produces a warning,
 #  doing the following prevents the warning message
 if ( file_exists( '/etc/timezone' ) ) {
-    $timezone = trim( file_get_contents( '/etc/timezone' ) );
-    if ( ini_set('date.timezone', $timezone ) === false ) {
-        echo "ini_set( 'date.timezone', '$timezone' ) failed\n";
-    }
+  $timezone = trim( file_get_contents( '/etc/timezone' ) );
+  if ( ini_set('date.timezone', $timezone ) === FALSE ) {
+    echo "ini_set( 'date.timezone', '$timezone' ) failed\n";
+  }
 }
 
 # Crank up the memory

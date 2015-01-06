@@ -5,7 +5,7 @@
  *
  *  (PHP 5)
  *
- *   @package   CiviCRM
+ * @package   CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -29,8 +29,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_activity_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Activity
+ * @package CiviCRM_APIv3
+ * @subpackage API_Activity
  */
 
 class api_v3_ActivityTypeTest extends CiviUnitTestCase {

@@ -33,7 +33,7 @@ require_once 'CiviTest/CiviTestSuite.php';
 /**
  *  Class containing all CRM test suites
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class WebTest_AllTests extends CiviTestSuite {
   private static $instance = NULL;

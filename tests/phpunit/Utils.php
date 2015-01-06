@@ -6,12 +6,12 @@
  *
  *  (PHP 5)
  *
- *   @author Walt Haas <walt@dharmatech.org> (801) 534-1262
- *   @copyright Copyright CiviCRM LLC (C) 2009
- *   @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
+ * @author Walt Haas <walt@dharmatech.org> (801) 534-1262
+ * @copyright Copyright CiviCRM LLC (C) 2009
+ * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
  *              GNU Affero General Public License version 3
- *   @version   $Id: Utils.php 40328 2012-05-11 23:06:13Z allen $
- *   @package   CiviCRM
+ * @version   $Id: Utils.php 40328 2012-05-11 23:06:13Z allen $
+ * @package   CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -32,13 +32,13 @@
 
 /**
  *  Utility functions
- *   @package   CiviCRM
+ * @package   CiviCRM
  */
 class Utils {
 
   /**
    *  PDO for the database
-   *  @var PDO
+   * @var PDO
    */
   public $pdo;
 
@@ -62,8 +62,8 @@ class Utils {
    *  Prepare and execute a query
    *
    *  If the query fails, output a diagnostic message
-   *  @param  string  Query to run
-   *  @return mixed   PDOStatement => Results of the query
+   * @param  string  Query to run
+   * @return mixed   PDOStatement => Results of the query
    *                  false        => Query failed
    */
   public function do_query($query) {

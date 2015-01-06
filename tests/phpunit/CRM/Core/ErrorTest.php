@@ -41,7 +41,7 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
 
   public function tearDown() {
     $config = CRM_Core_Config::singleton();
-    $config->configAndLogDir= $this->oldConfigAndLogDir;
+    $config->configAndLogDir = $this->oldConfigAndLogDir;
     parent::tearDown();
   }
 
@@ -80,7 +80,7 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
     $logger2->info('obj-3');
     CRM_Core_Error::debug_log_message("static-5");
     $this->assertLogRegexp('/static-1.*static-2.*obj-1.*static-3.*obj-2.*static-4.*obj-3.*static-5/s');
-}
+  }
 
   /**
    * @param $pattern

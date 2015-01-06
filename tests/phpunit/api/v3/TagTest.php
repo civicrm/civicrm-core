@@ -31,12 +31,12 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_tag_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Core
+ * @package CiviCRM_APIv3
+ * @subpackage API_Core
  */
 
 class api_v3_TagTest extends CiviUnitTestCase {
-  protected $_apiversion =3;
+  protected $_apiversion = 3;
   /**
    * @ids array of values to be cleaned up in the tear down
    */
@@ -102,7 +102,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
    * Test civicrm_tag_create with empty params.
    */
   public function testCreateEmptyParams() {
-    $result = $this->callAPIFailure('tag', 'create', array(),'Mandatory key(s) missing from params array: name');
+    $result = $this->callAPIFailure('tag', 'create', array(), 'Mandatory key(s) missing from params array: name');
   }
 
   /**
