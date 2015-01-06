@@ -151,9 +151,12 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
   /**
    * Global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $self    this object.
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param array $self
+   *   This object.
    *
    * @return true if no errors, else an array of errors
    * @static
