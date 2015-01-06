@@ -278,7 +278,7 @@
 
     $scope.save = function() {
       var result = crmApi('CaseType', 'create', $scope.caseType, true);
-      result.success(function(data) {
+      result.then(function(data) {
         if (data.is_error === 0 || data.is_error == '0') {
           $scope.caseType.id = data.id;
           window.location.href = '#/caseType';
