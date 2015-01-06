@@ -104,7 +104,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
 
     $individualFormat = FALSE;
     if ($mergeSameAddress) {
-      CRM_Contact_Form_Task_Label::mergeSameAddress($rows);
+      CRM_Core_BAO_Address::mergeSameAddress($rows);
       $individualFormat = TRUE;
     }
     if ($mergeSameHousehold) {
