@@ -456,8 +456,10 @@ WHERE  inst.report_id = %1";
    * stipulated in $_GET or in a report Preview, but which haven't yet been
    * saved in the report instance.
    *
-   * @param array $defaults The report criteria that aren't coming in as submitted form values, as in CRM_Report_Form::_defaults
-   * @param array $params All effective report criteria, as in CRM_Report_Form::_params
+   * @param array $defaults
+   *   The report criteria that aren't coming in as submitted form values, as in CRM_Report_Form::_defaults.
+   * @param array $params
+   *   All effective report criteria, as in CRM_Report_Form::_params.
    *
    * @return string URL query string
    */
