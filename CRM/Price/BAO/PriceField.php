@@ -241,7 +241,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @internal param bool $search true if used for search else false
    * @static
    */
-  public static function addQuickFormElement(&$qf,
+  public static function addQuickFormElement(
+    &$qf,
     $elementName,
     $fieldId,
     $inactiveNeeded,
