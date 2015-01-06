@@ -1626,8 +1626,8 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @todo - could not find any instances where this is called
    *
    * @param unknown_type $relative
-   * @param String $from
-   * @param String_type $to
+   * @param string $from
+   * @param string_type $to
    *
    * @return string|NULL
    */
@@ -3533,7 +3533,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   /**
    * Does table name have columns in SELECT clause?
    *
-   * @param string $tableName Name of table (index of $this->_columns array)
+   * @param string $tableName
+   *   Name of table (index of $this->_columns array).
    *
    * @return bool
    */
@@ -3601,8 +3602,10 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *
    * adding address fields to construct function in reports
    *
-   * @param bool $groupBy Add GroupBy? Not appropriate for detail report
-   * @param bool $orderBy Add GroupBy? Not appropriate for detail report
+   * @param bool $groupBy
+   *   Add GroupBy? Not appropriate for detail report.
+   * @param bool $orderBy
+   *   Add GroupBy? Not appropriate for detail report.
    * @param bool $filters
    * @param array $defaults
    *
