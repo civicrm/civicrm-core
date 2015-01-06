@@ -131,7 +131,7 @@ AND li.entity_id = {$entityId}
    * @return array
    */
   public static function getLineItemsByContributionID($contributionID) {
-     return self::getLineItems($contributionID,'contribution', NULL, TRUE, TRUE, " WHERE contribution_id = " . (int) $contributionID);
+    return self::getLineItems($contributionID, 'contribution', NULL, TRUE, TRUE, " WHERE contribution_id = " . (int) $contributionID);
   }
 
   /**
@@ -154,7 +154,7 @@ AND li.entity_id = {$entityId}
    *
    * @return array of line items
    */
-  public static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL , $isQtyZero = TRUE, $relatedEntity = FALSE, $overrideWhereClause = '') {
+  public static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL, $isQtyZero = TRUE, $relatedEntity = FALSE, $overrideWhereClause = '') {
     $whereClause = $fromClause = NULL;
     $selectClause = "
       SELECT    li.id,
@@ -212,7 +212,7 @@ AND li.entity_id = {$entityId}
     );
 
     $getTaxDetails = FALSE;
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     if ($overrideWhereClause) {
       $whereClause = $overrideWhereClause;
@@ -272,7 +272,7 @@ AND li.entity_id = {$entityId}
    *                          to the price set used for particular event
    * @param array $values
    *   Reference to the values array(.
-     this is
+  this is
    *                          lineItem array)
    *
    * @return void
@@ -420,8 +420,9 @@ AND li.entity_id = {$entityId}
    * @param array $otherParams
    */
   public static function syncLineItems($entityId, $entityTable = 'civicrm_contribution', $amount, $otherParams = NULL) {
-    if (!$entityId || CRM_Utils_System::isNull($amount))
+    if (!$entityId || CRM_Utils_System::isNull($amount)) {
       return;
+    }
 
     $from = " civicrm_line_item li
       LEFT JOIN   civicrm_price_field pf ON pf.id = li.price_field_id
@@ -451,7 +452,7 @@ AND li.entity_id = {$entityId}
       $set .= " ,li.label = %4,
         li.price_field_value_id = cpfv.id ";
       $where .= " AND cpse.entity_table = 'civicrm_event' AND cpse.entity_id = %5 ";
-      $amount = empty($amount) ? 0: $amount;
+      $amount = empty($amount) ? 0 : $amount;
       $params += array(
         4 => array($otherParams['fee_label'], 'String'),
         5 => array($otherParams['event_id'], 'String'),
@@ -467,7 +468,7 @@ AND li.entity_id = {$entityId}
     CRM_Core_DAO::executeQuery($query, $params);
   }
 
-   /**
+  /**
    * Build line items array.
    * @param array $params
    *   Form values.
@@ -546,10 +547,10 @@ AND li.entity_id = {$entityId}
       return;
     }
     if ($lineItemId['html_type'] == 'Text') {
-      $tax = $lineItemId['tax_amount']/($lineItemId['unit_price'] * $lineItemId['qty'])*100;
+      $tax = $lineItemId['tax_amount'] / ($lineItemId['unit_price'] * $lineItemId['qty']) * 100;
     }
     else {
-      $tax = ($lineItemId['tax_amount']/$lineItemId['unit_price']) * 100;
+      $tax = ($lineItemId['tax_amount'] / $lineItemId['unit_price']) * 100;
     }
     return $tax;
   }

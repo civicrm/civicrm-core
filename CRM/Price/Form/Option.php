@@ -158,7 +158,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       ) {
         $this->_sid = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $this->_fid, 'price_set_id', 'id');
       }
-      $this->isEvent = False;
+      $this->isEvent = FALSE;
       $extendComponentId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'extends', 'id');
       $this->assign('showMember', FALSE);
       if ($memberComponentId == $extendComponentId) {
@@ -195,7 +195,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
         'financial_type_id',
         ts('Financial Type'),
         array('' => ts('- select -')) + $financialType,
-        true
+        TRUE
       );
 
       //CRM_Core_DAO::getFieldValue( 'CRM_Price_DAO_PriceField', $this->_fid, 'weight', 'id' );
@@ -206,7 +206,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
                             'optionExists',
                             array( 'CRM_Core_DAO_OptionValue', $this->_oid, $this->_ogId, 'label' ) );
             */
-
 
       // value
       $this->add('text', 'amount', ts('Option Amount'), NULL, TRUE);
