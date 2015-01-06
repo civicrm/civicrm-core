@@ -106,7 +106,8 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @param $values
    * @param int $mappingTypeId
