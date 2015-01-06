@@ -756,7 +756,8 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *
    * @static
    */
-  static function buildMembershipBlock(&$form,
+  static function buildMembershipBlock(
+    &$form,
                                        $pageID,
                                        $cid,
                                        $formItems = FALSE,
@@ -1318,7 +1319,8 @@ AND civicrm_membership.is_test = %2";
    *
    * @return void
    */
-  public static function postProcessMembership($membershipParams, $contactID, &$form, $premiumParams,
+  public static function postProcessMembership(
+    $membershipParams, $contactID, &$form, $premiumParams,
                                                $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeIDs, $isPaidMembership, $membershipID,
                                                $isProcessSeparateMembershipTransaction, $defaultContributionTypeID, $membershipLineItems, $isPayLater) {
     $result = $membershipContribution = NULL;
@@ -1481,7 +1483,8 @@ AND civicrm_membership.is_test = %2";
    * @return void
    * @static
    */
-  static public function updateRecurMembership(CRM_Member_DAO_Membership $membership,
+  static public function updateRecurMembership(
+    CRM_Member_DAO_Membership $membership,
                                                CRM_Contribute_BAO_Contribution $contribution) {
 
     if (empty($contribution->contribution_recur_id)) {

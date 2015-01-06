@@ -76,7 +76,8 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
    * @return mixed
    * @throws Exception
    */
-  function run($fileName,
+  function run(
+    $fileName,
     $seperator = ',',
     &$mapper,
     $skipColumnHeader = FALSE,
