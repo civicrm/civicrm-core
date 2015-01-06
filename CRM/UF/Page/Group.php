@@ -268,8 +268,10 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   /**
    * Edit uf group
    *
-   * @param int $id uf group id
-   * @param string $action the action to be invoked
+   * @param int $id
+   *   Uf group id.
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
    */
@@ -380,7 +382,8 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   /**
    * This function is for preview mode for ufoup
    *
-   * @param int $id uf group id
+   * @param int $id
+   *   Uf group id.
    *
    * @param $action
    *
