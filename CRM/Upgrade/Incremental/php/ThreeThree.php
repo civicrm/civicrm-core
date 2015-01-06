@@ -266,7 +266,8 @@ WHERE id = %2
     $mainLineItem->find(TRUE);
     while ($mainLineItem->fetch()) {
       $dupeLineItem = new CRM_Price_BAO_LineItem();
-      foreach ($fields as $fld) { $dupeLineItem->$fld = $mainLineItem->$fld;
+      foreach ($fields as $fld) {
+        $dupeLineItem->$fld = $mainLineItem->$fld;
       }
       $dupeLineItem->find(TRUE);
       $dupeLineItem->addWhere("id != $mainLineItem->id");

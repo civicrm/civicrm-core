@@ -99,7 +99,8 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    * @param string $method
    * @param null|string $name
    */
-  function __construct($state = NULL,
+  function __construct(
+    $state = NULL,
     $action = CRM_Core_Action::NONE,
     $method = 'post',
     $name = NULL

@@ -143,7 +143,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
           if ($opId = CRM_Utils_Array::value($index, $opIds)) {
             $optionsIds['id'] = $opId;
           }
-          else { $optionsIds['id'] = NULL;
+          else {
+            $optionsIds['id'] = NULL;
           }
         }
         CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue::create($options, $optionsIds);
@@ -219,7 +220,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * @return null
    * @static
    */
-  public static function addQuickFormElement(&$qf,
+  public static function addQuickFormElement(
+    &$qf,
     $elementName,
     $fieldId,
     $inactiveNeeded,
