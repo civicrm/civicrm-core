@@ -183,7 +183,8 @@ WHERE  id = %1";
    *
    * @param int $contributionPageID
    * @param string $widgetID
-   * @param string $format - either myspace or normal
+   * @param string $format
+   *   Either myspace or normal.
    *
    * @return string
    */
