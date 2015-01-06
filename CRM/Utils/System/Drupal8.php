@@ -563,8 +563,10 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    */
   public function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     static $run_once = FALSE;
-    if ($run_once) { return TRUE;
-    } else { $run_once = TRUE;
+    if ($run_once) {
+      return TRUE;
+    } else {
+      $run_once = TRUE;
     }
 
     if (!($root = $this->cmsRootPath())) {

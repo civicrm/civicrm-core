@@ -185,11 +185,12 @@ WHERE      g.name IN ( $nameString )
    * @param $whereField
    * @param null $additionalWhereCond
    */
-  function table(&$ids,
-                 $tableName,
-                 &$fields,
-                 $whereField,
-                 $additionalWhereCond = NULL
+  function table(
+    &$ids,
+    $tableName,
+    &$fields,
+    $whereField,
+    $additionalWhereCond = NULL
   ) {
     if (empty($ids)) {
       return;
@@ -589,9 +590,10 @@ WHERE ac.contact_id IN ( $ids )
    * @param null $lastExportTime
    * @param bool $discoverContacts
    */
-  function run($fileName,
-               $lastExportTime = NULL,
-               $discoverContacts = FALSE
+  function run(
+    $fileName,
+    $lastExportTime = NULL,
+    $discoverContacts = FALSE
   ) {
     $this->_discoverContacts = $discoverContacts;
 
@@ -615,7 +617,7 @@ WHERE  date >= $lastExportTime
 ";
     }
 
-    $dao = & CRM_Core_DAO::executeQuery($sql);
+    $dao = &CRM_Core_DAO::executeQuery($sql);
 
     $contactIDs = array();
     while ($dao->fetch()) {

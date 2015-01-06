@@ -928,7 +928,8 @@ class CRM_Utils_Token {
    * @return string               The processed string
    * @static
    */
-  public static function &replaceResubscribeTokens($str, &$domain, &$groups, $html,
+  public static function &replaceResubscribeTokens(
+    $str, &$domain, &$groups, $html,
     $contact_id, $hash
   ) {
     if (self::token_match('resubscribe', 'group', $str)) {
@@ -1162,7 +1163,8 @@ class CRM_Utils_Token {
    * @return array
    * @static
    */
-  static function getTokenDetails($contactIDs,
+  static function getTokenDetails(
+    $contactIDs,
     $returnProperties = NULL,
     $skipOnHold = TRUE,
     $skipDeceased = TRUE,
@@ -1289,7 +1291,8 @@ class CRM_Utils_Token {
    * @param string $jobID
    * @return array contactDetails with hooks swapped out
    */
-  public function getAnonymousTokenDetails($contactIDs = array(0),
+  public function getAnonymousTokenDetails($contactIDs = array(
+    0),
     $returnProperties = NULL,
     $skipOnHold = TRUE,
     $skipDeceased = TRUE,
@@ -1324,7 +1327,8 @@ class CRM_Utils_Token {
    * @return array
    * @static
    */
-  static function getContributionTokenDetails($contributionIDs,
+  static function getContributionTokenDetails(
+    $contributionIDs,
     $returnProperties = NULL,
     $extraParams = NULL,
     $tokens = array(),

@@ -576,7 +576,8 @@ class CRM_Utils_String {
    * @return string the sanitized string
    * @static
    */
-  static function stripPathChars($string,
+  static function stripPathChars(
+    $string,
     $search = NULL,
     $replace = NULL
   ) {

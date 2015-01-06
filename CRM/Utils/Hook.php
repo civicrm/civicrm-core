@@ -111,7 +111,8 @@ abstract class CRM_Utils_Hook {
    *
    * @return mixed
    */
-  abstract function invoke($numParams,
+  abstract function invoke(
+    $numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix
   );
@@ -129,7 +130,8 @@ abstract class CRM_Utils_Hook {
    *
    * @return array|bool
    */
-  function commonInvoke($numParams,
+  function commonInvoke(
+    $numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix, $fnPrefix
   ) {
@@ -179,7 +181,8 @@ abstract class CRM_Utils_Hook {
    *
    * @return array|bool
    */
-  function runHooks($civiModules, $fnSuffix, $numParams,
+  function runHooks(
+    $civiModules, $fnSuffix, $numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6
   ) {
     // $civiModules is *not* passed by reference because runHooks
@@ -654,7 +657,8 @@ abstract class CRM_Utils_Hook {
    *
    * @return null
    */
-  static function tokenValues(&$details,
+  static function tokenValues(
+    &$details,
     $contactIDs,
     $jobID = NULL,
     $tokens = array(),
@@ -893,7 +897,8 @@ abstract class CRM_Utils_Hook {
    *
    * @return mixed
    */
-  static function alterPaymentProcessorParams($paymentObj,
+  static function alterPaymentProcessorParams(
+    $paymentObj,
     &$rawParams,
     &$cookedParams
   ) {

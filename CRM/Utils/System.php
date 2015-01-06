@@ -262,7 +262,8 @@ class CRM_Utils_System {
    *
    * @return string
    */
-  static function href($text, $path = NULL, $query = NULL, $absolute = TRUE,
+  static function href(
+    $text, $path = NULL, $query = NULL, $absolute = TRUE,
     $fragment = NULL, $htmlize = TRUE, $frontend = FALSE, $forceBackend = FALSE
   ) {
     $url = self::url($path, $query, $absolute, $fragment, $htmlize, $frontend, $forceBackend);
@@ -805,7 +806,8 @@ class CRM_Utils_System {
    * @param bool $output
    * @param string $disposition
    */
-  static function download($name, $mimeType, &$buffer,
+  static function download(
+    $name, $mimeType, &$buffer,
     $ext = NULL,
     $output = TRUE,
     $disposition = 'attachment'
@@ -1646,7 +1648,8 @@ class CRM_Utils_System {
    *
    * @return string $url, formatted url.
    */
-  static function languageNegotiationURL($url,
+  static function languageNegotiationURL(
+    $url,
     $addLanguagePart = TRUE,
     $removeLanguagePart = FALSE
   ) {
@@ -1667,7 +1670,8 @@ class CRM_Utils_System {
    *   (optional) Sent by contribution/event reg/profile pages which uses a id
    *   specific extra file name if present.
    */
-  static function appendTPLFile($fileName,
+  static function appendTPLFile(
+    $fileName,
     &$content,
     $overideFileName = NULL
   ) {
