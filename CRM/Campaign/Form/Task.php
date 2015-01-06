@@ -80,7 +80,8 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form {
    * @param
    *
    * @return void
-   */ function preProcess() {
+   */
+  function preProcess() {
     $values = $this->controller->exportValues('Search');
 
     $this->_task   = $values['task'];

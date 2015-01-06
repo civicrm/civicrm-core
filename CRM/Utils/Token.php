@@ -797,7 +797,8 @@ class CRM_Utils_Token {
    * @param bool $escapeSmarty
    *
    * @return mixed|string
-   */public static function getHookTokenReplacement(
+   */
+  public static function getHookTokenReplacement(
     $token,
     &$contact,
     $category,

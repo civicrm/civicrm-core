@@ -56,8 +56,9 @@ class CRM_Price_Form_DeleteSet extends CRM_Core_Form {
    * Set up variables to build the form
    *
    * @return void
-   * @acess protected
-   */ function preProcess() {
+   * @access protected
+   */
+  function preProcess() {
     $this->_sid = $this->get('sid');
 
     $this->_title = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet',

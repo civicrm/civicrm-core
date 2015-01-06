@@ -45,7 +45,8 @@ class api_v3_AllTests extends CiviTestSuite {
 
   /**
    * Simple name based constructor
-   */ function __construct($theClass = '', $name = '') {
+   */
+  function __construct($theClass = '', $name = '') {
     parent::__construct($theClass, $name);
   }
 

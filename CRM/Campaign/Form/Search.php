@@ -74,7 +74,8 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
    * Processing needed for buildForm and later
    *
    * @return void
-   */ function preProcess() {
+   */
+  function preProcess() {
     $this->_done = FALSE;
     $this->_defaults = array();
 
