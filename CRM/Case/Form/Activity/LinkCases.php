@@ -128,7 +128,8 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @return void
    */
-  public static function beginPostProcess(&$form, &$params) {}
+  public static function beginPostProcess(&$form, &$params) {
+  }
 
   /**
    * Process the form submission

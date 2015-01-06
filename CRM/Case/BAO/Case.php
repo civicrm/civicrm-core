@@ -749,7 +749,6 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
       $allCases = FALSE;
     }
 
-
     $condition = " AND civicrm_case.is_deleted = 0 ";
 
     if (!$allCases) {
@@ -809,7 +808,6 @@ AND civicrm_case.status_id != $closedId";
     // we're going to use the usual actions, so doesn't make sense to duplicate definitions
     $actions = CRM_Case_Selector_Search::links();
 
-
     // check is the user has view/edit signer permission
     $permissions = array(CRM_Core_Permission::VIEW);
     if (CRM_Core_Permission::check('access all cases and activities') ||
@@ -826,8 +824,7 @@ AND civicrm_case.status_id != $closedId";
       foreach ($resultFields as $donCare => $field) {
         $casesList[$result->case_id][$field] = $result->$field;
         if ($field == 'contact_type') {
-          $casesList[$result->case_id]['contact_type_icon'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-              $result->contact_sub_type : $result->contact_type
+          $casesList[$result->case_id]['contact_type_icon'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type
           );
           $casesList[$result->case_id]['action'] = CRM_Core_Action::formLink($actions['primaryActions'], $mask,
             array(
@@ -998,7 +995,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
  LEFT JOIN  civicrm_phone ON (civicrm_phone.contact_id = civicrm_contact.id AND civicrm_phone.is_primary = 1)
  LEFT JOIN  civicrm_email ON (civicrm_email.contact_id = civicrm_contact.id )
      WHERE  civicrm_relationship.contact_id_a = %1 AND civicrm_relationship.case_id = %2';
-
 
     $params = array(
       1 => array($contactID, 'Positive'),
@@ -1179,7 +1175,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     //EXIT;
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
-
     $activityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     $activityPriority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
@@ -1341,7 +1336,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
           $url .= " <a href='$attachmentViewUrl' ><span class='icon paper-icon'></span></a>";
         }
       }
-
 
       $values[$dao->id]['links'] = $url;
       $values[$dao->id]['class'] = "";

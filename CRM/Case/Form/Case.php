@@ -121,7 +121,8 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     }
 
     if (!$this->_caseId) {
-      $caseAttributes = array('case_type' => CRM_Case_PseudoConstant::caseType(),
+      $caseAttributes = array(
+      'case_type' => CRM_Case_PseudoConstant::caseType(),
         'case_status' => CRM_Case_PseudoConstant::caseStatus(),
         'encounter_medium' => CRM_Case_PseudoConstant::encounterMedium(),
       );
@@ -180,7 +181,6 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       }
       $this->assign('clientName', $contact->display_name);
     }
-
 
     $session = CRM_Core_Session::singleton();
     $this->_currentUserId = $session->get('userID');
@@ -363,7 +363,6 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     // store the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
     $params['now'] = date("Ymd");
-
 
     // 1. call begin post process
     if ($this->_activityTypeFile) {

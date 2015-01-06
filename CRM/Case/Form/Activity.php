@@ -319,14 +319,14 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       $this->_relatedContacts[] = $rgc = CRM_Case_BAO_Case::getRelatedAndGlobalContacts($val);
       $contName = CRM_Case_BAO_Case::getContactNames($val);
       foreach ($contName as $nkey => $nval) {
-        array_push($this->_relatedContacts[$i][0] , $this->_relatedContacts[$i][0]['managerOf']= $nval['display_name']);
+        array_push($this->_relatedContacts[$i][0], $this->_relatedContacts[$i][0]['managerOf'] = $nval['display_name']);
       }
       $i++;
     }
 
     //add case client in send a copy selector.CRM-4438.
     foreach ($this->_caseId as $key => $val) {
-      $relatedContacts[] = $relCon= CRM_Case_BAO_Case::getContactNames($val);
+      $relatedContacts[] = $relCon = CRM_Case_BAO_Case::getContactNames($val);
     }
 
     if (!empty($relatedContacts)) {
@@ -558,7 +558,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       foreach ($this->_caseId as $key => $val) {
         $newActParams['case_id'] = $val;
         $activity = CRM_Activity_BAO_Activity::create($newActParams);
-        $vvalue[] = array('case_id'=> $val, 'actId'=> $activity->id);
+        $vvalue[] = array('case_id' => $val, 'actId' => $activity->id);
         // call end post process, after the activity has been created/updated.
         $this->endPostProcess($newActParams, $activity);
       }

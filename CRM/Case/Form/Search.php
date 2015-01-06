@@ -135,7 +135,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
       );
     }
 
-
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
     $selector = new CRM_Case_Selector_Search($this->_queryParams,
       $this->_action,
@@ -405,7 +404,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
       }
     }
     else {
-        // First, if "all" is stored in the session, default to all cases, otherwise default to no selection.
+      // First, if "all" is stored in the session, default to all cases, otherwise default to no selection.
       $session = CRM_Core_Session::singleton();
       if (CRM_Utils_Request::retrieve('all', 'Positive', $session)) {
         $this->_formValues['case_owner'] = 1;

@@ -139,7 +139,8 @@ class CRM_Case_XMLRepository {
    * @param string $caseType
    * @return null|string file path
    */
-  public function findXmlFile($caseType) { // first check custom templates directory
+  public function findXmlFile($caseType) {
+    // first check custom templates directory
     $fileName = NULL;
 
     if (!$fileName || !file_exists($fileName)) {
