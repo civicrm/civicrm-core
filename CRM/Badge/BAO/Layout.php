@@ -46,8 +46,10 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * retrieves the relevant objects. It also stores all the retrieved
    * values in the default array
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_DAO_PrintLabel object on success, null otherwise
    * @static
@@ -65,8 +67,10 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   /**
    * Update the is_active flag in the db
    *
-   * @param int $id        id of the database record
-   * @param boolean $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on success, null otherwise
    *
@@ -79,7 +83,8 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   /**
    * Add a name label
    *
-   * @param array $params reference array contains the values submitted by the form
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
    *
    * @static
    *
@@ -120,7 +125,8 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   /**
    * Delete name labels
    *
-   * @param  int $printLabelId ID of the name label to be deleted.
+   * @param int $printLabelId
+   *   ID of the name label to be deleted.
    *
    * @static
    */
@@ -150,7 +156,8 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   /**
    * Build layout structure
    *
-   * @param array $params associated array of submitted values
+   * @param array $params
+   *   Associated array of submitted values.
    *
    * @return array $formattedLayout array formatted array
    */
@@ -167,7 +174,8 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   /**
    * Decode encoded data and return as an array
    *
-   * @param json $jsonData json object
+   * @param json $jsonData
+   *   Json object.
    *
    * @return array associated array of decoded elements
    * @static
