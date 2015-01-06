@@ -198,7 +198,6 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
     $dao = new CRM_Core_DAO();
     $dao->query($tempTableQuery);
 
-
     CRM_Utils_Hook::dupeQuery($this, 'table', $tableQueries);
 
     while (!empty($tableQueries)) {
@@ -447,8 +446,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
     $result = array();
     while ($dao->fetch()) {
       $title =
-        !empty($dao->title) ? $dao->title :
-        (!empty($dao->name)  ? $dao->name : $dao->contact_type);
+        !empty($dao->title) ? $dao->title : (!empty($dao->name) ? $dao->name : $dao->contact_type);
 
       $name = "$title - {$dao->used}";
       $result[$dao->id] = $name;

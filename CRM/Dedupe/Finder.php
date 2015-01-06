@@ -95,8 +95,8 @@ class CRM_Dedupe_Finder {
    */
   static function dupesByParams($params,
     $ctype,
-    $used        = 'Unsupervised',
-    $except      = array(),
+    $used = 'Unsupervised',
+    $except = array(),
     $ruleGroupID = NULL
   ) {
     // If $params is empty there is zero reason to proceed.
@@ -151,8 +151,8 @@ class CRM_Dedupe_Finder {
   public static function dupesInGroup($rgid, $gid) {
     $cids = array_keys(CRM_Contact_BAO_Group::getMember($gid));
     if ( !empty($cids) ) {
-    return self::dupes($rgid, $cids);
-  }
+      return self::dupes($rgid, $cids);
+    }
     return array();
   }
 
@@ -299,8 +299,10 @@ class CRM_Dedupe_Finder {
           $fields['location_type_id'] = '';
           // FIXME: we also need to do some hacking for id and name fields, see CRM-3902’s comments
           $fixes = array(
-            'address_name' => 'name', 'country' => 'country_id',
-            'state_province' => 'state_province_id', 'county' => 'county_id',
+            'address_name' => 'name',
+          'country' => 'country_id',
+            'state_province' => 'state_province_id',
+          'county' => 'county_id',
           );
           foreach ($fixes as $orig => $target) {
             if (!empty($flat[$orig])) {
