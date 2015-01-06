@@ -239,10 +239,14 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * process the PDf and email with activity and attachment
    * on click of Print Invoices
    *
-   * @param array $contribIDs Contribution Id
-   * @param array $params associated array of submitted values
-   * @param array $contactIds Contact Id
-   * @param CRM_Core_Form $form form object
+   * @param array $contribIDs
+   *   Contribution Id.
+   * @param array $params
+   *   Associated array of submitted values.
+   * @param array $contactIds
+   *   Contact Id.
+   * @param CRM_Core_Form $form
+   *   Form object.
    * @static
    *
    */
@@ -578,10 +582,14 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * This function is use for adding activity for
    * Email Invoice and the PDF Invoice
    *
-   * @param string $subject Activity subject
-   * @param array $contactIds Contact Id
-   * @param string $fileName gives the location with name of the file
-   * @param array $params for invoices
+   * @param string $subject
+   *   Activity subject.
+   * @param array $contactIds
+   *   Contact Id.
+   * @param string $fileName
+   *   Gives the location with name of the file.
+   * @param array $params
+   *   For invoices.
    *
    * @static
    */
@@ -625,7 +633,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * This function is use for creating the Invoice file in upload folder
    * for attachment
    *
-   * @param $html content for pdf in html format
+   * @param $html
+   *   Content for pdf in html format.
    *
    * return $fileName of file which is in pdf format
    *

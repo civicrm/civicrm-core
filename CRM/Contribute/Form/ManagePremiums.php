@@ -204,7 +204,8 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   /**
    * Function for validation
    *
-   * @param array $params (ref.) an assoc array of name/value pairs
+   * @param array $params
+   *   (ref.) an assoc array of name/value pairs.
    *
    * @param $files
    *

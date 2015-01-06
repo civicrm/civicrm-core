@@ -192,7 +192,8 @@ class CRM_Contribute_Form_SoftCredit {
   /**
    * Global form rule
    *
-   * @param array $fields the input form values
+   * @param array $fields
+   *   The input form values.
    *
    * @param $errors
    * @param $self

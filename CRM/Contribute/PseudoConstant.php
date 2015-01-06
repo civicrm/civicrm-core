@@ -202,8 +202,10 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * Get all the contribution pages
    *
-   * @param integer $id  id of the contribution page
-   * @param boolean $all do we want all pages or only active pages
+   * @param int $id
+   *   Id of the contribution page.
+   * @param bool $all
+   *   Do we want all pages or only active pages.
    *
    *
    * @return array - array reference of all contribution pages if any

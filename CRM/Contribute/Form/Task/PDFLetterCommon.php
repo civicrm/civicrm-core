@@ -177,8 +177,10 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
   * @param array $contribution
   * @param array $messageToken
   * @param array $categories
-  * @param bool $grouped Does this letter represent more than one contribution
-  * @param string $separator What is the preferred letter separator
+  * @param bool $grouped
+  *   Does this letter represent more than one contribution.
+  * @param string $separator
+  *   What is the preferred letter separator.
   * @return string
   */
  private static function resolveTokens($html_message, $contact, $contribution, $messageToken, $categories, $grouped, $separator) {
@@ -207,8 +209,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * @param string $groupBy
    * @param CRM_Contribute_Form_Task $form
    * @param array $returnProperties
-   * @param boolean $skipOnHold
-   * @param boolean $skipDeceased
+   * @param bool $skipOnHold
+   * @param bool $skipDeceased
    * @param array $messageToken
    * @param string $task
    * @param string $separator

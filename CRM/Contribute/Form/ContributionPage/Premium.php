@@ -111,7 +111,8 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
   /**
    * Validation
    *
-   * @param array $params (ref.) an assoc array of name/value pairs
+   * @param array $params
+   *   (ref.) an assoc array of name/value pairs.
    *
    * @return mixed true or array of errors
    * @static
