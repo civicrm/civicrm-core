@@ -76,7 +76,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $crmPath);
 require_once $crmPath . '/CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
 
-$docLink = CRM_Utils_System::docURL2('Installation and Upgrades', FALSE, 'Installation Guide',NULL,NULL,"wiki");
+$docLink = CRM_Utils_System::docURL2('Installation and Upgrades', FALSE, 'Installation Guide', NULL, NULL, "wiki");
 
 if ($installType == 'drupal') {
   //lets check only /modules/.
@@ -130,7 +130,8 @@ foreach ($langs as $locale => $_) {
   if ($locale == 'en_US') {
     continue;
   }
-  if (!file_exists(implode(CIVICRM_DIRECTORY_SEPARATOR, array($crmPath, 'sql', "civicrm_data.$locale.mysql"))))unset($langs[$locale]);
+  if (!file_exists(implode(CIVICRM_DIRECTORY_SEPARATOR, array($crmPath, 'sql', "civicrm_data.$locale.mysql")))) { unset($langs[$locale]);
+  }
 }
 
 $seedLanguage = 'en_US';
@@ -174,7 +175,7 @@ if ($alreadyInstalled) {
 
 $versionFile = $crmPath . CIVICRM_DIRECTORY_SEPARATOR . 'civicrm-version.php';
 if (file_exists($versionFile)) {
-  require_once ($versionFile);
+  require_once $versionFile;
   $civicrm_version = civicrmVersion();
 }
 else {
@@ -242,7 +243,7 @@ if ($databaseConfig) {
 if (isset($_REQUEST['go']) && !$req->hasErrors() && !$dbReq->hasErrors()) {
   // Confirm before reinstalling
   if (!isset($_REQUEST['force_reinstall']) && $alreadyInstalled) {
-    include ($installDirPath . 'template.html');
+    include $installDirPath . 'template.html';
   }
   else {
     $inst = new Installer();
@@ -252,7 +253,7 @@ if (isset($_REQUEST['go']) && !$req->hasErrors() && !$dbReq->hasErrors()) {
   // Show the config form
 }
 else {
-  include ($installDirPath . 'template.html');
+  include $installDirPath . 'template.html';
 }
 
 /**
@@ -900,7 +901,6 @@ class InstallRequirements {
       $this->error($testDetails);
     }
 
-
     mysql_query('DROP TRIGGER civicrm_install_temp_table_test_trigger');
     mysql_query('DROP TABLE civicrm_install_temp_table_test');
   }
@@ -1016,8 +1016,8 @@ class InstallRequirements {
       $this->error($testDetails);
     } else {
       $values = mysql_fetch_row($result);
-      if ($values[1] < (1024*$minValueKB)) {
-        $testDetails[2] = 'MySQL "thread_stack" is ' . ($values[1]/1024) . 'k';
+      if ($values[1] < (1024 * $minValueKB)) {
+        $testDetails[2] = 'MySQL "thread_stack" is ' . ($values[1] / 1024) . 'k';
         $this->error($testDetails);
       }
     }
@@ -1146,7 +1146,6 @@ class InstallRequirements {
     $section = $testDetails[0];
     $test = $testDetails[1];
 
-
     $this->tests[$section][$test] = array("warning", $testDetails[2]);
     $this->warnings[] = $testDetails;
   }
@@ -1240,7 +1239,7 @@ class Installer extends InstallRequirements {
         $output .= '<body>';
         $output .= '<div style="padding: 1em;"><p class="good">CiviCRM has been successfully installed</p>';
         $output .= '<ul>';
-        $docLinkConfig = CRM_Utils_System::docURL2('Configuring a New Site', FALSE, 'here',NULL,NULL,"wiki");
+        $docLinkConfig = CRM_Utils_System::docURL2('Configuring a New Site', FALSE, 'here', NULL, NULL, "wiki");
         if (!function_exists('ts')) {
           $docLinkConfig = "<a href=\"{$docLinkConfig}\">here</a>";
         }
@@ -1309,7 +1308,7 @@ class Installer extends InstallRequirements {
         $output .= '<body>';
         $output .= '<div style="padding: 1em;"><p class="good">CiviCRM has been successfully installed</p>';
         $output .= '<ul>';
-        $docLinkConfig = CRM_Utils_System::docURL2('Configuring a New Site', FALSE, 'here',NULL,NULL,"wiki");
+        $docLinkConfig = CRM_Utils_System::docURL2('Configuring a New Site', FALSE, 'here', NULL, NULL, "wiki");
         if (!function_exists('ts')) {
           $docLinkConfig = "<a href=\"{$docLinkConfig}\">here</a>";
         }
@@ -1352,7 +1351,7 @@ class Installer extends InstallRequirements {
         echo '<h1>CiviCRM Installed</h1>';
         echo '<div style="padding: 1em;"><p style="background-color: #0C0; border: 1px #070 solid; color: white;">CiviCRM has been successfully installed</p>';
         echo '<ul>';
-        $docLinkConfig = CRM_Utils_System::docURL2('Configuring a New Site', FALSE, 'here',NULL,NULL,"wiki");
+        $docLinkConfig = CRM_Utils_System::docURL2('Configuring a New Site', FALSE, 'here', NULL, NULL, "wiki");
         if (!function_exists('ts')) {
           $docLinkConfig = "<a href=\"{$docLinkConfig}\">here</a>";
         }
@@ -1367,10 +1366,10 @@ class Installer extends InstallRequirements {
           {$commonOutputMessage}
 ";
 
-         echo '</ul>';
-         echo '</div>';
-       }
-     }
+        echo '</ul>';
+        echo '</div>';
+      }
+    }
 
     return $this->errors;
   }
@@ -1459,7 +1458,6 @@ function getSiteDir($cmsPath, $str) {
  * @param $errorMsg
  */
 function errorDisplayPage($errorTitle, $errorMsg) {
-  include ('error.html');
+  include 'error.html';
   exit();
 }
-
