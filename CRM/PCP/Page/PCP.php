@@ -91,12 +91,14 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
           'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
           'title' => ts('Delete Personal Campaign Page'),
         ),
-        CRM_Core_Action::ENABLE => array('name' => ts('Enable'),
+        CRM_Core_Action::ENABLE => array(
+      'name' => ts('Enable'),
           'url' => 'civicrm/admin/pcp',
           'qs' => 'action=enable&id=%%id%%',
           'title' => ts('Enable'),
         ),
-        CRM_Core_Action::DISABLE => array('name' => ts('Disable'),
+        CRM_Core_Action::DISABLE => array(
+      'name' => ts('Disable'),
           'url' => 'civicrm/admin/pcp',
           'qs' => 'action=disable&id=%%id%%',
           'title' => ts('Disable'),
@@ -175,7 +177,6 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
     ) {
       $this->_sortByCharacter = '';
     }
-
 
     $status = CRM_PCP_BAO_PCP::buildOptions('status_id', 'create');
 
