@@ -2332,8 +2332,7 @@ div.grippie {
   margin-left: .5em;
 }
 
-.crm-container .crm-button,
-#crm-container .crm-button {
+.crm-container .crm-button {
   border: medium none;
   cursor: pointer;
   display: block;
@@ -2341,12 +2340,9 @@ div.grippie {
   overflow: hidden;
   text-shadow: 0 1px 0 black;
   margin: 0px 12px 0 0;
-  padding: 0px 4px;
-  cursor: pointer;
 }
 
-.crm-container .crm-button input,
-#crm-container .crm-button input {
+.crm-container .crm-button input {
   background: none;
   _background: #6C6C6C;
   /* IE6 only */
@@ -2360,13 +2356,10 @@ div.grippie {
 }
 
 .crm-container .crm-button-type-cancel,
-.crm-container .crm-button-type-back,
-#crm-container .crm-button-type-cancel,
-#crm-container .crm-button-type-back {
+.crm-container .crm-button-type-back {
   margin-left: 20px;
 }
-.crm-container .crm-button-type-cancel input,
-#crm-container .crm-button-type-cancel input {
+.crm-container .crm-button-type-cancel input {
   color: #E6E6DC!important;
 }
 
@@ -2379,9 +2372,9 @@ div.grippie {
 .crm-container input.crm-form-submit,
 .crm-container .crm-button,
 .crm-container .ui-dialog-buttonset .ui-button,
-#crm-container input[type=button],
-#crm-container input.crm-form-submit-inline,
-#crm-container .crm-button {
+.crm-container input[type=button],
+.crm-container input.crm-form-submit-inline,
+.crm-container .crm-button {
   text-shadow: 0 1px 0 black;
   background: #70716B url(../i/crm-button-bg.gif) repeat-x top left;
   color: #FFF;
@@ -2395,30 +2388,25 @@ div.grippie {
 }
 
 .crm-container input.crm-form-submit[disabled],
-.crm-container .crm-button[disabled],
-#crm-container input[type=button][disabled],
-#crm-container input.crm-form-submit-inline[disabled],
-#crm-container .crm-button[disabled] {
+.crm-container input[type=button][disabled],
+.crm-container input.crm-form-submit-inline[disabled],
+.crm-container .crm-button[disabled] {
     color: #999;
 }
 
-.crm-container .crm-button,
-#crm-container .crm-button {
+.crm-container .crm-button {
   padding: 1px;
 }
 
 .crm-container input.crm-form-submit,
-#crm-container input[type=button],
-#crm-container input.crm-form-submit-inline {
+.crm-container input[type=button],
+.crm-container input.crm-form-submit-inline {
   padding: 2px 6px;
 }
 
 .crm-container .crm-button input[type=button],
 .crm-container .crm-button input.crm-form-submit,
-.crm-container .crm-button input.crm-form-submit-inline,
-#crm-container .crm-button input[type=button],
-#crm-container .crm-button input.crm-form-submit,
-#crm-container .crm-button input.crm-form-submit-inline {
+.crm-container .crm-button input.crm-form-submit-inline {
   padding: 2px 4px;
   margin: 0px;
   background: none;
@@ -2618,6 +2606,23 @@ div.grippie {
 
 .crm-container .crm-button .icon {
   margin-top: 3px;
+}
+
+.crm-container input.crm-button.crm-icon-button {
+  position: relative;
+}
+
+.crm-container .crm-button.crm-icon-button input {
+  padding-left: 18px;
+}
+
+.crm-container .crm-button-icon {
+  background-image: url("../i/icons/jquery-ui-FFFFFF.png");
+  height: 16px;
+  width: 16px;
+  display: block;
+  position: absolute;
+  pointer-events: none;
 }
 
 .crm-container .dark-icon {

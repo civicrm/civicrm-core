@@ -1,4 +1,5 @@
-{*
+<?php
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
@@ -22,25 +23,27 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
+*/
 
-{* Loops through $form.buttons.html array and assigns separate spans with classes to allow theming
-   by button and name. crmBtnType grabs type keyword from button name (e.g. 'upload', 'next', 'back', 'cancel') so
-   types of buttons can be styled differently via css. *}
-{crmRegion name='form-buttons'}
-  {foreach from=$form.buttons item=button key=key name=btns}
-    {if $key|substring:0:4 EQ '_qf_'}
-        {if $location}
-          {assign var='html' value=$form.buttons.$key.html|crmReplace:id:"$key-$location"}
-        {else}
-          {assign var='html' value=$form.buttons.$key.html}
-        {/if}
-        {capture assign=validate}{$key|crmBtnValidate}{/capture}
-        {capture assign=icon}{crmGetAttribute html=$html attr='crm-icon'}{/capture}
-        <span class="crm-button crm-button-type-{$key|crmBtnType} crm-button{$key}{if $icon} crm-icon-button{/if}"{if $buttonStyle} style="{$buttonStyle}"{/if}>
-          {if $icon}<span class="crm-button-icon ui-icon-{$icon}"> </span>{/if}
-          {$html|crmAddClass:$validate}
-        </span>
-    {/if}
-  {/foreach}
-{/crmRegion}
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC
+ * $Id$
+ *
+ */
+
+/**
+ * Fetch an attribute from html
+ *
+ * @param array $params
+ * @param CRM_Core_Smarty $smarty
+ *
+ * @return string
+ */
+function smarty_function_crmGetAttribute($params, &$smarty) {
+  if (preg_match('#\W' . $params['attr'] . '="([^"]+)#', $params['html'], $matches)) {
+    return $matches[1];
+  }
+  return '';
+}

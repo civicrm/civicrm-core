@@ -34,12 +34,13 @@
  */
 
 /**
- * Add a stylesheet <LINK> to a specific part of the page
+ * Formats an array of attributes as html
  *
  * @param array $params
  *   ['a'] array of attributes.
  * @param CRM_Core_Smarty $smarty
  *
+ * @return string
  * @throws Exception
  */
 function smarty_function_crmAttributes($params, &$smarty) {
