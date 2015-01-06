@@ -52,7 +52,7 @@
     &nbsp; {$form.participant_test.html}
   </td>
   <td class="crm-event-form-block-participant_pay_later">
-  {$form.participant_pay_later.label} {$form.participant_pay_later.html}
+  {$form.participant_is_pay_later.label} {$form.participant_is_pay_later.html}
   </td>
 </tr>
 <tr>
