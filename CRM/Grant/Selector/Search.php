@@ -148,15 +148,14 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   @access public
    */
   function __construct(&$queryParams,
-    $action      = CRM_Core_Action::NONE,
+    $action = CRM_Core_Action::NONE,
     $grantClause = NULL,
-    $single      = FALSE,
-    $limit       = NULL,
-    $context     = 'search'
+    $single = FALSE,
+    $limit = NULL,
+    $context = 'search'
   ) {
     // submitted form values
     $this->_queryParams = &$queryParams;
-
 
     $this->_single  = $single;
     $this->_limit   = $limit;
@@ -207,7 +206,8 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
 
       if ($cid) {
         $delLink = array(
-          CRM_Core_Action::DELETE => array('name' => ts('Delete'),
+          CRM_Core_Action::DELETE => array(
+        'name' => ts('Delete'),
             'url' => 'civicrm/contact/view/grant',
             'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%&selectedChild=grant' . $extraParams,
             'title' => ts('Delete Grant'),
@@ -320,8 +320,7 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
         $result->grant_id
       );
 
-      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-        $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
+      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
       );
 
       $rows[] = $row;
@@ -354,7 +353,8 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     if (!isset(self::$_columnHeaders)) {
       self::$_columnHeaders = array(
-        array('name' => ts('Status'),
+        array(
+      'name' => ts('Status'),
           'sort' => 'grant_status',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
