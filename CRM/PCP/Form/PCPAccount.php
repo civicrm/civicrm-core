@@ -40,7 +40,7 @@
 class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
   /**
-   *Variable defined for Contribution Page Id
+   * Variable defined for Contribution Page Id
    *
    */
 
@@ -186,7 +186,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
       }
     }
 
-
     if ($this->_component == 'contribute') {
       $this->assign('campaignName', CRM_Contribute_PseudoConstant::contributionPage($this->_pageId));
     }
@@ -196,7 +195,8 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
     if ($this->_single) {
       $button = array(
-        array('type' => 'next',
+        array(
+      'type' => 'next',
           'name' => ts('Save'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,

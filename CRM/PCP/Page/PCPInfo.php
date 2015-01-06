@@ -160,7 +160,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
       $hints = array(
         CRM_Core_Action::UPDATE => ts('Change the content and appearance of your page'),
         CRM_Core_Action::DETACH => ts('Send emails inviting your friends to support your campaign!'),
-        CRM_Core_Action::VIEW =>   ts('Copy this link to share directly with your network!'),
+        CRM_Core_Action::VIEW => ts('Copy this link to share directly with your network!'),
         CRM_Core_Action::BROWSE => ts('Update your personal contact information'),
         CRM_Core_Action::DISABLE => ts('De-activate the page (you can re-activate it later)'),
         CRM_Core_Action::ENABLE => ts('Activate the page (you can de-activate it later)'),
@@ -207,7 +207,6 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     $totalAmount = CRM_PCP_BAO_PCP::thermoMeter($this->_id);
     $achieved = round($totalAmount / $pcpInfo['goal_amount'] * 100, 2);
 
-
     if ($pcpBlock->is_active == 1) {
       $linkTextUrl = CRM_Utils_System::url('civicrm/contribute/campaign',
         "action=add&reset=1&pageId={$pcpInfo['page_id']}&component={$pcpInfo['page_type']}",
@@ -234,7 +233,6 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
       $startDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('start_date', $pageInfo));
       $endDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('end_date', $pageInfo));
     }
-
 
     $now = time();
     $validDate = TRUE;
@@ -264,7 +262,6 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     }
 
     $this->assign('parentURL', $parentUrl);
-
 
     if ($validDate) {
 
