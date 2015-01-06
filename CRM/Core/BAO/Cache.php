@@ -76,8 +76,8 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
       if (!self::$_cache[$argString]) {
         $dao = new CRM_Core_DAO_Cache();
 
-        $dao->group_name   = $group;
-        $dao->path         = $path;
+        $dao->group_name = $group;
+        $dao->path = $path;
         $dao->component_id = $componentID;
 
         $data = NULL;
@@ -115,7 +115,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
       if (!self::$_cache[$argString]) {
         $dao = new CRM_Core_DAO_Cache();
 
-        $dao->group_name   = $group;
+        $dao->group_name = $group;
         $dao->component_id = $componentID;
         $dao->find();
 
@@ -155,8 +155,8 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
 
     $dao = new CRM_Core_DAO_Cache();
 
-    $dao->group_name   = $group;
-    $dao->path         = $path;
+    $dao->group_name = $group;
+    $dao->path = $path;
     $dao->component_id = $componentID;
 
     // get a lock so that multiple ajax requests on the same page
@@ -333,16 +333,16 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
       $session = $table = $prevNext = TRUE;
     }
 
-    if ( ! $session && ! $table && ! $prevNext ) {
+    if (!$session && !$table && !$prevNext) {
       return;
     }
 
-    if ( $prevNext ) {
+    if ($prevNext) {
       // delete all PrevNext caches
       CRM_Core_BAO_PrevNextCache::cleanupCache();
     }
 
-    if ( $table ) {
+    if ($table) {
       // also delete all the action temp tables
       // that were created the same interval ago
       $dao = new CRM_Core_DAO();
@@ -356,9 +356,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_task_action_temp_%'
 AND    CREATE_TIME < date_sub( NOW( ), INTERVAL $timeIntervalDays day )
 ";
 
-      $params   = array(1 => array($dao->database(), 'String'));
+      $params = array(1 => array($dao->database(), 'String'));
       $tableDAO = CRM_Core_DAO::executeQuery($query, $params);
-      $tables   = array();
+      $tables = array();
       while ($tableDAO->fetch()) {
         $tables[] = $tableDAO->tableName;
       }
@@ -369,27 +369,27 @@ AND    CREATE_TIME < date_sub( NOW( ), INTERVAL $timeIntervalDays day )
       }
     }
 
-    if ( $session ) {
+    if ($session) {
       // first delete all sessions which are related to any potential transaction
       // page
       $transactionPages = array(
-          'CRM_Contribute_Controller_Contribution',
-          'CRM_Event_Controller_Registration',
-        );
+        'CRM_Contribute_Controller_Contribution',
+        'CRM_Event_Controller_Registration',
+      );
 
       $params = array(
         1 => array(date('Y-m-d H:i:s', time() - $timeIntervalMins * 60), 'String'),
       );
       foreach ($transactionPages as $trPage) {
         $params[] = array("%${trPage}%", 'String');
-        $where[]  = 'path LIKE %' . sizeof($params);
+        $where[] = 'path LIKE %' . sizeof($params);
       }
 
       $sql = "
 DELETE FROM civicrm_cache
 WHERE       group_name = 'CiviCRM Session'
 AND         created_date <= %1
-AND         ("  . implode(' OR ', $where) . ")";
+AND         (" . implode(' OR ', $where) . ")";
       CRM_Core_DAO::executeQuery($sql, $params);
 
       $sql = "

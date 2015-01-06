@@ -992,7 +992,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
 
       // Create a unique, non-empty index for each field.
       $index = $field['title'];
-      if ($index === '') { $index = ' ';
+      if ($index === '') {
+        $index = ' ';
       }
       while (array_key_exists($index, $values)) {
         $index .= ' ';
@@ -2341,8 +2342,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @return null
    * @static
    */
-  static function setProfileDefaults($contactId, &$fields, &$defaults,
-                                     $singleProfile = TRUE, $componentId = NULL, $component = NULL
+  static function setProfileDefaults(
+    $contactId, &$fields, &$defaults,
+    $singleProfile = TRUE, $componentId = NULL, $component = NULL
   ) {
     if (!$componentId) {
       //get the contact details
