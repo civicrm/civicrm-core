@@ -235,22 +235,23 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
           1 => array($info->name, 'String'),
         )
       );
-      if ($dao->fetch()) { $paymentProcessor = array(
-        'id' => -1,
-        'name' => $dao->title,
-        'payment_processor_type_id' => $dao->id,
-        'user_name' => 'nothing',
-        'password' => 'nothing',
-        'signature' => '',
-        'url_site' => $dao->url_site_default,
-        'url_api' => $dao->url_api_default,
-        'url_recur' => $dao->url_recur_default,
-        'url_button' => $dao->url_button_default,
-        'subject' => '',
-        'class_name' => $dao->class_name,
-        'is_recur' => $dao->is_recur,
-        'billing_mode' => $dao->billing_mode,
-        'payment_type' => $dao->payment_type,
+      if ($dao->fetch()) {
+        $paymentProcessor = array(
+          'id' => -1,
+          'name' => $dao->title,
+          'payment_processor_type_id' => $dao->id,
+          'user_name' => 'nothing',
+          'password' => 'nothing',
+          'signature' => '',
+          'url_site' => $dao->url_site_default,
+          'url_api' => $dao->url_api_default,
+          'url_recur' => $dao->url_recur_default,
+          'url_button' => $dao->url_button_default,
+          'subject' => '',
+          'class_name' => $dao->class_name,
+          'is_recur' => $dao->is_recur,
+          'billing_mode' => $dao->billing_mode,
+          'payment_type' => $dao->payment_type,
         );
       }
       else { CRM_Core_Error::fatal("Unable to find payment processor in " . __CLASS__ . '::' . __METHOD__);
