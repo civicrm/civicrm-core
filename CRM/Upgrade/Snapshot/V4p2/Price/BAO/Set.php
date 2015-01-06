@@ -1012,7 +1012,8 @@ return $pricesetFieldCount[$sid];
    * @param $ids
    *
    * @return array
-   */public static function getMembershipCount($ids) {
+   */
+  public static function getMembershipCount($ids) {
 $queryString = "
 SELECT       count( pfv.id ) AS count, pfv.id AS id
 FROM         civicrm_price_field_value pfv

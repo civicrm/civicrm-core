@@ -58,7 +58,8 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
    * @param null
    *
    * @return void
-   */ function preProcess() {
+   */
+  function preProcess() {
     // get the controller vars
     $groupId = $this->get('groupId');
     $fieldId = $this->get('fieldId');

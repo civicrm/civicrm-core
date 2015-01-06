@@ -52,7 +52,8 @@ class CRM_Case_Form_Task_Restore extends CRM_Case_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   */ function preProcess() {
+   */
+  function preProcess() {
     parent::preProcess();
   }
 
