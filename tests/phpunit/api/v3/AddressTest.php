@@ -241,6 +241,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
    */
   public function testGetAddressSort() {
     $create = $this->callAPISuccess('address', 'create', $this->_params);
+    $this->callAPISuccess('address', 'create', array_merge($this->_params, array('street_address' => 'yzy')));
     $subfile     = "AddressSort";
     $description = "Demonstrates Use of sort filter";
     $params      = array(
@@ -251,8 +252,8 @@ class api_v3_AddressTest extends CiviUnitTestCase {
       'sequential' => 1,
     );
     $result = $this->callAPIAndDocument('Address', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
-    $this->assertEquals(2, $result['count'], 'In line ' . __LINE__);
-    $this->assertEquals('Ambachtstraat 23', $result['values'][0]['street_address'], 'In line ' . __LINE__);
+    $this->assertEquals(2, $result['count']);
+    $this->assertEquals('Ambachtstraat 23', $result['values'][1]['street_address']);
     $this->callAPISuccess('address', 'delete', array('id' => $create['id']));
   }
 
@@ -277,7 +278,8 @@ class api_v3_AddressTest extends CiviUnitTestCase {
    */
   public function testGetAddressLikeFail() {
     $create = $this->callAPISuccess('address', 'create', $this->_params);
-    $params      = array('street_address' => array('LIKE' => "'%xy%'"),
+    $params      = array(
+      'street_address' => array('LIKE' => "'%xy%'"),
       'sequential' => 1,
     );
     $result = $this->callAPISuccess('Address', 'Get', ($params));
