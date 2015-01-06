@@ -45,7 +45,8 @@
  * Sets custom values for an entity.
  *
  *
- * @param $params  expected keys are in format custom_fieldID:recordID or custom_groupName:fieldName:recordID
+ * @param $params
+ *   Expected keys are in format custom_fieldID:recordID or custom_groupName:fieldName:recordID.
  * for example:
  * // entity ID. You do not need to specify entity type, we figure it out based on the fields you're using
  * 'entity_id' => 123,
@@ -117,7 +118,8 @@ function civicrm_api3_custom_value_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_custom_value_create_spec(&$params) {
   $params['entity_id']['api.required'] = 1;
@@ -127,7 +129,8 @@ function _civicrm_api3_custom_value_create_spec(&$params) {
 /**
  * Use this API to get existing custom values for an entity.
  *
- * @param $params  array specifying the entity_id
+ * @param $params
+ *   Array specifying the entity_id.
  * Optionally include entity_type param, i.e. 'entity_type' => 'Activity'
  * If no entity_type is supplied, it will be determined based on the fields you request.
  * If no entity_type is supplied and no fields are specified, 'Contact' will be assumed.
@@ -232,7 +235,8 @@ function civicrm_api3_custom_value_get($params) {
  * Adjust Metadata for Get action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_custom_value_get_spec(&$params) {
   $params['entity_id']['api.required'] = 1;

@@ -45,7 +45,8 @@
  * If no status mentioned in params, by default 'added' will be used
  * to fetch the records
  *
- * @param  array $params  name value pair of contact information
+ * @param array $params
+ *   Name value pair of contact information.
  * {@getfields GroupContact_get}
  *
  * @return  array  list of groups, given contact subsribed to
@@ -72,7 +73,8 @@ function civicrm_api3_group_contact_get($params) {
  *
  * @access public
  *
- * @param  array $params Input parameters
+ * @param array $params
+ *   Input parameters.
  *
  * Allowed @params array keys are:<br>
  * "contact_id" (required) : first contact to add<br>

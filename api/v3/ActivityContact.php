@@ -56,7 +56,8 @@ function civicrm_api3_activity_contact_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_activity_contact_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
@@ -66,7 +67,7 @@ function _civicrm_api3_activity_contact_create_spec(&$params) {
 /**
  * Deletes an existing ActivityContact record
  *
- * @param  array  $params
+ * @param array $params
  *
  * @return array Api Result
  *
@@ -82,7 +83,8 @@ function civicrm_api3_activity_contact_delete($params) {
  *
  * @example ActivityContact.php
  *
- * @param  array $params  an associative array of name/value pairs.
+ * @param array $params
+ *   An associative array of name/value pairs.
  *
  * @return  array details of found tags else error
  *

@@ -110,7 +110,8 @@ function civicrm_api3_setting_getdefaults(&$params){
 /**
  * Metadata for setting create function
  *
- * @param array $params parameters as passed to the API
+ * @param array $params
+ *   Parameters as passed to the API.
  */
 function _civicrm_api3_setting_getdefaults_spec(&$params) {
   $params['domain_id'] = array(
@@ -195,7 +196,8 @@ function _civicrm_api3_setting_fill_spec(&$params) {
 /**
  * Create or update a setting
  *
- * @param array $params  Associative array of setting
+ * @param array $params
+ *   Associative array of setting.
  *                       name/value pairs + other vars as applicable - see getfields for more
  * @example SettingCreate.php Std Create example
  *
@@ -212,7 +214,8 @@ function civicrm_api3_setting_create($params) {
 /**
  * Metadata for setting create function
  *
- * @param array $params parameters as passed to the API
+ * @param array $params
+ *   Parameters as passed to the API.
  */
 function _civicrm_api3_setting_create_spec(&$params) {
   $params['domain_id'] = array(
@@ -231,7 +234,8 @@ function _civicrm_api3_setting_create_spec(&$params) {
 /**
  * Returns array of settings matching input parameters
  *
- * @param array $params Array of one or more valid
+ * @param array $params
+ *   Array of one or more valid.
  *                       property_name=>value pairs.
  *
  * @return array Array of matching settings
@@ -246,7 +250,8 @@ function civicrm_api3_setting_get($params) {
 /**
  * Metadata for setting create function
  *
- * @param array $params parameters as passed to the API
+ * @param array $params
+ *   Parameters as passed to the API.
  */
 function _civicrm_api3_setting_get_spec(&$params) {
   $params['domain_id'] = array(
@@ -264,7 +269,8 @@ function _civicrm_api3_setting_get_spec(&$params) {
  * Returns value for specific parameter. Function requires more fields than 'get' but is intended for
  * runtime usage & should be quicker
  *
- * @param array $params  (reference) Array of one or more valid
+ * @param array $params
+ *   (reference) Array of one or more valid.
  *                       property_name=>value pairs.
  *
  * @return array Array of matching settings
@@ -289,7 +295,8 @@ function civicrm_api3_setting_getvalue($params) {
 /**
  * Metadata for setting create function
  *
- * @param array $params parameters as passed to the API
+ * @param array $params
+ *   Parameters as passed to the API.
  */
 function _civicrm_api3_setting_getvalue_spec(&$params) {
 
