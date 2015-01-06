@@ -42,7 +42,8 @@ class CRM_Utils_Migrate_Import {
   /**
    * Import custom-data from an XML file
    *
-   * @param string $file path to an XML file
+   * @param string $file
+   *   Path to an XML file.
    * @throws CRM_Core_Exception
    * @return void;
    */

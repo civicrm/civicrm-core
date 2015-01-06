@@ -143,7 +143,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Append a string to the head of the html file
    *
-   * @param string $head the new string to be appended
+   * @param string $head
+   *   The new string to be appended.
    *
    * @return void
    * @static
@@ -172,7 +173,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Add a script file
    *
    * @param $url: string, absolute path to file
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -187,7 +189,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Add an inline script
    *
    * @param $code: string, javascript code
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -202,7 +205,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Add a css file
    *
    * @param $url: string, absolute path to file
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -217,7 +221,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Add an inline style
    *
    * @param $code: string, css code
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -244,7 +249,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Figure out the post url for the form
    *
-   * @param mix $action the default action if one is pre-specified
+   * @param mix $action
+   *   The default action if one is pre-specified.
    *
    * @return string the url to post the form
    * @static
@@ -260,14 +266,20 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Generate an internal CiviCRM URL (copied from DRUPAL/includes/common.inc#url)
    *
-   * @param $path     string   The path being linked to, such as "civicrm/add"
-   * @param $query    string   A query string to append to the link.
-   * @param $absolute boolean  Whether to force the output to be an absolute link (beginning with http:).
+   * @param $path
+   *   String The path being linked to, such as "civicrm/add".
+   * @param $query
+   *   String A query string to append to the link.
+   * @param $absolute
+   *   Boolean Whether to force the output to be an absolute link (beginning with http:).
    *                           Useful for links that will be displayed outside the site, such as in an
    *                           RSS feed.
-   * @param $fragment string   A fragment identifier (named anchor) to append to the link.
-   * @param $htmlize  boolean  whether to convert to html eqivalant
-   * @param $frontend boolean  a gross joomla hack
+   * @param $fragment
+   *   String A fragment identifier (named anchor) to append to the link.
+   * @param $htmlize
+   *   Boolean whether to convert to html eqivalant.
+   * @param $frontend
+   *   Boolean a gross joomla hack.
    *
    * @param bool $forceBackend
    *
@@ -380,8 +392,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Authenticate the user against the wordpress db
    *
-   * @param string $name the user name
-   * @param string $password the password for the above user name
+   * @param string $name
+   *   The user name.
+   * @param string $password
+   *   The password for the above user name.
    *
    * @param bool $loadCMSBootstrap
    * @param null $realPath
@@ -416,7 +430,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Set a message in the UF to display to a user
    *
-   * @param string $message the message to set
+   * @param string $message
+   *   The message to set.
    *
    * @static
    */
@@ -470,8 +485,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Load wordpress bootstrap
    *
-   * @param $name string  optional username for login
-   * @param $pass string  optional password for login
+   * @param $name
+   *   String optional username for login.
+   * @param $pass
+   *   String optional password for login.
    *
    * @return bool
    */
@@ -596,8 +613,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Change user name in host CMS
    *
-   * @param integer $ufID User ID in CMS
-   * @param string $ufName User name
+   * @param int $ufID
+   *   User ID in CMS.
+   * @param string $ufName
+   *   User name.
    */
   public function updateCMSName($ufID, $ufName) {
     // CRM-10620
@@ -693,7 +712,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   /**
    * Get User ID from UserFramework system (Joomla)
-   * @param object $user object as described by the CMS
+   * @param object $user
+   *   Object as described by the CMS.
    * @return mixed <NULL, number>
    */
   public function getUserIDFromUserObject($user) {
@@ -702,7 +722,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   /**
    * Get Unique Identifier from UserFramework system (CMS)
-   * @param object $user object as described by the User Framework
+   * @param object $user
+   *   Object as described by the User Framework.
    * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
    *
    */
@@ -713,7 +734,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
-   * @param string $destination - if present, add destination to querystring (works for Drupal only)
+   * @param string $destination
+   *   If present, add destination to querystring (works for Drupal only).
    *
    * @return string - loginURL for the current CMS
    *
@@ -757,7 +779,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   /**
    * Get Url to view user record
-   * @param integer $contactID Contact ID
+   * @param int $contactID
+   *   Contact ID.
    *
    * @return string
    */

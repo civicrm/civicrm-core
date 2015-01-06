@@ -80,7 +80,8 @@ class CRM_Utils_Cache_Memcache {
   /**
    * Constructor
    *
-   * @param array $config an array of configuration params
+   * @param array $config
+   *   An array of configuration params.
    *
    * @return \CRM_Utils_Cache_Memcache
    */

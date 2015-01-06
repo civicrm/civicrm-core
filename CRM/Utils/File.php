@@ -41,7 +41,8 @@ class CRM_Utils_File {
   /**
    * Given a file name, determine if the file contents make it an ascii file
    *
-   * @param string $name name of file
+   * @param string $name
+   *   Name of file.
    *
    * @return boolean     true if file is ascii
    */
@@ -67,7 +68,8 @@ class CRM_Utils_File {
   /**
    * Given a file name, determine if the file contents make it an html file
    *
-   * @param string $name name of file
+   * @param string $name
+   *   Name of file.
    *
    * @return boolean     true if file is html
    */
@@ -96,8 +98,10 @@ class CRM_Utils_File {
    * Create a directory given a path name, creates parent directories
    * if needed
    *
-   * @param string $path  the path name
-   * @param boolean $abort should we abort or just return an invalid code
+   * @param string $path
+   *   The path name.
+   * @param bool $abort
+   *   Should we abort or just return an invalid code.
    *
    * @return void
    * @static
@@ -126,7 +130,8 @@ class CRM_Utils_File {
    * Delete a directory given a path name, delete children directories
    * and files if needed
    *
-   * @param string $target the path name
+   * @param string $target
+   *   The path name.
    * @param bool $rmdir
    * @param bool $verbose
    *
@@ -195,7 +200,8 @@ class CRM_Utils_File {
   /**
    * Given a file name, recode it (in place!) to UTF-8
    *
-   * @param string $name name of file
+   * @param string $name
+   *   Name of file.
    *
    * @return boolean  whether the file was recoded properly
    */
@@ -338,7 +344,8 @@ class CRM_Utils_File {
   /**
    * Determine whether a given file is listed in the PHP include path
    *
-   * @param string $name name of file
+   * @param string $name
+   *   Name of file.
    *
    * @return boolean  whether the file can be include()d or require()d
    */
@@ -408,7 +415,8 @@ class CRM_Utils_File {
   /**
    * Restrict access to a given directory (by planting there a restrictive .htaccess file)
    *
-   * @param string $dir the directory to be secured
+   * @param string $dir
+   *   The directory to be secured.
    * @param bool $overwrite
    */
   public static function restrictAccess($dir, $overwrite = FALSE) {
@@ -560,7 +568,8 @@ HTACCESS;
    *
    * TODO: Automatic file cleanup using, eg, TTL policy
    *
-   * @param $prefix string
+   * @param $prefix
+   *   String.
    *
    * @return string, path to an openable/writable file
    * @see tempnam
@@ -578,7 +587,8 @@ HTACCESS;
    *
    * TODO: Automatic file cleanup using, eg, TTL policy
    *
-   * @param $prefix string
+   * @param $prefix
+   *   String.
    *
    * @return string, path to an openable/writable directory; ends with '/'
    * @see tempnam
@@ -595,8 +605,10 @@ HTACCESS;
    *
    * Note: Dot-directories (like "..", ".git", or ".svn") will be ignored.
    *
-   * @param $dir string, base dir
-   * @param $pattern string, glob pattern, eg "*.txt"
+   * @param $dir
+   *   String, base dir.
+   * @param $pattern
+   *   String, glob pattern, eg "*.txt".
    * @return array(string)
    */
   public static function findFiles($dir, $pattern) {
@@ -660,8 +672,10 @@ HTACCESS;
    * Move $fromDir to $toDir, replacing/deleting any
    * pre-existing content.
    *
-   * @param string $fromDir the directory which should be moved
-   * @param string $toDir the new location of the directory
+   * @param string $fromDir
+   *   The directory which should be moved.
+   * @param string $toDir
+   *   The new location of the directory.
    * @param bool $verbose
    *
    * @return bool TRUE on success

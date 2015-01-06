@@ -54,7 +54,8 @@ class CRM_Utils_OpenFlashChart {
   /**
    * Build The Bar Gharph.
    *
-   * @param  array  $params  assoc array of name/value pairs
+   * @param array $params
+   *   Assoc array of name/value pairs.
    *
    * @return object $chart   object of open flash chart.
    * @static
@@ -183,7 +184,8 @@ class CRM_Utils_OpenFlashChart {
   /**
    * Build The Pie Gharph.
    *
-   * @param  array  $params  assoc array of name/value pairs
+   * @param array $params
+   *   Assoc array of name/value pairs.
    *
    * @return object $chart   object of open flash chart.
    * @static
@@ -246,7 +248,8 @@ class CRM_Utils_OpenFlashChart {
   /**
    * Build The 3-D Bar Gharph.
    *
-   * @param  array  $params  assoc array of name/value pairs
+   * @param array $params
+   *   Assoc array of name/value pairs.
    *
    * @return object $chart   object of open flash chart.
    * @static

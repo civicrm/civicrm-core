@@ -47,7 +47,8 @@ class CRM_Utils_SQL_Select {
   /**
    * Create a new SELECT query
    *
-   * @param string $from table-name and optional alias
+   * @param string $from
+   *   Table-name and optional alias.
    * @return CRM_Utils_SQL_Select
    */
   public static function from($from) {
@@ -57,7 +58,8 @@ class CRM_Utils_SQL_Select {
   /**
    * Create a new SELECT query
    *
-   * @param string $from table-name and optional alias
+   * @param string $from
+   *   Table-name and optional alias.
    */
   public function __construct($from) {
     $this->from = $from;
@@ -66,8 +68,10 @@ class CRM_Utils_SQL_Select {
   /**
    * Add a new JOIN clause
    *
-   * @param string $name the effective alias of the joined table
-   * @param string $expr the complete join expression (eg "INNER JOIN mytable myalias ON mytable.id = maintable.foo_id")
+   * @param string $name
+   *   The effective alias of the joined table.
+   * @param string $expr
+   *   The complete join expression (eg "INNER JOIN mytable myalias ON mytable.id = maintable.foo_id").
    * @param array|null $args
    * @return CRM_Utils_SQL_Select
    */

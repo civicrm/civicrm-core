@@ -806,7 +806,8 @@ class CRM_Utils_Array {
    * not appear in the result.
    *
    * @param array $array
-   * @param array $keys list of keys to copy
+   * @param array $keys
+   *   List of keys to copy.
    * @return array
    */
   public static function subset($array, $keys) {

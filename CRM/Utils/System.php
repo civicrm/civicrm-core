@@ -1262,7 +1262,7 @@ class CRM_Utils_System {
    *
    * @param string $page
    *   Title of documentation wiki page.
-   * @param boolean $URLonly
+   * @param bool $URLonly
    *   (optional) Whether to return URL only or full HTML link (default).
    * @param string $text
    *   (optional) Text of HTML link (no effect if $URLonly = false).
@@ -1833,7 +1833,8 @@ class CRM_Utils_System {
    * This function delegates the decision-making to (a) the hook system and
    * (b) the BAO system.
    *
-   * @param array $crudLinkSpec with keys:
+   * @param array $crudLinkSpec
+   *   With keys:.
    *  - action: int, CRM_Core_Action::UPDATE or CRM_Core_Action::VIEW [default: VIEW]
    *  - entity_table: string, eg "civicrm_contact"
    *  - entity_id: int

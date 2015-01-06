@@ -169,8 +169,10 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
   /**
    * Create APIv3 "get" parameters to lookup an existing record using $keys
    *
-   * @param array $origParams api request
-   * @param array $keys list of keys to match against
+   * @param array $origParams
+   *   Api request.
+   * @param array $keys
+   *   List of keys to match against.
    *
    * @return array APIv3 $params
    */

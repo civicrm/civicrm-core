@@ -89,7 +89,8 @@ class CRM_Utils_QueryFormatter {
   protected $mode;
 
   /**
-   * @param string $mode eg MODE_NONE
+   * @param string $mode
+   *   Eg MODE_NONE.
    */
   public function __construct($mode) {
     $this->mode = $mode;
@@ -111,7 +112,8 @@ class CRM_Utils_QueryFormatter {
 
   /**
    * @param string $text
-   * @param string $language eg LANG_SQL_LIKE, LANG_SQL_FTS, LANG_SOLR
+   * @param string $language
+   *   Eg LANG_SQL_LIKE, LANG_SQL_FTS, LANG_SOLR.
    * @throws CRM_Core_Exception
    * @return string
    */
@@ -266,8 +268,10 @@ class CRM_Utils_QueryFormatter {
   }
 
   /**
-   * @param string $text user-supplied query string
-   * @param string $template a prototypical description of each word, eg "word%" or "word*" or "*word*"
+   * @param string $text
+   *   User-supplied query string.
+   * @param string $template
+   *   A prototypical description of each word, eg "word%" or "word*" or "*word*".
    * @return string
    */
   protected function mapWords($text, $template) {

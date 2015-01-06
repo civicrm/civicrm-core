@@ -105,7 +105,8 @@ class CRM_Utils_Tree {
   /**
    * Find a node that matches the given string
    *
-   * @param string      $name       name of the node we are searching for.
+   * @param string $name
+   *   Name of the node we are searching for.
    * @param array (ref) $parentNode which parent node should we search in ?
    *
    * @return array(
@@ -175,8 +176,9 @@ class CRM_Utils_Tree {
   /**
    * Add node
    *
-   * @param string $parentName - name of the parent ?
-   * @param array  (ref)       - node to be added
+   * @param string $parentName
+   *   Name of the parent ?.
+   * @param array (ref) - node to be added
    *
    * @return void
    *
@@ -191,9 +193,10 @@ class CRM_Utils_Tree {
   /**
    * Add Data
    *
-   * @param string $parentName - name of the parent ?
-   * @param mixed              - data to be added
-   * @param string             - key to be used (optional)
+   * @param string $parentName
+   *   Name of the parent ?.
+   * @param mixed - data to be added
+   * @param string - key to be used (optional)
    *
    * @return void
    *
