@@ -370,7 +370,7 @@ abstract class CRM_Core_Component_Info {
    */
   private function _instantiate($cl) {
     $className = $this->namespace . '_' . $cl;
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php');
+    require_once str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
     return new $className();
   }
 }

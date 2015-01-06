@@ -179,7 +179,7 @@ class CRM_Core_OptionValue {
    * @param array $groupParams
    *   Array containing group fields whose option-values is to retrieved/saved.
    * @param $action
-   * @param integer $optionValueID
+   * @param int $optionValueIDHas the id of the optionValue being edited, disabled ..etc.
    *   Has the id of the optionValue being edited, disabled ..etc.
    *
    * @return CRM_Core_DAO_OptionValue
@@ -381,7 +381,7 @@ class CRM_Core_OptionValue {
    * @param string $orderBy
    *   For orderBy clause.
    *
-   * @param boolean $isActive
+   * @param bool $isActiveDo you want only active option values?.
    *   Do you want only active option values?.
    *
    * @return array of option-values

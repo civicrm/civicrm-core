@@ -50,7 +50,7 @@ class CRM_Core_Payment_PaymentExpressUtils {
     if (is_array($element)) {
       $xml = '';
       foreach ($element as $elem => $value) {
-          $xml .= self::_valueXml($elem, $value);
+        $xml .= self::_valueXml($elem, $value);
       }
       return $xml;
     }

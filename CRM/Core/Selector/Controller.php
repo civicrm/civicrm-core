@@ -367,7 +367,6 @@ class CRM_Core_Selector_Controller {
         self::$_template->assign("{$this->_prefix}summary", $summary);
       }
 
-
       // always store the current pageID and sortID
       $this->_store->set($this->_prefix . CRM_Utils_Pager::PAGE_ID,
         $this->_pager->getCurrentPageID()

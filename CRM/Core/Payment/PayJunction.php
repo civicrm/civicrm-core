@@ -60,7 +60,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
    * @return object
    * @static
    */
-  public static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = false) {
+  public static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     if (!empty($paymentProcessor['id'])) {
       $cacheKey = $paymentProcessor['id'];
     }
@@ -134,7 +134,6 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
 
     // set customer info (level 3 data) for the transaction
     $pjpgTxn->setCustInfo($pjpgCustInfo);
-
 
     // empty installments convert to 999 because PayJunction do not allow open end donation
     if ($params['installments'] == "") {

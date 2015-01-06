@@ -137,8 +137,8 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
 
     $query = db_query($sql);
     while ($result = db_fetch_object($query)) {
-    $uids[] = $result->uid;
-  }
+      $uids[] = $result->uid;
+    }
 
     $_cache[$roleName] = self::getContactEmails($uids);
     return $_cache[$roleName];
@@ -171,11 +171,11 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
 
     $query = db_query($sql);
     while ($result = db_fetch_object($query)) {
-    $uids[] = $result->uid;
-  }
+      $uids[] = $result->uid;
+    }
 
-  $_cache[$permissionName] = self::getContactEmails($uids);
-  return $_cache[$permissionName];
+    $_cache[$permissionName] = self::getContactEmails($uids);
+    return $_cache[$permissionName];
   }
 
   /**

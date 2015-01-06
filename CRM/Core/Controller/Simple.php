@@ -57,10 +57,10 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
   function __construct(
     $path,
     $title,
-    $mode         = NULL,
-    $imageUpload  = FALSE,
-    $addSequence  = FALSE,
-    $ignoreKey    = FALSE,
+    $mode = NULL,
+    $imageUpload = FALSE,
+    $addSequence = FALSE,
+    $ignoreKey = FALSE,
     $attachUpload = FALSE
   ) {
     // by definition a single page is modal :). We use the form name as the scope for this controller
@@ -76,7 +76,6 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
     ) {
       $mode = $savedAction;
     }
-
 
     $this->_stateMachine->addSequentialPages($params, $mode);
 

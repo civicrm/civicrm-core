@@ -279,6 +279,7 @@ class CRM_Core_BAO_CustomValueTable {
 
       case 'Int':
         return 'int';
+
       // the below three are FK's, and have constraints added to them
 
       case 'ContactReference':
@@ -457,7 +458,7 @@ AND    $cond
             if ($formatMultiRecordField) {
               if($file[$tableName][$fieldID] == 'File') {
                 if($fileid = $dao->$fieldName) {
-                  $fileurl = CRM_Core_BAO_File::paperIconAttachment($tableName,$entityID);
+                  $fileurl = CRM_Core_BAO_File::paperIconAttachment($tableName, $entityID);
                   $result["{$dao->id}"]["{$fieldID}"] = $fileurl[$dao->$fieldName];
                 }
               }
@@ -471,7 +472,7 @@ AND    $cond
           else {
             if($file[$tableName][$fieldID] == 'File') {
               if($fileid = $dao->$fieldName) {
-                $fileurl = CRM_Core_BAO_File::paperIconAttachment($tableName,$entityID);
+                $fileurl = CRM_Core_BAO_File::paperIconAttachment($tableName, $entityID);
                 $result[$fieldID] = $fileurl[$dao->$fieldName];
               }
             }
@@ -572,7 +573,7 @@ AND    cf.id IN ( $fieldIDList )
             case 'Country':
             case 'Money':
             case 'Float':
-              $fieldValue['value'] = (int)0;
+              $fieldValue['value'] = (int) 0;
               break;
           }
         }

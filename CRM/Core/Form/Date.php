@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-Class CRM_Core_Form_Date {
+class CRM_Core_Form_Date {
 
   /**
    * Various Date Formats
@@ -253,7 +253,7 @@ Class CRM_Core_Form_Date {
       array('class' => 'crm-select2')
       );
 
-      $form->addDateRange($fieldName, $from, $to, $fromLabel, $dateFormat, FALSE, $displayTime);
+    $form->addDateRange($fieldName, $from, $to, $fromLabel, $dateFormat, FALSE, $displayTime);
   }
 
 }

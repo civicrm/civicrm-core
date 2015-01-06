@@ -1550,12 +1550,12 @@ WHERE  id = %1";
    */
   public static function &visibility($column = 'label') {
     if (!isset(self::$visibility)) {
-      self::$visibility = array( );
+      self::$visibility = array();
     }
 
     if (!isset(self::$visibility[$column])) {
       self::$visibility[$column] = CRM_Core_OptionGroup::values('visibility', FALSE, FALSE, FALSE, NULL, $column);
-  }
+    }
 
     return self::$visibility[$column];
   }
@@ -1823,10 +1823,10 @@ WHERE  id = %1
    *
    * @return array - array reference of all Option Group Name
    */
-  public static function accountOptionValues($optionGroupName, $id = null, $condition = null) {
+  public static function accountOptionValues($optionGroupName, $id = NULL, $condition = NULL) {
     $cacheKey = $optionGroupName . '_' . $condition;
     if (empty(self::$accountOptionValues[$cacheKey])) {
-      self::$accountOptionValues[$cacheKey] = CRM_Core_OptionGroup::values($optionGroupName, false, false, false, $condition);
+      self::$accountOptionValues[$cacheKey] = CRM_Core_OptionGroup::values($optionGroupName, FALSE, FALSE, FALSE, $condition);
     }
     if ($id) {
       return CRM_Utils_Array::value($id, self::$accountOptionValues[$cacheKey]);

@@ -689,11 +689,12 @@ AND   cas.entity_value = $id AND
     while ($actionSchedule->fetch()) {
       $extraSelect = $extraJoin = $extraWhere = $extraOn = '';
 
-      if ($actionSchedule->from_email)
+      if ($actionSchedule->from_email) {
         $fromEmailAddress = "$actionSchedule->from_name <$actionSchedule->from_email>";
+      }
 
-      $activityTypeID = false;
-      $activityStatusID = false;
+      $activityTypeID = FALSE;
+      $activityStatusID = FALSE;
       if ($actionSchedule->record_activity) {
         if ($mapping->entity == 'civicrm_membership') {
           $activityTypeID =
@@ -818,7 +819,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           elseif ($field == 'registration_url') {
             $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $dao->event_id, TRUE, NULL, FALSE);
           }
-          elseif (in_array($field, array('start_date','end_date','join_date','activity_date_time'))) {
+          elseif (in_array($field, array('start_date', 'end_date', 'join_date', 'activity_date_time'))) {
             $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Date::customFormat($dao->$field);
           }
           elseif ($field == 'balance') {
@@ -954,7 +955,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       );
       $status = implode(',', $status);
 
-      $anniversary = false;
+      $anniversary = FALSE;
 
       if (!CRM_Utils_System::isNull($mapping->entity_recipient)) {
         if ($mapping->entity_recipient == 'event_contacts') {
@@ -1077,7 +1078,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $notINClause = self::permissionedRelationships($contactField);
 
         $membershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, "(is_current_member = 1 OR name = 'Expired')", 'id');
-        $mStatus = implode (',', $membershipStatus);
+        $mStatus = implode(',', $membershipStatus);
         $where[] = "e.status_id IN ({$mStatus})";
       }
 
@@ -1106,7 +1107,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         if (in_array(2, $status_)) {
           // anniversary mode:
           $dateField = 'DATE_ADD(e.' . $dateDBField . ', INTERVAL ROUND(DATEDIFF(DATE(' . $now . '), e.' . $dateDBField . ') / 365) YEAR)';
-          $anniversary = true;
+          $anniversary = TRUE;
         }
         else {
           // regular mode:
@@ -1250,7 +1251,7 @@ LEFT JOIN {$reminderJoinClause}
         if ($addWhere) {
           $addWhereClause = "AND {$addWhere}";
         }
-        $insertAdditionalSql ="
+        $insertAdditionalSql = "
 INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id)
 {$addSelect}
 FROM ({$contactTable})
@@ -1388,7 +1389,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
 
     if (!empty($excludeIds)) {
       $clause = "AND {$field} NOT IN ( " .implode(', ', $excludeIds) . ' ) ';
-      return  $clause;
+      return $clause;
     }
     return NULL;
   }

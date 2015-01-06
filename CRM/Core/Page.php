@@ -305,7 +305,7 @@ class CRM_Core_Page {
    *   The value to append.
    * @param bool $merge
    */
-  public function append($tpl_var, $value=NULL, $merge=FALSE) {
+  public function append($tpl_var, $value = NULL, $merge = FALSE) {
     self::$_template->append($tpl_var, $value, $merge);
   }
 
@@ -316,7 +316,7 @@ class CRM_Core_Page {
    *
    * @return array
    */
-  public function get_template_vars($name=null) {
+  public function get_template_vars($name = NULL) {
     return self::$_template->get_template_vars($name);
   }
 
