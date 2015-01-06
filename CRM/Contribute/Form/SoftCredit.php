@@ -94,7 +94,7 @@ class CRM_Contribute_Form_SoftCredit {
           $form->addGroup($honorTypes, 'soft_credit_type_id', NULL)->setAttribute('allowClear', TRUE);
         }
       }
-        return $form;
+      return $form;
     }
 
     // by default generate 5 blocks

@@ -113,7 +113,8 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     WHERE cc.is_test = %2 AND ccs.contact_id = %1
     GROUP BY currency';
 
-    $params = array(1 => array($contact_id, 'Integer'),
+    $params = array(
+    1 => array($contact_id, 'Integer'),
       2 => array($isTest, 'Integer'));
 
     $cs = CRM_Core_DAO::executeQuery($query, $params);
@@ -205,7 +206,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    *
    * @return array
    */
-  public static function getSoftCreditIds($contributionID , $isPCP = FALSE) {
+  public static function getSoftCreditIds($contributionID, $isPCP = FALSE) {
     $query = "
   SELECT id
   FROM  civicrm_contribution_soft
@@ -348,24 +349,26 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
           );
           unset($profileFields['prefix_id']);
         }
-          $honorName .= ' ' . $params['first_name'] . ' ' . $params['last_name'];
-          unset($profileFields['first_name']);
-          unset($profileFields['last_name']);
-          if (array_key_exists('suffix_id', $params)) {
-            $honorName .= ' ' . CRM_Utils_Array::value(CRM_Utils_Array::value('suffix_id', $params),
+        $honorName .= ' ' . $params['first_name'] . ' ' . $params['last_name'];
+        unset($profileFields['first_name']);
+        unset($profileFields['last_name']);
+        if (array_key_exists('suffix_id', $params)) {
+          $honorName .= ' ' . CRM_Utils_Array::value(CRM_Utils_Array::value('suffix_id', $params),
               CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id')
             );
-            unset($profileFields['suffix_id']);
-          }
-          break;
-        case 'Organization':
-          $honorName = $params['organization_name'];
-          unset($profileFields['organization_name']);
-          break;
-        case 'Household':
-          $honorName = $params['household_name'];
-          unset($profileFields['household_name']);
-          break;
+          unset($profileFields['suffix_id']);
+        }
+        break;
+
+      case 'Organization':
+        $honorName = $params['organization_name'];
+        unset($profileFields['organization_name']);
+        break;
+
+      case 'Household':
+        $honorName = $params['household_name'];
+        unset($profileFields['household_name']);
+        break;
     }
 
     if ($honorId) {

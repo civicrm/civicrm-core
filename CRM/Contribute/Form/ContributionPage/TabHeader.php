@@ -51,7 +51,8 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
     $form->assign_by_ref('tabHeader', $tabs);
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
-      ->addSetting(array('tabSettings' => array(
+      ->addSetting(array(
+    'tabSettings' => array(
         'active' => self::getCurrentTab($tabs),
       )));
     return $tabs;
@@ -68,55 +69,64 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
     }
 
     $tabs = array(
-      'settings' => array('title' => ts('Title'),
+      'settings' => array(
+    'title' => ts('Title'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
       ),
-      'amount' => array('title' => ts('Amounts'),
+      'amount' => array(
+    'title' => ts('Amounts'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
       ),
-      'membership' => array('title' => ts('Memberships'),
+      'membership' => array(
+    'title' => ts('Memberships'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
       ),
-      'thankyou' => array('title' => ts('Receipt'),
+      'thankyou' => array(
+    'title' => ts('Receipt'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
       ),
-      'friend' => array('title' => ts('Tell a Friend'),
+      'friend' => array(
+    'title' => ts('Tell a Friend'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
       ),
-      'custom' => array('title' => ts('Profiles'),
+      'custom' => array(
+    'title' => ts('Profiles'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
       ),
-      'premium' => array('title' => ts('Premiums'),
+      'premium' => array(
+    'title' => ts('Premiums'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
       ),
-      'widget' => array('title' => ts('Widgets'),
+      'widget' => array(
+    'title' => ts('Widgets'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
       ),
-      'pcp' => array('title' => ts('Personal Campaigns'),
+      'pcp' => array(
+    'title' => ts('Personal Campaigns'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,

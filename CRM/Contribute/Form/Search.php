@@ -163,8 +163,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
   }
 
   public function setDefaultValues() {
-    if (empty($this->_defaults
-['contribution_status'])) {
+    if (empty($this->_defaults['contribution_status'])) {
       $this->_defaults['contribution_status'][1] = 1;
     }
     return $this->_defaults;
@@ -291,7 +290,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         }
       }
 
-
       if (!$config->groupTree) {
         $group = CRM_Utils_Array::value('group', $this->_formValues);
         if ($group && !is_array($group)) {
@@ -325,7 +323,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       $this->controller->resetPage($formName);
       return;
     }
-
 
     $sortID = NULL;
     if ($this->get(CRM_Utils_Sort::SORT_ID)) {

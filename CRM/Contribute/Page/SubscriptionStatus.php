@@ -42,10 +42,10 @@ class CRM_Contribute_Page_SubscriptionStatus extends CRM_Core_Page {
    * return null
    */
   public function run() {
-    $task    = CRM_Utils_Request::retrieve('task', 'String',   CRM_Core_DAO::$_nullObject);
-    $result  = CRM_Utils_Request::retrieve('result', 'Integer',  CRM_Core_DAO::$_nullObject);
+    $task    = CRM_Utils_Request::retrieve('task', 'String', CRM_Core_DAO::$_nullObject);
+    $result  = CRM_Utils_Request::retrieve('result', 'Integer', CRM_Core_DAO::$_nullObject);
 
-    $this->assign('task',   $task);
+    $this->assign('task', $task);
     $this->assign('result', $result);
 
     if ( $task == 'billing' ) {

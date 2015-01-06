@@ -347,23 +347,22 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
         )
     );
 
-
     foreach ($ufJoinParams as $index => $ufJoinParam) {
       if (!empty($params[$index])) {
-          $ufJoinParam['weight'] = 1;
-          if ($index == 'honor_block_is_active') {
-            $ufJoinParam['is_active'] = 1;
-            $ufJoinParam['module'] = 'soft_credit';
-            $ufJoinParam['uf_group_id'] = $params['honoree_profile'];
-            $ufJoinParam['module_data'] = $sctJSON;
-          }
-          else {
-            // first delete all past entries
-            CRM_Core_BAO_UFJoin::deleteAll($ufJoinParam);
-            $ufJoinParam['uf_group_id'] = $params[$index];
-          }
-            CRM_Core_BAO_UFJoin::create($ufJoinParam);
+        $ufJoinParam['weight'] = 1;
+        if ($index == 'honor_block_is_active') {
+          $ufJoinParam['is_active'] = 1;
+          $ufJoinParam['module'] = 'soft_credit';
+          $ufJoinParam['uf_group_id'] = $params['honoree_profile'];
+          $ufJoinParam['module_data'] = $sctJSON;
         }
+        else {
+          // first delete all past entries
+          CRM_Core_BAO_UFJoin::deleteAll($ufJoinParam);
+          $ufJoinParam['uf_group_id'] = $params[$index];
+        }
+        CRM_Core_BAO_UFJoin::create($ufJoinParam);
+      }
       elseif ($index == 'honor_block_is_active') {
         //On subsequent honor_block_is_active uncheck, disable(don't delete)
         //that particular honoree profile entry in UFjoin table, CRM-13981

@@ -141,7 +141,6 @@ AND    co.id IN ( $contribIDs )";
         array('CRM_Contribute_DAO_Contribution', $dao->contribution_id, 'trxn_id')
       );
 
-
       $row['fee_amount'] = &$this->add('text', "fee_amount_{$row['contribution_id']}", ts('Fee Amount'),
         $attributes['fee_amount']
       );

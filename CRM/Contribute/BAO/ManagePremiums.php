@@ -89,7 +89,7 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
   }
 
   /**
-     * add the financial types
+   * add the financial types
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -148,7 +148,7 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
       return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/contribute/managePremiums', 'reset=1&action=browse'));
     }
 
-        //delete from financial Type table
+    //delete from financial Type table
     $premium = new CRM_Contribute_DAO_Product();
     $premium->id = $productID;
     $premium->delete();
