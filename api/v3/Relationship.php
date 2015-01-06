@@ -148,10 +148,9 @@ function civicrm_api3_relationship_get($params) {
     if(!empty($params['membership_type_id']) && empty($params['relationship_type_id'])) {
       CRM_Contact_BAO_Relationship::membershipTypeToRelationshipTypes($params);
     }
-    $relationships = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
+    $relationships = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Relationship');
   }
   else {
-    $relationships = array();
     $relationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
       CRM_Utils_Array::value('status_id', $params),
       0,

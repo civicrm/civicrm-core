@@ -107,7 +107,6 @@ class CRM_Core_BAO_CustomQuery {
   /**
    * This stores custom data group types and tables that it extends
    *
-   * @todo add comments explaining why survey & campaign are missing from this
    * @var array
    * @static
    */
@@ -127,6 +126,8 @@ class CRM_Core_BAO_CustomQuery {
     'Pledge' => 'civicrm_pledge',
     'Grant' => 'civicrm_grant',
     'Address' => 'civicrm_address',
+    'Campaign' => 'civicrm_campaign',
+    'Survey' => 'civicrm_survey',
   );
 
   /**
