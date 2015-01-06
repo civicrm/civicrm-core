@@ -52,7 +52,8 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * friend object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Friend_BAO_Friend object
    * @static
@@ -66,8 +67,10 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array  $params input parameters to find object
-   * @param array  $values output values of the object
+   * @param array $params
+   *   Input parameters to find object.
+   * @param array $values
+   *   Output values of the object.
    *
    * @return array $values values
    * @static
@@ -87,7 +90,8 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   /**
    * Takes an associative array and creates a friend object
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Contact_BAO_Contact object
    * @static
@@ -235,7 +239,8 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   /**
    * Build the form object
    *
-   * @param CRM_Core_Form $form form object
+   * @param CRM_Core_Form $form
+   *   Form object.
    *
    * @return void
    */
@@ -266,7 +271,8 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   /**
    * The function sets the deafult values of the form.
    *
-   * @param array   $defaults (reference) the default values.
+   * @param array $defaults
+   *   (reference) the default values.
    *
    * @return booelan  whether anything was found
    */
@@ -334,7 +340,8 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * friend object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Friend_BAO_Friend object
    * @static
