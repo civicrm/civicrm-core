@@ -1425,9 +1425,19 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $err
         if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
           break;
         }
-        if (!CRM_Utils_Rule::money($fieldValue) && !empty($fieldValue)) {
-          throw new Exception($fieldName . " is  not a valid amount: " . $params[$fieldName]);
+        if (is_array($fieldValue)) {
+          foreach($fieldValue as $fieldvalue) {
+            if (!CRM_Utils_Rule::money($fieldvalue) && !empty($fieldvalue)) {
+              throw new Exception($fieldName . " is  not a valid amount: " . $params[$fieldName]);
+            }
+          }
         }
+        else {
+          if (!CRM_Utils_Rule::money($fieldValue) && !empty($fieldValue)) {
+            throw new Exception($fieldName . " is  not a valid amount: " . $params[$fieldName]);
+          }
+        }
+        break;
     }
 
     // intensive checks - usually only called after DB level fail
