@@ -786,7 +786,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Global validation rules for the form
    *
-   * @param array $values posted values of the form
+   * @param array $values
+   *   Posted values of the form.
    * @param $files
    * @param $self
    *

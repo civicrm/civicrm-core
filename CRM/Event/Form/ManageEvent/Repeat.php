@@ -162,7 +162,8 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
    /**
    * This function gets the number of participant count for the list of related event ids
    *
-   * @param array $listOfRelatedEntities list of related event ids
+   * @param array $listOfRelatedEntities
+   *   List of related event ids .
    *
    * @static
    *
@@ -194,7 +195,8 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
   /**
    * This function checks if there was any registraion for related event ids,
    * and returns array of ids with no regsitrations
-   * @param type $eventID Event ID
+   * @param type $eventID
+   *   Event ID .
    * @return type
    */
   public static function checkRegistrationForEvents($eventID) {
