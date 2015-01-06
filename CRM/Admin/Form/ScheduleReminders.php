@@ -263,7 +263,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   /**
    * Global form rule
    *
-   * @param array $fields  the input form values
+   * @param array $fields
+   *   The input form values.
    *
    * @return true if no errors, else array of errors
    * @static
