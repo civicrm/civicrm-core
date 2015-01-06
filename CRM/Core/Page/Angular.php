@@ -37,6 +37,9 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
         'angular' => array(
           'modules' => array_merge(array('ngRoute'), array_keys($modules)),
         ),
+        'crmAttachment' => array(
+          'token' => CRM_Core_Page_AJAX_Attachment::createToken(),
+        ),
       );
     });
 
