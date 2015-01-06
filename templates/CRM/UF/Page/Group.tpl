@@ -53,7 +53,7 @@
 
     {if NOT ($action eq 1 or $action eq 2)}
     <div class="crm-submit-buttons">
-        <a href="{crmURL p='civicrm/admin/uf/group/add' q="action=add&reset=1"}" id="newCiviCRMProfile-top" class="button"><span><div class="icon add-icon"></div>{ts}Add Profile{/ts}</span></a>
+        <a href="{crmURL p='civicrm/admin/uf/group/add' q="action=add&reset=1"}" id="newCiviCRMProfile-top" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Profile{/ts}</span></a>
     </div>
     {/if}
     {if $rows}
@@ -103,7 +103,7 @@
 
             {if NOT ($action eq 1 or $action eq 2)}
             <div class="crm-submit-buttons">
-                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><div class="icon add-icon"></div>{ts}Add Profile{/ts}</span></a>
+                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Profile{/ts}</span></a>
             </div>
             {/if}
             </div>
@@ -146,7 +146,7 @@
 
             {if NOT ($action eq 1 or $action eq 2)}
             <div class="crm-submit-buttons">
-                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><div class="icon add-icon"></div>{ts}Add Profile{/ts}</span></a>
+                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Profile{/ts}</span></a>
             </div>
             {/if}
             </div>

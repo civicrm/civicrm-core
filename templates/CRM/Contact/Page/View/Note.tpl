@@ -100,7 +100,7 @@
 
 {if $permission EQ 'edit' AND ($action eq 16)}
    <div class="action-link">
-   <a accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}" class="button medium-popup"><span><div class="icon add-icon"></div>{ts}Add Note{/ts}</span></a>
+   <a accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}" class="button medium-popup"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Note{/ts}</span></a>
    </div>
    <div class="clear"></div>
 {/if}

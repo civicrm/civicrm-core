@@ -50,7 +50,7 @@
 
 <div class="action-link">
   <a accesskey="N" href="{$newEventURL}" id="newManageEvent" class="button crm-popup">
-    <span><div class="icon add-icon"></div>{ts}Add Event{/ts}</span>
+    <span><div class="icon ui-icon-circle-plus"></div>{ts}Add Event{/ts}</span>
   </a>
   <div class="clear"></div>
 </div>

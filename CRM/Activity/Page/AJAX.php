@@ -275,7 +275,7 @@ class CRM_Activity_Page_AJAX {
       }
       // email column links/icon
       if ($row['email']) {
-        $row['email'] = '<a class="crm-hover-button crm-popup" href="' . CRM_Utils_System::url('civicrm/activity/email/add', 'reset=1&action=add&atype=3&cid=' . $row['cid']) . '&caseid=' . $caseID . '" title="' .  ts('Send an Email') . '"><span class="icon email-icon"></span></a>';
+        $row['email'] = '<a class="crm-hover-button crm-popup" href="' . CRM_Utils_System::url('civicrm/activity/email/add', 'reset=1&action=add&atype=3&cid=' . $row['cid']) . '&caseid=' . $caseID . '" title="' .  ts('Send an Email') . '"><span class="icon ui-icon-mail-closed"></span></a>';
       }
       // edit links
       $row['actions'] = '';
@@ -286,7 +286,7 @@ class CRM_Activity_Page_AJAX {
           case 'caseRel':
             $row['actions'] =
             '<a href="#editCaseRoleDialog" title="' .  ts('Reassign %1', array(1 => $typeLabel))  . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' .  $row['relation_type']  . '" data-rel_id="' .  $row['rel_id']  . '"data-key="' .  CRM_Core_Key::get('civicrm/ajax/relation')  . '">' .
-              '<span class="icon edit-icon"></span>' .
+              '<span class="icon ui-icon-pencil"></span>' .
             '</a>' .
             '<a href="#deleteCaseRoleDialog" title="' .  ts('Remove %1', array(1 => $typeLabel))  . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '" data-key="' .  CRM_Core_Key::get('civicrm/ajax/delcaserole')  . '">' .
               '<span class="icon delete-icon"></span>' .
@@ -296,7 +296,7 @@ class CRM_Activity_Page_AJAX {
           case 'caseRoles':
             $row['actions'] =
             '<a href="#editCaseRoleDialog" title="' .  ts('Assign %1', array(1 => $typeLabel))  . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' .  $row['relation_type']  . '" data-key="' .  CRM_Core_Key::get('civicrm/ajax/relation')  . '">' .
-              '<span class="icon edit-icon"></span>' .
+              '<span class="icon ui-icon-pencil"></span>' .
             '</a>';
             break;
         }

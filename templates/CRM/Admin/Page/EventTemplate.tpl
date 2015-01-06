@@ -31,7 +31,7 @@
 {if $action ne 1 and $action ne 2}
       <div class="action-link">
         <a href="{crmURL p="civicrm/event/add" q="action=add&is_template=1&reset=1"}" id="newEventTemplate" class="button">
-        <span><div class="icon add-icon"></div>{ts}Add Event Template{/ts}</span></a>
+        <span><div class="icon ui-icon-circle-plus"></div>{ts}Add Event Template{/ts}</span></a>
         <div class="clear"></div>
       </div>
 {/if}
