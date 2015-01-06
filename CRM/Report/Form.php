@@ -148,6 +148,12 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_tagFilter = FALSE;
 
   /**
+   * specify entity table for tags filter
+   *
+   */
+  protected $_tagFilterTable = 'civicrm_contact';
+
+  /**
    * build groups filter
    *
    */
@@ -1260,7 +1266,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   function buildTagFilter() {
-    $contactTags = CRM_Core_BAO_Tag::getTags();
+    $contactTags = CRM_Core_BAO_Tag::getTags($this->_tagFilterTable);
     if (!empty($contactTags)) {
       $this->_columns['civicrm_tag'] = array(
         'dao' => 'CRM_Core_DAO_Tag',
@@ -3009,11 +3015,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       $value = array($value);
     }
     $clause = "{$field['dbAlias']} IN (" . implode(', ', $value) . ")";
-
-    return " {$this->_aliases['civicrm_contact']}.id {$sqlOp} (
+    $entity_table = $this->_tagFilterTable;
+    return " {$this->_aliases[$entity_table]}.id {$sqlOp} (
                           SELECT DISTINCT {$this->_aliases['civicrm_tag']}.entity_id
                           FROM civicrm_entity_tag {$this->_aliases['civicrm_tag']}
-                          WHERE entity_table = 'civicrm_contact' AND {$clause} ) ";
+                          WHERE entity_table = '$entity_table' AND {$clause} ) ";
   }
 
   function whereMembershipOrgClause($field, $value, $op) {
