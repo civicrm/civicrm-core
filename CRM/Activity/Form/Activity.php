@@ -433,7 +433,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $urlString = 'civicrm/contact/search/advanced';
       }
       elseif ($path == 'civicrm/group/search'
-	|| $path == 'civicrm/contact/search'
+    || $path == 'civicrm/contact/search'
         || $path == 'civicrm/contact/search/advanced'
         || $path == 'civicrm/contact/search/custom'
         || $path == 'civicrm/group/search') {
@@ -677,7 +677,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       CRM_Campaign_BAO_Campaign::accessCampaign()
     ) {
       $buildEngagementLevel = TRUE;
-      $this->addSelect('engagement_level',array('entity' => 'activity'));
+      $this->addSelect('engagement_level', array('entity' => 'activity'));
       $this->addRule('engagement_level',
         ts('Please enter the engagement index as a number (integers only).'),
         'positiveInteger'
