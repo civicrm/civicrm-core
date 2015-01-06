@@ -472,7 +472,8 @@ class CRM_Pledge_BAO_Query {
   /**
    * Ideally this function should include fields that are displayed in the selector
    */
-  static function defaultReturnProperties($mode,
+  static function defaultReturnProperties(
+    $mode,
     $includeCustomFields = TRUE
   ) {
     $properties = NULL;
