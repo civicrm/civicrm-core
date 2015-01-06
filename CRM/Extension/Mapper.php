@@ -102,10 +102,10 @@ class CRM_Extension_Mapper {
       $this->civicrmUrl = rtrim($config->resourceBase, '/');
     }
     if ($civicrmPath) {
-      $this->civicrmPath = rtrim($civicrmPath,'/');
+      $this->civicrmPath = rtrim($civicrmPath, '/');
     } else {
       global $civicrm_root;
-      $this->civicrmPath = rtrim($civicrm_root,'/');
+      $this->civicrmPath = rtrim($civicrm_root, '/');
     }
   }
 
