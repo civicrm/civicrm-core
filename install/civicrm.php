@@ -303,4 +303,3 @@ function civicrm_home_url() {
   $drupalURL = civicrm_cms_base();
   return $drupalURL . 'index.php?q=civicrm';
 }
-
