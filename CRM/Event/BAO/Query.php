@@ -297,6 +297,11 @@ class CRM_Event_BAO_Query {
         $query->_tables['civicrm_event'] = $query->_whereTables['civicrm_event'] = 1;
         return;
 
+      case 'participant_is_test':
+        $key = array_search('civicrm_participant.is_test = 0', $query->_where[$grouping]);
+        if (!empty($key)) {
+          unset($query->_where[$grouping][$key]);
+        }
       case 'participant_test':
         // We dont want to include all tests for sql OR CRM-7827
         if (!$value || $query->getOperator() != 'OR') {
@@ -336,16 +341,18 @@ class CRM_Event_BAO_Query {
       case 'participant_source':
       case 'participant_id':
       case 'participant_contact_id':
-      case 'participant_pay_later':
+      case 'participant_is_pay_later':
       case 'participant_fee_amount':
       case 'participant_fee_level':
         $qillName = $name;
-        if (in_array($name, array('participant_status_id', 'participant_role_id', 'participant_source', 'participant_id', 'participant_contact_id', 'participant_fee_amount', 'participant_fee_level'))) {
+        if (in_array($name, array('participant_status_id', 'participant_role_id', 'participant_source', 'participant_id', 'participant_contact_id', 'participant_fee_amount', 'participant_fee_level', 'participant_is_pay_later'))) {
           $name = str_replace('participant_', '', $name);
-        }
-        if ($name == 'participant_pay_later') {
-          $name = str_replace('participant', 'is', $name);
-          $qillName = 'participant_' . $name;
+          if ($name == 'is_pay_later') {
+            $qillName = $name;
+          }
+          if ($name == 'participant_role_id') {
+            $qillName = str_replace('_id', '', $name);
+          }
         }
 
         $dataType = !empty($fields[$qillName]['type']) ? CRM_Utils_Type::typeToString($fields[$qillName]['type']) : 'String';
@@ -368,6 +375,8 @@ class CRM_Event_BAO_Query {
         return;
 
       case 'event_id':
+      case 'participant_event_id':
+        $name = str_replace('participant_', '', $name);
       case 'event_is_public':
       case 'event_type_id':
 
@@ -545,7 +554,7 @@ class CRM_Event_BAO_Query {
     );
 
     $form->addYesNo('participant_test', ts('Participant is a Test?'), TRUE);
-    $form->addYesNo('participant_pay_later', ts('Participant is Pay Later?'), TRUE);
+    $form->addYesNo('participant_is_pay_later', ts('Participant is Pay Later?'), TRUE);
     $form->addElement('text', 'participant_fee_amount_low', ts('From'), array('size' => 8, 'maxlength' => 8));
     $form->addElement('text', 'participant_fee_amount_high', ts('To'), array('size' => 8, 'maxlength' => 8));
 
