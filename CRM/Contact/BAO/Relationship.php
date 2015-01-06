@@ -404,7 +404,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @return array - array reference of all relationship types with context to current contact.
    */
-  static function getContactRelationshipType($contactId = NULL,
+  static function getContactRelationshipType(
+    $contactId = NULL,
     $contactSuffix = NULL,
     $relationshipId = NULL,
     $contactType = NULL,
@@ -1051,7 +1052,8 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    * @return array|int
    * @static
    */
-  static function getRelationship($contactId = NULL,
+  static function getRelationship(
+    $contactId = NULL,
     $status              = 0, $numRelationship = 0,
     $count               = 0, $relationshipId = 0,
     $links               = NULL, $permissionMask = NULL,

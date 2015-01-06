@@ -107,7 +107,8 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate implements CRM_Contac
   /**
    * Construct the search query
    */
-  function all($offset = 0, $rowcount = 0, $sort = NULL,
+  function all(
+    $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
 

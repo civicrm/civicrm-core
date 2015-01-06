@@ -699,12 +699,14 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     );
 
     //set respective mapper params to array.
-    foreach (array_keys($mapperParams) as $mapperParam) { $$mapperParam = array();
+    foreach (array_keys($mapperParams) as $mapperParam) {
+      $$mapperParam = array();
     }
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
       //set respective mapper value to null
-      foreach (array_values($mapperParams) as $mapperParam) { $$mapperParam = NULL;
+      foreach (array_values($mapperParams) as $mapperParam) {
+        $$mapperParam = NULL;
       }
 
       $fldName            = CRM_Utils_Array::value(0, $mapperKeys[$i]);

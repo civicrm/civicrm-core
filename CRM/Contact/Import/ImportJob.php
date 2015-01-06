@@ -118,7 +118,8 @@ class CRM_Contact_Import_ImportJob {
       'mapperRelatedContactImProvider',
       'mapperRelatedContactWebsiteType',
     );
-    foreach ($properties as $property) { $this->{"_$property"} = array();
+    foreach ($properties as $property) {
+      $this->{"_$property"} = array();
     }
   }
 
@@ -191,7 +192,8 @@ class CRM_Contact_Import_ImportJob {
 
     foreach ($mapper as $key => $value) {
       //set respective mapper value to null.
-      foreach (array_values($mapperPeroperties) as $perpertyVal) { $$perpertyVal = NULL;
+      foreach (array_values($mapperPeroperties) as $perpertyVal) {
+        $$perpertyVal = NULL;
       }
 
       $fldName = CRM_Utils_Array::value(0, $mapper[$key]);
@@ -346,7 +348,8 @@ class CRM_Contact_Import_ImportJob {
    *
    * @return array|bool
    */
-  private function _addImportedContactsToNewGroup($contactIds,
+  private function _addImportedContactsToNewGroup(
+    $contactIds,
     $newGroupName, $newGroupDesc
   ) {
 
@@ -399,7 +402,8 @@ class CRM_Contact_Import_ImportJob {
    *
    * @return array|bool
    */
-  private function _tagImportedContactsWithNewTag($contactIds,
+  private function _tagImportedContactsWithNewTag(
+    $contactIds,
     $newTagName, $newTagDesc
   ) {
 

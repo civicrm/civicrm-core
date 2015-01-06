@@ -103,7 +103,8 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
   /**
    * Construct the search query
    */
-  function all($offset = 0, $rowcount = 0, $sort = NULL,
+  function all(
+    $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
     // SELECT clause must include contact_id as an alias for civicrm_contact.id if you are going to use "tasks" like export etc.
@@ -270,7 +271,6 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
         inner join civicrm_entity_financial_trxn
         on (civicrm_entity_financial_trxn.entity_id = civicrm_participant_payment.contribution_id and civicrm_entity_financial_trxn.entity_table='civicrm_contribution')";
     }
-
 
     $where = $this->where();
 

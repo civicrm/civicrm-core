@@ -158,7 +158,8 @@ ON DUPLICATE KEY UPDATE
    * @return boolean
    * @static
    */
-  static function hasContactsInCache($type = CRM_Core_Permission::VIEW,
+  static function hasContactsInCache(
+    $type = CRM_Core_Permission::VIEW,
     $contactID = NULL
   ) {
     if (!$contactID) {
@@ -324,7 +325,8 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
   AND  ( civicrm_relationship.is_active = 1 )
 ";
       }
-      $params = array(1 => array($contactID, 'Integer'),
+      $params = array(
+      1 => array($contactID, 'Integer'),
         2 => array($selectedContactID, 'Integer'),
       );
       return CRM_Core_DAO::singleValueQuery($query, $params);

@@ -65,7 +65,8 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
    *
    * @static
    */
-  static function buildQuickForm(&$form,
+  static function buildQuickForm(
+    &$form,
     $contactId = 0,
     $type = self::ALL,
     $visibility = FALSE,
@@ -197,7 +198,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
         self::climbtree($form, $varValue['children'], $elements);
       }
     }
-   return $elements;
+    return $elements;
   }
 
   /**
