@@ -135,11 +135,10 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $this->_sortByCharacter =
       CRM_Utils_Request::retrieve('sortByCharacter', 'String', $this);
 
-
     // CRM-11920 all should set sortByCharacter to null, not empty string
     if (strtolower($this->_sortByCharacter) == 'all' || !empty($_POST)) {
-      $this->_sortByCharacter = null;
-      $this->set('sortByCharacter', null);
+      $this->_sortByCharacter = NULL;
+      $this->set('sortByCharacter', NULL);
     }
 
     if (CRM_Utils_Array::value(3, $newArgs) == 'unscheduled') {
@@ -232,7 +231,6 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       CRM_Core_Selector_Controller::TEMPLATE
     );
 
-
     $controller->setEmbedded(TRUE);
     $controller->run();
 
@@ -288,8 +286,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   }
 
   public function search() {
-    if ($this->_action &
-      (CRM_Core_Action::ADD |
+    if ($this->_action & (CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE
       )
     ) {

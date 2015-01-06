@@ -79,7 +79,8 @@ SET    on_hold = 2,
        hold_date = %1
 WHERE  email = %2
 ";
-        $sqlParams = array(1 => array($now, 'Timestamp'),
+        $sqlParams = array(
+        1 => array($now, 'Timestamp'),
           2 => array($email->email, 'String'),
         );
         CRM_Core_DAO::executeQuery($sql, $sqlParams);
@@ -174,7 +175,6 @@ WHERE  email = %2
 
     /* Make a list of groups and a list of prior mailings that received
          * this mailing */
-
 
     $groups = array();
     $base_groups = array();

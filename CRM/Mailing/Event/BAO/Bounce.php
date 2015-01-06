@@ -266,7 +266,7 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
         'email' => $dao->email,
         // FIXME: translate this
         'type' => (empty($dao->bounce_type)
-           ? ts('Unknown') : $dao->bounce_type
+      ? ts('Unknown') : $dao->bounce_type
         ),
         'reason' => $dao->reason,
         'date' => CRM_Utils_Date::customFormat($dao->date),

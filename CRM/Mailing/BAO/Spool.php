@@ -64,7 +64,7 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
    *               containing a descriptive error message on
    *               failure.
    */
-  public function send($recipient, $headers, $body, $job_id = null) {
+  public function send($recipient, $headers, $body, $job_id = NULL) {
     $headerStr = array();
     foreach ($headers as $name => $value) {
       $headerStr[] = "$name: $value";

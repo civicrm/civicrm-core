@@ -104,7 +104,6 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     /* Make a list of groups and a list of prior mailings that received
          * this mailing */
 
-
     $groups = array();
     $mailings = array();
 
