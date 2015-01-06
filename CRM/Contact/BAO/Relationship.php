@@ -42,8 +42,32 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   const PAST = 1, DISABLED = 2, CURRENT = 4, INACTIVE = 8;
 
   /**
+   * Create function. (Use the API instead)
+   * Note that the previous create function has been renamed 'createMultiple'
+   * and this is new in 4.6
+   * All existing calls have been changed to createMultiple except the api call - however, it is recommended
+   * that you call that as the end to end testing here is based on the api & refactoring may still be done
+   * @param $params
+   * @return \CRM_Contact_BAO_Relationship
+   * @throws \CRM_Core_Exception
+   */
+  public static function create(&$params) {
+    self::setContactABFromIDs($params);
+    if (self::checkDuplicateRelationship($params, $params['contact_id_a'], $params['contact_id_b'], CRM_Utils_Array::value('id', $params, 0))) {
+      throw new CRM_Core_Exception('Duplicate Relationship');
+    }
+    if (self::checkValidRelationship($params, $params, 0)) {
+      throw new CRM_Core_Exception('Invalide Relationship');
+    }
+    $relationship = self::add($params);
+    self::addRecent($params, $relationship);
+    return $relationship;
+  }
+  /**
    * Takes an associative array and creates a relationship object
-   *
+   * @deprecated For single creates use the api instead (it's tested).
+   * For multiple a new variant of this function needs to be written and migrated to as this is a bit
+   * nasty
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param array $ids    the array that holds all the db ids
@@ -53,7 +77,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @return CRM_Contact_BAO_Relationship object
    * @static
    */
-  public static function create(&$params, $ids = array()) {
+  public static function createMultiple(&$params, $ids = array()) {
     $valid = $invalid = $duplicate = $saved = 0;
     $relationships = $relationshipIds = array();
     $relationshipId = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
@@ -102,8 +126,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           $duplicate++;
           continue;
         }
-
-        $relationship = self::add($params, $ids, $key);
+        self::setContactABFromIDs($params, $ids, $key);
+        $relationship = self::add($params);
         $relationshipIds[] = $relationship->id;
         $relationships[$relationship->id] = $relationship;
         $valid++;
@@ -148,39 +172,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
     // do not add to recent items for import, CRM-4399
     if (!(!empty($params['skipRecentView']) || $invalid || $duplicate)) {
-      $url = CRM_Utils_System::url('civicrm/contact/view/rel',
-        "action=view&reset=1&id={$relationship->id}&cid={$relationship->contact_id_a}&context=home"
-      );
-
-
-      $session = CRM_Core_Session::singleton();
-      $recentOther = array();
-      if (($session->get('userID') == $relationship->contact_id_a) ||
-        CRM_Contact_BAO_Contact_Permission::allow($relationship->contact_id_a, CRM_Core_Permission::EDIT)
-      ) {
-        $rType = substr(CRM_Utils_Array::value('relationship_type_id', $params), -3);
-        $recentOther = array(
-          'editUrl' => CRM_Utils_System::url('civicrm/contact/view/rel',
-            "action=update&reset=1&id={$relationship->id}&cid={$relationship->contact_id_a}&rtype={$rType}&context=home"
-          ),
-          'deleteUrl' => CRM_Utils_System::url('civicrm/contact/view/rel',
-            "action=delete&reset=1&id={$relationship->id}&cid={$relationship->contact_id_a}&rtype={$rType}&context=home"
-          ),
-        );
-      }
-
-      $title = CRM_Contact_BAO_Contact::displayName($relationship->contact_id_a) . ' (' . CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType',
-        $relationship->relationship_type_id, 'label_a_b'
-      ) . ' ' . CRM_Contact_BAO_Contact::displayName($relationship->contact_id_b) . ')';
-      // add the recently created Relationship
-      CRM_Utils_Recent::add($title,
-        $url,
-        $relationship->id,
-        'Relationship',
-        $relationship->contact_id_a,
-        NULL,
-        $recentOther
-      );
+      self::addRecent($params, $relationship);
     }
 
     return array($valid, $invalid, $duplicate, $saved, $relationshipIds, $relationships);
@@ -207,27 +199,25 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     //@todo hook are called from create and add - remove one
     CRM_Utils_Hook::pre($hook , 'Relationship', $relationshipId, $params);
 
+    self::setContactABFromIDs($params);
     $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
 
     // explode the string with _ to get the relationship type id
     // and to know which contact has to be inserted in
     // contact_id_a and which one in contact_id_b
-    list($type, $first, $second) = explode('_', $relationshipTypes);
-
-    ${'contact_' . $first} = CRM_Utils_Array::value('contact', $ids);
-    ${'contact_' . $second} = $contactId;
+    list($type) = explode('_', $relationshipTypes);
 
     // check if the relationship type is Head of Household then update the
     // household's primary contact with this contact.
     if ($type == 6) {
-      CRM_Contact_BAO_Household::updatePrimaryContact($contact_b, $contact_a);
+      CRM_Contact_BAO_Household::updatePrimaryContact($params['contact_id_b'], $params['contact_id_a']);
     }
 
     $relationship = new CRM_Contact_BAO_Relationship();
     //@todo this code needs to be updated for the possibility that not all fields are set
     // (update)
-    $relationship->contact_id_b = $contact_b;
-    $relationship->contact_id_a = $contact_a;
+    $relationship->contact_id_b = $params['contact_id_b'];
+    $relationship->contact_id_a = $params['contact_id_a'];
     $relationship->relationship_type_id = $type;
     $relationship->id = $relationshipId;
 
@@ -263,6 +253,85 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
     return $relationship;
   }
+
+  /**
+   * Add relationship to recent links
+   * @param array $params
+   * @param CRM_Contact_DAO_Relationship $relationship
+   */
+  public static function addRecent($params, $relationship) {
+    $url = CRM_Utils_System::url('civicrm/contact/view/rel',
+      "action=view&reset=1&id={$relationship->id}&cid={$relationship->contact_id_a}&context=home"
+    );
+    $session = CRM_Core_Session::singleton();
+    $recentOther = array();
+    if (($session->get('userID') == $relationship->contact_id_a) ||
+      CRM_Contact_BAO_Contact_Permission::allow($relationship->contact_id_a, CRM_Core_Permission::EDIT)
+    ) {
+      $rType = substr(CRM_Utils_Array::value('relationship_type_id', $params), -3);
+      $recentOther = array(
+        'editUrl' => CRM_Utils_System::url('civicrm/contact/view/rel',
+          "action=update&reset=1&id={$relationship->id}&cid={$relationship->contact_id_a}&rtype={$rType}&context=home"
+        ),
+        'deleteUrl' => CRM_Utils_System::url('civicrm/contact/view/rel',
+          "action=delete&reset=1&id={$relationship->id}&cid={$relationship->contact_id_a}&rtype={$rType}&context=home"
+        ),
+      );
+    }
+    $title = CRM_Contact_BAO_Contact::displayName($relationship->contact_id_a) . ' (' . CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType',
+        $relationship->relationship_type_id, 'label_a_b'
+      ) . ' ' . CRM_Contact_BAO_Contact::displayName($relationship->contact_id_b) . ')';
+
+    CRM_Utils_Recent::add($title,
+      $url,
+      $relationship->id,
+      'Relationship',
+      $relationship->contact_id_a,
+      NULL,
+      $recentOther
+    );
+  }
+
+  /**
+   * Resolve passed in contact IDs to contact_id_a & contact_id_b
+   * @param $params
+   * @param array $ids
+   * @param null $contactID
+   * @throws \CRM_Core_Exception
+   */
+  public static function setContactABFromIDs(&$params, $ids = array(), $contactID = NULL) {
+    if (!empty($params['contact_id_a']) && !empty($params['contact_id_b'])) {
+      return;
+    }
+    if (empty($ids['contact'])) {
+      if (!empty($params['id'])) {
+        //let's load the missing ids here since other things tend to rely on them.
+        $fieldsToFill = array('contact_id_a', 'contact_id_b', 'relationship_type_id');
+        $result = CRM_Core_DAO::executeQuery("SELECT " . implode(',', $fieldsToFill) . " FROM civicrm_relationship WHERE id = %1", array('Integer', $params['id']))->fetchRow();
+        foreach ($fieldsToFill as $field) {
+          $params[$field] = !empty($params[$field]) ? $params[$field] : $result->$field;
+        }
+        return;
+      }
+      throw new CRM_Core_Exception('Cannot create relationship, insufficient contact IDs provided');
+    }
+    $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
+    list($relationshipTypeID, $first, $second) = explode('_', $relationshipTypes);
+    if (empty($params['relationship_type_id'])) {
+      $params['relationship_type_id'] = $relationshipTypeID;
+    }
+    foreach (array('a', 'b') as $contactLetter) {
+      if (empty($params['contact_' . $contactLetter])) {
+        if ($first == $contactLetter) {
+          $params['contact_id_' . $contactLetter] = CRM_Utils_Array::value('contact', $ids);
+        }
+        else {
+          $params['contact_id_' . $contactLetter] = $contactID;
+        }
+      }
+    }
+  }
+
   /**
    * Specifiy defaults for creating a relationship
    *
@@ -616,17 +685,15 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   @access public
    * @static
    */
-  public static function checkValidRelationship(&$params, &$ids, $contactId) {
+  public static function checkValidRelationship($params, $ids, $contactId) {
     $errors = '';
-
+    self::setContactABFromIDs($params, $ids, $contactId);
     // get the string of relationship type
     $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
-    list($type, $first, $second) = explode('_', $relationshipTypes);
-    ${'contact_' . $first} = CRM_Utils_Array::value('contact', $ids);
-    ${'contact_' . $second} = $contactId;
+    list($type) = explode('_', $relationshipTypes);
     // function to check if the relationship selected is correct
     // i.e. employer relationship can exit between Individual and Organization (not between Individual and Individual)
-    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($contact_a, $contact_b, $type)) {
+    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($params['contact_id_a'], $params['contact_id_b'], $type)) {
       $errors = 'Please select valid relationship between these two contacts.';
     }
     return $errors;
@@ -657,7 +724,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
     * supports date arrays BAO has increasingly standardised to ISO format
     * so I believe this function should support ISO rather than make API
     * format it - however, need to support array format for now to avoid breakage
-    * @ time of writing this function is called from Relationship::create (twice)
+    * @ time of writing this function is called from Relationship::createMultiple (twice)
     * CRM_BAO_Contact_Utils::clearCurrentEmployer (seemingly without dates)
     * CRM_Contact_Form_Task_AddToOrganization::postProcess &
     * CRM_Contact_Form_Task_AddToHousehold::postProcess
@@ -1479,7 +1546,7 @@ cr.relationship_type_id IN (%2) AND
 cr.is_permission_a_b    = 1 AND
 IF(cr.end_date IS NULL, 1, (DATEDIFF( CURDATE( ), cr.end_date ) <= 0)) AND
 cr.is_active = 1 AND
-cc.id = cr.contact_id_b AND 
+cc.id = cr.contact_id_b AND
 cc.is_deleted = 0";
 
       if (!empty($name)) {

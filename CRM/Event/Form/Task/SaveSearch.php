@@ -51,7 +51,8 @@ class CRM_Event_Form_Task_SaveSearch extends CRM_Event_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   */ function preProcess() {
+   */
+  function preProcess() {
     parent::preProcess();
     $this->_id = NULL;
   }

@@ -53,7 +53,8 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
    * Processing needed for buildForm and later
    *
    * @return void
-   */ function preProcess() {
+   */
+  function preProcess() {
     $this->_search = CRM_Utils_Array::value('search', $_GET);
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
     $this->_surveyId = CRM_Utils_Request::retrieve('sid', 'Positive', $this);

@@ -53,7 +53,8 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
    * This function is called when action is browse
    *
    * return null
-   */ function browse() {
+   */
+  function browse() {
     $controller = new CRM_Core_Controller_Simple('CRM_Grant_Form_Search', ts('Grants'), $this->_action);
     $controller->setEmbedded(TRUE);
     $controller->reset();

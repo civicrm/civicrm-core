@@ -458,7 +458,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     );
 
     // Save relationships
-    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::create($params, $ids);
+    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::createMultiple($params, $ids);
 
     // if this is called from case view,
     //create an activity for case role removal.CRM-4480

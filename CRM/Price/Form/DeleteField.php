@@ -59,7 +59,8 @@ class CRM_Price_Form_DeleteField extends CRM_Core_Form {
    *
    * @return void
    * @acess protected
-   */ function preProcess() {
+   */
+  function preProcess() {
     $this->_fid = $this->get('fid');
 
     $this->_title = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField',

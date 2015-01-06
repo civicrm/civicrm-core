@@ -61,7 +61,8 @@ class CRM_Auction_Page_Item extends CRM_Core_Page {
    * @return void
    * @access public
    *
-   */ function run() {
+   */
+  function run() {
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String',
       // default to 'browse'
