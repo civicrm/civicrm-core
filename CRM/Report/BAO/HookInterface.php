@@ -53,9 +53,8 @@ public function alterLogTables(&$reportObj, &$logTables) {
    * @param $table
    *
    * @return array
+   */
    public function logDiffClause(&$reportObj, $table) {
     return array();
 }
 }
-
-
