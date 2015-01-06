@@ -45,8 +45,10 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
    * Track a click-through and return the URL to redirect.  If the numbers
    * don't match up, return the base url.
    *
-   * @param int $queue_id     The Queue Event ID of the clicker
-   * @param int $url_id       The ID of the trackable URL
+   * @param int $queue_id
+   *   The Queue Event ID of the clicker.
+   * @param int $url_id
+   *   The ID of the trackable URL.
    *
    * @return string $url      The redirection url, or base url on failure.
    * @static
@@ -97,10 +99,14 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
   /**
    * Get row count for the event selector
    *
-   * @param int $mailing_id       ID of the mailing
-   * @param int $job_id           Optional ID of a job to filter on
-   * @param boolean $is_distinct  Group by queue ID?
-   * @param int $url_id           Optional ID of a url to filter on
+   * @param int $mailing_id
+   *   ID of the mailing.
+   * @param int $job_id
+   *   Optional ID of a job to filter on.
+   * @param bool $is_distinct
+   *   Group by queue ID?.
+   * @param int $url_id
+   *   Optional ID of a url to filter on.
    *
    * @return int                  Number of rows in result set
    * @static
@@ -194,8 +200,10 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
   /**
    * Get tracked url count for each mailing for a given set of mailing IDs
    *
-   * @param int $mailingIDs    IDs of the mailing (comma separated)
-   * @param int $contactID     ID of the contact
+   * @param int $mailingIDs
+   *   IDs of the mailing (comma separated).
+   * @param int $contactID
+   *   ID of the contact.
    *
    * @return array             Count per mailing ID
    * @static
@@ -234,14 +242,22 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
   /**
    * Get rows for the event browser
    *
-   * @param int $mailing_id       ID of the mailing
-   * @param int $job_id           optional ID of the job
-   * @param boolean $is_distinct  Group by queue id?
-   * @param int $url_id           optional ID of a trackable URL to filter on
-   * @param int $offset           Offset
-   * @param int $rowCount         Number of rows
-   * @param array $sort           sort array
-   * @param int $contact_id       optional contact ID
+   * @param int $mailing_id
+   *   ID of the mailing.
+   * @param int $job_id
+   *   Optional ID of the job.
+   * @param bool $is_distinct
+   *   Group by queue id?.
+   * @param int $url_id
+   *   Optional ID of a trackable URL to filter on.
+   * @param int $offset
+   *   Offset.
+   * @param int $rowCount
+   *   Number of rows.
+   * @param array $sort
+   *   Sort array.
+   * @param int $contact_id
+   *   Optional contact ID.
    *
    * @return array                Result set
    * @static
