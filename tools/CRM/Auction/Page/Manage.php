@@ -58,7 +58,8 @@ class CRM_Auction_Page_Manage extends CRM_Core_Page {
    * Get action Links
    *
    * @return array (reference) of action links
-   */ function &links() {
+   */
+  function &links() {
     if (!(self::$_actionLinks)) {
       // helper variable for nicer formatting
       $disableExtra = ts('Are you sure you want to disable this Auction?');

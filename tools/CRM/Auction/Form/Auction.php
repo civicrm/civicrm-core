@@ -60,7 +60,8 @@ class CRM_Auction_Form_Auction extends CRM_Core_Form {
    *
    * @return void
    * @access public
-   */ function preProcess() {
+   */
+  function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);

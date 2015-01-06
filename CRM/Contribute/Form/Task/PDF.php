@@ -52,7 +52,8 @@ class CRM_Contribute_Form_Task_PDF extends CRM_Contribute_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   */ function preProcess() {
+   */
+  function preProcess() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE
     );

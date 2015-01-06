@@ -68,7 +68,8 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
    * @param null
    *
    * @return void
-   */ function preProcess() {
+   */
+  function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this);
 
     if ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::DELETE)) {
