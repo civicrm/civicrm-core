@@ -1604,6 +1604,13 @@ SELECT contact_id
       'CRM_Financial_DAO_FinancialType'//because valid ones exist & we use pick them due to pseudoconstant can't reliably create & delete these
     );
 
+    // Prefer to instantiate BAO's instead of DAO's (when possible)
+    // so that assignTestValue()/assignTestFK() can be overloaded.
+    $baoName = str_replace('_DAO_', '_BAO_', $daoName);
+    if (class_exists($baoName)) {
+      $daoName = $baoName;
+    }
+
     for ($i = 0; $i < $numObjects; ++$i) {
 
       ++$counter;
