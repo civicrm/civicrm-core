@@ -108,7 +108,8 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    * @return string           -   The WHERE clause, or 0 on failure
    * @static
    */
-  public static function permissionClause(&$tables, $operation,
+  public static function permissionClause(
+    &$tables, $operation,
     $object_table = NULL, $object_id = NULL,
     $acl_id = NULL, $acl_role = FALSE
   ) {
@@ -851,7 +852,8 @@ SELECT g.*
    *
    * @return array
    */
-  public static function group($type,
+  public static function group(
+    $type,
     $contactID = NULL,
     $tableName = 'civicrm_saved_search',
     $allGroups = NULL,
