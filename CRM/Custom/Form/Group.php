@@ -107,8 +107,10 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   /**
    * Global form rule
    *
-   * @param array $fields the input form values
-   * @param array $files the uploaded files if any
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
    * @param $self
    *
    *
@@ -521,7 +523,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   /**
    * Return a formatted list of relationship name.
    *
-   * @param array $list array of relationship name.
+   * @param array $list
+   *   Array of relationship name.
    *
    * @return array of relationship name.
    */
