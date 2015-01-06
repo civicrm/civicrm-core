@@ -316,7 +316,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     }
 
     if (isset($fv['merge_same_address'])) {
-      $this->mergeSameAddress($rows);
+      self::mergeSameAddress($rows);
       $individualFormat = TRUE;
     }
 
@@ -400,7 +400,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
   /**
    * @param array $rows
    */
-  public function mergeSameAddress(&$rows) {
+  static public function mergeSameAddress(&$rows) {
     $uniqueAddress = array();
     foreach (array_keys($rows) as $rowID) {
       // load complete address as array key
