@@ -407,7 +407,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     //only valid processors get display to user
 
     if ($this->_mode) {
-      $this->assign(CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('supportsFutureRecurStartDate')), TRUE);
+      $this->assign(CRM_Core_Config::isEnabledBackOfficeCreditCardPayments($this->_mode, array('supportsFutureRecurStartDate')), TRUE);
       $this->_paymentProcessors = $this->getValidProcessors();
       if (!isset($this->_paymentProcessor['id'])) {
         // if the payment processor isn't set yet (as indicated by the presence of an id,) we'll grab the first one which should be the default

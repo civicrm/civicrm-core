@@ -276,7 +276,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     $this->preProcess();
 
     // check if we can process credit card contribs
-    $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
+    $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments(CRM_Utils_Request::retrieve('mode', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'GET')));
 
     $this->setContext();
 

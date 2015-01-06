@@ -373,9 +373,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_id) {
       $this->_contactID = $defaults['contact_id'];
     }
-
     // Set $newCredit variable in template to control whether link to credit card mode is included
-    $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
+    $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments($this->_mode));
 
     // fix the display of the monetary value, CRM-4038
     if (isset($defaults['total_amount'])) {
@@ -914,7 +913,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
       if (CRM_Utils_Array::value('membership', $componentDetails) || CRM_Utils_Array::value('participant', $componentDetails)) {
         if ($totalAmount) {
-          $totalAmount->freeze();          
+          $totalAmount->freeze();
         }
         $financialType->freeze();
         $this->assign('freezeFinancialType', TRUE);
