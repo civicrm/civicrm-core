@@ -1409,8 +1409,9 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * @return null|string
    */
-  function whereClause(&$field, $op,
-                       $value, $min, $max
+  function whereClause(
+    &$field, $op,
+    $value, $min, $max
   ) {
 
     $type = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $field));
@@ -1594,8 +1595,9 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * @return null|string
    */
-  function dateClause($fieldName,
-                      $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = NULL
+  function dateClause(
+    $fieldName,
+    $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = NULL
   ) {
     $clauses = array();
     if (in_array($relative, array_keys($this->getOperationPair(CRM_Report_Form::OP_DATE)))) {
