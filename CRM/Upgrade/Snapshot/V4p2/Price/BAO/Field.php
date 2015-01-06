@@ -48,7 +48,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * price field object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field object
    * @static
@@ -71,7 +72,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    *
    * This function is invoked from within the web form layer and also from the api layer
    *
-   * @param array $params (reference) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field object
    * @static
@@ -154,8 +156,10 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field object
    * @static
@@ -167,8 +171,10 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id         Id of the database record
-   * @param boolean  $is_active  Value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return   Object            DAO object on sucess, null otherwise
    *
@@ -181,7 +187,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
   /**
    * Get the field title.
    *
-   * @param int $id id of field.
+   * @param int $id
+   *   Id of field.
    *
    * @return string name
    *
@@ -195,12 +202,16 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
   /**
    * This function for building custom fields
    *
-   * @param CRM_Core_Form $qf form object (reference)
-   * @param string $elementName name of the custom field
+   * @param CRM_Core_Form $qf
+   *   Form object (reference).
+   * @param string $elementName
+   *   Name of the custom field.
    * @param int $fieldId
-   * @param boolean $inactiveNeeded
-   * @param boolean $useRequired true if required else false
-   * @param string $label label for custom field
+   * @param bool $inactiveNeeded
+   * @param bool $useRequired
+   *   True if required else false.
+   * @param string $label
+   *   Label for custom field.
    * @param null $fieldOptions
    * @param array $freezeOptions
    *
@@ -443,9 +454,12 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
   /**
    * Retrieve a list of options for the specified field
    *
-   * @param int $fieldId price field ID
-   * @param bool $inactiveNeeded include inactive options
-   * @param bool $reset ignore stored values\
+   * @param int $fieldId
+   *   Price field ID.
+   * @param bool $inactiveNeeded
+   *   Include inactive options.
+   * @param bool $reset
+   *   Ignore stored values\.
    *
    * @return array array of options
    */
@@ -495,7 +509,8 @@ WHERE
   /**
    * Delete the price set field.
    *
-   * @param   int   $id    Field Id
+   * @param int $id
+   *   Field Id.
    *
    * @return  boolean
    *
@@ -541,7 +556,8 @@ WHERE
   /**
    * Validate the priceset
    *
-   * @param int $priceSetId , array $fields
+   * @param int $priceSetId
+   *   , array $fields.
    *
    * retrun the error string
    *

@@ -53,7 +53,8 @@ class CRM_Upgrade_Incremental_php_FourTwo {
    * revision to the database.
    *
    * @param $preUpgradeMessage
-   * @param $rev string, a version number, e.g. '4.2.alpha1', '4.2.beta3', '4.2.0'
+   * @param $rev
+   *   String, a version number, e.g. '4.2.alpha1', '4.2.beta3', '4.2.0'.
    * @param null $currentVer
    *
    * @return void
@@ -146,8 +147,10 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
   /**
    * Compute any messages which should be displayed after upgrade
    *
-   * @param $postUpgradeMessage string, alterable
-   * @param $rev string, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs
+   * @param $postUpgradeMessage
+   *   String, alterable.
+   * @param $rev
+   *   String, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
@@ -587,8 +590,10 @@ WHERE     cpse.price_set_id IS NULL";
    * records.
    *
    * @param CRM_Queue_TaskContext $ctx
-   * @param $startId int, the first/lowest contribution ID to convert
-   * @param $endId int, the last/highest contribution ID to convert
+   * @param $startId
+   *   Int, the first/lowest contribution ID to convert.
+   * @param $endId
+   *   Int, the last/highest contribution ID to convert.
    *
    * @return bool
    */
@@ -733,8 +738,10 @@ WHERE     cpf.price_set_id = %1
    * records.
    *
    * @param CRM_Queue_TaskContext $ctx
-   * @param $startId int, the first/lowest participant ID to convert
-   * @param $endId int, the last/highest participant ID to convert
+   * @param $startId
+   *   Int, the first/lowest participant ID to convert.
+   * @param $endId
+   *   Int, the last/highest participant ID to convert.
    *
    * @return bool
    */

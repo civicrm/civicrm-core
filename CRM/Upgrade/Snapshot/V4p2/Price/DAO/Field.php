@@ -406,8 +406,10 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO
     /**
      * returns a ts()-translated enum value for display purposes
      *
-     * @param string $field  the enum field in question
-     * @param string $value  the enum value up for translation
+     * @param string $field
+     *   The enum field in question.
+     * @param string $value
+     *   The enum value up for translation.
      *
      * @return string  the display value of the enum
      */
@@ -429,7 +431,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO
     /**
      * adds $value['foo_display'] for each $value['foo'] enum from civicrm_price_field
      *
-     * @param array $values (reference)  the array up for enhancing
+     * @param array $values
+     *   (reference) the array up for enhancing.
      * @return void
      */
     public static function addDisplayEnums(&$values)
