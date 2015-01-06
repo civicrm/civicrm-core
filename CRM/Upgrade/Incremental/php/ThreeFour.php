@@ -313,7 +313,8 @@ FROM   civicrm_option_value v,
 WHERE  v.option_group_id = g.id
   AND  g.name      = %1
   AND  g.is_active = 1
-  AND  v.name      = %2", array(1 => array('activity_type', 'String'),
+  AND  v.name      = %2", array(
+    1 => array('activity_type', 'String'),
         2 => array('Bulk Email', 'String'),
       ));
 
@@ -352,7 +353,8 @@ INSERT INTO civicrm_uf_join
 VALUES
     (1, 'OnBehalf', 'civicrm_contribution_page', %1, 1, %2)";
 
-      $params = array(1 => array($pages->id, 'Integer'),
+      $params = array(
+      1 => array($pages->id, 'Integer'),
         2 => array($onBehalfProfileId, 'Integer'),
       );
       CRM_Core_DAO::executeQuery($query, $params);

@@ -70,8 +70,8 @@ class CRM_Upgrade_Headless {
       $errorMessage = CRM_Core_Error::formatTextException($queueResult['exception']);
       CRM_Core_Error::debug_log_message($errorMessage);
       if ($enablePrint) {
-        print($errorMessage);
-    }
+        print ($errorMessage);
+      }
       throw $queueResult['exception']; // FIXME test
     }
 

@@ -255,7 +255,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
   public static function migrateHonoreeInfo(CRM_Queue_TaskContext $ctx) {
     $query = "ALTER TABLE `civicrm_uf_join`
     ADD COLUMN `module_data` longtext COMMENT 'Json serialized array of data used by the ufjoin.module'";
-      CRM_Core_DAO::executeQuery($query);
+    CRM_Core_DAO::executeQuery($query);
 
     $honorTypes = array_keys(CRM_Core_OptionGroup::values('honor_type'));
     $ufGroupDAO = new CRM_Core_DAO_UFGroup();
@@ -273,8 +273,8 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
         if ($domain->locales) {
           $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
           foreach ($locales as $locale) {
-            $honor_block_title =  "honor_block_title_{$locale}";
-            $honor_block_text =  "honor_block_text_{$locale}";
+            $honor_block_title = "honor_block_title_{$locale}";
+            $honor_block_text = "honor_block_text_{$locale}";
             $honorParams['soft_credit'] += array(
               $locale => array(
                 'honor_block_title' => $dao->$honor_block_title,
