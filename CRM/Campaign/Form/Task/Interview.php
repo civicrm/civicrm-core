@@ -100,12 +100,12 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
       CRM_Campaign_BAO_Survey::retrieve($params, $this->_surveyDetails);
     }
 
-    $orderClause = false;
+    $orderClause = FALSE;
     $buttonName  = $this->controller->getButtonName();
     if ( $buttonName == '_qf_Interview_submit_orderBy' && !empty($_POST['order_bys'])) {
       $orderByParams = CRM_Utils_Array::value('order_bys', $_POST);
     }
-    elseif ( CRM_Core_OptionGroup::getValue('activity_type','WalkList') == $this->_surveyDetails['activity_type_id'] ) {
+    elseif ( CRM_Core_OptionGroup::getValue('activity_type', 'WalkList') == $this->_surveyDetails['activity_type_id'] ) {
       $orderByParams =
         array(
           1 => array(
@@ -155,7 +155,6 @@ WHERE {$clause}
         $this->_contactIds[] = $dao->id;
       }
     }
-
 
     //get the contact read only fields to display.
     $readOnlyFields = array_merge(array(
@@ -229,7 +228,7 @@ WHERE {$clause}
     $this->assign('surveyValues', $this->_surveyValues);
 
     $result = CRM_Campaign_BAO_Survey::getReportID($this->_surveyId);
-    $this->assign("instanceId",$result);
+    $this->assign("instanceId", $result);
 
     //get the survey result options.
     $this->_resultOptions = $this->get('resultOptions');
@@ -257,7 +256,8 @@ WHERE {$clause}
   }
 
   public function validateIds() {
-    $required = array('surveyId' => ts('Could not find Survey.'),
+    $required = array(
+    'surveyId' => ts('Could not find Survey.'),
       'interviewerId' => ts('Could not find Interviewer.'),
       'contactIds' => ts('No respondents are currently reserved for you to interview.'),
       'resultOptions' => ts('Oops. It looks like there is no response option configured.'),
@@ -287,7 +287,8 @@ WHERE {$clause}
     $this->assign('surveyTypeId', $this->_surveyTypeId);
 
     $options =
-      array('' => ' - none - ',
+      array(
+    '' => ' - none - ',
         'civicrm_address.street_name'     => 'Street Name',
         'civicrm_address.street_number%2' => 'Odd / Even Street Number',
         'civicrm_address.street_number'   => 'Street Number',
@@ -338,7 +339,8 @@ WHERE {$clause}
     }
 
     $buttons = array(
-      array('type' => 'cancel',
+      array(
+    'type' => 'cancel',
         'name' => ts('Done'),
         'subName' => 'interview',
         'isDefault' => TRUE,
@@ -398,7 +400,7 @@ WHERE {$clause}
       }
     }
 
-    if ( CRM_Core_OptionGroup::getValue('activity_type','WalkList') == $this->_surveyDetails['activity_type_id'] ) {
+    if ( CRM_Core_OptionGroup::getValue('activity_type', 'WalkList') == $this->_surveyDetails['activity_type_id'] ) {
       $defaults['order_bys'] =
         array(
           1 => array(
@@ -595,7 +597,8 @@ WHERE {$clause}
         $statusIds
       );
       $this->_contactIds = array();
-      foreach ($surveyActivities as $val) $this->_contactIds[$val['voter_id']] = $val['voter_id'];
+      foreach ($surveyActivities as $val) { $this->_contactIds[$val['voter_id']] = $val['voter_id'];
+      }
       $this->set('contactIds', $this->_contactIds);
     }
   }

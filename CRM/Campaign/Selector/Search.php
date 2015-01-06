@@ -150,11 +150,11 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
   @access public
    */
   function __construct(&$queryParams,
-    $action       = CRM_Core_Action::NONE,
+    $action = CRM_Core_Action::NONE,
     $surveyClause = NULL,
-    $single       = FALSE,
-    $limit        = NULL,
-    $context      = 'search'
+    $single = FALSE,
+    $limit = NULL,
+    $context = 'search'
   ) {
     // submitted form values
     $this->_queryParams = &$queryParams;
@@ -249,11 +249,10 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
       $this->_campaignFromClause
     );
 
-
     // process the result of the query
     $rows = array();
 
-    While ($result->fetch()) {
+    while ($result->fetch()) {
       $this->_query->convertToPseudoNames($result);
       $row = array();
       // the columns we are interested in
@@ -331,24 +330,30 @@ FROM {$from}
 
     if (!$this->_single) {
       $contactDetails = array(
-        array('name' => ts('Contact Name'),
+        array(
+      'name' => ts('Contact Name'),
           'sort' => 'sort_name',
           'direction' => CRM_Utils_Sort::ASCENDING,
         ),
-        array('name' => ts('Street Number'),
+        array(
+      'name' => ts('Street Number'),
           'sort' => 'street_number',
         ),
-        array('name' => ts('Street Name'),
+        array(
+      'name' => ts('Street Name'),
           'sort' => 'street_name',
         ),
         array('name' => ts('Street Address')),
-        array('name' => ts('City'),
+        array(
+      'name' => ts('City'),
           'sort' => 'city',
         ),
-        array('name' => ts('Postal Code'),
+        array(
+      'name' => ts('Postal Code'),
           'sort' => 'postal_code',
         ),
-        array('name' => ts('State'),
+        array(
+      'name' => ts('State'),
           'sort' => 'state_province_name',
         ),
         array('name' => ts('Country')),

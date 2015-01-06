@@ -59,7 +59,6 @@ class CRM_Campaign_Page_Petition_ThankYou extends CRM_Core_Page {
        * 2 = send a confirmation request email
        */
 
-
     return parent::run();
   }
 }

@@ -133,7 +133,6 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'description')
     );
 
-
     $this->add('checkbox', 'is_active', ts('Enabled?'));
 
     if ($this->_action == CRM_Core_Action::UPDATE &&
