@@ -51,7 +51,8 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * Set variables up before form is built
    *
    */
-  public function preProcess(&$form) {}
+  public function preProcess(&$form) {
+  }
 
   /**
    * This is function is called by the form object to get the DataSource's
@@ -117,8 +118,8 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    */
   private static function _CsvToTable(&$db,
     $file,
-    $headers        = FALSE,
-    $table          = NULL,
+    $headers = FALSE,
+    $table = NULL,
     $fieldSeparator = ','
   ) {
     $result = array();
@@ -153,7 +154,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
         $duplicateColName = TRUE;
       }
 
-
       // need to truncate values per mysql field name length limits
       // mysql allows 64, but we need to account for appending colKey
       // CRM-9079
@@ -175,11 +175,13 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       }
 
       // CRM-4881: we need to quote column names, as they may be MySQL reserved words
-      foreach ($columns as & $column) $column = "`$column`";
+      foreach ($columns as & $column) { $column = "`$column`";
+      }
     }
     else {
       $columns = array();
-      foreach ($firstrow as $i => $_) $columns[] = "col_$i";
+      foreach ($firstrow as $i => $_) { $columns[] = "col_$i";
+      }
     }
 
     // FIXME: we should regen this table's name if it exists rather than drop it
