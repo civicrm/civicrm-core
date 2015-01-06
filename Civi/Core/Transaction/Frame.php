@@ -156,8 +156,10 @@ class Frame {
    *
    * Pre-condition: isActive()
    *
-   * @param int $phase A constant; one of: self::PHASE_{PRE,POST}_{COMMIT,ROLLBACK}
-   * @param mixed $callback A PHP callback
+   * @param int $phase
+   *   A constant; one of: self::PHASE_{PRE,POST}_{COMMIT,ROLLBACK}.
+   * @param mixed $callback
+   *   A PHP callback.
    * @param array|NULL $params Optional values to pass to callback.
    *          See php manual call_user_func_array for details.
    */

@@ -65,8 +65,10 @@ class Analyzer {
   /**
    * Determine if case includes an activity of given type/status
    *
-   * @param string $type eg "Phone Call", "Interview Prospect", "Background Check"
-   * @param string $status eg "Scheduled", "Completed"
+   * @param string $type
+   *   Eg "Phone Call", "Interview Prospect", "Background Check".
+   * @param string $status
+   *   Eg "Scheduled", "Completed".
    * @return bool
    */
   public function hasActivity($type, $status = NULL) {
@@ -180,7 +182,8 @@ class Analyzer {
   /**
    * Get a list of all activities in the case (indexed by some property/properties)
    *
-   * @param array $keys list of properties by which to index activities
+   * @param array $keys
+   *   List of properties by which to index activities.
    * @return array list of activity records (api/v3 format), indexed by $keys
    */
   public function getActivityIndex($keys) {

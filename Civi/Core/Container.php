@@ -27,7 +27,8 @@ class Container {
   private static $singleton;
 
   /**
-   * @param bool $reset whether to forcibly rebuild the entire container
+   * @param bool $reset
+   *   Whether to forcibly rebuild the entire container.
    * @return \Symfony\Component\DependencyInjection\TaggedContainerInterface
    */
   public static function singleton($reset = FALSE) {
