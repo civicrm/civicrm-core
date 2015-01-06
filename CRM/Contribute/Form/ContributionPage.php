@@ -154,7 +154,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       $this->addElement('hidden', 'cancelURL', $this->_cancelURL);
     }
 
-
     if ($this->_single) {
       $this->addButtons(array(
           array(
@@ -368,7 +367,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
         case 'Contribute':
           $attributes  = $this->getVar('_attributes');
           $subPage     = strtolower(basename(CRM_Utils_Array::value('action', $attributes)));
-          $subPageName = ucFirst($subPage);
+          $subPageName = ucfirst($subPage);
           if ($subPage == 'friend') {
             $nextPage = 'custom';
           }

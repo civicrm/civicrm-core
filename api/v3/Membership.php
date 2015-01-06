@@ -42,7 +42,8 @@
  *
  * This API is used for deleting a contact membership
  *
- * @param  $params array  array holding id - Id of the contact membership to be deleted
+ * @param $params
+ *   Array  array holding id - Id of the contact membership to be deleted.
  *
  * @return array api result
  * {@getfields membership_delete}
@@ -58,7 +59,8 @@ function civicrm_api3_membership_delete($params) {
  * This API is used for creating a Membership for a contact.
  * Required parameters : membership_type_id and status_id.
  *
- * @param   array  $params     an associative array of name/value property values of civicrm_membership
+ * @param array $params
+ *   An associative array of name/value property values of civicrm_membership.
  *
  * @return array of newly created membership property values.
  * {@getfields membership_create}
@@ -111,10 +113,10 @@ function civicrm_api3_membership_create($params) {
   // Fixme: This code belongs in the BAO
   $action = CRM_Core_Action::ADD;
   // we need user id during add mode
-    $ids = array ();
-    if (!empty($params['contact_id'])) {
-      $ids['userId'] = $params['contact_id'];
-    }
+  $ids = array();
+  if (!empty($params['contact_id'])) {
+    $ids['userId'] = $params['contact_id'];
+  }
   //for edit membership id should be present
   if (!empty($params['id'])) {
     $ids['membership'] = $params['id'];
@@ -146,7 +148,8 @@ function civicrm_api3_membership_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_membership_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
@@ -166,7 +169,8 @@ function _civicrm_api3_membership_create_spec(&$params) {
  * Adjust Metadata for Get action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_membership_get_spec(&$params) {
   $params['membership_type_id']['api.aliases'] = array('membership_type');
@@ -178,7 +182,8 @@ function _civicrm_api3_membership_get_spec(&$params) {
  * This api will return the membership records for the contacts
  * having membership based on the relationship with the direct members.
  *
- * @param  Array $params key/value pairs for contact_id and some
+ * @param array $params
+ *   Key/value pairs for contact_id and some.
  *          options affecting the desired results; has legacy support
  *          for just passing the contact_id itself as the argument
  *
@@ -200,7 +205,7 @@ function civicrm_api3_membership_get($params) {
     $params['status_id'] = array('IN' => CRM_Member_BAO_MembershipStatus::getMembershipStatusCurrent());
   }
 
-  $options = _civicrm_api3_get_options_from_params($params, TRUE,'membership', 'get');
+  $options = _civicrm_api3_get_options_from_params($params, TRUE, 'membership', 'get');
   if ($options['is_count']) {
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
@@ -216,7 +221,7 @@ function civicrm_api3_membership_get($params) {
     return civicrm_api3_create_success($membershipValues, $params, 'membership', 'get');
   }
 
-  $members =  _civicrm_api3_membership_relationsship_get_customv2behaviour($params, $membershipValues, $contactID );
+  $members = _civicrm_api3_membership_relationsship_get_customv2behaviour($params, $membershipValues, $contactID );
   return civicrm_api3_create_success($members, $params, 'membership', 'get');
 }
 
@@ -227,7 +232,8 @@ function civicrm_api3_membership_get($params) {
  * is passed in as part of the reasonable expectation developers have that we will keep the api
  * as stable as possible
  *
- * @param array $params parameters passed into get function
+ * @param array $params
+ *   Parameters passed into get function.
  * @param int $membershipTypeId
  * @param $activeOnly
  *
@@ -248,7 +254,8 @@ function _civicrm_api3_membership_get_customv2behaviour(&$params, $membershipTyp
 /**
  * non-standard behaviour inherited from v2
  *
- * @param array $params parameters passed into get function
+ * @param array $params
+ *   Parameters passed into get function.
  * @param $membershipValues
  * @param int $contactID
  *

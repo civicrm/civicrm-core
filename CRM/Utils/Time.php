@@ -46,7 +46,8 @@ class CRM_Utils_Time {
   /**
    * Get the time
    *
-   * @param string $returnFormat format in which date is to be retrieved
+   * @param string $returnFormat
+   *   Format in which date is to be retrieved.
    *
    * @return date
    *
@@ -68,8 +69,10 @@ class CRM_Utils_Time {
   /**
    * Set the given time
    *
-   * @param string $newDateTime  a date formatted with strtotime
-   * @param string $returnFormat format in which date is to be retrieved
+   * @param string $newDateTime
+   *   A date formatted with strtotime.
+   * @param string $returnFormat
+   *   Format in which date is to be retrieved.
    *
    * @return date
    *
@@ -91,9 +94,12 @@ class CRM_Utils_Time {
    * Approximate time-comparison. $a and $b are considered equal if they
    * are within $threshold seconds of each other.
    *
-   * @param string $a time which can be parsed by strtotime
-   * @param string $b time which can be parsed by strtotime
-   * @param int $threshold maximum allowed difference (in seconds)
+   * @param string $a
+   *   Time which can be parsed by strtotime.
+   * @param string $b
+   *   Time which can be parsed by strtotime.
+   * @param int $threshold
+   *   Maximum allowed difference (in seconds).
    * @return bool
    */
   public static function isEqual($a, $b, $threshold = 0) {

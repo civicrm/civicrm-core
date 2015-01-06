@@ -39,7 +39,7 @@ class CRM_Cron_Action {
   function __construct() {
     // you can run this program either from an apache command, or from the cli
     if (php_sapi_name() == "cli") {
-      require_once ("cli.php");
+      require_once "cli.php";
       $cli = new civicrm_cli();
       //if it doesn't die, it's authenticated
     }
@@ -75,4 +75,3 @@ class CRM_Cron_Action {
 
 $cron = new CRM_Cron_Action();
 $cron->run();
-

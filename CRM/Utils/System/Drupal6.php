@@ -42,9 +42,12 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * If we are using a theming system, invoke theme, else just print the
    * content
    *
-   * @param string  $content the content that will be themed
-   * @param boolean $print   are we displaying to the screen or bypassing theming?
-   * @param boolean $maintenance  for maintenance mode
+   * @param string $content
+   *   The content that will be themed.
+   * @param bool $print
+   *   Are we displaying to the screen or bypassing theming?.
+   * @param bool $maintenance
+   *   For maintenance mode.
    *
    * @return void           prints content on stdout
    */
@@ -74,8 +77,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Create a user in Drupal.
    *
-   * @param array  $params associated array
-   * @param string $mail email id for cms user
+   * @param array $params
+   *   Associated array.
+   * @param string $mail
+   *   Email id for cms user.
    *
    * @return uid if user exists, false otherwise
    *
@@ -140,9 +145,12 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Check if username and email exists in the drupal db
    *
-   * @param array $params array of name and mail values
-   * @param array $errors array of errors
-   * @param string $emailName  field label for the 'email'
+   * @param array $params
+   *   Array of name and mail values.
+   * @param array $errors
+   *   Array of errors.
+   * @param string $emailName
+   *   Field label for the 'email'.
    *
    * @return void
    */
@@ -212,7 +220,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * Get the drupal destination string. When this is passed in the
    * URL the user will be directed to it after filling in the drupal form
    *
-   * @param CRM_Core_Form $form Form object representing the 'current' form - to which the user will be returned
+   * @param CRM_Core_Form $form
+   *   Form object representing the 'current' form - to which the user will be returned.
    * @return string $destination destination value for URL
    *
    */
@@ -311,7 +320,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Append a string to the head of the html file
    *
-   * @param string $head the new string to be appended
+   * @param string $head
+   *   The new string to be appended.
    *
    * @return void
    */
@@ -323,7 +333,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * Add a script file
    *
    * @param $url: string, absolute path to file
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -339,7 +350,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * Add an inline script
    *
    * @param $code: string, javascript code
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -355,7 +367,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * Add a css file
    *
    * @param $url: string, absolute path to file
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -374,7 +387,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * Add an inline style
    *
    * @param $code: string, css code
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -400,7 +414,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Figure out the post url for the form
    *
-   * @param mix $action the default action if one is pre-specified
+   * @param mix $action
+   *   The default action if one is pre-specified.
    *
    * @return string the url to post the form
    */
@@ -415,23 +430,27 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Authenticate the user against the drupal db
    *
-   * @param string $name     the user name
-   * @param string $password the password for the above user name
-   * @param boolean $loadCMSBootstrap load cms bootstrap?
-   * @param NULL|string $realPath filename of script
+   * @param string $name
+   *   The user name.
+   * @param string $password
+   *   The password for the above user name.
+   * @param bool $loadCMSBootstrap
+   *   Load cms bootstrap?.
+   * @param NULL|string $realPath
+   *   Filename of script.
    *
    * @return mixed false if no auth
    *               array(
    *  contactID, ufID, unique string ) if success
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
-   //@todo this 'PEAR-y' stuff is only required when bookstrap is not being loaded which is rare
-   // if ever now.
-   // probably if bootstrap is loaded this call
-   // CRM_Utils_System::loadBootStrap($bootStrapParams, TRUE, TRUE, $realPath); would be
-   // sufficient to do what this fn does. It does exist as opposed to return which might need some hanky-panky to make
-   // safe in the unknown situation where authenticate might be called & it is important that
-   // false is returned
+    //@todo this 'PEAR-y' stuff is only required when bookstrap is not being loaded which is rare
+    // if ever now.
+    // probably if bootstrap is loaded this call
+    // CRM_Utils_System::loadBootStrap($bootStrapParams, TRUE, TRUE, $realPath); would be
+    // sufficient to do what this fn does. It does exist as opposed to return which might need some hanky-panky to make
+    // safe in the unknown situation where authenticate might be called & it is important that
+    // false is returned
     require_once 'DB.php';
 
     $config = CRM_Core_Config::singleton();
@@ -522,7 +541,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Set a message in the UF to display to a user
    *
-   * @param string $message the message to set
+   * @param string $message
+   *   The message to set.
    *
    */
   public function setMessage($message) {
@@ -584,10 +604,14 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Load drupal bootstrap
    *
-   * @param array $params Either uid, or name & pass.
-   * @param boolean $loadUser boolean Require CMS user load.
-   * @param boolean $throwError If true, print error on failure and exit.
-   * @param boolean|string $realPath path to script
+   * @param array $params
+   *   Either uid, or name & pass.
+   * @param bool $loadUser
+   *   Boolean Require CMS user load.
+   * @param bool $throwError
+   *   If true, print error on failure and exit.
+   * @param bool|string $realPath
+   *   Path to script.
    *
    * @return bool
    */
@@ -683,7 +707,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     // which means that define(CIVICRM_CLEANURL) was correctly set.
     // So we correct it
     $config = CRM_Core_Config::singleton();
-    $config->cleanURL = (int)variable_get('clean_url', '0');
+    $config->cleanURL = (int) variable_get('clean_url', '0');
 
     // CRM-8655: Drupal wasn't available during bootstrap, so hook_civicrm_config never executes
     CRM_Utils_Hook::config($config);
@@ -844,8 +868,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * Find any users/roles/security-principals with the given permission
    * and replace it with one or more permissions.
    *
-   * @param $oldPerm string
-   * @param $newPerms array, strings
+   * @param $oldPerm
+   *   String.
+   * @param $newPerms
+   *   Array, strings.
    *
    * @return void
    */
@@ -884,7 +910,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
-   * @param string $destination - if present, add destination to querystring (works for Drupal only)
+   * @param string $destination
+   *   If present, add destination to querystring (works for Drupal only).
    *
    * @return string - loginURL for the current CMS
    * @static
@@ -903,8 +930,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Wrapper for og_membership creation
    *
-   * @param integer $ogID Organic Group ID
-   * @param integer $drupalID drupal User ID
+   * @param int $ogIDOrganic Group ID.
+   *   Organic Group ID.
+   * @param int $drupalIDDrupal User ID.
+   *   Drupal User ID.
    */
   public function og_membership_create($ogID, $drupalID){
     og_save_subscription( $ogID, $drupalID, array( 'is_active' => 1 ) );
@@ -913,11 +942,13 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Wrapper for og_membership deletion
    *
-   * @param integer $ogID Organic Group ID
-   * @param integer $drupalID drupal User ID
+   * @param int $ogIDOrganic Group ID.
+   *   Organic Group ID.
+   * @param int $drupalIDDrupal User ID.
+   *   Drupal User ID.
    */
   public function og_membership_delete($ogID, $drupalID) {
-      og_delete_subscription( $ogID, $drupalID );
+    og_delete_subscription( $ogID, $drupalID );
   }
 
   /**
@@ -929,7 +960,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
       $timezone = $user->timezone;
     } else {
-      $timezone = variable_get('date_default_timezone', null);
+      $timezone = variable_get('date_default_timezone', NULL);
     }
     if (!$timezone) {
       $timezone = parent::getTimeZoneString();

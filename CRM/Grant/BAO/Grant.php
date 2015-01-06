@@ -126,8 +126,10 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Grant_BAO_ManageGrant object
    * @static
@@ -145,8 +147,10 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Add grant
    *
-   * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
+   * @param array $ids
+   *   Reference array contains the id.
    *
    * @static
    *
@@ -221,7 +225,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
         );
       }
 
-    // add the recently created Grant
+      // add the recently created Grant
       CRM_Utils_Recent::add($title,
         $url,
         $grant->id,
@@ -245,8 +249,10 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Create the event
    *
-   * @param array $params reference array contains the values submitted by the form
-   * @param array $ids reference array contains the id
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
+   * @param array $ids
+   *   Reference array contains the id.
    *
    * @return object
    * @static
@@ -307,7 +313,8 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Delete the Contact
    *
-   * @param int $id contact id
+   * @param int $id
+   *   Contact id.
    *
    * @return bool
    *
@@ -323,7 +330,8 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Delete the grant
    *
-   * @param int $id grant id
+   * @param int $id
+   *   Grant id.
    *
    * @return bool|mixed
    * @static
@@ -393,7 +401,9 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
       );
 
       $fields = CRM_Grant_DAO_Grant::export();
-      $grantNote = array('grant_note' => array('title' => ts('Grant Note'),
+      $grantNote = array(
+      'grant_note' => array(
+      'title' => ts('Grant Note'),
           'name' => 'grant_note',
           'data_type' => CRM_Utils_Type::T_TEXT,
         ));

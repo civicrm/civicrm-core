@@ -34,7 +34,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Test class for UFGroup API - civicrm_uf_*
  * @todo Split UFGroup and UFJoin tests
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class api_v3_UFMatchTest extends CiviUnitTestCase {
   // ids from the uf_group_test.xml fixture
@@ -135,11 +135,14 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
 
   public function testDelete() {
     $result = $this->callAPISuccess('uf_match', 'create', $this->_params);
-    $this->assertEquals(1, $this->callAPISuccess('uf_match', 'getcount', array(      'id' => $result['id'],
+    $this->assertEquals(1, $this->callAPISuccess('uf_match', 'getcount', array(
+    'id' => $result['id'],
       )));
-    $this->callAPISuccess('uf_match', 'delete', array(      'id' => $result['id'],
+    $this->callAPISuccess('uf_match', 'delete', array(
+    'id' => $result['id'],
     ));
-    $this->assertEquals(0, $this->callAPISuccess('uf_match', 'getcount', array('id' => $result['id'],
+    $this->assertEquals(0, $this->callAPISuccess('uf_match', 'getcount', array(
+    'id' => $result['id'],
       )));
   }
 }

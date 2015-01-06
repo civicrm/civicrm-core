@@ -37,7 +37,8 @@
 /**
  * Handle a confirm event
  *
- * @param array $params Associative array of property
+ * @param array $params
+ *   Associative array of property.
  *                       name/value pairs to insert in new 'survey'
  *
  * @throws Exception
@@ -51,7 +52,7 @@ function civicrm_api3_mailing_event_queue_create($params) {
   }
   civicrm_api3_verify_mandatory($params,
     'CRM_Mailing_DAO_MailingJob',
-    array('job_id','contact_id'),
+    array('job_id', 'contact_id'),
     FALSE
   );
   return _civicrm_api3_basic_create('CRM_Mailing_Event_BAO_Queue', $params);
@@ -69,7 +70,8 @@ function civicrm_api3_mailing_event_queue_delete($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_mailing_event_queue_create_spec(&$params) {
   $params['job_id']['api.required'] = 1;

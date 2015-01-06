@@ -56,7 +56,8 @@ class CRM_Contact_Form_Location {
     $className = CRM_Utils_System::getClassName($form);
     if (in_array($className, array(
       'CRM_Event_Form_ManageEvent_Location', 'CRM_Contact_Form_Domain'))) {
-      $form->_blocks = array('Address' => ts('Address'),
+      $form->_blocks = array(
+      'Address' => ts('Address'),
         'Email' => ts('Email'),
         'Phone' => ts('Phone'),
       );
@@ -87,7 +88,7 @@ class CRM_Contact_Form_Location {
 
     //build 1 instance of all blocks, without using ajax ...
     foreach ($form->_blocks as $blockName => $label) {
-      require_once (str_replace('_', DIRECTORY_SEPARATOR, 'CRM_Contact_Form_Edit_' . $blockName) . '.php');
+      require_once str_replace('_', DIRECTORY_SEPARATOR, 'CRM_Contact_Form_Edit_' . $blockName) . '.php';
       $name = strtolower($blockName);
 
       $instances = array(1);

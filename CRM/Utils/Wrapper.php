@@ -53,11 +53,11 @@ class CRM_Utils_Wrapper {
    * The heart of the callback processing is done by this method.
    * forms are of different type and have different operations.
    *
-   * @param string  formName    name of the form processing this action
-   * @param string  formLabel   label for the above form
-   * @param int     mode        mode of operation.
-   * @param boolean addSequence should we add a unique sequence number to the end of the key
-   * @param boolean ignoreKey   should we not set a qfKey for this controller (for standalone forms)
+   * @param string formName name of the form processing this action
+   * @param string formLabel label for the above form
+   * @param int mode mode of operation.
+   * @param bool addSequence should we add a unique sequence number to the end of the key
+   * @param bool ignoreKey should we not set a qfKey for this controller (for standalone forms)
    *
    * @return void.
    */

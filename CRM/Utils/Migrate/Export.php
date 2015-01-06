@@ -267,7 +267,8 @@ class CRM_Utils_Migrate_Export {
   }
 
   /**
-   * @param array $customGroupIds list of custom groups to export
+   * @param array $customGroupIds
+   *   List of custom groups to export.
    * @return void
    */
   public function buildCustomGroups($customGroupIds) {
@@ -320,7 +321,8 @@ class CRM_Utils_Migrate_Export {
   }
 
   /**
-   * @param array $ufGroupIds list of custom groups to export
+   * @param array $ufGroupIds
+   *   List of custom groups to export.
    * @return void
    */
   public function buildUFGroups($ufGroupIds) {
@@ -389,7 +391,7 @@ class CRM_Utils_Migrate_Export {
     $result = array();
     foreach (array_keys($this->_xml) as $key) {
       if (!empty($this->_xml[$key]['data'])) {
-        $result[ $this->_xml[$key]['name'] ] = array_values($this->_xml[$key]['data']);
+        $result[$this->_xml[$key]['name']] = array_values($this->_xml[$key]['data']);
       }
     }
     return $result;
@@ -429,8 +431,10 @@ class CRM_Utils_Migrate_Export {
   /**
    * Compute any fields of the entity defined by the $mappedFields specification
    *
-   * @param array $mappedFields each item is an array(0 => MappedEntityname, 1 => InputFieldName (id-field), 2 => OutputFieldName (name-field), 3 => OptionalPrefix)
-   * @param CRM_Core_DAO $dao the entity for which we want to prepare mapped fields
+   * @param array $mappedFields
+   *   Each item is an array(0 => MappedEntityname, 1 => InputFieldName (id-field), 2 => OutputFieldName (name-field), 3 => OptionalPrefix).
+   * @param CRM_Core_DAO $dao
+   *   The entity for which we want to prepare mapped fields.
    * @return array new fields
    */
   public function computeMappedFields($mappedFields, $dao) {
@@ -452,7 +456,8 @@ class CRM_Utils_Migrate_Export {
   }
 
   /**
-   * @param string $objectName business-entity/xml-tag name
+   * @param string $objectName
+   *   Business-entity/xml-tag name.
    * @param CRM_Core_DAO $object
    * @param $mappedFields
    *
@@ -548,8 +553,10 @@ class CRM_Utils_Migrate_Export {
   }
 
   /**
-   * @param string $name tag name
-   * @param string $value text
+   * @param string $name
+   *   Tag name.
+   * @param string $value
+   *   Text.
    * @param string $prefix
    *
    * @throws Exception

@@ -82,7 +82,7 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
       $dao->id = $this->_pid;
       $dao->find(TRUE);
       $defaults['product_id'] = $dao->product_id;
-            $defaults['financial_type_id']   = $dao->financial_type_id;
+      $defaults['financial_type_id']   = $dao->financial_type_id;
       $defaults['weight'] = $dao->weight;
     } else {
       $dao = new CRM_Contribute_DAO_Product();
@@ -172,9 +172,9 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
     CRM_Core_PseudoConstant::populate(
       $premiumFinancialType,
       'CRM_Financial_DAO_EntityFinancialAccount',
-      $all = True,
+      $all = TRUE,
       $retrieve = 'entity_id',
-      $filter = null,
+      $filter = NULL,
       'account_relationship = 8'
     );
 
@@ -182,15 +182,16 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
     CRM_Core_PseudoConstant::populate(
       $costFinancialType,
       'CRM_Financial_DAO_EntityFinancialAccount',
-      $all = True,
+      $all = TRUE,
       $retrieve = 'entity_id',
-      $filter = null,
+      $filter = NULL,
       'account_relationship = 7'
     );
     $productFinancialType = array_intersect($costFinancialType, $premiumFinancialType);
     foreach( $financialType as $key => $financialTypeName ){
-      if(!in_array( $key, $productFinancialType))
+      if(!in_array( $key, $productFinancialType)) {
         unset( $financialType[$key] );
+      }
     }
     if( count( $financialType ) ){
       $this->assign( 'financialType', $financialType );
@@ -199,7 +200,7 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
       'select',
       'financial_type_id',
       ts( 'Financial Type' ),
-      array(''=>ts('- select -')) + $financialType
+      array('' => ts('- select -')) + $financialType
     );
     $this->addRule('weight', ts('Please enter integer value for weight'), 'integer');
     $session->pushUserContext(CRM_Utils_System::url($urlParams, 'action=update&reset=1&id=' . $this->_id));

@@ -60,15 +60,13 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->res
       ->addScriptFile('com.example.ext', 'foo%20bar.js', 0, 'testAddScriptFile')
       ->addScriptFile('com.example.ext', 'foo%20bar.js', 0, 'testAddScriptFile') // extra
-      ->addScriptFile('civicrm', 'foo%20bar.js', 0, 'testAddScriptFile')
-      ;
+      ->addScriptFile('civicrm', 'foo%20bar.js', 0, 'testAddScriptFile');
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testAddScriptFile}{/crmRegion}');
     $expected = "" // stable ordering: alphabetical by (snippet.weight,snippet.name)
       . "<script type=\"text/javascript\" src=\"http://core-app/foo%20bar.js?r=resTest\">\n</script>\n"
-      . "<script type=\"text/javascript\" src=\"http://ext-dir/com.example.ext/foo%20bar.js?r=resTest\">\n</script>\n"
-      ;
+      . "<script type=\"text/javascript\" src=\"http://ext-dir/com.example.ext/foo%20bar.js?r=resTest\">\n</script>\n";
     $this->assertEquals($expected, $actual);
   }
 
@@ -78,50 +76,45 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    * FIXME: This can't work because the tests run in English and CRM_Core_Resources optimizes
    * away the English data from $settings['strings']
   public function testAddScriptFile_strings() {
-    file_put_contents($this->mapper->keyToBasePath('com.example.ext') . '/hello.js', 'alert(ts("Hello world"));');
-    $this->res->addScriptFile('com.example.ext', 'hello.js', 0, 'testAddScriptFile_strings');
-    $settings = $this->res->getSettings();
-    $expected = array('Hello world');
-    $this->assertEquals($expected, $settings['strings']);
+  file_put_contents($this->mapper->keyToBasePath('com.example.ext') . '/hello.js', 'alert(ts("Hello world"));');
+  $this->res->addScriptFile('com.example.ext', 'hello.js', 0, 'testAddScriptFile_strings');
+  $settings = $this->res->getSettings();
+  $expected = array('Hello world');
+  $this->assertEquals($expected, $settings['strings']);
   }
-  */
+   */
 
   public function testAddScriptURL() {
     $this->res
       ->addScriptUrl('/whiz/foo%20bar.js', 0, 'testAddScriptURL')
       ->addScriptUrl('/whiz/foo%20bar.js', 0, 'testAddScriptURL') // extra
-      ->addScriptUrl('/whizbang/foo%20bar.js', 0, 'testAddScriptURL')
-      ;
+      ->addScriptUrl('/whizbang/foo%20bar.js', 0, 'testAddScriptURL');
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testAddScriptURL}{/crmRegion}');
     $expected = "" // stable ordering: alphabetical by (snippet.weight,snippet.name)
       . "<script type=\"text/javascript\" src=\"/whiz/foo%20bar.js\">\n</script>\n"
-      . "<script type=\"text/javascript\" src=\"/whizbang/foo%20bar.js\">\n</script>\n"
-      ;
+      . "<script type=\"text/javascript\" src=\"/whizbang/foo%20bar.js\">\n</script>\n";
     $this->assertEquals($expected, $actual);
   }
 
   public function testAddScript() {
     $this->res
       ->addScript('alert("hi");', 0, 'testAddScript')
-      ->addScript('alert("there");', 0, 'testAddScript')
-      ;
+      ->addScript('alert("there");', 0, 'testAddScript');
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testAddScript}{/crmRegion}');
     $expected = ""
       . "<script type=\"text/javascript\">\nalert(\"hi\");\n</script>\n"
-      . "<script type=\"text/javascript\">\nalert(\"there\");\n</script>\n"
-      ;
+      . "<script type=\"text/javascript\">\nalert(\"there\");\n</script>\n";
     $this->assertEquals($expected, $actual);
   }
 
   public function testAddVars() {
     $this->res
       ->addVars('food', array('fruit' => array('mine' => 'apple', 'ours' => 'banana')))
-      ->addVars('food', array('fruit' => array('mine' => 'new apple', 'yours' => 'orange')))
-    ;
+      ->addVars('food', array('fruit' => array('mine' => 'new apple', 'yours' => 'orange')));
     $this->assertTreeEquals(
       array('vars' => array('food' => array('fruit' => array('yours' => 'orange', 'mine' => 'new apple', 'ours' => 'banana')))),
       $this->res->getSettings()
@@ -131,8 +124,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   public function testAddSetting() {
     $this->res
       ->addSetting(array('fruit' => array('mine' => 'apple')))
-      ->addSetting(array('fruit' => array('yours' => 'orange')))
-    ;
+      ->addSetting(array('fruit' => array('yours' => 'orange')));
     $this->assertTreeEquals(
       array('fruit' => array('yours' => 'orange', 'mine' => 'apple')),
       $this->res->getSettings()
@@ -186,8 +178,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $actual = $smarty->fetch('string:{crmRegion name=testCrmJS}{/crmRegion}');
     $expected = "" // stable ordering: alphabetical by (snippet.weight,snippet.name)
       . "<script type=\"text/javascript\" src=\"http://ext-dir/com.example.ext/foo%20bar.js?r=resTest\">\n</script>\n"
-      . "<script type=\"text/javascript\" src=\"/whiz/foo%20bar.js\">\n</script>\n"
-      ;
+      . "<script type=\"text/javascript\" src=\"/whiz/foo%20bar.js\">\n</script>\n";
     $this->assertEquals($expected, $actual);
   }
 
@@ -195,15 +186,13 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->res
       ->addStyleFile('com.example.ext', 'foo%20bar.css', 0, 'testAddStyleFile')
       ->addStyleFile('com.example.ext', 'foo%20bar.css', 0, 'testAddStyleFile') // extra
-      ->addStyleFile('civicrm', 'foo%20bar.css', 0, 'testAddStyleFile')
-      ;
+      ->addStyleFile('civicrm', 'foo%20bar.css', 0, 'testAddStyleFile');
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testAddStyleFile}{/crmRegion}');
     $expected = "" // stable ordering: alphabetical by (snippet.weight,snippet.name)
       . "<link href=\"http://core-app/foo%20bar.css?r=resTest\" rel=\"stylesheet\" type=\"text/css\"/>\n"
-      . "<link href=\"http://ext-dir/com.example.ext/foo%20bar.css?r=resTest\" rel=\"stylesheet\" type=\"text/css\"/>\n"
-      ;
+      . "<link href=\"http://ext-dir/com.example.ext/foo%20bar.css?r=resTest\" rel=\"stylesheet\" type=\"text/css\"/>\n";
     $this->assertEquals($expected, $actual);
   }
 
@@ -211,30 +200,26 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->res
       ->addStyleUrl('/whiz/foo%20bar.css', 0, 'testAddStyleURL')
       ->addStyleUrl('/whiz/foo%20bar.css', 0, 'testAddStyleURL') // extra
-      ->addStyleUrl('/whizbang/foo%20bar.css', 0, 'testAddStyleURL')
-      ;
+      ->addStyleUrl('/whizbang/foo%20bar.css', 0, 'testAddStyleURL');
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testAddStyleURL}{/crmRegion}');
     $expected = "" // stable ordering: alphabetical by (snippet.weight,snippet.name)
       . "<link href=\"/whiz/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
-      . "<link href=\"/whizbang/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
-      ;
+      . "<link href=\"/whizbang/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n";
     $this->assertEquals($expected, $actual);
   }
 
   public function testAddStyle() {
     $this->res
       ->addStyle('body { background: black; }', 0, 'testAddStyle')
-      ->addStyle('body { text-color: black; }', 0, 'testAddStyle')
-      ;
+      ->addStyle('body { text-color: black; }', 0, 'testAddStyle');
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testAddStyle}{/crmRegion}');
     $expected = ""
       . "<style type=\"text/css\">\nbody { background: black; }\n</style>\n"
-      . "<style type=\"text/css\">\nbody { text-color: black; }\n</style>\n"
-      ;
+      . "<style type=\"text/css\">\nbody { text-color: black; }\n</style>\n";
     $this->assertEquals($expected, $actual);
   }
 
@@ -250,8 +235,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $actual = $smarty->fetch('string:{crmRegion name=testCrmCSS}{/crmRegion}');
     $expected = "" // stable ordering: alphabetical by (snippet.weight,snippet.name)
       . "<link href=\"http://ext-dir/com.example.ext/foo%20bar.css?r=resTest\" rel=\"stylesheet\" type=\"text/css\"/>\n"
-      . "<link href=\"/whiz/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
-      ;
+      . "<link href=\"/whiz/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n";
     $this->assertEquals($expected, $actual);
   }
 

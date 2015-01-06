@@ -41,7 +41,8 @@
  * In case of updating existing participant_status, id of that particular participant_status must
  * be in $params array.
  *
- * @param array $params Associative array of property
+ * @param array $params
+ *   Associative array of property.
  *                       name/value pairs to insert in new 'participant_status'
  *
  * @return array   participant_status array
@@ -56,7 +57,8 @@ function civicrm_api3_participant_status_type_create($params) {
 /**
  * Returns array of participant_statuses  matching a set of one or more group properties
  *
- * @param array $params Array of one or more valid
+ * @param array $params
+ *   Array of one or more valid.
  *                       property_name=>value pairs. If $params is set
  *                       as null, all participant_statuses will be returned
  *
@@ -75,7 +77,8 @@ function civicrm_api3_participant_status_type_get($params) {
  * This method is used to delete any existing participant_status. id of the group
  * to be deleted is required field in $params array
  *
- * @param array $params  (reference) array containing id of the group
+ * @param array $params
+ *   (reference) array containing id of the group.
  *                       to be deleted
  *
  * @return array api result array
@@ -90,4 +93,3 @@ function civicrm_api3_participant_status_type_delete($params) {
 
   return civicrm_api3_create_error(TRUE);
 }
-

@@ -59,11 +59,11 @@ class CRM_Report_BAO_Hook {
     return $singleton;
   }
 
- /**
-  * Get or build the list of search objects (via hook)
-  *
-  * @return array of CRM_Report_BAO_Hook_Interface objects
-  */
+  /**
+   * Get or build the list of search objects (via hook)
+   *
+   * @return array of CRM_Report_BAO_Hook_Interface objects
+   */
   public function getSearchQueryObjects() {
     if ($this->_queryObjects === NULL) {
       $this->_queryObjects = array();
@@ -92,10 +92,12 @@ class CRM_Report_BAO_Hook {
     $contactIdClause = $join = '';
     foreach (self::getSearchQueryObjects() as $obj) {
       list($cidClause, $joinClause) = $obj->logDiffClause($reportObj, $table);
-      if ($joinClause)
+      if ($joinClause) {
         $join .= $joinClause;
-      if ($cidClause)
+      }
+      if ($cidClause) {
         $contactIdClause .= $cidClause;
+      }
     }
     return array($contactIdClause, $join);
   }

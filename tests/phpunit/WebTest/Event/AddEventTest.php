@@ -915,11 +915,11 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $this->click('CIVICRM_QFID_1_is_monetary');
     $processorName = 'Test Processor';
     $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='$processorName']");
-    $this->select('financial_type_id','label=Event Fee');
-    $this->type("label[1]",'Junior Stars');
-    $this->type("value[1]",'500.00');
-    $this->type("label[2]",'Super Stars');
-    $this->type("value[2]",'1000.00');
+    $this->select('financial_type_id', 'label=Event Fee');
+    $this->type("label[1]", 'Junior Stars');
+    $this->type("value[1]", '500.00');
+    $this->type("label[2]", 'Super Stars');
+    $this->type("value[2]", '1000.00');
     $this->check('default');
     $this->click('_qf_Fee_upload-bottom');
     $this->waitForText('crm-notification-container', "'Fees' information has been saved.");
@@ -927,41 +927,41 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     // intro text for registration page
     $registerIntro = 'Fill in all the fields below and click Continue.';
 
-   // Go to Online Registration tab
-   $this->click('link=Online Registration');
-   $this->waitForElementPresent('_qf_Registration_upload-bottom');
-   $this->click('is_online_registration');
-   $this->assertChecked('is_online_registration');
+    // Go to Online Registration tab
+    $this->click('link=Online Registration');
+    $this->waitForElementPresent('_qf_Registration_upload-bottom');
+    $this->click('is_online_registration');
+    $this->assertChecked('is_online_registration');
 
-   //Requires Approvel
-   $this->click('requires_approval');
-   $this->assertChecked('requires_approval');
-   $this->click('_qf_Registration_upload-bottom');
-   $this->waitForText('crm-notification-container', "'Online Registration' information has been saved.");
+    //Requires Approvel
+    $this->click('requires_approval');
+    $this->assertChecked('requires_approval');
+    $this->click('_qf_Registration_upload-bottom');
+    $this->waitForText('crm-notification-container', "'Online Registration' information has been saved.");
 
-   // verify event input on info page
-   // start at Manage Events listing
-   $this->openCiviPage('event/manage', 'reset=1');
-   $this->click("link=$eventTitle");
-   $this->waitForPageToLoad($this->getTimeoutMsec());
-   $firstName = substr(sha1(rand()), 0, 7);
-   $this->webtestAddContact($firstName, 'Anderson', TRUE);
-   $contactName = "Anderson, $firstName";
-   $displayName = "$firstName Anderson";
-   $this->openCiviPage("event/register", "reset=1&id=$id", '_qf_Register_upload-bottom');
-   $this->type('first_name',$firstName);
-
-   //fill in last name
-   $lastName = 'Recuron'.substr(sha1(rand()), 0, 7);
-   $this->type('last_name', $contactName);
-   $email = $firstName . '@example.com';
-   $this->type('email-Primary', $email);
-   $this->click('_qf_Register_upload');
-   $this->waitForElementPresent("_qf_Confirm_next");
-   $this->click('_qf_Confirm_next');
+    // verify event input on info page
+    // start at Manage Events listing
+    $this->openCiviPage('event/manage', 'reset=1');
+    $this->click("link=$eventTitle");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-   $this->waitForElementPresent("xpath=//div[@class='section']");
-   $this->assertTextPresent("Thank You for Registering");
+    $firstName = substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName, 'Anderson', TRUE);
+    $contactName = "Anderson, $firstName";
+    $displayName = "$firstName Anderson";
+    $this->openCiviPage("event/register", "reset=1&id=$id", '_qf_Register_upload-bottom');
+    $this->type('first_name', $firstName);
+
+    //fill in last name
+    $lastName = 'Recuron'.substr(sha1(rand()), 0, 7);
+    $this->type('last_name', $contactName);
+    $email = $firstName . '@example.com';
+    $this->type('email-Primary', $email);
+    $this->click('_qf_Register_upload');
+    $this->waitForElementPresent("_qf_Confirm_next");
+    $this->click('_qf_Confirm_next');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@class='section']");
+    $this->assertTextPresent("Thank You for Registering");
 
   }
 
@@ -969,10 +969,10 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
    * @param $status
    */
   public function _testEnableParticipantStatuses($status) {
-   // enable participant status
-   if ($this->isElementPresent("xpath=//td[@class='crm-participant-label crm-editable crm-editable-enabled'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Enable']")) {
-     $this->click("xpath=//td[@class='crm-participant-label crm-editable crm-editable-enabled'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Enable']");
-     $this->waitForElementPresent("xpath=//td[@class='crm-participant-label crm-editable crm-editable-enabled'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Disable']");
-   }
- }
+    // enable participant status
+    if ($this->isElementPresent("xpath=//td[@class='crm-participant-label crm-editable crm-editable-enabled'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Enable']")) {
+      $this->click("xpath=//td[@class='crm-participant-label crm-editable crm-editable-enabled'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Enable']");
+      $this->waitForElementPresent("xpath=//td[@class='crm-participant-label crm-editable crm-editable-enabled'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Disable']");
+    }
+  }
 }

@@ -122,7 +122,6 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
       $this->type("duration_interval", "1");
       $this->select("duration_unit", "label=year");
 
-
       $this->click("_qf_MembershipType_upload-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -133,7 +132,6 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
 
       $this->type("duration_interval", "1");
       $this->select("duration_unit", "label=year");
-
 
       $this->click("_qf_MembershipType_upload-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());

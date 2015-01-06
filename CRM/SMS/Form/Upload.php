@@ -170,7 +170,8 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     $this->addFormRule(array('CRM_SMS_Form_Upload', 'formRule'), $this);
 
     $buttons = array(
-      array('type' => 'back',
+      array(
+    'type' => 'back',
         'name' => ts('<< Previous'),
       ),
       array(
@@ -290,7 +291,8 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
   /**
    * Validation
    *
-   * @param array $params (ref.) an assoc array of name/value pairs
+   * @param array $params
+   *   (ref.) an assoc array of name/value pairs.
    *
    * @param $files
    * @param $self
@@ -305,7 +307,6 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     $errors = array();
     $template = CRM_Core_Smarty::singleton();
 
-
     $domain = CRM_Core_BAO_Domain::getDomain();
 
     $mailing = new CRM_Mailing_BAO_Mailing();
@@ -313,7 +314,8 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     $mailing->find(TRUE);
 
     $session = CRM_Core_Session::singleton();
-    $values = array('contact_id' => $session->get('userID'),
+    $values = array(
+    'contact_id' => $session->get('userID'),
       'version' => 3,
     );
     require_once 'api/api.php';
@@ -331,7 +333,6 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     foreach ($urls as $key => $value) {
       $urls[$key]++;
     }
-
 
     $skipTextFile = $self->get('skipTextFile');
 
@@ -376,7 +377,6 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
       /* Do a full token replacement on a dummy verp, the current
              * contact and domain, and the first organization. */
-
 
       // here we make a dummy mailing object so that we
       // can retrieve the tokens that we need to replace

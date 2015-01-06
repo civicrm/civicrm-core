@@ -117,9 +117,9 @@ class CRM_Activity_Form_Task extends CRM_Core_Form {
 
       while ($result->fetch()) {
         if(!empty($result->activity_id)) {
-        $ids[] = $result->activity_id;
+          $ids[] = $result->activity_id;
+        }
       }
-    }
     }
 
     if (!empty($ids)) {
@@ -174,8 +174,10 @@ WHERE  activity_id IN ( $IDs ) AND
    * Simple shell that derived classes can call to add buttons to
    * the form with a customized title for the main Submit
    *
-   * @param string $title title of the main button
-   * @param string $nextType button type for the form after processing
+   * @param string $title
+   *   Title of the main button.
+   * @param string $nextType
+   *   Button type for the form after processing.
    * @param string $backType
    * @param bool $submitOnce
    *

@@ -42,9 +42,12 @@ class CRM_Contact_Form_Edit_Address {
    * Build form for address input fields
    *
    * @param CRM_Core_Form $form
-   * @param int     $addressBlockCount - the index of the address array (if multiple addresses on a page)
-   * @param boolean $sharing - false, if we want to skip the address sharing features
-   * @param boolean $inlineEdit true when edit used in inline edit
+   * @param int $addressBlockCount
+   *   The index of the address array (if multiple addresses on a page).
+   * @param bool $sharing
+   *   False, if we want to skip the address sharing features.
+   * @param bool $inlineEdit
+   *   True when edit used in inline edit.
    *
    * @return void
    *
@@ -232,8 +235,7 @@ class CRM_Contact_Form_Edit_Address {
 
       $template     = CRM_Core_Smarty::singleton();
       $tplGroupTree = $template->get_template_vars('address_groupTree');
-      $tplGroupTree = empty($tplGroupTree) ? array(
-        ) : $tplGroupTree;
+      $tplGroupTree = empty($tplGroupTree) ? array() : $tplGroupTree;
 
       $form->assign('address_groupTree', $tplGroupTree + array($blockId => $groupTree));
       // unset the temp smarty var that got created
@@ -312,12 +314,14 @@ class CRM_Contact_Form_Edit_Address {
   /**
    * Set default values for address block
    *
-   * @param array  $defaults  defaults associated array
-   * @param CRM_Core_Form $form     form object
+   * @param array $defaults
+   *   Defaults associated array.
+   * @param CRM_Core_Form $form
+   *   Form object.
    *
    * @static
    */
-  public static function setDefaultValues( &$defaults, &$form ) {
+  public static function setDefaultValues(&$defaults, &$form) {
     $addressValues = array();
     if (isset($defaults['address']) && is_array($defaults['address']) &&
       !CRM_Utils_System::isNull($defaults['address'])

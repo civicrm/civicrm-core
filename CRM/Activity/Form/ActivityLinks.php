@@ -81,7 +81,7 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
       list($name, $phone, $doNotSMS) = CRM_Contact_BAO_Contact_Location::getPhoneDetails($contactId, $mobileTypeID);
 
       if (!$doNotSMS && $phone) {
-        $sendSMS = array($SMSId  => ts('Send SMS'));
+        $sendSMS = array($SMSId => ts('Send SMS'));
         $activityTypes += $sendSMS;
       }
     }
@@ -96,11 +96,11 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
           "{$urlParams}{$typeId}", FALSE, NULL, FALSE
         );
       }
-       elseif ($typeId == $SMSId) {
+      elseif ($typeId == $SMSId) {
         $urls[$typeId] = CRM_Utils_System::url('civicrm/activity/sms/add',
           "{$urlParams}{$typeId}", FALSE, NULL, FALSE
         );
-        }
+      }
       elseif ($typeId == $letterTypeId) {
         $urls[$typeId] = CRM_Utils_System::url('civicrm/activity/pdf/add',
           "{$urlParams}{$typeId}", FALSE, NULL, FALSE

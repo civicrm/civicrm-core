@@ -80,7 +80,6 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
       $this->assign('note', CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Note', $this->_noteId, 'note'));
     }
 
-
     // add Grant to Recent Items
     $url = CRM_Utils_System::url('civicrm/contact/view/grant',
       "action=view&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"

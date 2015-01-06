@@ -102,7 +102,8 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
    * @param string $entity
    * @param string $action
    * @param array $params
-   * @param bool $throws whether we should pass any exceptions for authorization failures
+   * @param bool $throws
+   *   Whether we should pass any exceptions for authorization failures.
    *
    * @throws API_Exception
    * @throws Exception
@@ -252,7 +253,9 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
 
     $params = array(
       'registration_start_date' => 20080601,
-      'registration_end_date' => '2008-10-15', 'start_date' => '2010-12-20', 'end_date' => '',
+      'registration_end_date' => '2008-10-15',
+    'start_date' => '2010-12-20',
+    'end_date' => '',
     );
     $fields = civicrm_api3('Event', 'getfields', array('action' => 'create'));
     _civicrm_api3_validate_fields('event', 'create', $params, $fields['values']);

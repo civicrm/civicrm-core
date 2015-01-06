@@ -42,8 +42,10 @@ class CRM_Utils_PagerAToZ {
   /**
    * Returns the alphabetic array for sorting by character
    *
-   * @param array $query The query object
-   * @param string $sortByCharacter The character that we are potentially sorting on
+   * @param array $query
+   *   The query object.
+   * @param string $sortByCharacter
+   *   The character that we are potentially sorting on.
    *
    * @param bool $isDAO
    *
@@ -96,8 +98,10 @@ class CRM_Utils_PagerAToZ {
   /**
    * Create the links
    *
-   * @param array $query The form values for search
-   * @param string $sortByCharacter The character that we are potentially sorting on
+   * @param array $query
+   *   The form values for search.
+   * @param string $sortByCharacter
+   *   The character that we are potentially sorting on.
    *
    * @param $isDAO
    *
@@ -119,7 +123,7 @@ class CRM_Utils_PagerAToZ {
     //get the current path
     $path = CRM_Utils_System::currentPath();
 
-    $qfKey = null;
+    $qfKey = NULL;
     if (isset($query->_formValues)) {
       $qfKey = CRM_Utils_Array::value('qfKey', $query->_formValues);
     }

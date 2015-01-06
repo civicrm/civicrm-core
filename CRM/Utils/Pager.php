@@ -132,7 +132,8 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * Helper function to assign remaining pager options as good default
    * values
    *
-   * @param array   $params      the set of options needed to initialize the parent
+   * @param array $params
+   *   The set of options needed to initialize the parent.
    *                             constructor
    *
    *
@@ -164,7 +165,6 @@ class CRM_Utils_Pager extends Pager_Sliding {
     $params['prevImg'] = ' ' . ts('&lt; Previous');
     $params['nextImg'] = ts('Next &gt;') . ' ';
 
-
     // set first and last text fragments
     $params['firstPagePre'] = '';
     $params['firstPageText'] = ' ' . ts('&lt;&lt; First');
@@ -189,7 +189,8 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * POST over-rides a GET, a POST at the top overrides
    * a POST at the bottom (of the page)
    *
-   * @param int $defaultPageId defaultPageId   current pageId
+   * @param int $defaultPageId
+   *   DefaultPageId   current pageId.
    *
    * @param array $params
    *
@@ -201,20 +202,20 @@ class CRM_Utils_Pager extends Pager_Sliding {
     $currentPage = $defaultPageId;
     if (!empty($_POST)) {
       if (isset($_POST[CRM_Utils_Array::value('buttonTop', $params)]) && isset($_POST[self::PAGE_ID])) {
-        $currentPage = max((int )@$_POST[self::PAGE_ID], 1);
+        $currentPage = max((int ) @$_POST[self::PAGE_ID], 1);
       }
       elseif (isset($_POST[$params['buttonBottom']]) && isset($_POST[self::PAGE_ID_BOTTOM])) {
-        $currentPage = max((int )@$_POST[self::PAGE_ID_BOTTOM], 1);
+        $currentPage = max((int ) @$_POST[self::PAGE_ID_BOTTOM], 1);
       }
       elseif (isset($_POST[self::PAGE_ID])) {
-        $currentPage = max((int )@$_POST[self::PAGE_ID], 1);
+        $currentPage = max((int ) @$_POST[self::PAGE_ID], 1);
       }
       elseif (isset($_POST[self::PAGE_ID_BOTTOM])) {
-        $currentPage = max((int )@$_POST[self::PAGE_ID_BOTTOM]);
+        $currentPage = max((int ) @$_POST[self::PAGE_ID_BOTTOM]);
       }
     }
     elseif (isset($_GET[self::PAGE_ID])) {
-      $currentPage = max((int )@$_GET[self::PAGE_ID], 1);
+      $currentPage = max((int ) @$_GET[self::PAGE_ID], 1);
     }
     return $currentPage;
   }
@@ -222,7 +223,8 @@ class CRM_Utils_Pager extends Pager_Sliding {
   /**
    * Get the number of rows to display from either a GET / POST variable
    *
-   * @param int $defaultPageRowCount the default value if not set
+   * @param int $defaultPageRowCount
+   *   The default value if not set.
    *
    * @return int                     the rowCount value to use
    *
@@ -230,10 +232,10 @@ class CRM_Utils_Pager extends Pager_Sliding {
   public function getPageRowCount($defaultPageRowCount = self::ROWCOUNT) {
     // POST has higher priority than GET vars
     if (isset($_POST[self::PAGE_ROWCOUNT])) {
-      $rowCount = max((int )@$_POST[self::PAGE_ROWCOUNT], 1);
+      $rowCount = max((int ) @$_POST[self::PAGE_ROWCOUNT], 1);
     }
     elseif (isset($_GET[self::PAGE_ROWCOUNT])) {
-      $rowCount = max((int )@$_GET[self::PAGE_ROWCOUNT], 1);
+      $rowCount = max((int ) @$_GET[self::PAGE_ROWCOUNT], 1);
     }
     else {
       $rowCount = $defaultPageRowCount;

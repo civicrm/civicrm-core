@@ -136,13 +136,15 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
    *
    * @return void
    */
-  public function postProcess() {}
+  public function postProcess() {
+  }
 
   /**
    * Assign smarty variables to the template that will be used by google api to plot the contacts
    *
    * @param $ids
-   * @param int $locationId location_id
+   * @param int $locationId
+   *   Location_id.
    * @param $page
    * @param $addBreadCrumb
    * @param string $type
@@ -233,8 +235,8 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
       'lng' => (float ) $sumLng / count($locations),
     );
     $span = array(
-      'lat' => (float )($maxLat - $minLat),
-      'lng' => (float )($maxLng - $minLng),
+      'lat' => (float ) ($maxLat - $minLat),
+      'lng' => (float ) ($maxLng - $minLng),
     );
     $page->assign_by_ref('center', $center);
     $page->assign_by_ref('span', $span);

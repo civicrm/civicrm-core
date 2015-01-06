@@ -13,14 +13,14 @@ if ( ! defined( 'CIVICRM_DSN' ) && ! empty( $GLOBALS['mysql_user'] ) ) {
   if ( empty( $GLOBALS['mysql_pass'] ) && $GLOBALS['mysql_pass_need_password'] ) {
     $GLOBALS['mysql_pass'] = PHPUnit_TextUI_Command::getPassword( 'Password' );
   }
-  define( 'CIVICRM_DSN'          , "mysql://{$GLOBALS['mysql_user']}:{$GLOBALS['mysql_pass']}@{$GLOBALS['mysql_host']}/{$dbName}?new_link=true" );
+  define( 'CIVICRM_DSN', "mysql://{$GLOBALS['mysql_user']}:{$GLOBALS['mysql_pass']}@{$GLOBALS['mysql_host']}/{$dbName}?new_link=true" );
 }
 
 
 if (!defined("CIVICRM_DSN")) {
-  $dsn= getenv("CIVICRM_TEST_DSN");
+  $dsn = getenv("CIVICRM_TEST_DSN");
   if (!empty ($dsn)) {
-    define("CIVICRM_DSN",$dsn);
+    define("CIVICRM_DSN", $dsn);
   } else {
     echo "\nFATAL: no DB connection configured (CIVICRM_DSN). \nYou can either create/edit " . __DIR__ . "/civicrm.settings.local.php\n";
     if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
@@ -29,7 +29,7 @@ if (!defined("CIVICRM_DSN")) {
       echo "OR set it in your shell:\n SETX CIVICRM_TEST_DSN mysql://db_username:db_password@localhost/civicrm_tests_dev \n
       (you will need to open a new command shell before it takes effect)";
     }
-echo "\n\n
+    echo "\n\n
 If you haven't done so already, you need to create (once) a database dedicated to the unit tests:
 mysql -uroot -p
 create database civicrm_tests_dev;
@@ -59,7 +59,7 @@ define('CIVICRM_UF', 'UnitTests');
 
 global $civicrm_root;
 if (empty($civicrm_root)) {
-  $civicrm_root = dirname (dirname (dirname (dirname( __FILE__ ) )));
+  $civicrm_root = dirname(dirname(dirname(dirname( __FILE__ ) )));
 }
 #$civicrm_root = '/var/www/drupal7.dev.civicrm.org/public/sites/devel.drupal7.tests.dev.civicrm.org/modules/civicrm';
 
@@ -68,7 +68,7 @@ if (empty($civicrm_root)) {
 
 if (!defined("CIVICRM_TEMPLATE_COMPILEDIR")) {
   if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-    define( 'CIVICRM_TEMPLATE_COMPILEDIR', getenv ('TMP') . DIRECTORY_SEPARATOR . 'civi' . DIRECTORY_SEPARATOR );
+    define( 'CIVICRM_TEMPLATE_COMPILEDIR', getenv('TMP') . DIRECTORY_SEPARATOR . 'civi' . DIRECTORY_SEPARATOR );
   } else {
     define( 'CIVICRM_TEMPLATE_COMPILEDIR', '/tmp/civi/' );
   }
@@ -102,7 +102,7 @@ define( 'CIVICRM_SITE_KEY', 'phpunittestfakekey' );
  *
  */
 if (!defined('CIVICRM_UF_BASEURL')) {
-  define( 'CIVICRM_UF_BASEURL'      , 'http://FIX ME' );
+  define( 'CIVICRM_UF_BASEURL', 'http://FIX ME' );
 }
 
 /**
@@ -126,9 +126,9 @@ $include_path = '.'        . PATH_SEPARATOR .
 set_include_path( $include_path );
 
 if ( function_exists( 'variable_get' ) && variable_get('clean_url', '0') != '0' ) {
-    define( 'CIVICRM_CLEANURL', 1 );
+  define( 'CIVICRM_CLEANURL', 1 );
 } else {
-    define( 'CIVICRM_CLEANURL', 0 );
+  define( 'CIVICRM_CLEANURL', 0 );
 }
 
 // force PHP to auto-detect Mac line endings
@@ -139,12 +139,12 @@ $memLimitString = trim(ini_get('memory_limit'));
 $memLimitUnit   = strtolower(substr($memLimitString, -1));
 $memLimit       = (int) $memLimitString;
 switch ($memLimitUnit) {
-    case 'g': $memLimit *= 1024;
-    case 'm': $memLimit *= 1024;
-    case 'k': $memLimit *= 1024;
+  case 'g': $memLimit *= 1024;
+  case 'm': $memLimit *= 1024;
+  case 'k': $memLimit *= 1024;
 }
 if ($memLimit >= 0 and $memLimit < 67108864) {
-    ini_set('memory_limit', '64M');
+  ini_set('memory_limit', '64M');
 }
 
 require_once 'CRM/Core/ClassLoader.php';

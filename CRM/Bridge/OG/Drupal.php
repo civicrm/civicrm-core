@@ -73,7 +73,7 @@ class CRM_Bridge_OG_Drupal {
    * @param null $groupType
    */
   public static function updateCiviGroup(&$params, $op, $groupType = NULL) {
-    $abort             = false;
+    $abort             = FALSE;
     $params['version'] = 3;
     $params['id']      = CRM_Bridge_OG_Utils::groupID($params['source'], $params['title'], $abort);
 
@@ -153,7 +153,8 @@ SELECT v.id
  WHERE v.option_group_id = %1
    AND v.description     = %2
 ";
-    $queryParams = array(1 => array($optionGroupID, 'Integer'),
+    $queryParams = array(
+    1 => array($optionGroupID, 'Integer'),
       2 => array($params['source'], 'String'),
     );
     $dao->id = CRM_Core_DAO::singleValueQuery($query, $queryParams);

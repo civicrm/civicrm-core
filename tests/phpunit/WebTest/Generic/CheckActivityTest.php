@@ -64,7 +64,7 @@ class WebTest_Generic_CheckActivityTest extends CiviSeleniumTestCase {
     $this->clickAt("xpath=//div[@class='select2-result-label']");
 
     // ...again, waiting for the box with contact name to show up (span with delete token class indicates that it's present)...
-    $this->waitForText("xpath=//div[@id='s2id_target_contact_id']","$contactFirstName1");
+    $this->waitForText("xpath=//div[@id='s2id_target_contact_id']", "$contactFirstName1");
 
     // Now we're doing the same for "Assigned To" field.
     // Typing contact's name into the field (using typeKeys(), not type()!)...
@@ -80,6 +80,6 @@ class WebTest_Generic_CheckActivityTest extends CiviSeleniumTestCase {
     $this->clickAt("xpath=//div[@class='select2-result-label']");
 
     // ...again, waiting for the box with contact name to show up...
-    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']","$contactFirstName2");
+    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']", "$contactFirstName2");
   }
 }

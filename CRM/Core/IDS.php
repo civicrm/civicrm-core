@@ -96,7 +96,8 @@ class CRM_Core_IDS {
   /**
    * Create the default config file for the IDS system
    *
-   * @param boolean $force should we recreate it irrespective if it exists or not
+   * @param bool $force
+   *   Should we recreate it irrespective if it exists or not.
    *
    * @return string the full path to the config file
    * @static
@@ -160,7 +161,6 @@ class CRM_Core_IDS {
       CRM_Core_Error::movedSiteError($configFile);
     }
 
-
     // also create the .htaccess file so we prevent the reading of the log and ini files
     // via a browser, CRM-3875
     CRM_Utils_File::restrictAccess($config->configAndLogDir);
@@ -179,7 +179,7 @@ class CRM_Core_IDS {
    *
    * @return boolean
    */
-  private function react(IDS_Report$result) {
+  private function react() {
 
     $impact = $result->getImpact();
     if ($impact >= $this->threshold['kick']) {
@@ -213,9 +213,7 @@ class CRM_Core_IDS {
   private function log($result, $reaction = 0) {
     $ip = (isset($_SERVER['SERVER_ADDR']) &&
       $_SERVER['SERVER_ADDR'] != '127.0.0.1'
-    ) ? $_SERVER['SERVER_ADDR'] : (isset($_SERVER['HTTP_X_FORWARDED_FOR']) ?
-      $_SERVER['HTTP_X_FORWARDED_FOR'] :
-      '127.0.0.1'
+    ) ? $_SERVER['SERVER_ADDR'] : (isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '127.0.0.1'
     );
 
     $data = array();

@@ -45,8 +45,10 @@ class CRM_Core_Payment_Form {
    *  Note that this code is written to accommodate the possibility CiviCRM will switch to implementing pay later as a manual processor in future
    *
    * @param CRM_Contribute_Form_AbstractEditPayment|CRM_Contribute_Form_Contribution_Main $form
-   * @param array $processor array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors
-   * @param bool $forceBillingFieldsForPayLater display billing fields even for pay later
+   * @param array $processor
+   *   Array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors.
+   * @param bool $forceBillingFieldsForPayLater
+   *   Display billing fields even for pay later.
    */
   static public function setPaymentFieldsByProcessor(&$form, $processor, $forceBillingFieldsForPayLater = FALSE) {
     $form->billingFieldSets = array();
@@ -242,8 +244,10 @@ class CRM_Core_Payment_Form {
 
   /**
    * @param CRM_Contribute_Form_AbstractEditPayment|CRM_Contribute_Form_Contribution_Main|CRM_Core_Payment_ProcessorForm|CRM_Contribute_Form_UpdateBilling $form
-   * @param array $processor array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors
-   * @param bool $isBillingDataOptional This manifests for 'NULL' (pay later) payment processor as the addition of billing fields to the form and
+   * @param array $processor
+   *   Array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors.
+   * @param bool $isBillingDataOptional
+   *   This manifests for 'NULL' (pay later) payment processor as the addition of billing fields to the form and.
    *   for payment processors that gather payment data on site as rendering the fields as not being required. (not entirely sure why but this
    *   is implemented for back office forms)
    *
@@ -272,7 +276,8 @@ class CRM_Core_Payment_Form {
 
   /**
    * @param CRM_Core_Form $form
-   * @param array $paymentFields array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors
+   * @param array $paymentFields
+   *   Array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors.
 
    * @param $paymentFields
    */

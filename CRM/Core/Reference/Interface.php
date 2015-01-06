@@ -19,7 +19,8 @@ interface CRM_Core_Reference_Interface {
   /**
    * Create a query to find references to a particular record
    *
-   * @param CRM_Core_DAO $targetDao the instance for which we want references
+   * @param CRM_Core_DAO $targetDao
+   *   The instance for which we want references.
    * @return CRM_Core_DAO|NULL a query-handle (like the result of CRM_Core_DAO::executeQuery)
    */
   public function findReferences($targetDao);
@@ -27,7 +28,8 @@ interface CRM_Core_Reference_Interface {
   /**
    * Create a query to find references to a particular record
    *
-   * @param CRM_Core_DAO $targetDao the instance for which we want references
+   * @param CRM_Core_DAO $targetDao
+   *   The instance for which we want references.
    * @return array a record describing the reference; must include the keys:
    *  - 'type': string (not necessarily unique)
    *  - 'count': int

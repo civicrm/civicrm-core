@@ -53,7 +53,7 @@
  * @param string
  * @param integer
  * @param string
- * @param boolean
+ * @param bool
  *
  * @return string
  */
@@ -84,7 +84,8 @@ function smarty_modifier_mb_truncate($string, $length = 80, $etc = '...',
 
     return $substr($string, 0, $length) . $etc;
   }
-  else return $string;
+  else { return $string;
+  }
 }
 
 /* vim: set expandtab: */

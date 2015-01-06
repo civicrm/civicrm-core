@@ -41,8 +41,10 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   /**
    * Takes an associative array and creates a address
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param boolean $fixAddress true if you need to fix (format) address values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param bool $fixAddress
+   *   True if you need to fix (format) address values.
    *                               before inserting in db
    *
    * @param null $entity
@@ -133,8 +135,10 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   /**
    * Takes an associative array and adds address
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
-   * @param boolean  $fixAddress   true if you need to fix (format) address values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param bool $fixAddress
+   *   True if you need to fix (format) address values.
    *                               before inserting in db
    *
    * @return object       CRM_Core_BAO_Address object on success, null otherwise
@@ -196,7 +200,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   /**
    * Format the address params to have reasonable values
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return void
    * @static
@@ -395,7 +400,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   /**
    * Check if there is data to create the object
    *
-   * @param array  $params    (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return boolean
    *
@@ -451,9 +457,12 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array $entityBlock associated array of fields
-   * @param boolean $microformat if microformat output is required
-   * @param int|string $fieldName conditional field name
+   * @param array $entityBlock
+   *   Associated array of fields.
+   * @param bool $microformat
+   *   If microformat output is required.
+   * @param int|string $fieldName
+   *   Conditional field name.
    *
    * @return array  $addresses     array with address fields
    * @static
@@ -574,7 +583,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   /**
    * Get all the addresses for a specified contact_id, with the primary address being first
    *
-   * @param int $id the contact id
+   * @param int $id
+   *   The contact id.
    *
    * @param bool $updateBlankLocInfo
    *
@@ -610,7 +620,8 @@ ORDER BY civicrm_address.is_primary DESC, address_id ASC";
   /**
    * Get all the addresses for a specified location_block id, with the primary address being first
    *
-   * @param array $entityElements the array containing entity_id and
+   * @param array $entityElements
+   *   The array containing entity_id and.
    * entity_table name
    *
    * @return array  the array of adrress data
@@ -687,8 +698,8 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    * NB: civic street formats for en_CA and fr_CA used by default if those locales are active
    *     otherwise en_US format is default action
    *
-   * @param  string   Street address including number and apt
-   * @param  string   Locale - to set locale used to parse address
+   * @param string Street address including number and apt
+   * @param string Locale - to set locale used to parse address
    *
    * @return array    $parseFields    parsed fields values.
    * @static
@@ -822,7 +833,8 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    * Validate the address fields based on the address options enabled
    * in the Address Settings
    *
-   * @param  array   $fields an array of importable/exportable contact fields
+   * @param array $fields
+   *   An array of importable/exportable contact fields.
    *
    * @return array   $fields an array of contact fields and only the enabled address options
    * @static
@@ -850,7 +862,8 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
   /**
    * Check if current address is used by any other contacts
    *
-   * @param int $addressId address id
+   * @param int $addressId
+   *   Address id.
    *
    * @return count of contacts that use this shared address
    * @static
@@ -863,8 +876,10 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
   /**
    * Check if current address fields are shared with any other address
    *
-   * @param array    $fields    address fields in profile
-   * @param int      $contactId contact id
+   * @param array $fields
+   *   Address fields in profile.
+   * @param int $contactId
+   *   Contact id.
    *
    * @static
    */
@@ -933,8 +948,10 @@ SELECT is_primary,
   /**
    * Update the shared addresses if master address is modified
    *
-   * @param int    $addressId address id
-   * @param array  $params    associated array of address params
+   * @param int $addressId
+   *   Address id.
+   * @param array $params
+   *   Associated array of address params.
    *
    * @return void
    * @static
@@ -964,8 +981,10 @@ SELECT is_primary,
    * Note that currently we create relationship only for Individual contacts
    * Individual + Household and Individual + Orgnization
    *
-   * @param int    $masterAddressId master address id
-   * @param array  $params          associated array of submitted values
+   * @param int $masterAddressId
+   *   Master address id.
+   * @param array $params
+   *   Associated array of submitted values.
    *
    * @return void
    * @static
@@ -1034,9 +1053,12 @@ SELECT is_primary,
   /**
    * Check and set the status for shared address delete
    *
-   * @param int     $addressId address id
-   * @param int     $contactId contact id
-   * @param boolean $returnStatus by default false
+   * @param int $addressId
+   *   Address id.
+   * @param int $contactId
+   *   Contact id.
+   * @param bool $returnStatus
+   *   By default false.
    *
    * @return string $statusMessage
    * @static
@@ -1106,8 +1128,10 @@ SELECT is_primary,
    * TODO: In context of chainselect, what to return if e.g. a country has no states?
    *
    * @param String $fieldName
-   * @param String $context : @see CRM_Core_DAO::buildOptionsContext
-   * @param Array $props : whatever is known about this dao object
+   * @param String $context
+   *   : @see CRM_Core_DAO::buildOptionsContext.
+   * @param Array $props
+   *   : whatever is known about this dao object.
    *
    * @return Array|bool
    */

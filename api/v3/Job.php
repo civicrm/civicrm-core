@@ -43,7 +43,8 @@
  * Adjust metadata for "Create" action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_job_create_spec(&$params) {
   $params['run_frequency']['api.required'] = 1;
@@ -58,7 +59,8 @@ function _civicrm_api3_job_create_spec(&$params) {
 /**
  * create scheduled job
  *
- * @param  array $params   Associative array of property name/value pairs to insert in new job.
+ * @param array $params
+ *   Associative array of property name/value pairs to insert in new job.
  *
  * @return success or error
  * {@getfields Job_create}
@@ -71,7 +73,7 @@ function civicrm_api3_job_create($params) {
 
 /**
  * Retrieve one or more job
- * @param  array input parameters
+ * @param array input parameters
  * @return  array api result array
  * {@getfields email_get}
  * @access public
@@ -98,7 +100,8 @@ function civicrm_api3_job_delete($params) {
  * Dumb wrapper to execute scheduled jobs. Always creates success - errors
  * and results are handled in the job log.
  *
- * @param  array $params (reference ) input parameters
+ * @param array $params
+ *   (reference ) input parameters.
  *
  * @return array API Result Array
  *
@@ -117,7 +120,8 @@ function civicrm_api3_job_execute($params) {
 /**
  * Adjust Metadata for Execute action
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_job_execute_spec(&$params) {
 }
@@ -125,7 +129,8 @@ function _civicrm_api3_job_execute_spec(&$params) {
 /**
  * Geocode group of contacts based on given params
  *
- * @param  array       $params (reference ) input parameters
+ * @param array $params
+ *   (reference ) input parameters.
  *
  * @return array API Result Array
  * {@getfields contact_geocode}
@@ -137,7 +142,6 @@ function _civicrm_api3_job_execute_spec(&$params) {
  */
 function civicrm_api3_job_geocode($params) {
   $gc = new CRM_Utils_Address_BatchUpdate($params);
-
 
   $result = $gc->run();
 
@@ -165,7 +169,8 @@ function _civicrm_api3_job_geocode_spec(&$params) {
 /**
  * Send the scheduled reminders for all contacts (either for activities or events)
  *
- * @param  array       $params (reference ) input parameters
+ * @param array $params
+ *   (reference ) input parameters.
  *                        now - the time to use, in YmdHis format
  *                            - makes testing a bit simpler since we can simulate past/future time
  *
@@ -199,7 +204,8 @@ function civicrm_api3_job_send_reminder($params) {
  * Adjust metadata for "send_reminder" action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_job_send_reminder(&$params) {
   //@todo this function will now take all fields in action_schedule as params
@@ -212,7 +218,8 @@ function _civicrm_api3_job_send_reminder(&$params) {
 /**
  * Execute a specific report instance and send the output via email
  *
- * @param  array       $params (reference ) input parameters
+ * @param array $params
+ *   (reference ) input parameters.
  *                        sendmail - Boolean - should email be sent?, required
  *                        instanceId - Integer - the report instance ID
  *                        resetVal - Integer - should we reset form state (always true)?
@@ -279,10 +286,11 @@ function civicrm_api3_job_update_greeting($params) {
 
 /**
  * Adjust Metadata for Get action
-*
-* The metadata is used for setting defaults, documentation & validation
-* @param array $params array or parameters determined by getfields
-*/
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params
+ *   Array or parameters determined by getfields.
+ */
 function _civicrm_api3_job_update_greeting_spec(&$params) {
   $params['ct'] = array(
     'api.required' => 1,
@@ -299,7 +307,8 @@ function _civicrm_api3_job_update_greeting_spec(&$params) {
 /**
  * Mass update pledge statuses
  *
- * @param  array       $params (reference ) input parameters
+ * @param array $params
+ *   (reference ) input parameters.
  *
  * @return boolean        true if success, else false
  * @static
@@ -393,9 +402,9 @@ function civicrm_api3_job_fetch_activities($params) {
 
   try {
     CRM_Utils_Mail_EmailProcessor::processActivities();
-    $values = array( );
+    $values = array();
     $lock->release();
-    return civicrm_api3_create_success($values, $params,'mailing','activities');
+    return civicrm_api3_create_success($values, $params, 'mailing', 'activities');
   } catch (Exception $e) {
     $lock->release();
     return civicrm_api3_create_error('Process Activities failed');
@@ -405,7 +414,8 @@ function civicrm_api3_job_fetch_activities($params) {
 /**
  * Process participant statuses
  *
- * @param  array   $params           (reference ) input parameters
+ * @param array $params
+ *   (reference ) input parameters.
  *
  * @return array (reference )        array of properties, if error an array with an error id and error message
  * @access public
@@ -429,7 +439,8 @@ function civicrm_api3_job_process_participant($params) {
  * IMPORTANT:
  * Sending renewal reminders has been migrated from this job to the Scheduled Reminders function as of 4.3.
  *
- * @param  array $params input parameters NOT USED
+ * @param array $params
+ *   Input parameters NOT USED.
  *
  * @return boolean true if success, else false
  * @static void
@@ -455,7 +466,8 @@ function civicrm_api3_job_process_membership($params) {
 /**
  * This api checks and updates the status of all survey respondants.
  *
- * @param  array       $params (reference ) input parameters
+ * @param array $params
+ *   (reference ) input parameters.
  *
  * @return boolean        true if success, else false
  * @static void
@@ -475,7 +487,8 @@ function civicrm_api3_job_process_respondent($params) {
 /**
  * Merges given pair of duplicate contacts.
  *
- * @param  array   $params   input parameters
+ * @param array $params
+ *   Input parameters.
  *
  * Allowed @params array keys are:
  * {int     $rgid        rule group id}
@@ -509,7 +522,8 @@ function civicrm_api3_job_process_batch_merge($params) {
 /**
  * Runs handlePaymentCron method in the specified payment processor
  *
- * @param  array   $params   input parameters
+ * @param array $params
+ *   Input parameters.
  *
  * Expected @params array keys are:
  * {string  'processor_name' - the name of the payment processor, eg: Sagepay}
@@ -544,19 +558,20 @@ function civicrm_api3_job_run_payment_cron($params) {
 /**
  * This api cleans up all the old session entries and temp tables. We recommend that sites run this on an hourly basis
  *
- * @param  array    $params (reference ) - sends in various config parameters to decide what needs to be cleaned
+ * @param array $params
+ *   (reference ) - sends in various config parameters to decide what needs to be cleaned.
  *
  * @return boolean  true if success, else false
  * @static void
  * @access public
  */
-function civicrm_api3_job_cleanup( $params ) {
-  $session   = CRM_Utils_Array::value( 'session'   , $params, true  );
-  $tempTable = CRM_Utils_Array::value( 'tempTables', $params, true  );
-  $jobLog    = CRM_Utils_Array::value( 'jobLog'    , $params, true  );
-  $prevNext  = CRM_Utils_Array::value( 'prevNext'  , $params, true  );
-  $dbCache   = CRM_Utils_Array::value( 'dbCache'   , $params, false );
-  $memCache  = CRM_Utils_Array::value( 'memCache'  , $params, false );
+function civicrm_api3_job_cleanup($params) {
+  $session   = CRM_Utils_Array::value( 'session', $params, TRUE  );
+  $tempTable = CRM_Utils_Array::value( 'tempTables', $params, TRUE  );
+  $jobLog    = CRM_Utils_Array::value( 'jobLog', $params, TRUE  );
+  $prevNext  = CRM_Utils_Array::value( 'prevNext', $params, TRUE  );
+  $dbCache   = CRM_Utils_Array::value( 'dbCache', $params, FALSE );
+  $memCache  = CRM_Utils_Array::value( 'memCache', $params, FALSE );
 
   if ( $session || $tempTable || $prevNext ) {
     CRM_Core_BAO_Cache::cleanup( $session, $tempTable, $prevNext );
@@ -610,7 +625,7 @@ function civicrm_api3_job_group_rebuild($params) {
 
   $limit = CRM_Utils_Array::value( 'limit', $params, 0 );
 
-  CRM_Contact_BAO_GroupContactCache::loadAll(null, $limit);
+  CRM_Contact_BAO_GroupContactCache::loadAll(NULL, $limit);
   $lock->release();
 
   return civicrm_api3_create_success();

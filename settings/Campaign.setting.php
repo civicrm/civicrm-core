@@ -48,7 +48,7 @@ return array(
     'title' => 'Tag for Unconfirmed Petition Signers',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
+    'description' => NULL,
     'help_text' => 'If set, new contacts that are created when signing a petition are assigned a tag of this name.',
   ),
   'petition_contacts' => array(
@@ -62,7 +62,7 @@ return array(
     'title' => 'Petition Signers Group',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
+    'description' => NULL,
     'help_text' => 'If set, new contacts that are created when signing a petition are assigned a tag of this name.',
   ),
 

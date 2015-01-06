@@ -164,9 +164,8 @@ class CRM_Utils_Address_BatchUpdate {
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     if ($processGeocode) {
-      require_once (str_replace('_', DIRECTORY_SEPARATOR, $config->geocodeMethod) . '.php');
+      require_once str_replace('_', DIRECTORY_SEPARATOR, $config->geocodeMethod) . '.php';
     }
-
 
     $unparseableContactAddress = array();
     while ($dao->fetch()) {
@@ -194,7 +193,7 @@ class CRM_Utils_Address_BatchUpdate {
           }
 
           $className = $config->geocodeMethod;
-          $className::format( $params, true );
+          $className::format( $params, TRUE );
 
           // see if we got a geocode error, in this case we'll trigger a fatal
           // CRM-13760

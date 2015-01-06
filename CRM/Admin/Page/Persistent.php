@@ -51,20 +51,20 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
    * Get action Links
    *
    * @return array (reference) of action links
-   */ function &stringActionLinks() {
-    // check if variable _actionsLinks is populated
-    if (!isset(self::$_stringActionLinks)) {
+  function &stringActionLinks() {
+  // check if variable _actionsLinks is populated
+  if (!isset(self::$_stringActionLinks)) {
 
-      self::$_stringActionLinks = array(
-        CRM_Core_Action::UPDATE => array(
-          'name' => ts('Edit'),
-          'url' => 'civicrm/admin/tplstrings/add',
-          'qs' => 'reset=1&action=update&id=%%id%%',
-          'title' => ts('Configure'),
-        ),
-      );
-    }
-    return self::$_stringActionLinks;
+  self::$_stringActionLinks = array(
+  CRM_Core_Action::UPDATE => array(
+  'name' => ts('Edit'),
+  'url' => 'civicrm/admin/tplstrings/add',
+  'qs' => 'reset=1&action=update&id=%%id%%',
+  'title' => ts('Configure'),
+  ),
+  );
+  }
+  return self::$_stringActionLinks;
   }
 
   /**

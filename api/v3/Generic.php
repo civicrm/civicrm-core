@@ -10,13 +10,14 @@
  * access multiple objects e.g. contact api accesses is_deleted from the activity
  * table & from the contact table
  *
- * @param array $apiRequest api request as an array. Keys are
+ * @param array $apiRequest
+ *   Api request as an array. Keys are.
  *  - entity: string
  *  - action: string
  *  - version: string
  *  - function: callback (mixed)
  *  - params: array, varies
- *  @return array API success object
+ * @return array API success object
  */
 function civicrm_api3_generic_getfields($apiRequest) {
   static $results = array();
@@ -54,6 +55,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
     case 'getfields':
       $values = _civicrm_api_get_fields($entity, FALSE, $apiRequest['params']);
       return civicrm_api3_create_success($values, $apiRequest['params'], $entity, 'getfields');
+
     case 'create':
     case 'update':
     case 'replace':
@@ -103,7 +105,8 @@ function civicrm_api3_generic_getfields($apiRequest) {
           'title' => 'Context',
         ),
       );
-        break;
+      break;
+
     default:
       // oddballs are on their own
       $metadata = array();
@@ -140,7 +143,8 @@ function civicrm_api3_generic_getfields($apiRequest) {
 /**
  * API return function to reformat results as count
  *
- * @param array $apiRequest api request as an array. Keys are
+ * @param array $apiRequest
+ *   Api request as an array. Keys are.
  *
  * @throws API_Exception
  * @return integer count of results
@@ -148,7 +152,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
 function civicrm_api3_generic_getcount($apiRequest) {
   $apiRequest['params']['options']['is_count'] = TRUE;
   $result = civicrm_api($apiRequest['entity'], 'get', $apiRequest['params']);
-  if(is_numeric (CRM_Utils_Array::value('values', $result))) {
+  if(is_numeric(CRM_Utils_Array::value('values', $result))) {
     return (int) $result['values'];
   }
   if(!isset($result['count'])) {
@@ -160,7 +164,8 @@ function civicrm_api3_generic_getcount($apiRequest) {
 /**
  * API return function to reformat results as single result
  *
- * @param array $apiRequest api request as an array. Keys are
+ * @param array $apiRequest
+ *   Api request as an array. Keys are.
  *
  * @return integer count of results
  */
@@ -183,7 +188,8 @@ function civicrm_api3_generic_getsingle($apiRequest) {
 /**
  * API return function to reformat results as single value
  *
- * @param array $apiRequest api request as an array. Keys are
+ * @param array $apiRequest
+ *   Api request as an array. Keys are.
  *
  * @return integer count of results
  */
@@ -221,7 +227,8 @@ function _civicrm_api3_generic_getrefcount_spec(&$params) {
 /**
  * API to determine if a record is in-use
  *
- * @param array $apiRequest api request as an array
+ * @param array $apiRequest
+ *   Api request as an array.
  *
  * @throws API_Exception
  * @return array API result (int 0 or 1)
@@ -247,7 +254,8 @@ function civicrm_api3_generic_getrefcount($apiRequest) {
 /**
  * API wrapper for replace function
  *
- * @param array $apiRequest api request as an array. Keys are
+ * @param array $apiRequest
+ *   Api request as an array. Keys are.
  *
  * @return integer count of results
  */
@@ -258,7 +266,8 @@ function civicrm_api3_generic_replace($apiRequest) {
 /**
  * API wrapper for getoptions function
  *
- * @param array $apiRequest api request as an array.
+ * @param array $apiRequest
+ *   Api request as an array.
  *
  * @return array of results
  */
@@ -296,11 +305,15 @@ function civicrm_api3_generic_getoptions($apiRequest) {
  *
  * This function is only split out for the purpose of code clarity / comment block documentation
  *
- * @param array $metadata the array of metadata that will form the result of the getfields function
+ * @param array $metadata
+ *   The array of metadata that will form the result of the getfields function.
  * @param $apiRequest
- * @param string $fieldname field currently being processed
- * @param array $fieldSpec metadata for that field
- * @param array $fieldsToResolve anny field resolutions specifically requested
+ * @param string $fieldname
+ *   Field currently being processed.
+ * @param array $fieldSpec
+ *   Metadata for that field.
+ * @param array $fieldsToResolve
+ *   Anny field resolutions specifically requested.
  */
 function _civicrm_api3_generic_get_metadata_options(&$metadata, $apiRequest, $fieldname, $fieldSpec, $fieldsToResolve){
   if (empty($fieldSpec['pseudoconstant']) && empty($fieldSpec['option_group_id'])) {

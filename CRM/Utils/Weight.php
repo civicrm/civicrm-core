@@ -41,9 +41,12 @@ class CRM_Utils_Weight {
   /**
    * Correct duplicate weight entries by putting them (duplicate weights) in sequence.
    *
-   * @param string  $daoName full name of the DAO
-   * @param array   $fieldValues field => value to be used in the WHERE
-   * @param string  $weightField field which contains the weight value,
+   * @param string $daoName
+   *   Full name of the DAO.
+   * @param array $fieldValues
+   *   Field => value to be used in the WHERE.
+   * @param string $weightField
+   *   Field which contains the weight value,.
    * defaults to 'weight'
    *
    * @return bool
@@ -83,11 +86,14 @@ class CRM_Utils_Weight {
   /**
    * Remove a row from the specified weight, and shift all rows below it up
    *
-   * @param string $daoName full name of the DAO
+   * @param string $daoName
+   *   Full name of the DAO.
    * $param integer $weight the weight to be removed
    * @param int $fieldID
-   * @param array $fieldValues field => value to be used in the WHERE
-   * @param string $weightField field which contains the weight value,
+   * @param array $fieldValues
+   *   Field => value to be used in the WHERE.
+   * @param string $weightField
+   *   Field which contains the weight value,.
    * defaults to 'weight'
    *
    * @return bool
@@ -99,7 +105,7 @@ class CRM_Utils_Weight {
       return FALSE;
     }
 
-    $weight = (int)$object->weight;
+    $weight = (int) $object->weight;
     if ($weight < 1) {
       return FALSE;
     }
@@ -117,11 +123,14 @@ class CRM_Utils_Weight {
    * And returns the new weight be used. If old-weight not present, Creates a gap for a new row to be inserted
    * at the specified new weight
    *
-   * @param string $daoName full name of the DAO
-   * @param integer $oldWeight
-   * @param integer $newWeight
-   * @param array $fieldValues field => value to be used in the WHERE
-   * @param string $weightField field which contains the weight value,
+   * @param string $daoName
+   *   Full name of the DAO.
+   * @param int $oldWeight
+   * @param int $newWeight
+   * @param array $fieldValues
+   *   Field => value to be used in the WHERE.
+   * @param string $weightField
+   *   Field which contains the weight value,.
    * defaults to 'weight'
    *
    * @return int
@@ -183,9 +192,12 @@ class CRM_Utils_Weight {
   /**
    * Returns the new calculated weight.
    *
-   * @param string  $daoName     full name of the DAO
-   * @param array   $fieldValues field => value to be used in the WHERE
-   * @param string  $weightField field which used to get the wt, default to 'weight'.
+   * @param string $daoName
+   *   Full name of the DAO.
+   * @param array $fieldValues
+   *   Field => value to be used in the WHERE.
+   * @param string $weightField
+   *   Field which used to get the wt, default to 'weight'.
    *
    * @return integer
    */
@@ -221,9 +233,12 @@ class CRM_Utils_Weight {
   /**
    * Returns the highest weight.
    *
-   * @param string $daoName full name of the DAO
-   * @param array  $fieldValues field => value to be used in the WHERE
-   * @param string $weightField field which contains the weight value,
+   * @param string $daoName
+   *   Full name of the DAO.
+   * @param array $fieldValues
+   *   Field => value to be used in the WHERE.
+   * @param string $weightField
+   *   Field which contains the weight value,.
    * defaults to 'weight'
    *
    * @return integer
@@ -241,9 +256,12 @@ class CRM_Utils_Weight {
   /**
    * Returns the default weight ( highest weight + 1 ) to be used.
    *
-   * @param string $daoName full name of the DAO
-   * @param array  $fieldValues field => value to be used in the WHERE
-   * @param string $weightField field which contains the weight value,
+   * @param string $daoName
+   *   Full name of the DAO.
+   * @param array $fieldValues
+   *   Field => value to be used in the WHERE.
+   * @param string $weightField
+   *   Field which contains the weight value,.
    * defaults to 'weight'
    *
    * @return integer
@@ -256,12 +274,17 @@ class CRM_Utils_Weight {
   /**
    * Execute a weight-related query
    *
-   * @param string $queryType SELECT, UPDATE, DELETE
-   * @param string $daoName full name of the DAO
-   * @param array $fieldValues field => value to be used in the WHERE
-   * @param string $queryData data to be used, dependent on the query type
+   * @param string $queryType
+   *   SELECT, UPDATE, DELETE.
+   * @param string $daoName
+   *   Full name of the DAO.
+   * @param array $fieldValues
+   *   Field => value to be used in the WHERE.
+   * @param string $queryData
+   *   Data to be used, dependent on the query type.
    * @param null $additionalWhere
-   * @param string $orderBy optional ORDER BY field
+   * @param string $orderBy
+   *   Optional ORDER BY field.
    *
    * @param null $groupBy
    *
@@ -272,11 +295,11 @@ class CRM_Utils_Weight {
       $fieldValues = NULL,
       $queryData,
       $additionalWhere = NULL,
-      $orderBy         = NULL,
-      $groupBy         = NULL
+      $orderBy = NULL,
+      $groupBy = NULL
     ) {
 
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php");
+    require_once str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php";
 
     $dao       = new $daoName;
     $table     = $dao->getTablename();
@@ -436,13 +459,15 @@ class CRM_Utils_Weight {
     $tableName = $object->tableName();
 
     $query = "UPDATE $tableName SET weight = %1 WHERE $idName = %2";
-    $params = array(1 => array($dstWeight, 'Integer'),
+    $params = array(
+    1 => array($dstWeight, 'Integer'),
               2 => array($src, 'Integer'),
     );
     CRM_Core_DAO::executeQuery($query, $params);
 
     if ($dir == 'swap') {
-      $params = array(1 => array($srcWeight, 'Integer'),
+      $params = array(
+      1 => array($srcWeight, 'Integer'),
                 2 => array($dst, 'Integer'),
       );
       CRM_Core_DAO::executeQuery($query, $params);
@@ -453,7 +478,8 @@ class CRM_Utils_Weight {
       if ($filter) {
         $query .= " AND $filter";
       }
-      $params = array(1 => array($src, 'Integer'),
+      $params = array(
+      1 => array($src, 'Integer'),
                 2 => array($srcWeight, 'Integer'),
       );
       CRM_Core_DAO::executeQuery($query, $params);
@@ -464,7 +490,8 @@ class CRM_Utils_Weight {
       if ($filter) {
         $query .= " AND $filter";
       }
-      $params = array(1 => array($src, 'Integer'),
+      $params = array(
+      1 => array($src, 'Integer'),
                 2 => array($srcWeight, 'Integer'),
       );
       CRM_Core_DAO::executeQuery($query, $params);

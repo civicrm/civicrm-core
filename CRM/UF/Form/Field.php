@@ -107,7 +107,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext($url);
-      $breadCrumb = array(array('title' => ts('CiviCRM Profile Fields'),
+      $breadCrumb = array(array(
+      'title' => ts('CiviCRM Profile Fields'),
           'url' => $url,
         ));
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
@@ -527,7 +528,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $ids['uf_field'] = $this->_id;
     }
 
-
     $name = NULL;
     if (isset($params['field_name'][1]) && isset($this->_selectFields[$params['field_name'][1]])) {
       // we dont get a name for a html formatting element
@@ -609,9 +609,11 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   /**
    * Validation rule for subtype.
    *
-   * @param array $groupType contains all groupTypes.
+   * @param array $groupType
+   *   Contains all groupTypes.
    *
-   * @param  string  $fieldType type of field.
+   * @param string $fieldType
+   *   Type of field.
    *
    * @param array $errors
    *
@@ -652,10 +654,14 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   /**
    * Validation rule for custom data extends entity column values.
    *
-   * @param Object  $customField Custom field
-   * @param Integer $gid         Group Id.
-   * @param String  $fieldType   Group type of the field
-   * @param Array   $errors      Collect errors
+   * @param Object $customField
+   *   Custom field.
+   * @param Integer $gid
+   *   Group Id.
+   * @param string $fieldTypeGroup type of the field.
+   *   Group type of the field.
+   * @param array $errorsCollect errors.
+   *   Collect errors.
    *
    * @return Array  list of errors to be posted back to the form
    * @static
@@ -697,10 +703,14 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   /**
    * Validation rule to prevent multiple fields of primary location type within the same communication type.
    *
-   * @param Array   $fields            Submitted fields
-   * @param String  $profileFieldName  Group Id.
-   * @param Array   $groupFields       List of fields already in the group
-   * @param Array   $errors            Collect errors
+   * @param array $fieldsSubmitted fields.
+   *   Submitted fields.
+   * @param string $profileFieldNameGroup Id.
+   *   Group Id.
+   * @param array $groupFieldsList of fields already in the group.
+   *   List of fields already in the group.
+   * @param array $errorsCollect errors.
+   *   Collect errors.
    *
    * @static
    */
@@ -721,7 +731,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
       foreach ($groupFields as $groupField) {
         // if it is a phone
-        if ($groupField['where'] == $whereCheck && is_null($groupField['location_type_id']) && $groupField['field_id']  != $fieldID) {
+        if ($groupField['where'] == $whereCheck && is_null($groupField['location_type_id']) && $groupField['field_id'] != $fieldID) {
           $primaryOfSameTypeFound = $groupField['title'];
           break;
         }
@@ -735,7 +745,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @param $files
    * @param $self

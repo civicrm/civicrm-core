@@ -85,7 +85,7 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
     // CRM-10999 Control label and position for No Thank-you radio button
     $this->add('text', 'premiums_nothankyou_label', ts('No Thank-you Label'), $attributes['premiums_nothankyou_label']);
     $positions = array(1 => ts('Before Premiums'), 2 => ts('After Premiums'));
-    $this->add('select','premiums_nothankyou_position', ts('No Thank-you Option'), $positions);
+    $this->add('select', 'premiums_nothankyou_position', ts('No Thank-you Option'), $positions);
     $showForm = TRUE;
 
     if ($this->_single) {
@@ -111,7 +111,8 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
   /**
    * Validation
    *
-   * @param array $params (ref.) an assoc array of name/value pairs
+   * @param array $params
+   *   (ref.) an assoc array of name/value pairs.
    *
    * @return mixed true or array of errors
    * @static

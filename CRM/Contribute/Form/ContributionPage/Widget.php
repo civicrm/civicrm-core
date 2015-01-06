@@ -63,7 +63,8 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
       'title'
     );
 
-    $this->_fields = array('title' => array(ts('Title'),
+    $this->_fields = array(
+    'title' => array(ts('Title'),
         'text',
         FALSE,
         $title,
@@ -80,7 +81,8 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
       ),
     );
 
-    $this->_colorFields = array('color_title' => array(ts('Title Text Color'),
+    $this->_colorFields = array(
+    'color_title' => array(ts('Title Text Color'),
         'text',
         FALSE,
         '#2786C2',
@@ -207,7 +209,8 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
   /**
    * Validation
    *
-   * @param array $params (ref.) an assoc array of name/value pairs
+   * @param array $params
+   *   (ref.) an assoc array of name/value pairs.
    *
    * @param $files
    * @param $self

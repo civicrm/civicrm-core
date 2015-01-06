@@ -51,9 +51,12 @@ abstract class CRM_Utils_System_Base {
    * If we are using a theming system, invoke theme, else just print the
    * content
    *
-   * @param string $content the content that will be themed
-   * @param boolean $print are we displaying to the screen or bypassing theming?
-   * @param boolean $maintenance for maintenance mode
+   * @param string $content
+   *   The content that will be themed.
+   * @param bool $print
+   *   Are we displaying to the screen or bypassing theming?.
+   * @param bool $maintenance
+   *   For maintenance mode.
    *
    * @throws Exception
    * @return string|null
@@ -99,7 +102,7 @@ abstract class CRM_Utils_System_Base {
         throw new \Exception('Constant "ABSPATH" is not defined, even though WordPress is the user framework.');
       }
       if (is_admin()) {
-        require_once (ABSPATH . 'wp-admin/admin-header.php');
+        require_once ABSPATH . 'wp-admin/admin-header.php';
       }
       else {
         // FIXME: we need to figure out to replace civicrm content on the frontend pages
@@ -161,7 +164,8 @@ abstract class CRM_Utils_System_Base {
   /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
-   * @param string $destination - if present, add destination to querystring (works for Drupal only)
+   * @param string $destination
+   *   If present, add destination to querystring (works for Drupal only).
    *
    * @return string - loginURL for the current CMS
    * @static
@@ -265,7 +269,7 @@ abstract class CRM_Utils_System_Base {
         return FALSE;
       }
 
-      $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz/60)%60));
+      $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz / 60) % 60));
 
       if ($timeZoneOffset > 0) {
         $timeZoneOffset = '+' . $timeZoneOffset;
@@ -287,33 +291,39 @@ abstract class CRM_Utils_System_Base {
 
   /**
    * Get Unique Identifier from UserFramework system (CMS)
-   * @param object $user object as described by the User Framework
+   * @param object $user
+   *   Object as described by the User Framework.
    * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
    *
    */
-  public function getUniqueIdentifierFromUserObject($user) {}
+  public function getUniqueIdentifierFromUserObject($user) {
+  }
 
   /**
    * Get User ID from UserFramework system (CMS)
-   * @param object $user object as described by the User Framework
+   * @param object $user
+   *   Object as described by the User Framework.
    * @return mixed <NULL, number>
    *
    */
-  public function getUserIDFromUserObject($user) {}
+  public function getUserIDFromUserObject($user) {
+  }
 
   /**
    * Get currently logged in user uf id.
    *
    * @return int $userID logged in user uf id.
    */
-  public function getLoggedInUfID() {}
+  public function getLoggedInUfID() {
+  }
 
   /**
    * Get currently logged in user unique identifier - this tends to be the email address or user name.
    *
    * @return string $userID logged in user unique identifier
    */
-  public function getLoggedInUniqueIdentifier() {}
+  public function getLoggedInUniqueIdentifier() {
+  }
 
   /**
    * Return a UFID (user account ID from the UserFramework / CMS system being based on the user object
@@ -351,7 +361,8 @@ abstract class CRM_Utils_System_Base {
 
   /**
    * Get Url to view user record
-   * @param integer $contactID Contact ID
+   * @param int $contactIDContact ID.
+   *   Contact ID.
    *
    * @return string
    */
@@ -384,5 +395,6 @@ abstract class CRM_Utils_System_Base {
   /**
    * Append to coreResourcesList
    */
-  public function appendCoreResources(&$list) {}
+  public function appendCoreResources(&$list) {
+  }
 }

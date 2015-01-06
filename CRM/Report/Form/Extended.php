@@ -244,7 +244,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
             'title' => ts('Price Field Value Label'),
           ),
         ),
-        'group_bys' =>        //note that we have a requirement to group by label such that all 'Promo book' lines
+        'group_bys' => //note that we have a requirement to group by label such that all 'Promo book' lines
         // are grouped together across price sets but there may be a separate need to group
         // by id so that entries in one price set are distinct from others. Not quite sure what
         // to call the distinction for end users benefit
@@ -698,7 +698,8 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
 
   /*
    * adding address fields to construct function in reports
-   * @param array $options Options for the report
+   * @param array $options
+   *   Options for the report.
    * - prefix prefix to add (e.g. 'honor' when getting address details for honor contact
    * - prefix_label optional prefix lable eg. "Honoree " for front end
    * - group_by enable these fields for group by - default false

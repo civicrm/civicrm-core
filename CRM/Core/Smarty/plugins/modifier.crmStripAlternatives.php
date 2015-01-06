@@ -37,7 +37,8 @@
  * Given an ezComponents-parsed representation of
  * a text with alternatives return only the first one
  *
- * @param string $full  all alternatives as a long string (or some other text)
+ * @param string $full
+ *   All alternatives as a long string (or some other text).
  *
  * @return string       only the first alternative found (or the text without alternatives)
  */

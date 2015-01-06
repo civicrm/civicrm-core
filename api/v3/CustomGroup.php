@@ -41,7 +41,8 @@
  * as parameters. Some of the most commonly used parameters are
  * described below
  *
- * @param array $params           an associative array used in construction
+ * @param array $params
+ *   An associative array used in construction.
  * retrieval of the object
  * @todo missing get function
  *
@@ -55,7 +56,8 @@
  * See the CRM Data Model for custom_group property definitions
  * $params['class_name'] is a required field, class being extended.
  *
- * @param $params     array   Associative array of property name/value pairs to insert in group.
+ * @param $params
+ *   Array   Associative array of property name/value pairs to insert in group.
  * {@getfields CustomGroup_create}
  *
  * @return   Newly create custom_group object
@@ -82,7 +84,8 @@ function civicrm_api3_custom_group_create($params) {
 /**
  * Adjust Metadata for Create action
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_custom_group_create_spec(&$params) {
   $params['extends']['api.required'] = 1;
@@ -114,7 +117,8 @@ function civicrm_api3_custom_group_delete($params) {
 /**
  * Use this API to get existing custom fields.
  *
- * @param array $params Array to search on
+ * @param array $params
+ *   Array to search on.
  *
  * @return array
  * @access public

@@ -36,7 +36,8 @@
 /**
  * Determine the URL of a resource file
  *
- * @param $params array with keys:
+ * @param $params
+ *   Array with keys:.
  *  - ext: string, extension name. see CRM_Core_Resources::getUrl
  *  - file: string, relative file path. see CRM_Core_Resources::getUrl
  * @param $smarty
@@ -48,5 +49,5 @@ function smarty_function_crmResURL($params, &$smarty) {
   if (!array_key_exists('file', $params)) {
     $params['file'] = NULL;
   }
-  return  $res->getUrl($params['ext'], $params['file'], $params['addCacheCode']);
+  return $res->getUrl($params['ext'], $params['file'], $params['addCacheCode']);
 }

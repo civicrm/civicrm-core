@@ -458,8 +458,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
       }
 
       // convert Organization display name to links
-      if (array_key_exists('civicrm_contact_organization_organization_name', $row) && !empty($rows[$rowNum]
-        ['civicrm_contact_organization_organization_name']) &&
+      if (array_key_exists('civicrm_contact_organization_organization_name', $row) && !empty($rows[$rowNum]['civicrm_contact_organization_organization_name']) &&
         array_key_exists('civicrm_contact_organization_id', $row)
       ) {
         $url = CRM_Utils_System::url('civicrm/contact/view',

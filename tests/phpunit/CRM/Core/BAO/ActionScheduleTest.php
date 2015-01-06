@@ -41,7 +41,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     parent::setUp();
 
     require_once 'CiviTest/CiviMailUtils.php';
-    $this->mut = new CiviMailUtils($this, true);
+    $this->mut = new CiviMailUtils($this, TRUE);
 
     $this->fixtures['rolling_membership'] = array( // createTestObject
       'membership_type_id' => array(
@@ -436,7 +436,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
     $this->assertTrue(is_numeric($activity->id));
-    $contact =  $this->callAPISuccess('contact', 'create', $this->fixtures['contact']);
+    $contact = $this->callAPISuccess('contact', 'create', $this->fixtures['contact']);
     $activity->save();
 
     $source['contact_id'] = $contact['id'];
@@ -467,12 +467,12 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
     $this->assertTrue(is_numeric($activity->id));
-    $contact =  $this->callAPISuccess('contact', 'create', $this->fixtures['contact']);
+    $contact = $this->callAPISuccess('contact', 'create', $this->fixtures['contact']);
     $activity->save();
 
     $source['contact_id'] = $contact['id'];
     $source['activity_id'] = $activity->id;
-    $source['record_type_id'] =2;
+    $source['record_type_id'] = 2;
     $activityContact = $this->createTestObject('CRM_Activity_DAO_ActivityContact', $source);
     $activityContact->save();
 
@@ -665,14 +665,14 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
 
   /**
-  * For contacts/members which match schedule based on end date,
-  * an email should be sent.
-  */
+   * For contacts/members which match schedule based on end date,
+   * an email should be sent.
+   */
   public function testMembershipEndDate_NoMatch() {
     // creates membership with end_date = 20120615
     $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership_past'], array('status_id' => 3)));
     $this->assertTrue(is_numeric($membership->id));
-    $result =  $this->callAPISuccess('Email', 'create', array(
+    $result = $this->callAPISuccess('Email', 'create', array(
       'contact_id' => $membership->contact_id,
       'email' => 'test-member@example.com',
     ));
@@ -716,7 +716,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   public function testContactBirthDate_Anniv() {
-    $contact =  $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
+    $contact = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
     $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
     $actionSchedule = $this->fixtures['sched_contact_bday_anniv'];
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
@@ -739,7 +739,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'name' => 'test_group',
       'extends' => array('Individual'),
       'style' => 'Inline',
-      'is_multiple' => false,
+      'is_multiple' => FALSE,
       'is_active' => 1,
     );
     $createGroup = $this->callAPISuccess('custom_group', 'create', $group);
@@ -768,7 +768,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         'recipients' => array(array('test-member@example.com')),
       ),
     ));
-    $this->callAPISuccess('custom_group', 'delete', array('id' => $createGroup['id'],));
+    $this->callAPISuccess('custom_group', 'delete', array('id' => $createGroup['id']));
   }
   /**
    * Check that limit_to + an empty recipients doesn't sent to multiple contacts
@@ -810,7 +810,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'name' => 'test_group_now',
       'extends' => array('Individual'),
       'style' => 'Inline',
-      'is_multiple' => false,
+      'is_multiple' => FALSE,
       'is_active' => 1,
     );
     $createGroup = $this->callAPISuccess('custom_group', 'create', $group);
@@ -840,7 +840,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         'recipients' => array(array('test-member@example.com')),
       ),
     ));
-    $this->callAPISuccess('custom_group', 'delete', array('id' => $createGroup['id'],));
+    $this->callAPISuccess('custom_group', 'delete', array('id' => $createGroup['id']));
   }
 
   // TODO // function testMembershipEndDate_NonMatch() { }
@@ -902,8 +902,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @see CRM_Core_DAO::createTestObject
    */
-  function createTestObject($daoName, $params = array(
-    ), $numObjects = 1, $createOnly = FALSE) {
+  function createTestObject($daoName, $params = array(), $numObjects = 1, $createOnly = FALSE) {
     $objects = CRM_Core_DAO::createTestObject($daoName, $params, $numObjects, $createOnly);
     if (is_array($objects)) {
       $this->registerTestObjects($objects);
@@ -914,7 +913,8 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $objects array DAO or BAO objects
+   * @param $objects
+   *   Array DAO or BAO objects.
    */
   public function registerTestObjects($objects) {
     //if (is_object($objects)) {

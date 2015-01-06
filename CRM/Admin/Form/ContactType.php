@@ -84,7 +84,8 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
   /**
    * Global form rule
    *
-   * @param array $fields the input form values
+   * @param array $fields
+   *   The input form values.
    *
    * @param $files
    * @param $self

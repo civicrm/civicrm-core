@@ -40,7 +40,8 @@
 /**
  * API to Create or update a Membership Type
  *
- * @param array$params  an associative array of name/value property values of civicrm_membership_block
+ * @param array $params
+ *   An associative array of name/value property values of civicrm_membership_block.
  *
  * @return array $result newly created or updated membership type property values.
  * @access public
@@ -54,7 +55,8 @@ function civicrm_api3_membership_block_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_membership_block_create_spec(&$params) {
   $params['is_active']['api.default'] = TRUE;
@@ -67,7 +69,8 @@ function _civicrm_api3_membership_block_create_spec(&$params) {
  *
  * This api is used for finding an existing membership type.
  *
- * @param array $params  an associative array of name/value property values of civicrm_membership_block
+ * @param array $params
+ *   An associative array of name/value property values of civicrm_membership_block.
  * {getfields MembershipBlock_get}
  *
  * @return array api result array of all found membership block property values.
@@ -83,7 +86,7 @@ function civicrm_api3_membership_block_get($params) {
  * This API is used for deleting a membership type
  * Required parameters : id of a membership type
  *
- * @param  array $params
+ * @param array $params
  *
  * @return array api result array
  * @access public
@@ -92,4 +95,3 @@ function civicrm_api3_membership_block_get($params) {
 function civicrm_api3_membership_block_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

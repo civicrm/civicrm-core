@@ -61,8 +61,6 @@ class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
       $aclRoles, TRUE
     );
 
-
-
     $label = ts('Assigned to');
     $group = array('' => ts('- select group -')) + CRM_Core_PseudoConstant::staticGroup(FALSE, 'Access');
     $this->add('select', 'entity_id', $label, $group, TRUE, array('class' => 'crm-select2 huge'));

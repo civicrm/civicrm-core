@@ -156,7 +156,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     );
 
     $config = CRM_Core_Config::singleton();
-    if ($config->wkhtmltopdfPath == false) {
+    if ($config->wkhtmltopdfPath == FALSE) {
       $form->add(
         'text',
         'stationery',
@@ -203,9 +203,11 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   /**
    * Form rule
    *
-   * @param array $fields    the input form values
+   * @param array $fields
+   *   The input form values.
    * @param array $dontCare
-   * @param array $self      additional values form 'this'
+   * @param array $self
+   *   Additional values form 'this'.
    *
    * @return true if no errors, else array of errors
    *

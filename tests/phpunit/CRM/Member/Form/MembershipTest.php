@@ -5,11 +5,11 @@
  *
  *  (PHP 5)
  *
- *   @author Walt Haas <walt@dharmatech.org> (801) 534-1262
- *   @copyright Copyright CiviCRM LLC (C) 2009
- *   @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
+ * @author Walt Haas <walt@dharmatech.org> (801) 534-1262
+ * @copyright Copyright CiviCRM LLC (C) 2009
+ * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
  *              GNU Affero General Public License version 3
- *   @package   CiviCRM
+ * @package   CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -38,7 +38,7 @@ require_once 'HTML/QuickForm/Page.php';
 /**
  *  Test APIv2 civicrm_activity_* functions
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
@@ -353,7 +353,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   public function testFormRuleOverrideNoStatus() {
     $unixNow         = time();
     $unixYearFromNow = $unixNow + (365 * 24 * 60 * 60);
-    $params          = array('join_date' => date('m/d/Y', $unixNow),
+    $params          = array(
+    'join_date' => date('m/d/Y', $unixNow),
       'membership_type_id' => array('23', '13'),
       'is_override' => TRUE,
     );
@@ -375,7 +376,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   public function testFormRuleRollingJoin1MonthFromNow() {
     $unixNow     = time();
     $unix1MFmNow = $unixNow + (31 * 24 * 60 * 60);
-    $params      = array('join_date' => date('m/d/Y', $unix1MFmNow),
+    $params      = array(
+    'join_date' => date('m/d/Y', $unix1MFmNow),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '3'),
@@ -399,7 +401,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    */
   public function testFormRuleRollingJoinToday() {
     $unixNow = time();
-    $params = array('join_date' => date('m/d/Y', $unixNow),
+    $params = array(
+    'join_date' => date('m/d/Y', $unixNow),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '3'),
@@ -419,7 +422,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   public function testFormRuleRollingJoin1MonthAgo() {
     $unixNow   = time();
     $unix1MAgo = $unixNow - (31 * 24 * 60 * 60);
-    $params    = array('join_date' => date('m/d/Y', $unix1MAgo),
+    $params    = array(
+    'join_date' => date('m/d/Y', $unix1MAgo),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '3'),
@@ -439,7 +443,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   public function testFormRuleRollingJoin6MonthsAgo() {
     $unixNow   = time();
     $unix6MAgo = $unixNow - (180 * 24 * 60 * 60);
-    $params    = array('join_date' => date('m/d/Y', $unix6MAgo),
+    $params    = array(
+    'join_date' => date('m/d/Y', $unix6MAgo),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '3'),
@@ -459,7 +464,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   public function testFormRuleRollingJoin1YearAgo() {
     $unixNow   = time();
     $unix1YAgo = $unixNow - (370 * 24 * 60 * 60);
-    $params    = array('join_date' => date('m/d/Y', $unix1YAgo),
+    $params    = array(
+    'join_date' => date('m/d/Y', $unix1YAgo),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '3'),
@@ -479,7 +485,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   public function testFormRuleRollingJoin2YearsAgo() {
     $unixNow   = time();
     $unix2YAgo = $unixNow - (2 * 365 * 24 * 60 * 60);
-    $params    = array('join_date' => date('m/d/Y', $unix2YAgo),
+    $params    = array(
+    'join_date' => date('m/d/Y', $unix2YAgo),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '3'),
@@ -499,7 +506,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   public function testFormRuleFixedJoin6MonthsAgo() {
     $unixNow   = time();
     $unix6MAgo = $unixNow - (180 * 24 * 60 * 60);
-    $params    = array('join_date' => date('m/d/Y', $unix6MAgo),
+    $params    = array(
+    'join_date' => date('m/d/Y', $unix6MAgo),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '7'),

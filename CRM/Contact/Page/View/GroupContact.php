@@ -145,8 +145,10 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
   /**
    * Remove/ rejoin the group
    *
-   * @param int $groupContactId id of crm_group_contact
-   * @param string $status this is the status that should be updated.
+   * @param int $groupContactId
+   *   Id of crm_group_contact.
+   * @param string $status
+   *   This is the status that should be updated.
    *
    * $access public
    * @param int $contactID

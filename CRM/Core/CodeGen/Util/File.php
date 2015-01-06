@@ -47,8 +47,10 @@ class CRM_Core_CodeGen_Util_File {
   /**
    * Calculate a cumulative digest based on a collection of files
    *
-   * @param array $files list of file names (strings)
-   * @param callable|string $digest a one-way hash function (string => string)
+   * @param array $files
+   *   List of file names (strings).
+   * @param callable|string $digest
+   *   A one-way hash function (string => string).
    *
    * @return string
    */
@@ -78,7 +80,8 @@ class CRM_Core_CodeGen_Util_File {
   /**
    * Find files in several directories using several filename patterns
    *
-   * @param array $pairs each item is an array(0 => $searchBaseDir, 1 => $filePattern)
+   * @param array $pairs
+   *   Each item is an array(0 => $searchBaseDir, 1 => $filePattern).
    * @return array of file paths
    */
   public static function findManyFiles($pairs) {

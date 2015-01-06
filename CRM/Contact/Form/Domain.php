@@ -198,7 +198,8 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -264,7 +265,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
     }
 
     $params += array('contact_id' => $this->_contactId);
-    $contactParams = array (
+    $contactParams = array(
       'sort_name'    => $domain->name,
       'display_name' => $domain->name,
       'legal_name'   => $domain->name,
@@ -306,7 +307,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
       $fieldValues = array('option_group_id' => $grpId);
       $emailParams['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue', $fieldValues);
     }
-
 
     //reset default within domain.
     $emailParams['reset_default_for'] = array('domain_id' => CRM_Core_Config::domainID());

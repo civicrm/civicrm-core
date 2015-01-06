@@ -32,7 +32,7 @@ require_once 'CiviTest/ContributionPage.php';
 /**
  * Test class for CRM_Pledge_BAO_PledgeBlock BAO
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
 
@@ -51,7 +51,8 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    *
    */
-  protected function tearDown() {}
+  protected function tearDown() {
+  }
 
   /**
    *  create() and deletepledgeblock() method

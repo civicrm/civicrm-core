@@ -237,4 +237,3 @@ UPDATE civicrm_contact
 $obj = new CRM_UpdateGreeting();
 $obj->updateGreeting();
 echo "\n\n Greeting is updated for contact(s). (Done) \n";
-

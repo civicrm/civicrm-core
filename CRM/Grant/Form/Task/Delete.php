@@ -52,13 +52,13 @@ class CRM_Grant_Form_Task_Delete extends CRM_Grant_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   */ function preProcess() {
-    parent::preProcess();
+  function preProcess() {
+  parent::preProcess();
 
-    //check permission for delete.
-    if (!CRM_Core_Permission::checkActionPermission('CiviGrant', CRM_Core_Action::DELETE)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
-    }
+  //check permission for delete.
+  if (!CRM_Core_Permission::checkActionPermission('CiviGrant', CRM_Core_Action::DELETE)) {
+  CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+  }
   }
 
   /**

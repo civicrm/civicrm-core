@@ -56,7 +56,8 @@ function civicrm_api3_phone_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_phone_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
@@ -68,7 +69,7 @@ function _civicrm_api3_phone_create_spec(&$params) {
 /**
  * Deletes an existing Phone
  *
- * @param  array  $params
+ * @param array $params
  *
  * @return array Api Result
  * {@getfields phone_delete}
@@ -85,4 +86,3 @@ function civicrm_api3_phone_delete($params) {
  *  Could have been implemented here in this file too, but we moved it to illustrate the feature with a real usage.
  *
  */
-

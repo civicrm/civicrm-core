@@ -21,7 +21,6 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
       'civicrm dashboard & force = 1,;' => 'civicrm_dashboard___force___1__',
     );
 
-
     foreach ($testSet as $in => $expected) {
       $out = CRM_Utils_String::stripPathChars($in);
       $this->assertEquals($out, $expected, "Output does not match");
@@ -148,7 +147,8 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
 
   /**
    * @param $input
-   * @param $expected bool
+   * @param $expected
+   *   Bool.
    * @dataProvider booleanDataProvider
    */
   public function testStrToBool($input, $expected) {

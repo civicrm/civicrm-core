@@ -10,7 +10,8 @@ class CRM_Core_Region {
    * Obtain the content for a given region
    *
    * @param string $name
-   * @param bool $autocreate whether to automatically create an empty region
+   * @param bool $autocreate
+   *   Whether to automatically create an empty region.
    * @return CRM_Core_Region
    */
   public static function &instance($name, $autocreate = TRUE) {
@@ -83,7 +84,8 @@ class CRM_Core_Region {
    * Note: This function does not perform any extra encoding of markup, script code, or etc. If
    * you're passing in user-data, you must clean it yourself.
    *
-   * @param $snippet array; keys:
+   * @param $snippet
+   *   Array; keys:.
    *   - type: string (auto-detected for markup, template, callback, script, scriptUrl, jquery, style, styleUrl)
    *   - name: string, optional
    *   - weight: int, optional; default=1
@@ -120,7 +122,7 @@ class CRM_Core_Region {
     if (!isset($snippet['name'])) {
       $snippet['name'] = count($this->_snippets);
     }
-    $this->_snippets[ $snippet['name'] ] = $snippet;
+    $this->_snippets[$snippet['name']] = $snippet;
     $this->_isSorted = FALSE;
     return $snippet;
   }
@@ -146,8 +148,10 @@ class CRM_Core_Region {
   /**
    * Render all the snippets in a region
    *
-   * @param string $default HTML, the initial content of the region
-   * @param bool $allowCmsOverride allow CMS to override rendering of region
+   * @param string $default
+   *   HTML, the initial content of the region.
+   * @param bool $allowCmsOverride
+   *   Allow CMS to override rendering of region.
    * @return string, HTML
    */
   public function render($default, $allowCmsOverride = TRUE) {
@@ -173,21 +177,25 @@ class CRM_Core_Region {
         case 'markup':
           $html .= $snippet['markup'];
           break;
+
         case 'template':
           $tmp = $smarty->get_template_vars('snippet');
           $smarty->assign('snippet', $snippet);
           $html .= $smarty->fetch($snippet['template']);
           $smarty->assign('snippet', $tmp);
           break;
+
         case 'callback':
           $args = isset($snippet['arguments']) ? $snippet['arguments'] : array(&$snippet, &$html);
           $html .= call_user_func_array($snippet['callback'], $args);
           break;
+
         case 'scriptUrl':
           if (!$allowCmsOverride || !$cms->addScriptUrl($snippet['scriptUrl'], $this->_name)) {
             $html .= sprintf("<script type=\"text/javascript\" src=\"%s\">\n</script>\n", $snippet['scriptUrl']);
           }
           break;
+
         case 'jquery':
           $snippet['script'] = sprintf("CRM.\$(function(\$) {\n%s\n});", $snippet['jquery']);
           // no break - continue processing as script
@@ -196,16 +204,19 @@ class CRM_Core_Region {
             $html .= sprintf("<script type=\"text/javascript\">\n%s\n</script>\n", $snippet['script']);
           }
           break;
+
         case 'styleUrl':
           if (!$allowCmsOverride || !$cms->addStyleUrl($snippet['styleUrl'], $this->_name)) {
             $html .= sprintf("<link href=\"%s\" rel=\"stylesheet\" type=\"text/css\"/>\n", $snippet['styleUrl']);
           }
           break;
+
         case 'style':
           if (!$allowCmsOverride || !$cms->addStyle($snippet['style'], $this->_name)) {
             $html .= sprintf("<style type=\"text/css\">\n%s\n</style>\n", $snippet['style']);
           }
           break;
+
         default:
           require_once 'CRM/Core/Error.php';
           CRM_Core_Error::fatal( ts( 'Snippet type %1 is unrecognized',
@@ -222,24 +233,29 @@ class CRM_Core_Region {
    * @return int
    */
   public static function _cmpSnippet($a, $b) {
-    if ($a['weight'] < $b['weight']) return -1;
-    if ($a['weight'] > $b['weight']) return 1;
+    if ($a['weight'] < $b['weight']) { return -1;
+    }
+    if ($a['weight'] > $b['weight']) { return 1;
+    }
     // fallback to name sort; don't really want to do this, but it makes results more stable
-    if ($a['name'] < $b['name']) return -1;
-    if ($a['name'] > $b['name']) return 1;
+    if ($a['name'] < $b['name']) { return -1;
+    }
+    if ($a['name'] > $b['name']) { return 1;
+    }
     return 0;
   }
 
   /**
    * Add block of static HTML to a region
    *
-   * @param string $markup HTML
+   * @param string $markup
+   *   HTML.
    *
   public function addMarkup($markup) {
-    return $this->add(array(
-      'type' => 'markup',
-      'markup' => $markup,
-    ));
+  return $this->add(array(
+  'type' => 'markup',
+  'markup' => $markup,
+  ));
   }
 
   /**
@@ -247,27 +263,29 @@ class CRM_Core_Region {
    *
    * Note: File is not evaluated until the page is rendered
    *
-   * @param string $template path to the Smarty template file
+   * @param string $template
+   *   Path to the Smarty template file.
    *
   public function addTemplate($template) {
-    return $this->add(array(
-      'type' => 'template',
-      'template' => $template,
-    ));
+  return $this->add(array(
+  'type' => 'template',
+  'template' => $template,
+  ));
   }
 
   /**
    * Use a callback function to extend a region
    *
    * @param mixed $callback
-   * @param array $arguments optional, array of parameters for callback; if omitted, the default arguments are ($snippetSpec, $html)
+   * @param array $arguments
+   *   Optional, array of parameters for callback; if omitted, the default arguments are ($snippetSpec, $html).
    *
   public function addCallback($callback, $arguments = FALSE) {
-    return $this->add(array(
-      'type' => 'callback',
-      'callback' => $callback,
-      'arguments' => $arguments,
-    ));
+  return $this->add(array(
+  'type' => 'callback',
+  'callback' => $callback,
+  'arguments' => $arguments,
+  ));
   }
   */
 }

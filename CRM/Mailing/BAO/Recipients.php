@@ -127,7 +127,8 @@ SET mr.mailing_id = $newMailingID
    * Redistribute recipients from $sourceMailingId to a series of other mailings.
    *
    * @param int $sourceMailingId
-   * @param array $to (int $targetMailingId => int $count)
+   * @param array $to (int $targetMailingId
+   *   => int $count).
    */
   public static function reassign($sourceMailingId, $to) {
     foreach ($to as $targetMailingId => $count) {

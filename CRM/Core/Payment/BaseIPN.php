@@ -74,11 +74,16 @@ class CRM_Core_Payment_BaseIPN {
    * Paypal allows you to resend Instant Payment Notifications if you, for example, moved site
    * and didn't update your IPN URL.
    *
-   * @param array $input interpreted values from the values returned through the IPN
-   * @param array $ids more interpreted values (ids) from the values returned through the IPN
-   * @param array $objects an empty array that will be populated with loaded object
-   * @param boolean $required boolean Return FALSE if the relevant objects don't exist
-   * @param integer $paymentProcessorID Id of the payment processor ID in use
+   * @param array $input
+   *   Interpreted values from the values returned through the IPN.
+   * @param array $ids
+   *   More interpreted values (ids) from the values returned through the IPN.
+   * @param array $objects
+   *   An empty array that will be populated with loaded object.
+   * @param bool $required
+   *   Boolean Return FALSE if the relevant objects don't exist.
+   * @param int $paymentProcessorIDId of the payment processor ID in use.
+   *   Id of the payment processor ID in use.
    * @return boolean
    */
   public function validateData(&$input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
@@ -124,8 +129,8 @@ class CRM_Core_Payment_BaseIPN {
    * @param $input
    * @param array $ids
    * @param array $objects
-   * @param boolean $required
-   * @param integer $paymentProcessorID
+   * @param bool $required
+   * @param int $paymentProcessorID
    * @param array $error_handling
    *
    * @return boolean
@@ -386,7 +391,7 @@ class CRM_Core_Payment_BaseIPN {
       }
 
       if (!empty($memberships)) {
-        $membershipsUpdate = array( );
+        $membershipsUpdate = array();
         foreach ($memberships as $membershipTypeIdKey => $membership) {
           if ($membership) {
             $format = '%Y%m%d';
@@ -447,7 +452,8 @@ LIMIT 1;";
               (array) $membership
             );
 
-            $formatedParams = array('status_id' => CRM_Utils_Array::value('id', $calcStatus, 2),
+            $formatedParams = array(
+            'status_id' => CRM_Utils_Array::value('id', $calcStatus, 2),
               'join_date' => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('join_date', $dates), $format),
               'start_date' => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('start_date', $dates), $format),
               'end_date' => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('end_date', $dates), $format),
@@ -578,7 +584,7 @@ LIMIT 1;";
     //add lineitems for recurring payments
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id) {
       if ($addLineItems) {
-        $input ['line_item'] = $this->addRecurLineItems($objects['contributionRecur']->id, $contribution);
+        $input['line_item'] = $this->addRecurLineItems($objects['contributionRecur']->id, $contribution);
       }
       else {
         // this is just to prevent e-notices when we call recordFinancialAccounts - per comments on that line - intention is somewhat unclear
@@ -609,9 +615,8 @@ LIMIT 1;";
     // it would be good if someone added some comments or refactored this
     if ($contribution->id) {
       $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array('labelColumn' => 'name', 'flip' => 1));
-      if ((empty($input['prevContribution']) && $paymentProcessorId) || (!$input['prevContribution']->is_pay_later &&
--      $input['prevContribution']->contribution_status_id == $contributionStatuses['Pending'])) {
-       $input['payment_processor'] = $paymentProcessorId;
+      if ((empty($input['prevContribution']) && $paymentProcessorId) || (!$input['prevContribution']->is_pay_later && - $input['prevContribution']->contribution_status_id == $contributionStatuses['Pending'])) {
+        $input['payment_processor'] = $paymentProcessorId;
       }
       $input['contribution_status_id'] = $contributionStatuses['Completed'];
       $input['total_amount'] = $input['amount'];
@@ -698,12 +703,17 @@ LIMIT 1;";
    * Send receipt from contribution. Note that the compose message part has been moved to contribution
    * In general LoadObjects is called first to get the objects but the composeMessageArray function now calls it
    *
-   * @param array $input Incoming data from Payment processor
-   * @param array $ids Related object IDs
+   * @param array $input
+   *   Incoming data from Payment processor.
+   * @param array $ids
+   *   Related object IDs.
    * @param $objects
-   * @param array $values values related to objects that have already been loaded
-   * @param bool $recur is it part of a recurring contribution
-   * @param bool $returnMessageText Should text be returned instead of sent. This
+   * @param array $values
+   *   Values related to objects that have already been loaded.
+   * @param bool $recur
+   *   Is it part of a recurring contribution.
+   * @param bool $returnMessageText
+   *   Should text be returned instead of sent. This.
    *  is because the function is also used to generate pdfs
    *
    * @return array
@@ -811,7 +821,7 @@ LIMIT 1;";
 
     $contribution = &$objects['contribution'];
 
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array('labelColumn' => 'name','flip' => 1));
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array('labelColumn' => 'name', 'flip' => 1));
     $input['skipComponentSync'] = CRM_Utils_Array::value('skipComponentSync', $params);
     if ($statusId == $contributionStatuses['Cancelled']) {
       $baseIPN->cancelled($objects, $transaction, $input);

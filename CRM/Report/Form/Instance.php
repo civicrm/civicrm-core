@@ -87,7 +87,8 @@ class CRM_Report_Form_Instance {
     $form->add('text',
       'row_count',
       ts('Limit Dashboard Results'),
-      array('maxlength' => 64,
+      array(
+    'maxlength' => 64,
         'size' => 5
       )
     );
@@ -154,8 +155,9 @@ class CRM_Report_Form_Instance {
     // For now we only providing drilldown for one primary detail report only. In future this could be multiple reports
     foreach ($form->_drilldownReport as $reportUrl => $drillLabel) {
       $instanceList = CRM_Report_Utils_Report::getInstanceList($reportUrl);
-      if (count($instanceList) > 1)
+      if (count($instanceList) > 1) {
         $form->add('select', 'drilldown_id', $drillLabel, array('' => ts('- select -')) + $instanceList);
+      }
       break;
     }
 
@@ -213,8 +215,8 @@ class CRM_Report_Form_Instance {
     $navigationDefaults = array();
 
     if (!isset($defaults['permission'])){
-    $permissions = array_flip(CRM_Core_Permission::basicPermissions( ));
-    $defaults['permission'] = $permissions['CiviReport: access CiviReport'];
+      $permissions = array_flip(CRM_Core_Permission::basicPermissions( ));
+      $defaults['permission'] = $permissions['CiviReport: access CiviReport'];
     }
 
     $config = CRM_Core_Config::singleton();

@@ -52,50 +52,51 @@ class CRM_Contribute_Form_Task_PDF extends CRM_Contribute_Form_Task {
    * Build all the data structures needed to build the form
    *
    * @return void
-   */ function preProcess() {
-    $id = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this, FALSE
-    );
+  function preProcess() {
+  $id = CRM_Utils_Request::retrieve('id', 'Positive',
+  $this, FALSE
+  );
 
-    if ($id) {
-      $this->_contributionIds = array($id);
-      $this->_componentClause = " civicrm_contribution.id IN ( $id ) ";
-      $this->_single = TRUE;
-      $this->assign('totalSelectedContributions', 1);
-    }
-    else {
-      parent::preProcess();
-    }
+  if ($id) {
+  $this->_contributionIds = array($id);
+  $this->_componentClause = " civicrm_contribution.id IN ( $id ) ";
+  $this->_single = TRUE;
+  $this->assign('totalSelectedContributions', 1);
+  }
+  else {
+  parent::preProcess();
+  }
 
-    // check that all the contribution ids have pending status
-    $query = "
-SELECT count(*)
-FROM   civicrm_contribution
-WHERE  contribution_status_id != 1
-AND    {$this->_componentClause}";
-    $count = CRM_Core_DAO::singleValueQuery($query);
-    if ($count != 0) {
-      CRM_Core_Error::statusBounce("Please select only online contributions with Completed status.");
-    }
+  // check that all the contribution ids have pending status
+  $query = "
+  SELECT count(*)
+  FROM   civicrm_contribution
+  WHERE  contribution_status_id != 1
+  AND    {$this->_componentClause}";
+  $count = CRM_Core_DAO::singleValueQuery($query);
+  if ($count != 0) {
+  CRM_Core_Error::statusBounce("Please select only online contributions with Completed status.");
+  }
 
-    // we have all the contribution ids, so now we get the contact ids
-    parent::setContactIDs();
-    $this->assign('single', $this->_single);
+  // we have all the contribution ids, so now we get the contact ids
+  parent::setContactIDs();
+  $this->assign('single', $this->_single);
 
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
-    $urlParams = 'force=1';
-    if (CRM_Utils_Rule::qfKey($qfKey)) {
-      $urlParams .= "&qfKey=$qfKey";
-    }
+  $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
+  $urlParams = 'force=1';
+  if (CRM_Utils_Rule::qfKey($qfKey)) {
+  $urlParams .= "&qfKey=$qfKey";
+  }
 
-    $url = CRM_Utils_System::url('civicrm/contribute/search', $urlParams);
-    $breadCrumb = array(
-      array('url' => $url,
-        'title' => ts('Search Results'),
-      ));
+  $url = CRM_Utils_System::url('civicrm/contribute/search', $urlParams);
+  $breadCrumb = array(
+  array(
+  'url' => $url,
+  'title' => ts('Search Results'),
+  ));
 
-    CRM_Utils_System::appendBreadCrumb($breadCrumb);
-    CRM_Utils_System::setTitle(ts('Print Contribution Receipts'));
+  CRM_Utils_System::appendBreadCrumb($breadCrumb);
+  CRM_Utils_System::setTitle(ts('Print Contribution Receipts'));
   }
 
   /**
@@ -193,7 +194,6 @@ AND    {$this->_componentClause}";
       $values = array();
       $mail = $elements['baseIPN']->sendMail($input, $ids, $objects, $values, FALSE, $elements['createPdf']);
 
-
       if ($mail['html']) {
         $message[] = $mail['html'];
       }
@@ -236,9 +236,12 @@ AND    {$this->_componentClause}";
    * Declaration of common variables for Invoice and PDF
    *
    *
-   * @param array $contribIds Contribution Id
-   * @param array $params parameter for pdf or email invoices
-   * @param array $contactIds Contact Id
+   * @param array $contribIds
+   *   Contribution Id.
+   * @param array $params
+   *   Parameter for pdf or email invoices.
+   * @param array $contactIds
+   *   Contact Id.
    *
    * @return array array of common elements
    *
@@ -278,9 +281,9 @@ AND    {$this->_componentClause}";
           (empty($params['override_privacy']) && !empty($values['do_not_email']))
           || CRM_Utils_Array::value('is_deceased', $values)
           || !empty($values['on_hold'])) {
-            $suppressedEmails++;
-            $pdfElements['suppressedEmails'] = $suppressedEmails;
-            $excludeContactIds[] = $values['contact_id'];
+          $suppressedEmails++;
+          $pdfElements['suppressedEmails'] = $suppressedEmails;
+          $excludeContactIds[] = $values['contact_id'];
         }
       }
     }

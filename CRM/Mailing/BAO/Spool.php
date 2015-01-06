@@ -45,9 +45,11 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
    * Store Mails into Spool table.
    *
    * @param $recipient
-   * @param array $headers The string of headers to send with the mail.
+   * @param array $headers
+   *   The string of headers to send with the mail.
    *
-   * @param string $body The full text of the message body, including any
+   * @param string $body
+   *   The full text of the message body, including any.
    *               Mime parts, etc.
    *
    * @param int $job_id

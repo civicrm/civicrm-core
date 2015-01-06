@@ -51,8 +51,10 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_DAO_Domain object
    * @static
@@ -69,7 +71,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @return null|object CRM_Core_BAO_Domain
    * @static
    */
-  public static function &getDomain($reset = null) {
+  public static function &getDomain($reset = NULL) {
     static $domain = NULL;
     if (!$domain || $reset) {
       $domain = new CRM_Core_BAO_Domain();
@@ -81,19 +83,20 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     return $domain;
   }
 
- /**
-  * Change active domain (ie. to perform a temporary action) such as changing
-  * config for all domains
-  *
-  * Switching around the global domain variable is very risky business. This
-  * is ONLY used as a hack to allow CRM_Core_BAO_Setting::setItems to manipulate
-  * the civicrm_domain.config_backend in multiple domains. When/if config_backend
-  * goes away, this hack should be removed.
-  *
-  * @param integer $domainID id for domain you want to set as current
-  * @deprecated
-  * @see http://issues.civicrm.org/jira/browse/CRM-11204
-  */
+  /**
+   * Change active domain (ie. to perform a temporary action) such as changing
+   * config for all domains
+   *
+   * Switching around the global domain variable is very risky business. This
+   * is ONLY used as a hack to allow CRM_Core_BAO_Setting::setItems to manipulate
+   * the civicrm_domain.config_backend in multiple domains. When/if config_backend
+   * goes away, this hack should be removed.
+   *
+   * @param int $domainIDId for domain you want to set as current.
+   *   Id for domain you want to set as current.
+   * @deprecated
+   * @see http://issues.civicrm.org/jira/browse/CRM-11204
+   */
   public static function setDomain($domainID) {
     CRM_Core_Config::domainID($domainID);
     self::getDomain($domainID);
@@ -108,8 +111,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @see CRM_Core_BAO_Domain::setDomain
    */
   public static function resetDomain() {
-    CRM_Core_Config::domainID(null, true);
-    self::getDomain(null, true);
+    CRM_Core_Config::domainID(NULL, TRUE);
+    self::getDomain(NULL, TRUE);
     CRM_Core_Config::singleton(TRUE, TRUE);
   }
 
@@ -118,7 +121,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    *
    * @return null|string
    */
-  public static function version($skipUsingCache = false) {
+  public static function version($skipUsingCache = FALSE) {
     return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain',
       CRM_Core_Config::domainID(),
       'version',
@@ -136,7 +139,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    */
   public function &getLocationValues() {
     if ($this->_location == NULL) {
-      $domain = self::getDomain(null);
+      $domain = self::getDomain(NULL);
       $params = array(
         'contact_id' => $domain->contact_id
       );
@@ -266,7 +269,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
         CRM_Core_Config::domainID(), 'name'
       );
       $groupID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group',
-        $title, 'id', 'title', true
+        $title, 'id', 'title', TRUE
       );
       if (empty($groupID) && !empty($title)) {
         $groupParams = array(

@@ -180,7 +180,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         NULL,
         CRM_Core_Permission::EDIT
       );
-      $multiRecordFields = array( );
+      $multiRecordFields = array();
       $fieldIDs = NULL;
       $result = NULL;
       $multiRecordFieldsWithSummaryListing = CRM_Core_BAO_UFGroup::shiftMultiRecordFields($fields, $multiRecordFields, TRUE);
@@ -219,12 +219,12 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       $this->_customGroupTitle = $groupDetail[$customGroupId]['title'];
     }
     if ($fieldIDs && !empty($fieldIDs) && $this->_contactId) {
-      $options = array( );
+      $options = array();
       $returnProperities = array('html_type', 'data_type', 'date_format', 'time_format', 'default_value', 'is_required');
       foreach ($fieldIDs as $key => $fieldID) {
         $fieldIDs[$key] = !is_numeric($fieldID) ? CRM_Core_BAO_CustomField::getKeyID($fieldID) : $fieldID;
         $param = array('id' => $fieldIDs[$key]);
-        $returnValues = array( );
+        $returnValues = array();
         CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $param, $returnValues, $returnProperities);
         if ($returnValues['data_type'] == 'Date') {
           $dateFields[$fieldIDs[$key]] = 1;
@@ -317,10 +317,12 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                     $supportedDataTypes = array('Float', 'String', 'Int');
                     $editable = in_array($spec['data_type'], $supportedDataTypes);
                     break;
+
                   case 'TextArea':
                     $editable = TRUE;
                     $fieldAttributes['data-type'] = 'textarea';
                     break;
+
                   case 'Radio':
                   case 'Select':
                   case 'Select Country':
@@ -340,7 +342,9 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
 
               $op = NULL;
               if ($this->_pageViewType == 'profileDataView') {
-                $actionParams = array('recordId' => $recId, 'gid' => $this->_profileId,
+                $actionParams = array(
+                'recordId' => $recId,
+                'gid' => $this->_profileId,
                   'id' => $this->_contactId);
                 $op = 'profile.multiValue.row';
               }
@@ -385,14 +389,14 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       }
     }
 
-    $headers = array(  );
+    $headers = array();
     if (!empty($fieldIDs)) {
       foreach ($fieldIDs as $fieldID) {
         $headers[$fieldID] = ($this->_pageViewType == 'profileDataView') ? $customGroupInfo[$fieldID]['fieldLabel'] : $fieldLabels[$fieldID]['label'];
       }
     }
     $this->assign('dateFields', $dateFields);
-    $this->assign('dateFieldsVals',$dateFieldsVals);
+    $this->assign('dateFieldsVals', $dateFieldsVals);
     $this->assign('cgcount', $cgcount);
     $this->assign('customGroupTitle', $this->_customGroupTitle);
     $this->assign('headers', $headers);

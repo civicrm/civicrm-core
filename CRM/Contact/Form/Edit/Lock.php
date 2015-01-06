@@ -42,7 +42,8 @@ class CRM_Contact_Form_Edit_Lock {
   /**
    * Build the form object
    *
-   * @param CRM_Core_Form $form form object
+   * @param CRM_Core_Form $form
+   *   Form object.
    *
    * @return void
    */
@@ -53,8 +54,10 @@ class CRM_Contact_Form_Edit_Lock {
   /**
    * Ensure that modified_date hasn't changed in the underlying DB
    *
-   * @param array $fields the input form values
-   * @param array $files the uploaded files if any
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
    * @param int $contactID
    *
    * @return true if no errors, else array of errors

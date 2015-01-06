@@ -38,11 +38,14 @@ require_once 'api/v3/utils.php';
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object
  *
- * @param array $params Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                             pairs to insert in new contact.
- * @param array $values The reformatted properties that we can use internally
+ * @param array $values
+ *   The reformatted properties that we can use internally.
  *
- * @param array|bool $create Is the formatted Values array going to
+ * @param array|bool $create
+ *   Is the formatted Values array going to.
  *                             be used for CRM_vent_BAO_Participant:create()
  *
  * @return array|CRM_Error
@@ -208,9 +211,11 @@ function _civicrm_api3_deprecated_participant_formatted_param($params, &$values,
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object
  *
- * @param array $params Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                             pairs to insert in new contact.
- * @param array $values The reformatted properties that we can use internally
+ * @param array $values
+ *   The reformatted properties that we can use internally.
  *                            '
  *
  * @param bool $create
@@ -218,7 +223,7 @@ function _civicrm_api3_deprecated_participant_formatted_param($params, &$values,
  *
  * @return array|CRM_Error
  */
-function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = FALSE, $onDuplicate = Null) {
+function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = FALSE, $onDuplicate = NULL) {
   // copy all the contribution fields as is
 
   $fields = CRM_Contribute_DAO_Contribution::fields();
@@ -446,15 +451,15 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
                   return civicrm_api3_create_error("Invalid email address(duplicate) $email for Soft Credit. Row was skipped");
                 }
                 elseif (count($matchingContactIds) == 1) {
-                  $contactId =  $matchingContactIds[0];
+                  $contactId = $matchingContactIds[0];
                   unset($softParam['email']);
                   $values[$key][$softKey] = $softParam + array('contact_id' => $contactId);
                 }
               }
             }
           }
-       }
-       break;
+        }
+        break;
 
       case 'pledge_payment':
       case 'pledge_id':
@@ -610,7 +615,7 @@ function _civicrm_api3_deprecated_check_contact_dedupe($params) {
     $defaultLocation = CRM_Core_BAO_LocationType::getDefault();
 
     //set the value to default location id else set to 1
-    if (!$defaultLocationId = (int)$defaultLocation->id) {
+    if (!$defaultLocationId = (int) $defaultLocation->id) {
       $defaultLocationId = 1;
     }
   }
@@ -668,11 +673,14 @@ function _civicrm_api3_deprecated_check_contact_dedupe($params) {
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object
  *
- * @param array $params Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                             pairs to insert in new contact.
- * @param array $values The reformatted properties that we can use internally
+ * @param array $values
+ *   The reformatted properties that we can use internally.
  *
- * @param array|bool $create Is the formatted Values array going to
+ * @param array|bool $create
+ *   Is the formatted Values array going to.
  *                             be used for CRM_Activity_BAO_Activity::create()
  *
  * @return array|CRM_Error
@@ -748,8 +756,10 @@ function _civicrm_api3_deprecated_activity_formatted_param(&$params, &$values, $
  * the variable being added is a child of Location, a location_type_id must
  * also be included.  If it is a child of phone, a phone_type must be included.
  *
- * @param array  $values    The variable(s) to be added
- * @param array  $params    The structured parameter list
+ * @param array $values
+ *   The variable(s) to be added.
+ * @param array $params
+ *   The structured parameter list.
  *
  * @return bool|CRM_Utils_Error
  */
@@ -962,8 +972,10 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
 /**
  * This function format location blocks w/ v3.0 format.
  *
- * @param array  $values    The variable(s) to be added
- * @param array  $params    The structured parameter list
+ * @param array $values
+ *   The variable(s) to be added.
+ * @param array $params
+ *   The structured parameter list.
  *
  * @return bool
  */
@@ -974,7 +986,7 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
   }
 
   foreach (array(
-    'Phone', 'Email', 'IM', 'OpenID','Phone_Ext') as $block) {
+    'Phone', 'Email', 'IM', 'OpenID', 'Phone_Ext') as $block) {
     $name = strtolower($block);
     if (!array_key_exists($name, $values)) {
       continue;
@@ -1048,31 +1060,31 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
       $customFieldID = CRM_Core_BAO_CustomField::getKeyID($key);
       if ($customFieldID && array_key_exists($customFieldID, $customFields)) {
         // mark an entry in fields array since we want the value of custom field to be copied
-        $fields['Address'][$key] = null;
+        $fields['Address'][$key] = NULL;
 
         $htmlType = CRM_Utils_Array::value( 'html_type', $customFields[$customFieldID] );
         switch ( $htmlType ) {
-        case 'CheckBox':
-        case 'AdvMulti-Select':
-        case 'Multi-Select':
-          if ( $val ) {
-            $mulValues = explode( ',', $val );
-            $customOption = CRM_Core_BAO_CustomOption::getCustomOption( $customFieldID, true );
-            $newValues[$key] = array( );
-            foreach ( $mulValues as $v1 ) {
-              foreach ( $customOption as $v2 ) {
-                if ( ( strtolower( $v2['label'] ) == strtolower( trim( $v1 ) ) ) ||
+          case 'CheckBox':
+          case 'AdvMulti-Select':
+          case 'Multi-Select':
+            if ( $val ) {
+              $mulValues = explode( ',', $val );
+              $customOption = CRM_Core_BAO_CustomOption::getCustomOption( $customFieldID, TRUE );
+              $newValues[$key] = array();
+              foreach ( $mulValues as $v1 ) {
+                foreach ( $customOption as $v2 ) {
+                  if ( ( strtolower( $v2['label'] ) == strtolower( trim( $v1 ) ) ) ||
                      ( strtolower( $v2['value'] ) == strtolower( trim( $v1 ) ) ) ) {
-                  if ( $htmlType == 'CheckBox' ) {
-                    $newValues[$key][$v2['value']] = 1;
-                  } else {
-                    $newValues[$key][] = $v2['value'];
+                    if ( $htmlType == 'CheckBox' ) {
+                      $newValues[$key][$v2['value']] = 1;
+                    } else {
+                      $newValues[$key][] = $v2['value'];
+                    }
                   }
                 }
               }
             }
-          }
-          break;
+            break;
         }
       }
     }
@@ -1152,7 +1164,8 @@ function _civicrm_api3_deprecated_duplicate_formatted_contact($params) {
 /**
  * Validate a formatted contact parameter list.
  *
- * @param array $params  Structured parameter list (as in crm_format_params)
+ * @param array $params
+ *   Structured parameter list (as in crm_format_params).
  *
  * @return bool|CRM_Core_Error
  */
@@ -1284,9 +1297,11 @@ function _civicrm_api3_deprecated_participant_check_params($params, $checkDuplic
 /**
  * Ensure that we have the right input parameters for custom data
  *
- * @param array   $params          Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                                 pairs to insert in new contact.
- * @param string  $csType          contact subtype if exists/passed.
+ * @param string $csType
+ *   Contact subtype if exists/passed.
  *
  * @return null on success, error message otherwise
  */
@@ -1311,7 +1326,7 @@ function _civicrm_api3_deprecated_contact_check_custom_params($params, $csType =
 
         $errorMsg = "Invalid Custom Field Contact Type: {$params['contact_type']}";
         if (!empty($csType)) {
-          $errorMsg .= " or Mismatched SubType: " . implode(', ', (array)$csType);
+          $errorMsg .= " or Mismatched SubType: " . implode(', ', (array) $csType);
         }
         return civicrm_api3_create_error($errorMsg);
       }
@@ -1354,7 +1369,6 @@ function _civicrm_api3_deprecated_contact_check_params(
       ),
     );
 
-
     // contact_type has a limited number of valid values
     if(empty($params['contact_type'])) {
       return civicrm_api3_create_error("No Contact Type");
@@ -1366,7 +1380,7 @@ function _civicrm_api3_deprecated_contact_check_params(
 
     if ($csType = CRM_Utils_Array::value('contact_sub_type', $params)) {
       if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($csType, $params['contact_type']))) {
-        return civicrm_api3_create_error("Invalid or Mismatched Contact Subtype: " . implode(', ', (array)$csType));
+        return civicrm_api3_create_error("Invalid or Mismatched Contact Subtype: " . implode(', ', (array) $csType));
       }
     }
 

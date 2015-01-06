@@ -38,7 +38,8 @@
 /**
  * Create or update a price_field_value
  *
- * @param array $params  Associative array of property
+ * @param array $params
+ *   Associative array of property.
  *                       name/value pairs to insert in new 'price_field_value'
  * @example PriceFieldValueCreate.php Std Create example
  *
@@ -64,7 +65,8 @@ function civicrm_api3_price_field_value_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_price_field_value_create_spec(&$params) {
   $params['price_field_id']['api.required'] = TRUE;
@@ -76,7 +78,8 @@ function _civicrm_api3_price_field_value_create_spec(&$params) {
 /**
  * Returns array of price_field_values  matching a set of one or more group properties
  *
- * @param array $params Array of one or more valid property_name=>value pairs. If $params is set
+ * @param array $params Array of one or more valid property_name=>value pairs. If $params
+ *   Is set.
  *  as null, all price_field_values will be returned (default limit is 25)
  *
  * @return array  Array of matching price_field_values
@@ -93,7 +96,8 @@ function civicrm_api3_price_field_value_get($params) {
  * This method is used to delete any existing price_field_value. id of the group
  * to be deleted is required field in $params array
  *
- * @param array $params array containing id of the group
+ * @param array $params
+ *   Array containing id of the group.
  *  to be deleted
  *
  * @return array API result array

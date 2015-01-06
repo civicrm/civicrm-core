@@ -43,8 +43,10 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_BAO_MessageTemplate object
    * @static
@@ -62,8 +64,10 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on sucess, null otherwise
    * @static
@@ -75,7 +79,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   /**
    * Add the Message Templates
    *
-   * @param array $params reference array contains the values submitted by the form
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
    *
    * @static
    *
@@ -200,7 +205,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       }
       list($details) = CRM_Utils_Token::getTokenDetails(array($contactId),
                                                         $returnProperties,
-                                                        null, null, false,
+                                                        NULL, NULL, FALSE,
                                                         $tokens,
                                                         'CRM_Core_BAO_MessageTemplate');
       $contact = reset( $details );
@@ -216,10 +221,10 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
         $bodyType = "body_{$value}";
         if ($$bodyType) {
           CRM_Utils_Token::replaceGreetingTokens($$bodyType, NULL, $contact['contact_id']);
-          $$bodyType = CRM_Utils_Token::replaceDomainTokens($$bodyType, $domain, true, $tokens, true);
-          $$bodyType = CRM_Utils_Token::replaceContactTokens($$bodyType, $contact, false, $tokens, false, true);
-          $$bodyType = CRM_Utils_Token::replaceComponentTokens($$bodyType, $contact, $tokens, true);
-          $$bodyType = CRM_Utils_Token::replaceHookTokens($$bodyType, $contact , $categories, true);
+          $$bodyType = CRM_Utils_Token::replaceDomainTokens($$bodyType, $domain, TRUE, $tokens, TRUE);
+          $$bodyType = CRM_Utils_Token::replaceContactTokens($$bodyType, $contact, FALSE, $tokens, FALSE, TRUE);
+          $$bodyType = CRM_Utils_Token::replaceComponentTokens($$bodyType, $contact, $tokens, TRUE);
+          $$bodyType = CRM_Utils_Token::replaceHookTokens($$bodyType, $contact, $categories, TRUE);
         }
       }
       $html = $body_html;
@@ -232,10 +237,10 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       }
 
       // do replacements in message subject
-      $messageSubject = CRM_Utils_Token::replaceContactTokens($body_subject, $contact, false, $tokens);
-      $messageSubject = CRM_Utils_Token::replaceDomainTokens($messageSubject, $domain, true, $tokens);
-      $messageSubject = CRM_Utils_Token::replaceComponentTokens($messageSubject, $contact, $tokens, true);
-      $messageSubject = CRM_Utils_Token::replaceHookTokens($messageSubject, $contact, $categories, true);
+      $messageSubject = CRM_Utils_Token::replaceContactTokens($body_subject, $contact, FALSE, $tokens);
+      $messageSubject = CRM_Utils_Token::replaceDomainTokens($messageSubject, $domain, TRUE, $tokens);
+      $messageSubject = CRM_Utils_Token::replaceComponentTokens($messageSubject, $contact, $tokens, TRUE);
+      $messageSubject = CRM_Utils_Token::replaceHookTokens($messageSubject, $contact, $categories, TRUE);
 
       $messageSubject = $smarty->fetch("string:{$messageSubject}");
 
@@ -270,7 +275,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   /**
    * Revert a message template to its default subject+text+HTML state
    *
-   * @param integer id  id of the template
+   * @param integer id id of the template
    *
    * @return void
    */
@@ -302,7 +307,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   /**
    * Send an email from the specified template based on an array of params
    *
-   * @param array $params  a string-keyed array of function params, see function body for details
+   * @param array $params
+   *   A string-keyed array of function params, see function body for details.
    *
    * @return array  of four parameters: a boolean whether the email was sent, and the subject, text and HTML templates
    */
@@ -443,7 +449,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $text    = CRM_Utils_Token::replaceContactTokens($text, $contact, FALSE, $tokens['text'], FALSE, TRUE);
       $html    = CRM_Utils_Token::replaceContactTokens($html, $contact, FALSE, $tokens['html'], FALSE, TRUE);
 
-
       $contactArray = array($contactID => $contact);
       CRM_Utils_Hook::tokenValues($contactArray,
         array($contactID),
@@ -463,7 +468,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $subject = "{strip}$subject{/strip}";
 
     // parse the three elements with Smarty
-
 
     $smarty = CRM_Core_Smarty::singleton();
     foreach ($params['tplParams'] as $name => $value) {
@@ -502,7 +506,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
         if (empty($params['attachments'])) {
           $params['attachments'] = array();
         }
-        $params['attachments'][] =  CRM_Utils_Mail::appendPDF('Invoice.pdf', $pdfHtml, $format) ;
+        $params['attachments'][] = CRM_Utils_Mail::appendPDF('Invoice.pdf', $pdfHtml, $format);
       }
       $pdf_filename = '';
       if ($config->doNotAttachPDFReceipt &&

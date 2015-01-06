@@ -19,11 +19,16 @@ class CRM_Core_Page_Redirect extends CRM_Core_Page {
   }
 
   /**
-   * @param array $requestPath the parts of the path in the current page request
-   * @param array $requestArgs any GET arguments
-   * @param array $pageArgs the page_arguments registered in the router
-   * @param array $requestArgs any parameters passed as part of this page request
-   * @param bool $absolute whether to return an absolute URL
+   * @param array $requestPath
+   *   The parts of the path in the current page request.
+   * @param array $requestArgs
+   *   Any GET arguments.
+   * @param array $pageArgs
+   *   The page_arguments registered in the router.
+   * @param array $requestArgs
+   *   Any parameters passed as part of this page request.
+   * @param bool $absolute
+   *   Whether to return an absolute URL.
    * @return string URL
    */
   public static function createUrl($requestPath, $requestArgs, $pageArgs, $absolute) {

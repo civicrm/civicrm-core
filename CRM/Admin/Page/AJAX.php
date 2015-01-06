@@ -73,7 +73,7 @@ class CRM_Admin_Page_AJAX {
    * enabling/ disabling various objects
    */
   public static function getStatusMsg() {
-    require_once('api/v3/utils.php');
+    require_once 'api/v3/utils.php';
     $recordID  = CRM_Utils_Type::escape($_GET['id'], 'Integer');
     $entity = CRM_Utils_Type::escape($_GET['entity'], 'String');
     $ret = array();

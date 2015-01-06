@@ -47,7 +47,8 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    *
    * @return array self::$_links array of action links
    */
-  public function &links() {}
+  public function &links() {
+  }
 
   /**
    * Return class name of edit form
@@ -101,8 +102,10 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   /**
    * Make sure that the user has permission to access this group
    *
-   * @param int $id the id of the object
-   * @param int $title name or title of the object
+   * @param int $id
+   *   The id of the object.
+   * @param int $title
+   *   Name or title of the object.
    *
    * @return string   the permission that the user has (or null)
    */
@@ -147,8 +150,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   }
 
   public function search() {
-    if ($this->_action &
-      (CRM_Core_Action::ADD |
+    if ($this->_action & (CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE |
         CRM_Core_Action::DELETE
       )

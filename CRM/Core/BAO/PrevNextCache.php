@@ -64,7 +64,8 @@ WHERE  cacheKey     = %3 AND
        entity_table = 'civicrm_contact'
 ";
 
-      $params = array(1 => array($id1, 'Integer'),
+      $params = array(
+      1 => array($id1, 'Integer'),
                 2 => array($id2, 'Integer'),
                 3 => array($cacheKey, 'String'),
       );
@@ -81,13 +82,13 @@ WHERE  cacheKey     = %3 AND
         $where = " AND {$where}";
 
       }
-      $p = array(1 => array($mergeId, 'Integer'),
+      $p = array(
+      1 => array($mergeId, 'Integer'),
            2 => array($cacheKey, 'String'),
       );
       $sql       = "SELECT pn.id, pn.entity_id1, pn.entity_id2, pn.data FROM civicrm_prevnext_cache pn {$join} ";
       $wherePrev = " WHERE pn.id < %1 AND pn.cacheKey = %2 {$where} ORDER BY ID DESC LIMIT 1";
       $sqlPrev   = $sql . $wherePrev;
-
 
       $dao = CRM_Core_DAO::executeQuery($sqlPrev, $p);
       if ($dao->fetch()) {
@@ -146,9 +147,7 @@ WHERE  cacheKey     = %3 AND
     $params = array(1 => array($entityTable, 'String'));
 
     $pair =
-      ! $isViceVersa ?
-      "entity_id1 = %2 AND entity_id2 = %3" :
-      "(entity_id1 = %2 AND entity_id2 = %3) OR (entity_id1 = %3 AND entity_id2 = %2)";
+      ! $isViceVersa ? "entity_id1 = %2 AND entity_id2 = %3" : "(entity_id1 = %2 AND entity_id2 = %3) OR (entity_id1 = %3 AND entity_id2 = %2)";
     $sql .= " AND ( {$pair} )";
     $params[2] = array($id1, 'Integer');
     $params[3] = array($id2, 'Integer');
@@ -211,7 +210,7 @@ WHERE  cacheKey = %1
    * @return bool
    */
   public static function is_serialized($string) {
-    return (@unserialize($string) !== false);
+    return (@unserialize($string) !== FALSE);
   }
 
   /**
@@ -397,11 +396,14 @@ WHERE  cacheKey LIKE %1 AND is_selected = 1
   /**
    * Get the selections
    *
-   * @param string $cacheKey cache key
-   * @param string $action action
+   * @param string $cacheKey
+   *   Cache key.
+   * @param string $action
+   *   Action.
    *  $action : get - get only selection records
    *            getall - get all the records of the specified cache key
-   * @param string $entity_table entity table
+   * @param string $entity_table
+   *   Entity table.
    *
    * @return array
    */
@@ -451,7 +453,7 @@ WHERE  cacheKey LIKE %1
     $params1[2] = array("{$cacheKey}_alphabet%", 'String');
     $dao = CRM_Core_DAO::executeQuery($query, $params1);
 
-    $val = array( );
+    $val = array();
     while ($dao->fetch()) {
       $val[] = $dao->data;
     }
@@ -475,7 +477,7 @@ WHERE  cacheKey LIKE %1
       $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
     }
 
-    $qfKey = CRM_Utils_Request::retrieve('qfKey','String', $form);
+    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
     $cacheKey = "civicrm search {$qfKey}";
 
     $query = "

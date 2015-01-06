@@ -32,7 +32,7 @@ require_once 'CiviTest/Contact.php';
 /**
  * Test class for CRM_Pledge_BAO_Pledge BAO
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
 
@@ -51,7 +51,8 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    *
    */
-  protected function tearDown() {}
+  protected function tearDown() {
+  }
 
   /**
    *  Test for Add/Update Pledge.

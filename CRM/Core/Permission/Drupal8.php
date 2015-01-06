@@ -40,7 +40,8 @@ class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase{
   /**
    * Given a permission string, check for access requirements
    *
-   * @param string $str The permission to check
+   * @param string $str
+   *   The permission to check.
    *
    * @return bool
    */

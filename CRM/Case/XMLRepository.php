@@ -139,7 +139,8 @@ class CRM_Case_XMLRepository {
    * @param string $caseType
    * @return null|string file path
    */
-  public function findXmlFile($caseType) { // first check custom templates directory
+  public function findXmlFile($caseType) {
+    // first check custom templates directory
     $fileName = NULL;
 
     if (!$fileName || !file_exists($fileName)) {
@@ -254,7 +255,8 @@ class CRM_Case_XMLRepository {
    * Determine the number of times a particular activity-type is
    * referenced in CiviCase XML.
    *
-   * @param string $activityType symbolic-name of an activity type
+   * @param string $activityType
+   *   Symbolic-name of an activity type.
    * @return int
    */
   public function getActivityReferenceCount($activityType) {
@@ -273,7 +275,8 @@ class CRM_Case_XMLRepository {
    * Determine the number of times a particular activity-type is
    * referenced in CiviCase XML.
    *
-   * @param string $relationshipTypeName symbolic-name of a relationship-type
+   * @param string $relationshipTypeName
+   *   Symbolic-name of a relationship-type.
    * @return int
    */
   public function getRelationshipReferenceCount($relationshipTypeName) {

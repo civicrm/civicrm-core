@@ -177,12 +177,18 @@ class CRM_Core_Selector_Controller {
   /**
    * Class constructor
    *
-   * @param CRM_Core_Selector_API $object an object that implements the selector API
-   * @param int $pageID default pageID
-   * @param int $sortID default sortID
-   * @param int $action the actions to potentially support
-   * @param CRM_Core_Page|CRM_Core_Form $store place in session to store some values
-   * @param int $output what do we so with the output, session/template//both
+   * @param CRM_Core_Selector_API $object
+   *   An object that implements the selector API.
+   * @param int $pageID
+   *   Default pageID.
+   * @param int $sortID
+   *   Default sortID.
+   * @param int $action
+   *   The actions to potentially support.
+   * @param CRM_Core_Page|CRM_Core_Form $store
+   *   Place in session to store some values.
+   * @param int $output
+   *   What do we so with the output, session/template//both.
    *
    * @param null $prefix
    * @param null $case
@@ -252,7 +258,8 @@ class CRM_Core_Selector_Controller {
   /**
    * Have the GET vars changed, i.e. pageId or sortId that forces us to recompute the search values
    *
-   * @param int $reset are we being reset
+   * @param int $reset
+   *   Are we being reset.
    *
    * @return boolean   if the GET params are different from the session params
    */
@@ -360,7 +367,6 @@ class CRM_Core_Selector_Controller {
         self::$_template->assign("{$this->_prefix}qill", $qill);
         self::$_template->assign("{$this->_prefix}summary", $summary);
       }
-
 
       // always store the current pageID and sortID
       $this->_store->set($this->_prefix . CRM_Utils_Pager::PAGE_ID,
@@ -480,7 +486,7 @@ class CRM_Core_Selector_Controller {
   /**
    * Setter for embedded
    *
-   * @param boolean $embedded
+   * @param bool $embedded
    *
    * @return void
    */
@@ -500,7 +506,7 @@ class CRM_Core_Selector_Controller {
   /**
    * Setter for print
    *
-   * @param boolean $print
+   * @param bool $print
    *
    * @return void
    */

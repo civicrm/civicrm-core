@@ -61,7 +61,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
   /**
    * @param array $exportParams
    */
-  public function export( $exportParams ) {
+  public function export($exportParams) {
     parent::export( $exportParams );
 
     foreach( self::$complementaryTables as $rct ) {
@@ -194,7 +194,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
         $journalEntries[$dao->financial_trxn_id] = array(
           'to_account' => array(
             'trxn_date' => $this->format($dao->trxn_date, 'date'),
-            'trxn_id' =>  $this->format($dao->trxn_id),
+            'trxn_id' => $this->format($dao->trxn_id),
             'account_name' => $this->format($dao->to_account_name),
             'amount' => $this->format($dao->debit_total_amount, 'money'),
             'contact_name' => $this->format($dao->contact_to_name),
@@ -352,9 +352,11 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
       case 'date':
         $sout = date( 'Y/m/d', strtotime( $s1 ) );
         break;
+
       case 'money':
-        $sout = CRM_Utils_Money::format($s, null, null, true);
+        $sout = CRM_Utils_Money::format($s, NULL, NULL, TRUE);
         break;
+
       case 'string':
       case 'notepad':
         $s2 = str_replace( "\n", '\n', $s1 );

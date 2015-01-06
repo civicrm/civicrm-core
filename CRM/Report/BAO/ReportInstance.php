@@ -42,7 +42,8 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    * instance object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Report_DAO_ReportInstance object
    * @static
@@ -122,17 +123,18 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    *
    * This function is invoked from within the web form layer and also from the api layer
    *
-   * @param array   $params      (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Report_BAO_ReportInstance object
    * @static
    */
   public static function &create(&$params) {
     if (isset($params['report_header'])) {
-      $params['header']    = CRM_Utils_Array::value('report_header',$params);
+      $params['header']    = CRM_Utils_Array::value('report_header', $params);
     }
     if (isset($params['report_footer'])) {
-      $params['footer']    = CRM_Utils_Array::value('report_footer',$params);
+      $params['footer']    = CRM_Utils_Array::value('report_footer', $params);
     }
 
     // build navigation parameters

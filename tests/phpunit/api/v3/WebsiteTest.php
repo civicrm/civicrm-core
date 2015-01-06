@@ -31,8 +31,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_website_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Contact
+ * @package CiviCRM_APIv3
+ * @subpackage API_Contact
  */
 
 class api_v3_WebsiteTest extends CiviUnitTestCase {
@@ -90,7 +90,8 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
    */
   public function testGetMetadata() {
     $result = $this->callAPIAndDocument($this->_entity, 'get', array(
-      'options' => array('metadata' => array('fields')
+      'options' => array(
+    'metadata' => array('fields')
     )), __FUNCTION__, __FILE__, 'Demonostrates returning field metadata', 'GetWithMetadata');
     $this->assertEquals('Website', $result['metadata']['fields']['url']['title']);
   }

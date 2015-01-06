@@ -102,7 +102,8 @@ AND    v.name = %3
       else {
         $value = CRM_Utils_System::relativeURL($value);
       }
-      $sqlParams = array(1 => array($value, 'String'),
+      $sqlParams = array(
+      1 => array($value, 'String'),
         2 => array($optionName, 'String'),
         3 => array($name, 'String'),
       );
@@ -128,7 +129,6 @@ OR       g.name = 'url_preferences' )
 AND    v.option_group_id = g.id
 AND    v.is_active = 1
 ";
-
 
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {

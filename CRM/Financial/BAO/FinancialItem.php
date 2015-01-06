@@ -38,15 +38,17 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   /**
    * Class constructor
    */
-  public function __construct( ) {
+  public function __construct() {
     parent::__construct( );
   }
 
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Contribute_BAO_FinancialItem object
    * @static
@@ -64,9 +66,11 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   /**
    * Add the financial items and financial trxn
    *
-   * @param object $lineItem     line item object
-   * @param object $contribution contribution object
-   * @param boolean $taxTrxnID
+   * @param object $lineItem
+   *   Line item object.
+   * @param object $contribution
+   *   Contribution object.
+   * @param bool $taxTrxnID
    *
    * @static
    * @return void
@@ -127,23 +131,26 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   /**
    * Create the financial Items and financial enity trxn
    *
-   * @param array $params  associated array to create financial items
-   * @param array $ids financial item ids
-   * @param array $trxnIds financial item ids
+   * @param array $params
+   *   Associated array to create financial items.
+   * @param array $ids
+   *   Financial item ids.
+   * @param array $trxnIds
+   *   Financial item ids.
    *
    * @static
    * @return object
    */
   public static function create(&$params, $ids = NULL, $trxnIds = NULL) {
     $financialItem = new CRM_Financial_DAO_FinancialItem();
-    
+
     if (!empty($ids['id'])) {
       CRM_Utils_Hook::pre('edit', 'FinancialItem', $ids['id'], $params);
     }
     else {
       CRM_Utils_Hook::pre('create', 'FinancialItem', NULL, $params);
     }
-    
+
     $financialItem->copyValues($params);
     if (!empty($ids['id'])) {
       $financialItem->id = $ids['id'];
@@ -168,7 +175,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     if (!empty($ids['id'])) {
       CRM_Utils_Hook::post('edit', 'FinancialItem', $financialItem->id, $financialItem);
     }
-    else {      
+    else {
       CRM_Utils_Hook::post('create', 'FinancialItem', $financialItem->id, $financialItem);
     }
     return $financialItem;
@@ -177,7 +184,8 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   /**
    * Takes an associative array and creates a entity financial transaction object
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Core_BAO_FinancialTrxn object
    * @static
@@ -192,8 +200,10 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   /**
    * Retrive entity financial trxn details
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param bool $maxId to retrive max id
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param bool $maxId
+   *   To retrive max id.
    *
    * @return array
    * @static
@@ -220,7 +230,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       return $financialItems;
     }
     else {
-      return null;
+      return NULL;
     }
   }
 
@@ -229,9 +239,11 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    *
    * CRM-12929
    *
-   * @param array $contactIds  an array contact id's
+   * @param array $contactIds
+   *   An array contact id's.
    *
-   * @param array $error error to display
+   * @param array $error
+   *   Error to display.
    *
    * @return array
    * @static
@@ -246,7 +258,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     if (!$allowPermDelete) {
       $sql = 'SELECT DISTINCT(cc.id), cc.display_name FROM civicrm_contact cc
 INNER JOIN civicrm_contribution con ON con.contact_id = cc.id
-WHERE cc.id IN (' . implode (',', $contactIds) . ') AND con.is_test = 0';
+WHERE cc.id IN (' . implode(',', $contactIds) . ') AND con.is_test = 0';
       $dao = CRM_Core_DAO::executeQuery($sql);
       if ($dao->N) {
         while ($dao->fetch()) {

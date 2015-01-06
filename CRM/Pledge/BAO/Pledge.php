@@ -56,8 +56,10 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * of time. This is the inverse function of create. It also stores all the retrieved
    * values in the default array
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Pledge_BAO_Pledge object
    * @static
@@ -75,7 +77,8 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   /**
    * Add pledge
    *
-   * @param array $params reference array contains the values submitted by the form
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
    *
    * @static
    *
@@ -120,9 +123,12 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array $params input parameters to find object
-   * @param array $values output values of the object
-   * @param array $returnProperties  if you want to return specific fields
+   * @param array $params
+   *   Input parameters to find object.
+   * @param array $values
+   *   Output values of the object.
+   * @param array $returnProperties
+   *   If you want to return specific fields.
    *
    * @return array associated array of field values
    * @static
@@ -138,7 +144,8 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   /**
    * Takes an associative array and creates a pledge object
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Pledge_BAO_Pledge object
    * @static
@@ -251,7 +258,8 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   /**
    * Delete the pledge
    *
-   * @param int $id pledge id
+   * @param int $id
+   *   Pledge id.
    *
    * @return mixed
    * @static
@@ -439,7 +447,8 @@ GROUP BY  currency
   /**
    * Get list of pledges In Honor of contact Ids
    *
-   * @param int $honorId In Honor of Contact ID
+   * @param int $honorId
+   *   In Honor of Contact ID.
    *
    * @return array return the list of pledge fields
    *
@@ -483,8 +492,10 @@ GROUP BY  currency
   /**
    * Send Acknowledgment and create activity.
    *
-   * @param CRM_Core_Form $form form object.
-   * @param array $params an assoc array of name/value pairs.
+   * @param CRM_Core_Form $form
+   *   Form object.
+   * @param array $params
+   *   An assoc array of name/value pairs.
    *
    * @return void.
    */
@@ -739,7 +750,8 @@ GROUP BY  currency
   /**
    * Get pending or in progress pledges
    *
-   * @param int $contactID contact id
+   * @param int $contactID
+   *   Contact id.
    *
    * @return array associated array of pledge id(s)
    * @static
@@ -1092,7 +1104,8 @@ SELECT  pledge.contact_id              as contact_id,
 
   /**
    * Does this pledge / pledge payment status mean that a financial transaction has taken place?
-   * @param int $statusID pledge status id
+   * @param int $statusID
+   *   Pledge status id.
    *
    * @return bool is it a transactional status?
    */

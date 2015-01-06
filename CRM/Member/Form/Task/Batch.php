@@ -136,7 +136,6 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
       )
     );
 
-
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_memberIds);
     $fileFieldExists = FALSE;

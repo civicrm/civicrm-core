@@ -190,7 +190,8 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * The static array activityType is returned
    *
-   * @param boolean $indexName - true return activity name in array
+   * @param bool $indexName
+   *   True return activity name in array.
    * key else activity id as array key.
    *
    * @param bool $all
@@ -251,7 +252,8 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @static
    *
-   * @param bool|string $name pseudoconstant to be flushed
+   * @param bool|string $name
+   *   Pseudoconstant to be flushed.
    */
   public static function flush($name = 'cache') {
    if (isset(self::$$name)) {

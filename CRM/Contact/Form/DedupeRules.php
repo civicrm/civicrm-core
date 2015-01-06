@@ -142,7 +142,8 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @param $files
    * @param $self

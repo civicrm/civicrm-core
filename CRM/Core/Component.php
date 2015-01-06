@@ -99,7 +99,7 @@ class CRM_Core_Component {
       $cr->find(FALSE);
       while ($cr->fetch()) {
         $infoClass = $cr->namespace . '_' . self::COMPONENT_INFO_CLASS;
-        require_once (str_replace('_', DIRECTORY_SEPARATOR, $infoClass) . '.php');
+        require_once str_replace('_', DIRECTORY_SEPARATOR, $infoClass) . '.php';
         $infoObject = new $infoClass($cr->name, $cr->namespace, $cr->id);
         if ($infoObject->info['name'] !== $cr->name) {
           CRM_Core_Error::fatal("There is a discrepancy between name in component registry and in info file ({$cr->name}).");
@@ -419,7 +419,8 @@ class CRM_Core_Component {
   /**
    * Handle table dependencies of components
    *
-   * @param array $tables  array of tables
+   * @param array $tables
+   *   Array of tables.
    *
    * @return null
    * @static
@@ -452,7 +453,7 @@ class CRM_Core_Component {
         $infoFile = $crmFolderDir . "/{$subDir}/" . self::COMPONENT_INFO_CLASS . '.php';
         if (file_exists($infoFile)) {
           $infoClass = 'CRM_' . $subDir . '_' . self::COMPONENT_INFO_CLASS;
-          require_once (str_replace('_', DIRECTORY_SEPARATOR, $infoClass) . '.php');
+          require_once str_replace('_', DIRECTORY_SEPARATOR, $infoClass) . '.php';
           $infoObject = new $infoClass(NULL, NULL, NULL);
           $components[$infoObject->info['name']] = $infoObject;
           unset($infoObject);

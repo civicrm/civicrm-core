@@ -448,7 +448,8 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
    * Retrieve all valid voter ids,
    * and build respective clause to restrict search.
    *
-   * @param  array  $criteria an array
+   * @param array $criteria
+   *   An array.
    * @return $voterClause as a string
    * @static
    */

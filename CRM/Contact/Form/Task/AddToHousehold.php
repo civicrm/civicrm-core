@@ -176,7 +176,8 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
    * This function is to get the result of the search for Add to * forms
    *
    * @param CRM_Core_Form $form
-   * @param  array $params This contains elements for search criteria
+   * @param array $params
+   *   This contains elements for search criteria.
    *
    *
    * @return void
@@ -267,8 +268,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
 
         $contact_type = '<img src="' . $config->resourceBase . 'i/contact_';
 
-        $searchRows[$contactID]['type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-          $result->contact_sub_type : $result->contact_type
+        $searchRows[$contactID]['type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type
         );
       }
 

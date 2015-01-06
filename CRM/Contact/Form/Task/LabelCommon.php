@@ -51,7 +51,7 @@ class CRM_Contact_Form_Task_LabelCommon {
   public function tokenIsFound($contact, $mailingFormatProperties, $tokenFields) {
     foreach (array_merge($mailingFormatProperties, array_fill_keys($tokenFields, 1)) as $key => $dontCare) {
       //we should not consider addressee for data exists, CRM-6025
-       if ($key != 'addressee' && !empty($contact[$key])) {
+      if ($key != 'addressee' && !empty($contact[$key])) {
         return TRUE;
       }
     }
@@ -60,9 +60,12 @@ class CRM_Contact_Form_Task_LabelCommon {
   /**
    * Create labels (pdf)
    *
-   * @param   array    $contactRows   assciated array of contact data
-   * @param   string   $format   format in which labels needs to be printed
-   * @param   string   $fileName    The name of the file to save the label in
+   * @param array $contactRows
+   *   Assciated array of contact data.
+   * @param string $format
+   *   Format in which labels needs to be printed.
+   * @param string $fileName
+   *   The name of the file to save the label in.
    *
    * @return  null
    */
@@ -89,10 +92,11 @@ class CRM_Contact_Form_Task_LabelCommon {
    * Get the rows for the labels
    *
    * @param $contactIDs
-   * @param integer $locationTypeID
-   * @param boolean $respectDoNotMail
+   * @param int $locationTypeID
+   * @param bool $respectDoNotMail
    * @param $mergeSameAddress
-   * @param bool $mergeSameHousehold UNUSED
+   * @param bool $mergeSameHousehold
+   *   UNUSED.
    *
    * @return array of rows for labels
    */
@@ -306,7 +310,6 @@ class CRM_Contact_Form_Task_LabelCommon {
       }
     }
     return $tokenFields;
-
   }
 
   /**
@@ -329,19 +332,19 @@ class CRM_Contact_Form_Task_LabelCommon {
 
     # exclude individuals belonging to selected households
     foreach ($households as $household_id => $row) {
-    $dao = new CRM_Contact_DAO_Relationship();
-    $dao->contact_id_b = $household_id;
-    $dao->find();
-    while ($dao->fetch()) {
-    $individual_id = $dao->contact_id_a;
-    if (array_key_exists($individual_id, $individuals)) {
-    unset($individuals[$individual_id]);
-    }
-    }
+      $dao = new CRM_Contact_DAO_Relationship();
+      $dao->contact_id_b = $household_id;
+      $dao->find();
+      while ($dao->fetch()) {
+        $individual_id = $dao->contact_id_a;
+        if (array_key_exists($individual_id, $individuals)) {
+          unset($individuals[$individual_id]);
+        }
+      }
     }
 
     # merge back individuals and households
     $rows = array_merge($individuals, $households);
     return $rows;
-    }
+  }
 }

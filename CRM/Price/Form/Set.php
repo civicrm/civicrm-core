@@ -70,7 +70,8 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     CRM_Utils_System::setTitle($title);
 
     $url = CRM_Utils_System::url('civicrm/admin/price', 'reset=1');
-    $breadCrumb = array(array('title' => ts('Price Sets'),
+    $breadCrumb = array(array(
+    'title' => ts('Price Sets'),
         'url' => $url,
       ));
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
@@ -79,9 +80,12 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
   /**
    * Global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param array $options
+   *   Additional user data.
    *
    * @return true if no errors, else array of errors
    * @static
@@ -146,6 +150,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
           }
           $extends[] = $option;
           break;
+
         case 'CiviContribute':
           $option = $this->createElement('checkbox', $compObj->componentID, NULL, ts('Contribution'));
           if (!empty($priceSetUsedTables)) {
@@ -158,6 +163,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
           }
           $extends[] = $option;
           break;
+
         case 'CiviMember':
           $option = $this->createElement('checkbox', $compObj->componentID, NULL, ts('Membership'));
           if (!empty($priceSetUsedTables)) {
@@ -241,7 +247,8 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
       CRM_Price_BAO_PriceSet::retrieve($params, $defaults);
       $extends = explode(CRM_Core_DAO::VALUE_SEPARATOR, $defaults['extends']);
       unset($defaults['extends']);
-      foreach ($extends as $compId) $defaults['extends'][$compId] = 1;
+      foreach ($extends as $compId) { $defaults['extends'][$compId] = 1;
+      }
     }
 
     return $defaults;
@@ -264,7 +271,9 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     $compIds = array();
     $extends = CRM_Utils_Array::value('extends', $params);
     if (is_array($extends)) {
-      foreach ($extends as $compId => $selected) if ($selected) {   $compIds[] = $compId; }
+      foreach ($extends as $compId => $selected) { if ($selected) {   $compIds[] = $compId;
+      }
+      }
     }
     $params['extends'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $compIds);
 

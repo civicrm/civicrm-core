@@ -191,7 +191,6 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
       $this->_columns['civicrm_membership']['group_bys']['campaign_id'] = array('title' => ts('Campaign'));
     }
 
-
     $this->_groupFilter = TRUE;
     $this->_currencyColumn = 'civicrm_contribution_currency';
     parent::__construct();
@@ -626,7 +625,6 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
         $rows[$rowNum]['civicrm_membership_membership_type_id'] = '<b>SubTotal</b>';
         $entryFound = TRUE;
       }
-
 
       // If using campaigns, convert campaign_id to campaign title
       if (array_key_exists('civicrm_membership_campaign_id', $row)) {

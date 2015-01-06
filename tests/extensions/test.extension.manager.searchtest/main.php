@@ -16,7 +16,8 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   /**
    * Prepare a set of search fields
    *
-   * @param CRM_Core_Form $form modifiable
+   * @param CRM_Core_Form $form
+   *   Modifiable.
    * @return void
    */
   function buildForm(&$form) {
@@ -178,7 +179,8 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   /**
    * Modify the content of each row
    *
-   * @param array $row modifiable SQL result row
+   * @param array $row
+   *   Modifiable SQL result row.
    * @return void
    */
   function alterRow(&$row) {

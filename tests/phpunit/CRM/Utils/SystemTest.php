@@ -15,7 +15,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $config = CRM_Core_Config::singleton();
     $this->assertTrue($config->userSystem instanceof CRM_Utils_System_UnitTests);
     $expected = '/index.php?q=civicrm/foo/bar&foo=ab&bar=cd%26ef';
-    $actual = CRM_Utils_System::url('civicrm/foo/bar', 'foo=ab&bar=cd%26ef', false, null, false);
+    $actual = CRM_Utils_System::url('civicrm/foo/bar', 'foo=ab&bar=cd%26ef', FALSE, NULL, FALSE);
     $this->assertEquals($expected, $actual);
   }
 
@@ -26,7 +26,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $actual = CRM_Utils_System::url('civicrm/foo/bar', array(
       'foo' => 'ab',
       'bar' => 'cd&ef',
-    ), false, null, false);
+    ), FALSE, NULL, FALSE);
     $this->assertEquals($expected, $actual);
   }
 

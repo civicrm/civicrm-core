@@ -66,7 +66,7 @@ class CRM_Contact_Form_Search_Criteria {
         $form->add('select', 'group_type', ts('Group Types'), $groupOptions, FALSE,
           array('id' => 'group_type', 'multiple' => 'multiple', 'class' => 'crm-select2')
         );
-        $form->add('hidden','group_search_selected','group');
+        $form->add('hidden', 'group_search_selected', 'group');
       }
     }
 
@@ -85,7 +85,7 @@ class CRM_Contact_Form_Search_Criteria {
 
       $used_for = CRM_Core_OptionGroup::values('tag_used_for');
       $tagsTypes = array();
-      $showAllTagTypes = false;
+      $showAllTagTypes = FALSE;
       foreach ($used_for as $key => $value) {
         //check tags for every type and find if there are any defined
         $tags = CRM_Core_BAO_Tag::getTagsUsedFor($key, FALSE, TRUE, NULL);
@@ -94,13 +94,13 @@ class CRM_Contact_Form_Search_Criteria {
         if (count($tags) && $key != 'civicrm_file' && $key != 'civicrm_contact') {
           //if tags exists then add type to display in adv search form help text
           $tagsTypes[] = ts($value);
-          $showAllTagTypes = true;
+          $showAllTagTypes = TRUE;
         }
       }
       $tagTypesText = implode(" or ", $tagsTypes);
       if ($showAllTagTypes) {
         $form->add('checkbox', 'all_tag_types', ts('Include tags used for %1', array(1 => $tagTypesText)));
-        $form->add('hidden','tag_types_text', $tagTypesText);
+        $form->add('hidden', 'tag_types_text', $tagTypesText);
       }
     }
 
@@ -115,7 +115,6 @@ class CRM_Contact_Form_Search_Criteria {
 
     //added job title
     $form->addElement('text', 'job_title', ts('Job Title'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'job_title'));
-
 
     //added internal ID
     $form->addElement('text', 'contact_id', ts('Contact ID'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'id'));
@@ -192,7 +191,8 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addElement('select',
       'operator',
       ts('Search Operator'),
-      array('AND' => ts('AND'),
+      array(
+    'AND' => ts('AND'),
         'OR' => ts('OR'),
       )
     );
@@ -234,7 +234,8 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addElement('select',
       'privacy_operator',
       ts('Operator'),
-      array('OR' => ts('OR'),
+      array(
+    'OR' => ts('OR'),
         'AND' => ts('AND'),
       )
     );
@@ -484,7 +485,6 @@ class CRM_Contact_Form_Search_Criteria {
     CRM_Core_Form_Date::buildDateRange($form, 'birth_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
 
     CRM_Core_Form_Date::buildDateRange($form, 'deceased_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
-
 
     // radio button for is_deceased
     $form->addYesNo( 'is_deceased', ts('Deceased'), TRUE);

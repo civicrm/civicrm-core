@@ -4,11 +4,11 @@
  *
  *  (PHP 5)
  *
- *   @author Walt Haas <walt@dharmatech.org> (801) 534-1262
- *   @copyright Copyright CiviCRM LLC (C) 2009
- *   @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
+ * @author Walt Haas <walt@dharmatech.org> (801) 534-1262
+ * @copyright Copyright CiviCRM LLC (C) 2009
+ * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
  *              GNU Affero General Public License version 3
- *   @package CiviCRM
+ * @package CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -51,7 +51,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test contact custom search functions
  *
- *  @package CiviCRM
+ * @package CiviCRM
  */
 class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
   protected $_tablesToTruncate = array(
@@ -76,11 +76,12 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
-  public function tearDown() {}
+  public function tearDown() {
+  }
 
   /**
    *  Test CRM_Contact_Form_Search_Custom_Group::count()
-   *  @dataProvider dataProvider
+   * @dataProvider dataProvider
    */
   public function testCount($fv, $count, $ids, $full) {
     $this->foreignKeyChecksOff();
@@ -100,10 +101,10 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     /**
-     echo "Count: $count, OBJ: ", $obj->count( ) . "\n";
-     while ( $dao->fetch( ) ) {
-     echo "{$dao->contact_id}, {$dao->contact_type}, {$dao->sort_name}, {$dao->group_names}\n";
-     }
+    echo "Count: $count, OBJ: ", $obj->count( ) . "\n";
+    while ( $dao->fetch( ) ) {
+    echo "{$dao->contact_id}, {$dao->contact_type}, {$dao->sort_name}, {$dao->group_names}\n";
+    }
      **/
     $this->assertEquals($count, $obj->count(),
       'In line ' . __LINE__
@@ -112,7 +113,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
 
   /**
    *  Test CRM_Contact_Form_Search_Custom_Group::all()
-   *  @dataProvider dataProvider
+   * @dataProvider dataProvider
    */
   public function testAll($fv, $count, $ids, $full) {
     // Truncate affected tables
@@ -143,7 +144,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
 
   /**
    *  Test CRM_Contact_Form_Search_Custom_Group::contactIDs()
-   *  @dataProvider dataProvider
+   * @dataProvider dataProvider
    */
   public function testContactIDs($fv, $count, $ids, $full) {
     // Truncate affected tables
@@ -186,9 +187,10 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
 
   /**
    *  Test CRM_Contact_Form_Search_Custom_Group::from()
-   *  @todo write this test
+   * @todo write this test
    */
-  public function SKIPPED_testFrom() {}
+  public function SKIPPED_testFrom() {
+  }
 
   /**
    *  Test CRM_Contact_Form_Search_Custom_Group::summary()

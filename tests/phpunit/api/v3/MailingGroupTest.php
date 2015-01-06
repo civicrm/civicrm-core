@@ -30,7 +30,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_mailing_group_* functions
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class api_v3_MailingGroupTest extends CiviUnitTestCase {
   protected $_groupID;

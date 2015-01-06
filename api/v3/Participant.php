@@ -48,7 +48,8 @@
  * Required parameters : event_id AND contact_id for new creation
  *                     : participant as name/value with participantid for edit
  *
- * @param   array  $params     an associative array of name/value property values of civicrm_participant
+ * @param array $params
+ *   An associative array of name/value property values of civicrm_participant.
  *
  * @return array apiresult
  * {@getfields participant_create}
@@ -127,7 +128,7 @@ function _civicrm_api3_participant_createlineitem(&$params, $participant){
         'qty' => $qty,
         'participant_count' => 0,
         'unit_price' => $dao->amount,
-        'line_total' => $qty*$dao->amount,
+        'line_total' => $qty * $dao->amount,
         'version' => 3,
       );
       civicrm_api('line_item', 'create', $lineItemparams);
@@ -141,7 +142,8 @@ function _civicrm_api3_participant_createlineitem(&$params, $participant){
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_participant_create_spec(&$params) {
   $params['status_id']['api.default'] = "1";
@@ -158,7 +160,8 @@ function _civicrm_api3_participant_create_spec(&$params) {
  * If more than one matching participant exists, return an error, unless
  * the client has requested to return the first found contact
  *
- * @param  array   $params           (reference ) input parameters
+ * @param array $params
+ *   (reference ) input parameters.
  *
  * @return array (reference )        array of properties, if error an array with an error id and error message
  * {@getfields participant_get}
@@ -184,7 +187,8 @@ function civicrm_api3_participant_get($params) {
  * Adjust Metadata for Get action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_participant_get_spec(&$params) {
   $params['participant_test']['api.default'] = 0;
@@ -196,7 +200,8 @@ function _civicrm_api3_participant_get_spec(&$params) {
  *
  * This API is used for deleting a contact participant
  *
- * @param  array $params Array containing  Id of the contact participant to be deleted
+ * @param array $params
+ *   Array containing  Id of the contact participant to be deleted.
  *
  * {@getfields participant_delete}
  * @throws Exception
@@ -214,4 +219,3 @@ function civicrm_api3_participant_delete($params) {
     throw new Exception('Error while deleting participant');
   }
 }
-

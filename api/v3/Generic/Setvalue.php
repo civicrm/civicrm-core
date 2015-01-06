@@ -22,8 +22,9 @@ function civicrm_api3_generic_setValue($apiRequest) {
 
   $fields = civicrm_api($entity, 'getFields', array('version' => 3, 'action' => 'create', "sequential"));
   // getfields error, shouldn't happen.
-  if ($fields['is_error'])
-  return $fields;
+  if ($fields['is_error']) {
+    return $fields;
+  }
   $fields = $fields['values'];
 
   $isCustom = strpos($field, 'custom_') === 0;
@@ -48,28 +49,29 @@ function civicrm_api3_generic_setValue($apiRequest) {
       if (!is_numeric($value) && !empty($value) && $value !== 'null') {
         return civicrm_api3_create_error(ts('%1 must be a number.', array(1 => $title)), array('error_code' => 'NaN'));
       }
-    break;
+      break;
 
     case CRM_Utils_Type::T_INT:
       if (!CRM_Utils_Rule::integer($value) && !empty($value) && $value !== 'null') {
         return civicrm_api3_create_error(ts('%1 must be a number.', array(1 => $title)), array('error_code' => 'NaN'));
       }
-    break;
+      break;
 
     case CRM_Utils_Type::T_STRING:
     case CRM_Utils_Type::T_TEXT:
       if (!CRM_Utils_Rule::xssString($value)) {
         return civicrm_api3_create_error(ts('Illegal characters in input (potential scripting attack)'), array('error_code' => 'XSS'));
       }
-    if (array_key_exists('maxlength', $def)) {
-      $value = substr($value, 0, $def['maxlength']);
-    }
-    break;
+      if (array_key_exists('maxlength', $def)) {
+        $value = substr($value, 0, $def['maxlength']);
+      }
+      break;
 
     case CRM_Utils_Type::T_DATE:
-      $value = CRM_Utils_Type::escape($value,"Date",false);
-      if (!$value)
+      $value = CRM_Utils_Type::escape($value, "Date", FALSE);
+      if (!$value) {
         return civicrm_api3_create_error("Param '$field' is not a date. format YYYYMMDD or YYYYMMDDHHMMSS");
+      }
       break;
 
     case CRM_Utils_Type::T_BOOLEAN:

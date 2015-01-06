@@ -78,14 +78,14 @@ class CRM_Financial_BAO_ExportFormat {
     switch ($this->getFileExtension()) {
       case 'csv':
         self::createActivityExport($this->_batchIds, $fileName);
-      break;
+        break;
 
       case 'iif':
         $tplFile = $this->getHookedTemplateFileName();
         $out = self::getTemplate()->fetch($tplFile);
         $fileName = $this->putFile($out);
         self::createActivityExport($this->_batchIds, $fileName);
-      break;
+        break;
     }
   }
 
@@ -108,7 +108,7 @@ class CRM_Financial_BAO_ExportFormat {
    * @return null
    */
   public function getTemplateFileName() {
-    return null;
+    return NULL;
   }
 
   /**
@@ -150,7 +150,7 @@ class CRM_Financial_BAO_ExportFormat {
   public function initiateDownload() {
     $config = CRM_Core_Config::singleton();
     //zip files if more than one.
-    if (count($this->_downloadFile)>1) {
+    if (count($this->_downloadFile) > 1) {
       $zip = $config->customFileUploadDir . 'Financial_Transactions_' . date('YmdHis') . '.zip';
       $result = $this->createZip($this->_downloadFile, $zip, TRUE);
       if ($result) {
@@ -204,7 +204,7 @@ class CRM_Financial_BAO_ExportFormat {
     }
 
     //create activity.
-    $subject .=  ' ' . ts('Batch') . '['. $values['title'] .']';
+    $subject .= ' ' . ts('Batch') . '['. $values['title'] .']';
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
     $activityParams = array(
       'activity_type_id' => array_search('Export Accounting Batch', $activityTypes),
@@ -215,7 +215,7 @@ class CRM_Financial_BAO_ExportFormat {
       'source_record_id' => $values['id'],
       'target_contact_id' => $session->get('userID'),
       'details' => $details,
-      'attachFile_1' => array (
+      'attachFile_1' => array(
         'uri' => $fileName,
         'type' => 'text/csv',
         'location' => $fileName,
@@ -249,7 +249,7 @@ class CRM_Financial_BAO_ExportFormat {
     }
     if (count($validFiles)) {
       $zip = new ZipArchive();
-      if ($zip->open($destination,$overwrite ? ZIPARCHIVE::OVERWRITE : ZIPARCHIVE::CREATE) !== TRUE) {
+      if ($zip->open($destination, $overwrite ? ZIPARCHIVE::OVERWRITE : ZIPARCHIVE::CREATE) !== TRUE) {
         return FALSE;
       }
       foreach ($validFiles as $file) {
@@ -259,7 +259,7 @@ class CRM_Financial_BAO_ExportFormat {
       return file_exists($destination);
     }
     else {
-        return FALSE;
-      }
+      return FALSE;
+    }
   }
 }

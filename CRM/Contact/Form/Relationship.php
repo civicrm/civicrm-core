@@ -149,12 +149,15 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       case CRM_Core_Action::VIEW:
         CRM_Utils_System::setTitle(ts('View Relationship for %1', array(1 => $this->_display_name_a)));
         break;
+
       case CRM_Core_Action::ADD:
         CRM_Utils_System::setTitle(ts('Add Relationship for %1', array(1 => $this->_display_name_a)));
         break;
+
       case CRM_Core_Action::UPDATE:
         CRM_Utils_System::setTitle(ts('Edit Relationship for %1', array(1 => $this->_display_name_a)));
         break;
+
       case CRM_Core_Action::DELETE:
         CRM_Utils_System::setTitle(ts('Delete Relationship for %1', array(1 => $this->_display_name_a)));
         break;
@@ -262,7 +265,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
           'limit' => 1,
           'version' => 3
         );
-        $note = civicrm_api('Note' ,'getsingle', $noteParams);
+        $note = civicrm_api('Note', 'getsingle', $noteParams);
         $defaults['note'] = CRM_Utils_Array::value('note', $note);
       }
     }
@@ -486,7 +489,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
           'entity_id' => $id,
           'entity_table' => 'civicrm_relationship',
         );
-        $existing = civicrm_api3('note' ,'get', $noteParams);
+        $existing = civicrm_api3('note', 'get', $noteParams);
         if (!empty($existing['id'])) {
           $noteParams['id'] = $existing['id'];
         }
@@ -539,7 +542,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   /**
    * Date validation
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return mixed true or array of errors
    * @static

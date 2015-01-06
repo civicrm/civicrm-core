@@ -231,7 +231,6 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
       }
     }
 
-
     if (!empty($this->_params['charts'])) {
       $select[] = "COUNT({$this->_aliases['civicrm_mailing_event_bounce']}.id) as civicrm_mailing_bounce_count";
       $this->_columnHeaders["civicrm_mailing_bounce_count"]['title'] = ts('Bounce Count');

@@ -41,7 +41,8 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
   /**
    * Takes an associative array and adds im
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return object       CRM_Core_BAO_Website object on success, null otherwise
    * @static
@@ -61,8 +62,10 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
   /**
    * Process website
    *
-   * @param array $params associated array
-   * @param int $contactID contact id
+   * @param array $params
+   *   Associated array.
+   * @param int $contactID
+   *   Contact id.
    *
    * @param $skipDelete
    *
@@ -111,7 +114,8 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
   /**
    * Delete website
    *
-   * @param array $ids website ids
+   * @param array $ids
+   *   Website ids.
    *
    * @return void
    * @static
@@ -154,7 +158,8 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
   /**
    * Get all the websites for a specified contact_id
    *
-   * @param int $id the contact id
+   * @param int $id
+   *   The contact id.
    *
    * @param bool $updateBlankLocInfo
    *

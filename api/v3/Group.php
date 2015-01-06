@@ -43,12 +43,13 @@
  * be in $params array. Either id or name is required field in the
  * $params array
  *
- * @param array $params Associative array of property
+ * @param array $params
+ *   Associative array of property.
  *                       name/value pairs to insert in new 'group'
  *
  * @return array  API result array
- *@example GroupCreate.php
- *{@getfields group_create}
+ * @example GroupCreate.php
+ * {@getfields group_create}
  * @access public
  */
 function civicrm_api3_group_create($params) {
@@ -59,7 +60,8 @@ function civicrm_api3_group_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_group_create_spec(&$params) {
   $params['is_active']['api.default'] = 1;
@@ -69,7 +71,8 @@ function _civicrm_api3_group_create_spec(&$params) {
 /**
  * Returns array of groups  matching a set of one or more group properties
  *
- * @param array $params Array of one or more valid
+ * @param array $params
+ *   Array of one or more valid.
  *                       property_name=>value pairs. If $params is set
  *                       as null, all groups will be returned
  *
@@ -97,12 +100,13 @@ function civicrm_api3_group_get($params) {
  * This method is used to delete any existing group. id of the group
  * to be deleted is required field in $params array
  *
- * @param array $params array containing id of the group
+ * @param array $params
+ *   Array containing id of the group.
  *                       to be deleted
  *
  * @return array API result array
- *@example GroupDelete.php
- *{@getfields group_delete}
+ * @example GroupDelete.php
+ * {@getfields group_delete}
  *
  * @access public
  */
@@ -111,4 +115,3 @@ function civicrm_api3_group_delete($params) {
   CRM_Contact_BAO_Group::discard($params['id']);
   return civicrm_api3_create_success(TRUE);
 }
-

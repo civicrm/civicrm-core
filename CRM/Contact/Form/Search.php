@@ -337,7 +337,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     }
     else {
       $className = $this->_modeValue['taskClassName'];
-      $tasks += $className::permissionedTaskTitles($permission, false);
+      $tasks += $className::permissionedTaskTitles($permission, FALSE);
     }
 
     if (isset($this->_ssID)) {
@@ -416,8 +416,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
     // add the go button for the action form, note it is of type 'next' rather than of type 'submit'
     if ($this->_context === 'amtg') {
-        // check if _groupID exists, it might not if
-        // we are displaying a hidden group
+      // check if _groupID exists, it might not if
+      // we are displaying a hidden group
       if (!isset($this->_group[$this->_amtgID])) {
         $this->assign('permissionedForGroup', FALSE);
         $this->_group[$this->_amtgID] =
@@ -658,7 +658,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $this->_params,
         $this->_returnProperties,
         $this->_action,
-        false, true,
+        FALSE, TRUE,
         $this->_context,
         $this->_contextMenu
       );
@@ -668,7 +668,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $selector = new self::$_selectorName(
         $this->_params,
         $this->_action,
-        null, false, null,
+        NULL, FALSE, NULL,
         "search", "advanced"
       );
     }
@@ -799,7 +799,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           $this->_params,
           $this->_returnProperties,
           $this->_action,
-          false,
+          FALSE,
           $searchChildGroups,
           $this->_context,
           $this->_contextMenu
@@ -807,12 +807,12 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $setDynamic = TRUE;
       }
       else {
-        $selector = new  self::$_selectorName (
+        $selector = new self::$_selectorName (
           $this->_params,
           $this->_action,
-          null,
-          false,
-          null,
+          NULL,
+          FALSE,
+          NULL,
           "search",
           "advanced"
         );

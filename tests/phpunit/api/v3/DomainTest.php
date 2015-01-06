@@ -30,8 +30,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  * Test class for Domain API - civicrm_domain_*
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Domain
+ * @package CiviCRM_APIv3
+ * @subpackage API_Domain
  */
 class api_v3_DomainTest extends CiviUnitTestCase {
 
@@ -79,7 +79,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
       )
     );
 
-    $this->callAPISuccess('domain','create',array(
+    $this->callAPISuccess('domain', 'create', array(
       'id' => 1,
       'contact_id' => $domContact['id'],
       )
@@ -100,7 +100,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
    */
   public function testGet() {
 
-    $params = array('sequential' => 1,);
+    $params = array('sequential' => 1);
     $result = $this->callAPIAndDocument('domain', 'get', $params, __FUNCTION__, __FILE__);
 
     $this->assertType('array', $result);
@@ -138,9 +138,9 @@ class api_v3_DomainTest extends CiviUnitTestCase {
       $this->assertArrayHasKey('domain_email', $domain);
       $this->assertArrayHasKey('domain_phone', $domain);
       $this->assertArrayHasKey('domain_address', $domain);
-      $this->assertEquals("my@email.com",$domain['domain_email']);
-      $this->assertEquals("456-456",$domain['domain_phone']['phone']);
-      $this->assertEquals("45 Penny Lane",$domain['domain_address']['street_address']);
+      $this->assertEquals("my@email.com", $domain['domain_email']);
+      $this->assertEquals("456-456", $domain['domain_phone']['phone']);
+      $this->assertEquals("45 Penny Lane", $domain['domain_address']['street_address']);
     }
   }
 

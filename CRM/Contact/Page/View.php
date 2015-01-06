@@ -152,7 +152,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     $this->assign($navContacts);
 
     $path = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $this->_contactId);
-    CRM_Utils_System::appendBreadCrumb(array(array('title' => ts('View Contact'), 'url' => $path,)));
+    CRM_Utils_System::appendBreadCrumb(array(array('title' => ts('View Contact'), 'url' => $path)));
 
     if ($image_URL = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'image_URL')) {
       //CRM-7265 --time being fix.
@@ -345,10 +345,10 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
   /**
    * Add urls for display in the actions menu
    * @param CRM_Core_Page $obj
-   * @param integer $cid
+   * @param int $cid
    */
   public static function addUrls(&$obj, $cid) {
-     $uid = CRM_Core_BAO_UFMatch::getUFId($cid);
+    $uid = CRM_Core_BAO_UFMatch::getUFId($cid);
 
     if ($uid) {
       $userRecordUrl = CRM_Core_Config::singleton()->userSystem->getUserRecordUrl($cid);

@@ -138,7 +138,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
    */
   public function testCaseTypeUpdate() {
     // Create Case Type
-    $params =  array(
+    $params = array(
       'title' => 'Application',
       'name' => 'Application',
       'is_active' => 1,
@@ -164,7 +164,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
    */
   public function testCaseTypeDelete_New() {
     // Create Case Type
-    $params =  array(
+    $params = array(
       'title' => 'Application',
       'name' => 'Application',
       'is_active' => 1,

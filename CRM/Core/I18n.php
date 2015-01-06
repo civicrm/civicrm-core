@@ -55,7 +55,8 @@ class CRM_Core_I18n {
   /**
    * A locale-based constructor that shouldn't be called from outside of this class (use singleton() instead).
    *
-   * @param  $locale string  the base of this certain object's existence
+   * @param $locale
+   *   String  the base of this certain object's existence.
    *
    * @return \CRM_Core_I18n
    */
@@ -117,7 +118,8 @@ class CRM_Core_I18n {
   /**
    * Return languages available in this instance of CiviCRM.
    *
-   * @param $justEnabled boolean  whether to return all languages or just the enabled ones
+   * @param $justEnabled
+   *   Boolean  whether to return all languages or just the enabled ones.
    *
    * @return             array    of code/language name mappings
    */
@@ -148,7 +150,8 @@ class CRM_Core_I18n {
         if ($code == 'en_US') {
           continue;
         }
-        if (!in_array($code, $codes))unset($all[$code]);
+        if (!in_array($code, $codes)) { unset($all[$code]);
+        }
       }
     }
 
@@ -170,8 +173,9 @@ class CRM_Core_I18n {
   /**
    * Replace arguments in a string with their values. Arguments are represented by % followed by their number.
    *
-   * @param  $str string  source string
-   * @param       mixed   arguments, can be passed in an array or through single variables
+   * @param $str
+   *   String  source string.
+   * @param mixed arguments, can be passed in an array or through single variables
    *
    * @return      string  modified string
    */
@@ -207,8 +211,10 @@ class CRM_Core_I18n {
    *   - count - The item count for plural mode (3rd parameter of ngettext())
    *   - context - gettext context of that string (for homonym handling)
    *
-   * @param $text   string  the original string
-   * @param $params array   the params of the translation (if any)
+   * @param $text
+   *   String  the original string.
+   * @param $params
+   *   Array   the params of the translation (if any).
    *
    * @return        string  the translated string
    */
@@ -339,7 +345,8 @@ class CRM_Core_I18n {
   /**
    * Translate a string to the current locale.
    *
-   * @param  $string string  this string should be translated
+   * @param $string
+   *   String  this string should be translated.
    *
    * @return         string  the translated string
    */
@@ -350,8 +357,10 @@ class CRM_Core_I18n {
   /**
    * Localize (destructively) array values.
    *
-   * @param  $array array  the array for localization (in place)
-   * @param  $params array an array of additional parameters
+   * @param $array
+   *   Array  the array for localization (in place).
+   * @param $params
+   *   Array an array of additional parameters.
    *
    * @return        void
    */
@@ -375,7 +384,8 @@ class CRM_Core_I18n {
   /**
    * Localize (destructively) array elements with keys of 'title'.
    *
-   * @param  $array array  the array for localization (in place)
+   * @param $array
+   *   Array  the array for localization (in place).
    *
    * @return        void
    */
@@ -394,7 +404,8 @@ class CRM_Core_I18n {
   /**
    * Binds a gettext domain, wrapper over bindtextdomain().
    *
-   * @param  $key Key of the extension (can be 'civicrm', or 'org.example.foo').
+   * @param $key
+   *   Key of the extension (can be 'civicrm', or 'org.example.foo').
    *
    * @return Boolean True if the domain was changed for an extension.
    */
@@ -484,8 +495,10 @@ class CRM_Core_I18n {
 /**
  * Short-named function for string translation, defined in global scope so it's available everywhere.
  *
- * @param  $text   string  string for translating
- * @param  $params array   an array of additional parameters
+ * @param $text
+ *   String  string for translating.
+ * @param $params
+ *   Array   an array of additional parameters.
  *
  * @return         string  the translated string
  */

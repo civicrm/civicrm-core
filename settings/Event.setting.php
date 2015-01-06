@@ -35,9 +35,9 @@
 /*
  * Settings metadata file
  */
-return array (
+return array(
   'event_enable_cart' =>
-    array (
+    array(
       'name' => 'enable_cart',
       'group_name' => 'Event Preferences',
       'group' => 'event',

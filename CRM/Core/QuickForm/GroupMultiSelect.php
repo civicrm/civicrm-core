@@ -74,7 +74,7 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
           }
         }
 
-        if (is_array($this->_values) && in_array((string)$option['attr']['value'], $this->_values)) {
+        if (is_array($this->_values) && in_array((string) $option['attr']['value'], $this->_values)) {
           // The items is *selected*
           $checked = ' checked="checked"';
         }
@@ -146,7 +146,7 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
 
         foreach ($this->_options as $option) {
           if (is_array($this->_values) &&
-            in_array((string)$option['attr']['value'], $this->_values)
+            in_array((string) $option['attr']['value'], $this->_values)
           ) {
             // Get the post order
             $key = array_search($option['attr']['value'], $this->_values);

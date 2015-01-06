@@ -48,4 +48,3 @@ catch(CRM_Core_Exception $e) {
   CRM_Core_Error::debug_var('REQUEST', $_REQUEST, TRUE, TRUE);
   echo "The transaction has failed. Please review the log for more detail";
 }
-

@@ -64,7 +64,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    *
    * @var boolean
    */
-  protected $_isSetReserved = false;
+  protected $_isSetReserved = FALSE;
 
   /**
    * Get the action links for this page.
@@ -72,40 +72,40 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @param null
    *
    * @return array  array of action links that we need to display for the browse screen
-   */ function &actionLinks() {
-    if (!isset(self::$_actionLinks)) {
-      self::$_actionLinks = array(
-        CRM_Core_Action::UPDATE => array(
-          'name' => ts('Edit Price Field'),
-          'url' => 'civicrm/admin/price/field',
-          'qs' => 'action=update&reset=1&sid=%%sid%%&fid=%%fid%%',
-          'title' => ts('Edit Price'),
-        ),
-        CRM_Core_Action::PREVIEW => array(
-          'name' => ts('Preview Field'),
-          'url' => 'civicrm/admin/price/field',
-          'qs' => 'action=preview&reset=1&sid=%%sid%%&fid=%%fid%%',
-          'title' => ts('Preview Price'),
-        ),
-        CRM_Core_Action::DISABLE => array(
-          'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Disable Price'),
-        ),
-        CRM_Core_Action::ENABLE => array(
-          'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Enable Price'),
-        ),
-        CRM_Core_Action::DELETE => array(
-          'name' => ts('Delete'),
-          'url' => 'civicrm/admin/price/field',
-          'qs' => 'action=delete&reset=1&sid=%%sid%%&fid=%%fid%%',
-          'title' => ts('Delete Price'),
-        ),
-      );
-    }
-    return self::$_actionLinks;
+  function &actionLinks() {
+  if (!isset(self::$_actionLinks)) {
+  self::$_actionLinks = array(
+  CRM_Core_Action::UPDATE => array(
+  'name' => ts('Edit Price Field'),
+  'url' => 'civicrm/admin/price/field',
+  'qs' => 'action=update&reset=1&sid=%%sid%%&fid=%%fid%%',
+  'title' => ts('Edit Price'),
+  ),
+  CRM_Core_Action::PREVIEW => array(
+  'name' => ts('Preview Field'),
+  'url' => 'civicrm/admin/price/field',
+  'qs' => 'action=preview&reset=1&sid=%%sid%%&fid=%%fid%%',
+  'title' => ts('Preview Price'),
+  ),
+  CRM_Core_Action::DISABLE => array(
+  'name' => ts('Disable'),
+  'ref' => 'crm-enable-disable',
+  'title' => ts('Disable Price'),
+  ),
+  CRM_Core_Action::ENABLE => array(
+  'name' => ts('Enable'),
+  'ref' => 'crm-enable-disable',
+  'title' => ts('Enable Price'),
+  ),
+  CRM_Core_Action::DELETE => array(
+  'name' => ts('Delete'),
+  'url' => 'civicrm/admin/price/field',
+  'qs' => 'action=delete&reset=1&sid=%%sid%%&fid=%%fid%%',
+  'title' => ts('Delete Price'),
+  ),
+  );
+  }
+  return self::$_actionLinks;
   }
 
   /**
@@ -130,7 +130,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
     $priceFieldBAO->find();
 
     // display taxTerm for priceFields
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
     $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $getTaxDetails = FALSE;
@@ -214,7 +214,8 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    *
    * editing would involved modifying existing fields + adding data to new fields.
    *
-   * @param string  $action    the action to be invoked
+   * @param string $action
+   *   The action to be invoked.
 
    *
    * @return void
@@ -260,7 +261,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
     if ($this->_sid) {
       $usedBy = CRM_Price_BAO_PriceSet::getUsedBy($this->_sid);
       $this->assign('usedBy', $usedBy);
-      $this->_isSetReserved= CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'is_reserved');
+      $this->_isSetReserved = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'is_reserved');
       $this->assign('isReserved', $this->_isSetReserved);
 
       CRM_Price_BAO_PriceSet::checkPermission($this->_sid);

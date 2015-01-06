@@ -42,7 +42,8 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
    * Create email address - note that the create function calls 'add' but
    * has more business logic
    *
-   * @param array $params input parameters
+   * @param array $params
+   *   Input parameters.
    *
    * @return object
    */
@@ -60,7 +61,8 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
   /**
    * Takes an associative array and adds email
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return object       CRM_Core_BAO_Email object on success, null otherwise
    * @static
@@ -88,9 +90,9 @@ UPDATE civicrm_email
 SET    is_bulkmail = 0
 WHERE  contact_id = {$params['contact_id']}
 ";
-    if($hook == 'edit'){
-      $sql .= " AND id <> {$params['id']}";
-    }
+      if($hook == 'edit'){
+        $sql .= " AND id <> {$params['id']}";
+      }
       CRM_Core_DAO::executeQuery($sql);
     }
 
@@ -112,7 +114,8 @@ WHERE  contact_id = {$params['contact_id']}
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array $entityBlock   input parameters to find object
+   * @param array $entityBlock
+   *   Input parameters to find object.
    *
    * @return boolean
    * @static
@@ -124,7 +127,8 @@ WHERE  contact_id = {$params['contact_id']}
   /**
    * Get all the emails for a specified contact_id, with the primary email being first
    *
-   * @param int $id the contact id
+   * @param int $id
+   *   The contact id.
    *
    * @param bool $updateBlankLocInfo
    *
@@ -181,7 +185,8 @@ ORDER BY  civicrm_email.is_primary DESC, email_id ASC ";
   /**
    * Get all the emails for a specified location_block id, with the primary email being first
    *
-   * @param array $entityElements the array containing entity_id and
+   * @param array $entityElements
+   *   The array containing entity_id and.
    * entity_table name
    *
    * @return array  the array of email id's
@@ -194,7 +199,6 @@ ORDER BY  civicrm_email.is_primary DESC, email_id ASC ";
 
     $entityId = $entityElements['entity_id'];
     $entityTable = $entityElements['entity_table'];
-
 
     $sql = " SELECT email, ltype.name as locationType, e.is_primary as is_primary, e.on_hold as on_hold,e.id as email_id, e.location_type_id as locationTypeId
 FROM civicrm_loc_block loc, civicrm_email e, civicrm_location_type ltype, {$entityTable} ev
@@ -230,7 +234,8 @@ ORDER BY e.is_primary DESC, email_id ASC ";
   /**
    * Set / reset hold status for an email
    *
-   * @param object $email  email object
+   * @param object $email
+   *   Email object.
    *
    * @return void
    * @static

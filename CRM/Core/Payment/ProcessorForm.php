@@ -45,7 +45,7 @@ class CRM_Core_Payment_ProcessorForm {
    *
    * @throws Exception
    */
-  public static function preProcess(&$form, $type = NULL, $mode = NULL ) {
+  public static function preProcess(&$form, $type = NULL, $mode = NULL) {
     if ($type) {
       $form->_type = $type;
     }
@@ -69,7 +69,6 @@ class CRM_Core_Payment_ProcessorForm {
     // we do this outside of the above conditional to avoid
     // saving the country/state list in the session (which could be huge)
     CRM_Core_Payment_Form::setPaymentFieldsByProcessor($form, $form->_paymentProcessor);
-
 
     $form->assign_by_ref('paymentProcessor', $form->_paymentProcessor);
 

@@ -204,7 +204,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * Fix what blocks to show/hide based on the default values set
    *
-   * @param array $defaults the array of default values
+   * @param array $defaults
+   *   The array of default values.
    *
    * @return void
    */
@@ -321,14 +322,14 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    */
   public function buildRegistrationBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
-    $attributes['intro_text']['click_wysiwyg'] = true;
+    $attributes['intro_text']['click_wysiwyg'] = TRUE;
     $form->addWysiwyg('intro_text', ts('Introductory Text'), $attributes['intro_text']);
     // FIXME: This hack forces height of editor to 175px. Need to modify QF classes for editors to allow passing
     // explicit height and width.
     $footerAttribs = array(
       'rows' => 2,
       'cols' => 40,
-      'click_wysiwyg' => true,
+      'click_wysiwyg' => TRUE,
     );
     $form->addWysiwyg('footer_text', ts('Footer Text'), $footerAttribs);
 
@@ -337,8 +338,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $form->addProfileSelector( 'custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
     $form->addProfileSelector( 'custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
 
-    $form->addProfileSelector( 'additional_custom_pre_id',  ts('Profile for Additional Participants') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
-    $form->addProfileSelector( 'additional_custom_post_id',  ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
+    $form->addProfileSelector( 'additional_custom_pre_id', ts('Profile for Additional Participants') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
+    $form->addProfileSelector( 'additional_custom_post_id', ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
   }
 
   /**
@@ -346,16 +347,20 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * depends on getProfileSelectorTypes
    *
    * @param array &$form
-   * @param int $count unique index
-   * @param string $prefix dom element ID prefix
-   * @param string $label Label
-   * @param array $configs Optional, for addProfileSelector(), defaults to using getProfileSelectorTypes()
+   * @param int $count
+   *   Unique index.
+   * @param string $prefix
+   *   Dom element ID prefix.
+   * @param string $label
+   *   Label.
+   * @param array $configs
+   *   Optional, for addProfileSelector(), defaults to using getProfileSelectorTypes().
    **/
-  public function buildMultipleProfileBottom(&$form, $count, $prefix = '', $label = 'Include Profile', $configs = null) {
+  public function buildMultipleProfileBottom(&$form, $count, $prefix = '', $label = 'Include Profile', $configs = NULL) {
     extract( ( is_null($configs) ) ? self::getProfileSelectorTypes() : $configs );
     $element = $prefix . "custom_post_id_multiple[$count]";
     $label .= '<br />'.ts('(bottom of page)');
-    $form->addProfileSelector( $element,  $label, $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
+    $form->addProfileSelector( $element, $label, $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
   }
 
   /**
@@ -373,7 +378,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $configs['allowCoreTypes'] = array_merge(array('Contact', 'Individual'), CRM_Contact_BAO_ContactType::subTypes('Individual'));
     $configs['allowCoreTypes'][] = 'Participant';
     //CRM-15427
-    $id = CRM_Utils_Request::retrieve( 'id' , 'Integer' );
+    $id = CRM_Utils_Request::retrieve( 'id', 'Integer' );
     if ($id) {
       $participantEventType = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $id, 'event_type_id', 'id');
       $participantRole  = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'default_role_id');
@@ -384,7 +389,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $configs['profileEntities'][] = array('entity_name' => 'contact_1', 'entity_type' => 'IndividualModel');
     $configs['profileEntities'][] = array('entity_name' => 'participant_1', 'entity_type' => 'ParticipantModel', 'entity_sub_type' => '*');
 
-   return $configs;
+    return $configs;
   }
 
   /**
@@ -396,7 +401,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    */
   public function buildConfirmationBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
-    $attributes['confirm_text']['click_wysiwyg'] = true;
+    $attributes['confirm_text']['click_wysiwyg'] = TRUE;
     // CRM-11182 - Optional confirmation page for free events
     $is_monetary = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_id, 'is_monetary');
     $form->assign('is_monetary', $is_monetary);
@@ -410,7 +415,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $footerAttribs = array(
       'rows' => 2,
       'cols' => 40,
-      'click_wysiwyg' => true,
+      'click_wysiwyg' => TRUE,
     );
     $form->addWysiwyg('confirm_footer_text', ts('Footer Text'), $footerAttribs);
   }
@@ -441,7 +446,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    */
   public function buildThankYouBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
-    $attributes['thankyou_text']['click_wysiwyg'] = true;
+    $attributes['thankyou_text']['click_wysiwyg'] = TRUE;
     $form->add('text', 'thankyou_title', ts('Title'), $attributes['thankyou_title']);
     $form->addWysiwyg('thankyou_text', ts('Introductory Text'), $attributes['thankyou_text']);
     // FIXME: This hack forces height of editor to 175px. Need to modify QF classes for editors to allow passing
@@ -449,7 +454,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $footerAttribs = array(
       'rows' => 2,
       'cols' => 40,
-      'click_wysiwyg' => true,
+      'click_wysiwyg' => TRUE,
     );
     $form->addWysiwyg('thankyou_footer_text', ts('Footer Text'), $footerAttribs);
   }
@@ -742,7 +747,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $index = array();
     foreach ($combos as $comboid => $combo) {
       foreach ($combo as $cfield) {
-        $index[$cfield][$comboid] = true;
+        $index[$cfield][$comboid] = TRUE;
       }
       $combos[$comboid] = array_fill_keys($combo, 0);
       $okCombos[$comboid] = array_fill_keys($combo, 2);
@@ -759,7 +764,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
           // check each of the fields in the index against the profile field
           foreach ($index as $ifield => $icombos) {
-            if(strpos($field['name'], $ifield) !== false) {
+            if(strpos($field['name'], $ifield) !== FALSE) {
 
               // we found the field in the profile, now record it in the index
               foreach ($icombos as $icombo => $dontcare) {
@@ -778,17 +783,18 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     // check the combos to see if everything is > 0
     foreach ($combos as $comboid => $combo) {
-      $complete = false;
+      $complete = FALSE;
       foreach ($combo as $cfield) {
         if ($cfield > 0) {
-          $complete = true;
+          $complete = TRUE;
         }
         else {
           // this combo isn't complete--skip to the next combo
           continue 2;
         }
       }
-      if ($complete) { return 1; }
+      if ($complete) { return 1;
+      }
     }
 
     // no combo succeeded
@@ -850,7 +856,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       'entity_table' => 'civicrm_event',
       'entity_id' => $this->_id,
     );
-
 
     // first delete all past entries
     CRM_Core_BAO_UFJoin::deleteAll($ufJoinParams);
@@ -963,7 +968,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     self::addMultipleProfiles($profileIds, $params, 'custom_post_id_multiple');
     self::addMultipleProfiles($additionalProfileIds, $params, 'additional_custom_post_id_multiple');
 
-    $cantDedupe = false;
+    $cantDedupe = FALSE;
     $rgId = CRM_Utils_Array::value('dedupe_rule_group_id', $params, 0);
 
     switch (self::canProfilesDedupe($profileIds, $rgId)) {
@@ -971,6 +976,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         $dedupeTitle = 'Duplicate Matching Impossible';
         $cantDedupe = ts("The selected profiles do not contain the fields necessary to match registrations with existing contacts.  This means all anonymous registrations will result in a new contact.");
         break;
+
       case 1:
         $dedupeTitle = 'Duplicate Contacts Possible';
         $cantDedupe = ts("The selected profiles can collect enough information to match registrations with existing contacts, but not all of the relevant fields are required.  Anonymous registrations may result in duplicate contacts.");
@@ -986,6 +992,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
             $cantDedupe = ts("The selected profiles do not contain the fields necessary to match additional participants with existing contacts.  This means all additional participants will result in a new contact.");
           }
           break;
+
         case 1:
           if (!$cantDedupe) {
             $dedupeTitle = 'Duplicate Contacts Possible';

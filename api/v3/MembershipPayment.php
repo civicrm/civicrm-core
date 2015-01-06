@@ -39,7 +39,8 @@
 /**
  * Add or update a link between contribution and membership
  *
- * @param  array   $params           (reference ) input parameters
+ * @param array $params
+ *   (reference ) input parameters.
  *
  * @return array (reference )        membership_payment_id of created or updated record
  * {@getfields MembershipPayment_create}
@@ -54,7 +55,8 @@ function civicrm_api3_membership_payment_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_membership_payment_create_spec(&$params) {
   $params['membership_id']['api.required'] = 1;
@@ -65,14 +67,14 @@ function _civicrm_api3_membership_payment_create_spec(&$params) {
  * Retrieve one / all contribution(s) / membership(s) linked to a
  * membership / contrbution.
  *
- * @param  array   $params  input parameters
+ * @param array $params
+ *   Input parameters.
  *
  * @return array  array of properties, if error an array with an error id and error message
- *  @example MembershipPaymentGet
+ * @example MembershipPaymentGet
  * {@getfields MembershipPayment_get}
  * @access public
  */
 function civicrm_api3_membership_payment_get($params) {
   return _civicrm_api3_basic_get('CRM_Member_DAO_MembershipPayment', $params);
 }
-

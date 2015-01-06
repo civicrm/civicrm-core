@@ -61,11 +61,11 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   private static $financialAccount;
 
-    /**
-   * Contribution pages
-   * @var array
-   * @static
-   */
+  /**
+     * Contribution pages
+     * @var array
+     * @static
+     */
   private static $contributionPageActive = NULL;
 
   /**
@@ -158,7 +158,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @static
    */
   public static function &financialAccount($id = NULL, $financialAccountTypeId = NULL, $retrieveColumn = 'name', $key = 'id') {
-    $condition = NUll;
+    $condition = NULL;
     if ($financialAccountTypeId) {
       $condition = " financial_account_type_id = ". $financialAccountTypeId;
     }
@@ -189,12 +189,13 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @static
    *
-   * @param bool|string $name pseudoconstant to be flushed
+   * @param bool|string $name
+   *   Pseudoconstant to be flushed.
    */
   public static function flush($name = 'cache') {
-   if (isset(self::$$name)) {
+    if (isset(self::$$name)) {
       self::$$name = NULL;
-    }
+   }
   }
 
   /**
@@ -202,8 +203,10 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * Get all the contribution pages
    *
-   * @param integer $id  id of the contribution page
-   * @param boolean $all do we want all pages or only active pages
+   * @param int $idId of the contribution page.
+   *   Id of the contribution page.
+   * @param bool $all
+   *   Do we want all pages or only active pages.
    *
    *
    * @return array - array reference of all contribution pages if any
@@ -405,7 +408,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
       CRM_Core_PseudoConstant::populate(
         self::$financialTypeAccount[$financialTypeId],
         'CRM_Financial_DAO_EntityFinancialAccount',
-        $all = true,
+        $all = TRUE,
         $retrieve = 'financial_account_id',
         $filter = NULL,
         $condition,

@@ -103,8 +103,10 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   /**
    * Class constructor
    *
-   * @param int $id the contact id
-   * @param int $gid the group id
+   * @param int $id
+   *   The contact id.
+   * @param int $gid
+   *   The group id.
    *
    * @param $restrict
    * @param bool $skipPermission
@@ -133,8 +135,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     //specifies the action being done on a multi record field
     $multiRecordAction = CRM_Utils_Request::retrieve('multiRecord', 'String', $this);
 
-    $this->_multiRecord = (!is_numeric($multiRecordAction)) ?
-      CRM_Core_Action::resolve($multiRecordAction) : $multiRecordAction;
+    $this->_multiRecord = (!is_numeric($multiRecordAction)) ? CRM_Core_Action::resolve($multiRecordAction) : $multiRecordAction;
     if ($this->_multiRecord) {
       $this->set('multiRecord', $this->_multiRecord);
     }
@@ -319,9 +320,11 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
         //CRM-14338
         // Create a unique, non-empty index for each field.
         $index = $field['title'];
-        if ($index === '') $index = ' ';
-        while (array_key_exists($index, $labels))
+        if ($index === '') { $index = ' ';
+        }
+        while (array_key_exists($index, $labels)) {
           $index .= ' ';
+        }
 
         $labels[$index] = preg_replace('/\s+|\W+/', '_', $name);
       }

@@ -98,8 +98,10 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
-   * @param array $errors list of errors to be posted back to the form
+   * @param array $fields
+   *   Posted values of the form.
+   * @param array $errors
+   *   List of errors to be posted back to the form.
    *
    * @return array $errors@static
    */
@@ -114,7 +116,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
           if (!empty($blockValues['is_primary'])) {
             $hasPrimary[] = $instance;
             if (!$primaryID && !empty($blockValues['openid'])) {
-                $primaryID = $blockValues['openid'];
+              $primaryID = $blockValues['openid'];
             }
           }
         }

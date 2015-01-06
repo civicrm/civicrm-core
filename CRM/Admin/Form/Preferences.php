@@ -146,7 +146,6 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   public function buildQuickForm() {
     parent::buildQuickForm();
 
-
     if (!empty($this->_varNames)) {
       foreach ($this->_varNames as $groupName => $groupValues) {
         $formName = CRM_Utils_String::titleToVar($groupName);

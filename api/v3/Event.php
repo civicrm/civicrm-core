@@ -47,7 +47,8 @@
  *
  * This API is used for creating a Event
  *
- * @param  array   $params   input parameters
+ * @param array $params
+ *   Input parameters.
  * Allowed @params array keys are:
  * {@getfields event_create}
  *
@@ -72,7 +73,8 @@ function civicrm_api3_event_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_event_create_spec(&$params) {
   $params['start_date']['api.required'] = 1;
@@ -98,7 +100,8 @@ function _civicrm_api3_event_create_legacy_support_42(&$params){
  * Get Event record.
  *
  *
- * @param  array  $params     an associative array of name/value property values of civicrm_event
+ * @param array $params
+ *   An associative array of name/value property values of civicrm_event.
  * {@getfields event_get}
  *
  * @return  Array of all found event property values.
@@ -159,7 +162,8 @@ function civicrm_api3_event_get($params) {
  * Adjust Metadata for Get action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_event_get_spec(&$params) {
   $params['financial_type_id']['api.aliases'] = array('contribution_type_id');
@@ -173,7 +177,7 @@ function _civicrm_api3_event_get_spec(&$params) {
  */
 function _civicrm_api3_event_get_legacy_support_42(&$event, $event_id){
   if(!empty($event[$event_id]['payment_processor'])){
-    $processors = explode(CRM_Core_DAO::VALUE_SEPARATOR,$event[$event_id]['payment_processor']);
+    $processors = explode(CRM_Core_DAO::VALUE_SEPARATOR, $event[$event_id]['payment_processor']);
     if(count($processors) == 3 ){
       $event[$event_id]['payment_processor_id'] = $processors[1];
     }
@@ -185,7 +189,8 @@ function _civicrm_api3_event_get_legacy_support_42(&$event, $event_id){
  *
  * This API is used for deleting a event
  *
- * @param  Array  $params    array containing event_id to be deleted
+ * @param array $params
+ *   Array containing event_id to be deleted.
  *
  * @return boolean        true if success, error otherwise
  * @access public
@@ -202,8 +207,10 @@ function civicrm_api3_event_delete($params) {
  * add 'is_full' & 'available_seats' to the return array. (this might be better in the BAO)
  * Default BAO function returns a string if full rather than a Bool - which is more appropriate to a form
  *
- * @param array $event return array of the event
- * @param int $event_id Id of the event to be updated
+ * @param array $event
+ *   Return array of the event.
+ * @param int $event_id
+ *   Id of the event to be updated.
  *
  */
 /**
@@ -225,7 +232,8 @@ function _civicrm_api3_event_getisfull(&$event, $event_id) {
 /**
  * @see _civicrm_api3_generic_getlist_params.
  *
- * @param $request array
+ * @param $request
+ *   Array.
  */
 function _civicrm_api3_event_getlist_params(&$request) {
   $fieldsToReturn = array('start_date', 'event_type_id', 'title', 'summary');
@@ -240,8 +248,10 @@ function _civicrm_api3_event_getlist_params(&$request) {
 /**
  * @see _civicrm_api3_generic_getlist_output
  *
- * @param $result array
- * @param $request array
+ * @param $result
+ *   Array.
+ * @param $request
+ *   Array.
  *
  * @return array
  */

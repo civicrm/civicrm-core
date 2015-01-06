@@ -115,7 +115,6 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     //$this->assertEquals( 'testFld1',  $getCustomFields[$customFieldID1][0], 'Confirm First Custom field label' );
     //$this->assertEquals( 'testFld2',  $getCustomFields[$customFieldID2][0], 'Confirm Second Custom field label' );
 
-
     Custom::deleteGroup($customGroup);
   }
 
@@ -192,22 +191,19 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         )),
     );
     $fields = array(
-      'countryA' => Custom::createField(array(
-        ), array(
+      'countryA' => Custom::createField(array(), array(
           'groupId' => $groups['A']->id,
           'label' => 'Country A',
           'dataType' => 'Country',
           'htmlType' => 'Select Country',
         )),
-      'countryB' => Custom::createField(array(
-        ), array(
+      'countryB' => Custom::createField(array(), array(
           'groupId' => $groups['A']->id,
           'label' => 'Country B',
           'dataType' => 'Country',
           'htmlType' => 'Select Country',
         )),
-      'countryC' => Custom::createField(array(
-        ), array(
+      'countryC' => Custom::createField(array(), array(
           'groupId' => $groups['B']->id,
           'label' => 'Country C',
           'dataType' => 'Country',

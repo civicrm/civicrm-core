@@ -79,7 +79,8 @@ function civicrm_api3_mailing_a_b_get($params) {
  * Adjust Metadata for submit action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_mailing_a_b_submit_spec(&$params) {
   $mailingFields = CRM_Mailing_DAO_Mailing::fields();
@@ -168,7 +169,8 @@ function civicrm_api3_mailing_a_b_submit($params) {
  * Adjust Metadata for graph_stats action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_mailing_a_b_graph_stats_spec(&$params) {
   $params['criteria']['title'] = 'Criteria';
@@ -225,6 +227,7 @@ function civicrm_api3_mailing_a_b_graph_stats($params) {
           )
         );
         break;
+
       case 'total unique clicks':
         $result = CRM_Mailing_Event_BAO_TrackableURLOpen::getRows($mailingAB['mailing_id_a'], NULL, TRUE, 0, 1, "civicrm_mailing_event_trackable_url_open.time_stamp ASC");
         $startDate = CRM_Utils_Date::processDate($result[0]['date']);
@@ -239,6 +242,7 @@ function civicrm_api3_mailing_a_b_graph_stats($params) {
           )
         );
         break;
+
       case 'total clicks on a particular link':
         if (empty($params['target_url'])) {
           throw new API_Exception("Provide url to get stats result for total clicks on a particular link");

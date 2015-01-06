@@ -74,9 +74,9 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     if (count($this->_emails) > 1) {
       $actualBlockCount = $totalBlocks = count($this->_emails);
       if ($totalBlocks < $this->_blockCount) {
-      $additionalBlocks = $this->_blockCount - $totalBlocks;
-      $totalBlocks += $additionalBlocks;
-    }
+        $additionalBlocks = $this->_blockCount - $totalBlocks;
+        $totalBlocks += $additionalBlocks;
+      }
       else {
         $actualBlockCount++;
         $totalBlocks++;
@@ -98,8 +98,10 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
-   * @param array $errors list of errors to be posted back to the form
+   * @param array $fields
+   *   Posted values of the form.
+   * @param array $errors
+   *   List of errors to be posted back to the form.
    *
    * @return array $errors@static
    */
@@ -113,10 +115,9 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
           $hasData[] = $instance;
           if (!empty($blockValues['is_primary'])) {
             $hasPrimary[] = $instance;
-            }
           }
         }
-
+      }
 
       if (empty($hasPrimary) && !empty($hasData)) {
         $errors["email[1][is_primary]"] = ts('One email should be marked as primary.');

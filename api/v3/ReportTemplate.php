@@ -51,7 +51,8 @@ function civicrm_api3_report_template_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_report_template_create_spec(&$params) {
   require_once 'api/v3/OptionValue.php';
@@ -67,7 +68,7 @@ function _civicrm_api3_report_template_create_spec(&$params) {
 /**
  * Deletes an existing ReportTemplate
  *
- * @param  array  $params
+ * @param array $params
  *
  * {@example ReportTemplateDelete.php 0}
  *
@@ -83,7 +84,8 @@ function civicrm_api3_report_template_delete($params) {
 /**
  * Retrieve rows from a report template
  *
- * @param  array  $params input parameters
+ * @param array $params
+ *   Input parameters.
  *
  * @return  array details of found instances
  * @access public
@@ -122,7 +124,7 @@ function _civicrm_api3_report_template_getrows($params) {
   $reportInstance->preProcess();
   $reportInstance->setDefaultValues(FALSE);
   $reportInstance->setParams(array_merge($reportInstance->getDefaultValues(), $params));
-  $options = _civicrm_api3_get_options_from_params($params, TRUE,'report_template','get');
+  $options = _civicrm_api3_get_options_from_params($params, TRUE, 'report_template', 'get');
   $reportInstance->setLimitValue($options['limit']);
   $reportInstance->setOffsetValue($options['offset']);
   $reportInstance->beginPostProcessCommon();
@@ -159,7 +161,8 @@ function civicrm_api3_report_template_getstatistics($params) {
 /**
  * Retrieve rows from a report template
  *
- * @param  array  $params input parameters
+ * @param array $params
+ *   Input parameters.
  *
  * @return  array details of found instances
  * @access public

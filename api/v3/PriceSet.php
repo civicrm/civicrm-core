@@ -38,7 +38,8 @@
 /**
  * Create or update a price_set
  *
- * @param array $params  Associative array of property
+ * @param array $params
+ *   Associative array of property.
  *                       name/value pairs to insert in new 'price_set'
  * @example PriceSetCreate.php Std Create example
  *
@@ -68,7 +69,8 @@ function civicrm_api3_price_set_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_price_set_create_spec(&$params) {
   $params['title']['api.required'] = TRUE;
@@ -77,7 +79,8 @@ function _civicrm_api3_price_set_create_spec(&$params) {
 /**
  * Returns array of price_sets  matching a set of one or more group properties
  *
- * @param array $params Array of one or more valid property_name=>value pairs. If $params is set
+ * @param array $params Array of one or more valid property_name=>value pairs. If $params
+ *   Is set.
  *  as null, all price_sets will be returned (default limit is 25)
  *
  * @return array  Array of matching price_sets
@@ -104,7 +107,8 @@ function civicrm_api3_price_set_get($params) {
  * This method is used to delete any existing price_set. id of the group
  * to be deleted is required field in $params array
  *
- * @param array $params array containing id of the group
+ * @param array $params
+ *   Array containing id of the group.
  *  to be deleted
  *
  * @return array API result array

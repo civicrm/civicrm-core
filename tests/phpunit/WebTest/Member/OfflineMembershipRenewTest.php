@@ -93,7 +93,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // save the renewed membership
     $this->click('_qf_MembershipRenewal_upload-bottom');
 
-
     // page was loaded
     $this->waitForTextPresent($sourceText);
 
@@ -118,7 +117,7 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
       'End date' => $endDate,
     );
     $this->webtestVerifyTabularData($verifyMembershipRenewData);
-   }
+  }
 
   public function testOfflineMemberRenewOverride() {
     $this->webtestLogin();
@@ -195,7 +194,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // save the renewed membership
     $this->click('_qf_MembershipRenewal_upload-bottom');
-
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -294,7 +292,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // save the renewed membership
     $this->click('_qf_MembershipRenewal_upload-bottom');
 
-
     // page was loaded
     $this->waitForTextPresent($sourceText);
 
@@ -381,7 +378,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.");
     $this->waitForText('crm-notification-container', "A membership confirmation and receipt has been sent to {$firstName}@memberson.com.");
 
-
     $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
     // click through to the Membership Renewal Link
     $this->click("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
@@ -410,7 +406,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // save the renewed membership
     $this->click('_qf_MembershipRenewal_upload-bottom');
-
 
     // page was loaded
     $this->waitForTextPresent($sourceText);

@@ -87,14 +87,14 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'url' => 'civicrm/profile/create',
           'qs' => 'gid=%%id%%&reset=1',
           'title' => ts('Use Profile-Create Mode'),
-          'fe' => true,
+          'fe' => TRUE,
         ),
         CRM_Core_Action::BASIC => array(
           'name' => ts('Use Profile-Listings Mode'),
           'url' => 'civicrm/profile',
           'qs' => 'gid=%%id%%&reset=1',
           'title' => ts('Use Profile-Listings Mode'),
-          'fe' => true,
+          'fe' => TRUE,
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
@@ -268,8 +268,10 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   /**
    * Edit uf group
    *
-   * @param int $id uf group id
-   * @param string $action the action to be invoked
+   * @param int $id
+   *   Uf group id.
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
    */
@@ -380,7 +382,8 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   /**
    * This function is for preview mode for ufoup
    *
-   * @param int $id uf group id
+   * @param int $id
+   *   Uf group id.
    *
    * @param $action
    *
@@ -468,6 +471,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
             $typeName = 'Activity';
             $valueLabels = CRM_Core_PseudoConstant::ActivityType(TRUE, TRUE, FALSE, 'label', TRUE);
             break;
+
           case 'CaseType':
             $typeName = 'Case';
             $valueLabels = CRM_Case_PseudoConstant::caseType();

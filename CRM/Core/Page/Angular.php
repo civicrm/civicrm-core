@@ -54,7 +54,7 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
       }
       if (!empty($module['js'])) {
         foreach ($module['js'] as $file) {
-          $res->addScriptFile($module['ext'], $file, self::DEFAULT_MODULE_WEIGHT  + (++$headOffset), 'html-header', TRUE);
+          $res->addScriptFile($module['ext'], $file, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), 'html-header', TRUE);
         }
       }
     }

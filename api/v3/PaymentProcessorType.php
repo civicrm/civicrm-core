@@ -44,7 +44,8 @@
 /**
  * create payment_processor type
  *
- * @param  array $params   Associative array of property name/value pairs to insert in new payment_processor type.
+ * @param array $params
+ *   Associative array of property name/value pairs to insert in new payment_processor type.
  *
  * @return Newly created PaymentProcessor_type object
  * {@getfields PaymentProcessorType_create}
@@ -71,7 +72,8 @@ function civicrm_api3_payment_processor_type_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_payment_processor_type_create_spec(&$params) {
   $params['billing_mode']['api.required'] = 1;
@@ -97,7 +99,7 @@ function civicrm_api3_payment_processor_type_get($params) {
 /**
  * Delete a payment_processor type delete
  *
- * @param  id of payment_processor type  $id
+ * @param id of payment_processor type $id
  *
  * @return array API Result Array
  * {@getfields PaymentProcessorType_delete}

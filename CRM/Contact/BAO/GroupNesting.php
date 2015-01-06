@@ -277,8 +277,10 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * Adds a new child group identified by $childGroupId to the group
    * identified by $groupId
    *
-   * @param int $parentID id of the group to add the child to
-   * @param int $childID id of the new child group
+   * @param int $parentID
+   *   Id of the group to add the child to.
+   * @param int $childID
+   *   Id of the new child group.
    *
    *
    * @return void
@@ -295,8 +297,10 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * identified by $groupId; does not delete child group, just the
    * association between the two
    *
-   * @param            $parentID         The id of the group to remove the child from
-   * @param            $childID          The id of the child group being removed
+   * @param $parentID
+   *   The id of the group to remove the child from.
+   * @param $childID
+   *   The id of the child group being removed.
    *
    * @return           void
    *
@@ -312,7 +316,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * identified by $groupId; does not delete child group, just the
    * association between the two
    *
-   * @param int $childID The id of the child group being removed
+   * @param int $childID
+   *   The id of the child group being removed.
    *
    * @return           void
    *
@@ -327,8 +332,10 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * Returns true if the association between parent and child is present,
    * false otherwise.
    *
-   * @param            $parentID         The parent id of the association
-   * @param            $childID          The child id of the association
+   * @param $parentID
+   *   The parent id of the association.
+   * @param $childID
+   *   The child id of the association.
    *
    * @return           boolean           True if association is found, false otherwise.
    *
@@ -347,7 +354,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * Returns true if if the given groupId has 1 or more child groups,
    * false otherwise.
    *
-   * @param            $groupId               The id of the group to check for child groups
+   * @param $groupId
+   *   The id of the group to check for child groups.
    *
    * @return           boolean                True if 1 or more child groups are found, false otherwise.
    *
@@ -367,7 +375,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * Returns true if the given groupId has 1 or more parent groups,
    * false otherwise.
    *
-   * @param            $groupId               The id of the group to check for parent groups
+   * @param $groupId
+   *   The id of the group to check for parent groups.
    *
    * @return           boolean                True if 1 or more parent groups are found, false otherwise.
    *
@@ -386,8 +395,10 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * Returns true if checkGroupId is a parent of one of the groups in
    * groupIds, false otherwise.
    *
-   * @param            $groupIds              Array of group ids (or one group id) to serve as the starting point
-   * @param            $checkGroupId         The group id to check if it is a parent of the $groupIds group(s)
+   * @param $groupIds
+   *   Array of group ids (or one group id) to serve as the starting point.
+   * @param $checkGroupId The group id to check if it is a parent of the $groupIds
+   *   Group(s).
    *
    * @return           boolean                True if $checkGroupId points to a group that is a parent of one of the $groupIds groups, false otherwise.
    *
@@ -416,8 +427,10 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * Returns true if checkGroupId is a child of one of the groups in
    * groupIds, false otherwise.
    *
-   * @param            $groupIds              Array of group ids (or one group id) to serve as the starting point
-   * @param            $checkGroupId         The group id to check if it is a child of the $groupIds group(s)
+   * @param $groupIds
+   *   Array of group ids (or one group id) to serve as the starting point.
+   * @param $checkGroupId The group id to check if it is a child of the $groupIds
+   *   Group(s).
    *
    * @return           boolean                True if $checkGroupId points to a group that is a child of one of the $groupIds groups, false otherwise.
    *
@@ -448,8 +461,10 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * Returns true if checkGroupId is an ancestor of one of the groups in
    * groupIds, false otherwise.
    *
-   * @param            $groupIds              Array of group ids (or one group id) to serve as the starting point
-   * @param            $checkGroupId         The group id to check if it is an ancestor of the $groupIds group(s)
+   * @param $groupIds
+   *   Array of group ids (or one group id) to serve as the starting point.
+   * @param $checkGroupId The group id to check if it is an ancestor of the $groupIds
+   *   Group(s).
    *
    * @return           boolean                True if $checkGroupId points to a group that is an ancestor of one of the $groupIds groups, false otherwise.
    *
@@ -487,8 +502,10 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * Returns true if checkGroupId is a descendent of one of the groups in
    * groupIds, false otherwise.
    *
-   * @param            $groupIds              Array of group ids (or one group id) to serve as the starting point
-   * @param            $checkGroupId         The group id to check if it is a descendent of the $groupIds group(s)
+   * @param $groupIds
+   *   Array of group ids (or one group id) to serve as the starting point.
+   * @param $checkGroupId The group id to check if it is a descendent of the $groupIds
+   *   Group(s).
    *
    * @return           boolean                True if $checkGroupId points to a group that is a descendent of one of the $groupIds groups, false otherwise.
    *
@@ -525,7 +542,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
   /**
    * Returns array of group ids of ancestor groups of the specified group.
    *
-   * @param             $groupIds             An array of valid group ids (passed by reference)
+   * @param $groupIds
+   *   An array of valid group ids (passed by reference).
    *
    * @param bool $includeSelf
    *
@@ -561,7 +579,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
   /**
    * Returns array of ancestor groups of the specified group.
    *
-   * @param             $groupIds     An array of valid group ids (passed by reference)
+   * @param $groupIds
+   *   An array of valid group ids (passed by reference).
    *
    * @param bool $includeSelf
    * @return \An $groupArray   List of ancestor groups@access public
@@ -575,7 +594,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
   /**
    * Returns array of group ids of child groups of the specified group.
    *
-   * @param             $groupIds     An array of valid group ids (passed by reference)
+   * @param $groupIds
+   *   An array of valid group ids (passed by reference).
    *
    * @return array $groupIdArray List of groupIds that represent the requested group and its children@access public
    */
@@ -596,7 +616,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
   /**
    * Returns array of group ids of parent groups of the specified group.
    *
-   * @param             $groupIds               An array of valid group ids (passed by reference)
+   * @param $groupIds
+   *   An array of valid group ids (passed by reference).
    *
    * @return array $groupIdArray         List of groupIds that represent the requested group and its parents@access public
    */
@@ -617,7 +638,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
   /**
    * Returns array of group ids of descendent groups of the specified group.
    *
-   * @param             $groupIds               An array of valid group ids (passed by reference)
+   * @param $groupIds
+   *   An array of valid group ids (passed by reference).
    *
    * @param bool $includeSelf
    * @return array $groupIdArray         List of groupIds that represent the requested group and its descendents@access public
@@ -650,7 +672,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
   /**
    * Returns array of descendent groups of the specified group.
    *
-   * @param             $groupIds     An array of valid group ids (passed by reference)
+   * @param $groupIds
+   *   An array of valid group ids (passed by reference).
    *
    * @param bool $includeSelf
    * @return \An $groupArray   List of descendent groups@access public
@@ -664,7 +687,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
   /**
    * Returns array of group ids of valid potential child groups of the specified group.
    *
-   * @param             $groupId              The group id to get valid potential children for
+   * @param $groupId
+   *   The group id to get valid potential children for.
    *
    * @return array $groupIdArray         List of groupIds that represent the valid potential children of the group@access public
    */

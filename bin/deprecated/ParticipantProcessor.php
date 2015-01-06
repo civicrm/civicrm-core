@@ -264,5 +264,3 @@ $obj = new CRM_ParticipantProcessor();
 echo "Updating..";
 $obj->updateParticipantStatus();
 echo "<br />Participant records updated. (Done)";
-
-

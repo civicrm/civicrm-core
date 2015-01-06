@@ -49,7 +49,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
       'Int' => 1,
       'Float' => 10.00,
       'Date' => '2008-06-24',
-      'Boolean' => True,
+      'Boolean' => TRUE,
       'StateProvince' => 'California',
       'Country' => 'US',
       'Link' => 'http://civicrm.org',
@@ -60,7 +60,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
         $this->assertEquals($valid, '2008-06-24', 'Checking type ' . $type . ' for returned CustomField Type.');
       }
       else {
-        $this->assertEquals($valid, true, 'Checking type ' . $type . ' for returned CustomField Type.');
+        $this->assertEquals($valid, TRUE, 'Checking type ' . $type . ' for returned CustomField Type.');
       }
     }
   }
