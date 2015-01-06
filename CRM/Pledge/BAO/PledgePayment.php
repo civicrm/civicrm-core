@@ -633,7 +633,8 @@ WHERE  civicrm_pledge.id = %2
    *
    * @static
    */
-  static function updatePledgePayments($pledgeId,
+  static function updatePledgePayments(
+    $pledgeId,
                                        $paymentStatusId,
                                        $paymentIds = NULL,
                                        $actualAmount = 0,
