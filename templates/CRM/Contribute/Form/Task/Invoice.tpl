@@ -58,7 +58,7 @@
 </table>
 
 <div class="spacer"></div>
-<div class="form-item">
+<div class="crm-submit-buttons">
   {$form.buttons.html}
 </div>
 
