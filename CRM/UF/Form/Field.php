@@ -609,9 +609,11 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   /**
    * Validation rule for subtype.
    *
-   * @param array $groupType contains all groupTypes.
+   * @param array $groupType
+   *   Contains all groupTypes.
    *
-   * @param  string  $fieldType type of field.
+   * @param string $fieldType
+   *   Type of field.
    *
    * @param array $errors
    *
@@ -652,10 +654,14 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   /**
    * Validation rule for custom data extends entity column values.
    *
-   * @param Object  $customField Custom field
-   * @param Integer $gid         Group Id.
-   * @param String  $fieldType   Group type of the field
-   * @param Array   $errors      Collect errors
+   * @param Object $customField
+   *   Custom field.
+   * @param int $gid
+   *   Group Id.
+   * @param string $fieldType
+   *   Group type of the field.
+   * @param array $errors
+   *   Collect errors.
    *
    * @return Array  list of errors to be posted back to the form
    * @static
@@ -697,10 +703,14 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   /**
    * Validation rule to prevent multiple fields of primary location type within the same communication type.
    *
-   * @param Array   $fields            Submitted fields
-   * @param String  $profileFieldName  Group Id.
-   * @param Array   $groupFields       List of fields already in the group
-   * @param Array   $errors            Collect errors
+   * @param array $fields
+   *   Submitted fields.
+   * @param string $profileFieldName
+   *   Group Id.
+   * @param array $groupFields
+   *   List of fields already in the group.
+   * @param array $errors
+   *   Collect errors.
    *
    * @static
    */
@@ -735,7 +745,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @param $files
    * @param $self

@@ -64,7 +64,8 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
   /**
    * Register entity schemas for use in the editor's palette
    *
-   * @param array $entityTypes strings, e.g. "IndividualModel", "ActivityModel"
+   * @param array $entityTypes
+   *   Strings, e.g. "IndividualModel", "ActivityModel".
    */
   public static function registerSchemas($entityTypes) {
     // TODO in cases where registerSchemas is called multiple times for same entity, be more efficient
@@ -86,7 +87,8 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
   /**
    * Get a list of Backbone-Form models
    *
-   * @param array $entityTypes model names ("IndividualModel")
+   * @param array $entityTypes
+   *   Model names ("IndividualModel").
    *
    * @throws CRM_Core_Exception
    * @return array; keys are model names ("IndividualModel") and values describe 'sections' and 'schema'
@@ -173,9 +175,12 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
    * FIXME: Move to somewhere more useful
    * FIXME: Do real mapping of "types"
    *
-   * @param string $extends entity type; note: "Individual" means "Individual|Contact"; "Household" means "Household|Contact"
-   * @param string $title a string to use in section headers
-   * @param array $availableFields list of fields that are allowed in profiles, e.g. $availableFields['my_field']['field_type']
+   * @param string $extends
+   *   Entity type; note: "Individual" means "Individual|Contact"; "Household" means "Household|Contact".
+   * @param string $title
+   *   A string to use in section headers.
+   * @param array $availableFields
+   *   List of fields that are allowed in profiles, e.g. $availableFields['my_field']['field_type'].
    * @return array with keys 'sections' and 'schema'
    * @see js/model/crm.core.js
    * @see js/model/crm.mappedcore.js
