@@ -65,7 +65,7 @@ class CRM_Core_BAO_CustomOption {
    *
    * @param int $fieldID
    *   Field whose options are needed.
-   * @param boolean $inactiveNeeded
+   * @param bool $inactiveNeededDo we need inactive options ?.
    *   Do we need inactive options ?.
    *
    * @return array $customOption all active options for fieldId
@@ -271,7 +271,8 @@ WHERE  id = %2";
           $query     = "
 UPDATE {$dao->tableName}
 SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
-          $queryParams = array(1 => array($oldString, 'String'),
+          $queryParams = array(
+          1 => array($oldString, 'String'),
             2 => array($newString, 'String'),
           );
           break;

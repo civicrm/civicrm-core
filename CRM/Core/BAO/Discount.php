@@ -50,7 +50,7 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * @return boolean
    * @static
    */
-  public static function del($entityId,$entityTable) {
+  public static function del($entityId, $entityTable) {
     // delete all discount records with the selected discounted id
     $discount = new CRM_Core_DAO_Discount( );
     $discount->entity_id    = $entityId;
@@ -84,7 +84,7 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * Determine whether the given table/id
    * has discount associated with it
    *
-   * @param integer $entityId
+   * @param int $entityIdEntity id to be searched.
    *   Entity id to be searched.
    * @param string $entityTable
    *   Entity table to be searched.

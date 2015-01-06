@@ -275,7 +275,6 @@ class CRM_Core_Menu {
 
     self::build($menuArray);
 
-
     $config = CRM_Core_Config::singleton();
 
     foreach ($menuArray as $path => $item) {
@@ -319,8 +318,11 @@ class CRM_Core_Menu {
         'title' => $item['title'],
         'desc' => CRM_Utils_Array::value('desc', $item),
         'id' => strtr($item['title'], array(
-          '(' => '_', ')' => '', ' ' => '',
-            ',' => '_', '/' => '_',
+          '(' => '_',
+      ')' => '',
+      ' ' => '',
+            ',' => '_',
+      '/' => '_',
           )
         ),
         'url' => CRM_Utils_System::url($path, $query,
@@ -421,7 +423,6 @@ class CRM_Core_Menu {
         }
       }
     }
-
 
     if (!$all) {
       // remove all collapsed menu items from the array
@@ -701,7 +702,7 @@ UNION (
     // Once we have another example of a 'cleanup' we should generalize the clause below so it grabs string
     // which follows upgrade/ and checks for existence of a function in Cleanup class.
     if ($path == 'civicrm/upgrade/cleanup425') {
-      $menuPath['page_callback'] = array('CRM_Upgrade_Page_Cleanup','cleanup425');
+      $menuPath['page_callback'] = array('CRM_Upgrade_Page_Cleanup', 'cleanup425');
       $menuPath['access_arguments'][0][] = 'administer CiviCRM';
       $menuPath['access_callback'] = array('CRM_Core_Permission', 'checkMenu');
     }

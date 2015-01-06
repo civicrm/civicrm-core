@@ -75,7 +75,6 @@ function smarty_function_sectionTotal($params, &$smarty) {
   // concatenate with pipes to build the right key
   $totalsKey = implode(CRM_Core_DAO::VALUE_SEPARATOR, $sectionValues);
 
-
   // return the corresponding total
   return $smarty->_tpl_vars['sectionTotals'][$totalsKey];
 }

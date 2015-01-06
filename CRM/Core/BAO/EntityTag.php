@@ -46,7 +46,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *   Name of the entity table usually 'civicrm_contact'.
    *
    * @return array(
-     ) reference $tag array of category id's the contact belongs to.
+  ) reference $tag array of category id's the contact belongs to.
    *
    * @static
    */
@@ -345,7 +345,8 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * Merge two tags: tag B into tag A.
    */
   public function mergeTags($tagAId, $tagBId) {
-    $queryParams = array(1 => array($tagBId, 'Integer'),
+    $queryParams = array(
+    1 => array($tagBId, 'Integer'),
       2 => array($tagAId, 'Integer'),
     );
 

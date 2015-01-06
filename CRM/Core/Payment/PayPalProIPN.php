@@ -218,7 +218,6 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
          recurring_payment_suspended_due_to_max_failed_payment  RP Profile Suspended due to Max Failed Payment
         */
 
-
     //set transaction type
     $txnType = $this->retrieve('txn_type', 'String');
     //Changes for paypal pro recurring payment
@@ -226,7 +225,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     $contributionStatuses = $contributionStatuses['values'];
     switch ($txnType) {
       case 'recurring_payment_profile_created':
-        if(in_array($recur->contribution_status_id, array(array_search('Pending',$contributionStatuses), array_search('In Progress',$contributionStatuses)))
+        if(in_array($recur->contribution_status_id, array(array_search('Pending', $contributionStatuses), array_search('In Progress', $contributionStatuses)))
         && !empty($recur->processor_id)) {
           echo "already handled";
           return;
@@ -311,7 +310,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       $objects['contribution'] = &$contribution;
     }
     // CRM-13737 - am not aware of any reason why payment_date would not be set - this if is a belt & braces
-    $objects['contribution']->receive_date = !empty($input['payment_date']) ? date('YmdHis', strtotime($input['payment_date'])): $now;
+    $objects['contribution']->receive_date = !empty($input['payment_date']) ? date('YmdHis', strtotime($input['payment_date'])) : $now;
 
     $this->single($input, $ids, $objects,
       TRUE, $first
@@ -427,7 +426,8 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
 INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contribution_id = %1
      WHERE m.contribution_recur_id = %2
      LIMIT 1";
-      $sqlParams = array(1 => array($ids['contribution'], 'Integer'),
+      $sqlParams = array(
+      1 => array($ids['contribution'], 'Integer'),
         2 => array($ids['contributionRecur'], 'Integer'),
       );
       if ($membershipId = CRM_Core_DAO::singleValueQuery($sql, $sqlParams)) {
@@ -518,15 +518,15 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
    * only contribute is handled
    */
   public function handlePaymentExpress() {
-   //@todo - loads of copy & paste / code duplication but as this not going into core need to try to
-   // keep discreet
-   // also note that a lot of the complexity above could be removed if we used
-   // http://stackoverflow.com/questions/4848227/validate-that-ipn-call-is-from-paypal
-   // as membership id etc can be derived by the load objects fn
+    //@todo - loads of copy & paste / code duplication but as this not going into core need to try to
+    // keep discreet
+    // also note that a lot of the complexity above could be removed if we used
+    // http://stackoverflow.com/questions/4848227/validate-that-ipn-call-is-from-paypal
+    // as membership id etc can be derived by the load objects fn
     $objects = $ids = $input = array();
     $isFirst = FALSE;
     $input['txnType']  = $this->retrieve('txn_type', 'String');
-    if($input['txnType']  != 'recurring_payment') {
+    if($input['txnType'] != 'recurring_payment') {
       throw new CRM_Core_Exception('Paypal IPNS not handled other than recurring_payments');
     }
     $input['invoice'] = self::getValue('i', FALSE);
@@ -538,12 +538,12 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     $contributionRecur = civicrm_api3('contribution_recur', 'getsingle', array('return' => 'contact_id, id', 'invoice_id' => $input['invoice']));
     $ids['contact'] = $contributionRecur['contact_id'];
     $ids['contributionRecur'] = $contributionRecur['id'];
-    $result = civicrm_api3('contribution', 'getsingle', array('invoice_id' => $input['invoice'], ));
+    $result = civicrm_api3('contribution', 'getsingle', array('invoice_id' => $input['invoice'] ));
 
     $ids['contribution'] = $result['id'];
     //@todo hard - coding 'pending' for now
     if($result['contribution_status_id'] == 2) {
-      $isFirst = True;
+      $isFirst = TRUE;
     }
     // arg api won't get this - fix it
     $ids['contributionPage'] = CRM_Core_DAO::singleValueQuery("SELECT contribution_page_id FROM civicrm_contribution WHERE invoice_id = %1", array(1 => array($ids['contribution'], 'Integer')));

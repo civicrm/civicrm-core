@@ -63,7 +63,8 @@ class CRM_Core_Block {
    * Class constructor
    *
    */
-  public function __construct() {}
+  public function __construct() {
+  }
 
   /**
    * Initialises the $_properties array
@@ -301,7 +302,8 @@ class CRM_Core_Block {
       case self::ADD:
         $defaultLocation = CRM_Core_BAO_LocationType::getDefault();
         $defaultPrimaryLocationId = $defaultLocation->id;
-        $values = array('postURL' => CRM_Utils_System::url('civicrm/contact/add', 'reset=1&ct=Individual'),
+        $values = array(
+        'postURL' => CRM_Utils_System::url('civicrm/contact/add', 'reset=1&ct=Individual'),
           'primaryLocationType' => $defaultPrimaryLocationId,
         );
 
@@ -315,11 +317,12 @@ class CRM_Core_Block {
         );
         break;
 
-        case self::LANGSWITCH:
+      case self::LANGSWITCH:
         // gives the currentPath without trailing empty lcMessages to be completed
         $values = array('queryString' => CRM_Utils_System::getLinksUrl('lcMessages', TRUE, FALSE, FALSE));
         self::setProperty(self::LANGSWITCH, 'templateValues', $values);
         break;
+
       case self::FULLTEXT_SEARCH:
         $urlArray = array(
           'fullTextSearchID' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue',
@@ -380,7 +383,8 @@ class CRM_Core_Block {
 
       // new email (select recipients)
       $shortCuts = array_merge($shortCuts, array(
-        array('path' => 'civicrm/activity/email/add',
+        array(
+      'path' => 'civicrm/activity/email/add',
             'query' => 'atype=3&action=add&reset=1&context=standalone',
             'ref' => 'new-email',
             'title' => ts('Email'),
@@ -388,7 +392,8 @@ class CRM_Core_Block {
 
       if (CRM_Core_Permission::check('edit groups')) {
         $shortCuts = array_merge($shortCuts, array(
-          array('path' => 'civicrm/group/add',
+          array(
+        'path' => 'civicrm/group/add',
               'query' => 'reset=1',
               'ref' => 'new-group',
               'title' => ts('Group'),
@@ -397,7 +402,8 @@ class CRM_Core_Block {
 
       if (CRM_Core_Permission::check('administer CiviCRM')) {
         $shortCuts = array_merge($shortCuts, array(
-          array('path' => 'civicrm/admin/tag',
+          array(
+        'path' => 'civicrm/admin/tag',
               'query' => 'reset=1&action=add',
               'ref' => 'new-tag',
               'title' => ts('Tag'),
@@ -464,7 +470,8 @@ class CRM_Core_Block {
     static $dashboardLinks = array();
     if (CRM_Core_Permission::check('access Contact Dashboard')) {
       $dashboardLinks = array(
-        array('path' => 'civicrm/user',
+        array(
+      'path' => 'civicrm/user',
           'query' => 'reset=1',
           'title' => ts('My Contact Dashboard'),
         ));
@@ -500,7 +507,8 @@ class CRM_Core_Block {
 
     if (!($shortCuts)) {
       $shortCuts = array(
-        array('path' => 'civicrm/mailing/send',
+        array(
+      'path' => 'civicrm/mailing/send',
           'query' => 'reset=1',
           'title' => ts('Send Mailing'),
         ),
@@ -591,7 +599,7 @@ class CRM_Core_Block {
       // do nothing
     }
     // require 'access CiviCRM' permissons, except for the language switch block
-    elseif (!CRM_Core_Permission::check('access CiviCRM') && $id!=self::LANGSWITCH) {
+    elseif (!CRM_Core_Permission::check('access CiviCRM') && $id != self::LANGSWITCH) {
       return NULL;
     }
     elseif ($id == self::ADD) {
@@ -635,7 +643,6 @@ class CRM_Core_Block {
     $block['content'] = self::fetch($id, self::getProperty($id, 'template'),
       self::getProperty($id, 'templateValues')
     );
-
 
     return $block;
   }

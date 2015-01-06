@@ -249,28 +249,28 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   public static function storeSessionToCache($names, $resetSession = TRUE) {
     foreach ($names as $key => $sessionName) {
       if (is_array($sessionName)) {
-        $value = null;
+        $value = NULL;
         if (!empty($_SESSION[$sessionName[0]][$sessionName[1]])) {
           $value = $_SESSION[$sessionName[0]][$sessionName[1]];
         }
         self::setItem($value, 'CiviCRM Session', "{$sessionName[0]}_{$sessionName[1]}");
-          if ($resetSession) {
-            $_SESSION[$sessionName[0]][$sessionName[1]] = NULL;
-            unset($_SESSION[$sessionName[0]][$sessionName[1]]);
-          }
+        if ($resetSession) {
+          $_SESSION[$sessionName[0]][$sessionName[1]] = NULL;
+          unset($_SESSION[$sessionName[0]][$sessionName[1]]);
         }
+      }
       else {
-        $value = null;
+        $value = NULL;
         if (!empty($_SESSION[$sessionName])) {
           $value = $_SESSION[$sessionName];
         }
         self::setItem($value, 'CiviCRM Session', $sessionName);
-          if ($resetSession) {
-            $_SESSION[$sessionName] = NULL;
-            unset($_SESSION[$sessionName]);
-          }
+        if ($resetSession) {
+          $_SESSION[$sessionName] = NULL;
+          unset($_SESSION[$sessionName]);
         }
       }
+    }
 
     self::cleanup();
   }
@@ -321,7 +321,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @return void
    * @static
    */
-  public static function cleanup($session = false, $table = false, $prevNext = false) {
+  public static function cleanup($session = FALSE, $table = FALSE, $prevNext = FALSE) {
     // clean up the session cache every $cacheCleanUpNumber probabilistically
     $cleanUpNumber = 757;
 
@@ -330,7 +330,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     $timeIntervalMins = 30;
 
     if (mt_rand(1, 100000) % $cleanUpNumber == 0) {
-      $session = $table = $prevNext = true;
+      $session = $table = $prevNext = TRUE;
     }
 
     if ( ! $session && ! $table && ! $prevNext ) {

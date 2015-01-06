@@ -419,7 +419,7 @@ class CRM_Core_BAO_CMSUser {
   /**
    * Check if a cms user already exists.
    *
-   * @param Array $contact
+   * @param array $contactArray of contact-details.
    *   Array of contact-details.
    *
    * @return uid if user exists, false otherwise

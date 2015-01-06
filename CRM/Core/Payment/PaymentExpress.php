@@ -195,7 +195,6 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
       );
     }
 
-
     /*
          * Build the private data string to pass to DPS, which they will give back to us with the
          *
@@ -207,7 +206,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
     $privateData = "a={$params['contactID']},b={$params['contributionID']},c={$params['contributionTypeID']},d={$params['invoiceID']}";
 
     if ($component == 'event') {
-    $merchantRef = substr($params['contactID'] . "-" . $params['contributionID'] . " " . substr($params['description'], 27, 20), 0, 24);
+      $merchantRef = substr($params['contactID'] . "-" . $params['contributionID'] . " " . substr($params['description'], 27, 20), 0, 24);
       $privateData .= ",f={$params['participantID']},g={$params['eventID']}";
     }
     elseif ($component == 'contribute') {
@@ -238,7 +237,6 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
     /*
          *  determine whether method is pxaccess or pxpay by whether signature (mac key) is defined
          */
-
 
     if (empty($this->_paymentProcessor['signature'])) {
       /*
@@ -277,7 +275,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
     }
     else {
       $processortype = "pxaccess";
-      require_once ('PaymentExpress/pxaccess.inc.php');
+      require_once 'PaymentExpress/pxaccess.inc.php';
       // URL
       $PxAccess_Url = $this->_paymentProcessor['url_site'];
       // User ID

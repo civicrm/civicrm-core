@@ -87,7 +87,7 @@ class CRM_Core_Smarty extends Smarty {
     parent::__construct();
   }
 
-  private function initialize( ) {
+  private function initialize() {
     $config = CRM_Core_Config::singleton();
 
     if (isset($config->customTemplateDir) && $config->customTemplateDir) {

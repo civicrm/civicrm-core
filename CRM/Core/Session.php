@@ -86,7 +86,7 @@ class CRM_Core_Session {
    * @return CRM_Core_Session
    */
   public function __construct() {
-    $this->_session = null;
+    $this->_session = NULL;
   }
 
   /**
@@ -125,7 +125,7 @@ class CRM_Core_Session {
         // FIXME: This belongs in CRM_Utils_System_*
         if ($config->userSystem->is_drupal && function_exists('drupal_session_start')) {
           // https://issues.civicrm.org/jira/browse/CRM-14356
-          if (! (isset($GLOBALS['lazy_session']) && $GLOBALS['lazy_session'] == true)) {
+          if (! (isset($GLOBALS['lazy_session']) && $GLOBALS['lazy_session'] == TRUE)) {
             drupal_session_start();
           }
           $_SESSION = array();
@@ -275,7 +275,7 @@ class CRM_Core_Session {
     $this->createScope($prefix, TRUE);
 
     if (empty($this->_session) || empty($this->_session[$this->_key])) {
-      return null;
+      return NULL;
     }
 
     if (empty($prefix)) {
@@ -283,7 +283,7 @@ class CRM_Core_Session {
     }
     else {
       if (empty($this->_session[$this->_key][$prefix])) {
-        return null;
+        return NULL;
       }
       $session =& $this->_session[$this->_key][$prefix];
     }
@@ -343,7 +343,7 @@ class CRM_Core_Session {
       $this->set($name, time(), 'timer');
       return $ts ? $ts : 'not set';
     }
-    return false;
+    return FALSE;
   }
 
   /**

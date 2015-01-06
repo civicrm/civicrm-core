@@ -114,7 +114,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @return WordReplacement array
    */
   public static function create($params) {
-    if(array_key_exists("domain_id",$params) === FALSE) {
+    if(array_key_exists("domain_id", $params) === FALSE) {
       $params["domain_id"] = CRM_Core_Config::domainID();
     }
     $wordReplacement = new CRM_Core_DAO_WordReplacement();
@@ -166,7 +166,7 @@ WHERE  domain_id = %1
     $overrides = array();
 
     while ($dao->fetch()) {
-      if ($dao->is_active==1) {
+      if ($dao->is_active == 1) {
         $overrides['enabled'][$dao->match_type][$dao->find_word] = $dao->replace_word;
       }
       else {
@@ -248,9 +248,9 @@ WHERE  domain_id = %1
           $wordMatchArray = array();
           // Traverse Language array
           foreach ($localeCustomArray as $localCustomData) {
-          // Traverse status array "enabled" "disabled"
+            // Traverse status array "enabled" "disabled"
             foreach ($localCustomData as $status => $matchTypes) {
-              $params["is_active"] = ($status == "enabled")?TRUE:FALSE;
+              $params["is_active"] = ($status == "enabled") ? TRUE : FALSE;
               // Traverse Match Type array "wildcardMatch" "exactMatch"
               foreach ($matchTypes as $matchType => $words) {
                 $params["match_type"] = $matchType;

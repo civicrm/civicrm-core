@@ -517,13 +517,13 @@ class CRM_Core_BAO_Block {
     uasort($locations, 'self::primaryComparison');
   }
 
-/**
- * compare 2 locations to see which should go first based on is_primary
- * (sort function for sortPrimaryFirst)
- * @param array $location1
- * @param array $location2
- * @return number
- */
+  /**
+   * compare 2 locations to see which should go first based on is_primary
+   * (sort function for sortPrimaryFirst)
+   * @param array $location1
+   * @param array $location2
+   * @return number
+   */
   public static function primaryComparison($location1, $location2){
     $l1 = CRM_Utils_Array::value('is_primary', $location1);
     $l2 = CRM_Utils_Array::value('is_primary', $location2);

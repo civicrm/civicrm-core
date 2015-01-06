@@ -225,8 +225,8 @@ class CRM_Core_StateMachine {
    */
   public function &getState($name) {
     if (isset($this->_states[$name])) {
-    return $this->_states[$name];
-  }
+      return $this->_states[$name];
+    }
 
     /*
      * This is a gross hack for ajax driven requests where
@@ -239,7 +239,7 @@ class CRM_Core_StateMachine {
       }
     }
 
-    return null;
+    return NULL;
   }
 
   /**
@@ -395,6 +395,6 @@ class CRM_Core_StateMachine {
    */
   public function shouldReset() {
     return TRUE;
-}
+  }
 
 }

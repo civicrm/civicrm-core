@@ -498,7 +498,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       if ($count > 1) {
         foreach (array(
           'state', 'state_name', 'country', 'world_region') as $fld) {
-          if (isset($address->$fld))unset($address->$fld);
+          if (isset($address->$fld)) { unset($address->$fld);
+          }
         }
       }
       $stree = $address->street_address;
@@ -1024,20 +1025,20 @@ SELECT is_primary,
         if ($count > 2) {
           break;
         }
-          if(count($first_names) == 1){
-            $family = $first_names[current(array_keys($first_names))]['addressee_display'];
-          }
-          else {
-            // collapse the tree to summarize
-            $family = trim(implode(" & ", array_keys($first_names)) . " " . $last_name);
-          }
-          if ($count) {
-            $processedNames .= "\n" . $family;
-          }
-          else {
-            // build display_name string
-            $processedNames = $family;
-          }
+        if(count($first_names) == 1){
+          $family = $first_names[current(array_keys($first_names))]['addressee_display'];
+        }
+        else {
+          // collapse the tree to summarize
+          $family = trim(implode(" & ", array_keys($first_names)) . " " . $last_name);
+        }
+        if ($count) {
+          $processedNames .= "\n" . $family;
+        }
+        else {
+          // build display_name string
+          $processedNames = $family;
+        }
         $count++;
       }
       $rows[$data['ID']]['addressee'] = $rows[$data['ID']]['addressee_display'] = $rows[$data['ID']]['display_name'] = $processedNames;
@@ -1223,6 +1224,7 @@ SELECT is_primary,
           $params['condition'] = 'country_id IN (' . implode(',', (array) $props['country_id']) . ')';
         }
         break;
+
       // Filter country list based on site defaults
       case 'country_id':
         if ($context != 'get' && $context != 'validate') {
@@ -1232,16 +1234,19 @@ SELECT is_primary,
           }
         }
         break;
+
       // Filter county list based on chosen state
       case 'county_id':
         if (!empty($props['state_province_id'])) {
           $params['condition'] = 'state_province_id IN (' . implode(',', (array) $props['state_province_id']) . ')';
         }
         break;
+
       // Not a real field in this entity
       case 'world_region':
         return CRM_Core_PseudoConstant::worldRegion();
-        break;
+
+      break;
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }

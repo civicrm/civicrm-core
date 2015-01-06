@@ -87,8 +87,9 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       elseif (array_key_exists($type, $validSubTypes)) {
         $cType = CRM_Utils_Array::value('parent', $validSubTypes[$type]);
       }
-      if ($cType)
+      if ($cType) {
         break;
+      }
     }
 
     return $cType;
@@ -241,7 +242,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         if ($considerSelector) {
           // drop the fields not meant for the selector
           foreach ($subset as $name => $field) {
-            if (!$field['in_selector']) unset($subset[$name]);
+            if (!$field['in_selector']) { unset($subset[$name]);
+            }
           }
         }
         $fields = array_merge($fields, $subset);
@@ -990,7 +992,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
 
       // Create a unique, non-empty index for each field.
       $index = $field['title'];
-      if ($index === '') $index = ' ';
+      if ($index === '') { $index = ' ';
+      }
       while (array_key_exists($index, $values)) {
         $index .= ' ';
       }
@@ -1695,7 +1698,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                               WHERE civicrm_uf_join.module = %2';
       $p[2] = array($moduleName, 'String');
     }
-
 
     // add permissioning for profiles only if not registration
     if (!$skipPermission) {
@@ -3013,7 +3015,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $loc++;
       $data['location'][$loc]['email'][$loc]['email'] = $primaryEmail;
     }
-
 
     return $data;
   }

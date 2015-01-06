@@ -82,6 +82,7 @@ class CRM_Core_Page_AJAX {
           $wrapper->run($className);
         }
         break;
+
       default:
         CRM_Core_Error::debug_log_message('Unsupported inline request type: ' . var_export($type, TRUE));
     }
@@ -105,7 +106,7 @@ class CRM_Core_Page_AJAX {
     // return false if $id is null and
     // $context is not civicrm_event or civicrm_contribution_page
     if (!$id || !in_array($context, array('civicrm_event', 'civicrm_contribution_page'))) {
-      return false;
+      return FALSE;
     }
     $priceSetId = CRM_Price_BAO_PriceSet::getFor($context, $id, NULL);
     if ($priceSetId) {
@@ -122,7 +123,7 @@ class CRM_Core_Page_AJAX {
       }
     }
     if (!$result) {
-      $priceSetId = null;
+      $priceSetId = NULL;
     }
     CRM_Utils_JSON::output($priceSetId);
   }
@@ -139,7 +140,7 @@ class CRM_Core_Page_AJAX {
    *
    * @return bool
    */
-  public static function checkAuthz($type, $className, $fnName = null) {
+  public static function checkAuthz($type, $className, $fnName = NULL) {
     switch ($type) {
       case 'method':
         if (!preg_match('/^CRM_[a-zA-Z0-9]+_Page_AJAX$/', $className)) {
@@ -159,6 +160,7 @@ class CRM_Core_Page_AJAX {
           return FALSE;
         }
         return class_exists($className);
+
       default:
         return FALSE;
     }
@@ -203,7 +205,7 @@ class CRM_Core_Page_AJAX {
    */
   public static function setJsHeaders() {
     // Encourage browsers to cache for a long time - 1 year
-    $year = 60*60*24*364;
+    $year = 60 * 60 * 24 * 364;
     header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + $year));
     header('Content-Type:	application/javascript');
     header("Cache-Control: max-age=$year, public");
@@ -219,7 +221,7 @@ class CRM_Core_Page_AJAX {
    *   Array key to use as the key.
    * @deprecated
    */
-  public static function autocompleteResults($results, $val='label', $key='id') {
+  public static function autocompleteResults($results, $val = 'label', $key = 'id') {
     $output = array();
     if (is_array($results)) {
       foreach ($results as $k => $v) {

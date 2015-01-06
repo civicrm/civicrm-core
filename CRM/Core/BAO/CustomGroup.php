@@ -243,7 +243,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *
    * @param int $id
    *   Id of the database record.
-   * @param boolean $is_active
+   * @param bool $is_activeValue we want to set the is_active field.
    *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on sucess, null otherwise
@@ -1120,6 +1120,7 @@ ORDER BY civicrm_custom_group.weight,
       case 'Group':
         $tableName = 'civicrm_group';
         break;
+
       // DRAFTING: Verify if we cannot make it pluggable
 
       case 'Activity':
@@ -1145,6 +1146,7 @@ ORDER BY civicrm_custom_group.weight,
       case 'Grant':
         $tableName = 'civicrm_grant';
         break;
+
       // need to add cases for Location, Address
     }
 
@@ -1453,7 +1455,6 @@ ORDER BY civicrm_custom_group.weight,
             $v = $val;
           }
         }
-
 
         if (!isset($groupTree[$groupID]['fields'][$fieldId]['customValue'])) {
           // field exists in db so populate value from "form".
@@ -2080,8 +2081,8 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
           $retValue = $value;
           break;
         }
-      // note that if its not text / textarea, the code falls thru and executes
-      // the below case also
+        // note that if its not text / textarea, the code falls thru and executes
+        // the below case also
       case 'StateProvince':
       case 'Country':
         $options = array();
@@ -2310,8 +2311,8 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
           }
 
           list($className) = explode('::', $callback);
-          require_once(str_replace('_', DIRECTORY_SEPARATOR, $className) .
-            '.php');
+          require_once str_replace('_', DIRECTORY_SEPARATOR, $className) .
+            '.php';
 
           $objTypes[$ovValues['value']] = call_user_func_array($callback, $args);
         }
