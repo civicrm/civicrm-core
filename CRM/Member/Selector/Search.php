@@ -147,7 +147,8 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    * @return \CRM_Member_Selector_Search
   @access public
    */
-  function __construct(&$queryParams,
+  function __construct(
+    &$queryParams,
     $action = CRM_Core_Action::NONE,
     $memberClause = NULL,
     $single = FALSE,
@@ -194,7 +195,8 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    * @return array
    */
   static
-  function &links($status = 'all',
+  function &links(
+    $status = 'all',
     $isPaymentProcessor = NULL,
     $accessContribution = NULL,
     $qfKey = NULL,

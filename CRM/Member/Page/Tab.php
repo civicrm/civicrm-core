@@ -464,7 +464,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * @return array (reference) of action links
    * @static
    */
-  static function &links($status = 'all',
+  static function &links(
+    $status = 'all',
                          $isPaymentProcessor = NULL,
                          $accessContribution = NULL,
                          $isCancelSupported = FALSE,

@@ -392,7 +392,8 @@ class CRM_Member_BAO_Query {
    *
    * @return array|null
    */
-  static function defaultReturnProperties($mode,
+  static function defaultReturnProperties(
+    $mode,
     $includeCustomFields = TRUE
   ) {
     $properties = NULL;
