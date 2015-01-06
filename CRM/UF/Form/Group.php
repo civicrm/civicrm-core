@@ -139,7 +139,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     $this->add('text', 'title', ts('Profile Name'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'title'), TRUE);
     $this->add('textarea', 'description', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'description'));
 
-
     //add checkboxes
     $uf_group_type = array();
     $UFGroupType = CRM_Core_SelectValues::ufGroupTypes();
@@ -299,8 +298,9 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     $name = CRM_Utils_String::munge($title, '_', 56);
     $name .= $self->_id ? '_' . $self->_id : '';
     $query = 'select count(*) from civicrm_uf_group where ( name like %1 ) and id != %2';
-    $pCnt = CRM_Core_DAO::singleValueQuery($query, array(1 => array($name, 'String'),
-        2 => array((int)$self->_id, 'Integer'),
+    $pCnt = CRM_Core_DAO::singleValueQuery($query, array(
+    1 => array($name, 'String'),
+        2 => array((int) $self->_id, 'Integer'),
       ));
     if ($pCnt) {
       $errors['title'] = ts('Profile \'%1\' already exists in Database.', array(1 => $title));
