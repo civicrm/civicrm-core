@@ -960,18 +960,7 @@ SELECT is_primary,
 
   /**
    * Merge contacts with the Same address to get one shared label
-   * @param array $rows - array
-   * format to pass
-   * Array
-    (
-      [103] => Array
-      (
-          [contact_type] => Individual
-          [display_name] => Mr. Angelika Adams
-          [first_name] => Angelika
-          [last_name] => Adams
-      )
-    )
+   * @param array $rows - array[contact_id][contactDetails]
    */
   public static function mergeSameAddress(&$rows) {
     $uniqueAddress = array();
