@@ -43,7 +43,7 @@ function relationship_create_expectedresult(){
           'id' => '1',
           'contact_id_a' => '31',
           'contact_id_b' => '33',
-          'relationship_type_id' => '18',
+          'relationship_type_id' => '18_a_b',
           'start_date' => '2013-07-29 00:00:00',
           'end_date' => '2013-08-04 00:00:00',
           'is_active' => '1',
