@@ -44,9 +44,9 @@ class CRM_Report_BAO_HookInterface {
    *
    * @return null
    */
-public function alterLogTables(&$reportObj, &$logTables) {
-  return NULL;
-}
+  public function alterLogTables(&$reportObj, &$logTables) {
+    return NULL;
+  }
 
   /**
    * @param $reportObj
@@ -54,7 +54,7 @@ public function alterLogTables(&$reportObj, &$logTables) {
    *
    * @return array
    */
-   public function logDiffClause(&$reportObj, $table) {
+  public function logDiffClause(&$reportObj, $table) {
     return array();
-}
+  }
 }
