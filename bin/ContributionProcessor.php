@@ -283,9 +283,10 @@ class CiviContributeProcessor {
         }
 
         foreach ($response[1][$response[0]]['notifications']['charge-amount-notification']
-          as $amtData
+ as $amtData
         ) {
-          $searchParams = array('order-numbers' => array($amtData['google-order-number']['VALUE']),
+          $searchParams = array(
+          'order-numbers' => array($amtData['google-order-number']['VALUE']),
             'notification-types' => array('risk-information', 'new-order', 'charge-amount'),
           );
           $response = CRM_Core_Payment_Google::invokeAPI($paymentProcessor,
@@ -434,4 +435,3 @@ else {
 $lock->release();
 
 echo "Done processing<p>";
-
