@@ -162,9 +162,11 @@ class CRM_Core_ClassLoader {
       $file = strtr($class, '_', '/') . '.php';
       // There is some question about the best way to do this.
       // "require_once" is nice because it's simple and throws
-      // intelligible errors.  The down side is that autoloaders
-      // down the chain cannot try to find the file if we fail.
-      require_once $file;
+      // intelligible errors.
+      if (FALSE != stream_resolve_include_path($file)) {
+        require_once $file;
+      }
     }
   }
+
 }
