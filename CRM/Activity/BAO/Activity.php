@@ -1738,7 +1738,7 @@ WHERE  contact_id = $contactId
       if ($dao->record_type_id == $targetID) {
         $activities[$dao->activity_id]['targets'][$contactId] = $contactId;
       }
-      else if ($dao->record_type_id == $assigneeID) {
+      elseif ($dao->record_type_id == $assigneeID) {
         $activities[$dao->activity_id]['asignees'][$contactId] = $contactId;
       }
       else {

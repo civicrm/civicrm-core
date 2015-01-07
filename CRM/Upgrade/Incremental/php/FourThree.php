@@ -1147,7 +1147,7 @@ AND cli.entity_table = 'civicrm_contribution' AND cli.id IN (" . implode(',', $v
               $formValues[$value]['financial_type_id'] = $formValues[$value]['contribution_type_id'];
               unset($formValues[$value]['contribution_type_id']);
             }
-            else if (array_key_exists('contribution_type', $formValues[$value])) {
+            elseif (array_key_exists('contribution_type', $formValues[$value])) {
               $formValues[$value]['financial_type'] = $formValues[$value]['contribution_type'];
               unset($formValues[$value]['contribution_type']);
             }

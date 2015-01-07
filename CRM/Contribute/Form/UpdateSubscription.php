@@ -309,7 +309,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     if ( $userID && $status) {
       CRM_Core_Session::setStatus($status, $msgTitle, $msgType);
     }
-    else if (!$userID) {
+    elseif (!$userID) {
       if ($status)
         CRM_Utils_System::setUFMessage($status);
       // keep result as 1, since we not displaying anything on the redirected page anyway

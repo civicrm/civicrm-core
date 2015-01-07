@@ -256,7 +256,7 @@ class CRM_Core_Form_RecurringEntity {
           if (empty($values['start_action_offset'])) {
             $errors['start_action_offset'] = ts('This is a required field');
           }
-          else if ($values['start_action_offset'] > 30) {
+          elseif ($values['start_action_offset'] > 30) {
             $errors['start_action_offset'] = ts('Occurrences should be less than or equal to 30');
           }
         }

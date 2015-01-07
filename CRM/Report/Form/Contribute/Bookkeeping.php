@@ -384,7 +384,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
               ELSE  financial_account_civireport_credit_2.accounting_code
               END";
           }
-          else if ($fieldName == 'credit_name') {
+          elseif ($fieldName == 'credit_name') {
             $field['dbAlias'] = "CASE
               WHEN financial_trxn_civireport.from_financial_account_id IS NOT NULL
               THEN  financial_account_civireport_credit_1.id

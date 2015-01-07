@@ -593,7 +593,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     ) {
       $tempQuery = "(SELECT * FROM civireport_contribution_detail_temp1)";
     }
-    else if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
+    elseif (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
       'soft_credits_only'
     ) {
       $tempQuery = "(SELECT * FROM civireport_contribution_detail_temp2)";
@@ -890,7 +890,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
         ) {
           $title = '%1 contributions: %2';
         }
-        else if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
+        elseif (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
           'soft_credits_only'
         ) {
           $title = '%1 soft-credits: %2';

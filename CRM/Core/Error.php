@@ -609,7 +609,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       if ( CIVICRM_DEBUG_LOG_QUERY == 'backtrace' ) {
         CRM_Core_Error::backtrace( $string, TRUE );
       }
-      else if ( CIVICRM_DEBUG_LOG_QUERY ) {
+      elseif ( CIVICRM_DEBUG_LOG_QUERY ) {
         CRM_Core_Error::debug_var( 'Query', $string, FALSE, TRUE );
       }
     }

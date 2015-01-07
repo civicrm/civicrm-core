@@ -771,7 +771,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       if ($this->_currentUserID) {
         $this->_isAddCaptcha = FALSE;
       }
-      else if (!$this->_isAddCaptcha && !empty($addCaptcha)) {
+      elseif (!$this->_isAddCaptcha && !empty($addCaptcha)) {
         $this->_isAddCaptcha = TRUE;
       }
 

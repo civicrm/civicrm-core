@@ -353,7 +353,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         if ($context == 'advanced') {
           $url = CRM_Utils_System::url('civicrm/contact/search/advanced', $extraParams);
         }
-        else if ($searchContext) {
+        elseif ($searchContext) {
           $url = CRM_Utils_System::url("civicrm/$searchContext/search", $extraParams);
         }
         else {

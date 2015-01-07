@@ -236,7 +236,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       // get params by ID
       $this->schedule = $this->getScheduleParams($this->scheduleId);
     }
-    else if (!empty($this->scheduleFormValues)) {
+    elseif (!empty($this->scheduleFormValues)) {
       $this->schedule = $this->mapFormValuesToDB($this->scheduleFormValues);
     }
 
@@ -435,7 +435,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     if ($mode == '1') { // MODE = SINGLE
       $query .= " AND entity_id = %3";
     }
-    else if ($mode == '2') { // MODE = FUTURE
+    elseif ($mode == '2') { // MODE = FUTURE
       $recurringEntityID = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_recurring_entity WHERE entity_id = %3 AND entity_table = %2", $queryParams);
       if ($recurringEntityID) {
         $query .= $includeParent ? " AND id >= %4" : " AND id > %4";
@@ -1018,7 +1018,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
           $concatStartActionDateBits = $startActionDate1.strtoupper(substr($startActionDate[1], 0, 2));
           $r->byday(array($concatStartActionDateBits));
         }
-        else if ($scheduleReminderDetails['limit_to']) {
+        elseif ($scheduleReminderDetails['limit_to']) {
           $r->bymonthday(array($scheduleReminderDetails['limit_to']));
         }
       }

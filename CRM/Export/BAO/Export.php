@@ -235,7 +235,7 @@ class CRM_Export_BAO_Export {
           if ($fieldName == 'event_id') {
             $returnProperties['event_id'] = 1;
           }
-          else if (
+          elseif (
             $exportMode == CRM_Export_Form_Select::EVENT_EXPORT &&
             array_key_exists($fieldName, self::componentPaymentFields())
           ) {

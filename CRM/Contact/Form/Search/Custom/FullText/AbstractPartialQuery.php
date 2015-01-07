@@ -152,7 +152,7 @@ $sqlStatement
             CRM_Core_DAO::executeQuery($sql);
           }
         }
-        else if ($tableName == 'file') {
+        elseif ($tableName == 'file') {
           $searcher = CRM_Core_BAO_File::getSearchService();
           if (!($searcher && CRM_Core_Permission::check('access uploaded files'))) {
             continue;

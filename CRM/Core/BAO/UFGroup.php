@@ -2159,7 +2159,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->add('select', $name, $title,
         array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(), $required);
     }
-    else if ($fieldName == 'financial_type') {
+    elseif ($fieldName == 'financial_type') {
       $form->add('select', $name, $title,
         array(
           '' => ts('- select -')

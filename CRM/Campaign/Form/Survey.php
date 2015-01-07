@@ -158,7 +158,7 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
       if ($this->controller->getButtonName('submit') == "_qf_{$className}_upload_done") {
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey'));
       }
-      else if ($this->controller->getButtonName('submit') == "_qf_{$className}_upload_next") {
+      elseif ($this->controller->getButtonName('submit') == "_qf_{$className}_upload_next") {
         $subPage = CRM_Campaign_Form_Survey_TabHeader::getNextTab($this);
         CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/survey/configure/{$subPage}",
                                                          "action=update&reset=1&id={$this->_surveyId}"));
