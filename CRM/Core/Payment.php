@@ -125,7 +125,7 @@ abstract class CRM_Core_Payment {
       }
 
       //load the object.
-      self::$_singleton[$cacheKey] = $paymentClass::singleton($mode, $paymentProcessor);
+      self::$_singleton[$cacheKey] = new $paymentClass($mode, $paymentProcessor);
     }
 
     //load the payment form for required processor.
