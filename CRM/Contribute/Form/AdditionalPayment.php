@@ -692,7 +692,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       'groupName' => 'msg_tpl_workflow_contribution',
       'valueName' => 'payment_or_refund_notification',
       'contactId' => $this->_contactId,
-      'PDFFilename' => ts('notification').'.pdf',
+      'PDFFilename' => ts('notification') . '.pdf',
     );
 
     // try to send emails only if email id is present

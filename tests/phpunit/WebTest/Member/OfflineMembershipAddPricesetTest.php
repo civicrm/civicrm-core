@@ -108,19 +108,19 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->select('html_type', "value={$fields[1]}");
     $options = array(
       1 => array(
-    'label' => $memTypeTitle1."_1",
+    'label' => $memTypeTitle1 . "_1",
          'membership_type_id' => $memTypeId1,
          'amount' => 50.00,
          'membership_num_terms' => 1,
       ),
       2 => array(
-        'label' => $memTypeTitle1."_2",
+        'label' => $memTypeTitle1 . "_2",
         'membership_type_id' => $memTypeId1,
         'amount' => 90.00,
         'membership_num_terms' => 2,
       ),
       3 => array(
-        'label' => $memTypeTitle1."_3",
+        'label' => $memTypeTitle1 . "_3",
         'membership_type_id' => $memTypeId1,
         'amount' => 120.00,
         'membership_num_terms' => 3,

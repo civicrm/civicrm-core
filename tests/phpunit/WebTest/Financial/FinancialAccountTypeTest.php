@@ -41,7 +41,7 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     //Add new Financial Type
-    $financialType['name'] = 'FinancialType '.substr(sha1(rand()), 0, 4);
+    $financialType['name'] = 'FinancialType ' . substr(sha1(rand()), 0, 4);
     $financialType['is_deductible'] = TRUE;
     $financialType['is_reserved'] = FALSE;
     $this->addeditFinancialType($financialType);
@@ -92,7 +92,7 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
 
     //edit financial type
     $financialType['oldname'] = $financialType['name'];
-    $financialType['name'] = 'Edited FinancialType '.substr(sha1(rand()), 0, 4);
+    $financialType['name'] = 'Edited FinancialType ' . substr(sha1(rand()), 0, 4);
     $financialType['is_deductible'] = TRUE;
     $financialType['is_reserved'] = FALSE;
     $this->addeditFinancialType($financialType, 'Edit');

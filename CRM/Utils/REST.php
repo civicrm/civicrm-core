@@ -480,7 +480,7 @@ class CRM_Utils_REST {
     $entity = _civicrm_api_get_camel_name($request[2]);
     $tplfile = _civicrm_api_get_camel_name($request[3]);
 
-    $tpl = 'CRM/'.$entity.'/Page/Inline/'.$tplfile.'.tpl';
+    $tpl = 'CRM/' . $entity . '/Page/Inline/' . $tplfile . '.tpl';
     $smarty = CRM_Core_Smarty::singleton();
     CRM_Utils_System::setTitle("$entity::$tplfile inline $tpl");
     if (!$smarty->template_exists($tpl)) {

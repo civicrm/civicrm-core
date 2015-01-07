@@ -711,10 +711,10 @@ class CRM_Utils_String {
     $offset = floor(($len - $maskCount) / 2);
 
     $masked = substr($user, 0, $offset)
-      .str_repeat($maskChar, $maskCount)
-      .substr($user, $maskCount + $offset);
+       . str_repeat($maskChar, $maskCount)
+       . substr($user, $maskCount + $offset);
 
-    return ($masked.'@'.$domain);
+    return ($masked . '@' . $domain);
   }
 
   /**

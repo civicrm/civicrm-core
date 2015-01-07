@@ -204,7 +204,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
     $this->waitForElementPresent('_qf_Contact_cancel-bottom');
     //fill in first name
-    $firstName = "Anderson".substr(sha1(rand()), 0, 4);
+    $firstName = "Anderson" . substr(sha1(rand()), 0, 4);
     $this->type('first_name', $firstName);
 
     //fill in last name
@@ -226,7 +226,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
     $this->waitForElementPresent('_qf_Contact_cancel-bottom');
 
-    $fName = "John".substr(sha1(rand()), 0, 4);
+    $fName = "John" . substr(sha1(rand()), 0, 4);
     $this->type('first_name', $fName);
     $lName = substr(sha1(rand()), 0, 4);
     $this->type('last_name', $lName);
@@ -504,9 +504,9 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // add contact1 and its duplicate
     //first name
-    $firstName = "Kerry".substr(sha1(rand()), 0, 7);
+    $firstName = "Kerry" . substr(sha1(rand()), 0, 7);
     //last name
-    $lastName = "King".substr(sha1(rand()), 0, 7);
+    $lastName = "King" . substr(sha1(rand()), 0, 7);
     $this->_createContacts($firstName, $lastName);
 
     //add contact2 and its duplicate
@@ -514,11 +514,11 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     //fill in first name
-    $firstName1 = "Kurt".substr(sha1(rand()), 0, 7);
+    $firstName1 = "Kurt" . substr(sha1(rand()), 0, 7);
     $this->type('first_name', $firstName1);
 
     //fill in last name
-    $lastName1 = "Cobain".substr(sha1(rand()), 0, 7);
+    $lastName1 = "Cobain" . substr(sha1(rand()), 0, 7);
     $this->type('last_name', $lastName1);
 
     //fill in email id
@@ -576,16 +576,16 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // add contact3 and its duplicate
     //fill in first name
-    $firstName2 = "David".substr(sha1(rand()), 0, 7);
+    $firstName2 = "David" . substr(sha1(rand()), 0, 7);
     //fill in last name
-    $lastName2 = "Gilmour".substr(sha1(rand()), 0, 7);
+    $lastName2 = "Gilmour" . substr(sha1(rand()), 0, 7);
     $this->_createContacts($firstName2, $lastName2);
 
     // add contact4 and its duplicate
     //fill in first name
-    $firstName3 = "Dave".substr(sha1(rand()), 0, 7);
+    $firstName3 = "Dave" . substr(sha1(rand()), 0, 7);
     //fill in last name
-    $lastName3 = "Mustaine".substr(sha1(rand()), 0, 7);
+    $lastName3 = "Mustaine" . substr(sha1(rand()), 0, 7);
     $this->_createContacts($firstName3, $lastName3);
 
     // Find and Merge Contacts with Supervised Rule
@@ -765,7 +765,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // build organisation name
-    $orgnaizationName = 'org_'.substr(sha1(rand()), 0, 7);
+    $orgnaizationName = 'org_' . substr(sha1(rand()), 0, 7);
 
     $contactIds = array();
     // create organization and its duplicate

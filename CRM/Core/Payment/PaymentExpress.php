@@ -224,7 +224,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
       'MerchantReference' => $merchantRef,
       'TxnData1' => $params['qfKey'],
       'TxnData2' => $privateData,
-      'TxnData3' => $component . ",".$this->_paymentProcessor['id'],
+      'TxnData3' => $component . "," . $this->_paymentProcessor['id'],
       'TxnType' => 'Purchase',
       // Leave this empty for now, causes an error with DPS if we populate it
       'TxnId' => '',

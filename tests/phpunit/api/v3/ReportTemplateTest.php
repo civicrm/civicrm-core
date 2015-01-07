@@ -195,7 +195,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
         $reportTemplates[] = array($report['value']);
       }
       else {
-        $reportTemplates[] = array($report['value']. " has existing issues :  " . $reportsToSkip[$report['value']]);
+        $reportTemplates[] = array($report['value'] .  " has existing issues :  " . $reportsToSkip[$report['value']]);
       }
     }
 

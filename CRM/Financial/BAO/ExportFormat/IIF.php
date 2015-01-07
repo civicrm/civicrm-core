@@ -82,8 +82,8 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
    */
   public function putFile($out) {
     $config = CRM_Core_Config::singleton();
-    $fileName = $config->uploadDir.'Financial_Transactions_'.$this->_batchIds.'_'.date('YmdHis').'.'.$this->getFileExtension();
-    $this->_downloadFile[] = $config->customFileUploadDir.CRM_Utils_File::cleanFileName(basename($fileName));
+    $fileName = $config->uploadDir . 'Financial_Transactions_' . $this->_batchIds . '_' . date('YmdHis') . '.' . $this->getFileExtension();
+    $this->_downloadFile[] = $config->customFileUploadDir . CRM_Utils_File::cleanFileName(basename($fileName));
     $buffer = fopen($fileName, 'w');
     fwrite($buffer, $out);
     fclose($buffer);
@@ -263,7 +263,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
               'trxn_date' => $this->format($itemDAO->transaction_date, 'date'),
               'spl_id' => $this->format($itemDAO->financial_item_id),
               'account_name' => $this->format($itemDAO->account_name),
-              'amount' => '-' .$this->format($itemDAO->amount, 'money'),
+              'amount' => '-'  . $this->format($itemDAO->amount, 'money'),
               'contact_name' => $this->format($itemDAO->contact_name),
               'payment_instrument' => $this->format($itemDAO->payment_instrument),
               'description' => $this->format($itemDAO->description),

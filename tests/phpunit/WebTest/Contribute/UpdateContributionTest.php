@@ -114,13 +114,13 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $from = 'Premiums';
     $to = 'Premiums inventory';
     $financialType = array(
-     'name' => 'Test Financial'.substr(sha1(rand()), 0, 7),
+     'name' => 'Test Financial' . substr(sha1(rand()), 0, 7),
      'is_reserved' => 1,
      'is_deductible' => 1,
     );
     $this->addeditFinancialType($financialType);
-    $this->waitForElementPresent("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='".$financialType['name']."']/../td[7]/span/a[text()='Accounts']");
-    $this->click("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='".$financialType['name']."']/../td[7]/span/a[text()='Accounts']");
+    $this->waitForElementPresent("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='" . $financialType['name'] . "']/../td[7]/span/a[text()='Accounts']");
+    $this->click("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='" . $financialType['name'] . "']/../td[7]/span/a[text()='Accounts']");
     $this->waitForElementPresent("xpath=//a[@id='newfinancialTypeAccount']");
     $this->clickAjaxLink("xpath=//a[@id='newfinancialTypeAccount']", "_qf_FinancialTypeAccount_cancel-botttom");
     $this->select("account_relationship", "label=Premiums Inventory Account is");
@@ -128,7 +128,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $this->select("financial_account_id", "label=$to");
     $this->clickAjaxLink("_qf_FinancialTypeAccount_next-botttom", "xpath=//a[@id='newfinancialTypeAccount']");
 
-    $premiumName = 'Premium'.substr(sha1(rand()), 0, 7);
+    $premiumName = 'Premium' . substr(sha1(rand()), 0, 7);
     $amount = 500;
     $sku = 'SKU';
     $price = 300;
@@ -138,7 +138,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $this->addPremium($premiumName, $sku, $amount, $price, $cost, $financialType['name']);
 
     //add second premium
-    $premiumName2 = 'Premium'.substr(sha1(rand()), 0, 7);
+    $premiumName2 = 'Premium' . substr(sha1(rand()), 0, 7);
     $amount2 = 600;
     $sku2 = 'SKU';
     $price2 = 200;
@@ -190,8 +190,8 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
      'is_deductible' => 1,
     );
     $this->addeditFinancialType($financialType);
-    $this->waitForElementPresent("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='".$financialType['name']."']/../td[7]/span/a[text()='Accounts']");
-    $this->click("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='".$financialType['name']."']/../td[7]/span/a[text()='Accounts']");
+    $this->waitForElementPresent("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='" . $financialType['name'] . "']/../td[7]/span/a[text()='Accounts']");
+    $this->click("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='" . $financialType['name'] . "']/../td[7]/span/a[text()='Accounts']");
     $this->waitForElementPresent("xpath=//a[@id='newfinancialTypeAccount']");
     $this->clickLink("xpath=//a[@id='newfinancialTypeAccount']", "_qf_FinancialTypeAccount_cancel-botttom", FALSE);
 
@@ -244,7 +244,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
   public function testChangePaymentInstrument() {
     $this->webtestLogin();
-    $label = 'TEST'.substr(sha1(rand()), 0, 7);
+    $label = 'TEST' . substr(sha1(rand()), 0, 7);
     $amount = 100.00;
     $financialAccount = CRM_Contribute_PseudoConstant::financialAccount();
     $to = array_search('Accounts Receivable', $financialAccount);

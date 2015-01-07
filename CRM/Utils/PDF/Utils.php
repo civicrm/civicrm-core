@@ -164,7 +164,7 @@ class CRM_Utils_PDF_Utils {
 
     // close and output the PDF
     $pdf->Close();
-    $pdf_file = 'CiviLetter'.'.pdf';
+    $pdf_file = 'CiviLetter' . '.pdf';
     $pdf->Output($pdf_file, 'D');
     CRM_Utils_System::civiExit(1);
   }

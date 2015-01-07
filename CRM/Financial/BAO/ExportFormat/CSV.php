@@ -134,8 +134,8 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
    */
   public function putFile($export) {
     $config = CRM_Core_Config::singleton();
-    $fileName = $config->uploadDir.'Financial_Transactions_'.$this->_batchIds.'_'.date('YmdHis').'.'.$this->getFileExtension();
-    $this->_downloadFile[] = $config->customFileUploadDir.CRM_Utils_File::cleanFileName(basename($fileName));
+    $fileName = $config->uploadDir . 'Financial_Transactions_' . $this->_batchIds . '_' . date('YmdHis') . '.' . $this->getFileExtension();
+    $this->_downloadFile[] = $config->customFileUploadDir . CRM_Utils_File::cleanFileName(basename($fileName));
     $out = fopen($fileName, 'w');
     fputcsv($out, $export['headers']);
     unset($export['headers']);

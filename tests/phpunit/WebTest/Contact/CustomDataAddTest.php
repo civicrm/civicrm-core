@@ -270,11 +270,11 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
 
     //contact details section
     //fill in first name
-    $firstName = 'Jimmy'.substr(sha1(rand()), 0, 7);
+    $firstName = 'Jimmy' . substr(sha1(rand()), 0, 7);
     $this->type('first_name', $firstName);
 
     //fill in last name
-    $lastName = 'Page'.substr(sha1(rand()), 0, 7);
+    $lastName = 'Page' . substr(sha1(rand()), 0, 7);
     $this->type('last_name', $lastName);
 
     //fill in email id
@@ -284,7 +284,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->type("phone_1_phone", "2222-4444");
 
     $this->click("xpath=//table//tr/td/label[text()=\"$customField\"]");
-    $value = "custom".rand();
+    $value = "custom" . rand();
     $this->type("xpath=//table//tr/td/label[text()=\"$customField\"]/../following-sibling::td/input", $value);
 
     //check for matching contact
@@ -317,7 +317,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//ul[@id='actions']/li[2]/a/span");
     $this->clickLink("xpath=//ul[@id='actions']/li[2]/a/span");
     $this->click("xpath=//table//tr/td/label[text()=\"$customField\"]");
-    $value1 = "custom_1".rand();
+    $value1 = "custom_1" . rand();
     $this->type("xpath=//table//tr/td/label[text()=\"$customField\"]/../following-sibling::td/input", $value1);
     $this->click("_qf_Contact_upload_view-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());

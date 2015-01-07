@@ -161,7 +161,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@class='view-content']//div[@class='action-link']/a");
     $this->click("xpath=//div[@class='view-content']//div[@class='action-link']/a");
     $this->waitForElementPresent("_qf_Case_cancel-bottom");
-    $this->type('activity_subject', "subject".rand());
+    $this->type('activity_subject', "subject" . rand());
     $this->select('case_type_id', 'value=1');
     $this->click('_qf_Case_upload-bottom');
     $this->waitForElementPresent("xpath=//form[@id='Search']/div[2]/div/table/tbody/tr[2]/td[9]/span[1]/a[1][text()='Manage']");

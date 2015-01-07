@@ -157,7 +157,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
 
     CRM_Contact_Import_Parser_Contact::formatCommonData($this->_params, $formatted, $formatted);
     foreach ($formatted['custom'] as $key => $val) {
-      $this->_params['custom_'.$key] = $val[-1]['value'];
+      $this->_params['custom_' . $key] = $val[-1]['value'];
     }
     $this->_params['skipRecentView'] = TRUE;
     $this->_params['check_permissions'] = TRUE;

@@ -106,7 +106,7 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
       }
     }
     if ($rev == '4.4.6') {
-      $postUpgradeMessage .= '<br /><br /><strong>'. ts('Your contact image urls have been upgraded. If your contact image urls did not follow the standard format for image Urls they have not been upgraded. Please check the log to see image urls that were not upgraded.');
+      $postUpgradeMessage .= '<br /><br /><strong>' .  ts('Your contact image urls have been upgraded. If your contact image urls did not follow the standard format for image Urls they have not been upgraded. Please check the log to see image urls that were not upgraded.');
     }
   }
 
@@ -311,7 +311,7 @@ ALTER TABLE civicrm_dashboard
       }
       elseif ($urlElements[1] == 'report') {
         $url = explode('&', $urlElements[3]);
-        $name = 'report/' .$url[0];
+        $name = 'report/'  . $url[0];
       }
       $values .= "
       WHEN {$dashboard->id} THEN '{$name}'
@@ -336,7 +336,7 @@ ALTER TABLE civicrm_dashboard
    * @param $rev
    */
   public function upgrade_4_4_6($rev) {
-    $sql = "SELECT count(*) AS count FROM INFORMATION_SCHEMA.STATISTICS where ".
+    $sql = "SELECT count(*) AS count FROM INFORMATION_SCHEMA.STATISTICS where " .
       "TABLE_SCHEMA = database() AND INDEX_NAME = 'index_image_url' AND TABLE_NAME = 'civicrm_contact';";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $dao->fetch();
@@ -386,12 +386,12 @@ ALTER TABLE civicrm_dashboard
       if (substr($imageURL, 0, $baselen) == $baseurl) {
         $photo = basename($dao->image_url);
         $config = CRM_Core_Config::singleton();
-        $fullpath = $config->customFileUploadDir.$photo;
+        $fullpath = $config->customFileUploadDir . $photo;
         if (file_exists($fullpath)) {
           // For anyone who upgraded 4.4.6 release (eg 4.4.0=>4.4.6), the $newImageUrl incorrectly used backend URLs.
           // For anyone who skipped 4.4.6 (eg 4.4.0=>4.4.7), the $newImageUrl correctly uses frontend URLs
           self::setContactImageUrl($dao->id,
-              CRM_Utils_System::url('civicrm/contact/imagefile', 'photo='.$photo, TRUE, NULL, TRUE, TRUE));
+              CRM_Utils_System::url('civicrm/contact/imagefile', 'photo=' . $photo, TRUE, NULL, TRUE, TRUE));
         }
         else{
           $failures[$dao->id] = $dao->image_url;
@@ -470,7 +470,7 @@ ALTER TABLE civicrm_dashboard
         $imageUrlParts = parse_url($imageUrl);
         parse_str($imageUrlParts['query'], $imageUrlQuery);
         self::setContactImageUrl($dao->id,
-          CRM_Utils_System::url('civicrm/contact/imagefile', 'photo='.$imageUrlQuery['photo'], TRUE, NULL, TRUE, TRUE));
+          CRM_Utils_System::url('civicrm/contact/imagefile', 'photo=' . $imageUrlQuery['photo'], TRUE, NULL, TRUE, TRUE));
       }
     }
     return TRUE;

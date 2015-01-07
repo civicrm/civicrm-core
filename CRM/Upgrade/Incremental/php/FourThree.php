@@ -166,7 +166,7 @@ WHERE    entity_value = '' OR entity_value IS NULL
       }
       if (!empty($reminder)) {
         $list = "<br /><ul>" . $list . "</ul>";
-        $postUpgradeMessage .=  '<br />' .ts("Scheduled Reminders must be linked to one or more 'entities' (Events, Event Templates, Activity Types, Membership Types). The following reminders are not configured properly and will not be run. Please review them and update or delete them: %1", array(1 => $list));
+        $postUpgradeMessage .=  '<br />'  . ts("Scheduled Reminders must be linked to one or more 'entities' (Events, Event Templates, Activity Types, Membership Types). The following reminders are not configured properly and will not be run. Please review them and update or delete them: %1", array(1 => $list));
       }
     }
     if ($rev == '4.3.beta2') {
@@ -1111,7 +1111,7 @@ cfi.financial_account_id = %4,
 cfi.description = %5,
 cli.financial_type_id = %6
 WHERE cfi.entity_table = 'civicrm_line_item'
-AND cli.entity_table = 'civicrm_contribution' AND cli.id IN (" . implode(',', $value). ');';
+AND cli.entity_table = 'civicrm_contribution' AND cli.id IN (" . implode(',', $value) .  ');';
       $params =  array(
         1 => array($financialTrxn[$key]['label'], 'String'),
         2 => array($financialTrxn[$key]['price_field_id'], 'Integer'),

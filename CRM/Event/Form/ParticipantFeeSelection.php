@@ -136,7 +136,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     else {
       foreach ($priceFieldId as $key => $value) {
         if (!empty($value) && ($this->_values['fee'][$value]['html_type'] == 'Radio' || $this->_values['fee'][$value]['html_type'] == 'Select') && !$this->_values['fee'][$value]['is_required']) {
-          $defaults[$this->_participantId]['price_'.array_keys($this->_values['fee'])[$key]] = 0;
+          $defaults[$this->_participantId]['price_' . array_keys($this->_values['fee'])[$key]] = 0;
         }
       }
     }
@@ -369,7 +369,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       'valueName' => 'event_offline_receipt',
       'contactId' => $this->_contactId,
       'isTest' => FALSE,
-      'PDFFilename' => ts('confirmation').'.pdf',
+      'PDFFilename' => ts('confirmation') . '.pdf',
     );
 
     // try to send emails only if email id is present

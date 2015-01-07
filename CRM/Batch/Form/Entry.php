@@ -492,7 +492,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         // build line item params
         $this->_priceSet['fields'][$priceFieldID]['options'][$priceFieldValueID]['amount'] = $value['total_amount'];
-        $value['price_'. $priceFieldID] = 1;
+        $value['price_' .  $priceFieldID] = 1;
 
         $lineItem = array();
         CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'], $value, $lineItem[$priceSetId]);

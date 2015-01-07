@@ -187,7 +187,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
 
     //test for individual contact and household subtype contact
     //relationship
-    $typeb = "Household__". $householdSubtypeName;
+    $typeb = "Household__" .  $householdSubtypeName;
 
     //create a relationship type between different contact types
     $params = array(

@@ -365,7 +365,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                   'key' => CRM_Core_Key::get('civicrm/ajax/customvalue'),
                 );
                 $links[CRM_Core_Action::DELETE]['url'] = '#';
-                $links[CRM_Core_Action::DELETE]['extra'] = ' data-delete_params="'. htmlspecialchars(json_encode($deleteData)) .'"';
+                $links[CRM_Core_Action::DELETE]['extra'] = ' data-delete_params="' .  htmlspecialchars(json_encode($deleteData))  . '"';
                 $links[CRM_Core_Action::DELETE]['class'] = 'delete-custom-row';
               }
               if (!empty($pageCheckSum)) {

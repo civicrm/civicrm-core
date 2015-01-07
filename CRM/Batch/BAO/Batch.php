@@ -305,7 +305,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
           "' name='check_" .
           $object->id .
           "' value='1'  data-status_id='" .
-          $values['status_id']."' class='select-row'></input>";
+          $values['status_id'] . "' class='select-row'></input>";
 
         switch ($batchStatusByName[$values['status_id']]) {
           case 'Open':
@@ -655,7 +655,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     // action is taken depending upon the mode
     $select = 'civicrm_financial_trxn.id ';
     if (!empty($returnValues)) {
-      $select .= " , ".implode(' , ', $returnValues);
+      $select .= " , " . implode(' , ', $returnValues);
     }
 
     $orderBy = " ORDER BY civicrm_financial_trxn.id";
@@ -780,7 +780,7 @@ WHERE  {$where}
   public static function getBatchNames($batchIds) {
     $query = 'SELECT id, title
       FROM civicrm_batch
-      WHERE id IN ('. $batchIds . ')';
+      WHERE id IN (' .  $batchIds . ')';
 
     $batches = array();
     $dao = CRM_Core_DAO::executeQuery($query);
@@ -800,7 +800,7 @@ WHERE  {$where}
   public static function getBatchStatuses($batchIds) {
     $query = 'SELECT id, status_id
       FROM civicrm_batch
-      WHERE id IN ('.$batchIds.')';
+      WHERE id IN (' . $batchIds . ')';
 
     $batches = array();
     $dao = CRM_Core_DAO::executeQuery($query);

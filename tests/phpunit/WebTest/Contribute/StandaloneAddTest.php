@@ -44,8 +44,8 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->webtestAddContact($softCreditFname, $softCreditLname, FALSE);
 
     // Add new Financial Account
-    $orgName = 'Alberta '.substr(sha1(rand()), 0, 7);
-    $financialAccountTitle = 'Financial Account '.substr(sha1(rand()), 0, 4);
+    $orgName = 'Alberta ' . substr(sha1(rand()), 0, 7);
+    $financialAccountTitle = 'Financial Account ' . substr(sha1(rand()), 0, 4);
     $financialAccountDescription = "{$financialAccountTitle} Description";
     $accountingCode = 1033;
     $financialAccountType = 'Asset';

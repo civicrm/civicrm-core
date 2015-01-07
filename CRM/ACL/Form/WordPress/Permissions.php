@@ -64,7 +64,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
         if (!empty($roleObj->capabilities)) {
           foreach ($roleObj->capabilities as $ckey => $cname) {
             if (array_key_exists($ckey, $permissionsArray)) {
-              $elementName = $role.'['.$ckey.']';
+              $elementName = $role . '[' . $ckey . ']';
               $defaults[$elementName] = 1;
             }
           }
@@ -73,7 +73,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
         // Compose the checkbox array for each role, to assign to form
         $rolePerms[$role] = $permissionsArray;
         foreach ($rolePerms[$role] as $key => $value) {
-          $elementName = $role.'['.$key.']';
+          $elementName = $role . '[' . $key . ']';
           $this->add('checkbox', $elementName, $value);
         }
         $roles[$role] = $name;

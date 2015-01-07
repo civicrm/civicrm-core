@@ -19,7 +19,7 @@ class CRM_Core_CodeGen_Specification {
   public function parse($schemaPath, $buildVersion) {
     $this->buildVersion = $buildVersion;
 
-    echo "Parsing schema description ".$schemaPath."\n";
+    echo "Parsing schema description " . $schemaPath . "\n";
     $dbXML = CRM_Core_CodeGen_Util_Xml::parse($schemaPath);
     // print_r( $dbXML );
 

@@ -123,7 +123,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->select('field_name[0]', 'value=Contact');
     $this->click("//option[@value='Contact']");
     $this->click('field_name_1');
-    $this->select('field_name_1', 'label='.$params['textFieldLabel'].' :: '.$params['customGroupTitle']);
+    $this->select('field_name_1', 'label=' . $params['textFieldLabel'] . ' :: ' . $params['customGroupTitle']);
     if ($checkMultiRecord) {
       $this->click('is_multi_summary');
     }
@@ -143,7 +143,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->select('field_name[0]', 'value=Contact');
     $this->click("//option[@value='Contact']");
     $this->click('field_name_1');
-    $this->select('field_name_1', 'label='.$params['selectFieldLabel'].' :: '.$params['customGroupTitle']);
+    $this->select('field_name_1', 'label=' . $params['selectFieldLabel'] . ' :: ' . $params['customGroupTitle']);
     if ($checkMultiRecord) {
       $this->click('is_multi_summary');
     }
@@ -239,12 +239,12 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->click("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr/td[3]/span/a[text()='Edit']");
     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-content ui-widget-content modal-dialog crm-ajax-container']/form/div[2]//div[@id='crm-profile-block']");
     $this->verifyText("//div[@id='custom--table-wrapper']/div/div/table/thead/tr/th[1]", preg_quote($params['textFieldLabel']));
-    $this->type("//div[@id='crm-profile-block']/div/div[2]/input[@class='crm-form-text required']", $recordNew['text'].'edit');
+    $this->type("//div[@id='crm-profile-block']/div/div[2]/input[@class='crm-form-text required']", $recordNew['text'] . 'edit');
     $this->click("css=.ui-dialog-buttonset button[data-identifier=_qf_Edit_next]");
-    $this->waitForText("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr[1]/td[1]", $recordNew['text'].'edit');
+    $this->waitForText("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr[1]/td[1]", $recordNew['text'] . 'edit');
     $editalertText = $this->getAlert();
     $this->assertEquals("Thank you. Your information has been saved.", $editalertText);
-    $this->verifyText("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr[1]/td[1]", preg_quote($recordNew['text'].'edit'));
+    $this->verifyText("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr[1]/td[1]", preg_quote($recordNew['text'] . 'edit'));
 
     // Check the delete functionality
     $this->click("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr/td[3]/span/a[text()='Delete']");
@@ -256,7 +256,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->assertEquals("Deleted Your record has been deleted.", $delText);
 
     $this->click("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr/td[3]/span/a[text()='View']");
-    $this->waitForText("css=.ui-dialog-title", 'View '.$params['customGroupTitle'] . ' Record');
+    $this->waitForText("css=.ui-dialog-title", 'View ' . $params['customGroupTitle'] . ' Record');
     $this->assertElementContainsText("css=.ui-dialog-content.crm-ajax-container", $params['textFieldLabel']);
     if ($checkSearchable) {
       $this->verifyElementNotPresent("//div[@id='profile-dialog']/div/div/div/div/div[1]/div[2]/a");
@@ -380,7 +380,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
       $this->type('first_name', $params['firstname']);
       $params['lastname'] = 'Anderson' . substr(sha1(rand()), 0, 3);
       $this->type('last_name', $params['lastname']);
-      $params['email'] = $params['firstname'].$params['lastname'].'@exa.com';
+      $params['email'] = $params['firstname'] . $params['lastname'] . '@exa.com';
       $this->type('email-Primary', $params['email']);
       $this->waitForElementPresent("//div[@id='crm-profile-block']//div/div[2]/select");
       $this->select("//div[@id='crm-profile-block']//div/div[2]/select", 'value=1');

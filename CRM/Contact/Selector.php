@@ -1066,7 +1066,7 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
     //update pre/next cache using single insert query
     if (!empty($insertValues)) {
       $sql = 'INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cacheKey, data ) VALUES
-'.implode(',', $insertValues);
+' . implode(',', $insertValues);
 
       $result = CRM_Core_DAO::executeQuery($sql);
     }
