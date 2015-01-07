@@ -217,38 +217,6 @@ input.crm-form-entityref {
   color: #3E3E3E;
 }
 
-.crm-container .replace-plain,
-.crm-container textarea,
-.crm-container select.crm-form-multiselect {
-  border: 1px solid #999;
-}
-
-.crm-container .replace-plain {
-  cursor: pointer;
-  background: rgba(255,255,255,0.6);
-  min-height: 2em;
-  position: relative;
-  padding: 2px;
-}
-
-.crm-container .replace-plain:focus,
-.crm-container .replace-plain:hover {
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.15);
-  background: rgba(255,255,255,0.8);
-}
-
-.crm-container .replace-plain .icon.ui-icon-pencil {
-  position: absolute;
-  top: .5em;
-  right: .5em;
-}
-
-.crm-container .replace-plain a:active .icon.ui-icon-pencil,
-.crm-container .replace-plain:focus .icon.ui-icon-pencil,
-.crm-container .replace-plain:hover .icon.ui-icon-pencil {
-  background-image: url("../i/icons/jquery-ui-2786C2.png");
-}
-
 /*
 ** class for hiding the text box;
   it is used in the OtherActivity template
@@ -713,13 +681,6 @@ input.crm-form-entityref {
 }
 .crm-container .crm-error {
   padding: 4px;
-}
-
-.crm-container div.view-data {
-  padding: .25em .5em .25em .5em;
-  border: 1px solid DimGray;
-  width: auto;
-  background-color: #ffffff;
 }
 
 .crm-container .crm-footer {
@@ -3995,6 +3956,40 @@ div.m ul#civicrm-menu,
   width: 100%;
 }
 
+/* editable placeholder containers - share some styles with crm-editable below */
+
+.crm-container .replace-plain,
+.crm-container textarea,
+.crm-container select.crm-form-multiselect {
+  border: 1px solid #999;
+}
+
+.crm-container .replace-plain {
+  cursor: pointer;
+  background: rgba(255,255,255,0.6);
+  min-height: 1.4em;
+  position: relative;
+  padding: .4em 1.5em .3em .4em;
+}
+
+.crm-container .replace-plain p {
+  padding: .2em 0;
+  margin: 0;
+}
+
+.crm-container .replace-plain:focus,
+.crm-container .replace-plain:hover {
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.15);
+  background: rgba(255,255,255,0.8);
+}
+
+.crm-container .replace-plain:before {
+  content: "";
+  position: absolute;
+  top: .4em;
+  right: .5em;
+}
+
 /* in place edit  */
 .crm-container .crm-editable-enabled {
   white-space: nowrap;
@@ -4016,21 +4011,25 @@ div.m ul#civicrm-menu,
 }
 
 .crm-container span.crm-editable-textarea-enabled {
-  display: inline-block !important;
   width: 96%;
 }
 .crm-container span.crm-editable-enabled {
   display: inline-block !important;
 }
 
-.crm-container .crm-editable-placeholder {
+.crm-container .crm-editable-placeholder,
+.crm-container .replace-plain:before {
   background: url("../i/icons/jquery-ui-3E3E3E.png") -66px -114px no-repeat;
   text-indent: -10000px;
   display: block;
-  width: 12px;
+  height: 16px;
+  width: 16px;
   opacity: .5;
 }
 
+.crm-container .replace-plain a:active:before,
+.crm-container .replace-plain:focus:before,
+.crm-container .replace-plain:hover:before,
 .crm-container .crm-editable-enabled:hover .crm-editable-placeholder {
   background-image: url("../i/icons/jquery-ui-2786C2.png");
   opacity: 1;
@@ -4038,12 +4037,6 @@ div.m ul#civicrm-menu,
 
 .crm-container .crm-editable-saving {
   background: #FFFFCC!important;
-  opacity: 0.8;
-}
-
-.crm-container .crm-editable-error,
-.crm-container .crm-editable-error input {
-  background: red!important;
   opacity: 0.8;
 }
 
@@ -4071,13 +4064,10 @@ div.m ul#civicrm-menu,
 .crm-editable-form button {
   position: absolute;
   bottom: -22px;
+  left: 0;
   text-align: center;
   height: 23px;
   width: 32px;
-}
-
-.crm-editable-form button[type=submit] {
-  left: 0;
 }
 
 .crm-editable-form button[type=cancel] {
