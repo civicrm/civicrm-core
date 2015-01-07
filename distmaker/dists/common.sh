@@ -19,7 +19,7 @@ function dm_install_dir() {
   if [ ! -d "$to" ]; then
     mkdir -p "$to"
   fi
-  $DM_RSYNC -avC --exclude=.git --exclude=.svn "$from/./"  "$to/./"
+  ${DM_RSYNC:-rsync} -avC --exclude=.git --exclude=.svn "$from/./"  "$to/./"
 }
 
 ## Copy listed files
@@ -45,17 +45,32 @@ function dm_remove_files() {
   done
 }
 
+## Copy all bower dependencies
+function dm_install_bower() {
+  local repo="$1"
+  local to="$2"
+
+  local excludes_rsync=""
+  for exclude in .git .svn {T,t}est{,s} {D,d}oc{,s} {E,e}xample{,s} ; do
+    excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
+  done
+
+  [ ! -d "$to" ] && mkdir "$to"
+  ${DM_RSYNC:-rsync} -avC $excludes_rsync "$repo/./" "$to/./"
+}
+
 ## Copy all core files
 ## usage: dm_install_core <core_repo_path> <to_path>
 function dm_install_core() {
   local repo="$1"
   local to="$2"
 
-  for dir in css i js PEAR templates bin CRM api extern Reports install settings Civi partials node_modules bower_components ; do
+  for dir in css i js PEAR templates bin CRM api extern Reports install settings Civi partials ; do
     [ -d "$repo/$dir" ] && dm_install_dir "$repo/$dir" "$to/$dir"
   done
 
   dm_install_files "$repo" "$to" {agpl-3.0,agpl-3.0.exception,gpl,README,CONTRIBUTORS}.txt
+  dm_install_files "$repo" "$to" composer.json composer.lock bower.json package.json
 
   mkdir -p "$to/sql"
   pushd "$repo" >> /dev/null
@@ -91,7 +106,7 @@ function dm_install_packages() {
   ##   packages/Files packages/PHP packages/Text
 
   [ ! -d "$to" ] && mkdir "$to"
-  $DM_RSYNC -avC $excludes_rsync --include=core "$repo/./" "$to/./"
+  ${DM_RSYNC:-rsync} -avC $excludes_rsync --include=core "$repo/./" "$to/./"
 }
 
 ## Copy Drupal-integration module
@@ -146,13 +161,8 @@ function dm_install_vendor() {
     excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
   done
 
-  ## Note: These small folders have items that previously were not published,
-  ## but there's no real cost to including them, and excluding them seems
-  ## likely to cause confusion as the codebase evolves:
-  ##   packages/Files packages/PHP packages/Text
-
   [ ! -d "$to" ] && mkdir "$to"
-  $DM_RSYNC -avC $excludes_rsync --include=core "$repo/./" "$to/./"
+  ${DM_RSYNC:-rsync} -avC $excludes_rsync "$repo/./" "$to/./"
 }
 
 ##  usage: dm_install_wordpress <wp_repo_path> <to_path>
@@ -163,7 +173,7 @@ function dm_install_wordpress() {
   if [ ! -d "$to" ]; then
     mkdir -p "$to"
   fi
-  $DM_RSYNC -avC \
+  ${DM_RSYNC:-rsync} -avC \
     --exclude=.git \
     --exclude=.svn \
     --exclude=civicrm.config.php.wordpress \
@@ -173,12 +183,23 @@ function dm_install_wordpress() {
   ## Need --exclude=civicrm for self-building on WP site
 }
 
+
+## Generate the "bower_components" folder.
+## usage: dm_generate_bower <repo_path>
+function dm_generate_bower() {
+  local repo="$1"
+  pushd "$repo"
+    ${DM_NPM:-npm} install
+    ${DM_NODE:-node} node_modules/bower/bin/bower install
+  popd
+}
+
 ## Generate the composer "vendor" folder
 ## usage: dm_generate_vendor <repo_path>
 function dm_generate_vendor() {
   local repo="$1"
   pushd "$repo"
-    composer install
+    ${DM_COMPOSER:-composer} install
   popd
 }
 
@@ -204,13 +225,5 @@ function dm_git_checkout() {
   pushd "$1"
     git checkout .
     git checkout "$2"
-  popd
-}
-
-## Install npm packages
-## usage: dm_npm_install <path>
-function dm_npm_install() {
-  pushd "$1"
-    $DM_NPM install
   popd
 }
