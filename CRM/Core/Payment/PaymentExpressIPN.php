@@ -99,26 +99,6 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * Singleton function used to manage this object
-   *
-   * @param string $mode
-   *   The mode of operation: live or test.
-   *
-   * @param $paymentProcessor
-   * @param null $paymentForm
-   * @param bool $force
-   *
-   * @return object
-   * @static
-   */
-  public static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
-    if (self::$_singleton === NULL) {
-      self::$_singleton = new CRM_Core_Payment_PaymentExpressIPN($mode, $paymentProcessor);
-    }
-    return self::$_singleton;
-  }
-
-  /**
    * The function gets called when a new order takes place.
    *
    * @param $success
