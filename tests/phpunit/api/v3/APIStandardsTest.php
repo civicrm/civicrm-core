@@ -114,7 +114,8 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
             }
             try {
                 $result = $function($params);
-            } catch ( Exception $e ) {
+            }
+            catch ( Exception $e ) {
               continue;
             }
 

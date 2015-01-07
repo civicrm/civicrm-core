@@ -146,7 +146,8 @@ function civicrm_api3_create_error($msg, $data = array()) {
   // security hole here but seems sensible - perhaps should apply to the trace as well?)
   if(isset($data['sql']) && CRM_Core_Permission::check('Administer CiviCRM')) {
     $data['debug_information'] = $data['sql']; // Isn't this redundant?
-  } else {
+  }
+  else {
     unset($data['sql']);
   }
   return $data;
@@ -1797,7 +1798,8 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
       $realContactId = _civicrm_api3_resolve_contactID($params[$fieldName]);
       if ('unknown-user' === $realContactId) {
         throw new API_Exception("\"$fieldName\" \"{$params[$fieldName]}\" cannot be resolved to a contact ID", 2002, array('error_field' => $fieldName, "type" => "integer"));
-      } elseif (is_numeric($realContactId)) {
+      }
+      elseif (is_numeric($realContactId)) {
         $params[$fieldName] = $realContactId;
       }
     }

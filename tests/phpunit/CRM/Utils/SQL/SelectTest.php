@@ -133,7 +133,8 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
         '#num' => '5not-a-number5'
       ));
       $this->fail('Expected exception; got: ' . var_export($result, TRUE));
-    } catch (CRM_Core_Exception $e) {
+    }
+    catch (CRM_Core_Exception $e) {
       $this->assertTrue(TRUE, "Caught expected exception");
     }
 
@@ -142,7 +143,8 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
         '#num' => array(1, '5not-a-number5', 2)
       ));
       $this->fail('Expected exception; got: ' . var_export($result, TRUE));
-    } catch (CRM_Core_Exception $e) {
+    }
+    catch (CRM_Core_Exception $e) {
       $this->assertTrue(TRUE, "Caught expected exception");
     }
   }
@@ -153,7 +155,8 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
         '{var}' => 'not a well-formed variable name'
       ));
       $this->fail('Expected exception; got: ' . var_export($result, TRUE));
-    } catch (CRM_Core_Exception $e) {
+    }
+    catch (CRM_Core_Exception $e) {
       $this->assertTrue(TRUE, "Caught expected exception");
     }
   }

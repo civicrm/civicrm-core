@@ -105,7 +105,8 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       $discountId= CRM_Core_BAO_Discount::findSet($this->_id, 'civicrm_event');
       if ($discountId) {
         $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Discount', $discountId, 'price_set_id');
-      } else {
+      }
+      else {
         $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $this->_id);
       }
 

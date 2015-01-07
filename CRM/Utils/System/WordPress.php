@@ -82,7 +82,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
           $template->assign('pageTitle', $pageTitle);
       }
 
-    } elseif (civicrm_wp_in_civicrm()) {
+    }
+    elseif (civicrm_wp_in_civicrm()) {
 
       // legacy pre-4.6 behaviour
       global $civicrm_wp_title;
@@ -478,7 +479,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
     if (isset($language)) {
       return CRM_Core_I18n_PseudoConstant::longForShort(substr($language, 0, 2));
-    } else {
+    }
+    else {
       return NULL;
     }
   }

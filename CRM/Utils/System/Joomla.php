@@ -404,7 +404,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     elseif ($forceBackend) {
       if (defined('JVERSION')) {
         $joomlaVersion = JVERSION;
-      } else {
+      }
+      else {
         $jversion = new JVersion;
         $joomlaVersion = $jversion->getShortVersion();
       }

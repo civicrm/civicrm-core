@@ -565,7 +565,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     static $run_once = FALSE;
     if ($run_once) {
       return TRUE;
-    } else {
+    }
+    else {
       $run_once = TRUE;
     }
 

@@ -160,7 +160,8 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     foreach($keys as $key) {
       try {
         $obj = $mapper->keyToInfo($key);
-      } catch (CRM_Extension_Exception $ex) {
+      }
+      catch (CRM_Extension_Exception $ex) {
         CRM_Core_Session::setStatus(ts('Failed to read extension (%1). Please refresh the extension list.', array(1 => $key)));
         continue;
       }
@@ -298,7 +299,8 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     $extensionRow = (array) $obj;
     try {
       $extensionRow['path'] = $mapper->keyToBasePath($obj->key);
-    } catch (CRM_Extension_Exception $e) {
+    }
+    catch (CRM_Extension_Exception $e) {
       $extensionRow['path'] = '';
     }
     $extensionRow['status'] = $manager->getStatus($obj->key);

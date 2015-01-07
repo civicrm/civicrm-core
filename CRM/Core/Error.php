@@ -401,7 +401,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   public static function handleUnhandledException($exception) {
     try {
       CRM_Utils_Hook::unhandledException($exception);
-    } catch (Exception $other) {
+    }
+    catch (Exception $other) {
       // if the exception-handler generates an exception, then that sucks! oh, well. carry on.
       CRM_Core_Error::debug_var('handleUnhandledException_nestedException', self::formatTextException($other));
     }
@@ -607,7 +608,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     if ( defined( 'CIVICRM_DEBUG_LOG_QUERY' ) ) {
       if ( CIVICRM_DEBUG_LOG_QUERY == 'backtrace' ) {
         CRM_Core_Error::backtrace( $string, TRUE );
-      } else if ( CIVICRM_DEBUG_LOG_QUERY ) {
+      }
+      else if ( CIVICRM_DEBUG_LOG_QUERY ) {
         CRM_Core_Error::debug_var( 'Query', $string, FALSE, TRUE );
       }
     }
@@ -802,7 +804,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         $ei = $ei->getCause();
       }
       $msg .= $e->toHtml();
-    } else {
+    }
+    else {
       $msg .= '<p><b>' . get_class($e) . ': "' . htmlentities($e->getMessage()) . '"</b></p>';
       $msg .= '<pre>' . htmlentities(self::formatBacktrace($e->getTrace())) . '</pre>';
     }

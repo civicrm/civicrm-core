@@ -247,7 +247,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
               $this->assign('membershipContactID', $this->_membershipContactID);
               $this->assign('membershipContactName', $employers[$this->_membershipContactID]['name']);
               $validMembership = TRUE;
-            } else {
+            }
+            else {
               $membershipType = new CRM_Member_BAO_MembershipType();
               $membershipType->id = $membership->membership_type_id;
               if ($membershipType->find(TRUE)) {

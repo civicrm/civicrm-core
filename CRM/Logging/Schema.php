@@ -449,11 +449,13 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
         if ($civiTableSpecs[$col]['DATA_TYPE'] != CRM_Utils_Array::value('DATA_TYPE', $logTableSpecs[$col])) {
           // if data-type is different, surely consider the column
           $diff['MODIFY'][] = $col;
-        } else if ($civiTableSpecs[$col]['IS_NULLABLE'] != CRM_Utils_Array::value('IS_NULLABLE', $logTableSpecs[$col]) &&
+        }
+        else if ($civiTableSpecs[$col]['IS_NULLABLE'] != CRM_Utils_Array::value('IS_NULLABLE', $logTableSpecs[$col]) &&
           $logTableSpecs[$col]['IS_NULLABLE'] == 'NO') {
           // if is-null property is different, and log table's column is NOT-NULL, surely consider the column
           $diff['MODIFY'][] = $col;
-        } else if ($civiTableSpecs[$col]['COLUMN_DEFAULT'] != CRM_Utils_Array::value('COLUMN_DEFAULT', $logTableSpecs[$col]) &&
+        }
+        else if ($civiTableSpecs[$col]['COLUMN_DEFAULT'] != CRM_Utils_Array::value('COLUMN_DEFAULT', $logTableSpecs[$col]) &&
           !strstr($civiTableSpecs[$col]['COLUMN_DEFAULT'], 'TIMESTAMP')) {
           // if default property is different, and its not about a timestamp column, consider it
           $diff['MODIFY'][] = $col;

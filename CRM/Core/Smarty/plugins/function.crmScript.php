@@ -59,9 +59,11 @@ function smarty_function_crmScript($params, &$smarty) {
 
   if (array_key_exists('file', $params)) {
     $res->addScriptFile($params['ext'], $params['file'], $params['weight'], $params['region']);
-  } elseif (array_key_exists('url', $params)) {
+  }
+  elseif (array_key_exists('url', $params)) {
     $res->addScriptUrl($params['url'], $params['weight'], $params['region']);
-  } else {
+  }
+  else {
     CRM_Core_Error::debug_var('crmScript_params', $params);
     throw new Exception("crmScript requires url or ext+file");
   }

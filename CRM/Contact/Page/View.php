@@ -227,7 +227,8 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     // Check if this is default domain contact CRM-10482
     if (CRM_Contact_BAO_Contact::checkDomainContact($this->_contactId)) {
       $this->assign('domainContact', TRUE);
-    } else {
+    }
+    else {
       $this->assign('domainContact', FALSE);
     }
 

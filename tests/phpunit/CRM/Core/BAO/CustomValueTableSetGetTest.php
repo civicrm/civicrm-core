@@ -71,7 +71,8 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     $message = NULL;
     try {
       $result = CRM_Core_BAO_CustomValueTable::setValues($params);
-    } catch ( Exception $e ) {
+    }
+    catch ( Exception $e ) {
       $message = $e->getMessage();
     }
     $errorScope = NULL;
@@ -172,7 +173,8 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     $message = NULL;
     try {
       $result = CRM_Core_BAO_CustomValueTable::setValues($params);
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       $message = $e->getMessage();
     }
     $errorScope = NULL;

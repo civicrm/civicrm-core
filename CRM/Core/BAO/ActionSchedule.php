@@ -1152,7 +1152,8 @@ WHERE      $group.id = {$actionSchedule->group_id}
           if ($isSmartGroup) {
             $join[] = "INNER JOIN civicrm_group_contact_cache grp ON {$contactField} = grp.contact_id";
             $where[] = "grp.group_id IN ({$actionSchedule->group_id})";
-          } else {
+          }
+          else {
             $join[] = "INNER JOIN civicrm_group_contact grp ON {$contactField} = grp.contact_id AND grp.status = 'Added'";
             $where[] = "grp.group_id IN ({$actionSchedule->group_id})";
           }
@@ -1169,7 +1170,8 @@ WHERE      $group.id = {$actionSchedule->group_id}
           if ($isSmartGroup) {
             $addGroup = " INNER JOIN civicrm_group_contact_cache grp ON c.id = grp.contact_id";
             $addWhere = " grp.group_id IN ({$actionSchedule->group_id})";
-          } else {
+          }
+          else {
             $addGroup = " INNER JOIN civicrm_group_contact grp ON c.id = grp.contact_id AND grp.status = 'Added'";
             $addWhere = " grp.group_id IN ({$actionSchedule->group_id})";
           }

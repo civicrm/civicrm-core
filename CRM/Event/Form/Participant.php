@@ -998,7 +998,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         if ($this->_quickConfig && !empty($params['total_amount']) &&
           $params['status_id'] != array_search('Partially paid', $participantStatus)) {
           $params['fee_amount'] = $params['total_amount'];
-        } else {
+        }
+        else {
           //fix for CRM-3086
           $params['fee_amount'] = $params['amount'];
         }

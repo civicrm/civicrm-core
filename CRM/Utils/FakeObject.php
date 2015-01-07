@@ -28,7 +28,8 @@ class CRM_Utils_FakeObject {
   public function __call($name, $arguments) {
     if (isset($this->array[$name]) && is_callable($this->array[$name])) {
       return call_user_func_array($this->array[$name], $arguments);
-    } else {
+    }
+    else {
       throw new Exception("Call to unimplemented method: $name");
     }
   }

@@ -906,7 +906,8 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $objects = CRM_Core_DAO::createTestObject($daoName, $params, $numObjects, $createOnly);
     if (is_array($objects)) {
       $this->registerTestObjects($objects);
-    } else {
+    }
+    else {
       $this->registerTestObjects(array($objects));
     }
     return $objects;

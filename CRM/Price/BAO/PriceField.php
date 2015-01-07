@@ -148,14 +148,16 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         if (CRM_Utils_Array::value( $index, CRM_Utils_Array::value('option_financial_type_id', $params))) {
           $options['financial_type_id'] =  $params['option_financial_type_id'][$index];
-        } elseif (!empty($params['financial_type_id'])) {
+        }
+        elseif (!empty($params['financial_type_id'])) {
           $options['financial_type_id'] = $params['financial_type_id'];
         }
 
         if ($opIds = CRM_Utils_Array::value('option_id', $params)) {
           if ($opId = CRM_Utils_Array::value($index, $opIds)) {
             $optionsIds['id'] = $opId;
-          } else {
+          }
+          else {
             $optionsIds['id'] = NULL;
           }
         }
@@ -761,7 +763,8 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
         if (empty($noneSelectedPriceFields)) {
           $error['_qf_default'] = ts('Please select at least one option from price set.');
         }
-      } else {
+      }
+      else {
         $error['_qf_default'] = ts('Please select at least one option from price set.');
       }
     }

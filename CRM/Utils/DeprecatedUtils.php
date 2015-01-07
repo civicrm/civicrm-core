@@ -292,7 +292,8 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
         );
         if (!isset($svq)) {
           return civicrm_api3_create_error("Invalid Contact ID: There is no contact record with contact_id = $value.");
-        } else if ($svq == 1) {
+        }
+        else if ($svq == 1) {
           return civicrm_api3_create_error("Invalid Contact ID: contact_id $value is a soft-deleted contact.");
         }
 
@@ -1075,7 +1076,8 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
                      ( strtolower( $v2['value'] ) == strtolower( trim( $v1 ) ) ) ) {
                     if ( $htmlType == 'CheckBox' ) {
                       $newValues[$key][$v2['value']] = 1;
-                    } else {
+                    }
+                    else {
                       $newValues[$key][] = $v2['value'];
                     }
                   }

@@ -21,11 +21,13 @@ if (!defined("CIVICRM_DSN")) {
   $dsn = getenv("CIVICRM_TEST_DSN");
   if (!empty ($dsn)) {
     define("CIVICRM_DSN", $dsn);
-  } else {
+  }
+  else {
     echo "\nFATAL: no DB connection configured (CIVICRM_DSN). \nYou can either create/edit " . __DIR__ . "/civicrm.settings.local.php\n";
     if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
       echo "OR set it in your shell:\n \$export CIVICRM_TEST_DSN=mysql://db_username:db_password@localhost/civicrm_tests_dev \n";
-    } else {
+    }
+    else {
       echo "OR set it in your shell:\n SETX CIVICRM_TEST_DSN mysql://db_username:db_password@localhost/civicrm_tests_dev \n
       (you will need to open a new command shell before it takes effect)";
     }
@@ -69,7 +71,8 @@ if (empty($civicrm_root)) {
 if (!defined("CIVICRM_TEMPLATE_COMPILEDIR")) {
   if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
     define( 'CIVICRM_TEMPLATE_COMPILEDIR', getenv('TMP') . DIRECTORY_SEPARATOR . 'civi' . DIRECTORY_SEPARATOR );
-  } else {
+  }
+  else {
     define( 'CIVICRM_TEMPLATE_COMPILEDIR', '/tmp/civi/' );
   }
 }

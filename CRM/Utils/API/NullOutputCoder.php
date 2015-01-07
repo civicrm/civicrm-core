@@ -98,7 +98,8 @@ class CRM_Utils_API_NullOutputCoder extends CRM_Utils_API_AbstractFieldCoder {
     $lowerAction = strtolower($apiRequest['action']);
     if ($lowerAction === 'create') {
       return parent::toApiOutput($apiRequest, $result);
-    } else {
+    }
+    else {
       return $result;
     }
   }

@@ -290,7 +290,8 @@ LEFT JOIN   civicrm_price_set ps ON ps.id = pf.price_set_id ";
       $entityName = 'default_contribution_amount';
       $where .= " AND ps.name = %4 ";
       $params[4] = array($entityName, 'String');
-    } elseif ($entityTable == 'civicrm_participant') {
+    }
+    elseif ($entityTable == 'civicrm_participant') {
       $from .= "
 LEFT JOIN civicrm_price_set_entity cpse ON cpse.price_set_id = ps.id
 LEFT JOIN civicrm_price_field_value cpfv ON cpfv.price_field_id = pf.id and cpfv.label = %4 ";

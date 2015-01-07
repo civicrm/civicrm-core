@@ -98,7 +98,8 @@ class CRM_Case_XMLRepository {
       $fileXml = $this->retrieveFile($caseType);
       if ($fileXml) {
         $this->xml[$caseType] = $fileXml;
-      } else {
+      }
+      else {
         return FALSE;
       }
     }

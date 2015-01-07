@@ -173,7 +173,8 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
         $yearlyChart = TRUE;
         if (!empty($config->fiscalYearStart) && ($config->fiscalYearStart['M'] !== 1 || $config->fiscalYearStart['d'] !== 1)) {
           $values['xLabelAngle'] = 45;
-        } else {
+        }
+        else {
           $values['xLabelAngle'] = 0;
         }
       }

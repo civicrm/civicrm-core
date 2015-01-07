@@ -1599,7 +1599,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
             if (isset($dataArray[$value['tax_rate']])) {
               $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
-            } else {
+            }
+            else {
               $dataArray[$value['tax_rate']] = CRM_Utils_Array::value('tax_amount', $value);
             }
           }

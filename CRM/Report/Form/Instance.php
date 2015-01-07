@@ -314,9 +314,11 @@ class CRM_Report_Form_Instance {
     if ($instanceID && !$isNew) {
       // updating existing instance
       $statusMsg = ts('"%1" report has been updated.', array(1 => $instance->title));
-    } elseif ($form->getVar('_id') && $isNew) {
+    }
+    elseif ($form->getVar('_id') && $isNew) {
       $statusMsg = ts('Your report has been successfully copied as "%1". You are currently viewing the new copy.', array(1 => $instance->title));
-    } else {
+    }
+    else {
       $statusMsg = ts('"%1" report has been successfully created. You are currently viewing the new report instance.', array(1 => $instance->title));
     }
     CRM_Core_Session::setStatus($statusMsg);

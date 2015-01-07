@@ -1555,7 +1555,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     if ($other_sub_types = CRM_Utils_array::value('contact_sub_type', $migrationInfo['other_details'])) {
       if ($main_sub_types = CRM_Utils_array::value('contact_sub_type', $migrationInfo['main_details'])) {
         $submitted['contact_sub_type'] = array_unique( array_merge($main_sub_types, $other_sub_types));
-      } else {
+      }
+      else {
         $submitted['contact_sub_type'] = $other_sub_types;
       }
     }
@@ -1568,7 +1569,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       if ($currentEmloyerId = CRM_Utils_Array::value('current_employer_id', $submitted)) {
         if (!CRM_Utils_System::isNull($currentEmloyerId)) {
           $submitted['current_employer'] = $submitted['current_employer_id'];
-        } else {
+        }
+        else {
           $submitted['current_employer'] = '';
         }
         unset($submitted['current_employer_id']);

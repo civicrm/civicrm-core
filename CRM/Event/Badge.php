@@ -127,7 +127,8 @@ class CRM_Event_Badge {
           }
         }
       }
-    } else {
+    }
+    else {
       $imgFile = 'No template directories defined anywhere??';
     }
 

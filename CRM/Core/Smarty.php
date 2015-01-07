@@ -221,7 +221,8 @@ class CRM_Core_Smarty extends Smarty {
     $this->pushScope($vars);
     try {
       $result = $this->fetch($resource_name);
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       // simulate try { ... } finally { ... }
       $this->popScope();
       throw $e;
@@ -266,7 +267,8 @@ class CRM_Core_Smarty extends Smarty {
   public function addTemplateDir($path) {
     if ( is_array( $this->template_dir ) ) {
       array_unshift( $this->template_dir, $path );
-    } else {
+    }
+    else {
       $this->template_dir = array( $path, $this->template_dir );
     }
 

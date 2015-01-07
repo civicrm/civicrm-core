@@ -61,7 +61,8 @@ class CRM_Extension_System {
     if (! self::$singleton || $fresh) {
       if (self::$singleton) {
         self::$singleton = new CRM_Extension_System(self::$singleton->parameters);
-      } else {
+      }
+      else {
         self::$singleton = new CRM_Extension_System();
       }
     }
@@ -136,7 +137,8 @@ class CRM_Extension_System {
     if ($this->defaultContainer === NULL) {
       if ($this->parameters['extensionsDir']) {
         $this->defaultContainer = new CRM_Extension_Container_Default($this->parameters['extensionsDir'], $this->parameters['extensionsURL'], $this->getCache(), 'default');
-      } else {
+      }
+      else {
         $this->defaultContainer = FALSE;
       }
     }
@@ -216,7 +218,8 @@ class CRM_Extension_System {
           'group' => 'ext',
           'prefetch' => TRUE,
         ));
-      } else {
+      }
+      else {
         $this->cache = new CRM_Utils_Cache_ArrayCache(array());
       }
     }

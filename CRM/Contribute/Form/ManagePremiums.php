@@ -307,19 +307,23 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
               $params['image'] = $this->_resizeImage($imageFile, "_full", 200, 200);
               $params['thumbnail'] = $this->_resizeImage($imageFile, "_thumb", 50, 50);
             }
-          } else {
+          }
+          else {
             $error = TRUE;
             $params['image'] = $config->resourceBase . 'i/contribute/default_premium.jpg';
             $params['thumbnail'] = $config->resourceBase . 'i/contribute/default_premium_thumb.jpg';
           }
-        } elseif ($value == 'thumbnail') {
+        }
+        elseif ($value == 'thumbnail') {
           $params['image'] = $params['imageUrl'];
           $params['thumbnail'] = $params['thumbnailUrl'];
-        } elseif ($value == 'default_image') {
+        }
+        elseif ($value == 'default_image') {
           $url = parse_url($config->userFrameworkBaseURL);
           $params['image'] = $config->resourceBase . 'i/contribute/default_premium.jpg';
           $params['thumbnail'] = $config->resourceBase . 'i/contribute/default_premium_thumb.jpg';
-        } else {
+        }
+        else {
           $params['image'] = "";
           $params['thumbnail'] = "";
         }
@@ -368,9 +372,11 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $image = imagecreatetruecolor($width, $height);
     if($imageInfo['mime'] == 'image/gif') {
       $source = imagecreatefromgif($filename);
-    } elseif($imageInfo['mime'] == 'image/png') {
+    }
+    elseif($imageInfo['mime'] == 'image/png') {
       $source = imagecreatefrompng($filename);
-    } else {
+    }
+    else {
       $source = imagecreatefromjpeg($filename);
     }
 

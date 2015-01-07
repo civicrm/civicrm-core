@@ -493,7 +493,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     if ($billingModePaymentProcessors && count($this->_paymentProcessors) == $billingModePaymentProcessors) {
       $allAreBillingModeProcessors = TRUE;
-    } else {
+    }
+    else {
       $allAreBillingModeProcessors = FALSE;
     }
 
@@ -515,7 +516,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         && !$this->_values['event']['is_confirm_enabled']
       ) {
         $buttonLabel = ts('Register >>');
-      } else {
+      }
+      else {
         $buttonLabel = ts('Continue >>');
       }
 

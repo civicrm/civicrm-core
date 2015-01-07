@@ -993,7 +993,8 @@ AND    u.status = 1
       // TODO: Find a more solid way to make this test
       // Also, since we don't know how to get the entity type of the group, we'll assume it's 'node'
       og_ungroup('node', $ogID, 'user', user_load($drupalID));
-    } else {
+    }
+    else {
       // Works for the OG 7.x-1.x branch
       og_ungroup($ogID, 'user', user_load($drupalID));
     }
@@ -1007,7 +1008,8 @@ AND    u.status = 1
     global $user;
     if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
       $timezone = $user->timezone;
-    } else {
+    }
+    else {
       $timezone = variable_get('date_default_timezone', NULL);
     }
     if (!$timezone) {
