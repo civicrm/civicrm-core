@@ -170,7 +170,7 @@ dm_generate_bower "$DM_SOURCEDIR"
 # Before anything - regenerate DAOs
 
 cd $DM_SOURCEDIR/xml
-$DM_PHP GenCode.php schema/Schema.xml $DM_VERSION
+${DM_PHP:-php} GenCode.php schema/Schema.xml $DM_VERSION
 
 cd $ORIGPWD
 

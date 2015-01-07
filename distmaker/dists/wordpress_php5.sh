@@ -26,7 +26,7 @@ dm_install_wordpress "$SRC/WordPress" "$TRG/civicrm"
 
 # gen tarball
 cd $TRG
-$DM_ZIP -r -9 $DM_TARGETDIR/civicrm-$DM_VERSION-wordpress.zip *
+${DM_ZIP:-zip} -r -9 $DM_TARGETDIR/civicrm-$DM_VERSION-wordpress.zip *
 
 # clean up
 rm -rf $TRG
