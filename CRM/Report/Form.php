@@ -1032,7 +1032,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         if ($field['type'] == 'select') {
           $this->addElement('select', "{$fieldName}", $field['title'], $field['options']);
         }
-        else if ($field['type'] == 'checkbox') {
+        elseif ($field['type'] == 'checkbox') {
           $options[$field['title']] = $fieldName;
           $this->addCheckBox($fieldName, NULL,
             $options, NULL,

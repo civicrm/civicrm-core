@@ -199,7 +199,7 @@ class CRM_Grant_BAO_Query {
           }
         }
         if (!empty($val)) {
-          foreach($val as $id) {
+          foreach ($val as $id) {
             $names[] = CRM_Utils_Array::value($id, $grantTypes);
           }
         }
@@ -232,7 +232,7 @@ class CRM_Grant_BAO_Query {
           }
         }
         if (!empty($val)) {
-          foreach($val as $id) {
+          foreach ($val as $id) {
             $names[] = CRM_Utils_Array::value($id, $grantStatus);
           }
         }

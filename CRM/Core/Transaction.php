@@ -183,7 +183,8 @@ class CRM_Core_Transaction {
   public function run($callable) {
     try {
       $callable($this);
-    } catch (Exception $ex) {
+    }
+    catch (Exception $ex) {
       $this->rollback()->commit();
       throw $ex;
     }

@@ -56,7 +56,7 @@ FROM    civicrm_membership_type
 WHERE   id = %1";
 
     $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($memType, 'Positive')));
-    $properties = array( 'financial_type_id', 'total_amount', 'name', 'auto_renew' );
+    $properties = array('financial_type_id', 'total_amount', 'name', 'auto_renew');
     while ($dao->fetch()) {
       foreach ($properties as $property) {
         $details[$property] = $dao->$property;

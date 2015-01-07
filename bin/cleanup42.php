@@ -53,7 +53,7 @@ function run() {
   $fh   = fopen('php://output', 'w');
   $rows = CRM_Upgrade_Incremental_php_FourTwo::deleteInvalidPairs();
 
-  if ( !empty($rows)) {
+  if (!empty($rows)) {
     echo "The following records have been processed. If action = Un-linked, that membership has been disconnected from the contribution record.\n";
     echo "Contact ID, ContributionID, Contribution Status, MembershipID, Membership Type, Start Date, End Date, Membership Status, Action \n";
   }
@@ -61,7 +61,7 @@ function run() {
     echo "Could not find any records to process.\n";
   }
 
-  foreach ( $rows as $row ) {
+  foreach ($rows as $row) {
     fputcsv($fh, $row);
   }
 }

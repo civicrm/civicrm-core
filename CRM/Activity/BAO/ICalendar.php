@@ -53,7 +53,7 @@ class CRM_Activity_BAO_ICalendar {
    * @return \CRM_Activity_BAO_ICalendar
   @access public
    */
-  public function __construct( &$act ) {
+  public function __construct(&$act) {
     $this->activity = $act;
   }
 
@@ -67,15 +67,15 @@ class CRM_Activity_BAO_ICalendar {
    *
    * @return string   Array index of the added attachment in the $attachments array, or else null.
    */
-  public function addAttachment( &$attachments, $contacts ) {
+  public function addAttachment(&$attachments, $contacts) {
     // Check preferences setting
-    if ( CRM_Core_BAO_Setting::getItem( CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'activity_assignee_notification_ics' ) ) {
+    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'activity_assignee_notification_ics')) {
       $config = &CRM_Core_Config::singleton();
-      $this->icsfile = tempnam( $config->customFileUploadDir, 'ics' );
-      if ( $this->icsfile !== FALSE ) {
-        rename( $this->icsfile, $this->icsfile . '.ics' );
+      $this->icsfile = tempnam($config->customFileUploadDir, 'ics');
+      if ($this->icsfile !== FALSE) {
+        rename($this->icsfile, $this->icsfile . '.ics');
         $this->icsfile .= '.ics';
-        $icsFileName = basename( $this->icsfile );
+        $icsFileName = basename($this->icsfile);
 
         // get logged in user's primary email
         // TODO: Is there a better way to do this?
@@ -87,8 +87,8 @@ class CRM_Activity_BAO_ICalendar {
         $template->assign('contacts', $contacts);
         $template->assign('timezone', date_default_timezone_get());
         $calendar = $template->fetch('CRM/Activity/Calendar/ICal.tpl');
-        if ( file_put_contents( $this->icsfile, $calendar ) !== FALSE ) {
-          if ( empty( $attachments ) ) {
+        if (file_put_contents($this->icsfile, $calendar) !== FALSE) {
+          if (empty($attachments)) {
             $attachments = array();
           }
           $attachments['activity_ics'] = array(
@@ -105,8 +105,8 @@ class CRM_Activity_BAO_ICalendar {
   }
 
   public function cleanup() {
-    if ( !empty ( $this->icsfile ) ) {
-      @unlink( $this->icsfile );
+    if (!empty ($this->icsfile)) {
+      @unlink($this->icsfile);
     }
   }
 
@@ -118,16 +118,16 @@ class CRM_Activity_BAO_ICalendar {
     $session = &CRM_Core_Session::singleton();
     $uid = $session->get('userID');
     $primary = '';
-    $emails = CRM_Core_BAO_Email::allEmails( $uid );
-    foreach ( $emails as $eid => $e ) {
-      if ( $e['is_primary'] ) {
-        if ( $e['email'] ) {
+    $emails = CRM_Core_BAO_Email::allEmails($uid);
+    foreach ($emails as $eid => $e) {
+      if ($e['is_primary']) {
+        if ($e['email']) {
           $primary = $e['email'];
           break;
         }
       }
 
-      if ( count($emails) == 1 ) {
+      if (count($emails) == 1) {
         $primary = $e['email'];
         break;
       }

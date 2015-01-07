@@ -48,7 +48,8 @@ class CompareCommand {
 
     if ($printerType == 'csv') {
       $printer = new \Civi\CiUtil\CsvPrinter('php://stdout', \Civi\CiUtil\Arrays::collect($suites, 'file'));
-    } else {
+    }
+    else {
       $printer = new \Civi\CiUtil\ComparisonPrinter(\Civi\CiUtil\Arrays::collect($suites, 'file'));
     }
     foreach ($tests as $test) {

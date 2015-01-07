@@ -303,7 +303,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue extends CRM_Core_DAO
                 if (!empty($field['import'])) {
                     if ($prefix) {
                         self::$_import['price_field_value'] = & $fields[$name];
-                    } else {
+                    }
+                    else {
                         self::$_import[$name] = & $fields[$name];
                     }
                 }
@@ -326,7 +327,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue extends CRM_Core_DAO
                 if (!empty($field['export'])) {
                     if ($prefix) {
                         self::$_export['price_field_value'] = & $fields[$name];
-                    } else {
+                    }
+                    else {
                         self::$_export[$name] = & $fields[$name];
                     }
                 }

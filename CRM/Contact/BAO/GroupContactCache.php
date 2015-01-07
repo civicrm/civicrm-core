@@ -128,7 +128,7 @@ AND     ( g.cache_date IS NULL OR
     // this function is expensive and should be sparingly used if groupIDs is empty
     if (empty($groupIDs)) {
       $groupIDClause = null;
-      $groupIDs = array( );
+      $groupIDs = array();
     }
     else {
       if (!is_array($groupIDs)) {
@@ -305,11 +305,13 @@ WHERE  id IN ( $groupIDs )
 
     if ($groupID == NULL) {
       $invoked = TRUE;
-    } else if (is_array($groupID)) {
+    }
+    elseif (is_array($groupID)) {
       foreach ($groupID as $gid) {
         unset(self::$_alreadyLoaded[$gid]);
       }
-    } else if ($groupID && array_key_exists($groupID, self::$_alreadyLoaded)) {
+    }
+    elseif ($groupID && array_key_exists($groupID, self::$_alreadyLoaded)) {
       unset(self::$_alreadyLoaded[$groupID]);
     }
 
@@ -651,7 +653,7 @@ ORDER BY   gc.contact_id, g.children
       $prevContactID = $dao->contact_id;
       if (!array_key_exists($dao->contact_id, $contactGroup)) {
         $contactGroup[$dao->contact_id] =
-          array( 'group' => array(), 'groupTitle' => array());
+          array('group' => array(), 'groupTitle' => array());
       }
 
       $contactGroup[$dao->contact_id]['group'][] =

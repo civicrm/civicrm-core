@@ -62,7 +62,7 @@ function smarty_function_crmAPI($params, &$smarty) {
   }
 
   if (!empty($result['is_error'])) {
-    $smarty->trigger_error("{crmAPI} ".$result["error_message"]);
+    $smarty->trigger_error("{crmAPI} " . $result["error_message"]);
   }
 
   if (!array_key_exists('var', $params)) {

@@ -104,7 +104,7 @@ function civicrm_api3_report_template_getrows($params) {
  * @throws CiviCRM_API3_Exception
  */
 function _civicrm_api3_report_template_getrows($params) {
-  if(empty($params['report_id'])) {
+  if (empty($params['report_id'])) {
     $params['report_id'] = civicrm_api3('report_instance', 'getvalue', array('id' => $params['instance_id'], 'return' => 'report_id'));
   }
 
@@ -116,7 +116,7 @@ function _civicrm_api3_report_template_getrows($params) {
   );
 
   $reportInstance = new $class();
-  if(!empty($params['instance_id'])) {
+  if (!empty($params['instance_id'])) {
     $reportInstance->setID($params['instance_id']);
   }
   $reportInstance->setParams($params);
@@ -132,12 +132,12 @@ function _civicrm_api3_report_template_getrows($params) {
   $rows = $metadata = $requiredMetadata  = array();
   $reportInstance->buildRows($sql, $rows);
   $requiredMetadata = array();
-  if(isset($params['options']) && !empty($params['options']['metadata'])) {
+  if (isset($params['options']) && !empty($params['options']['metadata'])) {
     $requiredMetadata = $params['options']['metadata'];
-    if(in_array('title', $requiredMetadata)) {
+    if (in_array('title', $requiredMetadata)) {
       $metadata['metadata']['title'] = $reportInstance->getTitle();
     }
-    if(in_array('labels', $requiredMetadata)) {
+    if (in_array('labels', $requiredMetadata)) {
       foreach ($reportInstance->_columnHeaders as $key => $header) {
         //would be better just to expect reports to provide titles but reports are not consistent so we anticipate empty
         //NB I think these are already translated

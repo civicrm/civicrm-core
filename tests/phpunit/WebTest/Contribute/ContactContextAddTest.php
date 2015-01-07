@@ -49,8 +49,8 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     // We're using Quick Add block on the main page for this.
     $firstName = substr(sha1(rand()), 0, 7);
     // Add new Financial Account
-    $orgName = 'Alberta '.substr(sha1(rand()), 0, 7);
-    $financialAccountTitle = 'Financial Account '.substr(sha1(rand()), 0, 4);
+    $orgName = 'Alberta ' . substr(sha1(rand()), 0, 7);
+    $financialAccountTitle = 'Financial Account ' . substr(sha1(rand()), 0, 4);
     $financialAccountDescription = "{$financialAccountTitle} Description";
     $accountingCode = 1033;
     $financialAccountType = 'Asset';
@@ -61,7 +61,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     $isDefault = FALSE;
 
     //Add new organisation
-    if($orgName) {
+    if ($orgName) {
       $this->webtestAddOrganization($orgName);
     }
     $this->_testAddFinancialAccount($financialAccountTitle,

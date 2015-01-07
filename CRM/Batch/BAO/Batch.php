@@ -305,7 +305,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
           "' name='check_" .
           $object->id .
           "' value='1'  data-status_id='" .
-          $values['status_id']."' class='select-row'></input>";
+          $values['status_id'] . "' class='select-row'></input>";
 
         switch ($batchStatusByName[$values['status_id']]) {
           case 'Open':
@@ -513,7 +513,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
     $batches = array();
     $dao = CRM_Core_DAO::executeQuery($query);
-    while ( $dao->fetch( ) ) {
+    while ($dao->fetch()) {
       $batches[$dao->id] = $dao->title;
     }
     return $batches;
@@ -592,7 +592,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
     // Instantiate appropriate exporter based on user-selected format.
     $exporterClass = "CRM_Financial_BAO_ExportFormat_" . self::$_exportFormat;
-    if ( class_exists( $exporterClass ) ) {
+    if (class_exists($exporterClass)) {
       $exporter = new $exporterClass();
     }
     else {
@@ -621,10 +621,10 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    */
   public static function closeReOpen($batchIds = array(), $status) {
     $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id');
-    $params['status_id'] = CRM_Utils_Array::key( $status, $batchStatus );
-    $session = CRM_Core_Session::singleton( );
+    $params['status_id'] = CRM_Utils_Array::key($status, $batchStatus);
+    $session = CRM_Core_Session::singleton();
     $params['modified_date'] = date('YmdHis');
-    $params['modified_id'] = $session->get( 'userID' );
+    $params['modified_id'] = $session->get('userID');
     foreach ($batchIds as $key => $value) {
       $params['id'] = $ids['batchID'] = $value;
       self::create($params, $ids);
@@ -654,8 +654,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     }
     // action is taken depending upon the mode
     $select = 'civicrm_financial_trxn.id ';
-    if (!empty( $returnValues)) {
-      $select .= " , ".implode(' , ', $returnValues);
+    if (!empty($returnValues)) {
+      $select .= " , " . implode(' , ', $returnValues);
     }
 
     $orderBy = " ORDER BY civicrm_financial_trxn.id";
@@ -780,11 +780,11 @@ WHERE  {$where}
   public static function getBatchNames($batchIds) {
     $query = 'SELECT id, title
       FROM civicrm_batch
-      WHERE id IN ('. $batchIds . ')';
+      WHERE id IN (' .  $batchIds . ')';
 
     $batches = array();
     $dao = CRM_Core_DAO::executeQuery($query);
-    while ( $dao->fetch( ) ) {
+    while ($dao->fetch()) {
       $batches[$dao->id] = $dao->title;
     }
     return $batches;
@@ -800,11 +800,11 @@ WHERE  {$where}
   public static function getBatchStatuses($batchIds) {
     $query = 'SELECT id, status_id
       FROM civicrm_batch
-      WHERE id IN ('.$batchIds.')';
+      WHERE id IN (' . $batchIds . ')';
 
     $batches = array();
     $dao = CRM_Core_DAO::executeQuery($query);
-    while ( $dao->fetch( ) ) {
+    while ($dao->fetch()) {
       $batches[$dao->id] = $dao->status_id;
     }
     return $batches;

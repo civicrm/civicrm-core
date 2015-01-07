@@ -121,7 +121,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->assertFalse(empty($this->objects['membership']), 'in line ' . __LINE__);
     $this->assertArrayHasKey($this->_membershipTypeID, $this->objects['membership'], 'in line ' . __LINE__);
     $this->assertTrue(is_a($this->objects['membership'][$this->_membershipTypeID], 'CRM_Member_BAO_Membership'));
-      $this->assertTrue(is_a( $this->objects['contributionType'],'CRM_Financial_BAO_FinancialType'));
+      $this->assertTrue(is_a($this->objects['contributionType'],'CRM_Financial_BAO_FinancialType'));
     $this->assertFalse(empty($this->objects['contributionRecur']), __LINE__);
     $this->assertFalse(empty($this->objects['paymentProcessor']), __LINE__);
   }
@@ -181,7 +181,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
     $this->assertFalse(empty($this->objects['participant']), 'in line ' . __LINE__);
     $this->assertTrue(is_a($this->objects['participant'], 'CRM_Event_BAO_Participant'));
-      $this->assertTrue(is_a( $this->objects['contributionType'],'CRM_Financial_BAO_FinancialType'));
+      $this->assertTrue(is_a($this->objects['contributionType'],'CRM_Financial_BAO_FinancialType'));
     $this->assertFalse(empty($this->objects['event']));
     $this->assertTrue(is_a($this->objects['event'], 'CRM_Event_BAO_Event'));
     $this->assertTrue(is_a($this->objects['contribution'], 'CRM_Contribute_BAO_Contribution'));
@@ -221,7 +221,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_setUpParticipantObjects();
     $values = array();
     require_once 'CiviTest/CiviMailUtils.php';
-    $mut = new CiviMailUtils( $this, true );
+    $mut = new CiviMailUtils($this, true);
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
     $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, FALSE);
     $mut->checkMailLog(array(
@@ -247,7 +247,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     );
     $this->quickCleanup($tablesToTruncate, FALSE);
     require_once 'CiviTest/CiviMailUtils.php';
-    $mut = new CiviMailUtils( $this, true );
+    $mut = new CiviMailUtils($this, true);
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
     $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, FALSE);
     $mut->assertMailLogEmpty('no mail should have been send as event set to no confirm');
@@ -261,7 +261,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_setUpPledgeObjects();
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
     $this->assertFalse(empty($this->objects['pledge_payment'][0]), 'in line ' . __LINE__);
-      $this->assertTrue(is_a( $this->objects['contributionType'],'CRM_Financial_BAO_FinancialType'));
+      $this->assertTrue(is_a($this->objects['contributionType'],'CRM_Financial_BAO_FinancialType'));
     $this->assertTrue(is_a($this->objects['contribution'], 'CRM_Contribute_BAO_Contribution'));
     $this->assertTrue(is_a($this->objects['pledge_payment'][0], 'CRM_Pledge_BAO_PledgePayment'));
     $this->assertFalse(empty($this->objects['pledge_payment'][0]->id));
@@ -364,7 +364,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
      * fully but the calls to the POST happen in more than one function
      * keeping this as good example of data to bring back to life later
 
-    public function testMainFunctionActions(){
+    public function testMainFunctionActions() {
       $ids                = $objects = array( );
      $input['component'] = 'Contribute';
     $postedParams       = array(

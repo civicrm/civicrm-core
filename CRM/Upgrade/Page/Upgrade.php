@@ -100,7 +100,8 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
       $config = CRM_Core_Config::singleton();
       // also cleanup the templates_c directory
       $config->cleanupCaches();
-    } else {
+    }
+    else {
       $config = CRM_Core_Config::singleton();
       // cleanup only the templates_c directory
       $config->cleanup(1, FALSE);
@@ -158,7 +159,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
       'queue' => CRM_Upgrade_Form::buildQueue($currentVer, $latestVer, $this->get('postUpgradeMessageFile')),
       'isMinimal' => TRUE,
       'pathPrefix' => 'civicrm/upgrade/queue',
-      'onEndUrl' => CRM_Utils_System::url('civicrm/upgrade', 'action=finish', FALSE, NULL, FALSE ),
+      'onEndUrl' => CRM_Utils_System::url('civicrm/upgrade', 'action=finish', FALSE, NULL, FALSE),
       'buttons' => array('retry' => $config->debug, 'skip' => $config->debug),
       ));
     $queueRunner->runAllViaWeb();
@@ -180,7 +181,8 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
 
       // This destroys $session, so do it after get('postUpgradeMessageFile')
       CRM_Upgrade_Form::doFinish();
-    } else {
+    }
+    else {
       $postUpgradeMessage = ''; // Session was destroyed! Can't recover messages.
     }
 

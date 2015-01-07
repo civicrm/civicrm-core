@@ -190,7 +190,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     $type = 'next';
-    if ( $this->_selfService ) {
+    if ($this->_selfService) {
       $type = 'submit';
     }
 
@@ -420,9 +420,10 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
     $userID  = $session->get('userID');
-    if ( $userID && $status) {
+    if ($userID && $status) {
       $session->setStatus($status, $msgTitle, $msgType);
-    } else if (!$userID) {
+    }
+    elseif (!$userID) {
       if ($status)
         CRM_Utils_System::setUFMessage($status);
       $result = (int) ($updateSubscription && isset($ctype));

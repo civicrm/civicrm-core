@@ -238,15 +238,15 @@ abstract class CRM_Utils_System_Base {
    *
    * FIXME: Document values accepted/required by $params
    */
-  public function userLoginFinalize($params = array()){
+  public function userLoginFinalize($params = array()) {
   }
 
   /**
    * Set timezone in mysql so that timestamp fields show the correct time
    */
-  public function setMySQLTimeZone(){
+  public function setMySQLTimeZone() {
     $timeZoneOffset = $this->getTimeZoneOffset();
-    if($timeZoneOffset){
+    if ($timeZoneOffset) {
       $sql = "SET time_zone = '$timeZoneOffset'";
       CRM_Core_DAO::executequery($sql);
     }
@@ -258,7 +258,7 @@ abstract class CRM_Utils_System_Base {
    *
    * @return string|false|null
    */
-  public function getTimeZoneOffset(){
+  public function getTimeZoneOffset() {
     $timezone = $this->getTimeZoneString();
     if ($timezone) {
       $tzObj = new DateTimeZone($timezone);
@@ -337,7 +337,7 @@ abstract class CRM_Utils_System_Base {
    * @return int $ufid - user ID of UF System
    */
   public function getBestUFID($user = NULL) {
-    if($user) {
+    if ($user) {
       return $this->getUserIDFromUserObject($user);
     }
     return $this->getLoggedInUfID();
@@ -353,7 +353,7 @@ abstract class CRM_Utils_System_Base {
    * @return string $uniqueIdentifier - unique identifier from the UF System
    */
   public function getBestUFUniqueIdentifier($user = NULL) {
-    if($user) {
+    if ($user) {
       return $this->getUniqueIdentifierFromUserObject($user);
     }
     return $this->getLoggedInUniqueIdentifier();

@@ -413,7 +413,8 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
            $trxn_id           = str_replace( 'test', '', $trxn_id );
            $trxn_id           = intval($trxn_id) + 1;
            $params['trxn_id'] = sprintf('test%08d', $trxn_id);
-       } else {
+       }
+       else {
            $params['trxn_id'] = $eWAYResponse->TransactionNumber();
        }
        */

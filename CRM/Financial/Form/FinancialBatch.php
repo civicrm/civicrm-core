@@ -75,7 +75,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
 
       $createdID = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $this->_id, 'created_id');
       if (!empty($permissions[$this->_action])) {
-        $this->checkPermissions($this->_action, $permissions[$this->_action]['permission'], $createdID, $session->get('userID'), $permissions[$this->_action]['actionName'] );
+        $this->checkPermissions($this->_action, $permissions[$this->_action]['permission'], $createdID, $session->get('userID'), $permissions[$this->_action]['actionName']);
       }
     }
   }
@@ -89,9 +89,9 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
     parent::buildQuickForm();
     $this->setPageTitle(ts('Financial Batch'));
 
-    if (isset( $this->_id)) {
+    if (isset($this->_id)) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $this->_id, 'title');
-      CRM_Utils_System::setTitle($this->_title .' - '.ts( 'Accounting Batch'));
+      CRM_Utils_System::setTitle($this->_title  . ' - ' . ts('Accounting Batch'));
       $this->assign('batchTitle', $this->_title);
       $contactID = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $this->_id, 'created_id');
       $contactName = CRM_Contact_BAO_Contact::displayName($contactID);
@@ -123,7 +123,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
       $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id');
 
       //unset exported status
-      $exportedStatusId = CRM_Utils_Array::key('Exported', $batchStatus );
+      $exportedStatusId = CRM_Utils_Array::key('Exported', $batchStatus);
       unset($batchStatus[$exportedStatusId]);
       $this->add('select', 'status_id', ts('Batch Status'), array('' => ts('- select -')) + $batchStatus, TRUE);
       $this->freeze(array('status_id'));
@@ -245,7 +245,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
     //create activity.
     $activityParams = array(
       'activity_type_id' => array_search($activityTypeName, $activityTypes),
-      'subject' => $batch->title ."- Batch",
+      'subject' => $batch->title  . "- Batch",
       'status_id' => 2,
       'priority_id' => 2,
       'activity_date_time' => date('YmdHis'),
@@ -274,7 +274,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm', 'reset=1'));
     }
     elseif (($buttonName == $this->getButtonName('next') & $this->_action == CRM_Core_Action::UPDATE) ||
-      ($buttonName == $this->getButtonName('next') & $this->_action == CRM_Core_Action::ADD & $context == 1 )) {
+      ($buttonName == $this->getButtonName('next') & $this->_action == CRM_Core_Action::ADD & $context == 1)) {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/financial/financialbatches',
         "reset=1&batchStatus=1"));
     }

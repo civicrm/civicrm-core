@@ -359,7 +359,8 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
           $count++;
           $numRows++;
         }
-      } elseif ($this->_params['id_op'] == 'notin') {
+      }
+      elseif ($this->_params['id_op'] == 'notin') {
         $events = CRM_Event_PseudoConstant::event(NULL, NULL,
           "is_template = 0"
         );

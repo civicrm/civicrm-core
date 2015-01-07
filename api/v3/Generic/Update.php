@@ -54,7 +54,7 @@ function civicrm_api3_generic_update($apiRequest) {
   // @fixme
   // tests show that contribution works better with create
   // this is horrible but to make it work we'll just handle it separately
-  if(strtolower($apiRequest['entity']) == 'contribution'){
+  if (strtolower($apiRequest['entity']) == 'contribution') {
     return civicrm_api($apiRequest['entity'], 'create', $apiRequest['params']);
   }
   $seek = array($key_id => $apiRequest['params'][$key_id], 'version' => $apiRequest['version']);

@@ -202,7 +202,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
         );
       }
       if (strtolower($dbEmail) == strtolower($email)) {
-        if(empty($email)) {
+        if (empty($email)) {
           $errors[$emailName] = ts('You cannot create an email account for a contact with no email',
             array(1 => $email)
           );
@@ -933,8 +933,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param int $drupalID
    *   Drupal User ID.
    */
-  public function og_membership_create($ogID, $drupalID){
-    og_save_subscription( $ogID, $drupalID, array( 'is_active' => 1 ) );
+  public function og_membership_create($ogID, $drupalID) {
+    og_save_subscription($ogID, $drupalID, array('is_active' => 1));
   }
 
   /**
@@ -946,7 +946,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *   Drupal User ID.
    */
   public function og_membership_delete($ogID, $drupalID) {
-    og_delete_subscription( $ogID, $drupalID );
+    og_delete_subscription($ogID, $drupalID);
   }
 
   /**
@@ -957,7 +957,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     global $user;
     if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
       $timezone = $user->timezone;
-    } else {
+    }
+    else {
       $timezone = variable_get('date_default_timezone', NULL);
     }
     if (!$timezone) {

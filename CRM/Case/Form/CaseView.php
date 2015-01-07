@@ -257,10 +257,10 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
           FALSE, NULL, FALSE
         );
       }
-      else if ($type == $pdfActivityType ) {
+      elseif ($type == $pdfActivityType) {
         $url = CRM_Utils_System::url('civicrm/activity/pdf/add',
           "action=add&context=standalone&reset=1&cid={$this->_contactID}&caseid={$this->_caseID}&atype=$type",
-          FALSE, NULL, FALSE );
+          FALSE, NULL, FALSE);
       }
       else {
         $url = CRM_Utils_System::url('civicrm/case/activity',
@@ -506,7 +506,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     foreach ($caseRelationships as $key => & $value) {
       $reporters[$value['cid']] = $value['name'] . " ( {$value['relation']} )";
     }
-    $form->add('select', 'reporter_id', ts('Reporter/Role'), $reporters, FALSE, array('id' => 'reporter_id_'.$form->_caseID));
+    $form->add('select', 'reporter_id', ts('Reporter/Role'), $reporters, FALSE, array('id' => 'reporter_id_' . $form->_caseID));
 
     // take all case activity types for search filter, CRM-7187
     $aTypesFilter = array();
@@ -518,17 +518,17 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     }
     $aTypesFilter = $aTypesFilter + $aTypes;
     asort($aTypesFilter);
-    $form->add('select', 'activity_type_filter_id', ts('Activity Type'), array('' => ts('- select activity type -')) + $aTypesFilter, FALSE, array('id' => 'activity_type_filter_id_'.$form->_caseID));
+    $form->add('select', 'activity_type_filter_id', ts('Activity Type'), array('' => ts('- select activity type -')) + $aTypesFilter, FALSE, array('id' => 'activity_type_filter_id_' . $form->_caseID));
 
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
-    $form->add('select', 'status_id', ts('Status'), array("" => ts(' - any status - ')) + $activityStatus, FALSE, array('id' => 'status_id_'.$form->_caseID));
+    $form->add('select', 'status_id', ts('Status'), array("" => ts(' - any status - ')) + $activityStatus, FALSE, array('id' => 'status_id_' . $form->_caseID));
 
     // activity dates
-    $form->addDate('activity_date_low_'.$form->_caseID, ts('Activity Dates - From'), FALSE, array('formatType' => 'searchDate'));
-    $form->addDate('activity_date_high_'.$form->_caseID, ts('To'), FALSE, array('formatType' => 'searchDate'));
+    $form->addDate('activity_date_low_' . $form->_caseID, ts('Activity Dates - From'), FALSE, array('formatType' => 'searchDate'));
+    $form->addDate('activity_date_high_' . $form->_caseID, ts('To'), FALSE, array('formatType' => 'searchDate'));
 
     if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $form->add('checkbox', 'activity_deleted', ts('Deleted Activities'), '', FALSE, array('id' => 'activity_deleted_'.$form->_caseID));
+      $form->add('checkbox', 'activity_deleted', ts('Deleted Activities'), '', FALSE, array('id' => 'activity_deleted_' . $form->_caseID));
     }
   }
 }

@@ -61,7 +61,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
   public function tearDown() {
     foreach ($this->ids as $entity => $entities) {
       foreach ($entities as $id) {
-        $this->callAPISuccess($entity, 'delete', array( 'id' => $id));
+        $this->callAPISuccess($entity, 'delete', array('id' => $id));
       }
     }
     $this->quickCleanup(array('civicrm_grant'));

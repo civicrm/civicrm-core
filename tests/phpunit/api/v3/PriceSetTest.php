@@ -152,7 +152,7 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
     // put stuff here that should happen before all tests in this unit
   }
 
-  public static function tearDownAfterClass(){
+  public static function tearDownAfterClass() {
     $tablesToTruncate = array(
       'civicrm_contact',
       'civicrm_contribution',

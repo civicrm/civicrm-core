@@ -62,7 +62,7 @@ class CRM_Upgrade_Incremental_php_FourTwo {
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '4.2.alpha1') {
       $tables = array('civicrm_contribution_page', 'civicrm_event', 'civicrm_group', 'civicrm_contact');
-      if (!CRM_Core_DAO::schemaRequiresRebuilding($tables)){
+      if (!CRM_Core_DAO::schemaRequiresRebuilding($tables)) {
         $errors = ts("The upgrade has identified some schema integrity issues in the database. It seems some of your constraints are missing. You will have to rebuild your schema before re-trying the upgrade. Please refer to %1.", array(1 => CRM_Utils_System::docURL2("Ensuring Schema Integrity on Upgrades", FALSE, "Ensuring Schema Integrity on Upgrades", NULL, NULL, "wiki")));
         CRM_Core_Error::fatal($errors);
         return FALSE;
@@ -83,7 +83,7 @@ ORDER BY mp.contribution_id, mp.membership_id";
       $invalidData = CRM_Core_DAO::executeQuery($query);
       if ($invalidData->N) {
         $invalidDataMessage = "<br /><strong>" . ts('The upgrade is being aborted due to data integrity issues in your database. There are multiple membership records linked to the same contribution record. This is unexpected, and some of the membership records may be duplicates. The problem record sets are listed below. Refer to <a href="%1">this wiki page for instructions on repairing your database</a> so that you can run the upgrade successfully.
-        ', array( 1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC42/Repair+database+script+for+4.2+upgrades')) . "</strong>";
+        ', array(1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC42/Repair+database+script+for+4.2+upgrades')) . "</strong>";
         $membershipType = CRM_Member_PseudoConstant::membershipType();
         $membershipStatus = CRM_Member_PseudoConstant::membershipStatus();
         $invalidDataMessage .= "<table border=1><tr><th>Contact-ID</th><th>Contribution-ID</th><th>Membership-ID</th><th>Membership Type</th><th>Start Date</th><th>End Date</th><th>Membership Status</th></tr>";
@@ -110,9 +110,11 @@ ORDER BY mp.contribution_id, mp.membership_id";
         $preUpgradeMessage .= '<br />' . ts('Could not determine path to civicrm.settings.php. Please manually locate it and add these lines at the bottom: <pre>%1</pre>', array(
           1 => self::SETTINGS_SNIPPET
         ));
-      } elseif (preg_match(self::SETTINGS_SNIPPET_PATTERN, file_get_contents(CIVICRM_SETTINGS_PATH))) {
+      }
+      elseif (preg_match(self::SETTINGS_SNIPPET_PATTERN, file_get_contents(CIVICRM_SETTINGS_PATH))) {
         // OK, nothing to do
-      } elseif (!is_writable(CIVICRM_SETTINGS_PATH)) {
+      }
+      elseif (!is_writable(CIVICRM_SETTINGS_PATH)) {
         $preUpgradeMessage .= '<br />' . ts('The settings file (%1) must be updated. Please make it writable or manually add these lines:<pre>%2</pre>', array(
           1 => CIVICRM_SETTINGS_PATH,
           2 => self::SETTINGS_SNIPPET
@@ -128,7 +130,7 @@ INNER JOIN civicrm_price_field cpf ON cpf.id = cpfv.price_field_id and cpf.id !=
 INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'default_membership_type_amount' ";
       $dao = CRM_Core_DAO::executeQuery($query);
       if ($dao->N) {
-        $preUpgradeMessage .= "<br /><strong>". ts('We have identified extraneous data in your database that a previous upgrade likely introduced. We STRONGLY recommend making a backup of your site before continuing. We also STRONGLY suggest fixing this issue with unneeded records BEFORE you upgrade. You can find more information about this issue and the way to fix it by visiting <a href="http://forum.civicrm.org/index.php/topic,26181.0.html">http://forum.civicrm.org/index.php/topic,26181.0.html</a>.') ."</strong>";
+        $preUpgradeMessage .= "<br /><strong>" .  ts('We have identified extraneous data in your database that a previous upgrade likely introduced. We STRONGLY recommend making a backup of your site before continuing. We also STRONGLY suggest fixing this issue with unneeded records BEFORE you upgrade. You can find more information about this issue and the way to fix it by visiting <a href="http://forum.civicrm.org/index.php/topic,26181.0.html">http://forum.civicrm.org/index.php/topic,26181.0.html</a>.')  . "</strong>";
       }
     }
 
@@ -179,9 +181,9 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
                     'civicrm_event' => 'FK_civicrm_event_payment_processor_id',
                     'civicrm_group' => 'FK_civicrm_group_saved_search_id',
                     );
-    foreach($tables as $tableName => $fKey){
+    foreach ($tables as $tableName => $fKey) {
       $foreignKeyExists = CRM_Core_DAO::checkConstraintExists($tableName, $fKey);
-      if ($foreignKeyExists){
+      if ($foreignKeyExists) {
         CRM_Core_DAO::executeQuery("ALTER TABLE {$tableName} DROP FOREIGN KEY {$fKey}", $params, TRUE, NULL, FALSE, FALSE);
         CRM_Core_DAO::executeQuery("ALTER TABLE {$tableName} DROP INDEX {$fKey}", $params, TRUE, NULL, FALSE, FALSE);
       }
@@ -198,7 +200,8 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
           CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_price_set` DROP INDEX `UI_title_{$locale}`", $params, TRUE, NULL, FALSE, FALSE);
         }
       }
-    } else {
+    }
+    else {
       $query = "SHOW KEYS FROM `civicrm_price_set` WHERE key_name = 'UI_title'";
       $dao = CRM_Core_DAO::executeQuery($query);
       if ($dao->N) {
@@ -367,7 +370,7 @@ HAVING COUNT(cpse.price_set_id) > 1 AND MIN(cpse1.id) <> cpse.id ";
     }
   }
 
-  public function convertContribution(){
+  public function convertContribution() {
     $minContributionId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(min(id),0) FROM civicrm_contribution');
     $maxContributionId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(max(id),0) FROM civicrm_contribution');
     for ($startId = $minContributionId; $startId <= $maxContributionId; $startId += self::BATCH_SIZE) {
@@ -431,7 +434,7 @@ WHERE     cpse.price_set_id IS NULL";
       $addTo[2] = $dao->contribution_page_id;
       $options = array(
       'otherAmount' => $dao->is_allow_other_amount,
-                      'membership' => $dao->membership_block_id );
+                      'membership' => $dao->membership_block_id);
       self::createPriceSet($daoName, $addTo, $options);
     }
 
@@ -466,7 +469,7 @@ WHERE     cpse.price_set_id IS NULL";
     // an event or contrib page has been deleted but left the option group behind - (this may be fixed in later versions?)
     // we should probably delete the option group - but at least early exit here as the code following it does not fatal
     // CRM-10298
-    if ( empty($pageTitle)) {
+    if (empty($pageTitle)) {
       return;
     }
 
@@ -677,13 +680,13 @@ WHERE     cpf.price_set_id = %1
 
         //CRM-12273
         //check if price_set_id is exist, if not use the default contribution amount
-        if (isset($result->price_set_id)){
+        if (isset($result->price_set_id)) {
           $priceSetId = $result->price_set_id;
         }
         else{
           $defaultPriceSets = CRM_Price_BAO_PriceSet::getDefaultPriceSet();
           foreach ($defaultPriceSets as $key => $pSet) {
-            if ($pSet['name'] == 'contribution_amount'){
+            if ($pSet['name'] == 'contribution_amount') {
               $priceSetId = $pSet['setID'];
             }
           }
@@ -789,7 +792,8 @@ AND       cli.entity_id IS NULL AND cp.fee_amount IS NOT NULL";
           'price_field_value_id' => $dao->price_field_value_id,
         );
         $priceSetId = $dao->price_set_id;
-      } else {
+      }
+      else {
         $lineParams['price_field_id'] = $fieldID;
         $priceSetId = $defaultPriceSetId;
       }
@@ -956,13 +960,14 @@ VALUES
       }
     }
 
-    if ( !empty($processedRecords) ) {
+    if (!empty($processedRecords)) {
       CRM_Core_Error::debug_log_message("deleteInvalidPairs() - The following records have been processed. Membership records with action:");
-      CRM_Core_Error::debug_log_message( "Contact ID, ContributionID, Contribution Status, MembershipID, Membership Type, Start Date, End Date, Membership Status, Action" );
-      foreach ( $processedRecords as $record ) {
+      CRM_Core_Error::debug_log_message("Contact ID, ContributionID, Contribution Status, MembershipID, Membership Type, Start Date, End Date, Membership Status, Action");
+      foreach ($processedRecords as $record) {
         CRM_Core_Error::debug_log_message(implode(', ', $record));
       }
-    } else {
+    }
+    else {
       CRM_Core_Error::debug_log_message("deleteInvalidPairs() - Could not find any records to process.");
     }
     return $processedRecords;

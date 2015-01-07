@@ -84,10 +84,10 @@ class CRM_Utils_Token {
       'id',
       'description',
     ),
-    'subscribe' => array( 'group' ),
-    'unsubscribe' => array( 'group' ),
-    'resubscribe' => array( 'group' ),
-    'welcome' => array( 'group' ),
+    'subscribe' => array('group'),
+    'unsubscribe' => array('group'),
+    'resubscribe' => array('group'),
+    'welcome' => array('group'),
   );
 
   /**
@@ -1437,12 +1437,12 @@ class CRM_Utils_Token {
       $remainingTokens = self::getTokens($tokenString);
 
       // contact related $greetingTokens not empty, there are customized or hook tokens to replace
-      if (!empty($remainingTokens['contact']) ) {
+      if (!empty($remainingTokens['contact'])) {
         // Fill the return properties array
         $greetingTokens = $remainingTokens['contact'];
         reset($greetingTokens);
         $greetingsReturnProperties = array();
-        while(list($key) = each($greetingTokens)) {
+        while (list($key) = each($greetingTokens)) {
           $props = array_flip(CRM_Utils_Array::value($key, $greetingTokens));
           $props = array_fill_keys(array_keys($props), 1);
           $greetingsReturnProperties = $greetingsReturnProperties + $props;
@@ -1656,11 +1656,11 @@ class CRM_Utils_Token {
    * @return \Ambigous|mixed|string|\unknown
    */
   public static function replaceMultipleContributionTokens($separator, $str, &$contribution, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
-    if(empty($knownTokens['contribution'])) {
+    if (empty($knownTokens['contribution'])) {
       return $str;
     }
 
-    if(in_array('receive_date', $knownTokens['contribution'])) {
+    if (in_array('receive_date', $knownTokens['contribution'])) {
       $formattedDates = array();
       $dates = explode($separator, $contribution['receive_date']);
       foreach ($dates as $date) {

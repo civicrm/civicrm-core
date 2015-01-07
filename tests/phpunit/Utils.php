@@ -104,14 +104,15 @@ class Utils {
      $backtrace = debug_backtrace();
      $dir_name  = dirname( __FILE__ );
      $cwd_len   = strlen( $dir_name ) + 1;
-     foreach( $backtrace as $frame ){
+     foreach ($backtrace as $frame ) {
      echo "      ";
      if ( array_key_exists( 'class', $frame ) ) {
      echo " class {$frame['class']}";
      if ( array_key_exists( 'function', $frame ) ) {
      echo " method {$frame['function']}";
      }
-     } else {
+     }
+     else {
      if ( array_key_exists( 'function', $frame ) ) {
      echo " function {$frame['function']}";
      }

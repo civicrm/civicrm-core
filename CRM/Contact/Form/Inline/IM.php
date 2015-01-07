@@ -127,7 +127,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
       }
 
       if (count($hasPrimary) > 1) {
-        $errors["im[".array_pop($hasPrimary)."][is_primary]"] = ts('Only one IM can be marked as primary.');
+        $errors["im[" . array_pop($hasPrimary) . "][is_primary]"] = ts('Only one IM can be marked as primary.');
       }
     }
     return $errors;

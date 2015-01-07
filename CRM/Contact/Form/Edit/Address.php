@@ -210,7 +210,7 @@ class CRM_Contact_Form_Edit_Address {
       // since we change element name for address custom data, we need to format the setdefault values
       $addressDefaults = array();
       foreach ($defaults as $key => $val) {
-        if ( empty( $val ) ) {
+        if (empty($val)) {
           continue;
         }
 
@@ -280,7 +280,7 @@ class CRM_Contact_Form_Edit_Address {
           // DETACH 'required' form rule error to
           // custom data only if address data not exists upon submission
           if (!empty($customDataRequiredFields)) {
-            foreach($customDataRequiredFields as $customElementName) {
+            foreach ($customDataRequiredFields as $customElementName) {
               $elementName = "address[$instance][$customElementName]";
               if ($self->getElementError($elementName)) {
                 // set element error to none
@@ -294,7 +294,7 @@ class CRM_Contact_Form_Edit_Address {
         // DETACH 'required' form rule error to
         // custom data only if address data not exists upon submission
         if (!empty($customDataRequiredFields) && !CRM_Core_BAO_Address::dataExists($addressValues)) {
-          foreach($customDataRequiredFields as $customElementName) {
+          foreach ($customDataRequiredFields as $customElementName) {
             $elementName = "address[$instance][$customElementName]";
             if ($self->getElementError($elementName)) {
               // set element error to none
@@ -322,7 +322,7 @@ class CRM_Contact_Form_Edit_Address {
    *
    * @static
    */
-  public static function setDefaultValues( &$defaults, &$form ) {
+  public static function setDefaultValues(&$defaults, &$form) {
     $addressValues = array();
     if (isset($defaults['address']) && is_array($defaults['address']) &&
       !CRM_Utils_System::isNull($defaults['address'])

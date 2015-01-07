@@ -367,7 +367,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * @return bool
    */
   static protected function isPaymentTransaction($form) {
-    if(!empty($form->_values['is_monetary']) && $form->_amount >= 0.0) {
+    if (!empty($form->_values['is_monetary']) && $form->_amount >= 0.0) {
       return TRUE;
     }
     return FALSE;
@@ -526,7 +526,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
       $transaction['trxn_id'] = md5(uniqid(rand(), TRUE));
     }
 
-    if (!isset( $transaction['financial_type_id'])) {
+    if (!isset($transaction['financial_type_id'])) {
       $contributionTypes = array_keys(CRM_Contribute_PseudoConstant::financialType());
       $transaction['financial_type_id'] = $contributionTypes[0];
     }

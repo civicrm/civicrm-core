@@ -66,7 +66,7 @@ function civicrm_api3_system_flush($params) {
  * @param array $params
  *   Array or parameters determined by getfields.
  */
-function _civicrm_api3_system_flush_spec(&$params){
+function _civicrm_api3_system_flush_spec(&$params) {
   $params['triggers'] = array('title' => 'rebuild triggers (boolean)');
   $params['session'] = array('title' => 'refresh sessions (boolean)');
 }
@@ -112,12 +112,12 @@ function civicrm_api3_system_log($params) {
   $log = new CRM_Utils_SystemLogger();
   // this part means fields with separate db storage are accepted as params which kind of seems more intuitive to me
   // because I felt like not doing this required a bunch of explanation in the spec function - but perhaps other won't see it as helpful?
-  if(!isset($params['context'])) {
+  if (!isset($params['context'])) {
     $params['context'] = array();
   }
   $specialFields = array('contact_id', 'hostname');
-  foreach($specialFields as $specialField) {
-    if(isset($params[$specialField]) && !isset($params['context'])) {
+  foreach ($specialFields as $specialField) {
+    if (isset($params[$specialField]) && !isset($params['context'])) {
       $params['context'][$specialField] = $params[$specialField];
     }
   }

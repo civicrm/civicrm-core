@@ -346,7 +346,8 @@ FROM      civicrm_file AS CF
 LEFT JOIN civicrm_entity_file AS CEF ON ( CEF.file_id = CF.id )
 WHERE     CF.id = %2";
 
-    } else {
+    }
+    else {
       $sql = "
 SELECT    CF.id as cfID,
            CF.uri as uri,

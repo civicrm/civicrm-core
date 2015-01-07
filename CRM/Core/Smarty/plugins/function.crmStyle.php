@@ -59,9 +59,11 @@ function smarty_function_crmStyle($params, &$smarty) {
 
   if (array_key_exists('file', $params)) {
     $res->addStyleFile($params['ext'], $params['file'], $params['weight'], $params['region']);
-  } elseif (array_key_exists('url', $params)) {
+  }
+  elseif (array_key_exists('url', $params)) {
     $res->addStyleUrl($params['url'], $params['weight'], $params['region']);
-  } else {
+  }
+  else {
     CRM_Core_Error::debug_var('crmStyle_params', $params);
     throw new Exception("crmStyle requires url or ext+file");
   }

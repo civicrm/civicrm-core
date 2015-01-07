@@ -155,7 +155,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
       $nextGroup = $this->_getNextSiblingGroup($currentGroup);
       if (!$nextGroup) {
         // no sibling, find an ancestor w/ a sibling
-        for (;; ) {
+        for (;;) {
           // since we pop this array everytime, we should be
           // reasonably safe from infinite loops, I think :)
           $ancestor = array_pop($this->_parentStack);

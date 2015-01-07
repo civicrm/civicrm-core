@@ -144,7 +144,8 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   public static function caseType($column = 'title', $onlyActive = TRUE) {
     if ($onlyActive) {
       $condition = " is_active = 1 ";
-    } else {
+    }
+    else {
       $condition = NULL;
     }
     $caseType = NULL;

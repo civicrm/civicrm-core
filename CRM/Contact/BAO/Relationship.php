@@ -89,7 +89,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     $relationshipId = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
     //CRM-9015 - the hooks are called here & in add (since add doesn't call create)
     // but in future should be tidied per ticket
-    if(empty($relationshipId)){
+    if (empty($relationshipId)) {
       $hook = 'create';
       $action = CRM_Core_Action::ADD;
     }
@@ -202,7 +202,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
 
     $hook = 'create';
-    if($relationshipId) {
+    if ($relationshipId) {
       $hook = 'edit';
     }
     //@todo hook are called from create and add - remove one
@@ -232,11 +232,11 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
     $dateFields = array('end_date', 'start_date');
 
-    foreach (self::getdefaults() as $defaultField => $defaultValue){
-      if(isset($params[$defaultField])){
-        if(in_array($defaultField, $dateFields)){
+    foreach (self::getdefaults() as $defaultField => $defaultValue) {
+      if (isset($params[$defaultField])) {
+        if (in_array($defaultField, $dateFields)) {
           $relationship->$defaultField = CRM_Utils_Date::format(CRM_Utils_Array::value($defaultField, $params));
-          if(!$relationship->$defaultField){
+          if (!$relationship->$defaultField) {
             $relationship->$defaultField = 'NULL';
           }
         }
@@ -244,7 +244,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           $relationship->$defaultField = $params[$defaultField];
         }
       }
-      elseif(!$relationshipId){
+      elseif(!$relationshipId) {
         $relationship->$defaultField = $defaultValue;
       }
     }
@@ -766,9 +766,9 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
     */
 
     $dateFields = array('end_date', 'start_date');
-    foreach ($dateFields as $dateField){
-      if(array_key_exists($dateField, $params)) {
-        if (empty($params[$dateField]) || $params[$dateField] == 'null'){
+    foreach ($dateFields as $dateField) {
+      if (array_key_exists($dateField, $params)) {
+        if (empty($params[$dateField]) || $params[$dateField] == 'null') {
           //this is most likely coming from an api call & probably loaded
           // from the DB to deal with some of the
           // other myriad of excessive checks still in place both in
@@ -776,7 +776,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
           $queryString .= " AND $dateField IS NULL";
           continue;
         }
-        elseif (is_array($params[$dateField])){
+        elseif (is_array($params[$dateField])) {
           $queryString .= " AND $dateField = " .
             CRM_Utils_Type::escape(CRM_Utils_Date::format($params[$dateField]), 'Date');
         }
@@ -1005,11 +1005,11 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
 
     // CRM-6181
     $where .= ' AND civicrm_contact.is_deleted = 0';
-    if(!empty($params['membership_type_id']) && empty($params['relationship_type_id'])) {
+    if (!empty($params['membership_type_id']) && empty($params['relationship_type_id'])) {
       $where .= self::membershipTypeToRelationshipTypes($params, $direction);
     }
-    if(!empty($params['relationship_type_id'])) {
-      if(is_array($params['relationship_type_id'])) {
+    if (!empty($params['relationship_type_id'])) {
+      if (is_array($params['relationship_type_id'])) {
         $where .=  " AND " . CRM_Core_DAO::createSQLFilter('relationship_type_id', $params['relationship_type_id'], 'Integer');
       }
       else {
@@ -1712,11 +1712,11 @@ AND cc.sort_name LIKE '%$name%'";
   public static function membershipTypeToRelationshipTypes(&$params, $direction = NULL) {
     $membershipType = civicrm_api3('membership_type', 'getsingle', array('id' => $params['membership_type_id'], 'return' => 'relationship_type_id, relationship_direction'));
     $relationshipTypes = $membershipType['relationship_type_id'];
-    if(empty($relationshipTypes)) {
+    if (empty($relationshipTypes)) {
       return;
     }
     // if we don't have any contact data we can only filter on type
-    if(empty($params['contact_id']) && empty($params['contact_id_a']) && empty($params['contact_id_a'])) {
+    if (empty($params['contact_id']) && empty($params['contact_id_a']) && empty($params['contact_id_a'])) {
       $params['relationship_type_id'] = array('IN' => $relationshipTypes);
       return;
     }
@@ -1725,14 +1725,14 @@ AND cc.sort_name LIKE '%$name%'";
       // if we have contact_id_a OR contact_id_b we can make a call here
       // if we have contact??
       foreach ($relationshipDirections as $index => $mtdirection) {
-        if(isset($params['contact_id_a']) && $mtdirection == 'a_b'  || $direction == 'a_b') {
+        if (isset($params['contact_id_a']) && $mtdirection == 'a_b'  || $direction == 'a_b') {
           $types[] = $relationshipTypes[$index];
         }
-        if(isset($params['contact_id_b']) && $mtdirection == 'b_a'  || $direction == 'b_a') {
+        if (isset($params['contact_id_b']) && $mtdirection == 'b_a'  || $direction == 'b_a') {
           $types[] = $relationshipTypes[$index];
         }
       }
-      if(!empty($types)) {
+      if (!empty($types)) {
         $params['relationship_type_id'] = array('IN' => $types);
       }
       elseif(!empty($clauses)) {
@@ -1818,7 +1818,7 @@ AND cc.sort_name LIKE '%$name%'";
           FALSE,
           $values['cid']
         );
-        $contactRelationships[$relationshipId]['name'] = $icon.' '.CRM_Utils_System::href(
+        $contactRelationships[$relationshipId]['name'] = $icon . ' ' . CRM_Utils_System::href(
           $values['name'],
           'civicrm/contact/view',
           "reset=1&cid={$values['cid']}");

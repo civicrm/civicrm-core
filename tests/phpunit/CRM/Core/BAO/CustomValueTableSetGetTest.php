@@ -71,13 +71,14 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     $message = NULL;
     try {
       $result = CRM_Core_BAO_CustomValueTable::setValues($params);
-    } catch ( Exception $e ) {
+    }
+    catch (Exception $e) {
       $message = $e->getMessage();
     }
     $errorScope = NULL;
 
     // Check that an exception has been thrown
-    $this->assertNotNull( $message, 'Verify than an exception is thrown when bad date is passed' );
+    $this->assertNotNull($message, 'Verify than an exception is thrown when bad date is passed');
 
     $params = array(
       'entityID' => $contactID,
@@ -172,13 +173,14 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     $message = NULL;
     try {
       $result = CRM_Core_BAO_CustomValueTable::setValues($params);
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       $message = $e->getMessage();
     }
     $errorScope = NULL;
 
     // Check that an exception has been thrown
-    $this->assertNotNull( $message, 'Verify than an exception is thrown when bad boolean is passed' );
+    $this->assertNotNull($message, 'Verify than an exception is thrown when bad boolean is passed');
 
     $params = array(
       'entityID' => $contactID,

@@ -178,7 +178,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
 
     $params['contact_type'] = $this->_contactType;
     //CRM-14904
-    if ( isset($this->_defaults['contact_sub_type']) ) {
+    if (isset($this->_defaults['contact_sub_type'])) {
       $params['contact_sub_type'] = $this->_defaults['contact_sub_type'];
     }
     $params['contact_id'] = $this->_contactId;

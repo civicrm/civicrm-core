@@ -54,7 +54,8 @@ class CRM_Report_Page_TemplateList extends CRM_Core_Page {
     if ($compID) {
       if ($compID == 99) {
         $compClause = " AND v.component_id IS NULL ";
-      } else {
+      }
+      else {
         $compClause = " AND v.component_id = {$compID} ";
       }
     }

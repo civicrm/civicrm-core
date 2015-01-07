@@ -9,13 +9,13 @@ ini_set('include_path',
         "{$GLOBALS['base_dir']}" . PATH_SEPARATOR .
         "$tests_dir"            . PATH_SEPARATOR .
         "$civi_pkgs_dir"        . PATH_SEPARATOR
-        . ini_get( 'include_path') );
+        . ini_get('include_path'));
 
 #  Relying on system timezone setting produces a warning,
 #  doing the following prevents the warning message
-if ( file_exists( '/etc/timezone' ) ) {
-  $timezone = trim( file_get_contents( '/etc/timezone' ) );
-  if ( ini_set('date.timezone', $timezone ) === FALSE ) {
+if (file_exists('/etc/timezone')) {
+  $timezone = trim(file_get_contents('/etc/timezone'));
+  if (ini_set('date.timezone', $timezone) === FALSE) {
     echo "ini_set( 'date.timezone', '$timezone' ) failed\n";
   }
 }

@@ -121,7 +121,8 @@ class CRM_Event_Import_Field {
             }
             if (in_array($this->_value, $events)) {
                 return true;
-            } else {
+            }
+            else {
                 return false;
             }
             break;

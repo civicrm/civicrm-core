@@ -156,8 +156,8 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
     $setDateFields = array_intersect_key($this->_params, array_flip($this->_dateFields));
 
     CRM_Contact_Import_Parser_Contact::formatCommonData($this->_params, $formatted, $formatted);
-    foreach($formatted['custom'] as $key => $val) {
-      $this->_params['custom_'.$key] = $val[-1]['value'];
+    foreach ($formatted['custom'] as $key => $val) {
+      $this->_params['custom_' . $key] = $val[-1]['value'];
     }
     $this->_params['skipRecentView'] = TRUE;
     $this->_params['check_permissions'] = TRUE;
@@ -223,7 +223,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
     $fields = $allFields['values'];
     foreach ($fields as $id => $values) {
       $datatype = CRM_Utils_Array::value('data_type', $values);
-      if ( $datatype == 'File' ) {
+      if ($datatype == 'File') {
         continue;
       }
       /* generate the key for the fields array */

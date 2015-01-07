@@ -55,11 +55,11 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    */
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviCRM Extensions'));
-    $destination = CRM_Utils_System::url( 'civicrm/admin/extensions',
-                                              'reset=1' );
+    $destination = CRM_Utils_System::url('civicrm/admin/extensions',
+                                              'reset=1');
 
-    $destination = urlencode( $destination );
-    $this->assign( 'destination', $destination );
+    $destination = urlencode($destination);
+    $this->assign('destination', $destination);
   }
 
   /**
@@ -157,10 +157,11 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     $localExtensionRows = array(); // array($pseudo_id => extended_CRM_Extension_Info)
     $keys = array_keys($manager->getStatuses());
     sort($keys);
-    foreach($keys as $key) {
+    foreach ($keys as $key) {
       try {
         $obj = $mapper->keyToInfo($key);
-      } catch (CRM_Extension_Exception $ex) {
+      }
+      catch (CRM_Extension_Exception $ex) {
         CRM_Core_Session::setStatus(ts('Failed to read extension (%1). Please refresh the extension list.', array(1 => $key)));
         continue;
       }
@@ -298,7 +299,8 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     $extensionRow = (array) $obj;
     try {
       $extensionRow['path'] = $mapper->keyToBasePath($obj->key);
-    } catch (CRM_Extension_Exception $e) {
+    }
+    catch (CRM_Extension_Exception $e) {
       $extensionRow['path'] = '';
     }
     $extensionRow['status'] = $manager->getStatus($obj->key);

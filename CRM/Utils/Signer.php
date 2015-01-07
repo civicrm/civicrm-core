@@ -88,7 +88,8 @@ class CRM_Utils_Signer {
     $message['payload'] = array();
     if (empty($salt)) {
       $message['salt'] = $this->createSalt();
-    } else {
+    }
+    else {
       $message['salt'] = $salt;
     }
     // recall: paramNames is pre-sorted for stability
@@ -97,7 +98,8 @@ class CRM_Utils_Signer {
         if (is_numeric($params[$paramName])) {
           $params[$paramName] = (string) $params[$paramName];
         }
-      } else { // $paramName is not included or ===NULL
+      }
+      else { // $paramName is not included or ===NULL
         $params[$paramName] = '';
       }
       $message['payload'][$paramName] = $params[$paramName];

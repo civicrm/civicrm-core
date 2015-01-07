@@ -105,7 +105,7 @@ class CRM_Utils_OpenFlashChart {
       $bars[$barCount]->set_values($yValues);
       if ($barCount > 0) {
         // FIXME: for bars > 2, we'll need to come out with other colors
-        $bars[$barCount]->colour( '#BF3B69');
+        $bars[$barCount]->colour('#BF3B69');
       }
 
       if ($barKey = CRM_Utils_Array::value($barCount, CRM_Utils_Array::value('barKeys', $params))) {

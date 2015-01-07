@@ -366,7 +366,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * @param int $contactId
    */
   public static function setContext(&$form, $contactId = NULL) {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $form, FALSE, 'search' );
+    $context = CRM_Utils_Request::retrieve('context', 'String', $form, FALSE, 'search');
 
     $qfKey = CRM_Utils_Request::retrieve('key', 'String', $form);
 

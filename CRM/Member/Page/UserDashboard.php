@@ -73,9 +73,9 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
         if ($defaultRenewPageId) {
           //CRM-14831 - check if membership type is present in contrib page
           $memBlock = CRM_Member_BAO_Membership::getMembershipBlock($defaultRenewPageId);
-          if ( !empty($memBlock['membership_types']) ) {
+          if (!empty($memBlock['membership_types'])) {
             $memTypes = explode(',', $memBlock['membership_types']);
-            if ( in_array($dao->membership_type_id, $memTypes) ) {
+            if (in_array($dao->membership_type_id, $memTypes)) {
               $membership[$dao->id]['renewPageId'] = $defaultRenewPageId;
             }
           }

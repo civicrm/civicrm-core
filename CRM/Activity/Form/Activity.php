@@ -310,7 +310,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     // Set title
     if (isset($activityTName)) {
       $activityName = CRM_Utils_Array::value($this->_activityTypeId, $activityTName);
-      $this->assign('pageTitle', ts('%1 Activity', array( 1 => $activityName)));
+      $this->assign('pageTitle', ts('%1 Activity', array(1 => $activityName)));
 
       if ($this->_currentlyViewedContactId) {
         $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
@@ -321,7 +321,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         CRM_Utils_System::setTitle($displayName . ' - ' . $activityName);
       }
       else {
-        CRM_Utils_System::setTitle(ts('%1 Activity', array( 1 => $activityName)));
+        CRM_Utils_System::setTitle(ts('%1 Activity', array(1 => $activityName)));
       }
     }
 
@@ -429,7 +429,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $urlParams .= "&qfKey=$qfKey";
       }
       $path = CRM_Utils_System::currentPath();
-      if ($this->_compContext == 'advanced' ) {
+      if ($this->_compContext == 'advanced') {
         $urlString = 'civicrm/contact/search/advanced';
       }
       elseif ($path == 'civicrm/group/search'

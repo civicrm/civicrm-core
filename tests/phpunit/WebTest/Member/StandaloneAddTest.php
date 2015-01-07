@@ -143,14 +143,14 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
 
     // verify soft credit data
     $expected = array(
-      '1' => $giftMemberfirstName.' Memberson',
+      '1' => $giftMemberfirstName . ' Memberson',
       '2' => $totalAmount,
       '3' => 'Gift',
       '4' => 'Donation',
       '6' => 'Completed',
     );
 
-    foreach($expected as $key => $value) {
+    foreach ($expected as $key => $value) {
       $this->verifyText("xpath=//div[@class='crm-accordion-wrapper']//table/tbody//tr/td[$key]", $value);
     }
 

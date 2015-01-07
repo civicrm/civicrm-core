@@ -15,7 +15,7 @@ class CRM_Core_Region {
    * @return CRM_Core_Region
    */
   public static function &instance($name, $autocreate = TRUE) {
-    if ( $autocreate && ! isset( self::$_instances[$name] ) ) {
+    if ($autocreate && ! isset(self::$_instances[$name])) {
       self::$_instances[$name] = new CRM_Core_Region($name);
     }
     return self::$_instances[$name];
@@ -48,7 +48,7 @@ class CRM_Core_Region {
   public function __construct($name) {
     // Templates injected into regions should normally be file names, but sometimes inline notation is handy.
     require_once 'CRM/Core/Smarty/resources/String.php';
-    civicrm_smarty_register_string_resource( );
+    civicrm_smarty_register_string_resource();
 
     $this->_name = $name;
     $this->_snippets = array();
@@ -173,7 +173,7 @@ class CRM_Core_Region {
       if ($snippet['disabled']) {
         continue;
       }
-      switch($snippet['type']) {
+      switch ($snippet['type']) {
         case 'markup':
           $html .= $snippet['markup'];
           break;
@@ -219,8 +219,8 @@ class CRM_Core_Region {
 
         default:
           require_once 'CRM/Core/Error.php';
-          CRM_Core_Error::fatal( ts( 'Snippet type %1 is unrecognized',
-                     array( 1 => $snippet['type'] ) ) );
+          CRM_Core_Error::fatal(ts('Snippet type %1 is unrecognized',
+                     array(1 => $snippet['type'])));
       }
     }
     return $html;
@@ -233,14 +233,18 @@ class CRM_Core_Region {
    * @return int
    */
   public static function _cmpSnippet($a, $b) {
-    if ($a['weight'] < $b['weight']) { return -1;
+    if ($a['weight'] < $b['weight']) {
+      return -1;
     }
-    if ($a['weight'] > $b['weight']) { return 1;
+    if ($a['weight'] > $b['weight']) {
+      return 1;
     }
     // fallback to name sort; don't really want to do this, but it makes results more stable
-    if ($a['name'] < $b['name']) { return -1;
+    if ($a['name'] < $b['name']) {
+      return -1;
     }
-    if ($a['name'] > $b['name']) { return 1;
+    if ($a['name'] > $b['name']) {
+      return 1;
     }
     return 0;
   }

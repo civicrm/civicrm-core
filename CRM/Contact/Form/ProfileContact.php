@@ -120,7 +120,7 @@ class CRM_Contact_Form_ProfileContact {
       $dedupeParams = CRM_Dedupe_Finder::formatParams($params['honor'], $profileContactType);
       $dedupeParams['check_permission'] = FALSE;
       $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $profileContactType);
-      if(count($ids)) {
+      if (count($ids)) {
         $honorId = CRM_Utils_Array::value(0, $ids);
       }
 

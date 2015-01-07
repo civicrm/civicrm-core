@@ -80,17 +80,17 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       // names and titles
       $links[CRM_Core_Action::VIEW] = array(
         'name' => ts('View'),
-        'title' => ts('View %1', array( 1 => $this->_customGroupTitle . ' record')),
+        'title' => ts('View %1', array(1 => $this->_customGroupTitle . ' record')),
       );
 
       $links[CRM_Core_Action::UPDATE] = array(
         'name' => ts('Edit'),
-        'title' => ts('Edit %1', array( 1 => $this->_customGroupTitle . ' record')),
+        'title' => ts('Edit %1', array(1 => $this->_customGroupTitle . ' record')),
       );
 
       $links[CRM_Core_Action::DELETE] = array(
         'name' => ts('Delete'),
-        'title' => ts('Delete %1', array( 1 => $this->_customGroupTitle . ' record')),
+        'title' => ts('Delete %1', array(1 => $this->_customGroupTitle . ' record')),
       );
 
       // urls and queryStrings
@@ -118,7 +118,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         // copy action
         $links[CRM_Core_Action::COPY] = array(
           'name' => ts('Copy'),
-          'title' => ts('Copy %1', array( 1 => $this->_customGroupTitle . ' record')),
+          'title' => ts('Copy %1', array(1 => $this->_customGroupTitle . ' record')),
           'url' => 'civicrm/contact/view/cd/edit',
           'qs' => 'reset=1&type=%%type%%&groupID=%%groupID%%&entityID=%%entityID%%&cgcount=%%newCgCount%%&multiRecordDisplay=single&copyValueId=%%cgcount%%&mode=copy'
         );
@@ -365,7 +365,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                   'key' => CRM_Core_Key::get('civicrm/ajax/customvalue'),
                 );
                 $links[CRM_Core_Action::DELETE]['url'] = '#';
-                $links[CRM_Core_Action::DELETE]['extra'] = ' data-delete_params="'. htmlspecialchars(json_encode($deleteData)) .'"';
+                $links[CRM_Core_Action::DELETE]['extra'] = ' data-delete_params="' .  htmlspecialchars(json_encode($deleteData))  . '"';
                 $links[CRM_Core_Action::DELETE]['class'] = 'delete-custom-row';
               }
               if (!empty($pageCheckSum)) {

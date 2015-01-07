@@ -179,7 +179,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
           break;
       }
       $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
-      $this->waitForText('crm-notification-container', "Price Field '".$label."' has been saved.");
+      $this->waitForText('crm-notification-container', "Price Field '" . $label . "' has been saved.");
     }
   }
 
@@ -405,7 +405,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('summary', 'This is a great conference. Sign up now!');
 
     // Type description in ckEditor (fieldname, text to type, editor)
-    $this->fillRichTextField('description', $eventDescription );
+    $this->fillRichTextField('description', $eventDescription);
 
     // Choose Start and End dates.
     // Using helper webtestFillDate function.
@@ -459,7 +459,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Adding contact with randomized first name (so we can then select that contact when creating event registration)
     // We're using Quick Add block on the main page for this.
     $firstName = substr(sha1(rand()), 0, 7);
-    $lastName = 'Anderson'. substr(sha1(rand()), 0, 7);
+    $lastName = 'Anderson' .  substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, $lastName, TRUE);
     $contactName = "$lastName, $firstName";
     $displayName = "$firstName $lastName";
@@ -515,7 +515,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Adding contact with randomized first name (so we can then select that contact when creating event registration)
     // We're using Quick Add block on the main page for this.
     $firstName = substr(sha1(rand()), 0, 7);
-    $lastName = 'Anderson'. substr(sha1(rand()), 0, 7);
+    $lastName = 'Anderson' .  substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, $lastName, TRUE);
     $contactName = "$lastName, $firstName";
     $displayName = "$firstName $lastName";

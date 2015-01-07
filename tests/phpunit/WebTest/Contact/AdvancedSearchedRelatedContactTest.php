@@ -137,7 +137,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->click("_qf_AddToGroup_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->waitForText('crm-notification-container', "Added Contacts to ".$groupName);
+    $this->waitForText('crm-notification-container', "Added Contacts to " . $groupName);
     $this->waitForText('crm-notification-container', '2 contacts added to group');
     $this->_testSearchResult($relType);
   }
@@ -307,18 +307,18 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
   public function testAdvanceSearchForLog() {
     $this->webtestLogin();
 
-    $Pdate     = date('F jS, Y h:i:s A', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1, date( 'Y' )) );
-    $Ndate     = date('F jS, Y h:i:s A', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) + 1, date( 'Y' )) );
+    $Pdate     = date('F jS, Y h:i:s A', mktime(0, 0, 0, date('m'), date('d') - 1, date('Y')));
+    $Ndate     = date('F jS, Y h:i:s A', mktime(0, 0, 0, date('m'), date('d') + 1, date('Y')));
 
     //create a contact and return the contact id
-    $firstNameSoft = "John_".substr(sha1(rand()), 0, 5);
-    $lastNameSoft  = "Doe_".substr(sha1(rand()), 0, 5);
-    $this->webtestAddContact( $firstNameSoft, $lastNameSoft );
+    $firstNameSoft = "John_" . substr(sha1(rand()), 0, 5);
+    $lastNameSoft  = "Doe_" . substr(sha1(rand()), 0, 5);
+    $this->webtestAddContact($firstNameSoft, $lastNameSoft);
     $cid = $this->urlArg('cid');
 
     //advance search for created contacts
     $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');
-    $this->type('sort_name', $lastNameSoft.', '.$firstNameSoft);
+    $this->type('sort_name', $lastNameSoft . ', ' . $firstNameSoft);
     $this->click('changeLog');
     $this->waitForElementPresent("log_date_low");
     $this->select("log_date_relative", "value=0");

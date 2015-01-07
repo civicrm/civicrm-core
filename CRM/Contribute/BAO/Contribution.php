@@ -2871,7 +2871,7 @@ WHERE  contribution_id = %1 ";
               self::updateFinancialAccounts($params, 'changePaymentInstrument');
             }
           }
-          else if ((!CRM_Utils_System::isNull($params['contribution']->payment_instrument_id) ||
+          elseif ((!CRM_Utils_System::isNull($params['contribution']->payment_instrument_id) ||
               !CRM_Utils_System::isNull($params['prevContribution']->payment_instrument_id)) &&
             $params['contribution']->payment_instrument_id != $params['prevContribution']->payment_instrument_id
           ) {
@@ -2880,7 +2880,7 @@ WHERE  contribution_id = %1 ";
             $params['total_amount'] = $params['trxnParams']['total_amount'] = $trxnParams['total_amount'];
             self::updateFinancialAccounts($params, 'changePaymentInstrument');
           }
-          else if (!CRM_Utils_System::isNull($params['contribution']->check_number) &&
+          elseif (!CRM_Utils_System::isNull($params['contribution']->check_number) &&
             $params['contribution']->check_number != $params['prevContribution']->check_number
           ) {
             // another special case when check number is changed, create new financial records
@@ -3612,7 +3612,7 @@ WHERE con.id = {$contributionId}
       if (!isset($params['financial_type_id'])) {
         $params['financial_type_id'] = $prevContributionValue->financial_type_id;
       }
-      else if (isset($params['financial_type_id']) && !array_key_exists($params['financial_type_id'], $taxRates)) {
+      elseif (isset($params['financial_type_id']) && !array_key_exists($params['financial_type_id'], $taxRates)) {
         // Assisn tax Amount on update of contrbution
         if (!empty($prevContributionValue->tax_amount)) {
           $params['tax_amount'] = 'null';
@@ -3648,7 +3648,7 @@ WHERE con.id = {$contributionId}
       }
       $params['total_amount'] = $params['total_amount'] + $params['tax_amount'];
     }
-    else if (isset($params['api.line_item.create'])) {
+    elseif (isset($params['api.line_item.create'])) {
       // Update total amount of contribution using lineItem
       $taxAmountArray = array();
       foreach ($params['api.line_item.create'] as $key => $value) {

@@ -9,7 +9,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
 
-    $this->quickCleanup( array( 'civicrm_contact', 'civicrm_email' ) );
+    $this->quickCleanup(array('civicrm_contact', 'civicrm_email'));
   }
 
   /**

@@ -383,7 +383,7 @@ SELECT id
     }
 
     if (!empty($fields['is_recur_interval'])) {
-      foreach(array_keys($fields['payment_processor']) as $paymentProcessorID) {
+      foreach (array_keys($fields['payment_processor']) as $paymentProcessorID) {
         $paymentProcessorTypeId = CRM_Core_DAO::getFieldValue(
           'CRM_Financial_DAO_PaymentProcessor',
           $paymentProcessorID,
@@ -685,7 +685,7 @@ SELECT id
                 CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldValueID, 'label', $params['amount_label']);
               }
               else {
-                CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceField', $priceFieldID, 'is_required', 0 );
+                CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceField', $priceFieldID, 'is_required', 0);
                 CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldValueID, 'label', 'Other Amount');
               }
             }
@@ -743,7 +743,7 @@ SELECT id
         CRM_Price_BAO_PriceSet::removeFrom('civicrm_contribution_page', $contributionPageID);
       }
 
-      if ($deleteAmountBlk ) {
+      if ($deleteAmountBlk) {
         $priceField = !empty($params['price_field_id']) ? $params['price_field_id'] : CRM_Utils_Array::value('price_field_other', $params);
         if ($priceField) {
           $priceSetID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $priceField, 'price_set_id');

@@ -54,7 +54,7 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
     $addressId = CRM_Utils_Request::retrieve('aid', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, NULL, $_REQUEST);
 
     $address = array();
-    if ( $addressId > 0 ) {
+    if ($addressId > 0) {
       $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array('labelColumn' => 'display_name'));
 
       $entityBlock = array('id' => $addressId);
@@ -67,9 +67,9 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
     }
 
     // we just need current address block
-    $currentAddressBlock['address'][$locBlockNo] = array_pop( $address );
+    $currentAddressBlock['address'][$locBlockNo] = array_pop($address);
 
-    if ( !empty( $currentAddressBlock['address'][$locBlockNo] ) ) {
+    if (!empty($currentAddressBlock['address'][$locBlockNo])) {
       // get contact name of shared contact names
       $sharedAddresses = array();
       $shareAddressContactNames = CRM_Contact_BAO_Contact_Utils::getAddressShareContactNames($currentAddressBlock['address']);
@@ -85,23 +85,23 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
       }
 
       // add custom data of type address
-      $groupTree = CRM_Core_BAO_CustomGroup::getTree( 'Address',
+      $groupTree = CRM_Core_BAO_CustomGroup::getTree('Address',
         $this, $currentAddressBlock['address'][$locBlockNo]['id']
       );
 
       // we setting the prefix to dnc_ below so that we don't overwrite smarty's grouptree var.
-      $currentAddressBlock['address'][$locBlockNo]['custom'] = CRM_Core_BAO_CustomGroup::buildCustomDataView( $this, $groupTree, FALSE, NULL, "dnc_");
+      $currentAddressBlock['address'][$locBlockNo]['custom'] = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, "dnc_");
       $this->assign("dnc_viewCustomData", NULL);
 
       $this->assign('add', $currentAddressBlock['address'][$locBlockNo]);
       $this->assign('sharedAddresses', $sharedAddresses);
     }
-    $contact = new CRM_Contact_BAO_Contact( );
+    $contact = new CRM_Contact_BAO_Contact();
     $contact->id = $contactId;
     $contact->find(TRUE);
     $privacy = array();
-    foreach ( CRM_Contact_BAO_Contact::$_commPrefs as $name ) {
-      if ( isset( $contact->$name ) ) {
+    foreach (CRM_Contact_BAO_Contact::$_commPrefs as $name) {
+      if (isset($contact->$name)) {
         $privacy[$name] = $contact->$name;
       }
     }

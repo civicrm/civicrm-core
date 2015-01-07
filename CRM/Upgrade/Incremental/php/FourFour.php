@@ -105,8 +105,8 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
         $postUpgradeMessage .= '<br /><br /><strong>' . ts('Your database contains %1 financial transaction records with no payment instrument (Paid By is empty). If you use the Accounting Batches feature this may result in unbalanced transactions. If you do not use this feature, you can ignore the condition (although you will be required to select a Paid By value for new transactions). <a href="%2" target="_blank">You can review steps to correct transactions with missing payment instruments on the wiki.</a>', array(1 => $dao->N, 2 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Fixing+Transactions+Missing+a+Payment+Instrument+-+4.4.3+Upgrades')) . '</strong>';
       }
     }
-    if ($rev == '4.4.6'){
-      $postUpgradeMessage .= '<br /><br /><strong>'. ts('Your contact image urls have been upgraded. If your contact image urls did not follow the standard format for image Urls they have not been upgraded. Please check the log to see image urls that were not upgraded.');
+    if ($rev == '4.4.6') {
+      $postUpgradeMessage .= '<br /><br /><strong>' .  ts('Your contact image urls have been upgraded. If your contact image urls did not follow the standard format for image Urls they have not been upgraded. Please check the log to see image urls that were not upgraded.');
     }
   }
 
@@ -311,7 +311,7 @@ ALTER TABLE civicrm_dashboard
       }
       elseif ($urlElements[1] == 'report') {
         $url = explode('&', $urlElements[3]);
-        $name = 'report/' .$url[0];
+        $name = 'report/'  . $url[0];
       }
       $values .= "
       WHEN {$dashboard->id} THEN '{$name}'
@@ -335,8 +335,8 @@ ALTER TABLE civicrm_dashboard
   /**
    * @param $rev
    */
-  public function upgrade_4_4_6($rev){
-    $sql = "SELECT count(*) AS count FROM INFORMATION_SCHEMA.STATISTICS where ".
+  public function upgrade_4_4_6($rev) {
+    $sql = "SELECT count(*) AS count FROM INFORMATION_SCHEMA.STATISTICS where " .
       "TABLE_SCHEMA = database() AND INDEX_NAME = 'index_image_url' AND TABLE_NAME = 'civicrm_contact';";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $dao->fetch();
@@ -376,22 +376,22 @@ ALTER TABLE civicrm_dashboard
     $this->addTask(ts('Update saved search information'), 'changeSavedSearch');
   }
 
-  public static function upgradeImageUrls(CRM_Queue_TaskContext $ctx, $startId, $endId){
+  public static function upgradeImageUrls(CRM_Queue_TaskContext $ctx, $startId, $endId) {
     $dao = self::findContactImageUrls($startId, $endId);
     $failures = array();
-    while ($dao->fetch()){
+    while ($dao->fetch()) {
       $imageURL = $dao->image_url;
       $baseurl = CIVICRM_UF_BASEURL;
       $baselen = strlen($baseurl);
-      if (substr($imageURL, 0, $baselen) == $baseurl){
+      if (substr($imageURL, 0, $baselen) == $baseurl) {
         $photo = basename($dao->image_url);
         $config = CRM_Core_Config::singleton();
-        $fullpath = $config->customFileUploadDir.$photo;
-        if (file_exists($fullpath)){
+        $fullpath = $config->customFileUploadDir . $photo;
+        if (file_exists($fullpath)) {
           // For anyone who upgraded 4.4.6 release (eg 4.4.0=>4.4.6), the $newImageUrl incorrectly used backend URLs.
           // For anyone who skipped 4.4.6 (eg 4.4.0=>4.4.7), the $newImageUrl correctly uses frontend URLs
           self::setContactImageUrl($dao->id,
-              CRM_Utils_System::url('civicrm/contact/imagefile', 'photo='.$photo, TRUE, NULL, TRUE, TRUE));
+              CRM_Utils_System::url('civicrm/contact/imagefile', 'photo=' . $photo, TRUE, NULL, TRUE, TRUE));
         }
         else{
           $failures[$dao->id] = $dao->image_url;
@@ -470,7 +470,7 @@ ALTER TABLE civicrm_dashboard
         $imageUrlParts = parse_url($imageUrl);
         parse_str($imageUrlParts['query'], $imageUrlQuery);
         self::setContactImageUrl($dao->id,
-          CRM_Utils_System::url('civicrm/contact/imagefile', 'photo='.$imageUrlQuery['photo'], TRUE, NULL, TRUE, TRUE));
+          CRM_Utils_System::url('civicrm/contact/imagefile', 'photo=' . $imageUrlQuery['photo'], TRUE, NULL, TRUE, TRUE));
       }
     }
     return TRUE;
@@ -550,7 +550,7 @@ WHERE  option_group_id = {$optionGroupID} AND value IN ($ovValues)";
       $value[] = "({$optionGroupID}, 'Activity Targets', 3, 'Activity Targets', 3, 1, 1)";
     }
 
-    if (!$assigneeID || !$sourceID || !$targetID ) {
+    if (!$assigneeID || !$sourceID || !$targetID) {
       $insert = "
 INSERT INTO civicrm_option_value
 (option_group_id, label, value, name, weight, is_reserved, is_active)
@@ -792,7 +792,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
 
     $res = CRM_Core_DAO::singleValueQuery($sql);
 
-    if ($res <= 0 ) {
+    if ($res <= 0) {
       $sql = "ALTER TABLE civicrm_report_instance ADD `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'when combined with report_id/template uniquely identifies the instance'";
       $res = CRM_Core_DAO::executeQuery($sql);
     }
@@ -803,7 +803,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
 
     $res = CRM_Core_DAO::singleValueQuery($sql);
 
-    if ($res <= 0 ) {
+    if ($res <= 0) {
       $sql = "ALTER TABLE civicrm_report_instance ADD `args` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'arguments that are passed in the url when invoking the instance'";
 
       $res = CRM_Core_DAO::executeQuery($sql);

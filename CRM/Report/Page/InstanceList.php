@@ -41,7 +41,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
 
   static $_links = NULL;
 
-  static $_exceptions = array( 'logging/contact/detail' );
+  static $_exceptions = array('logging/contact/detail');
 
   /**
    * Name of component if report list is filtered
@@ -194,7 +194,8 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
       $this->assign('reportUrl', $reportUrl);
       if ($this->ovID) {
         $this->assign('title', $this->title);
-      } else {
+      }
+      else {
         CRM_Utils_System::setTitle(ts('%1 Reports', array(1 => $this->_compName)));
       }
     }
@@ -203,7 +204,8 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
       if ($this->compID) {
         $newButton = ts('New %1 Report', array(1 => $this->_compName));
         $templateUrl = CRM_Utils_System::url('civicrm/report/template/list', "reset=1&compid={$this->compID}");
-      } else {
+      }
+      else {
         $newButton = ts('New Report');
         $templateUrl = CRM_Utils_System::url('civicrm/report/template/list', "reset=1");
       }

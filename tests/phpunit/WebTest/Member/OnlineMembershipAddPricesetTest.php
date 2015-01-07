@@ -119,19 +119,19 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->select('html_type', "value={$fields[1]}");
     $options = array(
             1 => array(
-    'label' => $memTypeTitle1."_1",
+    'label' => $memTypeTitle1 . "_1",
               'membership_type_id' => $memTypeId1,
               'amount' => 50.00,
               'membership_num_terms' => 1,
             ),
             2 => array(
-              'label' => $memTypeTitle1."_2",
+              'label' => $memTypeTitle1 . "_2",
               'membership_type_id' => $memTypeId1,
               'amount' => 90.00,
               'membership_num_terms' => 2,
             ),
             3 => array(
-              'label' => $memTypeTitle1."_3",
+              'label' => $memTypeTitle1 . "_3",
               'membership_type_id' => $memTypeId1,
               'amount' => 120.00,
               'membership_num_terms' => 3,
@@ -139,19 +139,19 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
 
           );
     $i = 2;
-    foreach($options as $index => $values){
+    foreach ($options as $index => $values) {
       $this->select("membership_type_id_{$index}", "value={$values['membership_type_id']}");
 
       $this->waitForElementPresent("xpath=//table[@id='optionField']/tbody/tr[$i]/td[4]/input");
       $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[4]/input", $values['membership_num_terms']);
       $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[5]/input", $values['label']);
       $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[6]/input", $values['amount']);
-      if($i > 3){
+      if ($i > 3) {
         $this->click('link=another choice');
       }
       $i++;
     }
-    $this->waitForElementPresent( 'financial_type_id' );
+    $this->waitForElementPresent('financial_type_id');
     $this->select("financial_type_id", "label={$contributionType}");
     $this->waitForElementPresent('_qf_Field_next-bottom');
     $this->clickLink('_qf_Field_next-bottom');
@@ -201,7 +201,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     }
     elseif ($usedFor == 'Membership') {
       $this->click('extends[3]');
-      $this->waitForElementPresent( 'financial_type_id' );
+      $this->waitForElementPresent('financial_type_id');
       $this->select("css=select.crm-form-select", "label={$contributionType}");
     }
 
@@ -418,8 +418,8 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
    * @param $term
    * @param bool $renew
    */
-  public function _testMultilpeTermsMembershipRegistration($pageId, $contactParams, $memTypeTitle1, $term, $renew = FALSE){
-    if($renew){
+  public function _testMultilpeTermsMembershipRegistration($pageId, $contactParams, $memTypeTitle1, $term, $renew = FALSE) {
+    if ($renew) {
       $this->openCiviPage('member/search', 'reset=1', 'member_end_date_high');
       $this->type("sort_name", "{$contactParams['first_name']} {$contactParams['last_name']}");
       $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']/table/tbody/tr");
@@ -448,7 +448,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       'joinDate', 'startDate', 'endDate') as $date) {
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }
-    $i = ($term == 3) ? 3 : (($term == 2) ? 2 : 1 );
+    $i = ($term == 3) ? 3 : (($term == 2) ? 2 : 1);
     $this->waitForElementPresent("xpath=//div[@id='priceset']/div[2]/div[2]/div[$i]/span/input");
     $this->click("xpath=//div[@id='priceset']/div[2]/div[2]/div[$i]/span/input");
     $amount = $this->getText("xpath=//div[@id='priceset']/div[2]/div[2]/div[$i]/span/label/span[@class='crm-price-amount-amount']");

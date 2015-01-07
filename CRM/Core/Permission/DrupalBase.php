@@ -261,7 +261,7 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    */
   public function checkGroupRole($array) {
     if (function_exists('user_load') && isset($array)) {
-      $user = user_load( $GLOBALS['user']->uid);
+      $user = user_load($GLOBALS['user']->uid);
       //if giver roles found in user roles - return true
       foreach ($array as $key => $value) {
         if (in_array($value, $user->roles)) {
@@ -307,7 +307,7 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
     ";
 
     $result = db_query($sql);
-    foreach ( $result as $record ) {
+    foreach ($result as $record) {
       $uids[] = $record->uid;
     }
 

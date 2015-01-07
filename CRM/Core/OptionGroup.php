@@ -645,7 +645,7 @@ WHERE  v.option_group_id = g.id
    * @param $name
    * @param array $params
    */
-  public static function flush($name, $params = array()){
+  public static function flush($name, $params = array()) {
     $defaults = array(
       'flip' => FALSE,
       'grouping' => FALSE,

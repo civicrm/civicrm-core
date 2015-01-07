@@ -214,7 +214,7 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
         if ($compContext == 'advanced') {
           $url = CRM_Utils_System::url('civicrm/contact/search/advanced', $urlParams);
         }
-        else if ($searchContext) {
+        elseif ($searchContext) {
           $url = CRM_Utils_System::url("civicrm/$searchContext/search", $urlParams);
         }
         else {

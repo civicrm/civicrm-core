@@ -1148,7 +1148,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
             if (array_key_exists($customFieldID, $addressCustomFields) && CRM_Utils_Date::convertToDefaultDate($params[$key][0], $dateType, $key)) {
               $value = $params[$key][0][$key];
             }
-            else if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
+            elseif (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
               $value = $params[$key];
             }
             else {

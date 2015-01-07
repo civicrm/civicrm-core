@@ -360,7 +360,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
         'pay_later_receipt' => $this->pay_later_receipt,
       ),
       'valueName' => 'event_registration_receipt',
-      'PDFFilename' => ts('confirmation').'.pdf',
+      'PDFFilename' => ts('confirmation') . '.pdf',
     );
     $template_params_to_copy = array(
       'billing_name',
@@ -545,7 +545,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
         if ($event_in_cart->event->financial_type_id && $mer_participant->cost) {
           $params['financial_type_id'] = $event_in_cart->event->financial_type_id;
           $params['participant_contact_id'] = $mer_participant->contact_id;
-          $contribution = $this->record_contribution($mer_participant, $params, $event_in_cart->event );
+          $contribution = $this->record_contribution($mer_participant, $params, $event_in_cart->event);
           // Record civicrm_line_item
           CRM_Price_BAO_LineItem::processPriceSet($mer_participant->id, $mer_participant->price_details, $contribution, $entity_table = 'civicrm_participant');
         }

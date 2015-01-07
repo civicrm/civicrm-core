@@ -108,26 +108,26 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->select('html_type', "value={$fields[1]}");
     $options = array(
       1 => array(
-    'label' => $memTypeTitle1."_1",
+    'label' => $memTypeTitle1 . "_1",
          'membership_type_id' => $memTypeId1,
          'amount' => 50.00,
          'membership_num_terms' => 1,
       ),
       2 => array(
-        'label' => $memTypeTitle1."_2",
+        'label' => $memTypeTitle1 . "_2",
         'membership_type_id' => $memTypeId1,
         'amount' => 90.00,
         'membership_num_terms' => 2,
       ),
       3 => array(
-        'label' => $memTypeTitle1."_3",
+        'label' => $memTypeTitle1 . "_3",
         'membership_type_id' => $memTypeId1,
         'amount' => 120.00,
         'membership_num_terms' => 3,
       ),
     );
     $i = 2;
-    foreach($options as $index => $values){
+    foreach ($options as $index => $values) {
       $this->select("membership_type_id_{$index}", "value={$values['membership_type_id']}");
       // Because it tends to cause problems, all uses of sleep() must be justified in comments
       // Sleep should never be used for wait for anything to load from the server
@@ -136,12 +136,12 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
       $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[4]/input", $values['membership_num_terms']);
       $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[5]/input", $values['label']);
       $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[6]/input", $values['amount']);
-      if($i > 3){
+      if ($i > 3) {
         $this->click('link=another choice');
       }
       $i++;
     }
-    $this->waitForElementPresent( 'financial_type_id' );
+    $this->waitForElementPresent('financial_type_id');
     $this->select("financial_type_id", "label={$contributionType}");
     $this->waitForElementPresent('_qf_Field_next-bottom');
     $this->click('_qf_Field_next-bottom');
@@ -384,7 +384,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
    * @param $memTypeTitle1
    * @param $term
    */
-  public function _testMultilpeTermsMembershipRegistration($sid, $contactParams, $memTypeTitle1, $term){
+  public function _testMultilpeTermsMembershipRegistration($sid, $contactParams, $memTypeTitle1, $term) {
     //build the membership dates.
     require_once 'CRM/Core/Config.php';
     require_once 'CRM/Utils/Array.php';
@@ -411,7 +411,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->select('price_set_id', "value={$sid}");
     $this->waitForElementPresent('pricesetTotal');
 
-    $i  = ($term == 3) ? 3 : (($term == 2) ? 2 : 1 );
+    $i  = ($term == 3) ? 3 : (($term == 2) ? 2 : 1);
     $this->waitForElementPresent("xpath=//div[@id='priceset']/div[2]/div[2]/div[$i]/span/input");
     $this->click("xpath=//div[@id='priceset']/div[2]/div[2]/div[$i]/span/input");
     $amount = $this->getText("xpath=//div[@id='priceset']/div[2]/div[2]/div[$i]/span/label/span[@class='crm-price-amount-amount']");

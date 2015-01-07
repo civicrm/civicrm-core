@@ -624,7 +624,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
               $graphRows['multiValue'][0][] = $row['civicrm_contribution_total_amount_sum'];
               $graphRows['multiValue'][1][] = $row['civicrm_contribution_soft_soft_amount_sum'];
             }
-            else if ($softContrib) {
+            elseif ($softContrib) {
               // only soft contributions
               $graphRows['multiValue'][0][] = $row['civicrm_contribution_soft_soft_amount_sum'];
             }
@@ -640,7 +640,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
           $graphRows['barKeys'][1] = ts('Soft Credits');
           $graphRows['legend'] = ts('Contributions and Soft Credits');
         }
-        else if ($softContrib) {
+        elseif ($softContrib) {
           $graphRows['legend'] = ts('Soft Credits');
         }
 

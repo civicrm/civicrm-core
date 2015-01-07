@@ -543,7 +543,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $eventID = $_POST['event_id'];
     }
 
-    if($this->_eID) {
+    if ($this->_eID) {
       $eventID = $this->_eID;
       //@todo - rationalise the $this->_eID with $POST['event_id'],  $this->_eid is set when eid=x is in the url
       $roleID = CRM_Core_DAO::getFieldValue(
@@ -551,7 +551,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $this->_eID,
         'default_role_id'
       );
-      if(empty($roleIDs)) {
+      if (empty($roleIDs)) {
         $roleIDs = (array) $defaults[$this->_id]['participant_role_id'] = $roleID;
       }
       $defaults[$this->_id]['event_id'] = $eventID;
@@ -561,7 +561,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     //these should take precedence so we state them last
     $urlRoleIDS = CRM_Utils_Request::retrieve('roles', 'String');
-    if($urlRoleIDS) {
+    if ($urlRoleIDS) {
       $roleIDs = explode(',', $urlRoleIDS);
     }
     if (isset($roleIDs)) {
@@ -844,15 +844,15 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     // For single additions - show validation error if the contact has already been registered
     // for this event with the same role.
-    if($self->_single && ($self->_action & CRM_Core_Action::ADD)) {
+    if ($self->_single && ($self->_action & CRM_Core_Action::ADD)) {
       $contactId = $self->_contactId;
       $eventId = CRM_Utils_Array::value('event_id', $values);
-      if(!empty($contactId) && !empty($eventId)) {
+      if (!empty($contactId) && !empty($eventId)) {
         $dupeCheck = new CRM_Event_BAO_Participant;
         $dupeCheck->contact_id = $contactId;
         $dupeCheck->event_id = $eventId;
         $dupeCheck->find(TRUE);
-        if(!empty($dupeCheck->id)) {
+        if (!empty($dupeCheck->id)) {
           $errorMsg['event_id'] = ts("This contact has already been assigned to this event.");
         }
       }
@@ -892,30 +892,30 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // removed automatically and the user receives one notification.
     if ($this->_action & CRM_Core_Action::ADD) {
       $event_id = $this->_eventId;
-      if(empty($event_id) && !empty($params['event_id'])) {
+      if (empty($event_id) && !empty($params['event_id'])) {
         $event_id = $params['event_id'];
       }
-      if(!$this->_single && !empty($event_id)) {
+      if (!$this->_single && !empty($event_id)) {
         $duplicateContacts = 0;
-        while(list($k, $dupeCheckContactId) = each($this->_contactIds)) {
+        while (list($k, $dupeCheckContactId) = each($this->_contactIds)) {
           // Eliminate contacts that have already been assigned to this event.
           $dupeCheck = new CRM_Event_BAO_Participant;
           $dupeCheck->contact_id = $dupeCheckContactId;
           $dupeCheck->event_id = $event_id;
           $dupeCheck->find(TRUE);
-          if(!empty($dupeCheck->id)) {
+          if (!empty($dupeCheck->id)) {
             $duplicateContacts++;
             unset($this->_contactIds[$k]);
           }
         }
-        if($duplicateContacts > 0) {
+        if ($duplicateContacts > 0) {
           $msg = ts(
             "%1 contacts have already been assigned to this event. They were not added a second time.",
             array(1 => $duplicateContacts)
           );
           CRM_Core_Session::setStatus($msg);
         }
-        if(count($this->_contactIds) == 0) {
+        if (count($this->_contactIds) == 0) {
           CRM_Core_Session::setStatus(ts("No participants were added."));
           return;
         }
@@ -998,7 +998,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         if ($this->_quickConfig && !empty($params['total_amount']) &&
           $params['status_id'] != array_search('Partially paid', $participantStatus)) {
           $params['fee_amount'] = $params['total_amount'];
-        } else {
+        }
+        else {
           //fix for CRM-3086
           $params['fee_amount'] = $params['amount'];
         }
@@ -1318,7 +1319,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $contributionParams['non_deductible_amount'] = 'null';
         $contributionParams['receipt_date'] = !empty($params['send_receipt']) ? CRM_Utils_Array::value('receive_date', $params) : 'null';
 
-        $recordContribution = array( 'contact_id', 'financial_type_id',
+        $recordContribution = array('contact_id', 'financial_type_id',
           'payment_instrument_id', 'trxn_id',
           'contribution_status_id', 'receive_date',
           'check_number', 'campaign_id',
@@ -1515,7 +1516,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         if (isset($contributionParams['partial_payment_total'])) {
           // balance amount
           $balanceAmount = $contributionParams['partial_payment_total'] - $contributionParams['partial_amount_pay'];
-          $this->assign('balanceAmount', $balanceAmount );
+          $this->assign('balanceAmount', $balanceAmount);
         }
         $this->assign('isPrimary', 1);
         $this->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
@@ -1654,7 +1655,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           'valueName' => 'event_offline_receipt',
           'contactId' => $contactID,
           'isTest' => (bool) CRM_Utils_Array::value('is_test', $this->_defaultValues),
-          'PDFFilename' => ts('confirmation').'.pdf',
+          'PDFFilename' => ts('confirmation') . '.pdf',
         );
 
         // try to send emails only if email id is present
@@ -1668,7 +1669,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
 
         //send email with pdf invoice
-        $template = CRM_Core_Smarty::singleton( );
+        $template = CRM_Core_Smarty::singleton();
         $taxAmt = $template->get_template_vars('dataArray');
         $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
                                                       $this->_id, 'contribution_id', 'participant_id'

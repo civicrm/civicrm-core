@@ -254,7 +254,8 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
     if (is_array($params['filter.group_id'])) {
       $groups = $params['filter.group_id'];
     }
-    else { $groups = explode(',', $params['filter.group_id']);
+    else {
+      $groups = explode(',', $params['filter.group_id']);
     }
     unset($params['filter.group_id']);
     $groups = array_flip($groups);
@@ -361,7 +362,7 @@ function _civicrm_api3_contact_check_params(&$params, $dupeCheck = TRUE, $dupeEr
     $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $params['contact_type'], 'Unsupervised', array());
 
     if (count($ids) > 0) {
-      throw new API_Exception("Found matching contacts: ". implode(',', $ids), "duplicate", array("ids" => $ids));
+      throw new API_Exception("Found matching contacts: " .  implode(',', $ids), "duplicate", array("ids" => $ids));
     }
   }
 
@@ -588,7 +589,7 @@ function civicrm_api3_contact_getquick($params) {
     }
     // phone_numeric should be phone
     $searchField = str_replace('_numeric', '', $field_name);
-    if(!in_array($searchField, $list)) {
+    if (!in_array($searchField, $list)) {
       $list[] = $searchField;
     }
   }
@@ -989,7 +990,7 @@ function _civicrm_api3_contact_getlist_params(&$request) {
   }
   // phone_numeric should be phone
   $searchField = str_replace('_numeric', '', $field_name);
-  if(!in_array($searchField, $list)) {
+  if (!in_array($searchField, $list)) {
     $list[] = $searchField;
   }
   $request['description_field'] = $list;
@@ -1028,7 +1029,7 @@ function _civicrm_api3_contact_getlist_output($result, $request) {
         }
       }
       $address = array();
-      foreach($addressFields as $item) {
+      foreach ($addressFields as $item) {
         if (!empty($row[$item])) {
           $address[] = $row[$item];
         }

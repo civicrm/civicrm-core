@@ -64,7 +64,7 @@ class CRM_Core_BAO_Block {
       return NULL;
     }
     $BAOString = 'CRM_Core_BAO_' . $blockName;
-    $block = new $BAOString( );
+    $block = new $BAOString();
 
     $blocks = array();
     if (!isset($params['entity_table'])) {
@@ -83,7 +83,7 @@ class CRM_Core_BAO_Block {
 
       $count = 1;
       foreach ($blockIds as $blockId) {
-        $block = new $BAOString( );
+        $block = new $BAOString();
         $block->id        = $blockId['id'];
         $getBlocks        = self::retrieveBlock($block, $blockName);
         $blocks[$count++] = array_pop($getBlocks);
@@ -199,11 +199,11 @@ class CRM_Core_BAO_Block {
       // e.g $bao = new $baoString;
       // $bao->getAllBlocks()
       $baoFunction = 'all' . $name . 's';
-      $allBlocks = $baoString::$baoFunction( $contactId, $updateBlankLocInfo );
+      $allBlocks = $baoString::$baoFunction($contactId, $updateBlankLocInfo);
     }
     elseif (!empty($entityElements) && $blockName != 'openid') {
       $baoFunction = 'allEntity' . $name . 's';
-      $allBlocks = $baoString::$baoFunction( $entityElements );
+      $allBlocks = $baoString::$baoFunction($entityElements);
     }
 
     return $allBlocks;
@@ -275,7 +275,7 @@ class CRM_Core_BAO_Block {
           }
           if ($resetPrimaryId) {
             $baoString = 'CRM_Core_BAO_' . $blockName;
-            $block = new $baoString( );
+            $block = new $baoString();
             $block->selectAdd();
             $block->selectAdd("id, is_primary");
             $block->id = $resetPrimaryId;
@@ -375,7 +375,7 @@ class CRM_Core_BAO_Block {
 
       $blockFields = array_merge($value, $contactFields);
       $baoString = 'CRM_Core_BAO_' . $name;
-      $blocks[] = $baoString::add( $blockFields );
+      $blocks[] = $baoString::add($blockFields);
     }
 
     // we need to delete blocks that were deleted during update
@@ -412,7 +412,7 @@ class CRM_Core_BAO_Block {
     }
 
     $baoString = 'CRM_Core_DAO_' . $name;
-    $block = new $baoString( );
+    $block = new $baoString();
 
     $block->copyValues($params);
     /*
@@ -468,7 +468,7 @@ class CRM_Core_BAO_Block {
       $sql = "UPDATE $table SET is_primary = 0 WHERE contact_id = %1";
       $sqlParams = array(1 => array($contactId, 'Integer'));
       // we don't want to create unecessary entries in the log_ tables so exclude the one we are working on
-      if(!empty($params['id'])){
+      if (!empty($params['id'])) {
         $sql .= " AND id <> %2";
         $sqlParams[2] = array($params['id'], 'Integer');
       }
@@ -491,7 +491,7 @@ class CRM_Core_BAO_Block {
        * is_primary to 1
        * CRM-10451
        */
-      if ( $existingEntities->N == 1 && $existingEntities->id == CRM_Utils_Array::value( 'id', $params ) ) {
+      if ($existingEntities->N == 1 && $existingEntities->id == CRM_Utils_Array::value('id', $params)) {
         $params['is_primary'] = 1;
         return;
       }
@@ -513,7 +513,7 @@ class CRM_Core_BAO_Block {
    * @param array $locations
    *
    */
-  public static function sortPrimaryFirst(&$locations){
+  public static function sortPrimaryFirst(&$locations) {
     uasort($locations, 'self::primaryComparison');
   }
 
@@ -524,7 +524,7 @@ class CRM_Core_BAO_Block {
    * @param array $location2
    * @return number
    */
-  public static function primaryComparison($location1, $location2){
+  public static function primaryComparison($location1, $location2) {
     $l1 = CRM_Utils_Array::value('is_primary', $location1);
     $l2 = CRM_Utils_Array::value('is_primary', $location2);
     if ($l1 == $l2) {

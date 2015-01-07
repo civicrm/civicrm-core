@@ -146,7 +146,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
       else {
         require_once str_replace('_', DIRECTORY_SEPARATOR, $customSearchClass) . '.php';
       }
-      $this->_search = new $customSearchClass( $formValues );
+      $this->_search = new $customSearchClass($formValues);
     }
     else {
       $fnName = $ext->keyToPath;

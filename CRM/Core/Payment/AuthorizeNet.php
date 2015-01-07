@@ -285,11 +285,11 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
      * the date we entered to be respected
      */
     $minDate = date_create('now', new DateTimeZone(self::TIMEZONE));
-    if(strtotime($startDate->format('Y-m-d')) < strtotime($minDate->format('Y-m-d'))){
+    if (strtotime($startDate->format('Y-m-d')) < strtotime($minDate->format('Y-m-d'))) {
       $startDate->setTimezone(new DateTimeZone(self::TIMEZONE));
     }
 
-    $template->assign( 'startDate', $startDate->format('Y-m-d') );
+    $template->assign('startDate', $startDate->format('Y-m-d'));
 
     $installments = $this->_getParam('installments');
 
@@ -360,7 +360,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    */
   public function _getAuthorizeNetFields() {
     $amount = $this->_getParam('total_amount');//Total amount is from the form contribution field
-    if(empty($amount)){//CRM-9894 would this ever be the case??
+    if (empty($amount)){//CRM-9894 would this ever be the case??
       $amount = $this->_getParam('amount');
     }
     $fields = array();
@@ -587,7 +587,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   public function _getParam($field, $xmlSafe = FALSE) {
     $value = CRM_Utils_Array::value($field, $this->_params, '');
     if ($xmlSafe) {
-      $value = str_replace(array( '&', '"', "'", '<', '>' ), '', $value);
+      $value = str_replace(array('&', '"', "'", '<', '>'), '', $value);
     }
     return $value;
   }

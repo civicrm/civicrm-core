@@ -263,7 +263,7 @@ class CRM_Event_BAO_Query {
         //Get parent of this event
         $exEventId = '';
         if ($query->_where[$grouping]) {
-          foreach($query->_where[$grouping] as $key => $val) {
+          foreach ($query->_where[$grouping] as $key => $val) {
             if (strstr($val, 'civicrm_event.id =')) {
               $exEventId = $val;
               $extractEventId = explode(" ", $val);
@@ -279,12 +279,12 @@ class CRM_Event_BAO_Query {
         if ($thisEventHasParent) {
           $getAllConnections = CRM_Core_BAO_RecurringEntity::getEntitiesForParent($thisEventHasParent, 'civicrm_event');
           $allEventIds = array();
-          foreach($getAllConnections as $key => $val) {
+          foreach ($getAllConnections as $key => $val) {
             $allEventIds[] = $val['id'];
           }
           if (!empty($allEventIds)) {
             $op = "IN";
-            $value = "(".implode(",", $allEventIds).")";
+            $value = "(" . implode(",", $allEventIds) . ")";
           }
         }
         $query->_where[$grouping][] = "civicrm_event.id $op {$value}";
@@ -416,7 +416,7 @@ class CRM_Event_BAO_Query {
 
         $names = array();
         foreach ($val as $id => $dontCare) {
-          if (!empty($roleTypes[$id]) ) {
+          if (!empty($roleTypes[$id])) {
             $names[] = $roleTypes[$id];
           }
         }

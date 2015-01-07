@@ -175,7 +175,7 @@ class civicrm_cli {
         $this->_joblog = TRUE;
       }
       else {
-        while(list($short, $long) = each($this->_additional_arguments)) {
+        while (list($short, $long) = each($this->_additional_arguments)) {
           if ($arg == '-' . $short || $arg == '--' . $long) {
             $property = '_' . $long;
             $this->$property = $value;
@@ -213,7 +213,7 @@ class civicrm_cli {
     chdir($civicrm_root);
     require_once 'civicrm.config.php';
     // autoload
-    if ( !class_exists('CRM_Core_ClassLoader') ) {
+    if (!class_exists('CRM_Core_ClassLoader')) {
       require_once $civicrm_root . '/CRM/Core/ClassLoader.php';
     }
     CRM_Core_ClassLoader::singleton()->register();
@@ -245,7 +245,7 @@ class civicrm_cli {
     }
 
     if (!empty($this->_user)) {
-      if(!CRM_Utils_System::authenticateScript(TRUE, $this->_user, $this->_password, TRUE, FALSE, FALSE)) {
+      if (!CRM_Utils_System::authenticateScript(TRUE, $this->_user, $this->_password, TRUE, FALSE, FALSE)) {
         $this->_log(ts("Failed to login as %1. Wrong username or password.", array('1' => $this->_user)));
         return FALSE;
       }
@@ -334,14 +334,14 @@ class civicrm_cli_csv_exporter extends civicrm_cli {
     $result = civicrm_api($this->_entity, 'Get', $this->_params);
     $first = TRUE;
     foreach ($result['values'] as $row) {
-      if($first) {
+      if ($first) {
         $columns = array_keys($row);
         fputcsv($out, $columns, $this->separator, '"');
         $first = FALSE;
       }
       //handle values returned as arrays (i.e. custom fields that allow multiple selections) by inserting a control character
       foreach ($row as &$field) {
-        if(is_array($field)) {
+        if (is_array($field)) {
           //convert to string
           $field = implode($field, CRM_Core_DAO::VALUE_SEPARATOR) . CRM_Core_DAO::VALUE_SEPARATOR;
         }
@@ -397,7 +397,8 @@ class civicrm_cli_csv_file extends civicrm_cli {
     $this->header = $header;
     while (($data = fgetcsv($handle, 0, $this->separator)) !== FALSE) {
       // skip blank lines
-      if(count($data) == 1 && is_null($data[0])) { continue;
+      if (count($data) == 1 && is_null($data[0])) {
+        continue;
       }
       $this->row++;
       $params = $this->convertLine($data);
@@ -463,7 +464,8 @@ class civicrm_cli_csv_deleter extends civicrm_cli_csv_file {
     $result = civicrm_api($this->_entity, 'Delete', $params);
     if ($result['is_error']) {
       echo "\nERROR line " . $this->row . ": " . $result['error_message'] . "\n";
-    } else {
+    }
+    else {
       echo "\nline " . $this->row . ": deleted\n";
     }
   }

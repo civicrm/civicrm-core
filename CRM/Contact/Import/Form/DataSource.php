@@ -137,7 +137,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
       $this->_dataSourceClassFile = str_replace('_', '/', $this->_dataSource) . ".php";
       require_once $this->_dataSourceClassFile;
       $this->_dataSourceClass = new $this->_dataSource;
-      $this->_dataSourceClass->buildQuickForm( $this );
+      $this->_dataSourceClass->buildQuickForm($this);
     }
 
     // Get list of data sources and display them as options
@@ -336,7 +336,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
         $this->_params['import_table_name'] = 'civicrm_import_job_' . md5(uniqid(rand(), TRUE));
       }
 
-      $this->_dataSourceClass->postProcess( $this->_params, $db, $this );
+      $this->_dataSourceClass->postProcess($this->_params, $db, $this);
 
       // We should have the data in the DB now, parse it
       $importTableName = $this->get('importTableName');

@@ -421,7 +421,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $onlinePaymentProcessorEnabled = FALSE;
     if (!empty($this->_paymentProcessors)) {
       foreach ($this->_paymentProcessors as $key => $name) {
-        if($name['billing_mode'] == 1) {
+        if ($name['billing_mode'] == 1) {
           $onlinePaymentProcessorEnabled = TRUE;
         }
         $pps[$key] = $name['name'];
@@ -447,7 +447,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $contactID = $this->getContactID();
-    if($this->getContactID() === '0') {
+    if ($this->getContactID() === '0') {
       $this->addCidZeroOptions($onlinePaymentProcessorEnabled);
     }
     //build pledge block.
@@ -563,7 +563,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $pcp_supporter_text = ts('This contribution is being made thanks to the effort of <strong>%1</strong>, who supports our campaign.', array(1 => $pcpSupporter));
         // Only tell people that can also create a PCP if the contribution page has a non-empty value in the "Create Personal Campaign Page link" field.
         $text = CRM_PCP_BAO_PCP::getPcpBlockStatus($this->_id, 'contribute');
-        if(!empty($text)) {
+        if (!empty($text)) {
           $pcp_supporter_text .= ts("You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!");
         }
         $this->assign('pcpSupporterText', $pcp_supporter_text);
@@ -592,7 +592,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     //when multiple payment processor as the user
     //can toggle with payment processor selection
     $billingModePaymentProcessors = 0;
-    if ( !empty( $this->_paymentProcessors ) ) {
+    if (!empty($this->_paymentProcessors)) {
       foreach ($this->_paymentProcessors as $key => $values) {
         if ($values['billing_mode'] == CRM_Core_Payment::BILLING_MODE_BUTTON) {
           $billingModePaymentProcessors++;
@@ -602,7 +602,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     if ($billingModePaymentProcessors && count($this->_paymentProcessors) == $billingModePaymentProcessors) {
       $allAreBillingModeProcessors = TRUE;
-    } else {
+    }
+    else {
       $allAreBillingModeProcessors = FALSE;
     }
 
@@ -680,7 +681,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $unitVals = explode(CRM_Core_DAO::VALUE_SEPARATOR, $frUnits);
 
     // CRM 10860, display text instead of a dropdown if there's only 1 frequency unit
-    if(sizeof($unitVals) == 1) {
+    if (sizeof($unitVals) == 1) {
       $form->assign('one_frequency_unit', TRUE);
       $unit = $unitVals[0];
       $form->add('hidden', 'frequency_unit', $unit);
@@ -688,7 +689,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $unit .= "(s)";
       }
       $form->assign('frequency_unit', $unit);
-    } else {
+    }
+    else {
       $form->assign('one_frequency_unit', FALSE);
       $units = array();
       $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units');
@@ -763,7 +765,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
         if ($self->_quickConfig && ($priceField->name == 'contribution_amount' || $priceField->name == 'membership_amount')) {
           $previousId = $priceField->id;
-          if ($priceField->name == 'membership_amount' && !$priceField->is_active ) {
+          if ($priceField->name == 'membership_amount' && !$priceField->is_active) {
             $membershipIsActive = FALSE;
           }
         }
@@ -868,7 +870,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           $errors['_qf_default'] = ts('Select at least one option from Contribution(s).');
         }
       }
-      if($otherAmount && !empty($check)) {
+      if ($otherAmount && !empty($check)) {
         $errors["price_{$otherAmount}"] = ts('Amount is required field.');
       }
 
@@ -1257,18 +1259,18 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     if ($priceSetId = CRM_Utils_Array::value('priceSetId', $params)) {
       $lineItem = array();
-      $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config' );
-      if ( $is_quick_config ) {
-        foreach ( $this->_values['fee'] as $key => & $val ) {
-          if ( $val['name'] == 'other_amount' && $val['html_type'] == 'Text' && array_key_exists( 'price_'.$key, $params )  ) {
-            $params['price_'.$key] = CRM_Utils_Rule::cleanMoney($params['price_'.$key]); //Clean out any currency symbols
-            if ( $params['price_'.$key] != 0 ) {
-              foreach ( $val['options'] as $optionKey => & $options ) {
-                $options['amount'] = CRM_Utils_Array::value( 'price_'.$key, $params );
+      $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config');
+      if ($is_quick_config) {
+        foreach ($this->_values['fee'] as $key => & $val) {
+          if ($val['name'] == 'other_amount' && $val['html_type'] == 'Text' && array_key_exists('price_'.$key, $params) ) {
+            $params['price_' . $key] = CRM_Utils_Rule::cleanMoney($params['price_' . $key]); //Clean out any currency symbols
+            if ($params['price_'.$key] != 0) {
+              foreach ($val['options'] as $optionKey => & $options) {
+                $options['amount'] = CRM_Utils_Array::value('price_'.$key, $params);
                 break;
               }
             }
-            $params['price_'.$key] = 1;
+            $params['price_' . $key] = 1;
             break;
           }
         }
@@ -1298,7 +1300,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     if ($this->_membershipBlock['is_separate_payment'] && !empty($params['separate_amount'])) {
       $this->set('amount', $params['separate_amount']);
-    } else {
+    }
+    else {
       $this->set('amount', $params['amount']);
     }
 

@@ -582,7 +582,7 @@ ORDER BY title asc
       }
     }
 
-    $value = $this->get( 'financial_type_id' );
+    $value = $this->get('financial_type_id');
     $val = array();
     if ($value) {
       if (is_array($value)) {

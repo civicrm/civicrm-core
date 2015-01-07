@@ -98,7 +98,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * Set $this->_invoiceData from the input array
    */
   public function setInvoiceData() {
-    if(empty($this->_inputParameters['rp_invoice_id'])) {
+    if (empty($this->_inputParameters['rp_invoice_id'])) {
       $this->_isPaymentExpress = TRUE;
       return;
     }
@@ -121,11 +121,11 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       // p has been overloaded & could mean contribution page or participant id. Clearly we need an
       // alphabet with more letters.
       // the mode will always be resolved before the mystery p is reached
-      if($rpValueArray[1] == 'contribute') {
+      if ($rpValueArray[1] == 'contribute') {
         $mapping['p'] = 'contribution_page_id';
       }
     }
-    if(empty($this->_inputParameters['component'])) {
+    if (empty($this->_inputParameters['component'])) {
       $this->_isPaymentExpress = TRUE;
     }
   }
@@ -225,7 +225,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     $contributionStatuses = $contributionStatuses['values'];
     switch ($txnType) {
       case 'recurring_payment_profile_created':
-        if(in_array($recur->contribution_status_id, array(array_search('Pending', $contributionStatuses), array_search('In Progress', $contributionStatuses)))
+        if (in_array($recur->contribution_status_id, array(array_search('Pending', $contributionStatuses), array_search('In Progress', $contributionStatuses)))
         && !empty($recur->processor_id)) {
           echo "already handled";
           return;
@@ -248,7 +248,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
 
         //contribution installment is completed
         if ($this->retrieve('profile_status', 'String') == 'Expired') {
-          if(!empty($recur->end_date)) {
+          if (!empty($recur->end_date)) {
             echo "already handled";
             return;
           }
@@ -390,7 +390,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   public function main() {
     CRM_Core_Error::debug_var('GET', $_GET, TRUE, TRUE);
     CRM_Core_Error::debug_var('POST', $_POST, TRUE, TRUE);
-    if($this->_isPaymentExpress) {
+    if ($this->_isPaymentExpress) {
       $this->handlePaymentExpress();
       return;
     }
@@ -526,23 +526,23 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     $objects = $ids = $input = array();
     $isFirst = FALSE;
     $input['txnType']  = $this->retrieve('txn_type', 'String');
-    if($input['txnType'] != 'recurring_payment') {
+    if ($input['txnType'] != 'recurring_payment') {
       throw new CRM_Core_Exception('Paypal IPNS not handled other than recurring_payments');
     }
     $input['invoice'] = self::getValue('i', FALSE);
     $this->getInput($input, $ids);
-    if($this-> transactionExists($input['trxn_id'])) {
+    if ($this-> transactionExists($input['trxn_id'])) {
       throw new CRM_Core_Exception('This transaction has already been processed');
     }
 
     $contributionRecur = civicrm_api3('contribution_recur', 'getsingle', array('return' => 'contact_id, id', 'invoice_id' => $input['invoice']));
     $ids['contact'] = $contributionRecur['contact_id'];
     $ids['contributionRecur'] = $contributionRecur['id'];
-    $result = civicrm_api3('contribution', 'getsingle', array('invoice_id' => $input['invoice'] ));
+    $result = civicrm_api3('contribution', 'getsingle', array('invoice_id' => $input['invoice']));
 
     $ids['contribution'] = $result['id'];
     //@todo hard - coding 'pending' for now
-    if($result['contribution_status_id'] == 2) {
+    if ($result['contribution_status_id'] == 2) {
       $isFirst = TRUE;
     }
     // arg api won't get this - fix it
@@ -567,7 +567,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
    * @param string $trxn_id
    */
   public function transactionExists($trxn_id) {
-    if(CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_contribution WHERE trxn_id = %1",
+    if (CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_contribution WHERE trxn_id = %1",
       array(
         1 => array($trxn_id, 'String')
       ))) {

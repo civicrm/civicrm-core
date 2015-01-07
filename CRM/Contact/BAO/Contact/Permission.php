@@ -381,7 +381,8 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
     if ($checkSumValidationResult && $form && CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE)) {
       // if result is already validated, and url has cs, set the flag.
       $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_CHECKSUM);
-    } else if (($session->get('authSrc') & CRM_Core_Permission::AUTH_SRC_CHECKSUM) == CRM_Core_Permission::AUTH_SRC_CHECKSUM) {
+    }
+    elseif (($session->get('authSrc') & CRM_Core_Permission::AUTH_SRC_CHECKSUM) == CRM_Core_Permission::AUTH_SRC_CHECKSUM) {
       // if checksum wasn't present in REQUEST OR checksum result validated as FALSE,
       // and flag was already set exactly as AUTH_SRC_CHECKSUM, unset it.
       $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_UNKNOWN);

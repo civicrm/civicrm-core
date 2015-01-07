@@ -90,7 +90,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    * @return void
    */
   public function buildQuickForm() {
-    parent::buildQuickForm( );
+    parent::buildQuickForm();
     $this->setPageTitle(ts('Premium Product'));
 
     if ($this->_action & CRM_Core_Action::PREVIEW) {
@@ -146,7 +146,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->add('text', 'frequency_interval', ts('Frequency'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'frequency_interval'));
 
     //Financial Type CRM-11106
-    $financialType = CRM_Contribute_PseudoConstant::financialType( );
+    $financialType = CRM_Contribute_PseudoConstant::financialType();
     $premiumFinancialType = array();
     CRM_Core_PseudoConstant::populate(
       $premiumFinancialType,
@@ -167,18 +167,18 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       'account_relationship = 7'
     );
     $productFinancialType = array_intersect($costFinancialType, $premiumFinancialType);
-    foreach( $financialType as $key => $financialTypeName ){
-      if(!in_array( $key, $productFinancialType)) {
-        unset( $financialType[$key] );
+    foreach ($financialType as $key => $financialTypeName) {
+      if (!in_array($key, $productFinancialType)) {
+        unset($financialType[$key]);
       }
     }
-    if( count( $financialType ) ){
-      $this->assign( 'financialType', $financialType );
+    if (count($financialType)) {
+      $this->assign('financialType', $financialType);
     }
     $this->add(
       'select',
       'financial_type_id',
-      ts( 'Financial Type' ),
+      ts('Financial Type'),
       array('' => ts('- select -')) + $financialType
     );
 
@@ -301,25 +301,29 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
           // to check wether GD is installed or not
           $gdSupport = CRM_Utils_System::getModuleSetting('gd', 'GD Support');
-          if($gdSupport) {
-            if($imageFile) {
+          if ($gdSupport) {
+            if ($imageFile) {
               $error = FALSE;
               $params['image'] = $this->_resizeImage($imageFile, "_full", 200, 200);
               $params['thumbnail'] = $this->_resizeImage($imageFile, "_thumb", 50, 50);
             }
-          } else {
+          }
+          else {
             $error = TRUE;
             $params['image'] = $config->resourceBase . 'i/contribute/default_premium.jpg';
             $params['thumbnail'] = $config->resourceBase . 'i/contribute/default_premium_thumb.jpg';
           }
-        } elseif ($value == 'thumbnail') {
+        }
+        elseif ($value == 'thumbnail') {
           $params['image'] = $params['imageUrl'];
           $params['thumbnail'] = $params['thumbnailUrl'];
-        } elseif ($value == 'default_image') {
+        }
+        elseif ($value == 'default_image') {
           $url = parse_url($config->userFrameworkBaseURL);
           $params['image'] = $config->resourceBase . 'i/contribute/default_premium.jpg';
           $params['thumbnail'] = $config->resourceBase . 'i/contribute/default_premium_thumb.jpg';
-        } else {
+        }
+        else {
           $params['image'] = "";
           $params['thumbnail'] = "";
         }
@@ -359,18 +363,20 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   private function _resizeImage($filename, $resizedName, $width, $height) {
     // figure out the new filename
     $pathParts = pathinfo($filename);
-    $newFilename = $pathParts['dirname']."/".$pathParts['filename'].$resizedName.".".$pathParts['extension'];
+    $newFilename = $pathParts['dirname'] . "/" . $pathParts['filename'] . $resizedName . "." . $pathParts['extension'];
 
     // get image about original image
     $imageInfo = getimagesize($filename);
     $widthOrig = $imageInfo[0];
     $heightOrig = $imageInfo[1];
     $image = imagecreatetruecolor($width, $height);
-    if($imageInfo['mime'] == 'image/gif') {
+    if ($imageInfo['mime'] == 'image/gif') {
       $source = imagecreatefromgif($filename);
-    } elseif($imageInfo['mime'] == 'image/png') {
+    }
+    elseif($imageInfo['mime'] == 'image/png') {
       $source = imagecreatefrompng($filename);
-    } else {
+    }
+    else {
       $source = imagecreatefromjpeg($filename);
     }
 
@@ -390,7 +396,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
     // return the URL to link to
     $config = CRM_Core_Config::singleton();
-    return $config->imageUploadURL.basename($newFilename);
+    return $config->imageUploadURL . basename($newFilename);
   }
 
 }

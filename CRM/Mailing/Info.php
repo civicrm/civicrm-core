@@ -91,7 +91,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'return' => array("msg_html", "id", "msg_title", "msg_subject"),
         'id' => array('>' => 58),
       ));
-    } else {
+    }
+    else {
       // CiviMail UI
       $emailAdd = civicrm_api3('Email', 'get', array(
         'sequential' => 1,
@@ -105,7 +106,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       ));
     }
     $mailGrp = civicrm_api3('MailingGroup', 'get', array());
-    $mailTokens = civicrm_api3('Mailing', 'get_token', array( 'usage' => 'Mailing'));
+    $mailTokens = civicrm_api3('Mailing', 'get_token', array('usage' => 'Mailing'));
     $fromAddress = civicrm_api3('OptionGroup', 'get', array(
       'sequential' => 1,
       'name' => "from_email_address",

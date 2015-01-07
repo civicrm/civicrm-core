@@ -83,7 +83,7 @@ function _civicrm_api3_group_create_spec(&$params) {
  */
 function civicrm_api3_group_get($params) {
   $options = _civicrm_api3_get_options_from_params($params, TRUE, 'group', 'get');
-  if(empty($options['return']) || !in_array('member_count', $options['return'])) {
+  if (empty($options['return']) || !in_array('member_count', $options['return'])) {
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Group');
   }
 

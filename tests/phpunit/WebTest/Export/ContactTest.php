@@ -35,7 +35,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  public function testPrefixGenderSuffix(){
+  public function testPrefixGenderSuffix() {
     $this->webtestLogin();
 
     // Create new  group
@@ -122,9 +122,9 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
       1 => array(
         'First Name' => $firstContactName,
         'Last Name' => 'Smith',
-        'Email' => ''.strtolower($emailContactFirst).'',
+        'Email' => '' . strtolower($emailContactFirst) . '',
         'Sort Name' => $sortFirstName,
-        'Display Name' => $prefixLabelContactFrst.' '.$displayFirstName.' '.$suffixLabelContactFrst,
+        'Display Name' => $prefixLabelContactFrst . ' ' . $displayFirstName . ' ' . $suffixLabelContactFrst,
         'Individual Prefix' => $prefixLabelContactFrst,
         'Individual Suffix' => $suffixLabelContactFrst,
         'Gender' => $genderLabelContactFrst,
@@ -132,9 +132,9 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
       2 => array(
         'First Name' => $secondContactName,
         'Last Name' => 'John',
-        'Email' => ''.strtolower($emailContactSecond).'',
+        'Email' => '' . strtolower($emailContactSecond) . '',
         'Sort Name' => $sortSecondName,
-        'Display Name' => $prefixLabelContactScnd.' '.$displaySecondName.' '.$suffixLabelContactScnd,
+        'Display Name' => $prefixLabelContactScnd . ' ' . $displaySecondName . ' ' . $suffixLabelContactScnd,
         'Individual Prefix' => $prefixLabelContactScnd,
         'Individual Suffix' => $suffixLabelContactScnd,
         'Gender' => $genderLabelContactScnd,
@@ -441,7 +441,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $prefix = rand(1, 4);
     $suffix = rand(1, 8);
     $gender = rand(1, 3);
-    $genderLabel = "civicrm_gender_".$genderLabelArray[$gender]."_$gender";
+    $genderLabel = "civicrm_gender_" . $genderLabelArray[$gender] . "_$gender";
     $this->select("prefix_id", "value=$prefix");
     $this->select("suffix_id", "value=$suffix");
     $this->click("demographics");
@@ -462,7 +462,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
    *
    * @return array|int
    */
-  public function getOptionLabel($optionGroupName, $optionValue){
+  public function getOptionLabel($optionGroupName, $optionValue) {
     $params = array(
       'version' => 3,
       'sequential' => 1,

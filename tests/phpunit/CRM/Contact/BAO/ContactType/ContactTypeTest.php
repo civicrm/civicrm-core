@@ -8,7 +8,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    $labelsub1 = 'sub1_individual'.substr(sha1(rand()), 0, 7);
+    $labelsub1 = 'sub1_individual' . substr(sha1(rand()), 0, 7);
     $params = array(
       'label' => $labelsub1,
       'name' => $labelsub1,
@@ -19,7 +19,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $result = CRM_Contact_BAO_ContactType::add($params);
     $this->subTypesIndividual[] = $params['name'];
 
-    $labelsub2 = 'sub2_individual'.substr(sha1(rand()), 0, 7);
+    $labelsub2 = 'sub2_individual' . substr(sha1(rand()), 0, 7);
     $params = array(
       'label' => $labelsub2,
       'name' => $labelsub2,
@@ -30,7 +30,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $result = CRM_Contact_BAO_ContactType::add($params);
     $this->subTypesIndividual[] = $params['name'];
 
-    $labelsub = 'sub_organization'.substr(sha1(rand()), 0, 7);
+    $labelsub = 'sub_organization' . substr(sha1(rand()), 0, 7);
     $params = array(
       'label' => $labelsub,
       'name' => $labelsub,
@@ -41,7 +41,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $result = CRM_Contact_BAO_ContactType::add($params);
     $this->subTypesOrganization[] = $params['name'];
 
-    $labelhousehold = 'sub_household'.substr(sha1(rand()), 0, 7);
+    $labelhousehold = 'sub_household' . substr(sha1(rand()), 0, 7);
     $params = array(
       'label' => $labelhousehold,
       'name' => $labelhousehold,

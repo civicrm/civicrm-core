@@ -166,7 +166,8 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
 
     if ($this->isChecked("edit-2-administer-reserved-reports")) {
       $this->click("edit-2-administer-reserved-reports");
-    } else {
+    }
+    else {
       $this->click("edit-{$roleId}-administer-reserved-reports");
     }
     $this->click("edit-submit");

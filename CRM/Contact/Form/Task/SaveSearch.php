@@ -222,7 +222,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     $this->_id = $savedSearch->id;
 
     //CRM-14190
-    if ( !empty($formValues['parents']) ) {
+    if (!empty($formValues['parents'])) {
       CRM_Contact_BAO_GroupNestingCache::update();
     }
   }

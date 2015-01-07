@@ -61,8 +61,8 @@ function civicrm_api3_mailing_contact_get($params) {
  * @param bool $count
  * @throws Exception
  */
-function _civicrm_api3_mailing_contact_getresults($params, $count){
-  if(empty($params['type'])){
+function _civicrm_api3_mailing_contact_getresults($params, $count) {
+  if (empty($params['type'])) {
     //ie. because the api is an anomoly & passing in id is not valid
     throw new Exception('This api call does not accept api as a parameter');
   }

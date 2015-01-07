@@ -433,7 +433,7 @@ class CRM_Utils_Weight {
   }
 
   public static function fixOrder() {
-    $signature = CRM_Utils_Request::retrieve( '_sgn', 'String', CRM_Core_DAO::$_nullObject);
+    $signature = CRM_Utils_Request::retrieve('_sgn', 'String', CRM_Core_DAO::$_nullObject);
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), self::$SIGNABLE_FIELDS);
 
     // Validate $_GET values b/c subsequent code reads $_GET (via CRM_Utils_Request::retrieve)

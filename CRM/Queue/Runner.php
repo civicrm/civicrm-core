@@ -214,7 +214,8 @@ class CRM_Queue_Runner {
         if (!$isOK) {
           $exception = new Exception('Task returned false');
         }
-      } catch (Exception$e) {
+      }
+      catch (Exception$e) {
         $isOK = FALSE;
         $exception = $e;
       }

@@ -83,7 +83,7 @@ function civicrm_api3_generic_setValue($apiRequest) {
       break;
 
     default:
-      return civicrm_api3_create_error("Param '$field' is of a type not managed yet (".$def['type']."). Join the API team and help us implement it", array('error_code' => 'NOT_IMPLEMENTED'));
+      return civicrm_api3_create_error("Param '$field' is of a type not managed yet (" . $def['type'] . "). Join the API team and help us implement it", array('error_code' => 'NOT_IMPLEMENTED'));
   }
 
   $dao_name = _civicrm_api3_get_DAO($entity);

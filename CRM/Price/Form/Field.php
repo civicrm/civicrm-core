@@ -269,7 +269,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       //Financial Type
       $this->add(
         'select',
-        'option_financial_type_id['.$i.']',
+        'option_financial_type_id[' . $i . ']',
         ts('Financial Type'),
         array('' => ts('- select -')) + $financialType
       );

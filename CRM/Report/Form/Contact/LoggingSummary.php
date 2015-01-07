@@ -40,7 +40,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
     parent::__construct();
 
     $logTypes = array();
-    foreach ( array_keys($this->_logTables) as $table ) {
+    foreach (array_keys($this->_logTables) as $table) {
       $type = $this->getLogType($table);
       $logTypes[$type] = $type;
     }
@@ -189,7 +189,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
       }
 
       if ('Contact' == CRM_Utils_Array::value('log_type', $this->_logTables[$row['log_civicrm_entity_log_type']]) &&
-          CRM_Utils_Array::value('log_civicrm_entity_log_action', $row) == 'Insert' ) {
+          CRM_Utils_Array::value('log_civicrm_entity_log_action', $row) == 'Insert') {
         $row['log_civicrm_entity_log_action'] = ts('Update');
       }
 
@@ -205,13 +205,13 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
       $date = CRM_Utils_Date::isoToMysql($row['log_civicrm_entity_log_date']);
 
       if ('Update' == CRM_Utils_Array::value('log_civicrm_entity_log_action', $row)) {
-        $q = "reset=1&log_conn_id={$row['log_civicrm_entity_log_conn_id']}&log_date=". $date;
+        $q = "reset=1&log_conn_id={$row['log_civicrm_entity_log_conn_id']}&log_date=" .  $date;
         if ($this->cid) {
           $q .= '&cid=' . $this->cid;
         }
-        $q .= (!empty($row['log_civicrm_entity_altered_contact'])) ? '&alteredName='.$row['log_civicrm_entity_altered_contact'] : '';
-        $q .= (!empty($row['altered_by_contact_display_name'])) ? '&alteredBy='.$row['altered_by_contact_display_name'] : '';
-        $q .= (!empty($row['log_civicrm_entity_log_user_id'])) ? '&alteredById='.$row['log_civicrm_entity_log_user_id'] : '';
+        $q .= (!empty($row['log_civicrm_entity_altered_contact'])) ? '&alteredName=' . $row['log_civicrm_entity_altered_contact'] : '';
+        $q .= (!empty($row['altered_by_contact_display_name'])) ? '&alteredBy=' . $row['altered_by_contact_display_name'] : '';
+        $q .= (!empty($row['log_civicrm_entity_log_user_id'])) ? '&alteredById=' . $row['log_civicrm_entity_log_user_id'] : '';
 
         $url1 = CRM_Report_Utils_Report::getNextUrl('logging/contact/detail', "{$q}&snippet=4&section=2&layout=overlay", FALSE, TRUE);
         $url2 = CRM_Report_Utils_Report::getNextUrl('logging/contact/detail', "{$q}&section=2", FALSE, TRUE);
@@ -238,7 +238,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
    */
   public function from($logTable = NULL) {
     static $entity = NULL;
-    if ( $logTable ) {
+    if ($logTable) {
       $entity = $logTable;
     }
 

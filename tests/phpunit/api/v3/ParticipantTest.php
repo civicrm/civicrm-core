@@ -210,7 +210,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
    */
   public function testGetContactIdOnly() {
     $params = array(
-      'contact_id' => $this->_contactID, );
+      'contact_id' => $this->_contactID,);
     $participant = $this->callAPISuccess('participant', 'get', $params);
 
     $this->assertEquals($this->_participantID, $participant['id'],
@@ -237,7 +237,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   public function testGetMultiMatchReturnFirst() {
     $params = array(
       'event_id' => $this->_eventID,
-      'rowCount' => 1, );
+      'rowCount' => 1,);
 
     $participant = $this->callAPISuccess('participant', 'get', $params);
     $this->assertNotNull($participant['id']);
@@ -580,7 +580,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'role_id' => 3,
       'register_date' => '2006-01-21',
       'source' => 'US Open',
-      'event_level' => 'Donation', );
+      'event_level' => 'Donation',);
     $participant = $this->callAPIFailure('participant', 'create', $params);
     $this->assertEquals($participant['error_message'], 'Mandatory key(s) missing from params array: event_id');
     // Cleanup created participant records.
@@ -597,7 +597,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'role_id' => 3,
       'register_date' => '2006-01-21',
       'source' => 'US Open',
-      'event_level' => 'Donation', );
+      'event_level' => 'Donation',);
     $participant = $this->callAPIFailure('Participant', 'update', $params);
   }
 
@@ -616,7 +616,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'role_id' => 3,
       'register_date' => '2006-01-21',
       'source' => 'US Open',
-      'event_level' => 'Donation', );
+      'event_level' => 'Donation',);
     $participant = $this->callAPIFailure('participant', 'create', $params);
     $result = $this->participantDelete($participantId);
   }
@@ -644,7 +644,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
    */
   public function testParticipantDelete() {
     $params = array(
-      'id' => $this->_participantID, );
+      'id' => $this->_participantID,);
     $participant = $this->callAPISuccess('participant', 'delete', $params);
     $this->assertAPISuccess($participant);
     $this->assertDBState('CRM_Event_DAO_Participant', $this->_participantID, NULL, TRUE);
@@ -657,7 +657,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
    */
   public function testParticipantDeleteMissingID() {
     $params = array(
-      'event_id' => $this->_eventID, );
+      'event_id' => $this->_eventID,);
     $participant = $this->callAPIFailure('participant', 'delete', $params);
     $this->assertNotNull($participant['error_message']);
   }

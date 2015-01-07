@@ -142,7 +142,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
         }
 
         $className = "CRM_{$componentName[1]}_Form_Task";
-        $className::preProcessCommon( $this, TRUE );
+        $className::preProcessCommon($this, TRUE);
         $values = $this->controller->exportValues('Search');
       }
       else {

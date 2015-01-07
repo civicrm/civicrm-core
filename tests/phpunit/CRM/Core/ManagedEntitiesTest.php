@@ -271,7 +271,8 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     try {
       $me->reconcile();
       $this->fail('Expected exception when using invalid declaration');
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       // good
     }
   }
@@ -296,7 +297,8 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     try {
       $me->reconcile();
       $this->fail('Expected exception when using invalid declaration');
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       // good
     }
   }
@@ -321,7 +323,8 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     try {
       $me->reconcile();
       $this->fail('Expected exception when using invalid declaration');
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       // good
     }
   }

@@ -74,7 +74,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
       $statusMsg = ts('Email: %1 has been successfully unsubscribed from this Mailing List/Group.',
         array(1 => $email)
       );
-      CRM_Core_Session::setStatus( $statusMsg, '', 'fail' );
+      CRM_Core_Session::setStatus($statusMsg, '', 'fail');
     }
     $this->assign('groupExist', $groupExist);
 
@@ -131,16 +131,16 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
         array(1 => $values['email_confirm'])
       );
 
-      CRM_Core_Session::setStatus( $statusMsg, '', 'success' );
+      CRM_Core_Session::setStatus($statusMsg, '', 'success');
     }
-    else if ($result == FALSE) {
+    elseif ($result == FALSE) {
       // Email address not verified
 
       $statusMsg = ts('The email address: %1 you have entered does not match the email associated with this unsubscribe request.',
         array(1 => $values['email_confirm'])
       );
 
-    CRM_Core_Session::setStatus( $statusMsg, '', 'fail' );
+    CRM_Core_Session::setStatus($statusMsg, '', 'fail');
 
     }
 

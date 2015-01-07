@@ -54,9 +54,9 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
    */
   public function fileName ($key) {
     if (strlen($key) > 50) {
-      return CIVICRM_TEMPLATE_COMPILEDIR ."CRM_".md5($key).".php";
+      return CIVICRM_TEMPLATE_COMPILEDIR  . "CRM_" . md5($key) . ".php";
     }
-    return CIVICRM_TEMPLATE_COMPILEDIR .$key.".php";
+    return CIVICRM_TEMPLATE_COMPILEDIR  . $key . ".php";
   }
 
   /**
@@ -85,7 +85,7 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
       return;
     }
     $this->_cache[$key] = $value;
-    file_put_contents($this->fileName($key), "<?php //".serialize($value));
+    file_put_contents($this->fileName($key), "<?php //" . serialize($value));
   }
 
   /**
@@ -108,7 +108,7 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
     }
     while (FALSE !== ($entry = readdir($handle))) {
       if (substr($entry, 0, 4) == $prefix) {
-        unlink(CIVICRM_TEMPLATE_COMPILEDIR.$entry);
+        unlink(CIVICRM_TEMPLATE_COMPILEDIR . $entry);
       }
     }
     closedir($handle);

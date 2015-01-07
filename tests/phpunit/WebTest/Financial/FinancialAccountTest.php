@@ -39,9 +39,9 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // Add new Financial Account
-    $orgName = 'Alberta '.substr(sha1(rand()), 0, 7);
+    $orgName = 'Alberta ' . substr(sha1(rand()), 0, 7);
     $uniqueName = explode(" ", $orgName);
-    $financialAccountTitle = 'Financial Account '.substr(sha1(rand()), 0, 4);
+    $financialAccountTitle = 'Financial Account ' . substr(sha1(rand()), 0, 4);
     $financialAccountDescription = "{$financialAccountTitle} Description";
     $accountingCode = 1033;
     $financialAccountType = 'Liability';
@@ -52,7 +52,7 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
     $isDefault = FALSE;
 
     //Add new organisation
-    if($orgName) {
+    if ($orgName) {
       $this->webtestAddOrganization($orgName);
     }
 
@@ -96,7 +96,7 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
     $financialAccountType = 'Liability';
 
     if ($orgNameEdit) {
-      $orgNameEdit = 'NGO '.substr(sha1(rand()), 0, 7);
+      $orgNameEdit = 'NGO ' . substr(sha1(rand()), 0, 7);
       $this->webtestAddOrganization($orgNameEdit);
       $uniqueName = explode(" ", $orgNameEdit);
     }
@@ -114,7 +114,7 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
       $isDefault
     );
 
-    if($orgNameEdit) {
+    if ($orgNameEdit) {
       $orgName = $orgNameEdit;
     }
     $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");

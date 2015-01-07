@@ -49,7 +49,7 @@ class CRM_Utils_SystemLogger extends Psr\Log\AbstractLogger implements \Psr\Log\
    * @return null
    */
   public function log($level, $message, array $context = array()) {
-    if(!isset($context['hostname'])) {
+    if (!isset($context['hostname'])) {
       $context['hostname'] = CRM_Utils_System::ipAddress();
     }
     $rec = new CRM_Core_DAO_SystemLog();

@@ -53,7 +53,8 @@ class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
     try {
       CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_contact WHERE MATCH(first_name,last_name) AGAINST ("joe")');
       $this->fail("Missed expected exception");
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       $this->assertTrue(TRUE, 'Received expected exception');
     }
   }

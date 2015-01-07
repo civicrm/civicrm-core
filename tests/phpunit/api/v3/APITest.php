@@ -138,7 +138,7 @@ class api_v3_APITest extends CiviUnitTestCase {
     try{
       $result = civicrm_api3('contact', 'get', array());
     }
-    catch (CRM_Exception $e){
+    catch (CRM_Exception $e) {
       $this->fail("This should have been a success test");
     }
     $this->assertTrue(is_array($result));
@@ -148,11 +148,11 @@ class api_v3_APITest extends CiviUnitTestCase {
   /**
    * Test exception is thrown
    */
-  public function testv3WrapperException(){
+  public function testv3WrapperException() {
     try{
       $result = civicrm_api3('contact', 'create', array('debug' => 1));
     }
-    catch (CiviCRM_API3_Exception $e){
+    catch (CiviCRM_API3_Exception $e) {
       $this->assertEquals('mandatory_missing', $e->getErrorCode());
       $this->assertEquals('Mandatory key(s) missing from params array: contact_type', $e->getMessage());
       $extra = $e->getExtraParams();

@@ -292,7 +292,8 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
         );
         if (!isset($svq)) {
           return civicrm_api3_create_error("Invalid Contact ID: There is no contact record with contact_id = $value.");
-        } else if ($svq == 1) {
+        }
+        elseif ($svq == 1) {
           return civicrm_api3_create_error("Invalid Contact ID: contact_id $value is a soft-deleted contact.");
         }
 
@@ -990,7 +991,7 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
       continue;
     }
 
-    if($name == 'phone_ext'){
+    if ($name == 'phone_ext') {
       $block = 'Phone';
     }
 
@@ -1001,7 +1002,7 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
 
     if (!array_key_exists($block, $fields)) {
       $className = "CRM_Core_DAO_$block";
-      $fields[$block] =& $className::fields( );
+      $fields[$block] =& $className::fields();
     }
 
     $blockCnt = count($params[$name]);
@@ -1060,22 +1061,23 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
         // mark an entry in fields array since we want the value of custom field to be copied
         $fields['Address'][$key] = NULL;
 
-        $htmlType = CRM_Utils_Array::value( 'html_type', $customFields[$customFieldID] );
-        switch ( $htmlType ) {
+        $htmlType = CRM_Utils_Array::value('html_type', $customFields[$customFieldID]);
+        switch ($htmlType) {
           case 'CheckBox':
           case 'AdvMulti-Select':
           case 'Multi-Select':
-            if ( $val ) {
-              $mulValues = explode( ',', $val );
-              $customOption = CRM_Core_BAO_CustomOption::getCustomOption( $customFieldID, TRUE );
+            if ($val) {
+              $mulValues = explode(',', $val);
+              $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
               $newValues[$key] = array();
-              foreach ( $mulValues as $v1 ) {
-                foreach ( $customOption as $v2 ) {
-                  if ( ( strtolower( $v2['label'] ) == strtolower( trim( $v1 ) ) ) ||
-                     ( strtolower( $v2['value'] ) == strtolower( trim( $v1 ) ) ) ) {
-                    if ( $htmlType == 'CheckBox' ) {
+              foreach ($mulValues as $v1) {
+                foreach ($customOption as $v2) {
+                  if ((strtolower($v2['label']) == strtolower(trim($v1))) ||
+                     (strtolower($v2['value']) == strtolower(trim($v1)))) {
+                    if ($htmlType == 'CheckBox') {
                       $newValues[$key][$v2['value']] = 1;
-                    } else {
+                    }
+                    else {
                       $newValues[$key][] = $v2['value'];
                     }
                   }
@@ -1368,7 +1370,7 @@ function _civicrm_api3_deprecated_contact_check_params(
     );
 
     // contact_type has a limited number of valid values
-    if(empty($params['contact_type'])) {
+    if (empty($params['contact_type'])) {
       return civicrm_api3_create_error("No Contact Type");
     }
     $fields = CRM_Utils_Array::value($params['contact_type'], $required);

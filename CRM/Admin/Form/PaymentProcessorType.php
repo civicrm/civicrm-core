@@ -159,7 +159,7 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
       return;
     }
 
-    $attributes = CRM_Core_DAO::getAttribute( 'CRM_Financial_DAO_PaymentProcessorType' );
+    $attributes = CRM_Core_DAO::getAttribute('CRM_Financial_DAO_PaymentProcessorType');
 
     foreach ($this->_fields as $field) {
       $required = CRM_Utils_Array::value('required', $field, FALSE);
@@ -192,7 +192,7 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
       return $defaults;
     }
 
-    $dao = new CRM_Financial_DAO_PaymentProcessorType( );
+    $dao = new CRM_Financial_DAO_PaymentProcessorType();
     $dao->id = $this->_id;
 
     if (!$dao->find(TRUE)) {
@@ -211,7 +211,7 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
    * @return void
    */
   public function postProcess() {
-    CRM_Utils_System::flushCache( 'CRM_Financial_DAO_PaymentProcessorType' );
+    CRM_Utils_System::flushCache('CRM_Financial_DAO_PaymentProcessorType');
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Financial_BAO_PaymentProcessorType::del($this->_id);
@@ -226,7 +226,7 @@ UPDATE civicrm_payment_processor SET is_default = 0";
       CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
     }
 
-    $dao = new CRM_Financial_DAO_PaymentProcessorType( );
+    $dao = new CRM_Financial_DAO_PaymentProcessorType();
 
     $dao->id         = $this->_id;
     $dao->is_default = CRM_Utils_Array::value('is_default', $values, 0);

@@ -83,7 +83,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'entity_id',
       'Database check on added financial item record.'
     );
-    $this->assertEquals( $result, $price, 'Verify Amount for Financial Item');
+    $this->assertEquals($result, $price, 'Verify Amount for Financial Item');
   }
 
   /**
@@ -130,7 +130,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_line_item',
     );
     $financialItem = CRM_Financial_BAO_FinancialItem::retrieve($fParams, $values);
-    $this->assertEquals( $financialItem->amount, $price, 'Verify financial item amount.');
+    $this->assertEquals($financialItem->amount, $price, 'Verify financial item amount.');
   }
 
   /**
@@ -198,7 +198,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'Database check on added financial item record.'
     );
 
-    $this->assertEquals( $result, $price, 'Verify Amount for Financial Item');
+    $this->assertEquals($result, $price, 'Verify Amount for Financial Item');
     $entityResult = $this->assertDBNotNull(
       'CRM_Financial_DAO_EntityFinancialTrxn',
       $entityId,
@@ -206,7 +206,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'entity_id',
       'Database check on added entity financial trxn record.'
     );
-    $this->assertEquals( $entityResult, $price, 'Verify Amount for Financial Item');
+    $this->assertEquals($entityResult, $price, 'Verify Amount for Financial Item');
   }
 
   /**
@@ -214,7 +214,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
    */
   public function testCreateEntityTrxn() {
     $fParams = array(
-      'name' => 'Donations'.substr(sha1(rand()), 0, 7),
+      'name' => 'Donations' . substr(sha1(rand()), 0, 7),
       'is_deductible' => 0,
       'is_active' => 1,
     );
@@ -241,7 +241,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'financial_trxn_id',
       'Database check on added entity financial trxn record.'
     );
-    $this->assertEquals( $entityResult, $amount, 'Verify Amount for Financial Item');
+    $this->assertEquals($entityResult, $amount, 'Verify Amount for Financial Item');
     return $entityTrxn;
   }
 
@@ -265,6 +265,6 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'financial_trxn_id',
       'Database check on added entity financial trxn record.'
     );
-    $this->assertEquals( $entityResult, $entityTrxn->amount, 'Verify Amount for Financial Item');
+    $this->assertEquals($entityResult, $entityTrxn->amount, 'Verify Amount for Financial Item');
   }
 }

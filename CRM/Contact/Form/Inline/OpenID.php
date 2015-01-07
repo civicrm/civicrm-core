@@ -127,7 +127,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
       }
 
       if (count($hasPrimary) > 1) {
-        $errors["openid[".array_pop($hasPrimary)."][is_primary]"] = ts('Only one OpenID can be marked as primary.');
+        $errors["openid[" . array_pop($hasPrimary) . "][is_primary]"] = ts('Only one OpenID can be marked as primary.');
       }
     }
     return $errors;

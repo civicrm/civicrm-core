@@ -90,7 +90,7 @@ class CRM_Campaign_BAO_Query {
     // CRM-14238 Only translate when we are in contact mode
     // Other modes need the untranslated data for export and other functions
     if (is_array($query->_select)  && $query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
-      foreach($query->_select as $field => $queryString) {
+      foreach ($query->_select as $field => $queryString) {
         if (substr($field, -11) == 'campaign_id') {
           $query->_pseudoConstantsSelect[$field] = array(
             'pseudoField' => 'campaign_id',
@@ -589,7 +589,8 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
       foreach (array(
         'current_campaign', 'past_campaign') as $ignore) {
         $index = array_search($ignore, $campaign);
-        if ($index !== FALSE) { unset($campaign[$index]);
+        if ($index !== FALSE) {
+          unset($campaign[$index]);
         }
       }
     }

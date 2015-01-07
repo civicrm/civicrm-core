@@ -242,7 +242,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
 
     //Create contact.
     $group = "Advisory Board";
-    $firstName = "Adams".substr(sha1(rand()), 0, 4);
+    $firstName = "Adams" . substr(sha1(rand()), 0, 4);
     $lastName = substr(sha1(rand()), 0, 4);
     $email = "{$lastName}.{$firstName}@example.org";
     $this->type('first_name', $firstName);

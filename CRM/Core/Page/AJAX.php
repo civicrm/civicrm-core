@@ -206,7 +206,7 @@ class CRM_Core_Page_AJAX {
   public static function setJsHeaders() {
     // Encourage browsers to cache for a long time - 1 year
     $year = 60 * 60 * 24 * 364;
-    header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + $year));
+    header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + $year));
     header('Content-Type:	application/javascript');
     header("Cache-Control: max-age=$year, public");
   }

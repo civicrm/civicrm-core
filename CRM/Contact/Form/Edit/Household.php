@@ -57,18 +57,18 @@ class CRM_Contact_Form_Edit_Household {
 
     $form->applyFilter('__ALL__', 'trim');
 
-    if ( !$inlineEditMode || $inlineEditMode == 1 ) {
+    if (!$inlineEditMode || $inlineEditMode == 1) {
       // household_name
       $form->add('text', 'household_name', ts('Household Name'), $attributes['household_name']);
     }
 
-    if ( !$inlineEditMode || $inlineEditMode == 2 ) {
+    if (!$inlineEditMode || $inlineEditMode == 2) {
       // nick_name
       $form->addElement('text', 'nick_name', ts('Nickname'), $attributes['nick_name']);
       $form->addElement('text', 'contact_source', ts('Source'), CRM_Utils_Array::value('source', $attributes));
     }
 
-    if ( !$inlineEditMode ) {
+    if (!$inlineEditMode) {
       $form->add('text', 'external_identifier', ts('External ID'), $attributes['external_identifier'], FALSE);
       $form->addRule('external_identifier',
         ts('External ID already exists in Database.'),

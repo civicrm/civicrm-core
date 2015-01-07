@@ -88,7 +88,8 @@ class CRM_Utils_GlobalStack {
         foreach ($values as $key => $value) {
           $frame[$globalKey][$key] = CRM_Utils_Array::value($key, $GLOBALS[$globalKey]);
         }
-      } else {
+      }
+      else {
         $frame[$globalKey] = CRM_Utils_Array::value($globalKey, $GLOBALS);
       }
     }
@@ -104,7 +105,8 @@ class CRM_Utils_GlobalStack {
         foreach ($values as $key => $value) {
           $GLOBALS[$globalKey][$key] = $value;
         }
-      } else {
+      }
+      else {
         $GLOBALS[$globalKey] = $values;
       }
     }

@@ -632,7 +632,7 @@ class CRM_Utils_System {
       list($userID, $ufID, $randomNumber) = $result;
       if ($userID && $ufID) {
         $config = CRM_Core_Config::singleton();
-        $config->userSystem->setUserSession( array($userID, $ufID) );
+        $config->userSystem->setUserSession(array($userID, $ufID));
       }
       else {
         return self::authenticateAbort(
@@ -670,7 +670,7 @@ class CRM_Utils_System {
      * process typically done in CLI and cron scripts. See: CRM-12648
      */
     $session = CRM_Core_Session::singleton();
-    $session->set( 'civicrmInitSession', TRUE );
+    $session->set('civicrmInitSession', TRUE);
 
     $dbDrupal = DB::connect($config->userFrameworkDSN);
     return $config->userSystem->authenticate($name, $password, $loadCMSBootstrap, $realPath);
@@ -963,7 +963,7 @@ class CRM_Utils_System {
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
     // lets capture the return stuff rather than echo
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE );
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 
     // CRM-13227, CRM-14744: only return the SSL error status
     return (curl_exec($ch) !== FALSE);
@@ -1284,7 +1284,8 @@ class CRM_Utils_System {
     if (!function_exists('ts')) {
       if ($resource == 'wiki') {
         $docBaseURL = self::getWikiBaseURL();
-      } else {
+      }
+      else {
         $docBaseURL = self::getDocBaseURL();
       }
       return $docBaseURL . str_replace(' ', '+', $page);
@@ -1321,7 +1322,8 @@ class CRM_Utils_System {
 
     if (CRM_Utils_Array::value('resource', $params) == 'wiki') {
       $docBaseURL = self::getWikiBaseURL();
-    } else {
+    }
+    else {
       $docBaseURL = self::getDocBaseURL();
     }
 

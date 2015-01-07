@@ -864,7 +864,7 @@ class CRM_Core_SelectValues {
     );
     $contactTypes = self::contactType();
     $contactTypes = !empty($contactTypes) ? array('Contact' => 'Contacts') + $contactTypes : array();
-    $profileGroupType = array_merge($contactTypes, $profileGroupType );
+    $profileGroupType = array_merge($contactTypes, $profileGroupType);
 
     return $profileGroupType;
   }

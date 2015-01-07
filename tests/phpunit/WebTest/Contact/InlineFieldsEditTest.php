@@ -257,7 +257,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
   private function inlineEdit($block, $params, $valid = 're_open') {
     $this->openInlineForm($block);
     foreach ($params as $item => $val) {
-      switch(gettype($val)) {
+      switch (gettype($val)) {
         case 'boolean':
           $this->click($item);
           break;
@@ -309,7 +309,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
       if ($validate && $valid !== 'no_open') {
         $this->openInlineForm($block);
         foreach ($params as $item => $val) {
-          switch(gettype($val)) {
+          switch (gettype($val)) {
             case 'string':
               if ($val && substr($val, 0, 5) == 'date:') {
                 $val = date('m/d/Y', strtotime(trim(substr($val, 5))));
@@ -340,7 +340,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
     }
     // Verify there was a form error
     else {
-      switch($valid) {
+      switch ($valid) {
         case 'errorJs':
           $this->waitForElementPresent('css=label.error');
           break;

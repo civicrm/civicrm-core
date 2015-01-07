@@ -39,7 +39,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       $allEventIdsArray = CRM_Core_BAO_RecurringEntity::getEntitiesForParent($checkParentExistsForThisId, 'civicrm_event');
       $allEventIds = array();
       if (!empty($allEventIdsArray)) {
-        foreach($allEventIdsArray as $key => $val) {
+        foreach ($allEventIdsArray as $key => $val) {
           $allEventIds[] = $val['id'];
         }
         if (!empty($allEventIds)) {
@@ -47,13 +47,13 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
           $query = "
             SELECT *
             FROM civicrm_event
-            WHERE id IN (".implode(",", $allEventIds).")
+            WHERE id IN (" . implode(",", $allEventIds) . ")
             ORDER BY start_date asc
              ";
 
           $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Event_DAO_Event');
           $permissions = CRM_Event_BAO_Event::checkPermission();
-          while($dao->fetch()) {
+          while ($dao->fetch()) {
             if (in_array($dao->id, $permissions[CRM_Core_Permission::VIEW])) {
               $manageEvent[$dao->id] = array();
               CRM_Core_DAO::storeValues($dao, $manageEvent[$dao->id]);
@@ -183,7 +183,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
           GROUP BY p.event_id";
         $dao = CRM_Core_DAO::executeQuery($query);
         $participantDetails = array();
-        while($dao->fetch()) {
+        while ($dao->fetch()) {
           $participantDetails['countByID'][$dao->event_id] = $dao->participant_count;
           $participantDetails['countByName'][$dao->event_id][$dao->event_data] = $dao->participant_count;
         }

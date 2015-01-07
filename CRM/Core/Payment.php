@@ -596,9 +596,10 @@ abstract class CRM_Core_Payment {
       $extension_instance_found = TRUE;
     }
 
-    if (!$extension_instance_found) { CRM_Core_Error::fatal(
-      "No extension instances of the '{$params['processor_name']}' payment processor were found.<br />" .
-      "$method method is unsupported in legacy payment processors."
+    if (!$extension_instance_found) {
+      CRM_Core_Error::fatal(
+        "No extension instances of the '{$params['processor_name']}' payment processor were found.<br />" .
+        "$method method is unsupported in legacy payment processors."
       );
     }
 

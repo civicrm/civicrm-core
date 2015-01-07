@@ -77,7 +77,8 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
           // if _membershipContactID belongs to employers list, we can say:
           $form->_relatedOrganizationFound = TRUE;
         }
-      } else if (!empty($form->_employers)) {
+      }
+      elseif (!empty($form->_employers)) {
         // not a renewal case and _employers list is not empty
         $form->_relatedOrganizationFound = TRUE;
       }

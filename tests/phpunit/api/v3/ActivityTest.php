@@ -935,7 +935,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
       'id' => $activityId,
     );
-    $result = $this->callAPISuccess($this->_entity, 'get', $getParams );
+    $result = $this->callAPISuccess($this->_entity, 'get', $getParams);
     $assignee = $result['values'][$result['id']]['assignee_contact_id'];
     $target = $result['values'][$result['id']]['target_contact_id'];
     $this->assertEquals(2, count($assignee), ' in line ' . __LINE__);

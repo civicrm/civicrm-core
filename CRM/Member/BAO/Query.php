@@ -206,7 +206,7 @@ class CRM_Member_BAO_Query {
         if (!is_array($value)) {
           $status = $value;
           if (!empty($value)) {
-            $value = array_flip(explode(",", str_replace(array( '(', ')' ), '', $value)));
+            $value = array_flip(explode(",", str_replace(array('(', ')'), '', $value)));
           }
           else {
             $value = array();
@@ -287,7 +287,7 @@ class CRM_Member_BAO_Query {
         if (!is_array($value)) {
           $mType = $value;
           if (!empty($value)) {
-            $value = array_flip(explode(",", str_replace(array( '(', ')' ), '', $value)));
+            $value = array_flip(explode(",", str_replace(array('(', ')'), '', $value)));
           }
           else {
             $value = array();
@@ -304,7 +304,7 @@ class CRM_Member_BAO_Query {
         $names = array();
         $membershipTypes = CRM_Member_PseudoConstant::membershipType();
         foreach ($value as $id => $dontCare) {
-          if(!empty($membershipTypes[$id])) {
+          if (!empty($membershipTypes[$id])) {
             $names[] = $membershipTypes[$id];
           }
         }

@@ -355,8 +355,8 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // Record contribution
     $this->click('record_contribution');
-    $this->waitForElementPresent( 'financial_type_id' );
-    $this->select( 'financial_type_id', "label=Member Dues" );
+    $this->waitForElementPresent('financial_type_id');
+    $this->select('financial_type_id', "label=Member Dues");
     $this->select('payment_instrument_id', "label=Check");
     $this->waitForElementPresent('check_number');
     $this->type('check_number', '1023');

@@ -314,7 +314,7 @@ LEFT JOIN civicrm_phone   {$this->_aliases['civicrm_phone']}
        ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND {$this->_aliases['civicrm_phone']}.is_primary = 1";
 
     }
-    else if ($fromTable == 'civicrm_financial_type') {
+    elseif ($fromTable == 'civicrm_financial_type') {
       $contriCol = "financial_type_id";
     }
     elseif ($fromTable == 'civicrm_contribution') {

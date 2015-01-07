@@ -86,7 +86,7 @@ function civicrm_api3_custom_field_create($params) {
 /**
  * Flush static caches in functions that might have stored available custom fields
  */
-function _civicrm_api3_custom_field_flush_static_caches(){
+function _civicrm_api3_custom_field_flush_static_caches() {
   civicrm_api('custom_field', 'getfields', array('version' => 3, 'cache_clear' => 1));
   CRM_Core_BAO_UFField::getAvailableFieldsFlat(TRUE);
 }

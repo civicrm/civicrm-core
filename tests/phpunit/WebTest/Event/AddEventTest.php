@@ -900,7 +900,7 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $this->type('summary', 'This is a great conference. Sign up now!');
 
     // Type description in ckEditor (fieldname, text to type, editor)
-    $this->fillRichTextField('description', $eventDescription );
+    $this->fillRichTextField('description', $eventDescription);
     $this->type('max_participants', '50');
     $this->click('is_map');
     $this->click('_qf_EventInfo_upload-bottom');
@@ -952,7 +952,7 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $this->type('first_name', $firstName);
 
     //fill in last name
-    $lastName = 'Recuron'.substr(sha1(rand()), 0, 7);
+    $lastName = 'Recuron' . substr(sha1(rand()), 0, 7);
     $this->type('last_name', $contactName);
     $email = $firstName . '@example.com';
     $this->type('email-Primary', $email);
