@@ -74,8 +74,10 @@ class CRM_Utils_HttpClient {
   /**
    * Download the remote zipfile.
    *
-   * @param string $remoteFile URL of a .zip file
-   * @param string $localFile path at which to store the .zip file
+   * @param string $remoteFile
+   *   URL of a .zip file.
+   * @param string $localFile
+   *   Path at which to store the .zip file.
    * @return STATUS_OK|STATUS_WRITE_ERROR|STATUS_DL_ERROR
    */
   public function fetch($remoteFile, $localFile) {
@@ -114,7 +116,8 @@ class CRM_Utils_HttpClient {
   /**
    * Send an HTTP GET for a remote resource
    *
-   * @param string $remoteFile URL of remote file
+   * @param string $remoteFile
+   *   URL of remote file.
    * @return array array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
    */
   public function get($remoteFile) {
@@ -150,7 +153,8 @@ class CRM_Utils_HttpClient {
   /**
    * Send an HTTP POST for a remote resource
    *
-   * @param string $remoteFile URL of a .zip file
+   * @param string $remoteFile
+   *   URL of a .zip file.
    * @param array $params
    *
    * @return array array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
@@ -170,9 +174,9 @@ class CRM_Utils_HttpClient {
     }
 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POST,count($params));
-    curl_setopt($ch, CURLOPT_POSTFIELDS,$params);
+    curl_setopt($ch, CURLOPT_POST, TRUE);
+    curl_setopt($ch, CURLOPT_POST, count($params));
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
     $data = curl_exec($ch);
     if (curl_errno($ch)) {
       return array(self::STATUS_DL_ERROR, $data);

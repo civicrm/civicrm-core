@@ -132,7 +132,7 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     static $pageId = NULL;
 
     if (!$pageId) {
-        $this->webtestLogin();
+      $this->webtestLogin();
 
       //add payment processor.
       $hash = substr(sha1(rand()), 0, 7);
@@ -148,7 +148,6 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
       $this->type("duration_interval", "1");
       $this->select("duration_unit", "label=year");
 
-
       $this->click("_qf_MembershipType_upload-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -158,7 +157,6 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
 
       $this->type("duration_interval", "1");
       $this->select("duration_unit", "label=year");
-
 
       $this->click("_qf_MembershipType_upload-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -202,7 +200,7 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
       );
 
       //make sure we do have required permissions.
-      $permissions = array("edit-1-make-online-contributions",  "edit-1-profile-listings-and-forms");
+      $permissions = array("edit-1-make-online-contributions", "edit-1-profile-listings-and-forms");
       $this->changePermissions($permissions);
 
       // now logout and do membership test that way

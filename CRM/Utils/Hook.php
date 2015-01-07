@@ -83,27 +83,36 @@ abstract class CRM_Utils_Hook {
     if (self::$_singleton == NULL || $fresh) {
       $config = CRM_Core_Config::singleton();
       $class = $config->userHookClass;
-      require_once (str_replace('_', DIRECTORY_SEPARATOR, $config->userHookClass) . '.php');
+      require_once str_replace('_', DIRECTORY_SEPARATOR, $config->userHookClass) . '.php';
       self::$_singleton = new $class();
     }
     return self::$_singleton;
   }
 
   /**
-   *Invoke hooks
+   * Invoke hooks
    *
-   * @param int $numParams Number of parameters to pass to the hook
-   * @param mixed $arg1 parameter to be passed to the hook
-   * @param mixed $arg2 parameter to be passed to the hook
-   * @param mixed $arg3 parameter to be passed to the hook
-   * @param mixed $arg4 parameter to be passed to the hook
-   * @param mixed $arg5 parameter to be passed to the hook
-   * @param mixed $arg6 parameter to be passed to the hook
-   * @param string $fnSuffix function suffix, this is effectively the hook name
+   * @param int $numParams
+   *   Number of parameters to pass to the hook.
+   * @param mixed $arg1
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg2
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg3
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg4
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg5
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg6
+   *   Parameter to be passed to the hook.
+   * @param string $fnSuffix
+   *   Function suffix, this is effectively the hook name.
    *
    * @return mixed
    */
-  abstract function invoke($numParams,
+  abstract function invoke(
+    $numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix
   );
@@ -121,7 +130,8 @@ abstract class CRM_Utils_Hook {
    *
    * @return array|bool
    */
-  function commonInvoke($numParams,
+  function commonInvoke(
+    $numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix, $fnPrefix
   ) {
@@ -147,7 +157,7 @@ abstract class CRM_Utils_Hook {
       if (!empty($config->customPHPPathDir) &&
         file_exists("{$config->customPHPPathDir}/civicrmHooks.php")
       ) {
-        @include_once ("civicrmHooks.php");
+        @include_once "civicrmHooks.php";
       }
 
       if (!empty($fnPrefix)) {
@@ -171,7 +181,8 @@ abstract class CRM_Utils_Hook {
    *
    * @return array|bool
    */
-  function runHooks($civiModules, $fnSuffix, $numParams,
+  function runHooks(
+    $civiModules, $fnSuffix, $numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6
   ) {
     // $civiModules is *not* passed by reference because runHooks
@@ -245,17 +256,21 @@ abstract class CRM_Utils_Hook {
       }
       include_once $civiModule['filePath'];
       $moduleList[$civiModule['prefix']] = $civiModule['prefix'];
-      }
     }
+  }
 
   /**
    * This hook is called before a db write on some core objects.
    * This hook does not allow the abort of the operation
    *
-   * @param string $op         the type of operation being performed
-   * @param string $objectName the name of the object
-   * @param int $id         the object id if available
-   * @param array  $params     the parameters used for object creation / editing
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The name of the object.
+   * @param int $id
+   *   The object id if available.
+   * @param array $params
+   *   The parameters used for object creation / editing.
    *
    * @return null the return value is ignored
    */
@@ -269,10 +284,14 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called after a db write on some core objects.
    *
-   * @param string $op         the type of operation being performed
-   * @param string $objectName the name of the object
-   * @param int    $objectId   the unique identifier for the object
-   * @param object $objectRef  the reference to the object if available
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The name of the object.
+   * @param int $objectId
+   *   The unique identifier for the object.
+   * @param object $objectRef
+   *   The reference to the object if available.
    *
    * @return mixed             based on op. pre-hooks return a boolean or
    *                           an error message which aborts the operation
@@ -288,12 +307,18 @@ abstract class CRM_Utils_Hook {
    * This hook retrieves links from other modules and injects it into
    * the view contact tabs
    *
-   * @param string $op         the type of operation being performed
-   * @param string $objectName the name of the object
-   * @param int    $objectId   the unique identifier for the object
-   * @param array  $links      (optional) the links array (introduced in v3.2)
-   * @param int    $mask       (optional) the bitmask to show/hide links
-   * @param array  $values     (optional) the values to fill the links
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The name of the object.
+   * @param int $objectId
+   *   The unique identifier for the object.
+   * @param array $links
+   *   (optional) the links array (introduced in v3.2).
+   * @param int $mask
+   *   (optional) the bitmask to show/hide links.
+   * @param array $values
+   *   (optional) the values to fill the links.
    *
    * @return null  the return value is ignored
    */
@@ -304,8 +329,10 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is invoked during the CiviCRM form preProcess phase.
    *
-   * @param string $formName the name of the form
-   * @param CRM_Core_Form $form     reference to the form object
+   * @param string $formName
+   *   The name of the form.
+   * @param CRM_Core_Form $form
+   *   Reference to the form object.
    *
    * @return null the return value is ignored
    */
@@ -317,8 +344,10 @@ abstract class CRM_Utils_Hook {
    * This hook is invoked when building a CiviCRM form. This hook should also
    * be used to set the default values of a form element
    *
-   * @param string $formName the name of the form
-   * @param CRM_Core_Form $form     reference to the form object
+   * @param string $formName
+   *   The name of the form.
+   * @param CRM_Core_Form $form
+   *   Reference to the form object.
    *
    * @return null the return value is ignored
    */
@@ -330,8 +359,10 @@ abstract class CRM_Utils_Hook {
    * This hook is invoked when a CiviCRM form is submitted. If the module has injected
    * any form elements, this hook should save the values in the database
    *
-   * @param string $formName the name of the form
-   * @param CRM_Core_Form $form     reference to the form object
+   * @param string $formName
+   *   The name of the form.
+   * @param CRM_Core_Form $form
+   *   Reference to the form object.
    *
    * @return null the return value is ignored
    */
@@ -343,10 +374,11 @@ abstract class CRM_Utils_Hook {
    * This hook is invoked during all CiviCRM form validation. An array of errors
    * detected is returned. Else we assume validation succeeded.
    *
-   * @param string $formName the name of the form
-   * @param array  &$fields   the POST parameters as filtered by QF
-   * @param array  &$files    the FILES parameters as sent in by POST
-   * @param array  &$form     the form object
+   * @param string $formName
+   *   The name of the form.
+   * @param array &$fields the POST parameters as filtered by QF
+   * @param array &$files the FILES parameters as sent in by POST
+   * @param array &$form the form object
    *
    * @return mixed             formRule hooks return a boolean or
    *                           an array of error messages which display a QF Error
@@ -359,11 +391,12 @@ abstract class CRM_Utils_Hook {
    * This hook is invoked during all CiviCRM form validation. An array of errors
    * detected is returned. Else we assume validation succeeded.
    *
-   * @param string $formName  the name of the form
-   * @param array  &$fields   the POST parameters as filtered by QF
-   * @param array  &$files    the FILES parameters as sent in by POST
-   * @param array  &$form     the form object
-   * @param array &$errors    the array of errors.
+   * @param string $formName
+   *   The name of the form.
+   * @param array &$fields the POST parameters as filtered by QF
+   * @param array &$files the FILES parameters as sent in by POST
+   * @param array &$form the form object
+   * @param array &$errors the array of errors.
    *
    * @return mixed             formRule hooks return a boolean or
    *                           an array of error messages which display a QF Error
@@ -375,10 +408,14 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called before a db write on a custom table
    *
-   * @param string $op         the type of operation being performed
-   * @param string $groupID    the custom group ID
-   * @param object $entityID   the entityID of the row in the custom table
-   * @param array  $params     the parameters that were sent into the calling function
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $groupID
+   *   The custom group ID.
+   * @param object $entityID
+   *   The entityID of the row in the custom table.
+   * @param array $params
+   *   The parameters that were sent into the calling function.
    *
    * @return null the return value is ignored
    */
@@ -390,11 +427,16 @@ abstract class CRM_Utils_Hook {
    * This hook is called when composing the ACL where clause to restrict
    * visibility of contacts to the logged in user
    *
-   * @param int $type the type of permission needed
-   * @param array $tables (reference ) add the tables that are needed for the select clause
-   * @param array $whereTables (reference ) add the tables that are needed for the where clause
-   * @param int    $contactID the contactID for whom the check is made
-   * @param string $where the currrent where clause
+   * @param int $type
+   *   The type of permission needed.
+   * @param array $tables
+   *   (reference ) add the tables that are needed for the select clause.
+   * @param array $whereTables
+   *   (reference ) add the tables that are needed for the where clause.
+   * @param int $contactID
+   *   The contactID for whom the check is made.
+   * @param string $where
+   *   The currrent where clause.
    *
    * @return null the return value is ignored
    */
@@ -406,11 +448,16 @@ abstract class CRM_Utils_Hook {
    * This hook is called when composing the ACL where clause to restrict
    * visibility of contacts to the logged in user
    *
-   * @param int    $type          the type of permission needed
-   * @param int    $contactID     the contactID for whom the check is made
-   * @param string $tableName     the tableName which is being permissioned
-   * @param array  $allGroups     the set of all the objects for the above table
-   * @param array  $currentGroups the set of objects that are currently permissioned for this contact
+   * @param int $type
+   *   The type of permission needed.
+   * @param int $contactID
+   *   The contactID for whom the check is made.
+   * @param string $tableName
+   *   The tableName which is being permissioned.
+   * @param array $allGroups
+   *   The set of all the objects for the above table.
+   * @param array $currentGroups
+   *   The set of objects that are currently permissioned for this contact.
    *
    * @return null the return value is ignored
    */
@@ -421,7 +468,8 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called when building the menu table
    *
-   * @param array $files The current set of files to process
+   * @param array $files
+   *   The current set of files to process.
    *
    * @return null the return value is ignored
    */
@@ -435,7 +483,8 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called for declaring managed entities via API
    *
-   * @param array $entities List of pending entities
+   * @param array $entities
+   *   List of pending entities.
    *
    * @return null the return value is ignored
    */
@@ -449,8 +498,10 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called when rendering the dashboard (q=civicrm/dashboard)
    *
-   * @param int $contactID - the contactID for whom the dashboard is being rendered
-   * @param int $contentPlacement - (output parameter) where should the hook content be displayed
+   * @param int $contactID
+   *   The contactID for whom the dashboard is being rendered.
+   * @param int $contentPlacement
+   *   (output parameter) where should the hook content be displayed.
    * relative to the activity list
    *
    * @return string the html snippet to include in the dashboard
@@ -476,7 +527,8 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called before storing recently viewed items.
    *
-   * @param array $recentArray - an array of recently viewed or processed items, for in place modification
+   * @param array $recentArray
+   *   An array of recently viewed or processed items, for in place modification.
    *
    * @return array
    */
@@ -490,8 +542,10 @@ abstract class CRM_Utils_Hook {
   /**
    * Determine how many other records refer to a given record
    *
-   * @param CRM_Core_DAO $dao the item for which we want a reference count
-   * @param array $refCounts each item in the array is an array with keys:
+   * @param CRM_Core_DAO $dao
+   *   The item for which we want a reference count.
+   * @param array $refCounts
+   *   Each item in the array is an array with keys:.
    *   - name: string, eg "sql:civicrm_email:contact_id"
    *   - type: string, eg "sql"
    *   - count: int, eg "5" if there are 5 email addresses that refer to $dao
@@ -507,9 +561,12 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called when building the amount structure for a Contribution or Event Page
    *
-   * @param int    $pageType - is this a contribution or event page
-   * @param CRM_Core_Form $form     - reference to the form object
-   * @param array  $amount   - the amount structure to be displayed
+   * @param int $pageType
+   *   Is this a contribution or event page.
+   * @param CRM_Core_Form $form
+   *   Reference to the form object.
+   * @param array $amount
+   *   The amount structure to be displayed.
    *
    * @return null
    */
@@ -537,8 +594,10 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called when rendering the tabs for a contact (q=civicrm/contact/view)c
    *
-   * @param array $tabs      - the array of tabs that will be displayed
-   * @param int   $contactID - the contactID for whom the dashboard is being rendered
+   * @param array $tabs
+   *   The array of tabs that will be displayed.
+   * @param int $contactID
+   *   The contactID for whom the dashboard is being rendered.
    *
    * @return null
    */
@@ -570,7 +629,8 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called when sending an email / printing labels
    *
-   * @param array $tokens    - the list of tokens that can be used for the contact
+   * @param array $tokens
+   *   The list of tokens that can be used for the contact.
    *
    * @return null
    */
@@ -584,18 +644,24 @@ abstract class CRM_Utils_Hook {
    * This hook is called when sending an email / printing labels to get the values for all the
    * tokens returned by the 'tokens' hook
    *
-   * @param array  $details    - the array to store the token values indexed by contactIDs (unless it a single)
-   * @param array  $contactIDs - an array of contactIDs
-   * @param int    $jobID      - the jobID if this is associated with a CiviMail mailing
-   * @param array  $tokens     - the list of tokens associated with the content
-   * @param string $className  - the top level className from where the hook is invoked
+   * @param array $details
+   *   The array to store the token values indexed by contactIDs (unless it a single).
+   * @param array $contactIDs
+   *   An array of contactIDs.
+   * @param int $jobID
+   *   The jobID if this is associated with a CiviMail mailing.
+   * @param array $tokens
+   *   The list of tokens associated with the content.
+   * @param string $className
+   *   The top level className from where the hook is invoked.
    *
    * @return null
    */
-  static function tokenValues(&$details,
+  static function tokenValues(
+    &$details,
     $contactIDs,
-    $jobID     = NULL,
-    $tokens    = array(),
+    $jobID = NULL,
+    $tokens = array(),
     $className = NULL
   ) {
     return self::singleton()->invoke(5, $details, $contactIDs, $jobID, $tokens, $className, self::$_nullObject, 'civicrm_tokenValues');
@@ -605,7 +671,8 @@ abstract class CRM_Utils_Hook {
    * This hook is called before a CiviCRM Page is rendered. You can use this hook to insert smarty variables
    * in a  template
    *
-   * @param object $page - the page that will be rendered
+   * @param object $page
+   *   The page that will be rendered.
    *
    * @return null
    */
@@ -620,8 +687,10 @@ abstract class CRM_Utils_Hook {
    * This hook is called after a copy of an object has been made. The current objects are
    * Event, Contribution Page and UFGroup
    *
-   * @param string $objectName - name of the object
-   * @param object $object     - reference to the copy
+   * @param string $objectName
+   *   Name of the object.
+   * @param object $object
+   *   Reference to the copy.
    *
    * @return null
    */
@@ -658,15 +727,19 @@ abstract class CRM_Utils_Hook {
    * This hook is called when CiviCRM needs to edit/display a custom field with options (select, radio, checkbox,
    * adv multiselect)
    *
-   * @param int $customFieldID - the custom field ID
-   * @param array $options - the current set of options for that custom field.
+   * @param int $customFieldID
+   *   The custom field ID.
+   * @param array $options
+   *   The current set of options for that custom field.
    *   You can add/remove existing options.
    *   Important: This array may contain meta-data about the field that is needed elsewhere, so it is important
    *              to be careful to not overwrite the array.
    *   Only add/edit/remove the specific field options you intend to affect.
-   * @param boolean $detailedFormat - if true,
+   * @param bool $detailedFormat
+   *   If true,.
    *                the options are in an ID => array ( 'id' => ID, 'label' => label, 'value' => value ) format
-   * @param array $selectAttributes contain select attribute(s) if any
+   * @param array $selectAttributes
+   *   Contain select attribute(s) if any.
    *
    * @return mixed
    */
@@ -682,9 +755,11 @@ abstract class CRM_Utils_Hook {
    * This hook is called to display the list of actions allowed after doing a search.
    * This allows the module developer to inject additional actions or to remove existing actions.
    *
-   * @param string $objectType - the object type for this search
+   * @param string $objectType
+   *   The object type for this search.
    *   - activity, campaign, case, contact, contribution, event, grant, membership, and pledge are supported.
-   * @param array $tasks - the current set of tasks for that custom field.
+   * @param array $tasks
+   *   The current set of tasks for that custom field.
    *   You can add/remove existing tasks.
    *   Each task needs to have a title (eg 'title'  => ts( 'Add Contacts to Group')) and a class
    *   (eg 'class'  => 'CRM_Contact_Form_Task_AddToGroup').
@@ -781,15 +856,19 @@ abstract class CRM_Utils_Hook {
    * - you can override that behavior by providing a SQL query that returns some subset of your contacts.
    * The hook is called when the query is executed to get the list of contacts to display.
    *
-   * @param mixed $query - - the query that will be executed (input and output parameter);
+   * @param mixed $query
+   *   - the query that will be executed (input and output parameter);.
    *   It's important to realize that the ACL clause is built prior to this hook being fired,
    *   so your query will ignore any ACL rules that may be defined.
    *   Your query must return two columns:
    *     the contact 'data' to display in the autocomplete dropdown (usually contact.sort_name - aliased as 'data')
    *     the contact IDs
-   * @param string $name - the name string to execute the query against (this is the value being typed in by the user)
-   * @param string $context - the context in which this ajax call is being made (for example: 'customfield', 'caseview')
-   * @param int $id - the id of the object for which the call is being made.
+   * @param string $name
+   *   The name string to execute the query against (this is the value being typed in by the user).
+   * @param string $context
+   *   The context in which this ajax call is being made (for example: 'customfield', 'caseview').
+   * @param int $id
+   *   The id of the object for which the call is being made.
    *   For custom fields, it will be the custom field id
    *
    * @return mixed
@@ -818,7 +897,8 @@ abstract class CRM_Utils_Hook {
    *
    * @return mixed
    */
-  static function alterPaymentProcessorParams($paymentObj,
+  static function alterPaymentProcessorParams(
+    $paymentObj,
     &$rawParams,
     &$cookedParams
   ) {
@@ -834,7 +914,8 @@ abstract class CRM_Utils_Hook {
    * @param array $params
    *   Array fields include: groupName, from, toName, toEmail, subject, cc, bcc, text, html,
    * returnPath, replyTo, headers, attachments (array)
-   * @param string $context - the context in which the hook is being invoked, eg 'civimail'
+   * @param string $context
+   *   The context in which the hook is being invoked, eg 'civimail'.
    *
    * @return mixed
    */
@@ -848,15 +929,18 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called when membership status is being calculated
    *
-   * @param array $membershipStatus membership status details as determined - alter if required
-   * @param array $arguments arguments passed in to calculate date
+   * @param array $membershipStatus
+   *   Membership status details as determined - alter if required.
+   * @param array $arguments
+   *   Arguments passed in to calculate date.
    * - 'start_date'
    * - 'end_date'
    * - 'status_date'
    * - 'join_date'
    * - 'exclude_is_admin'
    * - 'membership_type_id'
-   * @param array $membership membership details from the calling function
+   * @param array $membership
+   *   Membership details from the calling function.
    *
    * @return mixed
    */
@@ -870,7 +954,8 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called when rendering the Manage Case screen
    *
-   * @param int $caseID - the case ID
+   * @param int $caseID
+   *   The case ID.
    *
    * @return array of data to be displayed, where the key is a unique id to be used for styling (div id's)
    * and the value is an array with keys 'label' and 'value' specifying label/value pairs
@@ -958,11 +1043,16 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook allows modification of the data used to perform merging of duplicates.
    *
-   * @param string $type the type of data being passed (cidRefs|eidRefs|relTables|sqls)
-   * @param array $data the data, as described in $type
-   * @param int $mainId contact_id of the contact that survives the merge
-   * @param int $otherId contact_id of the contact that will be absorbed and deleted
-   * @param array $tables when $type is "sqls", an array of tables as it may have been handed to the calling function
+   * @param string $type
+   *   The type of data being passed (cidRefs|eidRefs|relTables|sqls).
+   * @param array $data
+   *   The data, as described in $type.
+   * @param int $mainId
+   *   Contact_id of the contact that survives the merge.
+   * @param int $otherId
+   *   Contact_id of the contact that will be absorbed and deleted.
+   * @param array $tables
+   *   When $type is "sqls", an array of tables as it may have been handed to the calling function.
    *
    * @return mixed
    */
@@ -988,10 +1078,14 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called before record is exported as CSV
    *
-   * @param string $exportTempTable - name of the temporary export table used during export
-   * @param array  $headerRows      - header rows for output
-   * @param array  $sqlColumns      - SQL columns
-   * @param int    $exportMode      - export mode ( contact, contribution, etc...)
+   * @param string $exportTempTable
+   *   Name of the temporary export table used during export.
+   * @param array $headerRows
+   *   Header rows for output.
+   * @param array $sqlColumns
+   *   SQL columns.
+   * @param int $exportMode
+   *   Export mode ( contact, contribution, etc...).
    *
    * @return mixed
    */
@@ -1005,9 +1099,12 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook allows modification of the queries constructed from dupe rules.
    *
-   * @param string $obj object of rulegroup class
-   * @param string $type type of queries e.g table / threshold
-   * @param array $query set of queries
+   * @param string $obj
+   *   Object of rulegroup class.
+   * @param string $type
+   *   Type of queries e.g table / threshold.
+   * @param array $query
+   *   Set of queries.
    *
    * @return mixed
    */
@@ -1021,11 +1118,14 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called AFTER EACH email has been processed by the script bin/EmailProcessor.php
    *
-   * @param string $type type of mail processed: 'activity' OR 'mailing'
+   * @param string $type
+   *   Type of mail processed: 'activity' OR 'mailing'.
    * @param array &$params the params that were sent to the CiviCRM API function
-   * @param object $mail the mail object which is an ezcMail class
+   * @param object $mail
+   *   The mail object which is an ezcMail class.
    * @param array &$result the result returned by the api call
-   * @param string $action (optional ) the requested action to be performed if the types was 'mailing'
+   * @param string $action
+   *   (optional ) the requested action to be performed if the types was 'mailing'.
    *
    * @return mixed
    */
@@ -1037,11 +1137,15 @@ abstract class CRM_Utils_Hook {
    * This hook is called after a row has been processed and the
    * record (and associated records imported
    *
-   * @param string  $object     - object being imported (for now Contact only, later Contribution, Activity,
+   * @param string $object
+   *   Object being imported (for now Contact only, later Contribution, Activity,.
    *                               Participant and Member)
-   * @param string  $usage      - hook usage/location (for now process only, later mapping and others)
-   * @param string  $objectRef  - import record object
-   * @param array   $params     - array with various key values: currently
+   * @param string $usage
+   *   Hook usage/location (for now process only, later mapping and others).
+   * @param string $objectRef
+   *   Import record object.
+   * @param array $params
+   *   Array with various key values: currently.
    *                  contactID       - contact id
    *                  importID        - row id in temp table
    *                  importTempTable - name of tempTable
@@ -1061,8 +1165,10 @@ abstract class CRM_Utils_Hook {
    * This hook is called when API permissions are checked (cf. civicrm_api3_api_check_permission()
    * in api/v3/utils.php and _civicrm_api3_permissions() in CRM/Core/DAO/permissions.php).
    *
-   * @param string $entity the API entity (like contact)
-   * @param string $action the API action (like get)
+   * @param string $entity
+   *   The API entity (like contact).
+   * @param string $action
+   *   The API action (like get).
    * @param array &$params the API parameters
    * @param array &$permissions the associative permissions array (probably to be altered by this hook)
    *
@@ -1091,8 +1197,10 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook allows user to customize context menu Actions on contact summary page.
    *
-   * @param array $actions Array of all Actions in contextmenu.
-   * @param int $contactID ContactID for the summary page
+   * @param array $actions
+   *   Array of all Actions in contextmenu.
+   * @param int $contactID
+   *   ContactID for the summary page.
    *
    * @return mixed
    */
@@ -1113,7 +1221,8 @@ abstract class CRM_Utils_Hook {
    * However, if you use the same number of columns, you can overwrite the existing columns with the values that
    * you want displayed. This is a hackish, but avoids template modification.
    *
-   * @param string $objectName the component name that we are doing the search
+   * @param string $objectName
+   *   The component name that we are doing the search.
    *                           activity, campaign, case, contact, contribution, event, grant, membership, and pledge
    * @param array &$headers the list of column headers, an associative array with keys: ( name, sort, order )
    * @param array &$rows the list of values, an associate array with fields that are displayed for that component
@@ -1133,8 +1242,10 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called when uf groups are being built for a module.
    *
-   * @param string $moduleName module name.
-   * @param array $ufGroups array of ufgroups for a module.
+   * @param string $moduleName
+   *   Module name.
+   * @param array $ufGroups
+   *   Array of ufgroups for a module.
    *
    * @return null
    */
@@ -1149,9 +1260,12 @@ abstract class CRM_Utils_Hook {
    * This hook is called when we are determining the contactID for a specific
    * email address
    *
-   * @param string $email     the email address
-   * @param int    $contactID the contactID that matches this email address, IF it exists
-   * @param array  $result (reference) has two fields
+   * @param string $email
+   *   The email address.
+   * @param int $contactID
+   *   The contactID that matches this email address, IF it exists.
+   * @param array $result
+   *   (reference) has two fields.
    *                          contactID - the new (or same) contactID
    *                          action - 3 possible values:
    *                          CRM_Utils_Mail_Incoming::EMAILPROCESSOR_CREATE_INDIVIDUAL - create a new contact record
@@ -1170,7 +1284,8 @@ abstract class CRM_Utils_Hook {
   /**
    * Hook definition for altering the generation of Mailing Labels
    *
-   * @param array $args an array of the args in the order defined for the tcpdf multiCell api call
+   * @param array $args
+   *   An array of the args in the order defined for the tcpdf multiCell api call.
    *                    with the variable names below converted into string keys (ie $w become 'w'
    *                    as the first key for $args)
    *   float $w Width of cells. If 0, they extend up to the right margin of the page.
@@ -1210,10 +1325,14 @@ abstract class CRM_Utils_Hook {
   /**
    * This hooks allows alteration of generated page content
    *
-   * @param $content  previously generated content
-   * @param $context  context of content - page or form
-   * @param $tplName  the file name of the tpl
-   * @param $object   a reference to the page or form object
+   * @param $content
+   *   Previously generated content.
+   * @param $context
+   *   Context of content - page or form.
+   * @param $tplName
+   *   The file name of the tpl.
+   * @param $object
+   *   A reference to the page or form object.
    *
    * @return mixed
    */
@@ -1228,10 +1347,14 @@ abstract class CRM_Utils_Hook {
    * This hooks allows alteration of the tpl file used to generate content. It differs from the
    * altercontent hook as the content has already been rendered through the tpl at that point
    *
-   * @param $formName  previously generated content
-   * @param $form reference to the form object
-   * @param $context  context of content - page or form
-   * @param $tplName reference the file name of the tpl
+   * @param $formName
+   *   Previously generated content.
+   * @param $form
+   *   Reference to the form object.
+   * @param $context
+   *   Context of content - page or form.
+   * @param $tplName
+   *   Reference the file name of the tpl.
    *
    * @return mixed
    */
@@ -1246,7 +1369,8 @@ abstract class CRM_Utils_Hook {
    * This hook collects the trigger definition from all components
    *
    * @param $info
-   * @param string $tableName (optional) the name of the table that we are interested in only
+   * @param string $tableName
+   *   (optional) the name of the table that we are interested in only.
    *
    * @internal param \reference $triggerInfo to an array of trigger information
    *   each element has 4 fields:
@@ -1393,7 +1517,8 @@ abstract class CRM_Utils_Hook {
    * This hook is called when Settings have been loaded from the xml
    * It is an opportunity for hooks to alter the data
    *
-   * @param array $settingsMetaData - Settings Metadata
+   * @param array $settingsMetaData
+   *   Settings Metadata.
    * @param int $domainID
    * @param mixed $profile
    *
@@ -1459,10 +1584,11 @@ abstract class CRM_Utils_Hook {
 
   /**
    * @param CRM_Core_Exception Exception $exception
-   * @param mixed $request reserved for future use
+   * @param mixed $request
+   *   Reserved for future use.
    */
   static function unhandledException($exception, $request = NULL) {
-    self::singleton()->invoke(2, $exception, $request, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,'civicrm_unhandled_exception');
+    self::singleton()->invoke(2, $exception, $request, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_unhandled_exception');
     // == 4.4 ==
     //$event = new stdClass();
     //$event->exception = $exception;
@@ -1549,10 +1675,14 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is invoked when building a CiviCRM name badge.
    *
-   * @param string $labelName string referencing name of badge format
-   * @param object $label    reference to the label object
-   * @param array  $format   array of format data
-   * @param array  $participant array of participant values
+   * @param string $labelName
+   *   String referencing name of badge format.
+   * @param object $label
+   *   Reference to the label object.
+   * @param array $format
+   *   Array of format data.
+   * @param array $participant
+   *   Array of participant values.
    *
    * @return null the return value is ignored
    */
@@ -1564,13 +1694,16 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called before encoding data in barcode
    *
-   * @param array  $data associated array of values available for encoding
-   * @param string $type type of barcode, classic barcode or QRcode
-   * @param string $context where this hooks is invoked.
+   * @param array $data
+   *   Associated array of values available for encoding.
+   * @param string $type
+   *   Type of barcode, classic barcode or QRcode.
+   * @param string $context
+   *   Where this hooks is invoked.
    *
    * @return mixed
    */
-  public static function alterBarcode( &$data, $type = 'barcode', $context = 'name_badge' ) {
+  public static function alterBarcode(&$data, $type = 'barcode', $context = 'name_badge') {
     return self::singleton()->invoke(3, $data, $type, $context, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, 'civicrm_alterBarcode');
   }
@@ -1623,10 +1756,10 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called before a case merge (or a case reassign)
    *
-   * @param integer $mainContactId
-   * @param integer $mainCaseId
-   * @param integer $otherContactId
-   * @param integer $otherCaseId
+   * @param int $mainContactId
+   * @param int $mainCaseId
+   * @param int $otherContactId
+   * @param int $otherCaseId
    * @param bool $changeClient
    *
    * @return void
@@ -1638,10 +1771,10 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called after a case merge (or a case reassign)
    *
-   * @param integer $mainContactId
-   * @param integer $mainCaseId
-   * @param integer $otherContactId
-   * @param integer $otherCaseId
+   * @param int $mainContactId
+   * @param int $mainCaseId
+   * @param int $otherContactId
+   * @param int $otherCaseId
    * @param bool $changeClient
    *
    * @return void
@@ -1658,7 +1791,8 @@ abstract class CRM_Utils_Hook {
    *
    * @param string $displayName
    * @param int $contactId
-   * @param object $dao the contact object
+   * @param object $dao
+   *   The contact object.
    *
    * @return mixed
    */
@@ -1672,7 +1806,8 @@ abstract class CRM_Utils_Hook {
   /**
    * EXPERIMENTAL: This hook allows one to register additional Angular modules
    *
-   * @param array $angularModules list of modules
+   * @param array $angularModules
+   *   List of modules.
    * @return null the return value is ignored
    *
    * @code
@@ -1707,12 +1842,14 @@ abstract class CRM_Utils_Hook {
   /**
    * Generate a default CRUD URL for an entity
    *
-   * @param array $spec with keys:
+   * @param array $spec
+   *   With keys:.
    *   - action: int, eg CRM_Core_Action::VIEW or CRM_Core_Action::UPDATE
    *   - entity_table: string
    *   - entity_id: int
    * @param CRM_Core_DAO $bao
-   * @param array $link to define the link, add these keys to $link:
+   * @param array $link
+   *   To define the link, add these keys to $link:.
    *  - title: string
    *  - path: string
    *  - query: array

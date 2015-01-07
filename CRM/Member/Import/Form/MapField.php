@@ -170,7 +170,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     $dataPatterns     = $this->get('dataPatterns');
     $hasLocationTypes = $this->get('fieldTypes');
 
-
     /* Initialize all field usages to false */
 
     foreach ($mapperKeys as $key) {
@@ -298,7 +297,8 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @param $files
    * @param $self
@@ -371,7 +371,6 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
         }
       }
     }
-
 
     if (!empty($fields['saveMapping'])) {
       $nameField = CRM_Utils_Array::value('saveMappingName', $fields);

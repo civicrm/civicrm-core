@@ -119,9 +119,9 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     $actual = CRM_Utils_SQL_Select::from('ignore')->interpolate(
       '(@escaped) (!unescaped) (#validated)',
       array(
-        '@escaped' => array('foo"bar', "whiz", "null", null, "bang"),
+        '@escaped' => array('foo"bar', "whiz", "null", NULL, "bang"),
         '!unescaped' => array('foo"bar', 'bar'),
-        '#validated' => array(1, 10, null, 100.1)
+        '#validated' => array(1, 10, NULL, 100.1)
       )
     );
     $this->assertLike('("foo\\"bar", "whiz", "null", NULL, "bang") (foo"bar, bar) (1, 10, NULL, 100.1)', $actual);

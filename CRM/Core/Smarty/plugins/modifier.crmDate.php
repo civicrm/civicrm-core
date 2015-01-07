@@ -36,7 +36,8 @@
 /**
  * Convert the date string "YYYY-MM-DD" to "MM<long> DD, YYYY".
  *
- * @param string $dateString date which needs to converted to human readable format
+ * @param string $dateString
+ *   Date which needs to converted to human readable format.
  *
  * @param null $dateFormat
  * @param bool $onlyTime

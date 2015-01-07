@@ -42,7 +42,8 @@ define('API_V3_EXTENSION_DELIMITER', ',');
 /**
  * Install an extension
  *
- * @param  array       $params input parameters
+ * @param array $params
+ *   Input parameters.
  *                          - key: string, eg "com.example.myextension"
  *                          - keys: mixed; array of string, eg array("com.example.myextension1", "com.example.myextension2") or string with comma-delimited list
  *                            using 'keys' should be more performant than making multiple API calls with 'key'
@@ -101,7 +102,8 @@ function civicrm_api3_extension_upgrade() {
 /**
  * Enable an extension
  *
- * @param  array       $params input parameters
+ * @param array $params
+ *   Input parameters.
  *                          - key: string, eg "com.example.myextension"
  *                          - keys: mixed; array of string, eg array("com.example.myextension1", "com.example.myextension2") or string with comma-delimited list
  *                            using 'keys' should be more performant than making multiple API calls with 'key'
@@ -125,7 +127,8 @@ function civicrm_api3_extension_enable($params) {
 /**
  * Disable an extension
  *
- * @param  array       $params input parameters
+ * @param array $params
+ *   Input parameters.
  *                          - key: string, eg "com.example.myextension"
  *                          - keys: mixed; array of string, eg array("com.example.myextension1", "com.example.myextension2") or string with comma-delimited list
  *                            using 'keys' should be more performant than making multiple API calls with 'key'
@@ -149,7 +152,8 @@ function civicrm_api3_extension_disable($params) {
 /**
  * Uninstall an extension
  *
- * @param  array       $params input parameters
+ * @param array $params
+ *   Input parameters.
  *                          - key: string, eg "com.example.myextension"
  *                          - keys: array of string, eg array("com.example.myextension1", "com.example.myextension2")
  *                            using 'keys' should be more performant than making multiple API calls with 'key'
@@ -175,7 +179,8 @@ function civicrm_api3_extension_uninstall($params) {
 /**
  * Download and install an extension
  *
- * @param  array $params input parameters
+ * @param array $params
+ *   Input parameters.
  *                          - key: string, eg "com.example.myextension"
  *                          - url: string eg "http://repo.com/myextension-1.0.zip"
  *
@@ -226,7 +231,8 @@ function civicrm_api3_extension_download($params) {
 /**
  * Download and install an extension
  *
- * @param  array       $params input parameters
+ * @param array $params
+ *   Input parameters.
  *                          - local: bool, whether to rescan local filesystem (default: TRUE)
  *                          - remote: bool, whether to rescan remote repository (default: TRUE)
  *
@@ -275,8 +281,8 @@ function civicrm_api3_extension_get($params) {
     //try {
     //  $info = (array) $mapper->keyToInfo($key);
     //} catch (CRM_Extension_Exception $e) {
-      $info = array();
-      $info['key'] = $key;
+    $info = array();
+    $info['key'] = $key;
     //}
     $info['status'] = $status;
     $result[] = $info;
@@ -287,7 +293,8 @@ function civicrm_api3_extension_get($params) {
 /**
  * Determine the list of extension keys
  *
- * @param array $params API request params with 'key' or 'keys'
+ * @param array $params
+ *   API request params with 'key' or 'keys'.
  * @return array of extension keys
  * @throws API_Exception
  */

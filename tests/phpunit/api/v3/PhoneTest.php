@@ -32,8 +32,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_phone* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Contact
+ * @package CiviCRM_APIv3
+ * @subpackage API_Contact
  */
 class api_v3_PhoneTest extends CiviUnitTestCase {
   protected $_apiversion;
@@ -47,8 +47,8 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction();
 
-    $this->_contactID    = $this->organizationCreate();
-    $loc                 = $this->locationTypeCreate();
+    $this->_contactID = $this->organizationCreate();
+    $loc = $this->locationTypeCreate();
     $this->_locationType = $loc->id;
     CRM_Core_PseudoConstant::flush();
     $this->_params = array(
@@ -73,7 +73,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     //create one
     $create = $this->callAPISuccess('phone', 'create', $this->_params);
 
-    $result = $this->callAPIAndDocument('phone', 'delete', array('id' => $create['id'],), __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('phone', 'delete', array('id' => $create['id']), __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $get = $this->callAPISuccess('phone', 'get', array(
       'id' => $create['id'],
@@ -104,7 +104,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
   public function testGet() {
     $phone = $this->callAPISuccess('phone', 'create', $this->_params);
     $params = array(
-      'contact_id' =>  $this->_params['contact_id'],
+      'contact_id' => $this->_params['contact_id'],
       'phone' => $phone['values'][$phone['id']]['phone'],
     );
     $result = $this->callAPIAndDocument('Phone', 'Get', $params, __FUNCTION__, __FILE__);
@@ -138,11 +138,12 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     $phone1 = $this->callAPISuccess('phone', 'create', $params);
     //now we check & make sure it has been set to primary
     $check = $this->callAPISuccess('phone', 'getcount', array(
-        'is_primary' => 1,
-        'id' => $phone1['id'],
-      ));
+      'is_primary' => 1,
+      'id' => $phone1['id'],
+    ));
     $this->assertEquals(1, $check);
   }
+
   public function testCreatePhonePrimaryHandlingChangeExisting() {
     $phone1 = $this->callAPISuccess('phone', 'create', $this->_params);
     $phone2 = $this->callAPISuccess('phone', 'create', $this->_params);

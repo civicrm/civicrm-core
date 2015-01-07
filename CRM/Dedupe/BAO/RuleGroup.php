@@ -57,7 +57,8 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
   /**
    * Return a structure holding the supported tables, fields and their titles
    *
-   * @param string $requestedType  the requested contact type
+   * @param string $requestedType
+   *   The requested contact type.
    *
    * @return array  a table-keyed array of field-keyed arrays holding supported fields' titles
    */
@@ -196,7 +197,6 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
     // create temp table
     $dao = new CRM_Core_DAO();
     $dao->query($tempTableQuery);
-
 
     CRM_Utils_Hook::dupeQuery($this, 'table', $tableQueries);
 
@@ -428,7 +428,8 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    * for all th groups for that contactType. If contactType
    * not specified, do it for all
    *
-   * @param string $contactType Individual, Household or Organization
+   * @param string $contactType
+   *   Individual, Household or Organization.
    *
    * @static
    *
@@ -445,8 +446,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
     $result = array();
     while ($dao->fetch()) {
       $title =
-        !empty($dao->title) ? $dao->title :
-        (!empty($dao->name)  ? $dao->name : $dao->contact_type);
+        !empty($dao->title) ? $dao->title : (!empty($dao->name) ? $dao->name : $dao->contact_type);
 
       $name = "$title - {$dao->used}";
       $result[$dao->id] = $name;

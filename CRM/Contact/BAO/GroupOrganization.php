@@ -44,7 +44,8 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
   /**
    * Takes an associative array and creates a groupOrganization object
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Contact_DAO_GroupOrganization
    * @static
@@ -68,8 +69,10 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
   /**
    * Format the params
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
-   * @param array  $formatedValues (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $formatedValues
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return void
    * @static
@@ -91,7 +94,8 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
   /**
    * Check if there is data to create the object
    *
-   * @param array  $params  (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return boolean
    * @static
@@ -138,7 +142,8 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
   /**
    * Delete Group Organization
    *
-   * @param int $groupOrganizationID group organization id that needs to be deleted
+   * @param int $groupOrganizationID
+   *   Group organization id that needs to be deleted.
    *
    * @return mixed|null $results   no of deleted group organization on success, false otherwise@access public
    */

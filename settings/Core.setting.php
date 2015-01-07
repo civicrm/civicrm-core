@@ -35,7 +35,7 @@
 /*
  * Settings metadata file
  */
-return array (
+return array(
   'contact_view_options' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
@@ -50,8 +50,8 @@ return array (
     'title' => 'Viewing Contacts',
     'is_domain' => '1',
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
 
   'contact_edit_options' => array(
@@ -68,8 +68,8 @@ return array (
     'title' => 'Editing Contacts',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-     'help_text' => null,
+    'description' => NULL,
+     'help_text' => NULL,
   ),
   'advanced_search_options' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -84,8 +84,8 @@ return array (
     'title' => 'Contact Search',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
  'user_dashboard_options' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -101,8 +101,8 @@ return array (
     'title' => 'Contact Dashboard',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-     'help_text' => null,
+    'description' => NULL,
+     'help_text' => NULL,
   ),
   'address_options' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -118,8 +118,8 @@ return array (
     'title' => 'Addressing Options',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'address_format' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -132,8 +132,8 @@ return array (
     'title' => 'Address Format',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-     'help_text' => null,
+    'description' => NULL,
+     'help_text' => NULL,
   ),
   'mailing_format' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -146,8 +146,8 @@ return array (
     'title' => 'Mailing Format',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-     'help_text' => null,
+    'description' => NULL,
+     'help_text' => NULL,
   ),
   'display_name_format' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -160,8 +160,8 @@ return array (
     'title' => 'Display Name Format',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'sort_name_format' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -174,8 +174,8 @@ return array (
     'title' => 'Sort Name Format',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-     'help_text' => null,
+    'description' => NULL,
+     'help_text' => NULL,
   ),
   'editor_id' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -183,13 +183,13 @@ return array (
     'name' => 'editor_id',
     'type' => 'String',
     'html_type' => 'Text',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.1',
     'title' => 'Wysiwig Editor',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'contact_ajax_check_similar' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -197,13 +197,13 @@ return array (
     'name' => 'contact_ajax_check_similar',
     'type' => 'String',
     'html_type' => 'Text',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.1',
     'title' => 'Ajax Check Similar',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'ajaxPopupsEnabled' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -216,8 +216,8 @@ return array (
     'title' => 'Ajax Popups Enabled',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'activity_assignee_notification' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -225,13 +225,13 @@ return array (
     'name' => 'activity_assignee_notification',
     'type' => 'String',
     'html_type' => 'Text',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.1',
     'title' => 'Notify Activity Assignees',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-     'help_text' => null,
+    'description' => NULL,
+     'help_text' => NULL,
   ),
   'activity_assignee_notification_ics' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -239,13 +239,13 @@ return array (
     'name' => 'activity_assignee_notification_ics',
     'type' => 'String',
     'html_type' => 'Text',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.3',
     'title' => 'Include ICal Invite to Activity Assignees',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-     'help_text' => null,
+    'description' => NULL,
+     'help_text' => NULL,
   ),
   'contact_autocomplete_options' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -261,8 +261,8 @@ return array (
     'title' => 'Contact Reference Autocomplete Options',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-     'help_text' => null,
+    'description' => NULL,
+     'help_text' => NULL,
   ),
   'contact_reference_options' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -278,8 +278,8 @@ return array (
     'title' => 'Contact Reference Options',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-     'help_text' => null,
+    'description' => NULL,
+     'help_text' => NULL,
   ),
   'max_attachments' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -300,7 +300,7 @@ return array (
      'is_domain' => 1,
      'is_contact' => 0,
      'description' => 'Maximum number of files (documents, images, etc.) which can attached to emails or activities.',
-     'help_text' => null,
+     'help_text' => NULL,
   ),
   'maxFileSize' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -321,7 +321,7 @@ return array (
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'Maximum Size of file (documents, images, etc.) which can attached to emails or activities.<br />Note: php.ini should support this file size.',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'contact_undelete' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -335,7 +335,7 @@ return array (
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'If enabled, deleted contacts will be moved to trash (instead of being destroyed). Users with the proper permission are able to search for the deleted contacts and restore them (or delete permanently).',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'allowPermDeleteFinancial' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -349,7 +349,7 @@ return array (
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'Allow Permanent Delete for contacts who are linked to live financial transactions',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'versionAlert' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -370,7 +370,7 @@ return array (
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => "",
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'securityUpdateAlert' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -391,7 +391,7 @@ return array (
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => "",
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'versionCheck' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -405,7 +405,7 @@ return array (
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => "",
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'versionCheckIgnoreDate' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -421,7 +421,7 @@ return array (
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => "",
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'securityAlert' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -435,14 +435,14 @@ return array (
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => "If enabled, CiviCRM will automatically run checks for significant mis-configurations such as ineffective file protections.",
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'doNotAttachPDFReceipt' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'doNotAttachPDFReceipt',
-    'prefetch' => 1,  // prefetch causes it to be cached in config object. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
+    'prefetch' => 1, // prefetch causes it to be cached in config object. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
@@ -451,14 +451,14 @@ return array (
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => "If enabled, CiviCRM sends PDF receipt as an attachment during event signup or online contribution.",
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'wkhtmltopdfPath' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'wkhtmltopdfPath',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -467,20 +467,20 @@ return array (
       'maxlength' => 256,
     ),
     'html_type' => 'Text',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.3',
     'title' => 'Path to wkhtmltopdf executable',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'recaptchaPublicKey' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'recaptchaPublicKey',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -489,20 +489,20 @@ return array (
       'maxlength' => 64,
     ),
     'html_type' => 'Text',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.3',
     'title' => 'Recaptcha Public Key',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'recaptchaPrivateKey' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'recaptchaPrivateKey',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only'=> 1,//@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -511,20 +511,20 @@ return array (
       'maxlength' => 64,
     ),
     'html_type' => 'Text',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.3',
     'title' => 'Recaptcha Private Key',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'recaptchaPrivateKey' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'recaptchaPrivateKey',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -533,20 +533,20 @@ return array (
       'maxlength' => 64,
     ),
     'html_type' => 'Text',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.3',
     'title' => 'Recaptcha Private Key',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'dashboardCacheTimeout' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'dashboardCacheTimeout',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -555,19 +555,19 @@ return array (
       'maxlength' => 5,
     ),
     'html_type' => 'Text',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.3',
     'title' => 'Dashboard cache timeout',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
     ),
   'checksumTimeout' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'checksumTimeout',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -581,8 +581,8 @@ return array (
     'title' => 'Checksum Lifespan',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'blogUrl' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -630,8 +630,8 @@ return array (
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'resCacheCode',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -640,13 +640,13 @@ return array (
       'maxlength' => 16,
     ),
     'html_type' => 'Text',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.3',
     'title' => 'Resource Cache Code',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'Code appended to resource URLs (JS/CSS) to coerce HTTP caching',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'verifySSL' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -669,7 +669,7 @@ return array (
     'type' => 'String',
     'html_type' => 'text',
     'quick_form_type' => 'Element',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'default' => '',
     'add' => '4.3',
     'title' => 'WordPress Base Page',
@@ -682,7 +682,7 @@ return array (
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'secondDegRelPermissions',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 0,
@@ -691,7 +691,7 @@ return array (
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => "If enabled, contacts with the permission to edit a related contact will inherit that contact's permission to edit other related contacts",
-    'help_text' => null,
+    'help_text' => NULL,
   ),
 
   'enable_components' => array(
@@ -711,8 +711,8 @@ return array (
     'title' => 'Enable Components',
     'is_domain' => '1',
     'is_contact' => 0,
-    'description' => null,
-    'help_text'   => null,
+    'description' => NULL,
+    'help_text'   => NULL,
     'on_change' => array(
       array('CRM_Case_Info', 'onToggleComponents'),
       array('CRM_Core_Component', 'flushEnabledComponents'),
@@ -737,7 +737,7 @@ return array (
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'empoweredBy',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'prefetch' => 1, // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
@@ -746,6 +746,6 @@ return array (
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'When enabled, "empowered by CiviCRM" is displayed at the bottom of public forms.',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
 );

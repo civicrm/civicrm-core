@@ -41,7 +41,8 @@
 /**
  * Creates or updates an Activity. See the example for usage
  *
- * @param array $params Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                             pairs for the activity.
  * {@getfields activity_create}
  *
@@ -74,7 +75,6 @@ function civicrm_api3_activity_create($params) {
   if (!empty($errors)) {
     return $errors;
   }
-
 
   // processing for custom data
   $values = $activityArray = array();
@@ -177,7 +177,8 @@ function civicrm_api3_activity_create($params) {
 /**
  * Specify Meta data for create. Note that this data is retrievable via the getfields function
  * and is used for pre-filling defaults and ensuring mandatory requirements are met.
- * @param array $params (reference) array of parameters determined by getfields
+ * @param array $params
+ *   (reference) array of parameters determined by getfields.
  */
 function _civicrm_api3_activity_create_spec(&$params) {
 
@@ -212,7 +213,8 @@ function _civicrm_api3_activity_create_spec(&$params) {
 /**
  * Gets a CiviCRM activity according to parameters
  *
- * @param array  $params       Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                             pairs for the activity.
  *
  * @return array
@@ -233,7 +235,7 @@ function civicrm_api3_activity_get($params) {
   else {
     $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
   }
-  $options = _civicrm_api3_get_options_from_params($params, FALSE,'activity','get');
+  $options = _civicrm_api3_get_options_from_params($params, FALSE, 'activity', 'get');
   if($options['is_count']) {
     return civicrm_api3_create_success($activities, $params, 'activity', 'get');
   }
@@ -248,7 +250,8 @@ function civicrm_api3_activity_get($params) {
  *
  * NOTE: Called by civicrm-core and CiviHR
  *
- * @param array $params API request parameters
+ * @param array $params
+ *   API request parameters.
  * @param array $activities
  * @return array new activities list
  */
@@ -274,16 +277,19 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
           $activities[$key]['assignee_contact_id'] = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId($activityArray['id']);
         }
         break;
+
       case 'target_contact_id':
         foreach ($activities as $key => $activityArray) {
           $activities[$key]['target_contact_id'] = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId($activityArray['id']);
         }
         break;
+
       case 'source_contact_id':
         foreach ($activities as $key => $activityArray) {
           $activities[$key]['source_contact_id'] = CRM_Activity_BAO_Activity::getSourceContactID($activityArray['id']);
         }
         break;
+
       default:
         if (substr($n, 0, 6) == 'custom') {
           $returnProperties[$n] = $v;
@@ -303,7 +309,8 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
 /**
  * Delete a specified Activity.
  *
- * @param array $params array holding 'id' of activity to be deleted
+ * @param array $params
+ *   Array holding 'id' of activity to be deleted.
  * {@getfields activity_delete}
  *
  * @throws API_Exception
@@ -328,7 +335,8 @@ function civicrm_api3_activity_delete($params) {
 /**
  * Check for required params
  *
- * @param array $params associated array of fields
+ * @param array $params
+ *   Associated array of fields.
  *
  * @throws API_Exception
  * @throws Exception
@@ -363,7 +371,6 @@ function _civicrm_api3_activity_check_params(&$params) {
       }
     }
 
-
     $sql = '
 SELECT  count(*)
   FROM  civicrm_contact
@@ -373,8 +380,8 @@ SELECT  count(*)
     }
   }
 
-
-  $activityIds = array('activity' => CRM_Utils_Array::value('id', $params),
+  $activityIds = array(
+  'activity' => CRM_Utils_Array::value('id', $params),
                  'parent' => CRM_Utils_Array::value('parent_id', $params),
                  'original' => CRM_Utils_Array::value('original_id', $params),
   );
@@ -403,7 +410,7 @@ SELECT  count(*)
     $activityTypeIdInList = array_search(($activityName ? $activityName : $activityLabel), $activityTypes);
 
     if (!$activityTypeIdInList) {
-      $errorString = $activityName ? "Invalid Activity Name : $activityName"  : "Invalid Activity Type Label";
+      $errorString = $activityName ? "Invalid Activity Name : $activityName" : "Invalid Activity Type Label";
       throw new Exception($errorString);
     }
     elseif ($activityTypeId && ($activityTypeId != $activityTypeIdInList)) {
@@ -424,7 +431,6 @@ SELECT  count(*)
     throw new API_Exception('Invalid Activity Duration (in minutes)');
   }
 
-
   //if adding a new activity & date_time not set make it now
   // this should be managed by the wrapper layer & setting ['api.default'] in speces
   // needs testing
@@ -438,7 +444,8 @@ SELECT  count(*)
 /**
  * @see _civicrm_api3_generic_getlist_params.
  *
- * @param $request array
+ * @param $request
+ *   Array.
  */
 function _civicrm_api3_activity_getlist_params(&$request) {
   $fieldsToReturn = array('activity_date_time', 'activity_type_id', 'subject', 'source_contact_id');
@@ -453,8 +460,10 @@ function _civicrm_api3_activity_getlist_params(&$request) {
 /**
  * @see _civicrm_api3_generic_getlist_output
  *
- * @param $result array
- * @param $request array
+ * @param $result
+ *   Array.
+ * @param $request
+ *   Array.
  *
  * @return array
  */
@@ -481,4 +490,3 @@ function _civicrm_api3_activity_getlist_output($result, $request) {
   }
   return $output;
 }
-

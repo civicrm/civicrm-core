@@ -137,8 +137,6 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->type("invoice_id", time());
     $this->webtestFillDate('thankyou_date');
 
-
-
     //Premium section
     $this->click("Premium");
     $this->waitForElementPresent("fulfilled_date");

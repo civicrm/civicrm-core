@@ -88,14 +88,13 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
     $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
   }
 
-/**
- * Check the delete function succeeds
- */
+  /**
+   * Check the delete function succeeds
+   */
   public function testDeleteSurvey() {
     $entity = $this->createTestEntity();
     $result = $this->callAPIAndDocument('survey', 'delete', array('id' => $entity['id']), __FUNCTION__, __FILE__);
-    $checkDeleted = $this->callAPISuccess($this->entity, 'get', array(
-      ));
+    $checkDeleted = $this->callAPISuccess($this->entity, 'get', array());
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
 

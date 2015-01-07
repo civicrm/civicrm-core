@@ -49,9 +49,11 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   /**
    * Takes an associative array and creates a financial transaction object
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
-   * @param string $trxnEntityTable entity_table
+   * @param string $trxnEntityTable
+   *   Entity_table.
    *
    * @return CRM_Core_BAO_FinancialTrxn object
    * @static
@@ -120,8 +122,10 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Contribute_BAO_ContributionType object
    * @static
@@ -140,8 +144,10 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * Given an entity_id and entity_table, check for corresponding entity_financial_trxn and financial_trxn record.
    * NOTE: This should be moved to separate BAO for EntityFinancialTrxn when we start adding more code for that object.
    *
-   * @param $entity_id id of the entity usually the contactID.
-   * @param string $orderBy to get single trxn id for a entity table i.e last or first.
+   * @param $entity_id
+   *   Id of the entity usually the contactID.
+   * @param string $orderBy
+   *   To get single trxn id for a entity table i.e last or first.
    * @param bool $newTrxn
    *
    * @return array $tag array of category id's the contact belongs to.
@@ -184,7 +190,8 @@ LIMIT 1;";
    * Given an entity_id and entity_table, check for corresponding entity_financial_trxn and financial_trxn record.
    * @todo This should be moved to separate BAO for EntityFinancialTrxn when we start adding more code for that object.
    *
-   * @param int $entity_id id of the entity usually the contactID.
+   * @param int $entity_id
+   *   Id of the entity usually the contactID.
    *
    * @return array $tag array of catagory id's the contact belongs to.
    *
@@ -205,7 +212,8 @@ WHERE ft.entity_table = 'civicrm_contribution' AND ft.entity_id = %1
   /**
    * Given an financial_trxn_id  check for previous entity_financial_trxn.
    *
-   * @param $financial_trxn_id id of the latest payment.
+   * @param $financial_trxn_id
+   *   Id of the latest payment.
    *
    *
    * @return array $payment array of previous payments
@@ -256,8 +264,10 @@ WHERE  ef2.financial_trxn_id =%1
    * Given an entity_id and entity_table, check for corresponding entity_financial_trxn and financial_trxn record.
    * NOTE: This should be moved to separate BAO for EntityFinancialTrxn when we start adding more code for that object.
    *
-   * @param $entity_id id of the entity usually the contactID.
-   * @param string $entity_table name of the entity table usually 'civicrm_contact'
+   * @param $entity_id
+   *   Id of the entity usually the contactID.
+   * @param string $entity_table
+   *   Name of the entity table usually 'civicrm_contact'.
    *
    * @return array $tag array of catagory id's the contact belongs to.
    *
@@ -352,7 +362,8 @@ WHERE ceft.entity_id = %1";
   /**
    * Create financial trxn and items when fee is charged
    *
-   * @param array $params to create trxn entries
+   * @param array $params
+   *   To create trxn entries.
    *
    * @static
    */

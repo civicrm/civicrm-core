@@ -78,7 +78,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    *
    * @return void
    */
-  public function buildQuickForm( ) {
+  public function buildQuickForm() {
     parent::buildQuickForm( );
     $this->setPageTitle(ts('Financial Account'));
 
@@ -137,11 +137,11 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    * @return array list of errors to be posted back to the form
    * @static
    */
-  public static function formRule( $values, $files, $self ) {
-    $errorMsg = array( );
+  public static function formRule($values, $files, $self) {
+    $errorMsg = array();
     $financialAccountTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Liability' "));
     if (isset($values['is_tax'])) {
-      if ($values['financial_account_type_id'] !=  $financialAccountTypeId) {
+      if ($values['financial_account_type_id'] != $financialAccountTypeId) {
         $errorMsg['financial_account_type_id'] = ts('Taxable accounts should have Financial Account Type set to Liability.');
       }
       if (CRM_Utils_Array::value('tax_rate', $values) == NULL) {
@@ -158,7 +158,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
         $relationshipId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
         $params = array(
           'financial_account_id'  => $self->_id,
-          'account_relationship'=> $relationshipId
+          'account_relationship' => $relationshipId
         );
         $result = CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $defaults);
         if ($result) {
@@ -166,7 +166,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
         }
       }
     }
-    return CRM_Utils_Array::crmIsEmptyArray( $errorMsg ) ? true : $errorMsg;
+    return CRM_Utils_Array::crmIsEmptyArray( $errorMsg ) ? TRUE : $errorMsg;
   }
 
   /**
@@ -195,7 +195,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
       CRM_Core_Session::setStatus( ts('Selected Financial Account has been deleted.') );
     }
     else {
-      $ids = array( );
+      $ids = array();
       // store the submitted values in an array
       $params = $this->exportValues();
 

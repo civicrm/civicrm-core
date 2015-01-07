@@ -97,7 +97,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     // check for proper info message displayed regarding status
     $this->chooseCancelOnNextConfirmation();
     $this->click('_qf_Participant_upload-bottom');
-    $this->assertTrue((bool)preg_match("/Payment amount is less than the amount owed. Expected participant status is 'Partially paid'. Are you sure you want to set the participant status to Registered/", $this->getConfirmation()));
+    $this->assertTrue((bool) preg_match("/Payment amount is less than the amount owed. Expected participant status is 'Partially paid'. Are you sure you want to set the participant status to Registered/", $this->getConfirmation()));
 
     // select partially paid status again and click on save
     $this->select('status_id', 'label=Partially paid');
@@ -155,7 +155,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
 
     // verify balance
     $text = $this->getText("xpath=id('AdditionalPayment')/div[2]//table/tbody/tr[3]/td[2]");
-    $this->assertTrue((bool)preg_match("/{$balance}/", $text));
+    $this->assertTrue((bool) preg_match("/{$balance}/", $text));
 
     // check form rule error
     $errorBalance = $balance + 1;

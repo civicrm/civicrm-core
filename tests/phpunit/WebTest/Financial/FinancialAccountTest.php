@@ -40,7 +40,7 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
 
     // Add new Financial Account
     $orgName = 'Alberta '.substr(sha1(rand()), 0, 7);
-    $uniqueName = explode(" ",$orgName);
+    $uniqueName = explode(" ", $orgName);
     $financialAccountTitle = 'Financial Account '.substr(sha1(rand()), 0, 4);
     $financialAccountDescription = "{$financialAccountTitle} Description";
     $accountingCode = 1033;
@@ -72,7 +72,8 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
 
     $this->clickLink("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom', FALSE);
     //Varify Data after Adding new Financial Account
-    $verifyData = array('name' => $financialAccountTitle,
+    $verifyData = array(
+    'name' => $financialAccountTitle,
       'description' => $financialAccountDescription,
       'accounting_code' => $accountingCode,
       'tax_rate'   => $taxRate,
@@ -97,7 +98,7 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
     if ($orgNameEdit) {
       $orgNameEdit = 'NGO '.substr(sha1(rand()), 0, 7);
       $this->webtestAddOrganization($orgNameEdit);
-      $uniqueName = explode(" ",$orgNameEdit);
+      $uniqueName = explode(" ", $orgNameEdit);
     }
 
     $this->_testEditFinancialAccount($editfinancialAccount,
@@ -119,7 +120,8 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");
     $this->clickLink("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom', FALSE);
 
-    $verifyData = array( 'name' => $financialAccountTitle,
+    $verifyData = array(
+    'name' => $financialAccountTitle,
       'description' => $financialAccountDescription,
       'accounting_code' => $accountingCode,
       'tax_rate'   => $taxRate,
@@ -131,7 +133,7 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
     $this->assertEquals($orgName, $this->getText("xpath=//*[@id='s2id_contact_id']/a/span[1]"));
 
     $this->_assertFinancialAccount($verifyData);
-    $verifySelectFieldData = array('financial_account_type_id'   => $financialAccountType);
+    $verifySelectFieldData = array('financial_account_type_id' => $financialAccountType);
     $this->_assertSelectVerify($verifySelectFieldData);
     $this->click('_qf_FinancialAccount_cancel-botttom');
     $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Delete']");

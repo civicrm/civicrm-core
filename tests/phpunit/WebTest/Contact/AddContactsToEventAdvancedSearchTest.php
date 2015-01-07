@@ -48,7 +48,6 @@ class WebTest_Contact_AddContactsToEventAdvancedSearchTest extends CiviSeleniumT
 
     $this->select('task', "label=Add Contacts to Event");
 
-
     // Select event. Based on label for now.
     $this->waitForElementPresent('event_id');
     $this->select2('event_id', "Rain-forest Cup Youth Soccer Tournament");

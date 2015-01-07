@@ -112,7 +112,8 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
   // note that $job_id is used only as a variable in the temp table construction
   // and does not play a role in the queries generated
   /**
-   * @param int $job_id (misnomer) a nonce value used to name temporary tables
+   * @param int $job_id
+   *   (misnomer) a nonce value used to name temporary tables.
    * @param int $mailing_id
    * @param null $offset
    * @param null $limit
@@ -160,37 +161,40 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     // INSERT'ing INTO a table with a primary id so that last record
     // over writes any previous record.
     switch($email_selection_method) {
-    case 'location-exclude':
-      $location_filter = "($email.location_type_id != $location_type_id)";
-      // If there is more than one email that doesn't match the location,
-      // prefer the one marked is_bulkmail, followed by is_primary.
-      $order_by = "ORDER BY $email.is_bulkmail, $email.is_primary";
-      break;
-    case 'location-only':
-      $location_filter = "($email.location_type_id = $location_type_id)";
-      // If there is more than one email of the desired location, prefer
-      // the one marked is_bulkmail, followed by is_primary.
-      $order_by = "ORDER BY $email.is_bulkmail, $email.is_primary";
-      break;
-    case 'location-prefer':
-      $location_filter = "($email.is_bulkmail = 1 OR $email.is_primary = 1 OR $email.location_type_id = $location_type_id)";
+      case 'location-exclude':
+        $location_filter = "($email.location_type_id != $location_type_id)";
+        // If there is more than one email that doesn't match the location,
+        // prefer the one marked is_bulkmail, followed by is_primary.
+        $order_by = "ORDER BY $email.is_bulkmail, $email.is_primary";
+        break;
 
-      // ORDER BY is more complicated because we have to set an arbitrary
-      // order that prefers the location that we want. We do that using
-      // the FIELD function. For more info, see:
-      // https://dev.mysql.com/doc/refman/5.5/en/string-functions.html#function_field
-      // We assign the location type we want the value "1" by putting it
-      // in the first position after we name the field. All other location
-      // types are left out, so they will be assigned the value 0. That
-      // means, they will all be equally tied for first place, with our
-      // location being last.
-      $order_by = "ORDER BY FIELD($email.location_type_id, $location_type_id), $email.is_bulkmail, $email.is_primary";
-      break;
-    case 'automatic':
-      // fall through to default
-    default:
-      $location_filter = "($email.is_bulkmail = 1 OR $email.is_primary = 1)";
-      $order_by = "ORDER BY $email.is_bulkmail";
+      case 'location-only':
+        $location_filter = "($email.location_type_id = $location_type_id)";
+        // If there is more than one email of the desired location, prefer
+        // the one marked is_bulkmail, followed by is_primary.
+        $order_by = "ORDER BY $email.is_bulkmail, $email.is_primary";
+        break;
+
+      case 'location-prefer':
+        $location_filter = "($email.is_bulkmail = 1 OR $email.is_primary = 1 OR $email.location_type_id = $location_type_id)";
+
+        // ORDER BY is more complicated because we have to set an arbitrary
+        // order that prefers the location that we want. We do that using
+        // the FIELD function. For more info, see:
+        // https://dev.mysql.com/doc/refman/5.5/en/string-functions.html#function_field
+        // We assign the location type we want the value "1" by putting it
+        // in the first position after we name the field. All other location
+        // types are left out, so they will be assigned the value 0. That
+        // means, they will all be equally tied for first place, with our
+        // location being last.
+        $order_by = "ORDER BY FIELD($email.location_type_id, $location_type_id), $email.is_bulkmail, $email.is_primary";
+        break;
+
+      case 'automatic':
+        // fall through to default
+      default:
+        $location_filter = "($email.is_bulkmail = 1 OR $email.is_primary = 1)";
+        $order_by = "ORDER BY $email.is_bulkmail";
     }
 
     /* Create a temp table for contact exclusion */
@@ -653,9 +657,9 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    *  returns an array that denotes the type of token that we are dealing with
    *  we use the type later on when we are doing a token replcement lookup
    *
-   *  @param string $token       The token for which we will be doing adata lookup
+   * @param string $token       The token for which we will be doing adata lookup
    *
-   *  @return array $funcStruct  An array that holds the token itself and the type.
+   * @return array $funcStruct  An array that holds the token itself and the type.
    *                             the type will tell us which function to use for the data lookup
    *                             if we need to do a lookup at all
    */
@@ -887,7 +891,8 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    *  structures to represent the order in which tokens were found from left to right, top to bottom.
    *
    *
-   * @param str $prop     name of the property that holds the text that we want to scan for tokens (html, text)
+   * @param string $propName of the property that holds the text that we want to scan for tokens (html, text).
+   *   Name of the property that holds the text that we want to scan for tokens (html, text).
    *
    * @return void
    */
@@ -909,14 +914,15 @@ ORDER BY   i.contact_id, i.{$tempColumn}
   /**
    * Generate an event queue for a test job
    *
-   * @param array $testParams contains form values
+   * @param array $testParams
+   *   Contains form values.
    *
    * @return void
    */
   public function getTestRecipients($testParams) {
     if (array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {
-      $contacts = civicrm_api('contact','get', array(
-        'version' =>3,
+      $contacts = civicrm_api('contact', 'get', array(
+        'version' => 3,
         'group' => $testParams['test_group'],
          'return' => 'id',
            'options' => array('limit' => 100000000000,
@@ -985,12 +991,17 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * is placed on the values received, so they do not need to follow the verp
    * convention.
    *
-   * @param array  $headers         Array of message headers to update, in-out
-   * @param string $prefix          Prefix for the message ID, use same prefixes as verp
+   * @param array $headers
+   *   Array of message headers to update, in-out.
+   * @param string $prefix
+   *   Prefix for the message ID, use same prefixes as verp.
    *                                wherever possible
-   * @param string $job_id          Job ID component of the generated message ID
-   * @param string $event_queue_id  Event Queue ID component of the generated message ID
-   * @param string $hash            Hash component of the generated message ID.
+   * @param string $job_id
+   *   Job ID component of the generated message ID.
+   * @param string $event_queue_id
+   *   Event Queue ID component of the generated message ID.
+   * @param string $hash
+   *   Hash component of the generated message ID.
    *
    * @return void
    */
@@ -1015,10 +1026,14 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * Static wrapper for getting verp and urls
    *
-   * @param int $job_id ID of the Job associated with this message
-   * @param int $event_queue_id ID of the EventQueue
-   * @param string $hash Hash of the EventQueue
-   * @param string $email Destination address
+   * @param int $job_id
+   *   ID of the Job associated with this message.
+   * @param int $event_queue_id
+   *   ID of the EventQueue.
+   * @param string $hash
+   *   Hash of the EventQueue.
+   * @param string $email
+   *   Destination address.
    *
    * @return array (reference) array    array ref that hold array refs to the verp info and urls
    */
@@ -1037,10 +1052,14 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * Get verp, urls and headers
    *
-   * @param int $job_id ID of the Job associated with this message
-   * @param int $event_queue_id ID of the EventQueue
-   * @param string $hash Hash of the EventQueue
-   * @param string $email Destination address
+   * @param int $job_id
+   *   ID of the Job associated with this message.
+   * @param int $event_queue_id
+   *   ID of the EventQueue.
+   * @param string $hash
+   *   Hash of the EventQueue.
+   * @param string $email
+   *   Destination address.
    *
    * @param bool $isForward
    *
@@ -1129,23 +1148,33 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * Compose a message
    *
-   * @param int $job_id ID of the Job associated with this message
-   * @param int $event_queue_id ID of the EventQueue
-   * @param string $hash Hash of the EventQueue
-   * @param string $contactId ID of the Contact
-   * @param string $email Destination address
-   * @param string $recipient To: of the recipient
-   * @param boolean $test Is this mailing a test?
+   * @param int $job_id
+   *   ID of the Job associated with this message.
+   * @param int $event_queue_id
+   *   ID of the EventQueue.
+   * @param string $hash
+   *   Hash of the EventQueue.
+   * @param string $contactId
+   *   ID of the Contact.
+   * @param string $email
+   *   Destination address.
+   * @param string $recipient
+   *   To: of the recipient.
+   * @param bool $test
+   *   Is this mailing a test?.
    * @param $contactDetails
    * @param $attachments
-   * @param boolean $isForward Is this mailing compose for forward?
-   * @param string $fromEmail email address of who is forwardinf it.
+   * @param bool $isForward
+   *   Is this mailing compose for forward?.
+   * @param string $fromEmail
+   *   Email address of who is forwardinf it.
    *
    * @param null $replyToEmail
    *
    * @return Mail_mime               The mail object
    */
-  public function &compose($job_id, $event_queue_id, $hash, $contactId,
+  public function &compose(
+    $job_id, $event_queue_id, $hash, $contactId,
     $email, &$recipient, $test,
     $contactDetails, &$attachments, $isForward = FALSE,
     $fromEmail = NULL, $replyToEmail = NULL
@@ -1500,8 +1529,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * Add the mailings
    *
-   * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
+   * @param array $ids
+   *   Reference array contains the id.
    *
    * @static
    *
@@ -1545,7 +1576,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * Construct a new mailing object, along with job and mailing_group
    * objects, from the form values of the create mailing wizard.
    *
-   * @params array $params        Form values
+   * @params array $params
+   *   Form values.
    *
    * @param array $params
    * @param array $ids
@@ -1693,8 +1725,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * Replace the list of recipients on a given mailing
    *
    * @param int $mailingId
-   * @param string $type 'include' or 'exclude'
-   * @param string $entity 'groups' or 'mailings'
+   * @param string $type
+   *   'include' or 'exclude'.
+   * @param string $entity
+   *   'groups' or 'mailings'.
    * @param array<int> $entityIds
    * @throws CiviCRM_API3_Exception
    */
@@ -1704,7 +1738,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $values[] = array('entity_id' => $entityId);
     }
     civicrm_api3('mailing_group', 'replace', array(
-      'mailing_id' =>  $mailingId,
+      'mailing_id' => $mailingId,
       'group_type' => $type,
       'entity_table' => ($entity == 'groups') ? CRM_Contact_BAO_Group::getTableName() : CRM_Mailing_BAO_Mailing::getTableName(),
       'values' => $values,
@@ -1726,8 +1760,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * Generate a report.  Fetch event count information, mailing data, and job
    * status.
    *
-   * @param int $id The mailing id to report
-   * @param boolean $skipDetails whether return all detailed report
+   * @param int $id
+   *   The mailing id to report.
+   * @param bool $skipDetails
+   *   Whether return all detailed report.
    *
    * @param bool $isSMS
    *
@@ -1757,7 +1793,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'component' => CRM_Mailing_BAO_Component::getTableName(),
       'spool' => CRM_Mailing_BAO_Spool::getTableName(),
     );
-
 
     $report = array();
     $additionalWhereClause = " AND ";
@@ -2119,7 +2154,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       ),
     );
 
-
     $actionLinks = array(CRM_Core_Action::VIEW => array('name' => ts('Report')));
     if (CRM_Core_Permission::check('view all contacts')) {
       $actionLinks[CRM_Core_Action::ADVANCED] =
@@ -2309,9 +2343,12 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   /**
    * Get the rows for a browse operation
    *
-   * @param int $offset The row number to start from
-   * @param int $rowCount The nmber of rows to return
-   * @param string $sort The sql string that describes the sort order
+   * @param int $offset
+   *   The row number to start from.
+   * @param int $rowCount
+   *   The nmber of rows to return.
+   * @param string $sort
+   *   The sql string that describes the sort order.
    *
    * @param null $additionalClause
    * @param array $additionalParams
@@ -2414,7 +2451,8 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   /**
    * Delete Mails and all its associated records
    *
-   * @param  int  $id id of the mail to delete
+   * @param int $id
+   *   Id of the mail to delete.
    *
    * @return void
    * @static
@@ -2444,7 +2482,8 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    * Delete Jobss and all its associated records
    * related to test Mailings
    *
-   * @param  int  $id id of the Job to delete
+   * @param int $id
+   *   Id of the Job to delete.
    *
    * @return void
    * @static
@@ -2532,7 +2571,8 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       $form->addWysiwyg('html_message',
         ts('HTML Format'),
         array(
-          'cols' => '80', 'rows' => '8',
+          'cols' => '80',
+      'rows' => '8',
           'onkeyup' => "return verify(this)",
         )
       );
@@ -2555,7 +2595,8 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       }
       $form->add('textarea', $id, $label,
         array(
-          'cols' => '80', 'rows' => '8',
+          'cols' => '80',
+      'rows' => '8',
           'onkeyup' => "return verify(this, '{$prefix}')",
         )
       );
@@ -2626,11 +2667,11 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     );
     $form->add('text', 'saveTemplateName', ts('Template Title'));
 
-
     $form->addWysiwyg('html_message',
       ts('Your Letter'),
       array(
-        'cols' => '80', 'rows' => '8',
+        'cols' => '80',
+    'rows' => '8',
         'onkeyup' => "return verify(this)",
       )
     );
@@ -2669,9 +2710,11 @@ SELECT  $mailing.id as mailing_id
   /**
    * Get the content/components of mailing based on mailing Id
    *
-   * @param $report array of mailing report
+   * @param $report
+   *   Array of mailing report.
    *
-   * @param $form reference of this
+   * @param $form
+   *   Reference of this.
    *
    * @param bool $isSMS
    *
@@ -2874,7 +2917,8 @@ AND        m.id = %1
   /**
    * This function is a wrapper for ajax activity selector
    *
-   * @param  array   $params associated array for params record id.
+   * @param array $params
+   *   Associated array for params record id.
    *
    * @return array   $contactActivities associated array of contact activities
    */
@@ -2939,7 +2983,7 @@ AND        m.id = %1
 
       $contactMailings[$mailingId]['links'] = CRM_Core_Action::formLink(
         $actionLinks,
-        null,
+        NULL,
         array(
           'mid' => $values['mailing_id'],
           'cid' => $params['contact_id'],
@@ -2959,7 +3003,8 @@ AND        m.id = %1
   /**
    * Retrieve contact mailing
    *
-   * @param array $params associated array
+   * @param array $params
+   *   Associated array.
    *
    * @return array of mailings for a contact
    *
@@ -2978,7 +3023,8 @@ AND        m.id = %1
   /**
    * Retrieve contact mailing count
    *
-   * @param array $params associated array
+   * @param array $params
+   *   Associated array.
    *
    * @return int count of mailings for a contact
    *

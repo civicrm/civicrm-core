@@ -37,8 +37,10 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
   /**
    * Add the membership log record
    *
-   * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
+   * @param array $ids
+   *   Reference array contains the id.
    *
    * @static
    *

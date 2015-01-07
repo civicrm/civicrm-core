@@ -47,7 +47,8 @@ class CRM_Activity_BAO_ICalendar {
   /**
    * Constructor
    *
-   * @param object $act Reference to an activity object
+   * @param object $act
+   *   Reference to an activity object.
    *
    * @return \CRM_Activity_BAO_ICalendar
   @access public
@@ -59,8 +60,10 @@ class CRM_Activity_BAO_ICalendar {
   /**
    * Add an ics attachment to the input array
    *
-   * @param array $attachments  Reference to array in same format returned from CRM_Core_BAO_File::getEntityFile()
-   * @param array $contacts     Array of contacts (attendees)
+   * @param array $attachments
+   *   Reference to array in same format returned from CRM_Core_BAO_File::getEntityFile().
+   * @param array $contacts
+   *   Array of contacts (attendees).
    *
    * @return string   Array index of the added attachment in the $attachments array, or else null.
    */

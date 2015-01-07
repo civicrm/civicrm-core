@@ -37,7 +37,8 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
   /**
    * Create recurring contribution
    *
-   * @param array  $params           (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return object activity contact object
    *
@@ -53,7 +54,8 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * contribution object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Contribute_BAO_Contribution object
    * @static
@@ -105,8 +107,10 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
   /**
    * Check if there is a recurring contribution with the same trxn_id or invoice_id
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
-   * @param array  $duplicates (reference ) store ids of duplicate contribs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $duplicates
+   *   (reference ) store ids of duplicate contribs.
    *
    * @return boolean true if duplicate, false otherwise
    * static
@@ -175,7 +179,8 @@ SELECT r.payment_processor_id
   /**
    * Get the number of installment done/completed for each recurring contribution
    *
-   * @param array  $ids (reference ) an array of recurring contribution ids
+   * @param array $ids
+   *   (reference ) an array of recurring contribution ids.
    *
    * @return array $totalCount an array of recurring ids count
    * static
@@ -222,8 +227,10 @@ SELECT r.payment_processor_id
   /**
    * Cancel Recurring contribution.
    *
-   * @param integer $recurId recur contribution id.
-   * @param array $objects an array of objects that is to be cancelled like
+   * @param int $recurId
+   *   Recur contribution id.
+   * @param array $objects
+   *   An array of objects that is to be cancelled like.
    *                          contribution, membership, event. At least contribution object is a must.
    *
    * @param array $activityParams
@@ -265,7 +272,7 @@ SELECT r.payment_processor_id
         else {
           $details .= '
 <br/>' . ts('The recurring contribution of %1, every %2 %3 has been cancelled.', array(
-  1 => $dao->amount,
+          1 => $dao->amount,
               2 => $dao->frequency_interval,
               3 => $dao->frequency_unit
             ));
@@ -319,7 +326,8 @@ SELECT r.payment_processor_id
   /**
    * Get list of recurring contribution of contact Ids
    *
-   * @param int $contactId Contact ID
+   * @param int $contactId
+   *   Contact ID.
    *
    * @return array list of recurring contribution fields
    *

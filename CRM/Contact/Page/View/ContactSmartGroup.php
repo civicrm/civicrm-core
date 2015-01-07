@@ -57,11 +57,11 @@ class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
     }
 
     $allGroup = CRM_Contact_BAO_GroupContactCache::contactGroup($this->_contactId);
-    $this->assign('groupSmart'  , NULL);
+    $this->assign('groupSmart', NULL);
     $this->assign('groupParent', NULL);
 
     if (!empty($allGroup)) {
-      $smart = $parent = array( );
+      $smart = $parent = array();
       foreach ($allGroup['group'] as $group) {
         // delete all smart groups which are also in static groups
         if (isset($staticGroups[$group['id']])) {

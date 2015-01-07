@@ -197,7 +197,8 @@ class CRM_Mailing_BAO_Query {
    *
    * @return array|null
    */
-  static function defaultReturnProperties($mode,
+  static function defaultReturnProperties(
+    $mode,
     $includeCustomFields = TRUE
   ) {
 
@@ -427,7 +428,8 @@ class CRM_Mailing_BAO_Query {
    * @param $row
    * @param int $id
    */
-  public static function searchAction(&$row, $id) {}
+  public static function searchAction(&$row, $id) {
+  }
 
   /**
    * @param $tables

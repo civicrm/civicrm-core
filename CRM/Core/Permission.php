@@ -82,7 +82,8 @@ class CRM_Core_Permission {
 
   /**
    * Given a permission string or array, check for access requirements
-   * @param mixed $permissions the permission to check as an array or string -see examples
+   * @param mixed $permissions
+   *   The permission to check as an array or string -see examples.
    *  arrays
    *
    *  Ex 1
@@ -157,7 +158,8 @@ class CRM_Core_Permission {
   /**
    * Given a group/role array, check for access requirements
    *
-   * @param array $array the group/role to check
+   * @param array $array
+   *   The group/role to check.
    *
    * @return boolean true if yes, else false
    * @static
@@ -170,9 +172,12 @@ class CRM_Core_Permission {
   /**
    * Get the permissioned where clause for the user
    *
-   * @param int $type the type of permission needed
-   * @param  array $tables (reference ) add the tables that are needed for the select clause
-   * @param  array $whereTables (reference ) add the tables that are needed for the where clause
+   * @param int $type
+   *   The type of permission needed.
+   * @param array $tables
+   *   (reference ) add the tables that are needed for the select clause.
+   * @param array $whereTables
+   *   (reference ) add the tables that are needed for the where clause.
    *
    * @return string the group where clause for this user
    */
@@ -185,7 +190,8 @@ class CRM_Core_Permission {
    * Get all groups from database, filtered by permissions
    * for this user
    *
-   * @param string $groupType type of group(Access/Mailing)
+   * @param string $groupType
+   *   Type of group(Access/Mailing).
    * @param bool|\boolen $excludeHidden exclude hidden groups.
    *
    * @static
@@ -424,8 +430,10 @@ class CRM_Core_Permission {
   /**
    * Check permissions for delete and edit actions
    *
-   * @param string $module component name.
-   * @param integer $action action to be check across component
+   * @param string $module
+   *   Component name.
+   * @param int $action
+   *   Action to be check across component.
    *
    *
    * @return bool
@@ -737,7 +745,8 @@ class CRM_Core_Permission {
   /**
    * Get all the contact emails for users that have a specific permission
    *
-   * @param string $permissionName name of the permission we are interested in
+   * @param string $permissionName
+   *   Name of the permission we are interested in.
    *
    * @return string a comma separated list of email addresses
    */
@@ -749,7 +758,8 @@ class CRM_Core_Permission {
   /**
    * Get all the contact emails for users that have a specific role
    *
-   * @param string $roleName name of the role we are interested in
+   * @param string $roleName
+   *   Name of the role we are interested in.
    *
    * @return string a comma separated list of email addresses
    */

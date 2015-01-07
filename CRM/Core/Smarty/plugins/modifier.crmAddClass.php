@@ -36,8 +36,10 @@
 /**
  * Add a class to an html element
  *
- * @param string $string    the html to be tweaked
- * @param string $class     the new class or classes to add (separate with a space)
+ * @param string $string
+ *   The html to be tweaked.
+ * @param string $class
+ *   The new class or classes to add (separate with a space).
  *
  * @return string        the new modified html string
  */

@@ -78,7 +78,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     CRM_Financial_BAO_FinancialItem::add($lineItem, $contribution);
     $result = $this->assertDBNotNull(
       'CRM_Financial_DAO_FinancialItem',
-      $lineItem->id ,
+      $lineItem->id,
       'amount',
       'entity_id',
       'Database check on added financial item record.'
@@ -192,7 +192,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
 
     $result = $this->assertDBNotNull(
       'CRM_Financial_DAO_FinancialItem',
-      $lineItem->id ,
+      $lineItem->id,
       'amount',
       'entity_id',
       'Database check on added financial item record.'
@@ -201,7 +201,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $this->assertEquals( $result, $price, 'Verify Amount for Financial Item');
     $entityResult = $this->assertDBNotNull(
       'CRM_Financial_DAO_EntityFinancialTrxn',
-      $entityId ,
+      $entityId,
       'amount',
       'entity_id',
       'Database check on added entity financial trxn record.'
@@ -236,7 +236,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $entityTrxn = CRM_Financial_BAO_FinancialItem::createEntityTrxn($params);
     $entityResult = $this->assertDBNotNull(
       'CRM_Financial_DAO_EntityFinancialTrxn',
-      $financialTrxn->id ,
+      $financialTrxn->id,
       'amount',
       'financial_trxn_id',
       'Database check on added entity financial trxn record.'

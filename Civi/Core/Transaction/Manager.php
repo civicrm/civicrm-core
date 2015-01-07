@@ -63,7 +63,8 @@ class Manager {
   }
 
   /**
-   * @param CRM_Core_DAO $dao handle for the DB connection that will execute transaction statements
+   * @param CRM_Core_DAO $dao
+   *   Handle for the DB connection that will execute transaction statements.
    *   (all we really care about is the query() function)
    */
   public function __construct($dao) {
@@ -73,7 +74,8 @@ class Manager {
   /**
    * Increment the transaction count / add a new transaction level
    *
-   * @param bool $nest Determines what to do if there's currently an active transaction:
+   * @param bool $nest
+   *   Determines what to do if there's currently an active transaction:.
    *   - If true, then make a new nested transaction ("SAVEPOINT")
    *   - If false, then attach to the existing transaction
    */

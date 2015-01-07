@@ -43,7 +43,7 @@
  * @return array
  */
 function civicrm_api3_system_log_delete($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, True, 'SystemLog');
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'SystemLog');
 }
 
 /**
@@ -64,8 +64,8 @@ function civicrm_api3_system_log_create($params) {
  * @return array
  */
 function _civicrm_api3_system_log_create_spec(&$params) {
-  require_once('api/v3/System.php');
-   _civicrm_api3_system_log_spec($params);
+  require_once 'api/v3/System.php';
+  _civicrm_api3_system_log_spec($params);
 }
 
 /**
@@ -74,6 +74,5 @@ function _civicrm_api3_system_log_create_spec(&$params) {
  * @return array
  */
 function civicrm_api3_system_log_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, True, 'SystemLog');
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'SystemLog');
 }
-

@@ -36,7 +36,8 @@
 /**
  * Add a stylesheet <LINK> to a specific part of the page
  *
- * @param array $params ['a'] array of attributes
+ * @param array $params
+ *   ['a'] array of attributes.
  * @param CRM_Core_Smarty $smarty
  *
  * @throws Exception

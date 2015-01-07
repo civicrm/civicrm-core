@@ -108,7 +108,7 @@ class CRM_Member_Form_Task extends CRM_Core_Form {
     }
     else {
       $queryParams = $form->get('queryParams');
-      $sortOrder = null;
+      $sortOrder = NULL;
       if ( $form->get( CRM_Utils_Sort::SORT_ORDER  ) ) {
         $sortOrder = $form->get( CRM_Utils_Sort::SORT_ORDER );
       }
@@ -165,7 +165,8 @@ class CRM_Member_Form_Task extends CRM_Core_Form {
    * Simple shell that derived classes can call to add buttons to
    * the form with a customized title for the main Submit
    *
-   * @param string $title title of the main button
+   * @param string $title
+   *   Title of the main button.
    * @param string $nextType
    * @param string $backType
    * @param bool $submitOnce

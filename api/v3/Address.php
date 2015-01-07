@@ -95,7 +95,8 @@ function civicrm_api3_address_create(&$params) {
 /**
  * Adjust Metadata for Create action
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_address_create_spec(&$params) {
   $params['location_type_id']['api.required'] = 1;
@@ -111,7 +112,8 @@ function _civicrm_api3_address_create_spec(&$params) {
 /**
  * Adjust Metadata for Get action
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_address_get_spec(&$params) {
   $params['world_region'] = array(
@@ -124,7 +126,7 @@ function _civicrm_api3_address_get_spec(&$params) {
 /**
  * Deletes an existing Address
  *
- * @param  array  $params
+ * @param array $params
  *
  * {@getfields address_delete}
  * {@example AddressDelete.php 0}
@@ -140,10 +142,11 @@ function civicrm_api3_address_delete($params) {
  * Retrieve one or more addresses on address_id, contact_id, street_name, city
  * or a combination of those
  *
- * @param  mixed[]  (reference ) input parameters
+ * @param mixed[] (reference ) input parameters
  *
  * {@example AddressGet.php 0}
- * @param  array $params  an associative array of name/value pairs.
+ * @param array $params
+ *   An associative array of name/value pairs.
  *
  * @return  array details of found addresses else error
  * {@getfields address_get}
@@ -152,4 +155,3 @@ function civicrm_api3_address_delete($params) {
 function civicrm_api3_address_get(&$params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Address');
 }
-

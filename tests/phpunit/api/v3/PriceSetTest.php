@@ -42,7 +42,7 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->_params = array(
-#     [domain_id] =>
+    #     [domain_id] =>
       'name' => 'default_goat_priceset',
       'title' => 'Goat accessories',
       'is_active' => 1,
@@ -78,7 +78,7 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
       'title' => 'Some Price Set',
       'is_active' => 1,
       'financial_type_id' => 1,
-      'extends' => array(1,2),
+      'extends' => array(1, 2),
     );
     $createResult = $this->callAPIAndDocument($this->_entity, 'create', $createParams, __FUNCTION__, __FILE__);
 
@@ -149,7 +149,7 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
   }
 
   public static function setUpBeforeClass() {
-      // put stuff here that should happen before all tests in this unit
+    // put stuff here that should happen before all tests in this unit
   }
 
   public static function tearDownAfterClass(){

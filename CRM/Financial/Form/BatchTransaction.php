@@ -48,7 +48,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
   protected $_batchStatusId;
 
   public function preProcess() {
-    self::$_entityID = CRM_Utils_Request::retrieve( 'bid' , 'Positive' ) ? CRM_Utils_Request::retrieve( 'bid' , 'Positive' ) : $_POST['batch_id'];
+    self::$_entityID = CRM_Utils_Request::retrieve( 'bid', 'Positive' ) ? CRM_Utils_Request::retrieve( 'bid', 'Positive' ) : $_POST['batch_id'];
     $this->assign('entityID', self::$_entityID);
     if (isset(self::$_entityID)) {
       $this->_batchStatusId = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'status_id');
@@ -61,7 +61,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
         array(
           'created_by' => ts('Created By'),
           'status' => ts('Status'),
-          'description'=> ts('Description'),
+          'description' => ts('Description'),
           'payment_instrument' => ts('Payment Instrument'),
           'item_count' => ts('Entered Transactions'),
           'assigned_item_count' => ts('Assigned Transactions'),
@@ -121,19 +121,20 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     $this->add( 'select',
       'trans_remove',
       ts('Task'),
-      array( ''  => ts( '- actions -' )) +  array( 'Remove' => ts('Remove from Batch')));
+      array( '' => ts( '- actions -' )) + array( 'Remove' => ts('Remove from Batch')));
 
-    $this->add('submit','rSubmit', ts('Go'),
+    $this->add('submit', 'rSubmit', ts('Go'),
       array(
         'class' => 'crm-form-submit',
         'id' => 'GoRemove',
       ));
 
-    self::$_entityID = CRM_Utils_Request::retrieve('bid' , 'Positive');
+    self::$_entityID = CRM_Utils_Request::retrieve('bid', 'Positive');
 
     $this->addButtons(
       array(
-        array('type' => 'submit',
+        array(
+    'type' => 'submit',
           'name' => ts('Search'),
           'isDefault' => TRUE,
         )
@@ -144,9 +145,9 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     $this->add( 'select',
       'trans_assign',
       ts('Task'),
-      array( ''  => ts( '- actions -' )) + array( 'Assign' => ts( 'Assign to Batch' )));
+      array( '' => ts( '- actions -' )) + array( 'Assign' => ts( 'Assign to Batch' )));
 
-    $this->add('submit','submit', ts('Go'),
+    $this->add('submit', 'submit', ts('Go'),
       array(
         'class' => 'crm-form-submit',
         'id' => 'Go',

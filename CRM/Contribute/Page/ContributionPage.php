@@ -288,7 +288,8 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
     );
 
     // set breadcrumb to append to 2nd layer pages
-    $breadCrumb = array(array('title' => ts('Manage Contribution Pages'),
+    $breadCrumb = array(array(
+    'title' => ts('Manage Contribution Pages'),
         'url' => CRM_Utils_System::url(CRM_Utils_System::currentPath(),
           'reset=1'
         ),
@@ -471,15 +472,15 @@ ORDER BY title asc
       $action += array_sum(array_keys(self::contributionLinks()));
 
       if ($dao->is_active) {
-        $action -= (int)CRM_Core_Action::ENABLE;
+        $action -= (int) CRM_Core_Action::ENABLE;
       }
       else {
-        $action -= (int)CRM_Core_Action::DISABLE;
+        $action -= (int) CRM_Core_Action::DISABLE;
       }
 
       //CRM-4418
       if (!$allowToDelete) {
-        $action -= (int)CRM_Core_Action::DELETE;
+        $action -= (int) CRM_Core_Action::DELETE;
       }
 
       //build the configure links.
@@ -537,8 +538,7 @@ ORDER BY title asc
   }
 
   public function search() {
-    if (isset($this->_action) &
-      (CRM_Core_Action::ADD |
+    if (isset($this->_action) & (CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE |
         CRM_Core_Action::DELETE
       )
@@ -627,8 +627,8 @@ ORDER BY title asc
     // The unfiltered value from the session cannot be trusted, it needs to be
     // processed to get a clean array of positive integers.
     $ids = array();
-    foreach ((array)$this->get('campaign_id') as $id) {
-      if ((string)(int)$id === (string)$id && $id > 0) {
+    foreach ((array) $this->get('campaign_id') as $id) {
+      if ((string) (int) $id === (string) $id && $id > 0) {
         $ids[] = $id;
       }
     }

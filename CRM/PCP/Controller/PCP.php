@@ -53,7 +53,6 @@ class CRM_PCP_Controller_PCP extends CRM_Core_Controller {
 
     parent::__construct($title, $modal);
 
-
     $this->_stateMachine = new CRM_PCP_StateMachine_PCP($this, $action);
 
     // create and instantiate the pages

@@ -374,9 +374,12 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
   /**
    * Create labels (pdf)
    *
-   * @param   array    $contactRows   assciated array of contact data
-   * @param   string   $format   format in which labels needs to be printed
-   * @param   string   $fileName    The name of the file to save the label in
+   * @param array $contactRows
+   *   Assciated array of contact data.
+   * @param string $format
+   *   Format in which labels needs to be printed.
+   * @param string $fileName
+   *   The name of the file to save the label in.
    *
    * @return  null
    */

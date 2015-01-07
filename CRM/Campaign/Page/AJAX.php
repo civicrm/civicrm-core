@@ -191,7 +191,9 @@ class CRM_Campaign_Page_AJAX {
         $groups = CRM_Utils_Array::value('group', $params);
         if ($campaignId && CRM_Utils_System::isNull($groups)) {
           $campaignGroups = CRM_Campaign_BAO_Campaign::getCampaignGroups($campaignId);
-          foreach ($campaignGroups as $id => $group) $params['group'][$id] = 1;
+          foreach ($campaignGroups as $id => $group) {
+            $params['group'][$id] = 1;
+          }
         }
 
         //apply filter of survey contact type for search.
@@ -226,7 +228,8 @@ class CRM_Campaign_Page_AJAX {
 
     // get the data table params.
     $dataTableParams = array(
-      'sEcho' => array('name' => 'sEcho',
+      'sEcho' => array(
+    'name' => 'sEcho',
         'type' => 'Integer',
         'default' => 0,
       ),
@@ -255,7 +258,9 @@ class CRM_Campaign_Page_AJAX {
       $$pName = $pValues['default'];
       if (!empty($_POST[$pValues['name']])) {
         $$pName = CRM_Utils_Type::escape($_POST[$pValues['name']], $pValues['type']);
-        if ($pName == 'sort')$$pName = $selectorCols[$$pName];
+        if ($pName == 'sort') {
+          $$pName = $selectorCols[$$pName];
+        }
       }
     }
 
@@ -308,8 +313,7 @@ class CRM_Campaign_Page_AJAX {
       );
       while ($result->fetch()) {
         $contactID = $result->contact_id;
-        $typeImage = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-          $result->contact_sub_type : $result->contact_type,
+        $typeImage = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type,
           FALSE,
           $result->contact_id
         );
@@ -483,7 +487,8 @@ class CRM_Campaign_Page_AJAX {
     $currentCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns();
     $campaigns        = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
     $options          = array(
-      array('value' => '',
+      array(
+    'value' => '',
         'title' => ts('- select -'),
       ));
     foreach ($campaigns as $value => $title) {
@@ -528,7 +533,8 @@ class CRM_Campaign_Page_AJAX {
       $campGroups = CRM_Core_PseudoConstant::group();
     }
     $groups = array(
-      array('value' => '',
+      array(
+    'value' => '',
         'title' => ts('- select -'),
       ));
     foreach ($campGroups as $grpId => $title) {
@@ -579,7 +585,8 @@ class CRM_Campaign_Page_AJAX {
 
     // get the data table params.
     $dataTableParams = array(
-      'sEcho' => array('name' => 'sEcho',
+      'sEcho' => array(
+    'name' => 'sEcho',
         'type' => 'Integer',
         'default' => 0,
       ),
@@ -677,7 +684,8 @@ class CRM_Campaign_Page_AJAX {
 
     // get the data table params.
     $dataTableParams = array(
-      'sEcho' => array('name' => 'sEcho',
+      'sEcho' => array(
+    'name' => 'sEcho',
         'type' => 'Integer',
         'default' => 0,
       ),
@@ -770,7 +778,8 @@ class CRM_Campaign_Page_AJAX {
 
     // get the data table params.
     $dataTableParams = array(
-      'sEcho' => array('name' => 'sEcho',
+      'sEcho' => array(
+    'name' => 'sEcho',
         'type' => 'Integer',
         'default' => 0,
       ),

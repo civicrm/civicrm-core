@@ -35,16 +35,24 @@
  */
 class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
   /**
-   *Invoke hooks
+   * Invoke hooks
    *
-   * @param int $numParams Number of parameters to pass to the hook
-   * @param mixed $arg1 parameter to be passed to the hook
-   * @param mixed $arg2 parameter to be passed to the hook
-   * @param mixed $arg3 parameter to be passed to the hook
-   * @param mixed $arg4 parameter to be passed to the hook
-   * @param mixed $arg5 parameter to be passed to the hook
-   * @param mixed $arg6 parameter to be passed to the hook
-   * @param string $fnSuffix function suffix, this is effectively the hook name
+   * @param int $numParams
+   *   Number of parameters to pass to the hook.
+   * @param mixed $arg1
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg2
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg3
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg4
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg5
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg6
+   *   Parameter to be passed to the hook.
+   * @param string $fnSuffix
+   *   Function suffix, this is effectively the hook name.
    *
    * @return mixed
    */
@@ -60,7 +68,8 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
    *
    * @return mixed
    */
-  function invoke($numParams,
+  function invoke(
+    $numParams,
                   &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
                   $fnSuffix
   ) {

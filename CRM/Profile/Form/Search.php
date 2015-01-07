@@ -130,5 +130,6 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
    *
    * @return void
    */
-  public function postProcess() {}
+  public function postProcess() {
+  }
 }

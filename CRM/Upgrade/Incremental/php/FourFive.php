@@ -50,7 +50,8 @@ class CRM_Upgrade_Incremental_php_FourFive {
    * revision to the database.
    *
    * @param $preUpgradeMessage
-   * @param $rev string, a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'
+   * @param $rev
+   *   String, a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'.
    * @param null $currentVer
    *
    * @return void
@@ -61,8 +62,10 @@ class CRM_Upgrade_Incremental_php_FourFive {
   /**
    * Compute any messages which should be displayed after upgrade
    *
-   * @param $postUpgradeMessage string, alterable
-   * @param $rev string, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs
+   * @param $postUpgradeMessage
+   *   String, alterable.
+   * @param $rev
+   *   String, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
@@ -150,8 +153,10 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    *
    *
    * @param CRM_Queue_TaskContext $ctx
-   * @param $startId int, the first/lowest entity ID to convert
-   * @param $endId int, the last/highest entity ID to convert
+   * @param $startId
+   *   Int, the first/lowest entity ID to convert.
+   * @param $endId
+   *   Int, the last/highest entity ID to convert.
    * @param
    *
    * @return bool
@@ -250,7 +255,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
   public static function migrateHonoreeInfo(CRM_Queue_TaskContext $ctx) {
     $query = "ALTER TABLE `civicrm_uf_join`
     ADD COLUMN `module_data` longtext COMMENT 'Json serialized array of data used by the ufjoin.module'";
-      CRM_Core_DAO::executeQuery($query);
+    CRM_Core_DAO::executeQuery($query);
 
     $honorTypes = array_keys(CRM_Core_OptionGroup::values('honor_type'));
     $ufGroupDAO = new CRM_Core_DAO_UFGroup();
@@ -268,8 +273,8 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
         if ($domain->locales) {
           $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
           foreach ($locales as $locale) {
-            $honor_block_title =  "honor_block_title_{$locale}";
-            $honor_block_text =  "honor_block_text_{$locale}";
+            $honor_block_title = "honor_block_title_{$locale}";
+            $honor_block_text = "honor_block_text_{$locale}";
             $honorParams['soft_credit'] += array(
               $locale => array(
                 'honor_block_title' => $dao->$honor_block_title,

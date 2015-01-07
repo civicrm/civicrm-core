@@ -235,8 +235,8 @@ class CRM_Extension_System {
 
       // boolean false means don't try to check extensions
       // http://issues.civicrm.org/jira/browse/CRM-10575
-      if($url === false) {
-        $this->_repoUrl = false;
+      if($url === FALSE) {
+        $this->_repoUrl = FALSE;
       }
       else {
         $this->_repoUrl = CRM_Utils_System::evalUrl($url);

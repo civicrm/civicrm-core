@@ -63,8 +63,8 @@ class CRM_Core_Selector_Base {
    * This function gets the attribute for the action that
    * it matches.
    *
-   * @param string  match      the action to match against
-   * @param string  attribute  the attribute to return ( name, link, title )
+   * @param string match the action to match against
+   * @param string attribute the attribute to return ( name, link, title )
    *
    * @return string            the attribute that matches the action if any
    *
@@ -100,7 +100,8 @@ class CRM_Core_Selector_Base {
   /**
    * Compose the template file name from the class name
    *
-   * @param string $action the action being performed
+   * @param string $action
+   *   The action being performed.
    *
    * @return string template file name
    */

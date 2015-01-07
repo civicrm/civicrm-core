@@ -68,7 +68,7 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     );
 
     $errorScope = CRM_Core_TemporaryErrorScope::useException();
-    $message = null;
+    $message = NULL;
     try {
       $result = CRM_Core_BAO_CustomValueTable::setValues($params);
     } catch ( Exception $e ) {
@@ -161,7 +161,6 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
       'Verify that the boolean value is stored for contact ' . $contactID
     );
 
-
     // Now set YesNo radio to an invalid boolean value and try to reset
     $badYesNo = '20';
     $params = array(
@@ -170,7 +169,7 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     );
 
     $errorScope = CRM_Core_TemporaryErrorScope::useException();
-    $message = null;
+    $message = NULL;
     try {
       $result = CRM_Core_BAO_CustomValueTable::setValues($params);
     } catch (Exception $e) {

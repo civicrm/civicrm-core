@@ -129,8 +129,10 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * Class constructor
    *
    * @param $customSearchClass
-   * @param array $formValues array of form values imported
-   * @param array $params array of parameters for query
+   * @param array $formValues
+   *   Array of form values imported.
+   * @param array $params
+   *   Array of parameters for query.
    * @param null $returnProperties
    * @param \const|int $action - action of search basic or advanced.
    *
@@ -323,8 +325,10 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * Returns the column headers as an array of tuples:
    * (name, sortName (key to the sort array))
    *
-   * @param string $action the action being performed
-   * @param enum   $output what should the result set include (web/email/csv)
+   * @param string $action
+   *   The action being performed.
+   * @param enum $output
+   *   What should the result set include (web/email/csv).
    *
    * @return array the column headers that need to be displayed
    */
@@ -494,11 +498,16 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   /**
    * Returns all the rows in the given offset and rowCount
    *
-   * @param enum   $action   the action being performed
-   * @param int    $offset   the row number to start from
-   * @param int    $rowCount the number of rows to return
-   * @param string $sort     the sql string that describes the sort order
-   * @param enum   $output   what should the result set include (web/email/csv)
+   * @param enum $action
+   *   The action being performed.
+   * @param int $offset
+   *   The row number to start from.
+   * @param int $rowCount
+   *   The number of rows to return.
+   * @param string $sort
+   *   The sql string that describes the sort order.
+   * @param enum $output
+   *   What should the result set include (web/email/csv).
    *
    * @return int   the total number of rows for this action
    */
@@ -783,15 +792,13 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         // allow components to add more actions
         CRM_Core_Component::searchAction($row, $result->contact_id);
 
-        $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-          $result->contact_sub_type : $result->contact_type,
+        $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type,
           FALSE,
           $result->contact_id
         );
 
         $row['contact_type_orig'] = $result->contact_sub_type ? $result->contact_sub_type : $result->contact_type;
-        $row['contact_sub_type']  = $result->contact_sub_type ?
-          CRM_Contact_BAO_ContactType::contactTypePairs(FALSE, $result->contact_sub_type, ', ') : $result->contact_sub_type;
+        $row['contact_sub_type']  = $result->contact_sub_type ? CRM_Contact_BAO_ContactType::contactTypePairs(FALSE, $result->contact_sub_type, ', ') : $result->contact_sub_type;
         $row['contact_id'] = $result->contact_id;
         $row['sort_name'] = $result->sort_name;
         if (array_key_exists('id', $row)) {
@@ -886,7 +893,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
     $links = self::links($this->_context, $this->_contextMenu, $this->_key);
 
-
     foreach ($rows as $id => & $row) {
       if (!empty($this->_formValues['deleted_contacts']) && CRM_Core_Permission::check('access deleted contacts')
       ) {
@@ -915,7 +921,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         }
         $row['action'] = CRM_Core_Action::formLink(
           $links,
-          null,
+          NULL,
           array('id' => $row['contact_id']),
           ts('more'),
           FALSE,
@@ -1034,10 +1040,13 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
   /**
    * This function is called to rebuild prev next cache using full sql in case of core search ( excluding custom search)
    *
-   * @param int $start start for limit clause
-   * @param int $end end for limit clause
+   * @param int $start
+   *   Start for limit clause.
+   * @param int $end
+   *   End for limit clause.
    * @param CRM_Utils_Sort $sort
-   * @param string $cacheKey cache key
+   * @param string $cacheKey
+   *   Cache key.
    *
    * @return void
    */
@@ -1067,8 +1076,8 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
    * Given the current formValues, gets the query in local
    * language
    *
-   * @param  array(
-     reference)   $formValues   submitted formValues
+   * @param array(
+  reference)   $formValues   submitted formValues
    *
    * @return array              $qill         which contains an array of strings
    */
@@ -1082,7 +1091,8 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
   /**
    * Name of export file.
    *
-   * @param string $output type of output
+   * @param string $output
+   *   Type of output.
    *
    * @return string name of the file
    */

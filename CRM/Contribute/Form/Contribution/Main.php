@@ -40,7 +40,7 @@
 class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_ContributionBase {
 
   /**
-   *Define default MembershipType Id
+   * Define default MembershipType Id
    *
    */
   public $_defaultMemTypeId;
@@ -519,7 +519,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       CRM_Contact_Form_ProfileContact::buildQuickForm($this);
     }
 
-
     //don't build pledge block when mid is passed
     if (!$this->_mid) {
       $config = CRM_Core_Config::singleton();
@@ -682,7 +681,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     // CRM 10860, display text instead of a dropdown if there's only 1 frequency unit
     if(sizeof($unitVals) == 1) {
-      $form->assign('one_frequency_unit', true);
+      $form->assign('one_frequency_unit', TRUE);
       $unit = $unitVals[0];
       $form->add('hidden', 'frequency_unit', $unit);
       if (!empty($form->_values['is_recur_interval']) || $className == 'CRM_Contribute_Form_Contribution') {
@@ -690,7 +689,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
       $form->assign('frequency_unit', $unit);
     } else {
-      $form->assign('one_frequency_unit', false);
+      $form->assign('one_frequency_unit', FALSE);
       $units = array();
       $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units');
       foreach ($unitVals as $key => $val) {
@@ -703,7 +702,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
       $frequencyUnit = &$form->add('select', 'frequency_unit', NULL, $units);
     }
-
 
     // FIXME: Ideally we should freeze select box if there is only
     // one option but looks there is some problem /w QF freeze.
@@ -720,8 +718,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    * Global form rule
    *
-   * @param array $fields the input form values
-   * @param array $files the uploaded files if any
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
    * @param $self
    *
    *
@@ -1228,7 +1228,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
       if ($is_quick_config) {
         foreach ($this->_priceSet['fields'] as $fieldKey => $fieldVal) {
-          if ($fieldVal['name'] == 'membership_amount' && !empty($params['price_' . $fieldKey ])) {
+          if ($fieldVal['name'] == 'membership_amount' && !empty($params['price_' . $fieldKey])) {
             $fieldId     = $fieldVal['id'];
             $fieldOption = $params['price_' . $fieldId];
             $proceFieldAmount += $fieldVal['options'][$this->_submitValues['price_' . $fieldId]]['amount'];
@@ -1250,7 +1250,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
     }
-  
+
     if (!isset($params['amount_other'])) {
       $this->set('amount_level', CRM_Utils_Array::value('amount_level', $params));
     }
@@ -1259,7 +1259,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $lineItem = array();
       $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config' );
       if ( $is_quick_config ) {
-        foreach ( $this->_values['fee'] as $key => & $val ) {  
+        foreach ( $this->_values['fee'] as $key => & $val ) {
           if ( $val['name'] == 'other_amount' && $val['html_type'] == 'Text' && array_key_exists( 'price_'.$key, $params )  ) {
             $params['price_'.$key] = CRM_Utils_Rule::cleanMoney($params['price_'.$key]); //Clean out any currency symbols
             if ( $params['price_'.$key] != 0 ) {
@@ -1376,7 +1376,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       // redirect to thank you page
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_ThankYou_display=1&qfKey=$qfKey", TRUE, NULL, FALSE));
     }
-   
+
   }
 
   /**

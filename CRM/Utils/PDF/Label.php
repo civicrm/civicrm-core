@@ -93,7 +93,8 @@ class CRM_Utils_PDF_Label extends TCPDF {
   /**
    * Constructor
    *
-   * @param $format   Either the name of a Label Format in the Option Value table
+   * @param $format
+   *   Either the name of a Label Format in the Option Value table.
    *                  or an array of Label Format values.
    * @param string|\Unit $unit Unit of measure for the PDF document
    *
@@ -269,7 +270,6 @@ class CRM_Utils_PDF_Label extends TCPDF {
       'times' => ts('Times New Roman'),
       'dejavusans' => ts('Deja Vu Sans (UTF-8)'),
     );
-
 
     // Check to see if we have any additional fonts to add. You can specify more fonts in
     // civicrm.settings.php via: $config['CiviCRM Preferences']['additional_fonts']

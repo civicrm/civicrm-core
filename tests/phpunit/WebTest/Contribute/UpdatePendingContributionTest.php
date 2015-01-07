@@ -126,7 +126,6 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->type("invoice_id", time());
     $this->webtestFillDate('thankyou_date');
 
-
     //Premium section
     $this->click("Premium");
     $this->waitForElementPresent("fulfilled_date");

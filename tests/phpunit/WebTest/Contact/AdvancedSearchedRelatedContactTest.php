@@ -60,7 +60,8 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $Id = explode('-', $this->getAttribute("xpath=//div[@id='event_status_id']/div[2]/table/tbody/tr@id"));
     $eventId = $Id[1];
 
-    $params = array('label_a_b' => 'Owner of ' . rand(),
+    $params = array(
+    'label_a_b' => 'Owner of ' . rand(),
       'label_b_a' => 'Belongs to ' . rand(),
       'contact_type_a' => 'Individual',
       'contact_type_b' => 'Individual',
@@ -303,11 +304,11 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->assertElementContainsText('search-status', '2 Contacts');
   }
 
- public function testAdvanceSearchForLog() {
+  public function testAdvanceSearchForLog() {
     $this->webtestLogin();
 
-    $Pdate     = date('F jS, Y h:i:s A', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1,   date( 'Y' )) );
-    $Ndate     = date('F jS, Y h:i:s A', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) + 1,   date( 'Y' )) );
+    $Pdate     = date('F jS, Y h:i:s A', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1, date( 'Y' )) );
+    $Ndate     = date('F jS, Y h:i:s A', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) + 1, date( 'Y' )) );
 
     //create a contact and return the contact id
     $firstNameSoft = "John_".substr(sha1(rand()), 0, 5);
@@ -320,15 +321,15 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->type('sort_name', $lastNameSoft.', '.$firstNameSoft);
     $this->click('changeLog');
     $this->waitForElementPresent("log_date_low");
-    $this->select("log_date_relative","value=0");
+    $this->select("log_date_relative", "value=0");
     $this->webtestFillDate('log_date_low', "-1 day");
     $this->webtestFillDate('log_date_high', "+1 day");
     $this->click('_qf_Advanced_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue(True, 'greater than or equal to "{$Pdate}" AND less than or equal to "{$Ndate}"');
+    $this->assertTrue(TRUE, 'greater than or equal to "{$Pdate}" AND less than or equal to "{$Ndate}"');
     $value = "$lastNameSoft, $firstNameSoft";
     $this->verifyText("xpath= id('rowid{$cid}')/td[3]/a", preg_quote($value));
 
-}
+  }
 
 }

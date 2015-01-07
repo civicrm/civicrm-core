@@ -68,7 +68,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       'created_id' => 1,
       'groups' => array('include' => array($this->_groupID)),
     );
-    $this->_mut = new CiviMailUtils( $this, true );
+    $this->_mut = new CiviMailUtils( $this, TRUE );
     $this->callAPISuccess('mail_settings', 'get', array('api.mail_settings.create' => array('domain' => 'chaos.org')));
   }
 
@@ -77,7 +77,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->_mut->stop();
-//    $this->quickCleanup(array('civicrm_mailing', 'civicrm_mailing_job', 'civicrm_contact'));
+    //    $this->quickCleanup(array('civicrm_mailing', 'civicrm_mailing_job', 'civicrm_contact'));
     CRM_Utils_Hook::singleton()->reset();
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
     parent::tearDown();
@@ -96,8 +96,8 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param integer $count
-   * @param integer $groupID
+   * @param int $count
+   * @param int $groupID
    */
   public function createContactsInGroup($count, $groupID) {
     for($i = 1; $i <= $count; $i++ ) {
@@ -107,8 +107,8 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param integer $start
-   * @param integer $count
+   * @param int $start
+   * @param int $count
    *
    * @return array
    */

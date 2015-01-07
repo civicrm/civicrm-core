@@ -36,7 +36,7 @@
 class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
 
   /**
-   @var CRM_Extension_Mapper
+  @var CRM_Extension_Mapper
    */
   protected $mapper;
 
@@ -162,7 +162,8 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
   }
 
   /**
-   * @param string $attr the attribute used to key the array
+   * @param string $attr
+   *   The attribute used to key the array.
    * @return array ($$attr => $id)
    */
   private function _getAllPaymentProcessorTypes($attr) {
@@ -180,7 +181,8 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
    * Load requested payment processor and call the method specified.
    *
    * @param CRM_Extension_Info $info
-   * @param string $method - the method to call in the payment processor class
+   * @param string $method
+   *   The method to call in the payment processor class.
    */
   private function _runPaymentHook(CRM_Extension_Info $info, $method) {
     // Not concerned about performance at this stage, as these are seldomly performed tasks
@@ -233,24 +235,27 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
           1 => array($info->name, 'String'),
         )
       );
-      if ($dao->fetch()) $paymentProcessor = array(
-        'id' => -1,
-        'name' => $dao->title,
-        'payment_processor_type_id' => $dao->id,
-        'user_name' => 'nothing',
-        'password' => 'nothing',
-        'signature' => '',
-        'url_site' => $dao->url_site_default,
-        'url_api' => $dao->url_api_default,
-        'url_recur' => $dao->url_recur_default,
-        'url_button' => $dao->url_button_default,
-        'subject' => '',
-        'class_name' => $dao->class_name,
-        'is_recur' => $dao->is_recur,
-        'billing_mode' => $dao->billing_mode,
-        'payment_type' => $dao->payment_type,
-      );
-      else CRM_Core_Error::fatal("Unable to find payment processor in " . __CLASS__ . '::' . __METHOD__);
+      if ($dao->fetch()) {
+        $paymentProcessor = array(
+          'id' => -1,
+          'name' => $dao->title,
+          'payment_processor_type_id' => $dao->id,
+          'user_name' => 'nothing',
+          'password' => 'nothing',
+          'signature' => '',
+          'url_site' => $dao->url_site_default,
+          'url_api' => $dao->url_api_default,
+          'url_recur' => $dao->url_recur_default,
+          'url_button' => $dao->url_button_default,
+          'subject' => '',
+          'class_name' => $dao->class_name,
+          'is_recur' => $dao->is_recur,
+          'billing_mode' => $dao->billing_mode,
+          'payment_type' => $dao->payment_type,
+        );
+      }
+      else { CRM_Core_Error::fatal("Unable to find payment processor in " . __CLASS__ . '::' . __METHOD__);
+      }
     }
 
     // In the case of uninstall, check for instances of PP first.
@@ -278,7 +283,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
 
       default:
         CRM_Core_Session::setStatus(ts( "Unrecognized payment hook (%1) in %2::%3",
-                        array(1 => $method, 2 =>  __CLASS__ , 3 => __METHOD__) ),
+                        array(1 => $method, 2 => __CLASS__ , 3 => __METHOD__) ),
                         '', 'error');
     }
   }

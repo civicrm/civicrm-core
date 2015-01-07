@@ -914,7 +914,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
       if (CRM_Utils_Array::value('membership', $componentDetails) || CRM_Utils_Array::value('participant', $componentDetails)) {
         if ($totalAmount) {
-          $totalAmount->freeze();          
+          $totalAmount->freeze();
         }
         $financialType->freeze();
         $this->assign('freezeFinancialType', TRUE);
@@ -929,8 +929,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   /**
    * Global form rule
    *
-   * @param array $fields the input form values
-   * @param array $files the uploaded files if any
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
    * @param $self
    *
    *
@@ -1507,7 +1509,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   /**
    * @param $submittedValues
    * @param $config
-   * @param $session CRM_Core_Session
+   * @param $session
+   *   CRM_Core_Session.
    * @param $lineItem
    *
    * @throws CRM_Core_Exception

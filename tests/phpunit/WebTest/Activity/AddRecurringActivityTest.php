@@ -62,9 +62,8 @@ class WebTest_Activity_AddRecurringActivityTest extends CiviSeleniumTestCase {
 
     // ...need to use mouseDownAt on first result (which is a li element), click does not work
     $this->clickAt("xpath=//div[@class='select2-result-label']");
-    $this->waitForText("xpath=//div[@id='s2id_target_contact_id']","$contact1");
+    $this->waitForText("xpath=//div[@id='s2id_target_contact_id']", "$contact1");
     $this->assertElementContainsText("xpath=//div[@id='s2id_target_contact_id']", "Karan, $contact1", 'Contact not found in line ' . __LINE__);
-
 
     //Assigned To field
     $this->click("xpath=//div[@id='s2id_assignee_contact_id']/ul/li/input");
@@ -79,7 +78,7 @@ class WebTest_Activity_AddRecurringActivityTest extends CiviSeleniumTestCase {
     $this->clickAt("xpath=//div[@class='select2-result-label']");
 
     // ...again, waiting for the box with contact name to show up...
-    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']","$contact2");
+    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']", "$contact2");
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertElementContainsText("xpath=//div[@id='s2id_assignee_contact_id']", "Jane, $contact2", 'Contact not found in line ' . __LINE__);

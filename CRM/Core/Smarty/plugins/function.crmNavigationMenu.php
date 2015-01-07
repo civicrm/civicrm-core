@@ -38,7 +38,8 @@
  *
  * @param array $params
  *   - is_default: bool, true if this is normal/default instance of the menu (which may be subject to CIVICRM_DISABLE_DEFAULT_MENU)
- * @param object $smarty the Smarty object
+ * @param object $smarty
+ *   The Smarty object.
  *
  * @return string HTML
  */

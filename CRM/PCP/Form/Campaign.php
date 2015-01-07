@@ -120,7 +120,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     }
 
     $attrib = array('rows' => 8, 'cols' => 60);
-    $this->add('textarea', 'page_text', ts('Your Message'), null, false );
+    $this->add('textarea', 'page_text', ts('Your Message'), NULL, FALSE );
 
     $maxAttachments = 1;
     CRM_Core_BAO_File::buildAttachment($this, 'civicrm_pcp', $this->_pageId, $maxAttachments);
@@ -148,8 +148,10 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
   /**
    * Global form rule
    *
-   * @param array $fields the input form values
-   * @param array $files the uploaded files if any
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
    * @param $self
    *
    *
@@ -225,7 +227,6 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
 
     $pcp = CRM_PCP_BAO_PCP::add($params, FALSE);
 
-
     // add attachments as needed
     CRM_Core_BAO_File::formatAttachment($params,
       $params,
@@ -264,7 +265,6 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       $this->assign('supporterUrl', $supporterUrl);
       $supporterName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $pcp->contact_id, 'display_name');
       $this->assign('supporterName', $supporterName);
-
 
       if ($this->_component == 'contribute') {
         $pageUrl = CRM_Utils_System::url('civicrm/contribute/transact',

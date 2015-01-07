@@ -69,7 +69,8 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
       $this->_groupTree[$groupId]['fields'][$fieldId] = $groupTree[$groupId]['fields'][$fieldId];
       $this->assign('preview_type', 'field');
       $url = CRM_Utils_System::url('civicrm/admin/price/field', "reset=1&action=browse&sid={$groupId}");
-      $breadCrumb = array(array('title' => ts('Price Set Fields'),
+      $breadCrumb = array(array(
+      'title' => ts('Price Set Fields'),
           'url' => $url,
         ));
     }
@@ -79,7 +80,8 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
       $this->assign('preview_type', 'group');
       $this->assign('setTitle', CRM_Price_BAO_PriceSet::getTitle($groupId));
       $url = CRM_Utils_System::url('civicrm/admin/price', 'reset=1');
-      $breadCrumb = array(array('title' => ts('Price Sets'),
+      $breadCrumb = array(array(
+      'title' => ts('Price Sets'),
           'url' => $url,
         ));
     }

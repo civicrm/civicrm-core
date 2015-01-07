@@ -41,7 +41,8 @@ class PaypalPro extends PHPUnit_Framework_Testcase {
   /**
    * Helper function to delete a PayPal Pro
    * payment processor
-   * @param  int $id - id of the PayPal Pro payment processor
+   * @param int $id
+   *   Id of the PayPal Pro payment processor.
    * to be deleted
    * @return boolean true if payment processor deleted, false otherwise
    */

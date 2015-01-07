@@ -99,7 +99,8 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   /**
    * Validation
    *
-   * @param array $params (ref.) an assoc array of name/value pairs
+   * @param array $params
+   *   (ref.) an assoc array of name/value pairs.
    *
    * @param $files
    * @param $self

@@ -253,7 +253,7 @@ class CRM_Member_BAO_Query {
             "ccr.contribution_status_id",
             $op,
             array_search(
-              'Cancelled', 
+              'Cancelled',
               CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
             ),
             "Integer"
@@ -392,7 +392,8 @@ class CRM_Member_BAO_Query {
    *
    * @return array|null
    */
-  static function defaultReturnProperties($mode,
+  static function defaultReturnProperties(
+    $mode,
     $includeCustomFields = TRUE
   ) {
     $properties = NULL;
@@ -439,7 +440,6 @@ class CRM_Member_BAO_Query {
       $form->_membershipType = &$form->addElement('checkbox', "member_membership_type_id[$id]", NULL, $Name);
     }
 
-
     foreach (CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label') as $sId => $sName) {
       $form->_membershipStatus = &$form->addElement('checkbox', "member_status_id[$sId]", NULL, $sName);
     }
@@ -485,7 +485,8 @@ class CRM_Member_BAO_Query {
    * @param $row
    * @param int $id
    */
-  public static function searchAction(&$row, $id) {}
+  public static function searchAction(&$row, $id) {
+  }
 
   /**
    * @param $tables

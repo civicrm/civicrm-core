@@ -40,7 +40,8 @@
 /**
  * Add or update a relationship
  *
- * @param  array $params input parameters
+ * @param array $params
+ *   Input parameters.
  *
  * @throws API_Exception
  * @example RelationshipCreate.php Std Create example
@@ -58,7 +59,8 @@ function civicrm_api3_relationship_create($params) {
 /**
  * Adjust Metadata for Create action
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_relationship_create_spec(&$params) {
   $params['contact_id_a']['api.required'] = 1;
@@ -70,7 +72,7 @@ function _civicrm_api3_relationship_create_spec(&$params) {
 /**
  * Delete a relationship
  *
- * @param  array $params
+ * @param array $params
  *
  * @return array API Result Array
  * {@getfields relationship_delete}
@@ -99,7 +101,8 @@ function civicrm_api3_relationship_delete($params) {
 /**
  * get the relationship
  *
- * @param array   $params input parameters.
+ * @param array $params
+ *   Input parameters.
  * @todo  Result is inconsistent depending on whether contact_id is passed in :
  * -  if you pass in contact_id - it just returns all relationships for 'contact_id'
  * -  if you don't pass in contact_id then it does a filter on the relationship table (DAO based search)
@@ -135,7 +138,7 @@ function civicrm_api3_relationship_get($params) {
     return array('count' => $relationships);
   }
   foreach ($relationships as $relationshipId => $values) {
-    _civicrm_api3_custom_data_get($relationships[$relationshipId], 'Relationship', $relationshipId, NULL, CRM_Utils_Array::value('relationship_type_id',$values));
+    _civicrm_api3_custom_data_get($relationships[$relationshipId], 'Relationship', $relationshipId, NULL, CRM_Utils_Array::value('relationship_type_id', $values));
   }
   return civicrm_api3_create_success($relationships, $params);
 }
@@ -143,8 +146,9 @@ function civicrm_api3_relationship_get($params) {
 /**
  * legacy handling for relationship_type parameter
  *
- * @param array $params Associative array of property name/value
- *                             pairs to insert in new contact.
+ * @param array $params
+ *   Associative array of property name/value.
+ *   pairs to insert in new contact.
  */
 function _civicrm_api3_handle_relationship_type(&$params) {
   if (empty($params['relationship_type_id']) && !empty($params['relationship_type'])) {

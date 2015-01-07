@@ -73,7 +73,7 @@ class CRM_Event_Badge {
    * Create the labels (pdf)
    * It assumes the participants are from the same event
    *
-   * @param   array    $participants
+   * @param array $participants
    *
    * @return  null
    */
@@ -167,7 +167,8 @@ class CRM_Event_Badge {
     $this->pdf->MultiCell($this->pdf->width, $this->pdf->lineHeight, $txt);
   }
 
-  public function pdfExtraFormat() {}
+  public function pdfExtraFormat() {
+  }
 
   /**
    * Create labels (pdf)

@@ -108,5 +108,3 @@ $obj = new CRM_RespondentProcessor();
 echo "Releasing..";
 $obj->releaseRespondent();
 echo "<br /><br />Respondent Release Done";
-
-

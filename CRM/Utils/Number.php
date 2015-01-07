@@ -7,7 +7,8 @@ class CRM_Utils_Number {
   /**
    * Create a random number with a given precision
    *
-   * @param array $precision (int $significantDigits, int $postDecimalDigits)
+   * @param array $precision
+   *   (int $significantDigits, int $postDecimalDigits).
    *
    * @return float
    * @link https://dev.mysql.com/doc/refman/5.1/en/fixed-point-types.html
@@ -24,7 +25,8 @@ class CRM_Utils_Number {
    * and/or move the decimal place.
    *
    * @param int|float $keyValue
-   * @param array $precision (int $significantDigits, int $postDecimalDigits)
+   * @param array $precision
+   *   (int $significantDigits, int $postDecimalDigits).
    * @return float
    * @link https://dev.mysql.com/doc/refman/5.1/en/fixed-point-types.html
    */

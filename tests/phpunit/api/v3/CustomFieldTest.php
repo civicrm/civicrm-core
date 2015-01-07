@@ -34,7 +34,7 @@ require_once 'tests/phpunit/CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_create_custom_group
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class api_v3_CustomFieldTest extends CiviUnitTestCase {
   protected $_apiversion;
@@ -147,9 +147,9 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       $n++;
     }
   }
-/*
- * Can't figure out the point of this?
- */
+  /*
+  * Can't figure out the point of this?
+  */
   /**
    * @param array $params
    */
@@ -176,9 +176,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
                          'option_weight'   => array( 1, 2),
                          'option_status'   => array( 1, 1),
                          ));
-*/
-
-
+    */
 
     return $params;
   }
@@ -244,7 +242,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $this->assertTrue(is_numeric($optionGroupID) && ($optionGroupID > 0));
     $optionGroup = $this->callAPISuccess('option_group', 'getsingle', array(
       'id' => $optionGroupID));
-    $this->assertEquals($optionGroup['title'],'Country');
+    $this->assertEquals($optionGroup['title'], 'Country');
     $optionValueCount = $this->callAPISuccess('option_value', 'getcount', array(
       'option_group_id' => $optionGroupID));
     $this->assertEquals(0, $optionValueCount);
@@ -276,7 +274,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'return' => 'option_group_id',
     ));
 
-    $this->assertEquals($optionGroupID,3);
+    $this->assertEquals($optionGroupID, 3);
   }
 
 
@@ -330,7 +328,8 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $customGroup = $this->customGroupCreate(array('extends' => 'Contact', 'title' => 'select_test_group'));
 
     $option_values = array(
-      array('weight' => 1,
+      array(
+    'weight' => 1,
         'label' => 'Label1',
         'value' => 1,
         'is_active' => 1,
@@ -366,7 +365,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     );
     $description  = "Demonstrate retrieving metadata with custom field options";
     $subfile = "GetFieldsOptions";
-    $fields = $this->callAPIAndDocument('contact', 'getfields', $getFieldsParams, __FUNCTION__, 'ContactTest.php', $description,$subfile,'GetFields');
+    $fields = $this->callAPIAndDocument('contact', 'getfields', $getFieldsParams, __FUNCTION__, 'ContactTest.php', $description, $subfile, 'GetFields');
     $this->assertArrayHasKey('options', $fields['values']['custom_' . $customField['id']]);
     $this->assertEquals('Label1', $fields['values']['custom_' . $customField['id']]['options'][1]);
     $getOptionsArray = array(

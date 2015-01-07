@@ -14,7 +14,8 @@ class SequenceListener implements CaseChangeListener {
   private static $singleton;
 
   /**
-   * @param bool $reset whether to forcibly rebuild the entire container
+   * @param bool $reset
+   *   Whether to forcibly rebuild the entire container.
    * @return \Symfony\Component\DependencyInjection\TaggedContainerInterface
    */
   public static function singleton($reset = FALSE) {
@@ -87,7 +88,8 @@ class SequenceListener implements CaseChangeListener {
   }
 
   /**
-   * @param Analyzer $analyzer the case being analyzed -- to which we want to add an activity
+   * @param Analyzer $analyzer
+   *   The case being analyzed -- to which we want to add an activity.
    * @param \SimpleXMLElement $actXML the <ActivityType> tag which describes the new activity
    */
   public function createActivity(Analyzer $analyzer, \SimpleXMLElement $actXML) {

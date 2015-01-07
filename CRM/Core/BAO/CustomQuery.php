@@ -136,7 +136,8 @@ class CRM_Core_BAO_CustomQuery {
    * Takes in a set of custom field ids andsets up the data structures to
    * generate a query
    *
-   * @param  array $ids the set of custom field ids
+   * @param array $ids
+   *   The set of custom field ids.
    *
    * @param bool $contactSearch
    * @param array $locationSpecificFields
@@ -258,7 +259,7 @@ SELECT label, value
    * Generate the select clause and the associated tables
    * for the from clause
    *
-   * @param  NULL
+   * @param NULL
    *
    * @return void
    */
@@ -537,6 +538,7 @@ SELECT label, value
                 case 'IS EMPTY':
                   $op = 'IS NULL';
                   break;
+
                 case 'IS NOT EMPTY':
                   $op = 'IS NOT NULL';
                   break;

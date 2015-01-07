@@ -238,7 +238,8 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   }
 
   /**
-   * @param string $type eg 'Contribution'
+   * @param string $type
+   *   Eg 'Contribution'.
    * @param string $subType
    * @param int $entityId
    */
@@ -275,9 +276,9 @@ WHERE  contribution_id = {$id}
   /**
    * This function process contribution related objects.
    *
-   * @param integer $contributionId
-   * @param integer $statusId
-   * @param integer|null $previousStatusId
+   * @param int $contributionId
+   * @param int $statusId
+   * @param int|null $previousStatusId
    *
    * @return null|string
    */

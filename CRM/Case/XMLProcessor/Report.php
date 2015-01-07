@@ -44,7 +44,8 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
   /**
    *
    */
-  public function __construct() {}
+  public function __construct() {
+  }
 
   /**
    * @param int $clientID
@@ -94,7 +95,8 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
    *
    * @return array
    */
-  function &caseInfo($clientID,
+  function &caseInfo(
+    $clientID,
     $caseID
   ) {
     $case = $this->_redactionRegexRules = array();
@@ -250,13 +252,11 @@ AND    ac.case_id = %1
       $this->getRedactionRules();
     }
 
-
     $index = $activityID . '_' . (int) $anyActivity;
 
     if ($clientID) {
       $index = $index . '_' . $clientID;
     }
-
 
     if (!array_key_exists($index, $activityInfos)) {
       $activityInfos[$index] = array();
@@ -788,7 +788,8 @@ LIMIT  1
     }
 
     // next get activity set Informtion
-    $activitySet = array('label' => $form->getActivitySetLabel($xml, $activitySetName),
+    $activitySet = array(
+    'label' => $form->getActivitySetLabel($xml, $activitySetName),
       'includeActivities' => 'All',
       'redact' => 'false',
     );

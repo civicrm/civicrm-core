@@ -110,7 +110,8 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
     }
 
     $breadCrumb = array(
-      array('title' => ts('Financial Type Accounts'),
+      array(
+    'title' => ts('Financial Type Accounts'),
         'url' => $url,
       )
     );
@@ -167,7 +168,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
            '5' => 5, //expense
            '3' => 1, //AR relation
            '1' => 3, //revenue
-           '6' => 1,  //Asset
+           '6' => 1, //Asset
            '7' => 4, //cost of sales
            '8' => 1, //premium inventory
            '9' => 3 //discount account is
@@ -189,7 +190,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
         '5' => 5, //expense
         '3' => 1, //AR relation
         '1' => 3, //revenue
-        '6' => 1,  //Asset
+        '6' => 1, //Asset
         '7' => 4, //cost of sales
         '8' => 1, //premium inventory
         '9' => 3 //discount account is
@@ -219,7 +220,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
         'name'      => ts('Save and New'),
         'subName'   => 'new'
       ),
-      array (
+      array(
         'type'      => 'cancel',
         'name'      => ts('Cancel')
       ))

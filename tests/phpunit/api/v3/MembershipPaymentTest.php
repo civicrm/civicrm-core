@@ -31,8 +31,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_membership_payment* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Member
+ * @package CiviCRM_APIv3
+ * @subpackage API_Member
  */
 
 class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
@@ -66,7 +66,7 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
       'thankyou_date' => '20080522',
     );
 
-    $this->_contribution = $this->callAPISuccess('contribution','create', $params);
+    $this->_contribution = $this->callAPISuccess('contribution', 'create', $params);
   }
 
   ///////////////// civicrm_membership_payment_create methods

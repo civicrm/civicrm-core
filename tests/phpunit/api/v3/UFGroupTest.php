@@ -31,7 +31,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Test class for UFGroup API - civicrm_uf_*
  * @todo Split UFGroup and UFJoin tests
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class api_v3_UFGroupTest extends CiviUnitTestCase {
   // ids from the uf_group_test.xml fixture
@@ -39,7 +39,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
   protected $_ufFieldId;
   protected $_contactId;
   protected $_groupId;
-  protected $_apiversion =3;
+  protected $_apiversion = 3;
   protected $params;
 
   protected function setUp() {
@@ -50,7 +50,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     $ufGroup = $this->callAPISuccess('uf_group', 'create', array(
       'group_type' => 'Contact',
       'help_pre'   => 'Profile to Test API',
-      'title' =>'Test Profile',
+      'title' => 'Test Profile',
     ));
     $this->_ufGroupId = $ufGroup['id'];
     $ufMatch = $this->callAPISuccess('uf_match', 'create', array(
@@ -160,7 +160,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       'name' => 'test_group',
       'notify' => 'admin@example.org',
       'post_URL' => 'http://example.org/post',
-      'title' => 'Test Group',    );
+      'title' => 'Test Group', );
     $result = $this->callAPISuccess('uf_group', 'create', $params);
     $params['created_date'] = date('YmdHis', strtotime($params['created_date']));
     foreach ($params as $key => $value) {

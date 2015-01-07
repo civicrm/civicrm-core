@@ -158,7 +158,6 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('event_start_date_low', '-2 year');
     $this->webtestFillDate('event_end_date_high', '+1 year');
 
-
     $this->click("_qf_Search_refresh");
     $this->waitForElementPresent("xpath=//form[@id='Search']/div[3]/div/div[1]/div");
 

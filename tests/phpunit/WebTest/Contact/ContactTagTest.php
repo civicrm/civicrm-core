@@ -136,7 +136,6 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     // ...need to use mouseDownAt on first result (which is a li element), click does not work
     $this->clickAt("xpath=//div[@class='select2-result-label']");
 
-
     // Type search name in autocomplete.
     $this->click("css=input#sort_name_navigation");
     $this->type("css=input#sort_name_navigation", $firstName);

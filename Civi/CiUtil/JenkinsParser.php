@@ -6,7 +6,8 @@ namespace Civi\CiUtil;
  */
 class JenkinsParser {
   /**
-   * @param string $content xml data
+   * @param string $content
+   *   Xml data.
    * @return array (string $testName => string $status)
    */
   public static function parseXmlResults($content) {

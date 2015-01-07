@@ -53,7 +53,7 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
 
     //when user come from search context.
     $ssID = $this->get('ssID');
-    $this->assign('ssid',$ssID);
+    $this->assign('ssid', $ssID);
     $this->_searchBasedMailing = CRM_Contact_Form_Search::isSearchContext($this->get('context'));
     if(CRM_Contact_Form_Search::isSearchContext($this->get('context')) && !$ssID){
       $params = array();
@@ -81,7 +81,7 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
     else {
       $count = $this->get('count');
     }
-     $this->assign('count', $count);
+    $this->assign('count', $count);
     $defaults['now'] = 1;
     return $defaults;
   }
@@ -107,7 +107,8 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
       );
       CRM_Utils_System::setTitle($title);
       $buttons = array(
-        array('type' => 'next',
+        array(
+      'type' => 'next',
           'name' => ts('Submit Mailing'),
           'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
           'isDefault' => TRUE,
@@ -123,7 +124,8 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
       //search base mailing, we should handle it when we fix CRM-3876
       if ($this->_searchBasedMailing) {
         $buttons = array(
-          array('type' => 'back',
+          array(
+        'type' => 'back',
             'name' => ts('<< Previous'),
           ),
           array(
@@ -136,7 +138,8 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
       }
       else {
         $buttons = array(
-          array('type' => 'back',
+          array(
+        'type' => 'back',
             'name' => ts('<< Previous'),
           ),
           array(
@@ -186,7 +189,8 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
    * Warning: if you make changes here, be sure to also make them in
    * Retry.php
    *
-   * @param array $params The form values
+   * @param array $params
+   *   The form values.
    *
    * @param $files
    * @param $self
@@ -271,7 +275,6 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
     foreach (array('now', 'start_date', 'start_date_time') as $parameter) {
       $params[$parameter] = $this->controller->exportValue($this->_name, $parameter);
     }
-
 
     // Previously, we checked if $mailing->is_template, and did *not*
     // schedule if it was set. Discussed with Lobo, removed that check

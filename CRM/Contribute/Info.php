@@ -118,7 +118,8 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
    * @return array|null
    */
   public function getUserDashboardElement() {
-    return array('name' => ts('Contributions'),
+    return array(
+    'name' => ts('Contributions'),
       'title' => ts('Your Contribution(s)'),
       'perm' => array('make online contributions'),
       'weight' => 10,
@@ -138,7 +139,8 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
    * @return array|null
    */
   public function registerTab() {
-    return array('title' => ts('Contributions'),
+    return array(
+    'title' => ts('Contributions'),
       'url' => 'contribution',
       'weight' => 20,
     );

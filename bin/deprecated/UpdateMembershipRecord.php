@@ -49,7 +49,7 @@ class CRM_UpdateMembershipRecord {
   function __construct() {
     // you can run this program either from an apache command, or from the cli
     if (php_sapi_name() == "cli") {
-      require_once ("cli.php");
+      require_once "cli.php";
       $cli = new civicrm_cli();
       //if it doesn't die, it's authenticated
     }
@@ -85,4 +85,3 @@ $obj = new CRM_UpdateMembershipRecord();
 echo "\n Updating ";
 $obj->updateMembershipStatus();
 echo "\n\n Membership records updated. (Done) \n";
-

@@ -253,7 +253,8 @@ class CRM_Core_BAO_CustomValueTable {
   /**
    * Given a field return the mysql data type associated with it
    *
-   * @param string $type the civicrm type string
+   * @param string $type
+   *   The civicrm type string.
    *
    * @param int $maxLength
    *
@@ -278,6 +279,7 @@ class CRM_Core_BAO_CustomValueTable {
 
       case 'Int':
         return 'int';
+
       // the below three are FK's, and have constraints added to them
 
       case 'ContactReference':
@@ -372,14 +374,17 @@ class CRM_Core_BAO_CustomValueTable {
   /**
    * Return an array of all custom values associated with an entity.
    *
-   * @param int $entityID Identification number of the entity
-   * @param string $entityType Type of entity that the entityID corresponds to, specified
+   * @param int $entityID
+   *   Identification number of the entity.
+   * @param string $entityType
+   *   Type of entity that the entityID corresponds to, specified.
    *                                   as a string with format "'<EntityName>'". Comma separated
    *                                   list may be used to specify OR matches. Allowable values
    *                                   are enumerated types in civicrm_custom_group.extends field.
    *                                   Optional. Default value assumes entityID references a
    *                                   contact entity.
-   * @param array $fieldIDs optional list of fieldIDs that we want to retrieve. If this
+   * @param array $fieldIDs
+   *   Optional list of fieldIDs that we want to retrieve. If this.
    *                                   is set the entityType is ignored
    *
    * @param bool $formatMultiRecordField
@@ -453,7 +458,7 @@ AND    $cond
             if ($formatMultiRecordField) {
               if($file[$tableName][$fieldID] == 'File') {
                 if($fileid = $dao->$fieldName) {
-                  $fileurl = CRM_Core_BAO_File::paperIconAttachment($tableName,$entityID);
+                  $fileurl = CRM_Core_BAO_File::paperIconAttachment($tableName, $entityID);
                   $result["{$dao->id}"]["{$fieldID}"] = $fileurl[$dao->$fieldName];
                 }
               }
@@ -467,7 +472,7 @@ AND    $cond
           else {
             if($file[$tableName][$fieldID] == 'File') {
               if($fileid = $dao->$fieldName) {
-                $fileurl = CRM_Core_BAO_File::paperIconAttachment($tableName,$entityID);
+                $fileurl = CRM_Core_BAO_File::paperIconAttachment($tableName, $entityID);
                 $result[$fieldID] = $fileurl[$dao->$fieldName];
               }
             }
@@ -568,7 +573,7 @@ AND    cf.id IN ( $fieldIDList )
             case 'Country':
             case 'Money':
             case 'Float':
-              $fieldValue['value'] = (int)0;
+              $fieldValue['value'] = (int) 0;
               break;
           }
         }

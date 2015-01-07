@@ -159,7 +159,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       $recentOther
     );
 
-
     //get the related cases for given case.
     $relatedCases = $this->get('relatedCases');
     if (!isset($relatedCases)) {
@@ -259,7 +258,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
         );
       }
       else if ($type == $pdfActivityType ) {
-         $url = CRM_Utils_System::url('civicrm/activity/pdf/add',
+        $url = CRM_Utils_System::url('civicrm/activity/pdf/add',
           "action=add&context=standalone&reset=1&cid={$this->_contactID}&caseid={$this->_caseID}&atype=$type",
           FALSE, NULL, FALSE );
       }
@@ -497,7 +496,8 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
   /**
    * Build the activity selector/datatable
    * @param CRM_Core_Form $form
-   * @param array $aTypes to include acivities related to current case id $form->_caseID
+   * @param array $aTypes
+   *   To include acivities related to current case id $form->_caseID.
    */
   public static function activityForm($form, $aTypes = array()) {
     $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($form->_contactID, $form->_caseID);

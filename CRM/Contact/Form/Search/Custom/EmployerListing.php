@@ -104,7 +104,8 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
   /**
    * Construct the search query
    */
-  function all($offset = 0, $rowcount = 0, $sort = NULL,
+  function all(
+    $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
     if ($justIDs) {

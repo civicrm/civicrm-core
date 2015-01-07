@@ -289,28 +289,31 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             !empty($this->_params['fields'][$fieldName])
           ) {
             switch ($fieldName) {
-              case 'credit_accounting_code' :
+              case 'credit_accounting_code':
                 $select[] = " CASE
                             WHEN {$this->_aliases['civicrm_financial_trxn']}.from_financial_account_id IS NOT NULL
                             THEN  {$this->_aliases['civicrm_financial_account']}_credit_1.accounting_code
                             ELSE  {$this->_aliases['civicrm_financial_account']}_credit_2.accounting_code
                             END AS civicrm_financial_account_credit_accounting_code ";
                 break;
-              case 'amount' :
+
+              case 'amount':
                 $select[] = " CASE
                             WHEN  {$this->_aliases['civicrm_entity_financial_trxn']}_item.entity_id IS NOT NULL
                             THEN {$this->_aliases['civicrm_entity_financial_trxn']}_item.amount
                             ELSE {$this->_aliases['civicrm_entity_financial_trxn']}.amount
                             END AS civicrm_entity_financial_trxn_amount ";
                 break;
-              case 'credit_name' :
+
+              case 'credit_name':
                 $select[] = " CASE
                             WHEN {$this->_aliases['civicrm_financial_trxn']}.from_financial_account_id IS NOT NULL
                             THEN  {$this->_aliases['civicrm_financial_account']}_credit_1.name
                             ELSE  {$this->_aliases['civicrm_financial_account']}_credit_2.name
                             END AS civicrm_financial_account_credit_name ";
                 break;
-              default :
+
+              default:
                 $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
                 break;
             }

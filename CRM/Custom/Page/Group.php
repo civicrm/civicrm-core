@@ -155,8 +155,10 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   /**
    * Edit custom group
    *
-   * @param int    $id       custom group id
-   * @param string $action   the action to be invoked
+   * @param int $id
+   *   Custom group id.
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
    */
@@ -176,7 +178,8 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   /**
    * Preview custom group
    *
-   * @param int $id custom group id
+   * @param int $id
+   *   Custom group id.
    *
    * @return void
    */
@@ -193,7 +196,8 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   /**
    * Browse all custom data groups.
    *
-   * @param string $action   the action to be invoked
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
    */
@@ -240,7 +244,7 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
     $subTypes = array();
 
     $subTypes['Activity'] = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
-        $subTypes['Contribution'] = CRM_Contribute_PseudoConstant::financialType( );
+    $subTypes['Contribution'] = CRM_Contribute_PseudoConstant::financialType( );
     $subTypes['Membership'] = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
     $subTypes['Event'] = CRM_Core_OptionGroup::values('event_type');
     $subTypes['Grant'] = CRM_Core_OptionGroup::values('grant_type');
@@ -252,7 +256,6 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
     $subTypes['Individual'] = CRM_Contact_BAO_ContactType::subTypePairs('Individual', FALSE, NULL);
     $subTypes['Household'] = CRM_Contact_BAO_ContactType::subTypePairs('Household', FALSE, NULL);
     $subTypes['Organization'] = CRM_Contact_BAO_ContactType::subTypePairs('Organization', FALSE, NULL);
-
 
     $relTypeInd = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Individual');
     $relTypeOrg = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Organization');

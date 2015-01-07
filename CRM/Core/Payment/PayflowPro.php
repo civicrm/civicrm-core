@@ -29,7 +29,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
   /*
    * Constructor
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @return void
    */
@@ -47,7 +48,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
   /**
    * Singleton function used to manage this object
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param object $paymentProcessor
    *
@@ -77,7 +79,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * This function collects all the information from a web/api form and invokes
    * the relevant payment processor specific functions to perform the transaction
    *
-   * @param  array $params assoc array of input parameters for this transaction
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
    *
    * @return array the result in an nice formatted array (or an error object)
    * @abstract
@@ -199,8 +202,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
 
         case '2 weeks':
           $params['next_sched_contribution_date'] = mktime(0, 0, 0, date("m"), date("d") + 14, date("Y"));
-          $params['end_date'] = mktime(0, 0, 0, date("m"), date("d") + (14 * $payflow_query_array['TERM'])
-            , date("Y ")
+          $params['end_date'] = mktime(0, 0, 0, date("m"), date("d") + (14 * $payflow_query_array['TERM']), date("Y ")
           );
           $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution_date']);
           $payflow_query_array['PAYPERIOD'] = "BIWK";
@@ -211,8 +213,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
         case '4 weeks':
           $params['next_sched_contribution_date'] = mktime(0, 0, 0, date("m"), date("d") + 28, date("Y")
           );
-          $params['end_date'] = mktime(0, 0, 0, date("m"), date("d") + (28 * $payflow_query_array['TERM'])
-            , date("Y")
+          $params['end_date'] = mktime(0, 0, 0, date("m"), date("d") + (28 * $payflow_query_array['TERM']), date("Y")
           );
           $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution_date']);
           $payflow_query_array['PAYPERIOD'] = "FRWK";
@@ -235,8 +236,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
           break;
 
         case '3 months':
-          $params['next_sched_contribution_date'] = mktime(0, 0, 0, date("m") + 3, date("d")
-            , date("Y")
+          $params['next_sched_contribution_date'] = mktime(0, 0, 0, date("m") + 3, date("d"), date("Y")
           );
           $params['end_date'] = mktime(0, 0, 0, date("m") +
             (3 * $payflow_query_array['TERM']),
@@ -256,8 +256,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
             (6 * $payflow_query_array['TERM']),
             date("d"), date("Y")
           );
-          $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution_date'
-            ]
+          $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution_date']
           );
           $payflow_query_array['PAYPERIOD'] = "SMYR";
           $params['frequency_unit'] = "month";
@@ -375,7 +374,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
   /**
    * Checks to see if invoice_id already exists in db
    *
-   * @param  int     $invoiceId   The ID to check
+   * @param int $invoiceId
+   *   The ID to check.
    *
    * @return bool                  True if ID exists, else false
    */
@@ -426,7 +426,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * NOTE: Called by Events and Contribute to check config params are set prior to trying
    *  register any credit card details
    *
-   * @param string $mode the mode we are operating in (live or test) - not used
+   * @param string $mode
+   *   The mode we are operating in (live or test) - not used.
    *
    * returns string $errorMsg if any errors found - null if OK
    *
@@ -584,12 +585,14 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
       $errorDesc = curl_error($ch);
 
       //Paranoia - in the unlikley event that 'curl' errno fails
-      if ($errorNum == 0)
-      $errorNum = 9005;
+      if ($errorNum == 0) {
+        $errorNum = 9005;
+      }
 
       // Paranoia - in the unlikley event that 'curl' error fails
-      if (strlen($errorDesc) == 0)
-      $errorDesc = "Connection to payment gateway failed";
+      if (strlen($errorDesc) == 0) {
+        $errorDesc = "Connection to payment gateway failed";
+      }
       if ($errorNum = 60) {
         return self::errorExit($errorNum, "Curl error - " . $errorDesc .
           " Try this link for more information http://curl.haxx.se/d
@@ -654,7 +657,6 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     }
     //$recurringProfileID = "RT0000000001";
     //     c  $trythis =        $this->getRecurringTransactionStatus($recurringProfileID,17);
-
 
     /*
      *Create the array of variables to be sent to the processor from the $params array

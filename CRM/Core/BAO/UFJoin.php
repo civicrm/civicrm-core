@@ -41,7 +41,8 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
   /**
    * Takes an associative array and creates a uf join object
    *
-   * @param array $params (reference) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Core_DAO_UFJoin object
    * @static
@@ -91,7 +92,8 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
    * Given an assoc list of params, find if there is a record
    * for this set of params
    *
-   * @param array $params (reference) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
    *
    * @return int or null
    * @static
@@ -127,7 +129,8 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
    * Given an assoc list of params, find if there is a record
    * for this set of params and return the group id
    *
-   * @param array $params (reference) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
    *
    * @return int or null
    * @static

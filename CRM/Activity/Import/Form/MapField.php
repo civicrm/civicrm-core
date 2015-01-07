@@ -133,7 +133,6 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     $dataPatterns     = $this->get('dataPatterns');
     $hasLocationTypes = $this->get('fieldTypes');
 
-
     /* Initialize all field usages to false */
 
     foreach ($mapperKeys as $key) {
@@ -149,7 +148,6 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     //used to warn for mismatch column count or mismatch mapping
     $warning = 0;
-
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', array(1 => $i)), NULL);
@@ -267,7 +265,8 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -465,7 +464,6 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
       $this->set('savedMapping', $saveMappingFields->mapping_id);
     }
-
 
     $parser = new CRM_Activity_Import_Parser_Activity($mapperKeysMain, $mapperLocType, $mapperPhoneType);
     $parser->run($fileName, $seperator, $mapper, $skipColumnHeader,

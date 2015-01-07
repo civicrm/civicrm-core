@@ -64,7 +64,7 @@ class Custom extends CiviUnitTestCase {
    * @param array $params
    * @param null $fields
    * @return object of created field
-*/
+   */
   public static function createField($params, $fields = NULL) {
     if (empty($params)) {
       $params = array(
@@ -99,7 +99,7 @@ class Custom extends CiviUnitTestCase {
   /**
    * Helper function to delete custom field
    * @deprecated use function on parent class
-   * @param  object of Custom Field to delete
+   * @param object of Custom Field to delete
    */
   public static function deleteField($params) {
     require_once 'CRM/Core/BAO/CustomField.php';
@@ -109,7 +109,7 @@ class Custom extends CiviUnitTestCase {
   /**
    * Helper function to delete custom group
    * @deprecated use function on parent class
-   * @param  object Custom Group to delete
+   * @param object Custom Group to delete
    * @return boolean true if Group deleted, false otherwise
    */
   public static function deleteGroup($params) {

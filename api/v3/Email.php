@@ -57,7 +57,8 @@ function civicrm_api3_email_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_email_create_spec(&$params) {
   // TODO a 'clever' default should be introduced
@@ -69,7 +70,7 @@ function _civicrm_api3_email_create_spec(&$params) {
 /**
  * Deletes an existing Email
  *
- * @param  array  $params
+ * @param array $params
  *
  * @example EmailDelete.php Standard Delete Example
  *
@@ -84,12 +85,13 @@ function civicrm_api3_email_delete($params) {
 /**
  * Retrieve one or more emails
  *
- * @param  array input parameters
+ * @param array input parameters
  *
  *
  * @example EmailGet.php Standard Get Example
  *
- * @param  array $params  an associative array of name/value pairs.
+ * @param array $params
+ *   An associative array of name/value pairs.
  *
  * @return  array api result array
  * {@getfields email_get}
@@ -99,4 +101,3 @@ function civicrm_api3_email_get($params) {
 
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

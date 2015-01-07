@@ -109,4 +109,3 @@ function generateJoomlaConfig($version) {
   fputs($fd, $xml);
   fclose($fd);
 }
-

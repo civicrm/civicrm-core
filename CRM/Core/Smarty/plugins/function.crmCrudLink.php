@@ -36,7 +36,8 @@
 /**
  * Dynamically construct a link based on an entity-type and entity-id.
  *
- * @param $params array with keys:
+ * @param $params
+ *   Array with keys:.
  *  - table: string
  *  - id: int
  *  - action: string, 'VIEW' or 'UPDATE' [default: VIEW]

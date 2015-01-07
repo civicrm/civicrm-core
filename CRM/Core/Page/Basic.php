@@ -76,7 +76,8 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   /**
    * UserContext to pop back to
    *
-   * @param int $mode mode that we are in
+   * @param int $mode
+   *   Mode that we are in.
    *
    * @return string
    */
@@ -85,7 +86,8 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   /**
    * Get userContext params
    *
-   * @param int $mode mode that we are in
+   * @param int $mode
+   *   Mode that we are in.
    *
    * @return string
    */
@@ -96,8 +98,10 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   /**
    * Allow objects to be added based on permission
    *
-   * @param int $id   the id of the object
-   * @param int $name the name or title of the object
+   * @param int $id
+   *   The id of the object.
+   * @param int $name
+   *   The name or title of the object.
    *
    * @return string   permission value if permission is granted, else null
    */
@@ -109,17 +113,21 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * Allows the derived class to add some more state variables to
    * the controller. By default does nothing, and hence is abstract
    *
-   * @param CRM_Core_Controller $controller the controller object
+   * @param CRM_Core_Controller $controller
+   *   The controller object.
    *
    * @return void
    */
-  public function addValues($controller) {}
+  public function addValues($controller) {
+  }
 
   /**
    * Class constructor
    *
-   * @param string $title title of the page
-   * @param int $mode mode of the page
+   * @param string $title
+   *   Title of the page.
+   * @param int $mode
+   *   Mode of the page.
    *
    * @return \CRM_Core_Page_Basic
    */
@@ -148,7 +156,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     // get 'id' if present
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
 
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $this->getBAOName()) . ".php");
+    require_once str_replace('_', DIRECTORY_SEPARATOR, $this->getBAOName()) . ".php";
 
     if ($id) {
       if (!$this->checkPermission($id, NULL)) {
@@ -156,8 +164,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
       }
     }
 
-    if ($this->_action &
-      (CRM_Core_Action::VIEW |
+    if ($this->_action & (CRM_Core_Action::VIEW |
         CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE |
         CRM_Core_Action::COPY |
@@ -275,11 +282,16 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * object. Check the is_active and is_required flags to display valid
    * actions
    *
-   * @param CRM_Core_DAO $object the object being considered
-   * @param int $action the base set of actions
-   * @param array $values the array of values that we send to the template
-   * @param array $links the array of links
-   * @param string $permission the permission assigned to this object
+   * @param CRM_Core_DAO $object
+   *   The object being considered.
+   * @param int $action
+   *   The base set of actions.
+   * @param array $values
+   *   The array of values that we send to the template.
+   * @param array $links
+   *   The array of links.
+   * @param string $permission
+   *   The permission assigned to this object.
    *
    * @param bool $forceAction
    *
@@ -353,8 +365,10 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   /**
    * Edit this entity.
    *
-   * @param int $mode - what mode for the form ?
-   * @param int $id - id of the entity (for update, view operations)
+   * @param int $mode
+   *   What mode for the form ?.
+   * @param int $id
+   *   Id of the entity (for update, view operations).
    *
    * @param bool $imageUpload
    * @param bool $pushUserContext

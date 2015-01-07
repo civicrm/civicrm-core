@@ -84,7 +84,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * Constructor
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param $paymentProcessor
    *
@@ -100,7 +101,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * Singleton function used to manage this object
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param $paymentProcessor
    * @param null $paymentForm
@@ -120,7 +122,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    * The function gets called when a new order takes place.
    *
    * @param $success
-   * @param array $privateData contains the name value pair of <merchant-private-data>
+   * @param array $privateData
+   *   Contains the name value pair of <merchant-private-data>.
    *
    * @param $component
    * @param $amount
@@ -206,11 +209,13 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
 
-   /**
+  /**
    * The function returns the component(Event/Contribute..)and whether it is Test or not
    *
-   * @param array   $privateData    contains the name-value pairs of transaction related data
-   * @param int     $orderNo        <order-total> send by google
+   * @param array $privateData
+   *   Contains the name-value pairs of transaction related data.
+   * @param int $orderNo
+   *   <order-total> send by google.
    *
    * @return array context of this call (test, component, payment processor id)
    * @static
@@ -273,12 +278,12 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     return array($isTest, $component, $duplicateTransaction);
-    }
+  }
 
   /**
    * This method is handles the response that will be invoked by the
    * notification or request sent by the payment processor.
-   *hex string from paymentexpress is passed to this function as hex string. Code based on googleIPN
+   * hex string from paymentexpress is passed to this function as hex string. Code based on googleIPN
    * mac_key is only passed if the processor is pxaccess as it is used for decryption
    * $dps_method is either pxaccess or pxpay
    */
@@ -327,7 +332,7 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
         $DPStxnRef         = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'DpsTxnRef');
         $qfKey             = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData1");
         $privateData       = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData2");
-        list($component,$paymentProcessorID,)  =explode(',', CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData3"));
+        list($component, $paymentProcessorID,)  = explode(',', CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData3"));
         $amount            = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "AmountSettlement");
         $merchantReference = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "MerchantReference");
       }
@@ -339,7 +344,7 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     }
     elseif ($dps_method == "pxaccess") {
 
-      require_once ('PaymentExpress/pxaccess.inc.php');
+      require_once 'PaymentExpress/pxaccess.inc.php';
       global $pxaccess;
       $pxaccess = new PxAccess($dps_url, $dps_user, $dps_key, $mac_key);
       #getResponse method in PxAccess object returns PxPayResponse object
@@ -348,7 +353,7 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
 
       $qfKey             = $rsp->getTxnData1();
       $privateData       = $rsp->getTxnData2();
-      list($component,$paymentProcessorID)  = explode(',',$rsp->getTxnData3());
+      list($component, $paymentProcessorID)  = explode(',', $rsp->getTxnData3());
       $success           = $rsp->getSuccess();
       $authCode          = $rsp->getAuthCode();
       $DPStxnRef         = $rsp->getDpsTxnRef();
@@ -383,13 +388,11 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     list($mode, $component, $duplicateTransaction) = self::getContext($privateData, $transactionReference);
     $mode = $mode ? 'test' : 'live';
 
-
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID,
       $mode
     );
 
     $ipn = self::singleton($mode, $component, $paymentProcessor);
-
 
     //Check status and take appropriate action
 

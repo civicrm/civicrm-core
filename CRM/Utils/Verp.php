@@ -64,8 +64,10 @@ class CRM_Utils_Verp {
   /**
    * Encode the sender's address with the VERPed recipient.
    *
-   * @param string $sender    The address of the sender
-   * @param string $recipient The address of the recipient
+   * @param string $sender
+   *   The address of the sender.
+   * @param string $recipient
+   *   The address of the recipient.
    *
    * @return string           The VERP encoded address
    * @static
@@ -90,7 +92,8 @@ class CRM_Utils_Verp {
   /**
    * Decode the address and return the sender and recipient as an array
    *
-   * @param string $address   The address to be decoded
+   * @param string $address
+   *   The address to be decoded.
    *
    * @return array            The tuple ($sender, $recipient)
    * @static

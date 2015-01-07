@@ -264,7 +264,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       }
     }
 
-
     // set the params in session
     $session = CRM_Core_Session::singleton();
     $session->set('profileParams', $this->_params);

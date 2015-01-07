@@ -356,7 +356,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         }
 
         if ($reportID = CRM_Campaign_BAO_Survey::getReportID($sid)) {
-          $url = CRM_Utils_System::url("civicrm/report/instance/{$reportID}",'reset=1');
+          $url = CRM_Utils_System::url("civicrm/report/instance/{$reportID}", 'reset=1');
           $surveysData[$sid]['title'] = "<a href='{$url}' title='View Survey Report'>{$surveysData[$sid]['title']}</a>";
         }
       }
@@ -465,7 +465,8 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     }
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
-      ->addSetting(array('tabSettings' => array(
+      ->addSetting(array(
+    'tabSettings' => array(
         'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'campaign')),
       )));
   }

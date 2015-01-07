@@ -6,11 +6,11 @@
  *
  *  (PHP 5)
  *
- *   @copyright Copyright CiviCRM LLC (C) 2009
- *   @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
+ * @copyright Copyright CiviCRM LLC (C) 2009
+ * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
  *              GNU Affero General Public License version 3
- *   @version   $Id:
- *   @package   CiviCRM
+ * @version   $Id:
+ * @package   CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -37,8 +37,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_activity_* functions
  *
- *  @package CiviCRM_APIv3
- *  @todo determine where help functions should sit (here or 'up the tree'), & best way to define API dir
+ * @package CiviCRM_APIv3
+ * @todo determine where help functions should sit (here or 'up the tree'), & best way to define API dir
  */
 class api_v3_APIStandardsTest extends CiviUnitTestCase {
 
@@ -145,7 +145,8 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
 
   /**
    * Require once  Files
-   * @param $files array list of files to load
+   * @param $files
+   *   Array list of files to load.
    */
   public function requireOnceFilesArray($files) {
     foreach ($files as $key => $file) {

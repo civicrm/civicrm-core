@@ -42,7 +42,8 @@ class CRM_Upgrade_Incremental_Legacy {
   /**
    * Compute any messages which should be displayed before upgrade
    *
-   * @param $preUpgradeMessage string, alterable
+   * @param $preUpgradeMessage
+   *   String, alterable.
    * @param $currentVer
    * @param $latestVer
    */
@@ -203,8 +204,10 @@ SELECT  id
   /**
    * Compute any messages which should be displayed after upgrade
    *
-   * @param $postUpgradeMessage string, alterable
-   * @param $rev string, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs
+   * @param $postUpgradeMessage
+   *   String, alterable.
+   * @param $rev
+   *   String, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    * @return void
    */
   public static function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
@@ -268,7 +271,8 @@ SELECT  count( id ) as statusCount
   /**
    * Perform an incremental upgrade
    *
-   * @param $rev string, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final)
+   * @param $rev
+   *   String, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
    */
   public static function upgrade_2_2_alpha1($rev) {
     for ($stepID = 1; $stepID <= 4; $stepID++) {
@@ -312,7 +316,8 @@ SELECT  count( id ) as statusCount
   /**
    * Perform an incremental upgrade
    *
-   * @param $rev string, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final)
+   * @param $rev
+   *   String, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
    */
   public static function upgrade_2_1_2($rev) {
     $formName = "CRM_Upgrade_TwoOne_Form_TwoOneTwo";
@@ -353,7 +358,8 @@ SELECT  count( id ) as statusCount
   /**
    * Perform an incremental upgrade
    *
-   * @param $rev string, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final)
+   * @param $rev
+   *   String, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
    */
   public static function upgrade_2_2_beta1($rev) {
     if (!CRM_Core_DAO::checkFieldExists('civicrm_pcp_block', 'notify_email')) {
@@ -367,7 +373,8 @@ SELECT  count( id ) as statusCount
   /**
    * Perform an incremental upgrade
    *
-   * @param $rev string, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final)
+   * @param $rev
+   *   String, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
    */
   public static function upgrade_2_2_beta2($rev) {
     $template = CRM_Core_Smarty::singleton();
@@ -388,7 +395,8 @@ SELECT  count( id ) as statusCount
   /**
    * Perform an incremental upgrade
    *
-   * @param $rev string, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final)
+   * @param $rev
+   *   String, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
    */
   public static function upgrade_2_2_beta3($rev) {
     $template = CRM_Core_Smarty::singleton();
@@ -403,7 +411,8 @@ SELECT  count( id ) as statusCount
   /**
    * Perform an incremental upgrade
    *
-   * @param $rev string, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final)
+   * @param $rev
+   *   String, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
    */
   public static function upgrade_3_0_alpha1($rev) {
 
@@ -423,7 +432,8 @@ SELECT  count( id ) as statusCount
   /**
    * Perform an incremental upgrade
    *
-   * @param $rev string, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final)
+   * @param $rev
+   *   String, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
    */
   public static function upgrade_3_1_alpha1($rev) {
 
@@ -443,7 +453,8 @@ SELECT  count( id ) as statusCount
   /**
    * Perform an incremental upgrade
    *
-   * @param $rev string, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final)
+   * @param $rev
+   *   String, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
    */
   public static function upgrade_2_2_7($rev) {
     $upgrade = new CRM_Upgrade_Form();
@@ -475,7 +486,8 @@ SELECT  count( id ) as statusCount
   /**
    * Perform an incremental upgrade
    *
-   * @param $rev string, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final)
+   * @param $rev
+   *   String, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
    */
   public static function upgrade_3_0_2($rev) {
 
@@ -497,7 +509,8 @@ SELECT  count( id ) as statusCount
   /**
    * Perform an incremental upgrade
    *
-   * @param $rev string, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final)
+   * @param $rev
+   *   String, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
    */
   public static function upgrade_3_0_4($rev) {
     //make sure 'Deceased' membership status present in db,CRM-5636
@@ -517,7 +530,8 @@ SELECT  count( id ) as statusCount
   /**
    * Perform an incremental upgrade
    *
-   * @param $rev string, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final)
+   * @param $rev
+   *   String, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
    */
   public static function upgrade_3_1_0($rev) {
     // upgrade all roles who have 'access CiviEvent' permission, to also have
@@ -545,7 +559,8 @@ SELECT  count( id ) as statusCount
   /**
    * Perform an incremental upgrade
    *
-   * @param $rev string, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final)
+   * @param $rev
+   *   String, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
    */
   public static function upgrade_3_1_3($rev) {
     $threeOne = new CRM_Upgrade_ThreeOne_ThreeOne();
@@ -558,7 +573,8 @@ SELECT  count( id ) as statusCount
   /**
    * Perform an incremental upgrade
    *
-   * @param $rev string, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final)
+   * @param $rev
+   *   String, the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
    */
   public static function upgrade_3_1_4($rev) {
     $threeOne = new CRM_Upgrade_ThreeOne_ThreeOne();

@@ -78,7 +78,8 @@ WHERE {$whereClause}
       if (!$name && isset($_GET['id'])) {
         $name = $_GET['id'];
       }
-      $elements[] = array('name' => trim($name, '*'),
+      $elements[] = array(
+      'name' => trim($name, '*'),
         'value' => trim($name, '*'),
       );
     }
@@ -86,10 +87,10 @@ WHERE {$whereClause}
     echo CRM_Utils_JSON::encode($elements, 'value');
     CRM_Utils_System::civiExit();
   }
-    /**
-    * Function to setDefaults according to Pledge Id
-    * for batch entry pledges
-    */
+  /**
+   * Function to setDefaults according to Pledge Id
+   * for batch entry pledges
+   */
   public function getPledgeDefaults() {
     $details = array();
     if (!empty($_POST['pid'])) {

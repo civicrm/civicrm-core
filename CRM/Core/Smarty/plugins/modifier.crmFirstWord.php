@@ -36,7 +36,8 @@
 /**
  * Replace a string with the first word in the string
  *
- * @param string $string the html to be tweaked with
+ * @param string $string
+ *   The html to be tweaked with.
  *
  * @return string
  */

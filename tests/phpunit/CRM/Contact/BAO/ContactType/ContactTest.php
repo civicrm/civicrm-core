@@ -29,7 +29,6 @@ class CRM_Contact_BAO_ContactType_ContactTest extends CiviUnitTestCase {
     $result = CRM_Contact_BAO_ContactType::add($params);
     $this->parent = $params['name'];
 
-
     $params = array(
       'label' => 'org_sponsor',
       'name' => 'org_sponsor',
@@ -219,7 +218,6 @@ DELETE FROM civicrm_contact_type
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $updatedContact->contact_sub_type), $this->parent, 'In line ' . __LINE__);
     CRM_Contact_BAO_Contact::deleteContact($contact->id);
 
-
     $params = array(
       'organization_name' => 'Compumentor',
       'contact_type' => 'Organization',
@@ -244,7 +242,6 @@ DELETE FROM civicrm_contact_type
     $this->assertEquals($updatedContact->contact_type, 'Organization', 'In line ' . __LINE__);
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $updatedContact->contact_sub_type), $this->team, 'In line ' . __LINE__);
     CRM_Contact_BAO_Contact::deleteContact($contact->id);
-
 
     $params = array(
       'first_name' => 'Anne',

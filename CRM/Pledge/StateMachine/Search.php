@@ -74,7 +74,8 @@ class CRM_Pledge_StateMachine_Search extends CRM_Core_StateMachine {
    * to avoid using  conditional state machine, much more efficient
    * and simpler
    *
-   * @param CRM_Core_Controller $controller the controller object
+   * @param CRM_Core_Controller $controller
+   *   The controller object.
    *
    * @param string $formName
    *

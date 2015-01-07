@@ -200,7 +200,8 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    *
    * editing would involved modifying existing fields + adding data to new fields.
    *
-   * @param string  $action    the action to be invoked
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
    */
@@ -229,7 +230,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * @return void
    */
   public function run() {
-
 
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE, 0
@@ -302,7 +302,8 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
   /**
    * Preview custom field
    *
-   * @param int  $id    custom field id
+   * @param int $id
+   *   Custom field id.
    *
    * @return void
    */

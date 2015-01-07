@@ -219,7 +219,8 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
 
   /**
    * @param $module
-   * @param array $counts expected hook invocation counts ($hookName => $count)
+   * @param array $counts
+   *   Expected hook invocation counts ($hookName => $count).
    */
   public function assertHookCounts($module, $counts) {
     global $_test_extension_manager_moduletest_counts;
@@ -253,7 +254,7 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
   public function assertModuleActiveByKey($expectedIsActive, $key) {
     foreach (CRM_Core_Module::getAll() as $module) {
       if ($module->name == $key) {
-        $this->assertEquals((bool)$expectedIsActive, (bool)$module->is_active);
+        $this->assertEquals((bool) $expectedIsActive, (bool) $module->is_active);
         return;
       }
     }

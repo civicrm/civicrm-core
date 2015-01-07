@@ -86,7 +86,8 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   /**
    * Retrieve list of selections/drop downs for Scheduled Reminder form
    *
-   * @param bool    $id    mapping id
+   * @param bool $id
+   *   Mapping id.
    *
    * @return array  associated array of all the drop downs in the form
    * @static
@@ -315,7 +316,8 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   /**
    * Retrieve list of Scheduled Reminders
    *
-   * @param bool $namesOnly return simple list of names
+   * @param bool $namesOnly
+   *   Return simple list of names.
    *
    * @param null $entityValue
    * @param int $id
@@ -580,8 +582,10 @@ AND   cas.entity_value = $id AND
   /**
    * Add the schedules reminders in the db
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $ids    the array that holds all the db ids
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $ids
+   *   The array that holds all the db ids.
    *
    * @return CRM_Core_DAO_ActionSchedule
    * @static
@@ -599,8 +603,10 @@ AND   cas.entity_value = $id AND
    * retrieves the relevant objects. It also stores all the retrieved
    * values in the default array
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $values (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $values
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_DAO_ActionSchedule object on success, null otherwise
    * @static
@@ -626,7 +632,8 @@ AND   cas.entity_value = $id AND
   /**
    * Delete a Reminder
    *
-   * @param  int  $id     ID of the Reminder to be deleted.
+   * @param int $id
+   *   ID of the Reminder to be deleted.
    *
    * @static
    */
@@ -645,8 +652,10 @@ AND   cas.entity_value = $id AND
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on success, null otherwise
    * @static
@@ -680,11 +689,12 @@ AND   cas.entity_value = $id AND
     while ($actionSchedule->fetch()) {
       $extraSelect = $extraJoin = $extraWhere = $extraOn = '';
 
-      if ($actionSchedule->from_email)
+      if ($actionSchedule->from_email) {
         $fromEmailAddress = "$actionSchedule->from_name <$actionSchedule->from_email>";
+      }
 
-      $activityTypeID = false;
-      $activityStatusID = false;
+      $activityTypeID = FALSE;
+      $activityStatusID = FALSE;
       if ($actionSchedule->record_activity) {
         if ($mapping->entity == 'civicrm_membership') {
           $activityTypeID =
@@ -809,7 +819,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           elseif ($field == 'registration_url') {
             $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $dao->event_id, TRUE, NULL, FALSE);
           }
-          elseif (in_array($field, array('start_date','end_date','join_date','activity_date_time'))) {
+          elseif (in_array($field, array('start_date', 'end_date', 'join_date', 'activity_date_time'))) {
             $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Date::customFormat($dao->$field);
           }
           elseif ($field == 'balance') {
@@ -945,7 +955,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       );
       $status = implode(',', $status);
 
-      $anniversary = false;
+      $anniversary = FALSE;
 
       if (!CRM_Utils_System::isNull($mapping->entity_recipient)) {
         if ($mapping->entity_recipient == 'event_contacts') {
@@ -1068,7 +1078,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $notINClause = self::permissionedRelationships($contactField);
 
         $membershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, "(is_current_member = 1 OR name = 'Expired')", 'id');
-        $mStatus = implode (',', $membershipStatus);
+        $mStatus = implode(',', $membershipStatus);
         $where[] = "e.status_id IN ({$mStatus})";
       }
 
@@ -1097,7 +1107,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         if (in_array(2, $status_)) {
           // anniversary mode:
           $dateField = 'DATE_ADD(e.' . $dateDBField . ', INTERVAL ROUND(DATEDIFF(DATE(' . $now . '), e.' . $dateDBField . ') / 365) YEAR)';
-          $anniversary = true;
+          $anniversary = TRUE;
         }
         else {
           // regular mode:
@@ -1241,7 +1251,7 @@ LEFT JOIN {$reminderJoinClause}
         if ($addWhere) {
           $addWhereClause = "AND {$addWhere}";
         }
-        $insertAdditionalSql ="
+        $insertAdditionalSql = "
 INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id)
 {$addSelect}
 FROM ({$contactTable})
@@ -1379,7 +1389,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
 
     if (!empty($excludeIds)) {
       $clause = "AND {$field} NOT IN ( " .implode(', ', $excludeIds) . ' ) ';
-      return  $clause;
+      return $clause;
     }
     return NULL;
   }

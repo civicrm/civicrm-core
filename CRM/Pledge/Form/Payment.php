@@ -105,14 +105,14 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
       NULL, TRUE
     );
 
-    $optionTypes = array('1' => ts('Adjust Pledge Payment Schedule?'),
+    $optionTypes = array(
+    '1' => ts('Adjust Pledge Payment Schedule?'),
       '2' => ts('Adjust Total Pledge Amount?'),
     );
     $element = $this->addRadio('option_type',
       NULL,
       $optionTypes,
-      array(
-        ), '<br/>'
+      array(), '<br/>'
     );
 
     $this->addButtons(array(
@@ -162,7 +162,6 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
     if (CRM_Utils_Array::value('option_type', $formValues) == 2) {
       $adjustTotalAmount = TRUE;
     }
-
 
     $pledgeScheduledAmount = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment',
       $params['id'],

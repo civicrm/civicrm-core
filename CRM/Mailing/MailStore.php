@@ -39,7 +39,8 @@ class CRM_Mailing_MailStore {
   /**
    * Return the proper mail store implementation, based on config settings
    *
-   * @param  string $name name of the settings set from civimail_mail_settings to use (null for default)
+   * @param string $name
+   *   Name of the settings set from civimail_mail_settings to use (null for default).
    *
    * @throws Exception
    * @return object        mail store implementation for processing CiviMail-bound emails
@@ -93,12 +94,14 @@ class CRM_Mailing_MailStore {
   /**
    * Expunge the messages marked for deletion; stub function to be redefined by IMAP store
    */
-  public function expunge() {}
+  public function expunge() {
+  }
 
   /**
    * Return the next X messages from the mail store
    *
-   * @param int $count  number of messages to fetch (0 to fetch all)
+   * @param int $count
+   *   Number of messages to fetch (0 to fetch all).
    *
    * @return array      array of ezcMail objects
    */
@@ -139,7 +142,8 @@ class CRM_Mailing_MailStore {
   /**
    * Point to (and create if needed) a local Maildir for storing retrieved mail
    *
-   * @param string $name name of the Maildir
+   * @param string $name
+   *   Name of the Maildir.
    *
    * @throws Exception
    * @return string       path to the Maildir's cur directory

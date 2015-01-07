@@ -30,14 +30,13 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  * Test class for Domain API - civicrm_domain_*
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Domain
+ * @package CiviCRM_APIv3
+ * @subpackage API_Domain
  */
 class api_v3_DomainTest extends CiviUnitTestCase {
 
   /* This test case doesn't require DB reset - apart from
        where cleanDB() is called. */
-
 
 
   public $DBResetRequired = FALSE;
@@ -61,27 +60,27 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
     $location = array();
     $domContact = $this->callAPISuccess('contact', 'create', array(
-      'contact_type' => 'Organization',
-      'organization_name' => 'new org',
-      'api.phone.create' => array(
-        'location_type_id' => $defaultLocationType->id,
-        'phone_type_id' => 1,
-        'phone' => '456-456',
-       ),
-      'api.address.create' => array(
-        'location_type_id' => $defaultLocationType->id,
-        'street_address' => '45 Penny Lane',
+        'contact_type' => 'Organization',
+        'organization_name' => 'new org',
+        'api.phone.create' => array(
+          'location_type_id' => $defaultLocationType->id,
+          'phone_type_id' => 1,
+          'phone' => '456-456',
         ),
-      'api.email.create' => array(
-        'location_type_id' => $defaultLocationType->id,
-        'email' => 'my@email.com',
-      )
+        'api.address.create' => array(
+          'location_type_id' => $defaultLocationType->id,
+          'street_address' => '45 Penny Lane',
+        ),
+        'api.email.create' => array(
+          'location_type_id' => $defaultLocationType->id,
+          'email' => 'my@email.com',
+        )
       )
     );
 
-    $this->callAPISuccess('domain','create',array(
-      'id' => 1,
-      'contact_id' => $domContact['id'],
+    $this->callAPISuccess('domain', 'create', array(
+        'id' => 1,
+        'contact_id' => $domContact['id'],
       )
     );
     $this->params = array(
@@ -100,7 +99,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
    */
   public function testGet() {
 
-    $params = array('sequential' => 1,);
+    $params = array('sequential' => 1);
     $result = $this->callAPIAndDocument('domain', 'get', $params, __FUNCTION__, __FILE__);
 
     $this->assertType('array', $result);
@@ -138,9 +137,9 @@ class api_v3_DomainTest extends CiviUnitTestCase {
       $this->assertArrayHasKey('domain_email', $domain);
       $this->assertArrayHasKey('domain_phone', $domain);
       $this->assertArrayHasKey('domain_address', $domain);
-      $this->assertEquals("my@email.com",$domain['domain_email']);
-      $this->assertEquals("456-456",$domain['domain_phone']['phone']);
-      $this->assertEquals("45 Penny Lane",$domain['domain_address']['street_address']);
+      $this->assertEquals("my@email.com", $domain['domain_email']);
+      $this->assertEquals("456-456", $domain['domain_phone']['phone']);
+      $this->assertEquals("45 Penny Lane", $domain['domain_address']['street_address']);
     }
   }
 
@@ -150,17 +149,16 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     */
 
 
-
   public function testGetCurrentDomainTwice() {
     $domain = $this->callAPISuccess('domain', 'getvalue', array(
-        'current_domain' => 1,
-        'return' => 'name',
-      ));
+      'current_domain' => 1,
+      'return' => 'name',
+    ));
     $this->assertEquals('Default Domain Name', $domain, print_r($domain, TRUE));
     $domain = $this->callAPISuccess('domain', 'getvalue', array(
-        'current_domain' => 1,
-        'return' => 'name',
-      ));
+      'current_domain' => 1,
+      'return' => 'name',
+    ));
     $this->assertEquals('Default Domain Name', $domain, print_r($domain, TRUE));
   }
 

@@ -620,7 +620,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -698,11 +699,15 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     );
 
     //set respective mapper params to array.
-    foreach (array_keys($mapperParams) as $mapperParam)$$mapperParam = array();
+    foreach (array_keys($mapperParams) as $mapperParam) {
+      $$mapperParam = array();
+    }
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
       //set respective mapper value to null
-      foreach (array_values($mapperParams) as $mapperParam)$$mapperParam = NULL;
+      foreach (array_values($mapperParams) as $mapperParam) {
+        $$mapperParam = NULL;
+      }
 
       $fldName            = CRM_Utils_Array::value(0, $mapperKeys[$i]);
       $selOne             = CRM_Utils_Array::value(1, $mapperKeys[$i]);
@@ -812,7 +817,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       for ($i = 0; $i < $this->_columnCount; $i++) {
         $updateMappingFields = new CRM_Core_DAO_MappingField();
-        $updateMappingFields->id = CRM_Utils_Array::value($i,$mappingFieldsId);
+        $updateMappingFields->id = CRM_Utils_Array::value($i, $mappingFieldsId);
         $updateMappingFields->mapping_id = $params['mappingId'];
         $updateMappingFields->column_number = $i;
 

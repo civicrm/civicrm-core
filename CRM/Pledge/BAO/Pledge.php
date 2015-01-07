@@ -56,8 +56,10 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * of time. This is the inverse function of create. It also stores all the retrieved
    * values in the default array
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Pledge_BAO_Pledge object
    * @static
@@ -75,7 +77,8 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   /**
    * Add pledge
    *
-   * @param array $params reference array contains the values submitted by the form
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
    *
    * @static
    *
@@ -120,9 +123,12 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array $params input parameters to find object
-   * @param array $values output values of the object
-   * @param array $returnProperties  if you want to return specific fields
+   * @param array $params
+   *   Input parameters to find object.
+   * @param array $values
+   *   Output values of the object.
+   * @param array $returnProperties
+   *   If you want to return specific fields.
    *
    * @return array associated array of field values
    * @static
@@ -138,7 +144,8 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   /**
    * Takes an associative array and creates a pledge object
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Pledge_BAO_Pledge object
    * @static
@@ -196,7 +203,6 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
     // skip payment stuff inedit mode
     if (!isset($params['id']) || !empty($params['is_pledge_pending'])) {
 
-
       //if pledge is pending delete all payments and recreate.
       if (!empty($params['is_pledge_pending'])) {
         CRM_Pledge_BAO_PledgePayment::deletePayments($pledge->id);
@@ -251,7 +257,8 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   /**
    * Delete the pledge
    *
-   * @param int $id pledge id
+   * @param int $id
+   *   Pledge id.
    *
    * @return mixed
    * @static
@@ -357,7 +364,8 @@ GROUP BY  currency
       $pamount[] = CRM_Utils_Money::format($dao->pledge_amount, $dao->currency);
     }
 
-    $pledge_amount = array('pledge_amount' => implode(', ', $pamount),
+    $pledge_amount = array(
+    'pledge_amount' => implode(', ', $pamount),
       'pledge_count' => $pCount,
       'purl' => CRM_Utils_System::url('civicrm/pledge/search',
         "reset=1&force=1&pstatus={$statusId}&pstart={$start}&pend={$end}&test=0"
@@ -422,7 +430,8 @@ GROUP BY  currency
       }
 
       if ($count) {
-        return array_merge($pledge_amount, array('received_amount' => implode(', ', $amount),
+        return array_merge($pledge_amount, array(
+        'received_amount' => implode(', ', $amount),
             'received_count' => $count,
             'url' => CRM_Utils_System::url('civicrm/pledge/search',
               "reset=1&force=1&status={$statusId}&start={$start}&end={$end}&test=0"
@@ -439,7 +448,8 @@ GROUP BY  currency
   /**
    * Get list of pledges In Honor of contact Ids
    *
-   * @param int $honorId In Honor of Contact ID
+   * @param int $honorId
+   *   In Honor of Contact ID.
    *
    * @return array return the list of pledge fields
    *
@@ -483,8 +493,10 @@ GROUP BY  currency
   /**
    * Send Acknowledgment and create activity.
    *
-   * @param CRM_Core_Form $form form object.
-   * @param array $params an assoc array of name/value pairs.
+   * @param CRM_Core_Form $form
+   *   Form object.
+   * @param array $params
+   *   An assoc array of name/value pairs.
    *
    * @return void.
    */
@@ -513,7 +525,8 @@ GROUP BY  currency
           );
         }
         $payments[$payID] = array_merge($contributionValue,
-          array('amount' => CRM_Utils_Array::value('scheduled_amount', $values),
+          array(
+        'amount' => CRM_Utils_Array::value('scheduled_amount', $values),
             'due_date' => CRM_Utils_Array::value('scheduled_date', $values),
           )
         );
@@ -545,7 +558,8 @@ GROUP BY  currency
 
     //handle domain token values
     $domain = CRM_Core_BAO_Domain::getDomain();
-    $tokens = array('domain' => array('name', 'phone', 'address', 'email'),
+    $tokens = array(
+    'domain' => array('name', 'phone', 'address', 'email'),
       'contact' => CRM_Core_SelectValues::contactTokens(),
     );
     $domainValues = array();
@@ -691,21 +705,23 @@ GROUP BY  currency
       $fields = array_merge($fields, CRM_Pledge_DAO_PledgePayment::export());
 
       //set title to calculated fields
-      $calculatedFields = array('pledge_total_paid' => array('title' => ts('Total Paid')),
+      $calculatedFields = array(
+      'pledge_total_paid' => array('title' => ts('Total Paid')),
         'pledge_balance_amount' => array('title' => ts('Balance Amount')),
         'pledge_next_pay_date' => array('title' => ts('Next Payment Date')),
         'pledge_next_pay_amount' => array('title' => ts('Next Payment Amount')),
         'pledge_payment_paid_amount' => array('title' => ts('Paid Amount')),
         'pledge_payment_paid_date' => array('title' => ts('Paid Date')),
-        'pledge_payment_status' => array('title' => ts('Pledge Payment Status'),
+        'pledge_payment_status' => array(
+      'title' => ts('Pledge Payment Status'),
           'name' => 'pledge_payment_status',
           'data_type' => CRM_Utils_Type::T_STRING,
         ),
       );
 
-
       $pledgeFields = array(
-        'pledge_status' => array('title' => 'Pledge Status',
+        'pledge_status' => array(
+      'title' => 'Pledge Status',
           'name' => 'pledge_status',
           'data_type' => CRM_Utils_Type::T_STRING,
         ),
@@ -739,7 +755,8 @@ GROUP BY  currency
   /**
    * Get pending or in progress pledges
    *
-   * @param int $contactID contact id
+   * @param int $contactID
+   *   Contact id.
    *
    * @return array associated array of pledge id(s)
    * @static
@@ -904,7 +921,8 @@ SELECT  pledge.contact_id              as contact_id,
     if ($sendReminders) {
       // retrieve domain tokens
       $domain = CRM_Core_BAO_Domain::getDomain();
-      $tokens = array('domain' => array('name', 'phone', 'address', 'email'),
+      $tokens = array(
+      'domain' => array('name', 'phone', 'address', 'email'),
         'contact' => CRM_Core_SelectValues::contactTokens(),
       );
 
@@ -1073,11 +1091,11 @@ SELECT  pledge.contact_id              as contact_id,
    * when no transactions have taken place - the editing process currently involves deleting all pledge payments & contributions
    * & recreating so we want to block that if appropriate
    *
-   * @param integer $pledgeID
-   * @param integer $pledgeStatusID
+   * @param int $pledgeID
+   * @param int $pledgeStatusID
    * @return bool do financial transactions exist for this pledge?
    */
-   public static function pledgeHasFinancialTransactions($pledgeID, $pledgeStatusID) {
+  public static function pledgeHasFinancialTransactions($pledgeID, $pledgeStatusID) {
     if (empty($pledgeStatusID)) {
       //why would this happen? If we can see where it does then we can see if we should look it up
       //but assuming from form code it CAN be empty
@@ -1088,11 +1106,12 @@ SELECT  pledge.contact_id              as contact_id,
     }
 
     return civicrm_api3('pledge_payment', 'getcount', array('pledge_id' => $pledgeID, 'status_id' => array('IN' => self::getTransactionalStatus())));
-    }
+  }
 
   /**
    * Does this pledge / pledge payment status mean that a financial transaction has taken place?
-   * @param int $statusID pledge status id
+   * @param int $statusID
+   *   Pledge status id.
    *
    * @return bool is it a transactional status?
    */

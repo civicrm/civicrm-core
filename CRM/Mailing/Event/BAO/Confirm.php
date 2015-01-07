@@ -50,9 +50,12 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
   /**
    * Confirm a pending subscription
    *
-   * @param int $contact_id       The id of the contact
-   * @param int $subscribe_id     The id of the subscription event
-   * @param string $hash          The hash
+   * @param int $contact_id
+   *   The id of the contact.
+   * @param int $subscribe_id
+   *   The id of the subscription event.
+   * @param string $hash
+   *   The hash.
    *
    * @return boolean              True on success
    * @static
@@ -140,7 +143,8 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $text = CRM_Utils_Token::replaceWelcomeTokens($text, $group->title, FALSE);
 
     $mailParams = array(
-      'groupName' => 'Mailing Event ' . $component->component_type, 'subject' => $component->subject,
+      'groupName' => 'Mailing Event ' . $component->component_type,
+    'subject' => $component->subject,
       'from' => "\"$domainEmailName\" <do-not-reply@$emailDomain>",
       'toEmail' => $email,
       'toName' => $display_name,

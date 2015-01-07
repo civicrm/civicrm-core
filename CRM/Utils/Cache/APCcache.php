@@ -57,7 +57,8 @@ class CRM_Utils_Cache_APCcache {
   /**
    * Constructor
    *
-   * @param array $config an array of configuration params
+   * @param array $config
+   *   An array of configuration params.
    *
    * @return \CRM_Utils_Cache_APCcache
    */
@@ -109,7 +110,7 @@ class CRM_Utils_Cache_APCcache {
 
     foreach ($keys as $key) {
       $name = $key['info'];
-      if ($prefix == substr($name,0,$lp)) {  // Ours?
+      if ($prefix == substr($name, 0, $lp)) {  // Ours?
         apc_delete($this->_prefix . $name);
       }
     }

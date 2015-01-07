@@ -115,28 +115,34 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
           case 'Contribute':
             $this->_exportMode = self::CONTRIBUTE_EXPORT;
             break;
+
           case 'Member':
             $this->_exportMode = self::MEMBER_EXPORT;
             break;
+
           case 'Event':
             $this->_exportMode = self::EVENT_EXPORT;
             break;
+
           case 'Pledge':
             $this->_exportMode = self::PLEDGE_EXPORT;
             break;
+
           case 'Case':
             $this->_exportMode = self::CASE_EXPORT;
             break;
+
           case 'Grant':
             $this->_exportMode = self::GRANT_EXPORT;
             break;
+
           case 'Activity':
             $this->_exportMode = self::ACTIVITY_EXPORT;
             break;
         }
 
         $className = "CRM_{$componentName[1]}_Form_Task";
-        $className::preProcessCommon( $this, true );
+        $className::preProcessCommon( $this, TRUE );
         $values = $this->controller->exportValues('Search');
       }
       else {
@@ -177,11 +183,13 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
         $this->_exportMode = self::ACTIVITY_EXPORT;
         $componentName = array('', 'Activity');
         break;
+
       case 5:
         CRM_Member_Form_Task::preProcessCommon($this, TRUE);
         $this->_exportMode = self::MEMBER_EXPORT;
         $componentName = array('', 'Member');
         break;
+
       case 6:
         CRM_Case_Form_Task::preProcessCommon($this, TRUE);
         $this->_exportMode = self::CASE_EXPORT;
@@ -332,7 +340,8 @@ FROM   {$this->_componentTable}
   /**
    * Validation
    *
-   * @param array $params (ref.) an assoc array of name/value pairs
+   * @param array $params
+   *   (ref.) an assoc array of name/value pairs.
    *
    * @param $files
    * @param $self
@@ -407,7 +416,6 @@ FROM   {$this->_componentTable}
     else {
       $this->set('mappingId', NULL);
     }
-
 
     if ($exportOption == self::EXPORT_ALL) {
       CRM_Export_BAO_Export::exportComponents($this->_selectAll,

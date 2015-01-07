@@ -50,9 +50,12 @@ class CRM_Mailing_Event_BAO_Unsubscribe extends CRM_Mailing_Event_DAO_Unsubscrib
   /**
    * Unsubscribe a contact from the domain
    *
-   * @param int $job_id       The job ID
-   * @param int $queue_id     The Queue Event ID of the recipient
-   * @param string $hash      The hash
+   * @param int $job_id
+   *   The job ID.
+   * @param int $queue_id
+   *   The Queue Event ID of the recipient.
+   * @param string $hash
+   *   The hash.
    *
    * @return boolean          Was the contact successfully unsubscribed?
    * @static
@@ -76,7 +79,8 @@ SET    on_hold = 2,
        hold_date = %1
 WHERE  email = %2
 ";
-        $sqlParams = array(1 => array($now, 'Timestamp'),
+        $sqlParams = array(
+        1 => array($now, 'Timestamp'),
           2 => array($email->email, 'String'),
         );
         CRM_Core_DAO::executeQuery($sql, $sqlParams);
@@ -112,10 +116,14 @@ WHERE  email = %2
   /**
    * Unsubscribe a contact from all groups that received this mailing
    *
-   * @param int $job_id       The job ID
-   * @param int $queue_id     The Queue Event ID of the recipient
-   * @param string $hash      The hash
-   * @param boolean $return   If true return the list of groups.
+   * @param int $job_id
+   *   The job ID.
+   * @param int $queue_id
+   *   The Queue Event ID of the recipient.
+   * @param string $hash
+   *   The hash.
+   * @param bool $return
+   *   If true return the list of groups.
    *
    * @return array|null $groups    Array of all groups from which the contact was removed, or null if the queue event could not be found.
    * @static
@@ -167,7 +175,6 @@ WHERE  email = %2
 
     /* Make a list of groups and a list of prior mailings that received
          * this mailing */
-
 
     $groups = array();
     $base_groups = array();
@@ -284,10 +291,14 @@ WHERE  email = %2
    * Send a reponse email informing the contact of the groups from which he
    * has been unsubscribed.
    *
-   * @param string $queue_id      The queue event ID
-   * @param array $groups         List of group IDs
-   * @param bool $is_domain       Is this domain-level?
-   * @param int $job              The job ID
+   * @param string $queue_id
+   *   The queue event ID.
+   * @param array $groups
+   *   List of group IDs.
+   * @param bool $is_domain
+   *   Is this domain-level?.
+   * @param int $job
+   *   The job ID.
    *
    * @return void
    * @static
@@ -404,16 +415,20 @@ WHERE  email = %2
   /**
    * Get row count for the event selector
    *
-   * @param int $mailing_id ID of the mailing
-   * @param int $job_id Optional ID of a job to filter on
-   * @param boolean $is_distinct Group by queue ID?
+   * @param int $mailing_id
+   *   ID of the mailing.
+   * @param int $job_id
+   *   Optional ID of a job to filter on.
+   * @param bool $is_distinct
+   *   Group by queue ID?.
    *
    * @param null $org_unsubscribe
    *
    * @return int                  Number of rows in result set
    * @static
    */
-  public static function getTotalCount($mailing_id, $job_id = NULL,
+  public static function getTotalCount(
+    $mailing_id, $job_id = NULL,
     $is_distinct = FALSE, $org_unsubscribe = NULL, $toDate = NULL
   ) {
     $dao = new CRM_Core_DAO();
@@ -467,18 +482,25 @@ WHERE  email = %2
   /**
    * Get rows for the event browser
    *
-   * @param int $mailing_id ID of the mailing
-   * @param int $job_id optional ID of the job
-   * @param boolean $is_distinct Group by queue id?
-   * @param int $offset Offset
-   * @param int $rowCount Number of rows
-   * @param array $sort sort array
+   * @param int $mailing_id
+   *   ID of the mailing.
+   * @param int $job_id
+   *   Optional ID of the job.
+   * @param bool $is_distinct
+   *   Group by queue id?.
+   * @param int $offset
+   *   Offset.
+   * @param int $rowCount
+   *   Number of rows.
+   * @param array $sort
+   *   Sort array.
    *
    * @param null $org_unsubscribe
    * @return array                Result set
    * @static
    */
-  public static function &getRows($mailing_id, $job_id = NULL,
+  public static function &getRows(
+    $mailing_id, $job_id = NULL,
     $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL,
     $org_unsubscribe = NULL
   ) {

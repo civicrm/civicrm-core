@@ -84,7 +84,8 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
 
     $this->add('checkbox', 'is_ssl', ts('Use SSL?'));
 
-    $usedfor = array(1 => ts('Bounce Processing'),
+    $usedfor = array(
+    1 => ts('Bounce Processing'),
       0 => ts('Email-to-Activity Processing'),
     );
     $this->add('select', 'is_default', ts('Used For?'), $usedfor);
@@ -103,7 +104,8 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @return array list of errors to be posted back to the form
    * @static

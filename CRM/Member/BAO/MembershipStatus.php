@@ -49,8 +49,10 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Member_BAO_MembershipStatus object
    * @static
@@ -68,8 +70,10 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on sucess, null otherwise
    * @static
@@ -82,7 +86,8 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * Takes an associative array and creates a membership Status object
    * See http://wiki.civicrm.org/confluence/display/CRM/Database+layer
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @throws Exception
    * @return CRM_Member_BAO_MembershipStatus object
@@ -107,8 +112,10 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   /**
    * Add the membership types
    *
-   * @param array $params reference array contains the values submitted by the form
-   * @param array $ids array contains the id - this param is deprecated
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
+   * @param array $ids
+   *   Array contains the id - this param is deprecated.
    *
    * @static
    *
@@ -135,8 +142,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
         CRM_Core_DAO::$_nullArray
       );
     }
-
-
 
     // action is taken depending upon the mode
     $membershipStatus = new CRM_Member_DAO_MembershipStatus();
@@ -212,24 +217,30 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   /**
    * Find the membership status based on start date, end date, join date & status date.
    *
-   * @param  string $startDate start date of the member whose membership status is to be calculated.
-   * @param  string $endDate end date of the member whose membership status is to be calculated.
-   * @param  string $joinDate join date of the member whose membership status is to be calculated.
+   * @param string $startDate
+   *   Start date of the member whose membership status is to be calculated.
+   * @param string $endDate
+   *   End date of the member whose membership status is to be calculated.
+   * @param string $joinDate
+   *   Join date of the member whose membership status is to be calculated.
    * @param \date|string $statusDate status date of the member whose membership status is to be calculated.
-   * @param  boolean $excludeIsAdmin exclude the statuses those having is_admin = 1
+   * @param bool $excludeIsAdminExclude the statuses those having is_admin = 1.
+   *   Exclude the statuses those having is_admin = 1.
    * @param int $membershipTypeID
-   * @param array $membership membership params as available to calling function - passed to the hook
+   * @param array $membership
+   *   Membership params as available to calling function - passed to the hook.
    *
    * @return array
   @static
    */
-  static function getMembershipStatusByDate($startDate, $endDate, $joinDate,
+  static function getMembershipStatusByDate(
+    $startDate, $endDate, $joinDate,
     $statusDate = 'today', $excludeIsAdmin = FALSE, $membershipTypeID, $membership = array()
   ) {
     $membershipDetails = array();
 
     if (!$statusDate || $statusDate == 'today') {
-      $statusDate = getDate();
+      $statusDate = getdate();
       $statusDate = date('Ymd',
         mktime($statusDate['hours'],
           $statusDate['minutes'],
@@ -296,7 +307,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
                     ${$dat . 'Month'} + $membershipStatus->{$eve . '_event_adjust_interval'},
                     ${$dat . 'Day'},
                     ${$dat . 'Year'}
-                  ));
+                ));
               }
               // add in days
               if ($membershipStatus->{$eve . '_event_adjust_unit'} == 'day') {
@@ -304,7 +315,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
                     ${$dat . 'Month'},
                     ${$dat . 'Day'} + $membershipStatus->{$eve . '_event_adjust_interval'},
                     ${$dat . 'Year'}
-                  ));
+                ));
               }
               // add in years
               if ($membershipStatus->{$eve . '_event_adjust_unit'} == 'year') {
@@ -312,7 +323,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
                     ${$dat . 'Month'},
                     ${$dat . 'Day'},
                     ${$dat . 'Year'} + $membershipStatus->{$eve . '_event_adjust_interval'}
-                  ));
+                ));
               }
               // if no interval and unit, present
             }

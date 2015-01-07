@@ -44,8 +44,8 @@
  */
 function civicrm_api3_word_replacement_get($params) {
   $bao = new CRM_Core_BAO_WordReplacement();
-  _civicrm_api3_dao_set_filter($bao, $params, true, 'WordReplacement');
-  $wordReplacements = _civicrm_api3_dao_to_array($bao, $params, true,'WordReplacement');
+  _civicrm_api3_dao_set_filter($bao, $params, TRUE, 'WordReplacement');
+  $wordReplacements = _civicrm_api3_dao_to_array($bao, $params, TRUE, 'WordReplacement');
 
   return civicrm_api3_create_success($wordReplacements, $params, 'word_replacement', 'get', $bao);
 }
@@ -68,7 +68,8 @@ function civicrm_api3_word_replacement_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_word_replacement_create_spec(&$params) {
   unset($params['version']);
@@ -78,7 +79,8 @@ function _civicrm_api3_word_replacement_create_spec(&$params) {
  * delete an existing word_replacement
  *
  *
- * @param array $params array containing id of the word_replacement
+ * @param array $params
+ *   Array containing id of the word_replacement.
  *  to be deleted
  *
  * @return array api result array

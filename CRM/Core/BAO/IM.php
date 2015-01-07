@@ -41,7 +41,8 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
   /**
    * Takes an associative array and adds im
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return object       CRM_Core_BAO_IM object on success, null otherwise
    * @static
@@ -74,7 +75,8 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
   /**
    * Get all the ims for a specified contact_id, with the primary im being first
    *
-   * @param int $id the contact id
+   * @param int $id
+   *   The contact id.
    *
    * @param bool $updateBlankLocInfo
    *
@@ -125,7 +127,8 @@ ORDER BY
   /**
    * Get all the ims for a specified location_block id, with the primary im being first
    *
-   * @param array  $entityElements the array containing entity_id and
+   * @param array $entityElements
+   *   The array containing entity_id and.
    * entity_table name
    *
    * @return array  the array of im details

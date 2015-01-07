@@ -91,7 +91,9 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
     if ($this->_id &&
       CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $this->_id, 'is_reserved')
     ) {
-      foreach (array('contactTypeA', 'contactTypeB', 'isActive') as $field)$$field->freeze();
+      foreach (array('contactTypeA', 'contactTypeB', 'isActive') as $field) {
+        $$field->freeze();
+      }
     }
 
     if ($this->_action & CRM_Core_Action::VIEW) {

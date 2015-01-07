@@ -106,7 +106,8 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   /**********************************************************
    * Constructor
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param $paymentProcessor
    *
@@ -126,7 +127,8 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   /**
    * Singleton function used to manage this object
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param object $paymentProcessor
    * @param null $paymentForm
@@ -135,7 +137,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    * @return object
    * @static
    */
-  public static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = false) {
+  public static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     if (!empty($paymentProcessor['id'])) {
       $cacheKey = $paymentProcessor['id'];
     }
@@ -191,7 +193,6 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
        $currentcyID    = $params['currencyID'];
        $country        = $params['country'];
        */
-
 
     //-------------------------------------------------------------
     // Prepare some composite data from _paymentProcessor fields
@@ -323,12 +324,14 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
       $errorDesc = curl_error($submit);
 
       // Paranoia - in the unlikley event that 'curl' errno fails
-      if ($errorNum == 0)
-      $errorNum = 9005;
+      if ($errorNum == 0) {
+        $errorNum = 9005;
+      }
 
       // Paranoia - in the unlikley event that 'curl' error fails
-      if (strlen($errorDesc) == 0)
-      $errorDesc = "Connection to eWAY payment gateway failed";
+      if (strlen($errorDesc) == 0) {
+        $errorDesc = "Connection to eWAY payment gateway failed";
+      }
 
       return self::errorExit($errorNum, $errorDesc);
     }
@@ -415,7 +418,6 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
        }
        */
 
-
     //=============
     // Success !
     //=============
@@ -434,7 +436,8 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   /**
    * Checks to see if invoice_id already exists in db
    *
-   * @param  int     $invoiceId   The ID to check
+   * @param int $invoiceId
+   *   The ID to check.
    *
    * @return bool                 True if ID exists, else false
    */
@@ -524,7 +527,6 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   public function send_alert_email($p_eWAY_tran_num, $p_trxn_out, $p_trxn_back, $p_request, $p_response) {
     // Initialization call is required to use CiviCRM APIs.
     civicrm_initialize(TRUE);
-
 
     list($fromName, $fromEmail) = CRM_Core_BAO_Domain::getNameAndEmail();
     $from = "$fromName <$fromEmail>";

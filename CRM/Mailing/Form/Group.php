@@ -127,8 +127,8 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
       $dao = new CRM_Mailing_DAO_MailingGroup();
 
       $mailingGroups = array(
-        'civicrm_group' => array( ),
-        'civicrm_mailing' => array( )
+        'civicrm_group' => array(),
+        'civicrm_mailing' => array()
       );
       $dao->mailing_id = $this->_mailingID;
       $dao->find();
@@ -283,7 +283,8 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
     $this->addFormRule(array('CRM_Mailing_Form_Group', 'formRule'));
 
     $buttons = array(
-      array('type' => 'next',
+      array(
+    'type' => 'next',
         'name' => ts('Next >>'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
@@ -352,7 +353,8 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
       else {
         //get the hidden smart group id.
         $ssId = $this->get('ssID');
-        $hiddenSmartParams = array('group_type' => array('2' => 1),
+        $hiddenSmartParams = array(
+        'group_type' => array('2' => 1),
           'form_values' => $this->get('formValues'),
           'saved_search_id' => $ssId,
           'search_custom_id' => $this->get('customSearchID'),
@@ -384,7 +386,6 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
         $params[$n] = $values[$n];
       }
     }
-
 
     $qf_Group_submit = $this->controller->exportValue($this->_name, '_qf_Group_submit');
     $this->set('name', $params['name']);
@@ -539,7 +540,8 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @return array list of errors to be posted back to the form
    * @static

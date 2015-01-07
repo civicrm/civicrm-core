@@ -97,7 +97,8 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    * @return array|null
    */
   public function getUserDashboardElement() {
-    return array('name' => ts('Pledges'),
+    return array(
+    'name' => ts('Pledges'),
       'title' => ts('Your Pledge(s)'),
       // we need to check this permission since you can click on contribution page link for making payment
       'perm' => array('make online contributions'),
@@ -118,7 +119,8 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    * @return array|null
    */
   public function registerTab() {
-    return array('title' => ts('Pledges'),
+    return array(
+    'title' => ts('Pledges'),
       'url' => 'pledge',
       'weight' => 25,
     );
@@ -137,7 +139,8 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    * @return array|null
    */
   public function registerAdvancedSearchPane() {
-    return array('title' => ts('Pledges'),
+    return array(
+    'title' => ts('Pledges'),
       'weight' => 25,
     );
   }
@@ -168,7 +171,8 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
       CRM_Core_Permission::check('edit pledges')
     ) {
       $shortCuts = array_merge($shortCuts, array(
-        array('path' => 'civicrm/pledge/add',
+        array(
+      'path' => 'civicrm/pledge/add',
             'query' => 'reset=1&action=add&context=standalone',
             'ref' => 'new-pledge',
             'title' => ts('Pledge'),

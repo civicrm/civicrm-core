@@ -40,7 +40,8 @@
 /**
  * Create or Update a Soft Credit
  *
- * @param array $params  Associative array of property
+ * @param array $params
+ *   Associative array of property.
  *                       name/value pairs to insert in new 'contribution_soft'
  *
  * @example ContributionSoftCreate.php Standard Create Example //FIXME
@@ -57,7 +58,8 @@ function civicrm_api3_contribution_soft_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_contribution_soft_create_spec(&$params) {
   $params['contribution_id']['api.required'] = 1;
@@ -68,7 +70,7 @@ function _civicrm_api3_contribution_soft_create_spec(&$params) {
 /**
  * Deletes an existing Soft Credit
  *
- * @param  array  $params
+ * @param array $params
  *
  * @example ContributionSoftDelete.php Standard Delete Example
  *
@@ -85,12 +87,13 @@ function civicrm_api3_contribution_soft_delete($params) {
 /**
  * Retrieve one or more Soft Credits
  *
- * @param  array input parameters
+ * @param array input parameters
  *
  *
  * @example ContributionSoftGet.php Standard Get Example
  *
- * @param  array $params  an associative array of name/value pairs.
+ * @param array $params
+ *   An associative array of name/value pairs.
  *
  * @return  array api result
  * {@getfields contribution_soft_get}
@@ -99,4 +102,3 @@ function civicrm_api3_contribution_soft_delete($params) {
 function civicrm_api3_contribution_soft_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

@@ -49,7 +49,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   /**
    * Constructor
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param $paymentProcessor
    *
@@ -59,7 +60,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('PayPal Pro');
-    $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(false, null, 'name');
+    $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, NULL, 'name');
 
     if ($this->_paymentProcessor['payment_processor_type_id'] == CRM_Utils_Array::key('PayPal_Standard', $paymentProcessorType)) {
       $this->_processorName = ts('PayPal Standard');
@@ -77,7 +78,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   /**
    * Singleton function used to manage this object
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param object $paymentProcessor
    * @param null $paymentForm
@@ -113,7 +115,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   /**
    * Express checkout code. Check PayPal documentation for more information
    *
-   * @param  array $params assoc array of input parameters for this transaction
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
    *
    * @return array the result in an nice formatted array (or an error object)
    */
@@ -156,7 +159,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   /**
    * Get details from paypal. Check PayPal documentation for more information
    *
-   * @param  string $token the key associated with this transaction
+   * @param string $token
+   *   The key associated with this transaction.
    *
    * @return array the result in an nice formatted array (or an error object)
    */
@@ -314,7 +318,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * This function collects all the information from a web/api form and invokes
    * the relevant payment processor specific functions to perform the transaction
    *
-   * @param  array $params assoc array of input parameters for this transaction
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
    *
    * @param string $component
    * @return array the result in an nice formatted array (or an error object)
@@ -397,7 +402,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    */
   public function checkConfig() {
     $error = array();
-    $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(false, null, 'name');
+    $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, NULL, 'name');
     if (
       $this->_paymentProcessor['payment_processor_type_id'] == CRM_Utils_Array::key('PayPal_Standard', $paymentProcessorType) ||
       $this->_paymentProcessor['payment_processor_type_id'] == CRM_Utils_Array::key('PayPal', $paymentProcessorType)
@@ -440,7 +445,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   /**
    * Check whether a method is present ( & supported ) by the payment processor object.
    *
-   * @param  string $method method to check for.
+   * @param string $method
+   *   Method to check for.
    *
    * @return boolean
    */

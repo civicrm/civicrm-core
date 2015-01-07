@@ -134,23 +134,28 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
   /**
    * Class constructor
    *
-   * @param array $queryParams array of parameters for query
+   * @param array $queryParams
+   *   Array of parameters for query.
    * @param \const|int $action - action of search basic or advanced.
-   * @param string $surveyClause if the caller wants to further restrict the search.
-   * @param boolean $single are we dealing only with one contact?
-   * @param int $limit how many voters do we want returned
+   * @param string $surveyClause
+   *   If the caller wants to further restrict the search.
+   * @param bool $single
+   *   Are we dealing only with one contact?.
+   * @param int $limit
+   *   How many voters do we want returned.
    *
    * @param string $context
    *
    * @return \CRM_Campaign_Selector_Search
   @access public
    */
-  function __construct(&$queryParams,
-    $action       = CRM_Core_Action::NONE,
+  function __construct(
+    &$queryParams,
+    $action = CRM_Core_Action::NONE,
     $surveyClause = NULL,
-    $single       = FALSE,
-    $limit        = NULL,
-    $context      = 'search'
+    $single = FALSE,
+    $limit = NULL,
+    $context = 'search'
   ) {
     // submitted form values
     $this->_queryParams = &$queryParams;
@@ -223,11 +228,16 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
   /**
    * Returns all the rows in the given offset and rowCount
    *
-   * @param enum   $action   the action being performed
-   * @param int    $offset   the row number to start from
-   * @param int    $rowCount the number of rows to return
-   * @param string $sort     the sql string that describes the sort order
-   * @param enum   $output   what should the result set include (web/email/csv)
+   * @param enum $action
+   *   The action being performed.
+   * @param int $offset
+   *   The row number to start from.
+   * @param int $rowCount
+   *   The number of rows to return.
+   * @param string $sort
+   *   The sql string that describes the sort order.
+   * @param enum $output
+   *   What should the result set include (web/email/csv).
    *
    * @return int   the total number of rows for this action
    */
@@ -240,11 +250,10 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
       $this->_campaignFromClause
     );
 
-
     // process the result of the query
     $rows = array();
 
-    While ($result->fetch()) {
+    while ($result->fetch()) {
       $this->_query->convertToPseudoNames($result);
       $row = array();
       // the columns we are interested in
@@ -310,8 +319,10 @@ FROM {$from}
    * Returns the column headers as an array of tuples:
    * (name, sortName (key to the sort array))
    *
-   * @param string $action the action being performed
-   * @param enum   $output what should the result set include (web/email/csv)
+   * @param string $action
+   *   The action being performed.
+   * @param enum $output
+   *   What should the result set include (web/email/csv).
    *
    * @return array the column headers that need to be displayed
    */
@@ -320,24 +331,30 @@ FROM {$from}
 
     if (!$this->_single) {
       $contactDetails = array(
-        array('name' => ts('Contact Name'),
+        array(
+      'name' => ts('Contact Name'),
           'sort' => 'sort_name',
           'direction' => CRM_Utils_Sort::ASCENDING,
         ),
-        array('name' => ts('Street Number'),
+        array(
+      'name' => ts('Street Number'),
           'sort' => 'street_number',
         ),
-        array('name' => ts('Street Name'),
+        array(
+      'name' => ts('Street Name'),
           'sort' => 'street_name',
         ),
         array('name' => ts('Street Address')),
-        array('name' => ts('City'),
+        array(
+      'name' => ts('City'),
           'sort' => 'city',
         ),
-        array('name' => ts('Postal Code'),
+        array(
+      'name' => ts('Postal Code'),
           'sort' => 'postal_code',
         ),
-        array('name' => ts('State'),
+        array(
+      'name' => ts('State'),
           'sort' => 'state_province_name',
         ),
         array('name' => ts('Country')),
@@ -360,7 +377,8 @@ FROM {$from}
   /**
    * Name of export file.
    *
-   * @param string $output type of output
+   * @param string $output
+   *   Type of output.
    *
    * @return string name of the file
    */

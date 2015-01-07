@@ -7,7 +7,8 @@ class PCPBlock extends PHPUnit_Framework_Testcase {
   /**
    * Helper function to create a PCP Block for Contribution Page
    *
-   * @param  int $contributionPageId - id of the Contribution Page
+   * @param int $contributionPageId
+   *   Id of the Contribution Page.
    * to be deleted
    * @return array of created pcp block
    *
@@ -90,7 +91,7 @@ class PCPBlock extends PHPUnit_Framework_Testcase {
   /**
    * Helper function to delete a PCP related stuff viz. Profile, PCP Block Entry
    *
-   * @param  array key value pair
+   * @param array key value pair
    * pcpBlockId - id of the PCP Block Id, profileID - id of Supporter Profile
    * to be deleted
    * @return boolean true if success, false otherwise
@@ -100,7 +101,6 @@ class PCPBlock extends PHPUnit_Framework_Testcase {
 
     $delete_params = array('id' => $params['profileId']);
     $resulProfile = civicrm_api('uf_group', 'delete', $delete_params);
-
 
     require_once 'CRM/Contribute/DAO/PCPBlock.php';
     $dao = new CRM_Contribute_DAO_PCPBlock();

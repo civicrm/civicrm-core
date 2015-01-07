@@ -149,7 +149,8 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
   /**
    * Validation
    *
-   * @param array $params (ref.) an assoc array of name/value pairs
+   * @param array $params
+   *   (ref.) an assoc array of name/value pairs.
    *
    * @param $files
    * @param $options
@@ -172,7 +173,8 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
         if ($params['body_' . $type]) {
           if (preg_match('/' . preg_quote('{' . $token . '}') . '/', $params['body_' . $type])) {
             $dataErrors[] = '<li>' . ts('This message is having a invalid token - %1: %2', array(
-              1 => $token, 2 => $desc)) . '</li>';
+              1 => $token,
+            2 => $desc)) . '</li>';
           }
         }
       }

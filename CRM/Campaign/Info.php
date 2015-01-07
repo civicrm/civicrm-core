@@ -126,7 +126,8 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
       CRM_Core_Permission::check('administer CiviCampaign')
     ) {
       $shortCuts = array_merge($shortCuts, array(
-        array('path' => 'civicrm/campaign/add',
+        array(
+      'path' => 'civicrm/campaign/add',
             'query' => "reset=1&action=add",
             'ref' => 'new-campaign',
             'title' => ts('Campaign'),

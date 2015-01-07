@@ -389,8 +389,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
       unset($clauses['receive_date1'], $clauses['total_amount1']);
     }
 
-    $whereClause = !empty($clauses) ?
-      "WHERE " . implode(' AND ', $clauses) : '';
+    $whereClause = !empty($clauses) ? "WHERE " . implode(' AND ', $clauses) : '';
 
     if ($replaceAliasWith) {
       $whereClause = str_replace($this->_aliases['civicrm_contribution'], $replaceAliasWith, $whereClause);
@@ -428,8 +427,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
       }
     }
 
-    $this->_where = !empty($clauses) ?
-      "WHERE " . implode(' AND ', $clauses) : '';
+    $this->_where = !empty($clauses) ? "WHERE " . implode(' AND ', $clauses) : '';
   }
 
   /**

@@ -90,7 +90,8 @@ class CRM_Admin_Form_PreferencesDate extends CRM_Admin_Form {
   /**
    * Global validation rules for the form
    *
-   * @param array  $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @return array    if errors then list of errors to be posted back to the form,
    *                  true otherwise

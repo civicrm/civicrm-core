@@ -58,7 +58,6 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
       $this->redirectToListing();
     }
 
-
     // when user come from search context.
     $this->_searchBasedMailing = CRM_Contact_Form_Search::isSearchContext($this->get('context'));
 
@@ -123,7 +122,8 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
     $this->addRadio('approval_status_id', ts('Approval Status'), $mailApprovalStatus, TRUE, NULL, TRUE);
 
     $buttons = array(
-      array('type' => 'next',
+      array(
+    'type' => 'next',
         'name' => ts('Save'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
@@ -207,7 +207,6 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
     }
 
     CRM_Mailing_BAO_Mailing::create($params, $ids);
-
 
     //when user perform mailing from search context
     //redirect it to search result CRM-3711

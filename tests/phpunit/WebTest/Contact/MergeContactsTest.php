@@ -276,7 +276,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // Now we're filling the "Assigned To" field.
     // Typing contact's name into the field (using typeKeys(), not type()!)...
-    $this->select2("assignee_contact_id", $firstName,TRUE,FALSE);
+    $this->select2("assignee_contact_id", $firstName, TRUE, FALSE);
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertTrue($this->isTextPresent("$lastName, " . $firstName), "Contact not found in line " . __LINE__);
@@ -507,7 +507,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $firstName = "Kerry".substr(sha1(rand()), 0, 7);
     //last name
     $lastName = "King".substr(sha1(rand()), 0, 7);
-    $this->_createContacts($firstName,$lastName);
+    $this->_createContacts($firstName, $lastName);
 
     //add contact2 and its duplicate
     //These are the contacts with conflicts in communication preference.these contacts will be skipped during merge.
@@ -579,14 +579,14 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $firstName2 = "David".substr(sha1(rand()), 0, 7);
     //fill in last name
     $lastName2 = "Gilmour".substr(sha1(rand()), 0, 7);
-    $this->_createContacts($firstName2,$lastName2);
+    $this->_createContacts($firstName2, $lastName2);
 
     // add contact4 and its duplicate
     //fill in first name
     $firstName3 = "Dave".substr(sha1(rand()), 0, 7);
     //fill in last name
     $lastName3 = "Mustaine".substr(sha1(rand()), 0, 7);
-    $this->_createContacts($firstName3,$lastName3);
+    $this->_createContacts($firstName3, $lastName3);
 
     // Find and Merge Contacts with Supervised Rule
     $this->openCiviPage("contact/dedupefind", "reset=1&rgid=1&action=renew", "css=#DedupeFind table.pagerDisplay tbody tr");
@@ -597,7 +597,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // Check confirmation alert.
     $this->assertTrue(
-      (bool)preg_match("/^This will run the batch merge process on the listed duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation./",
+      (bool) preg_match("/^This will run the batch merge process on the listed duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation./",
         $this->getConfirmation()
                                        ));
     $this->chooseOkOnNextConfirmation();
@@ -972,7 +972,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage("contact/dedupefind", "reset=1&action=update&rgid=4");
     $this->click("xpath=//a/span[text()='Refresh Duplicates']");
-    $this->assertTrue((bool)preg_match("/This will refresh the duplicates list. Click OK to proceed./", $this->getConfirmation()));
+    $this->assertTrue((bool) preg_match("/This will refresh the duplicates list. Click OK to proceed./", $this->getConfirmation()));
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("xpath=//a[text()='$firstName $lastName']/../../td[4]/a[text()='merge']");

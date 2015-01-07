@@ -237,7 +237,6 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
         ),
       );
 
-
       if (CRM_Core_Permission::check('access CiviCRM')) {
         self::$_links = array_merge(self::$_links, array(
           CRM_Core_Action::DISABLE => array(

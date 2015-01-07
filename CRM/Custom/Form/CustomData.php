@@ -43,13 +43,14 @@ class CRM_Custom_Form_CustomData {
    * @param null|string $subName
    * @param null|string $subType
    * @param null|int $groupCount
-   * @param null|String $type
+   * @param string $type
    * @param null|int $entityID
    * @param null $onlySubType
    *
    * @return void
    */
-  static function preProcess(&$form, $subName = NULL, $subType = NULL,
+  static function preProcess(
+    &$form, $subName = NULL, $subType = NULL,
     $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL
   ) {
     if ($type) {

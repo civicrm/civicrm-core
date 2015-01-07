@@ -43,18 +43,26 @@ class CRM_Core_Form_Tag {
   /**
    * Build tag widget if correct parent is passed
    *
-   * @param CRM_Core_Form $form form object
-   * @param string $parentNames parent name ( tag name)
-   * @param string $entityTable entitytable 'eg: civicrm_contact'
-   * @param int $entityId entityid  'eg: contact id'
-   * @param boolean $skipTagCreate true if tag need be created using ajax
-   * @param boolean $skipEntityAction true if need to add entry in entry table via ajax
-   * @param string $tagsetElementName if you need to create tagsetlist with specific name
+   * @param CRM_Core_Form $form
+   *   Form object.
+   * @param string $parentNames
+   *   Parent name ( tag name).
+   * @param string $entityTable
+   *   Entitytable 'eg: civicrm_contact'.
+   * @param int $entityId
+   *   Entityid 'eg: contact id'.
+   * @param bool $skipTagCreate
+   *   True if tag need be created using ajax.
+   * @param bool $skipEntityAction
+   *   True if need to add entry in entry table via ajax.
+   * @param string $tagsetElementName
+   *   If you need to create tagsetlist with specific name.
    *
    * @return void
    * @static
    */
-  static function buildQuickForm(&$form, $parentNames, $entityTable, $entityId = NULL, $skipTagCreate = FALSE,
+  static function buildQuickForm(
+    &$form, $parentNames, $entityTable, $entityId = NULL, $skipTagCreate = FALSE,
     $skipEntityAction = FALSE, $tagsetElementName = NULL ) {
     $tagset = $form->_entityTagValues = array();
     $form->assign("isTagset", FALSE);
@@ -117,10 +125,14 @@ class CRM_Core_Form_Tag {
   /**
    * Save entity tags when it is not save used AJAX
    *
-   * @param array   $params      associated array
-   * @param int     $entityId    entity id, eg: contact id, activity id, case id, file id
-   * @param string  $entityTable entity table
-   * @param CRM_Core_Form  $form        form object
+   * @param array $params
+   *   Associated array.
+   * @param int $entityId
+   *   Entity id, eg: contact id, activity id, case id, file id.
+   * @param string $entityTable
+   *   Entity table.
+   * @param CRM_Core_Form $form
+   *   Form object.
    *
    * @return void
    * @static

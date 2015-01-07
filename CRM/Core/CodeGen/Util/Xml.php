@@ -5,7 +5,8 @@
  */
 class CRM_Core_CodeGen_Util_Xml {
   /**
-   * @param string $file path to input
+   * @param string $file
+   *   Path to input.
    *
    * @return SimpleXMLElement|bool
    */

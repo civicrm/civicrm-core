@@ -38,7 +38,8 @@ class CRM_Core_QuickForm_Action_Done extends CRM_Core_QuickForm_Action {
   /**
    * Class constructor
    *
-   * @param object $stateMachine reference to state machine object
+   * @param object $stateMachine
+   *   Reference to state machine object.
    *
    * @return \CRM_Core_QuickForm_Action_Done
   @access public

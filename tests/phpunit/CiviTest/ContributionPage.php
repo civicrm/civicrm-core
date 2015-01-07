@@ -41,7 +41,8 @@ class ContributionPage extends PHPUnit_Framework_Testcase {
   /**
    * Helper function to delete a Contribution Page
    *
-   * @param  int $contributionPageId - id of the Contribution Page
+   * @param int $contributionPageId
+   *   Id of the Contribution Page.
    * to be deleted
    * @return boolean true if Contribution Page deleted, false otherwise
    */

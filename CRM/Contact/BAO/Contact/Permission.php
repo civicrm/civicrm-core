@@ -37,7 +37,8 @@ class CRM_Contact_BAO_Contact_Permission {
   /**
    * Check if the logged in user has permissions for the operation type
    *
-   * @param int $id contact id
+   * @param int $id
+   *   Contact id.
    * @param int|string $type the type of operation (view|edit)
    *
    * @return boolean true if the user has permission, false otherwise
@@ -84,7 +85,8 @@ WHERE contact_a.id = %1 AND $permission";
    *
    * @param int $userID
    * @param int|string $type the type of operation (view|edit)
-   * @param boolean $force should we force a recompute
+   * @param bool $force
+   *   Should we force a recompute.
    *
    * @return void
    * @static
@@ -150,12 +152,14 @@ ON DUPLICATE KEY UPDATE
    * Check if there are any contacts in cache table
    *
    * @param int|string $type the type of operation (view|edit)
-   * @param int $contactID contact id
+   * @param int $contactID
+   *   Contact id.
    *
    * @return boolean
    * @static
    */
-  static function hasContactsInCache($type = CRM_Core_Permission::VIEW,
+  static function hasContactsInCache(
+    $type = CRM_Core_Permission::VIEW,
     $contactID = NULL
   ) {
     if (!$contactID) {
@@ -239,8 +243,10 @@ AND    $operationClause LIMIT 1";
   /**
    * Get the permission base on its relationship
    *
-   * @param int $selectedContactID contact id of selected contact
-   * @param int $contactID contact id of the current contact
+   * @param int $selectedContactID
+   *   Contact id of selected contact.
+   * @param int $contactID
+   *   Contact id of the current contact.
    *
    * @return bool true if logged in user has permission to view
    *   selected contact record else false
@@ -319,7 +325,8 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
   AND  ( civicrm_relationship.is_active = 1 )
 ";
       }
-      $params = array(1 => array($contactID, 'Integer'),
+      $params = array(
+      1 => array($contactID, 'Integer'),
         2 => array($selectedContactID, 'Integer'),
       );
       return CRM_Core_DAO::singleValueQuery($query, $params);

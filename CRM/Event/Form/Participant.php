@@ -286,7 +286,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->_single = TRUE;
       $this->assign('urlPath', 'civicrm/contact/view/participant');
       if (!$this->_id && !$this->_contactId) {
-        $breadCrumbs = array(array('title' => ts('CiviEvent Dashboard'),
+        $breadCrumbs = array(array(
+        'title' => ts('CiviEvent Dashboard'),
             'url' => CRM_Utils_System::url('civicrm/event', 'reset=1'),
           ));
 
@@ -612,7 +613,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
             TRUE
           )) - 1;
         if ($additionalParticipant) {
-          $deleteParticipants = array(1 => ts('Delete this participant record along with associated participant record(s).'),
+          $deleteParticipants = array(
+          1 => ts('Delete this participant record along with associated participant record(s).'),
             2 => ts('Delete only this participant record.'),
           );
           $this->addRadio('delete_participant', NULL, $deleteParticipants, NULL, '<br />');
@@ -635,7 +637,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       );
       return;
     }
-
 
     if ($this->_single && $this->_context == 'standalone') {
       $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE, 'api' => array('extra' => array('email'))), TRUE);
@@ -786,7 +787,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Global validation rules for the form
    *
-   * @param array $values posted values of the form
+   * @param array $values
+   *   Posted values of the form.
    * @param $files
    * @param $self
    *
@@ -895,7 +897,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
       if(!$this->_single && !empty($event_id)) {
         $duplicateContacts = 0;
-        while(list($k,$dupeCheckContactId) = each($this->_contactIds)) {
+        while(list($k, $dupeCheckContactId) = each($this->_contactIds)) {
           // Eliminate contacts that have already been assigned to this event.
           $dupeCheck = new CRM_Event_BAO_Participant;
           $dupeCheck->contact_id = $dupeCheckContactId;
@@ -923,7 +925,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $this->_contactIds = array_values($this->_contactIds);
       }
     }
-
 
     $participantStatus = CRM_Event_PseudoConstant::participantStatus();
     // set the contact, when contact is selected
@@ -1022,7 +1023,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         if (isset($participantCount)) {
           $this->assign('pricesetFieldsCount', $participantCount);
         }
-         $this->assign('lineItem', empty($lineItem[0]) || $this->_quickConfig? FALSE : $lineItem);
+        $this->assign('lineItem', empty($lineItem[0]) || $this->_quickConfig ? FALSE : $lineItem);
       }
       else {
         $this->assign('amount_level', $params['amount_level']);
@@ -1043,7 +1044,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if (!empty($params['total_amount'])) {
       $contributionParams['total_amount'] = CRM_Utils_Array::value('total_amount', $params);
     }
-
 
     // Retrieve the name and email of the current user - this will be the FROM for the receipt email
     $session = CRM_Core_Session::singleton();
@@ -1155,7 +1155,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     //do cleanup line  items if participant edit the Event Fee.
-      if (($this->_lineItem || !isset($params['proceSetId'])) && !$this->_paymentId && $this->_id) {
+    if (($this->_lineItem || !isset($params['proceSetId'])) && !$this->_paymentId && $this->_id) {
       CRM_Price_BAO_LineItem::deleteLineItems($this->_id, 'civicrm_participant');
     }
 
@@ -1231,7 +1231,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
 
       //CRM-15372 patch to fix fee amount replacing amount
-      $this->_params['fee_amount'] =  $this->_params['amount'];
+      $this->_params['fee_amount'] = $this->_params['amount'];
 
       $participants[] = CRM_Event_Form_Registration::addParticipant($this, $contactID);
 
@@ -1404,7 +1404,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
             $feeLevel = $this->_params['amount_priceset_level_radio'];
           }
           else {
-            $feeLevel[] = $this->_params['fee_level'] ;
+            $feeLevel[] = $this->_params['fee_level'];
           }
           CRM_Event_BAO_Participant::createDiscountTrxn($this->_eventId, $contributionParams, $feeLevel);
         }
@@ -1607,7 +1607,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         if ($this->_isPaidEvent) {
           // fix amount for each of participants ( for bulk mode )
           $eventAmount = array();
-          $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+          $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
           $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
           $totalTaxAmount = 0;
 
@@ -1676,7 +1676,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
         $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
         if (count($taxAmt) > 0 && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
-          $sendTemplateParams['isEmailPdf'] = True;
+          $sendTemplateParams['isEmailPdf'] = TRUE;
           $sendTemplateParams['contributionId'] = $contributionId;
         }
         list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);

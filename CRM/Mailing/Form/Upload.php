@@ -48,7 +48,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
 
     //when user come from search context.
     $ssID = $this->get('ssID');
-    $this->assign('ssid',$ssID);
+    $this->assign('ssid', $ssID);
     $this->_searchBasedMailing = CRM_Contact_Form_Search::isSearchContext($this->get('context'));
     if(CRM_Contact_Form_Search::isSearchContext($this->get('context')) && !$ssID){
       $params = array();
@@ -295,7 +295,8 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
     $this->addFormRule(array('CRM_Mailing_Form_Upload', 'formRule'), $this);
 
     $buttons = array(
-      array('type' => 'back',
+      array(
+    'type' => 'back',
         'name' => ts('<< Previous'),
       ),
       array(
@@ -501,7 +502,8 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
   /**
    * Validation
    *
-   * @param array $params (ref.) an assoc array of name/value pairs
+   * @param array $params
+   *   (ref.) an assoc array of name/value pairs.
    *
    * @param $files
    * @param $self
@@ -516,7 +518,6 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
     $errors = array();
     $template = CRM_Core_Smarty::singleton();
 
-
     if (isset($params['html_message'])) {
       $htmlMessage = str_replace(array("\n", "\r"), ' ', $params['html_message']);
       $htmlMessage = str_replace("'", "\'", $htmlMessage);
@@ -530,7 +531,8 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
     $mailing->find(TRUE);
 
     $session = CRM_Core_Session::singleton();
-    $values = array('contact_id' => $session->get('userID'),
+    $values = array(
+    'contact_id' => $session->get('userID'),
       'version' => 3,
     );
     require_once 'api/api.php';
@@ -549,7 +551,6 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
       $urls[$key]++;
     }
 
-
     // set $header and $footer
     foreach (array(
       'header', 'footer') as $part) {
@@ -567,7 +568,6 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
         ${$part}['htmlFile'] = ${$part}['textFile'] = '';
       }
     }
-
 
     $skipTextFile = $self->get('skipTextFile');
     $skipHtmlFile = $self->get('skipHtmlFile');
@@ -630,7 +630,6 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
 
       /* Do a full token replacement on a dummy verp, the current
              * contact and domain, and the first organization. */
-
 
       // here we make a dummy mailing object so that we
       // can retrieve the tokens that we need to replace

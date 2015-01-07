@@ -116,8 +116,10 @@ class CRM_Utils_Sort {
    * key names of variable (which should be the same as the column name)
    * value: ascending or descending
    *
-   * @param mixed $vars - assoc array as described above
-   * @param string $defaultSortOrder - order to sort
+   * @param mixed $vars
+   *   Assoc array as described above.
+   * @param string $defaultSortOrder
+   *   Order to sort.
    *
    * @return \CRM_Utils_Sort
   @access public
@@ -169,8 +171,10 @@ class CRM_Utils_Sort {
   /**
    * Create the sortID string to be used in the GET param
    *
-   * @param int $index the field index
-   * @param int $dir   the direction of the sort
+   * @param int $index
+   *   The field index.
+   * @param int $dir
+   *   The direction of the sort.
    *
    * @return string  the string to append to the url
    * @static
@@ -182,7 +186,8 @@ class CRM_Utils_Sort {
   /**
    * Init the sort ID values in the object
    *
-   * @param string $defaultSortOrder the sort order to use by default
+   * @param string $defaultSortOrder
+   *   The sort order to use by default.
    *
    * @return returns null if $url- (sort url) is not found
    */
@@ -218,7 +223,8 @@ class CRM_Utils_Sort {
   /**
    * Init the object
    *
-   * @param string $defaultSortOrder the sort order to use by default
+   * @param string $defaultSortOrder
+   *   The sort order to use by default.
    *
    * @return void
    */

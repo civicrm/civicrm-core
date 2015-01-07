@@ -37,8 +37,10 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Contact_BAO_ContactType object on success, null otherwise
    * @static
@@ -142,7 +144,8 @@ WHERE  parent_id IS NULL
   /**
    * Retrieve all subtypes Information.
    *
-   * @param array $contactType .
+   * @param array $contactType
+   *   ..
    * @param bool $all
    * @param bool $ignoreCache
    * @param bool $reset
@@ -210,13 +213,14 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    *
    *   retrieve all subtypes
    *
-   * @param array $contactType .
+   * @param array $contactType
+   *   ..
    * @param bool $all
    * @param string $columnName
    * @param bool $ignoreCache
    *
    * @return  array of all subtypes OR list of subtypes associated to
-   *a given basic contact type
+   * a given basic contact type
    * @static
    */
   public static function subTypes($contactType = NULL, $all = FALSE, $columnName = 'name', $ignoreCache = FALSE) {
@@ -232,7 +236,8 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    *
    * retrieve subtype pairs with name as 'subtype-name' and 'label' as value
    *
-   * @param array $contactType .
+   * @param array $contactType
+   *   ..
    * @param bool $all
    * @param string $labelPrefix
    * @param bool $ignoreCache
@@ -369,7 +374,8 @@ WHERE  type.name IS NOT NULL
    *
    * @return mixed
    */
-  static function getSelectElements($all = FALSE,
+  static function getSelectElements(
+    $all = FALSE,
     $isSeparator = TRUE,
     $separator = '__'
   ) {
@@ -441,7 +447,8 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
   /**
    * Check if a given type is a subtype
    *
-   * @param string $subType contact subType.
+   * @param string $subType
+   *   Contact subType.
    * @param bool $ignoreCache
    *
    * @return  boolean true if subType, false otherwise.
@@ -454,9 +461,9 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
   /**
    * Retrieve the basic contact type associated with given subType.
    *
-   *@param array/string $subType contact subType.
-   *@return array/string of basicTypes.
-   *@static
+   * @param array/string $subType contact subType.
+   * @return array/string of basicTypes.
+   * @static
    *
    */
   public static function getBasicType($subType) {
@@ -495,7 +502,8 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
   /**
    * Suppress all subtypes present in given array.
    *
-   * @param array $subTypes contact subTypes
+   * @param array $subTypes
+   *   Contact subTypes.
    * @param bool $ignoreCache
    *
    * @return array of suppressed subTypes.
@@ -509,8 +517,10 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
   /**
    * Verify if a given subtype is associated with a given basic contact type.
    *
-   * @param  string $subType contact subType
-   * @param  string $contactType contact Type
+   * @param string $subType
+   *   Contact subType.
+   * @param string $contactType
+   *   Contact Type.
    * @param bool $ignoreCache
    * @param string $columnName
    *
@@ -566,7 +576,8 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
   /**
    * Delete Contact SubTypes
    *
-   * @param  int $contactTypeId ID of the Contact Subtype to be deleted.
+   * @param int $contactTypeId
+   *   ID of the Contact Subtype to be deleted.
    *
    * @return bool
    * @static
@@ -618,7 +629,8 @@ WHERE name = %1";
   /**
    * Add or update Contact SubTypes
    *
-   * @param  array $params  an assoc array of name/value pairs
+   * @param array $params
+   *   An assoc array of name/value pairs.
    *
    * @return object
    * @static
@@ -683,8 +695,10 @@ WHERE name = %1";
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on success, null otherwise
    * @static
@@ -720,8 +734,10 @@ WHERE name = %1";
    * on the basis of custom data and relationship of specific subtype
    * currently used in contact/edit form amd in import validation
    *
-   * @param  int     $contactId    contact id.
-   * @param  string  $subType      subtype.
+   * @param int $contactId
+   *   Contact id.
+   * @param string $subType
+   *   Subtype.
    *
    * @return boolean true/false.
    * @static
@@ -857,7 +873,8 @@ WHERE extends = %1 AND " . implode(" OR ", $subTypeClause);
    *
    * @return bool
    */
-  static function deleteCustomSetForSubtypeMigration($contactID,
+  static function deleteCustomSetForSubtypeMigration(
+    $contactID,
     $contactType,
     $oldSubtypeSet = array(),
     $newSubtypeSet = array()
@@ -877,8 +894,10 @@ WHERE extends = %1 AND " . implode(" OR ", $subTypeClause);
    * This function currently works for contact subtypes only and could be later improved / genralized
    * to work for other subtypes as well.
    *
-   * @param   int  $gID      - custom group id.
-   * @param  array $subtypes - list of subtypes related to which entry is to be removed.
+   * @param int $gID
+   *   Custom group id.
+   * @param array $subtypes
+   *   List of subtypes related to which entry is to be removed.
    *
    * @return void
    */
@@ -913,8 +932,10 @@ WHERE ($subtypeClause)";
   /**
    * Delete content / rows of a custom table specific entity-id for a given custom-group table.
    *
-   * @param  int $customTable - custom table name.
-   * @param  int $entityID - entity id.
+   * @param int $customTable
+   *   Custom table name.
+   * @param int $entityID
+   *   Entity id.
    *
    * @return void
    */

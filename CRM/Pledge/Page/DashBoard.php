@@ -82,7 +82,6 @@ class CRM_Pledge_Page_DashBoard extends CRM_Core_Page {
     $previousMonth   = date("F Y", mktime(0, 0, 0, date("m") - 1, 01, date("Y")));
     $this->assign('previousMonthYear', $previousMonth);
 
-
     foreach ($prefixes as $prefix) {
       $aName     = $prefix . 'ToDate';
       $startName = $prefix . 'Date';
