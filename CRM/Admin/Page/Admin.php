@@ -57,7 +57,8 @@ class CRM_Admin_Page_Admin extends CRM_Core_Page {
       CRM_Core_Session::setStatus($errorMessage, ts('Warning'), "alert", array('expires' => 0));
     }
 
-    $groups = array('Customize Data and Screens' => ts('Customize Data and Screens'),
+    $groups = array(
+    'Customize Data and Screens' => ts('Customize Data and Screens'),
       'Communications' => ts('Communications'),
       'Localization' => ts('Localization'),
       'Users and Permissions' => ts('Users and Permissions'),

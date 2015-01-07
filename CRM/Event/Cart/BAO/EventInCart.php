@@ -8,8 +8,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   public $event;
   public $event_cart;
   public $location = NULL;
-  public $participants = array(
-    );
+  public $participants = array();
 
   /**
    *
@@ -50,7 +49,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   /**
    * @param bool $useWhere
    */
-  public function delete($useWhere = false) {
+  public function delete($useWhere = FALSE) {
     $this->load_associations();
     $contacts_to_delete = array();
     foreach ($this->participants as $participant) {
@@ -254,12 +253,14 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
    * @param mixed $offset
    * @param mixed $value
    */
-  public function offsetSet($offset, $value) {}
+  public function offsetSet($offset, $value) {
+  }
 
   /**
    * @param mixed $offset
    */
-  public function offsetUnset($offset) {}
+  public function offsetUnset($offset) {
+  }
 
   /**
    * @return array
@@ -316,6 +317,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
     if ($parent_event_id == NULL) {
       return $this->event->parent_event_id;
     }
-    else return $this->event->parent_event_id == $parent_event_id;
+    else { return $this->event->parent_event_id == $parent_event_id;
+    }
   }
 }

@@ -225,7 +225,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->type('first_name', $firstName);
     $this->type('last_name', $lastName);
 
-    $this->select('state_province-1',"value=1002");
+    $this->select('state_province-1', "value=1002");
     $this->clickLink('_qf_Main_upload-bottom', '_qf_Confirm_next-bottom');
 
     $this->click('_qf_Confirm_next-bottom');
@@ -238,7 +238,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contribute/search", "reset=1", 'contribution_date_low');
 
     $this->type('sort_name', "$lastName $firstName");
-    $this->select('financial_type_id',"label=Member Dues");
+    $this->select('financial_type_id', "label=Member Dues");
     $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom', FALSE);
     $expected = array(
@@ -256,7 +256,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->click("xpath=id('Search')/div[2]/div/div[1]");
     $this->waitForElementPresent("financial_type_id");
     $this->type("sort_name", $firstName);
-    $this->select('financial_type_id',"label=Donation");
+    $this->select('financial_type_id', "label=Donation");
     $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
 
     $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom', FALSE);

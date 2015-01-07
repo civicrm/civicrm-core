@@ -537,19 +537,19 @@ class CRM_Utils_Array {
    *   When passed an array of strings, unsets $items[$k] for each string $k
    *   in the array.
    */
-   public static function remove(&$items) {
-     foreach (func_get_args() as $n => $key) {
-       // Skip argument 0 ($items) by testing $n for truth.
-       if ($n && is_array($key)) {
-         foreach($key as $k) {
-           unset($items[$k]);
-         }
-       }
-       elseif ($n) {
-         unset($items[$key]);
-       }
-     }
-   }
+  public static function remove(&$items) {
+    foreach (func_get_args() as $n => $key) {
+      // Skip argument 0 ($items) by testing $n for truth.
+      if ($n && is_array($key)) {
+        foreach($key as $k) {
+          unset($items[$k]);
+        }
+      }
+      elseif ($n) {
+        unset($items[$key]);
+      }
+    }
+  }
 
   /**
    * Builds an array-tree which indexes the records in an array.
@@ -579,9 +579,9 @@ class CRM_Utils_Array {
         $node = &$node[$keyvalue];
       }
       if (is_array($record)) {
-        $node[ $record[$final_key] ] = $record;
+        $node[$record[$final_key]] = $record;
       } else {
-        $node[ $record->{$final_key} ] = $record;
+        $node[$record->{$final_key}] = $record;
       }
     }
     return $result;
@@ -806,7 +806,8 @@ class CRM_Utils_Array {
    * not appear in the result.
    *
    * @param array $array
-   * @param array $keys list of keys to copy
+   * @param array $keys
+   *   List of keys to copy.
    * @return array
    */
   public static function subset($array, $keys) {

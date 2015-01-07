@@ -32,7 +32,7 @@ require_once 'CiviTest/Contact.php';
 /**
  * Test class for CRM_Contact_BAO_GroupContact BAO
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
 
@@ -50,7 +50,8 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    *
    */
-  protected function tearDown() {}
+  protected function tearDown() {
+  }
 
   /**
    * Test case for add( )
@@ -62,17 +63,18 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     $groupContacts = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_GroupContact', NULL, 10);
 
     //check the group contact id is not null for each of them
-    foreach ($groupContacts as $gc) $this->assertNotNull($gc->id);
+    foreach ($groupContacts as $gc) { $this->assertNotNull($gc->id);
+    }
 
     //cleanup
-    foreach ($groupContacts as $gc) $gc->deleteTestObjects('CRM_Contact_DAO_GroupContact');
+    foreach ($groupContacts as $gc) { $gc->deleteTestObjects('CRM_Contact_DAO_GroupContact');
+    }
   }
 
   /**
    * Test case for getGroupId( )
    */
   public function testGetGroupId() {
-
 
     //creates a test groupContact object
     //force group_id to 1 so we can compare

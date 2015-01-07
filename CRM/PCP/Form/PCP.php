@@ -75,7 +75,6 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
 
     $this->assign('context', $this->_context);
 
-
     $session = CRM_Core_Session::singleton();
     $context = $session->popUserContext();
     $userID  = $session->get('userID');
@@ -189,7 +188,8 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @param $files
    * @param CRM_Core_Form $form
@@ -197,7 +197,8 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
    * @return array list of errors to be posted back to the form
    * @static
    */
-  public static function formRule($fields, $files, $form) {}
+  public static function formRule($fields, $files, $form) {
+  }
 
   /**
    * Process the form

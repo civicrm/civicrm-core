@@ -100,7 +100,7 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     }
 
     //Go to the contacts page and check that the custom field is in the right group
-    $this->openCiviPage('contact/view',"reset=1&cid={$cid_all}");
+    $this->openCiviPage('contact/view', "reset=1&cid={$cid_all}");
 
     //load the names of the custom fieldsets
     $source      = $this->webtest_civicrm_api("CustomGroup", "get", array('id' => $from_group_id));
@@ -373,6 +373,7 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
         $this->select("date_format", "value=yy-mm-dd");
         $this->click("//option[@value='yy-mm-dd']");
         break;
+
       //TODO allow for more things....
     }
 
@@ -397,8 +398,7 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
    * @param string $prefix
    * @param array $values
    */
-  function _createFieldOptions($count = 3, $prefix = "option", $values = array(
-    )) {
+  function _createFieldOptions($count = 3, $prefix = "option", $values = array()) {
     // Only support up to 10 options on the creation form
     $count = $count > 10 ? 10 : $count;
 

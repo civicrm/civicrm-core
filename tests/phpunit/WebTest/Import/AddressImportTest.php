@@ -84,11 +84,12 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
       'state' => 'State',
       'country' => 'Country',
     );
-    foreach( $customDataParams['headers'] as $key =>$value){
+    foreach( $customDataParams['headers'] as $key => $value){
       $headers[$key] = $value;
     }
 
-    $rows = array( 0 =>
+    $rows = array(
+    0 =>
 
       array(
         'first_name' => $firstName1,
@@ -140,7 +141,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     // clicking save
     $this->click('_qf_Field_done-bottom');
 
-    $this->waitForText('crm-notification-container',"Custom field '{$customField}' has been saved.");
+    $this->waitForText('crm-notification-container', "Custom field '{$customField}' has been saved.");
     $this->waitForElementPresent("xpath=//span[text()='$customField']");
     $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField']/../../td[8]/span/a@href"));
     $customFieldId = $customFieldId[1];
@@ -150,7 +151,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField1 = 'Customfield_int ' . substr(sha1(rand()), 0, 4);
     $this->type('label', $customField1);
-    $this->select("data_type[0]","value=1");
+    $this->select("data_type[0]", "value=1");
 
     // clicking save
     $this->click('_qf_Field_done-bottom');
@@ -165,7 +166,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField2 = 'Customfield_Number ' . substr(sha1(rand()), 0, 4);
     $this->type('label', $customField2);
-    $this->select("data_type[0]","value=2");
+    $this->select("data_type[0]", "value=2");
 
     // clicking save
     $this->click('_qf_Field_done-bottom');
@@ -179,44 +180,44 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->click("newCustomField");
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField3 = 'Customfield_alp_select' . substr(sha1(rand()), 0, 4);
-    $customFieldId3 = $this->_createMultipleValueCustomField($customField3,'Select');
+    $customFieldId3 = $this->_createMultipleValueCustomField($customField3, 'Select');
 
     // create custom field - "alphanumeric radio"
     $this->click("newCustomField");
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField4 = 'Customfield_alp_radio' . substr(sha1(rand()), 0, 4);
-    $customFieldId4 = $this->_createMultipleValueCustomField($customField4,'Radio');
+    $customFieldId4 = $this->_createMultipleValueCustomField($customField4, 'Radio');
 
     // create custom field - "alphanumeric checkbox"
     $this->click("newCustomField");
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField5 = 'Customfield_alp_checkbox' . substr(sha1(rand()), 0, 4);
-    $customFieldId5 = $this->_createMultipleValueCustomField($customField5,'CheckBox');
+    $customFieldId5 = $this->_createMultipleValueCustomField($customField5, 'CheckBox');
 
     // create custom field - "alphanumeric multiselect"
     $this->click("newCustomField");
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField6 = 'Customfield_alp_multiselect' . substr(sha1(rand()), 0, 4);
-    $customFieldId6 = $this->_createMultipleValueCustomField($customField6,'Multi-Select');
+    $customFieldId6 = $this->_createMultipleValueCustomField($customField6, 'Multi-Select');
 
     // create custom field - "alphanumeric advmultiselect"
     $this->click("newCustomField");
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField7 = 'Customfield_alp_advmultiselect' . substr(sha1(rand()), 0, 4);
-    $customFieldId7 = $this->_createMultipleValueCustomField($customField7,'AdvMulti-Select');
+    $customFieldId7 = $this->_createMultipleValueCustomField($customField7, 'AdvMulti-Select');
 
     // create custom field - "alphanumeric autocompleteselect"
     $this->click("newCustomField");
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField8 = 'Customfield_alp_autocompleteselect' . substr(sha1(rand()), 0, 4);
-    $customFieldId8 = $this->_createMultipleValueCustomField($customField8,'Autocomplete-Select');
+    $customFieldId8 = $this->_createMultipleValueCustomField($customField8, 'Autocomplete-Select');
 
     // create custom field - Money
     $this->click("newCustomField");
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField9 = 'Customfield_Money' . substr(sha1(rand()), 0, 4);
     $this->type('label', $customField9);
-    $this->select("data_type[0]","value=3");
+    $this->select("data_type[0]", "value=3");
 
     // clicking save
     $this->click('_qf_Field_done-bottom');
@@ -231,8 +232,8 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField10 = 'Customfield_Date' . substr(sha1(rand()), 0, 4);
     $this->type('label', $customField10);
-    $this->select("data_type[0]","value=5");
-    $this->select("date_format","value=yy-mm-dd");
+    $this->select("data_type[0]", "value=5");
+    $this->select("date_format", "value=yy-mm-dd");
 
     // clicking save
     $this->click('_qf_Field_done-bottom');
@@ -293,14 +294,14 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  public function _createMultipleValueCustomField( $customFieldName, $type ){
+  public function _createMultipleValueCustomField($customFieldName, $type){
     $this->type('label', $customFieldName);
-    $this->select("data_type[0]","value=0");
-    $this->select("data_type[1]","value=".$type);
-    $this->type("option_label_1","label1");
-    $this->type("option_value_1","label1");
-    $this->type("option_label_2","label2");
-    $this->type("option_value_2","label2");
+    $this->select("data_type[0]", "value=0");
+    $this->select("data_type[1]", "value=".$type);
+    $this->type("option_label_1", "label1");
+    $this->type("option_value_1", "label1");
+    $this->type("option_label_2", "label2");
+    $this->type("option_value_2", "label2");
 
     // clicking save
     $this->click('_qf_Field_done-bottom');

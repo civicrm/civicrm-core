@@ -73,7 +73,7 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent("xpath=//div[@class='select2-result-label']");
     $this->clickAt("xpath=//div[@class='select2-result-label']");
-    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']","$firstName1");
+    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']", "$firstName1");
 
     $subject = "Testing Ical attachment for activity assignee";
     $this->type("subject", $subject);

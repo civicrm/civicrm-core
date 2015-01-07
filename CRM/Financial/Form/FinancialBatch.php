@@ -105,7 +105,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
         array(
           'type' => 'next',
           'name' => ts('Save'),
-          'isDefault' => true,
+          'isDefault' => TRUE,
         ),
         array(
           'type' => 'next',
@@ -125,19 +125,19 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
       //unset exported status
       $exportedStatusId = CRM_Utils_Array::key('Exported', $batchStatus );
       unset($batchStatus[$exportedStatusId]);
-      $this->add('select', 'status_id', ts('Batch Status'), array('' => ts('- select -')) + $batchStatus, true);
+      $this->add('select', 'status_id', ts('Batch Status'), array('' => ts('- select -')) + $batchStatus, TRUE);
       $this->freeze(array('status_id'));
     }
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Batch_DAO_Batch');
 
-    $this->add('text', 'title', ts('Batch Name'), $attributes['name'], true);
+    $this->add('text', 'title', ts('Batch Name'), $attributes['name'], TRUE);
 
     $this->add('textarea', 'description', ts('Description'), $attributes['description']);
 
     $this->add('select', 'payment_instrument_id', ts('Payment Instrument'),
       array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
-      false
+      FALSE
     );
 
     $this->add('text', 'total', ts('Total Amount'), $attributes['total']);
@@ -196,7 +196,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
     if (!CRM_Core_DAO::objectExists($batchName, 'CRM_Batch_DAO_Batch', $self->_id)) {
       $errors['title'] = ts('This name already exists in database. Batch names must be unique.');
     }
-    return CRM_Utils_Array::crmIsEmptyArray($errors) ? true : $errors;
+    return CRM_Utils_Array::crmIsEmptyArray($errors) ? TRUE : $errors;
   }
 
   /**

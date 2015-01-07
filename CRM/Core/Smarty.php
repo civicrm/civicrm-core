@@ -87,7 +87,7 @@ class CRM_Core_Smarty extends Smarty {
     parent::__construct();
   }
 
-  private function initialize( ) {
+  private function initialize() {
     $config = CRM_Core_Config::singleton();
 
     if (isset($config->customTemplateDir) && $config->customTemplateDir) {
@@ -192,7 +192,7 @@ class CRM_Core_Smarty extends Smarty {
    * @param string $resource_name
    * @param string $cache_id
    * @param string $compile_id
-   * @param boolean $display
+   * @param bool $display
    *
    * @return bool|mixed|string
    */
@@ -212,7 +212,8 @@ class CRM_Core_Smarty extends Smarty {
    * Fetch a template (while using certain variables)
    *
    * @param string $resource_name
-   * @param array $vars (string $name => mixed $value) variables to export to Smarty
+   * @param array $vars
+   *   (string $name => mixed $value) variables to export to Smarty.
    * @throws Exception
    * @return bool|mixed|string
    */
@@ -283,7 +284,8 @@ class CRM_Core_Smarty extends Smarty {
    * $smarty->popScope();
    * @endcode
    *
-   * @param array $vars (string $name => mixed $value)
+   * @param array $vars
+   *   (string $name => mixed $value).
    * @return CRM_Core_Smarty
    * @see popScope
    */
@@ -312,7 +314,8 @@ class CRM_Core_Smarty extends Smarty {
   }
 
   /**
-   * @param array $vars (string $name => mixed $value)
+   * @param array $vars
+   *   (string $name => mixed $value).
    * @return CRM_Core_Smarty
    */
   public function assignAll($vars) {

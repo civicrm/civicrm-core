@@ -103,7 +103,6 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
     $gid = $this->urlArg('gid');
 
-
     //Add field to profile
     $this->waitForElementPresent("field_name[0]");
     $this->click('field_name[0]');
@@ -130,7 +129,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $groupName = 'group_' . substr(sha1(rand()), 0, 7);
     $this->WebtestAddGroup($groupName);
 
-     // Add new profile.
+    // Add new profile.
     $this->openCiviPage('admin/uf/group', 'reset=1');
 
     $this->click('newCiviCRMProfile-top');

@@ -31,7 +31,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  * Test class for CRM_Activity_BAO_ActivityAssignment BAO
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
 
@@ -49,7 +49,8 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    *
    */
-  protected function tearDown() {}
+  protected function tearDown() {
+  }
 
   /**
    *  Pass zero as an id and make sure no Assignees are retrieved
@@ -66,7 +67,7 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
    */
   public function testRetrieveAssigneeIdsByActivityIdNullId() {
     $activity = $this->activityCreate();
-    $activityId = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId(Null);
+    $activityId = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId(NULL);
 
     $this->assertEquals(count($activityId), 0, '0 assignees retrieved using null');
   }
@@ -106,7 +107,7 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
    */
   public function testGetAssigneeNamesNullId() {
     $activity = $this->activityCreate();
-    $assignees = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames(Null);
+    $assignees = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames(NULL);
 
     $this->assertEquals(count($assignees), 0, '0 assignee names retrieved');
   }

@@ -48,7 +48,8 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
   /**
    * Creates a new entry in the database.
    *
-   * @param array $params (reference) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Price_DAO_LineItem object
    * @static
@@ -89,8 +90,10 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * price_field_id.  This is the inverse function of create.  It also
    * stores all of the retrieved values in the default array.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Price_BAO_LineItem object
    * @static
@@ -128,27 +131,30 @@ AND li.entity_id = {$entityId}
    * @return array
    */
   public static function getLineItemsByContributionID($contributionID) {
-     return self::getLineItems($contributionID,'contribution', NULL, TRUE, TRUE, " WHERE contribution_id = " . (int) $contributionID);
+    return self::getLineItems($contributionID, 'contribution', NULL, TRUE, TRUE, " WHERE contribution_id = " . (int) $contributionID);
   }
 
   /**
    * Given a participant id/contribution id,
    * return contribution/fee line items
    *
-   * @param $entityId  int    participant/contribution id
-   * @param $entity    string participant/contribution.
+   * @param $entityId
+   *   Int participant/contribution id.
+   * @param $entity
+   *   String participant/contribution.
    *
    * @param null $isQuick
    * @param bool $isQtyZero
    * @param bool $relatedEntity
    *
-   * @param string $overrideWhereClause e.g "WHERE contribution id = 7 " per the getLineItemsByContributionID wrapper.
+   * @param string $overrideWhereClause
+   *   E.g "WHERE contribution id = 7 " per the getLineItemsByContributionID wrapper.
    * this function precedes the convenience of the contribution id but since it does quite a bit more than just a db retrieval we need to be able to use it even
    * when we don't want it's entity-id magix
    *
    * @return array of line items
    */
-  public static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL , $isQtyZero = TRUE, $relatedEntity = FALSE, $overrideWhereClause = '') {
+  public static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL, $isQtyZero = TRUE, $relatedEntity = FALSE, $overrideWhereClause = '') {
     $whereClause = $fromClause = NULL;
     $selectClause = "
       SELECT    li.id,
@@ -206,7 +212,7 @@ AND li.entity_id = {$entityId}
     );
 
     $getTaxDetails = FALSE;
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     if ($overrideWhereClause) {
       $whereClause = $overrideWhereClause;
@@ -257,12 +263,16 @@ AND li.entity_id = {$entityId}
    * This method will create the lineItem array required for
    * processAmount method
    *
-   * @param  int   $fid       price set field id
-   * @param  array $params    reference to form values
-   * @param  array $fields    reference to array of fields belonging
+   * @param int $fid
+   *   Price set field id.
+   * @param array $params
+   *   Reference to form values.
+   * @param array $fields
+   *   Reference to array of fields belonging.
    *                          to the price set used for particular event
-   * @param  array $values    reference to the values array(
-     this is
+   * @param array $values
+   *   Reference to the values array(.
+  this is
    *                          lineItem array)
    *
    * @return void
@@ -349,9 +359,11 @@ AND li.entity_id = {$entityId}
    * Process price set and line items.
    *
    * @param int $entityId
-   * @param array $lineItem line item array
+   * @param array $lineItem
+   *   Line item array.
    * @param object $contributionDetails
-   * @param string $entityTable entity table
+   * @param string $entityTable
+   *   Entity table.
    *
    * @param bool $update
    *
@@ -408,8 +420,9 @@ AND li.entity_id = {$entityId}
    * @param array $otherParams
    */
   public static function syncLineItems($entityId, $entityTable = 'civicrm_contribution', $amount, $otherParams = NULL) {
-    if (!$entityId || CRM_Utils_System::isNull($amount))
+    if (!$entityId || CRM_Utils_System::isNull($amount)) {
       return;
+    }
 
     $from = " civicrm_line_item li
       LEFT JOIN   civicrm_price_field pf ON pf.id = li.price_field_id
@@ -439,7 +452,7 @@ AND li.entity_id = {$entityId}
       $set .= " ,li.label = %4,
         li.price_field_value_id = cpfv.id ";
       $where .= " AND cpse.entity_table = 'civicrm_event' AND cpse.entity_id = %5 ";
-      $amount = empty($amount) ? 0: $amount;
+      $amount = empty($amount) ? 0 : $amount;
       $params += array(
         4 => array($otherParams['fee_label'], 'String'),
         5 => array($otherParams['event_id'], 'String'),
@@ -455,13 +468,16 @@ AND li.entity_id = {$entityId}
     CRM_Core_DAO::executeQuery($query, $params);
   }
 
-   /**
+  /**
    * Build line items array.
-   * @param array $params form values
+   * @param array $params
+   *   Form values.
    *
-   * @param string $entityId entity id
+   * @param string $entityId
+   *   Entity id.
    *
-   * @param string $entityTable entity Table
+   * @param string $entityTable
+   *   Entity Table.
    *
    * @return void
    * @static
@@ -519,7 +535,8 @@ AND li.entity_id = {$entityId}
   /**
    * Calculate tax rate in percentage
    *
-   * @param $lineItemId an assoc array of lineItem
+   * @param $lineItemId
+   *   An assoc array of lineItem.
    *
    * @return tax rate
    *
@@ -530,10 +547,10 @@ AND li.entity_id = {$entityId}
       return;
     }
     if ($lineItemId['html_type'] == 'Text') {
-      $tax = $lineItemId['tax_amount']/($lineItemId['unit_price'] * $lineItemId['qty'])*100;
+      $tax = $lineItemId['tax_amount'] / ($lineItemId['unit_price'] * $lineItemId['qty']) * 100;
     }
     else {
-      $tax = ($lineItemId['tax_amount']/$lineItemId['unit_price']) * 100;
+      $tax = ($lineItemId['tax_amount'] / $lineItemId['unit_price']) * 100;
     }
     return $tax;
   }

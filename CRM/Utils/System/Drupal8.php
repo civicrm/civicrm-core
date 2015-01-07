@@ -41,8 +41,10 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * Create a user in Drupal.
    *
-   * @param array  $params associated array
-   * @param string $mail email id for cms user
+   * @param array $params
+   *   Associated array.
+   * @param string $mail
+   *   Email id for cms user.
    *
    * @return uid if user exists, false otherwise
    *
@@ -99,9 +101,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       case $user_register_conf == 'admin_only' || $user->isAuthenticated():
         _user_mail_notify('register_admin_created', $account);
         break;
+
       case $user_register_conf == 'visitors':
         _user_mail_notify('register_no_approval_required', $account);
         break;
+
       case 'visitors_admin_approval':
         _user_mail_notify('register_pending_approval', $account);
         break;
@@ -113,8 +117,10 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * Update the Drupal user's email address.
    *
-   * @param integer $ufID  User ID in CMS
-   * @param string $email Primary contact email address
+   * @param int $ufID
+   *   User ID in CMS.
+   * @param string $email
+   *   Primary contact email address.
    */
   public function updateCMSName($ufID, $email) {
     $user = user_load($ufID);
@@ -130,9 +136,12 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * Check if username and email exists in the drupal db
    *
-   * @param array $params       array of name and mail values
-   * @param array $errors  errors
-   * @param string $emailName   field label for the 'email'
+   * @param array $params
+   *   Array of name and mail values.
+   * @param array $errors
+   *   Errors.
+   * @param string $emailName
+   *   Field label for the 'email'.
    *
    *
    * @return void
@@ -148,7 +157,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       // This checks for both username uniqueness and validity.
       $violations = iterator_to_array($user->validate());
       // We only care about violations on the username field; discard the rest.
-      $violations = array_filter($violations, function ($v) { return $v->getPropertyPath() == 'name.0.value'; });
+      $violations = array_filter($violations, function ($v) { return $v->getPropertyPath() == 'name.0.value';
+      });
       if (count($violations) > 0) {
         $errors['cms_name'] = $violations[0]->getMessage();
       }
@@ -164,7 +174,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       // This checks for both email uniqueness.
       $violations = iterator_to_array($user->validate());
       // We only care about violations on the email field; discard the rest.
-      $violations = array_filter($violations, function ($v) { return $v->getPropertyPath() == 'mail.0.value'; });
+      $violations = array_filter($violations, function ($v) { return $v->getPropertyPath() == 'mail.0.value';
+      });
       if (count($violations) > 0) {
         $errors[$emailName] = $violations[0]->getMessage();
       }
@@ -175,7 +186,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * Get the drupal destination string. When this is passed in the
    * URL the user will be directed to it after filling in the drupal form
    *
-   * @param CRM_Core_Form $form Form object representing the 'current' form - to which the user will be returned
+   * @param CRM_Core_Form $form
+   *   Form object representing the 'current' form - to which the user will be returned.
    * @return string $destination destination value for URL
    *
    */
@@ -212,7 +224,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
-   * @param string $destination - if present, add destination to querystring (works for Drupal only)
+   * @param string $destination
+   *   If present, add destination to querystring (works for Drupal only).
    *
    * @return string - loginURL for the current CMS
    * @static
@@ -268,7 +281,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * Append a string to the head of the html file
    *
-   * @param string $header the new string to be appended
+   * @param string $header
+   *   The new string to be appended.
    *
    * @return void
    */
@@ -280,7 +294,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * Add a script file
    *
    * @param $url: string, absolute path to file
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -294,6 +309,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       case 'page-footer':
         $options['scope'] = substr($region, 5);
         break;
+
       default:
         return FALSE;
     }
@@ -307,7 +323,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * Add an inline script
    *
    * @param $code: string, javascript code
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -321,6 +338,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       case 'page-footer':
         $options['scope'] = substr($region, 5);
         break;
+
       default:
         return FALSE;
     }
@@ -332,7 +350,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * Add a css file
    *
    * @param $url: string, absolute path to file
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -354,7 +373,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * Add an inline style
    *
    * @param $code: string, css code
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   * @param $region
+   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -406,13 +426,20 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @param string $path         The base path (eg. civicrm/search/contact)
-   * @param string $query      The query string (eg. reset=1&cid=66) but html encoded(?) (optional)
-   * @param bool $absolute     Produce an absolute including domain and protocol (optional)
-   * @param string $fragment   A named anchor (optional)
-   * @param bool $htmlize      Produce a html encoded url (optional)
-   * @param bool $frontend     A joomla hack (unused)
-   * @param bool $forceBackend A joomla jack (unused)
+   * @param string $path
+   *   The base path (eg. civicrm/search/contact).
+   * @param string $query
+   *   The query string (eg. reset=1&cid=66) but html encoded(?) (optional).
+   * @param bool $absolute
+   *   Produce an absolute including domain and protocol (optional).
+   * @param string $fragment
+   *   A named anchor (optional).
+   * @param bool $htmlize
+   *   Produce a html encoded url (optional).
+   * @param bool $frontend
+   *   A joomla hack (unused).
+   * @param bool $forceBackend
+   *   A joomla jack (unused).
    * @return string
    */
   public function url($path = '', $query = '', $absolute = FALSE, $fragment = '', $htmlize = FALSE, $frontend = FALSE, $forceBackend = FALSE) {
@@ -440,9 +467,12 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * Authenticate the user against the drupal db
    *
-   * @param string $name     the user name
-   * @param string $password the password for the above user name
-   * @param boolean $loadCMSBootstrap load cms bootstrap?
+   * @param string $name
+   *   The user name.
+   * @param string $password
+   *   The password for the above user name.
+   * @param bool $loadCMSBootstrap
+   *   Load cms bootstrap?.
    * @param NULL|string $realPath filename of script
    *
    * @return mixed false if no auth
@@ -497,7 +527,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * Set a message in the UF to display to a user
    *
-   * @param string $message the message to set
+   * @param string $message
+   *   The message to set.
    *
    */
   public function setMessage($message) {
@@ -519,17 +550,24 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * Load drupal bootstrap
    *
-   * @param array $params Either uid, or name & pass.
-   * @param boolean $loadUser boolean Require CMS user load.
-   * @param boolean $throwError If true, print error on failure and exit.
-   * @param boolean|string $realPath path to script
+   * @param array $params
+   *   Either uid, or name & pass.
+   * @param bool $loadUser
+   *   Boolean Require CMS user load.
+   * @param bool $throwError
+   *   If true, print error on failure and exit.
+   * @param bool|string $realPath path to script
    *
    * @return bool
    * @Todo Handle setting cleanurls configuration for CiviCRM?
    */
   public function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     static $run_once = FALSE;
-    if ($run_once) return TRUE; else $run_once = TRUE;
+    if ($run_once) {
+      return TRUE;
+    } else {
+      $run_once = TRUE;
+    }
 
     if (!($root = $this->cmsRootPath())) {
       return FALSE;

@@ -173,7 +173,8 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     $this->assign('hasExistingGroups', $hasExistingGroups);
 
     $buttons = array(
-      array('type' => 'done',
+      array(
+    'type' => 'done',
         'name' => ts('Reserve'),
         'subName' => 'reserve',
         'isDefault' => TRUE,
@@ -201,7 +202,8 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @param $files
    * @param $self
@@ -216,7 +218,8 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
       $title  = trim($fields['newGroupName']);
       $name   = CRM_Utils_String::titleToVar($title);
       $query  = 'select count(*) from civicrm_group where name like %1 OR title like %2';
-      $grpCnt = CRM_Core_DAO::singleValueQuery($query, array(1 => array($name, 'String'),
+      $grpCnt = CRM_Core_DAO::singleValueQuery($query, array(
+      1 => array($name, 'String'),
           2 => array($title, 'String'),
         ));
       if ($grpCnt) {
@@ -246,7 +249,8 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     foreach ($this->_contactIds as $cid) {
       $subject        = ts('%1', array(1 => $this->_surveyDetails['title'])) . ' - ' . ts('Respondent Reservation');
       $session        = CRM_Core_Session::singleton();
-      $activityParams = array('source_contact_id' => $session->get('userID'),
+      $activityParams = array(
+      'source_contact_id' => $session->get('userID'),
         'assignee_contact_id' => array($this->_interviewerId),
         'target_contact_id' => array($cid),
         'source_record_id' => $this->_surveyId,

@@ -122,7 +122,7 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     $this->select("task", "label=Add Contacts to Group");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-     // Select the new group and click to add
+    // Select the new group and click to add
     $this->click("group_id");
     $this->select("group_id", "label=" . $newGroupName);
     $this->click("_qf_AddToGroup_next-bottom");

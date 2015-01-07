@@ -37,7 +37,8 @@ class CRM_Upgrade_Controller extends CRM_Core_Controller {
   /**
    * Class constructor
    */
-  function __construct($title = NULL,
+  function __construct(
+    $title = NULL,
     $action = CRM_Core_Action::NONE,
     $modal = TRUE
   ) {

@@ -50,7 +50,7 @@
    * @link based on substr(): http://www.zend.com/manual/function.substr.php
    * @param string
    * @param position: startposition of the substring, beginning with 0
-   * @param length: length of  substring
+   * @param length: length of substring
    * @return string
    *
    * -------------------------------------------------------------

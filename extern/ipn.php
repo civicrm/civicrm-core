@@ -58,4 +58,3 @@ catch(CRM_Core_Exception $e) {
   //@todo give better info to logged in user - ie dev
   echo "The transaction has failed. Please review the log for more detail";
 }
-

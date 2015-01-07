@@ -86,7 +86,7 @@ class CRM_Core_Session {
    * @return CRM_Core_Session
    */
   public function __construct() {
-    $this->_session = null;
+    $this->_session = NULL;
   }
 
   /**
@@ -106,7 +106,8 @@ class CRM_Core_Session {
    * Creates an array in the session. All variables now will be stored
    * under this array
    *
-   * @param boolean $isRead is this a read operation, in this case, the session will not be touched
+   * @param bool $isRead
+   *   Is this a read operation, in this case, the session will not be touched.
    *
    *
    * @return void
@@ -124,7 +125,7 @@ class CRM_Core_Session {
         // FIXME: This belongs in CRM_Utils_System_*
         if ($config->userSystem->is_drupal && function_exists('drupal_session_start')) {
           // https://issues.civicrm.org/jira/browse/CRM-14356
-          if (! (isset($GLOBALS['lazy_session']) && $GLOBALS['lazy_session'] == true)) {
+          if (! (isset($GLOBALS['lazy_session']) && $GLOBALS['lazy_session'] == TRUE)) {
             drupal_session_start();
           }
           $_SESSION = array();
@@ -174,8 +175,10 @@ class CRM_Core_Session {
   /**
    * Creates a session local scope
    *
-   * @param string $prefix local scope name
-   * @param boolean $isRead is this a read operation, in this case, the session will not be touched
+   * @param string $prefix
+   *   Local scope name.
+   * @param bool $isRead
+   *   Is this a read operation, in this case, the session will not be touched.
    *
    *
    * @return void
@@ -195,7 +198,8 @@ class CRM_Core_Session {
   /**
    * Resets the session local scope
    *
-   * @param string $prefix local scope name
+   * @param string $prefix
+   *   Local scope name.
    *
    * @return void
    */
@@ -220,9 +224,12 @@ class CRM_Core_Session {
    * is supported but we need to verify this
    *
    *
-   * @param  string $name    name  of the variable
-   * @param  mixed  $value   value of the variable
-   * @param  string $prefix  a string to prefix the keys in the session with
+   * @param string $name
+   *   Name of the variable.
+   * @param mixed $value
+   *   Value of the variable.
+   * @param string $prefix
+   *   A string to prefix the keys in the session with.
    *
    * @return void
    *
@@ -255,8 +262,10 @@ class CRM_Core_Session {
    * variable from the session scope.
    *
    *
-   * @param string $name  : name  of the variable
-   * @param string $prefix : adds another level of scope to the session
+   * @param string $name
+   *   : name of the variable.
+   * @param string $prefix
+   *   : adds another level of scope to the session.
    *
    * @return mixed
    *
@@ -266,7 +275,7 @@ class CRM_Core_Session {
     $this->createScope($prefix, TRUE);
 
     if (empty($this->_session) || empty($this->_session[$this->_key])) {
-      return null;
+      return NULL;
     }
 
     if (empty($prefix)) {
@@ -274,7 +283,7 @@ class CRM_Core_Session {
     }
     else {
       if (empty($this->_session[$this->_key][$prefix])) {
-        return null;
+        return NULL;
       }
       $session =& $this->_session[$this->_key][$prefix];
     }
@@ -287,8 +296,10 @@ class CRM_Core_Session {
    * and stuffs them in an associate array
    *
    *
-   * @param array $vars associative array to store name/value pairs
-   * @param string $prefix will be stripped from the key before putting it in the return
+   * @param array $vars
+   *   Associative array to store name/value pairs.
+   * @param string $prefix
+   *   Will be stripped from the key before putting it in the return.
    *
    * @return void
    *
@@ -318,8 +329,10 @@ class CRM_Core_Session {
    * If you want to get more nuanced, you can check the type of the return to see if it's 'not set' or actually expired at a certain time
    *
    *
-   * @param string $name : name of the timer
-   * @param int $expire  : expiry time (in seconds)
+   * @param string $name
+   *   : name of the timer.
+   * @param int $expire
+   *   : expiry time (in seconds).
    *
    * @return mixed
    *
@@ -330,14 +343,16 @@ class CRM_Core_Session {
       $this->set($name, time(), 'timer');
       return $ts ? $ts : 'not set';
     }
-    return false;
+    return FALSE;
   }
 
   /**
    * Adds a userContext to the stack
    *
-   * @param string  $userContext the url to return to when done
-   * @param boolean $check       should we do a dupe checking with the top element
+   * @param string $userContext
+   *   The url to return to when done.
+   * @param bool $check
+   *   Should we do a dupe checking with the top element.
    *
    * @return void
    *
@@ -375,7 +390,8 @@ class CRM_Core_Session {
   /**
    * Replace the userContext of the stack with the passed one
    *
-   * @param string $userContext the url to return to when done
+   * @param string $userContext
+   *   The url to return to when done.
    *
    * @return void
    *
@@ -435,7 +451,8 @@ class CRM_Core_Session {
   /**
    * Fetches status messages
    *
-   * @param bool $reset should we reset the status variable?
+   * @param bool $reset
+   *   Should we reset the status variable?.
    *
    * @return string        the status message if any
    */
@@ -456,13 +473,16 @@ class CRM_Core_Session {
   /**
    * Stores an alert to be displayed to the user via crm-messages
    *
-   * @param $text string
+   * @param $text
+   *   String.
    *   The status message
    *
-   * @param $title string
+   * @param $title
+   *   String.
    *   The optional title of this message
    *
-   * @param $type string
+   * @param $type
+   *   String.
    *   The type of this message (printed as a css class). Possible options:
    *     - 'alert' (default)
    *     - 'info'
@@ -471,7 +491,8 @@ class CRM_Core_Session {
    *               until the user dismisses it)
    *     - 'no-popup' (will display in the document like old-school)
    *
-   * @param $options array
+   * @param $options
+   *   Array.
    *   Additional options. Possible values:
    *     - 'unique' (default: true) Check if this message was already set before adding
    *     - 'expires' how long to display this message before fadeout (in ms)

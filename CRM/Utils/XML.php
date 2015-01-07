@@ -104,7 +104,7 @@ class CRM_Utils_XML {
 
       $parts = array();
       if ($error->file) {
-          $parts[] = "File=$error->file";
+        $parts[] = "File=$error->file";
       }
       $parts[] = "Line=$error->line";
       $parts[] = "Column=$error->column";
@@ -119,7 +119,8 @@ class CRM_Utils_XML {
   /**
    * Convert an XML element to an array
    *
-   * @param $obj SimpleXMLElement
+   * @param $obj
+   *   SimpleXMLElement.
    *
    * @return array
    */

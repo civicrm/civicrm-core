@@ -45,8 +45,10 @@ class CRM_Badge_BAO_Badge {
   /**
    *  This function is called to create name label pdf
    *
-   * @param   array $participants associated array with participant info
-   * @param   array $layoutInfo   associated array which contains meta data about format/layout
+   * @param array $participants
+   *   Associated array with participant info.
+   * @param array $layoutInfo
+   *   Associated array which contains meta data about format/layout.
    *
    * @return  void
    */
@@ -75,8 +77,10 @@ class CRM_Badge_BAO_Badge {
   /**
    * Funtion to create structure and add meta data according to layout
    *
-   * @param array $row row element that needs to be formatted
-   * @param array $layout layout meta data
+   * @param array $row
+   *   Row element that needs to be formatted.
+   * @param array $layout
+   *   Layout meta data.
    *
    * @return array $formattedRow row with meta data
    */
@@ -84,7 +88,6 @@ class CRM_Badge_BAO_Badge {
     $formattedRow = array('labelFormat' => $layout['label_format_name']);
     $formattedRow['labelTitle'] = $layout['title'];
     $formattedRow['labelId'] = $layout['id'];
-
 
     if (!empty($layout['data']['rowElements'])) {
       foreach ($layout['data']['rowElements'] as $key => $element) {
@@ -162,6 +165,7 @@ class CRM_Badge_BAO_Badge {
       case 'Hanging Badge 3-3/4" x 4-3"/4':
         self::labelCreator($formattedRow, 5);
         break;
+
       case 'Avery 5395':
       default:
         self::labelCreator($formattedRow);
@@ -208,9 +212,11 @@ class CRM_Badge_BAO_Badge {
         case 'R':
           $imageAlign = 68;
           break;
+
         case 'L':
           $imageAlign = 0;
           break;
+
         default:
           break;
       }
@@ -285,9 +291,11 @@ class CRM_Badge_BAO_Badge {
           case 'L':
             $xAlign += -14;
             break;
+
           case 'R':
             $xAlign += 27;
             break;
+
           case 'C':
             $xAlign += 9;
             break;
@@ -321,24 +329,26 @@ class CRM_Badge_BAO_Badge {
           case 'L':
             $xAlign += -5;
             break;
+
           case 'R':
             $xAlign += 56;
             break;
+
           case 'C':
             $xAlign += 29;
             break;
         }
 
         $style = array(
-          'border' => false,
+          'border' => FALSE,
           'hpadding' => 13.5,
           'vpadding' => 'auto',
-          'fgcolor' => array(0,0,0),
-          'bgcolor' => false,
+          'fgcolor' => array(0, 0, 0),
+          'bgcolor' => FALSE,
           'position' => '',
         );
 
-        $this->pdf->write2DBarcode($data['current_value'], 'QRCODE,H', $xAlign, $y  + $this->pdf->height - 26, 30,
+        $this->pdf->write2DBarcode($data['current_value'], 'QRCODE,H', $xAlign, $y + $this->pdf->height - 26, 30,
           30, $style, 'B');
       }
     }
@@ -347,7 +357,8 @@ class CRM_Badge_BAO_Badge {
   /**
    * Helper function to print images
    *
-   * @param string $img image url
+   * @param string $img
+   *   Image url.
    *
    * @param string $x
    * @param string $y
@@ -394,7 +405,8 @@ class CRM_Badge_BAO_Badge {
   /**
    * Build badges parameters before actually creating badges.
    *
-   * @param  array $params associated array of submitted values
+   * @param array $params
+   *   Associated array of submitted values.
    * @param CRM_Core_Form $form
    *
    * @return void

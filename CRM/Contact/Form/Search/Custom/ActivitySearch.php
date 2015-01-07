@@ -75,7 +75,6 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
       NULL, '', NULL
     );
 
-
     //use simplified formatted groupTree
     $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, $form);
 
@@ -131,7 +130,6 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
     $form->addDate('start_date', ts('Activity Date From'), FALSE, array('formatType' => 'custom'));
     $form->addDate('end_date', ts('...through'), FALSE, array('formatType' => 'custom'));
 
-
     // Contact Name field
     $form->add('text', 'sort_name', ts('Contact Name'));
 
@@ -155,7 +153,8 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
   /**
    * Construct the search query
    */
-  function all($offset = 0, $rowcount = 0, $sort = NULL,
+  function all(
+    $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
 

@@ -512,8 +512,7 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
                 "({$values['percentage']}%)";
             }
             $totalAmt = implode(', ', $totalAmount);
-            $count = (boolean) CRM_Utils_Array::value('count', $values, 0) ?
-              $values['count'] . " ({$values['percentage']}%)" : '';
+            $count = (boolean) CRM_Utils_Array::value('count', $values, 0) ? $values['count'] . " ({$values['percentage']}%)" : '';
             $row[] = array(
               'civicrm_grant_total_grants' => $field,
               'civicrm_grant_count' => $count,
@@ -534,8 +533,9 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
    * @param $awardedGrantsAmount
    * @param bool $customData
    */
-  static function getStatistics(&$grantStatistics, $fieldValue, $values,
-                                $awardedGrants, $awardedGrantsAmount, $customData = FALSE
+  static function getStatistics(
+    &$grantStatistics, $fieldValue, $values,
+    $awardedGrants, $awardedGrantsAmount, $customData = FALSE
   ) {
     if (!$awardedGrantsAmount) {
       return;
@@ -543,7 +543,6 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
 
     $currencies = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'currency', array('labelColumn' => 'symbol'));
     $currency = $currencies[$values['civicrm_grant_currency']];
-
 
     if (!$customData) {
       if (!isset($grantStatistics['value'][$fieldValue]['currency'][$currency])

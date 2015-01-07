@@ -40,7 +40,8 @@
 /**
  * API to Create or update a Membership Type
  *
- * @param   array  $params  an associative array of name/value property values of civicrm_membership_type
+ * @param array $params
+ *   An associative array of name/value property values of civicrm_membership_type.
  *
  * @return array $result newly created or updated membership type property values.
  * @access public
@@ -64,13 +65,14 @@ function civicrm_api3_membership_type_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_membership_type_create_spec(&$params) {
   // todo could set default here probably
   $params['domain_id']['api.required'] = 1;
   $params['member_of_contact_id']['api.required'] = 1;
-  $params['financial_type_id']['api.required'] =1;
+  $params['financial_type_id']['api.required'] = 1;
   $params['name']['api.required'] = 1;
   $params['duration_unit']['api.required'] = 1;
   $params['duration_interval']['api.required'] = 1;
@@ -81,7 +83,8 @@ function _civicrm_api3_membership_type_create_spec(&$params) {
  *
  * This api is used for finding an existing membership type.
  *
- * @param  array $params  an associative array of name/value property values of civicrm_membership_type
+ * @param array $params
+ *   An associative array of name/value property values of civicrm_membership_type.
  * {getfields MembershipType_get}
  *
  * @return  Array of all found membership type property values.
@@ -97,7 +100,7 @@ function civicrm_api3_membership_type_get($params) {
  * This API is used for deleting a membership type
  * Required parameters : id of a membership type
  *
- * @param  array $params
+ * @param array $params
  *
  * @return boolean        true if success, else false
  * @access public
@@ -106,4 +109,3 @@ function civicrm_api3_membership_type_get($params) {
 function civicrm_api3_membership_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

@@ -47,14 +47,14 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
    * Name of component if report list is filtered
    *
    * @var string
-  **/
+   **/
   protected $_compName = NULL;
 
   /**
    * ID of component if report list is filtered
    *
    * @var int
-  **/
+   **/
   protected $_compID = NULL;
 
   /**
@@ -68,7 +68,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
    * ID of parent report template if list is filtered by template
    *
    * @var int
-  **/
+   **/
   protected $_ovID = NULL;
 
 
@@ -76,7 +76,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
    * Title of parent report template if list is filtered by template
    *
    * @var string
-  **/
+   **/
   protected $_title = NULL;
 
   /**

@@ -28,8 +28,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_action_schedule functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_ActionSchedule
+ * @package CiviCRM_APIv3
+ * @subpackage API_ActionSchedule
  */
 
 class api_v3_ActionScheduleTest extends CiviUnitTestCase {
@@ -76,7 +76,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
     $this->assertTrue(is_numeric($actionSchedule['id']), "In line " . __LINE__);
     $this->assertTrue($actionSchedule['id'] > 0, "In line " . __LINE__);
     $newCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
-    $this->assertEquals($oldCount+1, $newCount);
+    $this->assertEquals($oldCount + 1, $newCount);
   }
 
   /**
@@ -113,7 +113,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_condition' => 'before',
       'start_action_date' => 'activity_date_time',
       'is_repeat' => 1,
-      'repetition_frequency_unit'=> 'day',
+      'repetition_frequency_unit' => 'day',
       'repetition_frequency_interval' => 3,
       'end_frequency_unit' => 'hour',
       'end_frequency_interval' => 0,
@@ -127,7 +127,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
     $this->assertTrue($actionSchedule['id'] > 0, "In line " . __LINE__);
     $this->assertEquals($actionSchedule['values'][$actionSchedule['id']]['start_action_offset'][0], $params['start_action_offset']);
     $newCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
-    $this->assertEquals($oldCount+1, $newCount);
+    $this->assertEquals($oldCount + 1, $newCount);
 
   }
 

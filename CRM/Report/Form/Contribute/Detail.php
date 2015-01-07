@@ -618,8 +618,7 @@ UNION ALL
         list($alias, $rest) = explode('.', $clause);
         $orderClause[] = $aliases[$alias] . "_" . $rest;
       }
-      $orderBy = (!empty($orderClause)) ?
-        "ORDER BY " . implode(', ', $orderClause) : '';
+      $orderBy = (!empty($orderClause)) ? "ORDER BY " . implode(', ', $orderClause) : '';
     }
 
     // 6. show result set from temp table 3
@@ -874,11 +873,9 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
           }
           else {
             // other aliases are higher level; roll count into their total
-            $totals[$key] = (array_key_exists($key, $totals)) ?
-              $totals[$key] + $dao->ct : $dao->ct;
+            $totals[$key] = (array_key_exists($key, $totals)) ? $totals[$key] + $dao->ct : $dao->ct;
             if ($showsumcontribs) {
-              $sumcontribs[$key] = array_key_exists($key, $sumcontribs) ?
-                $sumcontribs[$key] + $dao->sumcontribs : $dao->sumcontribs;
+              $sumcontribs[$key] = array_key_exists($key, $sumcontribs) ? $sumcontribs[$key] + $dao->sumcontribs : $dao->sumcontribs;
             }
           }
         }

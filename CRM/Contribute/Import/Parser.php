@@ -121,7 +121,8 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
    * @return mixed
    * @throws Exception
    */
-  function run($fileName,
+  function run(
+    $fileName,
     $seperator = ',',
     &$mapper,
     $skipColumnHeader = FALSE,
@@ -599,7 +600,8 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
   /**
    * Determines the file extension based on error code
    *
-   * @param int $type error code constant
+   * @param int $type
+   *   Error code constant.
    *
    * @return string
    */
@@ -632,7 +634,8 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
   /**
    * Determines the file name based on error code
    *
-   * @param int $type error code constant
+   * @param int $type
+   *   Error code constant.
    *
    * @return string
    */

@@ -33,7 +33,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * @package CiviCRM_APIv3
  * @subpackage API_Contact
  */
-
 class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   public $DBResetRequired = FALSE;
@@ -233,10 +232,19 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
 
   public function setupCoreACL() {
     $this->createLoggedInUser();
-    $this->_permissionedDisabledGroup = $this->groupCreate(array('title' => 'pick-me-disabled', 'is_active' => 0, 'name' => 'pick-me-disabled'));
-    $this->_permissionedGroup = $this->groupCreate(array('title' => 'pick-me-active', 'is_active' => 1, 'name' => 'pick-me-active'));
+    $this->_permissionedDisabledGroup = $this->groupCreate(array(
+        'title' => 'pick-me-disabled',
+        'is_active' => 0,
+        'name' => 'pick-me-disabled'
+      ));
+    $this->_permissionedGroup = $this->groupCreate(array(
+        'title' => 'pick-me-active',
+        'is_active' => 1,
+        'name' => 'pick-me-active'
+      ));
     $this->setupACL();
   }
+
   /**
    * @dataProvider entities
    * confirm that without check permissions we still get 2 contacts returned
@@ -267,6 +275,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(2, $result['count']);
   }
+
   /**
    * @dataProvider entities
    * confirm that with check permissions we don't get entities
@@ -302,7 +311,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @return array
    */
   public static function entities() {
-    return array(array('contribution'), array('participant'),);// @todo array('pledge' => 'pledge')
+    return array(array('contribution'), array('participant'));// @todo array('pledge' => 'pledge')
   }
 
   /**
@@ -310,7 +319,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    */
   public function setUpEntities($entity) {
     $baoObj = new CRM_Core_DAO();
-    $baoObj->createTestObject( _civicrm_api3_get_BAO($entity), array(), 2, 0);
+    $baoObj->createTestObject(_civicrm_api3_get_BAO($entity), array(), 2, 0);
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array(
       'access CiviCRM',
       'access CiviContribute',

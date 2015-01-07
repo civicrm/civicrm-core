@@ -46,12 +46,12 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
   public function preProcess() {
     //when user come from search context.
     $ssID = $this->get('ssID');
-    $this->assign('ssid',$ssID);
+    $this->assign('ssid', $ssID);
     $this->_searchBasedMailing = CRM_Contact_Form_Search::isSearchContext($this->get('context'));
     if(CRM_Contact_Form_Search::isSearchContext($this->get('context')) && !$ssID){
-    $params = array();
-    $result = CRM_Core_BAO_PrevNextCache::getSelectedContacts();
-    $this->assign("value", $result);
+      $params = array();
+      $result = CRM_Core_BAO_PrevNextCache::getSelectedContacts();
+      $this->assign("value", $result);
     }
   }
 
@@ -142,7 +142,8 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
     );
 
     $buttons = array(
-      array('type' => 'back',
+      array(
+    'type' => 'back',
         'name' => ts('<< Previous'),
       ),
       array(

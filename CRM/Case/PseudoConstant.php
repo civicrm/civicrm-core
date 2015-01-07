@@ -87,7 +87,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * @static
    */
   public static function caseStatus($column = 'label', $onlyActive = TRUE, $condition = NULL, $fresh = FALSE) {
-    $cacheKey = "{$column}_" . (int)$onlyActive;
+    $cacheKey = "{$column}_" . (int) $onlyActive;
     if (!$condition) {
       $condition = 'AND filter = 0';
     }
@@ -174,7 +174,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * @static
    */
   public static function encounterMedium($column = 'label', $onlyActive = TRUE) {
-    $cacheKey = "{$column}_" . (int)$onlyActive;
+    $cacheKey = "{$column}_" . (int) $onlyActive;
     if (!isset(self::$encounterMedium[$cacheKey])) {
       self::$encounterMedium[$cacheKey] = CRM_Core_OptionGroup::values('encounter_medium',
         FALSE, FALSE, FALSE, NULL,
@@ -190,7 +190,8 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * The static array activityType is returned
    *
-   * @param boolean $indexName - true return activity name in array
+   * @param bool $indexName
+   *   True return activity name in array.
    * key else activity id as array key.
    *
    * @param bool $all
@@ -254,7 +255,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param bool|string $name pseudoconstant to be flushed
    */
   public static function flush($name = 'cache') {
-   if (isset(self::$$name)) {
+    if (isset(self::$$name)) {
       self::$$name = NULL;
     }
   }

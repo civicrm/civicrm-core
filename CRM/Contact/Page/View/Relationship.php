@@ -101,7 +101,6 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
       "action=view&reset=1&id={$viewRelationship[$this->_id]['id']}&cid={$this->_contactId}&context=home"
     );
 
-
     $session = CRM_Core_Session::singleton();
     $recentOther = array();
 

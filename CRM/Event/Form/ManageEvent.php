@@ -206,14 +206,16 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
         $this->_doneUrl = CRM_Utils_System::url('civicrm/event/manage',
           'reset=1'
         );
-        $breadCrumb = array(array('title' => ts('Manage Events'),
+        $breadCrumb = array(array(
+        'title' => ts('Manage Events'),
             'url' => $this->_doneUrl,
           ));
       }
     }
     else {
       $this->_doneUrl = CRM_Utils_System::url('civicrm/admin/eventTemplate', 'reset=1');
-      $breadCrumb = array(array('title' => ts('Manage Event Templates'),
+      $breadCrumb = array(array(
+      'title' => ts('Manage Event Templates'),
           'url' => $this->_doneUrl,
         ));
     }

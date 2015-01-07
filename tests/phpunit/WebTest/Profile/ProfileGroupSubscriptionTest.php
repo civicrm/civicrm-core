@@ -120,7 +120,6 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
 
     $this->click('_qf_Edit_next');
 
-
     // assert for subscription message
 
     $this->isTextPresent("Your subscription request has been submitted for");

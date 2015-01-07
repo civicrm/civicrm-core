@@ -154,12 +154,12 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
   public function buildQuickForm() {
 
     $statuses = CRM_Event_PseudoConstant::participantStatus();
-    $this->assign('partiallyPaid',  array_search('Partially paid', $statuses));
-    $this->assign('pendingRefund',  array_search('Pending refund', $statuses));
+    $this->assign('partiallyPaid', array_search('Partially paid', $statuses));
+    $this->assign('pendingRefund', array_search('Pending refund', $statuses));
     $this->assign('participantStatus', $this->_participantStatus);
 
     $config = CRM_Core_Config::singleton();
-    $this->assign('currencySymbol',  $config->defaultCurrencySymbol);
+    $this->assign('currencySymbol', $config->defaultCurrencySymbol);
 
     // line items block
     $lineItem = $event = array();

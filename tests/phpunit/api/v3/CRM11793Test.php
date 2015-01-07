@@ -9,7 +9,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_activity_* functions
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class api_v3_CRM11793Test extends CiviUnitTestCase {
 

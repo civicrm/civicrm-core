@@ -68,7 +68,7 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', "Contact Saved");
 
-    $this->openCiviPage('contact/add' , 'reset=1&ct=Individual');
+    $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 
     //contact details section
 

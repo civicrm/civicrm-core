@@ -60,8 +60,10 @@ class CRM_Utils_Signer {
   /**
    * Instantiate a signature-processor
    *
-   * @param $secret string, private
-   * @param $paramNames array, fields which should be part of the signature
+   * @param $secret
+   *   String, private.
+   * @param $paramNames
+   *   Array, fields which should be part of the signature.
    */
   public function __construct($secret, $paramNames) {
     sort($paramNames); // ensure consistent serialization of payloads
@@ -74,8 +76,10 @@ class CRM_Utils_Signer {
   /**
    * Generate a signature for a set of key-value pairs
    *
-   * @param $params array, key-value pairs
-   * @param $salt string, the salt (if known) or NULL (for auto-generated)
+   * @param $params
+   *   Array, key-value pairs.
+   * @param $salt
+   *   String, the salt (if known) or NULL (for auto-generated).
    * @return string, the full public token representing the signature
    */
   public function sign($params, $salt = NULL) {
@@ -85,7 +89,7 @@ class CRM_Utils_Signer {
     if (empty($salt)) {
       $message['salt'] = $this->createSalt();
     } else {
-      $message['salt'] =  $salt;
+      $message['salt'] = $salt;
     }
     // recall: paramNames is pre-sorted for stability
     foreach ($this->paramNames as $paramName) {
@@ -96,8 +100,8 @@ class CRM_Utils_Signer {
       } else { // $paramName is not included or ===NULL
         $params[$paramName] = '';
       }
-        $message['payload'][$paramName] = $params[$paramName];
-      }
+      $message['payload'][$paramName] = $params[$paramName];
+    }
     $token = $message['salt'] . $this->signDelim . md5(serialize($message));
     return $token;
   }
@@ -105,8 +109,10 @@ class CRM_Utils_Signer {
   /**
    * Determine whether a token represents a proper signature for $params
    *
-   * @param $token string, the full public token representing the signature
-   * @param $params array, key-value pairs
+   * @param $token
+   *   String, the full public token representing the signature.
+   * @param $params
+   *   Array, key-value pairs.
    *
    * @throws Exception
    * @return bool, TRUE iff all $paramNames for the submitted validate($params) and the original sign($params)

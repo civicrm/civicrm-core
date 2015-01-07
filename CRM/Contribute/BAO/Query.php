@@ -1128,11 +1128,16 @@ class CRM_Contribute_BAO_Query {
   /**
    * Add the where for dates
    *
-   * @param array $values array of query values
-   * @param object $query the query object
-   * @param string $name query field that is set
-   * @param string $field name of field to be set
-   * @param string $title title of the field
+   * @param array $values
+   *   Array of query values.
+   * @param object $query
+   *   The query object.
+   * @param string $name
+   *   Query field that is set.
+   * @param string $field
+   *   Name of field to be set.
+   * @param string $title
+   *   Title of the field.
    *
    * @return bool
    */

@@ -101,7 +101,7 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
           ),
         ),
         'filters' => array(
-          'activity_date_time' =>          //'default'      => 'this.month',
+          'activity_date_time' => //'default'      => 'this.month',
             array(
               'operatorType' => CRM_Report_Form::OP_DATE,
             ),

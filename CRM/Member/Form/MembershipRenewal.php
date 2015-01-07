@@ -41,31 +41,31 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   /*
    * Display name of the member
    */
-  protected $_memberDisplayName = null;
+  protected $_memberDisplayName = NULL;
   /*
   * email of the person paying for the membership (used for receipts)
   */
-  protected $_memberEmail = null;
+  protected $_memberEmail = NULL;
   /*
   * Contact ID of the member
   */
-  public $_contactID = null;
+  public $_contactID = NULL;
   /*
   * Display name of the person paying for the membership (used for receipts)
   */
-  protected $_contributorDisplayName = null;
- /*
-  * email of the person paying for the membership (used for receipts)
-  */
-  protected $_contributorEmail = null;
+  protected $_contributorDisplayName = NULL;
   /*
   * email of the person paying for the membership (used for receipts)
   */
-  protected $_contributorContactID = null;
- /*
+  protected $_contributorEmail = NULL;
+  /*
+  * email of the person paying for the membership (used for receipts)
+  */
+  protected $_contributorContactID = NULL;
+  /*
   * ID of the person the receipt is to go to
   */
-  protected $_receiptContactId = null;
+  protected $_receiptContactId = NULL;
   /*
    * context would be set to standalone if the contact is use is being selected from
    * the form rather than in the URL
@@ -187,7 +187,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         'minimum_fee'
       ), NULL, '%a');
 
-
     $defaults['record_contribution'] = 0;
     $defaults['num_terms'] = 1;
     $defaults['send_receipt'] = 0;
@@ -300,8 +299,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
         if (!empty($values['auto_renew'])) {
           $allMembershipInfo[$key]['auto_renew'] = $options[$values['auto_renew']];
+        }
       }
-    }
     }
 
     $this->assign('allMembershipInfo', json_encode($allMembershipInfo));
@@ -446,13 +445,14 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $this->addElement('checkbox', 'contribution_contact', ts('Record Payment from a Different Contact?'));
       $this->addSelect('soft_credit_type_id', array('entity' => 'contribution_soft'));
       $this->addEntityRef('soft_credit_contact_id', ts('Payment From'), array('create' => TRUE));
-  }
     }
+  }
 
   /**
    * Validation
    *
-   * @param array $params (ref.) an assoc array of name/value pairs
+   * @param array $params
+   *   (ref.) an assoc array of name/value pairs.
    *
    * @return mixed true or array of errors
    * @static
@@ -506,7 +506,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       );
     }
 
-    $now = CRM_Utils_Date::getToday( null, 'YmdHis');
+    $now = CRM_Utils_Date::getToday( NULL, 'YmdHis');
     $this->convertDateFieldsToMySQL($formValues);
     $this->assign('receive_date', $formValues['receive_date']);
 
@@ -523,7 +523,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           $this->_memType, 'minimum_fee'
         ));
       if (empty($formValues['financial_type_id'])) {
-        $formValues['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType,'financial_type_id');
+        $formValues['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
       }
 
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($formValues['payment_processor_id'],
@@ -678,7 +678,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       //create line items
       $lineItem = array();
-      $priceSetId = null;
+      $priceSetId = NULL;
       CRM_Member_BAO_Membership::createLineItems($this, $formValues['membership_type_id'], $priceSetId);
       CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
         $this->_params, $lineItem[$priceSetId]
@@ -819,7 +819,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     $statusMsg = ts('%1 membership for %2 has been renewed.', array(1 => $memType, 2 => $this->_memberDisplayName));
 
     if ($endDate) {
-      $statusMsg .= ' ' . ts('The new membership End Date is %1.', array(1 => CRM_Utils_Date::customFormat(substr($endDate,0,8))));
+      $statusMsg .= ' ' . ts('The new membership End Date is %1.', array(1 => CRM_Utils_Date::customFormat(substr($endDate, 0, 8))));
     }
 
     if ($receiptSend && $mailSend) {

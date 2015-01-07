@@ -54,9 +54,12 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   /**
    * Retrieve an item from the DB cache
    *
-   * @param string $group (required) The group name of the item
-   * @param string $path  (required) The path under which this item is stored
-   * @param int    $componentID The optional component ID (so componenets can share the same name space)
+   * @param string $group
+   *   (required) The group name of the item.
+   * @param string $path
+   *   (required) The path under which this item is stored.
+   * @param int $componentID
+   *   The optional component ID (so componenets can share the same name space).
    *
    * @return object The data if present in cache, else null
    * @static
@@ -73,8 +76,8 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
       if (!self::$_cache[$argString]) {
         $dao = new CRM_Core_DAO_Cache();
 
-        $dao->group_name   = $group;
-        $dao->path         = $path;
+        $dao->group_name = $group;
+        $dao->path = $path;
         $dao->component_id = $componentID;
 
         $data = NULL;
@@ -92,8 +95,10 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   /**
    * Retrieve all items in a group
    *
-   * @param string $group (required) The group name of the item
-   * @param int    $componentID The optional component ID (so componenets can share the same name space)
+   * @param string $group
+   *   (required) The group name of the item.
+   * @param int $componentID
+   *   The optional component ID (so componenets can share the same name space).
    *
    * @return object The data if present in cache, else null
    * @static
@@ -110,7 +115,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
       if (!self::$_cache[$argString]) {
         $dao = new CRM_Core_DAO_Cache();
 
-        $dao->group_name   = $group;
+        $dao->group_name = $group;
         $dao->component_id = $componentID;
         $dao->find();
 
@@ -131,10 +136,14 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   /**
    * Store an item in the DB cache
    *
-   * @param object $data  (required) A reference to the data that will be serialized and stored
-   * @param string $group (required) The group name of the item
-   * @param string $path  (required) The path under which this item is stored
-   * @param int    $componentID The optional component ID (so componenets can share the same name space)
+   * @param object $data
+   *   (required) A reference to the data that will be serialized and stored.
+   * @param string $group
+   *   (required) The group name of the item.
+   * @param string $path
+   *   (required) The path under which this item is stored.
+   * @param int $componentID
+   *   The optional component ID (so componenets can share the same name space).
    *
    * @return void
    * @static
@@ -146,8 +155,8 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
 
     $dao = new CRM_Core_DAO_Cache();
 
-    $dao->group_name   = $group;
-    $dao->path         = $path;
+    $dao->group_name = $group;
+    $dao->path = $path;
     $dao->component_id = $componentID;
 
     // get a lock so that multiple ajax requests on the same page
@@ -185,8 +194,10 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * Delete all the cache elements that belong to a group OR
    * delete the entire cache if group is not specified
    *
-   * @param string $group The group name of the entries to be deleted
-   * @param string $path path of the item that needs to be deleted
+   * @param string $group
+   *   The group name of the entries to be deleted.
+   * @param string $path
+   *   Path of the item that needs to be deleted.
    * @param bool|\booleab $clearAll clear all caches
    *
    * @return void
@@ -225,10 +236,12 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * This function takes entries from the session array and stores it in the cache.
    * It also deletes the entries from the $_SESSION object (for a smaller session size)
    *
-   * @param array $names Array of session values that should be persisted
+   * @param array $names
+   *   Array of session values that should be persisted.
    *                     This is either a form name + qfKey or just a form name
    *                     (in the case of profile)
-   * @param boolean $resetSession Should session state be reset on completion of DB store?
+   * @param bool $resetSession
+   *   Should session state be reset on completion of DB store?.
    *
    * @return void
    * @static
@@ -236,35 +249,36 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   public static function storeSessionToCache($names, $resetSession = TRUE) {
     foreach ($names as $key => $sessionName) {
       if (is_array($sessionName)) {
-        $value = null;
+        $value = NULL;
         if (!empty($_SESSION[$sessionName[0]][$sessionName[1]])) {
           $value = $_SESSION[$sessionName[0]][$sessionName[1]];
         }
         self::setItem($value, 'CiviCRM Session', "{$sessionName[0]}_{$sessionName[1]}");
-          if ($resetSession) {
-            $_SESSION[$sessionName[0]][$sessionName[1]] = NULL;
-            unset($_SESSION[$sessionName[0]][$sessionName[1]]);
-          }
+        if ($resetSession) {
+          $_SESSION[$sessionName[0]][$sessionName[1]] = NULL;
+          unset($_SESSION[$sessionName[0]][$sessionName[1]]);
         }
+      }
       else {
-        $value = null;
+        $value = NULL;
         if (!empty($_SESSION[$sessionName])) {
           $value = $_SESSION[$sessionName];
         }
         self::setItem($value, 'CiviCRM Session', $sessionName);
-          if ($resetSession) {
-            $_SESSION[$sessionName] = NULL;
-            unset($_SESSION[$sessionName]);
-          }
+        if ($resetSession) {
+          $_SESSION[$sessionName] = NULL;
+          unset($_SESSION[$sessionName]);
         }
       }
+    }
 
     self::cleanup();
   }
 
   /* Retrieve the session values from the cache and populate the $_SESSION array
      *
-     * @param array $names Array of session values that should be persisted
+     * @param array $names
+     *   Array of session values that should be persisted.
      *                     This is either a form name + qfKey or just a form name
      *                     (in the case of profile)
      *
@@ -307,7 +321,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @return void
    * @static
    */
-  public static function cleanup($session = false, $table = false, $prevNext = false) {
+  public static function cleanup($session = FALSE, $table = FALSE, $prevNext = FALSE) {
     // clean up the session cache every $cacheCleanUpNumber probabilistically
     $cleanUpNumber = 757;
 
@@ -316,19 +330,19 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     $timeIntervalMins = 30;
 
     if (mt_rand(1, 100000) % $cleanUpNumber == 0) {
-      $session = $table = $prevNext = true;
+      $session = $table = $prevNext = TRUE;
     }
 
-    if ( ! $session && ! $table && ! $prevNext ) {
+    if (!$session && !$table && !$prevNext) {
       return;
     }
 
-    if ( $prevNext ) {
+    if ($prevNext) {
       // delete all PrevNext caches
       CRM_Core_BAO_PrevNextCache::cleanupCache();
     }
 
-    if ( $table ) {
+    if ($table) {
       // also delete all the action temp tables
       // that were created the same interval ago
       $dao = new CRM_Core_DAO();
@@ -342,9 +356,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_task_action_temp_%'
 AND    CREATE_TIME < date_sub( NOW( ), INTERVAL $timeIntervalDays day )
 ";
 
-      $params   = array(1 => array($dao->database(), 'String'));
+      $params = array(1 => array($dao->database(), 'String'));
       $tableDAO = CRM_Core_DAO::executeQuery($query, $params);
-      $tables   = array();
+      $tables = array();
       while ($tableDAO->fetch()) {
         $tables[] = $tableDAO->tableName;
       }
@@ -355,27 +369,27 @@ AND    CREATE_TIME < date_sub( NOW( ), INTERVAL $timeIntervalDays day )
       }
     }
 
-    if ( $session ) {
+    if ($session) {
       // first delete all sessions which are related to any potential transaction
       // page
       $transactionPages = array(
-          'CRM_Contribute_Controller_Contribution',
-          'CRM_Event_Controller_Registration',
-        );
+        'CRM_Contribute_Controller_Contribution',
+        'CRM_Event_Controller_Registration',
+      );
 
       $params = array(
         1 => array(date('Y-m-d H:i:s', time() - $timeIntervalMins * 60), 'String'),
       );
       foreach ($transactionPages as $trPage) {
         $params[] = array("%${trPage}%", 'String');
-        $where[]  = 'path LIKE %' . sizeof($params);
+        $where[] = 'path LIKE %' . sizeof($params);
       }
 
       $sql = "
 DELETE FROM civicrm_cache
 WHERE       group_name = 'CiviCRM Session'
 AND         created_date <= %1
-AND         ("  . implode(' OR ', $where) . ")";
+AND         (" . implode(' OR ', $where) . ")";
       CRM_Core_DAO::executeQuery($sql, $params);
 
       $sql = "

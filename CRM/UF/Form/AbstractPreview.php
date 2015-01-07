@@ -50,7 +50,8 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
   /**
    * Set the profile/field structure for this form
    *
-   * @param array $fields list of fields per CRM_Core_BAO_UFGroup::formatUFFields or CRM_Core_BAO_UFGroup::getFields
+   * @param array $fields
+   *   List of fields per CRM_Core_BAO_UFGroup::formatUFFields or CRM_Core_BAO_UFGroup::getFields.
    * @param bool $isSingleField
    * @param bool $flag
    */

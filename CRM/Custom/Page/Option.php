@@ -141,7 +141,8 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
 SELECT id, label
 FROM   civicrm_custom_field
 WHERE  option_group_id = %1";
-    $params = array(1 => array($optionGroupID, 'Integer'),
+    $params = array(
+    1 => array($optionGroupID, 'Integer'),
       2 => array($this->_fid, 'Integer'),
     );
     $dao = CRM_Core_DAO::executeQuery($query, $params);
@@ -237,7 +238,8 @@ ORDER BY weight, label
    *
    * editing would involved modifying existing fields + adding data to new fields.
    *
-   * @param string  $action   the action to be invoked
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
    */
@@ -281,7 +283,8 @@ ORDER BY weight, label
     }
 
     //as url contain $gid so append breadcrumb dynamically.
-    $breadcrumb = array(array('title' => ts('Custom Data Fields'),
+    $breadcrumb = array(array(
+    'title' => ts('Custom Data Fields'),
         'url' => CRM_Utils_System::url('civicrm/admin/custom/group/field', 'reset=1&gid=' . $this->_gid),
       ));
     CRM_Utils_System::appendBreadCrumb($breadcrumb);
@@ -307,10 +310,8 @@ ORDER BY weight, label
       $this, FALSE, 0
     );
 
-
     // what action to take ?
-    if (($action &
-        (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD |
+    if (($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD |
           CRM_Core_Action::VIEW | CRM_Core_Action::DELETE
         )
       ) ||

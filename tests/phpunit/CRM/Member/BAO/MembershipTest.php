@@ -73,7 +73,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->membershipStatusDelete( $this->_membershipStatusID );
     Contact::delete( $this->_contactID );
 
-    $this->_contactID = $this->_membershipStatusID = $this->_membershipTypeID = null;
+    $this->_contactID = $this->_membershipStatusID = $this->_membershipTypeID = NULL;
   }
 
   public function testCreate() {
@@ -83,9 +83,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd',strtotime('2006-01-21')),
-      'start_date' => date('Ymd',strtotime('2006-01-21')),
-      'end_date' => date('Ymd',strtotime('2006-12-21')),
+      'join_date' => date('Ymd', strtotime('2006-01-21')),
+      'start_date' => date('Ymd', strtotime('2006-01-21')),
+      'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
@@ -103,9 +103,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd',strtotime('2006-01-21')),
-      'start_date' => date('Ymd',strtotime('2006-01-21')),
-      'end_date' => date('Ymd',strtotime('2006-12-21')),
+      'join_date' => date('Ymd', strtotime('2006-01-21')),
+      'start_date' => date('Ymd', strtotime('2006-01-21')),
+      'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
@@ -189,9 +189,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd',strtotime('2006-01-21')),
-      'start_date' => date('Ymd',strtotime('2006-01-21')),
-      'end_date' => date('Ymd',strtotime('2006-12-21')),
+      'join_date' => date('Ymd', strtotime('2006-01-21')),
+      'start_date' => date('Ymd', strtotime('2006-01-21')),
+      'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
@@ -217,9 +217,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd',strtotime('2006-01-21')),
-      'start_date' => date('Ymd',strtotime('2006-01-21')),
-      'end_date' => date('Ymd',strtotime('2006-12-21')),
+      'join_date' => date('Ymd', strtotime('2006-01-21')),
+      'start_date' => date('Ymd', strtotime('2006-01-21')),
+      'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
@@ -239,9 +239,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd',strtotime('2006-01-21')),
-      'start_date' => date('Ymd',strtotime('2006-01-21')),
-      'end_date' => date('Ymd',strtotime('2006-12-21')),
+      'join_date' => date('Ymd', strtotime('2006-01-21')),
+      'start_date' => date('Ymd', strtotime('2006-01-21')),
+      'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'PaySource',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
@@ -277,9 +277,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd',strtotime('2006-01-21')),
-      'start_date' => date('Ymd',strtotime('2006-01-21')),
-      'end_date' => date('Ymd',strtotime('2006-12-21')),
+      'join_date' => date('Ymd', strtotime('2006-01-21')),
+      'start_date' => date('Ymd', strtotime('2006-01-21')),
+      'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
@@ -304,9 +304,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd',strtotime('2006-01-21')),
-      'start_date' => date('Ymd',strtotime('2006-01-21')),
-      'end_date' => date('Ymd',strtotime('2006-12-21')),
+      'join_date' => date('Ymd', strtotime('2006-01-21')),
+      'start_date' => date('Ymd', strtotime('2006-01-21')),
+      'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
@@ -337,16 +337,15 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd',strtotime('2006-01-21')),
-      'start_date' => date('Ymd',strtotime('2006-01-21')),
-      'end_date' => date('Ymd',strtotime('2006-12-21')),
+      'join_date' => date('Ymd', strtotime('2006-01-21')),
+      'start_date' => date('Ymd', strtotime('2006-01-21')),
+      'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
     );
     $ids = array();
     CRM_Member_BAO_Membership::create($params, $ids);
-
 
     $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for created membership.'
@@ -368,9 +367,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd',strtotime('2006-01-21')),
-      'start_date' => date('Ymd',strtotime('2006-01-21')),
-      'end_date' => date('Ymd',strtotime('2006-12-21')),
+      'join_date' => date('Ymd', strtotime('2006-01-21')),
+      'start_date' => date('Ymd', strtotime('2006-01-21')),
+      'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
@@ -400,9 +399,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd',strtotime('2006-01-21')),
-      'start_date' => date('Ymd',strtotime('2006-01-21')),
-      'end_date' => date('Ymd',strtotime('2006-12-21')),
+      'join_date' => date('Ymd', strtotime('2006-01-21')),
+      'start_date' => date('Ymd', strtotime('2006-01-21')),
+      'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
@@ -433,9 +432,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd',strtotime('2006-01-21')),
-      'start_date' => date('Ymd',strtotime('2006-01-21')),
-      'end_date' => date('Ymd',strtotime('2006-12-21')),
+      'join_date' => date('Ymd', strtotime('2006-01-21')),
+      'start_date' => date('Ymd', strtotime('2006-01-21')),
+      'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
@@ -468,9 +467,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd',strtotime('2006-01-21')),
-      'start_date' => date('Ymd',strtotime('2006-01-21')),
-      'end_date' => date('Ymd',strtotime('2006-12-21')),
+      'join_date' => date('Ymd', strtotime('2006-01-21')),
+      'start_date' => date('Ymd', strtotime('2006-01-21')),
+      'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,

@@ -48,7 +48,8 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
   /**
    * Construct a new mailingab object
    *
-   * @params array $params        Form values
+   * @params array $params
+   *   Form values.
    *
    * @param $params
    * @param array $ids
@@ -72,8 +73,10 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
   /**
    * function to add the mailings
    *
-   * @param array $params reference array contains the values submitted by the form
-   * @param array $ids reference array contains the id
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
+   * @param array $ids
+   *   Reference array contains the id.
    *
    * @static
    *
@@ -113,7 +116,8 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
   /**
    * Delete MailingAB and all its associated records
    *
-   * @param  int $id id of the mail to delete
+   * @param int $id
+   *   Id of the mail to delete.
    *
    * @return void
    * @static

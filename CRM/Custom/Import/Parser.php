@@ -76,7 +76,8 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
    * @return mixed
    * @throws Exception
    */
-  function run($fileName,
+  function run(
+    $fileName,
     $separator = ',',
     &$mapper,
     $skipColumnHeader = FALSE,
@@ -242,7 +243,6 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
     }
 
     fclose($fd);
-
 
     if ($mode == self::MODE_PREVIEW || $mode == self::MODE_IMPORT) {
       $customHeaders = $mapper;

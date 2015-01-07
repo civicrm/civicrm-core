@@ -363,7 +363,8 @@ ALTER TABLE {$tableName}
   /**
    * Delete a civiCRM-table
    *
-   * @param  String  $tableName   name of the table to be created.
+   * @param String $tableName
+   *   Name of the table to be created.
    *
    * @return true if successfully deleted, false otherwise
    *

@@ -89,7 +89,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         self::$_links[CRM_Core_Action::DISABLE]['qs'] = "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}";
       }
       if (is_object( $paymentProcessorObj) && $paymentProcessorObj->isSupported('updateSubscriptionBillingInfo')) {
-        self::$_links[CRM_Core_Action::RENEW] = array('name' => ts('Change Billing Details'),
+        self::$_links[CRM_Core_Action::RENEW] = array(
+        'name' => ts('Change Billing Details'),
           'title' => ts('Change Billing Details'),
           'url' => 'civicrm/contribute/updatebilling',
           'qs' => "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}",

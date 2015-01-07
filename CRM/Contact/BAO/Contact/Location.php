@@ -37,7 +37,8 @@ class CRM_Contact_BAO_Contact_Location {
   /**
    * Get the display name, primary email, location type and location id of a contact
    *
-   * @param  int $id id of the contact
+   * @param int $id
+   *   Id of the contact.
    *
    * @param bool $isPrimary
    * @param int $locationTypeID
@@ -77,7 +78,8 @@ WHERE     civicrm_contact.id = %1";
   /**
    * Get the sms number and display name of a contact
    *
-   * @param  int $id id of the contact
+   * @param int $id
+   *   Id of the contact.
    *
    * @param null $type
    *
@@ -114,7 +116,8 @@ LEFT JOIN civicrm_phone ON ( civicrm_phone.contact_id = civicrm_contact.id )
   /**
    * Get the information to map a contact
    *
-   * @param  array $ids the list of ids for which we want map info
+   * @param array $ids
+   *   The list of ids for which we want map info.
    * $param  int    $locationTypeID
    *
    * @param int $locationTypeID

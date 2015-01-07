@@ -88,12 +88,12 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       }
     }
 
-      if (!empty($_POST) && !empty($_POST['entity']) && empty($this->_context)) {
-        $mappingID = $_POST['entity'][0];
-      }
-      elseif ($this->_mappingID) {
-        $mappingID = $this->_mappingID;
-      }
+    if (!empty($_POST) && !empty($_POST['entity']) && empty($this->_context)) {
+      $mappingID = $_POST['entity'][0];
+    }
+    elseif ($this->_mappingID) {
+      $mappingID = $this->_mappingID;
+    }
 
     $this->add(
       'text',
@@ -182,7 +182,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     //reminder_frequency
     $this->add('select', 'start_action_unit', ts('Frequency'), $freqUnitsDisplay, TRUE);
 
-    $condition = array('before' => ts('before'),
+    $condition = array(
+    'before' => ts('before'),
       'after' => ts('after'),
     );
     //reminder_action
@@ -263,7 +264,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   /**
    * Global form rule
    *
-   * @param array $fields  the input form values
+   * @param array $fields
+   *   The input form values.
    *
    * @return true if no errors, else array of errors
    * @static
@@ -531,7 +533,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
           $templateParams += array(
             'msg_text' => $params['sms_body_text'],
             'is_sms' => TRUE,
-        );
+          );
         }
         else {
           $templateParams += array(

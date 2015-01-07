@@ -71,7 +71,8 @@ class CRM_Core_Menu {
   /**
    * This function fetches the menu items from xml and xmlMenu hooks
    *
-   * @param boolen $fetchFromXML fetch the menu items from xml and not from cache
+   * @param boolen $fetchFromXML
+   *   Fetch the menu items from xml and not from cache.
    *
    * @return array
    */
@@ -162,7 +163,8 @@ class CRM_Core_Menu {
   /**
    * This function defines information for various menu items
    *
-   * @param boolen $fetchFromXML fetch the menu items from xml and not from cache
+   * @param boolen $fetchFromXML
+   *   Fetch the menu items from xml and not from cache.
    *
    * @static
    */
@@ -273,7 +275,6 @@ class CRM_Core_Menu {
 
     self::build($menuArray);
 
-
     $config = CRM_Core_Config::singleton();
 
     foreach ($menuArray as $path => $item) {
@@ -317,8 +318,11 @@ class CRM_Core_Menu {
         'title' => $item['title'],
         'desc' => CRM_Utils_Array::value('desc', $item),
         'id' => strtr($item['title'], array(
-          '(' => '_', ')' => '', ' ' => '',
-            ',' => '_', '/' => '_',
+          '(' => '_',
+      ')' => '',
+      ' ' => '',
+            ',' => '_',
+      '/' => '_',
           )
         ),
         'url' => CRM_Utils_System::url($path, $query,
@@ -420,7 +424,6 @@ class CRM_Core_Menu {
       }
     }
 
-
     if (!$all) {
       // remove all collapsed menu items from the array
       foreach ($values as $weight => $v) {
@@ -479,8 +482,10 @@ class CRM_Core_Menu {
   /**
    * Get the breadcrumb for a given path.
    *
-   * @param  array   $menu   An array of all the menu items.
-   * @param  string  $path   Path for which breadcrumb is to be build.
+   * @param array $menu
+   *   An array of all the menu items.
+   * @param string $path
+   *   Path for which breadcrumb is to be build.
    *
    * @return array  The breadcrumb for this path
    *
@@ -697,7 +702,7 @@ UNION (
     // Once we have another example of a 'cleanup' we should generalize the clause below so it grabs string
     // which follows upgrade/ and checks for existence of a function in Cleanup class.
     if ($path == 'civicrm/upgrade/cleanup425') {
-      $menuPath['page_callback'] = array('CRM_Upgrade_Page_Cleanup','cleanup425');
+      $menuPath['page_callback'] = array('CRM_Upgrade_Page_Cleanup', 'cleanup425');
       $menuPath['access_arguments'][0][] = 'administer CiviCRM';
       $menuPath['access_callback'] = array('CRM_Core_Permission', 'checkMenu');
     }

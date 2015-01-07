@@ -120,7 +120,8 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
     );
 
     // set breadcrumb to append to admin/access
-    $breadCrumb = array(array('title' => ts('Access Control'),
+    $breadCrumb = array(array(
+    'title' => ts('Access Control'),
         'url' => CRM_Utils_System::url('civicrm/admin/access',
           'reset=1'
         ),

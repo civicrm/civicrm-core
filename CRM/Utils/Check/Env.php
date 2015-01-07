@@ -108,7 +108,6 @@ class CRM_Utils_Check_Env {
         'checkOutboundMail',
         ts('Warning: Outbound email is disabled in <a href="%1">system settings</a>. Proper settings should be enabled on production servers.',
           array(1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1'))),
-
         ts('Outbound Email Settings')
       );
     }

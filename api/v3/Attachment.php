@@ -73,7 +73,8 @@
 /**
  * Adjust metadata for "create" action
  *
- * @param array $spec list of fields
+ * @param array $spec
+ *   List of fields.
  */
 function _civicrm_api3_attachment_create_spec(&$spec) {
   $spec = array_merge($spec, _civicrm_api3_attachment_getfields());
@@ -87,7 +88,7 @@ function _civicrm_api3_attachment_create_spec(&$spec) {
 /**
  * Create an attachment
  *
- * @param  array $params
+ * @param array $params
  * @return array of newly created file property values.
  * @access public
  * @throws API_Exception validation errors
@@ -154,7 +155,8 @@ function civicrm_api3_attachment_create($params) {
 /**
  * Adjust metadata for "create" action
  *
- * @param array $spec list of fields
+ * @param array $spec
+ *   List of fields.
  */
 function _civicrm_api3_attachment_get_spec(&$spec) {
   $spec = array_merge($spec, _civicrm_api3_attachment_getfields());
@@ -208,7 +210,7 @@ function civicrm_api3_attachment_delete($params) {
   $filePaths = array();
   $fileIds = array();
   while ($dao->fetch()) {
-    $filePaths [] = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $dao->uri;
+    $filePaths[] = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $dao->uri;
     $fileIds[] = $dao->id;
   }
 
@@ -232,8 +234,10 @@ function civicrm_api3_attachment_delete($params) {
 /**
  * @param array $params
  * @param int|null $id the user-supplied ID of the attachment record
- * @param array $file the user-supplied vales for the file (mime_type, description, upload_date)
- * @param array $entityFile the user-supllied values of the entity-file (entity_table, entity_id)
+ * @param array $file
+ *   The user-supplied vales for the file (mime_type, description, upload_date).
+ * @param array $entityFile
+ *   The user-supllied values of the entity-file (entity_table, entity_id).
  * @param bool $isTrusted
  * @return CRM_Core_DAO
  * @throws API_Exception
@@ -349,10 +353,14 @@ function _civicrm_api3_attachment_parse_params($params) {
 }
 
 /**
- * @param CRM_Core_DAO_File $fileDao maybe "File" or "File JOIN EntityFile"
- * @param CRM_Core_DAO_EntityFile $entityFileDao maybe "EntityFile" or "File JOIN EntityFile"
- * @param bool $returnContent whether to return the full content of the file
- * @param bool $isTrusted whether the current request is trusted to perform file-specific operations
+ * @param CRM_Core_DAO_File $fileDao
+ *   Maybe "File" or "File JOIN EntityFile".
+ * @param CRM_Core_DAO_EntityFile $entityFileDao
+ *   Maybe "EntityFile" or "File JOIN EntityFile".
+ * @param bool $returnContent
+ *   Whether to return the full content of the file.
+ * @param bool $isTrusted
+ *   Whether the current request is trusted to perform file-specific operations.
  * @return array
  */
 function _civicrm_api3_attachment_format_result($fileDao, $entityFileDao, $returnContent, $isTrusted) {

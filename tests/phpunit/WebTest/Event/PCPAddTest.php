@@ -493,7 +493,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Search_refresh");
 
     $this->clickLink("xpath=//div[@id='participantSearch']/table/tbody/tr[1]/td[@class='crm-participant-sort_name']/a[text()='{$sortName}']/../../td[11]/span/a[text()='View']", "xpath=//table[@class='selector row-highlight']/tbody/tr/td[8]/span/a[text()='View']", FALSE);
-    $this->clickLink("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']", "_qf_ParticipantView_cancel-bottom", false);
+    $this->clickLink("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']", "_qf_ParticipantView_cancel-bottom", FALSE);
 
     $this->webtestVerifyTabularData(
       array(

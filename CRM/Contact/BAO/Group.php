@@ -48,8 +48,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * of time. This is the inverse function of create. It also stores all the retrieved
    * values in the default array
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Contact_BAO_Group object
    * @static
@@ -69,7 +71,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * Delete the group and all the object that connect to
    * this group. Incredibly destructive
    *
-   * @param int $id group id
+   * @param int $id
+   *   Group id.
    *
    * @return null
    * @static
@@ -152,7 +155,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * Get the count of a members in a group with the specific status
    *
-   * @param int $id group id
+   * @param int $id
+   *   Group id.
    * @param enum|string $status status of members in group
    *
    * @param bool $countChildGroups
@@ -220,8 +224,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * Returns array of group object(s) matching a set of one or Group properties.
    *
-   * @param array $params Limits the set of groups returned.
-   * @param array $returnProperties Which properties should be included in the returned group objects.
+   * @param array $params
+   *   Limits the set of groups returned.
+   * @param array $returnProperties
+   *   Which properties should be included in the returned group objects.
    *                                       (member_count should be last element.)
    *
    * @param null $sort
@@ -300,7 +306,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * Make sure that the user has permission to access this group
    *
-   * @param int $id   the id of the object
+   * @param int $id
+   *   The id of the object.
    *
    * @return string   the permission that the user has (or null)
    * @static
@@ -338,7 +345,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * Create a new group
    *
-   * @param array $params     Associative array of parameters
+   * @param array $params
+   *   Associative array of parameters.
    *
    * @return object|null      The new group BAO (if created)
    * @static
@@ -519,7 +527,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * Defines a new smart group
    *
-   * @param array $params     Associative array of parameters
+   * @param array $params
+   *   Associative array of parameters.
    *
    * @return object|null      The new group BAO (if created)
    * @static
@@ -546,8 +555,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $isActive  value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $isActive
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on sucess, null otherwise
    * @static
@@ -559,7 +570,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * Build the condition to retrieve groups.
    *
-   * @param string $groupType type of group(Access/Mailing) OR the key of the group
+   * @param string $groupType
+   *   Type of group(Access/Mailing) OR the key of the group.
    * @param bool|\boolen $excludeHidden exclude hidden groups.
    *
    * @return string $condition
@@ -632,7 +644,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * This function create the hidden smart group when user perform
    * contact seach and want to send mailing to search contacts.
    *
-   * @param  array $params ( reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   ( reference ) an assoc array of name/value pairs.
    *
    * @return array ( smartGroupId, ssId ) smart group id and saved search id
    * @static
@@ -701,7 +714,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * This function is a wrapper for ajax group selector
    *
-   * @param  array   $params associated array for params record id.
+   * @param array $params
+   *   Associated array for params record id.
    *
    * @return array   $groupList associated array of group list
    *  -rp = rowcount
@@ -769,7 +783,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * This function to get list of groups
    *
-   * @param  array $params associated array for params
+   * @param array $params
+   *   Associated array for params.
    *
    * @return array
    */
@@ -971,7 +986,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * This function to get hierarchical list of groups (parent followed by children)
    *
-   * @param  array $groupIDs array of group ids
+   * @param array $groupIDs
+   *   Array of group ids.
    *
    * @param null $parents
    * @param string $spacer

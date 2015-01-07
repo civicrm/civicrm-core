@@ -42,7 +42,8 @@ class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
   public $autoReplace;
 
   /**
-   * @param bool $autoReplace whether to automatically uninstall and install during 'replace'
+   * @param bool $autoReplace
+   *   Whether to automatically uninstall and install during 'replace'.
    */
   public function __construct($autoReplace = FALSE) {
     $this->autoReplace = $autoReplace;

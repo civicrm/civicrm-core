@@ -52,9 +52,12 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Create a new batch
    *
-   * @param array  $params associated array
-   * @param array  $ids associated array of ids
-   * @param string $context string
+   * @param array $params
+   *   Associated array.
+   * @param array $ids
+   *   Associated array of ids.
+   * @param string $context
+   *   String.
    *
    * @return object $batch batch object
    */
@@ -76,8 +79,10 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Retrieve the information about the batch
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return array CRM_Batch_BAO_Batch object on success, null otherwise
    * @static
@@ -95,7 +100,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Get profile id associated with the batch type
    *
-   * @param int   $batchTypeId batch type id
+   * @param int $batchTypeId
+   *   Batch type id.
    *
    * @return int  $profileId   profile id
    * @static
@@ -133,7 +139,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
   /**
    * Create entity batch entry
-   * @param array $params associated array
+   * @param array $params
+   *   Associated array.
    * @return batch array
    */
   public static function addBatchEntity(&$params) {
@@ -145,7 +152,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
   /**
    * Remove entries from entity batch
-   * @param array $params associated array
+   * @param array $params
+   *   Associated array.
    * @return CRM_Batch_DAO_EntityBatch
    */
   public static function removeBatchEntity($params) {
@@ -158,7 +166,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Delete batch entry
    *
-   * @param int $batchId batch id
+   * @param int $batchId
+   *   Batch id.
    *
    * @return void
    */
@@ -167,13 +176,14 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     $batch = new CRM_Batch_DAO_Batch();
     $batch->id = $batchId;
     $batch->delete();
-    return true;
+    return TRUE;
   }
 
   /**
    * This function is a wrapper for ajax batch selector
    *
-   * @param  array   $params associated array for params record id.
+   * @param array $params
+   *   Associated array for params record id.
    *
    * @return array   $batchList associated array of batch list
    */
@@ -188,7 +198,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
     // get batch totals for open batches
     $fetchTotals = array();
-    $batchStatus =  CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name'));
+    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name'));
     $batchStatus = array(
       array_search('Open', $batchStatus),
       array_search('Reopened', $batchStatus),
@@ -238,7 +248,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Get list of batches
    *
-   * @param  array $params associated array for params
+   * @param array $params
+   *   Associated array for params.
    *
    * @return array
    */
@@ -300,9 +311,11 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
           case 'Open':
             CRM_Utils_Array::remove($newLinks, 'reopen', 'download');
             break;
+
           case 'Closed':
             CRM_Utils_Array::remove($newLinks, 'close', 'edit', 'download');
             break;
+
           case 'Exported':
             CRM_Utils_Array::remove($newLinks, 'close', 'edit', 'reopen', 'export');
         }
@@ -318,7 +331,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       }
       $tokens = array('id' => $object->id, 'status' => $values['status_id']);
       if ($values['status_id'] == array_search('Exported', $batchStatusByName)) {
-        $aid = CRM_Core_OptionGroup::getValue('activity_type','Export Accounting Batch');
+        $aid = CRM_Core_OptionGroup::getValue('activity_type', 'Export Accounting Batch');
         $activityParams = array('source_record_id' => $object->id, 'activity_type_id' => $aid);
         $exportActivity = CRM_Activity_BAO_Activity::retrieve($activityParams, $val);
         $fid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile', $exportActivity->id, 'file_id', 'entity_id');
@@ -343,7 +356,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Get count of batches
    *
-   * @param  array $params associated array for params
+   * @param array $params
+   *   Associated array for params.
    *
    * @return null|string
    */
@@ -359,7 +373,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Format where clause for getting lists of batches
    *
-   * @param  array $params associated array for params
+   * @param array $params
+   *   Associated array for params.
    *
    * @return string
    */
@@ -413,37 +428,37 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   public function links($context = NULL) {
     if ($context == 'financialBatch') {
       $links = array(
-        'transaction' =>  array(
+        'transaction' => array(
           'name'  => ts('Transactions'),
           'url'   => 'civicrm/batchtransaction',
           'qs'    => 'reset=1&bid=%%id%%',
           'title' => ts('View/Add Transactions to Batch'),
         ),
-        'edit' =>    array(
+        'edit' => array(
           'name'  => ts('Edit'),
           'url'   => 'civicrm/financial/batch',
           'qs'    => 'reset=1&action=update&id=%%id%%&context=1',
           'title' => ts('Edit Batch'),
         ),
-        'close' =>   array(
+        'close' => array(
           'name'  => ts('Close'),
           'title' => ts('Close Batch'),
           'url'   => '#',
           'extra' => 'rel="close"',
         ),
-        'export' =>  array(
+        'export' => array(
           'name'  => ts('Export'),
           'title' => ts('Export Batch'),
           'url'   => '#',
           'extra' => 'rel="export"',
         ),
-        'reopen' =>  array(
+        'reopen' => array(
           'name'  => ts('Re-open'),
           'title' => ts('Re-open Batch'),
           'url'   => '#',
           'extra' => 'rel="reopen"',
         ),
-        'delete' =>  array(
+        'delete' => array(
           'name'  => ts('Delete'),
           'title' => ts('Delete Batch'),
           'url'   => '#',
@@ -489,7 +504,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * excluding batches with data entry in progress
    */
   public static function getBatches() {
-    $dataEntryStatusId = CRM_Core_OptionGroup::getValue('batch_status','Data Entry', 'name');
+    $dataEntryStatusId = CRM_Core_OptionGroup::getValue('batch_status', 'Data Entry', 'name');
     $query = "SELECT id, title
       FROM civicrm_batch
       WHERE item_count >= 1
@@ -555,8 +570,10 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * Function for exporting financial accounts, currently we support CSV and IIF format
    * @see http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+Specifications+-++Batches#CiviAccountsSpecifications-Batches-%C2%A0Overviewofimplementation
    *
-   * @param array  $batchIds associated array of batch ids
-   * @param string $exportFormat export format
+   * @param array $batchIds
+   *   Associated array of batch ids.
+   * @param string $exportFormat
+   *   Export format.
    *
    * @return void
    *
@@ -612,7 +629,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       $params['id'] = $ids['batchID'] = $value;
       self::create($params, $ids);
     }
-    $url = CRM_Utils_System::url('civicrm/financial/financialbatches',"reset=1&batchStatus={$params['status_id']}");
+    $url = CRM_Utils_System::url('civicrm/financial/financialbatches', "reset=1&batchStatus={$params['status_id']}");
     CRM_Utils_System::redirect($url);
   }
 
@@ -710,7 +727,7 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
         $query = new CRM_Contact_BAO_Query($searchParams,
           CRM_Contribute_BAO_Query::defaultReturnProperties(CRM_Contact_BAO_Query::MODE_CONTRIBUTE,
             FALSE
-          ),NULL, FALSE, FALSE,CRM_Contact_BAO_Query::MODE_CONTRIBUTE
+          ), NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTRIBUTE
         );
         if ($field == 'contribution_date_high' || $field == 'contribution_date_low') {
           $query->dateQueryBuilder($params[$field], 'civicrm_contribution', 'contribution_date', 'receive_date', 'Contribution Date');
@@ -729,7 +746,7 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
 
     if (!$searchValue) {
       if (!$notPresent) {
-        $where =  " ( civicrm_entity_batch.batch_id = {$entityID}
+        $where = " ( civicrm_entity_batch.batch_id = {$entityID}
         AND civicrm_entity_batch.entity_table = 'civicrm_financial_trxn'
         AND civicrm_entity_financial_trxn.entity_table = 'civicrm_contribution') ";
       }

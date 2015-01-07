@@ -53,8 +53,10 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * @param array $modules CRM_Core_Module
-   * @param array $declarations per hook_civicrm_managed
+   * @param array $modules
+   *   CRM_Core_Module.
+   * @param array $declarations
+   *   Per hook_civicrm_managed.
    */
   public function __construct($modules, $declarations) {
     $this->moduleIndex = self::createModuleIndex($modules);
@@ -123,7 +125,8 @@ class CRM_Core_ManagedEntities {
    * Create, update, and delete entities declared by an active module
    *
    * @param \CRM_Core_Module|string $module string
-   * @param $todos array $name => array()
+   * @param $todos
+   *   Array $name => array().
    */
   public function reconcileEnabledModule(CRM_Core_Module $module, $todos) {
     $dao = new CRM_Core_DAO_Managed();
@@ -185,7 +188,8 @@ class CRM_Core_ManagedEntities {
   /**
    * Create a new entity
    *
-   * @param array $todo entity specification (per hook_civicrm_managedEntities)
+   * @param array $todo
+   *   Entity specification (per hook_civicrm_managedEntities).
    */
   public function insertNewEntity($todo) {
     $result = civicrm_api($todo['entity'], 'create', $todo['params']);
@@ -206,7 +210,8 @@ class CRM_Core_ManagedEntities {
    * Update an entity which (a) is believed to exist and which (b) ought to be active.
    *
    * @param CRM_Core_DAO_Managed $dao
-   * @param array $todo entity specification (per hook_civicrm_managedEntities)
+   * @param array $todo
+   *   Entity specification (per hook_civicrm_managedEntities).
    */
   public function updateExistingEntity($dao, $todo) {
     $policy = CRM_Utils_Array::value('update', $todo, 'always');

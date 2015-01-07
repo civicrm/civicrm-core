@@ -209,8 +209,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     if ($this->_mode == self::MODE_EDIT) {
       //specifies the action being done on a multi record field
       $multiRecordAction = CRM_Utils_Request::retrieve('multiRecord', 'String', $this);
-      $this->_multiRecord = (!is_numeric($multiRecordAction)) ?
-        CRM_Core_Action::resolve($multiRecordAction) : $multiRecordAction;
+      $this->_multiRecord = (!is_numeric($multiRecordAction)) ? CRM_Core_Action::resolve($multiRecordAction) : $multiRecordAction;
       if ($this->_multiRecord) {
         $this->set('multiRecord', $this->_multiRecord);
       }
@@ -321,7 +320,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
               array(1 => $this->_gid)
             ));
           } elseif (empty($this->_multiRecordFields)) {
-              CRM_Core_Error::fatal(ts('No Multi-Record Fields configured for this profile (gid=%1)',
+            CRM_Core_Error::fatal(ts('No Multi-Record Fields configured for this profile (gid=%1)',
               array(1 => $this->_gid)
             ));
           }
@@ -450,7 +449,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $fieldIds[] = CRM_Core_BAO_CustomField::getKeyID($key);
       }
 
-      $defaultValues = array( );
+      $defaultValues = array();
       if ($this->_multiRecord && $this->_multiRecord == CRM_Core_Action::UPDATE) {
         $defaultValues = CRM_Core_BAO_CustomValueTable::getEntityValues($this->_id, NULL, $fieldIds, TRUE);
         if ($this->_recordExists == TRUE) {
@@ -590,9 +589,11 @@ class CRM_Profile_Form extends CRM_Core_Form {
       case self::MODE_REGISTER:
         CRM_Utils_Hook::buildProfile($this->_ufGroup['name']);
         break;
+
       case self::MODE_SEARCH:
         CRM_Utils_Hook::searchProfile($this->_ufGroup['name']);
         break;
+
       default:
     }
 
@@ -649,7 +650,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
         if (
           ($profileType != 'Contact' && !$this->_isContactActivityProfile) &&
-          (($profileSubType && !empty($contactSubtypes) && (!in_array($profileSubType,$contactSubtypes))) ||
+          (($profileSubType && !empty($contactSubtypes) && (!in_array($profileSubType, $contactSubtypes))) ||
             ($profileType != $contactType))
         ) {
           $return = TRUE;
@@ -866,9 +867,12 @@ class CRM_Profile_Form extends CRM_Core_Form {
   /**
    * Global form rule
    *
-   * @param array  $fields the input form values
-   * @param array  $files  the uploaded files if any
-   * @param CRM_Core_Form $form   the form object
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param CRM_Core_Form $form
+   *   The form object.
    *
    * @return true if no errors, else array of errors
    * @static
@@ -1064,8 +1068,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
                           1 => array($this->_recordId, 'Integer'),
                           2 => array($this->_id, 'Integer')
                          );
-           CRM_Core_DAO::executeQuery($sql, $sqlParams);
-           CRM_Core_Session::setStatus(ts('Your record has been deleted.'), ts('Deleted'), 'success');
+            CRM_Core_DAO::executeQuery($sql, $sqlParams);
+            CRM_Core_Session::setStatus(ts('Your record has been deleted.'), ts('Deleted'), 'success');
           }
         }
         return;

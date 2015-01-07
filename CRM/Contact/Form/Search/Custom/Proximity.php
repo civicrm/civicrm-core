@@ -170,7 +170,8 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
    *
    * @return string
    */
-  function all($offset = 0, $rowcount = 0, $sort = NULL,
+  function all(
+    $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
     if ($justIDs) {
@@ -287,7 +288,8 @@ AND cgc.group_id = {$this->_group}
   /**
    * @param $row
    */
-  public function alterRow(&$row) {}
+  public function alterRow(&$row) {
+  }
 
   /**
    * @param $title

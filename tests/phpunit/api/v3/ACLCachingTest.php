@@ -31,10 +31,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  * This class is intended to test ACL permission using the multisite module
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Contact
+ * @package CiviCRM_APIv3
+ * @subpackage API_Contact
  */
-
 class api_v3_ACLCachingTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_params;
@@ -44,10 +43,11 @@ class api_v3_ACLCachingTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
   }
-/**
- * (non-PHPdoc)
- * @see CiviUnitTestCase::tearDown()
- */
+
+  /**
+   * (non-PHPdoc)
+   * @see CiviUnitTestCase::tearDown()
+   */
   public function tearDown() {
     $tablesToTruncate = array(
       'civicrm_activity',
@@ -56,7 +56,7 @@ class api_v3_ACLCachingTest extends CiviUnitTestCase {
   }
 
   public function testActivityCreateCustomBefore() {
-    $values = $this->callAPISuccess('custom_field', 'getoptions', array('field' => 'custom_group_id',));
+    $values = $this->callAPISuccess('custom_field', 'getoptions', array('field' => 'custom_group_id'));
     $this->assertTrue($values['count'] == 0);
     $this->CustomGroupCreate(array('extends' => 'Activity'));
     $groupCount = $this->callAPISuccess('custom_group', 'getcount', array('extends' => 'activity'));

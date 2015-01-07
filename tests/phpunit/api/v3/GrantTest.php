@@ -31,8 +31,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_grant* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Grant
+ * @package CiviCRM_APIv3
+ * @subpackage API_Grant
  */
 
 class api_v3_GrantTest extends CiviUnitTestCase {
@@ -153,17 +153,16 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $result = $this->callAPIAndDocument($this->_entity, 'delete', array('id' => $result['id']), __FUNCTION__, __FILE__);
     $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array(
-           ));
+    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
   /*
- * This is a test to check if setting fields one at a time alters other fields
- * Issues Hit so far =
- * 1) Currency keeps getting reset to USD -  BUT this may be the only enabled currency
- *  - in which case it is valid
- * 2)
- */
+  * This is a test to check if setting fields one at a time alters other fields
+  * Issues Hit so far =
+  * 1) Currency keeps getting reset to USD -  BUT this may be the only enabled currency
+  *  - in which case it is valid
+  * 2)
+  */
 
   public function testCreateAutoGrant() {
     $entityName = $this->_entity;

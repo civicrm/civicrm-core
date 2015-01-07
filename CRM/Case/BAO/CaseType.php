@@ -54,7 +54,8 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * case type object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @throws CRM_Core_Exception
    *
@@ -88,7 +89,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   }
 
   protected function assignTestValue($fieldName, &$fieldDef, $counter) {
-    if ($fieldName  == 'definition') {
+    if ($fieldName == 'definition') {
       $this->{$fieldName} = "<CaseType><name>TestCaseType{$counter}</name></CaseType>";
     } else {
       parent::assignTestValue($fieldName, $fieldDef, $counter);
@@ -100,7 +101,8 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * Format / convert submitted array to xml for case type definition
    *
    * @param string $name
-   * @param array $definition the case-type defintion expressed as an array-tree
+   * @param array $definition
+   *   The case-type defintion expressed as an array-tree.
    * @return string XML
    * @static
    */
@@ -143,12 +145,14 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
                 $xmlFile .= "</ActivityTypes>\n";
               }
               break;
+
             case 'sequence': // passthrough
             case 'timeline':
               if ($setVal) {
                 $xmlFile .= "<{$index}>true</{$index}>\n";
               }
               break;
+
             default:
               $xmlFile .= "<{$index}>{$setVal}</{$index}>\n";
           }
@@ -179,7 +183,8 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   /**
    * Get the case definition either from db or read from xml file
    *
-   * @param SimpleXmlElement $xml a single case-type record
+   * @param SimpleXmlElement $xml
+   *   A single case-type record.
    *
    * @return array the definition of the case-type, expressed as PHP array-tree
    * @static
@@ -240,8 +245,10 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array $params input parameters to find object
-   * @param array $values output values of the object
+   * @param array $params
+   *   Input parameters to find object.
+   * @param array $values
+   *   Output values of the object.
    *
    * @return CRM_Case_BAO_CaseType|null the found object or null
    * @static
@@ -261,7 +268,8 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   /**
    * Takes an associative array and creates a case type object
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Case_BAO_CaseType object
    * @static
@@ -301,8 +309,10 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * full featured over a period of time. This is the inverse function of
    * create.  It also stores all the retrieved values in the default array
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the name / value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the name / value pairs.
    *                        in a hierarchical manner
    *
    * @return CRM_Case_BAO_CaseType object
@@ -339,7 +349,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @return bool
    */
   public static function isValidName($caseType) {
-    return preg_match('/^[a-zA-Z0-9_]+$/',  $caseType);
+    return preg_match('/^[a-zA-Z0-9_]+$/', $caseType);
   }
 
   /**
@@ -370,7 +380,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       // if file-based definition explicitly disables "forkable" option, then don't allow changes to definition
       $fileDefinition = CRM_Case_XMLRepository::singleton()->retrieveFile($caseTypeName);
       if ($fileDefinition && isset($fileDefinition->forkable)) {
-        return CRM_Utils_String::strtobool((string)$fileDefinition->forkable);
+        return CRM_Utils_String::strtobool((string) $fileDefinition->forkable);
       }
     }
     return TRUE;

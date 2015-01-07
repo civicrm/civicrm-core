@@ -6,10 +6,10 @@
  *
  *  (PHP 5)
  *
- *   @copyright Copyright CiviCRM LLC (C) 2009
- *   @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
+ * @copyright Copyright CiviCRM LLC (C) 2009
+ * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
  *              GNU Affero General Public License version 3
- *   @package CiviCRM
+ * @package CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -37,7 +37,7 @@ require_once 'api/api.php';
 /**
  *  Test contact custom search functions
  *
- *  @package CiviCRM
+ * @package CiviCRM
  */
 class CRM_Bridge_OG_DrupalTest extends CiviUnitTestCase {
   /*

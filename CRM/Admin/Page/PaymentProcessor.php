@@ -106,7 +106,8 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
     //CRM-15546
     $paymentProcessorTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_PaymentProcessor', 'payment_processor_type_id', array('labelColumn' => 'name', 'flip' => 1));
     $this->assign('defaultPaymentProcessorType', $paymentProcessorTypes['PayPal']);
-    $breadCrumb = array(array('title' => ts('Administration'),
+    $breadCrumb = array(array(
+    'title' => ts('Administration'),
         'url' => CRM_Utils_System::url('civicrm/admin',
         'reset=1'
         ),

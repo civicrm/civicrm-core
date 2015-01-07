@@ -47,8 +47,10 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on sucess, null otherwise
    *
@@ -123,8 +125,10 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   /**
    * Fetch object based on array of properties
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_BAO_Navigation object on success, null otherwise
    * @static
@@ -145,8 +149,10 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   /**
    * Calculate navigation weight
    *
-   * @param $parentID parent_id of a menu
-   * @param $menuID  menu id
+   * @param $parentID
+   *   Parent_id of a menu.
+   * @param $menuID
+   *   Menu id.
    *
    * @return int $weight string@static
    */
@@ -211,9 +217,12 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
   /**
    * Helper function for getNavigationList( )
    *
-   * @param array $list menu info
-   * @param array $navigations navigation menus
-   * @param string $separator  menu separator
+   * @param array $list
+   *   Menu info.
+   * @param array $navigations
+   *   Navigation menus.
+   * @param string $separator
+   *   Menu separator.
    */
   public static function _getNavigationLabel($list, &$navigations, $separator = '') {
     $i18n = CRM_Core_I18n::singleton();
@@ -232,8 +241,10 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
   /**
    * Helper function for getNavigationList( )
    *
-   * @param string $val menu name
-   * @param array $pidGroups parent menus
+   * @param string $val
+   *   Menu name.
+   * @param array $pidGroups
+   *   Parent menus.
    * @return array
    */
   public static function _getNavigationValue($val, &$pidGroups) {
@@ -253,9 +264,12 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
   /**
    * Build navigation tree
    *
-   * @param array   $navigationTree nested array of menus
-   * @param int     $parentID       parent id
-   * @param boolean $navigationMenu true when called for building top navigation menu
+   * @param array $navigationTree
+   *   Nested array of menus.
+   * @param int $parentID
+   *   Parent id.
+   * @param bool $navigationMenu
+   *   True when called for building top navigation menu.
    *
    * @return array $navigationTree nested array of menus
    * @static
@@ -306,8 +320,10 @@ ORDER BY parent_id, weight";
   /**
    * Build menu
    *
-   * @param boolean $json by default output is html
-   * @param boolean $navigationMenu true when called for building top navigation menu
+   * @param bool $json
+   *   By default output is html.
+   * @param bool $navigationMenu
+   *   True when called for building top navigation menu.
    *
    * @return returns html or json object
    * @static
@@ -372,8 +388,8 @@ ORDER BY parent_id, weight";
    *
    * @param array $value
    * @param string $navigationString
-   * @param boolean $json
-   * @param boolean $skipMenuItems
+   * @param bool $json
+   * @param bool $skipMenuItems
    * @return string
    */
   public static function recurseNavigation(&$value, &$navigationString, $json, $skipMenuItems) {
@@ -559,7 +575,8 @@ ORDER BY parent_id, weight";
   /**
    * Create navigation for CiviCRM Admin Menu
    *
-   * @param int $contactID contact id
+   * @param int $contactID
+   *   Contact id.
    *
    * @return string $navigation returns navigation html
    * @static
@@ -623,7 +640,8 @@ ORDER BY parent_id, weight";
   /**
    * Reset navigation for all contacts or a specified contact
    *
-   * @param integer $contactID - reset only entries belonging to that contact ID
+   * @param int $contactID
+   *   Reset only entries belonging to that contact ID.
    * @return string
    */
   public static function resetNavigation($contactID = NULL) {
@@ -659,7 +677,8 @@ ORDER BY parent_id, weight";
   /**
    * Process navigation
    *
-   * @param array $params associated array, $_GET
+   * @param array $params
+   *   Associated array, $_GET.
    *
    * @return void
    * @static
@@ -693,9 +712,12 @@ ORDER BY parent_id, weight";
   /**
    * Process move action
    *
-   * @param $nodeID node that is being moved
-   * @param $referenceID parent id where node is moved. 0 mean no parent
-   * @param $position new position of the nod, it starts with 0 - n
+   * @param $nodeID
+   *   Node that is being moved.
+   * @param $referenceID
+   *   Parent id where node is moved. 0 mean no parent.
+   * @param $position
+   *   New position of the nod, it starts with 0 - n.
    *
    * @return void
    * @static
@@ -776,7 +798,8 @@ ORDER BY parent_id, weight";
   /**
    * Get the info on navigation item
    *
-   * @param int $navigationID  navigation id
+   * @param int $navigationID
+   *   Navigation id.
    *
    * @return array associated array
    * @static
@@ -795,8 +818,9 @@ ORDER BY parent_id, weight";
   /**
    * Update menu
    *
-   * @param array  $params
-   * @param array  $newParams new value of params
+   * @param array $params
+   * @param array $newParams
+   *   New value of params.
    * @static
    */
   public static function processUpdate($params, $newParams) {

@@ -200,8 +200,10 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   /**
    * Edit price set
    *
-   * @param int $sid price set id
-   * @param string $action the action to be invoked
+   * @param int $sid
+   *   Price set id.
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
    */
@@ -221,7 +223,8 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   /**
    * Preview price set
    *
-   * @param int $sid price set id
+   * @param int $sid
+   *   Price set id.
    *
    * @return void
    */
@@ -244,14 +247,16 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   /**
    * Browse all price sets
    *
-   * @param string $action   the action to be invoked
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
    */
   public function browse($action = NULL) {
     // get all price sets
     $priceSet = array();
-    $comps = array('CiviEvent' => ts('Event'),
+    $comps = array(
+    'CiviEvent' => ts('Event'),
       'CiviContribute' => ts('Contribution'),
       'CiviMember' => ts('Membership'),
     );
@@ -276,7 +281,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
           $extends[] = $comps[CRM_Core_Component::getComponentName($compId)];
         }
       }
-     $priceSet[$dao->id]['extends'] = implode(', ', $extends);
+      $priceSet[$dao->id]['extends'] = implode(', ', $extends);
 
       // form all action links
       $action = array_sum(array_keys($this->actionLinks()));

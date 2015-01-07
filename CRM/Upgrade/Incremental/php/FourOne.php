@@ -56,8 +56,10 @@ class CRM_Upgrade_Incremental_php_FourOne {
   /**
    * Compute any messages which should be displayed after upgrade
    *
-   * @param $postUpgradeMessage string, alterable
-   * @param $rev string, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs
+   * @param $postUpgradeMessage
+   *   String, alterable.
+   * @param $rev
+   *   String, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    *
    * @return void
    */
@@ -103,7 +105,6 @@ class CRM_Upgrade_Incremental_php_FourOne {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
 
-
     $this->transferPreferencesToSettings();
     $this->createNewSettings();
 
@@ -141,7 +142,6 @@ class CRM_Upgrade_Incremental_php_FourOne {
         'mailing_backend',
       ),
     );
-
 
     $userColumnNames = array(
       self::NAVIGATION_NAME => array(

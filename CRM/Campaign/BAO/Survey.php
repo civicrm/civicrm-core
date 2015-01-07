@@ -44,8 +44,10 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
    * retrieves the relevant objects. Typically the valid params are only
    * campaign_id.
    *
-   * @param array  $params   (reference ) an assoc array of name/value pairs
-   * @param array  $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
    */
 
@@ -83,7 +85,7 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
    */
   public static function create(&$params) {
     if (empty($params)) {
-      return false;
+      return FALSE;
     }
 
     if (!empty($params['is_default'])) {
@@ -211,7 +213,7 @@ SELECT  survey.id                         as id,
 
     //return only count.
     if ($onlyCount) {
-      return (int)CRM_Core_DAO::singleValueQuery($query, $queryParams);
+      return (int) CRM_Core_DAO::singleValueQuery($query, $queryParams);
     }
 
     $surveys = array();
@@ -236,20 +238,24 @@ SELECT  survey.id                         as id,
    * @static
    */
   public static function getSurveyCount() {
-    return (int)CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_survey');
+    return (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_survey');
   }
 
   /**
    * Get Surveys
    *
-   * @param boolean $onlyActive  retrieve only active surveys.
-   * @param boolean $onlyDefault retrieve only default survey.
-   * @param boolean $forceAll    retrieve all surveys.
-   * @param boolean $includePetition include or exclude petitions
+   * @param bool $onlyActive
+   *   Retrieve only active surveys.
+   * @param bool $onlyDefault
+   *   Retrieve only default survey.
+   * @param bool $forceAll
+   *   Retrieve all surveys.
+   * @param bool $includePetition
+   *   Include or exclude petitions.
    *
    * @static
    */
-  public static function getSurveys($onlyActive = TRUE, $onlyDefault = FALSE, $forceAll = FALSE, $includePetition = FALSE ) {
+  public static function getSurveys($onlyActive = TRUE, $onlyDefault = FALSE, $forceAll = FALSE, $includePetition = FALSE) {
     $cacheKey = 0;
     $cacheKeyParams = array('onlyActive', 'onlyDefault', 'forceAll', 'includePetition');
     foreach ($cacheKeyParams as $param) {
@@ -302,7 +308,8 @@ SELECT  survey.id    as id,
    *
    * @static
    */
-  static function getSurveyActivityType($returnColumn = 'label',
+  static function getSurveyActivityType(
+    $returnColumn = 'label',
     $includePetitionActivityType = FALSE
   ) {
     static $activityTypes;
@@ -334,7 +341,8 @@ SELECT  survey.id    as id,
   /**
    * Get Surveys custom groups
    *
-   * @param $surveyTypes array an array of survey type id.
+   * @param $surveyTypes
+   *   Array an array of survey type id.
    *
    * @return array
    * @static
@@ -374,8 +382,10 @@ SELECT  survey.id    as id,
   /**
    * Update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
    * @return Object             DAO object on sucess, null otherwise
    * @static
@@ -387,7 +397,8 @@ SELECT  survey.id    as id,
   /**
    * Delete the survey
    *
-   * @param int $id survey id
+   * @param int $id
+   *   Survey id.
    *
    * @return mixed|null
    * @static
@@ -410,7 +421,8 @@ SELECT  survey.id    as id,
    * This function retrieve contact information.
    *
    * @param array $voterIds
-   * @param array $returnProperties an array of return elements.
+   * @param array $returnProperties
+   *   An array of return elements.
    *
    * @return array $voterDetails array of contact info.
    * @static
@@ -483,8 +495,7 @@ Group By  contact.id";
         foreach ($returnProperties as $property => $ignore) {
           $voterDetails[$contact->contactId][$property] = $contact->$property;
         }
-        $image = CRM_Contact_BAO_Contact_Utils::getImage($contact->contact_sub_type ?
-          $contact->contact_sub_type : $contact->contact_type,
+        $image = CRM_Contact_BAO_Contact_Utils::getImage($contact->contact_sub_type ? $contact->contact_sub_type : $contact->contact_type,
           FALSE,
           $contact->contactId
         );
@@ -499,15 +510,18 @@ Group By  contact.id";
   /**
    * This function retrieve survey related activities w/ for give voter ids.
    *
-   * @param int $surveyId survey id.
-   * @param array $voterIds voterIds.
+   * @param int $surveyId
+   *   Survey id.
+   * @param array $voterIds
+   *   VoterIds.
    *
    * @param int $interviewerId
    * @param array $statusIds
    *
    * @return array $activityDetails array of survey activity.@static
    */
-  static function voterActivityDetails($surveyId, $voterIds, $interviewerId = NULL,
+  static function voterActivityDetails(
+    $surveyId, $voterIds, $interviewerId = NULL,
                                        $statusIds = array()) {
     $activityDetails = array();
     if (!$surveyId ||
@@ -560,7 +574,8 @@ INNER JOIN  civicrm_activity_contact activityAssignment
   /**
    * This function retrieve survey related activities.
    *
-   * @param int $surveyId survey id.
+   * @param int $surveyId
+   *   Survey id.
    *
    * @param int $interviewerId
    * @param null $statusIds
@@ -568,11 +583,12 @@ INNER JOIN  civicrm_activity_contact activityAssignment
    * @param bool $onlyCount
    * @return array $activities an array of survey activity.@static
    */
-  static function getSurveyActivities($surveyId,
+  static function getSurveyActivities(
+    $surveyId,
     $interviewerId = NULL,
-    $statusIds     = NULL,
-    $voterIds      = NULL,
-    $onlyCount     = FALSE
+    $statusIds = NULL,
+    $voterIds = NULL,
+    $onlyCount = FALSE
   ) {
     $activities = array();
     $surveyActivityCount = 0;
@@ -633,7 +649,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
        AND  ( activity.is_deleted IS NULL OR activity.is_deleted = 0 )
             $whereClause";
 
-    $params = array(1 => array($surveyId, 'Integer'),
+    $params = array(
+    1 => array($surveyId, 'Integer'),
       2 => array($actTypeId, 'Integer'),
     );
 
@@ -662,14 +679,17 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   /**
    * This function retrieve survey voter information.
    *
-   * @param int    $surveyId       survey id.
-   * @param int    $interviewerId  interviewer id.
-   * @param array  $statusIds      survey status ids.
+   * @param int $surveyId
+   *   Survey id.
+   * @param int $interviewerId
+   *   Interviewer id.
+   * @param array $statusIds
+   *   Survey status ids.
    *
    * @return array $$contactIds survey related contact ids.
    * @static
    */
-  public static function getSurveyVoterInfo($surveyId, $interviewerId = NULL, $statusIds = array( )) {
+  public static function getSurveyVoterInfo($surveyId, $interviewerId = NULL, $statusIds = array()) {
     $voterIds = array();
     if (!$surveyId) {
       return $voterIds;
@@ -701,7 +721,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    * @param string $valueColumnName
    * @return array $resultSets an array of option groups.@static
    */
-  public static function getResultSets( $valueColumnName = 'title' ) {
+  public static function getResultSets($valueColumnName = 'title') {
     $resultSets = array();
     $valueColumnName = CRM_Utils_Type::escape($valueColumnName, 'String');
 
@@ -717,7 +737,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   /**
    * This function is to check survey activity.
    *
-   * @param int $activityId activity id.
+   * @param int $activityId
+   *   Activity id.
    * @return boolean $isSurveyActivity true/false
    * @static
    */
@@ -745,7 +766,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   /**
    * This function retrive all response options of survey
    *
-   * @param int $surveyId survey id.
+   * @param int $surveyId
+   *   Survey id.
    * @return array $responseOptions an array of option values@static
    */
   public static function getResponsesOptions($surveyId) {
@@ -891,7 +913,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
 
     if (!array_key_exists($surveyId, $reportIds)) {
       $query = "SELECT MAX(id) as id FROM civicrm_report_instance WHERE name = %1";
-      $reportID = CRM_Core_DAO::singleValueQuery($query, array(1 => array("survey_{$surveyId}",'String')));
+      $reportID = CRM_Core_DAO::singleValueQuery($query, array(1 => array("survey_{$surveyId}", 'String')));
       $reportIds[$surveyId] = $reportID;
     }
     return $reportIds[$surveyId];
@@ -925,7 +947,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
 
     if (!isset($profileTypes)) {
       $profileTypes = array_merge(array('Activity', 'Contact'), CRM_Contact_BAO_ContactType::basicTypes());
-      $profileTypes = array_diff($profileTypes, array('Organization','Household'));
+      $profileTypes = array_diff($profileTypes, array('Organization', 'Household'));
     }
 
     return $profileTypes;
@@ -935,8 +957,10 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    * Get the valid survey response fields those
    * are configured with profile and custom fields.
    *
-   * @param int $surveyId     survey id.
-   * @param int $surveyTypeId survey activity type id.
+   * @param int $surveyId
+   *   Survey id.
+   * @param int $surveyTypeId
+   *   Survey activity type id.
    *
    * @return array an array of valid survey response fields.
    */
@@ -1106,9 +1130,9 @@ UPDATE  civicrm_activity
    * Get options for a given field.
    * @see CRM_Core_DAO::buildOptions
    *
-   * @param String $fieldName
-   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
-   * @param Array  $props: whatever is known about this dao object
+   * @param string $fieldName
+   * @param string $context: @see CRM_Core_DAO::buildOptionsContext
+   * @param array $props: whatever is known about this dao object
    *
    * @return array|bool
    */

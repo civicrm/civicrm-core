@@ -102,7 +102,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $this->assertEquals('secondone', $contribution['values'][1]['trxn_id']);
     $this->callAPISuccessGetCount('line_item', array('entity_id' => $this->ids['membership'], 'entity_table' => 'civicrm_membership'), 2);
     $this->callAPISuccessGetSingle('line_item', array('contribution_id' => $contribution['values'][1]['id'], 'entity_table' => 'civicrm_membership'));
-    $this->callAPISuccessGetSingle('membership_payment', array('contribution_id' => $contribution['values'][1]['id'],));
+    $this->callAPISuccessGetSingle('membership_payment', array('contribution_id' => $contribution['values'][1]['id']));
 
   }
   /**

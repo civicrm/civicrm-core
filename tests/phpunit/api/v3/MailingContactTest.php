@@ -67,7 +67,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
    * but don't copy it only any other classes
    */
   public function testMailingNullParams() {
-    $result = $this->callAPIFailure('MailingContact', 'get', null);
+    $result = $this->callAPIFailure('MailingContact', 'get', NULL);
   }
 
   public function testMailingContactGetFields() {
@@ -97,7 +97,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
    * belongs in the SyntaxConformance class
    */
   public function testMailingContactInvalidContactID() {
-    $params = array('contact_id' => 'This is not a number',);
+    $params = array('contact_id' => 'This is not a number');
     $result = $this->callAPIFailure('MailingContact', 'get', $params);
   }
 
@@ -163,7 +163,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
   /**
    * Test that the API returns only the "Bounced" mailings when instructed to do so
    */
-  public function testMailingContactBounced( ) {
+  public function testMailingContactBounced() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     //Create the User
     $op->execute($this->_dbconn,

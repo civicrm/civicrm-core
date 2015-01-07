@@ -93,9 +93,9 @@ SELECT object_table
       array('</td><td>', '</td></tr><tr><td>')
     );
 
-
     $label = ts('Role');
-    $role = array('-1' => ts('- select role -'),
+    $role = array(
+    '-1' => ts('- select role -'),
       '0' => ts('Everyone'),
     ) + CRM_Core_OptionGroup::values('acl_role');
     $entityID = &$this->add('select', 'entity_id', $label, $role, TRUE);

@@ -61,9 +61,12 @@ class CRM_Core_OptionValue {
   /**
    * Return option-values of a particular group
    *
-   * @param  array     $groupParams   Array containing group fields whose option-values is to retrieved.
-   * @param  string    $orderBy       for orderBy clause
-   * @param  array     $links         has links like edit, delete, disable ..etc
+   * @param array $groupParams
+   *   Array containing group fields whose option-values is to retrieved.
+   * @param string $orderBy
+   *   For orderBy clause.
+   * @param array $links
+   *   Has links like edit, delete, disable ..etc.
    *
    * @return array of option-values
    *
@@ -171,10 +174,13 @@ class CRM_Core_OptionValue {
   /**
    * Add/edit option-value of a particular group
    *
-   * @param  array $params Array containing exported values from the invoking form.
-   * @param  array $groupParams Array containing group fields whose option-values is to retrieved/saved.
+   * @param array $params
+   *   Array containing exported values from the invoking form.
+   * @param array $groupParams
+   *   Array containing group fields whose option-values is to retrieved/saved.
    * @param $action
-   * @param  integer $optionValueID has the id of the optionValue being edited, disabled ..etc
+   * @param int $optionValueIDHas the id of the optionValue being edited, disabled ..etc.
+   *   Has the id of the optionValue being edited, disabled ..etc.
    *
    * @return CRM_Core_DAO_OptionValue
    *
@@ -237,12 +243,16 @@ class CRM_Core_OptionValue {
   /**
    * Check if there is a record with the same name in the db
    *
-   * @param string $value the value of the field we are checking
-   * @param string $daoName the dao object name
-   * @param string $daoID the id of the object being updated. u can change your name
+   * @param string $value
+   *   The value of the field we are checking.
+   * @param string $daoName
+   *   The dao object name.
+   * @param string $daoID
+   *   The id of the object being updated. u can change your name.
    *                          as long as there is no conflict
    * @param int $optionGroupID
-   * @param string $fieldName the name of the field in the DAO
+   * @param string $fieldName
+   *   The name of the field in the DAO.
    *
    * @return boolean     true if object exists
    * @static
@@ -362,13 +372,17 @@ class CRM_Core_OptionValue {
   /**
    * Return option-values of a particular group
    *
-   * @param  array     $groupParams   Array containing group fields
+   * @param array $groupParams
+   *   Array containing group fields.
    *                                  whose option-values is to retrieved.
-   * @param  array     $values        (reference) to the array which
+   * @param array $values
+   *   (reference) to the array which.
    *                                  will have the values for the group
-   * @param  string    $orderBy       for orderBy clause
+   * @param string $orderBy
+   *   For orderBy clause.
    *
-   * @param  boolean   $isActive      do you want only active option values?
+   * @param bool $isActiveDo you want only active option values?.
+   *   Do you want only active option values?.
    *
    * @return array of option-values
    *

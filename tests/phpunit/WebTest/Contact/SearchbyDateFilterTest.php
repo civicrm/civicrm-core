@@ -65,90 +65,90 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     $this->openCiviPage("contribute/search", "reset=1");
-    $this->select("contribution_date_relative","value=previous_before.quarter");
+    $this->select("contribution_date_relative", "value=previous_before.quarter");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->select("contribution_date_relative","value=previous_2.quarter");
+    $this->select("contribution_date_relative", "value=previous_2.quarter");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->select("contribution_date_relative","value=earlier.quarter");
+    $this->select("contribution_date_relative", "value=earlier.quarter");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->select("contribution_date_relative","value=ending.year");
+    $this->select("contribution_date_relative", "value=ending.year");
 
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
 
     $this->openCiviPage("member/search", "reset=1");
-    $this->select("member_end_date_relative","value=previous_before.month");
+    $this->select("member_end_date_relative", "value=previous_before.month");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->select("member_end_date_relative","value=previous_2.month");
+    $this->select("member_end_date_relative", "value=previous_2.month");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->select("member_end_date_relative","value=earlier.month");
+    $this->select("member_end_date_relative", "value=earlier.month");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->select("member_end_date_relative","value=ending.month");
+    $this->select("member_end_date_relative", "value=ending.month");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
 
     $this->openCiviPage("event/search", "reset=1");
-    $this->select("event_relative","value=previous_before.week");
+    $this->select("event_relative", "value=previous_before.week");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->select("event_relative","value=previous_2.week");
+    $this->select("event_relative", "value=previous_2.week");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->select("event_relative","value=earlier.week");
+    $this->select("event_relative", "value=earlier.week");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->select("event_relative","value=ending.week");
+    $this->select("event_relative", "value=ending.week");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
 
     $this->openCiviPage("activity/search", "reset=1");
-    $this->select("activity_date_relative","value=previous_before.day");
+    $this->select("activity_date_relative", "value=previous_before.day");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->select("activity_date_relative","value=previous_2.day");
+    $this->select("activity_date_relative", "value=previous_2.day");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->select("activity_date_relative","value=earlier.day");
+    $this->select("activity_date_relative", "value=earlier.day");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->select("activity_date_relative","value=ending.quarter");
+    $this->select("activity_date_relative", "value=ending.quarter");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
 
     $this->openCiviPage("pledge/search", "reset=1");
-    $this->select("pledge_payment_date_relative","value=greater.week");
+    $this->select("pledge_payment_date_relative", "value=greater.week");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
     $this->click("xpath=//form[@id='Search']/div[2]/div/div");
-    $this->select("pledge_payment_date_relative","value=greater.day");
+    $this->select("pledge_payment_date_relative", "value=greater.day");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
     $this->click("xpath=//form[@id='Search']/div[2]/div/div");
-    $this->select("pledge_payment_date_relative","value=greater.quarter");
+    $this->select("pledge_payment_date_relative", "value=greater.quarter");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
     $this->click("xpath=//form[@id='Search']/div[2]/div/div");
-    $this->select("pledge_payment_date_relative","value=greater.month");
+    $this->select("pledge_payment_date_relative", "value=greater.month");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
 
     $this->openCiviPage("mailing", "reset=1");
-    $this->select("mailing_relative","value=previous_before.year");
+    $this->select("mailing_relative", "value=previous_before.year");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->select("mailing_relative","value=previous_2.year");
+    $this->select("mailing_relative", "value=previous_2.year");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->select("mailing_relative","value=earlier.year");
+    $this->select("mailing_relative", "value=earlier.year");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
-    $this->select("mailing_relative","value=greater.year");
+    $this->select("mailing_relative", "value=greater.year");
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
   }
@@ -156,8 +156,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
   /**
    * @param array $openedPanes
    */
-  function _checkOpenedPanes($openedPanes = array(
-    )) {
+  function _checkOpenedPanes($openedPanes = array()) {
     if (!$this->isTextPresent('None found.')) {
       $this->click('css=div.crm-advanced_search_form-accordion div.crm-accordion-header');
     }
@@ -179,8 +178,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
    * @param $paneRef
    * @param array $selectFields
    */
-  function _selectPaneFields($paneRef, $selectFields = array(
-    )) {
+  function _selectPaneFields($paneRef, $selectFields = array()) {
     $pane = $this->_advanceSearchPanesDateFilter($paneRef);
 
     $this->click("css=div.crm-accordion-wrapper {$pane['headerLocator']}");

@@ -3,7 +3,8 @@
 /**
  * Retrieve a report instance
  *
- * @param  array  $params input parameters
+ * @param array $params
+ *   Input parameters.
  *
  * @return  array details of found instances
  * @access public
@@ -28,7 +29,8 @@ function civicrm_api3_report_instance_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_report_instance_create_spec(&$params) {
   $params['report_id']['api.required'] = 1;
@@ -38,7 +40,7 @@ function _civicrm_api3_report_instance_create_spec(&$params) {
 /**
  * Deletes an existing ReportInstance
  *
- * @param  array  $params
+ * @param array $params
  *
  * @return array Api result
  * @access public

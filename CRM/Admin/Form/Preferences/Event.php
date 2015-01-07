@@ -44,7 +44,7 @@ class CRM_Admin_Form_Preferences_Event extends CRM_Admin_Form_Preferences {
     $docLink = CRM_Utils_System::docURL2("CiviEvent Cart Checkout", NULL, NULL, NULL, NULL, "wiki");
     // build an array containing all selectable option values for show_events
     $optionValues = array();
-    for ($i=10; $i <= 100; $i+=10) {
+    for ($i = 10; $i <= 100; $i += 10) {
       $optionValues[$i] = $i;
     }
     $this->_varNames = array(

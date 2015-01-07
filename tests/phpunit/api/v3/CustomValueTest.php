@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -31,7 +31,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class api_v3_CustomValueTest
  */
 class api_v3_CustomValueTest extends CiviUnitTestCase {
-  protected $_apiversion =3;
+  protected $_apiversion = 3;
   protected $individual;
   protected $params;
   protected $ids;
@@ -86,7 +86,6 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       'custom_' . $this->ids['multi2']['custom_field_id'][2] => "vegemite",
     );
 
-
     $result = $this->callAPISuccess('Contact', 'create', $params);
     $contact_id = $result['id'];
     $firstCustomField = $this->ids['multi']['custom_field_id'][0];
@@ -122,7 +121,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $this->assertEquals('', $result['values'][$thirdCustomField]['1']);
     $this->assertEquals('value 4', $result['values'][$thirdCustomField]['2']);
   }
-  
+
   public function testMultipleCustomValues() {
     $params = array(
       'first_name' => 'abc3',
@@ -140,7 +139,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $firstCustomField = $this->ids['multi']['custom_field_id'][1];
     $secondCustomField = $this->ids['single']['custom_field_id'];
     $thirdCustomField = $this->ids['multi']['custom_field_id'][0];
-    
+
     $createParams = array(
       'contact_type' => 'Individual',
       'id' => $contact_id,
@@ -157,7 +156,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('CustomValue', 'Get', $params);
     // delete the contact
     $this->callAPISuccess('contact', 'delete', array('id' => $contact_id));
-    
+
     $this->assertEquals($contact_id, $result['values'][$secondCustomField]['entity_id']);
     $this->assertEquals('value 1', $result['values'][$secondCustomField]['latest']);
     $this->assertEquals('value 1', $result['values'][$secondCustomField][0]);
@@ -165,7 +164,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $this->assertEquals($contact_id, $result['values'][$thirdCustomField]['entity_id']);
     $this->assertEquals('multi value 1', $result['values'][$thirdCustomField][1]);
     $this->assertEquals('multi value 2', $result['values'][$thirdCustomField][2]);
-    
+
     $this->assertEquals($contact_id, $result['values'][$firstCustomField]['entity_id']);
     $this->assertEquals('second multi value 1', $result['values'][$firstCustomField][1]);
     $this->assertEquals('', $result['values'][$firstCustomField][2]);

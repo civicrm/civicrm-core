@@ -4,12 +4,12 @@
  *
  *  (PHP 5)
  *
- *   @author Walt Haas <walt@dharmatech.org> (801) 534-1262
- *   @copyright Copyright CiviCRM LLC (C) 2009
- *   @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
+ * @author Walt Haas <walt@dharmatech.org> (801) 534-1262
+ * @copyright Copyright CiviCRM LLC (C) 2009
+ * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
  *              GNU Affero General Public License version 3
- *   @version   $Id: ActivityTest.php 31254 2010-12-15 10:09:29Z eileen $
- *   @package   CiviCRM
+ * @version   $Id: ActivityTest.php 31254 2010-12-15 10:09:29Z eileen $
+ * @package   CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -37,8 +37,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_activity_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Activity
+ * @package CiviCRM_APIv3
+ * @subpackage API_Activity
  */
 
 class api_v3_ActivityTest extends CiviUnitTestCase {
@@ -457,7 +457,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    */
   public function testActivityCreateTextStatus() {
 
-
     $params = array(
       'source_contact_id' => $this->_contactID,
       'subject' => 'Make-it-Happen Meeting',
@@ -496,11 +495,12 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
     $contact = $this->callAPISuccess('Contact', 'Create', array(
                  'first_name' => "The Rock",
-                 'last_name' =>'roccky',
+                 'last_name' => 'roccky',
                  'contact_type' => 'Individual',
                  'version' => 3,
                  'api.activity.create' => array(
-                   'id' => $activity['id'], 'assignee_contact_id' => '$value.id',
+                   'id' => $activity['id'],
+    'assignee_contact_id' => '$value.id',
                  ),
                ));
 
@@ -580,11 +580,11 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $params['target_contact_id'] = array($contact2 => $contact2);
     $activity = $this->callAPISuccess('Activity', 'Create', $params);
 
-    $activityget   = $this->callAPISuccess('Activity', 'get', array('id' => $activity['id'], 'target_contact_id' => $contact2,'return.target_contact_id' => 1));
+    $activityget   = $this->callAPISuccess('Activity', 'get', array('id' => $activity['id'], 'target_contact_id' => $contact2, 'return.target_contact_id' => 1));
     $this->assertEquals($activity['id'], $activityget['id'], 'In line ' . __LINE__);
     $this->assertEquals($contact2, $activityget['values'][$activityget['id']]['target_contact_id'][0], 'In line ' . __LINE__);
 
-    $activityget   = $this->callAPISuccess('activity', 'get', array('target_contact_id' => $this->_contactID,'return.target_contact_id' => 1,'id' => $activity['id']));
+    $activityget   = $this->callAPISuccess('activity', 'get', array('target_contact_id' => $this->_contactID, 'return.target_contact_id' => 1, 'id' => $activity['id']));
     if ($activityget['count'] > 0) {
       $this->assertNotEquals($contact2, $activityget['values'][$activityget['id']]['target_contact_id'][0], 'In line ' . __LINE__);
     }
@@ -618,7 +618,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
                 'version' => $this->_apiversion,
                 'status_id' => '2'));
     $this->assertEquals(0, $result['count'], 'No activities of status 1 should exist');
-
 
   }
 
@@ -936,7 +935,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
       'id' => $activityId,
     );
-    $result = $this->callAPISuccess($this->_entity, 'get',$getParams );
+    $result = $this->callAPISuccess($this->_entity, 'get', $getParams );
     $assignee = $result['values'][$result['id']]['assignee_contact_id'];
     $target = $result['values'][$result['id']]['target_contact_id'];
     $this->assertEquals(2, count($assignee), ' in line ' . __LINE__);

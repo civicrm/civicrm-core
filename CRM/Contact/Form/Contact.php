@@ -581,9 +581,12 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
-   * @param array $errors list of errors to be posted back to the form
-   * @param int $contactId contact id if doing update.
+   * @param array $fields
+   *   Posted values of the form.
+   * @param array $errors
+   *   List of errors to be posted back to the form.
+   * @param int $contactId
+   *   Contact id if doing update.
    *
    * @return bool $primaryID email/openId@static
    */
@@ -1054,7 +1057,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   /**
    * Is there any real significant data in the hierarchical location array
    *
-   * @param array $fields the hierarchical value representation of this location
+   * @param array $fields
+   *   The hierarchical value representation of this location.
    *
    * @return boolean true if data exists, false otherwise
    * @static
@@ -1097,10 +1101,13 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   /**
    * That checks for duplicate contacts
    *
-   * @param array $fields fields array which are submitted
+   * @param array $fields
+   *   Fields array which are submitted.
    * @param $errors
-   * @param int $contactID contact id
-   * @param string $contactType contact type
+   * @param int $contactID
+   *   Contact id.
+   * @param string $contactType
+   *   Contact type.
    *
    */
   public static function checkDuplicateContacts(&$fields, &$errors, $contactID, $contactType) {
@@ -1185,7 +1192,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * This function either parse street address in to child
    * elements or build street address from child elements.
    *
-   * @param $params array of key value consist of address  blocks.
+   * @param $params
+   *   Array of key value consist of address blocks.
    *
    * @return array $parseSuccess as array of sucess/fails for each address block@static
    */
@@ -1270,7 +1278,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * Check parse result and if some address block fails then this
    * function return the status message for all address blocks.
    *
-   * @param  $parseResult an array of address blk instance and its status.
+   * @param $parseResult
+   *   An array of address blk instance and its status.
    *
    * @return null|string $statusMsg   string status message for all address blocks.@static
    */
@@ -1300,7 +1309,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * Convert normal number to ordinal number format.
    * like 1 => 1st, 2 => 2nd and so on...
    *
-   * @param  $number int number to convert in to ordinal number.
+   * @param $number
+   *   Int number to convert in to ordinal number.
    *
    * @return ordinal number for given number.
    * @static
@@ -1336,7 +1346,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * Update membership status to deceased
    * function return the status message for updated membership.
    *
-   * @param  $deceasedParams array  having contact id and deceased value.
+   * @param $deceasedParams
+   *   Array having contact id and deceased value.
    *
    * @return null|string $updateMembershipMsg string  status message for updated membership.
    */

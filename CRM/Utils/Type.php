@@ -112,7 +112,7 @@ class CRM_Utils_Type {
         $string = 'Blob';
         break;
 
-        // CRM-10404
+      // CRM-10404
       case 12:
       case 256:
         $string = 'Timestamp';
@@ -149,7 +149,7 @@ class CRM_Utils_Type {
    *   The value to be verified/escaped.
    * @param string $type
    *   The type to verify against.
-   * @param boolean $abort
+   * @param bool $abort
    *   If TRUE, the operation will CRM_Core_Error::fatal() on invalid data.
    *
    * @return mixed
@@ -165,7 +165,7 @@ class CRM_Utils_Type {
         break;
 
       case 'Positive':
-      // CRM-8925 the 3 below are for custom fields of this type
+        // CRM-8925 the 3 below are for custom fields of this type
       case 'Country':
       case 'StateProvince':
         // Checked for multi valued state/country value
@@ -269,7 +269,7 @@ class CRM_Utils_Type {
    *   The value to validate.
    * @param string $type
    *   The type to validate against.
-   * @param boolean $abort
+   * @param bool $abort
    *   If TRUE, the operation will CRM_Core_Error::fatal() on invalid data.
    * @name string $name
    *   The name of the attribute

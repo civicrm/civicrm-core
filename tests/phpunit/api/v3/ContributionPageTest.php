@@ -31,10 +31,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_contribute_recur* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Contribution
+ * @package CiviCRM_APIv3
+ * @subpackage API_Contribution
  */
-
 class api_v3_ContributionPageTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $testAmount = 34567;
@@ -42,7 +41,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   protected $id = 0;
   protected $contactIds = array();
   protected $_entity = 'contribution_page';
-  protected $contribution_result = null;
+  protected $contribution_result = NULL;
   protected $_priceSetParams = array();
   /**
    * Payment processor details
@@ -61,6 +60,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
 
   public $DBResetRequired = TRUE;
+
   public function setUp() {
     parent::setUp();
     $this->contactIds[] = $this->individualCreate();
@@ -110,7 +110,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $createResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $this->id = $createResult['id'];
     $getParams = array(
-      'amount' => ''. $this->testAmount, // 3456
+      'amount' => '' . $this->testAmount, // 3456
       'currency' => 'NZD',
       'financial_type_id' => 1,
     );
@@ -148,6 +148,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
   }
+
   /**
    * Test submit with a membership block in place
    */
@@ -211,7 +212,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     );
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL, 'Submit');
-    $contributions = $this->callAPISuccess('contribution', 'get', array('contribution_page_id' => $this->_ids['contribution_page'],));
+    $contributions = $this->callAPISuccess('contribution', 'get', array('contribution_page_id' => $this->_ids['contribution_page']));
     $this->assertCount(2, $contributions['values']);
     $ids = array_keys($contributions['values']);
     $this->assertEquals('10.00', $contributions['values'][$ids[0]]['total_amount']);
@@ -238,12 +239,15 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'payment_processor' => 1,
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
-      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040 ),
+      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
       'cvv2' => 123,
     );
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL, 'Submit');
-    $contributions = $this->callAPISuccess('contribution', 'get', array('contribution_page_id' => $this->_ids['contribution_page'], 'contribution_status_id' => 1));
+    $contributions = $this->callAPISuccess('contribution', 'get', array(
+        'contribution_page_id' => $this->_ids['contribution_page'],
+        'contribution_status_id' => 1
+      ));
     $this->assertCount(2, $contributions['values']);
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
     $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
@@ -264,7 +268,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->params['recur_frequency_unit'] = 'month';
     $this->setUpMembershipContributionPage();
     $dummyPP = CRM_Core_Payment::singleton('live', $this->_paymentProcessor);
-    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 1, 'trxn_id' => 'create_first_success',));
+    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 1, 'trxn_id' => 'create_first_success'));
 
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
@@ -278,7 +282,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'payment_processor' => 1,
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
-      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040 ),
+      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
       'cvv2' => 123,
       'is_recur' => 1,
       'frequency_interval' => 1,
@@ -286,7 +290,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     );
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL, 'Submit');
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page'], 'contribution_status_id' => 1));
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array(
+        'contribution_page_id' => $this->_ids['contribution_page'],
+        'contribution_status_id' => 1
+      ));
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
     $this->assertEquals($membershipPayment['contribution_id'], $contribution['id']);
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
@@ -297,9 +304,13 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     //$this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id'], 'entity_id' => $membership['id']));
     //renew it with processor setting completed - should extend membership
     $submitParams['contact_id'] = $contribution['contact_id'];
-    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 1, 'trxn_id' => 'create_second_success',));
+    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 1, 'trxn_id' => 'create_second_success'));
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
-    $this->callAPISuccess('contribution', 'getsingle', array('id' => array('NOT IN' => array($contribution['id'])), 'contribution_page_id' => $this->_ids['contribution_page'], 'contribution_status_id' => 1));
+    $this->callAPISuccess('contribution', 'getsingle', array(
+        'id' => array('NOT IN' => array($contribution['id'])),
+        'contribution_page_id' => $this->_ids['contribution_page'],
+        'contribution_status_id' => 1
+      ));
     $renewedMembership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals(date('Y-m-d', strtotime('+ 1 year', strtotime($membership['end_date']))), $renewedMembership['end_date']);
     $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $contribution['contribution_recur_id']));
@@ -319,7 +330,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->params['recur_frequency_unit'] = 'month';
     $this->setUpMembershipContributionPage();
     $dummyPP = CRM_Core_Payment::singleton('live', $this->_paymentProcessor);
-    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 2,));
+    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 2));
 
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
@@ -333,7 +344,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'payment_processor' => 1,
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
-      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040 ),
+      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
       'cvv2' => 123,
       'is_recur' => 1,
       'frequency_interval' => 1,
@@ -341,7 +352,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     );
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL, 'Submit');
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page'], 'contribution_status_id' => 2));
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array(
+        'contribution_page_id' => $this->_ids['contribution_page'],
+        'contribution_status_id' => 2
+      ));
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
     $this->assertEquals($membershipPayment['contribution_id'], $contribution['id']);
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
@@ -349,19 +363,28 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals(5, $membership['status_id']);
     //@todo - check with Joe about these not existing
     //$this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id'], 'entity_id' => $membership['id']));
-    $this->callAPISuccess('contribution', 'completetransaction', array('id' => $contribution['id'], 'trxn_id' => 'ipn_called'));
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+        'id' => $contribution['id'],
+        'trxn_id' => 'ipn_called'
+      ));
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     //renew it with processor setting completed - should extend membership
     $submitParams = array_merge($submitParams, array(
-      'contact_id' => $contribution['contact_id'],
-      'is_recur' => 1,
-      'frequency_interval' => 1,
-      'frequency_unit' => 'month',)
+        'contact_id' => $contribution['contact_id'],
+        'is_recur' => 1,
+        'frequency_interval' => 1,
+        'frequency_unit' => 'month',
+      )
     );
-    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 2,));
+    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 2));
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
-    $newContribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => array(
-      'NOT IN' => array($contribution['id'])), 'contribution_page_id' => $this->_ids['contribution_page'], 'contribution_status_id' => 2)
+    $newContribution = $this->callAPISuccess('contribution', 'getsingle', array(
+        'id' => array(
+          'NOT IN' => array($contribution['id'])
+        ),
+        'contribution_page_id' => $this->_ids['contribution_page'],
+        'contribution_status_id' => 2
+      )
     );
 
     $renewedMembership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
@@ -400,7 +423,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * This function ensures it exists & populates $this->_ids with it's data
    */
   public function setUpMembershipBlockPriceSet() {
-    $this->_ids['price_set'][] = $this->callAPISuccess('price_set', 'getvalue', array('name' => 'default_membership_type_amount', 'return' => 'id'));
+    $this->_ids['price_set'][] = $this->callAPISuccess('price_set', 'getvalue', array(
+        'name' => 'default_membership_type_amount',
+        'return' => 'id'
+      ));
     if (empty($this->_ids['membership_type'])) {
       $this->_ids['membership_type'] = array($this->membershipTypeCreate(array('minimum_fee' => 2)));
     }
@@ -436,7 +462,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       $this->_ids['price_set'][] = $priceSet['id'];
     }
     $priceSetID = reset($this->_ids['price_set']);
-    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageResult['id'], $priceSetID );
+    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageResult['id'], $priceSetID);
 
     if (empty($this->_ids['price_field'])) {
       $priceField = $this->callAPISuccess('price_field', 'create', array(
@@ -467,10 +493,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   public static function setUpBeforeClass() {
-      // put stuff here that should happen before all tests in this unit
+    // put stuff here that should happen before all tests in this unit
   }
 
-  public static function tearDownAfterClass(){
+  public static function tearDownAfterClass() {
     $tablesToTruncate = array(
       'civicrm_contact',
       'civicrm_financial_type',

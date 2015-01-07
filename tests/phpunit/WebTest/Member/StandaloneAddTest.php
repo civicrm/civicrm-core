@@ -125,11 +125,11 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     // add softcredit details
     $totalAmount = 100;
     $financialType = 'Donation';
-    $this->clickLink('is_different_contribution_contact','total_amount',FALSE);
+    $this->clickLink('is_different_contribution_contact', 'total_amount', FALSE);
 
     $this->select('soft_credit_type_id', 'Gift');
     $this->select2('soft_credit_contact_id', $giftMembercontactName);
-    $this->select('financial_type_id','Donation');
+    $this->select('financial_type_id', 'Donation');
     $this->type('total_amount', $totalAmount);
     $this->select('payment_instrument_id', 'Check');
     $this->select('contribution_status_id', 'Completed');
@@ -198,7 +198,7 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     // fill in Record Membership Payment?
     $this->click("record_contribution", "value=1");
     $this->waitForElementPresent("contribution_status_id");
-      // let financial type be default
+    // let financial type be default
 
     // let the amount be default
 
@@ -250,7 +250,7 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     $test = $this;
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl,
       function() use ($test) {
-        $test->select('membership_type_id_0', 'value=1');
+      $test->select('membership_type_id_0', 'value=1');
       }
     );
   }

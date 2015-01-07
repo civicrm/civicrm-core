@@ -91,7 +91,8 @@ AND    {$this->_componentClause}";
 
     $url = CRM_Utils_System::url('civicrm/contribute/search', $urlParams);
     $breadCrumb = array(
-      array('url' => $url,
+      array(
+    'url' => $url,
         'title' => ts('Search Results'),
       ));
 
@@ -194,7 +195,6 @@ AND    {$this->_componentClause}";
       $values = array();
       $mail = $elements['baseIPN']->sendMail($input, $ids, $objects, $values, FALSE, $elements['createPdf']);
 
-
       if ($mail['html']) {
         $message[] = $mail['html'];
       }
@@ -237,9 +237,12 @@ AND    {$this->_componentClause}";
    * Declaration of common variables for Invoice and PDF
    *
    *
-   * @param array $contribIds Contribution Id
-   * @param array $params parameter for pdf or email invoices
-   * @param array $contactIds Contact Id
+   * @param array $contribIds
+   *   Contribution Id.
+   * @param array $params
+   *   Parameter for pdf or email invoices.
+   * @param array $contactIds
+   *   Contact Id.
    *
    * @return array array of common elements
    *
@@ -279,9 +282,9 @@ AND    {$this->_componentClause}";
           (empty($params['override_privacy']) && !empty($values['do_not_email']))
           || CRM_Utils_Array::value('is_deceased', $values)
           || !empty($values['on_hold'])) {
-            $suppressedEmails++;
-            $pdfElements['suppressedEmails'] = $suppressedEmails;
-            $excludeContactIds[] = $values['contact_id'];
+          $suppressedEmails++;
+          $pdfElements['suppressedEmails'] = $suppressedEmails;
+          $excludeContactIds[] = $values['contact_id'];
         }
       }
     }

@@ -40,7 +40,8 @@
 /**
  * Subscribe from mailing group
  *
- * @param array $params  Associative array of property
+ * @param array $params
+ *   Associative array of property.
  *                       name/value pairs to insert in new 'survey'
  *
  * @return array api result array
@@ -70,7 +71,8 @@ function civicrm_api3_mailing_event_resubscribe_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_mailing_event_resubscribe_create_spec(&$params) {
   $params['event_queue_id']['api.required'] = 1;

@@ -38,7 +38,8 @@
 /**
  * create or update case type
  *
- * @param  array $params   input parameters
+ * @param array $params
+ *   Input parameters.
  *
  * Allowed @params array keys are:
  * {@getfields case_type_create}
@@ -108,7 +109,8 @@ function _civicrm_api3_case_type_get_formatResult(&$result) {
 /**
  * Function to delete case type
  *
- * @param array $params array including id of case_type to delete
+ * @param array $params
+ *   Array including id of case_type to delete.
 
  * @return array API result array
  *

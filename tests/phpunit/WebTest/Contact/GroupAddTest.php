@@ -232,9 +232,9 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("The role has been deleted.");
   }
 
-   /**
-   * Webtest for add contact to group (CRM-15108)
-   */
+  /**
+    * Webtest for add contact to group (CRM-15108)
+    */
   public function testAddContactToGroup() {
     $this->webtestLogin();
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
@@ -273,7 +273,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage('contact/search', 'reset=1');
     $this->waitForElementPresent("_qf_Basic_refresh");
     $this->type('sort_name', $firstName);
-    $this->select('group',"Advisory Board");
+    $this->select('group', "Advisory Board");
     $this->click('_qf_Basic_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[3]/a[text()='{$lastName}, {$firstName}']"));

@@ -26,8 +26,10 @@ class AntagonistCommand {
   }
 
   /**
-   * @param string $target e.g. "MyTest::testFoo"
-   * @param array $candidateTests list of strings (e.g. "MyTest::testFoo")
+   * @param string $target
+   *   E.g. "MyTest::testFoo".
+   * @param array $candidateTests
+   *   List of strings (e.g. "MyTest::testFoo").
    * @return array|null array contains keys:
    *  - antagonist: array
    *    - file: string

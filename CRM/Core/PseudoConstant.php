@@ -214,9 +214,9 @@ class CRM_Core_PseudoConstant {
    * NOTE: Rather than calling this function directly use CRM_*_BAO_*::buildOptions()
    * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Pseudoconstant+%28option+list%29+Reference
    *
-   * @param String $daoName
-   * @param String $fieldName
-   * @param Array $params
+   * @param string $daoName
+   * @param string $fieldName
+   * @param array $params
    * - name       string  name of the option group
    * - flip       boolean results are return in id => label format if false
    *                            if true, the results are reversed
@@ -228,7 +228,7 @@ class CRM_Core_PseudoConstant {
    * - orderColumn string the column to use for sorting, defaults to 'weight' column if one exists, else defaults to labelColumn
    * - onlyActive boolean return only the action option values
    * - fresh      boolean ignore cache entries and go back to DB
-   * @param String $context: Context string
+   * @param string $context: Context string
    *
    * @return Array|bool - array on success, FALSE on error.
    *
@@ -443,9 +443,9 @@ class CRM_Core_PseudoConstant {
   /**
    * Fetch the translated label for a field given its key
    *
-   * @param String $baoName
-   * @param String $fieldName
-   * @param String|Int $key
+   * @param string $baoName
+   * @param string $fieldName
+   * @param string|Int $key
    *
    * TODO: Accept multivalued input?
    *
@@ -465,9 +465,9 @@ class CRM_Core_PseudoConstant {
   /**
    * Fetch the machine name for a field given its key
    *
-   * @param String $baoName
-   * @param String $fieldName
-   * @param String|Int $key
+   * @param string $baoName
+   * @param string $fieldName
+   * @param string|Int $key
    *
    * @return bool|null|string
    *   FALSE if the given field has no associated option list
@@ -485,9 +485,9 @@ class CRM_Core_PseudoConstant {
   /**
    * Fetch the key for a field option given its name
    *
-   * @param String $baoName
-   * @param String $fieldName
-   * @param String|Int $value
+   * @param string $baoName
+   * @param string $fieldName
+   * @param string|Int $value
    *
    * @return bool|null|string|number
    *   FALSE if the given field has no associated option list
@@ -538,12 +538,18 @@ class CRM_Core_PseudoConstant {
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @param array $var the associative array we will fill
-   * @param string $name the name of the DAO
-   * @param boolean $all get all objects. default is to get only active ones.
-   * @param string $retrieve the field that we are interested in (normally name, differs in some objects)
-   * @param string $filter the field that we want to filter the result set with
-   * @param string $condition the condition that gets passed to the final query as the WHERE clause
+   * @param array $var
+   *   The associative array we will fill.
+   * @param string $name
+   *   The name of the DAO.
+   * @param bool $all
+   *   Get all objects. default is to get only active ones.
+   * @param string $retrieve
+   *   The field that we are interested in (normally name, differs in some objects).
+   * @param string $filter
+   *   The field that we want to filter the result set with.
+   * @param string $condition
+   *   The condition that gets passed to the final query as the WHERE clause.
    *
    * @param null $orderby
    * @param string $key
@@ -698,7 +704,7 @@ class CRM_Core_PseudoConstant {
    *
    * @static
    *
-   * @param bool|int $id -  Optional id to return
+   * @param bool|int $id - Optional id to return
    *
    * @param bool $limit
    *
@@ -753,7 +759,7 @@ class CRM_Core_PseudoConstant {
    *
    * @static
    *
-   * @param bool|int $id -     Optional id to return
+   * @param bool|int $id - Optional id to return
    *
    * @param bool $limit
    *
@@ -927,8 +933,10 @@ WHERE  id = %1";
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @param string $groupType type of group(Access/Mailing)
-   * @param bool $excludeHidden exclude hidden groups.
+   * @param string $groupType
+   *   Type of group(Access/Mailing).
+   * @param bool $excludeHidden
+   *   Exclude hidden groups.
    *
    * @static
    *
@@ -984,8 +992,10 @@ WHERE  id = %1";
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @param string $groupType type of group(Access/Mailing)
-   * @param bool $excludeHidden exclude hidden groups.
+   * @param string $groupType
+   *   Type of group(Access/Mailing).
+   * @param bool $excludeHidden
+   *   Exclude hidden groups.
    *
    * @static
    *
@@ -1054,8 +1064,10 @@ WHERE  id = %1";
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @param string $valueColumnName db column name/label.
-   * @param boolean $reset          reset relationship types if true
+   * @param string $valueColumnName
+   *   Db column name/label.
+   * @param bool $reset
+   *   Reset relationship types if true.
    *
    * @static
    *
@@ -1386,7 +1398,7 @@ WHERE  id = %1";
    *
    * @static
    *
-   * @param bool|int $id -  Optional id to return
+   * @param bool|int $id - Optional id to return
    *
    * @return array - array reference of all Counties
    */
@@ -1416,8 +1428,10 @@ WHERE  id = %1";
    *
    * @static
    *
-   * @param boolean $all - get payment processors     - default is to get only active ones.
-   * @param boolean $test - get test payment processors
+   * @param bool $all
+   *   Get payment processors - default is to get only active ones.
+   * @param bool $test
+   *   Get test payment processors.
    *
    * @param null $additionalCond
    *
@@ -1450,7 +1464,8 @@ WHERE  id = %1";
    *
    * @static
    *
-   * @param boolean $all - get payment processors     - default is to get only active ones.
+   * @param bool $all
+   *   Get payment processors - default is to get only active ones.
    *
    * @param int $id
    * @param string $return
@@ -1535,12 +1550,12 @@ WHERE  id = %1";
    */
   public static function &visibility($column = 'label') {
     if (!isset(self::$visibility)) {
-      self::$visibility = array( );
+      self::$visibility = array();
     }
 
     if (!isset(self::$visibility[$column])) {
       self::$visibility[$column] = CRM_Core_OptionGroup::values('visibility', FALSE, FALSE, FALSE, NULL, $column);
-  }
+    }
 
     return self::$visibility[$column];
   }
@@ -1662,7 +1677,8 @@ ORDER BY name";
    * Given a state ID return the country ID, this allows
    * us to populate forms and values for downstream code
    *
-   * @param $stateID int
+   * @param $stateID
+   *   Int.
    *
    * @return int the country id that the state belongs to
    * @static
@@ -1689,7 +1705,8 @@ WHERE  id = %1
    *
    * @static
    *
-   * @param $filter - get All Email Greetings - default is to get only active ones.
+   * @param $filter
+   *   Get All Email Greetings - default is to get only active ones.
    *
    * @param string $columnName
    *
@@ -1798,17 +1815,18 @@ WHERE  id = %1
    *
    * @static
    *
-   * @param boolean $optionGroupName - get All  Option Group values- default is to get only active ones.
+   * @param bool $optionGroupName
+   *   Get All Option Group values- default is to get only active ones.
    *
    * @param int $id
    * @param null $condition
    *
    * @return array - array reference of all Option Group Name
    */
-  public static function accountOptionValues($optionGroupName, $id = null, $condition = null) {
+  public static function accountOptionValues($optionGroupName, $id = NULL, $condition = NULL) {
     $cacheKey = $optionGroupName . '_' . $condition;
     if (empty(self::$accountOptionValues[$cacheKey])) {
-      self::$accountOptionValues[$cacheKey] = CRM_Core_OptionGroup::values($optionGroupName, false, false, false, $condition);
+      self::$accountOptionValues[$cacheKey] = CRM_Core_OptionGroup::values($optionGroupName, FALSE, FALSE, FALSE, $condition);
     }
     if ($id) {
       return CRM_Utils_Array::value($id, self::$accountOptionValues[$cacheKey]);
@@ -1820,7 +1838,8 @@ WHERE  id = %1
   /**
    * Fetch the list of active extensions of type 'module'
    *
-   * @param $fresh bool whether to forcibly reload extensions list from canonical store
+   * @param $fresh
+   *   Bool whether to forcibly reload extensions list from canonical store.
    * @static
    *
    * @return array - array(array('prefix' => $, 'file' => $))

@@ -4,7 +4,8 @@ interface CRM_Core_FileSearchInterface {
   const DEFAULT_SEARCH_OFFSET = 0;
 
   /**
-   * @param array $query any of the following:
+   * @param array $query
+   *   Any of the following:.
    *  - text: string, plain text to search for
    *  - parent_table: string - entity to which file is directly attached
    *  - parent_id: int - entity to which file is directly attached

@@ -349,16 +349,18 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     foreach($contacts as $contact) {
       $this->verifyText("xpath=//div[@id='participantSearch']//table//tbody//tr/td[@class='crm-participant-sort_name']/a[text()='{$contact['sort_name']}']/../../td[9]", preg_quote($status));
       $this->verifyText("xpath=//div[@id='participantSearch']//table//tbody//tr/td[@class='crm-participant-sort_name']/a[text()='{$contact['sort_name']}']/../../td[4]/a", preg_quote($eventName));
-}
+    }
   }
 
   public function testAjaxCustomGroupLoad() {
     $this->webtestLogin();
 
     $customSets = array(
-      array('entity' => 'ParticipantEventName', 'subEntity' => 'Fall Fundraiser Dinner',
+      array(
+    'entity' => 'ParticipantEventName',
+    'subEntity' => 'Fall Fundraiser Dinner',
         'triggerElement' => array('name' => "event_id", 'type' => "select2")),
-      array('entity' => 'ParticipantRole', 'subEntity' => 'Attendee','triggerElement' => array('name' => 'role_id', 'type' => "select"))
+      array('entity' => 'ParticipantRole', 'subEntity' => 'Attendee', 'triggerElement' => array('name' => 'role_id', 'type' => "select"))
     );
     $pageUrl = array('url' => "participant/add", 'args' => "reset=1&action=add&context=standalone");
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl, TRUE);
@@ -372,14 +374,20 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     $customSets = array(
-      array('entity' => 'ParticipantEventType', 'subEntity' => '- Any -',
+      array(
+    'entity' => 'ParticipantEventType',
+    'subEntity' => '- Any -',
         'triggerElement' => array('name' => "event_id", 'type' => "select")),
-      array('entity' => 'ParticipantEventName', 'subEntity' => '- Any -',
+      array(
+    'entity' => 'ParticipantEventName',
+    'subEntity' => '- Any -',
         'triggerElement' => array('name' => "event_id", 'type' => "select")),
-      array('entity' => 'ParticipantEventName', 'subEntity' => 'Rain-forest Cup Youth Soccer Tournament',
+      array(
+    'entity' => 'ParticipantEventName',
+    'subEntity' => 'Rain-forest Cup Youth Soccer Tournament',
         'triggerElement' => array('name' => "event_id", 'type' => "select")),
-      array('entity' => 'ParticipantRole', 'subEntity' => '- Any -','triggerElement' => array('type' => "checkbox")),
-      array('entity' => 'ParticipantRole', 'subEntity' => 'Volunteer','triggerElement' => array('type' => "checkbox"))
+      array('entity' => 'ParticipantRole', 'subEntity' => '- Any -', 'triggerElement' => array('type' => "checkbox")),
+      array('entity' => 'ParticipantRole', 'subEntity' => 'Volunteer', 'triggerElement' => array('type' => "checkbox"))
     );
 
     $return = $this->addCustomGroupField($customSets);

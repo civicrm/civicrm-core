@@ -117,8 +117,10 @@ class CiviReportTestCase extends CiviUnitTestCase {
   }
 
   /**
-   * @param array $expectedCsvArray two-dimensional array representing a CSV table
-   * @param array $actualCsvArray two-dimensional array representing a CSV table
+   * @param array $expectedCsvArray
+   *   Two-dimensional array representing a CSV table.
+   * @param array $actualCsvArray
+   *   Two-dimensional array representing a CSV table.
    */
   public function assertCsvArraysEqual($expectedCsvArray, $actualCsvArray) {
     // TODO provide better debug output

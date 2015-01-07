@@ -153,7 +153,6 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
       // form all action links
       $action = array_sum(array_keys($this->links()));
 
-
       if ($dao->is_active) {
         $action -= CRM_Core_Action::ENABLE;
       }
@@ -170,12 +169,12 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
         'Premium',
         $dao->id
       );
-           //Financial Type
-                if( !empty( $dao->financial_type_id )  ){
-                    require_once 'CRM/Core/DAO.php';
-                    $premiums[$dao->id]['financial_type_id'] = CRM_Core_DAO::getFieldValue( 'CRM_Financial_DAO_FinancialType', $dao->financial_type_id, 'name' );
+      //Financial Type
+      if( !empty( $dao->financial_type_id )  ){
+        require_once 'CRM/Core/DAO.php';
+        $premiums[$dao->id]['financial_type_id'] = CRM_Core_DAO::getFieldValue( 'CRM_Financial_DAO_FinancialType', $dao->financial_type_id, 'name' );
+      }
     }
-        }
     $this->assign('rows', $premiums);
   }
 

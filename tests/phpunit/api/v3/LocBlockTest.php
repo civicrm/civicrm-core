@@ -104,9 +104,9 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
     $this->assertNotNull($result['phone_id'], 'In line ' . __LINE__);
     $this->assertNotNull($result['phone_2_id'], 'In line ' . __LINE__);
     $this->assertNotNull($result['address_id'], 'In line ' . __LINE__);
-    $this->assertEquals($params['email']['email'], $result['email']['email'],  'In line ' . __LINE__);
-    $this->assertEquals($params['phone_2']['phone'], $result['phone_2']['phone'],  'In line ' . __LINE__);
-    $this->assertEquals($params['address']['street_address'], $result['address']['street_address'],  'In line ' . __LINE__);
+    $this->assertEquals($params['email']['email'], $result['email']['email'], 'In line ' . __LINE__);
+    $this->assertEquals($params['phone_2']['phone'], $result['phone_2']['phone'], 'In line ' . __LINE__);
+    $this->assertEquals($params['address']['street_address'], $result['address']['street_address'], 'In line ' . __LINE__);
     // Delete block
     $result = $this->callAPISuccess($this->_entity, 'delete', array('id' => $id));
   }

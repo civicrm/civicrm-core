@@ -67,7 +67,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testCreateWithoutName() {
     $params = array(
-      'is_active' => 1,    );
+      'is_active' => 1,
+    );
     $result = $this->callAPIFailure('job', 'create', $params,
       'Mandatory key(s) missing from params array: run_frequency, name, api_entity, api_action'
     );
@@ -137,7 +138,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testDeleteWithIncorrectData() {
     $params = array(
-      'id' => 'abcd',    );
+      'id' => 'abcd',
+    );
     $result = $this->callAPIFailure('job', 'delete', $params);
   }
 
@@ -146,28 +148,31 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testDelete() {
     $createResult = $this->callAPISuccess('job', 'create', $this->_params);
-    $params = array('id' => $createResult['id'],);
+    $params = array('id' => $createResult['id']);
     $result = $this->callAPIAndDocument('job', 'delete', $params, __FUNCTION__, __FILE__);
     $this->assertAPIDeleted($this->_entity, $createResult['id']);
   }
 
   /**
-
-  public function testCallUpdateGreetingMissingParams() {
-    $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 1));
-    $this->assertEquals('Mandatory key(s) missing from params array: ct', $result['error_message']);
-  }
-
-  public function testCallUpdateGreetingIncorrectParams() {
-    $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 1, 'ct' => 'djkfhdskjfhds'));
-    $this->assertEquals('ct `djkfhdskjfhds` is not valid.', $result['error_message']);
-  }
-/*
- * Note that this test is about tesing the metadata / calling of the function & doesn't test the success of the called function
- */
+   *
+   * public function testCallUpdateGreetingMissingParams() {
+   * $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 1));
+   * $this->assertEquals('Mandatory key(s) missing from params array: ct', $result['error_message']);
+   * }
+   *
+   * public function testCallUpdateGreetingIncorrectParams() {
+   * $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 1, 'ct' => 'djkfhdskjfhds'));
+   * $this->assertEquals('ct `djkfhdskjfhds` is not valid.', $result['error_message']);
+   * }
+   * /*
+   * Note that this test is about tesing the metadata / calling of the function & doesn't test the success of the called function
+   */
   public function testCallUpdateGreetingSuccess() {
-    $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 'postal_greeting', 'ct' => 'Individual'));
-   }
+    $result = $this->callAPISuccess($this->_entity, 'update_greeting', array(
+        'gt' => 'postal_greeting',
+        'ct' => 'Individual'
+      ));
+  }
 
   public function testCallUpdateGreetingCommaSeparatedParamsSuccess() {
     $gt = 'postal_greeting,email_greeting,addressee';
@@ -188,7 +193,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $membershipTypeID = $this->membershipTypeCreate();
     $this->membershipStatusCreate();
     $createTotal = 30;
-    for($i = 1; $i <= $createTotal; $i++) {
+    for ($i = 1; $i <= $createTotal; $i++) {
       $contactID = $this->individualCreate();
       $groupID = $this->groupCreate(array('name' => $i, 'title' => $i));
       $result = $this->callAPISuccess('action_schedule', 'create', array(
@@ -203,7 +208,11 @@ class api_v3_JobTest extends CiviUnitTestCase {
         'group_id' => $groupID,
         'limit_to' => FALSE,
       ));
-      $this->callAPISuccess('group_contact', 'create', array('contact_id' => $contactID, 'status' => 'Added', 'group_id' => $groupID));
+      $this->callAPISuccess('group_contact', 'create', array(
+          'contact_id' => $contactID,
+          'status' => 'Added',
+          'group_id' => $groupID
+        ));
     }
     $result = $this->callAPISuccess('job', 'send_reminder', array());
     $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
@@ -220,19 +229,23 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->membershipStatusCreate();
     $createTotal = 3;
     $groupID = $this->groupCreate(array('name' => 'Texan drawlers', 'title' => 'a...'));
-    for($i = 1; $i <= $createTotal; $i++) {
+    for ($i = 1; $i <= $createTotal; $i++) {
       $contactID = $this->individualCreate();
-      if($i == 2) {
+      if ($i == 2) {
         $theChosenOneID = $contactID;
       }
-      if($i < 3) {
-        $this->callAPISuccess('group_contact', 'create', array('contact_id' => $contactID, 'status' => 'Added', 'group_id' => $groupID));
+      if ($i < 3) {
+        $this->callAPISuccess('group_contact', 'create', array(
+            'contact_id' => $contactID,
+            'status' => 'Added',
+            'group_id' => $groupID
+          ));
       }
-      if($i > 1) {
+      if ($i > 1) {
         $this->callAPISuccess('membership', 'create', array(
-          'contact_id' => $contactID,
-          'membership_type_id' => $membershipTypeID,
-          'join_date' => '+ 1 hour',
+            'contact_id' => $contactID,
+            'membership_type_id' => $membershipTypeID,
+            'join_date' => '+ 1 hour',
           )
         );
       }
@@ -260,7 +273,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $individualID = $this->individualCreate();
     $orgID = $this->organizationCreate();
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_pre', array($this, 'hookPreRelationship'));
-    $relationshipTypeID = $this->callAPISuccess('relationship_type', 'getvalue', array('return' => 'id', 'name_a_b' => 'Employee of'));
+    $relationshipTypeID = $this->callAPISuccess('relationship_type', 'getvalue', array(
+        'return' => 'id',
+        'name_a_b' => 'Employee of'
+      ));
     $result = $this->callAPISuccess('relationship', 'create', array(
       'relationship_type_id' => $relationshipTypeID,
       'contact_id_a' => $individualID,
@@ -283,11 +299,11 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param int $id
    * @param array $params
    */
-  public function hookPreRelationship($op, $objectName, $id, &$params ) {
-    if($op == 'delete') {
+  public function hookPreRelationship($op, $objectName, $id, &$params) {
+    if ($op == 'delete') {
       return;
     }
-    if($params['is_active']) {
+    if ($params['is_active']) {
       $params['description'] = 'Hooked';
     }
     else {

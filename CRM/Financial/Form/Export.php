@@ -76,7 +76,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
         //validate batch ids
         $batchIds = explode(',', $_GET['batch_id']);
         foreach($batchIds as $batchId) {
-          CRM_Utils_Type::validate($batchId,'Positive');
+          CRM_Utils_Type::validate($batchId, 'Positive');
         }
 
         $this->_batchIds = $_GET['batch_id'];
@@ -101,7 +101,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
 
     foreach( $batchStatus as $batchStatusId ) {
       if ($batchStatusId == $this->_exportStatusId) {
-       CRM_Core_Error::fatal(ts('You cannot exported the batches which were exported earlier.'));
+        CRM_Core_Error::fatal(ts('You cannot exported the batches which were exported earlier.'));
       }
     }
 
@@ -154,7 +154,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
    *
    * @return void
    */
-  public function postProcess( ) {
+  public function postProcess() {
     if (!$this->_exportFormat) {
       $params = $this->exportValues();
       $this->_exportFormat = $params['export_format'];

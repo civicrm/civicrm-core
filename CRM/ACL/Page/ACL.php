@@ -120,7 +120,8 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
     );
 
     // set breadcrumb to append to admin/access
-    $breadCrumb = array(array('title' => ts('Access Control'),
+    $breadCrumb = array(array(
+    'title' => ts('Access Control'),
         'url' => CRM_Utils_System::url('civicrm/admin/access',
           'reset=1'
         ),
@@ -170,17 +171,21 @@ ORDER BY entity_id
 
     $roles = CRM_Core_OptionGroup::values('acl_role');
 
-    $group = array('-1' => ts('- select -'),
+    $group = array(
+    '-1' => ts('- select -'),
       '0' => ts('All Groups'),
     ) + CRM_Core_PseudoConstant::group();
-    $customGroup = array('-1' => ts('- select -'),
+    $customGroup = array(
+    '-1' => ts('- select -'),
       '0' => ts('All Custom Groups'),
     ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
-    $ufGroup = array('-1' => ts('- select -'),
+    $ufGroup = array(
+    '-1' => ts('- select -'),
       '0' => ts('All Profiles'),
     ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
 
-    $event = array('-1' => ts('- select -'),
+    $event = array(
+    '-1' => ts('- select -'),
       '0' => ts('All Events'),
     ) + CRM_Event_PseudoConstant::event();
 
@@ -193,7 +198,6 @@ ORDER BY entity_id
       $acl[$dao->id]['object_table'] = $dao->object_table;
       $acl[$dao->id]['object_id'] = $dao->object_id;
       $acl[$dao->id]['is_active'] = $dao->is_active;
-
 
       if ($acl[$dao->id]['entity_id']) {
         $acl[$dao->id]['entity'] = $roles[$acl[$dao->id]['entity_id']];

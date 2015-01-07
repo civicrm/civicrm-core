@@ -109,7 +109,6 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
         CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Pending'")
       )) {
 
-
       //need to confirm that though participant confirming
       //registration - but is there enough space to confirm.
       $emptySeats   = CRM_Event_BAO_Participant::pendingToConfirmSpaces($this->_eventId);
@@ -128,7 +127,8 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
             1 => $values['title'])) . '</div><div><br />' . ts('Click the "Confirm Registration" button to begin, or click "Cancel Registration" if you are no longer interested in attending this event.') . '</div>';
         }
         $buttons = array_merge($buttons, array(
-          array('type' => 'next',
+          array(
+        'type' => 'next',
               'name' => ts('Confirm Registration'),
               'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
               'isDefault' => TRUE,
@@ -142,7 +142,8 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
       )) {
       $cancelConfirm = ts('Are you sure you want to cancel your registration for this event?');
       $buttons = array_merge($buttons, array(
-        array('type' => 'submit',
+        array(
+      'type' => 'submit',
             'name' => ts('Cancel Registration'),
             'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
             'js' => array('onclick' => 'return confirm(\'' . $cancelConfirm . '\');'),

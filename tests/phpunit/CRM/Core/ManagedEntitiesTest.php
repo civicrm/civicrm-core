@@ -237,7 +237,6 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
     $this->assertEquals($foo['id'], $foo2['id']);
 
-
     // Override 'getrefcount' ==> The refcount is 0
     $this->adhocProvider->addAction('getrefcount', 'access CiviCRM', function($apiRequest) {
       return civicrm_api3_create_success(array());
@@ -273,7 +272,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
       $me->reconcile();
       $this->fail('Expected exception when using invalid declaration');
     } catch (Exception $e) {
-     // good
+      // good
     }
   }
 
@@ -298,7 +297,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
       $me->reconcile();
       $this->fail('Expected exception when using invalid declaration');
     } catch (Exception $e) {
-     // good
+      // good
     }
   }
 
@@ -323,7 +322,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
       $me->reconcile();
       $this->fail('Expected exception when using invalid declaration');
     } catch (Exception $e) {
-     // good
+      // good
     }
   }
 

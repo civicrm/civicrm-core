@@ -49,23 +49,23 @@ class CRM_Core_Form_RecurringEntity {
   protected static $_scheduleReminderID = NULL;
 
   /**
-  * Schedule Reminder data
-  */
+   * Schedule Reminder data
+   */
   protected static $_scheduleReminderDetails = array();
 
   /**
-  *  Parent Entity ID
-  */
+   *  Parent Entity ID
+   */
   protected static $_parentEntityId = NULL;
 
   /**
-  * Exclude date information
-  */
+   * Exclude date information
+   */
   public static $_excludeDateInfo = array();
 
   /**
-  * Entity Table
-  */
+   * Entity Table
+   */
   public static $_entityTable;
 
   /**
@@ -104,7 +104,7 @@ class CRM_Core_Form_RecurringEntity {
     }
   }
 
-   /**
+  /**
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
@@ -116,7 +116,7 @@ class CRM_Core_Form_RecurringEntity {
     if (self::$_scheduleReminderID) {
       $defaults['repetition_frequency_unit'] = self::$_scheduleReminderDetails->repetition_frequency_unit;
       $defaults['repetition_frequency_interval'] = self::$_scheduleReminderDetails->repetition_frequency_interval;
-      $defaults['start_action_condition'] = array_flip(explode(",",self::$_scheduleReminderDetails->start_action_condition));
+      $defaults['start_action_condition'] = array_flip(explode(",", self::$_scheduleReminderDetails->start_action_condition));
       foreach($defaults['start_action_condition'] as $key => $val) {
         $val = 1;
         $defaults['start_action_condition'][$key] = $val;
@@ -161,12 +161,13 @@ class CRM_Core_Form_RecurringEntity {
     $form->_freqUnits = array('hour' => 'hour') + CRM_Core_OptionGroup::values('recur_frequency_units');
     foreach ($form->_freqUnits as $val => $label) {
       if ($label == "day") {
-          $label = "dai";
+        $label = "dai";
       }
       $freqUnitsDisplay[$val] = ts('%1ly', array(1 => $label));
     }
-   // echo "<pre>";print_r($freqUnitsDisplay);
-    $dayOfTheWeek = array('monday'   => 'Monday',
+    // echo "<pre>";print_r($freqUnitsDisplay);
+    $dayOfTheWeek = array(
+    'monday'   => 'Monday',
                           'tuesday'   => 'Tuesday',
                           'wednesday' => 'Wednesday',
                           'thursday'  => 'Thursday',
@@ -179,24 +180,27 @@ class CRM_Core_Form_RecurringEntity {
     $form->add('select', 'repetition_frequency_interval', ts('Repeats every:'), $numericOptions, '', array('style' => 'width:55px;'));
     $form->addDateTime('repetition_start_date', ts('Repetition Start Date'), FALSE, array('formatType' => 'activityDateTime'));
     foreach($dayOfTheWeek as $key => $val) {
-        $startActionCondition[] = $form->createElement('checkbox', $key, NULL, substr($val."&nbsp;", 0, 3));
+      $startActionCondition[] = $form->createElement('checkbox', $key, NULL, substr($val."&nbsp;", 0, 3));
     }
     $form->addGroup($startActionCondition, 'start_action_condition', ts('Repeats on'));
-    $roptionTypes = array('1' => ts('day of the month'),
+    $roptionTypes = array(
+    '1' => ts('day of the month'),
         '2' => ts('day of the week'),
       );
     $form->addRadio('repeats_by', ts("Repeats By:"), $roptionTypes, array(), NULL);
     $getMonths = CRM_Core_SelectValues::getNumericOptions(1, 31);
     $form->add('select', 'limit_to', '', $getMonths, FALSE, array('style' => 'width:55px;'));
-    $dayOfTheWeekNo = array('first'  => 'First',
-                            'second'=> 'Second',
+    $dayOfTheWeekNo = array(
+    'first'  => 'First',
+                            'second' => 'Second',
                             'third' => 'Third',
-                            'fourth'=> 'Fourth',
+                            'fourth' => 'Fourth',
                             'last'  => 'Last'
                          );
     $form->add('select', 'entity_status_1', ts(''), $dayOfTheWeekNo);
     $form->add('select', 'entity_status_2', ts(''), $dayOfTheWeek);
-    $eoptionTypes = array('1' => ts('After'),
+    $eoptionTypes = array(
+    '1' => ts('After'),
         '2' => ts('On'),
       );
     $form->addRadio('ends', ts("Ends:"), $eoptionTypes, array(), NULL);
@@ -206,8 +210,8 @@ class CRM_Core_Form_RecurringEntity {
     $form->addDate('exclude_date', ts('Exclude Date(s)'), FALSE);
     $select = $form->add('select', 'exclude_date_list', ts(''), self::$_excludeDateInfo, FALSE, array('style' => 'width:150px;', 'size' => 4));
     $select->setMultiple(TRUE);
-    $form->addElement('button','add_to_exclude_list','>>','onClick="addToExcludeList(document.getElementById(\'exclude_date\').value);"');
-    $form->addElement('button','remove_from_exclude_list', '<<', 'onClick="removeFromExcludeList(\'exclude_date_list\')"');
+    $form->addElement('button', 'add_to_exclude_list', '>>', 'onClick="addToExcludeList(document.getElementById(\'exclude_date\').value);"');
+    $form->addElement('button', 'remove_from_exclude_list', '<<', 'onClick="removeFromExcludeList(\'exclude_date_list\')"');
     $form->addElement('hidden', 'copyExcludeDates', '', array('id' => 'copyExcludeDates'));
     $form->addElement('hidden', 'allowRepeatConfigToSubmit', '', array('id' => 'allowRepeatConfigToSubmit'));
     $form->addButtons(array(
@@ -227,7 +231,8 @@ class CRM_Core_Form_RecurringEntity {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form .
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -288,7 +293,7 @@ class CRM_Core_Form_RecurringEntity {
           if (CRM_Utils_Array::value('entity_status_1', $values)) {
             $dayOfTheWeekNo = array(first, second, third, fourth, last);
             if (!in_array($values['entity_status_1'], $dayOfTheWeekNo)) {
-               $errors['entity_status_1'] = ts('Invalid option');
+              $errors['entity_status_1'] = ts('Invalid option');
             }
           }
           else {
@@ -296,7 +301,7 @@ class CRM_Core_Form_RecurringEntity {
           }
           if (CRM_Utils_Array::value('entity_status_2', $values)) {
             if (!in_array($values['entity_status_2'], $dayOfTheWeek)) {
-               $errors['entity_status_2'] = ts('Invalid day name');
+              $errors['entity_status_2'] = ts('Invalid day name');
             }
           }
           else {
@@ -369,18 +374,18 @@ class CRM_Core_Form_RecurringEntity {
               );
           $opGroup = CRM_Core_BAO_OptionGroup::add($optionGroupParams);
           if ($opGroup->id) {
-            $oldWeight= 0;
+            $oldWeight = 0;
             $fieldValues = array('option_group_id' => $opGroup->id);
             foreach($excludeDates as $val) {
               $optionGroupValue =
                   array(
-                    'option_group_id' =>  $opGroup->id,
-                    'label'           =>  CRM_Utils_Date::processDate($val),
-                    'value'           =>  CRM_Utils_Date::processDate($val),
-                    'name'            =>  $opGroup->name,
-                    'description'     =>  'Used for recurring '.$type,
-                    'weight'          =>  CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_OptionValue', $oldWeight, CRM_Utils_Array::value('weight', $params), $fieldValues),
-                    'is_active'       =>  1
+                    'option_group_id' => $opGroup->id,
+                    'label'           => CRM_Utils_Date::processDate($val),
+                    'value'           => CRM_Utils_Date::processDate($val),
+                    'name'            => $opGroup->name,
+                    'description'     => 'Used for recurring '.$type,
+                    'weight'          => CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_OptionValue', $oldWeight, CRM_Utils_Array::value('weight', $params), $fieldValues),
+                    'is_active'       => 1
                   );
               $excludeDateList[] = $optionGroupValue['value'];
               CRM_Core_BAO_OptionValue::add($optionGroupValue);
@@ -399,7 +404,7 @@ class CRM_Core_Form_RecurringEntity {
           //If entity has any pre delete function, consider that first
           if (CRM_Utils_Array::value('pre_delete_func', CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]) &&
               CRM_Utils_Array::value('helper_class', CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']])) {
-              call_user_func(array(
+            call_user_func(array(
                 CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['helper_class'],
                 call_user_func_array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['pre_delete_func'], array($params['entity_id'])))
               );
@@ -441,7 +446,7 @@ class CRM_Core_Form_RecurringEntity {
             }
           }
 
-          // find all entities from the recurring set. At this point we 'll get entities which were not deleted 
+          // find all entities from the recurring set. At this point we 'll get entities which were not deleted
           // for e.g due to participants being present. We need to delete them from recurring tables anyway.
           $pRepeatingEntities = CRM_Core_BAO_RecurringEntity::getEntitiesFor($params['entity_id'], $params['entity_table']);
           foreach($pRepeatingEntities as $val) {

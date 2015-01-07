@@ -129,7 +129,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     //change the case status to Resolved to get the end date
     $this->click("xpath=//form[@id='CaseView']/div[2]/table/tbody/tr/td[4]/a");
     $this->waitForElementPresent("_qf_Activity_cancel-bottom");
-    $this->select("case_status_id","value=2");
+    $this->select("case_status_id", "value=2");
     $this->click("_qf_Activity_upload-top");
 
     $this->_testSearchbyDate($client['first_name'], $client['last_name'], "this.quarter");
@@ -277,7 +277,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
    *
    * test for assign case to another client
    */
-   public function _testAssignToClient($firstName, $lastName, $caseTypeLabel) {
+  public function _testAssignToClient($firstName, $lastName, $caseTypeLabel) {
     $this->openCiviPage('case/search', 'reset=1', '_qf_Search_refresh-bottom');
     $this->type('sort_name', $firstName);
     $this->clickLink('_qf_Search_refresh-bottom');

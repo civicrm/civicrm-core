@@ -52,7 +52,8 @@ class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHi
   /**
    * Create a new subscription history record
    *
-   * @param array $params     Values for the new history record
+   * @param array $params
+   *   Values for the new history record.
    *
    * @return object $history  The new history object
    * @static
@@ -68,7 +69,8 @@ class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHi
   /**
    * Erase a contact's subscription history records
    *
-   * @param int $id       The contact id
+   * @param int $id
+   *   The contact id.
    *
    * @return void
    * @static

@@ -64,8 +64,8 @@ class CRM_Core_Action {
     RENEW = 32768,
     DETACH = 65536,
     REVERT = 131072,
-    CLOSE        =  262144,
-    REOPEN       =  524288,
+    CLOSE        = 262144,
+    REOPEN       = 524288,
     MAX_ACTION   = 1048575;
 
   //make sure MAX_ACTION = 2^n - 1 ( n = total number of actions )
@@ -111,7 +111,8 @@ class CRM_Core_Action {
   /**
    * Called by the request object to translate a string into a mask
    *
-   * @param string $str the action to be resolved
+   * @param string $str
+   *   The action to be resolved.
    *
    * @return int the action mask corresponding to the input string
    * @static
@@ -129,7 +130,8 @@ class CRM_Core_Action {
    * Given a string or an array of strings, determine the bitmask
    * for this set of actions
    *
-   * @param mixed $item either a single string or an array of strings
+   * @param mixed $item
+   *   Either a single string or an array of strings.
    *
    * @return int the action mask corresponding to the input args
    * @static
@@ -152,7 +154,8 @@ class CRM_Core_Action {
   /**
    * Given a string determine the bitmask for this specific string
    *
-   * @param string $item the input action to process
+   * @param string $item
+   *   The input action to process.
    *
    * @return int the action mask corresponding to the input string
    * @static
@@ -167,7 +170,8 @@ class CRM_Core_Action {
    *
    * Given an action mask, find the corresponding description
    *
-   * @param int $mask the action mask
+   * @param int $mask
+   *   The action mask.
    *
    * @return string the corresponding action description
    * @static
@@ -185,11 +189,16 @@ class CRM_Core_Action {
    * Given a set of links and a mask, return the html action string for
    * the links associated with the mask
    *
-   * @param array $links the set of link items
-   * @param int $mask the mask to be used. a null mask means all items
-   * @param array $values the array of values for parameter substitution in the link items
-   * @param string $extraULName enclosed extra links in this UL.
-   * @param boolean $enclosedAllInSingleUL force to enclosed all links in single UL.
+   * @param array $links
+   *   The set of link items.
+   * @param int $mask
+   *   The mask to be used. a null mask means all items.
+   * @param array $values
+   *   The array of values for parameter substitution in the link items.
+   * @param string $extraULName
+   *   Enclosed extra links in this UL.
+   * @param bool $enclosedAllInSingleUL
+   *   Force to enclosed all links in single UL.
    *
    * @param null $op
    * @param null $objectName
@@ -198,7 +207,8 @@ class CRM_Core_Action {
    * @return string       the html string
    * @static
    */
-  static function formLink($links,
+  static function formLink(
+    $links,
     $mask,
     $values,
     $extraULName = 'more',
@@ -268,7 +278,6 @@ class CRM_Core_Action {
       }
     }
 
-
     $mainLinks = $url;
     if ($enclosedAllInSingleUL) {
       $allLinks = '';
@@ -301,8 +310,10 @@ class CRM_Core_Action {
    * Given a string and an array of values, substitute the real values
    * in the placeholder in the str in the CiviCRM format
    *
-   * @param string $str    the string to be replaced
-   * @param array  $values the array of values for parameter substitution in the str
+   * @param string $str
+   *   The string to be replaced.
+   * @param array $values
+   *   The array of values for parameter substitution in the str.
    *
    * @return string        the substituted string
    * @static

@@ -76,7 +76,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
       $isDefault
     );
 
-    $this->webtestAddContact($firstName, "Anderson", true);
+    $this->webtestAddContact($firstName, "Anderson", TRUE);
 
     // Get the contact id of the new contact
     $contactUrl = $this->parseURL();
@@ -127,7 +127,6 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->type("net_amount", "0");
     $this->type("invoice_id", time());
     $this->webtestFillDate('thankyou_date');
-
 
     //Premium section
     $this->click("Premium");

@@ -38,7 +38,8 @@ class CRM_Utils_JS {
   /**
    * Parse a javascript file for translatable strings
    *
-   * @param string $jsCode raw Javascript code
+   * @param string $jsCode
+   *   Raw Javascript code.
    * @return array of translatable strings
    */
   public static function parseStrings($jsCode) {

@@ -51,7 +51,8 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * Set variables up before form is built
    *
    */
-  public function preProcess(&$form) {}
+  public function preProcess(&$form) {
+  }
 
   /**
    * This is function is called by the form object to get the DataSource's
@@ -102,18 +103,24 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   /**
    * Create a table that matches the CSV file and populate it with the file's contents
    *
-   * @param object $db     handle to the database connection
-   * @param string $file   file name to load
-   * @param bool   $headers  whether the first row contains headers
-   * @param string $table  Name of table from which data imported.
-   * @param string $fieldSeparator Character that seperates the various columns in the file
+   * @param object $db
+   *   Handle to the database connection.
+   * @param string $file
+   *   File name to load.
+   * @param bool $headers
+   *   Whether the first row contains headers.
+   * @param string $table
+   *   Name of table from which data imported.
+   * @param string $fieldSeparator
+   *   Character that seperates the various columns in the file.
    *
    * @return string  name of the created table
    */
-  private static function _CsvToTable(&$db,
+  private static function _CsvToTable(
+    &$db,
     $file,
-    $headers        = FALSE,
-    $table          = NULL,
+    $headers = FALSE,
+    $table = NULL,
     $fieldSeparator = ','
   ) {
     $result = array();
@@ -148,7 +155,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
         $duplicateColName = TRUE;
       }
 
-
       // need to truncate values per mysql field name length limits
       // mysql allows 64, but we need to account for appending colKey
       // CRM-9079
@@ -170,11 +176,15 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       }
 
       // CRM-4881: we need to quote column names, as they may be MySQL reserved words
-      foreach ($columns as & $column) $column = "`$column`";
+      foreach ($columns as & $column) {
+        $column = "`$column`";
+      }
     }
     else {
       $columns = array();
-      foreach ($firstrow as $i => $_) $columns[] = "col_$i";
+      foreach ($firstrow as $i => $_) {
+        $columns[] = "col_$i";
+      }
     }
 
     // FIXME: we should regen this table's name if it exists rather than drop it

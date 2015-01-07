@@ -43,7 +43,7 @@ class WebTest_Mailing_SpoolTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // Start spooling mail
-    $mut = new CiviMailUtils($this, true);
+    $mut = new CiviMailUtils($this, TRUE);
 
     // Add a contact
     $fname = substr(sha1(rand()), 0, 6);

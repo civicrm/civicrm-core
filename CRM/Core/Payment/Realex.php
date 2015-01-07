@@ -57,7 +57,8 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   /**
    * Constructor
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param $paymentProcessor
    *
@@ -80,14 +81,15 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   /**
    * Singleton function used to manage this object
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param object $paymentProcessor
    *
    * @return object
    * @static
    */
-  public static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = false) {
+  public static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     if (!empty($paymentProcessor['id'])) {
       $cacheKey = $paymentProcessor['id'];
     }
@@ -140,7 +142,8 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   /**
    * Submit a payment using Advanced Integration Method
    *
-   * @param  array $params assoc array of input parameters for this transaction
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
    *
    * @return array the result in a nice formatted array (or an error object)
    */
@@ -168,7 +171,6 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     $sha1hash = sha1($hashme);
     $hashme   = "$sha1hash.{$this->_getParam('secret')}";
     $sha1hash = sha1($hashme);
-
 
     // Generate the request xml that is send to Realex Payments.
     $request_xml = "<request type='auth' timestamp='{$this->_getParam('timestamp')}'>
@@ -358,7 +360,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *  Format the params from the form ready for sending to Realex.  Also perform some validation
    */
   public function setRealexFields(&$params) {
-    if ((int)$params['amount'] <= 0) {
+    if ((int) $params['amount'] <= 0) {
       return self::error(9001, ts('Amount must be positive'));
     }
 
@@ -429,17 +431,17 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     $this->_setParam('currency', $config->defaultCurrency);
 
     // Format the expiry date to MMYY
-    $expmonth = (string)$params['month'];
+    $expmonth = (string) $params['month'];
     $expmonth = (strlen($expmonth) === 1) ? '0' . $expmonth : $expmonth;
-    $expyear  = substr((string)$params['year'], 2, 2);
+    $expyear  = substr((string) $params['year'], 2, 2);
     $this->_setParam('exp_date', $expmonth . $expyear);
 
     if (isset($params['credit_card_start_date']) && (strlen($params['credit_card_start_date']['M']) !== 0) &&
       (strlen($params['credit_card_start_date']['Y']) !== 0)
     ) {
-      $startmonth = (string)$params['credit_card_start_date']['M'];
+      $startmonth = (string) $params['credit_card_start_date']['M'];
       $startmonth = (strlen($startmonth) === 1) ? '0' . $startmonth : $startmonth;
-      $startyear  = substr((string)$params['credit_card_start_date']['Y'], 2, 2);
+      $startyear  = substr((string) $params['credit_card_start_date']['Y'], 2, 2);
       $this->_setParam('start_date', $startmonth . $startyear);
     }
 
@@ -453,7 +455,8 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   /**
    * Checks to see if invoice_id already exists in db
    *
-   * @param  int     $invoiceId   The ID to check
+   * @param int $invoiceId
+   *   The ID to check.
    *
    * @return bool                  True if ID exists, else false
    */
@@ -466,7 +469,8 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   /**
    * Get the value of a field if set
    *
-   * @param string $field the field
+   * @param string $field
+   *   The field.
    *
    * @return mixed value of the field, or empty string if the field is
    * not set

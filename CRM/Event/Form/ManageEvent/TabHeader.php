@@ -52,7 +52,8 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     $form->assign_by_ref('tabHeader', $tabs);
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
-      ->addSetting(array('tabSettings' => array(
+      ->addSetting(array(
+    'tabSettings' => array(
         'active' => self::getCurrentTab($tabs),
       )));
     CRM_Event_Form_ManageEvent::addProfileEditScripts();
@@ -90,7 +91,6 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     $tabs['friend'] = array('title' => ts('Tell a Friend')) + $default;
     $tabs['pcp'] = array('title' => ts('Personal Campaigns')) + $default;
     $tabs['repeat'] = array('title' => ts('Repeat')) + $default;
-
 
     // check if we're in shopping cart mode for events
     $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,

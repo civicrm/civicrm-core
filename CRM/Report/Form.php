@@ -960,10 +960,10 @@ class CRM_Report_Form extends CRM_Core_Form {
                 $fieldName == 'county_id'
               ) {
                 $this->addChainSelect($fieldName . '_value', array(
-                    'multiple' => TRUE,
-                    'label' => NULL,
-                    'class' => 'huge'
-                  ));
+                  'multiple' => TRUE,
+                  'label' => NULL,
+                  'class' => 'huge'
+                ));
               }
               else {
                 $this->addElement('select', "{$fieldName}_value", NULL, $field['options'], array(
@@ -1119,9 +1119,9 @@ class CRM_Report_Form extends CRM_Core_Form {
       for ($i = 1; $i <= 5; $i++) {
         $this->addElement('select', "order_bys[{$i}][column]", ts('Order by Column'), $options);
         $this->addElement('select', "order_bys[{$i}][order]", ts('Order by Order'), array(
-            'ASC' => 'Ascending',
-            'DESC' => 'Descending'
-          ));
+          'ASC' => 'Ascending',
+          'DESC' => 'Descending'
+        ));
         $this->addElement('checkbox', "order_bys[{$i}][section]", ts('Order by Section'), FALSE, array('id' => "order_by_section_$i"));
         $this->addElement('checkbox', "order_bys[{$i}][pageBreak]", ts('Page Break'), FALSE, array('id' => "order_by_pagebreak_$i"));
       }
@@ -1409,8 +1409,9 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * @return null|string
    */
-  function whereClause(&$field, $op,
-                       $value, $min, $max
+  function whereClause(
+    &$field, $op,
+    $value, $min, $max
   ) {
 
     $type = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $field));
@@ -1594,8 +1595,9 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * @return null|string
    */
-  function dateClause($fieldName,
-                      $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = NULL
+  function dateClause(
+    $fieldName,
+    $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = NULL
   ) {
     $clauses = array();
     if (in_array($relative, array_keys($this->getOperationPair(CRM_Report_Form::OP_DATE)))) {
@@ -1626,8 +1628,8 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @todo - could not find any instances where this is called
    *
    * @param unknown_type $relative
-   * @param String $from
-   * @param String_type $to
+   * @param string $from
+   * @param string_type $to
    *
    * @return string|NULL
    */
@@ -3306,11 +3308,11 @@ ORDER BY cg.weight, cf.weight";
             if ($this->_customGroupFilters) {
               $curFilters[$fieldName]['options'] = array();
               $ogDAO = CRM_Core_DAO::executeQuery("SELECT ov.value, ov.label FROM civicrm_option_value ov WHERE ov.option_group_id = %1 ORDER BY ov.weight", array(
-                  1 => array(
-                    $customDAO->option_group_id,
-                    'Integer'
-                  )
-                ));
+                1 => array(
+                  $customDAO->option_group_id,
+                  'Integer'
+                )
+              ));
               while ($ogDAO->fetch()) {
                 $curFilters[$fieldName]['options'][$ogDAO->value] = $ogDAO->label;
               }
@@ -3533,7 +3535,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   /**
    * Does table name have columns in SELECT clause?
    *
-   * @param string $tableName Name of table (index of $this->_columns array)
+   * @param string $tableName
+   *   Name of table (index of $this->_columns array).
    *
    * @return bool
    */
@@ -3601,8 +3604,10 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *
    * adding address fields to construct function in reports
    *
-   * @param bool $groupBy Add GroupBy? Not appropriate for detail report
-   * @param bool $orderBy Add GroupBy? Not appropriate for detail report
+   * @param bool $groupBy
+   *   Add GroupBy? Not appropriate for detail report.
+   * @param bool $orderBy
+   *   Add GroupBy? Not appropriate for detail report.
    * @param bool $filters
    * @param array $defaults
    *

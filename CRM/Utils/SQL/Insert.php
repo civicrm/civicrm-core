@@ -42,7 +42,8 @@ class CRM_Utils_SQL_Insert {
   /**
    * Create a new INSERT query
    *
-   * @param string $table table-name and optional alias
+   * @param string $table
+   *   Table-name and optional alias.
    * @return CRM_Utils_SQL_Insert
    */
   public static function into($table) {
@@ -52,7 +53,8 @@ class CRM_Utils_SQL_Insert {
   /**
    * Create a new SELECT query
    *
-   * @param string $from table-name and optional alias
+   * @param string $from
+   *   Table-name and optional alias.
    */
   public function __construct($table) {
     $this->table = $table;
