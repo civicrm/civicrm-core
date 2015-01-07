@@ -233,14 +233,18 @@ class CRM_Core_Region {
    * @return int
    */
   public static function _cmpSnippet($a, $b) {
-    if ($a['weight'] < $b['weight']) { return -1;
+    if ($a['weight'] < $b['weight']) {
+      return -1;
     }
-    if ($a['weight'] > $b['weight']) { return 1;
+    if ($a['weight'] > $b['weight']) {
+      return 1;
     }
     // fallback to name sort; don't really want to do this, but it makes results more stable
-    if ($a['name'] < $b['name']) { return -1;
+    if ($a['name'] < $b['name']) {
+      return -1;
     }
-    if ($a['name'] > $b['name']) { return 1;
+    if ($a['name'] > $b['name']) {
+      return 1;
     }
     return 0;
   }

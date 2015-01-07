@@ -498,7 +498,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       if ($count > 1) {
         foreach (array(
           'state', 'state_name', 'country', 'world_region') as $fld) {
-          if (isset($address->$fld)) { unset($address->$fld);
+          if (isset($address->$fld)) {
+            unset($address->$fld);
           }
         }
       }

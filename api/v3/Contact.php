@@ -254,7 +254,8 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
     if (is_array($params['filter.group_id'])) {
       $groups = $params['filter.group_id'];
     }
-    else { $groups = explode(',', $params['filter.group_id']);
+    else {
+      $groups = explode(',', $params['filter.group_id']);
     }
     unset($params['filter.group_id']);
     $groups = array_flip($groups);

@@ -589,7 +589,8 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
       foreach (array(
         'current_campaign', 'past_campaign') as $ignore) {
         $index = array_search($ignore, $campaign);
-        if ($index !== FALSE) { unset($campaign[$index]);
+        if ($index !== FALSE) {
+          unset($campaign[$index]);
         }
       }
     }

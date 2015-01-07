@@ -541,7 +541,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         }
       }
       else {
-        if (!JUserHelper::verifyPassword($password, $dbPassword, $dbId)) { return FALSE;
+        if (!JUserHelper::verifyPassword($password, $dbPassword, $dbId)) {
+          return FALSE;
         }
 
         //include additional files required by Joomla 3.2.1+

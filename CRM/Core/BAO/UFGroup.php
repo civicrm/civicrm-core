@@ -242,7 +242,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         if ($considerSelector) {
           // drop the fields not meant for the selector
           foreach ($subset as $name => $field) {
-            if (!$field['in_selector']) { unset($subset[$name]);
+            if (!$field['in_selector']) {
+              unset($subset[$name]);
             }
           }
         }

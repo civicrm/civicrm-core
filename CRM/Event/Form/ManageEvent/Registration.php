@@ -793,7 +793,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
           continue 2;
         }
       }
-      if ($complete) { return 1;
+      if ($complete) {
+        return 1;
       }
     }
 

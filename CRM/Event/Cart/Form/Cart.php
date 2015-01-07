@@ -136,7 +136,8 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     if (is_array($ids)) {
       return array_pop($ids);
     }
-    else { return NULL;
+    else {
+      return NULL;
     }
   }
 
