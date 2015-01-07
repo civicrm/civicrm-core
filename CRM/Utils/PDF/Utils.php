@@ -131,18 +131,18 @@ class CRM_Utils_PDF_Utils {
     require_once 'tcpdf/tcpdf.php';
     require_once 'FPDI/fpdi.php'; // This library is only in the 'packages' area as of version 4.5
 
-    $paper_size_arr  = array( $paper_size[2], $paper_size[3]);
+    $paper_size_arr  = array($paper_size[2], $paper_size[3]);
 
     $pdf = new TCPDF($orientation, 'pt', $paper_size_arr);
     $pdf->Open();
 
-    if (is_readable($stationery_path)){
-      $pdf->SetStationery( $stationery_path );
+    if (is_readable($stationery_path)) {
+      $pdf->SetStationery($stationery_path);
     }
 
     $pdf->SetAuthor('');
     $pdf->SetKeywords('CiviCRM.org');
-    $pdf->setPageUnit( $margins[0] );
+    $pdf->setPageUnit($margins[0]);
     $pdf->SetMargins($margins[4], $margins[1], $margins[2], TRUE);
 
     $pdf->setJPEGQuality('100');
@@ -164,7 +164,7 @@ class CRM_Utils_PDF_Utils {
 
     // close and output the PDF
     $pdf->Close();
-    $pdf_file = 'CiviLetter'.'.pdf';
+    $pdf_file = 'CiviLetter' . '.pdf';
     $pdf->Output($pdf_file, 'D');
     CRM_Utils_System::civiExit(1);
   }

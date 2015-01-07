@@ -154,7 +154,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
           $c->buildAdvancedSearchPaneForm($this);
           $this->_paneTemplatePath[$type] = $c->getAdvancedSearchPaneTemplatePath();
         }
-        else if (in_array($type, $hookPanes)) {
+        elseif (in_array($type, $hookPanes)) {
           CRM_Contact_BAO_Query_Hook::singleton()->buildAdvancedSearchPaneForm($this, $type);
           CRM_Contact_BAO_Query_Hook::singleton()->setAdvancedSearchPaneTemplatePath($this->_paneTemplatePath, $type);
         }
@@ -361,7 +361,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     $financialType = CRM_Utils_Array::value('financial_type_id', $this->_formValues);
     if ($financialType && is_array($financialType)) {
       unset($this->_formValues['financial_type_id']);
-      foreach($financialType as $notImportant => $typeID) {
+      foreach ($financialType as $notImportant => $typeID) {
         $this->_formValues['financial_type_id'][$typeID] = 1;
       }
     }

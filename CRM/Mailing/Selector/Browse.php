@@ -535,7 +535,8 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
     if (isset($isArchived)) {
       if ($isArchived) {
         $clauses[] = "civicrm_mailing.is_archived = 1";
-      } else {
+      }
+      else {
         $clauses[] = "(civicrm_mailing.is_archived IS NULL OR civicrm_mailing.is_archived = 0)";
       }
     }

@@ -63,7 +63,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
     // Save the file in the public directory
     $fileName = self::putFile($export);
 
-    foreach ( self::$complementaryTables as $rct ) {
+    foreach (self::$complementaryTables as $rct) {
       $func = "export{$rct}";
       $this->$func();
     }
@@ -122,7 +122,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
       WHERE eb.batch_id = ( %1 )";
 
     $params = array(1 => array($batchId, 'String'));
-    $dao = CRM_Core_DAO::executeQuery( $sql, $params );
+    $dao = CRM_Core_DAO::executeQuery($sql, $params);
 
     return $dao;
   }
@@ -134,8 +134,8 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
    */
   public function putFile($export) {
     $config = CRM_Core_Config::singleton();
-    $fileName = $config->uploadDir.'Financial_Transactions_'.$this->_batchIds.'_'.date('YmdHis').'.'.$this->getFileExtension();
-    $this->_downloadFile[] = $config->customFileUploadDir.CRM_Utils_File::cleanFileName(basename($fileName));
+    $fileName = $config->uploadDir . 'Financial_Transactions_' . $this->_batchIds . '_' . date('YmdHis') . '.' . $this->getFileExtension();
+    $this->_downloadFile[] = $config->customFileUploadDir . CRM_Utils_File::cleanFileName(basename($fileName));
     $out = fopen($fileName, 'w');
     fputcsv($out, $export['headers']);
     unset($export['headers']);

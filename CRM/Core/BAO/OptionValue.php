@@ -51,7 +51,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @return object
    */
   public static function create($params) {
-    if (empty($params['id'])){
+    if (empty($params['id'])) {
       self::setDefaults($params);
     }
     $ids = array();
@@ -73,17 +73,17 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @param array $params
    */
-  public static function setDefaults(&$params){
-    if(CRM_Utils_Array::value('label', $params, NULL) === NULL){
+  public static function setDefaults(&$params) {
+    if (CRM_Utils_Array::value('label', $params, NULL) === NULL) {
       $params['label'] = $params['name'];
     }
-    if(CRM_Utils_Array::value('name', $params, NULL) === NULL){
+    if (CRM_Utils_Array::value('name', $params, NULL) === NULL) {
       $params['name'] = $params['label'];
     }
-    if(CRM_Utils_Array::value('weight', $params, NULL) === NULL){
+    if (CRM_Utils_Array::value('weight', $params, NULL) === NULL) {
       $params['weight'] = self::getDefaultWeight($params);
     }
-    if (CRM_Utils_Array::value('value', $params, NULL) === NULL){
+    if (CRM_Utils_Array::value('value', $params, NULL) === NULL) {
       $params['value'] = self::getDefaultValue($params);
     }
   }
@@ -98,7 +98,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @return int
    */
-  public static function getDefaultWeight($params){
+  public static function getDefaultWeight($params) {
     return (int) CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
           array('option_group_id' => $params['option_group_id']));
   }
@@ -110,10 +110,10 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * more complex decision making
    * @param array $params
    */
-  public static function getDefaultValue($params){
+  public static function getDefaultValue($params) {
      $bao = new CRM_Core_BAO_OptionValue();
      $bao->option_group_id = $params['option_group_id'];
-     if(isset($params['domain_id'])){
+     if (isset($params['domain_id'])) {
        $bao->domain_id = $params['domain_id'];
      }
      $bao->selectAdd();

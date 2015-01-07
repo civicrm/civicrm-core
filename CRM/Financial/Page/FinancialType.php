@@ -140,7 +140,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
 
     while ($dao->fetch()) {
       $financialType[$dao->id] = array();
-      CRM_Core_DAO::storeValues( $dao, $financialType[$dao->id]);
+      CRM_Core_DAO::storeValues($dao, $financialType[$dao->id]);
       $defaults = $financialAccountId = array();
       $financialAccounts = CRM_Contribute_PseudoConstant::financialAccount();
       $financialAccountIds = array();
@@ -149,15 +149,15 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
       $params['entity_table'] = 'civicrm_financial_type';
       CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, CRM_Core_DAO::$_nullArray, $financialAccountIds);
 
-      foreach( $financialAccountIds as $key => $values){
+      foreach ($financialAccountIds as $key => $values) {
         if (!empty($financialAccounts[$values['financial_account_id']])) {
           $financialAccountId[$values['financial_account_id']] = CRM_Utils_Array::value(
-            $values['financial_account_id'], $financialAccounts );
+            $values['financial_account_id'], $financialAccounts);
         }
       }
 
       if (!empty($financialAccountId)) {
-        $financialType[$dao->id]['financial_account'] = implode( ',', $financialAccountId );
+        $financialType[$dao->id]['financial_account'] = implode(',', $financialAccountId);
       }
 
       // form all action links

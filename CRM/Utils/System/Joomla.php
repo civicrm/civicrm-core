@@ -404,7 +404,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     elseif ($forceBackend) {
       if (defined('JVERSION')) {
         $joomlaVersion = JVERSION;
-      } else {
+      }
+      else {
         $jversion = new JVersion;
         $joomlaVersion = $jversion->getShortVersion();
       }
@@ -511,7 +512,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
 
     $joomlaBase = dirname(dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))));
-    if ( !defined('JVERSION') ) {
+    if (!defined('JVERSION')) {
       require $joomlaBase . '/libraries/cms/version/version.php';
       $jversion = new JVersion;
       define('JVERSION', $jversion->getShortVersion());
@@ -522,8 +523,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $dbId = $row->id;
       $dbEmail = $row->email;
 
-      if ( version_compare(JVERSION, '2.5.18', 'lt') ||
-        ( version_compare(JVERSION, '3.0', 'ge') && version_compare(JVERSION, '3.2.1', 'lt') )
+      if (version_compare(JVERSION, '2.5.18', 'lt') ||
+        (version_compare(JVERSION, '3.0', 'ge') && version_compare(JVERSION, '3.2.1', 'lt'))
       ) {
         // now check password
         if (strpos($dbPassword, ':') === FALSE) {
@@ -540,11 +541,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         }
       }
       else {
-        if (!JUserHelper::verifyPassword($password, $dbPassword, $dbId)) { return FALSE;
+        if (!JUserHelper::verifyPassword($password, $dbPassword, $dbId)) {
+          return FALSE;
         }
 
         //include additional files required by Joomla 3.2.1+
-        if ( version_compare(JVERSION, '3.2.1', 'ge') ) {
+        if (version_compare(JVERSION, '3.2.1', 'ge')) {
           require_once $joomlaBase . '/libraries/cms/application/helper.php';
           require_once $joomlaBase . '/libraries/cms/application/cms.php';
           require_once $joomlaBase . '/libraries/cms/application/administrator.php';
@@ -571,7 +573,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function setUserSession($data) {
     list($userID, $ufID) = $data;
-    $user = new JUser( $ufID );
+    $user = new JUser($ufID);
     $session = JFactory::getSession();
     $session->set('user', $user);
 
@@ -653,7 +655,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     // load BootStrap here if needed
     // We are a valid Joomla entry point.
-    if ( ! defined( '_JEXEC' ) && $loadDefines ) {
+    if (! defined('_JEXEC') && $loadDefines) {
       define('_JEXEC', 1);
       define('DS', DIRECTORY_SEPARATOR);
       define('JPATH_BASE', $joomlaBase . '/administrator');
@@ -669,13 +671,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     require $joomlaBase . '/configuration.php';
 
     // Files may be in different places depending on Joomla version
-    if ( !defined('JVERSION') ) {
+    if (!defined('JVERSION')) {
       require $joomlaBase . '/libraries/cms/version/version.php';
       $jversion = new JVersion;
       define('JVERSION', $jversion->getShortVersion());
     }
 
-    if( version_compare(JVERSION, '3.0', 'lt') ) {
+    if (version_compare(JVERSION, '3.0', 'lt')) {
       require $joomlaBase . '/libraries/joomla/environment/uri.php';
       require $joomlaBase . '/libraries/joomla/application/component/helper.php';
     }
@@ -782,8 +784,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $loginURL .= 'index.php?option=com_users&view=login';
 
     //CRM-14872 append destination
-    if ( !empty($destination) ) {
-      $loginURL .= '&return='.urlencode(base64_encode($destination));
+    if (!empty($destination)) {
+      $loginURL .= '&return=' . urlencode(base64_encode($destination));
     }
     return $loginURL;
   }
@@ -816,7 +818,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $destination = NULL;
     if ($args) {
       // append destination so user is returned to form they came from after login
-      $args = 'reset=1'.$args;
+      $args = 'reset=1' . $args;
       $destination = CRM_Utils_System::url(CRM_Utils_System::currentPath(), $args, TRUE, NULL, TRUE, TRUE);
     }
 
@@ -833,7 +835,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * - $siteName,
    * - $siteRoot
    */
-  public function getDefaultSiteSettings($dir){
+  public function getDefaultSiteSettings($dir) {
     $config = CRM_Core_Config::singleton();
     $url = preg_replace(
       '|/administrator|',
@@ -886,7 +888,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $error = new Exception($content);
       JErrorPage::render($error);
     }
-    else if (class_exists('JError')) {
+    elseif (class_exists('JError')) {
       JError::raiseError('CiviCRM-001', $content);
     }
     else {

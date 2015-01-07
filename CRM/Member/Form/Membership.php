@@ -374,7 +374,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->assign('currency', $config->defaultCurrencySymbol);
     $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-    if (isset($invoicing)){
+    if (isset($invoicing)) {
       $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
     }
     // build price set form.
@@ -884,10 +884,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
             ));
             $tmp_statuses = $result['values'];
             $status_ids = array();
-            foreach($tmp_statuses as $cur_stat) {
+            foreach ($tmp_statuses as $cur_stat) {
               $status_ids[] = $cur_stat['id'];
             }
-            if (empty($params['status_id']) || in_array( $params['status_id'], $status_ids) == FALSE) {
+            if (empty($params['status_id']) || in_array($params['status_id'], $status_ids) == FALSE) {
               $errors['status_id'] = ts('Please enter a status that does NOT represent a current membership status.');
               $errors['is_override']  = ts('This must be checked because you set an End Date for a lifetime membership');
             }
@@ -1599,7 +1599,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
             if (isset($dataArray[$value['tax_rate']])) {
               $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
-            } else {
+            }
+            else {
               $dataArray[$value['tax_rate']] = CRM_Utils_Array::value('tax_amount', $value);
             }
           }
@@ -1835,7 +1836,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $form->_receiptContactId = $formValues['contact_id'];
       }
     }
-    $template = CRM_Core_Smarty::singleton( );
+    $template = CRM_Core_Smarty::singleton();
     $taxAmt = $template->get_template_vars('dataArray');
     $eventTaxAmt = $template->get_template_vars('totalTaxAmount');
     $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
@@ -1855,7 +1856,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         'from' => $receiptFrom,
         'toName' => $form->_contributorDisplayName,
         'toEmail' => $form->_contributorEmail,
-        'PDFFilename' => ts('receipt').'.pdf',
+        'PDFFilename' => ts('receipt') . '.pdf',
         'isEmailPdf' => $isEmailPdf,
         'contributionId' => $formValues['contribution_id'],
         'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW)

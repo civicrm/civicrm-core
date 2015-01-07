@@ -236,7 +236,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       // get params by ID
       $this->schedule = $this->getScheduleParams($this->scheduleId);
     }
-    else if (!empty($this->scheduleFormValues)) {
+    elseif (!empty($this->scheduleFormValues)) {
       $this->schedule = $this->mapFormValuesToDB($this->scheduleFormValues);
     }
 
@@ -435,7 +435,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     if ($mode == '1') { // MODE = SINGLE
       $query .= " AND entity_id = %3";
     }
-    else if ($mode == '2') { // MODE = FUTURE
+    elseif ($mode == '2') { // MODE = FUTURE
       $recurringEntityID = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_recurring_entity WHERE entity_id = %3 AND entity_table = %2", $queryParams);
       if ($recurringEntityID) {
         $query .= $includeParent ? " AND id >= %4" : " AND id > %4";
@@ -597,7 +597,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     // to make sure we not copying to source itself
     unset($repeatingEntities[$key]);
 
-    foreach($repeatingEntities as $key => $val) {
+    foreach ($repeatingEntities as $key => $val) {
       $entityID = $val['id'];
       $entityTable = $val['table'];
 
@@ -693,7 +693,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
             // for each parent entity in the set, find out a similar linked entity,
             // if doesn't exist create one, and also create entries in recurring_entity table
 
-            foreach($pRepeatingEntities as $key => $val) {
+            foreach ($pRepeatingEntities as $key => $val) {
               if (array_key_exists($key, $processedEntities)) {
                 // this graph is already being processed
                 return NULL;
@@ -704,7 +704,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
             // start with first entry with just itself
             CRM_Core_BAO_RecurringEntity::quickAdd($obj->id, $obj->id, $obj->__table);
 
-            foreach($pRepeatingEntities as $key => $val) {
+            foreach ($pRepeatingEntities as $key => $val) {
               $rlinkedDAO = new self::$_tableDAOMapper[$obj->__table]();
               $rlinkedDAO->$idCol = $val['id'];
               $rlinkedDAO->$tableCol = $val['table'];
@@ -987,7 +987,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
           $startActionCondition = $scheduleReminderDetails['start_action_condition'];
           $explodeStartActionCondition = explode(',', $startActionCondition);
           $buildRuleArray = array();
-          foreach($explodeStartActionCondition as $key => $val) {
+          foreach ($explodeStartActionCondition as $key => $val) {
             $buildRuleArray[] = strtoupper(substr($val, 0, 2));
           }
           $r->wkst('MO')->byday($buildRuleArray);
@@ -1018,7 +1018,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
           $concatStartActionDateBits = $startActionDate1.strtoupper(substr($startActionDate[1], 0, 2));
           $r->byday(array($concatStartActionDateBits));
         }
-        else if ($scheduleReminderDetails['limit_to']) {
+        elseif ($scheduleReminderDetails['limit_to']) {
           $r->bymonthday(array($scheduleReminderDetails['limit_to']));
         }
       }

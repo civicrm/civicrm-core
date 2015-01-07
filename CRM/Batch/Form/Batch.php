@@ -114,7 +114,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
     else {
       $session = CRM_Core_Session::singleton();
       $params['created_id'] = $session->get('userID');
-      $params['created_date'] = CRM_Utils_Date::processDate( date( "Y-m-d" ), date( "H:i:s" ) );
+      $params['created_date'] = CRM_Utils_Date::processDate(date("Y-m-d"), date("H:i:s"));
     }
 
     // always create with data entry status
@@ -123,7 +123,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
 
     // redirect to batch entry page.
     $session = CRM_Core_Session::singleton();
-    if ( $this->_action & CRM_Core_Action::ADD ) {
+    if ($this->_action & CRM_Core_Action::ADD) {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/batch/entry', "id={$batch->id}&reset=1&action=add"));
     }
     else {

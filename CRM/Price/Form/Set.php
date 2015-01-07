@@ -272,8 +272,10 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     $compIds = array();
     $extends = CRM_Utils_Array::value('extends', $params);
     if (is_array($extends)) {
-      foreach ($extends as $compId => $selected) { if ($selected) {   $compIds[] = $compId;
-      }
+      foreach ($extends as $compId => $selected) {
+        if ($selected) {
+          $compIds[] = $compId;
+        }
       }
     }
     $params['extends'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $compIds);

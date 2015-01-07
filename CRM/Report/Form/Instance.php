@@ -214,8 +214,8 @@ class CRM_Report_Form_Instance {
     $instanceID = $form->getVar('_id');
     $navigationDefaults = array();
 
-    if (!isset($defaults['permission'])){
-      $permissions = array_flip(CRM_Core_Permission::basicPermissions( ));
+    if (!isset($defaults['permission'])) {
+      $permissions = array_flip(CRM_Core_Permission::basicPermissions());
       $defaults['permission'] = $permissions['CiviReport: access CiviReport'];
     }
 
@@ -262,7 +262,7 @@ class CRM_Report_Form_Instance {
         $defaults['grouprole'] = $grouproles;
       }
     }
-    else if (property_exists($form, '_description')) {
+    elseif (property_exists($form, '_description')) {
       $defaults['description'] = $form->_description;
     }
   }
@@ -285,7 +285,7 @@ class CRM_Report_Form_Instance {
     if (!empty($params['is_navigation'])) {
       $params['navigation'] = $form->_navigation;
     }
-    elseif ($instanceID){
+    elseif ($instanceID) {
       //delete navigation if exists
       $navId = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $instanceID, 'navigation_id', 'id');
       if ($navId) {
@@ -314,14 +314,16 @@ class CRM_Report_Form_Instance {
     if ($instanceID && !$isNew) {
       // updating existing instance
       $statusMsg = ts('"%1" report has been updated.', array(1 => $instance->title));
-    } elseif ($form->getVar('_id') && $isNew) {
+    }
+    elseif ($form->getVar('_id') && $isNew) {
       $statusMsg = ts('Your report has been successfully copied as "%1". You are currently viewing the new copy.', array(1 => $instance->title));
-    } else {
+    }
+    else {
       $statusMsg = ts('"%1" report has been successfully created. You are currently viewing the new report instance.', array(1 => $instance->title));
     }
     CRM_Core_Session::setStatus($statusMsg);
 
-    if ( $redirect ) {
+    if ($redirect) {
       CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/report/instance/{$instance->id}", "reset=1"));
     }
   }

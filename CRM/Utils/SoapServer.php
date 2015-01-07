@@ -129,12 +129,12 @@ class CRM_Utils_SoapServer {
   public function authenticate($name, $pass, $loadCMSBootstrap = FALSE) {
     require_once str_replace('_', DIRECTORY_SEPARATOR, $this->ufClass) . '.php';
 
-    if ($this->ufClass == 'CRM_Utils_System_Joomla'){
+    if ($this->ufClass == 'CRM_Utils_System_Joomla') {
       $loadCMSBootstrap = TRUE;
     }
 
     $className = $this->ufClass;
-    $result =& $className::authenticate($name, $pass, $loadCMSBootstrap );
+    $result =& $className::authenticate($name, $pass, $loadCMSBootstrap);
 
     if (empty($result)) {
       throw new SoapFault('Client', 'Invalid login');

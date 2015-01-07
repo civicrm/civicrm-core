@@ -97,7 +97,7 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
     // a potentially spurious message which might already have been set. This
     // is a bit hackish
     // CRM-10629
-    $session = CRM_Core_Session::singleton( );
+    $session = CRM_Core_Session::singleton();
     $session->getStatus(TRUE);
 
     parent::postProcess();

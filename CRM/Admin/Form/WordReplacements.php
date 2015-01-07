@@ -122,8 +122,8 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
 
     //CRM-14179
     $instances = 0;
-    foreach ( $values as $valMatchType ) {
-      foreach ( $valMatchType as $valPairs ) {
+    foreach ($values as $valMatchType) {
+      foreach ($valMatchType as $valPairs) {
         $instances += count($valPairs);
       }
     }

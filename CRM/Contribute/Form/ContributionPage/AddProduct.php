@@ -84,7 +84,8 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
       $defaults['product_id'] = $dao->product_id;
       $defaults['financial_type_id']   = $dao->financial_type_id;
       $defaults['weight'] = $dao->weight;
-    } else {
+    }
+    else {
       $dao = new CRM_Contribute_DAO_Product();
       $dao->id = key($this->_products);
       $dao->find(TRUE);
@@ -167,7 +168,7 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
 
     $this->addElement('text', 'weight', ts('Order'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_PremiumsProduct', 'weight'));
 
-    $financialType = CRM_Contribute_PseudoConstant::financialType( );
+    $financialType = CRM_Contribute_PseudoConstant::financialType();
     $premiumFinancialType = array();
     CRM_Core_PseudoConstant::populate(
       $premiumFinancialType,
@@ -188,18 +189,18 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
       'account_relationship = 7'
     );
     $productFinancialType = array_intersect($costFinancialType, $premiumFinancialType);
-    foreach( $financialType as $key => $financialTypeName ){
-      if(!in_array( $key, $productFinancialType)) {
-        unset( $financialType[$key] );
+    foreach ($financialType as $key => $financialTypeName) {
+      if (!in_array($key, $productFinancialType)) {
+        unset($financialType[$key]);
       }
     }
-    if( count( $financialType ) ){
-      $this->assign( 'financialType', $financialType );
+    if (count($financialType)) {
+      $this->assign('financialType', $financialType);
     }
     $this->add(
       'select',
       'financial_type_id',
-      ts( 'Financial Type' ),
+      ts('Financial Type'),
       array('' => ts('- select -')) + $financialType
     );
     $this->addRule('weight', ts('Please enter integer value for weight'), 'integer');

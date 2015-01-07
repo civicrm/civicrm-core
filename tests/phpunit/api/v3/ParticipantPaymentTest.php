@@ -87,7 +87,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   public function testPaymentCreateMissingContributionId() {
     //Without Payment EntityID
     $params = array(
-      'participant_id' => $this->_participantID, );
+      'participant_id' => $this->_participantID,);
 
     $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
   }
@@ -138,7 +138,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   public function testPaymentUpdateMissingParticipantId() {
     //WithoutParticipantId
     $params = array(
-      'contribution_id' => '3', );
+      'contribution_id' => '3',);
 
     $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
   }
@@ -148,7 +148,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   public function testPaymentUpdateMissingContributionId() {
     $params = array(
-      'participant_id' => $this->_participantID, );
+      'participant_id' => $this->_participantID,);
     $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
   }
 
@@ -164,7 +164,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'id' => $this->_participantPaymentID,
       'participant_id' => $this->_participantID,
-      'contribution_id' => $contributionID, );
+      'contribution_id' => $contributionID,);
 
     // Update Payment
     $participantPayment = $this->callAPISuccess('participant_payment', 'create', $params);
@@ -197,7 +197,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'id' => $this->_participantPaymentID,
       'participant_id' => $this->_participantID,
-      'contribution_id' => $contributionID, );
+      'contribution_id' => $contributionID,);
 
     // Update Payment
     $participantPayment = $this->callAPISuccess('participant_payment', 'create', $params);
@@ -232,7 +232,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'id' => $this->_participantPaymentID,
       'participant_id' => $this->_participantID,
-      'contribution_id' => $contributionID, );
+      'contribution_id' => $contributionID,);
 
     // Update Payment
     $participantPayment = $this->callAPISuccess('participant_payment', 'create', $params);
@@ -270,7 +270,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   public function testPaymentDeleteWithWrongID() {
     $params = array(
-      'id' => 0, );
+      'id' => 0,);
     $deletePayment = $this->callAPIFailure('participant_payment', 'delete', $params);
     $this->assertEquals($deletePayment['error_message'], 'Error while deleting participantPayment');
   }

@@ -84,7 +84,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
 
     // entity,action: omit apiKey, valid entity+action
     $cases[] = array(
-      array( // query
+      array(// query
         "entity" => "Contact",
         "action" => "get",
         "key" => $this->settings->siteKey,
@@ -95,7 +95,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
 
     // entity,action: valid apiKey, valid entity+action
     $cases[] = array(
-      array( // query
+      array(// query
         "entity" => "Contact",
         "action" => "get",
         "key" => $this->settings->siteKey,
@@ -107,7 +107,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
 
     // entity,action: bad apiKey, valid entity+action
     $cases[] = array(
-      array( // query
+      array(// query
         "entity" => "Contact",
         "action" => "get",
         "key" => $this->settings->siteKey,
@@ -119,7 +119,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
 
     // entity,action: valid apiKey, invalid entity+action
     $cases[] = array(
-      array( // query
+      array(// query
         "entity" => "Contactses",
         "action" => "get",
         "key" => $this->settings->siteKey,
@@ -131,7 +131,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
 
     // q=civicrm/entity/action: omit apiKey, valid entity+action
     $cases[] = array(
-      array( // query
+      array(// query
         "q" => "civicrm/contact/get",
         "key" => $this->settings->siteKey,
         "json" => "1",
@@ -141,7 +141,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
 
     // q=civicrm/entity/action: valid apiKey, valid entity+action
     $cases[] = array(
-      array( // query
+      array(// query
         "q" => "civicrm/contact/get",
         "key" => $this->settings->siteKey,
         "json" => "1",
@@ -152,7 +152,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
 
     // q=civicrm/entity/action: invalid apiKey, valid entity+action
     $cases[] = array(
-      array( // query
+      array(// query
         "q" => "civicrm/contact/get",
         "key" => $this->settings->siteKey,
         "json" => "1",
@@ -163,7 +163,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
 
     // q=civicrm/entity/action: valid apiKey, invalid entity+action
     $cases[] = array(
-      array( // query
+      array(// query
         "q" => "civicrm/contactses/get",
         "key" => $this->settings->siteKey,
         "json" => "1",
@@ -175,7 +175,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     // q=civicrm/entity/action: valid apiKey, invalid entity+action
     // XXX Actually Ping is valid, no?
     $cases[] = array(
-      array( // query
+      array(// query
         "q" => "civicrm/ping",
         "key" => $this->settings->siteKey,
         "json" => "1",

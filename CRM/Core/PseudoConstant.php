@@ -295,7 +295,7 @@ class CRM_Core_PseudoConstant {
       $pseudoconstant = $fieldSpec['pseudoconstant'];
 
       // if callback is specified..
-      if(!empty($pseudoconstant['callback'])) {
+      if (!empty($pseudoconstant['callback'])) {
         list($className, $fnName) = explode('::', $pseudoconstant['callback']);
         if (method_exists($className, $fnName)) {
           return call_user_func(array($className, $fnName));
@@ -310,7 +310,7 @@ class CRM_Core_PseudoConstant {
       );
 
       // Fetch option group from option_value table
-      if(!empty($pseudoconstant['optionGroupName'])) {
+      if (!empty($pseudoconstant['optionGroupName'])) {
         if ($context == 'validate') {
           $params['labelColumn'] = 'name';
         }
@@ -576,7 +576,7 @@ class CRM_Core_PseudoConstant {
       return $var;
     }
 
-    $object = new $name ( );
+    $object = new $name ();
 
     $object->selectAdd();
     $object->selectAdd("$key, $retrieve");
@@ -1473,7 +1473,7 @@ WHERE  id = %1";
    * @return array - array of all payment processor types
    */
   public static function &paymentProcessorType($all = FALSE, $id = NULL, $return = 'title') {
-    $cacheKey = $id . '_' .$return;
+    $cacheKey = $id . '_'  . $return;
     if (empty(self::$paymentProcessorType[$cacheKey])) {
       self::populate(self::$paymentProcessorType[$cacheKey], 'CRM_Financial_DAO_PaymentProcessorType', $all, $return, 'is_active', NULL, "is_default, $return", 'id');
     }

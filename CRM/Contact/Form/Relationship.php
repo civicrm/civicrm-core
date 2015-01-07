@@ -326,7 +326,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     $jsData = array();
     // Get just what we need to keep the dom small
     $whatWeWant = array_flip(array('contact_type_a', 'contact_type_b', 'contact_sub_type_a', 'contact_sub_type_b'));
-    foreach($this->_allRelationshipNames as $id => $vals) {
+    foreach ($this->_allRelationshipNames as $id => $vals) {
       if ($vals['name_a_b'] === 'Employee of') {
         $this->assign('employmentRelationship', $id);
       }
@@ -345,7 +345,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       'select',
       'relationship_type_id',
       ts('Relationship Type'),
-      array( '' => ts('- select -')) + $relationshipList,
+      array('' => ts('- select -')) + $relationshipList,
       TRUE,
       array('class' => 'crm-select2 huge')
     );

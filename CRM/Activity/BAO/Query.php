@@ -244,11 +244,11 @@ class CRM_Activity_BAO_Query {
             $query->_where[$grouping][] = " civicrm_activity_contact.record_type_id = $sourceID";
             $query->_qill[$grouping][] = ts('Activity created by');
           }
-          else if ($values[2] == 2) {
+          elseif ($values[2] == 2) {
             $query->_where[$grouping][] = " civicrm_activity_contact.record_type_id = $assigneeID";
             $query->_qill[$grouping][] = ts('Activity assigned to');
           }
-          else if ($values[2] == 3) {
+          elseif ($values[2] == 3) {
             $query->_where[$grouping][] = " civicrm_activity_contact.record_type_id = $targetID";
             $query->_qill[$grouping][] = ts('Activity targeted to');
           }
@@ -357,9 +357,9 @@ class CRM_Activity_BAO_Query {
         CRM_Campaign_BAO_Query::componentSearchClause($campParams, $query);
         break;
       case 'activity_result':
-        if(is_array($value)) {
+        if (is_array($value)) {
           $safe = NULL;
-          while(list(,$k) = each($value)) {
+          while (list(,$k) = each($value)) {
             $safe[] = "'" . CRM_Utils_Type::escape($k, 'String') . "'";
           }
           $query->_where[$grouping][] = "civicrm_activity.result IN (" . implode(',', $safe) . ")";
@@ -544,14 +544,14 @@ class CRM_Activity_BAO_Query {
       $form->addSelect('activity_engagement_level', array('entity' => 'activity', 'context' => 'search'));
 
       // Add survey result field.
-      $optionGroups  = CRM_Campaign_BAO_Survey::getResultSets( 'name' );
+      $optionGroups  = CRM_Campaign_BAO_Survey::getResultSets('name');
       $resultOptions = array();
-      foreach ( $optionGroups as $gid => $name ) {
-        if ( $name ) {
+      foreach ($optionGroups as $gid => $name) {
+        if ($name) {
           $value = array();
           $value = CRM_Core_OptionGroup::values($name);
           if (!empty($value)) {
-            while(list($k,$v) = each($value)) {
+            while (list($k,$v) = each($value)) {
               $resultOptions[$v] = $v;
             }
           }
@@ -559,7 +559,7 @@ class CRM_Activity_BAO_Query {
       }
       // If no survey result options have been created, don't build
       // the field to avoid clutter.
-      if(count($resultOptions) > 0) {
+      if (count($resultOptions) > 0) {
         $buildSurveyResult = TRUE;
         asort($resultOptions);
         $form->add('select', 'activity_result', ts("Survey Result"),

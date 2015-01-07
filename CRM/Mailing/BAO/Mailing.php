@@ -160,7 +160,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     // the record that comes last that counts. That's because we are
     // INSERT'ing INTO a table with a primary id so that last record
     // over writes any previous record.
-    switch($email_selection_method) {
+    switch ($email_selection_method) {
       case 'location-exclude':
         $location_filter = "($email.location_type_id != $location_type_id)";
         // If there is more than one email that doesn't match the location,
@@ -1707,7 +1707,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $job->status = 'Scheduled';
       $job->is_test = 0;
 
-      if ( !$job->find(TRUE) ) {
+      if (!$job->find(TRUE)) {
         $job->scheduled_date = $params['scheduled_date'];
         $job->save();
       }
@@ -2645,7 +2645,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       $tokens = array_merge(CRM_Core_SelectValues::contributionTokens(), $tokens);
     }
 
-    if(method_exists($form, 'listTokens')) {
+    if (method_exists($form, 'listTokens')) {
       $tokens = array_merge($form->listTokens(), $tokens);
     }
 
@@ -2910,7 +2910,7 @@ WHERE      g.is_hidden = 1
 AND        mg.group_type = 'Include'
 AND        m.id = %1
 ";
-    $params = array( 1 => array( $mid, 'Integer' ) );
+    $params = array(1 => array($mid, 'Integer'));
     return CRM_Core_DAO::singleValueQuery($sql, $params);
   }
 
@@ -2955,9 +2955,9 @@ AND        m.id = %1
         "reset=1&cid={$values['creator_id']}");
 
       //CRM-12814
-      $contactMailings[$mailingId]['openstats'] = "Opens: ".
-        CRM_Utils_Array::value($values['mailing_id'], $openCounts, 0).
-        "<br />Clicks: ".
+      $contactMailings[$mailingId]['openstats'] = "Opens: " .
+        CRM_Utils_Array::value($values['mailing_id'], $openCounts, 0) .
+        "<br />Clicks: " .
         CRM_Utils_Array::value($values['mailing_id'], $clickCounts, 0);
 
       $actionLinks = array(

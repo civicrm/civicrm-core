@@ -193,7 +193,7 @@ class CRM_Utils_Address_BatchUpdate {
           }
 
           $className = $config->geocodeMethod;
-          $className::format( $params, TRUE );
+          $className::format($params, TRUE);
 
           // see if we got a geocode error, in this case we'll trigger a fatal
           // CRM-13760

@@ -54,7 +54,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $resources = CRM_Core_Resources::singleton();
     $resources->addSetting(
       array(
-        'kcfinderPath' => $config->userFrameworkResourceURL .'packages' .DIRECTORY_SEPARATOR
+        'kcfinderPath' => $config->userFrameworkResourceURL  . 'packages'  . DIRECTORY_SEPARATOR
       )
     );
     $resources->addScriptFile('civicrm', 'templates/CRM/Badge/Form/Layout.js', 1, 'html-header');
@@ -92,7 +92,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     unset($imageAlignment['C']);
 
     $rowCount = self::FIELD_ROWCOUNT;
-    for ( $i = 1; $i <= $rowCount; $i++ ) {
+    for ($i = 1; $i <= $rowCount; $i++) {
       $this->add('select', "token[$i]", ts('Token'), array('' => ts('- skip -')) + $tokens);
       $this->add('select', "font_name[$i]", ts('Font Name'), $fontNames);
       $this->add('select', "font_size[$i]", ts('Font Size'), $fontSizes);

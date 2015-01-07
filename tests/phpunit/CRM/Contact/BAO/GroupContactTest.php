@@ -63,11 +63,13 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     $groupContacts = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_GroupContact', NULL, 10);
 
     //check the group contact id is not null for each of them
-    foreach ($groupContacts as $gc) { $this->assertNotNull($gc->id);
+    foreach ($groupContacts as $gc) {
+      $this->assertNotNull($gc->id);
     }
 
     //cleanup
-    foreach ($groupContacts as $gc) { $gc->deleteTestObjects('CRM_Contact_DAO_GroupContact');
+    foreach ($groupContacts as $gc) {
+      $gc->deleteTestObjects('CRM_Contact_DAO_GroupContact');
     }
   }
 

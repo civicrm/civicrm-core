@@ -79,7 +79,8 @@ abstract class CRM_SMS_Provider {
       if ($ext->isExtensionKey($providerName)) {
         $paymentClass = $ext->keyToClass($providerName);
         require_once "{$paymentClass}.php";
-      } else {
+      }
+      else {
         CRM_Core_Error::fatal("Could not locate extension for {$providerName}.");
       }
 

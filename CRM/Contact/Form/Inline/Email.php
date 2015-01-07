@@ -125,7 +125,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
       }
 
       if (count($hasPrimary) > 1) {
-        $errors["email[".array_pop($hasPrimary)."][is_primary]"] = ts('Only one email can be marked as primary.');
+        $errors["email[" . array_pop($hasPrimary) . "][is_primary]"] = ts('Only one email can be marked as primary.');
       }
     }
     return $errors;

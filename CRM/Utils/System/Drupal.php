@@ -64,7 +64,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
       $form_state['input']['pass'] = array('pass1' => $params['cms_pass'], 'pass2' => $params['cms_pass']);
     }
 
-    if(!empty($params['notify'])){
+    if (!empty($params['notify'])) {
       $form_state['input']['notify'] = $params['notify'];
     }
 
@@ -569,7 +569,7 @@ AND    u.status = 1
    *
    * FIXME: Document values accepted/required by $params
    */
-  public function userLoginFinalize($params = array()){
+  public function userLoginFinalize($params = array()) {
     user_login_finalize($params);
   }
 
@@ -964,7 +964,7 @@ AND    u.status = 1
    * @param int $drupalID
    *   Drupal User ID.
    */
-  public function og_membership_create($ogID, $drupalID){
+  public function og_membership_create($ogID, $drupalID) {
     if (function_exists('og_entity_query_alter')) {
       // sort-of-randomly chose a function that only exists in the // 7.x-2.x branch
       //
@@ -993,7 +993,8 @@ AND    u.status = 1
       // TODO: Find a more solid way to make this test
       // Also, since we don't know how to get the entity type of the group, we'll assume it's 'node'
       og_ungroup('node', $ogID, 'user', user_load($drupalID));
-    } else {
+    }
+    else {
       // Works for the OG 7.x-1.x branch
       og_ungroup($ogID, 'user', user_load($drupalID));
     }
@@ -1007,7 +1008,8 @@ AND    u.status = 1
     global $user;
     if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
       $timezone = $user->timezone;
-    } else {
+    }
+    else {
       $timezone = variable_get('date_default_timezone', NULL);
     }
     if (!$timezone) {

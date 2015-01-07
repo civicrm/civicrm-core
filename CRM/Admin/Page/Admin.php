@@ -108,7 +108,8 @@ class CRM_Admin_Page_Admin extends CRM_Core_Page {
         $adminPanel[$groupId]['show'] = $v['show'];
         $adminPanel[$groupId]['hide'] = $v['hide'];
         $adminPanel[$groupId]['title'] = $title;
-      } else {
+      }
+      else {
         $adminPanel[$groupId] = array();
         $adminPanel[$groupId]['show'] = '';
         $adminPanel[$groupId]['hide'] = '';

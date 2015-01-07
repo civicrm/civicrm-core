@@ -99,7 +99,7 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
     $tmpDir = trim($fields['newBaseDir']);
 
     $errors = array();
-    if (!is_writeable($tmpDir)) {
+    if (!is_writable($tmpDir)) {
       $errors['newBaseDir'] = ts('%1 directory does not exist or cannot be written by webserver',
         array(1 => $tmpDir)
       );

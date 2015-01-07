@@ -265,7 +265,8 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
         $test->assertContactsExistByOffset(array(0 => TRUE));
         throw new Exception("Ruh-roh");
       });
-    } catch (Exception $ex) {
+    }
+    catch (Exception $ex) {
       $e = $ex;
       if (get_class($e) != 'Exception' || $e->getMessage() != 'Ruh-roh') {
         throw $e;
@@ -332,7 +333,8 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     if ($insert == 'sql-insert') {
       $r = CRM_Core_DAO::executeQuery("INSERT INTO civicrm_contact(first_name,last_name) VALUES ('ff', 'll')");
       $cid = mysql_insert_id();
-    } elseif ($insert == 'bao-create') {
+    }
+    elseif ($insert == 'bao-create') {
       $params = array(
         'contact_type' => 'Individual',
         'first_name' => 'FF',
@@ -348,7 +350,8 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
 
     if ($outcome == 'rollback') {
       $tx->rollback();
-    } elseif ($outcome == 'explicit-commit') {
+    }
+    elseif ($outcome == 'explicit-commit') {
       $tx->commit();
     } // else: implicit-commit
 
@@ -388,7 +391,8 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
 
     if ($outcome == 'rollback') {
       $tx->rollback();
-    } elseif ($outcome == 'explicit-commit') {
+    }
+    elseif ($outcome == 'explicit-commit') {
       $tx->commit();
     } // else: implicit-commit
   }

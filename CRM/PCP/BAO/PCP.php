@@ -442,14 +442,14 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
       if ($pcpInfo['page_type'] == 'event') {
         $pcp_supporter_text = ts('This event registration is being made thanks to effort of <strong>%1</strong>, who supports our campaign. ', array(1 => $pcpSupporter));
         $text = CRM_PCP_BAO_PCP::getPcpBlockStatus($pcpInfo['page_id'], 'event');
-        if(!empty($text)) {
+        if (!empty($text)) {
           $pcp_supporter_text .= "You can support it as well - once you complete the registration, you will be able to create your own Personal Campaign Page!";
         }
       }
       else {
         $pcp_supporter_text = ts('This contribution is being made thanks to effort of <strong>%1</strong>, who supports our campaign. ', array(1 => $pcpSupporter));
         $text = CRM_PCP_BAO_PCP::getPcpBlockStatus($pcpInfo['page_id'], 'contribute');
-        if(!empty($text)) {
+        if (!empty($text)) {
           $pcp_supporter_text .= "You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!";
         }
       }
@@ -526,7 +526,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
     }
 
     // define redirect url back to contrib page or event if needed
-    $url = CRM_Utils_System::url($urlBase, "reset=1&id={$pcpBlock['entity_id']}", FALSE, NULL, FALSE, TRUE );
+    $url = CRM_Utils_System::url($urlBase, "reset=1&id={$pcpBlock['entity_id']}", FALSE, NULL, FALSE, TRUE);
 
     if ($pcpBlock['target_entity_id'] != $entity['id']) {
       $statusMessage = ts('This page is not related to the Personal Campaign Page you have just visited. However you can still make a contribution here.');

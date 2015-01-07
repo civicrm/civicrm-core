@@ -253,7 +253,7 @@ class CRM_Contribute_BAO_Query {
 
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     foreach (self::getRecurringFields() as $dateField => $dateFieldTitle) {
-      if(self::buildDateWhere($values, $query, $name, $dateField, $dateFieldTitle)) {
+      if (self::buildDateWhere($values, $query, $name, $dateField, $dateFieldTitle)) {
         return;
       }
     }
@@ -343,7 +343,7 @@ class CRM_Contribute_BAO_Query {
         // Ensure we have a sensible string to display to the user.
         $names = array();
         if (isset($val) && is_array($val)) {
-          foreach($val as $id) {
+          foreach ($val as $id) {
             $names[] = CRM_Utils_Array::value($id, $types);
           }
         }
@@ -382,12 +382,14 @@ class CRM_Contribute_BAO_Query {
           $query->_qill[$grouping][] = ts('Contributions OR Soft Credits? - Soft Credits Only');
           $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
           $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
-        } else if ($value == 'both_related') {
+        }
+        elseif ($value == 'both_related') {
           $query->_where[$grouping][] = "contribution_search_scredit_combined.filter_id IS NOT NULL";
           $query->_qill[$grouping][] = ts('Contributions OR Soft Credits? - Soft Credits with related Hard Credit');
           $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
           $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
-        } else if ($value == 'both') {
+        }
+        elseif ($value == 'both') {
           $query->_qill[$grouping][] = ts('Contributions OR Soft Credits? - Both');
           $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
           $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
@@ -790,7 +792,8 @@ class CRM_Contribute_BAO_Query {
         if (in_array(self::$_contribOrSoftCredit, array("only_scredits", "both_related", "both"))) {
           $from .= " $side JOIN civicrm_contact civicrm_contact_d ON (civicrm_contribution.contact_id = civicrm_contact_d.id )
             AND contribution_search_scredit_combined.scredit_id IS NOT NULL";
-        } else {
+        }
+        else {
           $from .= " $side JOIN civicrm_contact civicrm_contact_d ON (civicrm_contribution_soft.contact_id = civicrm_contact_d.id )";
         }
         break;
@@ -1092,7 +1095,7 @@ class CRM_Contribute_BAO_Query {
     // Add batch select
     $batches = CRM_Contribute_PseudoConstant::batch();
 
-    if ( !empty( $batches ) ) {
+    if (!empty($batches)) {
       $form->add('select', 'contribution_batch_id',
         ts('Batch Name'),
         array('' => ts('- any -')) + $batches,
@@ -1143,7 +1146,7 @@ class CRM_Contribute_BAO_Query {
    */
   public static function buildDateWhere(&$values, $query, $name, $field, $title) {
     $fieldPart = strpos($name, $field);
-    if($fieldPart === FALSE) {
+    if ($fieldPart === FALSE) {
       return;
     }
     // we only have recurring dates using this ATM so lets' short cut to find the table name

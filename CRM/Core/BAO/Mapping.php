@@ -377,8 +377,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       if (array_key_exists('note', $fields['Contact'])) {
         $noteTitle = $fields['Contact']['note']['title'];
         $fields['Contact']['note']['title'] = $noteTitle . ': ' . ts('Body and Subject');
-        $fields['Contact']['note_body']    = array( 'title' => $noteTitle . ': ' . ts('Body Only'),    'name' => 'note_body' );
-        $fields['Contact']['note_subject'] = array( 'title' => $noteTitle . ': ' . ts('Subject Only'), 'name' => 'note_subject' );
+        $fields['Contact']['note_body']    = array('title' => $noteTitle . ': ' . ts('Body Only'),    'name' => 'note_body');
+        $fields['Contact']['note_subject'] = array('title' => $noteTitle . ': ' . ts('Subject Only'), 'name' => 'note_subject');
       }
     }
 
@@ -871,7 +871,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       $js .= implode(', ', $elements);
       $js .= "]";
       $js .= "
-                for(var i=0;i<nullArray.length;i++) {
+                for (var i=0;i<nullArray.length;i++) {
                     if ( {$formName}['mapper['+nullArray[i][0]+']['+nullArray[i][1]+']['+nullArray[i][2]+']'] ) {
                         {$formName}['mapper['+nullArray[i][0]+']['+nullArray[i][1]+']['+nullArray[i][2]+']'].style.display = '';
                     }
@@ -892,7 +892,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       $js .= implode(', ', $elements);
       $js .= "]";
       $js .= "
-                for(var i=0;i<noneArray.length;i++) {
+                for (var i=0;i<noneArray.length;i++) {
                     if ( {$formName}['mapper['+noneArray[i][0]+']['+noneArray[i][1]+']['+noneArray[i][2]+']'] ) {
   {$formName}['mapper['+noneArray[i][0]+']['+noneArray[i][1]+']['+noneArray[i][2]+']'].style.display = 'none';
                     }

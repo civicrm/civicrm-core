@@ -198,7 +198,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    *  - contact_id
    *  - soft_credit_contact_id
    */
-  public function storeContactFields($formValues){
+  public function storeContactFields($formValues) {
     // in a 'standalone form' (contact id not in the url) the contact will be in the form values
     if (!empty($formValues['contact_id'])) {
       $this->_contactID = $formValues['contact_id'];
@@ -212,8 +212,8 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     // here we store details in order to do that
     if (!empty($formValues['soft_credit_contact_id'])) {
       $this->_receiptContactId = $this->_contributorContactID = $formValues['soft_credit_contact_id'];
-      list( $this->_contributorDisplayName,
-         $this->_contributorEmail ) = CRM_Contact_BAO_Contact_Location::getEmailDetails( $this->_contributorContactID );
+      list($this->_contributorDisplayName,
+         $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contributorContactID);
     }
     else {
       $this->_receiptContactId = $this->_contributorContactID = $this->_contactID;

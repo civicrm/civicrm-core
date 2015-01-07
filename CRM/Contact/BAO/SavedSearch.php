@@ -167,7 +167,8 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
     if ($params) {
       if (!empty($params['customSearchID'])) {
         // this has not yet been implemented
-      } else {
+      }
+      else {
       return CRM_Contact_BAO_Query::getWhereClause($params, NULL, $tables, $whereTables);
     }
     }

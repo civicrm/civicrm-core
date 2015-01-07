@@ -93,7 +93,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   public static function del($params) {
     //delete from contribution soft table
     $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();
-    foreach($params as $column => $value) {
+    foreach ($params as $column => $value) {
       $contributionSoft->$column = $value;
     }
     $contributionSoft->delete();

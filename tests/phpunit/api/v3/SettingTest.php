@@ -168,7 +168,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
         'is_contact' => 0,
         'description' => NULL,
         'help_text' => NULL,
-        'on_change' => array( // list of callbacks
+        'on_change' => array(// list of callbacks
           array(__CLASS__, '_testOnChange_onChangeExample')
         ),
       ),

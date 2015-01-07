@@ -7,7 +7,7 @@
 class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
   public function testRow_twice() {
     $insert = CRM_Utils_SQL_Insert::into('foo')
-      ->row(array('first' => '1', 'second' => '2' ))
+      ->row(array('first' => '1', 'second' => '2'))
       ->row(array('second' => '2b', 'first' => '1b'));
     $expected = '
       INSERT INTO foo (`first`,`second`) VALUES
@@ -19,7 +19,7 @@ class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
 
   public function testRows() {
     $insert = CRM_Utils_SQL_Insert::into('foo')
-      ->row(array('first' => '1', 'second' => '2' ))
+      ->row(array('first' => '1', 'second' => '2'))
       ->rows(array(
       array('second' => '2b', 'first' => '1b'),
       array('first' => '1c', 'second' => '2c')

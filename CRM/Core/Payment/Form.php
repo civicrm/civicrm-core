@@ -253,7 +253,7 @@ class CRM_Core_Payment_Form {
    *
    * @return bool
    */
-  public static function buildPaymentForm($form, $processor, $isBillingDataOptional){
+  public static function buildPaymentForm($form, $processor, $isBillingDataOptional) {
     //if the form has address fields assign to the template so the js can decide what billing fields to show
     $profileAddressFields = $form->get('profileAddressFields');
     if (!empty($profileAddressFields)) {

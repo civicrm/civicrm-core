@@ -401,7 +401,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   public static function handleUnhandledException($exception) {
     try {
       CRM_Utils_Hook::unhandledException($exception);
-    } catch (Exception $other) {
+    }
+    catch (Exception $other) {
       // if the exception-handler generates an exception, then that sucks! oh, well. carry on.
       CRM_Core_Error::debug_var('handleUnhandledException_nestedException', self::formatTextException($other));
     }
@@ -604,11 +605,12 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Append to the query log (if enabled)
    */
   public static function debug_query($string) {
-    if ( defined( 'CIVICRM_DEBUG_LOG_QUERY' ) ) {
-      if ( CIVICRM_DEBUG_LOG_QUERY == 'backtrace' ) {
-        CRM_Core_Error::backtrace( $string, TRUE );
-      } else if ( CIVICRM_DEBUG_LOG_QUERY ) {
-        CRM_Core_Error::debug_var( 'Query', $string, FALSE, TRUE );
+    if (defined('CIVICRM_DEBUG_LOG_QUERY')) {
+      if (CIVICRM_DEBUG_LOG_QUERY == 'backtrace') {
+        CRM_Core_Error::backtrace($string, TRUE);
+      }
+      elseif (CIVICRM_DEBUG_LOG_QUERY) {
+        CRM_Core_Error::debug_var('Query', $string, FALSE, TRUE);
       }
     }
   }
@@ -737,11 +739,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
               break;
 
             case 'string':
-              $args[] = '"' . CRM_Utils_String::ellipsify(addcslashes((string) $arg, "\r\n\t\""), $maxArgLen). '"';
+              $args[] = '"' . CRM_Utils_String::ellipsify(addcslashes((string) $arg, "\r\n\t\""), $maxArgLen) .  '"';
               break;
 
             case 'array':
-              $args[] = '(Array:'.count($arg).')';
+              $args[] = '(Array:' . count($arg) . ')';
               break;
 
             case 'object':
@@ -802,7 +804,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         $ei = $ei->getCause();
       }
       $msg .= $e->toHtml();
-    } else {
+    }
+    else {
       $msg .= '<p><b>' . get_class($e) . ': "' . htmlentities($e->getMessage()) . '"</b></p>';
       $msg .= '<pre>' . htmlentities(self::formatBacktrace($e->getTrace())) . '</pre>';
     }

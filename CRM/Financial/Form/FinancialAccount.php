@@ -79,7 +79,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    * @return void
    */
   public function buildQuickForm() {
-    parent::buildQuickForm( );
+    parent::buildQuickForm();
     $this->setPageTitle(ts('Financial Account'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -166,7 +166,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
         }
       }
     }
-    return CRM_Utils_Array::crmIsEmptyArray( $errorMsg ) ? TRUE : $errorMsg;
+    return CRM_Utils_Array::crmIsEmptyArray($errorMsg) ? TRUE : $errorMsg;
   }
 
   /**
@@ -192,7 +192,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Financial_BAO_FinancialAccount::del($this->_id);
-      CRM_Core_Session::setStatus( ts('Selected Financial Account has been deleted.') );
+      CRM_Core_Session::setStatus(ts('Selected Financial Account has been deleted.'));
     }
     else {
       $ids = array();

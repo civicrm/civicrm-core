@@ -342,7 +342,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         'contact_sub_type',
         'sort_name',
       );
-      foreach ( $doNotCareElements as $value) {
+      foreach ($doNotCareElements as $value) {
         unset($this->_returnProperties[$value]);
       }
     }
@@ -841,7 +841,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
     // check for current != previous to ensure cache is not reset if paging is done without changing
     // sort criteria
-    if (!$pageNum || (!empty($currentSortID) && $currentSortID != $previousSortID) ) {
+    if (!$pageNum || (!empty($currentSortID) && $currentSortID != $previousSortID)) {
       CRM_Core_BAO_PrevNextCache::deleteItem(NULL, $cacheKey, 'civicrm_contact');
       // this means it's fresh search, so set pageNum=1
       if (!$pageNum) {
@@ -1059,14 +1059,14 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
 
     // build insert query, note that currently we build cache for 500 contact records at a time, hence below approach
     $insertValues = array();
-    while($dao->fetch()) {
+    while ($dao->fetch()) {
       $insertValues[] = "('civicrm_contact', {$dao->contact_id}, {$dao->contact_id}, '{$cacheKey}', '" . CRM_Core_DAO::escapeString($dao->sort_name) . "')";
     }
 
     //update pre/next cache using single insert query
     if (!empty($insertValues)) {
       $sql = 'INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cacheKey, data ) VALUES
-'.implode(',', $insertValues);
+' . implode(',', $insertValues);
 
       $result = CRM_Core_DAO::executeQuery($sql);
     }

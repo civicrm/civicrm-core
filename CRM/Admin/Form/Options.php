@@ -415,7 +415,8 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       if ($this->_id && !array_key_exists('filter', $params)) {
         if ($this->_gName == 'participant_role') {
           $params['filter'] = 0;
-        } else {
+        }
+        else {
           $params['filter'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'filter', 'id');
         }
       }

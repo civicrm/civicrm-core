@@ -342,12 +342,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     }
 
     // for add mode set smart defaults
-    if ( $this->_action & CRM_Core_Action::ADD ) {
-      list( $currentDate, $currentTime ) = CRM_Utils_Date::setDateDefaults( NULL, 'activityDateTime' );
+    if ($this->_action & CRM_Core_Action::ADD) {
+      list($currentDate, $currentTime) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
 
       //get all status
       $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-      $completeStatus = array_search( 'Completed', $allStatus );
+      $completeStatus = array_search('Completed', $allStatus);
       $specialFields = array(
         'join_date' => $currentDate,
         'receive_date' => $currentDate,
@@ -356,7 +356,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       );
 
       for ($rowNumber = 1; $rowNumber <= $this->_batchInfo['item_count']; $rowNumber++) {
-        foreach ($specialFields as $key => $value ) {
+        foreach ($specialFields as $key => $value) {
           $defaults['field'][$rowNumber][$key] = $value;
         }
       }
@@ -464,7 +464,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         foreach ($dates as $val) {
           if (!empty($value[$val])) {
-            $value[$val] = CRM_Utils_Date::processDate( $value[$val], $value[$val . '_time'], TRUE );
+            $value[$val] = CRM_Utils_Date::processDate($value[$val], $value[$val . '_time'], TRUE);
           }
         }
 
@@ -492,7 +492,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         // build line item params
         $this->_priceSet['fields'][$priceFieldID]['options'][$priceFieldValueID]['amount'] = $value['total_amount'];
-        $value['price_'. $priceFieldID] = 1;
+        $value['price_' .  $priceFieldID] = 1;
 
         $lineItem = array();
         CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'], $value, $lineItem[$priceSetId]);
@@ -523,7 +523,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           if (is_numeric($pledgeId)) {
             $result = CRM_Pledge_BAO_PledgePayment::getPledgePayments($pledgeId);
             $pledgePaymentId = 0;
-            foreach ($result as $key => $values ) {
+            foreach ($result as $key => $values) {
               if ($values['status'] != 'Completed') {
                 $pledgePaymentId = $values['id'];
                 break;
@@ -569,7 +569,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $domainEmail = "$domainEmail[0] <$domainEmail[1]>";
           $value['from_email_address'] = $domainEmail;
           $value['contribution_id'] = $contribution->id;
-          CRM_Contribute_Form_AdditionalInfo::emailReceipt( $this, $value );
+          CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $value);
         }
       }
     }
@@ -698,7 +698,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
 
         if (!empty($value['receive_date'])) {
-          $value['receive_date'] = CRM_Utils_Date::processDate( $value['receive_date'], $value['receive_date_time'], TRUE );
+          $value['receive_date'] = CRM_Utils_Date::processDate($value['receive_date'], $value['receive_date_time'], TRUE);
         }
 
         $params['actualBatchTotal'] += $value['total_amount'];
@@ -763,7 +763,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         unset($value['membership_end_date']);
 
         $value['is_renew'] = FALSE;
-        if (!empty($params['member_option']) && CRM_Utils_Array::value( $key, $params['member_option'] ) == 2 ) {
+        if (!empty($params['member_option']) && CRM_Utils_Array::value($key, $params['member_option']) == 2) {
           $this->_params = $params;
           $value['is_renew'] = TRUE;
           $membership = CRM_Member_BAO_Membership::renewMembershipFormWrapper(
@@ -774,7 +774,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           );
 
           // make contribution entry
-          CRM_Member_BAO_Membership::recordMembershipContribution( array_merge($value, array('membership_id' => $membership->id)));
+          CRM_Member_BAO_Membership::recordMembershipContribution(array_merge($value, array('membership_id' => $membership->id)));
         }
         else {
           $membership = CRM_Member_BAO_Membership::create($value, CRM_Core_DAO::$_nullArray);
@@ -803,7 +803,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         // end of premium
 
         //send receipt mail.
-        if ( $membership->id && !empty($value['send_receipt'])) {
+        if ($membership->id && !empty($value['send_receipt'])) {
 
           // add the domain email id
           $domainEmail = CRM_Core_BAO_Domain::getNameAndEmail();
@@ -812,7 +812,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $value['from_email_address'] = $domainEmail;
           $value['membership_id']      = $membership->id;
           $value['contribution_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $membership->id, 'contribution_id', 'membership_id');
-          CRM_Member_Form_Membership::emailReceipt( $this, $value, $membership );
+          CRM_Member_Form_Membership::emailReceipt($this, $value, $membership);
         }
       }
     }

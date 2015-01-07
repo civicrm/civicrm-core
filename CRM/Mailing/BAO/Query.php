@@ -251,8 +251,8 @@ class CRM_Mailing_BAO_Query {
         return;
 
       case 'mailing_name':
-        $value = strtolower( addslashes( $value ) );
-        if ( $wildcard ) {
+        $value = strtolower(addslashes($value));
+        if ($wildcard) {
           $value = "%$value%";
           $op    = 'LIKE';
         }
@@ -467,7 +467,7 @@ class CRM_Mailing_BAO_Query {
 
     if (is_array($value)) {
       $query->_where[$grouping][] = "$tableName.$fieldName $op (" . implode(',', $value) . ")";
-      $query->_qill[$grouping][] = "$fieldTitle $op ". implode(', ', array_intersect_key($valueTitles, array_flip($value)));
+      $query->_qill[$grouping][] = "$fieldTitle $op " .  implode(', ', array_intersect_key($valueTitles, array_flip($value)));
     }
     else {
       $query->_qill[$grouping][] = $fieldTitle . ' - ' . $valueTitles[$value];

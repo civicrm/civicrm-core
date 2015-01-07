@@ -132,7 +132,7 @@ class CRM_Core_I18n_Schema {
 
     // lets drop all triggers first
     $logging = new CRM_Logging_Schema;
-    $logging->dropTriggers( );
+    $logging->dropTriggers();
 
     // turn subsequent tables singlelingual
     $tables = CRM_Core_I18n_SchemaStructure::tables();
@@ -149,7 +149,7 @@ class CRM_Core_I18n_Schema {
     $dbLocale = '';
 
     // now lets rebuild all triggers
-    CRM_Core_DAO::triggerRebuild( );
+    CRM_Core_DAO::triggerRebuild();
   }
 
   /**
@@ -221,7 +221,7 @@ class CRM_Core_I18n_Schema {
       $dao->query($query, FALSE);
     }
 
-    if ( !empty($triggers)) {
+    if (!empty($triggers)) {
       if (CRM_Core_Config::isUpgradeMode()) {
       foreach ($triggers as $triggerInfo) {
         $when = $triggerInfo['when'];

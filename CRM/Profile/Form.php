@@ -309,7 +309,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
         if ($this->_multiRecord) {
           if ($this->_multiRecord != CRM_Core_Action::ADD) {
             $this->_recordId = CRM_Utils_Request::retrieve('recordId', 'Positive', $this);
-          } else {
+          }
+          else {
             $this->_recordId = NULL;
             $this->set('recordId', NULL);
           }
@@ -319,7 +320,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
             CRM_Core_Error::fatal(ts('The requested Profile (gid=%1) requires record id while performing this action',
               array(1 => $this->_gid)
             ));
-          } elseif (empty($this->_multiRecordFields)) {
+          }
+          elseif (empty($this->_multiRecordFields)) {
             CRM_Core_Error::fatal(ts('No Multi-Record Fields configured for this profile (gid=%1)',
               array(1 => $this->_gid)
             ));
@@ -339,7 +341,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
             if (array_key_exists($this->_recordId, $getValues)) {
               $this->_recordExists = TRUE;
-            } else {
+            }
+            else {
               $this->_recordExists = FALSE;
               if ($this->_multiRecord & CRM_Core_Action::UPDATE) {
                 CRM_Core_Session::setStatus(ts('Note: The record %1 doesnot exists. Upon save a new record will be create', array(1 => $this->_recordId)), ts('Record doesnot exist'), 'alert');
@@ -353,8 +356,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
             }
           }
 
-        } elseif (!empty($this->_multiRecordFields)
-           && (!$this->_multiRecord || !in_array($this->_multiRecord, array(CRM_Core_Action::DELETE, CRM_Core_Action::UPDATE)) )) {
+        }
+        elseif (!empty($this->_multiRecordFields)
+           && (!$this->_multiRecord || !in_array($this->_multiRecord, array(CRM_Core_Action::DELETE, CRM_Core_Action::UPDATE)))) {
           CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header');
           //multirecord listing page
           $multiRecordFieldListing = TRUE;
@@ -391,7 +395,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
       if ($this->_multiRecord && !empty($this->_multiRecordFields)) {
         $this->_fields = $this->_multiRecordFields;
         $this->_multiRecordProfile = TRUE;
-      } elseif ($this->_multiRecord && empty($this->_multiRecordFields)) {
+      }
+      elseif ($this->_multiRecord && empty($this->_multiRecordFields)) {
         CRM_Core_Session::setStatus(ts('This feature is not currently available.'), ts('Sorry'), 'error');
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm', 'reset=1'));
       }
@@ -454,7 +459,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $defaultValues = CRM_Core_BAO_CustomValueTable::getEntityValues($this->_id, NULL, $fieldIds, TRUE);
         if ($this->_recordExists == TRUE) {
           $defaultValues = $defaultValues[$this->_recordId];
-        } else {
+        }
+        else {
           $defaultValues = NULL;
         }
       }
@@ -472,7 +478,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
                 $this->_mode,
                 $value
               );
-            } else {
+            }
+            else {
               $this->_defaults[$name] = "";
             }
           }
@@ -764,7 +771,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       if ($this->_currentUserID) {
         $this->_isAddCaptcha = FALSE;
       }
-      else if (!$this->_isAddCaptcha && !empty($addCaptcha)) {
+      elseif (!$this->_isAddCaptcha && !empty($addCaptcha)) {
         $this->_isAddCaptcha = TRUE;
       }
 

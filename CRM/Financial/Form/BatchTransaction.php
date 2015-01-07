@@ -48,7 +48,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
   protected $_batchStatusId;
 
   public function preProcess() {
-    self::$_entityID = CRM_Utils_Request::retrieve( 'bid', 'Positive' ) ? CRM_Utils_Request::retrieve( 'bid', 'Positive' ) : $_POST['batch_id'];
+    self::$_entityID = CRM_Utils_Request::retrieve('bid', 'Positive') ? CRM_Utils_Request::retrieve('bid', 'Positive') : $_POST['batch_id'];
     $this->assign('entityID', self::$_entityID);
     if (isset(self::$_entityID)) {
       $this->_batchStatusId = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'status_id');
@@ -83,7 +83,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     }
 
     // do not build rest of form unless it is open batch
-    if ($this->_batchStatusId != 1 ) {
+    if ($this->_batchStatusId != 1) {
       return;
     }
 
@@ -118,10 +118,10 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     CRM_Contribute_BAO_Query::buildSearchForm($this);
     $this->addElement('checkbox', 'toggleSelects', NULL, NULL);
 
-    $this->add( 'select',
+    $this->add('select',
       'trans_remove',
       ts('Task'),
-      array( '' => ts( '- actions -' )) + array( 'Remove' => ts('Remove from Batch')));
+      array('' => ts('- actions -')) + array('Remove' => ts('Remove from Batch')));
 
     $this->add('submit', 'rSubmit', ts('Go'),
       array(
@@ -142,10 +142,10 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     );
 
     $this->addElement('checkbox', 'toggleSelect', NULL, NULL);
-    $this->add( 'select',
+    $this->add('select',
       'trans_assign',
       ts('Task'),
-      array( '' => ts( '- actions -' )) + array( 'Assign' => ts( 'Assign to Batch' )));
+      array('' => ts('- actions -')) + array('Assign' => ts('Assign to Batch')));
 
     $this->add('submit', 'submit', ts('Go'),
       array(
@@ -161,7 +161,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
 
   public function setDefaultValues() {
     // do not setdefault unless it is open batch
-    if ($this->_batchStatusId != 1 ) {
+    if ($this->_batchStatusId != 1) {
       return;
     }
     if (isset(self::$_entityID)) {

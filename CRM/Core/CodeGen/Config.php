@@ -25,7 +25,8 @@ class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
       if ($configTemplate) {
         echo "Generating civicrm.config.php\n";
         copy($configTemplate, '../civicrm.config.php');
-      } else {
+      }
+      else {
         throw new Exception("Failed to locate template for civicrm.config.php");
       }
     }

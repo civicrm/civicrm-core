@@ -165,7 +165,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $uselink = explode('?', $this->getAttribute("xpath=//*[@id='field_page']/div[1]/a[4]@href"));
     $this->openCiviPage('profile/create', "$uselink[1]", '_qf_Edit_next');
     $lastName = substr(sha1(rand()), 0, 7);
-    $orgName = 'Organisation'.substr(sha1(rand()), 0, 7);
+    $orgName = 'Organisation' . substr(sha1(rand()), 0, 7);
 
     // Fill Last Name
     $this->type('last_name', $lastName);

@@ -120,10 +120,10 @@ class Requirements {
     if ($mem < $min && $mem > 0) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
     }
-    else if ($mem < $recommended && $mem != 0) {
+    elseif ($mem < $recommended && $mem != 0) {
       $results['severity'] = $this::REQUIREMENT_WARNING;
     }
-    else if ($mem == 0) {
+    elseif ($mem == 0) {
       $results['details'] = "Cannot determine PHP memory allocation. Install only if you're sure you've allocated at least 32 MB.";
       $results['severity'] = $this::REQUIREMENT_WARNING;
     }

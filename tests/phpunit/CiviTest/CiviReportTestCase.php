@@ -90,7 +90,8 @@ class CiviReportTestCase extends CiviUnitTestCase {
       $tmpFile = $this->createTempDir() . CRM_Utils_File::makeFileName('CiviReport.csv');
       $csvContent = CRM_Report_Utils_Report::makeCsv($reportObj, $rows);
       file_put_contents($tmpFile, $csvContent);
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       // print_r($e->getCause()->getUserInfo());
       CRM_Utils_GlobalStack::singleton()->pop();
       throw $e;
@@ -145,7 +146,7 @@ class CiviReportTestCase extends CiviUnitTestCase {
       $this->assertEquals(
         count($actualCsvArray[$intKey]),
         count($expectedCsvArray[$intKey]),
-        'Arrays have different number of columns at row ' . $intKey . '; in line ' . __LINE__. '; data: ' . $rowData
+        'Arrays have different number of columns at row ' . $intKey . '; in line ' . __LINE__ .  '; data: ' . $rowData
       );
       $this->assertEquals($expectedCsvArray[$intKey], $strVal);
     }

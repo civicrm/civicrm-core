@@ -128,7 +128,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
       }
 
       if (count($hasPrimary) > 1) {
-        $errors["phone[".array_pop($hasPrimary)."][is_primary]"] = ts('Only one phone can be marked as primary.');
+        $errors["phone[" . array_pop($hasPrimary) . "][is_primary]"] = ts('Only one phone can be marked as primary.');
       }
     }
     return $errors;

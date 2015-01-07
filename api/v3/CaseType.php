@@ -97,7 +97,8 @@ function _civicrm_api3_case_type_get_formatResult(&$result) {
     $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseTypeName);
     if ($xml) {
       $result['values'][$key]['definition'] = CRM_Case_BAO_CaseType::convertXmlToDefinition($xml);
-    } else {
+    }
+    else {
       $result['values'][$key]['definition'] = array();
     }
     $result['values'][$key]['is_forkable'] = CRM_Case_BAO_CaseType::isForkable($result['values'][$key]['id']);

@@ -93,7 +93,7 @@ INSERT INTO emails
     FROM civicrm_email as email1
     JOIN civicrm_email as email2 USING (email)
     WHERE email1.contact_id < email2.contact_id
-    AND  " . self::internalFilters($rg, "email1.contact_id", "email2.contact_id" );
+    AND  " . self::internalFilters($rg, "email1.contact_id", "email2.contact_id");
     CRM_Core_DAO::executeQuery($sql);
 
     $query = "

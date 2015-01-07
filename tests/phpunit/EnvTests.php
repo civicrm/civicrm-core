@@ -22,7 +22,8 @@ class EnvTests extends \PHPUnit_Framework_TestSuite {
         list ($class, $method) = explode('::', $test);
         $clazz = new \ReflectionClass($class);
         $suite->addTestMethod($clazz, $clazz->getMethod($method));
-      } else {
+      }
+      else {
         $suite->addTestSuite($test);
       }
     }

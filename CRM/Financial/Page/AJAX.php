@@ -79,7 +79,7 @@ class CRM_Financial_Page_AJAX {
       )
     );
 
-    if (!empty($result)){
+    if (!empty($result)) {
       foreach ($result as $id => $name) {
         $selectedArray = array();
         if ($id == $defaultId) {
@@ -128,7 +128,7 @@ class CRM_Financial_Page_AJAX {
     if (!empty($result)) {
       foreach ($result as $id => $name) {
         if (in_array($id, $financialAccountType[$financialAccountTypeId])  && $_GET['_value'] != 'select') {
-          if ($countResult != 1){
+          if ($countResult != 1) {
             $elements[] = array(
               'name'  => $name,
               'value' => $id,
@@ -142,7 +142,7 @@ class CRM_Financial_Page_AJAX {
             );
           }
         }
-        elseif ($_GET['_value'] == 'select'){
+        elseif ($_GET['_value'] == 'select') {
           $elements[] = array(
             'name'  => $name,
             'value' => $id,
@@ -214,7 +214,7 @@ class CRM_Financial_Page_AJAX {
               );
             }
             else {
-              $response = array('status' => ts("This batch is configured to include only transactions using %1 payment method. If you want to include other transactions, please edit the batch first and modify the Payment Method.", array( 1 => $paymentInstrument)));
+              $response = array('status' => ts("This batch is configured to include only transactions using %1 payment method. If you want to include other transactions, please edit the batch first and modify the Payment Method.", array(1 => $paymentInstrument)));
             }
             break;
 
@@ -368,13 +368,13 @@ class CRM_Financial_Page_AJAX {
         }
         $row[$financialItem->id][$columnKey] = $financialItem->$columnKey;
         if ($columnKey == 'sort_name' && $financialItem->$columnKey) {
-          $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=".$financialItem->contact_id);
-          $row[$financialItem->id][$columnKey] = '<a href='.$url.'>'.$financialItem->$columnKey.'</a>';
+          $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=" . $financialItem->contact_id);
+          $row[$financialItem->id][$columnKey] = '<a href=' . $url . '>' . $financialItem->$columnKey . '</a>';
         }
         elseif ($columnKey == 'payment_method' && $financialItem->$columnKey) {
           $row[$financialItem->id][$columnKey] = CRM_Core_OptionGroup::getLabel('payment_instrument', $financialItem->$columnKey);
           if ($row[$financialItem->id][$columnKey] == 'Check') {
-            $row[$financialItem->id][$columnKey] = $row[$financialItem->id][$columnKey].' ('.$financialItem->check_number.')';
+            $row[$financialItem->id][$columnKey] = $row[$financialItem->id][$columnKey] . ' (' . $financialItem->check_number . ')';
           }
         }
         elseif ($columnKey == 'amount' && $financialItem->$columnKey) {
@@ -390,7 +390,7 @@ class CRM_Financial_Page_AJAX {
       if ($statusID == CRM_Core_OptionGroup::getValue('batch_status', 'Open')) {
         if (isset($notPresent)) {
           $js = "enableActions('x')";
-          $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_x_". $financialItem->id."' name='mark_x_". $financialItem->id."' value='1' onclick={$js}></input>";
+          $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_x_" .  $financialItem->id . "' name='mark_x_" .  $financialItem->id . "' value='1' onclick={$js}></input>";
           $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
             CRM_Financial_Form_BatchTransaction::links(),
             NULL,
@@ -408,7 +408,7 @@ class CRM_Financial_Page_AJAX {
         }
         else {
           $js = "enableActions('y')";
-          $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_y_". $financialItem->id."' name='mark_y_". $financialItem->id."' value='1' onclick={$js}></input>";
+          $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_y_" .  $financialItem->id . "' name='mark_y_" .  $financialItem->id . "' value='1' onclick={$js}></input>";
           $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
             CRM_Financial_Page_BatchTransaction::links(),
             NULL,
@@ -493,7 +493,7 @@ class CRM_Financial_Page_AJAX {
       $status = array('status' => 'record-updated-success');
     }
     else {
-      $status = array('status' => ts("This batch is configured to include only transactions using %1 payment method. If you want to include other transactions, please edit the batch first and modify the Payment Method.", array( 1 => $paymentInstrument)));
+      $status = array('status' => ts("This batch is configured to include only transactions using %1 payment method. If you want to include other transactions, please edit the batch first and modify the Payment Method.", array(1 => $paymentInstrument)));
     }
     CRM_Utils_JSON::output($status);
   }

@@ -43,7 +43,8 @@ class CRM_Utils_Constant {
   public static function value($name, $default = NULL) {
     if (defined($name)) {
       return constant($name);
-    } else {
+    }
+    else {
       return $default;
     }
   }

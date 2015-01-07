@@ -78,7 +78,7 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->type("frequency_day", "2");
 
     $this->webtestFillDate('acknowledge_date', 'now');
-    $this->select( "financial_type_id", "label=Donation");
+    $this->select("financial_type_id", "label=Donation");
 
     $this->select("contribution_page_id", "value=3");
 

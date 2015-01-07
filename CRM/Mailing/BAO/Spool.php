@@ -71,7 +71,7 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
     }
     $headerStr = implode("\n", $headerStr);
 
-    if ( is_null( $job_id ) ) {
+    if (is_null($job_id)) {
       // This is not a bulk mailing. Create a dummy job for it.
 
       $session = CRM_Core_Session::singleton();
@@ -82,14 +82,14 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
       $params['scheduled_date'] = $params['created_date'];
       $params['is_completed'] = 1;
       $params['is_archived'] = 1;
-      $params['body_html'] = htmlspecialchars( $headerStr ) . "\n\n" . $body;
+      $params['body_html'] = htmlspecialchars($headerStr) . "\n\n" . $body;
       $params['subject'] = $headers['Subject'];
       $params['name'] = $headers['Subject'];
       $ids = array();
       $mailing = CRM_Mailing_BAO_Mailing::create($params, $ids);
 
-      if ( empty( $mailing ) || is_a( $mailing, 'CRM_Core_Error' ) ) {
-        return PEAR::raiseError( 'Unable to create spooled mailing.' );
+      if (empty($mailing) || is_a($mailing, 'CRM_Core_Error')) {
+        return PEAR::raiseError('Unable to create spooled mailing.');
       }
 
       $job = new CRM_Mailing_BAO_MailingJob();
@@ -114,8 +114,8 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
       $job->save();
       $job_id = $job->id; // this is the one we want for the spool
 
-      if ( is_array( $recipient ) ) {
-        $recipient = implode( ';', $recipient );
+      if (is_array($recipient)) {
+        $recipient = implode(';', $recipient);
       }
     }
 

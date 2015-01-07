@@ -114,7 +114,7 @@ class CRM_Contact_BAO_SearchCustom {
     }
 
     // instantiate the new class
-    $customClass = new $customSearchClass( $formValues );
+    $customClass = new $customSearchClass($formValues);
 
     return $customClass;
   }

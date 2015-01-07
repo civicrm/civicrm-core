@@ -101,8 +101,8 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $this->assertDBCompareValues('CRM_Contribute_DAO_Contribution', $search, $compare);
 
     $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
-    $search = array( 'entity_id' => $lineItem );
-    $compare = array( 'status_id' => 1 );
+    $search = array('entity_id' => $lineItem);
+    $compare = array('status_id' => 1);
     $this->assertDBCompareValues("CRM_Financial_DAO_FinancialItem", $search, $compare);
 
     $status = $this->_getPremiumActualCost($contId, 'Accounts Receivable', 'Payment Processor Account', NULL, "'civicrm_contribution'", "ft.status_id as status");
@@ -114,13 +114,13 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $from = 'Premiums';
     $to = 'Premiums inventory';
     $financialType = array(
-     'name' => 'Test Financial'.substr(sha1(rand()), 0, 7),
+     'name' => 'Test Financial' . substr(sha1(rand()), 0, 7),
      'is_reserved' => 1,
      'is_deductible' => 1,
     );
     $this->addeditFinancialType($financialType);
-    $this->waitForElementPresent("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='".$financialType['name']."']/../td[7]/span/a[text()='Accounts']");
-    $this->click("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='".$financialType['name']."']/../td[7]/span/a[text()='Accounts']");
+    $this->waitForElementPresent("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='" . $financialType['name'] . "']/../td[7]/span/a[text()='Accounts']");
+    $this->click("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='" . $financialType['name'] . "']/../td[7]/span/a[text()='Accounts']");
     $this->waitForElementPresent("xpath=//a[@id='newfinancialTypeAccount']");
     $this->clickAjaxLink("xpath=//a[@id='newfinancialTypeAccount']", "_qf_FinancialTypeAccount_cancel-botttom");
     $this->select("account_relationship", "label=Premiums Inventory Account is");
@@ -128,7 +128,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $this->select("financial_account_id", "label=$to");
     $this->clickAjaxLink("_qf_FinancialTypeAccount_next-botttom", "xpath=//a[@id='newfinancialTypeAccount']");
 
-    $premiumName = 'Premium'.substr(sha1(rand()), 0, 7);
+    $premiumName = 'Premium' . substr(sha1(rand()), 0, 7);
     $amount = 500;
     $sku = 'SKU';
     $price = 300;
@@ -138,7 +138,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $this->addPremium($premiumName, $sku, $amount, $price, $cost, $financialType['name']);
 
     //add second premium
-    $premiumName2 = 'Premium'.substr(sha1(rand()), 0, 7);
+    $premiumName2 = 'Premium' . substr(sha1(rand()), 0, 7);
     $amount2 = 600;
     $sku2 = 'SKU';
     $price2 = 200;
@@ -152,7 +152,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     // create new contact using dialog
     $this->createDialogContact();
     // select financial type
-    $this->select( "financial_type_id", "value=1" );
+    $this->select("financial_type_id", "value=1");
     // total amount
     $this->type("total_amount", "100");
     // fill Premium information
@@ -190,8 +190,8 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
      'is_deductible' => 1,
     );
     $this->addeditFinancialType($financialType);
-    $this->waitForElementPresent("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='".$financialType['name']."']/../td[7]/span/a[text()='Accounts']");
-    $this->click("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='".$financialType['name']."']/../td[7]/span/a[text()='Accounts']");
+    $this->waitForElementPresent("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='" . $financialType['name'] . "']/../td[7]/span/a[text()='Accounts']");
+    $this->click("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='" . $financialType['name'] . "']/../td[7]/span/a[text()='Accounts']");
     $this->waitForElementPresent("xpath=//a[@id='newfinancialTypeAccount']");
     $this->clickLink("xpath=//a[@id='newfinancialTypeAccount']", "_qf_FinancialTypeAccount_cancel-botttom", FALSE);
 
@@ -244,7 +244,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
   public function testChangePaymentInstrument() {
     $this->webtestLogin();
-    $label = 'TEST'.substr(sha1(rand()), 0, 7);
+    $label = 'TEST' . substr(sha1(rand()), 0, 7);
     $amount = 100.00;
     $financialAccount = CRM_Contribute_PseudoConstant::financialAccount();
     $to = array_search('Accounts Receivable', $financialAccount);
@@ -339,8 +339,8 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
     //Assertions
-    $search = array( 'id' => $contId );
-    $compare = array( 'financial_type_id' => 3 );
+    $search = array('id' => $contId);
+    $compare = array('financial_type_id' => 3);
     $this->assertDBCompareValues('CRM_Contribute_DAO_Contribution', $search, $compare);
 
     $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
@@ -460,7 +460,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $contact = $this->createDialogContact();
 
     // select financial type
-    $this->select( "financial_type_id", "value=1" );
+    $this->select("financial_type_id", "value=1");
 
     //Contribution status
     $this->select("contribution_status_id", "label=$status");

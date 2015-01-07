@@ -299,17 +299,17 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent('_qf_CaseView_cancel-bottom');
     $id = $this->urlArg('id');
-    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_".$id."']/tbody/tr[1]/td[2]");
+    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody/tr[1]/td[2]");
 
-    $this->click("xpath=//div[@id='activities']//table[@id='case_id_".$id."']/tbody/tr[1]/td[2]//a[text()='{$subject}']");
+    $this->click("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody/tr[1]/td[2]//a[text()='{$subject}']");
 
     $this->waitForElementPresent('ActivityView');
     $this->waitForElementPresent("css=table#crm-activity-view-table tr.crm-case-activityview-form-block-groupTitle");
     $this->assertElementContainsText('crm-activity-view-table', "$textField");
     $this->click("xpath=//span[@class='ui-button-icon-primary ui-icon ui-icon-closethick']");
-    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_".$id."']/tbody/tr[1]/td[2]");
+    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody/tr[1]/td[2]");
 
-    $this->click("xpath=//div[@id='activities']//table[@id='case_id_".$id."']/tbody//tr/td[2]/a[text()='{$subject}']/../../td[6]/a[text()='Scheduled']");
+    $this->click("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody//tr/td[2]/a[text()='{$subject}']/../../td[6]/a[text()='Scheduled']");
 
     $this->waitForElementPresent("xpath=//html/body/div[7]");
     $this->waitForElementPresent('activity_change_status');
@@ -321,8 +321,8 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[9]/span/a[text()='Manage']");
     $this->waitForElementPresent('_qf_CaseView_cancel-bottom');
     $id2 = $this->urlArg('id');
-    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_".$id2."']/tbody/tr[1]/td[2]");
-    $this->click("xpath=//div[@id='activities']//table[@id='case_id_".$id2."']//a[text()='{$subject}']");
+    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_" . $id2 . "']/tbody/tr[1]/td[2]");
+    $this->click("xpath=//div[@id='activities']//table[@id='case_id_" . $id2 . "']//a[text()='{$subject}']");
     $this->waitForElementPresent('ActivityView');
     $this->waitForElementPresent("css=table#crm-activity-view-table tr.crm-case-activityview-form-block-groupTitle");
   }

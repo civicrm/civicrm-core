@@ -290,7 +290,8 @@ class CRM_Utils_Sort {
       if (isset($a[$attribute]) && isset($b[$attribute])) {
         if ($a[$attribute] < $b[$attribute]) {
           return -1;
-        } elseif ($a[$attribute] > $b[$attribute]) {
+        }
+        elseif ($a[$attribute] > $b[$attribute]) {
           return 1;
         } // else: $a and $b are equal wrt to this attribute, try next...
       }

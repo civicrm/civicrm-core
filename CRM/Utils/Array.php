@@ -541,7 +541,7 @@ class CRM_Utils_Array {
     foreach (func_get_args() as $n => $key) {
       // Skip argument 0 ($items) by testing $n for truth.
       if ($n && is_array($key)) {
-        foreach($key as $k) {
+        foreach ($key as $k) {
           unset($items[$k]);
         }
       }
@@ -570,7 +570,8 @@ class CRM_Utils_Array {
       foreach ($keys as $key) {
         if (is_array($record)) {
           $keyvalue = isset($record[$key]) ? $record[$key] : NULL;
-        } else {
+        }
+        else {
           $keyvalue = isset($record->{$key}) ? $record->{$key} : NULL;
         }
         if (isset($node[$keyvalue]) && !is_array($node[$keyvalue])) {
@@ -580,7 +581,8 @@ class CRM_Utils_Array {
       }
       if (is_array($record)) {
         $node[$record[$final_key]] = $record;
-      } else {
+      }
+      else {
         $node[$record->{$final_key}] = $record;
       }
     }
@@ -604,7 +606,8 @@ class CRM_Utils_Array {
       foreach ($records as $key => $record) {
         if (is_object($record)) {
           $result[$key] = $record->{$prop};
-        } else {
+        }
+        else {
           $result[$key] = $record[$prop];
         }
       }

@@ -39,7 +39,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    * Class constructor
    */
   public function __construct() {
-    parent::__construct( );
+    parent::__construct();
   }
 
   /**
@@ -116,7 +116,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
     $check = FALSE;
     $relationValues = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
 
-    $financialTypeId = CRM_Core_DAO::getFieldValue( 'CRM_Financial_DAO_EntityFinancialAccount', $financialTypeAccountId, 'entity_id' );
+    $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $financialTypeAccountId, 'entity_id');
     //check dependencies
     // FIXME more table containing financial_type_id to come
     $dependancy = array(
@@ -148,11 +148,11 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
         $accountRelationShipId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $financialTypeAccountId, 'account_relationship');
         CRM_Core_Session::setStatus(ts('You cannot remove an account with a %1 relationship because it is being referenced by one or more of the following types of records: Contributions, Contribution Pages, or Membership Types. Consider disabling this type instead if you no longer want it used.', array(1 => $relationValues[$accountRelationShipId])), NULL, 'error');
       }
-      return CRM_Utils_System::redirect( CRM_Utils_System::url( 'civicrm/admin/financial/financialType/accounts', "reset=1&action=browse&aid={$accountId}" ));
+      return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/financial/financialType/accounts', "reset=1&action=browse&aid={$accountId}"));
     }
 
     //delete from financial Type table
-    $financialType = new CRM_Financial_DAO_EntityFinancialAccount( );
+    $financialType = new CRM_Financial_DAO_EntityFinancialAccount();
     $financialType->id = $financialTypeAccountId;
     $financialType->find(TRUE);
     $financialType->delete();

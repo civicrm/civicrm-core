@@ -681,7 +681,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       // handle register date CRM-4320
       if ($this->_allowConfirmation) {
-        $registerDate = CRM_Utils_Array::value( 'participant_register_date', $params );
+        $registerDate = CRM_Utils_Array::value('participant_register_date', $params);
       }
       elseif (!empty($params['participant_register_date']) &&
         is_array($params['participant_register_date']) &&
@@ -1159,7 +1159,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         'contact_type'
       );
 
-      if(array_key_exists('contact_id', $params) && empty($params['contact_id'])) {
+      if (array_key_exists('contact_id', $params) && empty($params['contact_id'])) {
         // we unset this here because the downstream function ignores the contactID we give it
         // if it is set & it is difficult to understand the implications of 'fixing' this downstream
         // but if we are passing a contact id into this function it's reasonable to assume we don't
@@ -1220,7 +1220,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       if ($participantNum) {
         $prefix1 = 'additional';
         $prefix2 = 'additional_';
-      } else {
+      }
+      else {
         $prefix1 = '';
         $prefix2 = '';
       }
@@ -1271,7 +1272,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
       $form->_fields = $profileFields;
     }
-    if (!empty($formattedValues) ) {
+    if (!empty($formattedValues)) {
       $form->assign('primaryParticipantProfile', $formattedValues[1]);
       $form->set('primaryParticipantProfile', $formattedValues[1]);
       if ($count > 2) {

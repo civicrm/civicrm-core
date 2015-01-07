@@ -75,14 +75,15 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
       // yes, set page title, depending on context
       $context = civi_wp()->civicrm_context_get();
-      switch ( $context ) {
+      switch ($context) {
         case 'admin':
         case 'shortcode':
           $template = CRM_Core_Smarty::singleton();
           $template->assign('pageTitle', $pageTitle);
       }
 
-    } elseif (civicrm_wp_in_civicrm()) {
+    }
+    elseif (civicrm_wp_in_civicrm()) {
 
       // legacy pre-4.6 behaviour
       global $civicrm_wp_title;
@@ -316,7 +317,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       // when shortcode is included in page
       // also make sure we have valid query object
       global $wp_query;
-      if ( method_exists( $wp_query, 'get' ) ) {
+      if (method_exists($wp_query, 'get')) {
         if (get_query_var('page_id')) {
           $wpPageParam = "page_id=" . get_query_var('page_id');
         }
@@ -478,7 +479,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
     if (isset($language)) {
       return CRM_Core_I18n_PseudoConstant::longForShort(substr($language, 0, 2));
-    } else {
+    }
+    else {
       return NULL;
     }
   }
@@ -626,8 +628,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       $ufName = CRM_Utils_Type::escape($ufName, 'String');
 
       $values = array('ID' => $ufID, 'user_email' => $ufName);
-      if( $ufID ) {
-        wp_update_user( $values );
+      if ($ufID) {
+        wp_update_user($values);
       }
     }
   }

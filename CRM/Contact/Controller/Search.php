@@ -82,10 +82,10 @@ class CRM_Contact_Controller_Search extends CRM_Core_Controller {
     if (strpos($qString, 'basic') !== FALSE) {
       $path = 'civicrm/contact/search/basic';
     }
-    else if (strpos($qString, 'builder') !== FALSE) {
+    elseif (strpos($qString, 'builder') !== FALSE) {
       $path = 'civicrm/contact/search/builder';
     }
-    else if (
+    elseif (
       strpos($qString, 'custom') !== FALSE &&
       isset($_REQUEST['csid'])
     ) {

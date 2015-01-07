@@ -378,7 +378,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       $params['group_type'] = '';
     }
 
-    $session = CRM_Core_Session::singleton( );
+    $session = CRM_Core_Session::singleton();
     $cid = $session->get('userID');
     // this action is add
     if ($cid && empty($params['id'])) {
@@ -396,7 +396,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     // use metadata to translate the array to the appropriate DB type or altering the param in the api layer,
     // or at least altering the param in same section as 'group_type' rather than repeating here. However, further down
     // we need the $params one to be in it's original form & we are not sure what test coverage we have on that
-    if(isset($group->parents) && is_array($group->parents)) {
+    if (isset($group->parents) && is_array($group->parents)) {
       $group->parents = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
         array_keys($group->parents)
       ) . CRM_Core_DAO::VALUE_SEPARATOR;
@@ -585,7 +585,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     elseif ($groupType == 'Access') {
       $value = CRM_Core_DAO::VALUE_SEPARATOR . '1' . CRM_Core_DAO::VALUE_SEPARATOR;
     }
-    elseif (!empty($groupType)){
+    elseif (!empty($groupType)) {
       // ie we have been given the group key
       $value = CRM_Core_DAO::VALUE_SEPARATOR . $groupType . CRM_Core_DAO::VALUE_SEPARATOR;
     }
@@ -618,7 +618,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   public static function getPermissionClause($force = FALSE) {
     static $clause = 1;
     static $retrieved = FALSE;
-    if ((!$retrieved || $force ) && !CRM_Core_Permission::check('view all contacts') && !CRM_Core_Permission::check('edit all contacts')) {
+    if ((!$retrieved || $force) && !CRM_Core_Permission::check('view all contacts') && !CRM_Core_Permission::check('edit all contacts')) {
       //get the allowed groups for the current user
       $groups = CRM_ACL_API::group(CRM_ACL_API::VIEW);
       if (!empty($groups)) {
@@ -753,10 +753,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         if (empty($params['parent_id']) && !empty($value['parents'])) {
           $groupIds = explode(',', $value['parents']);
           $title = array();
-          foreach($groupIds as $gId) {
+          foreach ($groupIds as $gId) {
             $title[] = $allGroups[$gId];
           }
-          $groupList[$id]['group_name'] .= '<div class="crm-row-parent-name"><em>'.ts('Child of').'</em>: ' . implode(', ', $title) . '</div>';
+          $groupList[$id]['group_name'] .= '<div class="crm-row-parent-name"><em>' . ts('Child of') . '</em>: ' . implode(', ', $title) . '</div>';
           $value['class'] = array_diff($value['class'], array('crm-row-parent'));
         }
         $value['class'][] = 'crm-entity';
@@ -975,7 +975,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         $where .= " AND status = 'Added'";
       }
       $dao = CRM_Core_DAO::executeQuery("SELECT group_id, COUNT(id) as `count` FROM $table WHERE $where GROUP BY group_id");
-      while($dao->fetch()) {
+      while ($dao->fetch()) {
         $values[$dao->group_id]['count'] = $dao->count;
       }
     }

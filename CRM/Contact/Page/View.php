@@ -104,7 +104,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     }
 
     // ensure that the id does exist
-    if ( CRM_Core_DAO::getFieldValue( 'CRM_Contact_DAO_Contact', $this->_contactId, 'id' ) != $this->_contactId ) {
+    if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'id') != $this->_contactId) {
       CRM_Core_Error::statusBounce(
         ts('A Contact with that ID does not exist: %1', array(1 => $this->_contactId)),
         CRM_Utils_System::url('civicrm/dashboard', 'reset=1')
@@ -227,7 +227,8 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     // Check if this is default domain contact CRM-10482
     if (CRM_Contact_BAO_Contact::checkDomainContact($this->_contactId)) {
       $this->assign('domainContact', TRUE);
-    } else {
+    }
+    else {
       $this->assign('domainContact', FALSE);
     }
 

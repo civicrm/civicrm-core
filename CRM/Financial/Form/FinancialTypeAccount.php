@@ -106,7 +106,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
     if ($this->_id) {
       $financialAccount = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $this->_id, 'financial_account_id');
       $fieldTitle = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $financialAccount, 'name');
-      CRM_Utils_System::setTitle($fieldTitle . ' - '. ts('Financial Type Accounts'));
+      CRM_Utils_System::setTitle($fieldTitle . ' - ' .  ts('Financial Type Accounts'));
     }
 
     $breadCrumb = array(

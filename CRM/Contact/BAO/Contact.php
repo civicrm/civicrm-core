@@ -941,7 +941,7 @@ WHERE id={$id}; ";
         str_replace('\\', '/', $absolutePath)
       );
     }
-    else if ($config->userFramework == 'WordPress') {
+    elseif ($config->userFramework == 'WordPress') {
       $userFrameworkBaseURL = trim(str_replace('/wp-admin/', '', $config->userFrameworkBaseURL));
       $customFileUploadDirectory = strstr(str_replace('\\', '/', $absolutePath), '/wp-content/');
       $relativePath = $userFrameworkBaseURL . $customFileUploadDirectory;
@@ -2244,7 +2244,7 @@ ORDER BY civicrm_email.is_primary DESC";
               }
             }
           }
-          else if (in_array($key,
+          elseif (in_array($key,
               array(
                 'nick_name',
                 'job_title',

@@ -229,7 +229,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
             if ($kkey) {
               $auto = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $kkey, 'auto_renew');
             }
-            if ( $auto ) {
+            if ($auto) {
               $vval = $statusLabel + $autoRenew;
             }
             else {
@@ -929,7 +929,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
     $actionSchedule = new CRM_Core_DAO_ActionSchedule();
     $actionSchedule->mapping_id = $mappingID;
     $actionSchedule->is_active = 1;
-    if(!empty($params)) {
+    if (!empty($params)) {
       _civicrm_api3_dao_set_filter($actionSchedule, $params, FALSE, 'ActionSchedule');
     }
     $actionSchedule->find();
@@ -1057,11 +1057,11 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $contactField = 'e.contact_id';
         $table = 'civicrm_membership e';
         // build where clause
-        if ( $status == 2 ) {
+        if ($status == 2) {
           //auto-renew memberships
           $where[] = "e.contribution_recur_id IS NOT NULL ";
         }
-        elseif ( $status == 1 ) {
+        elseif ($status == 1) {
           $where[] = "e.contribution_recur_id IS NULL ";
         }
 
@@ -1152,7 +1152,8 @@ WHERE      $group.id = {$actionSchedule->group_id}
           if ($isSmartGroup) {
             $join[] = "INNER JOIN civicrm_group_contact_cache grp ON {$contactField} = grp.contact_id";
             $where[] = "grp.group_id IN ({$actionSchedule->group_id})";
-          } else {
+          }
+          else {
             $join[] = "INNER JOIN civicrm_group_contact grp ON {$contactField} = grp.contact_id AND grp.status = 'Added'";
             $where[] = "grp.group_id IN ({$actionSchedule->group_id})";
           }
@@ -1169,7 +1170,8 @@ WHERE      $group.id = {$actionSchedule->group_id}
           if ($isSmartGroup) {
             $addGroup = " INNER JOIN civicrm_group_contact_cache grp ON c.id = grp.contact_id";
             $addWhere = " grp.group_id IN ({$actionSchedule->group_id})";
-          } else {
+          }
+          else {
             $addGroup = " INNER JOIN civicrm_group_contact grp ON c.id = grp.contact_id AND grp.status = 'Added'";
             $addWhere = " grp.group_id IN ({$actionSchedule->group_id})";
           }
@@ -1205,7 +1207,7 @@ reminder.action_schedule_id = %1";
         $date = $operator . "({$dateField}, INTERVAL {$actionSchedule->start_action_offset} {$actionSchedule->start_action_unit})";
         $startDateClause[] = "'{$now}' >= {$date}";
         if ($mapping->entity == 'civicrm_participant') {
-          $startDateClause[] = $operator. "({$now}, INTERVAL 1 DAY ) {$op} " . $dateField;
+          $startDateClause[] = $operator .  "({$now}, INTERVAL 1 DAY ) {$op} " . $dateField;
         }
         else {
           $startDateClause[] = "DATE_SUB({$now}, INTERVAL 1 DAY ) <= {$date}";
@@ -1388,7 +1390,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     }
 
     if (!empty($excludeIds)) {
-      $clause = "AND {$field} NOT IN ( " .implode(', ', $excludeIds) . ' ) ';
+      $clause = "AND {$field} NOT IN ( "  . implode(', ', $excludeIds) . ' ) ';
       return $clause;
     }
     return NULL;

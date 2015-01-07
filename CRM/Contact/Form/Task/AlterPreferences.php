@@ -110,11 +110,11 @@ class CRM_Contact_Form_Task_AlterPreferences extends CRM_Contact_Form_Task {
     if (!empty($params['pref'])) {
       $privacyValues = $params['pref'];
       $count = 0;
-      foreach($this->_contactIds as $contact_id) {
+      foreach ($this->_contactIds as $contact_id) {
         $contact = new CRM_Contact_BAO_Contact();
         $contact->id = $contact_id;
 
-        foreach($privacyValues as $privacy_key => $privacy_value) {
+        foreach ($privacyValues as $privacy_key => $privacy_value) {
           $contact->$privacy_key = $privacyValueNew;
         }
         $contact->save();
@@ -123,7 +123,7 @@ class CRM_Contact_Form_Task_AlterPreferences extends CRM_Contact_Form_Task {
       // Status message
       $privacyOptions = CRM_Core_SelectValues::privacy();
       $status = array();
-      foreach($privacyValues as $privacy_key => $privacy_value) {
+      foreach ($privacyValues as $privacy_key => $privacy_value) {
         $label = $privacyOptions[$privacy_key];
         $status[] = $privacyValueNew ? ts("Added '%1'", array(1 => $label)) : ts("Removed '%1'", array(1 => $label));
       }

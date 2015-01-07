@@ -134,9 +134,9 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       $defaults[$this->_participantId] = array_merge($defaults[$this->_participantId], $priceSetValues);
     }
     else {
-      foreach($priceFieldId as $key => $value) {
+      foreach ($priceFieldId as $key => $value) {
         if (!empty($value) && ($this->_values['fee'][$value]['html_type'] == 'Radio' || $this->_values['fee'][$value]['html_type'] == 'Select') && !$this->_values['fee'][$value]['is_required']) {
-          $defaults[$this->_participantId]['price_'.array_keys($this->_values['fee'])[$key]] = 0;
+          $defaults[$this->_participantId]['price_' . array_keys($this->_values['fee'])[$key]] = 0;
         }
       }
     }
@@ -240,7 +240,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     CRM_Event_BAO_Participant::changeFeeSelections($params, $this->_participantId, $this->_contributionId, $feeBlock, $lineItems, $this->_paidAmount, $params['priceSetId']);
     $this->contributionAmt = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'total_amount');
     // email sending
-    if (CRM_Utils_Array::value('send_receipt', $params)){
+    if (CRM_Utils_Array::value('send_receipt', $params)) {
       $fetchParticipantVals = array('id' => $this->_participantId);
       CRM_Event_BAO_Participant::getValues($fetchParticipantVals, $participantDetails, CRM_Core_DAO::$_nullArray);
       $participantParams = array_merge($params, $participantDetails[$this->_participantId]);
@@ -249,7 +249,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
     // update participant
     CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Participant', $this->_participantId, 'status_id', $params['status_id']);
-    if(!empty($params['note'])) {
+    if (!empty($params['note'])) {
       $noteParams = array(
         'entity_table' => 'civicrm_participant',
         'note' => $params['note'],
@@ -369,7 +369,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       'valueName' => 'event_offline_receipt',
       'contactId' => $this->_contactId,
       'isTest' => FALSE,
-      'PDFFilename' => ts('confirmation').'.pdf',
+      'PDFFilename' => ts('confirmation') . '.pdf',
     );
 
     // try to send emails only if email id is present

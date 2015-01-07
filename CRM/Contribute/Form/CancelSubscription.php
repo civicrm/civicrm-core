@@ -163,7 +163,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
     }
 
     $type = 'next';
-    if ( $this->_selfService ) {
+    if ($this->_selfService) {
       $type = 'submit';
     }
 
@@ -323,7 +323,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
     $userID  = $session->get('userID');
-    if ( $userID && $status) {
+    if ($userID && $status) {
       $session->setStatus($status, $msgTitle, $msgType);
     }
     elseif (!$userID) {

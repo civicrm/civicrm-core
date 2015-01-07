@@ -178,8 +178,8 @@ class CRM_Core_Smarty extends Smarty {
    */
   public static function &singleton() {
     if (!isset(self::$_singleton)) {
-      self::$_singleton = new CRM_Core_Smarty( );
-      self::$_singleton->initialize( );
+      self::$_singleton = new CRM_Core_Smarty();
+      self::$_singleton->initialize();
 
       self::registerStringResource();
     }
@@ -197,7 +197,7 @@ class CRM_Core_Smarty extends Smarty {
    * @return bool|mixed|string
    */
   public function fetch($resource_name, $cache_id = NULL, $compile_id = NULL, $display = FALSE) {
-    if (preg_match( '/^(\s+)?string:/', $resource_name)) {
+    if (preg_match('/^(\s+)?string:/', $resource_name)) {
       $old_security = $this->security;
       $this->security = TRUE;
     }
@@ -221,7 +221,8 @@ class CRM_Core_Smarty extends Smarty {
     $this->pushScope($vars);
     try {
       $result = $this->fetch($resource_name);
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       // simulate try { ... } finally { ... }
       $this->popScope();
       throw $e;
@@ -264,10 +265,11 @@ class CRM_Core_Smarty extends Smarty {
    * @param $path
    */
   public function addTemplateDir($path) {
-    if ( is_array( $this->template_dir ) ) {
-      array_unshift( $this->template_dir, $path );
-    } else {
-      $this->template_dir = array( $path, $this->template_dir );
+    if (is_array($this->template_dir)) {
+      array_unshift($this->template_dir, $path);
+    }
+    else {
+      $this->template_dir = array($path, $this->template_dir);
     }
 
   }

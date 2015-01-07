@@ -493,9 +493,9 @@ AND        a.is_deleted = 0
       // Add parameters for attachments
 
       $numAttachments = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'max_attachments');
-      for ( $i = 1; $i <= $numAttachments; $i++ ) {
+      for ($i = 1; $i <= $numAttachments; $i++) {
         $attachName = "attachFile_$i";
-        if ( isset( $params[$attachName] ) && !empty( $params[$attachName] ) ) {
+        if (isset($params[$attachName]) && !empty($params[$attachName])) {
           $activityParams[$attachName] = $params[$attachName];
         }
       }

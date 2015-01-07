@@ -19,7 +19,7 @@ class CRM_Core_CodeGen_Specification {
   public function parse($schemaPath, $buildVersion) {
     $this->buildVersion = $buildVersion;
 
-    echo "Parsing schema description ".$schemaPath."\n";
+    echo "Parsing schema description " . $schemaPath . "\n";
     $dbXML = CRM_Core_CodeGen_Util_Xml::parse($schemaPath);
     // print_r( $dbXML );
 
@@ -38,17 +38,17 @@ class CRM_Core_CodeGen_Specification {
 
     // add archive tables here
     $archiveTables = array();
-    foreach ($this->tables as $name => $table ) {
-      if ( $table['archive'] == 'true' ) {
+    foreach ($this->tables as $name => $table) {
+      if ($table['archive'] == 'true') {
         $name = 'archive_' . $table['name'];
         $table['name'] = $name;
         $table['archive'] = 'false';
-        if ( isset($table['foreignKey']) ) {
+        if (isset($table['foreignKey'])) {
           foreach ($table['foreignKey'] as $fkName => $fkValue) {
             if ($this->tables[$fkValue['table']]['archive'] == 'true') {
               $table['foreignKey'][$fkName]['table'] = 'archive_' . $table['foreignKey'][$fkName]['table'];
               $table['foreignKey'][$fkName]['uniqName'] =
-                str_replace( 'FK_', 'FK_archive_', $table['foreignKey'][$fkName]['uniqName'] );
+                str_replace('FK_', 'FK_archive_', $table['foreignKey'][$fkName]['uniqName']);
             }
           }
           $archiveTables[$name] = $table;
@@ -377,13 +377,13 @@ class CRM_Core_CodeGen_Specification {
       );
       $field['html'] = array();
       foreach ($validOptions as $htmlOption) {
-        if(!empty($fieldXML->html->$htmlOption)){
+        if (!empty($fieldXML->html->$htmlOption)) {
           $field['html'][$htmlOption] = $this->value($htmlOption, $fieldXML->html);
         }
       }
     }
     $field['pseudoconstant'] = $this->value('pseudoconstant', $fieldXML);
-    if(!empty($field['pseudoconstant'])){
+    if (!empty($field['pseudoconstant'])) {
       //ok this is a bit long-winded but it gets there & is consistent with above approach
       $field['pseudoconstant'] = array();
       $validOptions = array(
@@ -402,7 +402,7 @@ class CRM_Core_CodeGen_Specification {
         'callback',
       );
       foreach ($validOptions as $pseudoOption) {
-        if(!empty($fieldXML->pseudoconstant->$pseudoOption)){
+        if (!empty($fieldXML->pseudoconstant->$pseudoOption)) {
           $field['pseudoconstant'][$pseudoOption] = $this->value($pseudoOption, $fieldXML->pseudoconstant);
         }
       }

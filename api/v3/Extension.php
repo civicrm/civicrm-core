@@ -62,7 +62,8 @@ function civicrm_api3_extension_install($params) {
 
   try {
     CRM_Extension_System::singleton()->getManager()->install($keys);
-  } catch (CRM_Extension_Exception $e) {
+  }
+  catch (CRM_Extension_Exception $e) {
     return civicrm_api3_create_error($e->getMessage());
   }
 
@@ -88,13 +89,15 @@ function civicrm_api3_extension_upgrade() {
 
   try {
     $result = $runner->runAll();
-  } catch (CRM_Extension_Exception $e) {
+  }
+  catch (CRM_Extension_Exception $e) {
     return civicrm_api3_create_error($e->getMessage());
   }
 
   if ($result === TRUE) {
     return civicrm_api3_create_success();
-  } else {
+  }
+  else {
     return $result;
   }
 }
@@ -301,15 +304,19 @@ function civicrm_api3_extension_get($params) {
 function _civicrm_api3_getKeys($params) {
   if (array_key_exists('keys', $params) && is_array($params['keys'])) {
     return $params['keys'];
-  } elseif (array_key_exists('keys', $params) && is_string($params['keys'])) {
+  }
+  elseif (array_key_exists('keys', $params) && is_string($params['keys'])) {
     if ($params['keys'] == '') {
       return array();
-    } else {
+    }
+    else {
       return explode(API_V3_EXTENSION_DELIMITER, $params['keys']);
     }
-  } elseif (array_key_exists('key', $params)) {
+  }
+  elseif (array_key_exists('key', $params)) {
     return array($params['key']);
-  } else {
+  }
+  else {
     throw new API_Exception('Missing required parameter: key or keys');
   }
 }

@@ -48,7 +48,7 @@
  */
 function civicrm_api3_mailing_event_queue_create($params) {
   if (!array_key_exists('id', $params) && !array_key_exists('email_id', $params) && !array_key_exists('phone_id', $params)) {
-    throw new API_Exception("Mandatory key missing from params array: id, email_id, or phone_id field is required" );
+    throw new API_Exception("Mandatory key missing from params array: id, email_id, or phone_id field is required");
   }
   civicrm_api3_verify_mandatory($params,
     'CRM_Mailing_DAO_MailingJob',

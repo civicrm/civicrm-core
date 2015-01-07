@@ -282,7 +282,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
         if (property_exists($qf, '_membershipBlock') && !empty($qf->_membershipBlock['is_separate_payment']) && $qf->_quickConfig && $field->name == 'other_amount' && !property_exists($qf, '_contributionAmount')) {
           $label = ts('Additional Contribution');
           $useRequired = 0;
-        } elseif (!empty($fieldOptions[$optionKey]['label'])) {      //check for label.
+        }
+        elseif (!empty($fieldOptions[$optionKey]['label'])) {      //check for label.
           $label = $fieldOptions[$optionKey]['label'];
         }
 
@@ -310,7 +311,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
         if (property_exists($qf, '_quickConfig') && $qf->_quickConfig) {
           $message = ts("Please enter a valid amount.");
           $type = "money";
-        } else {
+        }
+        else {
           $message = ts('%1 must be an integer (whole number).', array(1 => $label));
           $type = "positiveInteger";
         }
@@ -340,7 +342,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
                          );
           if (property_exists($qf, '_quickConfig') && $qf->_quickConfig && $field->name == 'contribution_amount') {
             $extra += array('onclick' => 'clearAmountOther();');
-          } elseif (property_exists($qf, '_quickConfig') && $qf->_quickConfig && $field->name == 'membership_amount') {
+          }
+          elseif (property_exists($qf, '_quickConfig') && $qf->_quickConfig && $field->name == 'membership_amount') {
             $extra += array(
             'onclick' => "return showHideAutoRenew({$opt['membership_type_id']});",
                             'membership-type' => $opt['membership_type_id'],
@@ -367,9 +370,11 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
           // add "none" option
           if (!empty($otherAmount['is_allow_other_amount']) && $field->name == 'contribution_amount') {
             $none = ts('Other Amount');
-          } elseif (property_exists($qf, '_membershipBlock') && empty($qf->_membershipBlock['is_required']) && $field->name == 'membership_amount') {
+          }
+          elseif (property_exists($qf, '_membershipBlock') && empty($qf->_membershipBlock['is_required']) && $field->name == 'membership_amount') {
             $none = ts('No thank you');
-          } else {
+          }
+          else {
             $none = ts('-none-');
           }
 

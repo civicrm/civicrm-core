@@ -58,7 +58,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->_orgId = $this->organizationCreate(NULL);
 
     $this->params = array(
-      'title' => "Test Contribution Page".substr(sha1(rand()), 0, 7),
+      'title' => "Test Contribution Page" . substr(sha1(rand()), 0, 7),
       'financial_type_id' => 1,
       'payment_processor' => 1,
       'currency' => 'NZD',
@@ -71,8 +71,8 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     );
 
     $this->_priceSetParams = array(
-      'name' => 'tax_contribution'.substr(sha1(rand()), 0, 7),
-      'title' => 'contributiontax'.substr(sha1(rand()), 0, 7),
+      'name' => 'tax_contribution' . substr(sha1(rand()), 0, 7),
+      'title' => 'contributiontax' . substr(sha1(rand()), 0, 7),
       'is_active' => 1,
       'help_pre' => "Where does your goat sleep",
       'help_post' => "thank you for your time",
@@ -84,7 +84,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     // Financial Account with 20% tax rate
     $financialAccountSetparams = array(
       #[domain_id] =>
-      'name' => 'vat full taxrate account'.substr(sha1(rand()), 0, 7),
+      'name' => 'vat full taxrate account' . substr(sha1(rand()), 0, 7),
       'contact_id' => $this->_orgId,
       'financial_account_type_id' => 2,
       'is_tax' => 1,
@@ -99,7 +99,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
 
     // Financial type having 'Sales Tax Account is' with liability financail account
     $financialType = array(
-      'name' => 'grassvariety1'.substr(sha1(rand()), 0, 7),
+      'name' => 'grassvariety1' . substr(sha1(rand()), 0, 7),
       'is_reserved' => 0,
       'is_active' => 1,
     );
@@ -115,7 +115,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
 
     // Financial type with 5% tax rate
     $financialAccHalftax = array(
-      'name' => 'vat half taxrate account'.substr(sha1(rand()), 0, 7),
+      'name' => 'vat half taxrate account' . substr(sha1(rand()), 0, 7),
       'contact_id' => $this->_orgId,
       'financial_account_type_id' => 2,
       'is_tax' => 1,
@@ -127,7 +127,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $halfFinancialAccount = CRM_Financial_BAO_FinancialAccount::add($financialAccHalftax);
     $this->halfFinancialAccId = $halfFinancialAccount->id;
     $halfFinancialtypeHalftax = array(
-      'name' => 'grassvariety2'.substr(sha1(rand()), 0, 7),
+      'name' => 'grassvariety2' . substr(sha1(rand()), 0, 7),
       'is_reserved' => 0,
       'is_active' => 1,
     );
@@ -160,7 +160,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     // Payment Processor
     $paymentProceParams = array(
       'domain_id' => 1,
-      'name' => 'dummy'.substr(sha1(rand()), 0, 7),
+      'name' => 'dummy' . substr(sha1(rand()), 0, 7),
       'payment_processor_type_id' => 10,
       'financial_account_id' => 12,
       'is_active' => 1,
@@ -207,7 +207,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       $this->_ids['price_set'][] = $priceSet['id'];
     }
     $priceSetID = $this->_price = reset($this->_ids['price_set']);
-    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageResult['id'], $priceSetID );
+    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageResult['id'], $priceSetID);
 
     if (empty($this->_ids['price_field'])) {
       $priceField = $this->callAPISuccess('price_field', 'create', array(
@@ -259,7 +259,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->_ids['contributionId'] = $contribution['id'];
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID, 'In line ' . __LINE__ );
+    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
@@ -328,7 +328,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID, 'In line ' . __LINE__ );
+    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
@@ -353,7 +353,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID, 'In line ' . __LINE__ );
+    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
@@ -516,8 +516,8 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     );
 
     $result = array();
-    CRM_Financial_BAO_FinancialTypeAccount::retrieve( $searchParams, $result );
-    return CRM_Utils_Array::value( 'financial_account_id', $result );
+    CRM_Financial_BAO_FinancialTypeAccount::retrieve($searchParams, $result);
+    return CRM_Utils_Array::value('financial_account_id', $result);
   }
 
   ///////////////// civicrm_contribution_delete methods

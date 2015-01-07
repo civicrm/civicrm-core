@@ -54,7 +54,7 @@ class CRM_Contact_Page_Inline_ContactInfo extends CRM_Core_Page {
     $params = array('id' => $contactId);
 
     $defaults = array();
-    CRM_Contact_BAO_Contact::getValues( $params, $defaults );
+    CRM_Contact_BAO_Contact::getValues($params, $defaults);
 
     //get the current employer name
     if (CRM_Utils_Array::value('contact_type', $defaults) == 'Individual') {

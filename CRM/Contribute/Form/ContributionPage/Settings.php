@@ -232,7 +232,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
     // ensure on-behalf-of profile meets minimum requirements
     if (!empty($values['is_organization'])) {
-      if (empty($values['onbehalf_profile_id']) ) {
+      if (empty($values['onbehalf_profile_id'])) {
         $errors['onbehalf_profile_id'] = ts('Please select a profile to collect organization information on this contribution page.');
       }
       else {

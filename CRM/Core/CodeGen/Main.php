@@ -76,7 +76,7 @@ class CRM_Core_CodeGen_Main {
       unlink($this->digestPath);
     }
 
-    echo "\ncivicrm_domain.version := ". $this->db_version . "\n\n";
+    echo "\ncivicrm_domain.version := " .  $this->db_version . "\n\n";
     if ($this->buildVersion < 1.1) {
       echo "The Database is not compatible for this version";
       exit();
@@ -114,7 +114,8 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       if (is_a($task, 'CRM_Core_CodeGen_ITask')) {
         $task->setConfig($this);
         $task->run();
-      } else {
+      }
+      else {
         echo "Bad news: we tried to run a codegen task of an unrecognized type: {$component}\n";
         exit();
       }

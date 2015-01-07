@@ -393,7 +393,8 @@ class CRM_Extension_Manager {
     $statuses = $this->getStatuses();
     if (array_key_exists($key, $statuses)) {
       return $statuses[$key];
-    } else {
+    }
+    else {
       return self::STATUS_UNKNOWN;
     }
   }
@@ -420,12 +421,14 @@ class CRM_Extension_Manager {
         try {
           $path = $this->fullContainer->getPath($dao->full_name);
           $codeExists = !empty($path) && is_dir($path);
-        } catch (CRM_Extension_Exception $e) {
+        }
+        catch (CRM_Extension_Exception $e) {
           $codeExists = FALSE;
         }
         if ($dao->is_active) {
           $this->statuses[$dao->full_name] = $codeExists ? self::STATUS_INSTALLED : self::STATUS_INSTALLED_MISSING;
-        } else {
+        }
+        else {
           $this->statuses[$dao->full_name] = $codeExists ? self::STATUS_DISABLED : self::STATUS_DISABLED_MISSING;
         }
       }
@@ -453,7 +456,8 @@ class CRM_Extension_Manager {
     $info = $this->mapper->keyToInfo($key); // throws Exception
     if (array_key_exists($info->type, $this->typeManagers)) {
       return array($info, $this->typeManagers[$info->type]);
-    } else {
+    }
+    else {
       throw new CRM_Extension_Exception("Unrecognized extension type: " . $info->type);
     }
   }
@@ -471,10 +475,12 @@ class CRM_Extension_Manager {
     if ($info) {
       if (array_key_exists($info->type, $this->typeManagers)) {
         return array($info, $this->typeManagers[$info->type]);
-      } else {
+      }
+      else {
         throw new CRM_Extension_Exception("Unrecognized extension type: " . $info->type);
       }
-    } else {
+    }
+    else {
       throw new CRM_Extension_Exception("Failed to reconstruct missing extension: " . $key);
     }
   }
@@ -511,7 +517,8 @@ class CRM_Extension_Manager {
       $dao->file = $info->file;
       $dao->is_active = 1;
       return (bool) ($dao->update());
-    } else {
+    }
+    else {
       return $this->_createExtensionEntry($info);
     }
   }
@@ -527,7 +534,8 @@ class CRM_Extension_Manager {
     if ($dao->find(TRUE)) {
       if (CRM_Core_BAO_Extension::del($dao->id)) {
         CRM_Core_Session::setStatus(ts('Selected option value has been deleted.'), ts('Deleted'), 'success');
-      } else {
+      }
+      else {
         throw new CRM_Extension_Exception("Failed to remove extension entry");
       }
     } // else: post-condition already satisified
@@ -557,7 +565,8 @@ class CRM_Extension_Manager {
     if ($dao->find(TRUE)) {
       $info = new CRM_Extension_Info($dao->full_name, $dao->type, $dao->name, $dao->label, $dao->file);
       return $info;
-    } else {
+    }
+    else {
       return NULL;
     }
   }

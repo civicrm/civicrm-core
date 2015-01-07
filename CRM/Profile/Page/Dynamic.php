@@ -300,7 +300,8 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
             $copyFields = $fields;
             CRM_Core_BAO_UFGroup::shiftMultiRecordFields($copyFields, $multiRecordFields);
             $fieldKey = key($multiRecordFields);
-          } else {
+          }
+          else {
             $fieldKey = key($fields);
           }
           if ($fieldID = CRM_Core_BAO_CustomField::getKeyID($fieldKey)) {
@@ -354,7 +355,8 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $fieldId = CRM_Core_BAO_CustomField::getKeyID($fieldDetail['name']);
       $customGroupDetails = CRM_Core_BAO_CustomGroup::getGroupTitles(array($fieldId));
       $multiRecTitle = $customGroupDetails[$fieldId]['groupTitle'];
-    } else {
+    }
+    else {
       $title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_gid, 'title');
     }
 

@@ -399,8 +399,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
 
             //Delete all existing soft Contribution from contribution_soft table for pcp_id is_null
             $existingSoftCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dupeSoftCredit['contribution_id']);
-            if(isset($existingSoftCredit['soft_credit']) && !empty($existingSoftCredit['soft_credit'])){
-              foreach($existingSoftCredit['soft_credit'] as $key => $existingSoftCreditValues){
+            if (isset($existingSoftCredit['soft_credit']) && !empty($existingSoftCredit['soft_credit'])) {
+              foreach ($existingSoftCredit['soft_credit'] as $key => $existingSoftCreditValues) {
                 if (!empty($existingSoftCreditValues['soft_credit_id'])) {
                   $deleteParams = array(
                     'id' => $existingSoftCreditValues['soft_credit_id'],

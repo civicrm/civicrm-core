@@ -45,7 +45,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   const MAX_CONTACTS = 50;
 
   public function preProcess() {
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0 );
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
     $this->_BAOName = 'CRM_Member_BAO_MembershipType';
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
     $this->assign('action', $this->_action);
@@ -169,7 +169,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       CRM_Core_SelectValues::date(NULL, 'd'), FALSE
     );
 
-    $this->add('select', 'financial_type_id', ts( 'Financial Type' ),
+    $this->add('select', 'financial_type_id', ts('Financial Type'),
       array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType(), TRUE, array('class' => 'crm-select2')
     );
 
@@ -225,7 +225,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       $errors['name'] = ts('Please enter a membership type name.');
     }
 
-    if (($params['minimum_fee'] > 0 ) && !$params['financial_type_id'] ) {
+    if (($params['minimum_fee'] > 0) && !$params['financial_type_id']) {
       $errors['financial_type_id'] = ts('Please enter the financial Type.');
     }
 
@@ -374,7 +374,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
           $dat          = ($dat < 10) ? '0' . $dat : $dat;
           $params[$per] = $mon . $dat;
         }
-        else if($per == 'fixed_period_rollover_day' && !empty($params['month_fixed_period_rollover_day'])){
+        elseif($per == 'fixed_period_rollover_day' && !empty($params['month_fixed_period_rollover_day'])) {
           $params['fixed_period_rollover_day'] = $params['month_fixed_period_rollover_day']['d'];
           unset($params['month_fixed_period_rollover_day']);
         }

@@ -128,7 +128,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals($pledge['pledge_next_pay_amount'], 20.00, 'in line' . __LINE__);
 
     $params2 = array(
-      'pledge_id' => $this->_pledge['id'], );
+      'pledge_id' => $this->_pledge['id'],);
     $pledge = $this->callAPISuccess('pledge', 'delete', $params2);
   }
   /**
@@ -190,10 +190,10 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
       'start_date' => 'first saturday of march last year',
     );
     $this->_pledge = $this->callAPISuccess('pledge', 'create', array_merge($this->_params, $overdueParams));
-    $params = array(      'pledge_status_id' => '6',
+    $params = array(     'pledge_status_id' => '6',
     );
     $result = $this->callAPISuccess('pledge', 'get', $params);
-    $emptyResult = $this->callAPISuccess('pledge', 'get', array(        'pledge_status_id' => '1',
+    $emptyResult = $this->callAPISuccess('pledge', 'get', array(       'pledge_status_id' => '1',
       ));
     $pledge = $result['values'][$this->_pledge['id']];
     $this->callAPISuccess('pledge', 'delete', $pledge);
@@ -380,7 +380,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $pledgeID = $this->pledgeCreate($this->_individualId);
     $old_params = array(
       'id' => $pledgeID,
-      'sequential' => 1, );
+      'sequential' => 1,);
     $original = $this->callAPISuccess('pledge', 'get', $old_params);
     //Make sure it came back
     $this->assertEquals($original['values'][0]['pledge_id'], $pledgeID, 'In line ' . __LINE__);
@@ -402,7 +402,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
       'amount' => 100,
       'financial_type_id' => 1,
       'start_date' => date('Ymd'),
-      'installments' => 10, );
+      'installments' => 10,);
 
     $pledge = $this->callAPISuccess('pledge', 'create', $params);
     $new_params = array(
@@ -424,7 +424,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $pledgeID = $this->pledgeCreate($this->_individualId);
     $old_params = array(
       'id' => $pledgeID,
-      'sequential' => 1, );
+      'sequential' => 1,);
     $original = $this->callAPISuccess('pledge', 'get', $old_params);
     //Make sure it came back
     $this->assertEquals($original['values'][0]['pledge_id'], $pledgeID, 'In line ' . __LINE__);

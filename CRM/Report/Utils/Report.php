@@ -162,7 +162,8 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
    * @return int|null|string
    */
   public static function getInstanceCount($optionVal) {
-    if (empty($optionVal)) { return 0;
+    if (empty($optionVal)) {
+      return 0;
     }
 
     $sql = "
@@ -543,7 +544,7 @@ WHERE  inst.report_id = %1";
   public static function getInstanceList($reportUrl) {
     static $instanceDetails = array();
 
-    if (!array_key_exists($reportUrl, $instanceDetails )) {
+    if (!array_key_exists($reportUrl, $instanceDetails)) {
       $instanceDetails[$reportUrl] = array();
 
       $sql = "
@@ -551,7 +552,7 @@ SELECT id, title FROM civicrm_report_instance
 WHERE  report_id = %1";
       $params = array(1 => array($reportUrl, 'String'));
       $result = CRM_Core_DAO::executeQuery($sql, $params);
-      while( $result->fetch()) {
+      while ($result->fetch()) {
         $instanceDetails[$reportUrl][$result->id] = $result->title . " (ID: {$result->id})";
       }
     }

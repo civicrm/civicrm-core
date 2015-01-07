@@ -236,7 +236,7 @@ function civicrm_api3_activity_get($params) {
     $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
   }
   $options = _civicrm_api3_get_options_from_params($params, FALSE, 'activity', 'get');
-  if($options['is_count']) {
+  if ($options['is_count']) {
     return civicrm_api3_create_success($activities, $params, 'activity', 'get');
   }
 

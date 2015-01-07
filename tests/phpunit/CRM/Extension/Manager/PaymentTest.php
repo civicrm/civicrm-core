@@ -121,7 +121,8 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
     try {
       $manager->uninstall(array('test.extension.manager.paymenttest'));
       $this->fail('Failed to catch expected exception');
-    } catch (CRM_Extension_Exception_DependencyException $e) {
+    }
+    catch (CRM_Extension_Exception_DependencyException $e) {
     }
     $this->assertEquals(0, test_extension_manager_paymenttest::$counts['uninstall']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');

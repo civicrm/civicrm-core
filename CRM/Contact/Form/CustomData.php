@@ -125,7 +125,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
       // this is due to some condition inside it which restricts it from saving in session
       // so doing this for multi record edit action
       $entityId = CRM_Utils_Request::retrieve('entityID', 'Positive', $this);
-      if(!empty($entityId)) {
+      if (!empty($entityId)) {
         $subType = CRM_Contact_BAO_Contact::getContactSubType($entityId, ',');
       }
       CRM_Custom_Form_CustomData::preProcess($this, NULL, $subType, NULL, NULL, $entityId);

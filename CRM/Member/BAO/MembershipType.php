@@ -393,7 +393,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         // Check if we are on or after rollover day of the month - CRM-10585
         // If so, set fixed_period_rollover TRUE so we increment end_date month below.
         $dateParts = explode('-', $actualStartDate);
-        if ($dateParts[2] >= $membershipTypeDetails['fixed_period_rollover_day']){
+        if ($dateParts[2] >= $membershipTypeDetails['fixed_period_rollover_day']) {
           $fixed_period_rollover = TRUE;
         }
 
@@ -522,11 +522,12 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       switch ($membershipTypeDetails['duration_unit']) {
         case 'year':
           //need to check if the upsell is from rolling to fixed and adjust accordingly
-          if ($membershipTypeDetails['period_type'] == 'fixed' && $oldPeriodType == 'rolling' ) {
+          if ($membershipTypeDetails['period_type'] == 'fixed' && $oldPeriodType == 'rolling') {
             $month = substr($membershipTypeDetails['fixed_period_start_day'], 0, strlen($membershipTypeDetails['fixed_period_start_day']) - 2);
             $day = substr($membershipTypeDetails['fixed_period_start_day'], -2);
             $year += 1;
-          } else {
+          }
+          else {
             $year = $year + ($numRenewTerms * $membershipTypeDetails['duration_interval']);
           }
           break;
@@ -655,7 +656,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       $query = 'SELECT memType.id, memType.name, memType.member_of_contact_id, c.sort_name
         FROM civicrm_membership_type memType INNER JOIN civicrm_contact c ON c.id = memType.member_of_contact_id
         WHERE memType.is_active = 1 ';
-      $dao = CRM_Core_DAO::executeQuery( $query );
+      $dao = CRM_Core_DAO::executeQuery($query);
       while ($dao->fetch()) {
         $orgs[$dao->member_of_contact_id] = $dao->sort_name;
         $types[$dao->member_of_contact_id][$dao->id] = $dao->name;
@@ -755,7 +756,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param  integer      financial type id
    */
   public static function updateAllPriceFieldValue($membershipTypeId, $params) {
-    if (!empty($params['minimum_fee'])){
+    if (!empty($params['minimum_fee'])) {
       $amount = $params['minimum_fee'];
     }
     else {

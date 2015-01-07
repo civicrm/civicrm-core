@@ -499,7 +499,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       //Get the id of Logged in User
       $session = CRM_Core_Session::singleton();
       $contactID = $session->get('userID');
-      if(!empty($contactID)) {
+      if (!empty($contactID)) {
         $contactIDs[] = $session->get('userID');
       }
     }

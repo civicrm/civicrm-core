@@ -96,7 +96,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
     $params['has_separator'] = CRM_Utils_Array::value('has_separator', $params, FALSE);
 
     if (!isset($params['id']) ||
-      (CRM_Utils_Array::value( 'parent_id', $params ) != CRM_Utils_Array::value('current_parent_id', $params))
+      (CRM_Utils_Array::value('parent_id', $params) != CRM_Utils_Array::value('current_parent_id', $params))
     ) {
       /* re/calculate the weight, if the Parent ID changed OR create new menu */
 
@@ -630,7 +630,7 @@ ORDER BY parent_id, weight";
           <ul id='civicrm-home'>
             <li><a href='$homeURL'>$homeLabel</a></li>
             <li><a href='#' class='crm-hidemenu'>$hideLabel</a></li>
-            <li><a href='$logoutURL' class='crm-logout-link'>". ts('Log out') ."</a></li>
+            <li><a href='$logoutURL' class='crm-logout-link'>" .  ts('Log out')  . "</a></li>
           </ul>";
       // <li> tag doesn't need to be closed
     }
@@ -741,7 +741,7 @@ ORDER BY parent_id, weight";
 
     $incrementOtherNodes = true;
     $sql    = "SELECT weight from civicrm_navigation WHERE {$parentClause} ORDER BY weight LIMIT %1, 1";
-    $params = array(1 => array( $position, 'Positive'));
+    $params = array(1 => array($position, 'Positive'));
     $newWeight = CRM_Core_DAO::singleValueQuery($sql, $params);
 
     // this means node is moved to last position, so you need to get the weight of last element + 1
@@ -761,7 +761,7 @@ ORDER BY parent_id, weight";
     $transaction = new CRM_Core_Transaction();
 
     // now update the existing nodes to weight + 1, if required.
-    if ( $incrementOtherNodes ) {
+    if ($incrementOtherNodes) {
       $query = "UPDATE civicrm_navigation SET weight = weight + 1
                   WHERE {$parentClause} AND weight >= {$newWeight}";
 

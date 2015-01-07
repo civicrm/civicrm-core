@@ -109,11 +109,11 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
      */
 
     // distinguish between types of hook
-    if ( ! in_array( $fnSuffix, $this->hooksThatReturn ) ) {
+    if (! in_array($fnSuffix, $this->hooksThatReturn)) {
 
       // only pass the arguments that have values
       $args = array_slice(
-        array( &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6 ),
+        array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6),
         0,
         $numParams
       );
@@ -127,7 +127,7 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
 
       // protect from REST calls
       if (function_exists('do_action_ref_array')) {
-        do_action_ref_array( $fnSuffix, $args );
+        do_action_ref_array($fnSuffix, $args);
       }
 
     }

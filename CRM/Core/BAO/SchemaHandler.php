@@ -353,7 +353,7 @@ ALTER TABLE {$tableName}
       }
     }
 
-    if($triggerRebuild) {
+    if ($triggerRebuild) {
       CRM_Core_DAO::triggerRebuild($params['table_name']);
     }
 

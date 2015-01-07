@@ -60,7 +60,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
     $scheduledStatus = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
     $mappingId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionMapping', 'activity_type', 'id', 'entity_value');
     $activityTypeId = CRM_Core_OptionGroup::getValue('activity_type', "Meeting", 'name');
-    $title = "simpleActionSchedule".substr(sha1(rand()), 0, 7);
+    $title = "simpleActionSchedule" . substr(sha1(rand()), 0, 7);
     $params = array(
       'title' => $title,
       'recipient' => $assigneeID,
@@ -98,7 +98,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
     $scheduledStatus = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
     $mappingId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionMapping', 'activity_type', 'id', 'entity_value');
     $activityTypeId = CRM_Core_OptionGroup::getValue('activity_type', "Meeting", 'name');
-    $title = "simpleActionSchedule".substr(sha1(rand()), 0, 7);
+    $title = "simpleActionSchedule" . substr(sha1(rand()), 0, 7);
     $params = array(
       'title' => $title,
       'recipient' => $assigneeID,

@@ -325,7 +325,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     if (!empty($_POST['hidden_custom'])) {
       $customGroupCount = CRM_Utils_Array::value('hidden_custom_group_count', $_POST);
 
-      if ($contactSubType = CRM_Utils_Array::value( 'contact_sub_type', $_POST)) {
+      if ($contactSubType = CRM_Utils_Array::value('contact_sub_type', $_POST)) {
         $paramSubType = implode(',', $contactSubType);
       }
 
@@ -358,7 +358,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       //custom field to load
       if ($this->_contactSubType || isset($paramSubType)) {
         $paramSubType = (isset($paramSubType)) ? $paramSubType :
-          str_replace( CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($this->_contactSubType, CRM_Core_DAO::VALUE_SEPARATOR));
+          str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($this->_contactSubType, CRM_Core_DAO::VALUE_SEPARATOR));
 
         $this->assign('paramSubType', $paramSubType);
       }
@@ -429,7 +429,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     //set address block defaults
-    CRM_Contact_Form_Edit_Address::setDefaultValues( $defaults, $this );
+    CRM_Contact_Form_Edit_Address::setDefaultValues($defaults, $this);
 
 
     if (!empty($defaults['image_URL'])) {
@@ -866,7 +866,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       }
     }
 
-    CRM_Contact_BAO_Contact_Optimizer::edit( $params, $this->_preEditValues );
+    CRM_Contact_BAO_Contact_Optimizer::edit($params, $this->_preEditValues);
 
     if (!empty($params['image_URL'])) {
       CRM_Contact_BAO_Contact::processImageParams($params);

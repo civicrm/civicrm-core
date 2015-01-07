@@ -195,7 +195,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->createDialogContact();
 
     // select financial type
-    $this->select( "financial_type_id", "value=1" );
+    $this->select("financial_type_id", "value=1");
 
     //Contribution status
     $this->select("contribution_status_id", "label=Pending");

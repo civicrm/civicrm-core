@@ -72,12 +72,14 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   public function __construct($config) {
     if (isset($config['group'])) {
       $this->group = $config['group'];
-    } else {
+    }
+    else {
       throw new RuntimeException("Cannot construct SqlGroup cache: missing group");
     }
     if (isset($config['componentID'])) {
       $this->componentID = $config['componentID'];
-    } else {
+    }
+    else {
       $this->componentID = NULL;
     }
     $this->frontCache = array();

@@ -84,12 +84,13 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     if (!is_array($params) || empty($params)) {
       return;
     }
-    if(!$id && empty($params['name'])) {
+    if (!$id && empty($params['name'])) {
       $params['name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 242));
     }
 
     if ($id  && !empty($params['weight'])) {
-      if (isset($params['name'])) { unset($params['name']);
+      if (isset($params['name'])) {
+        unset($params['name']);
       }
 
       $oldWeight = NULL;

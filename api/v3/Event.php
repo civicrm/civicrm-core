@@ -90,8 +90,8 @@ function _civicrm_api3_event_create_spec(&$params) {
  * the core code or schema - this means we have to provide support for api calls (where possible)
  * across schema changes.
  */
-function _civicrm_api3_event_create_legacy_support_42(&$params){
-  if(!empty($params['payment_processor_id'])){
+function _civicrm_api3_event_create_legacy_support_42(&$params) {
+  if (!empty($params['payment_processor_id'])) {
     $params['payment_processor'] = CRM_Core_DAO::VALUE_SEPARATOR . $params['payment_processor_id'] . CRM_Core_DAO::VALUE_SEPARATOR;
   }
 }
@@ -150,7 +150,7 @@ function civicrm_api3_event_get($params) {
     }
     _civicrm_api3_event_get_legacy_support_42($event, $eventDAO->id);
     _civicrm_api3_custom_data_get($event[$eventDAO->id], 'Event', $eventDAO->id, NULL, $eventDAO->event_type_id);
-    if(!empty($options['return'])) {
+    if (!empty($options['return'])) {
       $event[$eventDAO->id]['price_set_id'] = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventDAO->id);
     }
   }
@@ -175,10 +175,10 @@ function _civicrm_api3_event_get_spec(&$params) {
  * the core code or schema - this means we have to provide support for api calls (where possible)
  * across schema changes.
  */
-function _civicrm_api3_event_get_legacy_support_42(&$event, $event_id){
-  if(!empty($event[$event_id]['payment_processor'])){
+function _civicrm_api3_event_get_legacy_support_42(&$event, $event_id) {
+  if (!empty($event[$event_id]['payment_processor'])) {
     $processors = explode(CRM_Core_DAO::VALUE_SEPARATOR, $event[$event_id]['payment_processor']);
-    if(count($processors) == 3 ){
+    if (count($processors) == 3) {
       $event[$event_id]['payment_processor_id'] = $processors[1];
     }
   }

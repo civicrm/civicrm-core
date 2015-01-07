@@ -61,7 +61,7 @@ class CRM_Core_Payment_BaseIPN {
    * @throws CRM_Core_Exception
    */
   public function setInputParameters($parameters) {
-    if(!is_array($parameters)) {
+    if (!is_array($parameters)) {
       throw new CRM_Core_Exception('Invalid input parameters');
     }
     $this->_inputParameters = $parameters;
@@ -92,7 +92,7 @@ class CRM_Core_Payment_BaseIPN {
     $contact = new CRM_Contact_BAO_Contact();
     $contact->id = $ids['contact'];
     if (!$contact->find(TRUE)) {
-      CRM_Core_Error::debug_log_message("Could not find contact record: {$ids['contact']} in IPN request: ".print_r($input, TRUE));
+      CRM_Core_Error::debug_log_message("Could not find contact record: {$ids['contact']} in IPN request: " . print_r($input, TRUE));
       echo "Failure: Could not find contact record: {$ids['contact']}<p>";
       return FALSE;
     }
@@ -101,7 +101,7 @@ class CRM_Core_Payment_BaseIPN {
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $ids['contribution'];
     if (!$contribution->find(TRUE)) {
-      CRM_Core_Error::debug_log_message("Could not find contribution record: {$contribution->id} in IPN request: ".print_r($input, TRUE));
+      CRM_Core_Error::debug_log_message("Could not find contribution record: {$contribution->id} in IPN request: " . print_r($input, TRUE));
       echo "Failure: Could not find contribution record for {$contribution->id}<p>";
       return FALSE;
     }
@@ -380,7 +380,7 @@ class CRM_Core_Payment_BaseIPN {
         $values['receipt_from_name'] = $domainValues[0];
         $values['receipt_from_email'] = $domainValues[1];
       }
-      if($recurContrib && $recurContrib->id){
+      if ($recurContrib && $recurContrib->id) {
         //CRM-13273 - is_email_receipt setting on recurring contribution should take precedence over contribution page setting
         $values['is_email_receipt'] = $recurContrib->is_email_receipt;
       }
@@ -924,7 +924,7 @@ LIMIT 1;";
 
       // we have a pledge now we need to get the oldest unpaid payment
       $paymentDetails = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeId);
-      if(empty($paymentDetails['id'])){
+      if (empty($paymentDetails['id'])) {
         // we can assume this pledge is now completed
         // return now so we don't create a core error & roll back
         return;

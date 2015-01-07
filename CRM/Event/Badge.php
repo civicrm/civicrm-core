@@ -119,15 +119,16 @@ class CRM_Event_Badge {
     // CRM-13235 - leverage the Smarty path to get all templates directories
     $template = CRM_Core_Smarty::singleton();
     if (isset($template->template_dir) && $template->template_dir) {
-      $dirs = is_array( $template->template_dir ) ? $template->template_dir : array($template->template_dir);
+      $dirs = is_array($template->template_dir) ? $template->template_dir : array($template->template_dir);
       foreach ($dirs as $dir) {
-        foreach (array( "$dir/$path/$eventID/$img", "$dir/$path/$img") as $imgFile) {
+        foreach (array("$dir/$path/$eventID/$img", "$dir/$path/$img") as $imgFile) {
           if (file_exists($imgFile)) {
             return $imgFile;
           }
         }
       }
-    } else {
+    }
+    else {
       $imgFile = 'No template directories defined anywhere??';
     }
 
