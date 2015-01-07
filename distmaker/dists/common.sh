@@ -19,7 +19,7 @@ function dm_install_dir() {
   if [ ! -d "$to" ]; then
     mkdir -p "$to"
   fi
-  $DM_RSYNC -avC --exclude=.git --exclude=.svn "$from/./"  "$to/./"
+  ${DM_RSYNC:-rsync} -avC --exclude=.git --exclude=.svn "$from/./"  "$to/./"
 }
 
 ## Copy listed files
@@ -56,7 +56,7 @@ function dm_install_bower() {
   done
 
   [ ! -d "$to" ] && mkdir "$to"
-  $DM_RSYNC -avC $excludes_rsync "$repo/./" "$to/./"
+  ${DM_RSYNC:-rsync} -avC $excludes_rsync "$repo/./" "$to/./"
 }
 
 ## Copy all core files
@@ -106,7 +106,7 @@ function dm_install_packages() {
   ##   packages/Files packages/PHP packages/Text
 
   [ ! -d "$to" ] && mkdir "$to"
-  $DM_RSYNC -avC $excludes_rsync --include=core "$repo/./" "$to/./"
+  ${DM_RSYNC:-rsync} -avC $excludes_rsync --include=core "$repo/./" "$to/./"
 }
 
 ## Copy Drupal-integration module
@@ -162,7 +162,7 @@ function dm_install_vendor() {
   done
 
   [ ! -d "$to" ] && mkdir "$to"
-  $DM_RSYNC -avC $excludes_rsync "$repo/./" "$to/./"
+  ${DM_RSYNC:-rsync} -avC $excludes_rsync "$repo/./" "$to/./"
 }
 
 ##  usage: dm_install_wordpress <wp_repo_path> <to_path>
@@ -173,7 +173,7 @@ function dm_install_wordpress() {
   if [ ! -d "$to" ]; then
     mkdir -p "$to"
   fi
-  $DM_RSYNC -avC \
+  ${DM_RSYNC:-rsync} -avC \
     --exclude=.git \
     --exclude=.svn \
     --exclude=civicrm.config.php.wordpress \
