@@ -110,7 +110,10 @@ abstract class CRM_Core_Payment {
     if (empty($paymentProcessor)) {
       return CRM_Core_DAO::$_nullObject;
     }
-    Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
+    //we use two lines because we can't remove the '&singleton' without risking breakage
+    //of extension classes that extend this one
+    $object =  Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
+    return $object;
   }
 
   /**
