@@ -319,10 +319,6 @@ input.crm-form-entityref {
   margin: .25em 0.5em 0.25em 0;
 }
 
-.crm-container .crm-form-submit-inline {
-  margin: 0em 0.5em 0.25em 0em;
-}
-
 .crm-container div.crm-inline-button {
   padding-left: 6px;
   padding-top: 6px;
@@ -2312,7 +2308,7 @@ div.grippie {
   cursor: pointer;
   font-size: 13px;
   font-weight: normal;
-  margin: 0 0 0 0px;
+  margin: 0;
   padding: 1px 8px 2px 4px;
 }
 
@@ -2334,7 +2330,6 @@ div.grippie {
 .crm-container .crm-button,
 .crm-container .ui-dialog-buttonset .ui-button,
 .crm-container input[type=button],
-.crm-container input.crm-form-submit-inline,
 .crm-container .crm-button {
   text-shadow: 0 1px 0 black;
   background: #70716B url(../i/crm-button-bg.gif) repeat-x top left;
@@ -2350,7 +2345,6 @@ div.grippie {
 
 .crm-container input.crm-form-submit[disabled],
 .crm-container input[type=button][disabled],
-.crm-container input.crm-form-submit-inline[disabled],
 .crm-container .crm-button[disabled] {
     color: #999;
 }
@@ -2360,16 +2354,14 @@ div.grippie {
 }
 
 .crm-container input.crm-form-submit,
-.crm-container input[type=button],
-.crm-container input.crm-form-submit-inline {
+.crm-container input[type=button] {
   padding: 2px 6px;
 }
 
 .crm-container .crm-button input[type=button],
-.crm-container .crm-button input.crm-form-submit,
-.crm-container .crm-button input.crm-form-submit-inline {
-  padding: 2px 4px;
-  margin: 0px;
+.crm-container .crm-button input.crm-form-submit {
+  padding: 3px 5px 2px;
+  margin: 0;
   background: none;
   _background: #6C6C6C;
   /* IE6 only */
@@ -2389,7 +2381,7 @@ div.grippie {
 .crm-container a.button .crm-container a.crm-invoiceButton span {
   display: block;
   line-height: 14px;
-  padding: 2px 0px;
+  padding: 2px 0;
 }
 
 .crm-container .button .red .crm-invoiceButton{
@@ -2412,7 +2404,7 @@ div.grippie {
 .crm-container a.crm-invoiceButton:hover,
 .crm-container a.crm-invoiceButton:focus,
 .crm-container a.button:focus {
-  background-position: 0px -25px;
+  background-position: 0 -25px;
 }
 
 .crm-container .ui-dialog-buttonpane {
@@ -2431,8 +2423,8 @@ div.grippie {
 #crm-container input#_qf_Register_upload_express,
 #crm-container input#_qf_Main_upload_express {
   background: none;
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
   border: none;
 }
 
@@ -3444,15 +3436,14 @@ tbody.scrollContent tr.alternateRow {
   color: #E43D2B !important;
 }
 
-/* rounded corners - we will call dd_roundies on all this */
+/* rounded corners */
 .crm-container .crm-button,
 .crm-container a.button,
 .crm-container a.crm-invoiceButton,
 .crm-container a.crm-invoiceButton:link,
 .crm-container a.button:link,
 .crm-container input.crm-form-submit,
-.crm-container input[type=button],
-.crm-container input.crm-form-submit-inline {
+.crm-container input[type=button] {
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
   -khtml-border-radius: 3px;
@@ -3699,18 +3690,6 @@ div.m ul#civicrm-menu,
 /* Restore this property otherwise our css overrides it */
 .select2-search input {
   box-sizing: border-box;
-}
-
-/* Special styling for specific form buttons */
-#crm-container span.crm-button_qf_Main_upload input,
-#crm-container span.crm-button_qf_Confirm_next input,
-#crm-container span.crm-button_qf_Register_upload input {
-  font-size: 1.2em;
-}
-
-/* Match font size on 'Continue' button on event participant form (no specific class) */
-#crm-container .crm-event-additionalparticipant-form-block span.crm-button input.crm-form-submit.default {
-  font-size: 1.2em;
 }
 
 /* jQuery UI styles */
