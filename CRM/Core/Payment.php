@@ -25,6 +25,7 @@
  +--------------------------------------------------------------------+
 */
 
+use Civi\Payment\System;
 /**
  *
  * @package CRM
@@ -85,6 +86,9 @@ abstract class CRM_Core_Payment {
 
   /**
    * Singleton function used to manage this object
+   * We will migrate to calling Civi\Payment\System::singleton()->getByProcessor($paymentProcessor)
+   * & Civi\Payment\System::singleton()->getById($paymentProcessor) directly as the main access methods & work
+   * to remove this function all together
    *
    * @param string $mode
    *   The mode of operation: live or test.
@@ -106,34 +110,7 @@ abstract class CRM_Core_Payment {
     if (empty($paymentProcessor)) {
       return CRM_Core_DAO::$_nullObject;
     }
-
-    $cacheKey = "{$mode}_{$paymentProcessor['id']}_" . (int) isset($paymentForm);
-
-    if (!isset(self::$_singleton[$cacheKey]) || $force) {
-      $config = CRM_Core_Config::singleton();
-      $ext = CRM_Extension_System::singleton()->getMapper();
-      if ($ext->isExtensionKey($paymentProcessor['class_name'])) {
-        $paymentClass = $ext->keyToClass($paymentProcessor['class_name'], 'payment');
-        require_once $ext->classToPath($paymentClass);
-      }
-      else {
-        $paymentClass = 'CRM_Core_' . $paymentProcessor['class_name'];
-        if (empty($paymentClass)) {
-          throw new CRM_Core_Exception('no class provided');
-        }
-        require_once str_replace('_', DIRECTORY_SEPARATOR, $paymentClass) . '.php';
-      }
-
-      //load the object.
-      self::$_singleton[$cacheKey] = new $paymentClass($mode, $paymentProcessor);
-    }
-
-    //load the payment form for required processor.
-    //if ($paymentForm !== NULL) {
-    //self::$_singleton[$cacheKey]->setForm($paymentForm);
-    //}
-
-    return self::$_singleton[$cacheKey];
+    Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
   }
 
   /**
