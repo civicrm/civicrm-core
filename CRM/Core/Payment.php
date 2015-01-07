@@ -580,7 +580,7 @@ abstract class CRM_Core_Payment {
       }
 
       // Instantiate PP
-      $processorInstance = $paymentClass::singleton($mode, $paymentProcessor);
+      $processorInstance = new $paymentClass($mode, $paymentProcessor);
 
       // Does PP implement this method, and can we call it?
       if (!method_exists($processorInstance, $method) ||
