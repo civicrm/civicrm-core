@@ -133,7 +133,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
 
       CRM_Core_Session::setStatus( $statusMsg, '', 'success' );
     }
-    else if ($result == FALSE) {
+    elseif ($result == FALSE) {
       // Email address not verified
 
       $statusMsg = ts('The email address: %1 you have entered does not match the email associated with this unsubscribe request.',

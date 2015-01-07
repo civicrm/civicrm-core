@@ -163,7 +163,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
     if ($this->_id) {
       $batchIds = array($this->_id);
     }
-    else if (!empty($this->_batchIds)) {
+    elseif (!empty($this->_batchIds)) {
       $batchIds = explode(',', $this->_batchIds);
     }
     // Recalculate totals

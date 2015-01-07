@@ -305,7 +305,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
         $this->assign('linkText', $linkText);
       }
     }
-    else if ( $this->_entityTable == 'civicrm_event' ) {
+    elseif ( $this->_entityTable == 'civicrm_event' ) {
       // If this is tell a friend after registering for an event, give donor link to create their own fundraising page
       require_once 'CRM/PCP/BAO/PCP.php';
       if ( $linkText = CRM_PCP_BAO_PCP::getPcpBlockStatus( $defaults['entity_id'], $defaults['entity_table'] ) ) {

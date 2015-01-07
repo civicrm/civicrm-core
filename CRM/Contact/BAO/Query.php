@@ -1311,7 +1311,7 @@ class CRM_Contact_BAO_Query {
       if (isset($this->_rowCountClause)) {
         $select = "SELECT {$this->_rowCountClause}";
       }
-      else if (isset($this->_distinctComponentClause)) {
+      elseif (isset($this->_distinctComponentClause)) {
         // we add distinct to get the right count for components
         // for the more complex result set, we use GROUP BY the same id
         // CRM-9630
@@ -1478,11 +1478,11 @@ class CRM_Contact_BAO_Query {
           $fromRange = 'event_start_date_low';
           $toRange = 'event_end_date_high';
         }
-        else if ($id == 'case_from_relative') {
+        elseif ($id == 'case_from_relative') {
           $fromRange = 'case_from_start_date_low';
           $toRange = 'case_from_start_date_high';
         }
-        else if ($id == 'case_to_relative') {
+        elseif ($id == 'case_to_relative') {
           $fromRange = 'case_to_end_date_low';
           $toRange = 'case_to_end_date_high';
         }
@@ -2756,7 +2756,7 @@ class CRM_Contact_BAO_Query {
     if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
       $this->_where[$grouping][] = self::buildClause($alias, $op, $value, 'String');
     }
-    else if (is_array($value)) {
+    elseif (is_array($value)) {
       foreach ($value as $k => $v) {
         if (!empty($k)) {
           $clause[$k] = "($alias $op '%" . CRM_Core_DAO::VALUE_SEPARATOR . CRM_Utils_Type::escape($k, 'String') . CRM_Core_DAO::VALUE_SEPARATOR . "%')";
@@ -3666,7 +3666,7 @@ WHERE  id IN ( $groupIDs )
     if ($op == '=') {
       $op = 'IN';
     }
-    else if ($op == '!=') {
+    elseif ($op == '!=') {
       $op = 'NOT IN';
     }
     else {
@@ -3722,7 +3722,7 @@ WHERE  id IN ( $groupIDs )
     if (in_array($op, array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
       $value = NULL;
     }
-    else if (!is_array($value)) {
+    elseif (!is_array($value)) {
       // force the state to be an array
       // check if its in the mapper format!
       $values = self::parseSearchBuilderString($value);
@@ -3749,7 +3749,7 @@ WHERE  id IN ( $groupIDs )
     if ($op == '=') {
       $op = 'IN';
     }
-    else if ($op == '!=') {
+    elseif ($op == '!=') {
       $op = 'NOT IN';
     }
     else {
@@ -3759,7 +3759,7 @@ WHERE  id IN ( $groupIDs )
     if (in_array($op, array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
       $stateClause = "civicrm_address.state_province_id $op";
     }
-    else if ($inputFormat == 'id') {
+    elseif ($inputFormat == 'id') {
       if ($op != 'NOT IN') {
         $op = 'IN';
       }
@@ -5490,7 +5490,7 @@ AND   displayRelType.is_active = 1
       if ($dataType == 'Integer' && !is_numeric($v)) {
         return FALSE;
       }
-      else if ($dataType == 'String' && !is_string($v)) {
+      elseif ($dataType == 'String' && !is_string($v)) {
         return FALSE;
       }
       $returnValues[] = trim($v);

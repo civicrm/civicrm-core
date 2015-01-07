@@ -320,7 +320,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
               CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
               unset($params[$key]);
             }
-            else if ( $customFields[$customFieldID]['data_type'] == 'Boolean' ) {
+            elseif ( $customFields[$customFieldID]['data_type'] == 'Boolean' ) {
               $params[$key] = CRM_Utils_String::strtoboolstr($val);
             }
           }

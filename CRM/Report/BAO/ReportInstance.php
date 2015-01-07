@@ -99,7 +99,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       if ($reportID = CRM_Utils_Array::value('report_id', $params)) {
         $instance->report_id = $reportID;
       }
-      else if ($instanceID) {
+      elseif ($instanceID) {
         $instance->report_id = CRM_Report_Utils_Report::getValueFromUrl($instanceID);
       }
       else {

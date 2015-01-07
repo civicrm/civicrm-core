@@ -109,7 +109,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
     if ($entity == 'contribution') {
       $entityName = 'default_contribution_amount';
     }
-    else if ($entity == 'membership') {
+    elseif ($entity == 'membership') {
       $entityName = 'default_membership_type_amount';
     }
 

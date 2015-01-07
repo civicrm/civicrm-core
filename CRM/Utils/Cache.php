@@ -77,10 +77,10 @@ class CRM_Utils_Cache {
       if (defined('CIVICRM_USE_MEMCACHE') && CIVICRM_USE_MEMCACHE) {
         $className = 'Memcache';
       }
-      else if (defined('CIVICRM_USE_ARRAYCACHE') && CIVICRM_USE_ARRAYCACHE) {
+      elseif (defined('CIVICRM_USE_ARRAYCACHE') && CIVICRM_USE_ARRAYCACHE) {
         $className = 'ArrayCache';
       }
-      else if (defined('CIVICRM_DB_CACHE_CLASS') && CIVICRM_DB_CACHE_CLASS) {
+      elseif (defined('CIVICRM_DB_CACHE_CLASS') && CIVICRM_DB_CACHE_CLASS) {
         $className = CIVICRM_DB_CACHE_CLASS;
       }
 

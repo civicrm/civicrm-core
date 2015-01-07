@@ -735,7 +735,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     if (empty($filters)) {
       return;
     }
-    else if (array_keys($filters) == array('name')) {
+    elseif (array_keys($filters) == array('name')) {
       $settingSpec = array($filters['name'] => CRM_Utils_Array::value($filters['name'], $settingSpec, ''));
       return;
     }

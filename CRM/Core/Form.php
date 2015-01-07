@@ -1587,7 +1587,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
     }
     // check if user has permission, CRM-12062
-    else if ($tempID && CRM_Contact_BAO_Contact_Permission::allow($tempID)) {
+    elseif ($tempID && CRM_Contact_BAO_Contact_Permission::allow($tempID)) {
       return $tempID;
     }
 

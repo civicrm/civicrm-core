@@ -293,7 +293,7 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
         if (!isset($svq)) {
           return civicrm_api3_create_error("Invalid Contact ID: There is no contact record with contact_id = $value.");
         }
-        else if ($svq == 1) {
+        elseif ($svq == 1) {
           return civicrm_api3_create_error("Invalid Contact ID: contact_id $value is a soft-deleted contact.");
         }
 

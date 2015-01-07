@@ -888,7 +888,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $error = new Exception($content);
       JErrorPage::render($error);
     }
-    else if (class_exists('JError')) {
+    elseif (class_exists('JError')) {
       JError::raiseError('CiviCRM-001', $content);
     }
     else {

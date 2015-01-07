@@ -244,11 +244,11 @@ class CRM_Activity_BAO_Query {
             $query->_where[$grouping][] = " civicrm_activity_contact.record_type_id = $sourceID";
             $query->_qill[$grouping][] = ts('Activity created by');
           }
-          else if ($values[2] == 2) {
+          elseif ($values[2] == 2) {
             $query->_where[$grouping][] = " civicrm_activity_contact.record_type_id = $assigneeID";
             $query->_qill[$grouping][] = ts('Activity assigned to');
           }
-          else if ($values[2] == 3) {
+          elseif ($values[2] == 3) {
             $query->_where[$grouping][] = " civicrm_activity_contact.record_type_id = $targetID";
             $query->_qill[$grouping][] = ts('Activity targeted to');
           }

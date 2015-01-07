@@ -78,7 +78,7 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
           $form->_relatedOrganizationFound = TRUE;
         }
       }
-      else if (!empty($form->_employers)) {
+      elseif (!empty($form->_employers)) {
         // not a renewal case and _employers list is not empty
         $form->_relatedOrganizationFound = TRUE;
       }

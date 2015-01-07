@@ -402,7 +402,7 @@ class CRM_Core_BAO_ConfigSetting {
         $config->imageUploadDir
       );
     }
-    else if ($config->userFramework == 'WordPress') {
+    elseif ($config->userFramework == 'WordPress') {
       $url = preg_replace(
         '|wp-content/plugins/civicrm/civicrm/|',
         '',

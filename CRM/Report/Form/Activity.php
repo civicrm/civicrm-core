@@ -344,7 +344,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         }
       }
     }
-    else if ($recordType == 'assignee') {
+    elseif ($recordType == 'assignee') {
       foreach ($this->_selectClauses as $key => $clause) {
         if (strstr($clause, 'civicrm_contact_target.') ||
           strstr($clause, 'civicrm_contact_source.') ||
@@ -356,7 +356,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         }
       }
     }
-    else if ($recordType == 'source') {
+    elseif ($recordType == 'source') {
       foreach ($this->_selectClauses as $key => $clause) {
         if (strstr($clause, 'civicrm_contact_target.') ||
           strstr($clause, 'civicrm_contact_assignee.') ||
@@ -368,7 +368,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         }
       }
     }
-    else if ($recordType == 'final') {
+    elseif ($recordType == 'final') {
       $this->_selectClauses = $this->_selectAliasesTotal;
       foreach ($this->_selectClauses as $key => $clause) {
         if (strstr($clause, 'civicrm_contact_contact_target') ||
@@ -640,7 +640,7 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy}";
       ) {
         $nullFilters[] = " civicrm_contact_contact_{$type}_id IS NOT NULL ";
       }
-      else if (CRM_Utils_Array::value("contact_{$type}_op", $this->_params) ==
+      elseif (CRM_Utils_Array::value("contact_{$type}_op", $this->_params) ==
         'nll'
       ) {
         $nullFilters[] = " civicrm_contact_contact_{$type}_id IS NULL ";
