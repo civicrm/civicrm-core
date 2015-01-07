@@ -75,6 +75,13 @@ if (!defined('CIVICRM_SETTINGS_PATH')) {
   define( 'CIVICRM_SETTINGS_PATH', CIVICRM_PLUGIN_DIR . 'civicrm.settings.php' );
 }
 
+// test if Civi is installed
+if ( file_exists( CIVICRM_SETTINGS_PATH ) ) {
+  define( 'CIVICRM_INSTALLED', TRUE );
+} else {
+  define( 'CIVICRM_INSTALLED', FALSE );
+}
+
 // prevent CiviCRM from rendering its own header
 define( 'CIVICRM_UF_HEAD', TRUE );
 
@@ -210,6 +217,26 @@ class CiviCRM_For_WordPress {
     // add CiviCRM access capabilities to WordPress roles
     add_action( 'init', array( $this, 'set_access_capabilities' ) );
 
+    // only when in WordPress admin...
+    if ( is_admin() ) {
+
+      // modify the admin menu
+      add_action( 'admin_menu', array( $this, 'add_menu_items' ) );
+
+      // check if settings file exist, do not show configuration link on
+      // install / settings page
+      if ( isset( $_GET['page'] ) && $_GET['page'] != 'civicrm-install' ) {
+        if ( ! CIVICRM_INSTALLED ) {
+          add_action( 'admin_notices', array( $this, 'show_setup_warning' ) );
+        }
+      }
+
+    }
+
+    // go no further if Civi not installed yet
+    if ( ! CIVICRM_INSTALLED ) return;
+
+
     // synchronise users on insert and update
     add_action( 'user_register', array( $this, 'update_user' ) );
     add_action( 'profile_update', array( $this, 'update_user' ) );
@@ -224,8 +251,8 @@ class CiviCRM_For_WordPress {
     // only when in WordPress admin...
     if ( is_admin() ) {
 
-      // modify the admin menu
-      add_action( 'admin_menu', array( $this, 'add_menu_items' ) );
+      // merge CiviCRM's HTML header with the WordPress theme's header
+      add_action( 'admin_head', array( $this, 'wp_head' ) );
 
       // the following three hooks CiviCRM button to post and page screens
 
@@ -238,17 +265,6 @@ class CiviCRM_For_WordPress {
 
       // add the javascript to make it all happen
       add_action( 'admin_enqueue_scripts', array( $this, 'add_form_button_js' ) );
-
-      // check if settings file exist, do not show configuration link on
-      // install / settings page
-      if ( isset( $_GET['page'] ) && $_GET['page'] != 'civicrm-install' ) {
-        if ( ! file_exists( CIVICRM_SETTINGS_PATH ) ) {
-          add_action( 'admin_notices', array( $this, 'show_setup_warning' ) );
-        }
-      }
-
-      // merge CiviCRM's HTML header with the WordPress theme's header
-      add_action( 'admin_head', array( $this, 'wp_head' ) );
 
 
     // not in admin
@@ -306,7 +322,7 @@ class CiviCRM_For_WordPress {
       }
 
       // check for settings
-      if ( ! file_exists( CIVICRM_SETTINGS_PATH ) ) {
+      if ( ! CIVICRM_INSTALLED ) {
         $error = FALSE;
       } else {
         $error = include_once ( CIVICRM_SETTINGS_PATH );
@@ -545,7 +561,7 @@ class CiviCRM_For_WordPress {
   public function add_menu_items() {
 
     // check for settings file
-    if ( file_exists( CIVICRM_SETTINGS_PATH ) ) {
+    if ( CIVICRM_INSTALLED ) {
 
       // use plugins_url( 'path/to/file.png', __FILE__ )
       // see http://codex.wordpress.org/Function_Reference/plugins_url
