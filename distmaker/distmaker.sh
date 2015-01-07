@@ -156,9 +156,6 @@ case $1 in
 
 esac
 
-## Install npm packages
-dm_npm_install "$DM_SOURCEDIR"
-
 ## Make sure we have the right branch or tag
 dm_git_checkout "$DM_SOURCEDIR" "$DM_REF_CORE"
 dm_git_checkout "$DM_SOURCEDIR/packages" "$DM_REF_PACKAGES"
@@ -168,6 +165,7 @@ dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
 
 ## Get latest dependencies
 dm_generate_vendor "$DM_SOURCEDIR"
+dm_generate_bower "$DM_SOURCEDIR"
 
 # Before anything - regenerate DAOs
 
