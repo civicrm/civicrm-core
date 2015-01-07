@@ -83,7 +83,7 @@ ORDER BY mp.contribution_id, mp.membership_id";
       $invalidData = CRM_Core_DAO::executeQuery($query);
       if ($invalidData->N) {
         $invalidDataMessage = "<br /><strong>" . ts('The upgrade is being aborted due to data integrity issues in your database. There are multiple membership records linked to the same contribution record. This is unexpected, and some of the membership records may be duplicates. The problem record sets are listed below. Refer to <a href="%1">this wiki page for instructions on repairing your database</a> so that you can run the upgrade successfully.
-        ', array( 1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC42/Repair+database+script+for+4.2+upgrades')) . "</strong>";
+        ', array(1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC42/Repair+database+script+for+4.2+upgrades')) . "</strong>";
         $membershipType = CRM_Member_PseudoConstant::membershipType();
         $membershipStatus = CRM_Member_PseudoConstant::membershipStatus();
         $invalidDataMessage .= "<table border=1><tr><th>Contact-ID</th><th>Contribution-ID</th><th>Membership-ID</th><th>Membership Type</th><th>Start Date</th><th>End Date</th><th>Membership Status</th></tr>";
@@ -434,7 +434,7 @@ WHERE     cpse.price_set_id IS NULL";
       $addTo[2] = $dao->contribution_page_id;
       $options = array(
       'otherAmount' => $dao->is_allow_other_amount,
-                      'membership' => $dao->membership_block_id );
+                      'membership' => $dao->membership_block_id);
       self::createPriceSet($daoName, $addTo, $options);
     }
 
@@ -469,7 +469,7 @@ WHERE     cpse.price_set_id IS NULL";
     // an event or contrib page has been deleted but left the option group behind - (this may be fixed in later versions?)
     // we should probably delete the option group - but at least early exit here as the code following it does not fatal
     // CRM-10298
-    if ( empty($pageTitle)) {
+    if (empty($pageTitle)) {
       return;
     }
 
@@ -960,10 +960,10 @@ VALUES
       }
     }
 
-    if ( !empty($processedRecords) ) {
+    if (!empty($processedRecords)) {
       CRM_Core_Error::debug_log_message("deleteInvalidPairs() - The following records have been processed. Membership records with action:");
-      CRM_Core_Error::debug_log_message( "Contact ID, ContributionID, Contribution Status, MembershipID, Membership Type, Start Date, End Date, Membership Status, Action" );
-      foreach ( $processedRecords as $record ) {
+      CRM_Core_Error::debug_log_message("Contact ID, ContributionID, Contribution Status, MembershipID, Membership Type, Start Date, End Date, Membership Status, Action");
+      foreach ($processedRecords as $record) {
         CRM_Core_Error::debug_log_message(implode(', ', $record));
       }
     }

@@ -198,7 +198,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
      );
     $result1 = $this->callAPISuccess($this->_entity, 'create', $params1);
     $result2 = $this->callAPISuccess($this->_entity, 'create', $params2);
-    $result = $this->callAPISuccess($this->_entity, 'get', array('price_field_id' => $this->priceFieldID1 ));
+    $result = $this->callAPISuccess($this->_entity, 'get', array('price_field_id' => $this->priceFieldID1));
     $this->assertEquals(2, $result['count'], 'In line ' . __LINE__);
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $result1['id']));
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $result2['id']));

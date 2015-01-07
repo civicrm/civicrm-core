@@ -208,7 +208,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
                                                         null, null, false,
                                                         $tokens,
                                                         'CRM_Core_BAO_MessageTemplate');
-      $contact = reset( $details );
+      $contact = reset($details);
 
       // call token hook
       $hookTokens = array();

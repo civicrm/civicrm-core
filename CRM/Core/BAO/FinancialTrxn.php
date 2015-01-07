@@ -58,7 +58,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @return CRM_Core_BAO_FinancialTrxn object
    * @static
    */
-  public static function create(&$params, $trxnEntityTable = null ) {
+  public static function create(&$params, $trxnEntityTable = null) {
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->copyValues($params);
     $fids = array();
@@ -130,11 +130,11 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @return CRM_Contribute_BAO_ContributionType object
    * @static
    */
-  public static function retrieve( &$params, &$defaults ) {
-    $financialItem = new CRM_Financial_DAO_FinancialTrxn( );
+  public static function retrieve(&$params, &$defaults) {
+    $financialItem = new CRM_Financial_DAO_FinancialTrxn();
     $financialItem->copyValues($params);
     if ($financialItem->find(true)) {
-      CRM_Core_DAO::storeValues( $financialItem, $defaults );
+      CRM_Core_DAO::storeValues($financialItem, $defaults);
       return $financialItem;
     }
     return null;

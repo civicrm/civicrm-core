@@ -53,7 +53,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
 
     // Templates injected into regions should normally be file names, but for unit-testing it's handy to use "string:" notation
     require_once 'CRM/Core/Smarty/resources/String.php';
-    civicrm_smarty_register_string_resource( );
+    civicrm_smarty_register_string_resource();
   }
 
   public function testAddScriptFile() {

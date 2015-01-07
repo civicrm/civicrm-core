@@ -179,7 +179,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     $params['priority_id'] = CRM_Core_OptionGroup::getValue('priority', 'Normal', 'name');
     $activity->priority_id = $params['priority_id'];
 
-    foreach ($form->_oldCaseStatus as $statuskey => $statusval ) {
+    foreach ($form->_oldCaseStatus as $statuskey => $statusval) {
       if ($activity->subject == 'null') {
         $activity->subject = ts('Case status changed from %1 to %2', array(
             1 => CRM_Utils_Array::value($statusval, $form->_caseStatus),

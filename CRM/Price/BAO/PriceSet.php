@@ -882,7 +882,7 @@ WHERE  id = %1";
           unset($autoRenew[$dontCare]);
         }
       }
-      if (count($autoRenew) > 1 ) {
+      if (count($autoRenew) > 1) {
         $params['autoRenew'] = $autoRenew;
       }
     }

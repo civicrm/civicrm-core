@@ -86,12 +86,12 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
       'entity_id' => 1,
       'weight' => 1,
       'uf_group_id' => $this->_ufGroupId,
-      'is_active' => 1, );
+      'is_active' => 1,);
     $ufJoin = $this->callAPISuccess('uf_join', 'create', $params);
 
     $searchParams = array(
       'entity_table' => 'civicrm_contribution_page',
-      'entity_id' => 1, );
+      'entity_id' => 1,);
     $result = $this->callAPISuccess('uf_join', 'get', $searchParams);
 
     foreach ($result['values'] as $key => $value) {
@@ -118,7 +118,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_contribution_page',
       'entity_id' => 1,
       'weight' => 1,
-      'is_active' => 1, );
+      'is_active' => 1,);
     $result = $this->callAPIFailure('uf_join', 'create', $params);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: uf_group_id', 'In line ' . __LINE__);
   }
@@ -191,7 +191,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
       'entity_id' => 1,
       'weight' => 1,
       'uf_group_id' => $this->_ufGroupId,
-      'is_active' => 1, );
+      'is_active' => 1,);
 
     $ufJoin = $this->callAPISuccess('uf_join', 'create', $params);
     $searchParams = array(

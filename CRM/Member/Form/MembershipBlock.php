@@ -364,14 +364,14 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
           }
           $setParams['is_quick_config'] = 1;
           $setParams['extends'] = CRM_Core_Component::getComponentID('CiviMember');
-          $setParams['financial_type_id'] = CRM_Utils_Array::value( 'financial_type_id', $this->_values );
+          $setParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $this->_values);
           $priceSet = CRM_Price_BAO_PriceSet::create($setParams);
           $priceSetID = $priceSet->id;
           $fieldParams['price_set_id'] = $priceSet->id;
         }
         elseif ($usedPriceSetId) {
           $setParams['extends'] = CRM_Core_Component::getComponentID('CiviMember');
-          $setParams['financial_type_id'] = CRM_Utils_Array::value( 'financial_type_id', $this->_values );
+          $setParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $this->_values);
           $setParams['id'] = $usedPriceSetId;
           $priceSet = CRM_Price_BAO_PriceSet::create($setParams);
           $priceSetID = $priceSet->id;
@@ -441,7 +441,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
       if ($priceSetID) {
         $params['membership_types'] = 'null';
         $params['membership_type_default'] = CRM_Utils_Array::value('membership_type_default', $params, 'null');
-        $params['membership_types']        = serialize( $membershipTypes );
+        $params['membership_types']        = serialize($membershipTypes);
         $params['display_min_fee']         = CRM_Utils_Array::value('display_min_fee', $params, FALSE);
         $params['is_separate_payment']     = CRM_Utils_Array::value('is_separate_payment', $params, FALSE);
       }

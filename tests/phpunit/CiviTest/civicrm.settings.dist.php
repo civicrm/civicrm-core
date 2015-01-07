@@ -8,12 +8,12 @@ define('CIVICRM_TEST', 1);
 
 //--- you shouldn't have to modify anything under this line, but might want to put the compiled templates CIVICRM_TEMPLATE_COMPILEDIR in a different folder than our default location ----------
 
-if ( ! defined( 'CIVICRM_DSN' ) && ! empty( $GLOBALS['mysql_user'] ) ) {
-  $dbName = ! empty( $GLOBALS['mysql_db'] ) ? $GLOBALS['mysql_db'] : 'civicrm_tests_dev';
-  if ( empty( $GLOBALS['mysql_pass'] ) && $GLOBALS['mysql_pass_need_password'] ) {
-    $GLOBALS['mysql_pass'] = PHPUnit_TextUI_Command::getPassword( 'Password' );
+if (! defined('CIVICRM_DSN') && ! empty($GLOBALS['mysql_user'])) {
+  $dbName = ! empty($GLOBALS['mysql_db']) ? $GLOBALS['mysql_db'] : 'civicrm_tests_dev';
+  if (empty($GLOBALS['mysql_pass']) && $GLOBALS['mysql_pass_need_password']) {
+    $GLOBALS['mysql_pass'] = PHPUnit_TextUI_Command::getPassword('Password');
   }
-  define( 'CIVICRM_DSN', "mysql://{$GLOBALS['mysql_user']}:{$GLOBALS['mysql_pass']}@{$GLOBALS['mysql_host']}/{$dbName}?new_link=true" );
+  define('CIVICRM_DSN', "mysql://{$GLOBALS['mysql_user']}:{$GLOBALS['mysql_pass']}@{$GLOBALS['mysql_host']}/{$dbName}?new_link=true");
 }
 
 
@@ -61,7 +61,7 @@ define('CIVICRM_UF', 'UnitTests');
 
 global $civicrm_root;
 if (empty($civicrm_root)) {
-  $civicrm_root = dirname(dirname(dirname(dirname( __FILE__ ) )));
+  $civicrm_root = dirname(dirname(dirname(dirname(__FILE__))));
 }
 #$civicrm_root = '/var/www/drupal7.dev.civicrm.org/public/sites/devel.drupal7.tests.dev.civicrm.org/modules/civicrm';
 
@@ -70,14 +70,14 @@ if (empty($civicrm_root)) {
 
 if (!defined("CIVICRM_TEMPLATE_COMPILEDIR")) {
   if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-    define( 'CIVICRM_TEMPLATE_COMPILEDIR', getenv('TMP') . DIRECTORY_SEPARATOR . 'civi' . DIRECTORY_SEPARATOR );
+    define('CIVICRM_TEMPLATE_COMPILEDIR', getenv('TMP') . DIRECTORY_SEPARATOR . 'civi' . DIRECTORY_SEPARATOR);
   }
   else {
-    define( 'CIVICRM_TEMPLATE_COMPILEDIR', '/tmp/civi/' );
+    define('CIVICRM_TEMPLATE_COMPILEDIR', '/tmp/civi/');
   }
 }
 
-define( 'CIVICRM_SITE_KEY', 'phpunittestfakekey' );
+define('CIVICRM_SITE_KEY', 'phpunittestfakekey');
 
 /**
  * Site URLs:
@@ -105,7 +105,7 @@ define( 'CIVICRM_SITE_KEY', 'phpunittestfakekey' );
  *
  */
 if (!defined('CIVICRM_UF_BASEURL')) {
-  define( 'CIVICRM_UF_BASEURL', 'http://FIX ME' );
+  define('CIVICRM_UF_BASEURL', 'http://FIX ME');
 }
 
 /**
@@ -125,13 +125,13 @@ define('CIVICRM_MYSQL_STRICT', TRUE);
 $include_path = '.'        . PATH_SEPARATOR .
                 $civicrm_root . PATH_SEPARATOR .
                 $civicrm_root . DIRECTORY_SEPARATOR . 'packages' . PATH_SEPARATOR .
-                get_include_path( );
-set_include_path( $include_path );
+                get_include_path();
+set_include_path($include_path);
 
-if ( function_exists( 'variable_get' ) && variable_get('clean_url', '0') != '0' ) {
-  define( 'CIVICRM_CLEANURL', 1 );
+if (function_exists('variable_get') && variable_get('clean_url', '0') != '0') {
+  define('CIVICRM_CLEANURL', 1);
 } else {
-  define( 'CIVICRM_CLEANURL', 0 );
+  define('CIVICRM_CLEANURL', 0);
 }
 
 // force PHP to auto-detect Mac line endings

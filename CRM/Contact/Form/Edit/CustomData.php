@@ -82,7 +82,7 @@ class CRM_Contact_Form_Edit_CustomData {
             unset($customValueCount[0]);
           }
           $form->_customValueCount = $customValueCount;
-          $form->assign( 'customValueCount', $customValueCount);
+          $form->assign('customValueCount', $customValueCount);
         }
       }
     }

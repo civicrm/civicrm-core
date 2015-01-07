@@ -44,7 +44,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $emailId = "$firstName.anderson@example.org";
     $this->webtestAddContact($firstName, "Anderson", $emailId);
 
-    $this->openCiviPage('report/contact/summary', 'reset=1', '_qf_Summary_submit' );
+    $this->openCiviPage('report/contact/summary', 'reset=1', '_qf_Summary_submit');
 
     // enable email field
     $this->click("fields[email]");

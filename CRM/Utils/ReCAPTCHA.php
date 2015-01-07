@@ -81,7 +81,7 @@ class CRM_Utils_ReCAPTCHA {
     $error  = NULL;
     $config = CRM_Core_Config::singleton();
     $useSSL = FALSE;
-    if ( !function_exists( 'recaptcha_get_html' ) ) {
+    if (!function_exists('recaptcha_get_html')) {
       require_once 'packages/recaptcha/recaptchalib.php';
     }
 

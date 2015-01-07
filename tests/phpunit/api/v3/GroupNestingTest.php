@@ -121,7 +121,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    */
   public function testGetWithChildGroupId() {
     $params = array(
-      'child_group_id' => 4, );
+      'child_group_id' => 4,);
 
     $result = $this->callAPISuccess('group_nesting', 'get', $params);
 
@@ -148,7 +148,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    */
   public function testGetWithParentGroupId() {
     $params = array(
-      'parent_group_id' => 1, );
+      'parent_group_id' => 1,);
 
     $result = $this->callAPISuccess('group_nesting', 'get', $params);
 
@@ -224,7 +224,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
     // groups id=1 and id=2 loaded in setUp
     $getparams = array(
       'parent_group_id' => 1,
-      'child_group_id' => 2, );
+      'child_group_id' => 2,);
 
     $result = $this->callAPISuccess('group_nesting', 'get', $getparams);
     $params = array('id' => $result['id']);

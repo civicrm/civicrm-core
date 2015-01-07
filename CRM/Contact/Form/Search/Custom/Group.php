@@ -161,7 +161,7 @@ class CRM_Contact_Form_Search_Custom_Group
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array( 'andOr' => '1' );
+    $defaults = array('andOr' => '1');
 
     if (!empty($this->_formValues)) {
       $defaults['andOr'] = CRM_Utils_Array::value('andOr', $this->_formValues, '1');

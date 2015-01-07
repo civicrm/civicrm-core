@@ -85,7 +85,7 @@ class CRM_Logging_Differ {
     $addressCustomTables = $logging->entityCustomDataLogTables('Address');
 
     $contactIdClause = $join = '';
-    if ( $contactID ) {
+    if ($contactID) {
       $params[3] = array($contactID, 'Integer');
       switch ($table) {
       case 'civicrm_contact':
@@ -128,7 +128,7 @@ LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND sour
         if (empty($contactIdClause)) {
           $contactIdClause = "AND contact_id = %3";
         }
-        if ( strpos($table, 'civicrm_value') !== false ) {
+        if (strpos($table, 'civicrm_value') !== false) {
           $contactIdClause = "AND entity_id = %3";
         }
       }
@@ -169,7 +169,7 @@ WHERE lt.log_conn_id = %1 AND
     $changedSQL = "SELECT * FROM `{$this->db}`.`log_$table` WHERE log_conn_id = %1 AND log_date >= %2 AND log_date < DATE_ADD(%2, INTERVAL {$this->interval}) AND id = %3 ORDER BY log_date DESC LIMIT 1";
 
     $changedDAO = CRM_Core_DAO::executeQuery($changedSQL, $params);
-    while ($changedDAO->fetch( )) {
+    while ($changedDAO->fetch()) {
       $changed = $changedDAO->toArray();
 
       // return early if nothing found
@@ -298,7 +298,7 @@ WHERE lt.log_conn_id = %1 AND
             $values[$table]['status_id'] = CRM_Case_PseudoConstant::caseStatus('label', FALSE);
             break;
           case 'civicrm_activity':
-            $values[$table]['status_id'] = CRM_Core_PseudoConstant::activityStatus( );
+            $values[$table]['status_id'] = CRM_Core_PseudoConstant::activityStatus();
             break;
         }
 

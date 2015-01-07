@@ -84,10 +84,10 @@ class CRM_Utils_Token {
       'id',
       'description',
     ),
-    'subscribe' => array( 'group' ),
-    'unsubscribe' => array( 'group' ),
-    'resubscribe' => array( 'group' ),
-    'welcome' => array( 'group' ),
+    'subscribe' => array('group'),
+    'unsubscribe' => array('group'),
+    'resubscribe' => array('group'),
+    'welcome' => array('group'),
   );
 
   /**
@@ -1437,7 +1437,7 @@ class CRM_Utils_Token {
       $remainingTokens = self::getTokens($tokenString);
 
       // contact related $greetingTokens not empty, there are customized or hook tokens to replace
-      if (!empty($remainingTokens['contact']) ) {
+      if (!empty($remainingTokens['contact'])) {
         // Fill the return properties array
         $greetingTokens = $remainingTokens['contact'];
         reset($greetingTokens);

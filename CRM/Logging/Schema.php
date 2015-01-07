@@ -439,7 +439,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
     // NOTE: we consider only those columns for modifications where there is a spec change, and that the column definition
     // wasn't deliberately modified by fixTimeStampAndNotNullSQL() method.
     foreach ($civiTableSpecs as $col => $colSpecs) {
-      if (!isset($logTableSpecs[$col]) || !is_array($logTableSpecs[$col]) ) {
+      if (!isset($logTableSpecs[$col]) || !is_array($logTableSpecs[$col])) {
         $logTableSpecs[$col] = array();
       }
 
@@ -591,7 +591,7 @@ COLS;
       $columns = $this->columnsOf($table, $force);
 
       // only do the change if any data has changed
-      $cond = array( );
+      $cond = array();
       foreach ($columns as $column) {
         // ignore modified_date changes
         if ($column != 'modified_date' && !in_array($column, CRM_Utils_Array::value($table, $this->exceptions, array()))) {
@@ -599,7 +599,7 @@ COLS;
         }
       }
       $suppressLoggingCond = "@civicrm_disable_logging IS NULL OR @civicrm_disable_logging = 0";
-      $updateSQL = "IF ( (" . implode( ' OR ', $cond ) . ") AND ( $suppressLoggingCond ) ) THEN ";
+      $updateSQL = "IF ( (" . implode(' OR ', $cond) . ") AND ( $suppressLoggingCond ) ) THEN ";
 
       if ($this->useDBPrefix) {
         $sqlStmt = "INSERT INTO `{$this->db}`.log_{tableName} (";
@@ -659,11 +659,11 @@ COLS;
    *
    * @static
    */
-  public static function disableLoggingForThisConnection( ) {
+  public static function disableLoggingForThisConnection() {
     // do this only if logging is enabled
-    $config = CRM_Core_Config::singleton( );
-    if ( $config->logging ) {
-      CRM_Core_DAO::executeQuery( 'SET @civicrm_disable_logging = 1' );
+    $config = CRM_Core_Config::singleton();
+    if ($config->logging) {
+      CRM_Core_DAO::executeQuery('SET @civicrm_disable_logging = 1');
     }
   }
 

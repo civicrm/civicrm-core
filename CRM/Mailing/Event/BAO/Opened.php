@@ -160,7 +160,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
 
     $dao->query($query);
 
-    while ( $dao->fetch() ) {
+    while ($dao->fetch()) {
       $openedCount[$dao->mailingID] = $dao->opened;
     }
     return $openedCount;
@@ -201,7 +201,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
 
     $dao->query($query);
 
-    while ( $dao->fetch() ) {
+    while ($dao->fetch()) {
       $openedCount[$dao->mailingID] = $dao->opened;
     }
 

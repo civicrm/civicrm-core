@@ -71,7 +71,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     // this mean it's a batch action
-    if (!$this->_id ) {
+    if (!$this->_id) {
       if (!empty($_GET['batch_id'])) {
         //validate batch ids
         $batchIds = explode(',', $_GET['batch_id']);
@@ -99,7 +99,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
     //check if batch status is valid, do not allow exported batches to export again
     $batchStatus = CRM_Batch_BAO_Batch::getBatchStatuses($this->_batchIds);
 
-    foreach ($batchStatus as $batchStatusId ) {
+    foreach ($batchStatus as $batchStatusId) {
       if ($batchStatusId == $this->_exportStatusId) {
         CRM_Core_Error::fatal(ts('You cannot exported the batches which were exported earlier.'));
       }

@@ -55,7 +55,7 @@ class CRM_Contact_Form_Edit_Individual {
   public static function buildQuickForm(&$form, $inlineEditMode = NULL) {
     $form->applyFilter('__ALL__', 'trim');
 
-    if ( !$inlineEditMode || $inlineEditMode == 1 ) {
+    if (!$inlineEditMode || $inlineEditMode == 1) {
       $nameFields = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'contact_edit_options', TRUE, NULL,
         FALSE, 'name', TRUE, 'AND v.filter = 2'
@@ -95,7 +95,7 @@ class CRM_Contact_Form_Edit_Individual {
       }
     }
 
-    if ( !$inlineEditMode || $inlineEditMode == 2 ) {
+    if (!$inlineEditMode || $inlineEditMode == 2) {
       // nick_name
       $form->addElement('text', 'nick_name', ts('Nickname'),
         CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'nick_name')
@@ -116,14 +116,14 @@ class CRM_Contact_Form_Edit_Individual {
       $form->addElement('text', 'contact_source', ts('Source'), CRM_Utils_Array::value('source', $attributes));
     }
 
-    if ( !$inlineEditMode ) {
+    if (!$inlineEditMode) {
       $checkSimilar = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'contact_ajax_check_similar',
         NULL,
         TRUE
       );
 
-      if ( $checkSimilar == null ) {
+      if ($checkSimilar == null) {
         $checkSimilar = 0;
       }
       $form->assign('checkSimilar', $checkSimilar);

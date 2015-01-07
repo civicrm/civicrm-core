@@ -29,7 +29,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
       CRM_Utils_PseudoConstant::flushConstant($apiRequest['params']['fieldname']);
     }
     if (!empty($apiRequest['params']['option_group_id'])) {
-      $optionGroupName = civicrm_api('option_group', 'getvalue', array('version' => 3, 'id' => $apiRequest['params']['option_group_id'], 'return' => 'name') );
+      $optionGroupName = civicrm_api('option_group', 'getvalue', array('version' => 3, 'id' => $apiRequest['params']['option_group_id'], 'return' => 'name'));
       if (is_string($optionGroupName)) {
         CRM_Utils_PseudoConstant::flushConstant(_civicrm_api_get_camel_name($optionGroupName));
       }

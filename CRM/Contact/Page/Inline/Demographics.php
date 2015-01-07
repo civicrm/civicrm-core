@@ -54,7 +54,7 @@ class CRM_Contact_Page_Inline_Demographics extends CRM_Core_Page {
     $params = array('id' => $contactId);
 
     $defaults = array();
-    CRM_Contact_BAO_Contact::getValues( $params, $defaults );
+    CRM_Contact_BAO_Contact::getValues($params, $defaults);
 
     if (!empty($defaults['gender_id'])) {
       $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');

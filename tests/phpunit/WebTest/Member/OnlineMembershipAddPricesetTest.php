@@ -151,7 +151,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       }
       $i++;
     }
-    $this->waitForElementPresent( 'financial_type_id' );
+    $this->waitForElementPresent('financial_type_id');
     $this->select("financial_type_id", "label={$contributionType}");
     $this->waitForElementPresent('_qf_Field_next-bottom');
     $this->clickLink('_qf_Field_next-bottom');
@@ -201,7 +201,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     }
     elseif ($usedFor == 'Membership') {
       $this->click('extends[3]');
-      $this->waitForElementPresent( 'financial_type_id' );
+      $this->waitForElementPresent('financial_type_id');
       $this->select("css=select.crm-form-select", "label={$contributionType}");
     }
 
@@ -448,7 +448,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       'joinDate', 'startDate', 'endDate') as $date) {
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }
-    $i = ($term == 3) ? 3 : (($term == 2) ? 2 : 1 );
+    $i = ($term == 3) ? 3 : (($term == 2) ? 2 : 1);
     $this->waitForElementPresent("xpath=//div[@id='priceset']/div[2]/div[2]/div[$i]/span/input");
     $this->click("xpath=//div[@id='priceset']/div[2]/div[2]/div[$i]/span/input");
     $amount = $this->getText("xpath=//div[@id='priceset']/div[2]/div[2]/div[$i]/span/label/span[@class='crm-price-amount-amount']");

@@ -41,7 +41,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
 
   static $_links = NULL;
 
-  static $_exceptions = array( 'logging/contact/detail' );
+  static $_exceptions = array('logging/contact/detail');
 
   /**
    * Name of component if report list is filtered

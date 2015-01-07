@@ -221,7 +221,7 @@ function civicrm_api3_membership_get($params) {
     return civicrm_api3_create_success($membershipValues, $params, 'membership', 'get');
   }
 
-  $members =  _civicrm_api3_membership_relationsship_get_customv2behaviour($params, $membershipValues, $contactID );
+  $members =  _civicrm_api3_membership_relationsship_get_customv2behaviour($params, $membershipValues, $contactID);
   return civicrm_api3_create_success($members, $params, 'membership', 'get');
 }
 

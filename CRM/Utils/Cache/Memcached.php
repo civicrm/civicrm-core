@@ -119,8 +119,8 @@ class CRM_Utils_Cache_Memcached {
   public function set($key, &$value) {
     $key = $this->cleanKey($key);
     if (!$this->_cache->set($key, $value, $this->_timeout)) {
-      CRM_Core_Error::debug( 'Result Code: ', $this->_cache->getResultMessage());
-      CRM_Core_Error::fatal("memcached set failed, wondering why?, $key", $value );
+      CRM_Core_Error::debug('Result Code: ', $this->_cache->getResultMessage());
+      CRM_Core_Error::fatal("memcached set failed, wondering why?, $key", $value);
       return FALSE;
     }
     return TRUE;
@@ -154,7 +154,7 @@ class CRM_Utils_Cache_Memcached {
    */
   public function cleanKey($key) {
     $key = preg_replace('/\s+|\W+/', '_', $this->_prefix . $key);
-    if ( strlen($key) > self::MAX_KEY_LEN ) {
+    if (strlen($key) > self::MAX_KEY_LEN) {
       $md5Key = md5($key);  // this should be 32 characters in length
       $subKeyLen = self::MAX_KEY_LEN - 1 - strlen($md5Key);
       $key = substr($key, 0, $subKeyLen) . "_" . $md5Key;

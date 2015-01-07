@@ -223,7 +223,7 @@ class CRM_Core_Report_Excel {
       if ($saveFile) {
         $print = FALSE;
       }
-      return self::makeCSVTable( $header, $rows, $titleHeader, $print, $outputHeader );
+      return self::makeCSVTable($header, $rows, $titleHeader, $print, $outputHeader);
     }
   }
 

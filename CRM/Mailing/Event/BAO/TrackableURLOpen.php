@@ -191,7 +191,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
 
     $dao->query($query);
 
-    while ( $dao->fetch() ) {
+    while ($dao->fetch()) {
       $clickCount[$dao->mailingID] = $dao->opened;
     }
     return $clickCount;
@@ -232,7 +232,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
 
     $dao->query($query);
 
-    while ( $dao->fetch() ) {
+    while ($dao->fetch()) {
       $clickCount[$dao->mailingID] = $dao->opened;
     }
 

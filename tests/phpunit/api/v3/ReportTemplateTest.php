@@ -102,7 +102,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"');
 
-    $result = $this->callAPISuccess('ReportTemplate', 'delete', array(      'id' => $entityId,
+    $result = $this->callAPISuccess('ReportTemplate', 'delete', array(     'id' => $entityId,
     ));
     $this->assertAPISuccess($result);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);

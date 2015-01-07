@@ -101,8 +101,8 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $this->assertDBCompareValues('CRM_Contribute_DAO_Contribution', $search, $compare);
 
     $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
-    $search = array( 'entity_id' => $lineItem );
-    $compare = array( 'status_id' => 1 );
+    $search = array('entity_id' => $lineItem);
+    $compare = array('status_id' => 1);
     $this->assertDBCompareValues("CRM_Financial_DAO_FinancialItem", $search, $compare);
 
     $status = $this->_getPremiumActualCost($contId, 'Accounts Receivable', 'Payment Processor Account', NULL, "'civicrm_contribution'", "ft.status_id as status");
@@ -152,7 +152,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     // create new contact using dialog
     $this->createDialogContact();
     // select financial type
-    $this->select( "financial_type_id", "value=1" );
+    $this->select("financial_type_id", "value=1");
     // total amount
     $this->type("total_amount", "100");
     // fill Premium information
@@ -339,8 +339,8 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
     //Assertions
-    $search = array( 'id' => $contId );
-    $compare = array( 'financial_type_id' => 3 );
+    $search = array('id' => $contId);
+    $compare = array('financial_type_id' => 3);
     $this->assertDBCompareValues('CRM_Contribute_DAO_Contribution', $search, $compare);
 
     $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
@@ -460,7 +460,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $contact = $this->createDialogContact();
 
     // select financial type
-    $this->select( "financial_type_id", "value=1" );
+    $this->select("financial_type_id", "value=1");
 
     //Contribution status
     $this->select("contribution_status_id", "label=$status");

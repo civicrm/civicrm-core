@@ -88,7 +88,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $contact = $this->createDialogContact();
 
     // select financial type
-    $this->select( "financial_type_id", "value=1" );
+    $this->select("financial_type_id", "value=1");
 
     // fill in Received Date
     $this->webtestFillDate('receive_date');

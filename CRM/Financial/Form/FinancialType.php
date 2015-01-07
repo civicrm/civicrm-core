@@ -101,7 +101,7 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
       $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $url = CRM_Utils_System::url('civicrm/admin/financial/financialType', 'reset=1&action=browse');
-        CRM_Core_Session::setStatus(ts('The financial type "%1" has been updated.', array( 1 => $financialType->name)), ts('Saved'), 'success');
+        CRM_Core_Session::setStatus(ts('The financial type "%1" has been updated.', array(1 => $financialType->name)), ts('Saved'), 'success');
       }
       else {
         $url = CRM_Utils_System::url('civicrm/admin/financial/financialType/accounts', 'reset=1&action=browse&aid=' . $financialType->id);

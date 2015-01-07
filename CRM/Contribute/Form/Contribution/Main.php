@@ -592,7 +592,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     //when multiple payment processor as the user
     //can toggle with payment processor selection
     $billingModePaymentProcessors = 0;
-    if ( !empty( $this->_paymentProcessors ) ) {
+    if (!empty($this->_paymentProcessors)) {
       foreach ($this->_paymentProcessors as $key => $values) {
         if ($values['billing_mode'] == CRM_Core_Payment::BILLING_MODE_BUTTON) {
           $billingModePaymentProcessors++;
@@ -765,7 +765,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
         if ($self->_quickConfig && ($priceField->name == 'contribution_amount' || $priceField->name == 'membership_amount')) {
           $previousId = $priceField->id;
-          if ($priceField->name == 'membership_amount' && !$priceField->is_active ) {
+          if ($priceField->name == 'membership_amount' && !$priceField->is_active) {
             $membershipIsActive = FALSE;
           }
         }
@@ -1259,14 +1259,14 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     if ($priceSetId = CRM_Utils_Array::value('priceSetId', $params)) {
       $lineItem = array();
-      $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config' );
-      if ( $is_quick_config ) {
-        foreach ( $this->_values['fee'] as $key => & $val ) {
-          if ( $val['name'] == 'other_amount' && $val['html_type'] == 'Text' && array_key_exists( 'price_'.$key, $params )  ) {
+      $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config');
+      if ($is_quick_config) {
+        foreach ($this->_values['fee'] as $key => & $val) {
+          if ($val['name'] == 'other_amount' && $val['html_type'] == 'Text' && array_key_exists('price_'.$key, $params) ) {
             $params['price_'.$key] = CRM_Utils_Rule::cleanMoney($params['price_'.$key]); //Clean out any currency symbols
-            if ( $params['price_'.$key] != 0 ) {
-              foreach ( $val['options'] as $optionKey => & $options ) {
-                $options['amount'] = CRM_Utils_Array::value( 'price_'.$key, $params );
+            if ($params['price_'.$key] != 0) {
+              foreach ($val['options'] as $optionKey => & $options) {
+                $options['amount'] = CRM_Utils_Array::value('price_'.$key, $params);
                 break;
               }
             }

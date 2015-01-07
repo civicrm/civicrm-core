@@ -48,10 +48,10 @@ class CRM_Contribute_Page_SubscriptionStatus extends CRM_Core_Page {
     $this->assign('task', $task);
     $this->assign('result', $result);
 
-    if ( $task == 'billing' ) {
+    if ($task == 'billing') {
       $session   = CRM_Core_Session::singleton();
       $tplParams = $session->get('resultParams');
-      foreach ( $tplParams as $key => $val ) {
+      foreach ($tplParams as $key => $val) {
         $this->assign($key, $val);
       }
     }

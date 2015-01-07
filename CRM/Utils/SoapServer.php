@@ -134,7 +134,7 @@ class CRM_Utils_SoapServer {
     }
 
     $className = $this->ufClass;
-    $result =& $className::authenticate($name, $pass, $loadCMSBootstrap );
+    $result =& $className::authenticate($name, $pass, $loadCMSBootstrap);
 
     if (empty($result)) {
       throw new SoapFault('Client', 'Invalid login');

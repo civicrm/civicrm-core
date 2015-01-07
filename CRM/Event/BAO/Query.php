@@ -416,7 +416,7 @@ class CRM_Event_BAO_Query {
 
         $names = array();
         foreach ($val as $id => $dontCare) {
-          if (!empty($roleTypes[$id]) ) {
+          if (!empty($roleTypes[$id])) {
             $names[] = $roleTypes[$id];
           }
         }

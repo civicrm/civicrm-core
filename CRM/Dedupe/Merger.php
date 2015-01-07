@@ -248,7 +248,7 @@ WHERE
   public static function locTables() {
     static $locTables;
     if (!$locTables) {
-      $locTables = array( 'civicrm_email', 'civicrm_address', 'civicrm_phone' );
+      $locTables = array('civicrm_email', 'civicrm_address', 'civicrm_phone');
 
       // Allow hook_civicrm_merge() to adjust $locTables
       CRM_Utils_Hook::merge('locTables', $locTables);
@@ -1486,7 +1486,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
       // move the other contact's file to main contact
       //NYSS need to INSERT or UPDATE depending on whether main contact has an existing record
-      if ( CRM_Core_DAO::singleValueQuery("SELECT id FROM {$tableName} WHERE entity_id = {$mainId}") ) {
+      if (CRM_Core_DAO::singleValueQuery("SELECT id FROM {$tableName} WHERE entity_id = {$mainId}")) {
         $sql = "UPDATE {$tableName} SET {$columnName} = {$fileIds[$otherId]} WHERE entity_id = {$mainId}";
       }
       else {
@@ -1494,10 +1494,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
       CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
 
-      if ( CRM_Core_DAO::singleValueQuery("
+      if (CRM_Core_DAO::singleValueQuery("
         SELECT id
         FROM civicrm_entity_file
-        WHERE entity_table = '{$tableName}' AND file_id = {$fileIds[$otherId]}") ) {
+        WHERE entity_table = '{$tableName}' AND file_id = {$fileIds[$otherId]}")) {
         $sql = "
           UPDATE civicrm_entity_file
           SET entity_id = {$mainId}
@@ -1554,7 +1554,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // CRM-15681 merge sub_types
     if ($other_sub_types = CRM_Utils_array::value('contact_sub_type', $migrationInfo['other_details'])) {
       if ($main_sub_types = CRM_Utils_array::value('contact_sub_type', $migrationInfo['main_details'])) {
-        $submitted['contact_sub_type'] = array_unique( array_merge($main_sub_types, $other_sub_types));
+        $submitted['contact_sub_type'] = array_unique(array_merge($main_sub_types, $other_sub_types));
       }
       else {
         $submitted['contact_sub_type'] = $other_sub_types;
@@ -1577,10 +1577,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
 
       //CRM-14312 include prefix/suffix from mainId if not overridden for proper construction of display/sort name
-      if ( !isset($submitted['prefix_id']) && !empty($migrationInfo['main_details']['prefix_id']) ) {
+      if (!isset($submitted['prefix_id']) && !empty($migrationInfo['main_details']['prefix_id'])) {
         $submitted['prefix_id'] = $migrationInfo['main_details']['prefix_id'];
       }
-      if ( !isset($submitted['suffix_id']) && !empty($migrationInfo['main_details']['suffix_id']) ) {
+      if (!isset($submitted['suffix_id']) && !empty($migrationInfo['main_details']['suffix_id'])) {
         $submitted['suffix_id'] = $migrationInfo['main_details']['suffix_id'];
       }
 

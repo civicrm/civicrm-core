@@ -840,7 +840,7 @@ SELECT  id
       }
     }
 
-    if (!in_array($prefixName, $validProfileFields) ) {
+    if (!in_array($prefixName, $validProfileFields)) {
       return;
     }
 

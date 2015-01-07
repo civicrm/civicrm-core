@@ -481,7 +481,7 @@ class CRM_Contribute_Form_AdditionalInfo {
       $form->assign('receive_date', CRM_Utils_Date::processDate($params['receive_date']));
     }
 
-     $template = CRM_Core_Smarty::singleton( );
+     $template = CRM_Core_Smarty::singleton();
      $taxAmt = $template->get_template_vars('dataArray');
      $eventTaxAmt = $template->get_template_vars('totalTaxAmount');
      $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');

@@ -1817,7 +1817,7 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
     // Check our field length
     if (is_string($params[$fieldName]) && !empty($fieldInfo['maxlength']) && strlen($params[$fieldName]) > $fieldInfo['maxlength']
       ) {
-      throw new API_Exception( $params[$fieldName] . " is " . strlen($params[$fieldName]) . " characters  - longer than $fieldName length" . $fieldInfo['maxlength'] . ' characters',
+      throw new API_Exception($params[$fieldName] . " is " . strlen($params[$fieldName]) . " characters  - longer than $fieldName length" . $fieldInfo['maxlength'] . ' characters',
         2100, array('field' => $fieldName, "max_length" => $fieldInfo['maxlength'])
       );
     }
@@ -1893,7 +1893,7 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
     // the missing piece of functionality is separating them to a separated string
     // & many save incorrectly. But can we change them wholesale?
   }
-  if ($value ) {
+  if ($value) {
     if (!CRM_Utils_Rule::xssString($value)) {
       throw new Exception(ts('Illegal characters in input (potential scripting attack)'));
     }

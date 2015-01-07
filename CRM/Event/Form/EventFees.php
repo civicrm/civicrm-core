@@ -80,7 +80,7 @@ class CRM_Event_Form_EventFees {
 
     if ($form->_eventId) {
       //get receipt text and financial type
-      $returnProperities = array( 'confirm_email_text', 'financial_type_id', 'campaign_id', 'start_date' );
+      $returnProperities = array('confirm_email_text', 'financial_type_id', 'campaign_id', 'start_date');
       $details = array();
       CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $form->_eventId, $details, $returnProperities);
       if (!empty($details[$form->_eventId]['financial_type_id'])) {
@@ -233,8 +233,8 @@ class CRM_Event_Form_EventFees {
     if ($contriId = $form->get('onlinePendingContributionId')) {
       $contribution = new CRM_Contribute_DAO_Contribution();
       $contribution->id = $contriId;
-      $contribution->find( TRUE );
-      foreach (array('financial_type_id', 'payment_instrument_id', 'contribution_status_id', 'receive_date', 'total_amount' ) as $f ) {
+      $contribution->find(TRUE);
+      foreach (array('financial_type_id', 'payment_instrument_id', 'contribution_status_id', 'receive_date', 'total_amount') as $f) {
         if ($f == 'receive_date') {
           list($defaults[$form->_pId]['receive_date']) = CRM_Utils_Date::setDateDefaults($contribution->$f);
         }
@@ -412,7 +412,7 @@ SELECT  id, html_type
         );
 
         $form->add('select', 'financial_type_id',
-          ts( 'Financial Type' ),
+          ts('Financial Type'),
           array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType()
         );
 

@@ -207,7 +207,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       $this->_ids['price_set'][] = $priceSet['id'];
     }
     $priceSetID = $this->_price = reset($this->_ids['price_set']);
-    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageResult['id'], $priceSetID );
+    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageResult['id'], $priceSetID);
 
     if (empty($this->_ids['price_field'])) {
       $priceField = $this->callAPISuccess('price_field', 'create', array(
@@ -259,7 +259,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->_ids['contributionId'] = $contribution['id'];
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID, 'In line ' . __LINE__ );
+    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
@@ -328,7 +328,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID, 'In line ' . __LINE__ );
+    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
@@ -353,7 +353,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID, 'In line ' . __LINE__ );
+    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
@@ -516,8 +516,8 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     );
 
     $result = array();
-    CRM_Financial_BAO_FinancialTypeAccount::retrieve( $searchParams, $result );
-    return CRM_Utils_Array::value( 'financial_account_id', $result );
+    CRM_Financial_BAO_FinancialTypeAccount::retrieve($searchParams, $result);
+    return CRM_Utils_Array::value('financial_account_id', $result);
   }
 
   ///////////////// civicrm_contribution_delete methods

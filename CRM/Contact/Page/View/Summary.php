@@ -188,7 +188,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         if (isset($value['customData'])) {
           foreach ($defaults[$key] as $blockId => $blockVal) {
             $idValue = $blockVal['id'];
-            if ( $key == 'address' ) {
+            if ($key == 'address') {
               if (!empty($blockVal['master_id'])) {
                 $idValue = $blockVal['master_id'];
               }

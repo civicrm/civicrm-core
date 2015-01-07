@@ -95,17 +95,17 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
       $this->_interviewerId = CRM_Utils_Array::value('survey_interviewer_id', $this->get('formValues'));
     }
 
-    if ( $this->_surveyId ) {
+    if ($this->_surveyId) {
       $params = array('id' => $this->_surveyId);
       CRM_Campaign_BAO_Survey::retrieve($params, $this->_surveyDetails);
     }
 
     $orderClause = FALSE;
     $buttonName  = $this->controller->getButtonName();
-    if ( $buttonName == '_qf_Interview_submit_orderBy' && !empty($_POST['order_bys'])) {
+    if ($buttonName == '_qf_Interview_submit_orderBy' && !empty($_POST['order_bys'])) {
       $orderByParams = CRM_Utils_Array::value('order_bys', $_POST);
     }
-    elseif ( CRM_Core_OptionGroup::getValue('activity_type', 'WalkList') == $this->_surveyDetails['activity_type_id'] ) {
+    elseif (CRM_Core_OptionGroup::getValue('activity_type', 'WalkList') == $this->_surveyDetails['activity_type_id']) {
       $orderByParams =
         array(
           1 => array(
@@ -128,13 +128,13 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
     }
 
     $orderBy = array();
-    if ( !empty($orderByParams) ) {
-      foreach ( $orderByParams as $key => $val ) {
+    if (!empty($orderByParams)) {
+      foreach ($orderByParams as $key => $val) {
         if (!empty($val['column'])) {
           $orderBy[] = "{$val['column']} {$val['order']}";
         }
       }
-      if ( !empty($orderBy) ) {
+      if (!empty($orderBy)) {
         $orderClause = "ORDER BY " . implode(', ', $orderBy);
       }
     }
@@ -400,7 +400,7 @@ WHERE {$clause}
       }
     }
 
-    if ( CRM_Core_OptionGroup::getValue('activity_type', 'WalkList') == $this->_surveyDetails['activity_type_id'] ) {
+    if (CRM_Core_OptionGroup::getValue('activity_type', 'WalkList') == $this->_surveyDetails['activity_type_id']) {
       $defaults['order_bys'] =
         array(
           1 => array(

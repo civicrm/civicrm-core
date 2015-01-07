@@ -251,8 +251,8 @@ class CRM_Mailing_BAO_Query {
         return;
 
       case 'mailing_name':
-        $value = strtolower( addslashes( $value ) );
-        if ( $wildcard ) {
+        $value = strtolower(addslashes($value));
+        if ($wildcard) {
           $value = "%$value%";
           $op    = 'LIKE';
         }

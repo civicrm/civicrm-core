@@ -538,7 +538,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     $contributionRecur = civicrm_api3('contribution_recur', 'getsingle', array('return' => 'contact_id, id', 'invoice_id' => $input['invoice']));
     $ids['contact'] = $contributionRecur['contact_id'];
     $ids['contributionRecur'] = $contributionRecur['id'];
-    $result = civicrm_api3('contribution', 'getsingle', array('invoice_id' => $input['invoice'] ));
+    $result = civicrm_api3('contribution', 'getsingle', array('invoice_id' => $input['invoice']));
 
     $ids['contribution'] = $result['id'];
     //@todo hard - coding 'pending' for now

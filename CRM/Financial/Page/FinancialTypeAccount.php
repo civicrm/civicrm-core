@@ -134,7 +134,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
     if ($this->_aid) {
       $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_aid, 'name');
-      CRM_Utils_System::setTitle($this->_title .' - '.ts( 'Assigned Financial Accounts'));
+      CRM_Utils_System::setTitle($this->_title .' - '.ts('Assigned Financial Accounts'));
       $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id');
       $accountRelationship = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
       $dao->copyValues($params);
@@ -185,11 +185,11 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
         );
       }
       $this->assign('rows', $financialType);
-      $this->assign( 'aid', $this->_aid );
+      $this->assign('aid', $this->_aid);
       $this->assign('financialTypeTitle', $this->_title);
     }
     else {
-      CRM_Core_Error::fatal( );
+      CRM_Core_Error::fatal();
       return NULL;
     }
   }
@@ -207,15 +207,15 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    */
   public function edit($action) {
     // create a simple controller for editing CiviCRM Profile data
-    $controller = new CRM_Core_Controller_Simple( 'CRM_Financial_Form_FinancialTypeAccount', ts('Financial Account Types'), $action );
+    $controller = new CRM_Core_Controller_Simple('CRM_Financial_Form_FinancialTypeAccount', ts('Financial Account Types'), $action);
 
     // set the userContext stack
     $session = CRM_Core_Session::singleton();
-    $session->pushUserContext( CRM_Utils_System::url( 'civicrm/admin/financial/financialType/accounts',
-      'reset=1&action=browse&aid=' . $this->_aid ) );
-    $controller->set( 'aid', $this->_aid );
+    $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/financial/financialType/accounts',
+      'reset=1&action=browse&aid=' . $this->_aid));
+    $controller->set('aid', $this->_aid);
 
-    $controller->setEmbedded( TRUE );
+    $controller->setEmbedded(TRUE);
     $controller->process();
     $controller->run();
   }

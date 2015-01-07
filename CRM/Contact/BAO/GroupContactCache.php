@@ -128,7 +128,7 @@ AND     ( g.cache_date IS NULL OR
     // this function is expensive and should be sparingly used if groupIDs is empty
     if (empty($groupIDs)) {
       $groupIDClause = null;
-      $groupIDs = array( );
+      $groupIDs = array();
     }
     else {
       if (!is_array($groupIDs)) {
@@ -653,7 +653,7 @@ ORDER BY   gc.contact_id, g.children
       $prevContactID = $dao->contact_id;
       if (!array_key_exists($dao->contact_id, $contactGroup)) {
         $contactGroup[$dao->contact_id] =
-          array( 'group' => array(), 'groupTitle' => array());
+          array('group' => array(), 'groupTitle' => array());
       }
 
       $contactGroup[$dao->contact_id]['group'][] =

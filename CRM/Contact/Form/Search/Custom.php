@@ -80,7 +80,7 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     parent::preProcess();
 
     // instantiate the new class
-    $this->_customClass = new $this->_customSearchClass( $this->_formValues );
+    $this->_customClass = new $this->_customSearchClass($this->_formValues);
 
     // CRM-12747
     if (isset($this->_customClass->_permissionedComponent) &&

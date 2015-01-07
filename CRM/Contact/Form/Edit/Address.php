@@ -210,7 +210,7 @@ class CRM_Contact_Form_Edit_Address {
       // since we change element name for address custom data, we need to format the setdefault values
       $addressDefaults = array();
       foreach ($defaults as $key => $val) {
-        if ( empty( $val ) ) {
+        if (empty($val)) {
           continue;
         }
 
@@ -322,7 +322,7 @@ class CRM_Contact_Form_Edit_Address {
    *
    * @static
    */
-  public static function setDefaultValues( &$defaults, &$form ) {
+  public static function setDefaultValues(&$defaults, &$form) {
     $addressValues = array();
     if (isset($defaults['address']) && is_array($defaults['address']) &&
       !CRM_Utils_System::isNull($defaults['address'])

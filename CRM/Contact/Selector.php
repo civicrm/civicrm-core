@@ -342,7 +342,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         'contact_sub_type',
         'sort_name',
       );
-      foreach ( $doNotCareElements as $value) {
+      foreach ($doNotCareElements as $value) {
         unset($this->_returnProperties[$value]);
       }
     }
@@ -841,7 +841,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
     // check for current != previous to ensure cache is not reset if paging is done without changing
     // sort criteria
-    if (!$pageNum || (!empty($currentSortID) && $currentSortID != $previousSortID) ) {
+    if (!$pageNum || (!empty($currentSortID) && $currentSortID != $previousSortID)) {
       CRM_Core_BAO_PrevNextCache::deleteItem(NULL, $cacheKey, 'civicrm_contact');
       // this means it's fresh search, so set pageNum=1
       if (!$pageNum) {

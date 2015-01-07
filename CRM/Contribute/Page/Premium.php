@@ -173,7 +173,7 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
         );
         //Financial Type
         if (!empty($dao->financial_type_id)) {
-          $premiums[$productDAO->id]['financial_type_id'] = CRM_Core_DAO::getFieldValue( 'CRM_Financial_DAO_FinancialType', $dao->financial_type_id, 'name' );
+          $premiums[$productDAO->id]['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $dao->financial_type_id, 'name');
         }
       }
     }

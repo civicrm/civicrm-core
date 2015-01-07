@@ -500,7 +500,7 @@ class CRM_Activity_Page_AJAX {
         $domainID,
         TRUE
       );
-      if ( $cacheKey ) {
+      if ($cacheKey) {
         CRM_Core_BAO_Setting::flushCache($cacheKey);
       }
 

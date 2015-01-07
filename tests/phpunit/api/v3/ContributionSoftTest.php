@@ -147,7 +147,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution_soft', 'getcount', array(), $expectedCount);
 
     //check id is same as 2
-    $this->assertEquals($this->_softcontribution2['id'], $this->callAPISuccess('contribution_soft', 'getvalue', array('return' => 'id' )));
+    $this->assertEquals($this->_softcontribution2['id'], $this->callAPISuccess('contribution_soft', 'getvalue', array('return' => 'id')));
 
     $this->callAPISuccess('ContributionSoft', 'Delete', array(
       'id' => $this->_softcontribution2['id'],
@@ -361,6 +361,6 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $this->assertEquals($p2['contribution_id'], $res['contribution_id'], 'In line ' . __LINE__);
     $this->assertEquals($p2['contact_id'], $res['contact_id'], 'In line ' . __LINE__);
     $this->assertEquals($p2['amount'], $res['amount'], 'In line ' . __LINE__);
-    $this->assertEquals($p2['currency'], $res['currency'], 'In line ' . __LINE__ );
+    $this->assertEquals($p2['currency'], $res['currency'], 'In line ' . __LINE__);
   }
 }

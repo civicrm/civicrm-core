@@ -1207,7 +1207,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
 
     $this->type('minimum_fee', '50');
 
-    $this->select( 'financial_type_id', 'value=2' );
+    $this->select('financial_type_id', 'value=2');
 
     $this->type('duration_interval', 1);
     $this->select('duration_unit', "label=year");

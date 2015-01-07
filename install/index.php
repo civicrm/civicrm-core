@@ -21,11 +21,11 @@ ini_set('max_execution_time', 3000);
 
 if (stristr(PHP_OS, 'WIN')) {
   define('CIVICRM_DIRECTORY_SEPARATOR', '/');
-  define('CIVICRM_WINDOWS', 1 );
+  define('CIVICRM_WINDOWS', 1);
 }
 else {
   define('CIVICRM_DIRECTORY_SEPARATOR', DIRECTORY_SEPARATOR);
-  define('CIVICRM_WINDOWS', 0 );
+  define('CIVICRM_WINDOWS', 0);
 }
 
 // set installation type - drupal

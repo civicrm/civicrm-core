@@ -1002,7 +1002,7 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
 
     if (!array_key_exists($block, $fields)) {
       $className = "CRM_Core_DAO_$block";
-      $fields[$block] =& $className::fields( );
+      $fields[$block] =& $className::fields();
     }
 
     $blockCnt = count($params[$name]);
@@ -1061,20 +1061,20 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
         // mark an entry in fields array since we want the value of custom field to be copied
         $fields['Address'][$key] = NULL;
 
-        $htmlType = CRM_Utils_Array::value( 'html_type', $customFields[$customFieldID] );
-        switch ( $htmlType ) {
+        $htmlType = CRM_Utils_Array::value('html_type', $customFields[$customFieldID]);
+        switch ($htmlType) {
           case 'CheckBox':
           case 'AdvMulti-Select':
           case 'Multi-Select':
-            if ( $val ) {
-              $mulValues = explode( ',', $val );
-              $customOption = CRM_Core_BAO_CustomOption::getCustomOption( $customFieldID, TRUE );
+            if ($val) {
+              $mulValues = explode(',', $val);
+              $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
               $newValues[$key] = array();
-              foreach ( $mulValues as $v1 ) {
-                foreach ( $customOption as $v2 ) {
-                  if ( ( strtolower( $v2['label'] ) == strtolower( trim( $v1 ) ) ) ||
-                     ( strtolower( $v2['value'] ) == strtolower( trim( $v1 ) ) ) ) {
-                    if ( $htmlType == 'CheckBox' ) {
+              foreach ($mulValues as $v1) {
+                foreach ($customOption as $v2) {
+                  if ((strtolower($v2['label']) == strtolower(trim($v1))) ||
+                     (strtolower($v2['value']) == strtolower(trim($v1)))) {
+                    if ($htmlType == 'CheckBox') {
                       $newValues[$key][$v2['value']] = 1;
                     }
                     else {

@@ -111,7 +111,7 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
 
     // Membership fees
     $this->type('minimum_fee', '100');
-    $this->select( 'financial_type_id', "value={$memTypeParams['financial_type']}" );
+    $this->select('financial_type_id', "value={$memTypeParams['financial_type']}");
 
     // Duration for which the membership will be active
     $this->type('duration_interval', 1);

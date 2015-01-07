@@ -87,7 +87,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
         $this->_mailing_id, NULL, FALSE, NULL, NULL, NULL, $cid);
       $this->assign('openreport', $full_open_report);
 
-      $click_thru_report = CRM_Mailing_Event_BAO_TrackableURLOpen::getRows( $this->_mailing_id, NULL, FALSE, NULL, NULL, NULL, NULL, $cid);
+      $click_thru_report = CRM_Mailing_Event_BAO_TrackableURLOpen::getRows($this->_mailing_id, NULL, FALSE, NULL, NULL, NULL, NULL, $cid);
       $this->assign('clickreport', $click_thru_report);
     }
 

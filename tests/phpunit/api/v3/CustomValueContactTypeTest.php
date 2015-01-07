@@ -198,7 +198,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $this->individualStudent,
       'contact_type' => 'Individual',
-      "custom_{$this->IndiStudentField['id']}" => 'Test String', );
+      "custom_{$this->IndiStudentField['id']}" => 'Test String',);
 
     $result = $this->callAPISuccess('contact', 'create', $params);
 
@@ -238,7 +238,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $this->individual,
       'contact_type' => 'Individual',
-      "custom_" . $this->IndividualField['id'] => 'Test String', );
+      "custom_" . $this->IndividualField['id'] => 'Test String',);
 
     $contact = $this->callAPISuccess('contact', 'create', $params);
 
@@ -263,7 +263,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
       'contact_id' => $this->individualStudent,
       'contact_type' => 'Individual',
       'contact_sub_type' => 'Student',
-      "custom_{$this->IndiStudentField['id']}" => 'Test String', );
+      "custom_{$this->IndiStudentField['id']}" => 'Test String',);
 
     $contact = $this->callAPISuccess('contact', 'create', $params);
     $this->assertAPISuccess($contact);

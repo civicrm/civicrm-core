@@ -229,7 +229,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
             if ($kkey) {
               $auto = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $kkey, 'auto_renew');
             }
-            if ( $auto ) {
+            if ($auto) {
               $vval = $statusLabel + $autoRenew;
             }
             else {
@@ -1057,11 +1057,11 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $contactField = 'e.contact_id';
         $table = 'civicrm_membership e';
         // build where clause
-        if ( $status == 2 ) {
+        if ($status == 2) {
           //auto-renew memberships
           $where[] = "e.contribution_recur_id IS NOT NULL ";
         }
-        elseif ( $status == 1 ) {
+        elseif ($status == 1) {
           $where[] = "e.contribution_recur_id IS NULL ";
         }
 

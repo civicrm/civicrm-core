@@ -111,7 +111,7 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix) {
 
-    $params = array( &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6);
+    $params = array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6);
 
     if ($this->civiModules === NULL) {
       $this->civiModules = array();
@@ -123,7 +123,7 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
       call_user_func(array($this->mockObject, $fnSuffix), $arg1, $arg2, $arg3, $arg4, $arg5, $arg6);
     }
     if (!empty($this->adhocHooks[$fnSuffix])) {
-      call_user_func_array($this->adhocHooks[$fnSuffix], $params );
+      call_user_func_array($this->adhocHooks[$fnSuffix], $params);
     }
   }
 }

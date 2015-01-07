@@ -934,7 +934,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *   Drupal User ID.
    */
   public function og_membership_create($ogID, $drupalID) {
-    og_save_subscription( $ogID, $drupalID, array( 'is_active' => 1 ) );
+    og_save_subscription($ogID, $drupalID, array('is_active' => 1));
   }
 
   /**
@@ -946,7 +946,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *   Drupal User ID.
    */
   public function og_membership_delete($ogID, $drupalID) {
-    og_delete_subscription( $ogID, $drupalID );
+    og_delete_subscription($ogID, $drupalID);
   }
 
   /**

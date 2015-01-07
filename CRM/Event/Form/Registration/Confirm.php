@@ -681,7 +681,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       // handle register date CRM-4320
       if ($this->_allowConfirmation) {
-        $registerDate = CRM_Utils_Array::value( 'participant_register_date', $params );
+        $registerDate = CRM_Utils_Array::value('participant_register_date', $params);
       }
       elseif (!empty($params['participant_register_date']) &&
         is_array($params['participant_register_date']) &&
@@ -1272,7 +1272,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
       $form->_fields = $profileFields;
     }
-    if (!empty($formattedValues) ) {
+    if (!empty($formattedValues)) {
       $form->assign('primaryParticipantProfile', $formattedValues[1]);
       $form->set('primaryParticipantProfile', $formattedValues[1]);
       if ($count > 2) {

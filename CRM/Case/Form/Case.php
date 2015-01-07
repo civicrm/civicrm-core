@@ -367,7 +367,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     // 1. call begin post process
     if ($this->_activityTypeFile) {
       $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
-      $className::beginPostProcess($this, $params );
+      $className::beginPostProcess($this, $params);
     }
 
     if (!empty($params['hidden_custom']) &&
@@ -431,7 +431,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     // 4. call end post process
     if ($this->_activityTypeFile) {
-      $className::endPostProcess($this, $params );
+      $className::endPostProcess($this, $params);
     }
 
     // 5. auto populate activites

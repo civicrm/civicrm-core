@@ -85,7 +85,7 @@ class CRM_Contact_Form_Task_Print extends CRM_Contact_Form_Task {
 
     $returnP = isset($returnPropeties) ? $returnPropeties : "";
     $customSearchClass = $this->get('customSearchClass');
-    $selector   = new $selectorName( $customSearchClass,
+    $selector   = new $selectorName($customSearchClass,
                  $fv,
                  $params,
                  $returnP,

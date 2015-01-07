@@ -550,7 +550,7 @@ WHERE  option_group_id = {$optionGroupID} AND value IN ($ovValues)";
       $value[] = "({$optionGroupID}, 'Activity Targets', 3, 'Activity Targets', 3, 1, 1)";
     }
 
-    if (!$assigneeID || !$sourceID || !$targetID ) {
+    if (!$assigneeID || !$sourceID || !$targetID) {
       $insert = "
 INSERT INTO civicrm_option_value
 (option_group_id, label, value, name, weight, is_reserved, is_active)
@@ -792,7 +792,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
 
     $res = CRM_Core_DAO::singleValueQuery($sql);
 
-    if ($res <= 0 ) {
+    if ($res <= 0) {
       $sql = "ALTER TABLE civicrm_report_instance ADD `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'when combined with report_id/template uniquely identifies the instance'";
       $res = CRM_Core_DAO::executeQuery($sql);
     }
@@ -803,7 +803,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
 
     $res = CRM_Core_DAO::singleValueQuery($sql);
 
-    if ($res <= 0 ) {
+    if ($res <= 0) {
       $sql = "ALTER TABLE civicrm_report_instance ADD `args` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'arguments that are passed in the url when invoking the instance'";
 
       $res = CRM_Core_DAO::executeQuery($sql);

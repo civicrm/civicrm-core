@@ -1707,7 +1707,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $job->status = 'Scheduled';
       $job->is_test = 0;
 
-      if ( !$job->find(TRUE) ) {
+      if (!$job->find(TRUE)) {
         $job->scheduled_date = $params['scheduled_date'];
         $job->save();
       }
@@ -2910,7 +2910,7 @@ WHERE      g.is_hidden = 1
 AND        mg.group_type = 'Include'
 AND        m.id = %1
 ";
-    $params = array( 1 => array( $mid, 'Integer' ) );
+    $params = array(1 => array($mid, 'Integer'));
     return CRM_Core_DAO::singleValueQuery($sql, $params);
   }
 

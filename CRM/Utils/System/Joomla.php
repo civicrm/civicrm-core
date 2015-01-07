@@ -512,7 +512,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
 
     $joomlaBase = dirname(dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))));
-    if ( !defined('JVERSION') ) {
+    if (!defined('JVERSION')) {
       require $joomlaBase . '/libraries/cms/version/version.php';
       $jversion = new JVersion;
       define('JVERSION', $jversion->getShortVersion());
@@ -523,8 +523,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $dbId = $row->id;
       $dbEmail = $row->email;
 
-      if ( version_compare(JVERSION, '2.5.18', 'lt') ||
-        ( version_compare(JVERSION, '3.0', 'ge') && version_compare(JVERSION, '3.2.1', 'lt') )
+      if (version_compare(JVERSION, '2.5.18', 'lt') ||
+        (version_compare(JVERSION, '3.0', 'ge') && version_compare(JVERSION, '3.2.1', 'lt'))
       ) {
         // now check password
         if (strpos($dbPassword, ':') === FALSE) {
@@ -546,7 +546,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         }
 
         //include additional files required by Joomla 3.2.1+
-        if ( version_compare(JVERSION, '3.2.1', 'ge') ) {
+        if (version_compare(JVERSION, '3.2.1', 'ge')) {
           require_once $joomlaBase . '/libraries/cms/application/helper.php';
           require_once $joomlaBase . '/libraries/cms/application/cms.php';
           require_once $joomlaBase . '/libraries/cms/application/administrator.php';
@@ -573,7 +573,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function setUserSession($data) {
     list($userID, $ufID) = $data;
-    $user = new JUser( $ufID );
+    $user = new JUser($ufID);
     $session = JFactory::getSession();
     $session->set('user', $user);
 
@@ -655,7 +655,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     // load BootStrap here if needed
     // We are a valid Joomla entry point.
-    if ( ! defined( '_JEXEC' ) && $loadDefines ) {
+    if (! defined('_JEXEC') && $loadDefines) {
       define('_JEXEC', 1);
       define('DS', DIRECTORY_SEPARATOR);
       define('JPATH_BASE', $joomlaBase . '/administrator');
@@ -671,13 +671,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     require $joomlaBase . '/configuration.php';
 
     // Files may be in different places depending on Joomla version
-    if ( !defined('JVERSION') ) {
+    if (!defined('JVERSION')) {
       require $joomlaBase . '/libraries/cms/version/version.php';
       $jversion = new JVersion;
       define('JVERSION', $jversion->getShortVersion());
     }
 
-    if (version_compare(JVERSION, '3.0', 'lt') ) {
+    if (version_compare(JVERSION, '3.0', 'lt')) {
       require $joomlaBase . '/libraries/joomla/environment/uri.php';
       require $joomlaBase . '/libraries/joomla/application/component/helper.php';
     }
@@ -784,7 +784,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $loginURL .= 'index.php?option=com_users&view=login';
 
     //CRM-14872 append destination
-    if ( !empty($destination) ) {
+    if (!empty($destination)) {
       $loginURL .= '&return='.urlencode(base64_encode($destination));
     }
     return $loginURL;

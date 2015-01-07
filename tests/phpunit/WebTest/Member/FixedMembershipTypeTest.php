@@ -62,7 +62,7 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
     $this->select2('member_of_contact_id', $title);
 
     $this->type('minimum_fee', '100');
-    $this->select( 'financial_type_id', 'value=2' );
+    $this->select('financial_type_id', 'value=2');
     $this->type('duration_interval', 1);
     $this->select('duration_unit', "label=year");
 
@@ -217,7 +217,7 @@ SELECT end_event_adjust_interval
     $this->select2('member_of_contact_id', $title);
 
     $this->type('minimum_fee', '100');
-    $this->select( 'financial_type_id', 'value=2' );
+    $this->select('financial_type_id', 'value=2');
 
     $this->type('duration_interval', 2);
     $this->select('duration_unit', "label=year");
@@ -374,7 +374,7 @@ SELECT end_event_adjust_interval
     $this->select2('member_of_contact_id', $title);
 
     $this->type('minimum_fee', '100');
-    $this->select( 'financial_type_id', 'value=2' );
+    $this->select('financial_type_id', 'value=2');
     $this->type('duration_interval', 1);
     $this->select('duration_unit', "label=year");
 
@@ -523,7 +523,7 @@ SELECT end_event_adjust_interval
     $this->select2('member_of_contact_id', $title);
 
     $this->type('minimum_fee', '100');
-    $this->select( 'financial_type_id', 'value=2' );
+    $this->select('financial_type_id', 'value=2');
     $this->type('duration_interval', 1);
     $this->select('duration_unit', "label=year");
 

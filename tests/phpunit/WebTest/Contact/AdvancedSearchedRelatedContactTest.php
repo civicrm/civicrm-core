@@ -307,13 +307,13 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
   public function testAdvanceSearchForLog() {
     $this->webtestLogin();
 
-    $Pdate     = date('F jS, Y h:i:s A', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1, date( 'Y' )) );
-    $Ndate     = date('F jS, Y h:i:s A', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) + 1, date( 'Y' )) );
+    $Pdate     = date('F jS, Y h:i:s A', mktime(0, 0, 0, date('m'), date('d') - 1, date('Y')));
+    $Ndate     = date('F jS, Y h:i:s A', mktime(0, 0, 0, date('m'), date('d') + 1, date('Y')));
 
     //create a contact and return the contact id
     $firstNameSoft = "John_".substr(sha1(rand()), 0, 5);
     $lastNameSoft  = "Doe_".substr(sha1(rand()), 0, 5);
-    $this->webtestAddContact( $firstNameSoft, $lastNameSoft );
+    $this->webtestAddContact($firstNameSoft, $lastNameSoft);
     $cid = $this->urlArg('cid');
 
     //advance search for created contacts

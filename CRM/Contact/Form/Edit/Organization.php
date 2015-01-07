@@ -57,12 +57,12 @@ class CRM_Contact_Form_Edit_Organization {
 
     $form->applyFilter('__ALL__', 'trim');
 
-    if ( !$inlineEditMode || $inlineEditMode == 1 ) {
+    if (!$inlineEditMode || $inlineEditMode == 1) {
       // Organization_name
       $form->add('text', 'organization_name', ts('Organization Name'), $attributes['organization_name']);
     }
 
-    if ( !$inlineEditMode || $inlineEditMode == 2 ) {
+    if (!$inlineEditMode || $inlineEditMode == 2) {
       // legal_name
       $form->addElement('text', 'legal_name', ts('Legal Name'), $attributes['legal_name']);
 
@@ -77,7 +77,7 @@ class CRM_Contact_Form_Edit_Organization {
       $form->addElement('text', 'contact_source', ts('Source'), CRM_Utils_Array::value('source', $attributes));
     }
 
-    if ( !$inlineEditMode ) {
+    if (!$inlineEditMode) {
       $form->add('text', 'external_identifier', ts('External ID'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'external_identifier'), FALSE);
       $form->addRule('external_identifier',
         ts('External ID already exists in Database.'),

@@ -215,7 +215,7 @@ class CRM_Report_Form_Instance {
     $navigationDefaults = array();
 
     if (!isset($defaults['permission'])) {
-      $permissions = array_flip(CRM_Core_Permission::basicPermissions( ));
+      $permissions = array_flip(CRM_Core_Permission::basicPermissions());
       $defaults['permission'] = $permissions['CiviReport: access CiviReport'];
     }
 
@@ -323,7 +323,7 @@ class CRM_Report_Form_Instance {
     }
     CRM_Core_Session::setStatus($statusMsg);
 
-    if ( $redirect ) {
+    if ($redirect) {
       CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/report/instance/{$instance->id}", "reset=1"));
     }
   }
