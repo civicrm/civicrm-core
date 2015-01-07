@@ -685,7 +685,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       );
       //CRM-11529 for quick config backoffice transactions
       //when financial_type_id is passed in form, update the
-      //lineitems with the financial type selected in form
+      //line items with the financial type selected in form
       if ($submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $formValues)) {
         foreach ($lineItem[$priceSetId] as &$li) {
           $li['financial_type_id'] = $submittedFinancialType;
