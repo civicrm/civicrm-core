@@ -37,25 +37,13 @@
 {include file="CRM/Core/DateRange.tpl" fieldName="event" from='_start_date_low' to='_end_date_high'}
 </tr>
 <tr>
-  <td class="crm-event-form-block-participant_status"><label>{ts}Participant Status{/ts}</label>
+  <td class="crm-event-form-block-participant_status"><label>{$form.participant_status_id.label}</label>
     <br />
-    <div class="listing-box" style="width: auto; height: 120px">
-    {foreach from=$form.participant_status_id item="participant_status_val"}
-      <div class="{cycle values="odd-row,even-row"}">
-        {$participant_status_val.html}
-      </div>
-    {/foreach}
-    </div>
+    {$form.participant_status_id.html}
   </td>
-  <td class="crm-event-form-block-participant_role_id"><label>{ts}Participant Role{/ts}</label>
+  <td class="crm-event-form-block-participant_role_id"><label>{$form.participant_role_id.label}</label>
     <br />
-    <div class="listing-box" style="width: auto; height: 120px">
-    {foreach from=$form.participant_role_id item="participant_role_id_val"}
-      <div class="{cycle values="odd-row,even-row"}">
-        {$participant_role_id_val.html}
-      </div>
-    {/foreach}
-    </div><br />
+    {$form.participant_role_id.html}
   </td>
 </tr>
 <tr>
@@ -64,7 +52,7 @@
     &nbsp; {$form.participant_test.html}
   </td>
   <td class="crm-event-form-block-participant_pay_later">
-  {$form.participant_pay_later.label} {$form.participant_pay_later.html}
+  {$form.participant_is_pay_later.label} {$form.participant_is_pay_later.html}
   </td>
 </tr>
 <tr>
