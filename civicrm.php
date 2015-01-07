@@ -225,7 +225,10 @@ class CiviCRM_For_WordPress {
 
       // check if settings file exist, do not show configuration link on
       // install / settings page
-      if ( isset( $_GET['page'] ) && $_GET['page'] != 'civicrm-install' ) {
+      if (
+      	! isset( $_GET['page'] )
+      	|| ( isset( $_GET['page'] ) && $_GET['page'] != 'civicrm-install' )
+      ) {
         if ( ! CIVICRM_INSTALLED ) {
           add_action( 'admin_notices', array( $this, 'show_setup_warning' ) );
         }
