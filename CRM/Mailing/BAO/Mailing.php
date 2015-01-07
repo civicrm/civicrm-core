@@ -2955,9 +2955,9 @@ AND        m.id = %1
         "reset=1&cid={$values['creator_id']}");
 
       //CRM-12814
-      $contactMailings[$mailingId]['openstats'] = "Opens: ".
-        CRM_Utils_Array::value($values['mailing_id'], $openCounts, 0).
-        "<br />Clicks: ".
+      $contactMailings[$mailingId]['openstats'] = "Opens: " .
+        CRM_Utils_Array::value($values['mailing_id'], $openCounts, 0) .
+        "<br />Clicks: " .
         CRM_Utils_Array::value($values['mailing_id'], $clickCounts, 0);
 
       $actionLinks = array(

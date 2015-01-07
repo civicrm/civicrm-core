@@ -415,10 +415,10 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $basedir = $this->createTempDir('ext-');
     mkdir("$basedir/weird");
     mkdir("$basedir/weird/foobar");
-    file_put_contents("$basedir/weird/foobar/info.xml", "<extension key='test.foo.bar' type='".self::TESTING_TYPE."'><file>oddball</file></extension>");
+    file_put_contents("$basedir/weird/foobar/info.xml", "<extension key='test.foo.bar' type='" . self::TESTING_TYPE . "'><file>oddball</file></extension>");
     // not needed for now // file_put_contents("$basedir/weird/bar/oddball.php", "<?php\n");
     mkdir("$basedir/weird/whizbang");
-    file_put_contents("$basedir/weird/whizbang/info.xml", "<extension key='test.whiz.bang' type='".self::TESTING_TYPE."'><file>oddball</file></extension>");
+    file_put_contents("$basedir/weird/whizbang/info.xml", "<extension key='test.whiz.bang' type='" . self::TESTING_TYPE . "'><file>oddball</file></extension>");
     // not needed for now // file_put_contents("$basedir/weird/whizbang/oddball.php", "<?php\n");
     $c = new CRM_Extension_Container_Basic($basedir, 'http://example/basedir', $cache, $cacheKey);
     return array($basedir, $c);
@@ -432,7 +432,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    */
   public function _createDownload($key, $file) {
     $basedir = $this->createTempDir('ext-dl-');
-    file_put_contents("$basedir/info.xml", "<extension key='$key' type='".self::TESTING_TYPE."'><file>$file</file></extension>");
+    file_put_contents("$basedir/info.xml", "<extension key='$key' type='" . self::TESTING_TYPE . "'><file>$file</file></extension>");
     file_put_contents("$basedir/$file.php", "<?php\n");
     return $basedir;
   }

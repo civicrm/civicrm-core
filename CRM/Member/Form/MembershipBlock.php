@@ -93,7 +93,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
           foreach ($options as $k => $v) {
             $newMembershipType[$v['membership_type_id']] = 1;
             if (!empty($defaults['auto_renew'])) {
-              $defaults["auto_renew_".$v['membership_type_id']] = $defaults['auto_renew'][$v['membership_type_id']];
+              $defaults["auto_renew_" . $v['membership_type_id']] = $defaults['auto_renew'][$v['membership_type_id']];
             }
           }
           $defaults['membership_type'] = $newMembershipType;

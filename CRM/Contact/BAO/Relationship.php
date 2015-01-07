@@ -1818,7 +1818,7 @@ AND cc.sort_name LIKE '%$name%'";
           FALSE,
           $values['cid']
         );
-        $contactRelationships[$relationshipId]['name'] = $icon.' '.CRM_Utils_System::href(
+        $contactRelationships[$relationshipId]['name'] = $icon . ' ' . CRM_Utils_System::href(
           $values['name'],
           'civicrm/contact/view',
           "reset=1&cid={$values['cid']}");

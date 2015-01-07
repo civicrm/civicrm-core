@@ -305,7 +305,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'mc_gross' => '15.00',
       'payment_date' => '03:59:05 Jul 14, 2013 PDT',
       'rp_invoice_id' => 'i=' . $this->_invoiceID
-        .'&m=contribute&c='
+         . '&m=contribute&c='
         . $this->_contactID
         . '&r=' . $this->_contributionRecurID
         . '&b=' . $this->_contributionID . '&p=' . $this->_contributionPageID,

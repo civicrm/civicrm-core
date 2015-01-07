@@ -284,7 +284,7 @@ class CRM_Event_BAO_Query {
           }
           if (!empty($allEventIds)) {
             $op = "IN";
-            $value = "(".implode(",", $allEventIds).")";
+            $value = "(" . implode(",", $allEventIds) . ")";
           }
         }
         $query->_where[$grouping][] = "civicrm_event.id $op {$value}";

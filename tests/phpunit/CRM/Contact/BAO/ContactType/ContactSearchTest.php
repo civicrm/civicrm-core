@@ -9,7 +9,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    $students = 'indivi_student'.substr(sha1(rand()), 0, 7);
+    $students = 'indivi_student' . substr(sha1(rand()), 0, 7);
     $params = array(
       'label' => $students,
       'name' => $students,
@@ -20,7 +20,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
     $result = CRM_Contact_BAO_ContactType::add($params);
     $this->student = $params['name'];
 
-    $parents = 'indivi_parent'.substr(sha1(rand()), 0, 7);
+    $parents = 'indivi_parent' . substr(sha1(rand()), 0, 7);
     $params = array(
       'label' => $parents,
       'name' => $parents,
@@ -31,7 +31,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
     $result = CRM_Contact_BAO_ContactType::add($params);
     $this->parent = $params['name'];
 
-    $orgs = 'org_sponsor'.substr(sha1(rand()), 0, 7);
+    $orgs = 'org_sponsor' . substr(sha1(rand()), 0, 7);
     $params = array(
       'label' => $orgs,
       'name' => $orgs,

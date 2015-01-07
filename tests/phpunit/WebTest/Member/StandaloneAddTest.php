@@ -143,7 +143,7 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
 
     // verify soft credit data
     $expected = array(
-      '1' => $giftMemberfirstName.' Memberson',
+      '1' => $giftMemberfirstName . ' Memberson',
       '2' => $totalAmount,
       '3' => 'Gift',
       '4' => 'Donation',

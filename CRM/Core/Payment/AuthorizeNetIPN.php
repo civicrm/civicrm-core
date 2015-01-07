@@ -270,7 +270,7 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
       $ids['contact'] = $contRecur->contact_id;
     }
     if (!$ids['contributionRecur']) {
-      CRM_Core_Error::debug_log_message("Could not find contributionRecur id: ".print_r($input, TRUE));
+      CRM_Core_Error::debug_log_message("Could not find contributionRecur id: " . print_r($input, TRUE));
       echo "Failure: Could not find contributionRecur<p>";
       exit();
     }

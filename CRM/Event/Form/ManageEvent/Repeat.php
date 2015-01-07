@@ -47,7 +47,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
           $query = "
             SELECT *
             FROM civicrm_event
-            WHERE id IN (".implode(",", $allEventIds).")
+            WHERE id IN (" . implode(",", $allEventIds) . ")
             ORDER BY start_date asc
              ";
 

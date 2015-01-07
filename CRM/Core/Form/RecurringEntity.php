@@ -93,7 +93,7 @@ class CRM_Core_Form_RecurringEntity {
       }
     }
     if ($entityTable) {
-      CRM_Core_OptionValue::getValues(array('name' => $entityTable.'_repeat_exclude_dates_'.self::$_parentEntityId), $optionValue);
+      CRM_Core_OptionValue::getValues(array('name' => $entityTable . '_repeat_exclude_dates_' . self::$_parentEntityId), $optionValue);
       $excludeOptionValues = array();
       if (!empty($optionValue)) {
         foreach ($optionValue as $key => $val) {
@@ -180,7 +180,7 @@ class CRM_Core_Form_RecurringEntity {
     $form->add('select', 'repetition_frequency_interval', ts('Repeats every:'), $numericOptions, '', array('style' => 'width:55px;'));
     $form->addDateTime('repetition_start_date', ts('Repetition Start Date'), FALSE, array('formatType' => 'activityDateTime'));
     foreach ($dayOfTheWeek as $key => $val) {
-      $startActionCondition[] = $form->createElement('checkbox', $key, NULL, substr($val."&nbsp;", 0, 3));
+      $startActionCondition[] = $form->createElement('checkbox', $key, NULL, substr($val . "&nbsp;", 0, 3));
     }
     $form->addGroup($startActionCondition, 'start_action_condition', ts('Repeats on'));
     $roptionTypes = array(
@@ -358,7 +358,7 @@ class CRM_Core_Form_RecurringEntity {
 
           //Check if there exists any values for this option group
           $optionGroupIdExists = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
-              $type.'_repeat_exclude_dates_'.$params['parent_entity_id'],
+              $type . '_repeat_exclude_dates_' . $params['parent_entity_id'],
               'id',
               'name'
             );
@@ -367,8 +367,8 @@ class CRM_Core_Form_RecurringEntity {
           }
           $optionGroupParams =
               array(
-                'name'        => $type.'_repeat_exclude_dates_'.$actionScheduleObj->entity_value,
-                'title'       => $type.' recursion',
+                'name'        => $type . '_repeat_exclude_dates_' . $actionScheduleObj->entity_value,
+                'title'       => $type . ' recursion',
                 'is_reserved' => 0,
                 'is_active'   => 1
               );
@@ -383,7 +383,7 @@ class CRM_Core_Form_RecurringEntity {
                     'label'           => CRM_Utils_Date::processDate($val),
                     'value'           => CRM_Utils_Date::processDate($val),
                     'name'            => $opGroup->name,
-                    'description'     => 'Used for recurring '.$type,
+                    'description'     => 'Used for recurring ' . $type,
                     'weight'          => CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_OptionValue', $oldWeight, CRM_Utils_Array::value('weight', $params), $fieldValues),
                     'is_active'       => 1
                   );

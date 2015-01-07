@@ -87,8 +87,8 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
    */
   public function assertLogRegexp($pattern) {
     $config = CRM_Core_Config::singleton();
-    $logFiles = glob($config->configAndLogDir.'/CiviCRM*.log');
-    $this->assertEquals(1, count($logFiles), 'Expect to find 1 file matching: ' . $config->configAndLogDir.'/CiviCRM*log*/');
+    $logFiles = glob($config->configAndLogDir . '/CiviCRM*.log');
+    $this->assertEquals(1, count($logFiles), 'Expect to find 1 file matching: ' . $config->configAndLogDir . '/CiviCRM*log*/');
     foreach ($logFiles as $logFile) {
       $this->assertRegexp($pattern, file_get_contents($logFile));
     }

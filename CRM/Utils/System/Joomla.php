@@ -785,7 +785,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     //CRM-14872 append destination
     if (!empty($destination)) {
-      $loginURL .= '&return='.urlencode(base64_encode($destination));
+      $loginURL .= '&return=' . urlencode(base64_encode($destination));
     }
     return $loginURL;
   }
@@ -818,7 +818,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $destination = NULL;
     if ($args) {
       // append destination so user is returned to form they came from after login
-      $args = 'reset=1'.$args;
+      $args = 'reset=1' . $args;
       $destination = CRM_Utils_System::url(CRM_Utils_System::currentPath(), $args, TRUE, NULL, TRUE, TRUE);
     }
 

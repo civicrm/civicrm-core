@@ -297,7 +297,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
   public function _createMultipleValueCustomField($customFieldName, $type) {
     $this->type('label', $customFieldName);
     $this->select("data_type[0]", "value=0");
-    $this->select("data_type[1]", "value=".$type);
+    $this->select("data_type[1]", "value=" . $type);
     $this->type("option_label_1", "label1");
     $this->type("option_value_1", "label1");
     $this->type("option_label_2", "label2");

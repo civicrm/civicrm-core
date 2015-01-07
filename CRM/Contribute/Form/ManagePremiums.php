@@ -363,7 +363,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   private function _resizeImage($filename, $resizedName, $width, $height) {
     // figure out the new filename
     $pathParts = pathinfo($filename);
-    $newFilename = $pathParts['dirname']."/".$pathParts['filename'].$resizedName.".".$pathParts['extension'];
+    $newFilename = $pathParts['dirname'] . "/" . $pathParts['filename'] . $resizedName . "." . $pathParts['extension'];
 
     // get image about original image
     $imageInfo = getimagesize($filename);
@@ -396,7 +396,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
     // return the URL to link to
     $config = CRM_Core_Config::singleton();
-    return $config->imageUploadURL.basename($newFilename);
+    return $config->imageUploadURL . basename($newFilename);
   }
 
 }

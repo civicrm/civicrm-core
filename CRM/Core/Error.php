@@ -739,11 +739,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
               break;
 
             case 'string':
-              $args[] = '"' . CRM_Utils_String::ellipsify(addcslashes((string) $arg, "\r\n\t\""), $maxArgLen). '"';
+              $args[] = '"' . CRM_Utils_String::ellipsify(addcslashes((string) $arg, "\r\n\t\""), $maxArgLen) .  '"';
               break;
 
             case 'array':
-              $args[] = '(Array:'.count($arg).')';
+              $args[] = '(Array:' . count($arg) . ')';
               break;
 
             case 'object':

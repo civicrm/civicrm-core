@@ -1655,7 +1655,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           'valueName' => 'event_offline_receipt',
           'contactId' => $contactID,
           'isTest' => (bool) CRM_Utils_Array::value('is_test', $this->_defaultValues),
-          'PDFFilename' => ts('confirmation').'.pdf',
+          'PDFFilename' => ts('confirmation') . '.pdf',
         );
 
         // try to send emails only if email id is present

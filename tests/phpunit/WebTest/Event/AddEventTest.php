@@ -952,7 +952,7 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $this->type('first_name', $firstName);
 
     //fill in last name
-    $lastName = 'Recuron'.substr(sha1(rand()), 0, 7);
+    $lastName = 'Recuron' . substr(sha1(rand()), 0, 7);
     $this->type('last_name', $contactName);
     $email = $firstName . '@example.com';
     $this->type('email-Primary', $email);

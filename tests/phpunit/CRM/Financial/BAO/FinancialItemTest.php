@@ -214,7 +214,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
    */
   public function testCreateEntityTrxn() {
     $fParams = array(
-      'name' => 'Donations'.substr(sha1(rand()), 0, 7),
+      'name' => 'Donations' . substr(sha1(rand()), 0, 7),
       'is_deductible' => 0,
       'is_active' => 1,
     );

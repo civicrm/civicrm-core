@@ -362,7 +362,7 @@ function _civicrm_api3_contact_check_params(&$params, $dupeCheck = TRUE, $dupeEr
     $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $params['contact_type'], 'Unsupervised', array());
 
     if (count($ids) > 0) {
-      throw new API_Exception("Found matching contacts: ". implode(',', $ids), "duplicate", array("ids" => $ids));
+      throw new API_Exception("Found matching contacts: " .  implode(',', $ids), "duplicate", array("ids" => $ids));
     }
   }
 
