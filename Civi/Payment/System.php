@@ -16,7 +16,7 @@ class System {
   /**
    * @var array cache
    */
-  private static $cache = array();
+  private $cache = array();
 
   /**
    * @return \Civi\Payment\System
@@ -35,8 +35,8 @@ class System {
   public function getByProcessor($processor) {
     $id = $processor['id'];
 
-    if (!isset(self::$cache[$id])) {
-      if (!isset(self::$cache[$id])) {
+    if (!isset($this->cache[$id])) {
+      if (!isset($this->cache[$id])) {
         //does this config need to be called?
         $config = \CRM_Core_Config::singleton();
         $ext = \CRM_Extension_System::singleton()->getMapper();
@@ -52,10 +52,10 @@ class System {
           require_once str_replace('_', DIRECTORY_SEPARATOR, $paymentClass) . '.php';
         }
 
-        self::$cache[$id] = new $paymentClass($processor['is_test'] ? 'test' : 'live', $processor);
+        $this->cache[$id] = new $paymentClass($processor['is_test'] ? 'test' : 'live', $processor);
       }
     }
-    return self::$cache[$id];
+    return $this->cache[$id];
   }
   /**
    * @param integer $id
