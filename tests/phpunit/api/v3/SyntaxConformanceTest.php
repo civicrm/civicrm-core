@@ -183,9 +183,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $invalidEntities = array('Individual', 'Organization', 'Household');
     $entitiesToFix = array('Case', 'Relationship');
     foreach ($entities as $entityName => $entity ) {
-      if(!in_array($entityName, $invalidEntities)
+      if (!in_array($entityName, $invalidEntities)
         && !in_array($entityName, $entitiesToFix)) {
-        if(!empty(self::$componentMap[$entityName]) && empty($enabledComponents[self::$componentMap[$entityName]])) {
+        if (!empty(self::$componentMap[$entityName]) && empty($enabledComponents[self::$componentMap[$entityName]])) {
           CRM_Core_BAO_ConfigSetting::enableComponent(self::$componentMap[$entityName]);
         }
         $customDataEntities[] = array($entityName);
@@ -489,7 +489,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         ),
       ),
     );
-    if(empty($knownFailures[$entity]) || empty($knownFailures[$entity][$key])){
+    if (empty($knownFailures[$entity]) || empty($knownFailures[$entity][$key])){
       return array();
     }
     return $knownFailures[$entity][$key];
@@ -723,7 +723,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       $this->checkLimitAgainstExpected($entityName, $case[0], $case[1], $case[2]);
 
       //non preferred / legacy syntax
-      if(isset($case[0]['options']['limit'])) {
+      if (isset($case[0]['options']['limit'])) {
         $this->checkLimitAgainstExpected($entityName, array('rowCount' => $case[0]['options']['limit']), $case[1], $case[2]);
         $this->checkLimitAgainstExpected($entityName, array('option_limit' => $case[0]['options']['limit']), $case[1], $case[2]);
         $this->checkLimitAgainstExpected($entityName, array('option.limit' => $case[0]['options']['limit']), $case[1], $case[2]);
@@ -779,7 +779,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public function checkLimitAgainstExpected($entityName, $params, $limit, $message) {
     $result = $this->callAPISuccess($entityName, 'get', $params);
-    if($limit == 30) {
+    if ($limit == 30) {
       $this->assertGreaterThanOrEqual($limit, $result['count'], $message);
       $this->assertGreaterThanOrEqual($limit, $result['count'], $message);
     }
@@ -945,7 +945,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->assertNotEmpty($baoString, $entityName);
     $this->assertNotEmpty($entityName, $entityName);
     $fieldsGet = $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'get'));
-    if($entityName != 'Pledge'){
+    if ($entityName != 'Pledge'){
       $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'create'));
     }
     $fields = $fields['values'];
@@ -1015,7 +1015,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
             $entity[$fieldName] = 2;
           }
           elseif (!empty($specs['FKClassName'])) {
-            if($specs['FKClassName'] == $baoString){
+            if ($specs['FKClassName'] == $baoString){
               $entity[$fieldName] = (string) $entity2['id'];
             }
             else{
@@ -1052,7 +1052,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         $options = $this->callAPISuccess($entityName, 'getoptions', array('context' => 'create', 'field' => $field));
         if (empty($options['values'])) {
           //eg. pdf_format id doesn't ship with any
-          if(isset($specs['pseudoconstant']['optionGroupName'])) {
+          if (isset($specs['pseudoconstant']['optionGroupName'])) {
             $optionGroupID = $this->callAPISuccess('option_group', 'getvalue', array('name' => 'pdf_format', 'return' => 'id'));
             $optionValue = $this->callAPISuccess('option_value', 'create', array('option_group_id' => $optionGroupID, 'label' => 'new option value'));
             $options['values'][] = $optionValue['id'];
@@ -1064,7 +1064,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         'id' => $entity['id'],
         $field => isset($entity[$field]) ? $entity[$field] : NULL,
       );
-      if(isset($updateParams['financial_type_id']) && in_array($entityName, array('Grant'))) {
+      if (isset($updateParams['financial_type_id']) && in_array($entityName, array('Grant'))) {
         //api has special handling on these 2 fields for backward compatibility reasons
         $entity['contribution_type_id'] = $updateParams['financial_type_id'];
       }
@@ -1087,7 +1087,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         $entity = array_merge($entity, $resetFKTo);
         $updateParams = array_merge($updateParams, $resetFKTo);
         $this->callAPISuccess($entityName, 'create', $updateParams);
-        if(isset($updateParams['financial_type_id']) && in_array($entityName, array('Grant'))) {
+        if (isset($updateParams['financial_type_id']) && in_array($entityName, array('Grant'))) {
           //api has special handling on these 2 fields for backward compatibility reasons
           $entity['contribution_type_id'] = $updateParams['financial_type_id'];
         }
@@ -1257,7 +1257,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
     $baos = array();
     $i = 0;
-    while($i < $count) {
+    while ($i < $count) {
       // create entities
       $baoObj = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
       $this->assertTrue(is_integer($baoObj->id), 'check first id');

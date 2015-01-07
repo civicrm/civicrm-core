@@ -764,7 +764,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
           // check each of the fields in the index against the profile field
           foreach ($index as $ifield => $icombos) {
-            if(strpos($field['name'], $ifield) !== FALSE) {
+            if (strpos($field['name'], $ifield) !== FALSE) {
 
               // we found the field in the profile, now record it in the index
               foreach ($icombos as $icombo => $dontcare) {
@@ -982,7 +982,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         $cantDedupe = ts("The selected profiles can collect enough information to match registrations with existing contacts, but not all of the relevant fields are required.  Anonymous registrations may result in duplicate contacts.");
     }
     if (!empty($params['is_multiple_registrations'])) {
-      switch(self::canProfilesDedupe($additionalProfileIds, $rgId)) {
+      switch (self::canProfilesDedupe($additionalProfileIds, $rgId)) {
         case 0:
           $dedupeTitle = 'Duplicate Matching Impossible';
           if ($cantDedupe) {

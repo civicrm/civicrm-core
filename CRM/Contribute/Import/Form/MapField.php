@@ -288,7 +288,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
             0,
           );
         }
-        if(!empty($mapperKeysValues) && $mapperKeysValues[$i][0] == 'soft_credit') {
+        if (!empty($mapperKeysValues) && $mapperKeysValues[$i][0] == 'soft_credit') {
           $js .= "cj('#mapper_".$i."_1').val($mapperKeysValues[$i][1]);\n";
           $js .= "cj('#mapper_".$i."_2').val($mapperKeysValues[$i][2]);\n";
         }

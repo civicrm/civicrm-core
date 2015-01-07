@@ -929,7 +929,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
     $actionSchedule = new CRM_Core_DAO_ActionSchedule();
     $actionSchedule->mapping_id = $mappingID;
     $actionSchedule->is_active = 1;
-    if(!empty($params)) {
+    if (!empty($params)) {
       _civicrm_api3_dao_set_filter($actionSchedule, $params, FALSE, 'ActionSchedule');
     }
     $actionSchedule->find();

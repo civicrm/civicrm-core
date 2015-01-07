@@ -52,7 +52,7 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
     $isDefault = FALSE;
 
     //Add new organisation
-    if($orgName) {
+    if ($orgName) {
       $this->webtestAddOrganization($orgName);
     }
 
@@ -114,7 +114,7 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
       $isDefault
     );
 
-    if($orgNameEdit) {
+    if ($orgNameEdit) {
       $orgName = $orgNameEdit;
     }
     $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");

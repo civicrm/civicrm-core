@@ -116,7 +116,7 @@ function civicrm_api3_relationship_get($params) {
   $options = _civicrm_api3_get_options_from_params($params);
 
   if (empty($params['contact_id'])) {
-    if(!empty($params['membership_type_id']) && empty($params['relationship_type_id'])) {
+    if (!empty($params['membership_type_id']) && empty($params['relationship_type_id'])) {
       CRM_Contact_BAO_Relationship::membershipTypeToRelationshipTypes($params);
     }
     $relationships = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Relationship');
@@ -134,7 +134,7 @@ function civicrm_api3_relationship_get($params) {
     );
   }
   //perhaps we should add a 'getcount' but at this stage lets just handle getcount output
-  if($options['is_count']) {
+  if ($options['is_count']) {
     return array('count' => $relationships);
   }
   foreach ($relationships as $relationshipId => $values) {

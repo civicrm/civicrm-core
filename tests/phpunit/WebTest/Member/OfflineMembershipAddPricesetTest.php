@@ -127,7 +127,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
       ),
     );
     $i = 2;
-    foreach($options as $index => $values){
+    foreach ($options as $index => $values){
       $this->select("membership_type_id_{$index}", "value={$values['membership_type_id']}");
       // Because it tends to cause problems, all uses of sleep() must be justified in comments
       // Sleep should never be used for wait for anything to load from the server
@@ -136,7 +136,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
       $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[4]/input", $values['membership_num_terms']);
       $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[5]/input", $values['label']);
       $this->type("xpath=//table[@id='optionField']/tbody/tr[$i]/td[6]/input", $values['amount']);
-      if($i > 3){
+      if ($i > 3){
         $this->click('link=another choice');
       }
       $i++;

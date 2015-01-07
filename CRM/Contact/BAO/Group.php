@@ -396,7 +396,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     // use metadata to translate the array to the appropriate DB type or altering the param in the api layer,
     // or at least altering the param in same section as 'group_type' rather than repeating here. However, further down
     // we need the $params one to be in it's original form & we are not sure what test coverage we have on that
-    if(isset($group->parents) && is_array($group->parents)) {
+    if (isset($group->parents) && is_array($group->parents)) {
       $group->parents = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
         array_keys($group->parents)
       ) . CRM_Core_DAO::VALUE_SEPARATOR;
@@ -753,7 +753,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         if (empty($params['parent_id']) && !empty($value['parents'])) {
           $groupIds = explode(',', $value['parents']);
           $title = array();
-          foreach($groupIds as $gId) {
+          foreach ($groupIds as $gId) {
             $title[] = $allGroups[$gId];
           }
           $groupList[$id]['group_name'] .= '<div class="crm-row-parent-name"><em>'.ts('Child of').'</em>: ' . implode(', ', $title) . '</div>';
@@ -975,7 +975,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         $where .= " AND status = 'Added'";
       }
       $dao = CRM_Core_DAO::executeQuery("SELECT group_id, COUNT(id) as `count` FROM $table WHERE $where GROUP BY group_id");
-      while($dao->fetch()) {
+      while ($dao->fetch()) {
         $values[$dao->group_id]['count'] = $dao->count;
       }
     }

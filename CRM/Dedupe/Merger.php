@@ -274,7 +274,7 @@ WHERE
         'extends' => array('IN' => array('Individual', 'Organization', 'Household', 'Contact')),
         'return' => array('id', 'title', 'table_name', 'style'),
       ));
-      foreach($result['values'] as $custom) {
+      foreach ($result['values'] as $custom) {
         $data['cidRefs'][$custom['table_name']] = array('entity_id');
         $urlSuffix = $custom['style'] == 'Tab' ? '&selectedChild=custom_' . $custom['id'] : '';
         $data['relTables']['rel_table_custom_' . $custom['id']] = array(

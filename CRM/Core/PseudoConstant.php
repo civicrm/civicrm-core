@@ -295,7 +295,7 @@ class CRM_Core_PseudoConstant {
       $pseudoconstant = $fieldSpec['pseudoconstant'];
 
       // if callback is specified..
-      if(!empty($pseudoconstant['callback'])) {
+      if (!empty($pseudoconstant['callback'])) {
         list($className, $fnName) = explode('::', $pseudoconstant['callback']);
         if (method_exists($className, $fnName)) {
           return call_user_func(array($className, $fnName));
@@ -310,7 +310,7 @@ class CRM_Core_PseudoConstant {
       );
 
       // Fetch option group from option_value table
-      if(!empty($pseudoconstant['optionGroupName'])) {
+      if (!empty($pseudoconstant['optionGroupName'])) {
         if ($context == 'validate') {
           $params['labelColumn'] = 'name';
         }

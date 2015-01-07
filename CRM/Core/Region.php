@@ -173,7 +173,7 @@ class CRM_Core_Region {
       if ($snippet['disabled']) {
         continue;
       }
-      switch($snippet['type']) {
+      switch ($snippet['type']) {
         case 'markup':
           $html .= $snippet['markup'];
           break;

@@ -90,7 +90,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    * @return object
    */
   public static function add(&$params, $ids = array()) {
-    if(empty($params['id'])){
+    if (empty($params['id'])){
       $params['id'] = CRM_Utils_Array::value('optionGroup', $ids);
     }
 

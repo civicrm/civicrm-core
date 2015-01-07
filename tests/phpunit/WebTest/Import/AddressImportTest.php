@@ -59,7 +59,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->click("css=ul.ui-autocomplete li");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    foreach($customDataParams['customFields'] as $key => $value){
+    foreach ($customDataParams['customFields'] as $key => $value){
       $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-summary-row']/div[@class='crm-label'][contains(text(), '$key')]"));
       $this->assertElementContainsText('address-block-1', "$value");
     }
@@ -84,7 +84,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
       'state' => 'State',
       'country' => 'Country',
     );
-    foreach( $customDataParams['headers'] as $key => $value){
+    foreach ($customDataParams['headers'] as $key => $value){
       $headers[$key] = $value;
     }
 

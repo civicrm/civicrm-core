@@ -624,7 +624,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
       3 => "{$firstName3}.{$lastName3}@example.com"
     );
 
-    foreach($contactEmails as $key => $value) {
+    foreach ($contactEmails as $key => $value) {
       $this->click('sort_name_navigation');
       $this->type('css=input#sort_name_navigation', $value);
       $this->typeKeys('css=input#sort_name_navigation', $value);

@@ -254,7 +254,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
    */
   public function testCreateGetEventLegacyContributionTypeID() {
     $contributionTypeArray = array('contribution_type_id' => 3);
-    if(isset($this->_params[0]['financial_type_id'])){
+    if (isset($this->_params[0]['financial_type_id'])){
       //in case someone edits $this->_params & invalidates this test :-)
       unset($this->_params[0]['financial_type_id']);
     }

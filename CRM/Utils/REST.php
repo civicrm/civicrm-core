@@ -419,7 +419,7 @@ class CRM_Utils_REST {
 
     if (array_key_exists('json', $requestParams) &&  $requestParams['json'][0] == "{") {
       $params = json_decode($requestParams['json'], TRUE);
-      if($params === NULL) {
+      if ($params === NULL) {
         CRM_Utils_JSON::output(array('is_error' => 1, 'error_message', 'Unable to decode supplied JSON.'));
       }
     }
@@ -483,7 +483,7 @@ class CRM_Utils_REST {
     $tpl = 'CRM/'.$entity.'/Page/Inline/'.$tplfile.'.tpl';
     $smarty = CRM_Core_Smarty::singleton( );
     CRM_Utils_System::setTitle( "$entity::$tplfile inline $tpl" );
-    if( !$smarty->template_exists($tpl) ){
+    if (!$smarty->template_exists($tpl) ){
       header("Status: 404 Not Found");
       die ("Can't find the requested template file templates/$tpl");
     }

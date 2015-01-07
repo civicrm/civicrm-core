@@ -676,7 +676,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       define('JVERSION', $jversion->getShortVersion());
     }
 
-    if( version_compare(JVERSION, '3.0', 'lt') ) {
+    if (version_compare(JVERSION, '3.0', 'lt') ) {
       require $joomlaBase . '/libraries/joomla/environment/uri.php';
       require $joomlaBase . '/libraries/joomla/application/component/helper.php';
     }

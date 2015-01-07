@@ -64,7 +64,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
   public function export($exportParams) {
     parent::export( $exportParams );
 
-    foreach( self::$complementaryTables as $rct ) {
+    foreach (self::$complementaryTables as $rct ) {
       $func = "export{$rct}";
       $this->$func();
     }
@@ -348,7 +348,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
     // In all cases need to do something with tabs in the input.
 
     $s1 = str_replace( self::$SEPARATOR, '\t', $s );
-    switch( $type ) {
+    switch ($type ) {
       case 'date':
         $sout = date( 'Y/m/d', strtotime( $s1 ) );
         break;

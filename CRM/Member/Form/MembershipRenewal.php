@@ -267,7 +267,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     // auto renew options if enabled for the membership
     $options = CRM_Core_SelectValues::memberAutoRenew();
 
-    foreach( $allMemberships as $key => $values ) {
+    foreach ($allMemberships as $key => $values ) {
       if (!empty($values['is_active'])) {
         $membershipType[$key] = CRM_Utils_Array::value('name', $values);
         if ($this->_mode && empty($values['minimum_fee'])) {
@@ -698,7 +698,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       }
 
       //assign contribution contact id to the field expected by recordMembershipContribution
-      if($this->_contributorContactID != $this->_contactID){
+      if ($this->_contributorContactID != $this->_contactID){
         $formValues['contribution_contact_id'] = $this->_contributorContactID;
         if (!empty($this->_params['soft_credit_type_id'])){
           $formValues['soft_credit'] = array(

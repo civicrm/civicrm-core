@@ -1159,7 +1159,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         'contact_type'
       );
 
-      if(array_key_exists('contact_id', $params) && empty($params['contact_id'])) {
+      if (array_key_exists('contact_id', $params) && empty($params['contact_id'])) {
         // we unset this here because the downstream function ignores the contactID we give it
         // if it is set & it is difficult to understand the implications of 'fixing' this downstream
         // but if we are passing a contact id into this function it's reasonable to assume we don't

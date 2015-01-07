@@ -304,7 +304,7 @@ class CRM_Member_BAO_Query {
         $names = array();
         $membershipTypes = CRM_Member_PseudoConstant::membershipType();
         foreach ($value as $id => $dontCare) {
-          if(!empty($membershipTypes[$id])) {
+          if (!empty($membershipTypes[$id])) {
             $names[] = $membershipTypes[$id];
           }
         }

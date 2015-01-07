@@ -64,7 +64,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    * @static
    */
   public static function create(&$params) {
-    if(empty($params['id']) && empty($params['name'])) {
+    if (empty($params['id']) && empty($params['name'])) {
       $params['name'] = CRM_Utils_String::munge($params['title'], '_', 242);
     }
     if (!empty($params['extends']) && is_array($params['extends'])) {
@@ -587,7 +587,7 @@ WHERE  id = %1";
    * @return int
    */
   public static function getOnlyPriceFieldID(array $priceSet) {
-    if(count($priceSet['fields']) > 1) {
+    if (count($priceSet['fields']) > 1) {
       throw new CRM_Core_Exception(ts('expected only one price field to be in priceset but multiple are present'));
     }
     return (int) implode('_', array_keys($priceSet['fields']));
@@ -603,7 +603,7 @@ WHERE  id = %1";
    */
   public static function getOnlyPriceFieldValueID(array $priceSet) {
     $priceFieldID = self::getOnlyPriceFieldID($priceSet);
-    if(count($priceSet['fields'][$priceFieldID]['options']) > 1) {
+    if (count($priceSet['fields'][$priceFieldID]['options']) > 1) {
       throw new CRM_Core_Exception(ts('expected only one price field to be in priceset but multiple are present'));
     }
     return (int) implode('_', array_keys($priceSet['fields'][$priceFieldID]['options']));
@@ -1043,7 +1043,7 @@ WHERE  id = %1";
    *   Name of entity - e.g event.
    */
   public static function setPriceSets(&$params, $entity, $entityName) {
-    if(empty($params['price_set_id']) || !is_array($params['price_set_id'])) {
+    if (empty($params['price_set_id']) || !is_array($params['price_set_id'])) {
       return;
     }
     // CRM-14069 note that we may as well start by assuming more than one.
@@ -1058,7 +1058,7 @@ WHERE  id = %1";
     $pse->entity_table = 'civicrm_' . $entityName;
     $pse->entity_id = $entity->id;
     while ($pse->fetch()) {
-      if(!in_array($pse->price_set_id, $params['price_set_id'])) {
+      if (!in_array($pse->price_set_id, $params['price_set_id'])) {
         // note an even more aggressive form of this deletion currently happens in event form
         // past price sets discounts are made inaccessible by this as the discount_id is set to NULL
         // on the participant record
@@ -1375,7 +1375,7 @@ WHERE       ps.id = %1
     $priceSetId = CRM_Price_BAO_PriceSet::getFor($baoName, $id);
     if ($priceSetId) {
       $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config');
-      if($isQuickConfig) {
+      if ($isQuickConfig) {
         $copyPriceSet = &CRM_Price_BAO_PriceSet::copy($priceSetId);
         CRM_Price_BAO_PriceSet::addTo($baoName, $newId, $copyPriceSet->id);
       }

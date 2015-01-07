@@ -541,7 +541,7 @@ class CRM_Utils_Array {
     foreach (func_get_args() as $n => $key) {
       // Skip argument 0 ($items) by testing $n for truth.
       if ($n && is_array($key)) {
-        foreach($key as $k) {
+        foreach ($key as $k) {
           unset($items[$k]);
         }
       }

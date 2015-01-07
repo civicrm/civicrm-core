@@ -202,7 +202,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
         );
       }
       if (strtolower($dbEmail) == strtolower($email)) {
-        if(empty($email)) {
+        if (empty($email)) {
           $errors[$emailName] = ts('You cannot create an email account for a contact with no email',
             array(1 => $email)
           );

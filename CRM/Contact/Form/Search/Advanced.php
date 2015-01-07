@@ -361,7 +361,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     $financialType = CRM_Utils_Array::value('financial_type_id', $this->_formValues);
     if ($financialType && is_array($financialType)) {
       unset($this->_formValues['financial_type_id']);
-      foreach($financialType as $notImportant => $typeID) {
+      foreach ($financialType as $notImportant => $typeID) {
         $this->_formValues['financial_type_id'][$typeID] = 1;
       }
     }

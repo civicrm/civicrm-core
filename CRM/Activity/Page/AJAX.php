@@ -161,7 +161,7 @@ class CRM_Activity_Page_AJAX {
     $clientRelationships = array_slice($allClientRelationships, $offset, $rowCount, TRUE);
 
     // after sort we can update username fields to be a url
-    foreach($clientRelationships as $key => $value) {
+    foreach ($clientRelationships as $key => $value) {
       $clientRelationships[$key]['name'] = '<a href='.CRM_Utils_System::url('civicrm/contact/view',
        'action=view&reset=1&cid='.$clientRelationships[$key]['cid']).'>'.$clientRelationships[$key]['name'].'</a>';
     }
@@ -225,7 +225,7 @@ class CRM_Activity_Page_AJAX {
     // move/transform caseRoles array data to caseRelationships
     // for sorting and display
     // CRM-14466 added cid to the non-client array to avoid php notice
-    foreach($caseRoles as $id => $value) {
+    foreach ($caseRoles as $id => $value) {
       if ($id != "client") {
         $rel = array();
         $rel['relation'] = $value;
@@ -237,7 +237,7 @@ class CRM_Activity_Page_AJAX {
         $caseRelationships[] = $rel;
       }
       else {
-        foreach($value as $clientRole) {
+        foreach ($value as $clientRole) {
           $relClient = array();
           $relClient['relation'] = 'Client';
           $relClient['name'] = $clientRole['sort_name'];
@@ -282,7 +282,7 @@ class CRM_Activity_Page_AJAX {
       if ($hasAccessToAllCases) {
         $contactType = empty($row['relation_type']) ? '' : (string) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $row['relation_type'], 'contact_type_b');
         $contactType = $contactType == 'Contact' ? '' : $contactType;
-        switch($row['source']) {
+        switch ($row['source']) {
           case 'caseRel':
             $row['actions'] =
             '<a href="#editCaseRoleDialog" title="'. ts('Reassign %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="'. $row['relation_type'] .'" data-rel_id="'. $row['rel_id'] .'"data-key="'. CRM_Core_Key::get('civicrm/ajax/relation') .'">'.

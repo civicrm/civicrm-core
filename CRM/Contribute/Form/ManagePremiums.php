@@ -167,12 +167,12 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       'account_relationship = 7'
     );
     $productFinancialType = array_intersect($costFinancialType, $premiumFinancialType);
-    foreach( $financialType as $key => $financialTypeName ){
-      if(!in_array( $key, $productFinancialType)) {
+    foreach ($financialType as $key => $financialTypeName ){
+      if (!in_array( $key, $productFinancialType)) {
         unset( $financialType[$key] );
       }
     }
-    if( count( $financialType ) ){
+    if (count( $financialType ) ){
       $this->assign( 'financialType', $financialType );
     }
     $this->add(
@@ -301,8 +301,8 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
           // to check wether GD is installed or not
           $gdSupport = CRM_Utils_System::getModuleSetting('gd', 'GD Support');
-          if($gdSupport) {
-            if($imageFile) {
+          if ($gdSupport) {
+            if ($imageFile) {
               $error = FALSE;
               $params['image'] = $this->_resizeImage($imageFile, "_full", 200, 200);
               $params['thumbnail'] = $this->_resizeImage($imageFile, "_thumb", 50, 50);
@@ -370,7 +370,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $widthOrig = $imageInfo[0];
     $heightOrig = $imageInfo[1];
     $image = imagecreatetruecolor($width, $height);
-    if($imageInfo['mime'] == 'image/gif') {
+    if ($imageInfo['mime'] == 'image/gif') {
       $source = imagecreatefromgif($filename);
     }
     elseif($imageInfo['mime'] == 'image/png') {

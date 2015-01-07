@@ -234,7 +234,7 @@ class CRM_Event_Form_EventFees {
       $contribution = new CRM_Contribute_DAO_Contribution();
       $contribution->id = $contriId;
       $contribution->find( TRUE );
-      foreach( array('financial_type_id', 'payment_instrument_id', 'contribution_status_id', 'receive_date', 'total_amount' ) as $f ) {
+      foreach (array('financial_type_id', 'payment_instrument_id', 'contribution_status_id', 'receive_date', 'total_amount' ) as $f ) {
         if ($f == 'receive_date') {
           list($defaults[$form->_pId]['receive_date']) = CRM_Utils_Date::setDateDefaults($contribution->$f);
         }

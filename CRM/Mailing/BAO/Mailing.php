@@ -160,7 +160,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     // the record that comes last that counts. That's because we are
     // INSERT'ing INTO a table with a primary id so that last record
     // over writes any previous record.
-    switch($email_selection_method) {
+    switch ($email_selection_method) {
       case 'location-exclude':
         $location_filter = "($email.location_type_id != $location_type_id)";
         // If there is more than one email that doesn't match the location,
@@ -2645,7 +2645,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       $tokens = array_merge(CRM_Core_SelectValues::contributionTokens(), $tokens);
     }
 
-    if(method_exists($form, 'listTokens')) {
+    if (method_exists($form, 'listTokens')) {
       $tokens = array_merge($form->listTokens(), $tokens);
     }
 

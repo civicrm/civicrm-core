@@ -139,7 +139,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @dataProvider getReportTemplates
    */
   public function testReportTemplateGetRowsAllReports($reportID) {
-    if(stristr($reportID, 'has existing issues')) {
+    if (stristr($reportID, 'has existing issues')) {
       $this->markTestIncomplete($reportID);
     }
     $result = $this->callAPISuccess('report_template', 'getrows', array(
@@ -151,10 +151,10 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @dataProvider getReportTemplates
    */
   public function testReportTemplateGetStatisticsAllReports($reportID) {
-    if(stristr($reportID, 'has existing issues')) {
+    if (stristr($reportID, 'has existing issues')) {
       $this->markTestIncomplete($reportID);
     }
-    if(in_array($reportID, array('contribute/softcredit', 'contribute/bookkeeping'))) {
+    if (in_array($reportID, array('contribute/softcredit', 'contribute/bookkeeping'))) {
       $this->markTestIncomplete($reportID . " has non enotices when calling statistics fn");
     }
     $description = "Get Statistics from a report (note there isn't much data to get in the test DB :-(";
@@ -191,7 +191,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
     $reports = civicrm_api3('report_template', 'get', array('return' => 'value', 'options' => array('limit' => 500)));
     foreach ($reports['values'] as $report) {
-      if(empty($reportsToSkip[$report['value']])) {
+      if (empty($reportsToSkip[$report['value']])) {
         $reportTemplates[] = array($report['value']);
       }
       else {

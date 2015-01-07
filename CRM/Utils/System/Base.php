@@ -246,7 +246,7 @@ abstract class CRM_Utils_System_Base {
    */
   public function setMySQLTimeZone(){
     $timeZoneOffset = $this->getTimeZoneOffset();
-    if($timeZoneOffset){
+    if ($timeZoneOffset){
       $sql = "SET time_zone = '$timeZoneOffset'";
       CRM_Core_DAO::executequery($sql);
     }
@@ -337,7 +337,7 @@ abstract class CRM_Utils_System_Base {
    * @return int $ufid - user ID of UF System
    */
   public function getBestUFID($user = NULL) {
-    if($user) {
+    if ($user) {
       return $this->getUserIDFromUserObject($user);
     }
     return $this->getLoggedInUfID();
@@ -353,7 +353,7 @@ abstract class CRM_Utils_System_Base {
    * @return string $uniqueIdentifier - unique identifier from the UF System
    */
   public function getBestUFUniqueIdentifier($user = NULL) {
-    if($user) {
+    if ($user) {
       return $this->getUniqueIdentifierFromUserObject($user);
     }
     return $this->getLoggedInUniqueIdentifier();

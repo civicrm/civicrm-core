@@ -991,7 +991,7 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
       continue;
     }
 
-    if($name == 'phone_ext'){
+    if ($name == 'phone_ext'){
       $block = 'Phone';
     }
 
@@ -1370,7 +1370,7 @@ function _civicrm_api3_deprecated_contact_check_params(
     );
 
     // contact_type has a limited number of valid values
-    if(empty($params['contact_type'])) {
+    if (empty($params['contact_type'])) {
       return civicrm_api3_create_error("No Contact Type");
     }
     $fields = CRM_Utils_Array::value($params['contact_type'], $required);

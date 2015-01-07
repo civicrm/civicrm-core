@@ -551,7 +551,7 @@ SELECT id, title FROM civicrm_report_instance
 WHERE  report_id = %1";
       $params = array(1 => array($reportUrl, 'String'));
       $result = CRM_Core_DAO::executeQuery($sql, $params);
-      while( $result->fetch()) {
+      while ($result->fetch()) {
         $instanceDetails[$reportUrl][$result->id] = $result->title . " (ID: {$result->id})";
       }
     }

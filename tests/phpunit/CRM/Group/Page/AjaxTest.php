@@ -431,7 +431,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
       $groups[] = $dao->id;
     }
 
-    if(!empty($allGroups)) {
+    if (!empty($allGroups)) {
       //all groups is empty if we really mean all groups but if a filter like 'is_disabled' is already applied
       // it is populated, ajax calls from Manage Groups will leave empty but calls from New Mailing pass in a filtered list
       $currentGroups = array_intersect($groups, array_flip($allGroups));

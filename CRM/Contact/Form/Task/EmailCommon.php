@@ -499,7 +499,7 @@ class CRM_Contact_Form_Task_EmailCommon {
     if (isset($form->_caseId)) {
       // if case-id is found in the url, create case activity record
       $cases = explode(',', $form->_caseId);
-      foreach($cases as $key => $val) {
+      foreach ($cases as $key => $val) {
         if (is_numeric($val)) {
           $caseParams = array(
             'activity_id' => $activityId,
