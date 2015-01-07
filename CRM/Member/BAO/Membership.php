@@ -71,7 +71,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       CRM_Utils_Hook::pre('edit', 'Membership', $params['id'], $params);
     }
     else {
-      CRM_Utils_Hook::pre('create', 'Membership', $params['id'], $params);
+      CRM_Utils_Hook::pre('create', 'Membership', NULL, $params);
     }
     $id = $params['id'];
     // we do this after the hooks are called in case it has been altered
