@@ -256,7 +256,8 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
           'payment_type' => $dao->payment_type,
         );
       }
-      else { CRM_Core_Error::fatal("Unable to find payment processor in " . __CLASS__ . '::' . __METHOD__);
+      else {
+        CRM_Core_Error::fatal("Unable to find payment processor in " . __CLASS__ . '::' . __METHOD__);
       }
     }
 

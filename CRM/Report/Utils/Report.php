@@ -162,7 +162,8 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
    * @return int|null|string
    */
   public static function getInstanceCount($optionVal) {
-    if (empty($optionVal)) { return 0;
+    if (empty($optionVal)) {
+      return 0;
     }
 
     $sql = "

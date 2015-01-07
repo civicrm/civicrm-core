@@ -397,7 +397,8 @@ class civicrm_cli_csv_file extends civicrm_cli {
     $this->header = $header;
     while (($data = fgetcsv($handle, 0, $this->separator)) !== FALSE) {
       // skip blank lines
-      if (count($data) == 1 && is_null($data[0])) { continue;
+      if (count($data) == 1 && is_null($data[0])) {
+        continue;
       }
       $this->row++;
       $params = $this->convertLine($data);
