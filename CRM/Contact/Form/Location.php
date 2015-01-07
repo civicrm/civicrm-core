@@ -111,7 +111,7 @@ class CRM_Contact_Form_Location {
 
         $form->set($blockName . '_Block_Count', $instance);
         $formName = 'CRM_Contact_Form_Edit_' . $blockName;
-        $formName::buildQuickForm( $form );
+        $formName::buildQuickForm($form);
       }
     }
 

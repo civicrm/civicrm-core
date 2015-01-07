@@ -83,7 +83,7 @@ class CRM_Case_Form_Activity_OpenCase {
     $form->_caseStatusId = array_key_exists($caseStatusId, $caseStatus) ? $caseStatusId : NULL;
 
     // Add attachments
-    CRM_Core_BAO_File::buildAttachment( $form, 'civicrm_activity', $form->_activityId );
+    CRM_Core_BAO_File::buildAttachment($form, 'civicrm_activity', $form->_activityId);
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/case', 'reset=1'));
   }
@@ -338,9 +338,9 @@ class CRM_Case_Form_Activity_OpenCase {
 
     // Add parameters for attachments
     $numAttachments = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'max_attachments');
-    for ( $i = 1; $i <= $numAttachments; $i++ ) {
+    for ($i = 1; $i <= $numAttachments; $i++) {
       $attachName = "attachFile_$i";
-      if ( isset( $params[$attachName] ) && !empty( $params[$attachName] ) ) {
+      if (isset($params[$attachName]) && !empty($params[$attachName])) {
         $xmlProcessorParams[$attachName] = $params[$attachName];
       }
     }

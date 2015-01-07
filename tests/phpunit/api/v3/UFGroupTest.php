@@ -160,7 +160,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       'name' => 'test_group',
       'notify' => 'admin@example.org',
       'post_URL' => 'http://example.org/post',
-      'title' => 'Test Group', );
+      'title' => 'Test Group',);
     $result = $this->callAPISuccess('uf_group', 'create', $params);
     $params['created_date'] = date('YmdHis', strtotime($params['created_date']));
     foreach ($params as $key => $value) {

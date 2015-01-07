@@ -233,7 +233,7 @@ class CRM_Core_StateMachine {
      * we change the form name to allow multiple edits to happen
      * We need a cleaner way of doing this going forward
      */
-    foreach ($this->_states as $n => $s ) {
+    foreach ($this->_states as $n => $s) {
       if (substr($name, 0, strlen($n)) == $n) {
         return $s;
       }

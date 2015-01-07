@@ -214,7 +214,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->clickLink("link=Successful Deliveries");
 
     // check for open page
-    $this->assertElementContainsText( 'page-title', "Successful Deliveries");
+    $this->assertElementContainsText('page-title', "Successful Deliveries");
 
     // verify email
     $this->verifyText("xpath=//table[@id='mailing_event']/tbody//tr/td[2]", preg_quote("mailino$firstName@mailson.co.in"));

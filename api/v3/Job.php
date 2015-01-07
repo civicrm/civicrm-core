@@ -403,7 +403,7 @@ function civicrm_api3_job_fetch_activities($params) {
 
   try {
     CRM_Utils_Mail_EmailProcessor::processActivities();
-    $values = array( );
+    $values = array();
     $lock->release();
     return civicrm_api3_create_success($values, $params,'mailing','activities');
   }
@@ -567,28 +567,28 @@ function civicrm_api3_job_run_payment_cron($params) {
  * @static void
  * @access public
  */
-function civicrm_api3_job_cleanup( $params ) {
-  $session   = CRM_Utils_Array::value( 'session'   , $params, true  );
-  $tempTable = CRM_Utils_Array::value( 'tempTables', $params, true  );
-  $jobLog    = CRM_Utils_Array::value( 'jobLog'    , $params, true  );
-  $prevNext  = CRM_Utils_Array::value( 'prevNext'  , $params, true  );
-  $dbCache   = CRM_Utils_Array::value( 'dbCache'   , $params, false );
-  $memCache  = CRM_Utils_Array::value( 'memCache'  , $params, false );
+function civicrm_api3_job_cleanup($params) {
+  $session   = CRM_Utils_Array::value('session'   , $params, true );
+  $tempTable = CRM_Utils_Array::value('tempTables', $params, true );
+  $jobLog    = CRM_Utils_Array::value('jobLog'    , $params, true );
+  $prevNext  = CRM_Utils_Array::value('prevNext'  , $params, true );
+  $dbCache   = CRM_Utils_Array::value('dbCache'   , $params, false);
+  $memCache  = CRM_Utils_Array::value('memCache'  , $params, false);
 
-  if ( $session || $tempTable || $prevNext ) {
-    CRM_Core_BAO_Cache::cleanup( $session, $tempTable, $prevNext );
+  if ($session || $tempTable || $prevNext) {
+    CRM_Core_BAO_Cache::cleanup($session, $tempTable, $prevNext);
   }
 
-  if ( $jobLog ) {
-    CRM_Core_BAO_Job::cleanup( );
+  if ($jobLog) {
+    CRM_Core_BAO_Job::cleanup();
   }
 
-  if ( $dbCache ) {
-    CRM_Core_Config::clearDBCache( );
+  if ($dbCache) {
+    CRM_Core_Config::clearDBCache();
   }
 
-  if ( $memCache ) {
-    CRM_Utils_System::flushCache( );
+  if ($memCache) {
+    CRM_Utils_System::flushCache();
   }
 }
 
@@ -625,7 +625,7 @@ function civicrm_api3_job_group_rebuild($params) {
     return civicrm_api3_create_error('Could not acquire lock, another EmailProcessor process is running');
   }
 
-  $limit = CRM_Utils_Array::value( 'limit', $params, 0 );
+  $limit = CRM_Utils_Array::value('limit', $params, 0);
 
   CRM_Contact_BAO_GroupContactCache::loadAll(null, $limit);
   $lock->release();

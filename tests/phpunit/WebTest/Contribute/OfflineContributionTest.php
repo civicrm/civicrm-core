@@ -380,7 +380,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 
     foreach ($verifyData as $label => $value) {
-      if ( $label == 'sort_name' ) {
+      if ($label == 'sort_name') {
         continue;
       }
       $this->verifyText("xpath=//form[@id='ContributionView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",

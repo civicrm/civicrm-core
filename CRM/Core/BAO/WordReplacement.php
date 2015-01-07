@@ -159,7 +159,7 @@ SELECT find_word,replace_word,is_active,match_type
 FROM   civicrm_word_replacement
 WHERE  domain_id = %1
 ";
-    $params = array( 1 => array($id, 'Integer'));
+    $params = array(1 => array($id, 'Integer'));
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 

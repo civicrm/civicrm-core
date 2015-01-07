@@ -285,8 +285,8 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
         break;
 
       default:
-        CRM_Core_Session::setStatus(ts( "Unrecognized payment hook (%1) in %2::%3",
-                        array(1 => $method, 2 => __CLASS__ , 3 => __METHOD__) ),
+        CRM_Core_Session::setStatus(ts("Unrecognized payment hook (%1) in %2::%3",
+                        array(1 => $method, 2 => __CLASS__ , 3 => __METHOD__)),
                         '', 'error');
     }
   }

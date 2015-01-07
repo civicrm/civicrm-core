@@ -141,7 +141,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
       }
       $i++;
     }
-    $this->waitForElementPresent( 'financial_type_id' );
+    $this->waitForElementPresent('financial_type_id');
     $this->select("financial_type_id", "label={$contributionType}");
     $this->waitForElementPresent('_qf_Field_next-bottom');
     $this->click('_qf_Field_next-bottom');
@@ -411,7 +411,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->select('price_set_id', "value={$sid}");
     $this->waitForElementPresent('pricesetTotal');
 
-    $i  = ($term == 3) ? 3 : (($term == 2) ? 2 : 1 );
+    $i  = ($term == 3) ? 3 : (($term == 2) ? 2 : 1);
     $this->waitForElementPresent("xpath=//div[@id='priceset']/div[2]/div[2]/div[$i]/span/input");
     $this->click("xpath=//div[@id='priceset']/div[2]/div[2]/div[$i]/span/input");
     $amount = $this->getText("xpath=//div[@id='priceset']/div[2]/div[2]/div[$i]/span/label/span[@class='crm-price-amount-amount']");

@@ -184,8 +184,8 @@ class CRM_Core_Page {
     CRM_Utils_Hook::pageRun($this);
 
     if ($this->_print) {
-      if (in_array( $this->_print, array( CRM_Core_Smarty::PRINT_SNIPPET,
-        CRM_Core_Smarty::PRINT_PDF, CRM_Core_Smarty::PRINT_NOFORM, CRM_Core_Smarty::PRINT_JSON ))) {
+      if (in_array($this->_print, array(CRM_Core_Smarty::PRINT_SNIPPET,
+        CRM_Core_Smarty::PRINT_PDF, CRM_Core_Smarty::PRINT_NOFORM, CRM_Core_Smarty::PRINT_JSON))) {
         $content = self::$_template->fetch('CRM/common/snippet.tpl');
       }
       else {

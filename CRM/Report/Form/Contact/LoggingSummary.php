@@ -40,7 +40,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
     parent::__construct();
 
     $logTypes = array();
-    foreach ( array_keys($this->_logTables) as $table ) {
+    foreach (array_keys($this->_logTables) as $table) {
       $type = $this->getLogType($table);
       $logTypes[$type] = $type;
     }
@@ -189,7 +189,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
       }
 
       if ('Contact' == CRM_Utils_Array::value('log_type', $this->_logTables[$row['log_civicrm_entity_log_type']]) &&
-          CRM_Utils_Array::value('log_civicrm_entity_log_action', $row) == 'Insert' ) {
+          CRM_Utils_Array::value('log_civicrm_entity_log_action', $row) == 'Insert') {
         $row['log_civicrm_entity_log_action'] = ts('Update');
       }
 
@@ -238,7 +238,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
    */
   public function from($logTable = NULL) {
     static $entity = NULL;
-    if ( $logTable ) {
+    if ($logTable) {
       $entity = $logTable;
     }
 

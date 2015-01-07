@@ -887,7 +887,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
             foreach ($tmp_statuses as $cur_stat) {
               $status_ids[] = $cur_stat['id'];
             }
-            if (empty($params['status_id']) || in_array( $params['status_id'], $status_ids) == FALSE) {
+            if (empty($params['status_id']) || in_array($params['status_id'], $status_ids) == FALSE) {
               $errors['status_id'] = ts('Please enter a status that does NOT represent a current membership status.');
               $errors['is_override']  = ts('This must be checked because you set an End Date for a lifetime membership');
             }
@@ -1836,7 +1836,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $form->_receiptContactId = $formValues['contact_id'];
       }
     }
-    $template = CRM_Core_Smarty::singleton( );
+    $template = CRM_Core_Smarty::singleton();
     $taxAmt = $template->get_template_vars('dataArray');
     $eventTaxAmt = $template->get_template_vars('totalTaxAmount');
     $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');

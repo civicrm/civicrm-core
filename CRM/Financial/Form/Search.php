@@ -66,7 +66,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
       'status_id',
       ts('Batch Status'),
       array(
-        '' => ts('- any -' ),
+        '' => ts('- any -'),
         array_search('Open', $batchStatus) => ts('Open'),
         array_search('Closed', $batchStatus) => ts('Closed'),
         array_search('Exported', $batchStatus) => ts('Exported'),
@@ -78,7 +78,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
       'select',
       'payment_instrument_id',
       ts('Payment Instrument'),
-      array('' => ts('- any -' )) + CRM_Contribute_PseudoConstant::paymentInstrument(),
+      array('' => ts('- any -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
       FALSE
     );
 
@@ -98,7 +98,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
 
     $this->add('select',
       'batch_update',
-      ts('Task' ),
+      ts('Task'),
       array('' => ts('- actions -')) + $batchAction);
 
     $this->add('submit', 'submit', ts('Go'),

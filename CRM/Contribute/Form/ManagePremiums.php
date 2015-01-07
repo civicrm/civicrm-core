@@ -90,7 +90,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    * @return void
    */
   public function buildQuickForm() {
-    parent::buildQuickForm( );
+    parent::buildQuickForm();
     $this->setPageTitle(ts('Premium Product'));
 
     if ($this->_action & CRM_Core_Action::PREVIEW) {
@@ -146,7 +146,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->add('text', 'frequency_interval', ts('Frequency'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'frequency_interval'));
 
     //Financial Type CRM-11106
-    $financialType = CRM_Contribute_PseudoConstant::financialType( );
+    $financialType = CRM_Contribute_PseudoConstant::financialType();
     $premiumFinancialType = array();
     CRM_Core_PseudoConstant::populate(
       $premiumFinancialType,
@@ -167,18 +167,18 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       'account_relationship = 7'
     );
     $productFinancialType = array_intersect($costFinancialType, $premiumFinancialType);
-    foreach ($financialType as $key => $financialTypeName ) {
-      if (!in_array( $key, $productFinancialType)) {
-        unset( $financialType[$key] );
+    foreach ($financialType as $key => $financialTypeName) {
+      if (!in_array($key, $productFinancialType)) {
+        unset($financialType[$key]);
       }
     }
-    if (count( $financialType ) ) {
-      $this->assign( 'financialType', $financialType );
+    if (count($financialType)) {
+      $this->assign('financialType', $financialType);
     }
     $this->add(
       'select',
       'financial_type_id',
-      ts( 'Financial Type' ),
+      ts('Financial Type'),
       array('' => ts('- select -')) + $financialType
     );
 

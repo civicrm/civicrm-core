@@ -454,7 +454,7 @@ WHERE  cacheKey LIKE %1
     $params1[2] = array("{$cacheKey}_alphabet%", 'String');
     $dao = CRM_Core_DAO::executeQuery($query, $params1);
 
-    $val = array( );
+    $val = array();
     while ($dao->fetch()) {
       $val[] = $dao->data;
     }

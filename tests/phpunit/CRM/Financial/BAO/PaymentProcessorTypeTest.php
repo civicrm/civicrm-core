@@ -55,7 +55,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'name',
       'Database check on added payment processor type record.'
     );
-    $this->assertEquals( $result, 'Test Payment Processor', 'Verify Payment Processor Type');
+    $this->assertEquals($result, 'Test Payment Processor', 'Verify Payment Processor Type');
   }
 
   /**
@@ -70,7 +70,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
     $defaults = array();
     CRM_Financial_BAO_PaymentProcessorType::create($params);
     $result = CRM_Financial_BAO_PaymentProcessorType::retrieve($params, $defaults);
-    $this->assertEquals( $result->name, 'Test_Retrieve_Payment_Processor', 'Verify Payment Processor Type');
+    $this->assertEquals($result->name, 'Test_Retrieve_Payment_Processor', 'Verify Payment Processor Type');
   }
 
   /**

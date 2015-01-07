@@ -178,7 +178,7 @@ function _civicrm_api3_event_get_spec(&$params) {
 function _civicrm_api3_event_get_legacy_support_42(&$event, $event_id) {
   if (!empty($event[$event_id]['payment_processor'])) {
     $processors = explode(CRM_Core_DAO::VALUE_SEPARATOR, $event[$event_id]['payment_processor']);
-    if (count($processors) == 3 ) {
+    if (count($processors) == 3) {
       $event[$event_id]['payment_processor_id'] = $processors[1];
     }
   }

@@ -378,7 +378,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       $params['group_type'] = '';
     }
 
-    $session = CRM_Core_Session::singleton( );
+    $session = CRM_Core_Session::singleton();
     $cid = $session->get('userID');
     // this action is add
     if ($cid && empty($params['id'])) {
@@ -618,7 +618,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   public static function getPermissionClause($force = FALSE) {
     static $clause = 1;
     static $retrieved = FALSE;
-    if ((!$retrieved || $force ) && !CRM_Core_Permission::check('view all contacts') && !CRM_Core_Permission::check('edit all contacts')) {
+    if ((!$retrieved || $force) && !CRM_Core_Permission::check('view all contacts') && !CRM_Core_Permission::check('edit all contacts')) {
       //get the allowed groups for the current user
       $groups = CRM_ACL_API::group(CRM_ACL_API::VIEW);
       if (!empty($groups)) {

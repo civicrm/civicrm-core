@@ -132,7 +132,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     );
     $this->addElement('select', 'group_by', ts('Group contributions by'), $options, array(), "<br/>", FALSE);
     // this was going to be free-text but I opted for radio options in case there was a script injection risk
-    $separatorOptions = array('comma' => 'Comma', 'td' => 'Table Cell' );
+    $separatorOptions = array('comma' => 'Comma', 'td' => 'Table Cell');
     $this->addElement('select', 'group_by_separator', ts('Separator (grouped contributions)'), $separatorOptions);
     $emailOptions = array(
       '' => ts('Generate PDFs for printing (only)'),

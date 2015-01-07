@@ -73,11 +73,11 @@ function civicrm_api3_domain_get($params) {
         'geo_code_1', 'geo_code_2',
       );
 
-      if ( !empty( $values['location']['email'] ) ) {
+      if (!empty($values['location']['email'])) {
         $domain['domain_email'] = CRM_Utils_Array::value('email', $values['location']['email'][1]);
       }
 
-      if ( !empty( $values['location']['phone'] ) ) {
+      if (!empty($values['location']['phone'])) {
         $domain['domain_phone'] = array(
           'phone_type' => CRM_Core_OptionGroup::getLabel(
           'phone_type',
@@ -93,7 +93,7 @@ function civicrm_api3_domain_get($params) {
         );
       }
 
-      if ( !empty( $values['location']['address'] ) ) {
+      if (!empty($values['location']['address'])) {
         foreach ($address_array as $value) {
           $domain['domain_address'][$value] = CRM_Utils_Array::value($value,
           $values['location']['address'][1]

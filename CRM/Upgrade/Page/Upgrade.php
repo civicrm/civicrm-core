@@ -159,7 +159,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
       'queue' => CRM_Upgrade_Form::buildQueue($currentVer, $latestVer, $this->get('postUpgradeMessageFile')),
       'isMinimal' => TRUE,
       'pathPrefix' => 'civicrm/upgrade/queue',
-      'onEndUrl' => CRM_Utils_System::url('civicrm/upgrade', 'action=finish', FALSE, NULL, FALSE ),
+      'onEndUrl' => CRM_Utils_System::url('civicrm/upgrade', 'action=finish', FALSE, NULL, FALSE),
       'buttons' => array('retry' => $config->debug, 'skip' => $config->debug),
       ));
     $queueRunner->runAllViaWeb();

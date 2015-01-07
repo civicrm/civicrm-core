@@ -214,7 +214,7 @@ class CRM_Financial_Page_AJAX {
               );
             }
             else {
-              $response = array('status' => ts("This batch is configured to include only transactions using %1 payment method. If you want to include other transactions, please edit the batch first and modify the Payment Method.", array( 1 => $paymentInstrument)));
+              $response = array('status' => ts("This batch is configured to include only transactions using %1 payment method. If you want to include other transactions, please edit the batch first and modify the Payment Method.", array(1 => $paymentInstrument)));
             }
             break;
 
@@ -493,7 +493,7 @@ class CRM_Financial_Page_AJAX {
       $status = array('status' => 'record-updated-success');
     }
     else {
-      $status = array('status' => ts("This batch is configured to include only transactions using %1 payment method. If you want to include other transactions, please edit the batch first and modify the Payment Method.", array( 1 => $paymentInstrument)));
+      $status = array('status' => ts("This batch is configured to include only transactions using %1 payment method. If you want to include other transactions, please edit the batch first and modify the Payment Method.", array(1 => $paymentInstrument)));
     }
     CRM_Utils_JSON::output($status);
   }

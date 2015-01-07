@@ -103,9 +103,9 @@ class CRM_Custom_Form_CustomData {
       $form->_entityId = CRM_Utils_Request::retrieve('entityID', 'Positive', $form);
     }
 
-    $typeCheck = CRM_Utils_Request::retrieve( 'type', 'String', CRM_Core_DAO::$_nullObject );
+    $typeCheck = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject);
     $urlGroupId = CRM_Utils_Request::retrieve('groupID', 'Positive', CRM_Core_DAO::$_nullObject);
-    if ( isset($typeCheck) && $urlGroupId) {
+    if (isset($typeCheck) && $urlGroupId) {
       $form->_groupID = $urlGroupId;
     }
     else {

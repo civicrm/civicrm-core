@@ -146,7 +146,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $options['membership_num_terms'] = CRM_Utils_Array::value($index, CRM_Utils_Array::value('membership_num_terms', $params), 1);
         }
 
-        if (CRM_Utils_Array::value( $index, CRM_Utils_Array::value('option_financial_type_id', $params))) {
+        if (CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_financial_type_id', $params))) {
           $options['financial_type_id'] =  $params['option_financial_type_id'][$index];
         }
         elseif (!empty($params['financial_type_id'])) {
@@ -266,7 +266,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       $is_pay_later = 1;
     }
     elseif (isset($qf->_values)) {
-      $is_pay_later = CRM_Utils_Array::value( 'is_pay_later', $qf->_values);
+      $is_pay_later = CRM_Utils_Array::value('is_pay_later', $qf->_values);
     }
 
     $otherAmount = $qf->get('values');
@@ -340,7 +340,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
                    $useRequired && $field->is_required
         );
         if ($is_pay_later) {
-          $qf->add( 'text', 'txt-'.$elementName, $label, array( 'size' => '4'));
+          $qf->add('text', 'txt-'.$elementName, $label, array('size' => '4'));
         }
 
         // CRM-6902 - Add "max" option for a price set field
@@ -412,7 +412,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $choice[$opId] = $qf->createElement('radio', NULL, '', $opt['label'], $opt['id'], $extra);
 
           if ($is_pay_later) {
-            $qf->add( 'text', 'txt-'.$elementName, $label, array( 'size' => '4'));
+            $qf->add('text', 'txt-'.$elementName, $label, array('size' => '4'));
           }
 
           // CRM-6902 - Add "max" option for a price set field
@@ -492,7 +492,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $selectOption[$opt['id']] = $opt['label'];
 
           if ($is_pay_later) {
-            $qf->add( 'text', 'txt-'.$elementName, $label, array( 'size' => '4'));
+            $qf->add('text', 'txt-'.$elementName, $label, array('size' => '4'));
           }
         }
 
@@ -535,7 +535,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             )
           );
           if ($is_pay_later) {
-            $txtcheck[$opId] =& $qf->createElement( 'text', $opId, $opt['label'], array( 'size' => '4' ) );
+            $txtcheck[$opId] =& $qf->createElement('text', $opId, $opt['label'], array('size' => '4'));
             $qf->addGroup($txtcheck, 'txt-'.$elementName, $label);
           }
           // CRM-6902 - Add "max" option for a price set field

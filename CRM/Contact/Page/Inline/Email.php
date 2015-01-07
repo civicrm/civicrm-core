@@ -61,12 +61,12 @@ class CRM_Contact_Page_Inline_Email extends CRM_Core_Page {
       }
     }
 
-    $contact = new CRM_Contact_BAO_Contact( );
+    $contact = new CRM_Contact_BAO_Contact();
     $contact->id = $contactId;
     $contact->find(TRUE);
     $privacy = array();
-    foreach ( CRM_Contact_BAO_Contact::$_commPrefs as $name ) {
-      if ( isset( $contact->$name ) ) {
+    foreach (CRM_Contact_BAO_Contact::$_commPrefs as $name) {
+      if (isset($contact->$name)) {
         $privacy[$name] = $contact->$name;
       }
     }

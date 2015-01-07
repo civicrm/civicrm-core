@@ -1095,7 +1095,7 @@ class CRM_Contribute_BAO_Query {
     // Add batch select
     $batches = CRM_Contribute_PseudoConstant::batch();
 
-    if ( !empty( $batches ) ) {
+    if (!empty($batches)) {
       $form->add('select', 'contribution_batch_id',
         ts('Batch Name'),
         array('' => ts('- any -')) + $batches,

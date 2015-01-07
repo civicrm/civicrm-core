@@ -161,7 +161,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       }
     }
 
-    $this->assign( 'qParams', $qParams );
+    $this->assign('qParams', $qParams);
 
     if ($membershipTypeID) {
       $transactionID    = $this->get('membership_trx_id');

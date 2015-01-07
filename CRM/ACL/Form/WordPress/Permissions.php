@@ -46,7 +46,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
    */
   public function buildQuickForm() {
 
-    CRM_Utils_System::setTitle( 'Wordpress Access Control' );
+    CRM_Utils_System::setTitle('Wordpress Access Control');
 
     // Get the core permissions array
     $permissionsArray = self::getPermissionArray();
@@ -57,7 +57,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
     if (!isset($wp_roles)) {
       $wp_roles = new WP_Roles();
     }
-    foreach ( $wp_roles->role_names as $role => $name ) {
+    foreach ($wp_roles->role_names as $role => $name) {
       // Dont show the permissions options for administrator, as they have all permissions
       if ($role !== 'administrator') {
         $roleObj = $wp_roles->get_role($role);
@@ -72,7 +72,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
 
         // Compose the checkbox array for each role, to assign to form
         $rolePerms[$role] = $permissionsArray;
-        foreach ( $rolePerms[$role] as $key => $value) {
+        foreach ($rolePerms[$role] as $key => $value) {
           $elementName = $role.'['.$key.']';
           $this->add('checkbox', $elementName, $value);
         }
@@ -91,7 +91,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
           'type'      => 'next',
           'name'      => ts('Save'),
           'spacing'   => '',
-          'isDefault' => FALSE   ),
+          'isDefault' => FALSE  ),
       )
     );
 
@@ -112,7 +112,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
     if (!isset($wp_roles)) {
       $wp_roles = new WP_Roles();
     }
-    foreach ( $wp_roles->role_names as $role => $name ) {
+    foreach ($wp_roles->role_names as $role => $name) {
       $roleObj = $wp_roles->get_role($role);
 
       //Remove all civicrm capabilities for the role, as there may be some capabilities checkbox unticked
@@ -123,7 +123,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
       //Add the selected wordpress capabilities for the role
       $rolePermissions = $params[$role];
       if (!empty($rolePermissions)) {
-        foreach ( $rolePermissions as $key => $capability ) {
+        foreach ($rolePermissions as $key => $capability) {
           $roleObj->add_cap($key);
         }
       }
@@ -141,7 +141,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
         }
         if (!empty($warningPermissionNames)) {
           CRM_Core_Session::setStatus(
-            ts('The %1 role was assigned one or more permissions that may prove dangerous for users of that role to have. Please reconsider assigning %2 to them.', array( 1 => $wp_roles->role_names[$role], 2 => implode(', ', $warningPermissionNames))),
+            ts('The %1 role was assigned one or more permissions that may prove dangerous for users of that role to have. Please reconsider assigning %2 to them.', array(1 => $wp_roles->role_names[$role], 2 => implode(', ', $warningPermissionNames))),
             ts('Unsafe Permission Settings')
           );
         }
@@ -159,7 +159,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
     CRM_Core_Session::setStatus("", ts('Wordpress Access Control Updated'), "success");
 
     // rebuild the menus to comply with the new permisssions/capabilites
-    CRM_Core_Invoke::rebuildMenuAndCaches( );
+    CRM_Core_Invoke::rebuildMenuAndCaches();
 
     CRM_Utils_System::redirect('admin.php?page=CiviCRM&q=civicrm/admin/access&reset=1');
     CRM_Utils_System::civiExit();

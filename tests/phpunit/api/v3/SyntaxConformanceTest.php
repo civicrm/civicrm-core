@@ -182,7 +182,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $customDataEntities = array();
     $invalidEntities = array('Individual', 'Organization', 'Household');
     $entitiesToFix = array('Case', 'Relationship');
-    foreach ($entities as $entityName => $entity ) {
+    foreach ($entities as $entityName => $entity) {
       if (!in_array($entityName, $invalidEntities)
         && !in_array($entityName, $entitiesToFix)) {
         if (!empty(self::$componentMap[$entityName]) && empty($enabledComponents[self::$componentMap[$entityName]])) {

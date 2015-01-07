@@ -283,7 +283,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
       $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[2][contains(text(), '{$value['log_type']}')]/../{$contactCheck}/../{$actionPath}"), "The proper record not present for (log type : {$value['log_type']}, altered contact : {$value['altered_contact']}, action as {$value['action']})");
 
       if ($value['action'] == 'Update') {
-        $this->assertTrue( ($value['action'] == $this->getText("xpath=//table/tbody//tr/td[2][contains(text(), '{$value['log_type']}')]/../td[4]/a[contains(text(), '{$value['altered_contact']}')]/../../{$actionPath}")), "The proper record action  {$value['action']} not present for (log type : {$value['log_type']}, altered contact : {$value['altered_contact']} record)");
+        $this->assertTrue(($value['action'] == $this->getText("xpath=//table/tbody//tr/td[2][contains(text(), '{$value['log_type']}')]/../td[4]/a[contains(text(), '{$value['altered_contact']}')]/../../{$actionPath}")), "The proper record action  {$value['action']} not present for (log type : {$value['log_type']}, altered contact : {$value['altered_contact']} record)");
       }
     }
   }
@@ -313,7 +313,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
       //visit the logging contact summary report
       $this->openCiviPage('report/logging/contact/summary', 'reset=1');
       foreach ($filters as $type => $filter) {
-        if ($type == 'text' ) {
+        if ($type == 'text') {
           foreach ($filter as $filterName => $filterValue) {
             $this->type($filterName, $filterValue);
           }

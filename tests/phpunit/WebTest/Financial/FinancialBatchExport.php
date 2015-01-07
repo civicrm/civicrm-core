@@ -100,7 +100,7 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
    * @param $numberOfTrxn
    */
   public function _testAssignBatch($numberOfTrxn) {
-    $this->select( "xpath=//div[@id='crm-transaction-selector-assign_length']/label/select[@name='crm-transaction-selector-assign_length']", "value=$numberOfTrxn" );
+    $this->select("xpath=//div[@id='crm-transaction-selector-assign_length']/label/select[@name='crm-transaction-selector-assign_length']", "value=$numberOfTrxn");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME

@@ -120,7 +120,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     }
 
     $attrib = array('rows' => 8, 'cols' => 60);
-    $this->add('textarea', 'page_text', ts('Your Message'), NULL, FALSE );
+    $this->add('textarea', 'page_text', ts('Your Message'), NULL, FALSE);
 
     $maxAttachments = 1;
     CRM_Core_BAO_File::buildAttachment($this, 'civicrm_pcp', $this->_pageId, $maxAttachments);
@@ -176,7 +176,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
    * @return void
    */
   public function postProcess() {
-    $params  = $this->controller->exportValues( $this->_name );
+    $params  = $this->controller->exportValues($this->_name);
     $checkBoxes = array('is_thermometer', 'is_honor_roll', 'is_active');
 
     foreach ($checkBoxes as $key) {
@@ -197,9 +197,9 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
 
     // since we are allowing html input from the user
     // we also need to purify it, so lets clean it up
-    $htmlFields = array( 'intro_text', 'page_text', 'title' );
-    foreach ( $htmlFields as $field ) {
-      if ( ! empty($params[$field]) ) {
+    $htmlFields = array('intro_text', 'page_text', 'title');
+    foreach ($htmlFields as $field) {
+      if (! empty($params[$field])) {
         $params[$field] = CRM_Utils_String::purifyHTML($params[$field]);
       }
     }

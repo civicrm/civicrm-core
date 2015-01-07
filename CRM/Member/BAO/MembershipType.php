@@ -522,7 +522,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       switch ($membershipTypeDetails['duration_unit']) {
         case 'year':
           //need to check if the upsell is from rolling to fixed and adjust accordingly
-          if ($membershipTypeDetails['period_type'] == 'fixed' && $oldPeriodType == 'rolling' ) {
+          if ($membershipTypeDetails['period_type'] == 'fixed' && $oldPeriodType == 'rolling') {
             $month = substr($membershipTypeDetails['fixed_period_start_day'], 0, strlen($membershipTypeDetails['fixed_period_start_day']) - 2);
             $day = substr($membershipTypeDetails['fixed_period_start_day'], -2);
             $year += 1;
@@ -656,7 +656,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       $query = 'SELECT memType.id, memType.name, memType.member_of_contact_id, c.sort_name
         FROM civicrm_membership_type memType INNER JOIN civicrm_contact c ON c.id = memType.member_of_contact_id
         WHERE memType.is_active = 1 ';
-      $dao = CRM_Core_DAO::executeQuery( $query );
+      $dao = CRM_Core_DAO::executeQuery($query);
       while ($dao->fetch()) {
         $orgs[$dao->member_of_contact_id] = $dao->sort_name;
         $types[$dao->member_of_contact_id][$dao->id] = $dao->name;

@@ -544,7 +544,7 @@ WHERE  inst.report_id = %1";
   public static function getInstanceList($reportUrl) {
     static $instanceDetails = array();
 
-    if (!array_key_exists($reportUrl, $instanceDetails )) {
+    if (!array_key_exists($reportUrl, $instanceDetails)) {
       $instanceDetails[$reportUrl] = array();
 
       $sql = "

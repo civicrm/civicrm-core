@@ -45,7 +45,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * Class constructor
    */
   public function __construct() {
-    parent::__construct( );
+    parent::__construct();
   }
 
   /**
@@ -60,10 +60,10 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
-    $financialType = new CRM_Financial_DAO_FinancialType( );
-    $financialType->copyValues( $params );
+    $financialType = new CRM_Financial_DAO_FinancialType();
+    $financialType->copyValues($params);
     if ($financialType->find(TRUE)) {
-      CRM_Core_DAO::storeValues( $financialType, $defaults );
+      CRM_Core_DAO::storeValues($financialType, $defaults);
       return $financialType;
     }
     return NULL;
@@ -81,7 +81,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @static
    */
   public static function setIsActive($id, $is_active) {
-    return CRM_Core_DAO::setFieldValue( 'CRM_Financial_DAO_FinancialType', $id, 'is_active', $is_active );
+    return CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_FinancialType', $id, 'is_active', $is_active);
   }
 
   /**
@@ -126,7 +126,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @static
    */
   public static function del($financialTypeId) {
-    $financialType = new CRM_Financial_DAO_FinancialType( );
+    $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $financialTypeId;
     $financialType->find(TRUE);
     // tables to ingore checks for financial_type_id
@@ -157,7 +157,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     //delete from financial Type table
     $financialType->delete();
 
-    $entityFinancialType = new CRM_Financial_DAO_EntityFinancialAccount( );
+    $entityFinancialType = new CRM_Financial_DAO_EntityFinancialAccount();
     $entityFinancialType->entity_id = $financialTypeId;
     $entityFinancialType->entity_table = 'civicrm_financial_type';
     $entityFinancialType->delete();

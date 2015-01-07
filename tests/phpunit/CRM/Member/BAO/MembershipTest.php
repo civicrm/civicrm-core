@@ -69,9 +69,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    *
    */
   public function tearDown() {
-    $this->membershipTypeDelete( array( 'id' => $this->_membershipTypeID ) );
-    $this->membershipStatusDelete( $this->_membershipStatusID );
-    Contact::delete( $this->_contactID );
+    $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
+    $this->membershipStatusDelete($this->_membershipStatusID);
+    Contact::delete($this->_contactID);
 
     $this->_contactID = $this->_membershipStatusID = $this->_membershipTypeID = NULL;
   }

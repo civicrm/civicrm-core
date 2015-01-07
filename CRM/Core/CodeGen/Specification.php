@@ -38,17 +38,17 @@ class CRM_Core_CodeGen_Specification {
 
     // add archive tables here
     $archiveTables = array();
-    foreach ($this->tables as $name => $table ) {
-      if ( $table['archive'] == 'true' ) {
+    foreach ($this->tables as $name => $table) {
+      if ($table['archive'] == 'true') {
         $name = 'archive_' . $table['name'];
         $table['name'] = $name;
         $table['archive'] = 'false';
-        if ( isset($table['foreignKey']) ) {
+        if (isset($table['foreignKey'])) {
           foreach ($table['foreignKey'] as $fkName => $fkValue) {
             if ($this->tables[$fkValue['table']]['archive'] == 'true') {
               $table['foreignKey'][$fkName]['table'] = 'archive_' . $table['foreignKey'][$fkName]['table'];
               $table['foreignKey'][$fkName]['uniqName'] =
-                str_replace( 'FK_', 'FK_archive_', $table['foreignKey'][$fkName]['uniqName'] );
+                str_replace('FK_', 'FK_archive_', $table['foreignKey'][$fkName]['uniqName']);
             }
           }
           $archiveTables[$name] = $table;

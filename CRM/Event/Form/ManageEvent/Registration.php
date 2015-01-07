@@ -333,13 +333,13 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     );
     $form->addWysiwyg('footer_text', ts('Footer Text'), $footerAttribs);
 
-    extract( self::getProfileSelectorTypes() );
+    extract(self::getProfileSelectorTypes());
     //CRM-15427
-    $form->addProfileSelector( 'custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
-    $form->addProfileSelector( 'custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
+    $form->addProfileSelector('custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
+    $form->addProfileSelector('custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
 
-    $form->addProfileSelector( 'additional_custom_pre_id', ts('Profile for Additional Participants') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
-    $form->addProfileSelector( 'additional_custom_post_id', ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
+    $form->addProfileSelector('additional_custom_pre_id', ts('Profile for Additional Participants') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
+    $form->addProfileSelector('additional_custom_post_id', ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
   }
 
   /**
@@ -357,10 +357,10 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *   Optional, for addProfileSelector(), defaults to using getProfileSelectorTypes().
    **/
   public function buildMultipleProfileBottom(&$form, $count, $prefix = '', $label = 'Include Profile', $configs = NULL) {
-    extract( ( is_null($configs) ) ? self::getProfileSelectorTypes() : $configs );
+    extract((is_null($configs)) ? self::getProfileSelectorTypes() : $configs);
     $element = $prefix . "custom_post_id_multiple[$count]";
     $label .= '<br />'.ts('(bottom of page)');
-    $form->addProfileSelector( $element, $label, $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
+    $form->addProfileSelector($element, $label, $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
   }
 
   /**
@@ -378,7 +378,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $configs['allowCoreTypes'] = array_merge(array('Contact', 'Individual'), CRM_Contact_BAO_ContactType::subTypes('Individual'));
     $configs['allowCoreTypes'][] = 'Participant';
     //CRM-15427
-    $id = CRM_Utils_Request::retrieve( 'id', 'Integer' );
+    $id = CRM_Utils_Request::retrieve('id', 'Integer');
     if ($id) {
       $participantEventType = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $id, 'event_type_id', 'id');
       $participantRole  = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'default_role_id');

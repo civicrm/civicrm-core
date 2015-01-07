@@ -405,7 +405,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('summary', 'This is a great conference. Sign up now!');
 
     // Type description in ckEditor (fieldname, text to type, editor)
-    $this->fillRichTextField('description', $eventDescription );
+    $this->fillRichTextField('description', $eventDescription);
 
     // Choose Start and End dates.
     // Using helper webtestFillDate function.

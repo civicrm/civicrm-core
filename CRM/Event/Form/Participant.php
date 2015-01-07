@@ -1319,7 +1319,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $contributionParams['non_deductible_amount'] = 'null';
         $contributionParams['receipt_date'] = !empty($params['send_receipt']) ? CRM_Utils_Array::value('receive_date', $params) : 'null';
 
-        $recordContribution = array( 'contact_id', 'financial_type_id',
+        $recordContribution = array('contact_id', 'financial_type_id',
           'payment_instrument_id', 'trxn_id',
           'contribution_status_id', 'receive_date',
           'check_number', 'campaign_id',
@@ -1516,7 +1516,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         if (isset($contributionParams['partial_payment_total'])) {
           // balance amount
           $balanceAmount = $contributionParams['partial_payment_total'] - $contributionParams['partial_amount_pay'];
-          $this->assign('balanceAmount', $balanceAmount );
+          $this->assign('balanceAmount', $balanceAmount);
         }
         $this->assign('isPrimary', 1);
         $this->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
@@ -1669,7 +1669,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
 
         //send email with pdf invoice
-        $template = CRM_Core_Smarty::singleton( );
+        $template = CRM_Core_Smarty::singleton();
         $taxAmt = $template->get_template_vars('dataArray');
         $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
                                                       $this->_id, 'contribution_id', 'participant_id'

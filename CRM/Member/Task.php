@@ -118,7 +118,7 @@ class CRM_Member_Task {
         unset(self::$_tasks[1]);
       }
       //CRM-12920 - check for edit permission
-      if (!CRM_Core_Permission::check('edit memberships') ) {
+      if (!CRM_Core_Permission::check('edit memberships')) {
         unset(self::$_tasks[5]);
       }
     }

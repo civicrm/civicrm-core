@@ -161,7 +161,7 @@ class CRM_Utils_Mail {
 
     $to = array($params['toEmail']);
     $result = NULL;
-    $mailer =& CRM_Core_Config::getMailer( );
+    $mailer =& CRM_Core_Config::getMailer();
 
     // Mail_smtp and Mail_sendmail mailers require Bcc anc Cc emails
     // be included in both $to and $headers['Cc', 'Bcc']
@@ -169,10 +169,10 @@ class CRM_Utils_Mail {
       //get emails from headers, since these are
       //combination of name and email addresses.
       if (!empty($headers['Cc'])) {
-        $to[] = CRM_Utils_Array::value( 'Cc', $headers );
+        $to[] = CRM_Utils_Array::value('Cc', $headers);
       }
       if (!empty($headers['Bcc'])) {
-        $to[] = CRM_Utils_Array::value( 'Bcc', $headers );
+        $to[] = CRM_Utils_Array::value('Bcc', $headers);
       }
     }
     if (is_object($mailer)) {

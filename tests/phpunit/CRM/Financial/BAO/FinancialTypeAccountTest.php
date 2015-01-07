@@ -69,7 +69,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
       'financial_account_id',
       'Database check on added financial type record.'
     );
-    $this->assertEquals( $result, $financialType->id, 'Verify Account Type');
+    $this->assertEquals($result, $financialType->id, 'Verify Account Type');
   }
 
   /**
@@ -97,9 +97,9 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     );
     $financialAccountType = CRM_Financial_BAO_FinancialTypeAccount::add($financialParams, $ids);
     CRM_Financial_BAO_FinancialTypeAccount::del($financialAccountType->id);
-    $params = array('id' => $financialAccountType->id );
+    $params = array('id' => $financialAccountType->id);
     $result = CRM_Financial_BAO_FinancialType::retrieve($params, $defaults);
-    $this->assertEquals( empty($result), TRUE, 'Verify financial types record deletion.');
+    $this->assertEquals(empty($result), TRUE, 'Verify financial types record deletion.');
   }
 
   /**
@@ -127,8 +127,8 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     CRM_Financial_BAO_FinancialTypeAccount::add($financialParams, $ids);
     $defaults = array();
     $financialAccountType = CRM_Financial_BAO_FinancialTypeAccount::retrieve($financialParams, $defaults);
-    $this->assertEquals( $financialAccountType['entity_id'], $financialType->id, 'Verify Entity Id.');
-    $this->assertEquals( $financialAccountType['financial_account_id'], $financialAccount->id, 'Verify Financial Account Id.');
+    $this->assertEquals($financialAccountType['entity_id'], $financialType->id, 'Verify Entity Id.');
+    $this->assertEquals($financialAccountType['financial_account_id'], $financialAccount->id, 'Verify Financial Account Id.');
   }
 
   /**
@@ -188,6 +188,6 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     CRM_Financial_BAO_FinancialTypeAccount::add($financialParams, $ids);
     $financialAccountId = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($paymentInstrumentValue);
 
-    $this->assertEquals( $financialAccountId, $financialAccount->id, 'Verify Payment Instrument');
+    $this->assertEquals($financialAccountId, $financialAccount->id, 'Verify Payment Instrument');
   }
 }

@@ -183,7 +183,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     }
     elseif ($usedFor == 'Membership') {
       $this->click('extends[3]');
-      $this->waitForElementPresent( 'financial_type_id' );
+      $this->waitForElementPresent('financial_type_id');
       $this->select("css=select.crm-form-select", "label={$contributionType}");
     }
 

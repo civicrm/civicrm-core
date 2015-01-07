@@ -39,7 +39,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * Class constructor
    */
   public function __construct() {
-    parent::__construct( );
+    parent::__construct();
   }
 
   /**
@@ -97,7 +97,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       'currency'          => $contribution->currency,
       'entity_table'      => 'civicrm_line_item',
       'entity_id'         => $lineItem->id,
-      'description'       => ( $lineItem->qty != 1 ? $lineItem->qty . ' of ' : ''). ' ' . $lineItem->label,
+      'description'       => ($lineItem->qty != 1 ? $lineItem->qty . ' of ' : ''). ' ' . $lineItem->label,
       'status_id'         => $itemStatus,
     );
 
@@ -119,8 +119,8 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       );
 
       $result = array();
-      CRM_Financial_BAO_FinancialTypeAccount::retrieve( $searchParams, $result );
-      $params['financial_account_id'] = CRM_Utils_Array::value( 'financial_account_id', $result );
+      CRM_Financial_BAO_FinancialTypeAccount::retrieve($searchParams, $result);
+      $params['financial_account_id'] = CRM_Utils_Array::value('financial_account_id', $result);
     }
     $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'ASC', TRUE);
     $trxnId['id'] = $trxn['financialTrxnId'];

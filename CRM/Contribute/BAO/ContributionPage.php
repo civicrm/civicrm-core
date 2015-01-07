@@ -238,7 +238,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         if ($gId) {
           $email = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gId, 'notify');
           if ($email) {
-            $val = CRM_Core_BAO_UFGroup::checkFieldsEmptyValues($gId, $contactID, CRM_Utils_Array::value($key, $params), TRUE );
+            $val = CRM_Core_BAO_UFGroup::checkFieldsEmptyValues($gId, $contactID, CRM_Utils_Array::value($key, $params), TRUE);
             CRM_Core_BAO_UFGroup::commonSendMail($contactID, $val);
           }
         }
@@ -402,7 +402,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $sendTemplateParams['cc'] = CRM_Utils_Array::value('cc_receipt', $values);
         $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc_receipt', $values);
         //send email with pdf invoice
-        $template = CRM_Core_Smarty::singleton( );
+        $template = CRM_Core_Smarty::singleton();
         $taxAmt = $template->get_template_vars('dataArray');
         $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
         $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);

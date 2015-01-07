@@ -191,7 +191,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
         'location_type_id' => 1,
         'version' => 3,
       );
-      $result = civicrm_api( 'address', 'create', $params );
+      $result = civicrm_api('address', 'create', $params);
       $contactIds[$count++] = $contact['id'];
     }
 

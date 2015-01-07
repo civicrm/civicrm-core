@@ -70,7 +70,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
       $params = array('id' => $this->_id);
       // this is needed if the form is outside the CRM name space
       $baoName = $this->_BAOName;
-      $baoName::retrieve($params, $this->_values );
+      $baoName::retrieve($params, $this->_values);
     }
   }
 
@@ -86,7 +86,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
       $this->_values = array();
       $params = array('id' => $this->_id);
       $baoName = $this->_BAOName;
-      $baoName::retrieve($params, $this->_values );
+      $baoName::retrieve($params, $this->_values);
     }
     $defaults = $this->_values;
 

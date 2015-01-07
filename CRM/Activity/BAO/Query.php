@@ -544,10 +544,10 @@ class CRM_Activity_BAO_Query {
       $form->addSelect('activity_engagement_level', array('entity' => 'activity', 'context' => 'search'));
 
       // Add survey result field.
-      $optionGroups  = CRM_Campaign_BAO_Survey::getResultSets( 'name' );
+      $optionGroups  = CRM_Campaign_BAO_Survey::getResultSets('name');
       $resultOptions = array();
-      foreach ( $optionGroups as $gid => $name ) {
-        if ( $name ) {
+      foreach ($optionGroups as $gid => $name) {
+        if ($name) {
           $value = array();
           $value = CRM_Core_OptionGroup::values($name);
           if (!empty($value)) {

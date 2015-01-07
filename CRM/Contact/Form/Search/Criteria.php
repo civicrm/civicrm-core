@@ -430,7 +430,7 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addRadio('relation_status', ts('Relationship Status'), $relStatusOption);
     $form->setDefaults(array('relation_status' => 0));
     // relation permission
-    $relPermissionOption = array(ts('Any'), ts('Yes'), ts('No') );
+    $relPermissionOption = array(ts('Any'), ts('Yes'), ts('No'));
     $form->addRadio('relation_permission', ts('Permissioned Relationship?'), $relPermissionOption);
     $form->setDefaults(array('relation_permission' => 0));
 
@@ -487,7 +487,7 @@ class CRM_Contact_Form_Search_Criteria {
 
 
     // radio button for is_deceased
-    $form->addYesNo( 'is_deceased', ts('Deceased'), TRUE);
+    $form->addYesNo('is_deceased', ts('Deceased'), TRUE);
   }
 
   /**

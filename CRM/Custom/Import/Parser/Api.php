@@ -223,7 +223,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
     $fields = $allFields['values'];
     foreach ($fields as $id => $values) {
       $datatype = CRM_Utils_Array::value('data_type', $values);
-      if ( $datatype == 'File' ) {
+      if ($datatype == 'File') {
         continue;
       }
       /* generate the key for the fields array */

@@ -89,7 +89,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
       $groupSelect = $groupHierarchy;
     }
 
-    $groupSelect = array( '' => ts('- select group -')) + $groupSelect;
+    $groupSelect = array('' => ts('- select group -')) + $groupSelect;
 
     if (count($groupSelect) > 1) {
       $session = CRM_Core_Session::singleton();

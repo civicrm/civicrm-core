@@ -55,7 +55,7 @@ class CRM_Financial_BAO_ExportFormat {
    * Class constructor
    */
   public function __construct() {
-    if ( !isset( self::$_template ) ) {
+    if (!isset(self::$_template)) {
       self::$_template = CRM_Core_Smarty::singleton();
     }
   }

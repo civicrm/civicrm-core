@@ -267,7 +267,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     // auto renew options if enabled for the membership
     $options = CRM_Core_SelectValues::memberAutoRenew();
 
-    foreach ($allMemberships as $key => $values ) {
+    foreach ($allMemberships as $key => $values) {
       if (!empty($values['is_active'])) {
         $membershipType[$key] = CRM_Utils_Array::value('name', $values);
         if ($this->_mode && empty($values['minimum_fee'])) {
@@ -506,7 +506,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       );
     }
 
-    $now = CRM_Utils_Date::getToday( NULL, 'YmdHis');
+    $now = CRM_Utils_Date::getToday(NULL, 'YmdHis');
     $this->convertDateFieldsToMySQL($formValues);
     $this->assign('receive_date', $formValues['receive_date']);
 

@@ -135,7 +135,7 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
 
     while ($dao->fetch()) {
       $contributionType[$dao->id] = array();
-      CRM_Core_DAO::storeValues( $dao, $contributionType[$dao->id]);
+      CRM_Core_DAO::storeValues($dao, $contributionType[$dao->id]);
       $contributionType[$dao->id]['financial_account_type_id'] = $financialAccountType[$dao->financial_account_type_id];
       // form all action links
       $action = array_sum(array_keys($this->links()));

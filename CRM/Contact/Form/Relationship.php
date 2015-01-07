@@ -345,7 +345,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       'select',
       'relationship_type_id',
       ts('Relationship Type'),
-      array( '' => ts('- select -')) + $relationshipList,
+      array('' => ts('- select -')) + $relationshipList,
       TRUE,
       array('class' => 'crm-select2 huge')
     );

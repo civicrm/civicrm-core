@@ -289,7 +289,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
       $startDate->setTimezone(new DateTimeZone(self::TIMEZONE));
     }
 
-    $template->assign( 'startDate', $startDate->format('Y-m-d') );
+    $template->assign('startDate', $startDate->format('Y-m-d'));
 
     $installments = $this->_getParam('installments');
 
@@ -587,7 +587,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   public function _getParam($field, $xmlSafe = FALSE) {
     $value = CRM_Utils_Array::value($field, $this->_params, '');
     if ($xmlSafe) {
-      $value = str_replace(array( '&', '"', "'", '<', '>' ), '', $value);
+      $value = str_replace(array('&', '"', "'", '<', '>'), '', $value);
     }
     return $value;
   }

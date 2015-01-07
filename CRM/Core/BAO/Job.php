@@ -135,7 +135,7 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
     $query = 'SELECT COUNT(*) FROM civicrm_job_log';
     $count = CRM_Core_DAO::singleValueQuery($query);
 
-    if ( $count <= $maxEntriesToKeep) {
+    if ($count <= $maxEntriesToKeep) {
       return;
     }
 

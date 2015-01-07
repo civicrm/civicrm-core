@@ -533,7 +533,7 @@ SELECT label, value
             break;
 
           case 'File':
-            if ( $op == 'IS NULL' || $op == 'IS NOT NULL' || $op == 'IS EMPTY' || $op == 'IS NOT EMPTY' ) {
+            if ($op == 'IS NULL' || $op == 'IS NOT NULL' || $op == 'IS EMPTY' || $op == 'IS NOT EMPTY') {
               switch ($op) {
                 case 'IS EMPTY':
                   $op = 'IS NULL';

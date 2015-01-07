@@ -576,7 +576,7 @@ class CRM_Core_PseudoConstant {
       return $var;
     }
 
-    $object = new $name ( );
+    $object = new $name ();
 
     $object->selectAdd();
     $object->selectAdd("$key, $retrieve");
