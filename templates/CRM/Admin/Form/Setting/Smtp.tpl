@@ -45,13 +45,13 @@
                     <tr class="crm-smtp-form-block-smtpServer">
                        <td class="label">{$form.smtpServer.label}</td>
                        <td>{$form.smtpServer.html}<br  />
-                            <span class="description">{ts}Enter the SMTP server (machine) name. EXAMPLE: smtp.example.com{/ts}</span>
+                            <span class="description">{ts}Enter the SMTP server (machine) name, such as "smtp.example.com".  If the server uses SSL, add "ssl://" to the beginning of the server name, such as "ssl://smtp.example.com".{/ts}</span>
                        </td>
                     </tr>
                     <tr class="crm-smtp-form-block-smtpPort">
                        <td class="label">{$form.smtpPort.label}</td>
                        <td>{$form.smtpPort.html}<br />
-                           <span class="description">{ts}The standard SMTP port is 25. You should only change that value if your SMTP server is running on a non-standard port.{/ts}</span>
+                           <span class="description">{ts}The most common SMTP port possibilities are 25, 465, and 587.  Check with your mail provider for the appropriate one.{/ts}</span>
                        </td>
                     </tr>
                     <tr class="crm-smtp-form-block-smtpAuth">
