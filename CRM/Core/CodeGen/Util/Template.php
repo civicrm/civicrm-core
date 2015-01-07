@@ -68,7 +68,8 @@ class CRM_Core_CodeGen_Util_Template {
       $this->beautifier->setOutputFile($outpath);
       $this->beautifier->process();
       $this->beautifier->save();
-    } else {
+    }
+    else {
       file_put_contents($outpath, $renderedContents);
     }
   }

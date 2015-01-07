@@ -111,7 +111,8 @@ class Utils {
      if ( array_key_exists( 'function', $frame ) ) {
      echo " method {$frame['function']}";
      }
-     } else {
+     }
+     else {
      if ( array_key_exists( 'function', $frame ) ) {
      echo " function {$frame['function']}";
      }

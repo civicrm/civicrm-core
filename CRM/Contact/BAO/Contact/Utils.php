@@ -854,7 +854,8 @@ Group By  componentId";
         if (!in_array($field, $skipFields)){
           if (isset($masterAddress->$field)) {
           $values[$field] = $masterAddress->$field;
-          } else {
+          }
+          else {
             $values[$field] = '';
         }
       }

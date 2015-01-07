@@ -105,7 +105,8 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     }
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $this->assign('lineItem', $this->_lineItem);
-    } else {
+    }
+    else {
       if (is_array($membershipTypeID)) {
         $membershipTypeID = current($membershipTypeID);
       }

@@ -295,7 +295,8 @@ class CRM_Utils_REST {
       if ($args[1] == 'ping') {
         return self::ping();
       }
-    } else {
+    }
+    else {
       // or the new format (entity+action)
       $args = array();
       $args[0] = 'civicrm';
@@ -512,7 +513,8 @@ class CRM_Utils_REST {
 
       return CRM_Utils_System::theme($content);
 
-    } else {
+    }
+    else {
       $content = "<!-- .tpl file embeded: $tpl -->\n";
       CRM_Utils_System::appendTPLFile( $tpl, $content );
       echo $content . $smarty->fetch($tpl);

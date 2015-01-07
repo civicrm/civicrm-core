@@ -313,7 +313,8 @@ WHERE lt.log_conn_id = %1 AND
       }
       elseif (substr($table, 0, 14) == 'civicrm_value_') {
         list($titles[$table], $values[$table]) = $this->titlesAndValuesForCustomDataTable($table);
-      } else {
+      }
+      else {
         $titles[$table] = $values[$table] = array();
       }
     }

@@ -791,7 +791,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
       if (array_key_exists('email-5', $this->_params)) {
       $mail = 'email-5';
-      } else {
+      }
+      else {
         foreach ($this->_params as $name => $dontCare) {
           if (substr($name, 0, 5) == 'email') {
             $mail = $name;

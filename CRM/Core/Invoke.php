@@ -81,7 +81,8 @@ class CRM_Core_Invoke {
       self::hackStandalone($args);
       $item = self::getItem($args);
       return self::runItem($item);
-    } else {
+    }
+    else {
       // Symfony-based invocation path
       require_once CIVICRM_SYMFONY_PATH . '/app/bootstrap.php.cache';
       require_once CIVICRM_SYMFONY_PATH . '/app/AppKernel.php';
@@ -91,7 +92,8 @@ class CRM_Core_Invoke {
       if (preg_match(':^text/html:', $response->headers->get('Content-Type'))) {
         // let the CMS handle the trappings
         return $response->getContent();
-      } else {
+      }
+      else {
         $response->send();
         exit();
       }
@@ -169,7 +171,8 @@ class CRM_Core_Invoke {
     if (is_array($args)) {
       // get the menu items
       $path = implode('/', $args);
-    } else {
+    }
+    else {
       $path = $args;
     }
     $item = CRM_Core_Menu::get($path);

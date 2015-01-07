@@ -605,7 +605,8 @@ class CRM_Core_Resources {
       $filePath = $this->getPath($ext, $file);
       if ($filePath && is_readable($filePath)) {
         $stringsByFile[$file] = CRM_Utils_JS::parseStrings(file_get_contents($filePath));
-      } else {
+      }
+      else {
         $stringsByFile[$file] = array();
       }
       $this->cache->set($ext, $stringsByFile);

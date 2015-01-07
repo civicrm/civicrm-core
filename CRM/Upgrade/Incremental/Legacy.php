@@ -105,7 +105,8 @@ SELECT  id
         $preUpgradeMessage .= '<br />' . ts('This system included an outdated, insecure script (%1). The file was automatically deleted.', array(
           1 => $ofcFile
         ));
-      } else {
+      }
+      else {
         $preUpgradeMessage .= '<br />' . ts('This system includes an outdated, insecure script (%1). Please delete it.', array(
           1 => $ofcFile
         ));

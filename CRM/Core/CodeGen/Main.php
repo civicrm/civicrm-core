@@ -114,7 +114,8 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       if (is_a($task, 'CRM_Core_CodeGen_ITask')) {
         $task->setConfig($this);
         $task->run();
-      } else {
+      }
+      else {
         echo "Bad news: we tried to run a codegen task of an unrecognized type: {$component}\n";
         exit();
       }

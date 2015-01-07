@@ -116,11 +116,13 @@ function civicrm_api3_generic_getfields($apiRequest) {
     list ($apiProvider, $hypApiRequest) = \Civi\Core\Container::singleton()->get('civi_api_kernel')->resolve($hypApiRequest);
     if (isset($hypApiRequest['function'])) {
       $helper = '_' . $hypApiRequest['function'] . '_spec';
-    } else {
+    }
+    else {
       // not implemented MagicFunctionProvider
       $helper = NULL;
     }
-  } catch (\Civi\API\Exception\NotImplementedException $e) {
+  }
+  catch (\Civi\API\Exception\NotImplementedException $e) {
     $helper = NULL;
   }
   if (function_exists($helper)) {

@@ -319,7 +319,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             if ( $customFields[$customFieldID]['data_type'] == 'Date' ) {
               CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
               unset($params[$key]);
-            } else if ( $customFields[$customFieldID]['data_type'] == 'Boolean' ) {
+            }
+            else if ( $customFields[$customFieldID]['data_type'] == 'Boolean' ) {
               $params[$key] = CRM_Utils_String::strtoboolstr($val);
             }
           }
@@ -658,7 +659,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
                 ( strtolower($customValue) == strtolower(trim($v1)) )) {
                 if ( $type == 'CheckBox' ) {
                   $values[$key][$customValue] = 1;
-                } else {
+                }
+                else {
                   $values[$key][] = $customValue;
                 }
               }

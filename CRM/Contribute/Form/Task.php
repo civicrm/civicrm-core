@@ -135,7 +135,8 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
         $contactIds = $contributionContactIds = array();
         $query->_rowCountClause = " count(civicrm_contribution.id)";
         $query->_groupByComponentClause = " GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.contact_id, contribution_search_scredit_combined.scredit_id ";
-      } else {
+      }
+      else {
         $query->_distinctComponentClause = ' civicrm_contribution.id';
         $query->_groupByComponentClause = ' GROUP BY civicrm_contribution.id ';
       }

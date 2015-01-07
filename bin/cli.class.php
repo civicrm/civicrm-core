@@ -463,7 +463,8 @@ class civicrm_cli_csv_deleter extends civicrm_cli_csv_file {
     $result = civicrm_api($this->_entity, 'Delete', $params);
     if ($result['is_error']) {
       echo "\nERROR line " . $this->row . ": " . $result['error_message'] . "\n";
-    } else {
+    }
+    else {
       echo "\nline " . $this->row . ": deleted\n";
     }
   }

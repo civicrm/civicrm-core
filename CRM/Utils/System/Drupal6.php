@@ -957,7 +957,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     global $user;
     if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
       $timezone = $user->timezone;
-    } else {
+    }
+    else {
       $timezone = variable_get('date_default_timezone', NULL);
     }
     if (!$timezone) {

@@ -996,7 +996,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($displayTime) {
       $this->addDateTime($name . $from, $label, $required, array('formatType' => $dateFormat));
       $this->addDateTime($name . $to, ts('To:'), $required, array('formatType' => $dateFormat));
-    } else {
+    }
+    else {
       $this->addDate($name . $from, $label, $required, array('formatType' => $dateFormat));
       $this->addDate($name . $to, ts('To:'), $required, array('formatType' => $dateFormat));
     }
@@ -1804,7 +1805,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           if (!$options) {
             $targetField->setAttribute('placeholder', $targetField->getAttribute('data-none-prompt'));
           }
-        } else {
+        }
+        else {
           $targetField->setAttribute('placeholder', $targetField->getAttribute('data-empty-prompt'));
           $targetField->setAttribute('disabled', 'disabled');
         }

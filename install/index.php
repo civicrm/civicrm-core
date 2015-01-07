@@ -1014,7 +1014,8 @@ class InstallRequirements {
     if (!$result) {
       $testDetails[2] = 'Could not query thread_stack.';
       $this->error($testDetails);
-    } else {
+    }
+    else {
       $values = mysql_fetch_row($result);
       if ($values[1] < (1024 * $minValueKB)) {
         $testDetails[2] = 'MySQL "thread_stack" is ' . ($values[1] / 1024) . 'k';

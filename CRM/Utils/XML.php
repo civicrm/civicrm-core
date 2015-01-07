@@ -46,7 +46,8 @@ class CRM_Utils_XML {
 
     if (! file_exists($file)) {
       $error = 'File ' . $file . ' does not exist.';
-    } else {
+    }
+    else {
       $oldLibXMLErrors = libxml_use_internal_errors();
       libxml_use_internal_errors(TRUE);
 

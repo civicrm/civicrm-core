@@ -795,7 +795,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $domain->find(TRUE);
     if ($domain->config_backend) {
       $values = unserialize($domain->config_backend);
-    } else {
+    }
+    else {
       $values = array();
     }
     $spec = self::getSettingSpecification(NULL, array('name' => $name), $domainID);

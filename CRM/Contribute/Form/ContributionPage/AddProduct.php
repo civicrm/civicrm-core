@@ -84,7 +84,8 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
       $defaults['product_id'] = $dao->product_id;
       $defaults['financial_type_id']   = $dao->financial_type_id;
       $defaults['weight'] = $dao->weight;
-    } else {
+    }
+    else {
       $dao = new CRM_Contribute_DAO_Product();
       $dao->id = key($this->_products);
       $dao->find(TRUE);

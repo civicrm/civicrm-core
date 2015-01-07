@@ -602,7 +602,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     if ($billingModePaymentProcessors && count($this->_paymentProcessors) == $billingModePaymentProcessors) {
       $allAreBillingModeProcessors = TRUE;
-    } else {
+    }
+    else {
       $allAreBillingModeProcessors = FALSE;
     }
 
@@ -688,7 +689,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $unit .= "(s)";
       }
       $form->assign('frequency_unit', $unit);
-    } else {
+    }
+    else {
       $form->assign('one_frequency_unit', FALSE);
       $units = array();
       $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units');
@@ -1298,7 +1300,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     if ($this->_membershipBlock['is_separate_payment'] && !empty($params['separate_amount'])) {
       $this->set('amount', $params['separate_amount']);
-    } else {
+    }
+    else {
       $this->set('amount', $params['amount']);
     }
 

@@ -511,7 +511,8 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
         $this->open($mailingReportUrl);
         if ($entity == "report") {
           $this->clickLink("xpath=//fieldset/legend[text()='Delivery Summary']/../table//tr[td/a[text()='{$key}']]/descendant::td[3]/span/a[1][text()='Report']");
-        } else {
+        }
+        else {
           $this->clickLink("xpath=//fieldset/legend[text()='Delivery Summary']/../table//tr[td/a[text()='{$key}']]/descendant::td[3]/span/a[2][text()='Advanced Search']");
         }
         $this-> _verifyCriteria($key, $dataToCheck, $entity);
@@ -532,7 +533,8 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
           continue;
         }
         $this->assertTrue($this->isElementPresent("xpath=//form//div[3]/table/tbody//tr/th[contains(text(),'{$key}')]/../td[contains(text(),'{$value}')]"), "Criteria check for {$key} failed for Report for {$summaryInfo}");
-      } else {
+      }
+      else {
         $this->assertElementContainsText('page-title', "Advanced Search");
         $assertedValue = $this->isElementPresent("xpath=//div[@class='crm-results-block']//div[@class='qill'][contains(text(),'{$key} {$value}')]");
         if (!$assertedValue) {

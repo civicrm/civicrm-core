@@ -127,7 +127,8 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
       foreach ($values as &$value) {
         $this->encodeInput($value, TRUE);
       }
-    } elseif ($castToString || is_string($values)) {
+    }
+    elseif ($castToString || is_string($values)) {
       $values = str_replace(array('<', '>'), array('&lt;', '&gt;'), $values);
     }
   }
@@ -143,7 +144,8 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
       foreach ($values as &$value) {
         $this->decodeOutput($value, TRUE);
       }
-    } elseif ($castToString || is_string($values)) {
+    }
+    elseif ($castToString || is_string($values)) {
       $values = str_replace(array('&lt;', '&gt;'), array('<', '>'), $values);
     }
   }

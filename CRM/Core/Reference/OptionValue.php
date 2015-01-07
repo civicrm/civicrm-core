@@ -38,7 +38,8 @@ class CRM_Core_Reference_OptionValue extends CRM_Core_Reference_Basic {
     }
     if ($targetDao->option_group_id == $this->getTargetOptionGroupId()) {
       return parent::findReferences($targetDao);
-    } else {
+    }
+    else {
       return NULL;
     }
   }
@@ -55,7 +56,8 @@ class CRM_Core_Reference_OptionValue extends CRM_Core_Reference_Basic {
     }
     if ($targetDao->option_group_id == $this->getTargetOptionGroupId()) {
       return parent::getReferenceCount($targetDao);
-    } else {
+    }
+    else {
       return NULL;
     }
   }

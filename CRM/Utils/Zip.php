@@ -57,7 +57,8 @@ class CRM_Utils_Zip {
         if (preg_match('/^[^\/]+\/$/', $filename) && $filename != './' && $filename != '../') {
           $base = $filename;
           $baselen = strlen($filename);
-        } else {
+        }
+        else {
           return FALSE;
         }
       }  elseif (0 != substr_compare($base, $filename, 0, $baselen)) {
@@ -103,12 +104,14 @@ class CRM_Utils_Zip {
     $basedirs = CRM_Utils_Zip::findBaseDirs($zip);
     if (in_array($expected, $basedirs)) {
       $candidate = $expected;
-    } elseif (count($basedirs) == 1) {
+    }
+    elseif (count($basedirs) == 1) {
       $candidate = array_shift($basedirs);
     }
     if ($candidate !== FALSE && preg_match('/^[a-zA-Z0-9]/', $candidate)) {
       return $candidate;
-    } else {
+    }
+    else {
       return FALSE;
     }
   }
@@ -141,7 +144,8 @@ class CRM_Utils_Zip {
         }
       }
       $zip->close();
-    } else {
+    }
+    else {
       return FALSE;
     }
     return TRUE;

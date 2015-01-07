@@ -558,7 +558,8 @@ HTACCESS;
   public static function relativize($directory, $basePath) {
     if (substr($directory, 0, strlen($basePath)) == $basePath) {
       return substr($directory, strlen($basePath));
-    } else {
+    }
+    else {
       return $directory;
     }
   }
@@ -629,7 +630,8 @@ HTACCESS;
           $path = $subdir . DIRECTORY_SEPARATOR . $entry;
           if ($entry{0} == '.') {
             // ignore
-          } elseif (is_dir($path)) {
+          }
+          elseif (is_dir($path)) {
             $todos[] = $path;
           }
         }
@@ -663,7 +665,8 @@ HTACCESS;
     }
     if (empty($childParts)) {
       return FALSE; // same directory
-    } else {
+    }
+    else {
       return TRUE;
     }
   }

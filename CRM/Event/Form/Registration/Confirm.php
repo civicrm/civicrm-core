@@ -1220,7 +1220,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       if ($participantNum) {
         $prefix1 = 'additional';
         $prefix2 = 'additional_';
-      } else {
+      }
+      else {
         $prefix1 = '';
         $prefix2 = '';
       }

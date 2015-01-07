@@ -117,11 +117,13 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     try {
       $kernel->authorize(NULL, $apiRequest);
       return TRUE;
-    } catch (\API_Exception $e) {
+    }
+    catch (\API_Exception $e) {
       $extra = $e->getExtraParams();
       if (!$throws && $extra['error_code'] == API_Exception::UNAUTHORIZED) {
         return FALSE;
-      } else {
+      }
+      else {
         throw $e;
       }
     }

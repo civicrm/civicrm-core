@@ -1284,7 +1284,8 @@ class CRM_Utils_System {
     if (!function_exists('ts')) {
       if ($resource == 'wiki') {
         $docBaseURL = self::getWikiBaseURL();
-      } else {
+      }
+      else {
         $docBaseURL = self::getDocBaseURL();
       }
       return $docBaseURL . str_replace(' ', '+', $page);
@@ -1321,7 +1322,8 @@ class CRM_Utils_System {
 
     if (CRM_Utils_Array::value('resource', $params) == 'wiki') {
       $docBaseURL = self::getWikiBaseURL();
-    } else {
+    }
+    else {
       $docBaseURL = self::getDocBaseURL();
     }
 

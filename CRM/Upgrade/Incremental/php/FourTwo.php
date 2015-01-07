@@ -110,9 +110,11 @@ ORDER BY mp.contribution_id, mp.membership_id";
         $preUpgradeMessage .= '<br />' . ts('Could not determine path to civicrm.settings.php. Please manually locate it and add these lines at the bottom: <pre>%1</pre>', array(
           1 => self::SETTINGS_SNIPPET
         ));
-      } elseif (preg_match(self::SETTINGS_SNIPPET_PATTERN, file_get_contents(CIVICRM_SETTINGS_PATH))) {
+      }
+      elseif (preg_match(self::SETTINGS_SNIPPET_PATTERN, file_get_contents(CIVICRM_SETTINGS_PATH))) {
         // OK, nothing to do
-      } elseif (!is_writable(CIVICRM_SETTINGS_PATH)) {
+      }
+      elseif (!is_writable(CIVICRM_SETTINGS_PATH)) {
         $preUpgradeMessage .= '<br />' . ts('The settings file (%1) must be updated. Please make it writable or manually add these lines:<pre>%2</pre>', array(
           1 => CIVICRM_SETTINGS_PATH,
           2 => self::SETTINGS_SNIPPET
@@ -198,7 +200,8 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
           CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_price_set` DROP INDEX `UI_title_{$locale}`", $params, TRUE, NULL, FALSE, FALSE);
         }
       }
-    } else {
+    }
+    else {
       $query = "SHOW KEYS FROM `civicrm_price_set` WHERE key_name = 'UI_title'";
       $dao = CRM_Core_DAO::executeQuery($query);
       if ($dao->N) {
@@ -789,7 +792,8 @@ AND       cli.entity_id IS NULL AND cp.fee_amount IS NOT NULL";
           'price_field_value_id' => $dao->price_field_value_id,
         );
         $priceSetId = $dao->price_set_id;
-      } else {
+      }
+      else {
         $lineParams['price_field_id'] = $fieldID;
         $priceSetId = $defaultPriceSetId;
       }
@@ -962,7 +966,8 @@ VALUES
       foreach ( $processedRecords as $record ) {
         CRM_Core_Error::debug_log_message(implode(', ', $record));
       }
-    } else {
+    }
+    else {
       CRM_Core_Error::debug_log_message("deleteInvalidPairs() - Could not find any records to process.");
     }
     return $processedRecords;

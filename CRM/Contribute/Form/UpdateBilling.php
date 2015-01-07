@@ -422,7 +422,8 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     $userID  = $session->get('userID');
     if ( $userID && $status) {
       $session->setStatus($status, $msgTitle, $msgType);
-    } else if (!$userID) {
+    }
+    else if (!$userID) {
       if ($status)
         CRM_Utils_System::setUFMessage($status);
       $result = (int) ($updateSubscription && isset($ctype));

@@ -208,7 +208,8 @@ class CRM_Extension_Downloader {
 
     try {
       $newInfo = CRM_Extension_Info::loadFromFile($filename);
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       CRM_Core_Session::setStatus(ts('Failed reading data from %1 during installation', array(1 => $filename)), ts('Installation Error'), 'error');
       return FALSE;
     }

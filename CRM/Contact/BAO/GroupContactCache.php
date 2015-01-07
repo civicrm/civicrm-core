@@ -305,11 +305,13 @@ WHERE  id IN ( $groupIDs )
 
     if ($groupID == NULL) {
       $invoked = TRUE;
-    } else if (is_array($groupID)) {
+    }
+    else if (is_array($groupID)) {
       foreach ($groupID as $gid) {
         unset(self::$_alreadyLoaded[$gid]);
       }
-    } else if ($groupID && array_key_exists($groupID, self::$_alreadyLoaded)) {
+    }
+    else if ($groupID && array_key_exists($groupID, self::$_alreadyLoaded)) {
       unset(self::$_alreadyLoaded[$groupID]);
     }
 

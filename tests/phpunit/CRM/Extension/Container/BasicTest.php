@@ -29,7 +29,8 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
     list($basedir, $c) = $this->_createContainer();
     try {
       $c->getPath('un.kno.wn');
-    } catch (CRM_Extension_Exception $e) {
+    }
+    catch (CRM_Extension_Exception $e) {
       $exc = $e;
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
@@ -42,7 +43,8 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
     list($basedir, $c) = $this->_createContainer(NULL, NULL, '/');
     try {
       $c->getPath('un.kno.wn');
-    } catch (CRM_Extension_Exception $e) {
+    }
+    catch (CRM_Extension_Exception $e) {
       $exc = $e;
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
@@ -55,7 +57,8 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
     list($basedir, $c) = $this->_createContainer();
     try {
       $c->getResUrl('un.kno.wn');
-    } catch (CRM_Extension_Exception $e) {
+    }
+    catch (CRM_Extension_Exception $e) {
       $exc = $e;
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
@@ -68,7 +71,8 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
     list($basedir, $c) = $this->_createContainer(NULL, NULL, '/');
     try {
       $c->getResUrl('un.kno.wn');
-    } catch (CRM_Extension_Exception $e) {
+    }
+    catch (CRM_Extension_Exception $e) {
       $exc = $e;
     }
     $this->assertTrue(is_object($exc), 'Expected exception');

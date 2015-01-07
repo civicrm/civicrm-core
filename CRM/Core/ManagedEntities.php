@@ -63,7 +63,8 @@ class CRM_Core_ManagedEntities {
 
     if ($declarations !== NULL) {
       $this->declarations = self::cleanDeclarations($declarations);
-    } else {
+    }
+    else {
       $this->declarations = NULL;
     }
   }
@@ -89,7 +90,8 @@ class CRM_Core_ManagedEntities {
         $this->onApiError($dao->entity_type, 'getsingle', $params, $result);
       }
       return $result;
-    } else {
+    }
+    else {
       return NULL;
     }
   }
@@ -113,9 +115,11 @@ class CRM_Core_ManagedEntities {
     foreach ($decls as $moduleName => $todos) {
       if (isset($this->moduleIndex[TRUE][$moduleName])) {
         $this->reconcileEnabledModule($this->moduleIndex[TRUE][$moduleName], $todos);
-      } elseif (isset($this->moduleIndex[FALSE][$moduleName])) {
+      }
+      elseif (isset($this->moduleIndex[FALSE][$moduleName])) {
         // do nothing -- module should get swept up later
-      } else {
+      }
+      else {
         throw new Exception("Entity declaration references invalid or inactive module name [$moduleName]");
       }
     }
@@ -137,7 +141,8 @@ class CRM_Core_ManagedEntities {
         // update existing entity; remove from $todos
         $this->updateExistingEntity($dao, $todos[$dao->name]);
         unset($todos[$dao->name]);
-      } else {
+      }
+      else {
         // remove stale entity; not in $todos
         $this->removeStaleEntity($dao);
       }

@@ -77,7 +77,8 @@ class CRM_Core_IDS {
     try {
       $init = IDS_Init::init($configFile);
       $ids  = new IDS_Monitor($_REQUEST, $init);
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       // might be an old stale copy of Config.IDS.ini
       // lets try to rebuild it again and see if it works
       $configFile = self::createConfigFile(TRUE);

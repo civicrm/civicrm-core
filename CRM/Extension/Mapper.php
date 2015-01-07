@@ -97,13 +97,15 @@ class CRM_Extension_Mapper {
     $this->cacheKey = $cacheKey;
     if ($civicrmUrl) {
       $this->civicrmUrl = rtrim($civicrmUrl, '/');
-    } else {
+    }
+    else {
       $config = CRM_Core_Config::singleton();
       $this->civicrmUrl = rtrim($config->resourceBase, '/');
     }
     if ($civicrmPath) {
       $this->civicrmPath = rtrim($civicrmPath, '/');
-    } else {
+    }
+    else {
       global $civicrm_root;
       $this->civicrmPath = rtrim($civicrm_root, '/');
     }
@@ -180,7 +182,8 @@ class CRM_Extension_Mapper {
     if ($fresh || !array_key_exists($key, $this->infos)) {
       try {
         $this->infos[$key] = CRM_Extension_Info::loadFromFile($this->container->getPath($key) . DIRECTORY_SEPARATOR . CRM_Extension_Info::FILENAME);
-      } catch (CRM_Extension_Exception $e) {
+      }
+      catch (CRM_Extension_Exception $e) {
         // file has more detailed info, but we'll fallback to DB if it's missing -- DB has enough info to uninstall
         $this->infos[$key] = CRM_Extension_System::singleton()->getManager()->createInfoFromDB($key);
         if (!$this->infos[$key]) {
@@ -292,7 +295,8 @@ class CRM_Extension_Mapper {
             'prefix' => $dao->file,
             'filePath' => $this->keyToPath($dao->full_name),
           );
-        } catch (CRM_Extension_Exception $e) {
+        }
+        catch (CRM_Extension_Exception $e) {
           // Putting a stub here provides more consistency
           // in how getActiveModuleFiles when racing between
           // dirty file-removals and cache-clears.

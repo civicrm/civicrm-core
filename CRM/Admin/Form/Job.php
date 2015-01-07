@@ -124,7 +124,8 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $apiRequest = \Civi\API\Request::create($fields['api_entity'], $fields['api_action'], array('version' => 3), NULL);
     try {
       $apiKernel->resolve($apiRequest);
-    } catch (\Civi\API\Exception\NotImplementedException $e) {
+    }
+    catch (\Civi\API\Exception\NotImplementedException $e) {
       $errors['api_action'] = ts('Given API command is not defined.');
     }
 

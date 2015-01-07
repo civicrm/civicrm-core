@@ -235,7 +235,8 @@ class CRM_Activity_Page_AJAX {
         $rel['email'] = '';
         $rel['source'] = 'caseRoles';
         $caseRelationships[] = $rel;
-      } else {
+      }
+      else {
         foreach($value as $clientRole) {
           $relClient = array();
           $relClient['relation'] = 'Client';

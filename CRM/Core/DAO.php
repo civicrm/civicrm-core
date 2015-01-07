@@ -1519,7 +1519,8 @@ SELECT contact_id
       if (!defined('CIVICRM_DSN')) {
         if (function_exists('mysql_real_escape_string')) {
           return mysql_real_escape_string($string);
-        } else {
+        }
+        else {
           throw new CRM_Core_Exception("Cannot generate SQL. \"mysql_real_escape_string\" is missing. Have you installed PHP \"mysql\" extension?");
         }
       }
@@ -1624,7 +1625,8 @@ SELECT contact_id
           if ($FKClassName != NULL) {
             $object->assignTestFK($fieldName, $fieldDef, $params);
             continue;
-          } else {
+          }
+          else {
             $object->assignTestValue($fieldName, $fieldDef, $counter);
           }
         }

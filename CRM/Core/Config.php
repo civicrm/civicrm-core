@@ -741,7 +741,8 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       $this->userPermissionClass->upgradePermissions(
         CRM_Core_Permission::basicPermissions()
       );
-    } else {
+    }
+    else {
       // Cannot store permissions -- warn if any modules require them
       $modules_with_perms = array();
       foreach ($module_files as $module_file) {

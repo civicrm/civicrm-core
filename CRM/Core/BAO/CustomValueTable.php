@@ -465,7 +465,8 @@ AND    $cond
               else {
                 $result["{$dao->id}"]["{$fieldID}"] = $dao->$fieldName;
               }
-            } else {
+            }
+            else {
               $result["{$fieldID}_{$dao->id}"] = $dao->$fieldName;
             }
           }
