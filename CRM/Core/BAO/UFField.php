@@ -832,7 +832,7 @@ SELECT  id
     $requiredProfileFields = array();
 
     foreach ($profileFields['values'] as $field) {
-      if(in_array($field['field_name'], $validBillingFields)) {
+      if (in_array($field['field_name'], $validBillingFields)) {
         $validProfileFields[] = $field['field_name'];
       }
       if ($field['is_required']) {

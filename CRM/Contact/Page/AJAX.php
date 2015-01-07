@@ -268,7 +268,7 @@ class CRM_Contact_Page_AJAX {
 
     $ret = array('is_error' => 0);
 
-    foreach($clientList as $sourceContactID) {
+    foreach ($clientList as $sourceContactID) {
       $relationParams = array(
         'relationship_type_id' => $relType . '_a_b',
         'contact_check' => array($relContactID => 1),
@@ -288,7 +288,7 @@ class CRM_Contact_Page_AJAX {
         $caseRelationships->contact_id_a = $sourceContactID;
         $caseRelationships->find();
 
-        while($caseRelationships->fetch()) {
+        while ($caseRelationships->fetch()) {
           $relationIds['relationship'] = $caseRelationships->id;
           $relationIds['contactTarget'] = $relContactID;
         }

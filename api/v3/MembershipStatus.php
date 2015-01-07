@@ -147,7 +147,7 @@ function civicrm_api3_membership_status_calc($membershipParams) {
     throw new API_Exception('membershipParams do not contain membership_id');
   }
 
-  if(empty($membershipParams['id'])) {
+  if (empty($membershipParams['id'])) {
     //for consistency lets make sure id is set as this will get passed to hooks downstream
     $membershipParams['id'] = $membershipID;
   }

@@ -884,7 +884,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
             ));
             $tmp_statuses = $result['values'];
             $status_ids = array();
-            foreach($tmp_statuses as $cur_stat) {
+            foreach ($tmp_statuses as $cur_stat) {
               $status_ids[] = $cur_stat['id'];
             }
             if (empty($params['status_id']) || in_array( $params['status_id'], $status_ids) == FALSE) {

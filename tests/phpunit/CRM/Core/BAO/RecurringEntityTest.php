@@ -174,7 +174,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
 
     $this->assertCount($recursion->schedule['start_action_offset'], $generatedEntities['civicrm_event'], 'Check if the number of events created are right');
     $actualDates = array();
-    foreach($generatedEntities['civicrm_event'] as $key => $val) {
+    foreach ($generatedEntities['civicrm_event'] as $key => $val) {
       $this->assertDBNotNull('CRM_Event_DAO_Event', $val, 'id', 'id', 'Check if repeating events were created.');
       $startDate = date('YmdHis', strtotime(CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $val, 'start_date', 'id')));
       $endDate = date('YmdHis', strtotime(CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $val, 'end_date', 'id')));
@@ -184,7 +184,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $resultDates = array_diff($actualDates, $expectedDates);
     $this->assertEquals(0, count($resultDates), "Check if all the value in expected array matches actual array");
 
-    foreach($generatedEntities['civicrm_tell_friend'] as $key => $val) {
+    foreach ($generatedEntities['civicrm_tell_friend'] as $key => $val) {
       $this->assertDBNotNull('CRM_Friend_DAO_Friend', $val, 'id', 'id', 'Check if friends were created in loop');
       $this->assertDBCompareValue('CRM_Friend_DAO_Friend', $val, 'entity_id', 'id', $generatedEntities['civicrm_event'][$key], 'Check DB if correct FK was maintained with event for Friend');
     }

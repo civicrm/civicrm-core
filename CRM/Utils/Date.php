@@ -1277,7 +1277,7 @@ class CRM_Utils_Date {
             $quarter    = ceil($now['mon'] / 3);
             $quarter    = $quarter - $difference;
             //CRM-14550 QA Fix
-            if($quarter > 4) {
+            if ($quarter > 4) {
               $now['year'] = $now['year'] + 1;
               $quarter = 1;
             }

@@ -346,7 +346,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     //verifying the registered participants
     $status = "Registered (test)";
 
-    foreach($contacts as $contact) {
+    foreach ($contacts as $contact) {
       $this->verifyText("xpath=//div[@id='participantSearch']//table//tbody//tr/td[@class='crm-participant-sort_name']/a[text()='{$contact['sort_name']}']/../../td[9]", preg_quote($status));
       $this->verifyText("xpath=//div[@id='participantSearch']//table//tbody//tr/td[@class='crm-participant-sort_name']/a[text()='{$contact['sort_name']}']/../../td[4]/a", preg_quote($eventName));
     }

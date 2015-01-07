@@ -36,7 +36,7 @@
  */
 
 function civicrm_api3_setting_getfields($params) {
-  if(!empty($params['action']) && strtolower($params['action']) == 'getvalue'){
+  if (!empty($params['action']) && strtolower($params['action']) == 'getvalue'){
     $result = array(
       'name' => array(
         'title' => 'name of setting field',
@@ -50,7 +50,7 @@ function civicrm_api3_setting_getfields($params) {
       );
     return civicrm_api3_create_success($result, $params, 'setting', 'getfields');
   }
-  if(!empty($params['name'])){
+  if (!empty($params['name'])){
     //am of two minds about special handling for 'name' as opposed to other filters - but is does make most common
     //usage really easy
     $params['filters']['name'] = $params['name'];
@@ -93,14 +93,14 @@ function civicrm_api3_setting_getdefaults(&$params){
     $defaults[$domainID] = array();
     $noDefaults = array();
     foreach ($settings['values'] as $setting => $spec){
-      if(array_key_exists('default', $spec) && !is_null($spec['default'])){
+      if (array_key_exists('default', $spec) && !is_null($spec['default'])){
         $defaults[$domainID][$setting] = $spec['default'];
       }
       else{
         $noDefaults[$setting] = 1;
       }
     }
-    if(!empty($params['debug'])){
+    if (!empty($params['debug'])){
       // we are only tracking 'noDefaults' to help us check the xml
       print_r($noDefaults);
     }
@@ -133,7 +133,7 @@ function civicrm_api3_setting_revert(&$params){
   $result = array();
   foreach ($domains as $domainID){
     $valuesToRevert = array_intersect_key($defaults['values'][$domainID], $fields);
-    if(!empty($valuesToRevert)){
+    if (!empty($valuesToRevert)){
       $valuesToRevert['version'] = $params['version'];
       $valuesToRevert['domain_id'] = $domainID;
       // note that I haven't looked at how the result would appear with multiple domains in play
@@ -172,7 +172,7 @@ function civicrm_api3_setting_fill(&$params){
     );
     $existing = civicrm_api3('setting', 'get', $apiArray);
     $valuesToFill = array_diff_key($defaults['values'][$domainID], $existing['values'][$domainID]);
-    if(!empty($valuesToFill)){
+    if (!empty($valuesToFill)){
       $result = array_merge($result, civicrm_api('setting', 'create', $valuesToFill + $apiArray));
     }
   }
@@ -277,7 +277,7 @@ function _civicrm_api3_setting_get_spec(&$params) {
  */
 function civicrm_api3_setting_getvalue($params) {
   $config = CRM_Core_Config::singleton();
-  if(isset($config->$params['name'])){
+  if (isset($config->$params['name'])){
     return $config->$params['name'];
   }
   return CRM_Core_BAO_Setting::getItem(
@@ -330,15 +330,15 @@ function _civicrm_api3_setting_getvalue_spec(&$params) {
  * we did talk about id being a pseudonym for domain_id in this api so applying it here
  */
 function _civicrm_api3_setting_getDomainArray(&$params){
-  if(empty($params['domain_id']) && isset($params['id'])){
+  if (empty($params['domain_id']) && isset($params['id'])){
     $params['domain_id'] = $params['id'];
   }
 
-  if($params['domain_id'] == 'current_domain'){
+  if ($params['domain_id'] == 'current_domain'){
     $params['domain_id']    = CRM_Core_Config::domainID();
   }
 
-  if($params['domain_id'] == 'all'){
+  if ($params['domain_id'] == 'all'){
     $domainAPIResult = civicrm_api('domain', 'get', array('version' => 3, 'return' => 'id'));
     if (isset($domainAPIResult['values'])) {
       $params['domain_id'] = array_keys($domainAPIResult['values']);
@@ -347,7 +347,7 @@ function _civicrm_api3_setting_getDomainArray(&$params){
       throw new Exception('All domains not retrieved - problem with Domain Get api call ' . $domainAPIResult['error_message']);
     }
   }
-  if(is_array($params['domain_id'])){
+  if (is_array($params['domain_id'])){
     $domains = $params['domain_id'];
   }
   else{

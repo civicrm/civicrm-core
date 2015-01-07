@@ -79,7 +79,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @static
    */
   public static function create(&$params) {
-    if(empty($params['id']) && empty($params['name'])) {
+    if (empty($params['id']) && empty($params['name'])) {
       $params['name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 242));
     }
     $transaction = new CRM_Core_Transaction();
@@ -315,7 +315,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         $extra = array();
         if (!empty($qf->_quickConfig) && !empty($qf->_contributionAmount)) {
-          foreach($fieldOptions as &$fieldOption) {
+          foreach ($fieldOptions as &$fieldOption) {
             if ($fieldOption['name'] == 'other_amount') {
               $fieldOption['label'] = $fieldOption['label'] . '  ' . $currencySymbol;
             }

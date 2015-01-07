@@ -114,7 +114,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @return WordReplacement array
    */
   public static function create($params) {
-    if(array_key_exists("domain_id", $params) === FALSE) {
+    if (array_key_exists("domain_id", $params) === FALSE) {
       $params["domain_id"] = CRM_Core_Config::domainID();
     }
     $wordReplacement = new CRM_Core_DAO_WordReplacement();

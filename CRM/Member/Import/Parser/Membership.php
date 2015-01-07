@@ -648,12 +648,12 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
         $values[$key] = $value;
         $type = $customFields[$customFieldID]['html_type'];
-        if( $type == 'CheckBox' || $type == 'Multi-Select' || $type == 'AdvMulti-Select') {
+        if ($type == 'CheckBox' || $type == 'Multi-Select' || $type == 'AdvMulti-Select') {
           $mulValues = explode( ',', $value );
           $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
           $values[$key] = array();
-          foreach( $mulValues as $v1 ) {
-            foreach($customOption as $customValueID => $customLabel) {
+          foreach ($mulValues as $v1 ) {
+            foreach ($customOption as $customValueID => $customLabel) {
               $customValue = $customLabel['value'];
               if (( strtolower($customLabel['label']) == strtolower(trim($v1)) ) ||
                 ( strtolower($customValue) == strtolower(trim($v1)) )) {

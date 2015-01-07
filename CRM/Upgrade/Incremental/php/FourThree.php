@@ -133,7 +133,7 @@ WHERE {$key}.id IS NULL";
       //CRM-11636
       //here we do the financial type check and migration
       $isDefaultsModified = self::_checkAndMigrateDefaultFinancialTypes();
-      if($isDefaultsModified) {
+      if ($isDefaultsModified) {
         $postUpgradeMessage .= '<br />' . ts('Please review all price set financial type assignments.');
       }
       list($context, $orgName) = self::createDomainContacts();
@@ -429,7 +429,7 @@ FROM   civicrm_financial_type
 WHERE name IN ('Donation', 'Event Fee', 'Member Dues');
 ";
     $daoFinancialIds = CRM_Core_DAO::executeQuery($sqlFinancialIds);
-    while($daoFinancialIds->fetch()) {
+    while ($daoFinancialIds->fetch()) {
       $financialIds[$daoFinancialIds->name] = $daoFinancialIds->id;
     }
     $sqlPriceSetUpdate = "
@@ -853,7 +853,7 @@ LEFT JOIN civicrm_loc_block clb ON clb.id = cd. loc_block_id
 LEFT JOIN civicrm_email ce ON ce.id = clb.email_id ;
 ' ;
     $dao = CRM_Core_DAO::executeQuery($query);
-    while($dao->fetch()) {
+    while ($dao->fetch()) {
       $query = "
 SELECT    cc.id FROM civicrm_contact cc
 LEFT JOIN civicrm_email ce ON ce.contact_id = cc.id
@@ -905,7 +905,7 @@ AND TABLE_SCHEMA = %1
 ";
     $params = array(1 => array($dbUf['database'], 'String'));
     $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
-    foreach($tables as $columnName => $value){
+    foreach ($tables as $columnName => $value){
       if ($value['tableName'] == 'civicrm_membership_type' || $value['tableName'] == 'civicrm_contribution_recur') {
         $foreignKeyExists = CRM_Core_DAO::checkConstraintExists($value['tableName'], $value['fkey']);
         $fKey = $value['fkey'];

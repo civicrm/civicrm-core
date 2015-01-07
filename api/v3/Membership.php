@@ -212,7 +212,7 @@ function civicrm_api3_membership_get($params) {
   $membershipValues = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Membership');
 
   $return = $options['return'];
-  if(empty($membershipValues) ||
+  if (empty($membershipValues) ||
     (!empty($return)
       && !array_key_exists('related_contact_id', $return)
       && !array_key_exists('relationship_name', $return)

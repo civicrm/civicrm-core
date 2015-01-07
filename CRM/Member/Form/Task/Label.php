@@ -92,7 +92,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
     $mergeSameAddress = CRM_Utils_Array::value('merge_same_address', $formValues);
     $mergeSameHousehold = CRM_Utils_Array::value('merge_same_household', $formValues);
     $isPerMembership = CRM_Utils_Array::value('per_membership', $formValues);
-    if($isPerMembership && ($mergeSameAddress || $mergeSameHousehold)) {
+    if ($isPerMembership && ($mergeSameAddress || $mergeSameHousehold)) {
       // this shouldn't happen  - perhaps is could if JS is disabled
       CRM_Core_Session::setStatus(ts('As you are printing one label per membership your merge settings are being ignored'));
       $mergeSameAddress = $mergeSameHousehold = FALSE;
@@ -127,7 +127,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
       $rows[$id] = array($formatted);
     }
 
-    if($isPerMembership) {
+    if ($isPerMembership) {
       $labelRows = array();
       $memberships = civicrm_api3('membership', 'get', array('id' => array('IN' => $this->_memberIds), 'return' => 'contact_id'));
       foreach ($memberships['values'] as $id => $membership) {

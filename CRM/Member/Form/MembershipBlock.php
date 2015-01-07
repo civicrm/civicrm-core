@@ -154,7 +154,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
             $autoRenewOptions = array(ts('Not offered'), ts('Give option'), ts('Required'));
             $this->addElement('select', "auto_renew_$k", ts('Auto-renew'), $autoRenewOptions);
             //CRM-15573
-            if($autoRenew == 2) {
+            if ($autoRenew == 2) {
               $this->freeze("auto_renew_$k");
               $params['id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipBlock', $this->_id, 'id', 'entity_id');
             }
@@ -239,7 +239,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
 
         if (!empty($paymentProcessorId)) {
           $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, NULL, 'name');
-          foreach($paymentProcessorId as $pid) {
+          foreach ($paymentProcessorId as $pid) {
             if ($pid) {
               $paymentProcessorTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor',
                 $pid, 'payment_processor_type_id'

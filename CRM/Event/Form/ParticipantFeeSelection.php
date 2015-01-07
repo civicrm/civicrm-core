@@ -134,7 +134,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       $defaults[$this->_participantId] = array_merge($defaults[$this->_participantId], $priceSetValues);
     }
     else {
-      foreach($priceFieldId as $key => $value) {
+      foreach ($priceFieldId as $key => $value) {
         if (!empty($value) && ($this->_values['fee'][$value]['html_type'] == 'Radio' || $this->_values['fee'][$value]['html_type'] == 'Select') && !$this->_values['fee'][$value]['is_required']) {
           $defaults[$this->_participantId]['price_'.array_keys($this->_values['fee'])[$key]] = 0;
         }
@@ -249,7 +249,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
     // update participant
     CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Participant', $this->_participantId, 'status_id', $params['status_id']);
-    if(!empty($params['note'])) {
+    if (!empty($params['note'])) {
       $noteParams = array(
         'entity_table' => 'civicrm_participant',
         'note' => $params['note'],

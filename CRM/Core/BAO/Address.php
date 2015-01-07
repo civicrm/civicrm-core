@@ -821,7 +821,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
     // the DB to fatal
     $fields = CRM_Core_BAO_Address::fields();
     foreach ($fields as $fieldname => $field) {
-      if(!empty($field['maxlength']) && strlen(CRM_Utils_Array::value($fieldname, $parseFields)) > $field['maxlength']) {
+      if (!empty($field['maxlength']) && strlen(CRM_Utils_Array::value($fieldname, $parseFields)) > $field['maxlength']) {
         return $emptyParseFields;
       }
     }
@@ -1025,7 +1025,7 @@ SELECT is_primary,
         if ($count > 2) {
           break;
         }
-        if(count($first_names) == 1){
+        if (count($first_names) == 1){
           $family = $first_names[current(array_keys($first_names))]['addressee_display'];
         }
         else {

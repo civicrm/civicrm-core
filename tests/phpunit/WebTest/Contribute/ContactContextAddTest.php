@@ -61,7 +61,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     $isDefault = FALSE;
 
     //Add new organisation
-    if($orgName) {
+    if ($orgName) {
       $this->webtestAddOrganization($orgName);
     }
     $this->_testAddFinancialAccount($financialAccountTitle,

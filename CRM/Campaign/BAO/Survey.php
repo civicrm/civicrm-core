@@ -409,7 +409,7 @@ SELECT  survey.id    as id,
       return NULL;
     }
     $reportId = CRM_Campaign_BAO_Survey::getReportID($id);
-    if($reportId){
+    if ($reportId){
       CRM_Report_BAO_ReportInstance::del($reportId);
     }
     $dao = new CRM_Campaign_DAO_Survey();
@@ -552,7 +552,7 @@ INNER JOIN  civicrm_activity_contact activityAssignment
   ON ( activityAssignment.activity_id = activity.id AND activityAssignment.record_type_id = $assigneeID )
      WHERE  activity.source_record_id = %1
      AND  ( activity.is_deleted IS NULL OR activity.is_deleted = 0 ) ";
-    if(!empty($interviewerId)) {
+    if (!empty($interviewerId)) {
       $query .= "AND activityAssignment.contact_id = %2 ";
       $params[2] = array($interviewerId, 'Integer');
     }

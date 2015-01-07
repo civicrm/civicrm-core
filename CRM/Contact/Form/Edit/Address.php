@@ -280,7 +280,7 @@ class CRM_Contact_Form_Edit_Address {
           // DETACH 'required' form rule error to
           // custom data only if address data not exists upon submission
           if (!empty($customDataRequiredFields)) {
-            foreach($customDataRequiredFields as $customElementName) {
+            foreach ($customDataRequiredFields as $customElementName) {
               $elementName = "address[$instance][$customElementName]";
               if ($self->getElementError($elementName)) {
                 // set element error to none
@@ -294,7 +294,7 @@ class CRM_Contact_Form_Edit_Address {
         // DETACH 'required' form rule error to
         // custom data only if address data not exists upon submission
         if (!empty($customDataRequiredFields) && !CRM_Core_BAO_Address::dataExists($addressValues)) {
-          foreach($customDataRequiredFields as $customElementName) {
+          foreach ($customDataRequiredFields as $customElementName) {
             $elementName = "address[$instance][$customElementName]";
             if ($self->getElementError($elementName)) {
               // set element error to none

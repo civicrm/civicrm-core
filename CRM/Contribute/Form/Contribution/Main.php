@@ -421,7 +421,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $onlinePaymentProcessorEnabled = FALSE;
     if (!empty($this->_paymentProcessors)) {
       foreach ($this->_paymentProcessors as $key => $name) {
-        if($name['billing_mode'] == 1) {
+        if ($name['billing_mode'] == 1) {
           $onlinePaymentProcessorEnabled = TRUE;
         }
         $pps[$key] = $name['name'];
@@ -447,7 +447,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $contactID = $this->getContactID();
-    if($this->getContactID() === '0') {
+    if ($this->getContactID() === '0') {
       $this->addCidZeroOptions($onlinePaymentProcessorEnabled);
     }
     //build pledge block.
@@ -563,7 +563,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $pcp_supporter_text = ts('This contribution is being made thanks to the effort of <strong>%1</strong>, who supports our campaign.', array(1 => $pcpSupporter));
         // Only tell people that can also create a PCP if the contribution page has a non-empty value in the "Create Personal Campaign Page link" field.
         $text = CRM_PCP_BAO_PCP::getPcpBlockStatus($this->_id, 'contribute');
-        if(!empty($text)) {
+        if (!empty($text)) {
           $pcp_supporter_text .= ts("You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!");
         }
         $this->assign('pcpSupporterText', $pcp_supporter_text);
@@ -681,7 +681,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $unitVals = explode(CRM_Core_DAO::VALUE_SEPARATOR, $frUnits);
 
     // CRM 10860, display text instead of a dropdown if there's only 1 frequency unit
-    if(sizeof($unitVals) == 1) {
+    if (sizeof($unitVals) == 1) {
       $form->assign('one_frequency_unit', TRUE);
       $unit = $unitVals[0];
       $form->add('hidden', 'frequency_unit', $unit);
@@ -870,7 +870,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           $errors['_qf_default'] = ts('Select at least one option from Contribution(s).');
         }
       }
-      if($otherAmount && !empty($check)) {
+      if ($otherAmount && !empty($check)) {
         $errors["price_{$otherAmount}"] = ts('Amount is required field.');
       }
 

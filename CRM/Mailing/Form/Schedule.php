@@ -55,7 +55,7 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
     $ssID = $this->get('ssID');
     $this->assign('ssid', $ssID);
     $this->_searchBasedMailing = CRM_Contact_Form_Search::isSearchContext($this->get('context'));
-    if(CRM_Contact_Form_Search::isSearchContext($this->get('context')) && !$ssID){
+    if (CRM_Contact_Form_Search::isSearchContext($this->get('context')) && !$ssID){
       $params = array();
       $result = CRM_Core_BAO_PrevNextCache::getSelectedContacts();
       $this->assign("value", $result);

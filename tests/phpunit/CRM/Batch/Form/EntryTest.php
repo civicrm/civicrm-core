@@ -164,7 +164,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $this->assertEquals(date('Y-m-d', strtotime('now')), $result['values'][3]['join_date']);
     $result = $this->callAPISuccess('contribution', 'get', array('return' => 'total_amount'));
     $this->assertEquals(3, $result['count']);
-    foreach($result['values'] as $contribution) {
+    foreach ($result['values'] as $contribution) {
       $this-> assertEquals($this->callAPISuccess('line_item', 'getvalue', array(
         'contribution_id' => $contribution['id'],
         'return' => 'line_total',
@@ -183,7 +183,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $this->assertTrue($form->testProcessContribution($params));
     $result = $this->callAPISuccess('contribution', 'get', array('return' => 'total_amount'));
     $this->assertEquals(2, $result['count']);
-    foreach($result['values'] as $contribution) {
+    foreach ($result['values'] as $contribution) {
       $this-> assertEquals($this->callAPISuccess('line_item', 'getvalue', array(
        'contribution_id' => $contribution['id'],
        'return' => 'line_total',

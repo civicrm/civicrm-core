@@ -761,7 +761,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                 //create discount priceset
                 $priceField = CRM_Price_BAO_PriceField::create($fieldParams);
                 if (!empty($discountFieldIDs[$j])) {
-                  foreach($discountFieldIDs[$j] as $fID){
+                  foreach ($discountFieldIDs[$j] as $fID){
                     CRM_Price_BAO_PriceFieldValue::setIsActive($fID, '0');
                   }
                 }

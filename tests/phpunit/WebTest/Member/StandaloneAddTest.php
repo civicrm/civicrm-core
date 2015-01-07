@@ -150,7 +150,7 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
       '6' => 'Completed',
     );
 
-    foreach($expected as $key => $value) {
+    foreach ($expected as $key => $value) {
       $this->verifyText("xpath=//div[@class='crm-accordion-wrapper']//table/tbody//tr/td[$key]", $value);
     }
 

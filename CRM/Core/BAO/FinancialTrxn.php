@@ -111,7 +111,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
 
     $balanceAmtDAO = CRM_Core_DAO::executeQuery($q, $p);
     $ret = array();
-    while($balanceAmtDAO->fetch()) {
+    while ($balanceAmtDAO->fetch()) {
       $ret['trxn_id'] = $balanceAmtDAO->id;
       $ret['total_amount'] = $balanceAmtDAO->total_amount;
     }
@@ -281,7 +281,7 @@ WHERE lt.entity_id = %1 ";
 
     $sqlParams = array(1 => array($entity_id, 'Integer'), 2 => array($entity_table, 'String'));
     $dao =  CRM_Core_DAO::executeQuery($query, $sqlParams);
-    while($dao->fetch()){
+    while ($dao->fetch()){
       $result[$dao->financial_trxn_id][$dao->id] = $dao->amount;
     }
     if (!empty($result)) {

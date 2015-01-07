@@ -100,7 +100,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
    * @param int $groupID
    */
   public function createContactsInGroup($count, $groupID) {
-    for($i = 1; $i <= $count; $i++ ) {
+    for ($i = 1; $i <= $count; $i++ ) {
       $contactID = $this->individualCreate(array('first_name' => $count, 'email' => 'mail' . $i . '@nul.com'));
       $this->callAPISuccess('group_contact', 'create', array('contact_id' => $contactID, 'group_id' => $groupID, 'status' => 'Added'));
     }
@@ -114,7 +114,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
    */
   public function getRecipients($start, $count) {
     $recipients = array();
-    for($i = $start; $i < ($start + $count); $i++ ) {
+    for ($i = $start; $i < ($start + $count); $i++ ) {
       $recipients[][0] = 'mail' . $i . '@nul.com';
     }
     return $recipients;

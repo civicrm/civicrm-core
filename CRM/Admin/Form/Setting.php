@@ -138,9 +138,9 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     foreach ($this->_settings as $setting => $group){
       $settingMetaData = civicrm_api('setting', 'getfields', array('version' => 3, 'name' => $setting));
       $props = $settingMetaData['values'][$setting];
-      if(isset($props['quick_form_type'])){
+      if (isset($props['quick_form_type'])){
         $add = 'add' . $props['quick_form_type'];
-        if($add == 'addElement'){
+        if ($add == 'addElement'){
           $this->$add(
             $props['html_type'],
             $setting,
@@ -153,11 +153,11 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
           $this->$add($setting, ts($props['title']));
         }
         $this->assign("{$setting}_description", ts($props['description']));
-        if($setting == 'max_attachments'){
+        if ($setting == 'max_attachments'){
           //temp hack @todo fix to get from metadata
           $this->addRule('max_attachments', ts('Value should be a positive number'), 'positiveInteger');
         }
-        if($setting == 'maxFileSize'){
+        if ($setting == 'maxFileSize'){
           //temp hack
           $this->addRule('maxFileSize', ts('Value should be a positive number'), 'positiveInteger');
         }

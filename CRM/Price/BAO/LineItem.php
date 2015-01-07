@@ -387,7 +387,7 @@ AND li.entity_id = {$entityId}
         if (empty($line['entity_id'])) {
           $line['entity_id'] = $entityId;
         }
-        if(!empty($line['membership_type_id'])) {
+        if (!empty($line['membership_type_id'])) {
           $line['entity_table'] = 'civicrm_membership';
         }
         if (!empty($contributionDetails->id)) {

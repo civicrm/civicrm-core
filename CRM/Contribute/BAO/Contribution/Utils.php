@@ -367,7 +367,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * @return bool
    */
   static protected function isPaymentTransaction($form) {
-    if(!empty($form->_values['is_monetary']) && $form->_amount >= 0.0) {
+    if (!empty($form->_values['is_monetary']) && $form->_amount >= 0.0) {
       return TRUE;
     }
     return FALSE;

@@ -466,8 +466,8 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   public function testMembershipGetFieldsOrder() {
     $result = $this->callAPISuccess('profile', 'getfields', array('action' => 'submit', 'profile_id' => 'membership_batch_entry'));
     $weight = 1;
-    foreach($result['values'] as $fieldName => $field) {
-      if($fieldName == 'profile_id') {
+    foreach ($result['values'] as $fieldName => $field) {
+      if ($fieldName == 'profile_id') {
         continue;
       }
       $this->assertEquals($field['weight'], $weight);

@@ -81,7 +81,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
     }
 
     list ($civiPrefix, $name) = CRM_Utils_String::parsePrefix(':', $perm, NULL);
-    switch($civiPrefix) {
+    switch ($civiPrefix) {
       case 'Joomla':
         return explode(':', $name);
 

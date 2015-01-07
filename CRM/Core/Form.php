@@ -1051,7 +1051,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Core field
     else {
       $info = civicrm_api3($props['entity'], 'getfields');
-      foreach($info['values'] as $uniqueName => $fieldSpec) {
+      foreach ($info['values'] as $uniqueName => $fieldSpec) {
         if (
           $uniqueName === $props['field'] ||
           CRM_Utils_Array::value('name', $fieldSpec) === $props['field'] ||
@@ -1488,7 +1488,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function convertDateFieldsToMySQL(&$params){
     foreach ($this->_dateFields as $fieldName => $specs){
-      if(!empty($params[$fieldName])){
+      if (!empty($params[$fieldName])){
         $params[$fieldName] = CRM_Utils_Date::isoToMysql(
           CRM_Utils_Date::processDate(
           $params[$fieldName],
@@ -1496,7 +1496,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         );
       }
       else{
-        if(isset($specs['default'])){
+        if (isset($specs['default'])){
           $params[$fieldName] = date('YmdHis', strtotime($specs['default']));
         }
       }
@@ -1553,10 +1553,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function getContactID() {
     $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    if(isset($this->_params) && isset($this->_params['select_contact_id'])) {
+    if (isset($this->_params) && isset($this->_params['select_contact_id'])) {
       $tempID = $this->_params['select_contact_id'];
     }
-    if(isset($this->_params, $this->_params[0]) && !empty($this->_params[0]['select_contact_id'])) {
+    if (isset($this->_params, $this->_params[0]) && !empty($this->_params[0]['select_contact_id'])) {
       // event form stores as an indexed array, contribution form not so much...
       $tempID = $this->_params[0]['select_contact_id'];
     }
@@ -1634,7 +1634,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         'api' => array('params' => array('contact_type' => 'Individual'))
       ), $autoCompleteField);
 
-    if($this->canUseAjaxContactLookups()) {
+    if ($this->canUseAjaxContactLookups()) {
       $this->assign('selectable', $autoCompleteField['id_field']);
       $this->addEntityRef($autoCompleteField['id_field'], NULL, array('placeholder' => $autoCompleteField['placeholder'], 'api' => $autoCompleteField['api']));
 
@@ -1667,16 +1667,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public function addCIDZeroOptions($onlinePaymentProcessorEnabled) {
     $this->assign('nocid', TRUE);
     $profiles = array();
-    if($this->_values['custom_pre_id']) {
+    if ($this->_values['custom_pre_id']) {
       $profiles[] = $this->_values['custom_pre_id'];
     }
-    if($this->_values['custom_post_id']) {
+    if ($this->_values['custom_post_id']) {
       $profiles = array_merge($profiles, (array) $this->_values['custom_post_id']);
     }
-    if($onlinePaymentProcessorEnabled) {
+    if ($onlinePaymentProcessorEnabled) {
       $profiles[] = 'billing';
     }
-    if(!empty($this->_values)) {
+    if (!empty($this->_values)) {
       $this->addAutoSelector($profiles);
     }
   }

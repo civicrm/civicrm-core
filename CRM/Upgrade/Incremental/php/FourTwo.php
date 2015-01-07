@@ -181,7 +181,7 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
                     'civicrm_event' => 'FK_civicrm_event_payment_processor_id',
                     'civicrm_group' => 'FK_civicrm_group_saved_search_id',
                     );
-    foreach($tables as $tableName => $fKey){
+    foreach ($tables as $tableName => $fKey){
       $foreignKeyExists = CRM_Core_DAO::checkConstraintExists($tableName, $fKey);
       if ($foreignKeyExists){
         CRM_Core_DAO::executeQuery("ALTER TABLE {$tableName} DROP FOREIGN KEY {$fKey}", $params, TRUE, NULL, FALSE, FALSE);

@@ -383,7 +383,7 @@ SELECT id
     }
 
     if (!empty($fields['is_recur_interval'])) {
-      foreach(array_keys($fields['payment_processor']) as $paymentProcessorID) {
+      foreach (array_keys($fields['payment_processor']) as $paymentProcessorID) {
         $paymentProcessorTypeId = CRM_Core_DAO::getFieldValue(
           'CRM_Financial_DAO_PaymentProcessor',
           $paymentProcessorID,

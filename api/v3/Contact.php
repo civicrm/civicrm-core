@@ -588,7 +588,7 @@ function civicrm_api3_contact_getquick($params) {
     }
     // phone_numeric should be phone
     $searchField = str_replace('_numeric', '', $field_name);
-    if(!in_array($searchField, $list)) {
+    if (!in_array($searchField, $list)) {
       $list[] = $searchField;
     }
   }
@@ -989,7 +989,7 @@ function _civicrm_api3_contact_getlist_params(&$request) {
   }
   // phone_numeric should be phone
   $searchField = str_replace('_numeric', '', $field_name);
-  if(!in_array($searchField, $list)) {
+  if (!in_array($searchField, $list)) {
     $list[] = $searchField;
   }
   $request['description_field'] = $list;
@@ -1028,7 +1028,7 @@ function _civicrm_api3_contact_getlist_output($result, $request) {
         }
       }
       $address = array();
-      foreach($addressFields as $item) {
+      foreach ($addressFields as $item) {
         if (!empty($row[$item])) {
           $address[] = $row[$item];
         }

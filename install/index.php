@@ -714,7 +714,7 @@ class InstallRequirements {
       $filename = $this->getBaseDir() . $filename;
     }
 
-    if (!is_writeable($filename)) {
+    if (!is_writable($filename)) {
       $name = NULL;
       if (function_exists('posix_getpwuid')) {
         $user = posix_getpwuid(posix_geteuid());

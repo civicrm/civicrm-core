@@ -47,7 +47,7 @@ class CRM_Contribute_Form_SearchContribution extends CRM_Core_Form {
     $this->add('text', 'title', ts('Find'), $attributes);
 
     $financial_account = CRM_Contribute_PseudoConstant::financialType( );
-    foreach($financial_account as $contributionId => $contributionName) {
+    foreach ($financial_account as $contributionId => $contributionName) {
       $this->addElement('checkbox', "financial_type_id[$contributionId]", 'Financial Type', $contributionName);
     }
 

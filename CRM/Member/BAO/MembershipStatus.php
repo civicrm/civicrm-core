@@ -95,7 +95,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    */
   public static function create($params){
     $ids = array();
-    if(!empty($params['id'])){
+    if (!empty($params['id'])){
       $ids['membershipStatus']  = $params['id'];
     }
     else{

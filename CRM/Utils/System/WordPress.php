@@ -628,7 +628,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       $ufName = CRM_Utils_Type::escape($ufName, 'String');
 
       $values = array('ID' => $ufID, 'user_email' => $ufName);
-      if( $ufID ) {
+      if ($ufID ) {
         wp_update_user( $values );
       }
     }

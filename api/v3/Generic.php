@@ -25,12 +25,12 @@ function civicrm_api3_generic_getfields($apiRequest) {
     $results = array();
     // we will also clear pseudoconstants here - should potentially be moved to relevant BAO classes
     CRM_Core_PseudoConstant::flush();
-    if(!empty($apiRequest['params']['fieldname'])){
+    if (!empty($apiRequest['params']['fieldname'])){
       CRM_Utils_PseudoConstant::flushConstant($apiRequest['params']['fieldname']);
     }
-    if(!empty($apiRequest['params']['option_group_id'])){
+    if (!empty($apiRequest['params']['option_group_id'])){
       $optionGroupName = civicrm_api('option_group', 'getvalue', array('version' => 3, 'id' => $apiRequest['params']['option_group_id'], 'return' => 'name') );
-      if(is_string($optionGroupName)){
+      if (is_string($optionGroupName)){
         CRM_Utils_PseudoConstant::flushConstant(_civicrm_api_get_camel_name($optionGroupName));
       }
     }
@@ -65,7 +65,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
       $metadata = _civicrm_api_get_fields($apiRequest['entity'], $unique, $apiRequest['params']);
       if (empty($metadata['id'])){
         // if id is not set we will set it eg. 'id' from 'case_id', case_id will be an alias
-        if(!empty($metadata[strtolower($apiRequest['entity']) . '_id'])) {
+        if (!empty($metadata[strtolower($apiRequest['entity']) . '_id'])) {
           $metadata['id'] = $metadata[$lcase_entity . '_id'];
           unset($metadata[$lcase_entity . '_id']);
           $metadata['id']['api.aliases'] = array($lcase_entity . '_id');
@@ -152,10 +152,10 @@ function civicrm_api3_generic_getfields($apiRequest) {
 function civicrm_api3_generic_getcount($apiRequest) {
   $apiRequest['params']['options']['is_count'] = TRUE;
   $result = civicrm_api($apiRequest['entity'], 'get', $apiRequest['params']);
-  if(is_numeric (CRM_Utils_Array::value('values', $result))) {
+  if (is_numeric (CRM_Utils_Array::value('values', $result))) {
     return (int) $result['values'];
   }
-  if(!isset($result['count'])) {
+  if (!isset($result['count'])) {
     throw new API_Exception(ts('Unexpected result from getcount') . print_r($result, TRUE));
   }
   return $result['count'];

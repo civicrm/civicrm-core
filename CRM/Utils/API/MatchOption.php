@@ -98,7 +98,7 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
     // If one of the options was specified, then try to match records.
     // Matching logic differs for 'create' and 'replace' actions.
     if ($keys !== NULL) {
-      switch($apiRequest['action']) {
+      switch ($apiRequest['action']) {
         case 'create':
           if (empty($apiRequest['params']['id'])) {
             $apiRequest['params'] = $this->match($apiRequest['entity'], $apiRequest['params'], $keys, $isMandatory);
@@ -117,7 +117,7 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
           ));
 
           // attempt to match each replacement item
-          foreach($apiRequest['params']['values'] as $offset => $createParams) {
+          foreach ($apiRequest['params']['values'] as $offset => $createParams) {
             $createParams = array_merge($baseParams, $createParams);
             $createParams = $this->match($apiRequest['entity'], $createParams, $keys, $isMandatory);
             $apiRequest['params']['values'][$offset] = $createParams;

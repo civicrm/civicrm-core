@@ -253,7 +253,7 @@ class CRM_Contribute_BAO_Query {
 
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     foreach (self::getRecurringFields() as $dateField => $dateFieldTitle) {
-      if(self::buildDateWhere($values, $query, $name, $dateField, $dateFieldTitle)) {
+      if (self::buildDateWhere($values, $query, $name, $dateField, $dateFieldTitle)) {
         return;
       }
     }
@@ -343,7 +343,7 @@ class CRM_Contribute_BAO_Query {
         // Ensure we have a sensible string to display to the user.
         $names = array();
         if (isset($val) && is_array($val)) {
-          foreach($val as $id) {
+          foreach ($val as $id) {
             $names[] = CRM_Utils_Array::value($id, $types);
           }
         }
@@ -1146,7 +1146,7 @@ class CRM_Contribute_BAO_Query {
    */
   public static function buildDateWhere(&$values, $query, $name, $field, $title) {
     $fieldPart = strpos($name, $field);
-    if($fieldPart === FALSE) {
+    if ($fieldPart === FALSE) {
       return;
     }
     // we only have recurring dates using this ATM so lets' short cut to find the table name

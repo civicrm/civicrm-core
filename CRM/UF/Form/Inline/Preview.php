@@ -62,7 +62,7 @@ class CRM_UF_Form_Inline_Preview extends CRM_UF_Form_AbstractPreview {
       CRM_Core_Error::fatal(ts('Permission Denied'));
     }
     $content = json_decode($_REQUEST['ufData'], TRUE);
-    foreach(array('ufGroup', 'ufFieldCollection') as $key) {
+    foreach (array('ufGroup', 'ufFieldCollection') as $key) {
       if (!is_array($content[$key])) {
         CRM_Core_Error::fatal("Missing JSON parameter, $key");
       }

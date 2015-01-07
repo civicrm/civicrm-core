@@ -1059,7 +1059,7 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
 
     // build insert query, note that currently we build cache for 500 contact records at a time, hence below approach
     $insertValues = array();
-    while($dao->fetch()) {
+    while ($dao->fetch()) {
       $insertValues[] = "('civicrm_contact', {$dao->contact_id}, {$dao->contact_id}, '{$cacheKey}', '" . CRM_Core_DAO::escapeString($dao->sort_name) . "')";
     }
 

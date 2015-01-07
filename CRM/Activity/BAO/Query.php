@@ -357,9 +357,9 @@ class CRM_Activity_BAO_Query {
         CRM_Campaign_BAO_Query::componentSearchClause($campParams, $query);
         break;
       case 'activity_result':
-        if(is_array($value)) {
+        if (is_array($value)) {
           $safe = NULL;
-          while(list(,$k) = each($value)) {
+          while (list(,$k) = each($value)) {
             $safe[] = "'" . CRM_Utils_Type::escape($k, 'String') . "'";
           }
           $query->_where[$grouping][] = "civicrm_activity.result IN (" . implode(',', $safe) . ")";
@@ -551,7 +551,7 @@ class CRM_Activity_BAO_Query {
           $value = array();
           $value = CRM_Core_OptionGroup::values($name);
           if (!empty($value)) {
-            while(list($k,$v) = each($value)) {
+            while (list($k,$v) = each($value)) {
               $resultOptions[$v] = $v;
             }
           }
@@ -559,7 +559,7 @@ class CRM_Activity_BAO_Query {
       }
       // If no survey result options have been created, don't build
       // the field to avoid clutter.
-      if(count($resultOptions) > 0) {
+      if (count($resultOptions) > 0) {
         $buildSurveyResult = TRUE;
         asort($resultOptions);
         $form->add('select', 'activity_result', ts("Survey Result"),

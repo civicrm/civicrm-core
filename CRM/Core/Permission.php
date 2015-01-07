@@ -120,9 +120,9 @@ class CRM_Core_Permission {
     $permissions = (array) $permissions;
 
     foreach ($permissions as $permission) {
-      if(is_array($permission)) {
+      if (is_array($permission)) {
         foreach ($permission as $orPerm) {
-          if(self::check($orPerm)) {
+          if (self::check($orPerm)) {
             //one of our 'or' permissions has succeeded - stop checking this permission
             return TRUE;;
           }
@@ -131,7 +131,7 @@ class CRM_Core_Permission {
         return FALSE;
       }
       else {
-        if(!CRM_Core_Config::singleton()->userPermissionClass->check($permission)) {
+        if (!CRM_Core_Config::singleton()->userPermissionClass->check($permission)) {
           //one of our 'and' conditions has not been met
           return FALSE;
         }
@@ -357,8 +357,8 @@ class CRM_Core_Permission {
    * @return array|null
    */
   public static function event($type = CRM_Core_Permission::VIEW, $eventID = NULL, $context = '') {
-    if(!empty($context)) {
-      if(CRM_Core_Permission::check($context)) {
+    if (!empty($context)) {
+      if (CRM_Core_Permission::check($context)) {
         return TRUE;
       }
     }

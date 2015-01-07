@@ -108,7 +108,7 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
         $apiStdFunctions = $this->getAllAPIStdFunctions();
         $this->assertGreaterThan(1, count($apiStdFunctions),"something has gone wrong getting the std functions in line " . __LINE__);
         $params = 'string';
-        foreach($apiStdFunctions as $key => $function){
+        foreach ($apiStdFunctions as $key => $function){
             if ( in_array( $function, $this->_skipFunctionList ) ) {
                 continue;
             }

@@ -90,7 +90,7 @@ UPDATE civicrm_email
 SET    is_bulkmail = 0
 WHERE  contact_id = {$params['contact_id']}
 ";
-      if($hook == 'edit'){
+      if ($hook == 'edit'){
         $sql .= " AND id <> {$params['id']}";
       }
       CRM_Core_DAO::executeQuery($sql);

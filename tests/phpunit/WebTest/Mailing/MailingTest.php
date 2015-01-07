@@ -424,7 +424,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $summaryInfoLinks = array('Intended Recipients', 'Successful Deliveries', 'Tracked Opens', 'Click-throughs', 'Forwards', 'Replies', 'Bounces', 'Unsubscribe Requests', 'Opt-out Requests');
 
     //check for report and adv search links
-    foreach($summaryInfoLinks as $value) {
+    foreach ($summaryInfoLinks as $value) {
       $this->assertTrue($this->isElementPresent("xpath=//fieldset/legend[text()='Delivery Summary']/../table//tr[td/a[text()='{$value}']]/descendant::td[3]/span/a[1][text()='Report']"), "Report link missing for {$value}");
       $this->assertTrue($this->isElementPresent("xpath=//fieldset/legend[text()='Delivery Summary']/../table//tr[td/a[text()='{$value}']]/descendant::td[3]/span/a[2][text()='Advanced Search']"), "Advance Search link missing for {$value}");
     }
@@ -506,8 +506,8 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
    * @param $mailingReportUrl
    */
   public function criteriaCheck($criteriaCheck, $mailingReportUrl) {
-    foreach($criteriaCheck as $key => $infoFilter) {
-      foreach($infoFilter as $entity => $dataToCheck) {
+    foreach ($criteriaCheck as $key => $infoFilter) {
+      foreach ($infoFilter as $entity => $dataToCheck) {
         $this->open($mailingReportUrl);
         if ($entity == "report") {
           $this->clickLink("xpath=//fieldset/legend[text()='Delivery Summary']/../table//tr[td/a[text()='{$key}']]/descendant::td[3]/span/a[1][text()='Report']");
@@ -526,7 +526,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
    * @param $entity
    */
   public function _verifyCriteria($summaryInfo, $dataToCheck, $entity) {
-    foreach($dataToCheck as $key => $value) {
+    foreach ($dataToCheck as $key => $value) {
       if ($entity == 'report') {
         if ($key == 'report_name') {
           $this->assertElementContainsText('page-title', "{$value}");
