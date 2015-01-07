@@ -38,8 +38,8 @@ class System {
     if (!isset(self::$cache[$id])) {
       if (!isset(self::$cache[$id])) {
         //does this config need to be called?
-        $config = CRM_Core_Config::singleton();
-        $ext = CRM_Extension_System::singleton()->getMapper();
+        $config = \CRM_Core_Config::singleton();
+        $ext = \CRM_Extension_System::singleton()->getMapper();
         if ($ext->isExtensionKey($processor['class_name'])) {
           $paymentClass = $ext->keyToClass($processor['class_name'], 'payment');
           require_once $ext->classToPath($paymentClass);
@@ -52,7 +52,7 @@ class System {
           require_once str_replace('_', DIRECTORY_SEPARATOR, $paymentClass) . '.php';
         }
 
-        self::$cachen[$id] = new $paymentClass($processor['is_test'] ? 'test' : 'live', $processor);
+        self::$cache[$id] = new $paymentClass($processor['is_test'] ? 'test' : 'live', $processor);
       }
     }
     return self::$cache[$id];
