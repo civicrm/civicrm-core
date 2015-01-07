@@ -1099,8 +1099,8 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $mStatus = implode(',', $membershipStatus);
         $where[] = "e.status_id IN ({$mStatus})";
 
-        // We are not tracking the reference date for 'repeated' schedule reminders as
-        // it will violate the repeat use-case, for further details please check CRM-15376
+        // We are not tracking the reference date for 'repeated' schedule reminders,
+        // for further details please check CRM-15376
         if ($actionSchedule->start_action_date && $actionSchedule->is_repeat == FALSE) {
           $select[] = $dateField;
           $selectColumns = "reference_date, " . $selectColumns;
@@ -1266,25 +1266,27 @@ LEFT JOIN {$reminderJoinClause}
 {$whereClause} {$limitWhereClause} AND {$dateClause} {$notINClause}
 ";
 
-      // In some cases reference_date got outdated due to many reason
-      // e.g. In Membership renewal end_date got extended which means reference date mismatches with the end_date
-      // in other words reference_date != end_date where end_date may be used as the start_action_date criteria
-      // for some schedule reminder so in order to send new reminder we INSERT new record with new reference_date value
-      // via UNION operation
+      // In some cases reference_date got outdated due to many reason e.g. In Membership renewal end_date got extended
+      // which means reference date mismatches with the end_date where end_date may be used as the start_action_date
+      // criteria  for some schedule reminder so in order to send new reminder we INSERT new reminder with new reference_date
+      // value via UNION operation
       if (strpos($selectColumns, 'reference_date') !== FALSE) {
+        $dateClause = str_replace('reminder.id IS NULL', 'reminder.id IS NOT NULL', $dateClause);
         $query .= "
 UNION
 {$selectClause}
 {$fromClause}
 {$joinClause}
-LEFT JOIN {$reminderJoinClause}
-{$whereClause} {$limitWhereClause} {$notINClause} AND
+ LEFT JOIN {$reminderJoinClause}
+{$whereClause} {$limitWhereClause} {$notINClause} AND {$dateClause} AND
+ reminder.action_date_time IS NOT NULL AND
  (reminder.reference_date IS NOT NULL AND reminder.reference_date != {$dateField})
 ";
 
-        //Those reminders which are sent in past and there reference_date doesn't reflect the
-        //newly changed entity's action_start_date, we need to update those so that we never
-        //get new reminder redundantly as because of the above usage of UNION clause
+        // As per the usage of UNION clause above we always INSERT a new reminder if reference_date (RD)
+        // got outdated or mismatches to start_action_date criteria so we need to update RD with actual
+        // start_action_date of already sent reminder, so to prevent redeundancy in sending new reminder
+        // due to above INSERT-UNION query
         $updateQuery = "UPDATE civicrm_action_log reminder
  INNER JOIN {$mapping->entity} e ON e.id = reminder.entity_id AND
  reminder.reference_date IS NOT NULL AND reminder.action_date_time IS NOT NULL
