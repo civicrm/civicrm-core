@@ -45,31 +45,6 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     $this->_processorName = ts('Payflow Pro');
   }
 
-  /**
-   * Singleton function used to manage this object
-   *
-   * @param string $mode
-   *   The mode of operation: live or test.
-   *
-   * @param object $paymentProcessor
-   *
-   * @return object
-   * @static
-   */
-   public static function &singleton($mode, &$paymentProcessor) {
-     if (!empty($paymentProcessor['id'])) {
-       $cacheKey = $paymentProcessor['id'];
-     }
-     else {
-       //@todo eliminated instances of this in favour of id-specific instances.
-       $cacheKey = $mode . '_' . $paymentProcessor['name'];
-     }
-    if (self::$_singleton[$cacheKey] === NULL) {
-      self::$_singleton[$cacheKey] = new CRM_Core_Payment_PayflowPro($mode, $paymentProcessor);
-    }
-    return self::$_singleton[$cacheKey];
-   }
-
   /*
    * This function  sends request and receives response from
    * the processor. It is the main function for processing on-server

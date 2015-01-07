@@ -80,31 +80,6 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
   }
 
   /**
-   * Singleton function used to manage this object
-   *
-   * @param string $mode
-   *   The mode of operation: live or test.
-   *
-   * @param object $paymentProcessor
-   *
-   * @return object
-   * @static
-   */
-  public static function &singleton($mode, &$paymentProcessor) {
-    if (!empty($paymentProcessor['id'])) {
-      $cacheKey = $paymentProcessor['id'];
-    }
-    else {
-      //@todo eliminated instances of this in favour of id-specific instances.
-      $cacheKey = $mode . '_' . $paymentProcessor['name'];
-    }
-    if (self::$_singleton[$cacheKey] === NULL) {
-      self::$_singleton[$cacheKey] = new CRM_Core_Payment_Moneris($mode, $paymentProcessor);
-    }
-    return self::$_singleton[$cacheKey];
-  }
-
-  /**
    * This function collects all the information from a web/api form and invokes
    * the relevant payment processor specific functions to perform the transaction
    *
