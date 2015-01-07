@@ -285,7 +285,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
      * the date we entered to be respected
      */
     $minDate = date_create('now', new DateTimeZone(self::TIMEZONE));
-    if (strtotime($startDate->format('Y-m-d')) < strtotime($minDate->format('Y-m-d'))){
+    if (strtotime($startDate->format('Y-m-d')) < strtotime($minDate->format('Y-m-d'))) {
       $startDate->setTimezone(new DateTimeZone(self::TIMEZONE));
     }
 

@@ -235,7 +235,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//div[@id='custom-set-content-{$customFieldsetId}']/div/div[2]/div[2]", '12,345,678.98');
   }
 
-  public function testCustomDataChangeLog(){
+  public function testCustomDataChangeLog() {
     $this->webtestLogin();
 
     //enable logging

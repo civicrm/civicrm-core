@@ -89,7 +89,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     $relationshipId = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
     //CRM-9015 - the hooks are called here & in add (since add doesn't call create)
     // but in future should be tidied per ticket
-    if (empty($relationshipId)){
+    if (empty($relationshipId)) {
       $hook = 'create';
       $action = CRM_Core_Action::ADD;
     }
@@ -232,11 +232,11 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
     $dateFields = array('end_date', 'start_date');
 
-    foreach (self::getdefaults() as $defaultField => $defaultValue){
-      if (isset($params[$defaultField])){
-        if (in_array($defaultField, $dateFields)){
+    foreach (self::getdefaults() as $defaultField => $defaultValue) {
+      if (isset($params[$defaultField])) {
+        if (in_array($defaultField, $dateFields)) {
           $relationship->$defaultField = CRM_Utils_Date::format(CRM_Utils_Array::value($defaultField, $params));
-          if (!$relationship->$defaultField){
+          if (!$relationship->$defaultField) {
             $relationship->$defaultField = 'NULL';
           }
         }
@@ -244,7 +244,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           $relationship->$defaultField = $params[$defaultField];
         }
       }
-      elseif(!$relationshipId){
+      elseif(!$relationshipId) {
         $relationship->$defaultField = $defaultValue;
       }
     }
@@ -766,9 +766,9 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
     */
 
     $dateFields = array('end_date', 'start_date');
-    foreach ($dateFields as $dateField){
+    foreach ($dateFields as $dateField) {
       if (array_key_exists($dateField, $params)) {
-        if (empty($params[$dateField]) || $params[$dateField] == 'null'){
+        if (empty($params[$dateField]) || $params[$dateField] == 'null') {
           //this is most likely coming from an api call & probably loaded
           // from the DB to deal with some of the
           // other myriad of excessive checks still in place both in
@@ -776,7 +776,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
           $queryString .= " AND $dateField IS NULL";
           continue;
         }
-        elseif (is_array($params[$dateField])){
+        elseif (is_array($params[$dateField])) {
           $queryString .= " AND $dateField = " .
             CRM_Utils_Type::escape(CRM_Utils_Date::format($params[$dateField]), 'Date');
         }

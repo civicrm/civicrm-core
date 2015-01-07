@@ -451,7 +451,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
             $params[$this->_activeFields[$i]->_name] = array();
           }
           $params[$this->_activeFields[$i]->_name][$i][$this->_activeFields[$i]->_softCreditField] = $this->_activeFields[$i]->_value;
-          if (isset($this->_activeFields[$i]->_softCreditType)){
+          if (isset($this->_activeFields[$i]->_softCreditType)) {
             $params[$this->_activeFields[$i]->_name][$i]['soft_credit_type_id'] = $this->_activeFields[$i]->_softCreditType;
           }
         }

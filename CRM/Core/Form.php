@@ -1486,9 +1486,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @todo standardise the format which dates are passed to the BAO layer in & remove date
    * handling from BAO
    */
-  public function convertDateFieldsToMySQL(&$params){
-    foreach ($this->_dateFields as $fieldName => $specs){
-      if (!empty($params[$fieldName])){
+  public function convertDateFieldsToMySQL(&$params) {
+    foreach ($this->_dateFields as $fieldName => $specs) {
+      if (!empty($params[$fieldName])) {
         $params[$fieldName] = CRM_Utils_Date::isoToMysql(
           CRM_Utils_Date::processDate(
           $params[$fieldName],
@@ -1496,7 +1496,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         );
       }
       else{
-        if (isset($specs['default'])){
+        if (isset($specs['default'])) {
           $params[$fieldName] = date('YmdHis', strtotime($specs['default']));
         }
       }

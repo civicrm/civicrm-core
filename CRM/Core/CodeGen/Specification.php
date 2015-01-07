@@ -377,13 +377,13 @@ class CRM_Core_CodeGen_Specification {
       );
       $field['html'] = array();
       foreach ($validOptions as $htmlOption) {
-        if (!empty($fieldXML->html->$htmlOption)){
+        if (!empty($fieldXML->html->$htmlOption)) {
           $field['html'][$htmlOption] = $this->value($htmlOption, $fieldXML->html);
         }
       }
     }
     $field['pseudoconstant'] = $this->value('pseudoconstant', $fieldXML);
-    if (!empty($field['pseudoconstant'])){
+    if (!empty($field['pseudoconstant'])) {
       //ok this is a bit long-winded but it gets there & is consistent with above approach
       $field['pseudoconstant'] = array();
       $validOptions = array(
@@ -402,7 +402,7 @@ class CRM_Core_CodeGen_Specification {
         'callback',
       );
       foreach ($validOptions as $pseudoOption) {
-        if (!empty($fieldXML->pseudoconstant->$pseudoOption)){
+        if (!empty($fieldXML->pseudoconstant->$pseudoOption)) {
           $field['pseudoconstant'][$pseudoOption] = $this->value($pseudoOption, $fieldXML->pseudoconstant);
         }
       }

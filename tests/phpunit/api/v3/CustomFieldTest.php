@@ -281,7 +281,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Test custom field get works & return param works
    */
-  public function testCustomFieldGetReturnOptions(){
+  public function testCustomFieldGetReturnOptions() {
     $customGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'test_group'));
     $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
 
@@ -296,7 +296,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Test custom field get works & return param works
    */
-  public function testCustomFieldGetReturnArray(){
+  public function testCustomFieldGetReturnArray() {
     $customGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'test_group'));
     $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
 
@@ -311,7 +311,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Test custom field get works & return param works
    */
-  public function testCustomFieldGetReturnTwoOptions(){
+  public function testCustomFieldGetReturnTwoOptions() {
     $customGroup = $this->customGroupCreate(array('extends' => 'Individual', 'test_group'));
     $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
 

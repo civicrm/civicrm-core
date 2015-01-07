@@ -684,7 +684,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
 
       // pass record id param to view url for multi record view
       if ($multiRecordTableId && $newLinks) {
-        if ($result->$multiRecordTableId){
+        if ($result->$multiRecordTableId) {
           if ($newLinks[CRM_Core_Action::VIEW]['url'] == 'civicrm/profile/view') {
             $newLinks[CRM_Core_Action::VIEW]['qs'] .= "&multiRecord=view&recordId=%%recordId%%&allFields=1";
             $params['recordId'] = $result->$multiRecordTableId;

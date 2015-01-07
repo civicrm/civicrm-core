@@ -60,7 +60,7 @@ function civicrm_api3_domain_get($params) {
   $domains = _civicrm_api3_dao_to_array($bao, $params, TRUE, 'domain');
 
   foreach ($domains as $domain) {
-    if (!empty($domain['contact_id'])){
+    if (!empty($domain['contact_id'])) {
       $values = array();
       $locparams = array(
         'contact_id' => $domain['contact_id']

@@ -243,7 +243,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param array_type $processor2
    * @return number
    */
-  public static function defaultComparison($processor1, $processor2){
+  public static function defaultComparison($processor1, $processor2) {
     $p1 = CRM_Utils_Array::value('is_default', $processor1);
     $p2 = CRM_Utils_Array::value('is_default', $processor2);
     if ($p1 == $p2) {

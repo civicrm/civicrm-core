@@ -41,7 +41,7 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
 function civicrm_api3($entity, $action, $params = array()) {
   $params['version'] = 3;
   $result = civicrm_api($entity, $action, $params);
-  if (is_array($result) && !empty($result['is_error'])){
+  if (is_array($result) && !empty($result['is_error'])) {
     throw new CiviCRM_API3_Exception($result['error_message'], CRM_Utils_Array::value('error_code', $result, 'undefined'), $result);
   }
   return $result;
@@ -178,7 +178,7 @@ function _civicrm_api_get_entity_name_from_camel($entity) {
  *   DAO being passed in.
  * @return string
  */
-function _civicrm_api_get_entity_name_from_dao($bao){
+function _civicrm_api_get_entity_name_from_dao($bao) {
   $daoName = str_replace("BAO", "DAO", get_class($bao));
   return _civicrm_api_get_entity_name_from_camel(CRM_Core_DAO_AllCoreTables::getBriefName($daoName));
 }

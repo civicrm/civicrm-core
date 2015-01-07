@@ -189,12 +189,12 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
       'account_relationship = 7'
     );
     $productFinancialType = array_intersect($costFinancialType, $premiumFinancialType);
-    foreach ($financialType as $key => $financialTypeName ){
+    foreach ($financialType as $key => $financialTypeName ) {
       if (!in_array( $key, $productFinancialType)) {
         unset( $financialType[$key] );
       }
     }
-    if (count( $financialType ) ){
+    if (count( $financialType ) ) {
       $this->assign( 'financialType', $financialType );
     }
     $this->add(

@@ -116,7 +116,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
       $roleObj = $wp_roles->get_role($role);
 
       //Remove all civicrm capabilities for the role, as there may be some capabilities checkbox unticked
-      foreach ($permissionsArray as $key => $capability){
+      foreach ($permissionsArray as $key => $capability) {
         $roleObj->remove_cap($key);
       }
 
@@ -172,7 +172,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
    *
    * @return array   civicrm permissions
    */
-  public static function getPermissionArray(){
+  public static function getPermissionArray() {
     global $civicrm_root;
 
     $permissions = CRM_Core_Permission::basicPermissions();

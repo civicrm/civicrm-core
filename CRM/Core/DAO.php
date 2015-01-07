@@ -814,7 +814,7 @@ LIKE %1
    */
   public static function schemaRequiresRebuilding($tables = array("civicrm_contact")) {
     $show = array();
-    foreach ($tables as $tableName){
+    foreach ($tables as $tableName) {
       if (!array_key_exists($tableName, $show)) {
         $query = "SHOW CREATE TABLE $tableName";
         $dao = CRM_Core_DAO::executeQuery($query);
@@ -828,7 +828,7 @@ LIKE %1
       }
 
       $result = preg_match("/\bCONSTRAINT\b\s/i", $show[$tableName]) ? TRUE : FALSE;
-      if ($result == TRUE){
+      if ($result == TRUE) {
         continue;
       }
       else {

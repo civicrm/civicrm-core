@@ -136,7 +136,7 @@ class CRM_Utils_PDF_Utils {
     $pdf = new TCPDF($orientation, 'pt', $paper_size_arr);
     $pdf->Open();
 
-    if (is_readable($stationery_path)){
+    if (is_readable($stationery_path)) {
       $pdf->SetStationery( $stationery_path );
     }
 

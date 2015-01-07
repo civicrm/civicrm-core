@@ -393,7 +393,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         // Check if we are on or after rollover day of the month - CRM-10585
         // If so, set fixed_period_rollover TRUE so we increment end_date month below.
         $dateParts = explode('-', $actualStartDate);
-        if ($dateParts[2] >= $membershipTypeDetails['fixed_period_rollover_day']){
+        if ($dateParts[2] >= $membershipTypeDetails['fixed_period_rollover_day']) {
           $fixed_period_rollover = TRUE;
         }
 
@@ -756,7 +756,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param  integer      financial type id
    */
   public static function updateAllPriceFieldValue($membershipTypeId, $params) {
-    if (!empty($params['minimum_fee'])){
+    if (!empty($params['minimum_fee'])) {
       $amount = $params['minimum_fee'];
     }
     else {

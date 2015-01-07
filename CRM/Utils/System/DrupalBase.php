@@ -66,7 +66,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * - $siteName,
    * - $siteRoot
    */
-  public function getDefaultSiteSettings($dir){
+  public function getDefaultSiteSettings($dir) {
     $config = CRM_Core_Config::singleton();
     $siteName = $siteRoot = NULL;
     $matches = array();
@@ -473,7 +473,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * FIXME: Document values accepted/required by $params
    *
    */
-  public function userLoginFinalize($params = array()){
+  public function userLoginFinalize($params = array()) {
     user_login_finalize($params);
   }
 

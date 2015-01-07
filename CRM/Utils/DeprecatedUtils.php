@@ -991,7 +991,7 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
       continue;
     }
 
-    if ($name == 'phone_ext'){
+    if ($name == 'phone_ext') {
       $block = 'Phone';
     }
 

@@ -180,11 +180,11 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
       if (empty($item['id']) && !empty($item[$entity . "_id"])) {
         $values[$key]['id'] = $item[$entity . "_id"];
       }
-      if (!empty($item['financial_type_id'])){
+      if (!empty($item['financial_type_id'])) {
         //4.3 legacy handling
         $values[$key]['contribution_type_id'] = $item['financial_type_id'];
       }
-      if (!empty($item['next_sched_contribution_date'])){
+      if (!empty($item['next_sched_contribution_date'])) {
         // 4.4 legacy handling
         $values[$key]['next_sched_contribution'] = $item['next_sched_contribution_date'];
       }
@@ -403,7 +403,7 @@ function _civicrm_api3_separate_values(&$values) {
  * @param array $params
  * @param array $values
  */
-function _civicrm_api3_filter_fields_for_bao($entity, &$params, &$values){
+function _civicrm_api3_filter_fields_for_bao($entity, &$params, &$values) {
   $fields = civicrm_api($entity, 'getfields', array('version' => 3, 'action' => 'create'));
   $fields = $fields['values'];
   _civicrm_api3_store_values($fields, $params, $values);
@@ -449,7 +449,7 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
  *
  * @return
  */
-function _civicrm_api3_get_using_query_object($entity, $params, $additional_options = array(), $getCount = NULL){
+function _civicrm_api3_get_using_query_object($entity, $params, $additional_options = array(), $getCount = NULL) {
 
   // Convert id to e.g. contact_id
   if (empty($params[$entity . '_id']) && isset($params['id'])) {
@@ -467,17 +467,17 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     CRM_Utils_Array::value('return', $options, array()),
     CRM_Utils_Array::value('return', $additional_options, array())
   );
-  if (empty($returnProperties)){
+  if (empty($returnProperties)) {
     $returnProperties = NULL;
   }
-  if (!empty($params['check_permissions'])){
+  if (!empty($params['check_permissions'])) {
     // we will filter query object against getfields
     $fields = civicrm_api($entity, 'getfields', array('version' => 3, 'action' => 'get'));
     // we need to add this in as earlier in this function 'id' was unset in favour of $entity_id
     $fields['values'][$entity . '_id'] = array();
     $varsToFilter = array('returnProperties', 'inputParams');
-    foreach ($varsToFilter as $varToFilter){
-      if (!is_array($$varToFilter)){
+    foreach ($varsToFilter as $varToFilter) {
+      if (!is_array($$varToFilter)) {
         continue;
       }
       //I was going to throw an exception rather than silently filter out - but
@@ -493,7 +493,7 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
   $limit             = CRM_Utils_Array::value('limit', $options, NULL);
   $smartGroupCache  = CRM_Utils_Array::value('smartGroupCache', $params);
 
-  if ($getCount){
+  if ($getCount) {
     $limit = NULL;
     $returnProperties = NULL;
   }
@@ -655,7 +655,7 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
       $unmatchedFields,
       array_flip($allfields)// but a match for the field keys
     );
-    foreach ($returnUniqueMatched as $uniqueVal){
+    foreach ($returnUniqueMatched as $uniqueVal) {
       $dao->selectAdd($allfields[$uniqueVal]);
     }
   }
@@ -680,11 +680,11 @@ function _civicrm_api3_apply_filters_to_dao($filterField, $filterValue, &$dao) {
     $fieldName = substr($filterField, 0, -4);
     $dao->whereAdd("($fieldName >= $filterValue )");
   }
-  if ($filterField == 'is_current' && $filterValue == 1){
+  if ($filterField == 'is_current' && $filterValue == 1) {
     $todayStart = date('Ymd000000', strtotime('now'));
     $todayEnd = date('Ymd235959', strtotime('now'));
     $dao->whereAdd("(start_date <= '$todayStart' OR start_date IS NULL) AND (end_date >= '$todayEnd' OR end_date IS NULL)");
-    if (property_exists($dao, 'is_active')){
+    if (property_exists($dao, 'is_active')) {
       $dao->whereAdd('is_active = 1');
     }
   }
@@ -745,7 +745,7 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
       $returnProperties[$entity . '_id'] = 1;
       unset($returnProperties['id']);
     }
-    switch (trim(strtolower($sort))){
+    switch (trim(strtolower($sort))) {
       case 'id':
       case 'id desc':
       case 'id asc':
@@ -825,7 +825,7 @@ function _civicrm_api3_apply_options_to_dao(&$params, &$dao, $entity) {
 function _civicrm_api3_build_fields_array(&$bao, $unique = TRUE) {
   $fields = $bao->fields();
   if ($unique) {
-    if (empty($fields['id'])){
+    if (empty($fields['id'])) {
       $entity = _civicrm_api_get_entity_name_from_dao($bao);
       $fields['id'] = $fields[$entity . '_id'];
       unset($fields[$entity . '_id']);
@@ -1816,7 +1816,7 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
 
     // Check our field length
     if (is_string($params[$fieldName]) && !empty($fieldInfo['maxlength']) && strlen($params[$fieldName]) > $fieldInfo['maxlength']
-      ){
+      ) {
       throw new API_Exception( $params[$fieldName] . " is " . strlen($params[$fieldName]) . " characters  - longer than $fieldName length" . $fieldInfo['maxlength'] . ' characters',
         2100, array('field' => $fieldName, "max_length" => $fieldInfo['maxlength'])
       );
@@ -1885,7 +1885,7 @@ function _civicrm_api3_validate_html(&$params, &$fieldName, $fieldInfo) {
 function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $entity) {
   // If fieldname exists in params
   $value = CRM_Utils_Array::value($fieldName, $params, '');
-  if (!is_array($value)){
+  if (!is_array($value)) {
     $value = (string) $value;
   }
   else{

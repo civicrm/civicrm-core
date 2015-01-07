@@ -468,7 +468,7 @@ class CRM_Core_BAO_Block {
       $sql = "UPDATE $table SET is_primary = 0 WHERE contact_id = %1";
       $sqlParams = array(1 => array($contactId, 'Integer'));
       // we don't want to create unecessary entries in the log_ tables so exclude the one we are working on
-      if (!empty($params['id'])){
+      if (!empty($params['id'])) {
         $sql .= " AND id <> %2";
         $sqlParams[2] = array($params['id'], 'Integer');
       }
@@ -513,7 +513,7 @@ class CRM_Core_BAO_Block {
    * @param array $locations
    *
    */
-  public static function sortPrimaryFirst(&$locations){
+  public static function sortPrimaryFirst(&$locations) {
     uasort($locations, 'self::primaryComparison');
   }
 
@@ -524,7 +524,7 @@ class CRM_Core_BAO_Block {
    * @param array $location2
    * @return number
    */
-  public static function primaryComparison($location1, $location2){
+  public static function primaryComparison($location1, $location2) {
     $l1 = CRM_Utils_Array::value('is_primary', $location1);
     $l2 = CRM_Utils_Array::value('is_primary', $location2);
     if ($l1 == $l2) {

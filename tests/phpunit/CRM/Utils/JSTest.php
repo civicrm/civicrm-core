@@ -64,7 +64,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
       '
       public function whits() {
         for (a in b) {
-          mitts("wallaby", function(zoo){
+          mitts("wallaby", function(zoo) {
             alert(zoo + ts("Hello"))
           });
         }

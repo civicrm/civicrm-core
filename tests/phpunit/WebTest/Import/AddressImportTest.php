@@ -59,7 +59,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->click("css=ul.ui-autocomplete li");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    foreach ($customDataParams['customFields'] as $key => $value){
+    foreach ($customDataParams['customFields'] as $key => $value) {
       $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-summary-row']/div[@class='crm-label'][contains(text(), '$key')]"));
       $this->assertElementContainsText('address-block-1', "$value");
     }
@@ -84,7 +84,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
       'state' => 'State',
       'country' => 'Country',
     );
-    foreach ($customDataParams['headers'] as $key => $value){
+    foreach ($customDataParams['headers'] as $key => $value) {
       $headers[$key] = $value;
     }
 
@@ -294,7 +294,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  public function _createMultipleValueCustomField($customFieldName, $type){
+  public function _createMultipleValueCustomField($customFieldName, $type) {
     $this->type('label', $customFieldName);
     $this->select("data_type[0]", "value=0");
     $this->select("data_type[1]", "value=".$type);

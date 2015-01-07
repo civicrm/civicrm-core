@@ -483,7 +483,7 @@ class CRM_Utils_REST {
     $tpl = 'CRM/'.$entity.'/Page/Inline/'.$tplfile.'.tpl';
     $smarty = CRM_Core_Smarty::singleton( );
     CRM_Utils_System::setTitle( "$entity::$tplfile inline $tpl" );
-    if (!$smarty->template_exists($tpl) ){
+    if (!$smarty->template_exists($tpl) ) {
       header("Status: 404 Not Found");
       die ("Can't find the requested template file templates/$tpl");
     }

@@ -118,7 +118,7 @@ function civicrm_api3_profile_get($params) {
     }
     elseif(!empty($params['contact_id'])) {
       $ufGroupBAO->setProfileDefaults($params['contact_id'], $profileFields, $values[$profileID], TRUE);
-      foreach ($values[$profileID] as $fieldName => $field){
+      foreach ($values[$profileID] as $fieldName => $field) {
         // we should return 'Primary' with & without capitalisation. it is more consistent with api to not
         // capitalise, but for form support we need it for now. Hopefully we can move away from it
         $values[$profileID][strtolower($fieldName)] = $field;
@@ -297,7 +297,7 @@ function civicrm_api3_profile_submit($params) {
  *
  * @return string BAO Field Name
  */
-function _civicrm_api3_profile_translate_fieldnames_for_bao($fieldName){
+function _civicrm_api3_profile_translate_fieldnames_for_bao($fieldName) {
   $fieldName = str_replace('url', 'URL', $fieldName);
   return str_replace('primary', 'Primary', $fieldName);
 }

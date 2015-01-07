@@ -851,7 +851,7 @@ Group By  componentId";
       // make sure you preserve specific form values like location type, is_primary_ is_billing, master_id
       // CRM-10336: Also empty any fields from the existing address block if they don't exist in master (otherwise they will persist)
       foreach ($values as $field => $submittedValue) {
-        if (!in_array($field, $skipFields)){
+        if (!in_array($field, $skipFields)) {
           if (isset($masterAddress->$field)) {
           $values[$field] = $masterAddress->$field;
           }

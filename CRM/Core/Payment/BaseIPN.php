@@ -380,7 +380,7 @@ class CRM_Core_Payment_BaseIPN {
         $values['receipt_from_name'] = $domainValues[0];
         $values['receipt_from_email'] = $domainValues[1];
       }
-      if ($recurContrib && $recurContrib->id){
+      if ($recurContrib && $recurContrib->id) {
         //CRM-13273 - is_email_receipt setting on recurring contribution should take precedence over contribution page setting
         $values['is_email_receipt'] = $recurContrib->is_email_receipt;
       }
@@ -924,7 +924,7 @@ LIMIT 1;";
 
       // we have a pledge now we need to get the oldest unpaid payment
       $paymentDetails = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeId);
-      if (empty($paymentDetails['id'])){
+      if (empty($paymentDetails['id'])) {
         // we can assume this pledge is now completed
         // return now so we don't create a core error & roll back
         return;

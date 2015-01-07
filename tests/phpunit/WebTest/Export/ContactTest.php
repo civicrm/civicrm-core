@@ -35,7 +35,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  public function testPrefixGenderSuffix(){
+  public function testPrefixGenderSuffix() {
     $this->webtestLogin();
 
     // Create new  group
@@ -462,7 +462,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
    *
    * @return array|int
    */
-  public function getOptionLabel($optionGroupName, $optionValue){
+  public function getOptionLabel($optionGroupName, $optionValue) {
     $params = array(
       'version' => 3,
       'sequential' => 1,

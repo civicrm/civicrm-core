@@ -905,7 +905,7 @@ AND TABLE_SCHEMA = %1
 ";
     $params = array(1 => array($dbUf['database'], 'String'));
     $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
-    foreach ($tables as $columnName => $value){
+    foreach ($tables as $columnName => $value) {
       if ($value['tableName'] == 'civicrm_membership_type' || $value['tableName'] == 'civicrm_contribution_recur') {
         $foreignKeyExists = CRM_Core_DAO::checkConstraintExists($value['tableName'], $value['fkey']);
         $fKey = $value['fkey'];
