@@ -1025,7 +1025,7 @@ SELECT is_primary,
         if ($count > 2) {
           break;
         }
-        if (count($first_names) == 1){
+        if (count($first_names) == 1) {
           $family = $first_names[current(array_keys($first_names))]['addressee_display'];
         }
         else {

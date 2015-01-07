@@ -49,7 +49,7 @@
  */
 function civicrm_api3_price_field_value_create($params) {
   $ids = array();
-  if (!empty($params['id'])){
+  if (!empty($params['id'])) {
     $ids['id'] = $params['id'];
   }
 

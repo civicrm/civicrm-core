@@ -499,7 +499,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='phone-block']/div/div/div[3]/div[2][contains(text(), '9876543210')]"));
   }
 
-  public function testBatchMerge(){
+  public function testBatchMerge() {
     $this->webtestLogin();
 
     // add contact1 and its duplicate

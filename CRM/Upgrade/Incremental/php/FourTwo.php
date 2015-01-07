@@ -62,7 +62,7 @@ class CRM_Upgrade_Incremental_php_FourTwo {
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '4.2.alpha1') {
       $tables = array('civicrm_contribution_page', 'civicrm_event', 'civicrm_group', 'civicrm_contact');
-      if (!CRM_Core_DAO::schemaRequiresRebuilding($tables)){
+      if (!CRM_Core_DAO::schemaRequiresRebuilding($tables)) {
         $errors = ts("The upgrade has identified some schema integrity issues in the database. It seems some of your constraints are missing. You will have to rebuild your schema before re-trying the upgrade. Please refer to %1.", array(1 => CRM_Utils_System::docURL2("Ensuring Schema Integrity on Upgrades", FALSE, "Ensuring Schema Integrity on Upgrades", NULL, NULL, "wiki")));
         CRM_Core_Error::fatal($errors);
         return FALSE;
@@ -181,9 +181,9 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
                     'civicrm_event' => 'FK_civicrm_event_payment_processor_id',
                     'civicrm_group' => 'FK_civicrm_group_saved_search_id',
                     );
-    foreach ($tables as $tableName => $fKey){
+    foreach ($tables as $tableName => $fKey) {
       $foreignKeyExists = CRM_Core_DAO::checkConstraintExists($tableName, $fKey);
-      if ($foreignKeyExists){
+      if ($foreignKeyExists) {
         CRM_Core_DAO::executeQuery("ALTER TABLE {$tableName} DROP FOREIGN KEY {$fKey}", $params, TRUE, NULL, FALSE, FALSE);
         CRM_Core_DAO::executeQuery("ALTER TABLE {$tableName} DROP INDEX {$fKey}", $params, TRUE, NULL, FALSE, FALSE);
       }
@@ -370,7 +370,7 @@ HAVING COUNT(cpse.price_set_id) > 1 AND MIN(cpse1.id) <> cpse.id ";
     }
   }
 
-  public function convertContribution(){
+  public function convertContribution() {
     $minContributionId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(min(id),0) FROM civicrm_contribution');
     $maxContributionId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(max(id),0) FROM civicrm_contribution');
     for ($startId = $minContributionId; $startId <= $maxContributionId; $startId += self::BATCH_SIZE) {
@@ -680,13 +680,13 @@ WHERE     cpf.price_set_id = %1
 
         //CRM-12273
         //check if price_set_id is exist, if not use the default contribution amount
-        if (isset($result->price_set_id)){
+        if (isset($result->price_set_id)) {
           $priceSetId = $result->price_set_id;
         }
         else{
           $defaultPriceSets = CRM_Price_BAO_PriceSet::getDefaultPriceSet();
           foreach ($defaultPriceSets as $key => $pSet) {
-            if ($pSet['name'] == 'contribution_amount'){
+            if ($pSet['name'] == 'contribution_amount') {
               $priceSetId = $pSet['setID'];
             }
           }

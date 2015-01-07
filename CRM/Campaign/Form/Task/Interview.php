@@ -307,7 +307,7 @@ WHERE {$clause}
     foreach ($this->_contactIds as $contactId) {
       //build the profile fields.
       foreach ($this->_surveyFields as $name => $field) {
-        if ($field){
+        if ($field) {
           CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $contactId);
         }
       }

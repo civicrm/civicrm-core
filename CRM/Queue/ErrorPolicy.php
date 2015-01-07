@@ -31,7 +31,7 @@
  *
  * @code
  * $errorContainer = new CRM_Queue_ErrorPolicy();
- * $errorContainer->call(function(){
+ * $errorContainer->call(function() {
  *    ...include some files, do some work, etc...
  * });
  * @endcode

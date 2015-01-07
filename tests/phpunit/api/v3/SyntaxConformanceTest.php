@@ -402,7 +402,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getKnownUnworkablesUpdateSingle($entity, $key){
+  public function getKnownUnworkablesUpdateSingle($entity, $key) {
     // can't update values are values for which updates don't result in the value being changed
     $knownFailures = array(
       'ActionSchedule' => array(
@@ -489,7 +489,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         ),
       ),
     );
-    if (empty($knownFailures[$entity]) || empty($knownFailures[$entity][$key])){
+    if (empty($knownFailures[$entity]) || empty($knownFailures[$entity][$key])) {
       return array();
     }
     return $knownFailures[$entity][$key];
@@ -945,7 +945,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->assertNotEmpty($baoString, $entityName);
     $this->assertNotEmpty($entityName, $entityName);
     $fieldsGet = $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'get'));
-    if ($entityName != 'Pledge'){
+    if ($entityName != 'Pledge') {
       $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'create'));
     }
     $fields = $fields['values'];
@@ -1015,7 +1015,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
             $entity[$fieldName] = 2;
           }
           elseif (!empty($specs['FKClassName'])) {
-            if ($specs['FKClassName'] == $baoString){
+            if ($specs['FKClassName'] == $baoString) {
               $entity[$fieldName] = (string) $entity2['id'];
             }
             else{

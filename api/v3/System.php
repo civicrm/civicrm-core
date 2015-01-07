@@ -66,7 +66,7 @@ function civicrm_api3_system_flush($params) {
  * @param array $params
  *   Array or parameters determined by getfields.
  */
-function _civicrm_api3_system_flush_spec(&$params){
+function _civicrm_api3_system_flush_spec(&$params) {
   $params['triggers'] = array('title' => 'rebuild triggers (boolean)');
   $params['session'] = array('title' => 'refresh sessions (boolean)');
 }

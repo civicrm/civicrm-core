@@ -214,7 +214,7 @@ class CRM_Report_Form_Instance {
     $instanceID = $form->getVar('_id');
     $navigationDefaults = array();
 
-    if (!isset($defaults['permission'])){
+    if (!isset($defaults['permission'])) {
       $permissions = array_flip(CRM_Core_Permission::basicPermissions( ));
       $defaults['permission'] = $permissions['CiviReport: access CiviReport'];
     }
@@ -285,7 +285,7 @@ class CRM_Report_Form_Instance {
     if (!empty($params['is_navigation'])) {
       $params['navigation'] = $form->_navigation;
     }
-    elseif ($instanceID){
+    elseif ($instanceID) {
       //delete navigation if exists
       $navId = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $instanceID, 'navigation_id', 'id');
       if ($navId) {

@@ -364,7 +364,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
      * fully but the calls to the POST happen in more than one function
      * keeping this as good example of data to bring back to life later
 
-    public function testMainFunctionActions(){
+    public function testMainFunctionActions() {
       $ids                = $objects = array( );
      $input['component'] = 'Contribute';
     $postedParams       = array(

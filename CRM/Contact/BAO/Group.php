@@ -585,7 +585,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     elseif ($groupType == 'Access') {
       $value = CRM_Core_DAO::VALUE_SEPARATOR . '1' . CRM_Core_DAO::VALUE_SEPARATOR;
     }
-    elseif (!empty($groupType)){
+    elseif (!empty($groupType)) {
       // ie we have been given the group key
       $value = CRM_Core_DAO::VALUE_SEPARATOR . $groupType . CRM_Core_DAO::VALUE_SEPARATOR;
     }

@@ -431,7 +431,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         }
         $priceField = CRM_Price_BAO_PriceField::create($fieldParams);
       }
-      elseif (!$priceSetID){
+      elseif (!$priceSetID) {
         $deletePriceSet = 1;
       }
 

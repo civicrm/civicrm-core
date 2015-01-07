@@ -19,7 +19,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
     $loaded = TRUE;
 
     CRM_Core_Resources::singleton()
-      ->addSettingsFactory(function(){
+      ->addSettingsFactory(function() {
         return array(
           'PseudoConstant' => array(
             'locationType' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'),

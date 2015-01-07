@@ -64,7 +64,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
       $form_state['input']['pass'] = array('pass1' => $params['cms_pass'], 'pass2' => $params['cms_pass']);
     }
 
-    if (!empty($params['notify'])){
+    if (!empty($params['notify'])) {
       $form_state['input']['notify'] = $params['notify'];
     }
 
@@ -569,7 +569,7 @@ AND    u.status = 1
    *
    * FIXME: Document values accepted/required by $params
    */
-  public function userLoginFinalize($params = array()){
+  public function userLoginFinalize($params = array()) {
     user_login_finalize($params);
   }
 
@@ -964,7 +964,7 @@ AND    u.status = 1
    * @param int $drupalID
    *   Drupal User ID.
    */
-  public function og_membership_create($ogID, $drupalID){
+  public function og_membership_create($ogID, $drupalID) {
     if (function_exists('og_entity_query_alter')) {
       // sort-of-randomly chose a function that only exists in the // 7.x-2.x branch
       //

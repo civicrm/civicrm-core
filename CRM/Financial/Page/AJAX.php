@@ -79,7 +79,7 @@ class CRM_Financial_Page_AJAX {
       )
     );
 
-    if (!empty($result)){
+    if (!empty($result)) {
       foreach ($result as $id => $name) {
         $selectedArray = array();
         if ($id == $defaultId) {
@@ -128,7 +128,7 @@ class CRM_Financial_Page_AJAX {
     if (!empty($result)) {
       foreach ($result as $id => $name) {
         if (in_array($id, $financialAccountType[$financialAccountTypeId])  && $_GET['_value'] != 'select') {
-          if ($countResult != 1){
+          if ($countResult != 1) {
             $elements[] = array(
               'name'  => $name,
               'value' => $id,
@@ -142,7 +142,7 @@ class CRM_Financial_Page_AJAX {
             );
           }
         }
-        elseif ($_GET['_value'] == 'select'){
+        elseif ($_GET['_value'] == 'select') {
           $elements[] = array(
             'name'  => $name,
             'value' => $id,

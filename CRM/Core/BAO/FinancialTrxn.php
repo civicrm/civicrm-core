@@ -281,7 +281,7 @@ WHERE lt.entity_id = %1 ";
 
     $sqlParams = array(1 => array($entity_id, 'Integer'), 2 => array($entity_table, 'String'));
     $dao =  CRM_Core_DAO::executeQuery($query, $sqlParams);
-    while ($dao->fetch()){
+    while ($dao->fetch()) {
       $result[$dao->financial_trxn_id][$dao->id] = $dao->amount;
     }
     if (!empty($result)) {

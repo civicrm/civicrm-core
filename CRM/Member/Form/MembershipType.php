@@ -374,7 +374,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
           $dat          = ($dat < 10) ? '0' . $dat : $dat;
           $params[$per] = $mon . $dat;
         }
-        else if($per == 'fixed_period_rollover_day' && !empty($params['month_fixed_period_rollover_day'])){
+        else if($per == 'fixed_period_rollover_day' && !empty($params['month_fixed_period_rollover_day'])) {
           $params['fixed_period_rollover_day'] = $params['month_fixed_period_rollover_day']['d'];
           unset($params['month_fixed_period_rollover_day']);
         }

@@ -933,7 +933,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param int $drupalID
    *   Drupal User ID.
    */
-  public function og_membership_create($ogID, $drupalID){
+  public function og_membership_create($ogID, $drupalID) {
     og_save_subscription( $ogID, $drupalID, array( 'is_active' => 1 ) );
   }
 

@@ -128,7 +128,7 @@ function civicrm_api3_constant_get($params) {
   }
   else{
     $values = call_user_func(array('CRM_Utils_PseudoConstant', 'getConstant'), $name);
-    if (!empty($values)){
+    if (!empty($values)) {
       return civicrm_api3_create_success($values, $params, 'constant');
     }
   }

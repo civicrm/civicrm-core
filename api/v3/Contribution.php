@@ -152,16 +152,16 @@ function _civicrm_api3_contribution_create_spec(&$params) {
  * the core code or schema - this means we have to provide support for api calls (where possible)
  * across schema changes.
  */
-function _civicrm_api3_contribution_create_legacy_support_45(&$params){
+function _civicrm_api3_contribution_create_legacy_support_45(&$params) {
   //legacy soft credit handling - recommended approach is chaining
-  if (!empty($params['soft_credit_to'])){
+  if (!empty($params['soft_credit_to'])) {
     $params['soft_credit'][] = array(
       'contact_id'          => $params['soft_credit_to'],
       'amount'              => $params['total_amount'],
       'soft_credit_type_id' => CRM_Core_OptionGroup::getDefaultValue("soft_credit_type")
     );
   }
-  if (!empty($params['honor_contact_id'])){
+  if (!empty($params['honor_contact_id'])) {
     $params['soft_credit'][] = array(
       'contact_id'          => $params['honor_contact_id'],
       'amount'              => $params['total_amount'],
@@ -224,7 +224,7 @@ function civicrm_api3_contribution_get($params) {
     $contribution_details = $query->store($dao);
     $softContribution = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dao->contribution_id, TRUE);
     $contribution[$dao->contribution_id] = array_merge($contribution_details, $softContribution);
-    if (isset($contribution[$dao->contribution_id]['financial_type_id'])){
+    if (isset($contribution[$dao->contribution_id]['financial_type_id'])) {
       $contribution[$dao->contribution_id]['financial_type_id'] = $contribution[$dao->contribution_id]['financial_type_id'];
     }
     // format soft credit for backward compatibility
@@ -423,11 +423,11 @@ function civicrm_api3_contribution_completetransaction(&$params) {
   $contribution = new CRM_Contribute_BAO_Contribution();
   $contribution->id = $params['id'];
   $contribution->find(TRUE);
-  if (!$contribution->id == $params['id']){
+  if (!$contribution->id == $params['id']) {
     throw new API_Exception('A valid contribution ID is required', 'invalid_data');
   }
   try {
-    if (!$contribution->loadRelatedObjects($input, $ids, FALSE, TRUE)){
+    if (!$contribution->loadRelatedObjects($input, $ids, FALSE, TRUE)) {
       throw new API_Exception('failed to load related objects');
     }
     elseif ($contribution->contribution_status_id == CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')) {
@@ -439,7 +439,7 @@ function civicrm_api3_contribution_completetransaction(&$params) {
     $input['is_test'] = $contribution->is_test;
     $input['trxn_id'] = !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
     $input['amount'] = $contribution->total_amount;
-    if (isset($params['is_email_receipt'])){
+    if (isset($params['is_email_receipt'])) {
       $input['is_email_receipt'] = $params['is_email_receipt'];
     }
     // @todo required for base ipn but problematic as api layer handles this

@@ -61,7 +61,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
 
   }
 
-  public function testIndividualSearchPage(){
+  public function testIndividualSearchPage() {
     $this->webtestLogin();
 
     $this->openCiviPage("contribute/search", "reset=1");

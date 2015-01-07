@@ -70,7 +70,7 @@ function civicrm_api3_participant_create($params) {
 
   $participantBAO = CRM_Event_BAO_Participant::create($params);
 
-  if (empty($params['price_set_id']) && empty($params['id']) && !empty($params['fee_level'])){
+  if (empty($params['price_set_id']) && empty($params['id']) && !empty($params['fee_level'])) {
     _civicrm_api3_participant_createlineitem($params, $participantBAO);
   }
   _civicrm_api3_object_to_array($participantBAO, $participant[$participantBAO->id]);
@@ -81,7 +81,7 @@ function civicrm_api3_participant_create($params) {
 /**
  * Create a default participant line item
  */
-function _civicrm_api3_participant_createlineitem(&$params, $participant){
+function _civicrm_api3_participant_createlineitem(&$params, $participant) {
   // it is possible that a fee level contains information about multiple
   // price field values.
 

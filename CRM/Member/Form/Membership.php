@@ -374,7 +374,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->assign('currency', $config->defaultCurrencySymbol);
     $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-    if (isset($invoicing)){
+    if (isset($invoicing)) {
       $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
     }
     // build price set form.
