@@ -58,11 +58,11 @@ abstract class CRM_Import_Form_Preview extends CRM_Core_Form {
     $this->addButtons(array(
         array(
           'type' => 'back',
-          'name' => ts('<< Previous'),
+          'name' => ts('Previous'),
         ),
         array(
           'type' => 'next',
-          'name' => ts('Import Now >>'),
+          'name' => ts('Import Now'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
         ),

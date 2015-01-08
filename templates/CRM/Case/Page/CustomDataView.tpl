@@ -70,7 +70,7 @@
       {/foreach}
       <div>
         <a href="{crmURL p="civicrm/case/cd/edit" q="cgcount=1&action=update&reset=1&type=Case&entityID=$caseID&groupID=$customGroupId&cid=$contactID&subType=$caseTypeID"}" class="button">
-          <span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span>
+          <span><div class="icon ui-icon-pencil"></div>{ts}Edit{/ts}</span>
         </a>
       </div>
       <br/>

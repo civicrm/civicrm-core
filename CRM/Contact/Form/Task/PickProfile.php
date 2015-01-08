@@ -120,7 +120,7 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
     }
     $ufGroupElement = $this->add('select', 'uf_group_id', ts('Select Profile'), array('' => ts('- select profile -')) + $profiles, TRUE, array('class' => 'crm-select2 huge'));
 
-    $this->addDefaultButtons(ts('Continue >>'));
+    $this->addDefaultButtons(ts('Continue'));
   }
 
   /**

@@ -125,8 +125,8 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
       if ($this->_searchBasedMailing) {
         $buttons = array(
           array(
-        'type' => 'back',
-            'name' => ts('<< Previous'),
+            'type' => 'back',
+            'name' => ts('Previous'),
           ),
           array(
             'type' => 'next',
@@ -139,8 +139,8 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
       else {
         $buttons = array(
           array(
-        'type' => 'back',
-            'name' => ts('<< Previous'),
+            'type' => 'back',
+            'name' => ts('Previous'),
           ),
           array(
             'type' => 'next',

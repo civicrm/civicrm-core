@@ -77,7 +77,7 @@
         {/if}
     {/if}
     <div class="action-link">
-      <a href="{crmURL p='civicrm/admin/custom/group/field/add' q="reset=1&action=add&gid=$gid"}" id="newCustomField" class="button action-item"><span><div class="icon add-icon"></div>{ts}Add Custom Field{/ts}</span></a>
+      <a href="{crmURL p='civicrm/admin/custom/group/field/add' q="reset=1&action=add&gid=$gid"}" id="newCustomField" class="button action-item"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Custom Field{/ts}</span></a>
       <a href="{crmURL p="civicrm/admin/custom/group" q="reset=1"}" class="button cancel no-popup"><span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span></a>
     </div>
 {/if}

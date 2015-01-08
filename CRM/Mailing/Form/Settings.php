@@ -143,12 +143,12 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
 
     $buttons = array(
       array(
-    'type' => 'back',
-        'name' => ts('<< Previous'),
+        'type' => 'back',
+        'name' => ts('Previous'),
       ),
       array(
         'type' => 'next',
-        'name' => ts('Next >>'),
+        'name' => ts('Next'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
       ),

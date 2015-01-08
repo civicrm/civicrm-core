@@ -105,7 +105,7 @@ class CRM_Contribute_Form_Task_PickProfile extends CRM_Contribute_Form_Task {
       array(
         '' => ts('- select profile -')) + $profiles, TRUE
     );
-    $this->addDefaultButtons(ts('Continue >>'));
+    $this->addDefaultButtons(ts('Continue'));
   }
 
   /**

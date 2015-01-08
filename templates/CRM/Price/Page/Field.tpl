@@ -45,9 +45,9 @@
 {if $action NEQ 8 and $priceField}
   <div class="action-link">
     {if !$isReserved}
-      <a href="{crmURL q="reset=1&action=add&sid=$sid"}" id="newPriceField" class="button"><span><div class="icon add-icon"></div>{ts}Add Price Field{/ts}</span></a>
+      <a href="{crmURL q="reset=1&action=add&sid=$sid"}" id="newPriceField" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Price Field{/ts}</span></a>
     {/if}
-      <a href="{crmURL p="civicrm/admin/price" q="action=preview&sid=`$sid`&reset=1&context=field"}" class="button"><span><div class="icon preview-icon"></div>{ts}Preview (all fields){/ts}</span></a>
+      <a href="{crmURL p="civicrm/admin/price" q="action=preview&sid=`$sid`&reset=1&context=field"}" class="button"><span><div class="icon ui-icon-zoomin"></div>{ts}Preview (all fields){/ts}</span></a>
   </div>
   <div id="field_page">
   {strip}
@@ -96,9 +96,9 @@
   </div>
   <div class="action-link">
     {if !$isReserved}
-      <a href="{crmURL q="reset=1&action=add&sid=$sid"}" id="newPriceField" class="button"><span><div class="icon add-icon"></div>{ts}Add Price Field{/ts}</span></a>
+      <a href="{crmURL q="reset=1&action=add&sid=$sid"}" id="newPriceField" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Price Field{/ts}</span></a>
     {/if}
-    <a href="{crmURL p="civicrm/admin/price" q="action=preview&sid=`$sid`&reset=1&context=field"}" class="button"><span><div class="icon preview-icon"></div>{ts}Preview (all fields){/ts}</span></a>
+    <a href="{crmURL p="civicrm/admin/price" q="action=preview&sid=`$sid`&reset=1&context=field"}" class="button"><span><div class="icon ui-icon-zoomin"></div>{ts}Preview (all fields){/ts}</span></a>
   </div>
 
 {else}
@@ -108,7 +108,7 @@
       {ts}None found.{/ts}
     </div>
     <div class="action-link">
-      <a href="{crmURL q="reset=1&action=add&sid=$sid"}" id="newPriceField" class="button"><span><div class="icon add-icon"></div>{ts}Add Price Field{/ts}</span></a>
+      <a href="{crmURL q="reset=1&action=add&sid=$sid"}" id="newPriceField" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Price Field{/ts}</span></a>
     </div>
   {/if}
 {/if}

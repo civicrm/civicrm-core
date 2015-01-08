@@ -31,7 +31,7 @@
     </div>
 
     <div class="action-link">
-         <a href="{crmURL p='civicrm/survey/add' q='reset=1' h=0 }" class="button"><span><div class="icon add-icon"></div>{ts}Add Survey{/ts}</span></a>
+         <a href="{crmURL p='civicrm/survey/add' q='reset=1' h=0 }" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Survey{/ts}</span></a>
     </div>
 
 {elseif $buildSelector}
@@ -76,7 +76,7 @@
 {else}
 
    <div class="action-link">
-      <a href="{crmURL p='civicrm/survey/add' q='reset=1' h=0 }" class="button"><span><div class="icon add-icon"></div>{ts}Add Survey{/ts}</span></a>
+      <a href="{crmURL p='civicrm/survey/add' q='reset=1' h=0 }" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Survey{/ts}</span></a>
    </div>
 
     {* build search form here *}

@@ -210,7 +210,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     else {
       $button[] = array(
         'type' => 'next',
-        'name' => ts('Continue >>'),
+        'name' => ts('Continue'),
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
       );

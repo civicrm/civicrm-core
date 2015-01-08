@@ -171,11 +171,11 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
     $buttons = array(
       array('type' => 'back',
-        'name' => ts('<< Previous'),
+        'name' => ts('Previous'),
       ),
       array(
         'type' => 'upload',
-        'name' => ts('Next >>'),
+        'name' => ts('Next'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
       ),

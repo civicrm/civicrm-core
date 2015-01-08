@@ -97,13 +97,13 @@ EOS;
 
     $buttons = array();
     $buttons[] = array(
-      'name' => ts('<< Go Back'),
+      'name' => ts('Go Back'),
       'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp',
       'type' => 'back',
     );
     $buttons[] = array(
       'isDefault' => TRUE,
-      'name' => ts('Continue >>'),
+      'name' => ts('Continue'),
       'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
       'type' => 'next',
     );

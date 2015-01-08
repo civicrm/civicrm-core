@@ -49,7 +49,7 @@
     </td>
     <td class="labels" rowspan="2">
       <div class="crm-submit-buttons">
-        {include file="CRM/common/formButtons.tpl" location="top" buttonStyle="width:80px; text-align:center;"}
+        {include file="CRM/common/formButtons.tpl" location="top"}
       </div>
       <div class="crm-submit-buttons reset-advanced-search">
         <a href="{crmURL p='civicrm/contact/search/advanced' q='reset=1'}" id="resetAdvancedSearch" class="crm-hover-button" title="{ts}Clear all search criteria{/ts}">

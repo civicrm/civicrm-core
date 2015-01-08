@@ -28,29 +28,28 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC
  * $Id$
  *
  */
 
 /**
- * Based on the QF id, give this button a class 'validate' or 'cancel' which will be used by jQuery.validate
+ * Fetch an attribute from html
  *
- * @param string $btnName
+ * @param array $params
+ * @param CRM_Core_Smarty $smarty
  *
  * @return string
- *
- * @see smarty_modifier_crmBtnType
  */
-function smarty_modifier_crmBtnValidate($btnName) {
-  // split the string into 5 or more
-  // button name are typically: '_qf_Contact_refresh' OR '_qf_Contact_refresh_dedupe'
-  // button type is always the 3rd element
-  // note the first _
-  $substr = CRM_Utils_System::explode('_', $btnName, 5);
-
-  if (in_array($substr[3], array('upload', 'next', 'submit', 'done', 'process', 'refresh'))) {
-    return 'validate';
+function smarty_function_crmGetAttribute($params, &$smarty) {
+  $ret = '';
+  if (preg_match('#\W' . $params['attr'] . '="([^"]+)#', $params['html'], $matches)) {
+    $ret = $matches[1];
   }
-  return 'cancel';
+  if (!empty($params['assign'])) {
+    $smarty->assign($params['assign'], $ret);
+  }
+  else {
+    return $ret;
+  }
 }

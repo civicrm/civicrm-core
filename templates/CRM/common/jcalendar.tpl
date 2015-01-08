@@ -65,7 +65,7 @@
 {/if}
 
 {if $action neq 1028}
-    <a href="#" class="crm-hover-button crm-clear-link" title="{ts}Clear{/ts}"><span class="icon close-icon"></span></a>
+    <a href="#" class="crm-hover-button crm-clear-link" title="{ts}Clear{/ts}"><span class="icon ui-icon-close"></span></a>
 {/if}
 
 <script type="text/javascript">
