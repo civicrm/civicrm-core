@@ -92,6 +92,13 @@ if (!defined('CIVICRM_SETTINGS_PATH')) {
   define( 'CIVICRM_SETTINGS_PATH', CIVICRM_PLUGIN_DIR . 'civicrm.settings.php' );
 }
 
+// test if Civi is installed
+if ( file_exists( CIVICRM_SETTINGS_PATH ) ) {
+  define( 'CIVICRM_INSTALLED', TRUE );
+} else {
+  define( 'CIVICRM_INSTALLED', FALSE );
+}
+
 // prevent CiviCRM from rendering its own header
 define( 'CIVICRM_UF_HEAD', TRUE );
 
@@ -218,7 +225,7 @@ class CiviCRM_For_WordPress {
     if (
       is_admin() &&
       get_option( 'civicrm_activation_create_basepage' ) == 'true' &&
-      file_exists( CIVICRM_SETTINGS_PATH )
+      CIVICRM_INSTALLED
     ) {
 
       // create basepage
@@ -425,6 +432,9 @@ class CiviCRM_For_WordPress {
 
     }
 
+    // go no further if Civi not installed yet
+    if ( ! CIVICRM_INSTALLED ) return;
+
     // when embedded via wpBasePage or AJAX call...
     if ( $this->civicrm_in_wordpress() ) {
 
@@ -495,7 +505,7 @@ class CiviCRM_For_WordPress {
     add_action( 'admin_menu', array( $this, 'add_menu_items' ) );
 
     // if settings file does not exist, show notice with link to installer
-    if ( ! file_exists( CIVICRM_SETTINGS_PATH ) ) {
+    if ( ! CIVICRM_INSTALLED ) {
       if ( isset( $_GET['page'] ) && $_GET['page'] == 'civicrm-install' ) {
         // register hooks for installer page?
       } else {
@@ -545,7 +555,7 @@ class CiviCRM_For_WordPress {
       }
 
       // check for settings
-      if ( ! file_exists( CIVICRM_SETTINGS_PATH ) ) {
+      if ( ! CIVICRM_INSTALLED ) {
         $error = FALSE;
       } else {
         $error = include_once ( CIVICRM_SETTINGS_PATH );
@@ -690,7 +700,7 @@ class CiviCRM_For_WordPress {
   public function add_menu_items() {
 
     // check for settings file
-    if ( file_exists( CIVICRM_SETTINGS_PATH ) ) {
+    if ( CIVICRM_INSTALLED ) {
 
       // use plugins_url( 'path/to/file.png', __FILE__ )
       // see http://codex.wordpress.org/Function_Reference/plugins_url
