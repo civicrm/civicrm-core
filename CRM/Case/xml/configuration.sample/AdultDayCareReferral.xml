@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<CaseType>
+  <name>Adult Day Care Referral</name>
+  <ActivityTypes>
+    <ActivityType>
+      <name>Open Case</name>
+      <max_instances>1</max_instances>
+    </ActivityType>
+    <ActivityType>
+      <name>Medical evaluation</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Mental health evaluation</name>
+    </ActivityType>
+    <ActivityType>
+      <name>ADC referral</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Follow up</name>
+    </ActivityType>
+  <ActivityType>
+      <name>Change Case Type</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Change Case Status</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Change Case Start Date</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Link Cases</name>
+    </ActivityType>
+  </ActivityTypes>
+  <ActivitySets>
+    <ActivitySet>
+      <name>standard_timeline</name>
+      <label>Standard Timeline</label>
+      <timeline>true</timeline>
+      <ActivityTypes>
+        <ActivityType>
+          <name>Open Case</name>
+          <status>Completed</status>
+        </ActivityType>
+        <ActivityType>
+          <name>Medical evaluation</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>3</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+        <ActivityType>
+          <name>Mental health evaluation</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>7</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+        <ActivityType>
+          <name>ADC referral</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>10</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+        <ActivityType>
+          <name>Follow up</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>14</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+      </ActivityTypes>
+    </ActivitySet>
+  </ActivitySets>
+  <CaseRoles>
+    <RelationshipType>
+        <name>Senior Services Coordinator</name>
+        <creator>1</creator>
+    </RelationshipType>
+    <RelationshipType>
+        <name>Health Services Coordinator</name>
+    </RelationshipType>
+    <RelationshipType>
+        <name>Benefits Specialist</name>
+    </RelationshipType>
+ </CaseRoles>
+</CaseType>

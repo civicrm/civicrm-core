@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<CaseType>
+  <name>Housing Support</name>
+  <ActivityTypes>
+    <ActivityType>
+      <name>Open Case</name>
+      <max_instances>1</max_instances>
+    </ActivityType>
+    <ActivityType>
+      <name>Medical evaluation</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Mental health evaluation</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Secure temporary housing</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Income and benefits stabilization</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Long-term housing plan</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Follow up</name>
+    </ActivityType>
+  <ActivityType>
+      <name>Change Case Type</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Change Case Status</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Change Case Start Date</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Link Cases</name>
+    </ActivityType>
+  </ActivityTypes>
+  <ActivitySets>
+    <ActivitySet>
+      <name>standard_timeline</name>
+      <label>Standard Timeline</label>
+      <timeline>true</timeline>
+      <ActivityTypes>
+        <ActivityType>
+          <name>Open Case</name>
+          <status>Completed</status>
+        </ActivityType>
+        <ActivityType>
+          <name>Medical evaluation</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>1</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+        <ActivityType>
+          <name>Mental health evaluation</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>1</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+        <ActivityType>
+          <name>Secure temporary housing</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>2</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+        <ActivityType>
+          <name>Follow up</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>3</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+        <ActivityType>
+          <name>Income and benefits stabilization</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>7</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+        <ActivityType>
+          <name>Long-term housing plan</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>14</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+        <ActivityType>
+          <name>Follow up</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>21</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+      </ActivityTypes>
+    </ActivitySet>
+  </ActivitySets>
+  <CaseRoles>
+    <RelationshipType>
+        <name>Homeless Services Coordinator</name>
+        <creator>1</creator>
+        <manager>1</manager>
+    </RelationshipType>
+    <RelationshipType>
+        <name>Health Services Coordinator</name>
+    </RelationshipType>
+    <RelationshipType>
+        <name>Benefits Specialist</name>
+    </RelationshipType>
+ </CaseRoles>
+</CaseType>

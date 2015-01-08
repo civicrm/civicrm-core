@@ -1,0 +1,51 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 3.3                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2010                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id='upload'}
+<h1>{ts}Import File Format{/ts}</h1>
+<p>
+    {ts}Files to be imported must be in the 'comma-separated-values' format (CSV). Most applications will allow you to export records in CSV format. Consult the documentation for your application if you're not sure how to do this.{/ts}
+</p>
+<h1>{ts}Contact Records for Members{/ts}</h1>
+<p>
+    {ts}Membership import requires that each person, household or organization already exists as a contact record in your CiviCRM database. If you need to import memberships for contact records which haven't been added to CiviCRM yet - you will do this in 2 steps. First, use <strong>Import Contacts</strong> to add the contact records. If possible, include a unique 'External ID' for each new contact which you can then use to match memberships to contacts. Then return to this screen and import the membership records.{/ts}
+</p>
+<h1>{ts}Matching Memberships to Contacts{/ts}</h1>
+<p>{ts}Membership import files must contain data needed to <strong>match the membership to the contact record</strong>. This 'matching' can be handled in several different ways:{/ts}</p>
+    <ul>
+    <li>{ts}Include the data fields used for contact 'matching' based on your configured <strong>Strict Duplicate Matching</strong> rules. For the default duplicate matching rules, you would include a column in each row with the contributors' Email Address.{/ts}</li>
+    <li>{ts}If you've stored a unique <strong>External Identifier</strong> for each contact in CiviCRM, you can include that value as a column in your import file. Memberships will then be matched to contact records using their External ID.{/ts}</li>
+    <li>{ts}You can include a column with each contact's <strong>Internal Contact ID</strong>. This is the unique ID assigned by CiviCRM which is displayed at the bottom of the Contact Summary screen - and can be exported.{/ts}</li>
+    </ul>
+<p>
+    {ts}Save the CSV file with your membership data and 'contact matching' data to your local hard drive (or an accessible drive on your network) - and you are now ready for step 1 (Upload Data).{/ts}
+</p>
+{/htxt}
+
+{htxt id="id-onDuplicate"}
+    <p>
+    {ts}For each import, you can either INSERT new membership records, or UPDATE existing records. You can not do both types of operations in a single import session. If you are UPDATING existing memberships, you will need to include a column containing the unique CiviCRM-assigned membership ID to match to the existing membership records.{/ts}
+    </p>
+{/htxt}
