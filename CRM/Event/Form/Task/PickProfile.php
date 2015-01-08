@@ -103,7 +103,7 @@ class CRM_Event_Form_Task_PickProfile extends CRM_Event_Form_Task {
       array(
         '' => ts('- select profile -')) + $profiles, TRUE
     );
-    $this->addDefaultButtons(ts('Continue >>'));
+    $this->addDefaultButtons(ts('Continue'));
   }
 
   /**

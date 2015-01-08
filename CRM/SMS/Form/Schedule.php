@@ -84,7 +84,7 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
 
     $buttons = array(
       array('type' => 'back',
-        'name' => ts('<< Previous'),
+        'name' => ts('Previous'),
       ),
       array(
         'type' => 'next',

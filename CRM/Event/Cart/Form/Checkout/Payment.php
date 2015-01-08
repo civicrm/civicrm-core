@@ -195,13 +195,13 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $this->assign('total', $this->total);
     $buttons = array();
     $buttons[] = array(
-      'name' => ts('<< Go Back'),
+      'name' => ts('Go Back'),
       'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp',
       'type' => 'back',
     );
     $buttons[] = array(
       'isDefault' => TRUE,
-      'name' => ts('Complete Transaction >>'),
+      'name' => ts('Complete Transaction'),
       'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
       'type' => 'next',
     );

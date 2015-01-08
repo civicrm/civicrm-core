@@ -78,7 +78,7 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
    */
   public function buildQuickForm() {
     $this->add('text', 'unclosed_case_id', ts('Select Case'), array('class' => 'huge'), TRUE);
-    $this->addDefaultButtons(ts('Continue >>'));
+    $this->addDefaultButtons(ts('Save'));
   }
 
   /**

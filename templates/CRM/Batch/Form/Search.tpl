@@ -33,7 +33,7 @@
         {ts}Complete OR partial batch name.{/ts}
         </span>
       </td>
-      <td>{$form.buttons.html}</td>
+      <td>{include file="CRM/common/formButtons.tpl"}</td>
     </tr>
   </table>
 </div>
