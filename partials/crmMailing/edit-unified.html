@@ -12,16 +12,12 @@
     <div crm-mailing-block-summary crm-mailing="mailing"/>
     <div crm-mailing-block-mailing crm-mailing="mailing"/>
 
-    <div crm-ui-accordion crm-title="ts('HTML')">
-      <div crm-mailing-body-html crm-mailing="mailing"/>
-    </div>
-    <div crm-ui-accordion crm-title="ts('Plain Text')" crm-collapsed='true'>
-      <div crm-mailing-body-text crm-mailing="mailing"/>
-    </div>
-
     <div crm-ui-tab-set>
-      <div crm-ui-tab id="tab-schedule" crm-title="ts('Schedule')">
-        <div crm-mailing-block-schedule crm-mailing="mailing"/>
+      <div crm-ui-tab id="tab-html" crm-title="ts('HTML')">
+        <div crm-mailing-body-html crm-mailing="mailing"/>
+      </div>
+      <div crm-ui-tab id="tab-text" crm-title="ts('Plain Text')">
+        <div crm-mailing-body-text crm-mailing="mailing"/>
       </div>
       <div crm-ui-tab id="tab-attachment" crm-title="ts('Attachments')">
         <div crm-attachments="attachments"/>
@@ -42,6 +38,10 @@
 
     <div crm-ui-accordion crm-title="ts('Preview')">
       <div crm-mailing-block-preview crm-mailing="mailing" on-preview="previewMailing(mailing, preview.mode)" on-send="sendTest(mailing, attachments, preview.recipient)" />
+    </div>
+
+    <div crm-ui-accordion crm-title="ts('Schedule')">
+      <div crm-mailing-block-schedule crm-mailing="mailing"/>
     </div>
 
     <button ng-click="submit()">{{ts('Submit Mailing')}}</button>
