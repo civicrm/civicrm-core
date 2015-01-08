@@ -329,8 +329,8 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     $buttons = array(
       array(
-    'type' => 'back',
-        'name' => ts('<< Go Back'),
+        'type' => 'back',
+        'name' => ts('Go Back'),
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp',
       ),
     );
@@ -339,8 +339,8 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     if ($allowToProceed) {
       $buttons = array_merge($buttons, array(
         array(
-      'type' => 'next',
-            'name' => ts('Continue >>'),
+            'type' => 'next',
+            'name' => ts('Continue'),
             'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
             'isDefault' => TRUE,
             'js' => $js,
@@ -350,11 +350,11 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       if ($includeSkipButton) {
         $buttons = array_merge($buttons, array(
           array(
-        'type' => 'next',
-              'name' => ts('Skip Participant >>|'),
-              'subName' => 'skip',
-            ),
-          )
+            'type' => 'next',
+            'name' => ts('Skip Participant'),
+            'subName' => 'skip',
+            'icon' => 'seek-next',
+          ))
         );
       }
     }

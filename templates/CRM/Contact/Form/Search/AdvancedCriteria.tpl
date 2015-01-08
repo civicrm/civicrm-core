@@ -130,7 +130,7 @@ CRM.$(function($) {
 
     <table class="form-layout">
         <tr>
-            <td>{$form.buttons.html}</td>
+            <td>{include file="CRM/common/formButtons.tpl" location="botton"}</td>
         </tr>
     </table>
 {/strip}

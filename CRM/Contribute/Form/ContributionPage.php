@@ -186,13 +186,13 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       if (!$this->_first) {
         $buttons[] = array(
           'type' => 'back',
-          'name' => ts('<< Previous'),
+          'name' => ts('Previous'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         );
       }
       $buttons[] = array(
         'type' => 'next',
-        'name' => ts('Continue >>'),
+        'name' => ts('Continue'),
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
       );

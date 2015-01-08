@@ -304,13 +304,13 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       if (!$this->_first) {
         $buttons[] = array(
           'type' => 'back',
-          'name' => ts('<< Previous'),
+          'name' => ts('Previous'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         );
       }
       $buttons[] = array(
         'type' => 'upload',
-        'name' => ts('Continue >>'),
+        'name' => ts('Continue'),
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
       );

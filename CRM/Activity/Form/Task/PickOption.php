@@ -102,7 +102,7 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
     $this->addElement('checkbox', 'assigned_to', ts('Assigned to Contact'));
     $this->addElement('checkbox', 'created_by', ts('Created by'));
     $this->setDefaults(array('with_contact' => 1));
-    $this->addDefaultButtons(ts('Continue >>'));
+    $this->addDefaultButtons(ts('Continue'));
   }
 
   /**
