@@ -1002,7 +1002,22 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that if membership start date is not set it defaults to correct end date for rolling memberships.
+   * Test that if membership start date is not set it defaults to correct end date for fixed multi year memberships.
+   */
+  public function testEmptyStartEndDateFixedMultiYear() {
+    unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
+    $this->callAPISuccess('membership_type', 'create', array('id' => $this->_membershipTypeID2, 'duration_interval' => 5));
+    $this->_params['membership_type_id'] = $this->_membershipTypeID2;
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $result = $this->callAPISuccess($this->_entity, 'getsingle', array('id' => $result['id']));
+    $this->assertEquals('2009-01-21', $result['join_date']);
+    $this->assertEquals('2008-03-01', $result['start_date']);
+    $this->assertEquals('2014-02-28', $result['end_date']);
+  }
+
+
+  /**
+   * Test that if membership start date is not set it defaults to correct end date for fixed single year memberships.
    */
   public function testEmptyStartDateRolling() {
     unset($this->_params['start_date'], $this->_params['is_override']);
