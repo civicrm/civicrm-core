@@ -42,8 +42,14 @@
  * @return string
  */
 function smarty_function_crmGetAttribute($params, &$smarty) {
+  $ret = '';
   if (preg_match('#\W' . $params['attr'] . '="([^"]+)#', $params['html'], $matches)) {
-    return $matches[1];
+    $ret = $matches[1];
   }
-  return '';
+  if (!empty($params['assign'])) {
+    $smarty->assign($params['assign'], $ret);
+  }
+  else {
+    return $ret;
+  }
 }

@@ -4285,11 +4285,6 @@ span.crm-status-icon {
   margin-top: 30px;
 }
 
-#crm-container.crm-public #crm-submit-buttons input#_qf_Main_upload-bottom {
-  font-size: 1.5em;
-  padding: 3px 10px;
-}
-
 #crm-container.crm-public #premiums-listings {
   margin-top: 10px;
   min-width: 450px;
