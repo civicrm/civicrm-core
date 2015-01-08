@@ -128,8 +128,18 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     if ($id) {
       self::updateAllPriceFieldValue($id, $params);
     }
-
+    self::flush();
     return $membershipType;
+  }
+
+  /**
+   * Flush anywhere that membership types might be cached
+   * @throws \CiviCRM_API3_Exception
+   */
+  static function flush() {
+    CRM_Member_PseudoConstant::membershipType(NULL, TRUE);
+    civicrm_api3('membership', 'getfields', array('cache_clear' => 1, 'fieldname' => 'membership_type_id'));
+    civicrm_api3('profile', 'getfields', array('action' => 'submit', 'cache_clear' => 1));
   }
 
   /**
