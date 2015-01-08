@@ -46,17 +46,7 @@
  *   newly created or updated membership type property values.
  */
 function civicrm_api3_membership_type_create($params) {
-  $ids['membershipType'] = CRM_Utils_Array::value('id', $params);
-  $ids['memberOfContact'] = CRM_Utils_Array::value('member_of_contact_id', $params);
-  $ids['contributionType'] = CRM_Utils_Array::value('financial_type_id', $params);
-
-  $membershipTypeBAO = CRM_Member_BAO_MembershipType::add($params, $ids);
-  $membershipType = array();
-  _civicrm_api3_object_to_array($membershipTypeBAO, $membershipType[$membershipTypeBAO->id]);
-  CRM_Member_PseudoConstant::membershipType(NULL, TRUE);
-  civicrm_api3('membership', 'getfields', array('cache_clear' => 1, 'fieldname' => 'membership_type_id'));
-  civicrm_api3('profile', 'getfields', array('action' => 'submit', 'cache_clear' => 1));
-  return civicrm_api3_create_success($membershipType, $params, 'membership_type', 'create', $membershipTypeBAO);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Membership_type');
 }
 
 /**

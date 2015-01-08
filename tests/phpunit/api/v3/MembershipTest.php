@@ -1019,7 +1019,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
 
   /**
-   * Test that if datesdate are not set they not over-ridden if id is passed in
+   * Test that if dates are set they not over-ridden if id is passed in
    */
   public function testMembershipDatesNotOverridden() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
