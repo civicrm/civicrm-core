@@ -203,20 +203,22 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'visibility' => 'public',
     );
 
-    $membershiptype = $this->callAPIAndDocument('membership_type', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertNotNull($membershiptype['values']);
-    $this->membershipTypeDelete(array('id' => $membershiptype['id']));
+    $membershipType = $this->callAPIAndDocument('membership_type', 'create', $params, __FUNCTION__, __FILE__);
+    $this->assertNotNull($membershipType['values']);
+    $this->membershipTypeDelete(array('id' => $membershipType['id']));
   }
 
 
+  /**
+   * Test mandatory parameter check.
+   */
   public function testUpdateWithEmptyParams() {
-    $params = array();
-    $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
-    $this->assertEquals($membershiptype['error_message'],
-      'Mandatory key(s) missing from params array: domain_id, member_of_contact_id, financial_type_id, duration_unit, duration_interval, name'
-                       );
+    $this->callAPIFailure('membership_type', 'create', array());
   }
 
+  /**
+   * Test update fails with no ID.
+   */
   public function testUpdateWithoutId() {
     $params = array(
       'name' => '60+ Membership',
@@ -230,8 +232,8 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'visibility' => 'public',
     );
 
-    $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
-    $this->assertEquals($membershiptype['error_message'], 'Mandatory key(s) missing from params array: domain_id');
+    $membershipType = $this->callAPIFailure('membership_type', 'create', $params);
+    $this->assertEquals($membershipType['error_message'], 'Mandatory key(s) missing from params array: domain_id');
   }
 
   public function testUpdate() {
@@ -260,13 +262,16 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $this->getAndCheck($params, $id, $this->_entity);
   }
 
+  /**
+   * Test for failure when id is not valid.
+   */
   public function testDeleteNotExists() {
     $params = array(
       'id' => 'doesNotExist',
     );
-    $membershiptype = $this->callAPIFailure('membership_type', 'delete', $params,
-                      'Error while deleting membership type. id : ' . $params['id']
-                                           );
+    $this->callAPIFailure('membership_type', 'delete', $params,
+      'Error while deleting membership type. id : ' . $params['id']
+    );
   }
 
   public function testDelete() {
@@ -276,7 +281,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'id' => $membershipTypeID,
     );
 
-    $result = $this->callAPIAndDocument('membership_type', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPIAndDocument('membership_type', 'delete', $params, __FUNCTION__, __FILE__);
   }
 
 }
