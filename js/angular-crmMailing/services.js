@@ -1,6 +1,6 @@
 (function (angular, $, _) {
   var partialUrl = function (relPath) {
-    return CRM.resourceUrls['civicrm'] + '/partials/crmMailing/' + relPath;
+    return CRM.resourceUrls.civicrm + '/partials/crmMailing/' + relPath;
   };
 
   // The representation of from/reply-to addresses is inconsistent in the mailing data-model,
@@ -8,7 +8,7 @@
   // the available "From:" addrs. Records are like the underlying OptionValues -- but add "email"
   // and "author".
   angular.module('crmMailing').factory('crmFromAddresses', function ($q, crmApi) {
-    var emailRegex = /^"(.*)" \<([^@\>]*@[^@\>]*)\>$/;
+    var emailRegex = /^"(.*)" <([^@>]*@[^@>]*)>$/;
     var addrs = _.map(CRM.crmMailing.fromAddress, function (addr) {
       var match = emailRegex.exec(addr.label);
       return angular.extend({}, addr, {
@@ -18,7 +18,7 @@
     });
 
     function first(array) {
-      return (array.length == 0) ? null : array[0];
+      return (array.length === 0) ? null : array[0];
     }
 
     return {
