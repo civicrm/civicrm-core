@@ -156,16 +156,16 @@
       create: function create() {
         return {
           jobs: {}, // {jobId: JobRecord}
-          name: "revert this", // fixme
+          name: "",
           campaign_id: null,
           from_name: crmFromAddresses.getDefault().author,
           from_email: crmFromAddresses.getDefault().email,
           replyto_email: "",
-          subject: "For {contact.display_name}", // fixme
-          groups: {include: [2], exclude: [4]}, // fixme
+          subject: "",
+          groups: {include: [], exclude: []},
           mailings: {include: [], exclude: []},
-          body_html: "<b>Hello</b> {contact.display_name}", // fixme
-          body_text: "Hello {contact.display_name}", // fixme
+          body_html: "",
+          body_text: "",
           footer_id: null, // pickDefaultMailComponent('Footer'),
           header_id: null, // pickDefaultMailComponent('Header'),
           visibility: "Public Pages",
@@ -257,6 +257,8 @@
         // To get list of recipients, we tentatively save the mailing and
         // get the resulting recipients -- then rollback any changes.
         var params = angular.extend({}, mailing, {
+          name: 'placeholder', // for previewing recipients on new, incomplete mailing
+          subject: 'placeholder', // for previewing recipients on new, incomplete mailing
           options: {force_rollback: 1},
           'api.mailing_job.create': 1, // note: exact match to API default
           'api.MailingRecipients.get': {
