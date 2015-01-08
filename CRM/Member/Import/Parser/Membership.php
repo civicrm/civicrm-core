@@ -255,7 +255,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * @return boolean      the result of this processing
    */
   public function import($onDuplicate, &$values) {
-    try{
+    try {
       // first make sure this is a valid line
       $response = $this->summary($values);
       if ($response != CRM_Import_Parser::VALID) {

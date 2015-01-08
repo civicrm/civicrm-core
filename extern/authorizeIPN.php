@@ -39,7 +39,7 @@ $log = new CRM_Utils_SystemLogger();
 $log->alert('payment_notification processor_name=AuthNet', $_REQUEST);
 
 $authorizeNetIPN = new CRM_Core_Payment_AuthorizeNetIPN($_REQUEST);
-try{
+try {
   $authorizeNetIPN->main();
 }
 catch(CRM_Core_Exception $e) {

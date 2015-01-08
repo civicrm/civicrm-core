@@ -1502,7 +1502,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           CRM_Utils_Array::value("{$fieldName}_time", $params), TRUE)
         );
       }
-      else{
+      else {
         if (isset($specs['default'])) {
           $params[$fieldName] = date('YmdHis', strtotime($specs['default']));
         }
@@ -1698,7 +1698,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return array
    */
   public function getProfileDefaults($profile_id = 'Billing', $contactID = NULL) {
-    try{
+    try {
       $defaults = civicrm_api3('profile', 'getsingle', array(
         'profile_id' => (array) $profile_id,
         'contact_id' => $contactID,

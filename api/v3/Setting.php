@@ -96,7 +96,7 @@ function civicrm_api3_setting_getdefaults(&$params) {
       if (array_key_exists('default', $spec) && !is_null($spec['default'])) {
         $defaults[$domainID][$setting] = $spec['default'];
       }
-      else{
+      else {
         $noDefaults[$setting] = 1;
       }
     }
@@ -343,14 +343,14 @@ function _civicrm_api3_setting_getDomainArray(&$params) {
     if (isset($domainAPIResult['values'])) {
       $params['domain_id'] = array_keys($domainAPIResult['values']);
     }
-    else{
+    else {
       throw new Exception('All domains not retrieved - problem with Domain Get api call ' . $domainAPIResult['error_message']);
     }
   }
   if (is_array($params['domain_id'])) {
     $domains = $params['domain_id'];
   }
-  else{
+  else {
     $domains = array($params['domain_id']);
   }
   return $domains;

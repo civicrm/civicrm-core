@@ -153,7 +153,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   public function testIPNPaymentExpressNoError() {
     $this->setupRecurringPaymentProcessorTransaction();
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalExpressTransactionIPN());
-    try{
+    try {
       $paypalIPN->main();
     }
     catch(CRM_Core_Exception $e) {

@@ -605,7 +605,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'name'
       );
     }
-    else{
+    else {
       $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
         'Emailed Invoice',
         'name'
