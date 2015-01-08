@@ -229,7 +229,7 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
         }
 
         $urlParams = "force=1&reset=1&ssID={$ssID}&context={$context}";
-        $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
+        $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $self);
         if (CRM_Utils_Rule::qfKey($qfKey)) {
           $urlParams .= "&qfKey=$qfKey";
         }
