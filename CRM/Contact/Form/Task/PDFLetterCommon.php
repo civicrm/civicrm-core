@@ -42,7 +42,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   /**
    * build all the data structures needed to build the form
    *
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return void
    * @access public
@@ -64,7 +64,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    * @param $cid
    */
   static function preProcessSingle(&$form, $cid) {
@@ -74,7 +74,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @var CRM_Core_Form $form
    *
@@ -240,7 +240,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    *
    * @access protected
    *
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return array( $categories, $html_message, $messageToken, $returnProperties )
    */
@@ -315,7 +315,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    *
    * @access public
    *
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return void
    */
@@ -364,7 +364,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    * @param $html_message
    * @param $contactIds
    *

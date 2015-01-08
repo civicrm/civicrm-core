@@ -157,7 +157,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *
@@ -303,6 +303,8 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * global validation rules for the form
    *
    * @param array $fields posted values of the form
+   *
+   * @internal param array $errors list of errors to be posted back to the form
    *
    * @return void
    * @static

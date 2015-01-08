@@ -43,8 +43,9 @@
  * @param $params  array  Associative array of property name/value pairs to create new uf field.
  *
  * @throws API_Exception
+ * @internal param int $groupId Valid uf_group id
  *
- * @return array Newly created $ufFieldArray
+ * @return Newly created $ufFieldArray array
  *
  * @access public
  * {@getfields UFField_create}
@@ -111,7 +112,7 @@ function civicrm_api3_uf_field_create($params) {
 /**
  * Gets field for civicrm_uf_field create
  *
- * @param array $params
+ * @param $params
  *
  * @return array fields valid for other functions
  */
@@ -145,9 +146,10 @@ function civicrm_api3_uf_field_get($params) {
 /**
  * Delete uf field
  *
- * @param array $params
+ * @param $params
  *
  * @throws API_Exception
+ * @internal param int $fieldId Valid uf_field id that to be deleted
  *
  * @return true on successful delete or return error
  *

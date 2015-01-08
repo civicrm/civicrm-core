@@ -31,7 +31,7 @@
     {include file="CRM/common/displaySearchCriteria.tpl"}
     <br />
   {else}
-    {ts}None found.{/ts}
+    {ts}No matches found.{/ts}
     <br />
   {/if}
   {ts}Suggestions:{/ts}

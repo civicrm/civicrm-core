@@ -52,7 +52,7 @@ class CRM_Grant_BAO_Query {
    * @access public
    */
   static function select(&$query) {
-    if (($query->_mode & CRM_Contact_BAO_Query::MODE_GRANT) || !empty($query->_returnProperties)) {
+    if ($query->_mode & CRM_Contact_BAO_Query::MODE_GRANT) {
       if (!empty($query->_returnProperties['grant_status_id'])) {
         $query->_select['grant_status_id'] = 'grant_status.id as grant_status_id';
         $query->_element['grant_status'] = 1;
@@ -127,7 +127,6 @@ class CRM_Grant_BAO_Query {
   static function whereClauseSingle(&$values, &$query) {
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     list($name, $op, $value, $grouping, $wildcard) = $values;
-    $val = $names = array();
     switch ($name) {
       case 'grant_money_transfer_date_low':
       case 'grant_money_transfer_date_high':
@@ -186,67 +185,29 @@ class CRM_Grant_BAO_Query {
         return;
 
       case 'grant_type_id':
-      case 'grant_type':
+
+        $value = $strtolower(CRM_Core_DAO::escapeString(trim($value)));
+
+        $query->_where[$grouping][] = "civicrm_grant.grant_type_id $op '{$value}'";
+
         $grantTypes = CRM_Core_OptionGroup::values('grant_type');
-        if (is_array($value)) {
-          foreach ($value as $k => $v) {
-            if ($v) {
-              $val[] = $v;
-            }
-          }
-          if (count($val) > 0) {
-            // Overwrite $value so it works with an IN where statement.
-            $op = 'IN';
-            $value = '(' . implode(',', $val) . ')';
-          }
-        }
-        if (!empty($val)) {
-          foreach($val as $id) {
-            $names[] = CRM_Utils_Array::value($id, $grantTypes);
-          }
-        }
-        else {
-          if (!empty($value)) {
-            $names[] = $grantTypes[$value];
-          }
-        }
-
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_grant.grant_type_id', $op, $value, "Integer");
-
-        $query->_qill[$grouping][] = ts('Grant Type %2 %1', array(1 => implode(' ' . ts('or') . ' ', $names), 2 => $op));
+        $value = $grantTypes[$value];
+        $query->_qill[$grouping][] = ts('Grant Type %2 %1', array(1 => $value, 2 => $op));
         $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
 
         return;
 
       case 'grant_status_id':
-      case 'grant_status':
+
+        $value = $strtolower(CRM_Core_DAO::escapeString(trim($value)));
+
+        $query->_where[$grouping][] = "civicrm_grant.status_id $op '{$value}'";
+
+
         $grantStatus = CRM_Core_OptionGroup::values('grant_status');
-        if (is_array($value)) {
-          foreach ($value as $k => $v) {
-            if ($v) {
-              $val[] = $v;
-            }
-          }
-          if (count($val) > 0) {
-            // Overwrite $value so it works with an IN where statement.
-            $op = 'IN';
-            $value = '(' . implode(',', $val) . ')';
-          }
-        }
-        if (!empty($val)) {
-          foreach($val as $id) {
-            $names[] = CRM_Utils_Array::value($id, $grantStatus);
-          }
-        }
-        else {
-          if (!empty($value)) {
-            $names[] = $grantStatus[$value];
-          }
-        }
+        $value = $grantStatus[$value];
 
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_grant.status_id', $op, $value, "Integer");
-
-        $query->_qill[$grouping][] = ts('Grant Status %2 %1', array(1 => implode(' ' . ts('or') . ' ', $names), 2 => $op));
+        $query->_qill[$grouping][] = ts('Grant Status %2 %1', array(1 => $value, 2 => $op));
         $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
 
         return;
@@ -357,7 +318,7 @@ class CRM_Grant_BAO_Query {
    *
    * @access public
    *
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return void
    * @static
@@ -365,13 +326,15 @@ class CRM_Grant_BAO_Query {
   static function buildSearchForm(&$form) {
 
     $grantType = CRM_Core_OptionGroup::values('grant_type');
-    $form->add('select', 'grant_type_id', ts('Grant Type'), $grantType, FALSE,
-      array('id' => 'grant_type_id', 'multiple' => 'multiple', 'class' => 'crm-select2')
+    $form->add('select', 'grant_type_id', ts('Grant Type'),
+      array('' => ts('- any -')) + $grantType,
+      FALSE, array('class' => 'crm-select2')
     );
 
     $grantStatus = CRM_Core_OptionGroup::values('grant_status');
-    $form->add('select', 'grant_status_id', ts('Grant Status'), $grantStatus, FALSE,
-      array('id' => 'grant_status_id', 'multiple' => 'multiple', 'class' => 'crm-select2')
+    $form->add('select', 'grant_status_id', ts('Grant Status'),
+      array('' => ts('- any -')) + $grantStatus,
+      FALSE, array('class' => 'crm-select2')
     );
 
     $form->addDate('grant_application_received_date_low', ts('App. Received Date - From'), FALSE, array('formatType' => 'searchDate'));

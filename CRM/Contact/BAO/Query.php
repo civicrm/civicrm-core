@@ -1000,7 +1000,7 @@ class CRM_Contact_BAO_Query {
           // CRM-13011 : If location type is primary, do not restrict search to the phone
           // type id - we want the primary phone, regardless of what type it is.
           // Otherwise, restrict to the specified phone type for the given field.
-          if ((!$cond) && ($elementName == 'phone')) {
+          if ((!$cond) && ($elementName == 'phone') && $elements['location_type'] != 'Primary') {
             $cond = "phone_type_id = '$elementType'";
           }
           elseif ((!$cond) && ($elementName == 'im')) {
@@ -1130,14 +1130,7 @@ class CRM_Contact_BAO_Query {
                 case 'civicrm_im':
                 case 'civicrm_openid':
 
-                  $this->_tables[$tName] = "\nLEFT JOIN $tableName `$tName` ON contact_a.id = `$tName`.contact_id";
-                  if ($tableName != 'civicrm_phone') {
-                    $this->_tables[$tName] .= " AND `$tName`.$lCond";
-                  }
-                  elseif (is_numeric($name)) {
-                    $this->_select[$tName] = "IF (`$tName`.is_primary = $name, `$tName`.phone, NULL) as `$tName`";
-                  }
-
+                  $this->_tables[$tName] = "\nLEFT JOIN $tableName `$tName` ON contact_a.id = `$tName`.contact_id AND `$tName`.$lCond";
                   // this special case to add phone type
                   if ($cond) {
                     $phoneTypeCondition = " AND `$tName`.$cond ";
@@ -2263,7 +2256,7 @@ class CRM_Contact_BAO_Query {
   /**
    * Given a result dao, extract the values and return that array
    *
-   * @param CRM_Core_DAO $dao
+   * @param Object $dao
    *
    * @return array values for this query
    */
@@ -2898,7 +2891,7 @@ WHERE  id IN ( $groupIDs )
         $tableAlias = "civicrm_group_contact_cache_{$groupIDsFiltered}";
       }
 
-      $this->_tables[$tableAlias] = $this->_whereTables[$tableAlias] = " LEFT JOIN civicrm_group_contact_cache `{$tableAlias}` ON {$joinTable}.id = `{$tableAlias}`.contact_id ";
+      $this->_tables["`{$tableAlias}`"] = $this->_whereTables["`{$tableAlias}`"] = " LEFT JOIN civicrm_group_contact_cache `{$tableAlias}` ON {$joinTable}.id = `{$tableAlias}`.contact_id ";
 
       return "`{$tableAlias}`.group_id IN (" . $groupIDsFiltered . ")";
     }
@@ -2985,7 +2978,7 @@ WHERE  id IN ( $groupIDs )
           LEFT JOIN civicrm_tag {$tActTable} ON ( {$etActTable}.tag_id = {$tActTable}.id  )";
 
       $this->_where[$grouping][] = "({$tTable}.name $op '". $value . "' OR {$tCaseTable}.name $op '". $value . "' OR {$tActTable}.name $op '". $value . "')";
-      $this->_qill[$grouping][] = ts('Tag %1 %2', array(1 => $tagTypesText[2], 2 => $op)) . ' ' . $value;
+      $this->_qill[$grouping][] = ts('Tag %1 %2 ', array(1 => $tagTypesText[2], 2 => $op)) . ' ' . $value;
     } else {
       $etTable = "`civicrm_entity_tag-" . $value . "`";
       $tTable = "`civicrm_tag-" . $value . "`";
@@ -3315,7 +3308,7 @@ WHERE  id IN ( $groupIDs )
     $this->_where[$grouping][] = $sub;
     if ($config->includeEmailInName) {
       $this->_tables['civicrm_email'] = $this->_whereTables['civicrm_email'] = 1;
-      $this->_qill[$grouping][] = ts('Name or Email') . " $op - '$name'";
+      $this->_qill[$grouping][] = ts('Name or Email ') . "$op - '$name'";
     }
     else {
       $this->_qill[$grouping][] = ts('Name like') . " - '$name'";
@@ -3862,7 +3855,7 @@ WHERE  id IN ( $groupIDs )
     $name = $targetName[4] ? "%$name%" : $name;
     $this->_where[$grouping][] = "contact_b_log.sort_name LIKE '%$name%'";
     $this->_tables['civicrm_log'] = $this->_whereTables['civicrm_log'] = 1;
-    $this->_qill[$grouping][] = ts('Modified By') . " $name";
+    $this->_qill[$grouping][] = ts('Modified by') . ": $name";
   }
 
   /**
@@ -4036,7 +4029,7 @@ WHERE  id IN ( $groupIDs )
        return;
     }
     // also get values array for relation_target_name
-    // for relationship search we always do wildcard
+    // for relatinship search we always do wildcard
     $relationType = $this->getWhereValues('relation_type_id', $grouping);
     $targetName = $this->getWhereValues('relation_target_name', $grouping);
     $relStatus = $this->getWhereValues('relation_status', $grouping);
@@ -4366,10 +4359,11 @@ civicrm_relationship.is_permission_a_b = 0
    * @param string $sort
    * @param int $offset
    * @param int $row_count
-   * @param bool $smartGroupCache  ?? update smart group cache?
+   * @param bool $smartGroupCache
    * @param bool $count return count obnly
    * @param bool $skipPermissions Should permissions be ignored or should the logged in user's permissions be applied
    *
+   * @params bool $smartGroupCache ?? update smart group cache?
    *
    * @return array
    * @access public
@@ -5387,12 +5381,14 @@ AND   displayRelType.is_active = 1
    * @param $op       string the sql operator, this function should handle ALL SQL operators
    * @param $value string|integer|array depends on the operator and who's calling the query builder
    * @param $grouping int    the index where to place the where clause
-   * @param $selectValues the key value pairs for this element. This allows us to use this function for things besides option-value pairs
+   * @param $selectValues
    * @param $field    array  an array that contains various properties of the field identified by $name
    * @param $label    string The label for this field element
    * @param $dataType string The data type for this element
+   *
    * @param bool $useIDsOnly
    *
+   * @internal param array $selectValue the key value pairs for this element. This allows us to use this function for things besides option-value pairs
    * @return void     adds the where clause and qill to the query object
    */
   function optionValueQuery(
@@ -5463,7 +5459,7 @@ AND   displayRelType.is_active = 1
   }
 
   /**
-   * check and explode a user defined numeric string into an array
+   * function to check and explode a user defined numeric string into an array
    * this was the protocol used by search builder in the old old days before we had
    * super nice js widgets to do the hard work
    *

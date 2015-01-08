@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_Inline {
 
   /**
-   * Build the form object elements for communication preferences
+   * build the form elements for communication preferences
    *
    * @return void
    * @access public

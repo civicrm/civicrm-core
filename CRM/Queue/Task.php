@@ -52,6 +52,7 @@ class CRM_Queue_Task {
   var $title;
 
   /**
+   *
    * @param $callback mixed, serializable, a callable PHP item; must accept at least one argument (CRM_Queue_TaskContext)
    * @param $arguments array, serializable, extra arguments to pass to the callback (in order)
    * @param $title string, a printable string which describes this task
@@ -65,10 +66,12 @@ class CRM_Queue_Task {
   /**
    * Perform the task
    *
-   * @param $taskCtx array with keys:
-   *  - log: object 'Log'
+   * @param $taskCtx
    *
    * @throws Exception
+   * @internal param array $taskContext with keys:
+   *  - log: object 'Log'
+   *
    * @return bool, TRUE if task completes successfully
    */
   function run($taskCtx) {

@@ -66,7 +66,7 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -113,6 +113,7 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
   }
 
   /**
+   *
    * @access public
    *
    * @return void
@@ -129,5 +130,6 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
 
     CRM_Core_Session::setStatus(ts('Your update(s) have been saved.'), ts('Saved'), 'success');
   }
+  //end of function
 }
 

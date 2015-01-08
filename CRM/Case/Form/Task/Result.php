@@ -49,7 +49,7 @@ class CRM_Case_Form_Task_Result extends CRM_Case_Form_Task {
   function preProcess() {}
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public

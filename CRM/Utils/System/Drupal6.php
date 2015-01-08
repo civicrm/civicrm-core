@@ -73,7 +73,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * create a user in Drupal.
+   * Function to create a user in Drupal.
    *
    * @param array  $params associated array
    * @param string $mail email id for cms user
@@ -142,9 +142,13 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Check if username and email exists in the drupal db
    *
-   * @param array $params array of name and mail values
-   * @param array $errors array of errors
-   * @param string $emailName  field label for the 'email'
+   * @params $params    array   array of name and mail values
+   * @params $errors    array   array of errors
+   * @params $emailName string  field label for the 'email'
+   *
+   * @param $params
+   * @param $errors
+   * @param string $emailName
    *
    * @return void
    */
@@ -211,10 +215,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * get the drupal destination string. When this is passed in the
+   * Function to get the drupal destination string. When this is passed in the
    * URL the user will be directed to it after filling in the drupal form
    *
-   * @param CRM_Core_Form $form Form object representing the 'current' form - to which the user will be returned
+   * @param object $form Form object representing the 'current' form - to which the user will be returned
    * @return string $destination destination value for URL
    *
    */

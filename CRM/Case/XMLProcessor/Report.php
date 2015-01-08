@@ -50,7 +50,7 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
    * @param $clientID
    * @param $caseID
    * @param $activitySetName
-   * @param array $params
+   * @param $params
    *
    * @return mixed
    */
@@ -466,7 +466,7 @@ WHERE      a.id = %1
       }
       $assigneeContacts = implode(', ', $assignee_contact_names);
       $activity['fields'][] = array(
-        'label' => ts('Assigned to'),
+        'label' => ts('Assigned To'),
         'value' => $assigneeContacts,
         'type' => 'String',
       );
@@ -722,7 +722,8 @@ LIMIT  1
    *
    * @return mixed
    */
-  private function redact($string, $printReport = FALSE, $replaceString = array()) {
+  private function redact($string, $printReport = FALSE, $replaceString = array(
+    )) {
     if ($printReport) {
       return CRM_Utils_String::redaction($string, $replaceString);
     }
@@ -737,8 +738,8 @@ LIMIT  1
    * @param $clientID
    * @param $caseID
    * @param $activitySetName
-   * @param array $params
-   * @param CRM_Core_Form $form
+   * @param $params
+   * @param $form
    *
    * @return mixed
    */

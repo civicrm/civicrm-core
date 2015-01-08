@@ -133,10 +133,10 @@
             }
 
             // hide and display the appropriate blocks as directed by the php code
-            on_load_init_blocks( showRows, hideBlocks, '');
-
+            on_load_init_blocks( showRows, hideBlocks, '' );
+            
             cj('input[id^="order_by_section_"]').click(disPageBreak).each(disPageBreak);
-
+            
             function disPageBreak() {
               if (!cj(this).prop('checked')) {
                 cj(this).parent('td').next('td').children('input[id^="order_by_pagebreak_"]').prop({checked: false, disabled: true});

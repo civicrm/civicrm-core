@@ -455,7 +455,7 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
    * @static
    */
   /**
-   * @param array $params
+   * @param $params
    *
    * @return array
    */

@@ -11,22 +11,22 @@ h2.entity {cursor:pointer}
 {/literal}
 </style>
 <script>
-if (!jQuery) {ldelim}
+if (!jQuery) {ldelim}  
 var head= document.getElementsByTagName('head')[0];
 var script= document.createElement('script');
 script.type= 'text/javascript';
 script.src= CRM.config.resourceBase + 'js/packages/jquery/jquery.js';
 head.appendChild(script);
-{rdelim}
+{rdelim} 
 restURL = '{crmURL p="civicrm/api/json"}';
 if (restURL.indexOf('?') == -1 )
 restURL = restURL + '?';
-else
+else 
 restURL = restURL + '&';
 {literal}
 if (typeof $ == "undefined") {
   $ = cj;
-}
+} 
 
 function APIDoc(entity){
   $detail=$('#detail_'+entity);
@@ -64,7 +64,7 @@ function APIDoc(entity){
 
 
 CRM.$(function($) {
-    $('h2.entity').click ( function(){APIDoc($(this).attr('id'))} );
+    $('h2.entity').click ( function(){APIDoc($(this).attr('id'))} ); 
     entity=window.location.hash;
     if (entity.substring(0, 1) === '#') {
       $entity=$(entity);

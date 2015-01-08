@@ -88,7 +88,7 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Set default values for the form. Relationship that in edit/view action
+   * This function sets the default values for the form. Relationship that in edit/view action
    * the default values are retrieved from the database
    *
    * @access public
@@ -110,7 +110,7 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *

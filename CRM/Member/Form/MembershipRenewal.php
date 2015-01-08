@@ -49,7 +49,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   /*
   * Contact ID of the member
   */
-  public $_contactID = null;
+  protected $_contactID = null;
   /*
   * Display name of the person paying for the membership (used for receipts)
   */
@@ -70,7 +70,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * context would be set to standalone if the contact is use is being selected from
    * the form rather than in the URL
    */
-  public $_context;
+  protected $_context;
 
   /**
    * An array to hold a list of datefields on the form
@@ -91,10 +91,25 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       return CRM_Custom_Form_CustomData::preProcess($this);
     }
 
-    parent::preProcess();
     // check for edit permission
     if (!CRM_Core_Permission::check('edit memberships')) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+    }
+    // action
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String',
+      $this, FALSE, 'add'
+    );
+    $this->_context = CRM_Utils_Request::retrieve('context', 'String',
+      $this, FALSE, 'membership'
+    );
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive',
+      $this
+    );
+    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive',
+      $this
+    );
+    if ($this->_id) {
+      $this->_memType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id, 'membership_type_id');
     }
 
     $this->assign('endDate', CRM_Utils_Date::customFormat(CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
@@ -110,15 +125,68 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       )
     );
 
+    //using credit card :: CRM-2759
+    $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
     if ($this->_mode) {
       $membershipFee = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee');
       if (!$membershipFee) {
-        $statusMsg = ts('Membership Renewal using a credit card requires a Membership fee. Since there is no fee associated with the selected membership type, you can use the normal renewal mode.');
+        $statusMsg = ts('Membership Renewal using a credit card requires a Membership fee. Since there is no fee associated with the selected memebership type, you can use the normal renewal mode.');
         CRM_Core_Session::setStatus($statusMsg, '', 'info');
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/membership',
             "reset=1&action=renew&cid={$this->_contactID}&id={$this->_id}&context=membership"
           ));
       }
+      $this->assign('membershipMode', $this->_mode);
+
+      $this->_paymentProcessor = array('billing_mode' => 1);
+      $validProcessors = array();
+      $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'billing_mode IN ( 1, 3 )');
+
+      foreach ($processors as $ppID => $label) {
+        $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ppID, $this->_mode);
+        if ($paymentProcessor['payment_processor_type'] == 'PayPal' && !$paymentProcessor['user_name']) {
+          continue;
+        }
+        elseif ($paymentProcessor['payment_processor_type'] == 'Dummy' && $this->_mode == 'live') {
+          continue;
+        }
+        else {
+          $paymentObject = CRM_Core_Payment::singleton($this->_mode, $paymentProcessor, $this);
+          $error = $paymentObject->checkConfig();
+          if (empty($error)) {
+            $validProcessors[$ppID] = $label;
+          }
+          $paymentObject = NULL;
+        }
+      }
+      if (empty($validProcessors)) {
+        CRM_Core_Error::fatal(ts('Could not find valid payment processor for this page'));
+      }
+      else {
+        $this->_processors = $validProcessors;
+      }
+      // also check for billing information
+      // get the billing location type
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
+      // CRM-8108 remove ts around Billing location type
+      //$this->_bltID = array_search( ts('Billing'),  $locationTypes );
+      $this->_bltID = array_search('Billing', $locationTypes);
+      if (!$this->_bltID) {
+        CRM_Core_Error::fatal(ts('Please set a location type of %1', array(1 => 'Billing')));
+      }
+      $this->set('bltID', $this->_bltID);
+      $this->assign('bltID', $this->_bltID);
+
+      $this->_fields = array();
+
+      CRM_Core_Payment_Form::setCreditCardFields($this);
+
+      // this required to show billing block
+      $this->assign_by_ref('paymentProcessor', $paymentProcessor);
+      $this->assign('hidePayPalExpress', TRUE);
+    }
+    else {
+      $this->assign('membershipMode', FALSE);
     }
 
     // when custom data is included in this page
@@ -128,13 +196,15 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
 
+    $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
+
     CRM_Utils_System::setTitle(ts('Renew Membership'));
 
     parent::preProcess();
   }
 
   /**
-   * Set default values for the form.
+   * This function sets the default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -145,7 +215,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     if ($this->_cdType) {
       return CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
-
+    $defaults       = array();
     $defaults       = parent::setDefaultValues();
     $this->_memType = $defaults['membership_type_id'];
 
@@ -244,7 +314,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -256,6 +326,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     parent::buildQuickForm();
 
+    $defaults       = array();
     $defaults       = parent::setDefaultValues();
     $this->_memType = $defaults['membership_type_id'];
     $this->assign('customDataType', 'Membership');
@@ -423,6 +494,11 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
     $this->add('textarea', 'receipt_text_renewal', ts('Renewal Message'));
 
+    if ($this->_mode) {
+      $this->add('select', 'payment_processor_id', ts('Payment Processor'), $this->_processors, TRUE);
+      CRM_Core_Payment_Form::buildCreditCard($this, TRUE);
+    }
+
     // Retrieve the name and email of the contact - this will be the TO for receipt email
     list($this->_contributorDisplayName,
       $this->_contributorEmail
@@ -452,7 +528,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
   /**
-   * validation
+   * Function for validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
@@ -486,7 +562,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   }
 
   /**
-   * process the renewal form
+   * Function to process the renewal form
    *
    * @access public
    *
@@ -579,7 +655,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
       $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
-      $this->_params['description'] = ts('Office Credit Card Membership Renewal Contribution');
       $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
       $this->_params['amount'] = $formValues['total_amount'];
       $this->_params['currencyID'] = $config->defaultCurrency;

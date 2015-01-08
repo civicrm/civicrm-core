@@ -274,7 +274,8 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    *
    * @return array
    */
-  static function isQuerySetInclusive($tableQueries, $threshold, $exclWeightSum = array()) {
+  static function isQuerySetInclusive($tableQueries, $threshold, $exclWeightSum = array(
+    )) {
     $input = array();
     foreach ($tableQueries as $key => $query) {
       $input[] = substr($key, strrpos($key, '.') + 1);
@@ -377,7 +378,9 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
   /**
    * To find fields related to a rule group.
    *
-   * @param array $params
+   * @param $params
+   *
+   * @internal param \contains $array the rule group property to identify rule group
    *
    * @return array (rule field => weight) array and threshold associated to rule group@access public
    */

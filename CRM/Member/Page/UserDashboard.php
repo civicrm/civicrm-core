@@ -39,7 +39,7 @@
 class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard {
 
   /**
-   * list memberships for the UF user
+   * Function to list memberships for the UF user
    *
    * return null
    * @access public

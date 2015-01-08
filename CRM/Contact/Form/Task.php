@@ -99,7 +99,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    * @param bool $useTable
    */
   static function preProcessCommon(&$form, $useTable = FALSE) {
@@ -278,7 +278,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * get the contact id for custom search
+   * Function to get the contact id for custom search
    * we are not using prev/next table incase of custom search
    */
   public function getContactIds() {
@@ -327,7 +327,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
 
 
   /**
-   * Set default values for the form. Relationship that in edit/view action
+   * This function sets the default values for the form. Relationship that in edit/view action
    * the default values are retrieved from the database
    *
    * @access public
@@ -349,7 +349,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public
@@ -368,14 +368,18 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
   public function postProcess() {
   }
 
+  //end of function
+
   /**
    * simple shell that derived classes can call to add buttons to
    * the form with a customized title for the main Submit
    *
    * @param string $title title of the main button
-   * @param string $nextType button type for the form after processing
+   * @param string $nextType
    * @param string $backType
    * @param bool $submitOnce
+   *
+   * @internal param string $type button type for the form after processing
    *
    * @return void
    * @access public

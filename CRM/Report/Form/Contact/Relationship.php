@@ -71,7 +71,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           ),
           'contact_sub_type_a' =>
           array(
-            'title' => ts('Contact Subtype (Contact A)'),
+            'title' => ts('Contact SubType (Contact A)'),
             'name' => 'contact_sub_type',
           ),
         ),
@@ -84,7 +84,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'type' => CRM_Report_Form::OP_STRING,
           ),
           'contact_type_a' =>
-          array('title' => ts('Contact Type A'),
+          array('title' => ts('Contact Type  A'),
             'name' => 'contact_type',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $contact_type,
@@ -116,7 +116,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           ),
           'contact_sub_type_b' =>
           array(
-            'title' => ts('Contact Subtype (Contact B)'),
+            'title' => ts('Contact SubType (Contact B)'),
             'name' => 'contact_sub_type',
           ),
         ),
@@ -129,7 +129,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'type' => CRM_Report_Form::OP_STRING,
           ),
           'contact_type_b' =>
-          array('title' => ts('Contact Type B'),
+          array('title' => ts('Contact Type  B'),
             'name' => 'contact_type',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $contact_type,

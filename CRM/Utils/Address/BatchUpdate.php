@@ -44,7 +44,7 @@ class CRM_Utils_Address_BatchUpdate {
   var $returnError = 0;
 
   /**
-   * @param array $params
+   * @param $params
    */
   public function __construct($params) {
 

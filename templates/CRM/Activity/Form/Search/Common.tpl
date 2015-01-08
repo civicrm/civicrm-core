@@ -65,16 +65,16 @@
     <table>
       <tr><td>
         {if $form.parent_id}
-          <label>{ts}Has a Followup Activity?{/ts}</label>
-          <br/>
-          {$form.parent_id.html}
+      	  <label>{ts}Has a Followup Activity?{/ts}</label>
+      	  <br/>
+      	  {$form.parent_id.html}
         {/if}
       </td></tr>
       <tr><td>
-      {if $form.followup_parent_id}
-          <label>{ts}Is a Followup Activity?{/ts}</label>
-          <br/>
-          {$form.followup_parent_id.html}
+    	{if $form.followup_parent_id}
+      	  <label>{ts}Is a Followup Activity?{/ts}</label>
+      	  <br/>
+      	  {$form.followup_parent_id.html}
         {/if}
       </td></tr>
     </table>
@@ -118,17 +118,17 @@
   </td>
 </tr>
 {if $buildSurveyResult }
-  <tr>
-    <td id="activityResult">
-      <label>{$form.activity_result.label}</label><br />
-      {$form.activity_result.html}
-    </td>
-    <td colspan="2">{include file="CRM/common/Tagset.tpl" tagsetType='activity'}</td>
-  </tr>
+	<tr>
+	  <td id="activityResult">
+	    <label>{$form.activity_result.label}</label><br />
+	    {$form.activity_result.html}
+	  </td>
+		<td colspan="2">{include file="CRM/common/Tagset.tpl" tagsetType='activity'}</td>
+	</tr>
 {else}
-  <tr>
-    <td colspan="3">{include file="CRM/common/Tagset.tpl" tagsetType='activity'}</td>
-  </tr>
+	<tr>
+		<td colspan="3">{include file="CRM/common/Tagset.tpl" tagsetType='activity'}</td>
+	</tr>
 {/if}
 
 {* campaign in activity search *}

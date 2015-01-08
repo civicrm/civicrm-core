@@ -40,7 +40,7 @@
 class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
 
   /**
-   * for pre-processing
+   * Function to for pre-processing
    *
    * @return void
    * @access public
@@ -85,7 +85,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
   }
 
   /**
-   * Set default values for the form.
+   * This function sets the default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -98,41 +98,37 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
    */
   public function buildQuickForm() {
 
-    $info = CRM_Extension_System::singleton()->getMapper()->keyToInfo($this->_key);
-    $extInfo = CRM_Admin_Page_Extensions::createExtendedInfo($info);
-    $extName = $extInfo['name'];
-
     switch ($this->_action) {
       case CRM_Core_Action::ADD:
         $buttonName = ts('Install');
-        $title = ts('Install ' . $extName  . '?');
+        $title = ts('Install Extension');
         break;
 
       case CRM_Core_Action::UPDATE:
         $buttonName = ts('Download and Install');
-        $title = ts('Download and Install ' . $extName  . '?');
+        $title = ts('Download and Install Extension');
         break;
 
       case CRM_Core_Action::DELETE:
         $buttonName = ts('Uninstall');
-        $title = ts('Uninstall ' . $extName . '?');
+        $title = ts('Uninstall Extension');
         break;
 
       case CRM_Core_Action::ENABLE:
         $buttonName = ts('Enable');
-        $title = ts('Enable ' . $extName . '?');
+        $title = ts('Enable Extension');
         break;
 
       case CRM_Core_Action::DISABLE:
         $buttonName = ts('Disable');
-        $title = ts('Disable ' . $extName . '?');
+        $title = ts('Disable Extension');
         break;
     }
 
@@ -169,7 +165,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

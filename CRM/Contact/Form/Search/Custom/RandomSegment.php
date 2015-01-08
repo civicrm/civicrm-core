@@ -311,6 +311,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
       $totalSize  = $dao->N;
       $multiplier = substr($this->_segmentSize, 0, strlen($this->_segmentSize) - 1);
       $multiplier /= 100;
+      //CRM_Core_Error::debug( "Total size: $totalSize<br/>Multiplier: $multiplier<br/>");
       $this->_segmentSize = round($totalSize * $multiplier);
     }
 

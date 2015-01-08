@@ -46,7 +46,7 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
   protected $_id = NULL;
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -106,7 +106,7 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

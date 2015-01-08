@@ -225,7 +225,7 @@ class CRM_Utils_PDF_Utils {
   }
 
   /*
-   * convert value from one metric to another
+   * function to convert value from one metric to another
    */
   /**
    * @param $value
@@ -373,6 +373,13 @@ class CRM_Utils_PDF_Utils {
             'embedding encoding=winansi'
           );
 
+          /**
+           if ( $res == 0 ) {
+           CRM_Core_Error::debug( "$key, $value: $res", $pdf->get_errmsg( ) );
+           } else {
+           CRM_Core_Error::debug( "SUCCESS: $key, $value", null );
+           }
+           **/
         }
 
         $pdf->end_page_ext('');

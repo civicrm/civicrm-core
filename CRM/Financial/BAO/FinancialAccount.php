@@ -49,12 +49,16 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
   }
 
   /**
-   * Fetch object based on array of properties
+   * Takes a bunch of params that are needed to match certain criteria and
+   * retrieves the relevant objects. Typically the valid params are only
+   * contact_id. We'll tweak this function to be more full featured over a period
+   * of time. This is the inverse function of create. It also stores all the retrieved
+   * values in the default array
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Contribute_BAO_FinancialAccount object
+   * @return object CRM_Contribute_BAO_FinancialAccount object
    * @access public
    * @static
    */
@@ -82,7 +86,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
   }
 
   /**
-   * add the financial types
+   * function to add the financial types
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -116,7 +120,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
   }
 
   /**
-   * delete financial Types
+   * Function to delete financial Types
    *
    * @param int $financialAccountId
    * @static

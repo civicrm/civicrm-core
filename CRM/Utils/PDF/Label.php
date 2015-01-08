@@ -151,7 +151,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
   }
 
   /*
-   * initialize label format settings
+   * Function to initialize label format settings
    */
   /**
    * @param $format
@@ -184,7 +184,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
   }
 
   /*
-   * Generate the pdf of one label (can be modified using SetGenerator)
+   * function to Generate the pdf of one label (can be modified using SetGenerator)
    */
   /**
    * @param $text
@@ -231,7 +231,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
   }
 
   /*
-   * Print a label
+   * function to Print a label
    */
   /**
    * @param $texte

@@ -40,7 +40,7 @@
 class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -128,7 +128,7 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

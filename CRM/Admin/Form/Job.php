@@ -62,7 +62,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @param bool $check
    *
@@ -168,7 +168,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *
@@ -211,5 +211,6 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
 
 
   }
+  //end of function
 }
 

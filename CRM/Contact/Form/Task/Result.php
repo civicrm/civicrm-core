@@ -97,7 +97,7 @@ class CRM_Contact_Form_Task_Result extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public

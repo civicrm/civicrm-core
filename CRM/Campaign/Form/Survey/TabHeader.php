@@ -39,7 +39,7 @@
 class CRM_Campaign_Form_Survey_TabHeader {
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return array
    */
@@ -59,7 +59,7 @@ class CRM_Campaign_Form_Survey_TabHeader {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return array
    */
@@ -120,7 +120,7 @@ class CRM_Campaign_Form_Survey_TabHeader {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    */
   static function reset(&$form) {
     $tabs = self::process($form);

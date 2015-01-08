@@ -88,7 +88,7 @@ AND    {$this->_componentClause}";
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *

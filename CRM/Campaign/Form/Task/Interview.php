@@ -283,7 +283,7 @@ WHERE {$clause}
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *
@@ -383,7 +383,7 @@ WHERE {$clause}
   }
 
   /**
-   * Set default values for the form.
+   * This function sets the default values for the form.
    *
    * @access public
    *
@@ -470,7 +470,7 @@ WHERE {$clause}
   }
 
   /**
-   * @param array $params
+   * @param $params
    *
    * @return mixed
    */

@@ -51,7 +51,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   protected $_profilePostMultipleAdd = array();
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @return void
    * @access public
@@ -90,7 +90,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Set default values for the form.
+   * This function sets the default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -208,6 +208,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @param array $defaults the array of default values
    *
+   * @internal param bool $force should we set show hide based on input defaults
+   *
    * @return void
    */
   function setShowHide($defaults) {
@@ -228,7 +230,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -247,7 +249,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     $this->addElement('checkbox',
       'is_online_registration',
-      ts('Allow Online Registration'),
+      ts('Allow Online Registration?'),
       NULL,
       array(
         'onclick' => "return showHideByValue('is_online_registration',
@@ -316,10 +318,11 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * build Registration Block
+   * Function to build Registration Block
    *
-   * @param CRM_Core_Form $form
+   * @param $form
    *
+   * @internal param int $pageId
    * @static
    */
   function buildRegistrationBlock(&$form) {
@@ -391,10 +394,11 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * build Confirmation Block
+   * Function to build Confirmation Block
    *
-   * @param CRM_Core_Form $form
+   * @param $form
    *
+   * @internal param int $pageId
    * @static
    */
   function buildConfirmationBlock(&$form) {
@@ -421,8 +425,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * Function to build Email Block
    *
-   * @param CRM_Core_Form $form
+   * @param $form
    *
+   * @internal param int $pageId
    * @static
    */
   function buildMailBlock(&$form) {
@@ -440,7 +445,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    */
   function buildThankYouBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
@@ -474,9 +479,11 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * global validation rules for the form
    *
-   * @param array $values
+   * @param $values
    * @param $files
-   * @param CRM_Core_Form $form
+   * @param $form
+   *
+   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -813,7 +820,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *
@@ -1008,6 +1015,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     parent::endPostProcess();
   }
+  //end of function
 
   /**
    * Return a descriptive name for the page, used in wizard header

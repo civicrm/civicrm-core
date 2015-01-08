@@ -73,7 +73,9 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
   /**
    * This function is called when action is update
    *
-   * @param int $groupId
+   * @param null $groupId
+   *
+   * @internal param int $groupID group id
    *
    * return null
    * @access public
@@ -146,7 +148,7 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
   }
 
   /**
-   * remove/ rejoin the group
+   * function to remove/ rejoin the group
    *
    * @param int $groupContactId id of crm_group_contact
    * @param string $status this is the status that should be updated.

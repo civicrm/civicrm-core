@@ -64,7 +64,9 @@ class CRM_Member_Form_Task_PickProfile extends CRM_Member_Form_Task {
    * @access public
    */
   function preProcess() {
-    // initialize the task and row fields
+    /*
+     * initialize the task and row fields
+     */
     parent::preProcess();
     $session = CRM_Core_Session::singleton();
     $this->_userContext = $session->readUserContext();
@@ -85,7 +87,7 @@ class CRM_Member_Form_Task_PickProfile extends CRM_Member_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *
@@ -146,5 +148,6 @@ class CRM_Member_Form_Task_PickProfile extends CRM_Member_Form_Task {
     // also reset the batch page so it gets new values from the db
     $this->controller->resetPage('Batch');
   }
+  //end of function
 }
 

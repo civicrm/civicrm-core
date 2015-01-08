@@ -58,7 +58,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *

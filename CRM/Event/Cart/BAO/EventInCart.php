@@ -26,7 +26,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   }
 
   /**
-   * @param array $params
+   * @param $params
    *
    * @return $this|CRM_Event_Cart_BAO_EventInCart
    * @throws Exception
@@ -79,7 +79,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   }
 
   /**
-   * @param array $params
+   * @param $params
    *
    * @return array
    */
@@ -105,7 +105,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   }
 
   /**
-   * @param array $params
+   * @param $params
    *
    * @return bool|CRM_Event_Cart_BAO_EventInCart
    */

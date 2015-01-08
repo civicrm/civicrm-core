@@ -57,7 +57,7 @@ class CRM_Event_Form_Task_SaveSearch_Update extends CRM_Event_Form_Task_SaveSear
   }
 
   /**
-   * Set default values for the form.
+   * This function sets the default values for the form.
    * the default values are retrieved from the database
    *
    * @access public

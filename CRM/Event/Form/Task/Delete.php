@@ -58,7 +58,7 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
 
     //check for delete
     if (!CRM_Core_Permission::checkActionPermission('CiviEvent', CRM_Core_Action::DELETE)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
     }
     parent::preProcess();
     foreach ($this->_participantIds as $participantId) {
@@ -69,7 +69,7 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *

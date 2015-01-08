@@ -139,7 +139,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
   }
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @return void
    * @access public
@@ -390,7 +390,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public

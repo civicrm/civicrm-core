@@ -37,25 +37,5 @@
  *
  */
 class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase{
-  /**
-   * Given a permission string, check for access requirements
-   *
-   * @param string $str The permission to check
-   *
-   * @return bool
-   */
-  function check($str, $contactID = NULL) {
-    $str = $this->translatePermission($str, 'Drupal', array(
-      'view user account' => 'access user profiles',
-    ));
 
-    if ($str == CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
-      return FALSE;
-    }
-    if ($str == CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
-      return TRUE;
-    }
-    return \Drupal::currentUser()->hasPermission($str);
-  }
 }
-

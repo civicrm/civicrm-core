@@ -435,7 +435,7 @@ class civicrm_cli_csv_file extends civicrm_cli {
 
 class civicrm_cli_csv_importer extends civicrm_cli_csv_file {
   /**
-   * @param array $params
+   * @param $params
    */
   function processline($params) {
     $result = civicrm_api($this->_entity, 'Create', $params);
@@ -456,7 +456,7 @@ class civicrm_cli_csv_importer extends civicrm_cli_csv_file {
 
 class civicrm_cli_csv_deleter extends civicrm_cli_csv_file {
   /**
-   * @param array $params
+   * @param $params
    */
   function processline($params) {
     $result = civicrm_api($this->_entity, 'Delete', $params);

@@ -59,12 +59,14 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
   /**
    * Class constructor
    *
+   * @internal param $
    *
    * @return \CRM_Mailing_Selector_Browse
   @access public
    */
   function __construct() {
   }
+  //end of constructor
 
   /**
    * This method returns the links that are given for each search row.
@@ -76,13 +78,15 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
   static function &links() {
     return self::$_links;
   }
+  //end of function
 
   /**
    * getter for array of the parameters required for creating pager.
    *
    * @param $action
-   * @param array $params
+   * @param $params
    *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -92,6 +96,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }
+  //end of function
 
   /**
    * returns the column headers as an array of tuples:
@@ -433,7 +438,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
   }
 
   /**
-   * @param array $params
+   * @param $params
    * @param bool $sortBy
    *
    * @return int|string
@@ -600,4 +605,5 @@ ORDER BY LEFT(name, 1)
     $this->_parent->assign('aToZ', $aToZBar);
   }
 }
+//end of class
 

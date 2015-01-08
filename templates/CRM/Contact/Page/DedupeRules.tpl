@@ -42,7 +42,7 @@
       <div id="browseValues_{$contactType}">
         <div>
         {strip}
-          <table id="options_{$contactType}" class="display mergecontact">
+          <table id="options_{$contactType}" class="display">
             <thead>
             <tr>
               <th>{ts 1=$contactType}%1 Rules{/ts}</th>

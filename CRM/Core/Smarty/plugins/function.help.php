@@ -71,11 +71,6 @@ function smarty_function_help($params, &$smarty) {
     $name = trim(strip_tags($params['title']));
   }
 
-  $class = "helpicon";
-  if (!empty($params['class'])) {
-    $class .= " {$params['class']}";
-  }
-
   // Escape for html
   $title = htmlspecialchars(ts('%1 Help', array(1 => $name)));
   // Escape for html and js
@@ -86,5 +81,5 @@ function smarty_function_help($params, &$smarty) {
   foreach ($params as &$param) {
     $param = is_bool($param) || is_numeric($param) ? (int) $param : (string) $param;
   }
-  return '<a class="' . $class . '" title="' . $title . '" href="#" onclick=\'CRM.help(' . $name . ', ' . json_encode($params) . '); return false;\'>&nbsp;</a>';
+  return '<a class="helpicon" title="' . $title . '" href="#" onclick=\'CRM.help(' . $name . ', ' . json_encode($params) . '); return false;\'>&nbsp;</a>';
 }

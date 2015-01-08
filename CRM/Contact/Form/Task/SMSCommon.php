@@ -48,7 +48,7 @@ class CRM_Contact_Form_Task_SMSCommon {
 
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    */
   static function preProcessProvider(&$form) {
     $form->_single = FALSE;
@@ -83,11 +83,11 @@ class CRM_Contact_Form_Task_SMSCommon {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return void
    */
@@ -341,7 +341,7 @@ class CRM_Contact_Form_Task_SMSCommon {
    *
    * @access public
    *
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return void
    */

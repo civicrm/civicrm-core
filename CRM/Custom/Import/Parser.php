@@ -309,7 +309,7 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * format the field values for input to the api
+   * function to format the field values for input to the api
    *
    * @return array (reference ) associative array of name/value pairs
    * @access public

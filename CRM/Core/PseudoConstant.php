@@ -57,7 +57,7 @@ class CRM_Core_PseudoConstant {
   private static $cache;
 
   /**
-   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    *
    * activity type
    * @var array
@@ -101,7 +101,7 @@ class CRM_Core_PseudoConstant {
   private static $countryIsoCode;
 
   /**
-   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    *
    * group
    * @var array
@@ -159,7 +159,7 @@ class CRM_Core_PseudoConstant {
   private static $worldRegions;
 
   /**
-   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    *
    * activity status
    * @var array
@@ -201,13 +201,6 @@ class CRM_Core_PseudoConstant {
    * @static
    */
   private static $accountOptionValues;
-
-  /**
-   * Tax Rates
-   * @var array
-   * @static
-   */
-  private static $taxRates;
 
   /**
    * Low-level option getter, rarely accessed directly.
@@ -531,7 +524,7 @@ class CRM_Core_PseudoConstant {
 
   /**
    * DEPRECATED generic populate method
-   * All pseudoconstant functions that use this method are also @deprecated
+   * All pseudoconstant functions that use this method are also deprecated.
    *
    * The static array $var is populated from the db
    * using the <b>$name DAO</b>.
@@ -618,11 +611,13 @@ class CRM_Core_PseudoConstant {
   }
 
   /**
-   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    *
    * Get all Activty types.
    *
    * The static array activityType is returned
+   *
+   * @internal param bool $all - get All Activity  types - default is to get only active ones.
    *
    * @access public
    * @static
@@ -924,7 +919,7 @@ WHERE  id = %1";
   }
 
   /**
-   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    *
    * Get all groups from database
    *
@@ -935,7 +930,7 @@ WHERE  id = %1";
    * Note: any database errors will be trapped by the DAO.
    *
    * @param string $groupType type of group(Access/Mailing)
-   * @param bool $excludeHidden exclude hidden groups.
+   * @param bool|\boolen $excludeHidden exclude hidden groups.
    *
    * @access public
    * @static
@@ -1423,7 +1418,7 @@ WHERE  id = %1";
   }
 
   /**
-   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    * Get all active payment processors
    *
    * The static array paymentProcessor is returned
@@ -1459,7 +1454,7 @@ WHERE  id = %1";
   }
 
   /**
-   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    *
    * The static array paymentProcessorType is returned
    *
@@ -1512,7 +1507,7 @@ WHERE  id = %1";
   }
 
   /**
-   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    *
    * Get all Activity Statuses.
    *
@@ -1539,7 +1534,7 @@ WHERE  id = %1";
   }
 
   /**
-   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
+   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
    *
    * Get all Visibility levels.
    *
@@ -1852,39 +1847,6 @@ WHERE  id = %1
    */
   public static function getModuleExtensions($fresh = FALSE) {
     return CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles($fresh);
-  }
-
-
-  /**
-   * Get all tax rates
-   *
-   * The static array tax rates is returned
-   *
-   * @access public
-   * @static
-   *
-   * @return array - array list of tax rates with the financial type
-   */
-  public static function getTaxRates() {
-    if (!self::$taxRates) {
-      self::$taxRates = array();
-      $sql = "
-        SELECT fa.tax_rate, efa.entity_id
-        FROM civicrm_entity_financial_account efa
-        INNER JOIN civicrm_financial_account fa ON fa.id = efa.financial_account_id
-        INNER JOIN civicrm_option_value cov ON cov.value = efa.account_relationship
-        INNER JOIN civicrm_option_group cog ON cog.id = cov.option_group_id
-        WHERE efa.entity_table = 'civicrm_financial_type'
-        AND cov.name = 'Sales Tax Account is'
-        AND cog.name = 'account_relationship'
-        AND fa.is_active = 1";
-      $dao = CRM_Core_DAO::executeQuery($sql);
-      while ($dao->fetch()) {
-        self::$taxRates[$dao->entity_id] = $dao->tax_rate;
-      }
-    }
-
-    return self::$taxRates;
   }
 }
 

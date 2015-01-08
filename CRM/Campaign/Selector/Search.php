@@ -177,6 +177,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
       TRUE
     );
   }
+  //end of constructor
 
   /**
    * This method returns the links that are given for each search row.
@@ -198,8 +199,9 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
    * getter for array of the parameters required for creating pager.
    *
    * @param $action
-   * @param array $params
+   * @param $params
    *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -308,6 +310,7 @@ FROM {$from}
   }
 
   /**
+   *
    * @return array   $qill which contains an array of strings
    * @access public
    **/
@@ -378,4 +381,5 @@ FROM {$from}
     return ts('CiviCRM Respondent Search');
   }
 }
+//end of class
 

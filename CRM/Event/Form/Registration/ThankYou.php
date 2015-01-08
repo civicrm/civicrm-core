@@ -41,7 +41,7 @@
 class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @return void
    * @access public
@@ -84,7 +84,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -98,48 +98,18 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     }
     $this->assignToTemplate();
 
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
-    $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-    $getTaxDetails = FALSE;
-    $taxAmount = 0;
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $lineItemForTemplate = array();
       foreach ($this->_lineItem as $key => $value) {
         if (!empty($value)) {
           $lineItemForTemplate[$key] = $value;
-          if ($invoicing) {
-            foreach ($value as $v) {
-              if (isset($v['tax_amount']) || isset($v['tax_rate'])) {
-                $taxAmount += $v['tax_amount'];
-                $getTaxDetails = TRUE;
-              }
-            }
-          }
         }
       }
       if (!empty($lineItemForTemplate)) {
         $this->assign('lineItem', $lineItemForTemplate);
       }
     }
-    else {
-      if ($invoicing) {
-        foreach ($this->_lineItem as $lineItemKey => $lineItemValue) {
-          foreach ($lineItemValue as $v) {
-            if (isset($v['tax_amount']) || isset($v['tax_rate'])) {
-              $taxAmount += $v['tax_amount'];
-              $getTaxDetails = TRUE;
-            }
-          }
-        }
-      }
-    }
 
-    if ($invoicing) {
-      $this->assign('getTaxDetails', $getTaxDetails);
-      $this->assign('totalTaxAmount', $taxAmount);
-      $this->assign('taxTerm', $taxTerm);
-    }
     $this->assign('totalAmount', $this->_totalAmount);
 
     $hookDiscount = $this->get('hookDiscount');
@@ -239,13 +209,14 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *
    * @return void
    */
   public function postProcess() {}
+  //end of function
 
   /**
    * Return a descriptive name for the page, used in wizard header

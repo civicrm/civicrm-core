@@ -129,6 +129,8 @@ class CRM_Extension_Mapper {
    *
    * @param $clazz
    *
+   * @internal param string $key extension key
+   *
    * @return string full path the extension .php file
    */
   public function classToPath($clazz) {
@@ -174,7 +176,7 @@ class CRM_Extension_Mapper {
    *
    * @throws CRM_Extension_Exception
    * @throws Exception
-   * @return CRM_Extension_Info
+   * @return object CRM_Extension_Info
    */
   public function keyToInfo($key, $fresh = FALSE) {
     if ($fresh || !array_key_exists($key, $this->infos)) {

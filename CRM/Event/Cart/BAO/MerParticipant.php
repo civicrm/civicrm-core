@@ -51,7 +51,7 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
    * @return CRM_Event_Cart_BAO_MerParticipant
    * @throws Exception
    */
-  static function create(&$params) {
+  public static function &create($params) {
     $participantParams = array(
       'id' => CRM_Utils_Array::value('id', $params),
       'role_id' => self::get_attendee_role_id(),
@@ -119,7 +119,7 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
   }
 
   /**
-   * @param array $params
+   * @param $params
    *
    * @return array
    */

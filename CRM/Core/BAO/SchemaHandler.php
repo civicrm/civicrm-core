@@ -62,9 +62,12 @@
 class CRM_Core_BAO_SchemaHandler {
 
   /**
-   * Create a CiviCRM-table
+   * Function for creating a civiCRM-table
    *
-   * @param array $params
+   * @param $params
+   *
+   * @internal param String $tableName name of the table to be created.
+   * @internal param Array $tableAttributes array containing atrributes for the table that needs to be created
    *
    * @return true if successfully created, false otherwise
    *
@@ -91,7 +94,7 @@ class CRM_Core_BAO_SchemaHandler {
   }
 
   /**
-   * @param array $params
+   * @param $params
    *
    * @return string
    */
@@ -126,7 +129,7 @@ class CRM_Core_BAO_SchemaHandler {
   }
 
   /**
-   * @param array $params
+   * @param $params
    * @param $separator
    * @param $prefix
    *
@@ -161,7 +164,7 @@ class CRM_Core_BAO_SchemaHandler {
   }
 
   /**
-   * @param array $params
+   * @param $params
    * @param $separator
    * @param $prefix
    *
@@ -179,7 +182,7 @@ class CRM_Core_BAO_SchemaHandler {
   }
 
   /**
-   * @param array $params
+   * @param $params
    * @param $separator
    * @param $prefix
    * @param bool $indexExist
@@ -212,7 +215,7 @@ class CRM_Core_BAO_SchemaHandler {
   }
 
   /**
-   * @param array $params
+   * @param $params
    * @param $separator
    * @param $prefix
    *
@@ -273,7 +276,7 @@ ALTER TABLE {$tableName}
   }
 
   /**
-   * @param array $params
+   * @param $params
    * @param $separator
    * @param $prefix
    * @param $tableName
@@ -298,7 +301,7 @@ ALTER TABLE {$tableName}
   }
 
   /**
-   * @param array $params
+   * @param $params
    * @param bool $indexExist
    * @param bool $triggerRebuild
    *
@@ -362,7 +365,7 @@ ALTER TABLE {$tableName}
   }
 
   /**
-   * delete a civiCRM-table
+   * Function to delete a civiCRM-table
    *
    * @param  String  $tableName   name of the table to be created.
    *
@@ -408,9 +411,11 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
    * @param string $createIndexPrefix
    * @param array $substrLenghts
    */
-  static function createIndexes(&$tables, $createIndexPrefix = 'index', $substrLenghts = array()) {
+  static function createIndexes(&$tables, $createIndexPrefix = 'index', $substrLenghts = array(
+    )) {
     $queries = array();
-    require_once 'CRM/Core/DAO/Domain.php';
+
+        require_once 'CRM/Core/DAO/Domain.php';
     $domain = new CRM_Core_DAO_Domain;
     $domain->find(TRUE);
     $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);

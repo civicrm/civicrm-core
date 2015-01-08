@@ -125,7 +125,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
+   * This function sets the default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -143,7 +143,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
   }
 
   /**
-   * actually build the components of the form
+   * Function to actually build the components of the form
    *
    * @return void
    * @access public

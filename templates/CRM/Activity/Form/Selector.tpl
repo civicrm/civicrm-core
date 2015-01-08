@@ -58,13 +58,7 @@
 
     {/if}
 
-    <td>
-      {$row.activity_type}
-      {if $row.repeat}
-        <br/>
-        <span><b>{$row.repeat}</b></span>
-      {/if}
-    </td>
+    <td>{$row.activity_type}</td>
 
   <td>{$row.activity_subject}</td>
 

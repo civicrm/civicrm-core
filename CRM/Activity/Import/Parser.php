@@ -296,7 +296,7 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * format the field values for input to the api
+   * function to format the field values for input to the api
    *
    * @return array (reference ) associative array of name/value pairs
    * @access public
@@ -386,10 +386,11 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
   /**
    * Export data to a CSV file
    *
-   * @param string $fileName
+   * @param $fileName
    * @param array $header
-   * @param array $data
+   * @param data $data
    *
+   * @internal param string $filename
    * @return void
    * @access public
    */

@@ -56,7 +56,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   protected $_gLabel;
 
   /**
-   * pre-process
+   * Function to pre-process
    *
    * @return void
    * @access public
@@ -109,13 +109,13 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     if ($this->_id && in_array($this->_gName, CRM_Core_OptionGroup::$_domainIDGroups)) {
       $domainID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'domain_id', 'id');
       if (CRM_Core_Config::domainID() != $domainID) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
       }
     }
   }
 
   /**
-   * Set default values for the form.
+   * This function sets the default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -143,7 +143,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -355,7 +355,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     if ($self->_gName == 'from_email_address') {
       $formEmail = CRM_Utils_Mail::pluckEmailFromHeader($fields['label']);
       if (!CRM_Utils_Rule::email($formEmail)) {
-        $errors['label'] = ts('Please enter a valid email address.');
+        $errors['label'] = ts('Please enter the valid email address.');
       }
 
       $formName = explode('"', $fields['label']);
@@ -368,7 +368,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

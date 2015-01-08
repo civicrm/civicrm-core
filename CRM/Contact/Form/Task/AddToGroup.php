@@ -78,7 +78,7 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *
@@ -182,7 +182,9 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
   /**
    * global validation rules for the form
    *
-   * @param array $params
+   * @param $params
+   *
+   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -249,5 +251,6 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
       CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/group/search', "reset=1&force=1&context=smog&gid=$groupID"));
     }
   }
+  //end of function
 }
 

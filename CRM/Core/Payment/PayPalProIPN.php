@@ -59,13 +59,8 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @var string component
    */
   protected $_component = 'contribute';
-
   /**
    * constructor function
-   *
-   * @param array $inputData contents of HTTP REQUEST
-   *
-   * @throws CRM_Core_Exception
    */
   function __construct($inputData) {
     $this->setInputParameters($inputData);

@@ -73,7 +73,7 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *

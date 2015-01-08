@@ -76,7 +76,7 @@ class CRM_Core_Action {
    * bit manipulation operations so we can perform multiple
    * actions on the same object if needed
    *
-   * @var array $_names  type of variable name to action constant
+   * @var array  _names  tupe of variable name to action constant
    *
    * @access private
    * @static
@@ -111,9 +111,12 @@ class CRM_Core_Action {
   static $_description;
 
   /**
+   *
    * called by the request object to translate a string into a mask
    *
-   * @param string $str the action to be resolved
+   * @param $str
+   *
+   * @internal param string $action the action to be resolved
    *
    * @return int the action mask corresponding to the input string
    * @access public
@@ -132,7 +135,7 @@ class CRM_Core_Action {
    * Given a string or an array of strings, determine the bitmask
    * for this set of actions
    *
-   * @param mixed $item either a single string or an array of strings
+   * @param mixed either a single string or an array of strings
    *
    * @return int the action mask corresponding to the input args
    * @access public
@@ -156,7 +159,7 @@ class CRM_Core_Action {
   /**
    * Given a string determine the bitmask for this specific string
    *
-   * @param string $item the input action to process
+   * @param string the input action to process
    *
    * @return int the action mask corresponding to the input string
    * @access public
@@ -172,7 +175,7 @@ class CRM_Core_Action {
    *
    * Given an action mask, find the corresponding description
    *
-   * @param int $mask the action mask
+   * @param int the action mask
    *
    * @return string the corresponding action description
    * @access public

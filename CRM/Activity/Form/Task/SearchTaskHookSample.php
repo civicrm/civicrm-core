@@ -80,7 +80,7 @@ INNER JOIN civicrm_contact ct ON ( ac.contact_id = ct.id )
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public

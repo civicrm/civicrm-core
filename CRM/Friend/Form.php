@@ -146,7 +146,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form.
+   * This function sets the default values for the form.
    *
    * @access public
    *
@@ -175,7 +175,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -229,9 +229,11 @@ class CRM_Friend_Form extends CRM_Core_Form {
   }
 
   /**
-   * validation
+   * Function for validation
    *
-   * @param array $fields
+   * @param $fields
+   *
+   * @internal param array $params (ref.) an assoc array of name/value pairs
    *
    * @return mixed true or array of errors
    * @access public
@@ -268,7 +270,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *
@@ -295,7 +297,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
 
     CRM_Friend_BAO_Friend::getValues($defaults);
     if ($this->_entityTable == 'civicrm_pcp') {
-      $defaults['thankyou_text'] = $defaults['thankyou_title'] = ts('Thank you for your support');
+      $defaults['thankyou_text'] = $defaults['thankyou_title'] = ts('Thanks for your Support');
       $defaults['thankyou_text'] = ts('Thanks for supporting this campaign by spreading the word to your friends.');
     }
     elseif ($this->_entityTable == 'civicrm_contribution_page') {

@@ -43,7 +43,7 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
   protected $_pid;
 
   /**
-   * pre  process the form
+   * Function to pre  process the form
    *
    * @access public
    *
@@ -69,7 +69,7 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
+   * This function sets the default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -112,7 +112,7 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public

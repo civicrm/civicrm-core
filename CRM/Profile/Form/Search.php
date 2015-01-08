@@ -101,7 +101,7 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public

@@ -35,7 +35,7 @@
 class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
 
   /**
-   * create recurring contribution
+   * function to create recurring contribution
    *
    * @param array  $params           (reference ) an assoc array of name/value pairs
    *
@@ -48,7 +48,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
   }
 
   /**
-   * Takes an associative array and creates a contribution object
+   * takes an associative array and creates a contribution object
    *
    * the function extract all the params it needs to initialize the create a
    * contribution object. the params array could contain additional unused name/value
@@ -56,7 +56,9 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @return CRM_Contribute_BAO_Contribution object
+   * @internal param array $ids the array that holds all the db ids
+   *
+   * @return object CRM_Contribute_BAO_Contribution object
    * @access public
    * @static
    * @todo move hook calls / extended logic to create - requires changing calls to call create not add
@@ -176,7 +178,7 @@ SELECT r.payment_processor_id
   }
 
   /**
-   * get the number of installment done/completed for each recurring contribution
+   * Function to get the number of installment done/completed for each recurring contribution
    *
    * @param array  $ids (reference ) an array of recurring contribution ids
    *
@@ -323,7 +325,7 @@ SELECT r.payment_processor_id
   }
 
   /**
-   * get list of recurring contribution of contact Ids
+   * Function to get list of recurring contribution of contact Ids
    *
    * @param int $contactId Contact ID
    *
@@ -418,11 +420,11 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     // handle context redirection for subscription url
     $session = CRM_Core_Session::singleton();
     if ($session->get('userID')) {
-      $url = FALSE;
-      $cid = CRM_Utils_Request::retrieve('cid', 'Integer');
-      $mid = CRM_Utils_Request::retrieve('mid', 'Integer');
-      $qfkey = CRM_Utils_Request::retrieve('key', 'String');
-      $context = CRM_Utils_Request::retrieve('context', 'String');
+      $url     = FALSE;
+      $cid     = CRM_Utils_Request::retrieve('cid', 'Integer', $this, FALSE);
+      $mid     = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE);
+      $qfkey   = CRM_Utils_Request::retrieve('key', 'String', $this, FALSE);
+      $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE);
       if ($cid) {
         switch ($context) {
           case 'contribution':

@@ -53,7 +53,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Set default values for the form.
+   * This function sets the default values for the form.
    *
    * @access public
    *
@@ -90,7 +90,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -131,7 +131,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * validation
+   * Function for validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
@@ -173,7 +173,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

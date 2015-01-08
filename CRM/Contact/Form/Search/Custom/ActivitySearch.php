@@ -90,7 +90,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    */
   function buildForm(&$form) {
 
@@ -277,9 +277,11 @@ ORDER BY contact_a.sort_name';
                  ON assignment.contact_id = contact_c.id ";
   }
 
+  /*
+     * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
+     *
+     */
   /**
-   * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
-   *
    * @param bool $includeContactIDs
    *
    * @return string

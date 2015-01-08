@@ -45,7 +45,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
   protected $_rgid;
 
   /**
-   * pre processing
+   * Function to pre processing
    *
    * @return void
    * @access public
@@ -95,7 +95,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -175,7 +175,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
   }
 
   /**
-   * Set default values for the form. MobileProvider that in edit/view mode
+   * This function sets the default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -190,7 +190,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

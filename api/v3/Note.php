@@ -78,8 +78,10 @@ function _civicrm_api3_note_create_spec(&$params) {
  *
  * This API is used for deleting a note
  *
- * @param array $params including id of the note to be deleted
+ * @params  array  $paramsarray including id of the note to be deleted
  * {@getfields note_delete}
+ *
+ * @param $params
  *
  * @return null
  * @access public

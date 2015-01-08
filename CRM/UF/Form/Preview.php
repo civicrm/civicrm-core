@@ -126,7 +126,7 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public

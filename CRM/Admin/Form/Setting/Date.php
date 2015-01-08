@@ -40,7 +40,7 @@
 class CRM_Admin_Form_Setting_Date extends CRM_Admin_Form_Setting {
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public

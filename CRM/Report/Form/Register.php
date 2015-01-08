@@ -47,6 +47,7 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
       return;
     }
 
+    //   crm_core_error::debug("$this->_actions", $this->_action);
     $this->_opID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
       'report_template', 'id', 'name'
     );
@@ -174,7 +175,7 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

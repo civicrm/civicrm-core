@@ -73,7 +73,7 @@ class CRM_Mailing_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    * @param bool $useTable
    */
   static function preProcessCommon(&$form, $useTable = FALSE) {
@@ -142,6 +142,7 @@ class CRM_Mailing_Form_Task extends CRM_Core_Form {
    * @param string $backType
    * @param bool $submitOnce
    *
+   * @internal param string $type button type for the form after processing
    *
    * @return void
    * @access public

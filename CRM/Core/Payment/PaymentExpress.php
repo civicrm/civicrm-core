@@ -116,7 +116,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
   }
 
   /**
-   * @param array $params
+   * @param $params
    *
    * @throws Exception
    */
@@ -134,7 +134,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
   }
 
   /**
-   * @param array $params
+   * @param $params
    *
    * @throws Exception
    */

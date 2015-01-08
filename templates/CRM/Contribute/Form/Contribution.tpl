@@ -111,10 +111,7 @@
         {/if}
 
         {if $ppID}{ts}<a href='#' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
-        <div id="totalAmountBlock">
-          <br /><span class="description">{ts}Total amount of this contribution.{/ts}{if $hasPriceSets} {ts}Alternatively, you can use a price set.{/ts}{/if}</span>
-          <br /><span id="totalTaxAmount" class="label"></span>
-        </div>
+        <br /><span class="description">{ts}Total amount of this contribution.{/ts}{if $hasPriceSets} {ts}Alternatively, you can use a price set.{/ts}{/if}</span>
       </td>
     </tr>
 
@@ -606,78 +603,5 @@ cj('#fee_amount').change( function() {
     cj('#net_amount').val(netAmount);
   }
 });
-
-cj("#financial_type_id").on("change",function(){
-    cj('#total_amount').trigger("change");
-})
-
-cj("#currency").on("change",function(){
-  cj('#total_amount').trigger("change");
-})
-
-{/literal}{if $taxRates && $invoicing}{literal}
-CRM.$(function($) {
-  $('#total_amount').on("change",function(event) {
-    if (event.handled !== true) {
-      var freezeFinancialType = '{/literal}{$freezeFinancialType}{literal}';
-      if (!freezeFinancialType) {
-        var financialType = $('#financial_type_id').val();
-        var taxRates = '{/literal}{$taxRates}{literal}';
-        taxRates = JSON.parse(taxRates);
-        var currencies = '{/literal}{$currencies}{literal}';
-        currencies = JSON.parse(currencies);
-        var currencySelect = $('#currency').val();
-        var currencySymbol = currencies[currencySelect];
-        var re= /\((.*?)\)/g;
-        for(m = re.exec(currencySymbol); m; m = re.exec(currencySymbol)){
-          currencySymbol = m[1];
-        }
-        var taxRate = taxRates[financialType];
-        if (!taxRate) {
-          taxRate = 0;
-        }
-        var totalAmount = $('#total_amount').val();
-        var thousandMarker = '{/literal}{$config->monetaryThousandSeparator}{literal}';
-        var seperator = '{/literal}{$config->monetaryDecimalPoint}{literal}';
-        // replace all thousandMarker and change the seperator to a dot
-  totalAmount = totalAmount.replace(thousandMarker,'').replace(seperator,'.');
-
-        var totalTaxAmount = '{/literal}{$totalTaxAmount}{literal}';
-        var taxAmount = (taxRate/100)*totalAmount;
-        taxAmount = isNaN (taxAmount) ? 0:taxAmount;
-        var totalTaxAmount = taxAmount + Number(totalAmount);
-  totalTaxAmount = formatMoney( totalTaxAmount, 2, seperator, thousandMarker );
-
-        $("#totalTaxAmount" ).html('Amount with tax : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
-      }
-      event.handled = true;
-    }
-    return false;
-  });
-
-  $('#total_amount').trigger("change");
-});
-{/literal}{/if}{literal}
-
-CRM.$(function($) {
-  $('#price_set_id').click(function() {
-    if( $('#price_set_id').val() ) {
-      $('#totalAmountBlock').hide();
-    }
-    else {
-      $('#totalAmountBlock').show();
-    }
-  });
-});
-
-function formatMoney (amount, c, d, t){
-  var n = amount,
-  c = isNaN(c = Math.abs(c)) ? 2 : c,
-  d = d == undefined ? "," : d,
-  t = t == undefined ? "." : t, s = n < 0 ? "-" : "",
-  i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
-  j = (j = i.length) > 3 ? j % 3 : 0;
-return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
-};
 </script>
 {/literal}

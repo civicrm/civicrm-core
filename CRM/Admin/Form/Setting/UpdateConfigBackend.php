@@ -43,7 +43,7 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
   protected $_oldSiteName;
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -138,8 +138,8 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
         $val = CRM_Utils_File::addTrailingSlash($val);
       }
     }
-
-    //CRM-15365 - Fix BaseURL to avoid wrong trailing slash on Windows installs
+	
+	//CRM-15365 - Fix BaseURL to avoid wrong trailing slash on Windows installs
     foreach ($params as $name => & $val) {
       if ($val && in_array($name, array('newBaseURL'))) {
         $val = CRM_Utils_File::addTrailingSlash($val,"/");

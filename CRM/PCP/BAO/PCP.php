@@ -50,11 +50,10 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
   }
 
   /**
-   * add or update either a Personal Campaign Page OR a PCP Block
+   * function to add or update either a Personal Campaign Page OR a PCP Block
    *
    * @param array $params reference array contains the values submitted by the form
    * @param bool $pcpBlock if true, create or update PCPBlock, else PCP
-   *
    * @access public
    * @static
    *
@@ -89,7 +88,7 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
   }
 
   /**
-   * get the Display  name of a contact for a PCP
+   * function to get the Display  name of a contact for a PCP
    *
    * @param  int $id      id for the PCP
    *
@@ -110,7 +109,7 @@ WHERE  civicrm_pcp.contact_id = civicrm_contact.id
   }
 
   /**
-   * return PCP  Block info for dashboard
+   * Function to return PCP  Block info for dashboard
    *
    * @param $contactId
    *
@@ -373,9 +372,9 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
-   * @param CRM_Core_Form $form form object
+   * @param object $form form object
    *
    * @return void
    * @access public
@@ -404,7 +403,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
       $form->assign('profile', $profile);
     }
 
-    $form->add('select', 'supporter_profile_id', ts('Supporter Profile'), array('' => ts('- select -')) + $profile, TRUE);
+    $form->add('select', 'supporter_profile_id', ts('Supporter profile'), array('' => ts('- select -')) + $profile, TRUE);
 
     $form->addElement('checkbox', 'is_tellfriend_enabled', ts("Allow 'Tell a friend' functionality"), NULL, array('onclick' => "return showHideByValue('is_tellfriend_enabled',true,'tflimit','table-row','radio',false);"));
 
@@ -429,8 +428,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * Add PCP form elements to a form
    */
   /**
-   * @param integer $pcpId
-   * @param CRM_Core_Page $page
+   * @param $pcpId
+   * @param $page
    * @param null $elements
    */
   function buildPcp($pcpId, &$page, &$elements = NULL) {
@@ -740,8 +739,9 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Function to get pcp block is active
    *
-   * @param int $pcpId
+   * @param $pcpId
    * @param $component
+   * @internal param int $id campaign page id
    *
    * @return int
    * @access public
@@ -764,10 +764,11 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Function to get pcp block is enabled for component page
    *
-   * @param int $pageId
+   * @param $pageId
    * @param $component
+   * @internal param int $id contribution page id
    *
-   * @return string
+   * @return String
    * @access public
    * @static
    */
@@ -809,7 +810,9 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Function to get email is enabled for supporter's profile
    *
-   * @param int $profileId supporter's profile id
+   * @param $profileId
+   *
+   * @internal param int $id supporter's profile id
    *
    * @return boolean
    * @access public
@@ -832,8 +835,10 @@ WHERE field_name like 'email%' And is_active = 1 And uf_group_id = %1";
   /**
    * Function to obtain the title of page associated with a pcp
    *
-   * @param int $pcpId
+   * @param $pcpId
    * @param $component
+   *
+   * @internal param int $id campaign page id
    *
    * @return int
    * @access public
@@ -862,8 +867,10 @@ WHERE field_name like 'email%' And is_active = 1 And uf_group_id = %1";
   /**
    * Function to get pcp block & entity id given pcp id
    *
-   * @param int $pcpId
+   * @param $pcpId
    * @param $component
+   *
+   * @internal param int $id campaign page id
    *
    * @return String
    * @access public
@@ -892,6 +899,8 @@ WHERE pcp.id = %1";
    *
    * @param $component
    *
+   * @internal param int $id campaign page id
+   *
    * @return String
    * @access public
    * @static
@@ -909,8 +918,10 @@ WHERE pcp.id = %1";
   /**
    * Function to get supporter profile id
    *
-   * @param int $component_id
+   * @param $component_id
    * @param string $component
+   *
+   * @internal param int $contributionPageId contribution page id
    *
    * @return int
    * @access public

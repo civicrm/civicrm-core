@@ -51,7 +51,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *
-   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set object
+   * @return object CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set object
    * @access public
    * @static
    */
@@ -65,12 +65,16 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
   }
 
   /**
-   * Fetch object based on array of properties
+   * Takes a bunch of params that are needed to match certain criteria and
+   * retrieves the relevant objects. Typically the valid params are only
+   * contact_id. We'll tweak this function to be more full featured over a period
+   * of time. This is the inverse function of create. It also stores all the retrieved
+   * values in the default array
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set object
+   * @return object CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set object
    * @access public
    * @static
    */
@@ -81,8 +85,10 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
   /**
    * update the is_active flag in the db
    *
-   * @param int $id id of the database record
-   * @param bool $isActive value we want to set the is_active field
+   * @param  int $id id of the database record
+   * @param $isActive
+   *
+   * @internal param bool $is_active value we want to set the is_active field
    *
    * @return Object             DAO object on sucess, null otherwise
    * @static
@@ -451,9 +457,11 @@ WHERE     ct.id = cp.contribution_type_id AND
    *
    * An array containing price set details (including price fields) is returned
    *
-   * @param int $setID price set id whose details are needed
+   * @param $setID
    * @param bool $required
    * @param bool $validOnly
+   *
+   * @internal param int $setId - price set id whose details are needed
    *
    * @return array $setTree - array consisting of field details
    */
@@ -546,7 +554,7 @@ WHERE  id = %1";
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    * @param $id
    * @param string $entityTable
    * @param bool $validOnly
@@ -648,7 +656,7 @@ WHERE  id = %1";
 
   /**
    * @param $fields
-   * @param array $params
+   * @param $params
    * @param $lineItem
    */
   static function processAmount(&$fields, &$params, &$lineItem) {
@@ -756,9 +764,9 @@ WHERE  id = %1";
   }
 
   /**
-   * build the price set form.
+   * Function to build the price set form.
    *
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return void
    * @access public
@@ -835,7 +843,7 @@ $options
 }
 
 /**
- * check the current Membership
+ * Function to check the current Membership
  * having end date null.
  */
 static function checkCurrentMembership(&$options, $userid) {
@@ -865,9 +873,9 @@ return FALSE;
 }
 
   /**
-   * set daefult the price set fields.
+   * Function to set daefult the price set fields.
    *
-   * @param CRM_Core_Form $form
+   * @param $form
    * @param $defaults
    *
    * @return array $defaults
@@ -974,7 +982,7 @@ self::eventPriceSetDomainID()
 ) {
 $domain_id = CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set', $sid, 'domain_id', 'id');
 if (CRM_Core_Config::domainID() != $domain_id) {
-CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
 }
 }
 return TRUE;

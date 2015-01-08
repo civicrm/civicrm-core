@@ -73,7 +73,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     }
   }
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public

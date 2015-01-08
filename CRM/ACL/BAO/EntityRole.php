@@ -53,7 +53,7 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
   }
 
   /**
-   * @param array $params
+   * @param $params
    *
    * @return CRM_ACL_DAO_EntityRole
    */
@@ -65,7 +65,7 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
   }
 
   /**
-   * @param array $params
+   * @param $params
    * @param $defaults
    */
   static function retrieve(&$params, &$defaults) {
@@ -86,7 +86,7 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
   }
 
   /**
-   * delete Entity Role records
+   * Function to delete Entity Role records
    *
    * @param  int  $entityRoleId ID of the EntityRole record to be deleted.
    *

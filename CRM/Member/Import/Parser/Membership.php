@@ -165,6 +165,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       $errorMessage = 'Membership Start Date is required to create a memberships.';
       CRM_Contact_Import_Parser_Contact::addToErrorMsg('Start Date', $errorMessage);
     }
+    //end
 
     //for date-Formats
     $session = CRM_Core_Session::singleton();
@@ -381,11 +382,11 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
               'membership' => $formatValues['membership_id'],
               'userId' => $session->get('userID'),
             );
-
+            
             if (empty($params['line_item']) && !empty($formatted['membership_type_id'])) {
               CRM_Price_BAO_LineItem::getLineItemArray($formatted, NULL, 'membership', $formatted['membership_type_id']);
             }
-
+            
             $newMembership = CRM_Member_BAO_Membership::create($formatted, $ids, TRUE);
             if (civicrm_error($newMembership)) {
               array_unshift($values, $newMembership['is_error'] . ' for Membership ID ' . $formatValues['membership_id'] . '. Row was skipped.');

@@ -91,7 +91,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'qs' => 'reset=1&action=copy&id=%%id%%',
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
           'title' => ts('Copy Event'),
-        )
+        ),
       );
     }
     return self::$_actionLinks;
@@ -160,12 +160,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'title' => ts('Personal Campaign Pages'),
           'url' => 'civicrm/event/manage/pcp',
           'field' => 'is_pcp_enabled',
-        );
-      self::$_tabLinks[$cacheKey]['repeat'] =
-        array(
-          'title' => ts('Repeat'),
-          'url' => 'civicrm/event/manage/repeat',
-          'field' => 'is_repeating_event',
         );
 
     }
@@ -317,16 +311,6 @@ ORDER BY start_date desc
     while ($dao->fetch()) {
       if (in_array($dao->id, $permissions[CRM_Core_Permission::VIEW])) {
         $manageEvent[$dao->id] = array();
-        $isRecurringEvent = CRM_Core_BAO_RecurringEntity::getParentFor($dao->id, 'civicrm_event');
-        $manageEvent[$dao->id]['repeat'] = '';
-        if ($isRecurringEvent) {
-          if ($dao->id == $isRecurringEvent) {
-            $manageEvent[$dao->id]['repeat'] = 'Recurring Event - (Parent)';
-          }
-          else {
-            $manageEvent[$dao->id]['repeat'] = 'Recurring Event - (Child)';
-          }
-        }
         CRM_Core_DAO::storeValues($dao, $manageEvent[$dao->id]);
 
         // form all action links
@@ -378,7 +362,7 @@ ORDER BY start_date desc
         $manageEvent[$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mappingID);
         $manageEvent[$dao->id]['is_pcp_enabled'] = CRM_Utils_Array::value($dao->id, $eventPCPS);
         $manageEvent[$dao->id]['event_type'] = CRM_Utils_Array::value($manageEvent[$dao->id]['event_type_id'], $eventType);
-        $manageEvent[$dao->id]['is_repeating_event'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_RecurringEntity', $dao->id, 'parent_id', 'entity_id');
+
         // allow hooks to set 'field' value which allows configuration pop-up to show a tab as enabled/disabled
         CRM_Utils_Hook::tabset('civicrm/event/manage/rows', $manageEvent, array('event_id' => $dao->id));
       }
@@ -434,7 +418,7 @@ ORDER BY start_date desc
   }
 
   /**
-   * @param array $params
+   * @param $params
    * @param bool $sortBy
    * @param $force
    *

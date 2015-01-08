@@ -57,7 +57,7 @@ class CRM_Admin_Form_Preferences_Member extends CRM_Admin_Form_Preferences {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public

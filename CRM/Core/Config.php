@@ -827,7 +827,7 @@ AND
   }
 
   /**
-   * check if running in upgrade mode
+   * function to check if running in upgrade mode
    */
   static function isUpgradeMode($path = NULL) {
     if (defined('CIVICRM_UPGRADE_ACTIVE')) {
@@ -862,10 +862,19 @@ AND
 
   /**
    * Is back office credit card processing enabled for this site - ie are there any installed processors that support
-   * it?
+   * on-site processing
    * @return bool
    */
   static function isEnabledBackOfficeCreditCardPayments() {
-    return CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('BackOffice'));
+    // restrict to type=1 (credit card) payment processor payment_types and only include billing mode types 1 and 3
+    $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE,
+      "billing_mode IN ( 1, 3 ) AND payment_type = 1"
+    );
+    if (count($processors) > 0) {
+      return TRUE;
+    }
+    return FALSE;
   }
 }
+// end CRM_Core_Config
+

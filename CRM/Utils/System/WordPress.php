@@ -52,10 +52,12 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * Sets the title of the page
+   * sets the title of the page
    *
    * @param string $title
    * @param null $pageTitle
+   *
+   * @paqram string $pageTitle
    *
    * @return void
    * @access public
@@ -64,33 +66,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     if (!$pageTitle) {
       $pageTitle = $title;
     }
-
-    // get civi-wordpress instance
-    $civi = civi_wp();
-
-    // do we have functionality provided by plugin version 4.6+ present?
-    if (method_exists($civi, 'civicrm_context_get')) {
-
-      global $civicrm_wp_title;
-      $civicrm_wp_title = $pageTitle;
-
-      // yes, set page title, depending on context
-      $context = civi_wp()->civicrm_context_get();
-      switch ( $context ) {
-        case 'admin':
-        case 'shortcode':
-          $template = CRM_Core_Smarty::singleton();
-          $template->assign('pageTitle', $pageTitle);
-      }
-
-    } elseif (civicrm_wp_in_civicrm()) {
-
-      // legacy pre-4.6 behaviour
+    if (civicrm_wp_in_civicrm()) {
       global $civicrm_wp_title;
       $civicrm_wp_title = $pageTitle;
       $template = CRM_Core_Smarty::singleton();
       $template->assign('pageTitle', $pageTitle);
-
     }
   }
 
@@ -446,7 +426,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   function permissionDenied() {
-    CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+    CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
   }
 
   function logout() {
@@ -571,7 +551,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @param array $params
+   * @param $params
    * @param $mail
    *
    * @return mixed
@@ -629,7 +609,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @param array $params
+   * @param $params
    * @param $errors
    * @param string $emailName
    */
@@ -742,7 +722,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    */
   public function getLoginDestination(&$form) {
     return;

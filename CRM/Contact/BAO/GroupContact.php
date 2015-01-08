@@ -50,7 +50,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
-   * @return CRM_Contact_BAO_Group object
+   * @return object CRM_Contact_BAO_Group object
    * @access public
    * @static
    */
@@ -92,6 +92,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *
    * @param array $params input parameters to find object
    * @param array $values output values of the object
+   *
+   * @internal param array $ids the array that holds all the db ids
    *
    * @return array (reference)   the values that could be potentially assigned to smarty
    * @access public
@@ -266,7 +268,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   }
 
   /**
-   * get list of all the groups and groups for a contact
+   * Function to get list of all the groups and groups for a contact
    *
    * @param  int $contactId contact id
    *
@@ -309,7 +311,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   }
 
   /**
-   * get the list of groups for contact based on status of group membership
+   * Function to get the list of groups for contact based on status of group membership
    *
    * @param int $contactId contact id
    * @param string $status state of membership
@@ -692,11 +694,13 @@ AND       group_id IN ( $groupIDString )
   /**
    * Given an array of contact ids, add all the contacts to the group
    *
-   * @param array $contactIDs the array of contact ids to be added
-   * @param int $groupID the id of the group
+   * @param $contactIDs
+   * @param $groupID
    * @param string $method
    * @param string $status
    * @param null $tracking
+   * @internal param array $contactIds (reference ) the array of contact ids to be added
+   * @internal param int $groupId the id of the group
    *
    * @return array             (total, added, notAdded) count of contacts added to group
    * @access public

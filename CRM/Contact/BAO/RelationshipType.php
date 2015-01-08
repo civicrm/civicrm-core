@@ -42,12 +42,16 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
   }
 
   /**
-   * Fetch object based on array of properties
+   * Takes a bunch of params that are needed to match certain criteria and
+   * retrieves the relevant objects. Typically the valid params are only
+   * contact_id. We'll tweak this function to be more full featured over a period
+   * of time. This is the inverse function of create. It also stores all the retrieved
+   * values in the default array
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Contact_BAO_RelationshipType object
+   * @return object CRM_Contact_BAO_RelationshipType object
    * @access public
    * @static
    */
@@ -76,12 +80,12 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
   }
 
   /**
-   * add the relationship type in the db
+   * Function to add the relationship type in the db
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param array $ids    the array that holds all the db ids
    *
-   * @return CRM_Contact_DAO_RelationshipType
+   * @return object CRM_Contact_DAO_RelationshipType
    * @access public
    * @static
    *
@@ -131,7 +135,7 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
   }
 
   /**
-   * delete Relationship Types
+   * Function to delete Relationship Types
    *
    * @param int $relationshipTypeId
    *

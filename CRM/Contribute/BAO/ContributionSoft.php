@@ -42,7 +42,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * add contribution soft credit record
+   * function to add contribution soft credit record
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
@@ -63,12 +63,16 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Fetch object based on array of properties
+   * Takes a bunch of params that are needed to match certain criteria and
+   * retrieves the relevant objects. Typically the valid params are only
+   * contact_id. We'll tweak this function to be more full featured over a period
+   * of time. This is the inverse function of create. It also stores all the retrieved
+   * values in the default array
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Contribute_BAO_ContributionSoft object
+   * @return object CRM_Contribute_BAO_ContributionSoft object
    * @access public
    * @static
    */
@@ -83,10 +87,11 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * delete soft credits
+   * Function to delete soft credits
    *
-   * @param array $params
+   * @param $params
    *
+   * @internal param int $contributionTypeId
    * @static
    */
   static function del($params) {
@@ -140,11 +145,12 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * retrieve soft contributions for contribution record.
+   *  Function to retrieve soft contributions for contribution record.
    *
    * @param $contributionID
    * @param boolean $all include PCP data
    *
+   * @internal param array $params an associated array
    * @return array of soft contribution ids, amounts, and associated contact ids
    * @static
    */
@@ -313,8 +319,8 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    */
 
   /**
-   * @param CRM_Core_Form $form
-   * @param array $params
+   * @param $form
+   * @param $params
    * @param $honoreeprofileId
    * @param null $honorId
    */

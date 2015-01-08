@@ -394,10 +394,11 @@ class CRM_Badge_BAO_Badge {
   }
 
   /**
-   * build badges parameters before actually creating badges.
+   * function to build badges parameters before actually creating badges.
    *
    * @param  array $params associated array of submitted values
-   * @param CRM_Core_Form $form
+   * @param $form
+   * @params object $form form/controller object
    *
    * @return void
    * @access public
@@ -407,7 +408,7 @@ class CRM_Badge_BAO_Badge {
     // get name badge layout info
     $layoutInfo = CRM_Badge_BAO_Layout::buildLayout($params);
 
-    // split/get actual field names from token and individual contact image URLs
+    // spit / get actual field names from tokeni and individual contact image URLs
     $returnProperties = array();
     if (!empty($layoutInfo['data']['token'])) {
       foreach ($layoutInfo['data']['token'] as $index => $value) {

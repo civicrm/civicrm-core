@@ -37,7 +37,7 @@
  * This class generates form components for Membership Type
  *
  */
-class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
+class CRM_Member_Form_MembershipType extends CRM_Member_Form {
 
   /**
    * max number of contacts we will display for membership-organisation
@@ -58,7 +58,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   }
 
   /**
-   * Set default values for the form. MobileProvider that in edit/view mode
+   * This function sets the default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -108,7 +108,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -212,7 +212,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   }
 
   /**
-   * validation
+   * Function for validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
@@ -228,7 +228,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     }
 
     if (($params['minimum_fee'] > 0 ) && !$params['financial_type_id'] ) {
-      $errors['financial_type_id'] = ts('Please enter the financial Type.');
+      $errors['financial_type_id'] = ts('Please enter the financial type.');
     }
 
     if (empty($params['duration_interval']) and $params['duration_unit'] != 'lifetime') {
@@ -289,7 +289,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

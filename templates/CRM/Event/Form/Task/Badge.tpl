@@ -27,7 +27,7 @@
 <div class="crm-section crm-task-count">
     {include file="CRM/Event/Form/Task.tpl"}
 </div>
-<table class="form-layout-compressed">
+<table class="form-layout-compressed"> 
      <tr class="crm-event-badge-form-block-label_id">
         <td class="label">{$form.badge_id.label}</td>
         <td>{$form.badge_id.html}</td>

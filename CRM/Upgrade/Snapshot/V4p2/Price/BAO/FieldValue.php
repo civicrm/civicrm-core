@@ -46,7 +46,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    *
    * @param $ids
    *
-   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
+   * @return object CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
    * @access public
    * @static
    */
@@ -75,7 +75,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    *
    * @param $ids
    *
-   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
+   * @return object CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
    * @access public
    * @static
    */
@@ -116,7 +116,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @param array $params   (reference ) an assoc array
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
+   * @return object CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
    * @access public
    * @static
    */

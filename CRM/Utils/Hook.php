@@ -303,23 +303,11 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is invoked during the CiviCRM form preProcess phase.
-   *
-   * @param string $formName the name of the form
-   * @param CRM_Core_Form $form     reference to the form object
-   *
-   * @return null the return value is ignored
-   */
-  static function preProcess($formName, &$form) {
-    return self::singleton()->invoke(2, $formName, $form, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_preProcess');
-  }
-
-  /**
    * This hook is invoked when building a CiviCRM form. This hook should also
    * be used to set the default values of a form element
    *
    * @param string $formName the name of the form
-   * @param CRM_Core_Form $form     reference to the form object
+   * @param object $form     reference to the form object
    *
    * @return null the return value is ignored
    */
@@ -332,7 +320,7 @@ abstract class CRM_Utils_Hook {
    * any form elements, this hook should save the values in the database
    *
    * @param string $formName the name of the form
-   * @param CRM_Core_Form $form     reference to the form object
+   * @param object $form     reference to the form object
    *
    * @return null the return value is ignored
    */
@@ -512,7 +500,7 @@ abstract class CRM_Utils_Hook {
    * This hook is called when building the amount structure for a Contribution or Event Page
    *
    * @param int    $pageType - is this a contribution or event page
-   * @param CRM_Core_Form $form     - reference to the form object
+   * @param object $form     - reference to the form object
    * @param array  $amount   - the amount structure to be displayed
    *
    * @return null
@@ -1077,9 +1065,10 @@ abstract class CRM_Utils_Hook {
    * @param string $entity the API entity (like contact)
    * @param string $action the API action (like get)
    * @param array &$params the API parameters
-   * @param array &$permissions the associative permissions array (probably to be altered by this hook)
+   * @param $permissions
    *
    * @return mixed
+   * @internal param array $permisisons the associative permissions array (probably to be altered by this hook)
    */
   static function alterAPIPermissions($entity, $action, &$params, &$permissions) {
     return self::singleton()->invoke(4, $entity, $action, $params, $permissions,
@@ -1089,7 +1078,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * @param CRM_Core_DAO $dao
+   * @param $dao
    *
    * @return mixed
    */

@@ -48,7 +48,7 @@
     function buildMailingContact() {
       var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/contactmailing" h=0 q="contact_id=$contactId"}'{literal};
 
-      var ZeroRecordText = {/literal}'{ts escape="js"}None found.{/ts}'{literal};
+      var ZeroRecordText = {/literal}'{ts escape="js"}No mailings found{/ts}.'{literal};
 
       oTable = $('.contact-mailing-selector').dataTable({
         "bFilter": false,

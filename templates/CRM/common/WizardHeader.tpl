@@ -74,9 +74,9 @@
             {if !$wizard.steps[step].valid}
                 {assign var="stepClass" value="$stepClass not-valid"}
             {/if}
-            {* wizard.steps[step].link value is passed for wizards/steps which allow clickable navigation *}
+            {* wizard.steps[step].link value is passed for wizards/steps which allow clickable navigation *} 
             <li class="{$stepClass}">{$stepPrefix}{if $wizard.steps[step].link}<a href="{$wizard.steps[step].link}">{/if}{$title}{if $wizard.steps[step].link}</a>{/if}</li>
-        {/if}
+        {/if} 
     {/section}
    </ul>
 </div>

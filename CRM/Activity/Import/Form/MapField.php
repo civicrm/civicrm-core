@@ -42,7 +42,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
 
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @return void
    * @access public
@@ -78,7 +78,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public
@@ -291,7 +291,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
         'target_contact_id' => ts('Contact ID'),
         'activity_date_time' => ts('Activity Date'),
         'activity_subject' => ts('Activity Subject'),
-        'activity_type_id' => ts('Activity Type ID'),
+        'activity_type_id' => ts('Activity Type Id'),
       );
 
       $params = array(

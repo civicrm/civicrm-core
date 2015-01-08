@@ -53,7 +53,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   static $csv = array('contact_type', 'group', 'tag');
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *

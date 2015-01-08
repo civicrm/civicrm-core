@@ -76,7 +76,7 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -106,7 +106,7 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
   /**
    * @param $vals
    * @param $rule
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return array
    */

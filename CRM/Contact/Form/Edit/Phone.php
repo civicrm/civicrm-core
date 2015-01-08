@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Edit_Phone {
 
   /**
-   * Build the form object elements for a phone object
+   * build the form elements for a phone object
    *
    * @param CRM_Core_Form $form       reference to the form object
    * @param int           $addressBlockCount block number to build

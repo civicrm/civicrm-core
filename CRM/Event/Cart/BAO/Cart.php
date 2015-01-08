@@ -10,7 +10,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     );
 
   /**
-   * @param array $params
+   * @param $params
    *
    * @return $this
    */
@@ -56,7 +56,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
   /**
-   * @param array $params
+   * @param $params
    *
    * @return $this
    * @throws Exception
@@ -86,7 +86,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
   /**
-   * @param array $params
+   * @param $params
    *
    * @return bool|CRM_Event_Cart_BAO_Cart
    */
@@ -313,7 +313,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
   /**
-   * @param array $params
+   * @param $params
    * @param $values
    *
    * @return mixed

@@ -118,7 +118,7 @@
   </item>
   <item>
     <path>civicrm/mailing/optout</path>
-    <title>Opt-out</title>
+    <title>Optout</title>
     <page_callback>CRM_Mailing_Form_Optout</page_callback>
     <access_arguments>access CiviMail subscribe/unsubscribe pages</access_arguments>
     <is_public>true</is_public>

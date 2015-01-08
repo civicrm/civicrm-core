@@ -45,4 +45,4 @@
     <tr><td>{include file="CRM/Contact/Form/Task.tpl"}</td></tr>
 </table>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-</div>
+</div> 

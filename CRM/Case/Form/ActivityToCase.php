@@ -57,7 +57,7 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. For edit/view mode
+   * This function sets the default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -91,7 +91,7 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public

@@ -223,7 +223,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         array(
           'worldregion_id' => array(
             'name' => 'id',
-            'title' => ts('World Region'),
+            'title' => ts('WorldRegion'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::worldRegion(),
@@ -289,7 +289,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     $elements = array();
     $elements[] = &$this->createElement('select', 'case_activity_all_dates', NULL,
       array(
-        '' => ts('- select -')) + $this->caseActivityTypes
+        '' => ts('-- select --')) + $this->caseActivityTypes
     );
     $this->addGroup($elements, 'case_detail_extra');
 

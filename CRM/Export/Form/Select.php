@@ -237,7 +237,7 @@ FROM   {$this->_componentTable}
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public
@@ -332,7 +332,7 @@ FROM   {$this->_componentTable}
   }
 
   /**
-   * validation
+   * Function for validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
@@ -445,7 +445,7 @@ FROM   {$this->_componentTable}
   }
 
   /**
-   * build mapping form element
+   * Function to build mapping form element
    *
    */
   function buildMapping() {

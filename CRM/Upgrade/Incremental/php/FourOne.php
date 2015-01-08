@@ -280,7 +280,7 @@ VALUES
   }
 
   /**
-   * @param array $params
+   * @param $params
    */
   static function retrieveDirectoryAndURLPaths(&$params) {
 

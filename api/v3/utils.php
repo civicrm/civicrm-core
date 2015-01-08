@@ -65,7 +65,7 @@ function civicrm_api3_verify_one_mandatory($params, $daoName = NULL, $keyoptions
 }
 
 /**
- * check mandatory fields are included
+ * Function to check mandatory fields are included
  *
  * @param array $params array of fields to check
  * @param array $daoName string DAO to check for required fields (create functions only)
@@ -270,7 +270,7 @@ function _civicrm_api3_load_DAO($entity) {
 }
 
 /**
- * return the DAO of the function or Entity
+ * Function to return the DAO of the function or Entity
  * @param String $name  either a function of the api (civicrm_{entity}_create or the entity name
  * return the DAO name to manipulate this function
  * eg. "civicrm_api3_contact_create" or "Contact" will return "CRM_Contact_BAO_Contact"
@@ -333,7 +333,7 @@ function _civicrm_api3_get_DAO($name) {
 }
 
 /**
- * return the DAO of the function or Entity
+ * Function to return the DAO of the function or Entity
  * @param String $name is either a function of the api (civicrm_{entity}_create or the entity name
  * return the DAO name to manipulate this function
  * eg. "civicrm_contact_create" or "Contact" will return "CRM_Contact_BAO_Contact"
@@ -829,13 +829,16 @@ function _civicrm_api3_get_unique_name_array(&$bao) {
 /**
  * Converts an DAO object to an array
  *
- * @param CRM_Core_DAO $dao object to convert
- * @param array $params
+ * @param  object $dao (reference )object to convert
+ * @param null $params
  * @param bool $uniqueFields
  * @param string $entity
+ *
  * @param bool $autoFind
  *
  * @return array
+ *
+ * @params array of arrays (key = id) of array of fields
  *
  * @static void
  * @access public
@@ -884,7 +887,7 @@ function _civicrm_api3_dao_to_array($dao, $params = NULL, $uniqueFields = TRUE, 
  * && it can take custom fields & there is the string 'custom' in their return request we get them all, they are filtered on the way out
  * @todo filter so only required fields are queried
  *
- * @param array $params
+ * @param $params
  * @param string $entity - entity name in CamelCase
  *
  * @return bool
@@ -965,7 +968,7 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
 }
 
 /**
- * @param array $params
+ * @param $params
  * @param $entity
  */
 function _civicrm_api3_format_params_for_create(&$params, $entity) {
@@ -1087,7 +1090,7 @@ function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
  *
  * @param array $params       Associative array of property name/value
  *                             pairs to insert in new history.
- * @param string $daoName
+ * @param $daoName
  * @param bool $return
  *
  * @daoName string DAO to check params agains
@@ -1254,7 +1257,7 @@ function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
  * if api::del doesn't exist it will try DAO delete method
  *
  * @param $bao_name
- * @param array $params
+ * @param $params
  *
  * @return array API result array
  * @throws API_Exception
@@ -1426,6 +1429,9 @@ function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldInfo) {
  * @param $fieldType
  *
  * @throws Exception
+ * @internal param $fieldInfo
+ *
+ * @internal param $params
  * @return mixed
  */
 function _civicrm_api3_getValidDate($dateValue, $fieldName, $fieldType) {
@@ -1558,7 +1564,7 @@ function _civicrm_api3_generic_replace($entity, $params) {
 }
 
 /**
- * @param array $params
+ * @param $params
  *
  * @return mixed
  */

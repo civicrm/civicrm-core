@@ -43,9 +43,6 @@ class CRM_Core_Payment_BaseIPN {
    */
   protected $_inputParameters = array();
 
-  protected $_isRecurring = FALSE;
-
-  protected $_isFirstOrLastRecurringPayment = FALSE;
   /**
    * Constructor
    */
@@ -205,7 +202,7 @@ class CRM_Core_Payment_BaseIPN {
 
     //add lineitems for recurring payments
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
-      $this->addRecurLineItems($objects['contributionRecur']->id, $contribution);
+      $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id, CRM_Core_DAO::$_nullArray);
     }
 
     //add new soft credit against current contribution id and
@@ -285,7 +282,7 @@ class CRM_Core_Payment_BaseIPN {
 
     //add lineitems for recurring payments
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
-      $this->addRecurLineItems($objects['contributionRecur']->id, $contribution);
+      $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id, CRM_Core_DAO::$_nullArray);
     }
 
     //add new soft credit against current $contribution and
@@ -328,8 +325,9 @@ class CRM_Core_Payment_BaseIPN {
    */
   function unhandled(&$objects, &$transaction) {
     $transaction->rollback();
-    CRM_Core_Error::debug_log_message("returning since contribution status: is not handled");
-    echo "Failure: contribution status is not handled<p>";
+    // we dont handle this as yet
+    CRM_Core_Error::debug_log_message("returning since contribution status: $status is not handled");
+    echo "Failure: contribution status $status is not handled<p>";
     return FALSE;
   }
 
@@ -570,14 +568,8 @@ LIMIT 1;";
     }
 
     //add lineitems for recurring payments
-    if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id) {
-      if ($addLineItems) {
-        $input ['line_item'] = $this->addRecurLineItems($objects['contributionRecur']->id, $contribution);
-      }
-      else {
-        // this is just to prevent e-notices when we call recordFinancialAccounts - per comments on that line - intention is somewhat unclear
-        $input['line_item'] = array();
-      }
+    if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
+      $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id, $input);
     }
 
     //copy initial contribution custom fields for recurring contributions
@@ -622,7 +614,7 @@ LIMIT 1;";
         $input['contribution_mode'] = 'membership';
       }
       //@todo writing a unit test I was unable to create a scenario where this line did not fatal on second
-      // and subsequent payments. In this case the line items are created at $this->addRecurLineItems
+      // and subsequent payments. In this case the line items are created at $this->addrecurLineItems
       // and since the contribution is saved prior to this line there is always a contribution-id,
       // however there is never a prevContribution (which appears to mean original contribution not previous
       // contribution - or preUpdateContributionObject most accurately)
@@ -630,7 +622,6 @@ LIMIT 1;";
       // to mean "are we updating an exisitng pending contribution"
       //I was able to make the unit test complete as fataling here doesn't prevent
       // the contribution being created - but activities would not be created or emails sent
-
       CRM_Contribute_BAO_Contribution::recordFinancialAccounts($input, NULL);
     }
 
@@ -664,9 +655,6 @@ LIMIT 1;";
     }
 
     CRM_Core_Error::debug_log_message("Success: Database updated");
-    if ($this->_isRecurring) {
-      $this->sendRecurringStartOrEndNotification($ids, $recur);
-    }
   }
 
   /**
@@ -688,19 +676,26 @@ LIMIT 1;";
     return TRUE;
   }
 
-  /**
+  /*
    * Send receipt from contribution. Note that the compose message part has been moved to contribution
    * In general LoadObjects is called first to get the objects but the composeMessageArray function now calls it
    *
-   * @param array $input Incoming data from Payment processor
-   * @param array $ids Related object IDs
+   * @params array $input Incoming data from Payment processor
+   * @params array $ids Related object IDs
+   * @params array $values values related to objects that have already been loaded
+   * @params bool $recur is it part of a recurring contribution
+   * @params bool $returnMessageText Should text be returned instead of sent. This
+   * is because the function is also used to generate pdfs
+   */
+  /**
+   * @param $input
+   * @param $ids
    * @param $objects
-   * @param array $values values related to objects that have already been loaded
-   * @param bool $recur is it part of a recurring contribution
-   * @param bool $returnMessageText Should text be returned instead of sent. This
-   *  is because the function is also used to generate pdfs
+   * @param $values
+   * @param bool $recur
+   * @param bool $returnMessageText
    *
-   * @return array
+   * @return mixed
    */
   function sendMail(&$input, &$ids, &$objects, &$values, $recur = FALSE, $returnMessageText = FALSE) {
     $contribution = &$objects['contribution'];
@@ -716,30 +711,6 @@ LIMIT 1;";
       }
     }
     return $contribution->composeMessageArray($input, $ids, $values, $recur, $returnMessageText);
-  }
-
-  /**
-   * Send start or end notification for recurring payments
-   * @param $ids
-   * @param $recur
-   */
-  function sendRecurringStartOrEndNotification($ids, $recur) {
-    if ($this->_isFirstOrLastRecurringPayment) {
-      $autoRenewMembership = FALSE;
-      if ($recur->id &&
-        isset($ids['membership']) && $ids['membership']
-      ) {
-        $autoRenewMembership = TRUE;
-      }
-
-      //send recurring Notification email for user
-      CRM_Contribute_BAO_ContributionPage::recurringNotify($this->_isFirstOrLastRecurringPayment,
-        $ids['contact'],
-        $ids['contributionPage'],
-        $recur,
-        $autoRenewMembership
-      );
-    }
   }
 
   /**
@@ -929,37 +900,32 @@ LIMIT 1;";
   }
 
   /**
-   * @param int $recurId
-   * @param $contribution
-   *
-   * @return array
+   * @param $recurId
+   * @param $contributionId
+   * @param $input
    */
-  function addRecurLineItems($recurId, $contribution) {
-    $lineSets = array();
+  function addrecurLineItems($recurId, $contributionId, &$input) {
+    $lineSets = $lineItems = array();
 
-    $originalContributionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($originalContributionID);
-    if (!empty($lineItems)) {
-      foreach ($lineItems as $key => $value) {
-        $priceField = new CRM_Price_DAO_PriceField();
-        $priceField->id = $value['price_field_id'];
-        $priceField->find(TRUE);
-        $lineSets[$priceField->price_set_id][] = $value;
-        if ($value['entity_table'] == 'civicrm_membership') {
-          try {
-            civicrm_api3('membership_payment', 'create', array('membership_id' => $value['entity_id'], 'contribution_id' => $contribution->id));
-          }
-          catch (CiviCRM_API3_Exception $e) {
-            // we are catching & ignoring errors as an extra precaution since lost IPNs may be more serious that lost membership_payment data
-            // this fn is unit-tested so risk of changes elsewhere breaking it are otherwise mitigated
-          }
+    //Get the first contribution id with recur id
+    if ($recurId) {
+      $contriID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
+      $lineItems = CRM_Price_BAO_LineItem::getLineItems($contriID, 'contribution');
+      if (!empty($lineItems)) {
+        foreach ($lineItems as $key => $value) {
+          $pricesetID = new CRM_Price_DAO_PriceField();
+          $pricesetID->id = $value['price_field_id'];
+          $pricesetID->find(TRUE);
+          $lineSets[$pricesetID->price_set_id][] = $value;
         }
       }
+      if (!empty($input)) {
+        $input['line_item'] = $lineSets;
+      }
+      else {
+        CRM_Price_BAO_LineItem::processPriceSet($contributionId, $lineSets);
+      }
     }
-    else {
-      CRM_Price_BAO_LineItem::processPriceSet($contribution->id, $lineSets, $contribution);
-    }
-    return $lineSets;
   }
 
   // function to copy custom data of the

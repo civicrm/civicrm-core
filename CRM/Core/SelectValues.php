@@ -112,19 +112,6 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * various pre defined email selection methods
-   * @static
-   */
-  static function emailSelectMethods() {
-    return array(
-      'automatic' => ts("Automatic"),
-      'location-only' => ts("Only send to email addresses assigned to the specified location"),
-      'location-prefer' => ts("Prefer email addresses assigned to the specified location"),
-      'location-exclude' => ts("Exclude email addresses assigned to the specified location")
-    );
-  }
-
-  /**
    * various pre defined member visibility options
    * @static
    */
@@ -169,7 +156,7 @@ class CRM_Core_SelectValues {
       'Multi-Select' => ts('Multi-Select'),
       'AdvMulti-Select' => ts('AdvMulti-Select'),
       'Link' => ts('Link'),
-      'ContactReference' => ts('Autocomplete-Select'),
+      'ContactReference' => ts('Autocomplete Select'),
     );
   }
 
@@ -355,7 +342,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * get hours
+   * Function to get hours
    *
    *
    * @static
@@ -369,7 +356,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * get minutes
+   * Function to get minutes
    *
    *
    * @static
@@ -383,7 +370,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * get the Map Provider
+   * Function to get the Map Provider
    *
    * @return array $map array of map providers
    * @static
@@ -522,7 +509,7 @@ class CRM_Core_SelectValues {
       '{contribution.total_amount}' => ts('Total Amount'),
       '{contribution.fee_amount}' => ts('Fee Amount'),
       '{contribution.net_amount}' => ts('Net Amount'),
-      '{contribution.non_deductible_amount}' => ts('Non-deductible Amount'),
+      '{contribution.non_deductible_amount}' => ts('Non Deductible Amount'),
       '{contribution.receive_date}' => ts('Contribution Receive Date'),
       '{contribution.payment_instrument}' => ts('Payment Instrument'),
       '{contribution.trxn_id}' => ts('Transaction ID'),
@@ -913,3 +900,4 @@ class CRM_Core_SelectValues {
     return $scheduleReminderFrequencyUnits;
   }
 }
+

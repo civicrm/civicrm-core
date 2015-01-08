@@ -45,9 +45,9 @@
        {/literal}
 
      {/section}
-   </dl>
+   </dl>    
 </div>
-
+    
 <div id="crm-submit-buttons" class="form-item">
 <dl>
    <dt>&nbsp;</dt><dd>{$form.buttons.html}</dd>

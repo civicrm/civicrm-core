@@ -40,7 +40,7 @@
 class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @return void
    * @access public
@@ -55,7 +55,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Set default values for the form.
+   * This function sets the default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -103,7 +103,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public

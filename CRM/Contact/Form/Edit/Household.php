@@ -40,11 +40,11 @@
  */
 class CRM_Contact_Form_Edit_Household {
 
-  /**
+ /**
    * This function provides the HTML form elements that are specific
    * to the Household Contact Type
    *
-   * @param CRM_Core_Form $form form object
+   * @param object $form form object
    * @param int $inlineEditMode ( 1 for contact summary
    * top bar form and 2 for display name edit )
    *
@@ -80,9 +80,11 @@ class CRM_Contact_Form_Edit_Household {
   /**
    * add rule for household
    *
-   * @param array $fields array of form values
-   * @param array $files - unused
-   * @param int $contactID
+   * @params array $fields array of form values
+   *
+   * @param $fields
+   * @param $files
+   * @param null $contactID
    *
    * @return array|bool $error@static
    * @public

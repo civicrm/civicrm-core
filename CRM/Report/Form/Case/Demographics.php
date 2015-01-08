@@ -373,6 +373,7 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
     $this->beginPostProcess();
 
     $sql = $this->buildQuery(TRUE);
+    //CRM_Core_Error::debug('sql', $sql);
     $rows = $graphRows = array();
     $this->buildRows($sql, $rows);
 

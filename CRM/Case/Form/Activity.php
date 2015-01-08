@@ -68,7 +68,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   public $_relatedContacts;
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -219,7 +219,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   }
 
   /**
-   * Set default values for the form. For edit/view mode
+   * This function sets the default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -361,6 +361,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
    * @param array $files the uploaded files if any
    * @param $self
    *
+   * @internal param array $options additional user data
+   *
    * @return true if no errors, else array of errors
    * @access public
    * @static
@@ -375,7 +377,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

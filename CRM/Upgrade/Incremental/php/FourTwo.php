@@ -56,6 +56,7 @@ class CRM_Upgrade_Incremental_php_FourTwo {
    * @param $rev string, a version number, e.g. '4.2.alpha1', '4.2.beta3', '4.2.0'
    * @param null $currentVer
    *
+   * @internal param string $postUpgradeMessage , alterable
    * @return void
    */
   function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
@@ -452,7 +453,7 @@ WHERE     cpse.price_set_id IS NULL";
 
   /**
    *
-   * create price sets
+   * Function to create price sets
    */
   static function createPriceSet($daoName, $addTo,  $options = array()) {
     $query = "SELECT title FROM {$addTo[0]} where id =%1";

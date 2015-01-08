@@ -46,7 +46,7 @@ class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
     'fatalErrorHandler' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
   );
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public

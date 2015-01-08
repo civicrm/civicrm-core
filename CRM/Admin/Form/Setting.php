@@ -43,7 +43,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
   protected $_settings = array();
 
   /**
-   * Set default values for the form.
+   * This function sets the default values for the form.
    * default values are retrieved from the database
    *
    * @access public
@@ -114,7 +114,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public
@@ -167,7 +167,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *
@@ -181,7 +181,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
   }
 
   /**
-   * @param array $params
+   * @param $params
    */
   public function commonProcess(&$params) {
 
@@ -267,7 +267,7 @@ AND    time_format <> ''
       unset($params[$setting]);
     }
     CRM_Core_BAO_ConfigSetting::create($params);
-    CRM_Core_Session::setStatus(" ", ts('Changes Saved'), "success");
+    CRM_Core_Session::setStatus(" ", ts('Changes Saved.'), "success");
   }
 
   public function rebuildMenu() {

@@ -48,7 +48,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   protected $_id;
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @return void
    * @access public
@@ -83,7 +83,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -150,7 +150,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
+   * This function sets the default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -175,9 +175,11 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   /**
    * global validation rules for the form
    *
-   * @param array $values
+   * @param $values
    * @param $files
    * @param $self
+   *
+   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -205,7 +207,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    * @return void
@@ -298,6 +300,8 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    * @param $createdID
    * @param $userContactID
    * @param $actionName
+   *
+   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static

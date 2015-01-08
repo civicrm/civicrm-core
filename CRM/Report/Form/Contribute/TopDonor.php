@@ -80,7 +80,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
           ),
           'contact_sub_type' =>
           array(
-            'title' => ts('Contact Subtype'),
+            'title' => ts('Contact SubType'),
           ),
         ),
       ),
@@ -132,7 +132,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'options' => CRM_Contribute_PseudoConstant::financialType() ,
           ),
           'contribution_status_id' =>
-          array('title' => ts('Contribution Status'),
+          array('title' => ts('Donation Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
             'default' => array(1),

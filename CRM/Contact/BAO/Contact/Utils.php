@@ -246,7 +246,7 @@ WHERE  id IN ( $idString )
   }
 
   /**
-   * get the count of  contact loctions
+   * Function to get the count of  contact loctions
    *
    * @param int $contactId contact id
    *
@@ -277,8 +277,9 @@ UNION
    *
    * @param int $contactID contact id of the individual
    * @param $organization (id or name)
-   * @param int $previousEmployerID
-   * @param bool $newContact
+   * @param null $previousEmployerID
+   *
+   * @internal param string $organization it can be name or id of organization
    *
    * @access public
    * @static
@@ -390,7 +391,7 @@ UNION
   }
 
   /**
-   * set current employer id and organization name
+   * Function to set current employer id and organization name
    *
    * @param array $currentEmployerParams associated array of contact id and its employer id
    *
@@ -408,7 +409,7 @@ WHERE contact_a.id ={$contactId} AND contact_b.id={$orgId}; ";
   }
 
   /**
-   * update cached current employer name
+   * Function to update cached current employer name
    *
    * @param int $organizationId current employer id
    *
@@ -470,11 +471,13 @@ WHERE id={$contactId}; ";
   /**
    * Function to build form for related contacts / on behalf of organization.
    *
-   * @param CRM_Core_Form $form
+   * @param $form              object  invoking Object
    * @param $contactType       string  contact type
    * @param $countryID
    * @param $stateID
    * @param $title             string  fieldset title
+   *
+   * @internal param int $maxLocationBlocks number of location blocks
    *
    * @static
    */
@@ -674,7 +677,8 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
    *
    * @return array $contactDetails array of contact info.@static
    */
-  static function contactDetails($componentIds, $componentName, $returnProperties = array()) {
+  static function contactDetails($componentIds, $componentName, $returnProperties = array(
+    )) {
     $contactDetails = array();
     if (empty($componentIds) ||
       !in_array($componentName, array('CiviContribute', 'CiviMember', 'CiviEvent', 'Activity'))
@@ -903,7 +907,7 @@ Group By  componentId";
   }
 
   /**
-   * @param array $params
+   * @param $params
    *
    * @throws Exception
    */

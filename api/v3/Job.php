@@ -56,7 +56,7 @@ function _civicrm_api3_job_create_spec(&$params) {
 }
 
 /**
- * create scheduled job
+ * Function to create scheduled job
  *
  * @param  array $params   Associative array of property name/value pairs to insert in new job.
  *

@@ -97,8 +97,9 @@ class CRM_Utils_PseudoConstant {
    * If there's a full, preloaded map, use it. Otherwise, use search
    * class space.
    *
-   * @param string $constant constant-name
+   * @param $constant
    *
+   * @internal param string $name constant-name
    * @return string|NULL class-name
    */
   public static function findConstantClass($constant) {

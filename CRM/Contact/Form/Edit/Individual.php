@@ -149,6 +149,8 @@ class CRM_Contact_Form_Edit_Individual {
    * @param array $files the uploaded files if any
    * @param null $contactID
    *
+   * @internal param array $options additional user data
+   *
    * @return true if no errors, else array of errors
    * @access public
    * @static

@@ -47,6 +47,7 @@ class CRM_Extension_Info {
    * @param $file
    *
    * @throws CRM_Extension_Exception_ParseException
+   * @internal param string $string XML content
    * @return CRM_Extension_Info
    */
   public static function loadFromFile($file) {

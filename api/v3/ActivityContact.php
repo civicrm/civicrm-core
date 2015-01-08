@@ -43,7 +43,7 @@
  *
  * @example ActivityContact.php
  *
- * @param array $params
+ * @param $params
  *
  * @return array of newly created activity contact records.
  * @access public

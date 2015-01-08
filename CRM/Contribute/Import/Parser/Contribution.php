@@ -565,7 +565,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
   }
 
   /**
-   * process pledge payments
+   *  Function to process pledge payments
    */
   function processPledgePayments(&$formatted) {
     if (!empty($formatted['pledge_payment_id']) && !empty($formatted['pledge_id'])) {

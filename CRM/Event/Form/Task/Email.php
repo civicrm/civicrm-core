@@ -78,7 +78,7 @@ class CRM_Event_Form_Task_Email extends CRM_Event_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *

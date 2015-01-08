@@ -36,7 +36,7 @@
  */
 
 /**
- * create or update case type
+ * Function to create or update case type
  *
  * @param  array $params   input parameters
  *
@@ -68,9 +68,9 @@ function civicrm_api3_case_type_create($params) {
 }
 
 /**
- * retrieve case types
+ * Function to retrieve case types
  *
- * @param array $params
+ * @param $params
  *
  * @return array $caseTypes case types keyed by id
  * @access public
@@ -85,7 +85,7 @@ function civicrm_api3_case_type_get($params) {
 }
 
 /**
- * format definition
+ * Function to format definition
  *
  * @param $caseTypes
  * @return mixed

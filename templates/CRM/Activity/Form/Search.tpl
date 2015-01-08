@@ -39,7 +39,7 @@
                 {$form.sort_name.label}&nbsp;&nbsp;{$form.sort_name.html|crmAddClass:'twenty'}
                 &nbsp;&nbsp;&nbsp;{$form.buttons.html}
                 <div>
-                  <div class="description font-italic">{ts}Complete OR Partial Name{/ts}
+                  <div class="description font-italic">{ts}Complete OR partial name{/ts}
                     <span class="contact-name-option option-1">{ts} of the Source Contact{/ts}</span>
                     <span class="contact-name-option option-2">{ts} of the Assignee Contact{/ts}</span>
                     <span class="contact-name-option option-3">{ts} of the Target Contact{/ts}</span>

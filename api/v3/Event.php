@@ -79,7 +79,6 @@ function _civicrm_api3_event_create_spec(&$params) {
   $params['title']['api.required'] = 1;
   $params['is_active']['api.default'] = 1;
   $params['financial_type_id']['api.aliases'] = array('contribution_type_id');
-  $params['is_template']['api.default'] = 0;
 }
 
 /**
@@ -128,6 +127,13 @@ function civicrm_api3_event_get($params) {
   $eventDAO = new CRM_Event_BAO_Event();
   _civicrm_api3_dao_set_filter($eventDAO, $params, TRUE, 'Event');
 
+  if (!empty($params['is_template'])) {
+    $eventDAO->whereAdd( '( is_template = 1 )' );
+  }
+  elseif(empty($eventDAO->id)){
+    $eventDAO->whereAdd('( is_template IS NULL ) OR ( is_template = 0 )');
+  }
+
   if (!empty($params['isCurrent'])) {
     $eventDAO->whereAdd('(start_date >= CURDATE() || end_date >= CURDATE())');
   }
@@ -151,6 +157,7 @@ function civicrm_api3_event_get($params) {
       $event[$eventDAO->id]['price_set_id'] = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventDAO->id);
     }
   }
+  //end of the loop
 
   return civicrm_api3_create_success($event, $params, 'event', 'get', $eventDAO);
 }
@@ -199,7 +206,7 @@ function civicrm_api3_event_delete($params) {
 /*
 
 /**
- * add 'is_full' & 'available_seats' to the return array. (this might be better in the BAO)
+ * Function to add 'is_full' & 'available_seats' to the return array. (this might be better in the BAO)
  * Default BAO function returns a string if full rather than a Bool - which is more appropriate to a form
  *
  * @param array $event return array of the event

@@ -57,7 +57,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
     }
   }
   /**
-   * Set default values for the form.
+   * This function sets the default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -201,7 +201,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public
@@ -501,7 +501,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
   }
 
   /**
-   * validation
+   * Function for validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *

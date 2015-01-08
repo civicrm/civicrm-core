@@ -44,7 +44,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
   }
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @return void
    * @access public
@@ -82,7 +82,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form.
+   * This function sets the default values for the form.
    *
    * @access public
    *
@@ -99,7 +99,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object for the approval/rejection mailing
+   * Build the form for the approval/rejection mailing
    *
    * @param
    *

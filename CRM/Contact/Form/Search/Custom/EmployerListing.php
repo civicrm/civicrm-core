@@ -55,7 +55,7 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    */
   function buildForm(&$form) {
 
@@ -82,9 +82,10 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
     $form->assign('elements', array('sort_name', 'state_province_id'));
   }
 
+  /*
+     * Set search form field defaults here.
+     */
   /**
-   * Set search form field defaults here.
-   *
    * @return array
    */
   function setDefaultValues() {
@@ -153,6 +154,11 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
       $sql .= "ORDER BY sort_name asc";
     }
 
+    /* Uncomment the next 2 lines to see the exact query you're generating */
+
+    // CRM_Core_Error::debug('sql',$sql);
+    // exit();
+
     return $sql;
   }
 
@@ -173,9 +179,11 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
             ";
   }
 
+  /*
+     * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
+     *
+     */
   /**
-   * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
-   *
    * @param bool $includeContactIDs
    *
    * @return string
@@ -238,8 +246,8 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
   }
 
   /*
-   * Functions below generally don't need to be modified
-   */
+     * Functions below generally don't need to be modified
+     */
   function count() {
     $sql = $this->all();
 

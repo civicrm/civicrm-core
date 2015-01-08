@@ -97,7 +97,7 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *

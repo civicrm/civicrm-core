@@ -141,7 +141,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *
@@ -287,5 +287,6 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       $session->replaceUserContext(CRM_Utils_System::url($urlString, $urlParams));
     }
   }
+  //end of function
 }
 

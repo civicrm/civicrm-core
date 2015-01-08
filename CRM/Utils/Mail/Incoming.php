@@ -370,7 +370,7 @@ class CRM_Utils_Mail_Incoming {
 
   /**
    * @param $address
-   * @param array $params
+   * @param $params
    * @param $subParam
    * @param $mail
    */
@@ -395,7 +395,7 @@ class CRM_Utils_Mail_Incoming {
   /**
    * @param $addresses
    * @param $token
-   * @param array $params
+   * @param $params
    * @param $mail
    */
   public static function parseAddresses(&$addresses, $token, &$params, &$mail) {

@@ -39,7 +39,7 @@
  */
 class CRM_Financial_Page_AJAX {
   /*
-   * get financial accounts of required account relationship
+   * Function to get financial accounts of required account relationship
    * $financialAccountType array with key account relationship and value financial account type option groups
    *
    */
@@ -64,7 +64,6 @@ class CRM_Financial_Page_AJAX {
         '7' => 4, //cost of sales
         '8' => 1, //premium inventory
         '9' => 3, //discount account is
-        '10' => 2, //sales tax liability
       );
       $financialAccountType = CRM_Utils_Array::value($_GET['_value'], $financialAccountType);
       $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);

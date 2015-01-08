@@ -34,9 +34,9 @@
 function civicrm_api3_generic_getList($apiRequest) {
   $entity = _civicrm_api_get_entity_name_from_camel($apiRequest['entity']);
   $request = $apiRequest['params'];
-
+  
   _civicrm_api3_generic_getList_defaults($entity, $request);
-
+  
   // Hey api, would you like to format the search params?
   $fnName = "_civicrm_api3_{$entity}_getlist_params";
   $fnName = function_exists($fnName) ? $fnName : '_civicrm_api3_generic_getlist_params';

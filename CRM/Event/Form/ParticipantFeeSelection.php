@@ -264,7 +264,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
   }
 
   /**
-   * @param array $params
+   * @param $params
    *
    * @return mixed
    */

@@ -75,6 +75,9 @@ class CRM_Core_Lock {
     if (stristr($name, 'civimail.job.')) {
       $jobLog = $this->_name;
     }
+    //if (defined('CIVICRM_LOCK_DEBUG')) {
+    //CRM_Core_Error::debug_var('backtrace', debug_backtrace());
+    //}
     $this->_timeout = $timeout !== NULL ? $timeout : self::TIMEOUT;
 
     $this->acquire();

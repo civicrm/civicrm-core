@@ -39,7 +39,7 @@
 class CRM_Event_Import_Form_Summary extends CRM_Import_Form_Summary {
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @return void
    * @access public

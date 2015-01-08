@@ -35,7 +35,7 @@
 class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_ContributionPage {
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @return void
    * @access public
@@ -45,7 +45,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
+   * This function sets the default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -61,7 +61,9 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
         $this->_id,
         'title'
       );
-      CRM_Utils_System::setTitle(ts('Title and Settings') . " ($title)");
+      CRM_Utils_System::setTitle(ts('Title and Settings (%1)',
+          array(1 => $title)
+        ));
 
       $ufJoinParams = array(
         'module' => 'OnBehalf',
@@ -113,7 +115,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public

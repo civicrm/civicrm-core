@@ -49,7 +49,7 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    */
   function buildForm(&$form) {
     $groups = array('' => ts('- select group -')) + CRM_Core_PseudoConstant::nestedGroup(FALSE);

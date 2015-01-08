@@ -36,10 +36,10 @@
  */
 class CRM_Core_Component {
 
-  /**
-   * End part (filename) of the component information class'es name
-   * that needs to be present in components main directory.
-   */
+  /*
+     * End part (filename) of the component information class'es name
+     * that needs to be present in components main directory.
+     */
   CONST COMPONENT_INFO_CLASS = 'Info';
 
   private static $_info = NULL;
@@ -346,7 +346,7 @@ class CRM_Core_Component {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    */
   static function &buildSearchForm(&$form) {
     $info = self::_info();
@@ -417,7 +417,7 @@ class CRM_Core_Component {
   }
 
   /**
-   * handle table dependencies of components
+   * Function to handle table dependencies of components
    *
    * @param array $tables  array of tables
    *
@@ -437,7 +437,7 @@ class CRM_Core_Component {
   }
 
   /**
-   * get components info from info file
+   * Function to get components info from info file
    *
    */
   static function getComponentsFromFile($crmFolderDir) {

@@ -41,16 +41,7 @@
         {else}
           <th class="right">{ts}Qty{/ts}</th>
           <th class="right">{ts}Unit Price{/ts}</th>
-          {if !$getTaxDetails}
-            <th class="right">{ts}Total Price{/ts}</th>
-          {/if}
-        {/if}
-
-        {if $getTaxDetails}
-          <th class="right">{ts}Subtotal{/ts}</th>
-          <th class="right">{ts}Tax Rate{/ts}</th>
-          <th class="right">{ts}Tax Amount{/ts}</th>
-          <th class="right">{ts}Total Amount{/ts}</th>
+          <th class="right">{ts}Total Price{/ts}</th>
         {/if}
 
         {if $pricesetFieldsCount}
@@ -63,23 +54,8 @@
           {if $context NEQ "Membership"}
             <td class="right">{$line.qty}</td>
             <td class="right">{$line.unit_price|crmMoney}</td>
-    {else}
-            <td class="right">{$line.line_total|crmMoney}</td>
           {/if}
-    {if !$getTaxDetails && $context NEQ "Membership"}
-      <td class="right">{$line.line_total|crmMoney}</td>
-    {/if}
-    {if $getTaxDetails}
-      <td class="right">{$line.line_total|crmMoney}</td>
-      {if $line.tax_rate != "" || $line.tax_amount != ""}
-        <td class="right">{$taxTerm} ({$line.tax_rate|string_format:"%.2f"}%)</td>
-        <td class="right">{$line.tax_amount|crmMoney}</td>
-      {else}
-        <td></td>
-        <td></td>
-      {/if}
-      <td class="right">{$line.line_total+$line.tax_amount|crmMoney}</td>
-    {/if}
+          <td class="right">{$line.line_total|crmMoney}</td>
           {if $pricesetFieldsCount}
             <td class="right">{$line.participant_count}</td>
           {/if}
@@ -91,15 +67,9 @@
 
 <div class="crm-section no-label total_amount-section">
   <div class="content bold">
-    {if $getTaxDetails && $totalTaxAmount}
-      {ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney}<br />
-    {/if}
     {if $context EQ "Contribution"}
       {ts}Contribution Total{/ts}:
     {elseif $context EQ "Event"}
-      {if $totalTaxAmount}
-        {ts}Event SubTotal: {$totalAmount-$totalTaxAmount|crmMoney}{/ts}<br />
-      {/if}
       {ts}Event Total{/ts}:
     {elseif $context EQ "Membership"}
       {ts}Membership Fee Total{/ts}:

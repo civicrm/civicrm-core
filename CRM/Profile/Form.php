@@ -406,7 +406,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
+   * This function sets the default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -579,7 +579,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public
@@ -826,12 +826,18 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
   }
 
-  /**
-   * Validate profile and provided activity Id
+  /*
+   * Function to validate profile and provided activity Id
    *
-   * @param int $activityId
-   * @param int $contactId
-   * @param int $gid
+   * @params Integer $activityId Activity Id
+   * @params Integer $gid        Profile Id
+   *
+   * @return Array   $errors     Errors ( if any ).
+   */
+  /**
+   * @param $activityId
+   * @param $contactId
+   * @param $gid
    *
    * @return array
    */
@@ -871,7 +877,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    *
    * @param array  $fields the input form values
    * @param array  $files  the uploaded files if any
-   * @param CRM_Core_Form $form   the form object
+   * @param object $form   the form object
    *
    * @return true if no errors, else array of errors
    * @access public

@@ -55,7 +55,17 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   }
 
   /**
-   * takes an associative array and creates a case object
+   * Is CiviCase enabled?
+   *
+   * @return bool
+   */
+  static function enabled() {
+    $config = CRM_Core_Config::singleton();
+    return in_array('CiviCase', $config->enableComponents);
+  }
+
+  /**
+   * Takes an associative array and creates a case object
    *
    * the function extract all the params it needs to initialize the create a
    * case object. the params array could contain additional unused name/value
@@ -63,7 +73,9 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @return CRM_Case_BAO_Case object
+   * @internal param array $ids the array that holds all the db ids
+   *
+   * @return object CRM_Case_BAO_Case object
    * @access public
    * @static
    */
@@ -103,7 +115,9 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @return CRM_Case_BAO_Case object
+   * @internal param array $ids the array that holds all the db ids
+   *
+   * @return object CRM_Case_BAO_Case object
    * @access public
    * @static
    */
@@ -247,7 +261,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    *                        in a hierarchical manner
    * @param array $ids      (reference) the array that holds all the db ids
    *
-   * @return CRM_Case_BAO_Case object
+   * @return object CRM_Case_BAO_Case object
    * @access public
    * @static
    */
@@ -257,7 +271,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   }
 
   /**
-   * process case activity add/delete
+   * Function to process case activity add/delete
    * takes an associative array and
    *
    * @param array $params (reference ) an assoc array of name/value pairs
@@ -275,7 +289,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   }
 
   /**
-   * get the case subject for Activity
+   * Function to get the case subject for Activity
    *
    * @param int $activityId  activity id
    *
@@ -293,7 +307,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   }
 
   /**
-   * get the case type.
+   * Function to get the case type.
    *
    * @param int $caseId
    *
@@ -442,6 +456,8 @@ WHERE civicrm_case.id = %1";
    *
    * @param $activityId
    *
+   * @internal param $activity_id
+   *
    * @return int, case ID
    */
   static function getCaseIdByActivityId($activityId) {
@@ -509,8 +525,10 @@ WHERE civicrm_case.id = %1";
    *
    * @param $contactID
    * @param boolean $includeDeleted include the deleted cases in result
+   *
    * @param null $caseType
    *
+   * @internal param int $contactId ID of the contact
    * @return array
    *
    * @access public
@@ -1174,8 +1192,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $editUrl = "{$url}&action=update{$contextUrl}";
     $deleteUrl = "{$url}&action=delete{$contextUrl}";
     $restoreUrl = "{$url}&action=renew{$contextUrl}";
-    $viewTitle = ts('View activity');
-    $statusTitle = ts('Edit Status');
+    $viewTitle = ts('View this activity.');
+    $statusTitle = ts('Edit status');
 
     $emailActivityTypeIDs = array(
       'Email' => CRM_Core_OptionGroup::getValue('activity_type',
@@ -1892,8 +1910,10 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param $caseId
    * @param int $relationshipId relationship id
    * @param int $relContactId case role assignee contactId.
+   *
    * @param null $contactId
    *
+   * @internal param int $caseID case id
    * @return void on success creates activity and case activity
    *
    * @static
@@ -2794,18 +2814,8 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     }
 
     //do check for civicase component enabled.
-    if ($checkComponent) {
-      static $componentEnabled;
-      if (!isset($componentEnabled)) {
-        $config = CRM_Core_Config::singleton();
-        $componentEnabled = FALSE;
-        if (in_array('CiviCase', $config->enableComponents)) {
-          $componentEnabled = TRUE;
-        }
-      }
-      if (!$componentEnabled) {
-        return $allow;
-      }
+    if ($checkComponent && !self::enabled()) {
+      return $allow;
     }
 
     //do check for cases.
@@ -3034,15 +3044,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * or 'access all cases and activities'
    */
   static function accessCiviCase() {
-    static $componentEnabled;
-    if (!isset($componentEnabled)) {
-      $componentEnabled = FALSE;
-      $config = CRM_Core_Config::singleton();
-      if (in_array('CiviCase', $config->enableComponents)) {
-        $componentEnabled = TRUE;
-      }
-    }
-    if (!$componentEnabled) {
+    if (!self::enabled()) {
       return FALSE;
     }
 
@@ -3056,7 +3058,55 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   }
 
   /**
-   * Function to check whether activity is a case Activity
+   * Verify user has permission to access a case
+   *
+   * @param int $caseId
+   * @param bool $denyClosed set TRUE if one wants closed cases to be treated as inaccessible
+   *
+   * @return bool
+   */
+  static function accessCase($caseId, $denyClosed = TRUE) {
+    if (!$caseId || !self::enabled()) {
+      return FALSE;
+    }
+
+    // This permission always has access
+    if (CRM_Core_Permission::check('access all cases and activities')) {
+      return TRUE;
+    }
+
+    // This permission is required at minimum
+    if (!CRM_Core_Permission::check('access my cases and activities')) {
+      return FALSE;
+    }
+
+    $session = CRM_Core_Session::singleton();
+    $userID = CRM_Utils_Type::validate($session->get('userID'), 'Positive');
+    $caseId = CRM_Utils_Type::validate($caseId, 'Positive');
+
+    $condition = " AND civicrm_case.is_deleted = 0 ";
+    $condition .= " AND case_relationship.contact_id_b = {$userID} ";
+    $condition .= " AND civicrm_case.id = {$caseId}";
+
+    if ($denyClosed) {
+      $closedId = CRM_Core_OptionGroup::getValue('case_status', 'Closed', 'name');
+      $condition .= " AND civicrm_case.status_id != $closedId";
+    }
+
+    // We don't actually care about activities in the case, but the underlying
+    // query is verbose, and this allows us to share the basic query with
+    // getCases(). $type=='any' means that activities will be left-joined.
+    $query = self::getCaseActivityQuery('any', $userID, $condition);
+    $queryParams = array();
+    $dao = CRM_Core_DAO::executeQuery($query,
+      $queryParams
+    );
+
+    return (bool) $dao->fetch();
+  }
+
+  /**
+   * Check whether activity is a case Activity
    *
    * @param  int $activityID   activity id
    *

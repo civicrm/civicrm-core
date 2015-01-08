@@ -73,7 +73,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Contact_BAO_SavedSearch
+   * @return object CRM_Contact_BAO_SavedSearch
    * @access public
    * @static
    */

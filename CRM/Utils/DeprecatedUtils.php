@@ -596,7 +596,7 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
 }
 
 /**
- * check duplicate contacts based on de-deupe parameters
+ *  Function to check duplicate contacts based on de-deupe parameters
  */
 function _civicrm_api3_deprecated_check_contact_dedupe($params) {
   static $cIndieFields = NULL;
@@ -1212,8 +1212,11 @@ function _civicrm_api3_deprecated_validate_formatted_contact(&$params) {
 /**
  * @deprecated - this is part of the import parser not the API & needs to be moved on out
  *
- * @param array $params
+ * @param $params
  * @param $onDuplicate
+ *
+ * @internal param $ <type> $params
+ * @internal param $ <type> $onDuplicate
  *
  * @return array|bool <type>
  */
@@ -1262,7 +1265,7 @@ function _civicrm_api3_deprecated_participant_check_params($params, $checkDuplic
   if (!empty($params['event_id'])) {
     $isTemplate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'is_template');
     if (!empty($isTemplate)) {
-      return civicrm_api3_create_error(ts('Event templates are not meant to be registered.'));
+      return civicrm_api3_create_error(ts('Event templates are not meant to be registered'));
     }
   }
 
@@ -1327,7 +1330,7 @@ function _civicrm_api3_deprecated_contact_check_custom_params($params, $csType =
 }
 
 /**
- * @param array $params
+ * @param $params
  * @param bool $dupeCheck
  * @param bool $dupeErrorArray
  * @param bool $requiredCheck
@@ -1373,7 +1376,7 @@ function _civicrm_api3_deprecated_contact_check_params(
 
     if ($csType = CRM_Utils_Array::value('contact_sub_type', $params)) {
       if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($csType, $params['contact_type']))) {
-        return civicrm_api3_create_error("Invalid or Mismatched Contact Subtype: " . implode(', ', (array)$csType));
+        return civicrm_api3_create_error("Invalid or Mismatched Contact SubType: " . implode(', ', (array)$csType));
       }
     }
 
@@ -1466,6 +1469,9 @@ function _civicrm_api3_deprecated_contact_check_params(
  *
  * @param $result
  * @param $activityTypeID
+ *
+ * @internal param $ <type> $result
+ * @internal param $ <type> $activityTypeID
  *
  * @return array <type> $params
  */

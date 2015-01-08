@@ -39,7 +39,7 @@
  */
 class CRM_Case_Form_Activity_LinkCases {
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @throws Exception
    */
@@ -70,12 +70,12 @@ class CRM_Case_Form_Activity_LinkCases {
   }
 
   /**
-   * Set default values for the form. For edit/view mode
+   * This function sets the default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
    *
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return void
    */
@@ -84,7 +84,7 @@ class CRM_Case_Form_Activity_LinkCases {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    */
   static function buildQuickForm(&$form) {
     $form->add('text', 'link_to_case_id', ts('Link To Case'), array('class' => 'huge'), TRUE);
@@ -96,7 +96,7 @@ class CRM_Case_Form_Activity_LinkCases {
    * @param array $values posted values of the form
    *
    * @param $files
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -121,24 +121,24 @@ class CRM_Case_Form_Activity_LinkCases {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *
-   * @param CRM_Core_Form $form
-   * @param array $params
+   * @param $form
+   * @param $params
    *
    * @return void
    */
   static function beginPostProcess(&$form, &$params) {}
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *
-   * @param CRM_Core_Form $form
-   * @param array $params
+   * @param $form
+   * @param $params
    * @param $activity
    *
    * @return void

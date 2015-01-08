@@ -113,7 +113,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    * @return void

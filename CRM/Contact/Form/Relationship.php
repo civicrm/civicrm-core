@@ -211,7 +211,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. Relationship that in edit/view mode
+   * This function sets the default values for the form. Relationship that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -293,7 +293,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -541,7 +541,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   * date validation
+   * function for date validation
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *

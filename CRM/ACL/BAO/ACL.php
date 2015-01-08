@@ -92,13 +92,14 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   /**
    * Construct a WHERE clause to handle permissions to $object_*
    *
-   * @param array $tables -   Any tables that may be needed in the FROM
+   * @param $tables
    * @param string $operation -   The operation being attempted
    * @param string $object_table -    The table of the object in question
    * @param int $object_id -   The ID of the object in question
    * @param int $acl_id -       If it's a grant/revoke operation, the ACL ID
    * @param boolean $acl_role -  For grant operations, this flag determines if we're granting a single acl (false) or an entire group.
    *
+   * @internal param \ref $array $tables -   Any tables that may be needed in the FROM
    * @return string           -   The WHERE clause, or 0 on failure
    * @access public
    * @static
@@ -329,7 +330,9 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    *
    * @param string $table -   The table owning the object
    * @param int $id -       The ID of the object
-   * @param array $tables - Tables that will be needed in the FROM
+   * @param $tables
+   *
+   * @internal param \ref $array $tables - Tables that will be needed in the FROM
    *
    * @return string|null  -   WHERE-style clause to filter results,
    * or null if $table or $id is null
@@ -654,7 +657,7 @@ SELECT $acl.*
   }
 
   /**
-   * @param array $params
+   * @param $params
    *
    * @return CRM_ACL_DAO_ACL
    */
@@ -666,7 +669,7 @@ SELECT $acl.*
   }
 
   /**
-   * @param array $params
+   * @param $params
    * @param $defaults
    */
   static function retrieve(&$params, &$defaults) {
@@ -731,6 +734,7 @@ SELECT count( a.id )
    */
   public static function whereClause($type, &$tables, &$whereTables, $contactID = NULL) {
     $acls = CRM_ACL_BAO_Cache::build($contactID);
+    //CRM_Core_Error::debug( "a: $contactID", $acls );
 
     $whereClause = NULL;
     $clauses = array();
@@ -846,7 +850,7 @@ SELECT g.*
   }
 
   /**
-   * @param int $type
+   * @param $type
    * @param null $contactID
    * @param string $tableName
    * @param null $allGroups
@@ -917,7 +921,7 @@ ORDER BY a.object_id
   }
 
   /**
-   * @param int $type
+   * @param $type
    * @param $operation
    *
    * @return bool
@@ -963,7 +967,7 @@ ORDER BY a.object_id
   }
 
   /**
-   * delete ACL records
+   * Function to delete ACL records
    *
    * @param  int  $aclId     ID of the ACL record to be deleted.
    *

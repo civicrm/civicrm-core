@@ -54,7 +54,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
-   * @return CRM_Friend_BAO_Friend object
+   * @return object CRM_Friend_BAO_Friend object
    * @access public
    * @static
    */
@@ -91,7 +91,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @return CRM_Contact_BAO_Contact object
+   * @return object CRM_Contact_BAO_Contact object
    * @access public
    * @static
    */
@@ -236,9 +236,9 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
-   * @param CRM_Core_Form $form form object
+   * @param object $form form object
    *
    * @return void
    * @access public
@@ -288,8 +288,11 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   /**
    * Process that send tell a friend e-mails
    *
-   * @param int $contactID
-   * @param array $values
+   * @params int     $contactId      contact id
+   * @params array   $values         associative array of name/value pair
+   *
+   * @param $contactID
+   * @param $values
    *
    * @return void
    * @access public
@@ -341,7 +344,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
    *
-   * @return CRM_Friend_BAO_Friend object
+   * @return object CRM_Friend_BAO_Friend object
    * @access public
    * @static
    */

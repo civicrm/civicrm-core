@@ -49,7 +49,11 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   static $_matchFields = NULL;
 
   /**
-   * Fetch object based on array of properties
+   * Takes a bunch of params that are needed to match certain criteria and
+   * retrieves the relevant objects. Typically the valid params are only
+   * contact_id. We'll tweak this function to be more full featured over a period
+   * of time. This is the inverse function of create. It also stores all the retrieved
+   * values in the default array
    *
    * @param array $params      (reference) an assoc array of name/value pairs
    * @param array $defaults    (reference) an assoc array to hold the flattened values
@@ -256,12 +260,14 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param          $searchable
    * @param bool $showAll
    * @param string $restrict should we restrict based on a specified profile type
+   *
    * @param bool $skipPermission
    * @param null $ctype
    * @param int $permissionType
    * @param string $orderBy
    * @param null $orderProfiles
    *
+   * @internal param bool $showall
    * @return array   the fields that belong to this ufgroup(s)
    * @static
    * @access public
@@ -362,8 +368,9 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param null $ctype
    * @param int $permissionType
    *
+   * @internal param bool $showall
    * @return array
-   * @see self::getFields
+   * @see getFields
    */
   public static function formatUFFields(
     $groupArr,
@@ -882,7 +889,9 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param int $id the current contact id (hence excluded from matching)
    * @param string $contactType
    *
-   * @return int|null contact_id if found, null otherwise
+   * @internal param bool $flatten should we flatten the input params
+   *
+   * @return contact_id if found, null otherwise
    * @access public
    * @static
    */
@@ -908,8 +917,10 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param boolean $searchable searchable or not
    * @param array $componentWhere component condition
    * @param boolean $absolute return urls in absolute form (useful when sending an email)
+   *
    * @param null $additionalWhereClause
    *
+   * @internal param int $id the contact id
    * @return void
    * @access public
    * @static
@@ -1375,7 +1386,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   }
 
   /**
-   * add the UF Group
+   * function to add the UF Group
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids    reference array contains the id
@@ -1418,7 +1429,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   }
 
   /**
-   * make uf join entries for an uf group
+   * Function to make uf join entries for an uf group
    *
    * @param array $params       (reference) an assoc array of name/value pairs
    * @param int   $ufGroupId    ufgroup id
@@ -1488,11 +1499,15 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * get the UF Join records for an ufgroup id
+   * Function to get the UF Join records for an ufgroup id
    *
-   * @param int $ufGroupId uf group id
-   * @param int $displayName if set return display name in array
-   * @param int $status if set return module other than default modules (User Account/User registration/Profile)
+   * @params int $ufGroupId uf group id
+   * @params int $displayName if set return display name in array
+   * @params int $status if set return module other than default modules (User Account/User registration/Profile)
+   *
+   * @param null $ufGroupId
+   * @param null $displayName
+   * @param null $status
    *
    * @return array $ufGroupJoinRecords
    *
@@ -1540,7 +1555,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *
-   * @return CRM_Core_BAO_UFJoin object
+   * @return object CRM_Core_BAO_UFJoin object
    * @access public
    * @static
    */
@@ -1605,6 +1620,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param int $op - which operation (view, edit, create, etc) to check permission for
    * @param array|NULL $returnFields list of UFGroup fields to return; NULL for default
    *
+   * @internal param bool $skipPermision - whether to add permission clause
    * @return array $ufGroups array of ufgroups for a module
    * @access public
    * @static
@@ -1675,8 +1691,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   /**
    * Function to filter ufgroups based on logged in user contact type
    *
-   * @param int $ufGroupId uf group id (profile id)
-   * @param int $contactID
+   * @params int $ufGroupId uf group id (profile id)
+   *
+   * @param $ufGroupId
+   * @param null $contactID
    *
    * @return boolean true or false
    * @static
@@ -1891,13 +1909,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           '' => ts('- select -')) + CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label'), $required
       );
     }
-    elseif (in_array($fieldName, array('gender_id', 'communication_style_id'))) {
-      $options = array();
-      $pseudoValues = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $fieldName);
-      foreach ($pseudoValues as $key => $var) {
-        $options[$key] = $form->createElement('radio', NULL, ts($title), $var, $key);
+    elseif ($fieldName === 'gender_id') {
+      $genderOptions = array();
+      $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
+      foreach ($gender as $key => $var) {
+        $genderOptions[$key] = $form->createElement('radio', NULL, ts('Gender'), $var, $key);
       }
-      $group = $form->addGroup($options, $name, $title);
+      $group = $form->addGroup($genderOptions, $name, $title);
       if ($required) {
         $form->addRule($name, ts('%1 is a required field.', array(1 => $title)), 'required');
       }
@@ -2222,12 +2240,18 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   /**
    * Function to set profile defaults
    *
-   * @param int     $contactId      contact id
-   * @param array   $fields         associative array of fields
-   * @param array   $defaults       defaults array
-   * @param boolean $singleProfile  true for single profile else false(batch update)
-   * @param int     $componentId    id for specific components like contribute, event etc
-   * @param null    $component
+   * @params int     $contactId      contact id
+   * @params array   $fields         associative array of fields
+   * @params array   $defaults       defaults array
+   * @params boolean $singleProfile  true for single profile else false(batch update)
+   * @params int     $componentId    id for specific components like contribute, event etc
+   *
+   * @param $contactId
+   * @param $fields
+   * @param $defaults
+   * @param bool $singleProfile
+   * @param null $componentId
+   * @param null $component
    *
    * @return null
    * @static
@@ -2662,8 +2686,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   /**
    * Process that send notification e-mails
    *
-   * @param int     $contactID      contact id
-   * @param array   $values         associative array of name/value pair
+   * @params int     $contactId      contact id
+   * @params array   $values         associative array of name/value pair
+   *
+   * @param $contactID
+   * @param $values
    *
    * @return void
    * @access public
@@ -2721,9 +2748,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * for this group and notify email only if group's notify field is
    * set and field values are not empty
    *
-   * @param int $gid  group id
-   * @param int $cid  contact id
-   * @param array $params
+   * @params $gid      group id
+   * @params $cid      contact id
+   * @params $params   associative array
+   *
+   * @param $gid
+   * @param $cid
+   * @param $params
    * @param bool $skipCheck
    *
    * @return array
@@ -2756,9 +2787,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   /**
    * Function to assign uf fields to template
    *
-   * @param int $gid group id
-   * @param array $values
-   * @param CRM_Core_Smarty $template
+   * @params int     $gid      group id
+   * @params array   $values   associative array of fields
+   *
+   * @param $gid
+   * @param $values
+   * @param $template
    *
    * @return void
    * @access public
@@ -2909,10 +2943,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   /**
    * calculate the profile type 'group_type' as per profile fields.
    *
-   * @param int $gId profile id
+   * @param $gId
    * @param bool $includeTypeValues
    * @param int $ignoreFieldId ignore particular profile field
    *
+   * @internal param int $gid profile id
    * @return array list of calculated group type
    */
   static function calculateGroupType($gId, $includeTypeValues = FALSE, $ignoreFieldId = NULL) {
@@ -2928,6 +2963,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param bool $includeTypeValues
    * @param int $ignoreFieldId ignore perticular profile field
    *
+   * @internal param int $gid profile id
    * @return array list of calculated group type
    */
   static function _calculateGroupType($ufFields, $includeTypeValues = FALSE, $ignoreFieldId = NULL) {
@@ -2993,12 +3029,14 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * BirthDate + SurveyOrPhoneField + SurveyOnlyField         Individual,Activity\0ActivityType:2:28
    * BirthDate + StudentField + Subject + SurveyOnlyField     Individual,Activity,Student\0ActivityType:28
    *
-   * @param int $gId
-   * @param array $groupTypes With key having group type names
+   * @param $gId
+   * @param  Array $groupTypes With key having group type names
    *
+   * @internal param int $gid profile id
    * @return Boolean
    */
-  static function updateGroupTypes($gId, $groupTypes = array()) {
+  static function updateGroupTypes($gId, $groupTypes = array(
+    )) {
     if (!is_array($groupTypes) || !$gId) {
       return FALSE;
     }
@@ -3435,8 +3473,11 @@ SELECT  group_id
   /**
    * function to get group type values of the profile
    *
-   * @param int $profileId
-   * @param string $groupType
+   * @params Integer $profileId       Profile Id
+   * @params String  $groupType       Group Type
+   *
+   * @param $profileId
+   * @param null $groupType
    *
    * @return Array   group type values
    * @static

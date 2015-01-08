@@ -330,13 +330,13 @@ class CRM_Campaign_Page_AJAX {
         elseif ($searchVoterFor == 'gotv') {
           $surveyActId       = $result->survey_activity_id;
           $voterExtraColHtml = '<input type="checkbox" id="survey_activity[' . $surveyActId . ']" name="survey_activity[' . $surveyActId . ']" value=' . $surveyActId . ' onClick="processVoterData( this, \'gotv\' );" />';
-          $msg               = ts('Vote Recorded.');
+          $msg               = ts('Vote Recorded');
           $voterExtraColHtml .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id='success_msg_{$surveyActId}' class='ok' style='display:none;'>$msg</span>";
         }
         else {
           $surveyActId       = $result->survey_activity_id;
           $voterExtraColHtml = '<input type="checkbox" id="survey_activity[' . $surveyActId . ']" name="survey_activity[' . $surveyActId . ']" value=' . $surveyActId . ' onClick="processVoterData( this, \'release\' );" />';
-          $msg               = ts('Vote Recorded.');
+          $msg               = ts('Vote Recorded');
           $voterExtraColHtml .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id='success_msg_{$surveyActId}' class='ok' style='display:none;'>$msg</span>";
         }
         $searchRows[$contactID][$extraVoterColName] = $voterExtraColHtml;

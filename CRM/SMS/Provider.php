@@ -54,7 +54,8 @@ abstract class CRM_SMS_Provider {
    * @return object
    * @static
    */
-  static function &singleton($providerParams = array(), $force = FALSE) {
+  static function &singleton($providerParams = array(
+    ), $force = FALSE) {
     $mailingID    = CRM_Utils_Array::value('mailing_id', $providerParams);
     $providerID   = CRM_Utils_Array::value('provider_id', $providerParams);
     $providerName = CRM_Utils_Array::value('provider', $providerParams);
@@ -96,7 +97,7 @@ abstract class CRM_SMS_Provider {
   abstract function send($recipients, $header, $message, $dncID = NULL);
 
   /**
-   * return message text. Child class could override this function to have better control over the message being sent.
+   * Function to return message text. Child class could override this function to have better control over the message being sent.
    *
    * @access public
    */
@@ -129,7 +130,8 @@ abstract class CRM_SMS_Provider {
    * @return $this|null|object
    * @throws CRM_Core_Exception
    */
-  function createActivity($apiMsgID, $message, $headers = array(), $jobID = NULL, $userID = NULL) {
+  function createActivity($apiMsgID, $message, $headers = array(
+    ), $jobID = NULL, $userID = NULL) {
     if ($jobID) {
       $sql = "
 SELECT scheduled_id FROM civicrm_mailing m

@@ -199,7 +199,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
   /**
    * Remove an item from the queue
    *
-   * @param CRM_Core_DAO $dao The item returned by claimItem
+   * @param $dao object The item returned by claimItem
    */
   function deleteItem($dao) {
     $dao->delete();
@@ -209,7 +209,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
   /**
    * Return an item that could not be processed
    *
-   * @param CRM_Core_DAO $dao The item returned by claimItem
+   * @param $dao object The item returned by claimItem
    *
    * @return bool
    */

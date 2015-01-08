@@ -155,7 +155,7 @@ function civicrm_api3_contact_get($params) {
 }
 
 /**
- * @param array $params
+ * @param $params
  *
  * @return int
  */
@@ -292,7 +292,7 @@ function civicrm_api3_contact_delete($params) {
 
 
 /**
- * @param array $params
+ * @param $params
  * @param bool $dupeCheck
  * @param bool $dupeErrorArray
  * @param bool $obsoletevalue
@@ -330,7 +330,7 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
 
   if (!empty($params['contact_sub_type']) && !empty($params['contact_type'])) {
       if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $params['contact_type']))) {
-        throw new API_Exception("Invalid or Mismatched Contact Subtype: " . implode(', ', (array)$params['contact_sub_type']));
+        throw new API_Exception("Invalid or Mismatched Contact SubType: " . implode(', ', (array)$params['contact_sub_type']));
       }
     }
 
@@ -396,7 +396,7 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
  * @param array $params (reference ) an assoc array of name/value pairs
  * @param  int     $contactID        if present the contact with that ID is updated
  *
- * @return CRM_Contact_BAO_Contact object
+ * @return object CRM_Contact_BAO_Contact object
  * @access public
  * @static
  */
@@ -720,8 +720,8 @@ function civicrm_api3_contact_getquick($params) {
   //CRM-10687
   if (!empty($params['field_name']) && !empty($params['table_name'])) {
     $table_name = CRM_Utils_String::munge($params['table_name']);
-    $whereClause = " WHERE ( $table_name.$field_name LIKE '$strSearch') {$where}";
-    $exactWhereClause = " WHERE ( $table_name.$field_name = '$name') {$where}";
+    $whereClause = " WHERE ( $table_name.$field_name LIKE '$strSearch')";
+    $exactWhereClause = " WHERE ( $table_name.$field_name = '$name')";
     // Search by id should be exact
     if ($field_name == 'id' || $field_name == 'external_identifier') {
       $whereClause = $exactWhereClause;
@@ -881,7 +881,7 @@ function civicrm_api3_contact_merge($params) {
 }
 
 /**
- * @param array $params
+ * @param $params
  */
 function _civicrm_api3_contact_proximity_spec(&$params) {
   $params['latitude']['api.required'] = 1;
@@ -893,7 +893,7 @@ function _civicrm_api3_contact_proximity_spec(&$params) {
 }
 
 /**
- * @param array $params
+ * @param $params
  *
  * @return array
  * @throws Exception

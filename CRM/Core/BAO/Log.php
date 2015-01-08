@@ -151,9 +151,11 @@ UPDATE civicrm_log
   }
 
   /**
-   * get log record count for a Contact
+   * Function to get log record count for a Contact
    *
-   * @param int $contactID
+   * @param $contactID
+   *
+   * @internal param int $contactId Contact ID
    *
    * @return int count of log records
    * @access public

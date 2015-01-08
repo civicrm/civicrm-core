@@ -43,7 +43,7 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
     'disable_core_css' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
   );
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public

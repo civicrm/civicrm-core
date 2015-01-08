@@ -34,7 +34,7 @@
  */
 
 /**
- * load a context. If name is asked for only name data is returned.
+ * Function to load a context. If name is asked for only name data is returned.
  * And if name is not provided whole context is returned.
  *
  */

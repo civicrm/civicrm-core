@@ -49,12 +49,16 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * Fetch object based on array of properties
+   * Takes a bunch of params that are needed to match certain criteria and
+   * retrieves the relevant objects. Typically the valid params are only
+   * contact_id. We'll tweak this function to be more full featured over a period
+   * of time. This is the inverse function of create. It also stores all the retrieved
+   * values in the default array
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Member_BAO_MembershipType object
+   * @return object CRM_Member_BAO_MembershipType object
    * @access public
    * @static
    */
@@ -82,7 +86,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * add the membership types
+   * function to add the membership types
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids array contains the id (deprecated)
@@ -109,19 +113,15 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     $membershipType->copyValues($params);
     $membershipType->id = $id;
 
-    // $previousID is the old organization id for membership type i.e 'member_of_contact_id'. This is used when an organization is changed.
+    // $previousID is the old organization id for membership type i.e 'member_of_contact_id'. This is used when an oganization is changed.
     $previousID = NULL;
-    if ($id) {
-      $previousID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $id, 'member_of_contact_id');
+    if ($membershipType->id) {
+      $previousID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipType->id, 'member_of_contact_id');
     }
 
     $membershipType->save();
-    if ($id) {
-      // on update we may need to retrieve some details for the price field function - otherwise we get e-notices on attempts to retrieve
-      // name etc - the presence of previous id tells us this is an update
-      $params = array_merge(civicrm_api3('membership_type', 'getsingle', array('id' => $membershipType->id)), $params);
-    }
-    self::createMembershipPriceField($params, $previousID, $membershipType->id);
+
+    self::createMembershipPriceField($params, $ids, $previousID, $membershipType->id);
     // update all price field value for quick config when membership type is set CRM-11718
     if ($id) {
       self::updateAllPriceFieldValue($id, $params);
@@ -131,7 +131,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * delete membership Types
+   * Function to delete membership Types
    *
    * @param int $membershipTypeId
    *
@@ -188,7 +188,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * convert membership Type's 'start day' & 'rollover day' to human readable formats.
+   * Function to convert membership Type's 'start day' & 'rollover day' to human readable formats.
    *
    * @param array $membershipType an array of membershipType-details.
    * @static
@@ -234,6 +234,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param bool $public
    *
    * @return array
+   * @internal param int $membershipTypeId
    * @static
    */
   static function getMembershipTypes($public = TRUE) {
@@ -608,9 +609,11 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   /**
    * The function returns all the Organization for  all membershiptypes .
    *
-   * @param int $membershipTypeId
+   * @param null $membershipTypeId
    *
    * @return array
+   * @internal param array $allmembershipTypes array of allMembershipTypes
+   *  with organization id Key - value pairs.
    */
   static function getMembershipTypeOrganization($membershipTypeId = NULL) {
     $allmembershipTypes = array();
@@ -657,11 +660,12 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
 
   /**
-   * @param array $params
+   * @param $params
+   * @param $ids
    * @param $previousID
    * @param $membershipTypeId
    */
-  public static function createMembershipPriceField($params, $previousID, $membershipTypeId) {
+  public static function createMembershipPriceField($params, $ids, $previousID, $membershipTypeId) {
 
     $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
 
@@ -698,7 +702,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         CRM_Member_Form_MembershipType::checkPreviousPriceField($previousID, $priceSetId, $membershipTypeId, $optionsIds);
         $fieldParams['option_id'] = CRM_Utils_Array::value('option_id', $optionsIds);
       }
-      CRM_Price_BAO_PriceField::create($fieldParams);
+      $priceField = CRM_Price_BAO_PriceField::create($fieldParams);
     }
     else {
       $fieldID = $results['id'];

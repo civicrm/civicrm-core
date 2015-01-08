@@ -42,12 +42,16 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   }
 
   /**
-   * Fetch object based on array of properties
+   * Takes a bunch of params that are needed to match certain criteria and
+   * retrieves the relevant objects. Typically the valid params are only
+   * contact_id. We'll tweak this function to be more full featured over a period
+   * of time. This is the inverse function of create. It also stores all the retrieved
+   * values in the default array
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Event_BAO_ManageEvent object
+   * @return object CRM_Event_BAO_ManageEvent object
    * @access public
    * @static
    */
@@ -75,7 +79,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   }
 
   /**
-   * add the event
+   * function to add the event
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -115,7 +119,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   }
 
   /**
-   * create the event
+   * function to create the event
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -174,7 +178,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   }
 
   /**
-   * delete the event
+   * Function to delete the event
    *
    * @param int $id event id
    *
@@ -227,8 +231,11 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * Function to delete the location block associated with an event,
    * if not being used by any other event.
    *
-   * @param $locBlockId location block id to be deleted
-   * @param int $eventId event with which loc block is associated
+   * @param $locBlockId
+   * @param null $eventId
+   *
+   * @internal param int $loc_block_id location block id to be deleted
+   * @internal param int $eventid event id with which loc block is associated
    *
    * @access public
    * @static
@@ -396,15 +403,13 @@ SELECT     civicrm_event.id as id, civicrm_event.title as event_title, civicrm_e
            civicrm_event.end_date as end_date, civicrm_event.is_online_registration, civicrm_event.is_monetary, civicrm_event.is_show_location,civicrm_event.is_map as is_map, civicrm_option_value.label as event_type, civicrm_tell_friend.is_active as is_friend_active,
            civicrm_event.slot_label_id,
            civicrm_event.summary as summary,
-           civicrm_pcp_block.id as is_pcp_enabled,
-           civicrm_recurring_entity.parent_id as is_repeating_event
+           civicrm_pcp_block.id as is_pcp_enabled
 FROM       civicrm_event
 LEFT JOIN  civicrm_option_value ON (
            civicrm_event.event_type_id = civicrm_option_value.value AND
            civicrm_option_value.option_group_id = %1 )
 LEFT JOIN  civicrm_tell_friend ON ( civicrm_tell_friend.entity_id = civicrm_event.id  AND civicrm_tell_friend.entity_table = 'civicrm_event' )
 LEFT JOIN  civicrm_pcp_block ON ( civicrm_pcp_block.entity_id = civicrm_event.id AND civicrm_pcp_block.entity_table = 'civicrm_event')
-LEFT JOIN  civicrm_recurring_entity ON ( civicrm_event.id = civicrm_recurring_entity.entity_id AND civicrm_recurring_entity.entity_table = 'civicrm_event' )
 WHERE      civicrm_event.is_active = 1 AND
            ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0) AND
            civicrm_event.start_date >= DATE_SUB( NOW(), INTERVAL 7 day )
@@ -536,7 +541,6 @@ $event_summary_limit
       $eventSummary['events'][$dao->id]['is_subevent'] = $dao->slot_label_id;
       $eventSummary['events'][$dao->id]['is_pcp_enabled'] = $dao->is_pcp_enabled;
       $eventSummary['events'][$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mappingID);
-      $eventSummary['events'][$dao->id]['is_repeating_event'] = $dao->is_repeating_event;
 
       $statusTypes = CRM_Event_PseudoConstant::participantStatus();
       foreach ($statusValues as $statusId => $statusValue) {
@@ -581,6 +585,9 @@ $event_summary_limit
    * @param  boolean $status consider counted participant.
    * @param  boolean $considerRole consider role for participant count.
    * @param  boolean $role consider counted( is filter role) participant.
+   *
+   * @internal param array $eventIds consider participants from given events.
+   * @internal param bool $countWithStatus retrieve participant count w/ each participant status.
    *
    * @access public
    *
@@ -637,7 +644,9 @@ $event_summary_limit
   /**
    * function to get the information to map a event
    *
-   * @param int $id for which we want map info
+   * @param $id
+   *
+   * @internal param array $ids the list of ids for which we want map info
    *
    * @return null|string     title of the event
    * @static
@@ -1208,15 +1217,6 @@ WHERE civicrm_event.is_active = 1
           $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc_confirm',
             $values['event']
           );
-          // append invoice pdf to email
-          $template = CRM_Core_Smarty::singleton( );
-          $taxAmt = $template->get_template_vars('totalTaxAmount');
-          $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
-          $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
-          if ($taxAmt && (isset($invoicing) && isset($prefixValue['is_email_pdf'])) ) {
-            $sendTemplateParams['isEmailPdf'] = True;
-            $sendTemplateParams['contributionId'] = $values['contributionId'];
-          }
           CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         }
       }
@@ -1275,7 +1275,7 @@ WHERE civicrm_event.is_active = 1
         //add participant id
         $fields['participant_id'] = array(
           'name' => 'participant_id',
-          'title' => ts('Participant ID'),
+          'title' => 'Participant Id',
         );
         //check whether its a text drive
         if ($isTest) {
@@ -1805,7 +1805,7 @@ WHERE  id = $cfID
     $events = array();
 
     $query = "
-SELECT CONCAT_WS(' :: ' , ca.name, ca.street_address, ca.city, sp.name, ca.supplemental_address_1, ca.supplemental_address_2) title, ce.loc_block_id
+SELECT CONCAT_WS(' :: ' , ca.name, ca.street_address, ca.city, sp.name) title, ce.loc_block_id
 FROM   civicrm_event ce
 INNER JOIN civicrm_loc_block lb ON ce.loc_block_id = lb.id
 INNER JOIN civicrm_address ca   ON lb.address_id = ca.id
@@ -1925,7 +1925,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @access public
    */
   /**
-   * @param array $params
+   * @param $params
    *
    * @return bool
    */
@@ -1953,8 +1953,11 @@ WHERE  ce.loc_block_id = $locBlockId";
   /**
    * make sure that the user has permission to access this event
    *
-   * @param int $eventId
+   * @param null $eventId
    * @param int $type
+   *
+   * @internal param int $id the id of the event
+   * @internal param int $name the name or title of the event
    *
    * @return string   the permission that the user has (or null)
    * @access public
@@ -2094,13 +2097,18 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     return (int)CRM_Core_DAO::singleValueQuery($query, array(1 => array($eventId, 'Positive')));
   }
 
-  /**
+  /*
    * Retrieve event template default values to be set
    *  as default values for current new event.
    *
-   * @param int $templateId event template id.
+   * @params int $templateId event template id.
    *
-   * @return array of custom data defaults.
+   * @return $defaults an array of custom data defaults.
+   */
+  /**
+   * @param $templateId
+   *
+   * @return array
    */
   static function getTemplateDefaultValues($templateId) {
     $defaults = array();
@@ -2134,11 +2142,16 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     return CRM_Event_BAO_Event::retrieve($params, $defaults);
   }
 
-  /**
+  /*
    * Update the Campaign Id of all the participants of the given event
    *
-   * @param int $eventID event id.
-   * @param int $eventCampaignID campaign id of that event
+   * @params int $eventID event id.
+   * @params int $eventCampaignID campaign id of that event
+   *
+   */
+  /**
+   * @param $eventID
+   * @param $eventCampaignID
    */
   static function updateParticipantCampaignID($eventID, $eventCampaignID) {
     $params = array();
@@ -2175,5 +2188,5 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
-
 }
+

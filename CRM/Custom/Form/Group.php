@@ -71,7 +71,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   protected $_defaults = array();
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @param null
    *
@@ -116,6 +116,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @param array $files the uploaded files if any
    * @param $self
    *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -166,7 +167,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       // gives the ascii value
       $asciiValue = ord($title{0});
       if ($asciiValue >= 48 && $asciiValue <= 57) {
-        $errors['title'] = ts("Name cannot not start with a digit");
+        $errors['title'] = ts("Set's Name should not start with digit");
       }
     }
 
@@ -188,7 +189,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @param null
    *
@@ -404,7 +405,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
+   * This function sets the default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @param null
@@ -442,6 +443,9 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       else {
         $defaults['extends'][1] = array(0 => '');
       }
+
+
+      $subName = CRM_Utils_Array::value('extends_entity_column_id', $defaults);
 
       if ($extends == 'Relationship' && !empty($this->_subtypes)) {
         $relationshipDefaults = array();
@@ -528,12 +532,16 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     }
   }
 
+  /*
+   * Function to return a formatted list of relationship name.
+   * @param $list array array of relationship name.
+   * @static
+   * return array array of relationship name.
+   */
   /**
-   * Return a formatted list of relationship name.
+   * @param $list
    *
-   * @param array $list array of relationship name.
-   *
-   * @return array of relationship name.
+   * @return array
    */
   static function getFormattedList(&$list) {
     $relName = array();

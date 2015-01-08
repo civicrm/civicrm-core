@@ -232,7 +232,7 @@ ORDER BY e.is_primary DESC, email_id ASC ";
   }
 
   /**
-   * set / reset hold status for an email
+   * Function to set / reset hold status for an email
    *
    * @param object $email  email object
    *

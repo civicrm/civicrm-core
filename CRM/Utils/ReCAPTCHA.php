@@ -116,7 +116,7 @@ class CRM_Utils_ReCAPTCHA {
 
   /**
    * @param $value
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return mixed
    */

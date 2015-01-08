@@ -467,7 +467,7 @@ class CRM_Core_I18n_Schema {
    *
    * @param $locale string  locale of the view
    * @param $table string   table of the view
-   * @param CRM_Core_DAO $dao     a DAO object to run DESCRIBE queries
+   * @param $dao object     a DAO object to run DESCRIBE queries
    * @param $class string   schema structure class to use
    *
    * @return array          array of CREATE INDEX queries

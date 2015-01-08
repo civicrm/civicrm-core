@@ -41,12 +41,16 @@ require_once 'Mail/mime.php';
 class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
   /**
-   * Fetch object based on array of properties
+   * Takes a bunch of params that are needed to match certain criteria and
+   * retrieves the relevant objects. Typically the valid params are only
+   * contact_id. We'll tweak this function to be more full featured over a period
+   * of time. This is the inverse function of create. It also stores all the retrieved
+   * values in the default array
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Core_BAO_MessageTemplate object
+   * @return object CRM_Core_BAO_MessageTemplate object
    * @access public
    * @static
    */
@@ -74,7 +78,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * add the Message Templates
+   * function to add the Message Templates
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -96,7 +100,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * delete the Message Templates
+   * function to delete the Message Templates
    *
    * @access public
    * @static
@@ -126,7 +130,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * get the Message Templates
+   * function to get the Message Templates
    *
    * @access public
    * @static
@@ -501,13 +505,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       }
 
       $config = CRM_Core_Config::singleton();
-      if (isset($params['isEmailPdf']) && $params['isEmailPdf'] == 1) {
-        $pdfHtml = CRM_Contribute_BAO_ContributionPage::addInvoicePdfToEmail($params['contributionId'], $params['contactId']);
-        if (empty($params['attachments'])) {
-          $params['attachments'] = array();
-        }
-        $params['attachments'][] =  CRM_Utils_Mail::appendPDF('Invoice.pdf', $pdfHtml, $format) ;
-      }
       $pdf_filename = '';
       if ($config->doNotAttachPDFReceipt &&
         $params['PDFFilename'] &&
@@ -517,10 +514,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
           $params['attachments'] = array();
         }
         $params['attachments'][] = CRM_Utils_Mail::appendPDF($params['PDFFilename'], $params['html'], $format);
-        if (isset($params['tplParams']['email_comment'])) {
-          $params['html'] = $params['tplParams']['email_comment'];
-          $params['text'] = strip_tags($params['tplParams']['email_comment']);
-        }
       }
 
       $sent = CRM_Utils_Mail::send($params);

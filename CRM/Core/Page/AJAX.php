@@ -39,7 +39,7 @@
 class CRM_Core_Page_AJAX {
 
   /**
-   * call generic ajax forms
+   * function to call generic ajax forms
    *
    * @static
    * @access public
@@ -90,7 +90,7 @@ class CRM_Core_Page_AJAX {
   }
 
   /**
-   * change is_quick_config priceSet to complex
+   * function to change is_quick_config priceSet to complex
    *
    * @static
    * @access public

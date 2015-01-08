@@ -95,16 +95,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
-   * @return bool
-   */
-  protected function supportsBackOffice() {
-    if ($this->_processorName == ts('PayPal Pro')) {
-      return TRUE;
-    }
-    return FALSE;
-  }
-  /**
    * express checkout code. Check PayPal documentation for more information
    *
    * @param  array $params assoc array of input parameters for this transaction
@@ -192,7 +182,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   /**
    * do the express checkout at paypal. Check PayPal documentation for more information
    *
-   * @param array $params
+   * @param $params
    *
    * @internal param string $token the key associated with this transaction
    *
@@ -237,7 +227,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
   //LCD add new function for handling recurring payments for PayPal Express
   /**
-   * @param array $params
+   * @param $params
    *
    * @return mixed
    */
@@ -437,7 +427,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * check whether a method is present ( & supported ) by the payment processor object.
+   * Function to check whether a method is present ( & supported ) by the payment processor object.
    *
    * @param  string $method method to check for.
    *
@@ -459,7 +449,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *
    * @return array|bool|object
    */
-  function cancelSubscription(&$message = '', $params = array()) {
+  function cancelSubscription(&$message = '', $params = array(
+    )) {
     if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal') {
       $args = array();
       $this->initialize($args, 'ManageRecurringPaymentsProfileStatus');
@@ -484,7 +475,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *
    * @return array|bool|object
    */
-  function updateSubscriptionBillingInfo(&$message = '', $params = array()) {
+  function updateSubscriptionBillingInfo(&$message = '', $params = array(
+    )) {
     if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal') {
       $config = CRM_Core_Config::singleton();
       $args = array();
@@ -545,7 +537,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * @param array $params
+   * @param $params
    * @param string $component
    *
    * @throws Exception

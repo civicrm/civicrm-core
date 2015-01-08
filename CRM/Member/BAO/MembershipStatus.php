@@ -47,12 +47,16 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * Fetch object based on array of properties
+   * Takes a bunch of params that are needed to match certain criteria and
+   * retrieves the relevant objects. Typically the valid params are only
+   * contact_id. We'll tweak this function to be more full featured over a period
+   * of time. This is the inverse function of create. It also stores all the retrieved
+   * values in the default array
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Member_BAO_MembershipStatus object
+   * @return object CRM_Member_BAO_MembershipStatus object
    * @access public
    * @static
    */
@@ -86,7 +90,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @param array $params (reference ) an assoc array of name/value pairs
    *
    * @throws Exception
-   * @return CRM_Member_BAO_MembershipStatus object
+   * @return object CRM_Member_BAO_MembershipStatus object
    * @access public
    * @static
    */
@@ -107,7 +111,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     return $membershipStatusBAO;
   }
   /**
-   * add the membership types
+   * function to add the membership types
    *
    * @param array $params reference array contains the values submitted by the form
    * @param array $ids array contains the id - this param is deprecated
@@ -118,54 +122,42 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @return object
    */
   static function add(&$params, $ids = array()) {
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membershipStatus', $ids));
-    if (!$id) {
-      CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
-      //copy name to label when not passed.
-      if (empty($params['label']) && !empty($params['name'])) {
-        $params['label'] = $params['name'];
-      }
-
-      if (empty($params['name']) && !empty($params['label'])) {
-        $params['name'] = $params['label'];
-      }
-    }
+    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+    $params['is_current_member'] = CRM_Utils_Array::value('is_current_member', $params, FALSE);
+    $params['is_admin'] = CRM_Utils_Array::value('is_admin', $params, FALSE);
+    $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
 
     // set all other defaults to false.
-    if (!empty($params['is_default'])) {
+    if ($params['is_default']) {
       $query = "UPDATE civicrm_membership_status SET is_default = 0";
       CRM_Core_DAO::executeQuery($query,
         CRM_Core_DAO::$_nullArray
       );
     }
 
+    //copy name to label when not passed.
+    if (empty($params['label']) && !empty($params['name'])) {
+      $params['label'] = $params['name'];
+    }
 
+    //for add mode, copy label to name.
+    $statusId = !empty($params['id']) ? $params['id'] : CRM_Utils_Array::value('membershipStatus', $ids);
+    if (!$statusId && !empty($params['label']) && empty($params['name'])) {
+      $params['name'] = $params['label'];
+    }
 
     // action is taken depending upon the mode
     $membershipStatus = new CRM_Member_DAO_MembershipStatus();
     $membershipStatus->copyValues($params);
 
-    $membershipStatus->id = $id;
+    $membershipStatus->id = $statusId;
 
     $membershipStatus->save();
     return $membershipStatus;
   }
 
   /**
-   * Get defaults for new entity
-   * @return array
-   */
-  static function getDefaults() {
-    return array(
-      'is_active' => FALSE,
-      'is_current_member' => FALSE,
-      'is_admin' => FALSE,
-      'is_default' => FALSE,
-    );
-  }
-
-  /**
-   * get  membership status
+   * Function to get  membership status
    *
    * @param int $membershipStatusId
    *
@@ -183,11 +175,12 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * delete membership Types
+   * Function to delete membership Types
    *
    * @param int $membershipStatusId
    *
    * @throws CRM_Core_Exception
+   * @internal param $
    * @static
    */
   static function del($membershipStatusId) {
@@ -220,9 +213,10 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @param  string $joinDate join date of the member whose membership status is to be calculated.
    * @param \date|string $statusDate status date of the member whose membership status is to be calculated.
    * @param  boolean $excludeIsAdmin exclude the statuses those having is_admin = 1
-   * @param int $membershipTypeID
+   * @param $membershipTypeID
    * @param array $membership membership params as available to calling function - passed to the hook
    *
+   * @internal param int $membershipType membership type id - passed to the hook
    * @return array
   @static
    */

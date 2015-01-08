@@ -55,6 +55,7 @@ class CRM_Upgrade_Incremental_php_FourFour {
    * @param $rev string, a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'
    * @param null $currentVer
    *
+   * @internal param string $postUpgradeMessage , alterable
    * @return void
    */
   function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {

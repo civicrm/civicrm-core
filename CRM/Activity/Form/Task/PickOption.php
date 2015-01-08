@@ -93,7 +93,7 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *

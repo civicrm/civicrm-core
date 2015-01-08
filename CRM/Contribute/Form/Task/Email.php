@@ -72,7 +72,7 @@ class CRM_Contribute_Form_Task_Email extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *

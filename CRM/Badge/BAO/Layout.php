@@ -49,7 +49,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Core_DAO_PrintLabel object on success, null otherwise
+   * @return object CRM_Core_DAO_PrintLabel object on success, null otherwise
    * @access public
    * @static
    */
@@ -79,9 +79,11 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   }
 
   /**
-   * add a name label
+   * Function to add a name label
    *
    * @param array $params reference array contains the values submitted by the form
+   *
+   * @internal param array $ids reference array contains the id
    *
    * @access public
    * @static
@@ -121,7 +123,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   }
 
   /**
-   * delete name labels
+   * Function to delete name labels
    *
    * @param  int $printLabelId ID of the name label to be deleted.
    *
@@ -171,7 +173,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   }
 
   /**
-   * decode encoded data and return as an array
+   * Function to decode encoded data and return as an array
    *
    * @param json $jsonData json object
    *

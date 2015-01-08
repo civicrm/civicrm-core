@@ -53,7 +53,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
   protected $_selfService = FALSE;
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @return void
    * @access public
@@ -132,7 +132,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -185,7 +185,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
+   * This function sets the default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @param null
@@ -199,7 +199,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

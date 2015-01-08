@@ -132,7 +132,7 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *

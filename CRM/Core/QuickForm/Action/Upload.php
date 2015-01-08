@@ -67,7 +67,7 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
   /**
    * upload and move the file if valid to the uploaded directory
    *
-   * @param CRM_Core_Form $page       the CRM_Core_Form object
+   * @param object $page       the CRM_Core_Form object
    * @param object $data       the QFC data container
    * @param string $pageName   the name of the page which index the data container with
    * @param string $uploadName the name of the uploaded file
@@ -111,7 +111,7 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
   /**
    * Processes the request.
    *
-   * @param  CRM_Core_Form    $page       CRM_Core_Form the current form-page
+   * @param  object    $page       CRM_Core_Form the current form-page
    * @param  string    $actionName Current action name, as one Action object can serve multiple actions
    *
    * @return void

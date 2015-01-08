@@ -42,7 +42,11 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * Fetch object based on array of properties
+   * Takes a bunch of params that are needed to match certain criteria and
+   * retrieves the relevant objects. Typically the valid params are only
+   * contact_id. We'll tweak this function to be more full featured over a period
+   * of time. This is the inverse function of create. It also stores all the retrieved
+   * values in the default array
    *
    * @param array $params      (reference ) an assoc array of name/value pairs
    * @param array $defaults    (reference ) an assoc array to hold the flattened values
@@ -80,7 +84,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param bool $excludeHidden
    */
   function buildTree($usedFor = NULL, $excludeHidden = FALSE) {
-    $sql = "SELECT id, parent_id, name, description, is_selectable FROM civicrm_tag";
+    $sql = "SELECT id, parent_id, name, description FROM civicrm_tag";
 
     $whereClause = array();
     if ($usedFor) {
@@ -105,7 +109,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       $thisref['parent_id'] = $dao->parent_id;
       $thisref['name'] = $dao->name;
       $thisref['description'] = $dao->description;
-      $thisref['is_selectable'] = $dao->is_selectable;
 
       if (!$dao->parent_id) {
         $this->tree[$dao->id] = &$thisref;
@@ -263,7 +266,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * delete the tag
+   * Function to delete the tag
    *
    * @param int $id   tag id
    *
@@ -311,8 +314,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @static
    */
   static function add(&$params, $ids = array()) {
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('tag', $ids));
-    if (!$id && !self::dataExists($params)) {
+    if (!self::dataExists($params)) {
       return NULL;
     }
 
@@ -325,8 +327,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     }
 
     $tag->copyValues($params);
-    $tag->id = $id;
-    $hook = !$id ? 'create' : 'edit';
+    $tag->id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('tag', $ids));
+    $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Tag', $tag->id, $params);
 
     // save creator id and time
@@ -371,7 +373,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * get the tag sets for a entity object
+   * Function to get the tag sets for a entity object
    *
    * @param string $entityTable entity_table
    *
@@ -392,7 +394,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * get the tags that are not children of a tagset.
+   * Function to get the tags that are not children of a tagset.
    *
    * @return array $tags associated array of tag name and id@access public
    * @static

@@ -86,7 +86,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   private static $_dataToLabels = NULL;
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @param null
    *
@@ -139,7 +139,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         array('Text' => ts('Text'), 'Select' => ts('Select'),
           'Radio' => ts('Radio'), 'CheckBox' => ts('CheckBox'), 'Multi-Select' => ts('Multi-Select'),
           'AdvMulti-Select' => ts('Adv Multi-Select (obsolete)'),
-          'Autocomplete-Select' => ts('Autocomplete-Select'),
+          'Autocomplete-Select' => ts('Autocomplete Select'),
         ),
         array('Text' => ts('Text'), 'Select' => ts('Select'),
           'Radio' => ts('Radio'),
@@ -150,20 +150,20 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         array('Text' => ts('Text'), 'Select' => ts('Select'),
           'Radio' => ts('Radio'),
         ),
-        array('TextArea' => ts('TextArea'), 'RichTextEditor' => ts('Rich Text Editor')),
+        array('TextArea' => ts('TextArea'), 'RichTextEditor' => ts('RichTextEditor')),
         array('Date' => ts('Select Date')),
         array('Radio' => ts('Radio')),
         array('StateProvince' => ts('Select State/Province'), 'Multi-Select' => ts('Multi-Select State/Province')),
-        array('Country' => ts('Select Country'), 'Multi-Select' => ts('Multi-Select Country')),
+        array('Country' => ts('Select Country'), 'Multi-Select' => ts('Multi-Select Country ')),
         array('File' => ts('Select File')),
         array('Link' => ts('Link')),
-        array('ContactReference' => ts('Autocomplete-Select')),
+        array('ContactReference' => ts('Autocomplete Select')),
       );
     }
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
+   * This function sets the default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @param null
@@ -270,7 +270,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @param null
    *
@@ -595,7 +595,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       // gives the ascii value
       $asciiValue = ord($title{0});
       if ($asciiValue >= 48 && $asciiValue <= 57) {
-        $errors['label'] = ts("Name cannot not start with a digit");
+        $errors['label'] = ts("Field's Name should not start with digit");
       }
     }
 
@@ -614,19 +614,19 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       switch ($dataType) {
         case 'Int':
           if (!CRM_Utils_Rule::integer($default)) {
-            $errors['default_value'] = ts('Please enter a valid integer.');
+            $errors['default_value'] = ts('Please enter a valid integer as default value.');
           }
           break;
 
         case 'Float':
           if (!CRM_Utils_Rule::numeric($default)) {
-            $errors['default_value'] = ts('Please enter a valid number.');
+            $errors['default_value'] = ts('Please enter a valid number as default value.');
           }
           break;
 
         case 'Money':
           if (!CRM_Utils_Rule::money($default)) {
-            $errors['default_value'] = ts('Please enter a valid number.');
+            $errors['default_value'] = ts('Please enter a valid number value.');
           }
           break;
 

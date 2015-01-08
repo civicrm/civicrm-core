@@ -40,12 +40,16 @@
 class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
 
   /**
-   * Fetch object based on array of properties
+   * Takes a bunch of params that are needed to match certain criteria and
+   * retrieves the relevant objects. Typically the valid params are only
+   * contact_id. We'll tweak this function to be more full featured over a period
+   * of time. This is the inverse function of create. It also stores all the retrieved
+   * values in the default array
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Core_BAO_LocationType object on success, null otherwise
+   * @return object CRM_Core_BAO_LocationType object on success, null otherwise
    * @access public
    * @static
    */
@@ -60,7 +64,7 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
   }
 
   /**
-   * delete an extension
+   * Function to delete an extension
    *
    * @param  int  $id     Id of the extension to be deleted.
    *

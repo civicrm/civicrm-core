@@ -45,7 +45,7 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    * @param array $params input parameters
    */
   /**
-   * @param array $params
+   * @param $params
    *
    * @return CRM_Core_DAO_UFMatch
    */
@@ -414,7 +414,9 @@ AND    domain_id    = %4
    * Update the email value for the contact and user profile
    *
    * @param  $contactId  Int     Contact ID of the user
-   * @param $emailAddress email to be modified for the user
+   * @param $emailAddress
+   *
+   * @internal param String $email email to be modified for the user
    *
    * @return void
    * @access public

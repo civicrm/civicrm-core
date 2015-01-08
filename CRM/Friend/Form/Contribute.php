@@ -51,7 +51,7 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
+   * This function sets the default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -87,7 +87,7 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -105,7 +105,7 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

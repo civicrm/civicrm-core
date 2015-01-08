@@ -211,7 +211,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
   }
 
   function preProcess() {
-    $this->assign('reportTitle', ts('Pledged but not Paid Report'));
+    $this->assign('reportTitle', ts('Pledge But Not Paid Report'));
     parent::preProcess();
   }
 

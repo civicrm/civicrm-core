@@ -35,12 +35,16 @@
 class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
 
   /**
-   * Fetch object based on array of properties
+   * Takes a bunch of params that are needed to match certain criteria and
+   * retrieves the relevant objects. Typically the valid params are only
+   * contact_id. We'll tweak this function to be more full featured over a period
+   * of time. This is the inverse function of create. It also stores all the retrieved
+   * values in the default array
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Contact_BAO_ContactType object on success, null otherwise
+   * @return object CRM_Contact_BAO_ContactType object on success, null otherwise
    * @access public
    * @static
    */
@@ -66,7 +70,8 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
   }
 
   /**
-   * Retrieve basic contact type information.
+   *
+   *function to retrieve basic contact type information.
    *
    * @param bool $all
    *
@@ -112,7 +117,8 @@ WHERE  parent_id IS NULL
   }
 
   /**
-   * Retrieve all basic contact types.
+   *
+   *function to  retrieve  all basic contact types.
    *
    * @param bool $all
    *
@@ -141,7 +147,8 @@ WHERE  parent_id IS NULL
   }
 
   /**
-   * Retrieve all subtypes Information.
+   *
+   *function to retrieve all subtypes Information.
    *
    * @param array $contactType .
    * @param bool $all
@@ -209,7 +216,7 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
 
   /**
    *
-   *   retrieve all subtypes
+   *function to  retrieve all subtypes
    *
    * @param array $contactType .
    * @param bool $all
@@ -231,7 +238,7 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
 
   /**
    *
-   * retrieve subtype pairs with name as 'subtype-name' and 'label' as value
+   *function to retrieve subtype pairs with name as 'subtype-name' and 'label' as value
    *
    * @param array $contactType .
    * @param bool $all
@@ -253,7 +260,7 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
 
   /**
    *
-   * retrieve list of all types i.e basic + subtypes.
+   *function to retrieve list of all types i.e basic + subtypes.
    *
    * @param bool $all
    *
@@ -266,7 +273,7 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
 
   /**
    *
-   * retrieve info array about all types i.e basic + subtypes.
+   *function to retrieve info array about all types i.e basic + subtypes.
    *
    * @param bool $all
    * @param bool $reset
@@ -325,13 +332,15 @@ WHERE  type.name IS NOT NULL
   }
 
   /**
-   * Retrieve basic type pairs with name as 'built-in name' and 'label' as value
+   *
+   *function to retrieve basic type pairs with name as 'built-in name' and 'label' as value
    *
    * @param bool $all
    * @param null $typeName
    * @param null $delimiter
    *
-   * @return array of basictypes with name as 'built-in name' and 'label' as value
+   * @internal param array $contactType .
+   * @return list of basictypes with name as 'built-in name' and 'label' as value
    * @static
    */
   static function contactTypePairs($all = FALSE, $typeName = NULL, $delimiter = NULL) {
@@ -440,7 +449,7 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
   }
 
   /**
-   * check if a given type is a subtype
+   * function to check if a given type is a subtype
    *
    * @param string $subType contact subType.
    * @param bool $ignoreCache
@@ -453,7 +462,8 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
   }
 
   /**
-   * retrieve the basic contact type associated with given subType.
+   *function to retrieve the basic contact type associated with
+   *given subType.
    *
    *@param array/string $subType contact subType.
    *@return array/string of basicTypes.
@@ -494,12 +504,14 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
   }
 
   /**
-   * Suppress all subtypes present in given array.
    *
-   * @param array $subTypes contact subTypes
+   *function to suppress all subtypes present in given array.
+   *
+   * @param $subTypes
    * @param bool $ignoreCache
    *
-   * @return array of suppressed subTypes.
+   * @internal param array $subType contact subType.
+   * @return array of suppresssubTypes .
    * @static
    */
   static function suppressSubTypes(&$subTypes, $ignoreCache = FALSE) {
@@ -508,7 +520,8 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
   }
 
   /**
-   * verify if a given subtype is associated with a given basic contact type.
+   *
+   *function to verify if a given subtype is associated with a given basic contact type.
    *
    * @param  string $subType contact subType
    * @param  string $contactType contact Type
@@ -528,10 +541,12 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
   }
 
   /**
-   * create shortcuts menu for contactTypes
    *
-   * @return array  of contactTypes
-   * @static
+   *function to create shortcuts menu for contactTypes
+   *
+   *@return array  of contactTypes
+   *@static
+   *
    */
   static function getCreateNewList() {
     $shortCuts = array();
@@ -565,7 +580,7 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
   }
 
   /**
-   * delete Contact SubTypes
+   * Function to delete Contact SubTypes
    *
    * @param  int $contactTypeId ID of the Contact Subtype to be deleted.
    *
@@ -828,7 +843,8 @@ LIMIT 1";
    *
    * @return array
    */
-  static function getSubtypeCustomPair($contactType, $subtypeSet = array()) {
+  static function getSubtypeCustomPair($contactType, $subtypeSet = array(
+    )) {
     if (empty($subtypeSet)) {
       return $subtypeSet;
     }

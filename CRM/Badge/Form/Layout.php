@@ -41,7 +41,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
 
   const FIELD_ROWCOUNT = 6;
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -156,7 +156,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   }
 
   /**
-   * Set default values for the form. MobileProvider that in edit/view mode
+   * This function sets the default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -185,7 +185,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *
@@ -223,7 +223,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   }
 
   /**
-   * @param array $params
+   * @param $params
    */
   public function buildPreview(&$params) {
     // get a max participant id

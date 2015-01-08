@@ -85,7 +85,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           ),
           'contact_sub_type' =>
           array(
-            'title' => ts('Contact Subtype'),
+            'title' => ts('Contact SubType'),
           ),
         ),
         'grouping' => 'contact-fields',
@@ -145,9 +145,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           array('title' => ts('Contribution Amount Stats'),
             'default' => TRUE,
             'statistics' =>
-            array('sum' => ts('Contribution Aggregate'),
+            array('sum' => ts('Contributions Aggregate'),
               'count' => ts('Contributions'),
-              'avg' => ts('Contribution Avg'),
+              'avg' => ts('Contributions Avg'),
             ),
           ),
         ),
@@ -157,7 +157,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'receive_date' =>
           array('operatorType' => CRM_Report_Form::OP_DATE),
           'contribution_status_id' =>
-          array('title' => ts('Contribution Status'),
+          array('title' => ts('Donation Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
             'default' => array(1),
@@ -186,19 +186,19 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           array('title' => ts('Contribution Amount'),
           ),
           'total_sum' =>
-          array('title' => ts('Contribution Aggregate'),
+          array('title' => ts('Contributions Aggregate'),
             'type' => CRM_Report_Form::OP_INT,
             'dbAlias' => 'civicrm_contribution_total_amount_sum',
             'having' => TRUE,
           ),
           'total_count' =>
-          array('title' => ts('Contribution Count'),
+          array('title' => ts('Contributions Count'),
             'type' => CRM_Report_Form::OP_INT,
             'dbAlias' => 'civicrm_contribution_total_amount_count',
             'having' => TRUE,
           ),
           'total_avg' =>
-          array('title' => ts('Contribution Avg'),
+          array('title' => ts('Contributions Avg'),
             'type' => CRM_Report_Form::OP_INT,
             'dbAlias' => 'civicrm_contribution_total_amount_avg',
             'having' => TRUE,
@@ -572,7 +572,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
         'type' => CRM_Utils_Type::T_STRING,
       );
       $statistics['counts']['count'] = array(
-        'title' => ts('Total Contributions'),
+        'title' => ts('Total Donations'),
         'value' => $count,
       );
       $statistics['counts']['avg'] = array(

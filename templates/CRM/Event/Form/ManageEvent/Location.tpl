@@ -186,7 +186,7 @@ CRM.$(function($) {
       }
     }
   }
-
+  
   $('input[name=location_option]').click(showLocFields);
   showLocFields(false);
 

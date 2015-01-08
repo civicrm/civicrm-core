@@ -41,10 +41,10 @@
 class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   public $_contactId = NULL;
 
-  /**
-   * always show public groups
-   * @var bool
-   */
+  /*
+     * always show public groups
+     */
+
   public $_onlyPublicGroups = TRUE;
 
   public $_edit = TRUE;
@@ -67,6 +67,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
 
     if (!$check) {
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/dashboard', 'reset=1'));
+      break;
     }
 
     $this->_contactId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -79,7 +80,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     }
     elseif ($this->_contactId != $userID) {
       if (!CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::VIEW)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this contact.'));
+        CRM_Core_Error::fatal(ts('You do not have permission to view this contact'));
       }
       if (!CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)) {
         $this->_edit = FALSE;
@@ -87,13 +88,14 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     }
   }
 
-  /**
-   * Heart of the viewing process. The runner gets all the meta data for
-   * the contact and calls the appropriate type of page to view.
-   *
-   * @return void
-   * @access public
-   */
+  /*
+     * Heart of the viewing process. The runner gets all the meta data for
+     * the contact and calls the appropriate type of page to view.
+     *
+     * @return void
+     * @access public
+     *
+     */
   function preProcess() {
     if (!$this->_contactId) {
       CRM_Core_Error::fatal(ts('You must be logged in to view this page.'));
@@ -110,7 +112,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   }
 
   /**
-   * build user dashboard
+   * Function to build user dashboard
    *
    * @return void
    * @access public
@@ -186,9 +188,6 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     usort($dashboardElements, array('CRM_Utils_Sort', 'cmpFunc'));
     $this->assign('dashboardElements', $dashboardElements);
 
-    // return true when 'Invoices / Credit Notes' checkbox is checked
-    $this->assign('invoices', $this->_userOptions['Invoices / Credit Notes']);
-
     if (!empty($this->_userOptions['Groups'])) {
       $this->assign('showGroup', TRUE);
       //build group selector
@@ -234,6 +233,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
         CRM_Core_Action::VIEW => array(
           'name' => ts('Dashboard'),
           'url' => 'civicrm/user',
+          'class' => 'no-popup',
           'qs' => 'reset=1&id=%%cbid%%',
           'title' => ts('View Relationship'),
         ),

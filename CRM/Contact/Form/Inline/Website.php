@@ -61,7 +61,7 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Build the form object elements for website object
+   * build the form elements for website object
    *
    * @return void
    * @access public

@@ -158,8 +158,8 @@ registration process.{/ts}</p>
        {/if}
       {/foreach}
      {/if}
-
-     {if $event.is_public}
+	 
+     {if $event.is_public} 
       <tr>
        <td colspan="2" {$valueStyle}>
         {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
@@ -167,7 +167,7 @@ registration process.{/ts}</p>
        </td>
       </tr>
      {/if}
-
+	 
     {if $event.is_share}
         <tr>
             <td colspan="2" {$valueStyle}>

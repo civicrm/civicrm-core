@@ -62,7 +62,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Build the form object elements for phone object
+   * build the form elements for phone object
    *
    * @return void
    * @access public

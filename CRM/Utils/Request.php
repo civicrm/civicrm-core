@@ -59,7 +59,7 @@ class CRM_Utils_Request {
    *
    * @param string $name name of the variable to be retrieved
    * @param string $type  type of the variable (see CRM_Utils_Type for details)
-   * @param object $store session scope where variable is stored
+   * @param stdClass $store session scope where variable is stored
    * @param bool $abort is this variable required
    * @param mixed $default default value of the variable if not present
    * @param string $method where should we look for the variable
@@ -125,6 +125,7 @@ class CRM_Utils_Request {
    * This is a replacement for $_REQUEST which includes $_GET/$_POST
    * but excludes $_COOKIE / $_ENV / $_SERVER.
    *
+   * @internal param string $method
    * @return array
    */
   static function exportValues() {

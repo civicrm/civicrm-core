@@ -115,9 +115,6 @@
             <strong> -------------------------------------------</strong><br />
             {ts}Total{/ts}: <strong>{$amount+$membership_amount|crmMoney}</strong><br />
           {else}
-            {if $totalTaxAmount}
-              {ts}Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney}</strong><br />
-            {/if}
             {ts}Amount{/ts}: <strong>{$amount|crmMoney} {if $amount_level} - {$amount_level} {/if}</strong><br />
           {/if}
     {/if}
@@ -141,19 +138,11 @@
 {/crmRegion}
                 {else}
 {crmRegion name="contribution-thankyou-recur"}
-                  {if $installments > 1}
-                    {if $frequency_interval > 1}
-                      <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}This recurring contribution will be automatically processed every %1 %2s for a total %3 installments (including this initial contribution).{/ts}</strong></p>
+                    {if $installments}
+                 <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}This recurring contribution will be automatically processed every %1 %2(s) for a total %3 installments (including this initial contribution).{/ts}</strong></p>
                     {else}
-                      <p><strong>{ts 1=$frequency_unit 2=$installments}This recurring contribution will be automatically processed every %1 for a total %2 installments (including this initial contribution).{/ts}</strong></p>
+                        <p><strong>{ts 1=$frequency_interval 2=$frequency_unit}This recurring contribution will be automatically processed every %1 %2(s).{/ts}</strong></p>
                     {/if}
-                  {else}
-                    {if $frequency_interval > 1}
-                      <p><strong>{ts 1=$frequency_interval 2=$frequency_unit}This recurring contribution will be automatically processed every %1 %2s.{/ts}</strong></p>
-                    {else}
-                      <p><strong>{ts 1=$frequency_unit}This recurring contribution will be automatically processed every %1.{/ts}</strong></p>
-                    {/if}
-                  {/if}
                     <p>
                     {if $is_email_receipt}
                         {ts}You will receive an email receipt which includes information about how to update or cancel this recurring contribution.{/ts}
@@ -241,8 +230,8 @@
       </div>
     {/if}
 
-    {if ( $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) ) or $email }
-        {if $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) }
+    {if ( $contributeMode ne 'notify' and ! $is_pay_later and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) ) or $email }
+        {if $contributeMode ne 'notify' and ! $is_pay_later and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) }
           {if $billingName or $address}
             <div class="crm-group billing_name_address-group">
                 <div class="header-dark">

@@ -555,7 +555,7 @@ ORDER BY title asc
   }
 
   /**
-   * @param array $params
+   * @param $params
    * @param bool $sortBy
    *
    * @return int|string

@@ -89,7 +89,7 @@ class CRM_Utils_REST {
 
   // Generates values needed for non-error responses.
   /**
-   * @param array $params
+   * @param $params
    *
    * @return array
    */
@@ -340,7 +340,7 @@ class CRM_Utils_REST {
 
   /**
    * @param $args
-   * @param array $params
+   * @param $params
    *
    * @return array|int
    */

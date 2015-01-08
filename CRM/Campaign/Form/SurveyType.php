@@ -63,7 +63,7 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
   protected $_action;
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @param null
    *
@@ -90,13 +90,13 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
     if ($this->_id && in_array($this->_gName, CRM_Core_OptionGroup::$_domainIDGroups)) {
       $domainID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'domain_id', 'id');
       if (CRM_Core_Config::domainID() != $domainID) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
       }
     }
   }
 
   /**
-   * Set default values for the form.
+   * This function sets the default values for the form.
    * the default values are retrieved from the database.
    *
    * @param null
@@ -116,7 +116,7 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -149,7 +149,7 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

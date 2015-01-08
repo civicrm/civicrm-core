@@ -241,6 +241,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param array $values output values of the object
    * @param int $numNotes the maximum number of notes to return (0 if all)
    *
+   * @internal param array $ids the array that holds all the db ids
    * @return object $notes  Object of CRM_Core_BAO_Note
    * @access public
    * @static
@@ -279,7 +280,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   }
 
   /**
-   * delete the notes
+   * Function to delete the notes
    *
    * @param int $id note id
    * @param boolean $showStatus do we need to set status or not
@@ -385,9 +386,11 @@ ORDER BY  modified_date desc";
   }
 
   /**
-   * get log record count for a Contact
+   * Function to get log record count for a Contact
    *
-   * @param int $contactID
+   * @param $contactID
+   *
+   * @internal param int $contactId Contact ID
    *
    * @return int $count count of log records
    *
@@ -409,7 +412,7 @@ ORDER BY  modified_date desc";
   }
 
   /**
-   * get all descendent notes of the note with given ID
+   * Function to get all descendent notes of the note with given ID
    *
    * @param int $parentId ID of the note to start from
    * @param int $maxDepth Maximum number of levels to descend into the tree; if not given, will include all descendents.
@@ -521,7 +524,8 @@ ORDER BY  modified_date desc";
    *
    * @return array $ids One-dimensional array containing ids of all desendent notes
    */
-  public static function getDescendentIds($parentId, &$ids = array()) {
+  public static function getDescendentIds($parentId, &$ids = array(
+    )) {
     // get direct children of given parentId note
     $note               = new CRM_Core_DAO_Note();
     $note->entity_table = 'civicrm_note';
@@ -539,6 +543,8 @@ ORDER BY  modified_date desc";
    * function to delete all note related to contact when contact is deleted
    *
    * @param int $contactID contact id whose notes to be deleted
+   *
+   * @internal param array $deleteNoteID to store all deleted note ids
    *
    * @return void
    * @static

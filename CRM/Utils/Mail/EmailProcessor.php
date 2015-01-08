@@ -132,7 +132,7 @@ class CRM_Utils_Mail_EmailProcessor {
 
   /**
    * @param $civiMail
-   * @param CRM_Core_DAO $dao
+   * @param $dao
    *
    * @throws Exception
    */

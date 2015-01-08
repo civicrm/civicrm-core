@@ -25,7 +25,7 @@
 *}
 {* Callback snippet: Load payment processor *}
 {if $snippet}
-  {include file="CRM/Core/BillingBlock.tpl"}
+  {include file="CRM/Core/BillingBlock.tpl" context="front-end"}
   <div id="paypalExpress">
     {* Put PayPal Express button after customPost block since it's the submit button in this case. *}
     {if $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}
@@ -154,7 +154,7 @@
 
     <div id="billing-payment-block">
       {* If we have a payment processor, load it - otherwise it happens via ajax *}
-      {if $paymentProcessorID or $isBillingAddressRequiredForPayLater}
+      {if $ppType}
         {include file="CRM/Event/Form/Registration/Register.tpl" snippet=4}
       {/if}
     </div>

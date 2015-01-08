@@ -67,9 +67,6 @@ function civicrm_api3_contribution_create(&$params) {
 
   _civicrm_api3_contribution_create_legacy_support_45($params);
 
-  // make sure tax calculation is handled via api
-  $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
-
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Contribution');
 }
 
@@ -202,7 +199,11 @@ function _civicrm_api3_contribution_delete_spec(&$params) {
  *
  * @param  array $params (reference ) input parameters
  *
- * @return array of contributions, if error an array with an error id and error message
+ * @internal param array $returnProperties Which properties should be included in the
+ * returned Contribution object. If NULL, the default
+ * set of properties will be included.
+ *
+ * @return array (reference )        array of contributions, if error an array with an error id and error message
  * @static void
  * @access public
  * {@getfields Contribution_get}
@@ -442,7 +443,7 @@ function civicrm_api3_contribution_completetransaction(&$params) {
 
 /**
  * provide function metadata
- * @param array $params
+ * @param $params
  */
 function _civicrm_api3_contribution_completetransaction_spec(&$params) {
   $params['id'] = array(

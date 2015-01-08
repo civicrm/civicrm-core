@@ -322,7 +322,7 @@ class CRM_Core_Menu {
             ',' => '_', '/' => '_',
           )
         ),
-        'url' => CRM_Utils_System::url($path, $query,
+        'url' => CRM_Utils_System::url($path, $query, 
             FALSE, // absolute
             NULL, // fragment
             TRUE, // htmlize
@@ -723,6 +723,7 @@ UNION (
     $args = array();
 
     $elements = explode(',', $pathArgs);
+    //CRM_Core_Error::debug( 'e', $elements );
     foreach ($elements as $keyVal) {
       list($key, $val) = explode('=', $keyVal, 2);
       $arr[$key] = $val;

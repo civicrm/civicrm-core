@@ -143,7 +143,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -151,10 +151,6 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   public function buildQuickForm() {
     $wysiwyg_options = array('' => ts('Textarea')) + CRM_Core_OptionGroup::values('wysiwyg_editor');
 
-    //changes for freezing the invoices/credit notes checkbox if invoicing is uncheck
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-    $this->assign('invoicing', $invoicing);
     $config = CRM_Core_Config::singleton();
     $extra = array();
 
@@ -200,14 +196,11 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
 
     $this->addElement('hidden', 'contact_edit_preferences', NULL, array('id' => 'contact_edit_preferences'));
 
-    $optionValues = CRM_Core_OptionGroup::values('user_dashboard_options', FALSE, FALSE, FALSE, NULL, 'name');
-    $invoicesKey = array_search('Invoices / Credit Notes', $optionValues);
-    $this->assign('invoicesKey', $invoicesKey);
     parent::buildQuickForm();
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *
@@ -244,5 +237,6 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
 
     $this->postProcessCommon();
   }
+  //end of function
 }
 

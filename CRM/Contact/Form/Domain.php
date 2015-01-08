@@ -91,7 +91,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   }
 
   /*
-   * Set default values for the form.
+   * This function sets the default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -150,7 +150,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public

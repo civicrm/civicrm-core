@@ -41,7 +41,7 @@
  * {@getfields batch_create}
  * @example BatchCreate.php
  *
- * @param array $params
+ * @param $params
  *
  * @return array of newly created batch property values.
  * @access public
@@ -76,7 +76,7 @@ function _civicrm_api3_batch_create_spec(&$params) {
  * {@getfields batch_get}
  * @example BatchCreate.php
  *
- * @param array $params
+ * @param $params
  *
  * @return array of retrieved batch property values.
  * @access public
@@ -92,7 +92,7 @@ function civicrm_api3_batch_get($params) {
  * {@getfields batch_delete}
  * @example BatchCreate.php
  *
- * @param array $params
+ * @param $params
  *
  * @return array of deleted values.
  * @access public

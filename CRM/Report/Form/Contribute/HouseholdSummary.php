@@ -77,7 +77,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
             'title' => ts('Contact Type'),
           ),
           'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
+            'title' => ts('Contact SubType'),
           ),
         ),
         'filters' => array(
@@ -98,7 +98,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => $this->relationTypes,
-            'default' => key($this->relationTypes),
+            'default' => array(1),
           ),
         ),
         'grouping' => 'household-fields',
@@ -348,20 +348,6 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
   function postProcess() {
 
     $this->beginPostProcess();
-    $this->buildACLClause(array($this->_aliases['civicrm_contact'], $this->_aliases['civicrm_contact_household']));
-    $sql = $this->buildQuery(TRUE);
-    $rows = array();
-
-    $this->buildRows($sql, $rows);
-    $this->formatDisplay($rows);
-    $this->doTemplateAssignment($rows);
-    $this->endPostProcess($rows);
-  }
-
-  /**
-   * Set variables to be accessed by API and form layer in processing
-   */
-  function beginPostProcessCommon() {
     $getRelationship = $this->_params['relationship_type_id_value'];
     $type = substr($getRelationship, -3);
     $this->relationshipId = intval((substr($getRelationship, 0, strpos($getRelationship, '_'))));
@@ -373,6 +359,14 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
       $this->householdContact = 'contact_id_a';
       $this->otherContact = 'contact_id_b';
     }
+    $this->buildACLClause(array($this->_aliases['civicrm_contact'], $this->_aliases['civicrm_contact_household']));
+    $sql = $this->buildQuery(TRUE);
+    $rows = array();
+
+    $this->buildRows($sql, $rows);
+    $this->formatDisplay($rows);
+    $this->doTemplateAssignment($rows);
+    $this->endPostProcess($rows);
   }
 
   function validRelationships() {

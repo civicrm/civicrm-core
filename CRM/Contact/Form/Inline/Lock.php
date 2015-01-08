@@ -42,8 +42,11 @@ class CRM_Contact_Form_Inline_Lock {
   /**
    * This function provides the HTML form elements
    *
-   * @param CRM_Core_Form $form form object
-   * @param int $contactID
+   * @param object $form form object
+   * @param $contactID
+   *
+   * @internal param int $inlineEditMode ( 1 for contact summary
+   * top bar form and 2 for display name edit )
    *
    * @access public
    * @return void
@@ -68,6 +71,8 @@ class CRM_Contact_Form_Inline_Lock {
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
    * @param null $contactID
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public

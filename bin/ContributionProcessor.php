@@ -393,6 +393,7 @@ class CiviContributeProcessor {
           CRM_Core_DAO::$_nullObject, FALSE, 'live', 'REQUEST'
         );
 
+        require_once 'CRM/Financial/BAO/PaymentProcessor.php';
         $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ppID, $mode);
 
         CRM_Core_Error::debug_log_message("Start Date=$start,  End Date=$end, ppID=$ppID, mode=$mode <p>", TRUE);

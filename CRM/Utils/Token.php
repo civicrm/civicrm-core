@@ -187,7 +187,9 @@ class CRM_Utils_Token {
   /**
    * get< the regex for token replacement
    *
-   * @param string $token_type a string indicating the the type of token to be used in the expression
+   * @param $token_type
+   *
+   * @internal param string $key a string indicating the the type of token to be used in the expression
    *
    * @return string           regular expression sutiable for using in preg_replace
    * @access private
@@ -1091,6 +1093,7 @@ class CRM_Utils_Token {
    * @param null $className
    * @param  int $jobID the mailing list jobID - this is a legacy param
    *
+   * @internal param array $contactIds of contacts
    * @return array
    * @access public
    * @static
@@ -1243,12 +1246,16 @@ class CRM_Utils_Token {
    * gives required details of contribuion in an indexed array format so we
    * can iterate in a nice loop and do token evaluation
    *
-   * @param array $contributionIDs
-   * @param array $returnProperties of required properties
-   * @param array $extraParams extra params
-   * @param array $tokens the list of tokens we've extracted from the content
-   * @param string $className
+   * @param $contributionIDs
+   * @param  array $returnProperties of required properties
+   * @param  array $extraParams extra params
+   * @param  array $tokens the list of tokens we've extracted from the content
    *
+   * @param null $className
+   *
+   * @internal param array $contributionId one contribution id
+   * @internal param bool $skipOnHold don't return on_hold contact info.
+   * @internal param bool $skipDeceased don't return deceased contact info.
    * @return array
    * @access public
    * @static
@@ -1357,11 +1364,11 @@ class CRM_Utils_Token {
           $escapeSmarty
         );
       }
-
+      
       // check if there are still any unevaluated tokens
       $remainingTokens = self::getTokens($tokenString);
 
-      // contact related $greetingTokens not empty, there are customized or hook tokens to replace
+      // contact related $greetingTokens not empty, there are customized or hook tokens to replace 
       if (!empty($remainingTokens['contact']) ) {
         // Fill the return properties array
         $greetingTokens = $remainingTokens['contact'];

@@ -16,7 +16,7 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    */
   function appendQuickForm(&$form) {
     $textarea_size = array('size' => 30, 'maxlength' => 60);

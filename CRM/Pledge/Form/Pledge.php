@@ -75,7 +75,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   public $_isPending = FALSE;
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @return void
    * @access public
@@ -90,7 +90,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     // check for action permissions.
     if (!CRM_Core_Permission::checkActionPermission('CiviPledge', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
     }
 
     $this->assign('action', $this->_action);
@@ -132,7 +132,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
 
   /**
-   * Set default values for the form.
+   * This function sets the default values for the form.
    * the default values are retrieved from the database
    *
    * @access public
@@ -219,7 +219,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -452,6 +452,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * @param array $files the uploaded files if any
    * @param $self
    *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -481,7 +482,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

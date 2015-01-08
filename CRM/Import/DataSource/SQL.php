@@ -47,7 +47,7 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
   }
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @access public
    */
@@ -58,7 +58,7 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
    * form snippet. It should add all fields necesarry to get the data
    * uploaded to the temporary table in the DB.
    *
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return void (operates directly on form argument)
    * @access public
@@ -72,7 +72,7 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
   /**
    * @param $fields
    * @param $files
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return array|bool
    */
@@ -91,7 +91,7 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    */

@@ -799,6 +799,8 @@ class CRM_Report_Form extends CRM_Core_Form {
    * Setter for $_id
    *
    * @param $instanceid
+   *
+   * @internal param int $id
    */
   function setID($instanceid) {
     $this->_id = $instanceid;
@@ -806,7 +808,8 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * Setter for $_force
-   * @param bool $isForce
+   * @param $isForce
+   * @internal param bool $force
 */
   function setForce($isForce) {
     $this->_force = $isForce;
@@ -3436,7 +3439,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * @deprecated - use getAddressColumns which is a more accurate description
    * and also accepts an array of options rather than a long list
    *
-   * adding address fields to construct function in reports
+   * function for adding address fields to construct function in reports
    *
    * @param bool $groupBy Add GroupBy? Not appropriate for detail report
    * @param bool $orderBy Add GroupBy? Not appropriate for detail report

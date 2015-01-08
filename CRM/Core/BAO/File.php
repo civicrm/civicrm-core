@@ -457,7 +457,7 @@ AND       CEF.entity_id    = %2";
   }
 
   /**
-   * return a clean url string and the number of attachment for a
+   * Function to return a clean url string and the number of attachment for a
    * given entityTable, entityID
    *
    * @param $entityTable string The entityTable to which the file is attached
@@ -485,7 +485,7 @@ AND       CEF.entity_id    = %2";
 
   /**
    * @param $formValues
-   * @param array $params
+   * @param $params
    * @param $entityTable
    * @param null $entityID
    */
@@ -538,7 +538,7 @@ AND       CEF.entity_id    = %2";
   }
 
   /**
-   * @param array $params
+   * @param $params
    * @param $entityTable
    * @param $entityID
    */
@@ -580,7 +580,7 @@ AND       CEF.entity_id    = %2";
   }
 
   /*
-   * copy/attach an existing file to a different entity
+   * Function to copy/attach an existing file to a different entity
    * table and id.
    */
   /**
@@ -622,7 +622,7 @@ AND       CEF.entity_id    = %2";
   }
 
   /**
-   * delete a file attachment from an entity table / entity ID
+   * function to delete a file attachment from an entity table / entity ID
    *
    * @static
    * @access public

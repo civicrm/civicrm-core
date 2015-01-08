@@ -40,7 +40,7 @@
 class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @access public
    * @return void
@@ -99,7 +99,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    * @return void

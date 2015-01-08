@@ -67,7 +67,7 @@ class CRM_Event_Form_Task_Print extends CRM_Event_Form_Task {
   }
 
   /**
-   * Build the form object - it consists of
+   * Build the form - it consists of
    *    - displaying the QILL (query in local language)
    *    - displaying elements for saving the search
    *

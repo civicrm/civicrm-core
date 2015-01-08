@@ -44,7 +44,7 @@ class CRM_Export_BAO_Export {
   CONST EXPORT_ROW_COUNT = 10000;
 
   /**
-   * get the list the export fields
+   * Function to get the list the export fields
    *
    * @param int $selectAll user preference while export
    * @param array $ids contact ids
@@ -896,7 +896,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           }
           elseif (array_key_exists($field, $contactRelationshipTypes)) {
             $relDAO = CRM_Utils_Array::value($iterationDAO->contact_id, $allRelContactArray[$field]);
-            $relationQuery[$field]->convertToPseudoNames($relDAO);
             foreach ($value as $relationField => $relationValue) {
               if (is_object($relDAO) && property_exists($relDAO, $relationField)) {
                 $fieldValue = $relDAO->$relationField;
@@ -925,12 +924,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
               }
               $field = $field . '_';
 
-              if (array_key_exists($relationField, $multipleSelectFields)) {
-                $param = array($relationField => $fieldValue);
-                $names = array($relationField => array('newName' => $relationField, 'groupName' => $relationField));
-                CRM_Core_OptionGroup::lookupValues($param, $names, FALSE);
-                $fieldValue = $param[$relationField];
-              }
               if (is_object($relDAO) && $relationField == 'id') {
                 $row[$field . $relationField] = $relDAO->contact_id;
               }
@@ -1207,7 +1200,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
   }
 
   /**
-   * handle import error file creation.
+   * Function to handle import error file creation.
    *
    */
   static function invoke() {
@@ -1789,7 +1782,7 @@ WHERE  id IN ( $deleteIDString )
   }
 
   /**
-   * merge household record into the individual record
+   * Function to merge household record into the individual record
    * if exists
    *
    * @param string $exportTempTable temporary temp table that stores the records

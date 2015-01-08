@@ -42,10 +42,12 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
   }
 
   /**
-   * delete the discount
+   * Function to delete the discount
    *
-   * @param int $entityId
-   * @param string $entityTable
+   * @param $entityId
+   * @param $entityTable
+   *
+   * @internal param int $id discount id
    *
    * @return boolean
    * @access public
@@ -106,14 +108,17 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
   /**
    * Determine in which discount set the registration date falls
    *
-   * @param int $entityID entity id to be searched
-   * @param string $entityTable entity table to be searched
+   * @param $entityID
+   * @param  string $entityTable entity table to be searched
    *
+   * @internal param int $entityId entity id to be searched
    * @return integer  $dao->id       discount id of the set which matches
    *                                 the date criteria
    */
   static function findSet($entityID, $entityTable) {
-    if (empty($entityID) || empty($entityTable)) {
+    if (empty($entityID) ||
+      empty($entityTable)
+    ) {
       // adding this here, to trap errors if values are not sent
       CRM_Core_Error::fatal();
       return NULL;

@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Edit_Demographics {
 
   /**
-   * Build the form object elements for Demographics object
+   * build the form elements for Demographics object
    *
    * @param CRM_Core_Form $form       reference to the form object
    *
@@ -61,17 +61,17 @@ class CRM_Contact_Form_Edit_Demographics {
 
     $form->addDate('birth_date', ts('Date of Birth'), FALSE, array('formatType' => 'birth'));
 
-    $form->addElement('checkbox', 'is_deceased', NULL, ts('Contact is Deceased'), array('onclick' => "showDeceasedDate()"));
-    $form->addDate('deceased_date', ts('Deceased Date'), FALSE, array('formatType' => 'birth'));
+    $form->addElement('checkbox', 'is_deceased', NULL, ts('Contact is deceased'), array('onclick' => "showDeceasedDate()"));
+    $form->addDate('deceased_date', ts('Deceased date'), FALSE, array('formatType' => 'birth'));
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
+   * This function sets the default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
    *
-   * @param CRM_Core_Form $form
+   * @param $form
    * @param $defaults
    *
    * @return void

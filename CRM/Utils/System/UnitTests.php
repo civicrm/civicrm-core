@@ -269,7 +269,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   }
 
   function permissionDenied() {
-    CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+    CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
   }
 
   function logout() {

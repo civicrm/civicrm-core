@@ -35,7 +35,7 @@
 class CRM_Report_Form_Instance {
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    */
   static function buildForm(&$form) {
     // we should not build form elements in dashlet mode
@@ -149,7 +149,7 @@ class CRM_Report_Form_Instance {
     // navigation field
     $parentMenu = CRM_Core_BAO_Navigation::getNavigationList();
 
-    $form->add('select', 'parent_id', ts('Parent Menu'), array('' => ts('- select -')) + $parentMenu);
+    $form->add('select', 'parent_id', ts('Parent Menu'), array('' => ts('-- select --')) + $parentMenu);
 
     // For now we only providing drilldown for one primary detail report only. In future this could be multiple reports
     foreach ($form->_drilldownReport as $reportUrl => $drillLabel) {
@@ -189,7 +189,7 @@ class CRM_Report_Form_Instance {
     $errors = array();
     if ($selfButtonName == $buttonName) {
       if (empty($fields['title'])) {
-        $errors['title'] = ts('Title is a required field.');
+        $errors['title'] = ts('Title is a required field');
         $self->assign('instanceFormError', TRUE);
       }
     }
@@ -198,7 +198,7 @@ class CRM_Report_Form_Instance {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    * @param $defaults
    */
   static function setDefaultValues(&$form, &$defaults) {
@@ -264,7 +264,7 @@ class CRM_Report_Form_Instance {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    * @param bool $redirect
    */
   static function postProcess(&$form, $redirect = TRUE) {

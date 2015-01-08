@@ -298,7 +298,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $values   (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Core_DAO_OptionValue object
+   * @return object CRM_Core_DAO_OptionValue object
    * @access public
    * @static
    */
@@ -385,7 +385,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * delete a PDF Page Format
+   * Function to delete a PDF Page Format
    *
    * @param  int  $id     ID of the PDF Page Format to be deleted.
    *

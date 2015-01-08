@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Inline_Demographics extends CRM_Contact_Form_Inline {
 
   /**
-   * Build the form object elements
+   * build the form elements
    *
    * @return void
    * @access public

@@ -40,7 +40,7 @@
 class CRM_Contribute_Form extends CRM_Admin_Form {
 
   /**
-   * Set default values for the form. Note that in edit/view mode
+   * This function sets the default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public

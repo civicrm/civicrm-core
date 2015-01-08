@@ -56,38 +56,46 @@ class CRM_Core_Selector_Controller {
    */
   protected $_object;
 
-  /**
-   * @var CRM_Utils_Sort
-   */
+  /*
+     * the CRM_Utils_Sort object
+     * @var object
+     */
+
   protected $_sort;
 
-  /**
-   * the current column to sort on
-   * @var int
-   */
+  /*
+     * the current column to sort on
+     * @var int
+     */
+
   protected $_sortID;
 
-  /**
-   * the sortOrder array
-   * @var array
-   */
+  /*
+     * the sortOrder array
+     * @var array
+     */
+
   protected $_sortOrder;
 
-  /**
-   * @var CRM_Utils_Pager
-   */
+  /*
+     * the CRM_Utils_Pager object
+     * @var object
+     */
+
   protected $_pager;
 
-  /**
-   * the pageID
-   * @var int
-   */
+  /*
+     * the pageID
+     * @var int
+     */
+
   protected $_pageID;
 
-  /**
-   * offset
-   * @var int
-   */
+  /*
+     * offset
+     * @var int
+     */
+
   protected $_pagerOffset;
 
   /**
@@ -102,9 +110,8 @@ class CRM_Core_Selector_Controller {
    */
   protected $_total;
 
-  /**
-   * the objectAction for the WebObject
-   */
+  /* the objectAction for the WebObject */
+
   protected $_action;
 
   /**
@@ -383,9 +390,9 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * retrieve rows.
+   * function to retrieve rows.
    *
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return array of rows
    * @access public
@@ -423,7 +430,7 @@ class CRM_Core_Selector_Controller {
   /**
    * getter for pager
    *
-   * @return CRM_Utils_Pager
+   * @return object CRM_Utils_Pager
    * @access public
    */
   function getPager() {
@@ -433,7 +440,7 @@ class CRM_Core_Selector_Controller {
   /**
    * getter for sort
    *
-   * @return CRM_Utils_Sort
+   * @return object CRM_Utils_Sort
    * @access public
    */
   function getSort() {

@@ -92,7 +92,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    */
   function buildForm(&$form) {
 

@@ -48,9 +48,11 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * price field object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array $params (reference) an assoc array of name/value pairs
+   * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @return CRM_Price_BAO_PriceField object
+   * @internal param array $ids the array that holds all the db ids
+   *
+   * @return object CRM_Price_BAO_PriceField object
    * @access public
    * @static
    */
@@ -74,7 +76,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *
-   * @return CRM_Price_DAO_PriceField object
+   * @return object CRM_Price_DAO_PriceField object
    * @access public
    * @static
    */
@@ -168,12 +170,16 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   }
 
   /**
-   * Fetch object based on array of properties
+   * Takes a bunch of params that are needed to match certain criteria and
+   * retrieves the relevant objects. Typically the valid params are only
+   * contact_id. We'll tweak this function to be more full featured over a period
+   * of time. This is the inverse function of create. It also stores all the retrieved
+   * values in the default array
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Price_DAO_PriceField object
+   * @return object CRM_Price_DAO_PriceField object
    * @access public
    * @static
    */
@@ -281,22 +287,12 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     //use value field.
     $valueFieldName = 'amount';
     $seperator = '|';
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
-    $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-    $displayOpt = CRM_Utils_Array::value('tax_display_settings', $invoiceSettings);
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     switch ($field->html_type) {
       case 'Text':
         $optionKey = key($customOption);
         $count = CRM_Utils_Array::value('count', $customOption[$optionKey], '');
         $max_value = CRM_Utils_Array::value('max_value', $customOption[$optionKey], '');
-        $taxAmount = CRM_Utils_Array::value('tax_amount', $customOption[$optionKey]);
-        if (isset($taxAmount) && $displayOpt && $invoicing) {
-          $qf->assign('displayOpt', $displayOpt);
-          $qf->assign('taxTerm', $taxTerm);
-          $qf->assign('invoicing', $invoicing);
-        }
-        $priceVal = implode($seperator, array($customOption[$optionKey][$valueFieldName] + $taxAmount, $count, $max_value));
+        $priceVal = implode($seperator, array($customOption[$optionKey][$valueFieldName], $count, $max_value));
 
         $extra = array();
         if (!empty($qf->_quickConfig) && !empty($qf->_contributionAmount)) {
@@ -339,8 +335,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $type = 'money';
         }
         else {
-          $message = ts('%1 must be a number (with or without decimal point).', array(1 => $label));
-          $type = 'numeric';
+          $message = ts('%1 must be an integer (whole number).', array(1 => $label));
+          $type = 'positiveInteger';
         }
         // integers will have numeric rule applied to them.
         $qf->addRule($elementName, $message, $type);
@@ -354,29 +350,13 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         }
 
         foreach ($customOption as $opId => $opt) {
-          $taxAmount = CRM_Utils_Array::value('tax_amount', $opt);
           if ($field->is_display_amounts) {
             $opt['label'] = !empty($opt['label']) ? $opt['label'] : '';
-            if (isset($taxAmount) && $invoicing) {
-              if ($displayOpt == 'Do_not_show') {
-                $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName] + $taxAmount) . '</span> <span class="crm-price-amount-label">' . $opt['label'] . '</span>';
-              }
-              else if ($displayOpt == 'Inclusive') {
-                $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName] + $taxAmount) . '</span> <span class="crm-price-amount-label">' . $opt['label'] . '</span>';
-                $opt['label'] .= '<span class="crm-price-amount-label"> (includes ' . $taxTerm . ' of ' . CRM_Utils_Money::format($opt['tax_amount']) . ')</span>';
-              }
-              else {
-                $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span> <span class="crm-price-amount-label">' . $opt['label'] . '</span>';
-                $opt['label'] .= '<span class="crm-price-amount-label"> + '. CRM_Utils_Money::format($opt['tax_amount']) . ' ' . $taxTerm . '</span>';
-              }
-            }
-            else {
-              $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span> <span class="crm-price-amount-label">' . $opt['label'] . '</span>';
-            }
+            $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span> <span class="crm-price-amount-label">' . $opt['label'] . '</span>';
           }
           $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
-          $priceVal = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value));
+          $priceVal = implode($seperator, array($opt[$valueFieldName], $count, $max_value));
           $extra = array('price' => json_encode(array($elementName, $priceVal)),
                    'data-amount' => $opt[$valueFieldName],
                    'data-currency' => $currencyName,
@@ -445,21 +425,15 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         $selectOption = $allowedOptions = $priceVal = array();
 
         foreach ($customOption as $opt) {
-          $taxAmount = CRM_Utils_Array::value('tax_amount', $opt);
           $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
+          $priceVal[$opt['id']] = implode($seperator, array($opt[$valueFieldName], $count, $max_value));
 
           if ($field->is_display_amounts) {
             $opt['label'] .= '&nbsp;-&nbsp;';
-            if (isset($taxAmount)  && $invoicing) {
-              $opt['label'] .= self::getTaxLabel($opt, $valueFieldName, $displayOpt, $taxTerm);
-            }
-            else {
-              $opt['label'] .= CRM_Utils_Money::format($opt[$valueFieldName]);
-            }
+            $opt['label'] .= CRM_Utils_Money::format($opt[$valueFieldName]);
           }
           $selectOption[$opt['id']] = $opt['label'];
-          $priceVal[$opt['id']] = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value));
 
           if (!in_array($opt['id'], $feezeOptions)) {
             $allowedOptions[] = $opt['id'];
@@ -486,20 +460,14 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         $check = array();
         foreach ($customOption as $opId => $opt) {
-          $taxAmount = CRM_Utils_Array::value('tax_amount', $opt);
           $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
+          $priceVal = implode($seperator, array($opt[$valueFieldName], $count, $max_value));
 
           if ($field->is_display_amounts) {
             $opt['label'] .= '&nbsp;-&nbsp;';
-            if (isset($taxAmount) && $invoicing) {
-              $opt['label'] .= self::getTaxLabel($opt, $valueFieldName, $displayOpt, $taxTerm);
-            }
-            else {
-              $opt['label'] .= CRM_Utils_Money::format($opt[$valueFieldName]);
-            }
+            $opt['label'] .= CRM_Utils_Money::format($opt[$valueFieldName]);
           }
-          $priceVal = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value));
           $check[$opId] = &$qf->createElement('checkbox', $opt['id'], NULL, $opt['label'],
             array('price' => json_encode(array($opt['id'], $priceVal)),
              'data-amount' => $opt[$valueFieldName],
@@ -542,17 +510,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       $values = array();
       CRM_Price_BAO_PriceFieldValue::getValues($fieldId, $values, 'weight', !$inactiveNeeded);
       $options[$fieldId] = $values;
-      $taxRates = CRM_Core_PseudoConstant::getTaxRates();
-
-      // ToDo - Code for Hook Invoke
-
-      foreach ($options[$fieldId] as $priceFieldId => $priceFieldValues) {
-        if (isset($priceFieldValues['financial_type_id']) && array_key_exists($priceFieldValues['financial_type_id'], $taxRates)) {
-          $options[$fieldId][$priceFieldId]['tax_rate'] = $taxRates[$priceFieldValues['financial_type_id']];
-          $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($priceFieldValues['amount'], $options[$fieldId][$priceFieldId]['tax_rate']);
-          $options[$fieldId][$priceFieldId]['tax_amount'] = round($taxAmount['tax_amount'],2);
-        }
-      }
     }
 
     return $options[$fieldId];
@@ -734,35 +691,6 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
         $error['_qf_default'] = ts('Please select at least one option from price set.');
       }
     }
-  }
-
-  /**
-   * Generate the label for price fields based on tax display setting option on CiviContribute Component Settings page.
-   *
-   * @param array $opt
-   * @param string $valueFieldName amount
-   * @param string $displayOpt tax display setting option
-   *
-   * @return string $label tax label for custom field
-   *
-   * @access public
-   * @static
-   *
-   */
-  public static function getTaxLabel($opt, $valueFieldName, $displayOpt, $taxTerm) {
-    if ($displayOpt == 'Do_not_show') {
-      $label = CRM_Utils_Money::format($opt[$valueFieldName] + $opt['tax_amount']);
-    }
-    else if ($displayOpt == 'Inclusive') {
-      $label = CRM_Utils_Money::format($opt[$valueFieldName] + $opt['tax_amount']);
-      $label .= '<span class="crm-price-amount-label"> (includes ' . $taxTerm . ' of ' . CRM_Utils_Money::format($opt['tax_amount']) . ')</span>';
-    }
-    else {
-      $label = CRM_Utils_Money::format($opt[$valueFieldName]);
-      $label .= '<span class="crm-price-amount-label"> + '. CRM_Utils_Money::format($opt['tax_amount']) . ' ' . $taxTerm . '</span>';
-    }
-
-    return $label;
   }
 }
 

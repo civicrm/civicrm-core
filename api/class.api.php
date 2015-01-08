@@ -126,14 +126,14 @@ class civicrm_api3 {
   }
 
   /**
-   * @return string
+   *
    */
   public function __toString() {
     return json_encode($this->lastResult);
   }
 
   /**
-   * Perform action
+   *
    */
   public function __call($action, $params) {
     // @TODO Check if it's a valid action.
@@ -154,8 +154,7 @@ class civicrm_api3 {
   }
 
   /**
-   * Call via rest
-   * @return stdClass
+   *
    */
   function remoteCall($entity, $action, $params = array()) {
     $fields = "key={$this->key}&api_key={$this->api_key}";
@@ -254,21 +253,20 @@ class civicrm_api3 {
 
   /**
    * Return the last error message.
-   * @return string
    */
   function errorMsg() {
     return $this->lastResult->error_message;
   }
 
   /**
-   * Initialize
+   *
    */
   function init() {
     CRM_Core_DAO::init($this->cfg->dsn);
   }
 
   /**
-   * @return $this
+   *
    */
   public function attr($name, $value = NULL) {
     if ($value === NULL) {
@@ -283,22 +281,21 @@ class civicrm_api3 {
   }
 
   /**
-   * @return bool
+   *
    */
   public function is_error() {
     return (property_exists($this->lastResult, 'is_error') && $this->lastResult->is_error);
   }
 
   /**
-   * @param $name
-   * @return bool
+   *
    */
   public function is_set($name) {
     return (isset($this->lastResult->$name));
   }
 
   /**
-   * @return $this
+   *
    */
   public function __get($name) {
     // @TODO Test if valid entity.
@@ -323,7 +320,6 @@ class civicrm_api3 {
 
   /**
    * Or use $api->value.
-   * @return array
    */
   public function values() {
     if (is_array($this->lastResult)) {
@@ -336,7 +332,6 @@ class civicrm_api3 {
 
   /**
    * Or use $api->result.
-   * @return array
    */
   public function result() {
     return $this->lastResult;

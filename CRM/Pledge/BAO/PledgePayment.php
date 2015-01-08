@@ -42,7 +42,7 @@ class CRM_Pledge_BAO_PledgePayment extends CRM_Pledge_DAO_PledgePayment {
   }
 
   /**
-   * get pledge payment details
+   * Function to get pledge payment details
    *
    * @param int $pledgeId pledge id
    *
@@ -93,7 +93,7 @@ WHERE     pledge_id = %1
   }
 
   /**
-   * @param array $params
+   * @param $params
    *
    * @return pledge
    */
@@ -208,7 +208,7 @@ WHERE     pledge_id = %1
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Pledge_BAO_PledgePayment object
+   * @return object CRM_Pledge_BAO_PledgePayment object
    * @access public
    * @static
    */
@@ -227,7 +227,9 @@ WHERE     pledge_id = %1
    *
    * @param $id
    *
-   * @return int pledge payment id
+   * @internal param array $params associate array of field
+   *
+   * @return pledge payment id
    * @static
    */
   static function del($id) {
@@ -250,7 +252,7 @@ WHERE     pledge_id = %1
   }
 
   /**
-   * delete all pledge payments
+   * Function to delete all pledge payments
    *
    * @param int $id pledge id
    *
@@ -328,11 +330,12 @@ WHERE     pledge_id = %1
    * @param int $pledgeID , id of pledge
    * @param array $paymentIDs , ids of pledge payment(s) to update
    * @param int $paymentStatusID , payment status to set
-   * @param int $pledgeStatusID pledge status to change (if needed)
+   * @param null $pledgeStatusID
    * @param float|int $actualAmount , actual amount being paid
    * @param bool $adjustTotalAmount , is amount being paid different from scheduled amount?
    * @param bool $isScriptUpdate , is function being called from bin script?
    *
+   * @internal param int $pledgeStatus , pledge status to change (if needed)
    * @return int $newStatus, updated status id (or 0)
    */
   static function updatePledgePaymentStatus(
@@ -608,7 +611,7 @@ WHERE  civicrm_pledge.id = %2
   }
 
   /**
-   * update pledge payment table
+   * Function to update pledge payment table
    *
    * @param int $pledgeId pledge id
    * @param int $paymentStatusId payment status id to set

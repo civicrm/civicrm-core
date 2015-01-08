@@ -103,26 +103,6 @@ class CRM_Utils_String {
   }
 
   /**
-   * convert possibly underscore separated words to camel case with special handling for 'UF'
-   * e.g
-   * membership_payment returns MembershipPayment
-   * @param string $string
-   *
-   * @return string string
-   */
-  static function convertStringToCamel($string) {
-    $fragments = explode('_', $string);
-    foreach ($fragments as & $fragment) {
-      $fragment = ucfirst($fragment);
-    }
-    // Special case: UFGroup, UFJoin, UFMatch, UFField
-    if ($fragments[0] === 'Uf') {
-      $fragments[0] = 'UF';
-    }
-    return implode('', $fragments);
-  }
-
-  /**
    *
    * Takes a variable name and munges it randomly into another variable name
    *
@@ -358,7 +338,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * extract variable values
+   * Function to extract variable values
    *
    * @param  mix $query this is basically url
    *
@@ -447,7 +427,7 @@ class CRM_Utils_String {
 
   /**
    * @param $string
-   * @param array $params
+   * @param $params
    */
   static function extractName($string, &$params) {
     $name = trim($string);

@@ -631,7 +631,7 @@ class CRM_Activity_BAO_Query {
    * @param $pseudoconstantType
    * @param $op
    * @param $grouping
-   * @param array $params
+   * @param $params
    *
    * @return array
    */

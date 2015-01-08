@@ -77,7 +77,7 @@
         {include file="CRM/Contact/Form/Search/ResultTasks.tpl"}
       {/if}
     </div>
-
+    
     {* This section displays the rows along and includes the paging controls *}
     <div class="crm-search-results">
       {if $resultFile}

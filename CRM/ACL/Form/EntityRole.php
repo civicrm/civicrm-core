@@ -43,7 +43,7 @@
 class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -64,7 +64,7 @@ class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
 
 
 
-    $label = ts('Assigned to');
+    $label = ts('Assigned To');
     $group = array('' => ts('- select group -')) + CRM_Core_PseudoConstant::staticGroup(FALSE, 'Access');
     $this->add('select', 'entity_id', $label, $group, TRUE, array('class' => 'crm-select2 huge'));
 
@@ -72,7 +72,7 @@ class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

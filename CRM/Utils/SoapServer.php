@@ -321,7 +321,7 @@ class CRM_Utils_SoapServer {
 
   /**
    * @param $key
-   * @param array $params
+   * @param $params
    *
    * @return array|int
    * @throws SoapFault

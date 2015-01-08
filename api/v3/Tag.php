@@ -42,7 +42,7 @@
  *
  * {@example TagCreate.php}
  *
- * @param array $params
+ * @param $params
  *
  * @return array of newly created tag property values.
  * {@getfields tag_create}

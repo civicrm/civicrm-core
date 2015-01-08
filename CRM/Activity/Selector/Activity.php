@@ -99,12 +99,14 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    *
    * - View
    *
-   * @param int $activityTypeId
+   * @param $activityTypeId
    * @param null $sourceRecordId
    * @param bool $accessMailingReport
    * @param null $activityId
    * @param null $key
    * @param null $compContext
+   *
+   * @internal param string $activityType type of activity
    *
    * @return array
    * @access public
@@ -242,10 +244,10 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
       $activityTypeName &&
       CRM_Case_BAO_Case::checkPermission($activityId, 'File On Case', $activityTypeId)
     ) {
-      $actionLinks += array(CRM_Core_Action::ADD => array('name' => ts('File on Case'),
+      $actionLinks += array(CRM_Core_Action::ADD => array('name' => ts('File On Case'),
         'url' => '#',
         'extra' => 'onclick="javascript:fileOnCase( \'file\', \'%%id%%\', null, this ); return false;"',
-        'title' => ts('File on Case'),
+        'title' => ts('File On Case'),
       ));
     }
 
@@ -275,8 +277,9 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    * getter for array of the parameters required for creating pager.
    *
    * @param $action
-   * @param array $params
+   * @param $params
    *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {

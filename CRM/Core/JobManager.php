@@ -212,7 +212,7 @@ class CRM_Core_JobManager {
   /**
    * @param $entity
    * @param $job
-   * @param array $params
+   * @param $params
    * @param null $source
    */
   public function setSingleRunParams($entity, $job, $params, $source = NULL) {

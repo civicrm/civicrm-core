@@ -142,7 +142,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -229,6 +229,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    * @param array $files the uploaded files if any
    * @param $self
    *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -248,7 +249,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

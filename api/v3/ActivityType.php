@@ -45,9 +45,9 @@ function _civicrm_api3_activity_type_deprecation() {
 }
 
 /**
- * retrieve activity types
+ * Function to retrieve activity types
  *
- * @param array $params
+ * @param $params
  *
  * @return array $activityTypes activity types keyed by id
  * @access public
@@ -62,7 +62,7 @@ function civicrm_api3_activity_type_get($params) {
 }
 
 /**
- * create activity type (
+ * Function to create activity type (
  *
  * @param array   $params  associated array of fields
  *                 $params['option_value_id'] is required for updation of activity type
@@ -102,7 +102,7 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
 }
 
 /**
- * delete activity type
+ * Function to delete activity type
  *
  * @param array $params array including id of activity_type to delete
 

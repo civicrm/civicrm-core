@@ -38,7 +38,7 @@
 
 <table class="selector row-highlight">
     <tr class="columnheader">
-        <th scope="col">{ts}Contributor{/ts}</th>
+        <th scope="col">{ts}Contributor{/ts}</th> 
         <th scope="col">{ts}Amount{/ts}</th>
         <th scope="col">{ts}Type{/ts}</th>
         <th scope="col">{ts}Financial Type{/ts}</th>

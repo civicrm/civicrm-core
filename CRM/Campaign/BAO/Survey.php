@@ -53,10 +53,11 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
   /**
    * The action links that we need to display for the browse screen
    *
-   * @param array $params
+   * @param $params
    * @param $defaults
    *
-   * @return CRM_Campaign_DAO_Survey|null
+   * @return \CRM_Campaign_DAO_Survey|null
+   * @internal param array $
    */
   static function retrieve(&$params, &$defaults) {
     $dao = new CRM_Campaign_DAO_Survey();
@@ -77,9 +78,9 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
    * survey object.
    *
    *
-   * @param array $params
+   * @param $params
    *
-   * @return CRM_Survey_DAO_Survey object
+   * @return object CRM_Survey_DAO_Survey object
    * @access public
    * @static
    */
@@ -117,11 +118,12 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
   }
 
   /**
-   * retrieve surveys for dashboard.
+   * Function to retrieve surveys for dashboard.
    *
    * @static
    */
-  static function getSurveySummary($params = array(), $onlyCount = FALSE) {
+  static function getSurveySummary($params = array(
+    ), $onlyCount = FALSE) {
     //build the limit and order clause.
     $limitClause = $orderByClause = $lookupTableJoins = NULL;
     if (!$onlyCount) {
@@ -242,7 +244,7 @@ SELECT  survey.id                         as id,
   }
 
   /**
-   * get Surveys
+   * Function to get Surveys
    *
    * @param boolean $onlyActive  retrieve only active surveys.
    * @param boolean $onlyDefault retrieve only default survey.
@@ -299,7 +301,7 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * get Surveys activity types
+   * Function to get Surveys activity types
    *
    *
    * @static
@@ -341,7 +343,8 @@ SELECT  survey.id    as id,
    * @return array
    * @static
    */
-  static function getSurveyCustomGroups($surveyTypes = array()) {
+  static function getSurveyCustomGroups($surveyTypes = array(
+    )) {
     $customGroups = array();
     if (!is_array($surveyTypes)) {
       $surveyTypes = array($surveyTypes);
@@ -412,13 +415,14 @@ SELECT  survey.id    as id,
   /**
    * This function retrieve contact information.
    *
-   * @param array $voterIds
+   * @param $voterIds
    * @param array $returnProperties an array of return elements.
    *
-   * @return array $voterDetails array of contact info.
-   * @static
+   * @internal param array $voter an array of contact Ids.
+   * @return array $voterDetails array of contact info.@static
    */
-  static function voterDetails($voterIds, $returnProperties = array()) {
+  static function voterDetails($voterIds, $returnProperties = array(
+    )) {
     $voterDetails = array();
     if (!is_array($voterIds) || empty($voterIds)) {
       return $voterDetails;
@@ -721,7 +725,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    * This function is to check survey activity.
    *
    * @param int $activityId activity id.
-   * @return boolean $isSurveyActivity true/false
+   * @internal param int $activityTypeId activity type id.
+   * @return boolean $isSurveyActivity true/false boolean.
    * @static
    */
   static function isSurveyActivity($activityId) {
@@ -1047,7 +1052,7 @@ INNER JOIN  civicrm_survey survey ON ( activity.source_record_id = survey.id )
   /**
    * Check and update the survey respondents.
    *
-   * @param array $params
+   * @param $params
    *
    * @return array success message
    */

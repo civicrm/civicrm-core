@@ -42,10 +42,11 @@ class CRM_Contribute_StateMachine_Contribution extends CRM_Core_StateMachine {
   /**
    * class constructor
    *
-   * @param CRM_Contact_Import_Controller $controller
+   * @param object $controller
    * @param \const|int $action
    *
-   * @return CRM_Contribute_StateMachine_Contribution
+   * @internal param \CRM_Contact_Import_Controller $object
+   * @return \CRM_Contribute_StateMachine_Contribution CRM_Contact_Import_StateMachine
    */
   function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);

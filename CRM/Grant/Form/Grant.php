@@ -58,7 +58,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   protected $_context;
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @return void
    * @access public
@@ -87,7 +87,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
 
     //check permission for action.
     if (!CRM_Core_Permission::checkActionPermission('CiviGrant', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
     }
 
     $this->setPageTitle(ts('Grant'));
@@ -170,7 +170,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -259,7 +259,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

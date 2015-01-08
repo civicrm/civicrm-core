@@ -509,7 +509,7 @@ class CRM_Utils_OpenFlashChart {
   }
 
   /**
-   * @param array $params
+   * @param $params
    * @param $chart
    *
    * @return array

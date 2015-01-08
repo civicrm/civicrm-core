@@ -51,7 +51,9 @@ class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
    * @access public
    */
   function preProcess() {
-    // initialize the task and row fields
+    /*
+     * initialize the task and row fields
+     */
     parent::preProcess();
 
     $session = CRM_Core_Session::singleton();
@@ -59,7 +61,7 @@ class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *
@@ -90,5 +92,6 @@ class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
       CRM_Event_BAO_Participant::create($value);
     }
   }
+  //end of function
 }
 

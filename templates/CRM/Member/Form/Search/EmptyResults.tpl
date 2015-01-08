@@ -29,7 +29,7 @@
         {if $qill}{ts}No matches found for:{/ts}
             {include file="CRM/common/displaySearchCriteria.tpl"}
         {else}
-            {ts}None found.{/ts}
+            {ts}No matching memberships found.{/ts}
         {/if}
         <br />
         {ts}Suggestions:{/ts}

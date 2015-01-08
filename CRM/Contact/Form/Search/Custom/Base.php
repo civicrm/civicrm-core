@@ -213,7 +213,7 @@ class CRM_Contact_Form_Search_Custom_Base {
 
   /**
    * @param $where
-   * @param array $params
+   * @param $params
    *
    * @return string
    */

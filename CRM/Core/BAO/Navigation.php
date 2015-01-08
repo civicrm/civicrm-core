@@ -60,7 +60,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * get existing / build navigation for CiviCRM Admin Menu
+   * Function to get existing / build navigation for CiviCRM Admin Menu
    *
    * @static
    * @return array associated array
@@ -81,7 +81,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * add/update navigation record
+   * Function to add/update navigation record
    *
    * @param array associated array of submitted values
    *
@@ -122,12 +122,16 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Fetch object based on array of properties
+   * Takes a bunch of params that are needed to match certain criteria and
+   * retrieves the relevant objects. Typically the valid params are only
+   * contact_id. We'll tweak this function to be more full featured over a period
+   * of time. This is the inverse function of create. It also stores all the retrieved
+   * values in the default array
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Core_BAO_Navigation object on success, null otherwise
+   * @return object CRM_Core_BAO_Navigation object on success, null otherwise
    * @access public
    * @static
    */
@@ -253,7 +257,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
   }
 
   /**
-   * build navigation tree
+   * Function to build navigation tree
    *
    * @param array   $navigationTree nested array of menus
    * @param int     $parentID       parent id
@@ -615,7 +619,7 @@ ORDER BY parent_id, weight";
           <ul id='civicrm-home'>
             <li><a href='$homeURL'>$homeLabel</a></li>
             <li><a href='#' class='crm-hidemenu'>$hideLabel</a></li>
-            <li><a href='$logoutURL' class='crm-logout-link'>". ts('Log out') ."</a></li>
+            <li><a href='$logoutURL' class='crm-logout-link'>". ts('Logout') ."</a></li>
           </ul>";
       // <li> tag doesn't need to be closed
     }

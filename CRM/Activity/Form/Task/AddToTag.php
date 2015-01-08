@@ -55,7 +55,7 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
   protected $_tags;
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *
@@ -81,7 +81,7 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    * @param $rule
    *
    * @return array
@@ -156,5 +156,6 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
     }
 
   }
+  //end of function
 }
 

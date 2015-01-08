@@ -323,7 +323,7 @@ WHERE lt.log_conn_id = %1 AND
 
   /**
    * @param $sql
-   * @param array $params
+   * @param $params
    *
    * @return mixed
    */

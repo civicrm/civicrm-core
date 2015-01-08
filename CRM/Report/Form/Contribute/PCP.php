@@ -63,7 +63,7 @@ class CRM_Report_Form_Contribute_PCP extends CRM_Report_Form {
           ),
           'contact_sub_type' =>
           array(
-            'title' => ts('Supporter Contact Subtype'),
+            'title' => ts('Supporter Contact SubType'),
           ),
         ),
         'filters' =>
@@ -178,10 +178,10 @@ class CRM_Report_Form_Contribute_PCP extends CRM_Report_Form {
             'required' => TRUE,
           ),
           'receive_date' =>
-          array('title' => ts('Most Recent Contribution'),
+          array('title' => ts('Most Recent Donation'),
             'default' => TRUE,
             'statistics' =>
-            array('max' => ts('Most Recent Contribution'),
+            array('max' => ts('Most Recent Donation'),
             ),
           ),
         ),

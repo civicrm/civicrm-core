@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Edit_OpenID {
 
   /**
-   * Build the form object elements for an open id object
+   * build the form elements for an open id object
    *
    * @param CRM_Core_Form $form       reference to the form object
    * @param int           $blockCount block number to build

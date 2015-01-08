@@ -152,7 +152,7 @@ class CRM_Contact_Import_ImportJob {
   }
 
   /**
-   * @param array $params
+   * @param $params
    */
   public function setJobParams(&$params) {
     foreach ($params as $param => $value) {
@@ -162,7 +162,7 @@ class CRM_Contact_Import_ImportJob {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    * @param int $timeout
    */
   public function runImport(&$form, $timeout = 55) {

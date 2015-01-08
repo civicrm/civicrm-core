@@ -61,10 +61,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   */
   protected $_memberEmail = NULL;
 
-  /*l43
+  /*
   * Contact ID of the member
   */
-  public $_contactID = NULL;
+  protected $_contactID = NULL;
 
   /*
   * Display name of the person paying for the membership (used for receipts)
@@ -111,16 +111,21 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       return CRM_Custom_Form_CustomData::preProcess($this);
     }
 
-    parent::preProcess();
     // get price set id.
     $this->_priceSetId = CRM_Utils_Array::value('priceSetId', $_GET);
     $this->set('priceSetId', $this->_priceSetId);
     $this->assign('priceSetId', $this->_priceSetId);
 
+    // action
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $this->_processors = array();
+    $this->assign('contactID', $this->_contactID);
 
     // check for edit permission
     if (!CRM_Core_Permission::checkActionPermission('CiviMember', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
     }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -129,6 +134,66 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       if ($this->_id && $contributionID && !CRM_Core_Permission::checkActionPermission('CiviContribute', $this->_action)) {
         CRM_Core_Error::fatal(ts("This Membership is linked to a contribution. You must have 'delete in CiviContribute' permission in order to delete this record."));
       }
+    }
+
+    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->assign('context', $this->_context);
+
+    if ($this->_id) {
+      $this->_memType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id, 'membership_type_id');
+      $this->_membershipIDs[] = $this->_id;
+    }
+
+    $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
+    $this->assign('membershipMode', $this->_mode);
+
+    if ($this->_mode) {
+      $this->_paymentProcessor = array('billing_mode' => 1);
+      $validProcessors = array();
+      $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'billing_mode IN ( 1, 3 )');
+
+      foreach ($processors as $ppID => $label) {
+        $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ppID, $this->_mode);
+        if ($paymentProcessor['payment_processor_type'] == 'PayPal' && !$paymentProcessor['user_name']) {
+          continue;
+        }
+        elseif ($paymentProcessor['payment_processor_type'] == 'Dummy' && $this->_mode == 'live') {
+          continue;
+        }
+        else {
+          $paymentObject = CRM_Core_Payment::singleton($this->_mode, $paymentProcessor, $this);
+          $error = $paymentObject->checkConfig();
+          if (empty($error)) {
+            $validProcessors[$ppID] = $label;
+          }
+          $paymentObject = NULL;
+        }
+      }
+      if (empty($validProcessors)) {
+        CRM_Core_Error::fatal(ts('Could not find valid payment processor for this page'));
+      }
+      else {
+        $this->_processors = $validProcessors;
+      }
+      // also check for billing information
+      // get the billing location type
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
+      // CRM-8108 remove ts around Billing location type
+      //$this->_bltID = array_search( ts('Billing'),  $locationTypes );
+      $this->_bltID = array_search('Billing', $locationTypes);
+      if (!$this->_bltID) {
+        CRM_Core_Error::fatal(ts('Please set a location type of %1', array(1 => 'Billing')));
+      }
+      $this->set('bltID', $this->_bltID);
+      $this->assign('bltID', $this->_bltID);
+
+      $this->_fields = array();
+
+      CRM_Core_Payment_Form::setCreditCardFields($this);
+
+      // this required to show billing block
+      $this->assign_by_ref('paymentProcessor', $paymentProcessor);
+      $this->assign('hidePayPalExpress', TRUE);
     }
 
     if ($this->_action & CRM_Core_Action::ADD) {
@@ -202,12 +267,16 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       );
     }
     $this->assign('onlinePendingContributionId', $this->_onlinePendingContributionId);
+    $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
 
     $this->setPageTitle(ts('Membership'));
+
+
+    parent::preProcess();
   }
 
   /**
-   * Set default values for the form. MobileProvider that in edit/view mode
+   * This function sets the default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -362,7 +431,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -372,7 +441,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       return CRM_Custom_Form_CustomData::buildQuickForm($this);
     }
 
-    $this->assign('taxRates', json_encode(CRM_Core_PseudoConstant::getTaxRates()));
     // build price set form.
     $buildPriceSet = FALSE;
     if ($this->_priceSetId || !empty($_POST['price_set_id'])) {
@@ -691,6 +759,15 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
 
     $this->add('textarea', 'receipt_text_signup', ts('Receipt Message'));
+    if ($this->_mode) {
+
+      $this->add('select', 'payment_processor_id',
+        ts('Payment Processor'),
+        $this->_processors, TRUE,
+        array('onChange' => "buildAutoRenew( null, this.value );")
+      );
+      CRM_Core_Payment_Form::buildCreditCard($this, TRUE);
+    }
 
     // Retrieve the name and email of the contact - this will be the TO for receipt email
     if ($this->_contactID) {
@@ -732,7 +809,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   }
 
   /**
-   * validation
+   * Function for validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
@@ -881,7 +958,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
             ));
             $tmp_statuses = $result['values'];
             $status_ids = array();
-            foreach($tmp_statuses as $cur_stat) {
+      	    foreach($tmp_statuses as $cur_stat) {
               $status_ids[] = $cur_stat['id'];
             }
             if (empty($params['status_id']) || in_array( $params['status_id'] , $status_ids) == false) {
@@ -973,7 +1050,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *
@@ -1049,9 +1126,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     if ($priceSetId) {
       CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
         $this->_params, $lineItem[$priceSetId]);
-      if (CRM_Utils_Array::value('tax_amount', $this->_params)) {
-        $params['tax_amount'] = $this->_params['tax_amount'];
-      }
       $params['total_amount'] = CRM_Utils_Array::value('amount', $this->_params);
       $submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $formValues);
       if (!empty($lineItem[$priceSetId])) {
@@ -1199,12 +1273,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       }
 
       if (!$this->_onlinePendingContributionId) {
-        if (empty($formValues['source'])) {
-          $params['contribution_source'] = ts('%1 Membership: Offline signup (by %2)', array(1 => $membershipType, 2 => $userName));
-        }
-        else {
-          $params['contribution_source'] = $formValues['source'];
-        }
+        $params['contribution_source'] = ts('%1 Membership: Offline signup (by %2)',
+          array(1 => $membershipType, 2 => $userName)
+        );
       }
 
       if (empty($params['is_override']) &&
@@ -1313,7 +1384,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
       $this->_params['amount'] = $params['total_amount'];
       $this->_params['currencyID'] = $config->defaultCurrency;
-      $this->_params['description'] = ts('Office Credit Card Membership Signup Contribution');
       $this->_params['payment_action'] = 'Sale';
       $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
       $this->_params['financial_type_id'] = $params['financial_type_id'];
@@ -1575,10 +1645,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
     if (!empty($lineItem[$priceSetId])) {
-      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
-      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-      $taxAmount = FALSE;
-      $totalTaxAmount = 0;
       foreach ($lineItem[$priceSetId] as & $priceFieldOp) {
         if (!empty($priceFieldOp['membership_type_id'])) {
           $priceFieldOp['start_date'] = $membershipTypeValues[$priceFieldOp['membership_type_id']]['start_date'] ? CRM_Utils_Date::customFormat($membershipTypeValues[$priceFieldOp['membership_type_id']]['start_date'], '%B %E%f, %Y') : '-';
@@ -1587,27 +1653,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         else {
           $priceFieldOp['start_date'] = $priceFieldOp['end_date'] = 'N/A';
         }
-        if ($invoicing && isset($priceFieldOp['tax_amount'])) {
-          $taxAmount = TRUE;
-          $totalTaxAmount += $priceFieldOp['tax_amount'];
-        }
-      }
-      if ($invoicing) {
-        $dataArray = array();
-        foreach ($lineItem[$priceSetId] as $key => $value) {
-          if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
-            if (isset($dataArray[$value['tax_rate']])) {
-              $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
-            } else {
-              $dataArray[$value['tax_rate']] = CRM_Utils_Array::value('tax_amount', $value);
-            }
-          }
-        }
-        if ($taxAmount) {
-          $this->assign('totalTaxAmount', $totalTaxAmount);
-          $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
-        }
-        $this->assign('dataArray', $dataArray);
       }
     }
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
@@ -1693,12 +1738,13 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   }
 
   /**
-   * send email receipt
+   * Function to send email receipt
    *
-   * @param CRM_Core_Form $form form object
-   * @param array $formValues
+   * @param object $form form object
+   * @param $formValues
    * @param object $membership object
    *
+   * @internal param array $values submitted values
    * @return boolean true if mail was sent successfully
    * @static
    */
@@ -1830,17 +1876,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $form->_receiptContactId = $formValues['contact_id'];
       }
     }
-    $template = CRM_Core_Smarty::singleton( );
-    $taxAmt = $template->get_template_vars('dataArray');
-    $eventTaxAmt = $template->get_template_vars('totalTaxAmount');
-    $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
-    $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
-    if ((!empty($taxAmt) || isset($eventTaxAmt)) && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
-      $isEmailPdf = True;
-    }
-    else {
-      $isEmailPdf = False;
-    }
 
     list($mailSend, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
       array(
@@ -1850,9 +1885,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         'from' => $receiptFrom,
         'toName' => $form->_contributorDisplayName,
         'toEmail' => $form->_contributorEmail,
-        'PDFFilename' => ts('receipt').'.pdf',
-        'isEmailPdf' => $isEmailPdf,
-        'contributionId' => $formValues['contribution_id'],
         'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW)
       )
     );

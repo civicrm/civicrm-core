@@ -29,7 +29,7 @@
     {include file="CRM/common/formButtons.tpl"}
   </div>
 
-  <div class="crm-clear">
+  <div class="crm-clear">  
     {if $contactType eq 'Individual'}
     <div class="crm-summary-row">
       <div class="crm-label">{$form.employer_id.label}&nbsp;{help id="id-current-employer" file="CRM/Contact/Form/Contact.hlp"}</div>

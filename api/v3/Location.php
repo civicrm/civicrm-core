@@ -8,7 +8,7 @@ function civicrm_api3_location_create($params) {
 }
 
 /**
- * @param array $params
+ * @param $params
  *
  * @return array
  */
@@ -17,7 +17,7 @@ function civicrm_api3_location_get($params) {
 }
 
 /**
- * @param array $params
+ * @param $params
  *
  * @return array
  */

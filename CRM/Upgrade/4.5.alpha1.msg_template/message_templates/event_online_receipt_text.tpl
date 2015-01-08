@@ -105,7 +105,7 @@ registration process.{/ts}
 {ts}Email{/ts}: {$eventEmail.email}{/if}{/foreach}
 {/if}
 
-{if $event.is_public}
+{if $event.is_public} 
 {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
 {ts}Download iCalendar File:{/ts} {$icalFeed}
 {/if}

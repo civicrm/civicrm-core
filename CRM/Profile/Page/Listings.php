@@ -398,11 +398,13 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
   }
 
   /**
-   * get the list of contacts for a profile
+   * Function to get the list of contacts for a profile
    *
    * @param $gid
    *
    * @return array
+   * @internal param object $form
+   *
    * @access public
    */
   function getProfileContact($gid) {

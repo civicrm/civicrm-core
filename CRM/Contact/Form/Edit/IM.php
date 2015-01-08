@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Edit_IM {
 
   /**
-   * Build the form object elements for an IM object
+   * build the form elements for an IM object
    *
    * @param CRM_Core_Form $form       reference to the form object
    * @param int           $blockCount block number to build

@@ -390,11 +390,7 @@ class CRM_Pledge_BAO_Query {
         return;
 
       case 'pledge_id':
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_pledge.id",
-          $op,
-          $value,
-          "Integer"
-        );
+        $query->_where[$grouping][] = "civicrm_pledge.id $op $value";
         $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
         return;
 
@@ -537,7 +533,7 @@ class CRM_Pledge_BAO_Query {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    */
   static function buildSearchForm(&$form) {
     // pledge related dates

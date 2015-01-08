@@ -90,7 +90,7 @@ class CRM_Utils_Tree {
    *
    * @param $nodeName
    *
-   * @internal param string $rootNode
+   * @internal param string $root
    *
    * @return CRM_Utils_Tree
    * @access public
@@ -145,7 +145,7 @@ class CRM_Utils_Tree {
   }
 
   /**
-   * check if node is a leaf node.
+   * Function to check if node is a leaf node.
    * Currently leaf nodes are strings and non-leaf nodes are arrays
    *
    * @param array(

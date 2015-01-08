@@ -63,7 +63,7 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
   protected $_mappingId;
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public

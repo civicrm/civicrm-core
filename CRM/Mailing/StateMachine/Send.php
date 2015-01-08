@@ -42,9 +42,10 @@ class CRM_Mailing_StateMachine_Send extends CRM_Core_StateMachine {
   /**
    * class constructor
    *
-   * @param CRM_Mailing_Controller $controller
+   * @param object $controller
    * @param \const|int $action
    *
+   * @internal param \CRM_Mailing_Controller $object
    * @return \CRM_Mailing_StateMachine_Send CRM_Mailing_StateMachine
    */
   function __construct($controller, $action = CRM_Core_Action::NONE) {

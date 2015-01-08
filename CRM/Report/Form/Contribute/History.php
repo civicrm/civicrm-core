@@ -61,7 +61,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     $yearsInPast = 4;
     $date        = CRM_Core_SelectValues::date('custom', NULL, $yearsInPast, 0);
     $count       = $date['maxYear'];
-    $optionYear  = array('' => ts('- select -'));
+    $optionYear  = array('' => ts('-- select --'));
 
     $this->_yearStatisticsFrom = $date['minYear'];
     $this->_yearStatisticsTo = $date['maxYear'];
@@ -106,7 +106,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
           ),
           'contact_sub_type' =>
           array(
-            'title' => ts('Contact Subtype'),
+            'title' => ts('Contact SubType'),
           ),
         ),
         'grouping' => 'contact-fields',
@@ -210,7 +210,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
           'receive_date' =>
           array('operatorType' => CRM_Report_Form::OP_DATE),
           'contribution_status_id' =>
-          array('title' => ts('Contribution Status'),
+          array('title' => ts('Donation Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
             'default' => array(1),
@@ -221,7 +221,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
             'options' => CRM_Contribute_PseudoConstant::financialType(),
           ),
           'total_amount' =>
-          array('title' => ts('Contribution Amount'),
+          array('title' => ts('Donation Amount'),
           ),
           'total_sum' =>
           array('title' => ts('Aggregate Amount'),

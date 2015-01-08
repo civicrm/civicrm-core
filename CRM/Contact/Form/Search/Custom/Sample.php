@@ -57,7 +57,7 @@ class CRM_Contact_Form_Search_Custom_Sample extends CRM_Contact_Form_Search_Cust
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    */
   function buildForm(&$form) {
 

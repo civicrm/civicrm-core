@@ -35,9 +35,9 @@
 class CRM_Contribute_Form_Contribution_OnBehalfOf {
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return void
    * @access public
@@ -123,9 +123,12 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
   }
 
   /**
-   * build form for related contacts / on behalf of organization.
+   * Function to build form for related contacts / on behalf of organization.
    *
-   * @param CRM_Core_Form $form
+   * @param $form              object  invoking Object
+   *
+   * @internal param string $contactType contact type
+   * @internal param string $title fieldset title
    *
    * @static
    */

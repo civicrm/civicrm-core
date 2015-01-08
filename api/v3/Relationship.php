@@ -129,7 +129,7 @@ function civicrm_api3_relationship_delete($params) {
 }
 
 /**
- * get the relationship
+ * Function to get the relationship
  *
  * @param array   $params input parameters.
  * @todo  Result is inconsistent depending on whether contact_id is passed in :

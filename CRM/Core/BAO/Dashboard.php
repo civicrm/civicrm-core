@@ -38,7 +38,7 @@
  */
 class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   /**
-   * add Dashboard
+   * function to add Dashboard
    *
    * @param array $params values
    *
@@ -186,10 +186,12 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
 
 
   /**
-   * check dashlet permission for current user
+   * Function to check dashlet permission for current user
    *
-   * @param string $permission comma separated list
-   * @param string $operator
+   * @param $permission
+   * @param $operator
+   *
+   * @internal param \permission $string string
    *
    * @return boolean true if use has permission else false
    */
@@ -260,7 +262,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * get details of each dashlets
+   * Function to get details of each dashlets
    *
    * @param int $dashletID widget ID
    *

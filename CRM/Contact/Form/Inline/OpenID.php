@@ -62,7 +62,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Build the form object elements for openID object
+   * build the form elements for openID object
    *
    * @return void
    * @access public

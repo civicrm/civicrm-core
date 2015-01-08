@@ -51,7 +51,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *
@@ -92,7 +92,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Set default values for the form.
+   * This function sets the default values for the form.
    *
    * @param null
    *
@@ -266,6 +266,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
           continue;
         }
 
+        $contact = array_merge($contact, $contact[$locName]);
         unset($contact[$locName]);
 
         if (!empty($contact['county_id'])) {
@@ -374,7 +375,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     return FALSE;
   }
   /**
-   * create labels (pdf)
+   * function to create labels (pdf)
    *
    * @param   array    $contactRows   assciated array of contact data
    * @param   string   $format   format in which labels needs to be printed
@@ -402,7 +403,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
   }
 
   /**
-   * create the array of returnProperties
+   * function to create the array of returnProperties
    *
    * @param   string   $format   format for which return properties build
    *

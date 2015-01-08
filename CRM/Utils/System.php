@@ -1519,7 +1519,8 @@ class CRM_Utils_System {
    * @param bool $throwError
    * @param $realPath
    */
-  static function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
+  static function loadBootStrap($params = array(
+    ), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     if (!is_array($params)) {
       $params = array();
     }
@@ -1621,6 +1622,7 @@ class CRM_Utils_System {
    * @param string $url
    * @param bool $removeLanguagePart
    *
+   * @internal param bool $remoteLanguagePart
    * @return string
    */
   static function absoluteURL($url, $removeLanguagePart = FALSE) {
@@ -1642,7 +1644,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * clean url, replaces first '&' with '?'
+   * Function to clean url, replaces first '&' with '?'
    *
    * @param string $url
    *
@@ -1764,9 +1766,10 @@ class CRM_Utils_System {
    *   each element.
    * @access public
    */
-  static function getPluginList($relpath, $fext = '.php', $skipList = array()) {
-    $fext_len = strlen($fext);
-    $plugins = array();
+  static function getPluginList($relpath, $fext = '.php', $skipList = array(
+    )) {
+    $fext_len  = strlen($fext);
+    $plugins   = array();
     $inc_files = CRM_Utils_System::listIncludeFiles($relpath);
     foreach ($inc_files as $inc_file) {
       if (substr($inc_file, 0 - $fext_len) == $fext) {

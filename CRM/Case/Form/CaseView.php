@@ -38,14 +38,14 @@
  *
  */
 class CRM_Case_Form_CaseView extends CRM_Core_Form {
-  /**
-   * check for merge cases.
-   * @var bool
-   */
+  /*
+     * check for merge cases.
+     */
+
   private $_mergeCases = FALSE;
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @return void
    * @access public
@@ -193,7 +193,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. For edit/view mode
+   * This function sets the default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -206,7 +206,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -328,7 +328,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     }
 
     //call activity form
-    self::activityForm($this, $aTypes);
+    self::activityForm($this);
 
     //get case related relationships (Case Role)
     $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($this->_contactID, $this->_caseID);
@@ -501,9 +501,8 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
   /**
    * Build the activity selector/datatable
    * @param CRM_Core_Form $form
-   * @param array $aTypes to include acivities related to current case id $form->_caseID
    */
-  static function activityForm($form, $aTypes = array()) {
+  static function activityForm($form) {
     $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($form->_contactID, $form->_caseID);
     //build reporter select
     $reporters = array("" => ts(' - any reporter - '));
@@ -520,7 +519,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
         $aTypesFilter[$typeDetails['id']] = CRM_Utils_Array::value('label', $typeDetails);
       }
     }
-    $aTypesFilter = $aTypesFilter + $aTypes;
     asort($aTypesFilter);
     $form->add('select', 'activity_type_filter_id', ts('Activity Type'), array('' => ts('- select activity type -')) + $aTypesFilter, FALSE, array('id' => 'activity_type_filter_id_'.$form->_caseID));
 

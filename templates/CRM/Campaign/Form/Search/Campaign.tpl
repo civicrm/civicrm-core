@@ -28,7 +28,7 @@
   <div class="messages status no-popup">
     <div class="icon inform-icon"></div>
     &nbsp;
-    {ts}None found.{/ts}
+    {ts}No campaigns found.{/ts}
   </div>
   <div class="action-link">
     <a href="{crmURL p='civicrm/campaign/add' q='reset=1' h=0 }" class="button"><span><div

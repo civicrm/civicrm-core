@@ -46,7 +46,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @param $ids
    *
-   * @return CRM_Price_DAO_PriceFieldValue object
+   * @return object CRM_Price_DAO_PriceFieldValue object
    * @access public
    * @static
    */
@@ -75,20 +75,20 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @param $ids
    *
-   * @return CRM_Price_DAO_PriceFieldValue object
+   * @return object CRM_Price_DAO_PriceFieldValue object
    * @access public
    * @static
    */
   static function create(&$params, $ids = array()) {
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
+
     if (!is_array($params) || empty($params)) {
       return;
     }
-    if(!$id && empty($params['name'])) {
+    if(empty($params['id']) && empty($params['name'])) {
       $params['name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 242));
     }
 
-    if ($id  && !empty($params['weight'])) {
+    if ($id = CRM_Utils_Array::value('id', $ids) && !empty($params['weight'])) {
       if (isset($params['name']))unset($params['name']);
 
       $oldWeight = NULL;
@@ -100,26 +100,16 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
       $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Price_DAO_PriceFieldValue', $oldWeight, $params['weight'], $fieldValues);
     }
     else {
-      if (!$id) {
-        CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
-        if (empty($params['name'])) {
-          $params['name'] = CRM_Utils_String::munge(CRM_Utils_Array::value('label', $params), '_', 64);
-        }
+      if (!$id && empty($params['name'])) {
+        $params['name'] = CRM_Utils_String::munge(CRM_Utils_Array::value('label', $params), '_', 64);
+      }
+      if (empty($params['weight'])) {
+        $params['weight'] = 1;
       }
     }
+    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, 0);
+
     return self::add($params, $ids);
-  }
-
-  /**
-   * Get defaults for new entity
-   * @return array
-   */
-  static function getDefaults() {
-    return array(
-      'is_active' => 1,
-      'weight' => 1,
-    );
-
   }
 
   /**
@@ -129,7 +119,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param array $params   (reference ) an assoc array
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Price_DAO_PriceFieldValue object
+   * @return object CRM_Price_DAO_PriceFieldValue object
    * @access public
    * @static
    */

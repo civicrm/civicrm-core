@@ -509,7 +509,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         $params['contact_sub_type'] = array_search($subType, $subTypes);
       }
       elseif (!CRM_Contact_BAO_ContactType::isExtendsContactType($subType, $this->_contactType)) {
-        $message = "Mismatched or Invalid Contact Subtype.";
+        $message = "Mismatched or Invalid Contact SubType.";
         array_unshift($values, $message);
         return CRM_Import_Parser::NO_MATCH;
       }
@@ -745,7 +745,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           if (isset($relationType->$direction)) {
             //validation of related contact subtype for update mode
             if ($relCsType = CRM_Utils_Array::value('contact_sub_type', $params[$key]) && $relCsType != $relationType->$direction) {
-              $errorMessage = ts("Mismatched or Invalid contact subtype found for this related contact.");
+              $errorMessage = ts("Mismatched or Invalid contact subtype found for this related contact");
               array_unshift($values, $errorMessage);
               return CRM_Import_Parser::NO_MATCH;
             }
@@ -783,7 +783,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
               if (!empty($relatedCsType) && (!CRM_Contact_BAO_ContactType::isAllowEdit($params[$key]['id'], $relatedCsType) &&
                 $relatedCsType != CRM_Utils_Array::value('contact_sub_type', $formatting))) {
-                $errorMessage = ts("Mismatched or Invalid contact subtype found for this related contact.") . ' ' . ts("ID: %1", array(1 => $params[$key]['id']));
+                $errorMessage = ts("Mismatched or Invalid contact subtype found for this related contact ID: %1", array(1 => $params[$key]['id']));
                 array_unshift($values, $errorMessage);
                 return CRM_Import_Parser::NO_MATCH;
               }
@@ -1096,9 +1096,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   function fini() {}
 
   /**
-   * check if an error in custom data
+   * function to check if an error in custom data
    *
-   * @param array $params
+   * @param $params
    * @param String $errorMessage A string containing all the error-fields.
    *
    * @param null $csType
@@ -1317,9 +1317,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * check if an error in Core( non-custom fields ) field
+   * function to check if an error in Core( non-custom fields ) field
    *
-   * @param array $params
+   * @param $params
    * @param String $errorMessage A string containing all the error-fields.
    *
    * @access public
@@ -1588,7 +1588,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * ckeck a value present or not in a array
+   * function to ckeck a value present or not in a array
    *
    * @param $value
    * @param $valueArray
@@ -2068,7 +2068,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
   /**
    * @param $relKey
-   * @param array $params
+   * @param $params
    *
    * @return bool
    */

@@ -72,7 +72,7 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public
@@ -99,8 +99,9 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
-   * @param CRM_Core_Form $form
+   * @param object $form
    *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public

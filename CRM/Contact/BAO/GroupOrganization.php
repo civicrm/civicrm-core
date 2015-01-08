@@ -123,7 +123,9 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
   /**
    * Method to check group organization relationship exist
    *
-   * @param int $contactID
+   * @param $contactID
+   *
+   * @internal param int $contactId
    *
    * @return boolean
    * @access public
@@ -140,7 +142,7 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
   }
 
   /**
-   * delete Group Organization
+   * Function to delete Group Organization
    *
    * @param int $groupOrganizationID group organization id that needs to be deleted
    *

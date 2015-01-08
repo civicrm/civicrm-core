@@ -204,7 +204,7 @@ class CRM_Utils_Migrate_ImportJSON {
 
   /**
    * @param $chunk
-   * @param string $daoName
+   * @param $daoName
    * @param null $lookUpMapping
    * @param null $dateFields
    */

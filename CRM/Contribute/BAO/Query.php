@@ -958,7 +958,7 @@ class CRM_Contribute_BAO_Query {
    *
    * @access public
    *
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return void
    * @static

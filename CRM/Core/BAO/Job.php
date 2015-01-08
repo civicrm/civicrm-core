@@ -46,11 +46,13 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
   }
 
   /**
-   * add the payment-processor type in the db
+   * Function to add the payment-processor type in the db
    *
-   * @param array $params an assoc array of name/value pairs
+   * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @return CRM_Financial_DAO_PaymentProcessorType
+   * @internal param array $ids the array that holds all the db ids
+   *
+   * @return object CRM_Financial_DAO_PaymentProcessorType
    * @access public
    * @static
    */
@@ -68,7 +70,7 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Core_DAO_Job object on success, null otherwise
+   * @return object CRM_Core_DAO_Job object on success, null otherwise
    * @access public
    * @static
    */
@@ -100,7 +102,9 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
   /**
    * Function  to delete scheduled job
    *
-   * @param $jobID ID of the job to be deleted.
+   * @param $jobID
+   *
+   * @internal param int $jobId ID of the job to be deleted.
    *
    * @return bool|null
    * @access public
@@ -108,7 +112,7 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    */
   static function del($jobID) {
     if (!$jobID) {
-      CRM_Core_Error::fatal(ts('Invalid value passed to delete function.'));
+      CRM_Core_Error::fatal(ts('Invalid value passed to delete function'));
     }
 
     $dao = new CRM_Core_DAO_Job();

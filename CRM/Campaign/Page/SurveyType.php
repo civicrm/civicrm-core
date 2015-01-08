@@ -207,7 +207,7 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
   }
 
   /**
-   * get userContext params
+   * function to get userContext params
    *
    * @param int $mode mode that we are in
    *

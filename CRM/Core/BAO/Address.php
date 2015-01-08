@@ -545,7 +545,10 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *
    * @param bool $microformat
    *
+   * @internal param $NULL
+   *
    * @return void
+   *
    * @access public
    */
   function addDisplay($microformat = FALSE) {
@@ -653,7 +656,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
   }
 
   /**
-   * get address sequence
+   * Function to get address sequence
    *
    * @return  array of address sequence.
    */
@@ -872,7 +875,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
   }
 
   /**
-   * check if current address fields are shared with any other address
+   * Function to check if current address fields are shared with any other address
    *
    * @param array    $fields    address fields in profile
    * @param int      $contactId contact id
@@ -943,7 +946,7 @@ SELECT is_primary,
   }
 
   /**
-   * update the shared addresses if master address is modified
+   * Function to update the shared addresses if master address is modified
    *
    * @param int    $addressId address id
    * @param array  $params    associated array of address params

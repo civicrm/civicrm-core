@@ -213,7 +213,7 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
   }
 
   /**
-   * get userContext params
+   * function to get userContext params
    *
    * @param int $mode mode that we are in
    *

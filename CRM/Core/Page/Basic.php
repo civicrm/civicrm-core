@@ -88,7 +88,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   abstract function userContext($mode = NULL);
 
   /**
-   * get userContext params
+   * function to get userContext params
    *
    * @param int $mode mode that we are in
    *
@@ -194,6 +194,8 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
 
   /**
    * browse all entities.
+   *
+   * @internal param int $action
    *
    * @return void
    * @access public

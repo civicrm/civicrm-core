@@ -51,7 +51,7 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Set default values for the form.
+   * This function sets the default values for the form.
    *
    * @access public
    *
@@ -89,7 +89,7 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -107,7 +107,7 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

@@ -89,6 +89,8 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
    *
    * @access public
    *
+   * @internal param object $page - the view page which created this one
+   *
    * @return void
    * @static
    */

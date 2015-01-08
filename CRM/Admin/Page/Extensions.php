@@ -268,7 +268,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
   }
 
   /**
-   * get userContext params
+   * function to get userContext params
    *
    * @param int $mode mode that we are in
    *

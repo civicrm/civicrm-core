@@ -107,7 +107,7 @@ CRM.$(function($) {
     .on('click', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', CRM.popup)
     .on('crmPopupFormSuccess', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', function() {
         // Refresh datatable when form completes
-        var $context = $('#crm-main-content-wrapper');
+      	var $context = $('#crm-main-content-wrapper');
         $('table.crm-group-selector', $context).dataTable().fnDraw();
     });
 

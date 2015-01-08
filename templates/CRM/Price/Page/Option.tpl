@@ -58,10 +58,6 @@
             <th>{ts}Default{/ts}</th>
             <th>{ts}Financial Type{/ts}</th>
             <th>{ts}Order{/ts}</th>
-            {if $getTaxDetails}
-              <th>{ts}Tax Label{/ts}</th>
-              <th>{ts}Tax Amount{/ts}</th>
-            {/if}
             <th>{ts}Enabled?{/ts}</th>
             <th></th>
           </tr>
@@ -74,13 +70,6 @@
               <td class="crm-price-option-is_default">{if $row.is_default}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}</td>
               <td class="nowrap crm-price-option-financial-type-id">{$row.financial_type_id}</td>
               <td class="nowrap crm-price-option-order">{$row.weight}</td>
-              {if $getTaxDetails}
-                <td>{if $row.tax_rate != '' }
-                      {$taxTerm} ({$row.tax_rate|string_format:"%.2f"}%)
-                    {/if}
-                </td>
-                <td>{$row.tax_amount|crmMoney}</td>
-              {/if}
               <td id="row_{$row.id}_status" class="crm-price-option-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
               <td>{$row.action|replace:'xx':$row.id}</td>
             </tr>

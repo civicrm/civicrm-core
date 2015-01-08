@@ -47,7 +47,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
   protected $_sid;
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @param null
    *
@@ -103,13 +103,13 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     // gives the ascii value
     $asciiValue = ord($title{0});
     if ($asciiValue >= 48 && $asciiValue <= 57) {
-      $errors['title'] = ts("Name cannot not start with a digit");
+      $errors['title'] = ts("Set's Name should not start with digit");
     }
     return empty($errors) ? TRUE : $errors;
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @param null
    *
@@ -231,7 +231,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
+   * This function sets the default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @param null

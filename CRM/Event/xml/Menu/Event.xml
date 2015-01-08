@@ -216,14 +216,6 @@
      <weight>950</weight>
   </item>
   <item>
-     <path>civicrm/event/manage/repeat</path>
-     <title>Repeat Event</title>
-     <page_callback>CRM_Event_Form_ManageEvent_Repeat</page_callback>
-     <access_arguments>access CiviEvent</access_arguments>
-     <is_ssl>true</is_ssl>
-     <weight>960</weight>
-  </item>
-  <item>
      <path>civicrm/event/manage/conference</path>
      <title>Conference Slots</title>
      <page_callback>CRM_Event_Form_ManageEvent_Conference</page_callback>

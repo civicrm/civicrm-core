@@ -81,6 +81,7 @@ class CRM_Queue_Service {
   }
 
   /**
+   *
    * @param $queueSpec, array with keys:
    *   - type: string, required, e.g. "interactive", "immediate", "stomp", "beanstalk"
    *   - name: string, required, e.g. "upgrade-tasks"
@@ -111,6 +112,7 @@ class CRM_Queue_Service {
   }
 
   /**
+   *
    * @param $queueSpec, array with keys:
    *   - type: string, required, e.g. "interactive", "immediate", "stomp", "beanstalk"
    *   - name: string, required, e.g. "upgrade-tasks"
@@ -147,6 +149,7 @@ class CRM_Queue_Service {
   }
 
   /**
+   *
    * @param $queueSpec array, see create()
    *
    * @return CRM_Queue_Queue

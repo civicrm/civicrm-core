@@ -87,7 +87,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   public $_caseTypeId = NULL;
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -114,7 +114,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     //CRM-4418
     if (!CRM_Core_Permission::checkActionPermission('CiviCase', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
     }
 
     if ($this->_action & CRM_Core_Action::DELETE || $this->_action & CRM_Core_Action::RENEW) {
@@ -204,7 +204,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. For edit/view mode
+   * This function sets the default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -317,7 +317,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
    * @param array $values posted values of the form
    *
    * @param $files
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -328,7 +328,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

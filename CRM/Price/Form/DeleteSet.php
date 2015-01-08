@@ -66,7 +66,7 @@ class CRM_Price_Form_DeleteSet extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public

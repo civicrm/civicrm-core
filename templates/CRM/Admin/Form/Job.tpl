@@ -99,11 +99,11 @@ CRM.$(function($) {
 {/literal}
 </script>
 
-      </td>
+			</td>
     </tr>
     <tr class="crm-job-form-block-parameters">
       <td class="label">{$form.parameters.label}<br />{docURL page="Managing Scheduled Jobs" resource="wiki"}</td>
-      <td>{$form.parameters.html}</td>
+			<td>{$form.parameters.html}</td>
     </tr>
     <tr class="crm-job-form-block-is_active">
       <td></td><td>{$form.is_active.html}&nbsp;{$form.is_active.label}</td>

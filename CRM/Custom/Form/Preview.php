@@ -109,7 +109,7 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @param null
    *

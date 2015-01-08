@@ -52,7 +52,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
+   * This function sets the default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -60,6 +60,9 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    * @return void
    */
   public function setDefaultValues() {
+    //   $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title' );
+    //    CRM_Utils_System::setTitle(ts('Personal Campaign Page Settings (%1)', array(1 => $title)));
+
     $defaults = array();
 
     if (isset($this->_id)) {
@@ -85,7 +88,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -100,7 +103,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   }
 
   /**
-   * validation
+   * Function for validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
@@ -142,7 +145,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

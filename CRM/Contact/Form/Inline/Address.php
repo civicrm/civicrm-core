@@ -120,7 +120,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Build the form object elements for an address object
+   * build the form elements for an address object
    *
    * @return void
    * @access public

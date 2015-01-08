@@ -101,7 +101,7 @@ function civicrm_api3_system_check($params) {
 }
 
 /**
- * @param array $params
+ * @param $params
  *
  * @return array
  */
@@ -124,7 +124,7 @@ function civicrm_api3_system_log($params) {
 
 /**
  * Metadata for log function
- * @param array $params
+ * @param $params
  */
 function _civicrm_api3_system_log_spec(&$params) {
   $params['level'] = array(

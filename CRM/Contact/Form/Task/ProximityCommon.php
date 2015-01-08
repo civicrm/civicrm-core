@@ -73,7 +73,7 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *
@@ -112,7 +112,9 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
    *
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
-   * @param CRM_Core_Form $form
+   * @param $form
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -140,7 +142,7 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
    *
    * @access protected
    *
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return array the default array reference
    */

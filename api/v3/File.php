@@ -128,7 +128,7 @@ function civicrm_api3_file_update($params) {
  * This API is used for deleting a file
  * Required parameters : id of a file
  *
- * @param array $params
+ * @param $params
  *
  * @return array API result array
  * @access public

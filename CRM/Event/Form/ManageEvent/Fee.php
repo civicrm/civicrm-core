@@ -60,7 +60,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
   private $_inDate;
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @return void
    * @access public
@@ -70,7 +70,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Set default values for the form. For edit/view mode
+   * This function sets the default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -249,7 +249,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -288,7 +288,6 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     );
     $this->addWysiwyg('pay_later_receipt', ts('Pay Later Instructions'), CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'pay_later_receipt'));
 
-    $this->addElement('checkbox', 'is_billing_required', ts('Billing address required'));
     $this->add('text', 'fee_label', ts('Fee Label'));
 
     $price = CRM_Price_BAO_PriceSet::getAssoc(FALSE, 'CiviEvent');
@@ -578,7 +577,6 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     }
 
     $params['is_pay_later'] = CRM_Utils_Array::value('is_pay_later', $params, 0);
-    $params['is_billing_required'] = CRM_Utils_Array::value('is_billing_required', $params, 0);
 
     if ($this->_id) {
 
@@ -793,12 +791,6 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       }
       $params['financial_type_id'] = '';
       $params['is_pay_later'] = 0;
-      $params['is_billing_required'] = 0;
-    }
-
-    //update 'is_billing_required'
-    if (empty($params['is_pay_later'])) {
-      $params['is_billing_required'] = False;
     }
 
     //update events table

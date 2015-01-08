@@ -52,19 +52,19 @@ class CRM_Core_State {
 
   /**
    * the state that precedes this state
-   * @var CRM_Core_State
+   * @var object
    */
   protected $_back;
 
   /**
    * the state that succeeds this state
-   * @var CRM_Core_State
+   * @var object
    */
   protected $_next;
 
   /**
    * The state machine that this state is part of
-   * @var CRM_Core_StateMachine
+   * @var object
    */
   protected $_stateMachine;
 
@@ -79,14 +79,20 @@ class CRM_Core_State {
   /**
    * constructor
    *
-   * @param string $name internal name of the state
-   * @param int $type state type
-   * @param CRM_Core_State $back state that precedes this state
-   * @param CRM_Core_State $next state that follows  this state
-   * @param CRM_Core_StateMachine $stateMachine statemachine that this states belongs to
+   * @param $name
+   * @param $type
+   * @param $back
+   * @param $next
+   * @param $stateMachine
    *
-   * @return CRM_Core_State
-   * @access public
+   * @internal param \the $string internal name of the state
+   * @internal param \the $int state type
+   * @internal param \the $object state that precedes this state
+   * @internal param \the $object state that follows  this state
+   * @internal param \the $object statemachine that this states belongs to
+   *
+   * @return \CRM_Core_State
+  @access public
    */
   function __construct($name, $type, $back, $next, &$stateMachine) {
     $this->_name = $name;

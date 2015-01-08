@@ -41,7 +41,7 @@
  * {@getfields premium_create}
  * @example premiumCreate.php
  *
- * @param array $params
+ * @param $params
  *
  * @throws API_Exception
  * @return array of newly created premium property values.
@@ -58,7 +58,7 @@ function civicrm_api3_premium_create($params) {
  * {@getfields premium_get}
  * @example premiumCreate.php
  *
- * @param array $params
+ * @param $params
  *
  * @return array of retrieved premium property values.
  * @access public
@@ -74,7 +74,7 @@ function civicrm_api3_premium_get($params) {
  * {@getfields premium_delete}
  * @example premiumCreate.php
  *
- * @param array $params
+ * @param $params
  *
  * @throws API_Exception
  * @return array of deleted values.

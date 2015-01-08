@@ -57,7 +57,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   public $_totalAmount;
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @return void
    * @access public
@@ -69,7 +69,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $this->_lineItem = $this->get('lineItem');
 
     $this->_params = $this->get('params');
-    $this->_params[0]['tax_amount'] = $this->get('tax_amount');
 
     $this->_params[0]['is_pay_later'] = $this->get('is_pay_later');
     $this->assign('is_pay_later', $this->_params[0]['is_pay_later']);
@@ -219,7 +218,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -232,10 +231,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     ) {
       $this->_amount = array();
 
-      $taxAmount = 0;
       foreach ($this->_params as $k => $v) {
-        //display tax amount on confirmation page
-        $taxAmount += $v['tax_amount'];
         if (is_array($v)) {
           foreach (array(
             'first_name', 'last_name') as $name) {
@@ -275,13 +271,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
 
-      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
-      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-      if ($invoicing) {
-        $this->assign('totalTaxAmount', $taxAmount);
-        $this->assign('taxTerm', $taxTerm);
-      }
       $this->assign('part', $this->_part);
       $this->set('part', $this->_part);
       $this->assign('amounts', $this->_amount);
@@ -291,23 +280,14 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $lineItemForTemplate = array();
-      $getTaxDetails = FALSE;
       foreach ($this->_lineItem as $key => $value) {
         if (!empty($value)) {
           $lineItemForTemplate[$key] = $value;
-        }
-        if ($invoicing) {
-          foreach ($value as $v) {
-            if (isset($v['tax_rate'])) {
-              $getTaxDetails = TRUE;
-            }
-          }
         }
       }
       if (!empty($lineItemForTemplate)) {
         $this->assign('lineItem', $lineItemForTemplate);
       }
-      $this->assign('getTaxDetails', $getTaxDetails);
     }
 
     //display additional participants profile.
@@ -391,7 +371,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *
@@ -464,11 +444,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       CRM_Event_Form_Registration_Confirm::fixLocationFields($value, $fields, $this);
       //unset the billing parameters if it is pay later mode
       //to avoid creation of billing location
-      if ($this->_allowWaitlist
-        || $this->_requireApproval
-        || (!empty($value['is_pay_later']) && !$this->_isBillingAddressRequiredForPayLater)
-        || empty($value['is_primary'])
-      ) {
+      if ($this->_allowWaitlist || $this->_requireApproval || !empty($value['is_pay_later']) || empty($value['is_primary'])) {
         $billingFields = array(
           "email-{$this->_bltID}",
           'billing_first_name',
@@ -624,10 +600,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $value['item_name'] = $value['description'];
       }
 
-      if (!empty($value['contributionID'])) {
-        $this->_values['contributionId'] = $value['contributionID'];
-      }
-
       //CRM-4453.
       if (!empty($value['is_primary'])) {
         $primaryCurrencyID = CRM_Utils_Array::value('currencyID', $value);
@@ -692,10 +664,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
 
       $entityTable = 'civicrm_participant';
-      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
-      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-      $totalTaxAmount = 0;
-      $dataArray = array();
       foreach ($this->_lineItem as $key => $value) {
         if (($value != 'skip') &&
           ($entityId = CRM_Utils_Array::value($key, $allParticipantIds))
@@ -708,23 +676,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $lineItem[$this->_priceSetId] = $value;
           CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, $entityTable);
         }
-        if ($invoicing) {
-          foreach ($value as $line) {
-            if (isset($line['tax_amount']) && isset($line['tax_rate'])) {
-              $totalTaxAmount = $line['tax_amount'] + $totalTaxAmount;
-              if (isset($dataArray[$line['tax_rate']])) {
-                $dataArray[$line['tax_rate']] = $dataArray[$line['tax_rate']] + CRM_Utils_Array::value('tax_amount', $line);
-              }
-              else {
-                $dataArray[$line['tax_rate']] = CRM_Utils_Array::value('tax_amount', $line);
-              }
-            }
-          }
-        }
-      }
-      if ($invoicing) {
-        $this->assign('dataArray', $dataArray);
-        $this->assign('totalTaxAmount', $totalTaxAmount);
       }
     }
 
@@ -861,12 +812,13 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
   }
+  //end of function
 
   /**
    * Process the contribution
    *
-   * @param CRM_Core_Form $form
-   * @param array $params
+   * @param $form
+   * @param $params
    * @param $result
    * @param $contactID
    * @param bool $pending
@@ -897,11 +849,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $form->_values['event']['financial_type_id'] : $params['financial_type_id'],
       'receive_date' => $now,
       'total_amount' => $params['amount'],
-      'tax_amount' => $params['tax_amount'],
       'amount_level' => $params['amount_level'],
       'invoice_id' => $params['invoiceID'],
       'currency' => $params['currencyID'],
-      'source' => !empty($params['participant_source']) ? $params['participant_source'] : $params['description'],
+      'source' => $params['description'],
       'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
       'campaign_id' => CRM_Utils_Array::value('campaign_id', $params),
     );
@@ -986,9 +937,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Fix the Location Fields
    *
-   * @param array $params
+   * @param $params
    * @param $fields
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return void
    * @access public
@@ -1032,12 +983,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * update contact fields
+   * function to update contact fields
    *
    * @param $contactID
-   * @param array $params
+   * @param $params
    * @param $fields
-   * @param CRM_Core_Form $form
+   * @param $form
    *
    * @return void
    * @access public

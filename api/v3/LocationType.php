@@ -43,7 +43,7 @@
  *
  * @example LocationTypeCreate.php Standard Create Example
  *
- * @param array $params
+ * @param $params
  *
  * @return array API result array
  * {@getfields email_create}

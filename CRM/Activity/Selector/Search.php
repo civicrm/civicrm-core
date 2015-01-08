@@ -188,14 +188,17 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     );
     $this->_query->_distinctComponentClause = '( civicrm_activity.id )';
     $this->_query->_groupByComponentClause = " GROUP BY civicrm_activity.id ";
+    //CRM_Core_Error::debug( $this->_query ); exit();
   }
+  //end of constructor
 
   /**
    * getter for array of the parameters required for creating pager.
    *
    * @param $action
-   * @param array $params
+   * @param $params
    *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -205,6 +208,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }
+  //end of function
 
   /**
    * Returns total number of rows for the query.
@@ -340,17 +344,6 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         );
       }
 
-      //Check if recurring activity
-      $isRecurringActivity = CRM_Core_BAO_RecurringEntity::getParentFor($row['activity_id'], 'civicrm_activity');
-      $row['repeat'] = '';
-      if ($isRecurringActivity) {
-        if ($row['activity_id'] == $isRecurringActivity) {
-          $row['repeat'] = 'Recurring Activity - (Parent)';
-        }
-        else {
-          $row['repeat'] = 'Recurring Activity - (Child)';
-        }
-      }
       $rows[] = $row;
     }
 
@@ -358,6 +351,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
   }
 
   /**
+   *
    * @return array  $qill  which contains an array of strings
    * @access public
    */
@@ -438,3 +432,5 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     return ts('CiviCRM Activity Search');
   }
 }
+//end of class
+

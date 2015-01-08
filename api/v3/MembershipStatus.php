@@ -53,6 +53,16 @@ function civicrm_api3_membership_status_create($params) {
 }
 
 /**
+ * Adjust Metadata for Create action
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params array or parameters determined by getfields
+ */
+function _civicrm_api3_membership_status_create_spec(&$params) {
+  $params['name']['api.aliases'] = array('label');
+}
+
+/**
  * Get a membership status.
  *
  * This api is used for finding an existing membership status.
@@ -135,6 +145,8 @@ function civicrm_api3_membership_status_delete($params) {
  * @param $membershipParams
  *
  * @throws API_Exception
+ * @internal param Int $membershipID Id of a membership
+ * @internal param String $statusDate
  *
  * @return Array  Array of status id and status name
  * @public

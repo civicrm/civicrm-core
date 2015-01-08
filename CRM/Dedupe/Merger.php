@@ -243,6 +243,20 @@ WHERE
   }
 
   /**
+   * Return tables using locations
+   */
+  static function locTables() {
+    static $locTables;
+    if (!$locTables) {
+      $locTables = array( 'civicrm_email', 'civicrm_address', 'civicrm_phone' );
+
+      // Allow hook_civicrm_merge() to adjust $locTables
+      CRM_Utils_Hook::merge('locTables', $locTables);
+    }
+    return $locTables;
+  }
+
+  /**
    * We treat multi-valued custom sets as "related tables" similar to activities, contributions, etc.
    * @param string $request 'relTables' or 'cidRefs'
    * @see CRM-13836
@@ -416,8 +430,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
     else {
       // if there aren't any specific tables, don't affect the ones handled by relTables()
+      // also don't affect tables in locTables() CRM-15658
       $relTables = self::relTables();
-      $handled = array();
+      $handled = self::locTables();
       foreach ($relTables as $params) {
         $handled = array_merge($handled, $params['tables']);
       }
@@ -537,7 +552,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   }
 
   /**
-   * batch merge a set of contacts based on rule-group and group.
+   * Function to batch merge a set of contacts based on rule-group and group.
    *
    * @param  int $rgid rule group id
    * @param  int $gid group id
@@ -545,9 +560,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *                              A 'safe' value skips the merge if there are any un-resolved conflicts.
    *                              Does a force merge otherwise.
    * @param  boolean $autoFlip wether to let api decide which contact to retain and which to delete.
+   *
+   *
    * @param bool $redirectForPerformance
    *
    * @return array|bool
+   * @internal param array $cacheParams prev-next-cache params based on which next pair of contacts are computed.
+   *                              Generally used with batch-merge.
    * @static
    * @access public
    */
@@ -579,7 +598,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   }
 
   /**
-   * merge given set of contacts. Performs core operation.
+   * Function to merge given set of contacts. Performs core operation.
    *
    * @param  array $dupePairs set of pair of contacts for whom merge is to be done.
    * @param  array $cacheParams prev-next-cache params based on which next pair of contacts are computed.
@@ -596,7 +615,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @static
    * @access public
    */
-  static function merge($dupePairs = array(), $cacheParams = array(), $mode = 'safe',
+  static function merge($dupePairs = array(
+    ), $cacheParams = array(), $mode = 'safe',
     $autoFlip = TRUE, $redirectForPerformance = FALSE
   ) {
     $cacheKeyString = CRM_Utils_Array::value('cache_key_string', $cacheParams);

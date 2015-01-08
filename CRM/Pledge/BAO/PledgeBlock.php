@@ -51,7 +51,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Pledge_BAO_PledgeBlock object
+   * @return object CRM_Pledge_BAO_PledgeBlock object
    * @access public
    * @static
    */
@@ -70,7 +70,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @return CRM_Pledge_BAO_PledgeBlock object
+   * @return object CRM_Pledge_BAO_PledgeBlock object
    * @access public
    * @static
    */
@@ -91,7 +91,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   }
 
   /**
-   * add pledgeBlock
+   * function to add pledgeBlock
    *
    * @param array $params reference array contains the values submitted by the form
    *
@@ -147,7 +147,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   }
 
   /**
-   * delete the pledgeBlock
+   * Function to delete the pledgeBlock
    *
    * @param int $id pledgeBlock id
    *
@@ -174,11 +174,13 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   }
 
   /**
-   * return Pledge  Block info in Contribution Pages
+   * Function to return Pledge  Block info in Contribution Pages
    *
-   * @param int $pageID contribution page id
+   * @param $pageID
    *
    * @return array
+   * @internal param int $pageId contribution page id
+   *
    * @static
    */
   static function getPledgeBlock($pageID) {
@@ -197,7 +199,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   /**
    * Function to build Pledge Block in Contribution Pages
    *
-   * @param CRM_Core_Form $form
+   * @param obj $form
    * @static
    */
   static function buildPledgeBlock($form) {

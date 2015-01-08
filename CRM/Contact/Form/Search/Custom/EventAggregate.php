@@ -59,7 +59,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param $form
    */
   function buildForm(&$form) {
 
@@ -171,6 +171,9 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
       $rowcount = CRM_Utils_Type::escape($rowcount, 'Int');
       $sql .= " LIMIT $offset, $rowcount ";
     }
+
+    // Uncomment the next line to see the actual SQL generated:
+    //CRM_Core_Error::debug('sql',$sql); exit();
     return $sql;
   }
 
@@ -193,9 +196,11 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
         ( civicrm_option_value.value = civicrm_event.event_type_id AND civicrm_option_value.option_group_id = 14)";
   }
 
+  /*
+     * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
+     *
+     */
   /**
-   * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
-   *
    * @param bool $includeContactIDs
    *
    * @return string
@@ -280,6 +285,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
         WHERE   $where
         ";
 
+    //CRM_Core_Error::debug('sql',$sql);
     $dao = CRM_Core_DAO::executeQuery($sql,
       CRM_Core_DAO::$_nullArray
     );
@@ -294,8 +300,8 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
   }
 
   /*
-   * Functions below generally don't need to be modified
-   */
+     * Functions below generally don't need to be modified
+     */
   function count() {
     $sql = $this->all();
 

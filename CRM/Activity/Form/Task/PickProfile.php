@@ -88,7 +88,7 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *
@@ -174,5 +174,6 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
     // also reset the batch page so it gets new values from the db
     $this->controller->resetPage('Batch');
   }
+  //end of function
 }
 

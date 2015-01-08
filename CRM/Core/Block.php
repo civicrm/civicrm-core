@@ -182,8 +182,11 @@ class CRM_Core_Block {
   /**
    * returns the desired property from the $_properties array
    *
-   * @param int $id one of the class constants (ADD, SEARCH, etc.)
-   * @param string $property the desired property
+   * @params int    $id        one of the class constants (ADD, SEARCH, etc.)
+   * @params string $property  the desired property
+   *
+   * @param $id
+   * @param $property
    *
    * @return string  the value of the desired property
    */
@@ -197,10 +200,13 @@ class CRM_Core_Block {
   /**
    * sets the desired property in the $_properties array
    *
-   * @param int    $id        one of the class constants (ADD, SEARCH, etc.)
-   * @param string $property  the desired property
-   * @param string $value     the value of the desired property
+   * @params int    $id        one of the class constants (ADD, SEARCH, etc.)
+   * @params string $property  the desired property
+   * @params string $value     the value of the desired property
    *
+   * @param $id
+   * @param $property
+   * @param $value
    * @return void
    */
   static function setProperty($id, $property, $value) {

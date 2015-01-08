@@ -82,7 +82,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form
    *
    * @access public
    *
@@ -158,7 +158,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
     $buttonName = $this->controller->getButtonName('submit');
 
     if ($suppressFields && $buttonName != '_qf_BatchUpdateProfile_next') {
-      CRM_Core_Session::setStatus(ts("File or Autocomplete-Select type field(s) in the selected profile are not supported for Batch Update."), ts('Some Fields Excluded'), 'info');
+      CRM_Core_Session::setStatus(ts("File or Autocomplete Select type field(s) in the selected profile are not supported for Batch Update and have been excluded."), ts('Some Fields Excluded'), 'info');
     }
 
     $this->addDefaultButtons(ts('Update Contacts'));
@@ -166,7 +166,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Set default values for the form.
+   * This function sets the default values for the form.
    *
    * @access public
    *
@@ -261,14 +261,15 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
     CRM_Core_Session::setStatus('', ts("Updates Saved"), 'success');
     if ($inValidSubtypeCnt) {
-      CRM_Core_Session::setStatus(ts('Contact Subtype field of 1 contact has not been updated.', array('plural' => 'Contact Subtype field of %count contacts has not been updated.', 'count' => $inValidSubtypeCnt)), ts('Invalid Subtype'));
+      CRM_Core_Session::setStatus(ts('Contact SubType field of 1 contact has not been updated.', array('plural' => 'Contact SubType field of %count contacts has not been updated.', 'count' => $inValidSubtypeCnt)), ts('Invalid Subtype'));
     }
   }
+  //end of function
 
   /**
    * parse street address
    * @param array $contactValues contact values
-   * @param CRM_Core_Form $form form object
+   * @param object $form form object
    */
   public static function parseStreetAddress(&$contactValues, &$form) {
     if (!is_array($contactValues) || !is_array($form->_fields)) {

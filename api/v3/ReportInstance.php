@@ -15,7 +15,7 @@ function civicrm_api3_report_instance_get($params) {
 /**
  *  Add or update a report instance.
  *
- * @param array $params
+ * @param $params
  *
  * @return array of newly created report instance property values.
  * @access public

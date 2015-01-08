@@ -85,7 +85,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           ),
           'contact_sub_type' =>
           array(
-            'title' => ts('Contact Subtype'),
+            'title' => ts('Contact SubType'),
           ),
         ),
         'filters' =>
@@ -479,12 +479,12 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
       $count += $dao->count;
     }
     $statistics['counts']['amount'] = array(
-      'title' => ts('Total Amount (Contributions)'),
+      'title' => ts('Total Amount (Donations)'),
       'value' => implode(',  ', $totalAmount),
       'type' => CRM_Utils_Type::T_STRING,
     );
     $statistics['counts']['count'] = array(
-      'title' => ts('Total Contributions'),
+      'title' => ts('Total Donations'),
       'value' => $count,
     );
     $statistics['counts']['avg'] = array(

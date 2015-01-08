@@ -50,7 +50,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
 
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @return void
    * @access public
@@ -108,7 +108,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Build the form object
+   * Function to actually build the form
    *
    * @return void
    * @access public

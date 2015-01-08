@@ -139,7 +139,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public
@@ -203,10 +203,6 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
               );
               break;
 
-            case 'wysiwyg':
-              $this->addWysiwyg($fieldName, $fieldValue['title'], $fieldValue['attributes']);
-              break;
-
             case 'entity_reference':
               $this->addEntityRef($fieldName, $fieldValue['title'], CRM_Utils_Array::value('options', $fieldValue, array()));
           }
@@ -236,7 +232,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *
@@ -252,9 +248,10 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
     $this->postProcessCommon();
   }
+  //end of function
 
   /**
-   * Process the form submission
+   * Function to process the form
    *
    * @access public
    *

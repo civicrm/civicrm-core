@@ -204,7 +204,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       );
 
 
-      if ($params['option_type'] == 1 && empty($params['option_group_id'])) {
+      if ($params['option_type'] == 1) {
         // first create an option group for this custom group
         $optionGroup = new CRM_Core_DAO_OptionGroup();
         $optionGroup->name = "{$columnName}_" . date('YmdHis');
@@ -313,12 +313,16 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * Fetch object based on array of properties
+   * Takes a bunch of params that are needed to match certain criteria and
+   * retrieves the relevant objects. Typically the valid params are only
+   * contact_id. We'll tweak this function to be more full featured over a period
+   * of time. This is the inverse function of create. It also stores all the retrieved
+   * values in the default array
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return CRM_Core_DAO_CustomField object
+   * @return object CRM_Core_DAO_CustomField object
    * @access public
    * @static
    */
@@ -720,10 +724,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param string $elementName name of the custom field
    * @param $fieldId
    * @param boolean $inactiveNeeded -deprecated
-   * @param bool $useRequired true if required else false
+   * @param bool $useRequired
    * @param boolean $search true if used for search else false
    * @param string $label label for custom field
    *
+   * @internal param bool $userRequired true if required else false
    * @access public
    * @static
    */
@@ -1310,12 +1315,16 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * set default values for custom data used in profile
+   * Function to set default values for custom data used in profile
    *
-   * @param int    $customFieldId custom field id
-   * @param string $elementName   custom field name
-   * @param array  $defaults      associated array of fields
-   * @param int    $contactId     contact id
+   * @params int    $customFieldId custom field id
+   * @params string $elementName   custom field name
+   * @params array  $defaults      associated array of fields
+   * @params int    $contactId     contact id
+   * @param $customFieldId
+   * @param $elementName
+   * @param $defaults
+   * @param null $contactId
    * @param  int $mode profile mode
    * @param  mixed $value if passed - dont fetch value from db,
    *                               just format the given value
@@ -1756,7 +1765,7 @@ SELECT $columnName
   }
 
   /**
-   * @param array $params
+   * @param $params
    *
    * @return array
    */
@@ -1856,7 +1865,7 @@ SELECT $columnName
       $params['fk_field_name'] = 'id';
       $params['fk_attributes'] = 'ON DELETE SET NULL';
     }
-    if (isset($field->default_value)) {
+    if ($field->default_value) {
       $params['default'] = "'{$field->default_value}'";
     }
 
@@ -2026,15 +2035,17 @@ AND    cf.id = %1";
   }
 
   /**
-   * get custom option groups
+   * Function to get custom option groups
    *
-   * @param array $includeFieldIds ids of custom fields for which
+   * @params array $includeFieldIds ids of custom fields for which
    * option groups must be included.
    *
    * Currently this is required in the cases where option groups are to be included
    * for inactive fields : CRM-5369
    *
    * @access public
+   *
+   * @param null $includeFieldIds
    *
    * @return mixed $customOptionGroup@static
    */
@@ -2073,12 +2084,16 @@ INNER JOIN  civicrm_custom_field f ON ( g.id = f.option_group_id )
   }
 
   /**
-   * fix orphan groups
+   * Function to fix orphan groups
    *
-   * @param int $customFieldId custom field id
-   * @param int $optionGroupId option group id
+   * @params int $customFieldId custom field id
+   * @params int $optionGroupId option group id
    *
    * @access public
+   *
+   * @param $customFieldId
+   * @param $optionGroupId
+   *
    * @return void
    * @static
    */
@@ -2103,10 +2118,12 @@ INNER JOIN  civicrm_custom_field f ON ( g.id = f.option_group_id )
    * Function to check if option group is related to more than one
    * custom field
    *
-   * @param int $optionGroupId option group id
+   * @params int $optionGroupId option group id
+   *
+   * @param $optionGroupId
    *
    * @return void
-   * @static
+  @static
    */
   static function checkOptionGroup($optionGroupId) {
     $query = "
@@ -2170,7 +2187,7 @@ ORDER BY html_type";
   }
 
   /**
-   * @param array $params
+   * @param $params
    * @param $customFields
    * @param $entityID
    * @param $customFieldExtends

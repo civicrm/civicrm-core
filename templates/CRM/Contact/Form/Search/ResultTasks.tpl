@@ -58,7 +58,7 @@
         {if $savedSearch.name}{$savedSearch.name} ({ts}smart group{/ts}) - {/if}
         {ts count=$pager->_totalItems plural='%count Contacts'}%count Contact{/ts}
     </td>
-
+    
     {* Search criteria are passed to tpl in the $qill array *}
     <td class="nowrap">
     {if $qill}

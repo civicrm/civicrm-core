@@ -100,6 +100,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
     $this->_job_id      = $job;
     $this->_url_id      = $url;
   }
+  //end of constructor
 
   /**
    * This method returns the links that are given for each search row.
@@ -111,13 +112,15 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
   static function &links() {
     return self::$_links;
   }
+  //end of function
 
   /**
    * getter for array of the parameters required for creating pager.
    *
    * @param $action
-   * @param array $params
+   * @param $params
    *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -127,6 +130,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }
+  //end of function
 
   /**
    * returns the column headers as an array of tuples:
@@ -454,4 +458,5 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
     return $this->eventToTitle();
   }
 }
+//end of class
 

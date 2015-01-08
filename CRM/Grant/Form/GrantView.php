@@ -40,7 +40,7 @@
 class CRM_Grant_Form_GrantView extends CRM_Core_Form {
 
   /**
-   * set variables up before form is built
+   * Function to set variables up before form is built
    *
    * @return void
    * @access public
@@ -122,7 +122,7 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Function to build the form
    *
    * @return void
    * @access public

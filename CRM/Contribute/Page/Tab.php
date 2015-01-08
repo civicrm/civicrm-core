@@ -46,6 +46,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   public $_contactId = NULL;
   public $_crid = NULL;
 
+  //end of function
+
   /**
    * This method returns the links that are given for recur search row.
    * currently the links added for each row are:
@@ -252,10 +254,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       $this->_action = CRM_Core_Action::ADD;
     }
     else {
-      $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, empty($this->_id));
-      if (empty($this->_contactId)) {
-        $this->_contactId = civicrm_api3('contribution', 'getvalue', array('id' => $this->_id, 'return' => 'contact_id'));
-      }
+      $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
       $this->assign('contactId', $this->_contactId);
 
       // check logged in url permission
