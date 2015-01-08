@@ -167,7 +167,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
     $buttons = array(
       array('type' => 'next',
-        'name' => ts('Next >>'),
+        'name' => ts('Next'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
       ),

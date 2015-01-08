@@ -23,28 +23,31 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* this template is used for adding/editing/deleting activity type  *}
-<div class="form-item">
-<fieldset><legend>{if $action eq 1}{ts}New Activity Type{/ts}{elseif $action eq 2}{ts}Edit Activity Type{/ts}{else}{ts}Delete Activity Type{/ts}{/if}</legend>
-
-   {if $action eq 8}
-      <div class="messages status no-popup">
-        <dl>
-          <dt><div class="icon inform-icon"></div></dt>
-          <dd>
-          {ts}WARNING: Deleting this option will result in the loss of all activity type records which use the option.{/ts} {ts}This may mean the loss of a substantial amount of data, and the action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
-          </dd>
-       </dl>
-      </div>
-     {else}
-      <dl>
-       <dt>{$form.name.label}</dt><dd>{$form.name.html}</dd>
-      <dt>{$form.description.label}</dt><dd>{$form.description.html}</dd>
-        <dt>{$form.is_active.label}</dt><dd>{$form.is_active.html}</dd>
-      </dl>
-     {/if}
-    <dl>
-      <dt></dt><dd>{$form.buttons.html}</dd>
-    </dl>
-</fieldset>
-</div>
+{literal}
+  <script type="text/javascript">
+    CRM.$(function($) {
+      var $form = $('form.{/literal}{$form.formClass}{literal}');
+      $('#postal_greeting_id, #addressee_id, #email_greeting_id', $form).change(function() {
+        var fldName = $(this).attr('id');
+        if ($(this).val() == 4) {
+          $("#greetings1, #greetings2", $form).show();
+          $("#" + fldName + "_html, #" + fldName + "_label", $form).show();
+        } else {
+          $("#" + fldName + "_html, #" + fldName + "_label", $form).hide();
+          $("#" + fldName.slice(0, -3) + "_custom", $form).val('');
+        }
+      });
+      
+      $('.replace-plain[data-id]', $form).click(function() {
+        var element = $(this).data('id');
+        $(this).hide();
+        $('#' + element, $form).show();
+        var fldName = '#' + element + '_id';
+        if ($(fldName, $form).val() == 4) {
+          $("#greetings1, #greetings2", $form).show();
+          $(fldName + "_html, " + fldName + "_label", $form).show();
+        }
+      });
+    });
+  </script>
+{/literal}

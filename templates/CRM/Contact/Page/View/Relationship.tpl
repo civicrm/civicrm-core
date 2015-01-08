@@ -33,7 +33,7 @@
     {if $permission EQ 'edit'}
       <div class="action-link">
         <a accesskey="N" href="{crmURL p='civicrm/contact/view/rel' q="cid=`$contactId`&action=add&reset=1"}"
-           class="button"><span><div class="icon add-icon"></div>{ts}Add Relationship{/ts}</span></a>
+           class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Relationship{/ts}</span></a>
       </div>
     {/if}
 

@@ -80,7 +80,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
     $this->setDefaults($defaults);
 
     $this->add('submit', 'sendtest', ts('Send a Test Mailing'));
-    $name = ts('Next >>');
+    $name = ts('Next');
     if (CRM_Mailing_Info::workflowEnabled()) {
       if (!CRM_Core_Permission::check('schedule mailings') &&
         CRM_Core_Permission::check('create mailings')
@@ -91,8 +91,8 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
 
     $buttons = array(
       array(
-    'type' => 'back',
-        'name' => ts('<< Previous'),
+        'type' => 'back',
+        'name' => ts('Previous'),
       ),
       array(
         'type' => 'next',

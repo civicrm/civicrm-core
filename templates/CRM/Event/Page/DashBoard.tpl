@@ -36,7 +36,7 @@
   <table class="form-layout-compressed">
      <tr>
     <td><a href="{$configPagesURL}" class="button no-popup"><span>{ts}Manage Events{/ts}</span></a></td>
-    <td><a href="{$newEventURL}" class="button"><span><div class="icon add-icon"></div>{ts}New Event{/ts}</span></a></td>
+    <td><a href="{$newEventURL}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}New Event{/ts}</span></a></td>
      </tr>
   </table>
     </div>

@@ -515,10 +515,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         && !$this->_values['event']['is_monetary']
         && !$this->_values['event']['is_confirm_enabled']
       ) {
-        $buttonLabel = ts('Register >>');
+        $buttonLabel = ts('Register');
       }
       else {
-        $buttonLabel = ts('Continue >>');
+        $buttonLabel = ts('Continue');
       }
 
       $this->addButtons(array(

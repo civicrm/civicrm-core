@@ -59,7 +59,7 @@
   {/section}
   <tr>
     <td>
-      <a href="#" class="crm-hover-button" id="addMoreSoftCredit"><span class="icon add-icon"></span> {ts}another soft credit{/ts}</a>
+      <a href="#" class="crm-hover-button" id="addMoreSoftCredit"><span class="icon ui-icon-circle-plus"></span> {ts}another soft credit{/ts}</a>
     </td>
   </tr>
 </table>

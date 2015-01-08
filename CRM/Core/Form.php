@@ -496,24 +496,21 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    */
   public function addButtons($params) {
-    $prevnext = array();
-    $spacing = array();
+    $prevnext = $spacing = array();
     foreach ($params as $button) {
-      $js = CRM_Utils_Array::value('js', $button);
-      $isDefault = CRM_Utils_Array::value('isDefault', $button, FALSE);
-      if ($isDefault) {
-        $attrs = array('class' => 'crm-form-submit default');
+      $attrs = array('class' => 'crm-form-submit') + (array) CRM_Utils_Array::value('js', $button);
+
+      if (!empty($button['isDefault'])) {
+        $attrs['class'] .= ' default';
+      }
+
+      if (in_array($button['type'], array('upload', 'next', 'submit', 'done', 'process', 'refresh'))) {
+        $attrs['class'] .= ' validate';
+        $defaultIcon = 'check';
       }
       else {
-        $attrs = array('class' => 'crm-form-submit');
-      }
-
-      if ($js) {
-        $attrs = array_merge($js, $attrs);
-      }
-
-      if ($button['type'] === 'cancel') {
         $attrs['class'] .= ' cancel';
+        $defaultIcon = $button['type'] == 'back' ? 'triangle-1-w' : 'close';
       }
 
       if ($button['type'] === 'reset') {
@@ -521,15 +518,25 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
       else {
         if (!empty($button['subName'])) {
-          $buttonName = $this->getButtonName($button['type'], $button['subName']);
-        }
-        else {
-          $buttonName = $this->getButtonName($button['type']);
+          if ($button['subName'] == 'new') {
+            $defaultIcon = 'plus';
+          }
+          if ($button['subName'] == 'done') {
+            $defaultIcon = 'circle-check';
+          }
+          if ($button['subName'] == 'next') {
+            $defaultIcon = 'circle-triangle-e';
+          }
         }
 
         if (in_array($button['type'], array('next', 'upload', 'done')) && $button['name'] === ts('Save')) {
-          $attrs = array_merge($attrs, (array('accesskey' => 'S')));
+          $attrs['accesskey'] = 'S';
         }
+        $icon = CRM_Utils_Array::value('icon', $button, $defaultIcon);
+        if ($icon) {
+          $attrs['crm-icon'] = $icon;
+        }
+        $buttonName = $this->getButtonName($button['type'], CRM_Utils_Array::value('subName', $button));
         $prevnext[] = $this->createElement('submit', $buttonName, $button['name'], $attrs);
       }
       if (!empty($button['isDefault'])) {

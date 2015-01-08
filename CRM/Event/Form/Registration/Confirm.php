@@ -329,17 +329,17 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->addButtons(array(
           array(
             'type' => 'back',
-            'name' => ts('<< Go Back'),
+            'name' => ts('Go Back'),
           ),
         )
       );
     }
     else {
-      $contribButton = ts('Continue >>');
+      $contribButton = ts('Continue');
       $this->addButtons(array(
           array(
             'type' => 'back',
-            'name' => ts('<< Go Back'),
+            'name' => ts('Go Back'),
           ),
           array(
             'type' => 'next',

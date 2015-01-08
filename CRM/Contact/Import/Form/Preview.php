@@ -163,12 +163,12 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     $buttons = array(
       array(
         'type' => 'back',
-        'name' => ts('<< Previous'),
+        'name' => ts('Previous'),
         'js' => array('onclick' => "location.href='{$previousURL}'; return false;"),
       ),
       array(
         'type' => 'next',
-        'name' => ts('Import Now >>'),
+        'name' => ts('Import Now'),
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
         'js' => array('onclick' => "return verify( );"),

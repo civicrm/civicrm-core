@@ -569,7 +569,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->addButtons(array(
           array(
             'type' => 'back',
-            'name' => ts('<< Go Back'),
+            'name' => ts('Go Back'),
           ),
         )
       );
@@ -579,7 +579,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $this->_amount <= 0.0 || $this->_params['is_pay_later'] ||
         ($this->_separateMembershipPayment && $this->_amount <= 0.0)
       ) {
-        $contribButton = ts('Continue >>');
+        $contribButton = ts('Continue');
         $this->assign('button', ts('Continue'));
       }
       else {

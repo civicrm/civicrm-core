@@ -508,14 +508,14 @@
             if ($icon.length) {
               button.icons = {primary: $icon.attr('class')};
             } else {
-              var action = $el.hasClass('cancel') ? 'close' : (identifier.substr(identifier.length-4) === '_new' ? 'plus' : 'check');
+              var action = $el.attr('crm-icon') || ($el.hasClass('cancel') ? 'close' : 'check');
               button.icons = {primary: 'ui-icon-' + action};
             }
             buttons.push(button);
             added.push(identifier);
           }
           // display:none causes the form to not submit when pressing "enter"
-          $el.parents(buttonContainers).css({height: 0, padding: 0, margin: 0, overflow: 'hidden'});
+          $el.parents(buttonContainers).css({height: 0, padding: 0, margin: 0, overflow: 'hidden'}).find('.crm-button-icon').hide();
         });
         $el.dialog('option', 'buttons', buttons);
       }

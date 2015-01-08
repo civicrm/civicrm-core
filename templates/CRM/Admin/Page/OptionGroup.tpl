@@ -29,7 +29,7 @@
 {else}
 <div id="help">
     {ts}CiviCRM stores configurable choices for various drop-down fields as 'option groups'. You can click <strong>Options</strong> to view the available choices.{/ts}
-    <p><div class="icon alert-icon"></div> {ts}WARNING: Many option groups are used programatically and values should be added or modified with caution.{/ts}</p>
+    <p><div class="icon ui-icon-alert"></div> {ts}WARNING: Many option groups are used programatically and values should be added or modified with caution.{/ts}</p>
 </div>
 {/if}
 
@@ -57,7 +57,7 @@
 
     {if $action ne 1 and $action ne 2}
       <div class="action-link">
-          <a href="{crmURL q="action=add&reset=1"}" id="newOptionGroup" class="button"><span><div class="icon add-icon"></div>{ts}Add Option Group{/ts}</span></a>
+          <a href="{crmURL q="action=add&reset=1"}" id="newOptionGroup" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Option Group{/ts}</span></a>
           <a href="{crmURL p="civicrm/admin" q="reset=1"}" class="button cancel no-popup"><span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span></a>
         </div>
     {/if}

@@ -61,7 +61,7 @@
         {/strip}
        </div>
        <div style="float:right">
-            <a href="{crmURL q="action=add&contact_type=$contactType&reset=1"}" class="button"><span><div class="icon add-icon"></div>{ts 1=$contactType}Add Rule for %1s{/ts}</span></a>
+            <a href="{crmURL q="action=add&contact_type=$contactType&reset=1"}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts 1=$contactType}Add Rule for %1s{/ts}</span></a>
         </div>
       </div>
     {/foreach}
