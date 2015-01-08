@@ -251,7 +251,7 @@
             return date;
           }
           var p = date.split(/[\- :]/);
-          return new Date(p[0], p[1], p[2], p[3], p[4], p[5]);
+          return new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]), parseInt(p[3]), parseInt(p[4]), parseInt(p[5]));
         };
 
         /// Remove {value} from {array}
