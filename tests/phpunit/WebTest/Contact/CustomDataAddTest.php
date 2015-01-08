@@ -205,7 +205,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
 
     //Get the customFieldsetID
     $this->openCiviPage('admin/custom/group', 'reset=1');
-    $customFieldsetId = explode('&gid=', $this->getAttribute("xpath=//div[@id='custom_group']//table/tbody//tr/td/span[text()='$customGroupTitle']/../../td[7]/span/a@href"));
+    $customFieldsetId = explode('&gid=', $this->getAttribute("xpath=//div[@id='custom_group']/table/tbody//tr/td/div[text()='$customGroupTitle']/../../td[7]/span/a@href"));
     $customFieldsetId = $customFieldsetId[1];
 
     //create Individual contact

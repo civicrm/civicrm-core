@@ -406,8 +406,8 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('link=Add Membership Type');
     $this->waitForText('crm-notification-container', "The membership type 'Membership Type $title' has been saved.");
 
-    $this->waitForElementPresent("xpath=//div[@id='membership_type']/table/tbody//tr/td[1][text()='{$membershipTypeTitle}']/../td[12]/span/a[3][text()='Delete']/@href");
-    $url = $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[1][text()='{$membershipTypeTitle}']/../td[12]/span/a[3][text()='Delete']/@href");
+    $this->waitForElementPresent("xpath=//div[@id='membership_type']/table/tbody//tr/td[1]/div[text()='{$membershipTypeTitle}']/../../td[12]/span/a[3][text()='Delete']/@href");
+    $url = $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[1]/div[text()='{$membershipTypeTitle}']/../../td[12]/span/a[3][text()='Delete']/@href");
     $matches = array();
     preg_match('/id=([0-9]+)/', $url, $matches);
     $membershipTypeId = $matches[1];

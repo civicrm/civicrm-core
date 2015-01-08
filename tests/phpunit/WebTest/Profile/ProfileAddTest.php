@@ -236,8 +236,8 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
    */
   public function _testdeleteProfile($profileTitle) {
     //$this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul//li/a[text()='Delete']");
-    $this->click("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul//li/a[text()='Delete']");
+    $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/div[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul//li/a[text()='Delete']");
+    $this->click("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/div[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul//li/a[text()='Delete']");
 
     $this->waitForElementPresent('_qf_Group_next-bottom');
     $this->click('_qf_Group_next-bottom');
