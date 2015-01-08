@@ -121,7 +121,7 @@ class CRM_Core_DAO extends DB_DataObject {
     $required = CRM_Utils_Array::value('required', $fieldDef);
     $FKClassName = CRM_Utils_Array::value('FKClassName', $fieldDef);
     $dbName = $fieldDef['name'];
-    $daoName = get_class($this);
+    $daoName = str_replace('_BAO_', '_DAO_', get_class($this));
 
     // skip the FK if it is not required
     // if it's contact id we should create even if not required
@@ -1604,6 +1604,13 @@ SELECT contact_id
       'CRM_Core_DAO_Domain',
       'CRM_Financial_DAO_FinancialType'//because valid ones exist & we use pick them due to pseudoconstant can't reliably create & delete these
     );
+
+    // Prefer to instantiate BAO's instead of DAO's (when possible)
+    // so that assignTestValue()/assignTestFK() can be overloaded.
+    $baoName = str_replace('_DAO_', '_BAO_', $daoName);
+    if (class_exists($baoName)) {
+      $daoName = $baoName;
+    }
 
     for ($i = 0; $i < $numObjects; ++$i) {
 
