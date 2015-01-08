@@ -113,7 +113,7 @@ function civicrm_api3_membership_create($params) {
   // Fixme: This code belongs in the BAO
   $action = CRM_Core_Action::ADD;
   // we need user id during add mode
-    $ids = array ();
+    $ids = array();
     if (!empty($params['contact_id'])) {
       $ids['userId'] = $params['contact_id'];
     }
