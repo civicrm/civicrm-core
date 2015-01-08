@@ -91,7 +91,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $setHelp          = 'Select your membership options.';
     $memTypeParams1 = $this->webtestAddMembershipType();
     $memTypeTitle1  = $memTypeParams1['membership_type'];
-    $memTypeId1     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
+    $memTypeId1     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[1]/div[text()='{$memTypeTitle1}']/../../td[12]/span/a[3]@href"));
     $memTypeId1     = $memTypeId1[1];
     $this->_testAddSet($setTitle, $usedFor, $contributionType, $setHelp);
 
@@ -211,12 +211,12 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $memTypeParams1 = $this->webtestAddMembershipType();
     $memTypeTitle1  = $memTypeParams1['membership_type'];
 
-    $memTypeId1     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
+    $memTypeId1     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[1]/div[text()='{$memTypeTitle1}']/../../td[12]/span/a[3]@href"));
     $memTypeId1     = $memTypeId1[1];
 
     $memTypeParams2 = $this->webtestAddMembershipType();
     $memTypeTitle2  = $memTypeParams2['membership_type'];
-    $memTypeId2     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[12]/span/a[3]@href"));
+    $memTypeId2     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[1]/div[text()='{$memTypeTitle2}']/../../td[12]/span/a[3]@href"));
     $memTypeId2     = $memTypeId2[1];
 
     $this->openCiviPage("admin/price/field", "reset=1&action=add&sid={$sid}");

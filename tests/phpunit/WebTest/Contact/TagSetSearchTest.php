@@ -148,9 +148,9 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=table.display tbody tr td");
 
     // verify text
-    $this->waitForElementPresent("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']");
+    $this->assertTrue($this->isTextPresent($tagSetName), 'Missing text: ' . $tagSetName);
 
-    $tagid = explode('&id=', $this->getAttribute("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']/following-sibling::td[7]/span/a[text()= 'Edit']@href"));
+    $tagid = explode('&id=', $this->getAttribute("xpath=//table[@class='display dataTable no-footer']/tbody//tr/td[1]/div[text()= '$tagSetName']/../../td[8]/span/a[text()= 'Edit']@href"));
     $tagid = explode('&', $tagid[1]);
     $tagid = $tagid[0];
 

@@ -736,7 +736,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
     //check the delete for priceset
     $this->openCiviPage("admin/price", "reset=1");
-    $this->click("xpath=//table[@id='option11']/tbody/tr/td[4]/span[2]/ul/li[3]/a");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[4]/span[2]");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[4]/span[2]/ul/li[3]/a");
     // Check confirmation alert.
     $this->assertTrue((bool) preg_match("/^Are you sure you want to delete this price set?/",
       $this->getConfirmation()
