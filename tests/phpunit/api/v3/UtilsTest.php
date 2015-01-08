@@ -246,7 +246,8 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $params = array('start_date' => '2010-12-20', 'end_date' => '', 'membership_end_date' => '0', 'join_date' => '2010-12-20', 'membership_start_date' => '2010-12-20');
     $fields = civicrm_api3('Membership', 'getfields', array('action' => 'get'));
     _civicrm_api3_validate_fields('Membership', 'get', $params, $fields['values']);
-    $this->assertEquals('20101220000000', $params['start_date'], 'in line ' . __LINE__);
+    $this->assertEquals('2010-12-20', $params['start_date']);
+    $this->assertEquals('20101220000000', $params['membership_start_date'], 'in line ' . __LINE__);
     $this->assertEquals('', $params['end_date']);
     $this->assertEquals('20101220000000', $params['join_date'], 'join_date not set in line ' . __LINE__);
   }
