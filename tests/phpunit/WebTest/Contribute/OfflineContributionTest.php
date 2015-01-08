@@ -46,7 +46,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
 
     //financial account for check
     $this->openCiviPage("admin/options/payment_instrument", "reset=1");
-    $financialAccount = $this->getText("xpath=//div[@id='payment_instrument']/table/tbody//tr/td[1][text()='Check']/../td[3]");
+    $financialAccount = $this->getText("xpath=//div[@id='payment_instrument']/table/tbody//tr/td[1]/div[text()='Check']/../../td[3]");
 
     // Add new Financial Account
     $orgName = 'Alberta ' . substr(sha1(rand()), 0, 7);
