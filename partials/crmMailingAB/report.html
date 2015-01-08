@@ -27,25 +27,13 @@
       <td><a ng-click="previewMailing('c','text')" ng-show="abtest.mailings.c.body_text && abtest.ab.status == 'Final'">{{ts('View')}}</a></td>
     </tr>
     <tr>
-      <td>{{ts('Delivered')}}</td>
+      <td>{{ts('Deliveries')}}</td>
       <td>{{stats.a.Delivered}}</td>
       <td>{{stats.b.Delivered}}</td>
       <td ng-show="abtest.ab.status == 'Final'">{{stats.c.Delivered}}</td>
     </tr>
     <tr>
-      <td>{{ts('Bounces')}}</td>
-      <td>{{stats.a.Bounces}}</td>
-      <td>{{stats.b.Bounces}}</td>
-      <td ng-show="abtest.ab.status == 'Final'">{{stats.c.Bounces}}</td>
-    </tr>
-    <tr>
-      <td>{{ts('Unsubscribers')}}</td>
-      <td>{{stats.a.Unsubscribers}}</td>
-      <td>{{stats.b.Unsubscribers}}</td>
-      <td ng-show="abtest.ab.status == 'Final'">{{stats.c.Unsubscribers}}</td>
-    </tr>
-    <tr>
-      <td>{{'Opened'}}</td>
+      <td>{{ts('Opens')}}</td>
       <td>{{stats.a.Opened}}</td>
       <td>{{stats.b.Opened}}</td>
       <td ng-show="abtest.ab.status == 'Final'">{{stats.c.Opened}}</td>
@@ -55,6 +43,18 @@
       <td>{{stats.a['Unique Clicks']}}</td>
       <td>{{stats.b['Unique Clicks']}}</td>
       <td ng-show="abtest.ab.status == 'Final'">{{stats.c['Unique Clicks']}}</td>
+    </tr>
+    <tr>
+      <td>{{ts('Bounces')}}</td>
+      <td>{{stats.a.Bounces}}</td>
+      <td>{{stats.b.Bounces}}</td>
+      <td ng-show="abtest.ab.status == 'Final'">{{stats.c.Bounces}}</td>
+    </tr>
+    <tr>
+      <td>{{ts('Unsubscribes')}}</td>
+      <td>{{stats.a.Unsubscribers}}</td>
+      <td>{{stats.b.Unsubscribers}}</td>
+      <td ng-show="abtest.ab.status == 'Final'">{{stats.c.Unsubscribers}}</td>
     </tr>
     <tr ng-show="abtest.ab.status == 'Testing'">
       <td></td>
