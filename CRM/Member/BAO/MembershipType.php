@@ -464,7 +464,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     $endDateOfFirstYearMembershipPeriod = date('Y-m-d', mktime(0, 0, 0,
       $dateParts[1],
       $dateParts[2] - 1,
-      $dateParts[0] + ($numRenewTerms * $membershipTypeDetails['duration_interval'])
+      $dateParts[0] + 1
     ));
 
     //we know the month and day of the rollover date but not the year (we're just
