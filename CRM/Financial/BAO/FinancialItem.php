@@ -271,7 +271,7 @@ WHERE cc.id IN (' . implode(',', $contactIds) . ') AND con.is_test = 0';
           $errorStatus = '<ul><li>' . implode('</li><li>', $not_deleted) . '</li></ul>';
         }
 
-        $error['_qf_default'] = $errorStatus .  ts('This contact(s) can not be permanently deleted because the contact record is linked to one or more live financial transactions. Deleting this contact would result in the loss of financial data.');
+        $error['_qf_default'] = $errorStatus . ts('This contact(s) can not be permanently deleted because the contact record is linked to one or more live financial transactions. Deleting this contact would result in the loss of financial data.');
         return $error;
       }
     }

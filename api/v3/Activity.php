@@ -376,7 +376,7 @@ SELECT  count(*)
   FROM  civicrm_contact
  WHERE  id IN (' . implode(', ', $contactIds) . ' )';
     if (count($contactIds) != CRM_Core_DAO::singleValueQuery($sql)) {
-      throw new API_Exception('Invalid ' .  ' Contact Id');
+      throw new API_Exception('Invalid ' . ' Contact Id');
     }
   }
 

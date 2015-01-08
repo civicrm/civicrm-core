@@ -73,7 +73,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
 
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('first_name', 'Mary');
-    $this->type('last_name', 'Jones' .  substr(sha1(rand()), 0, 5));
+    $this->type('last_name', 'Jones' . substr(sha1(rand()), 0, 5));
     $this->type('email-Primary', $email);
 
     // fill billing details and register
@@ -90,7 +90,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->click("xpath=//input[@class='crm-form-radio']");
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('first_name', 'Mary');
-    $this->type('last_name', 'Jones' .  substr(sha1(rand()), 0, 5));
+    $this->type('last_name', 'Jones' . substr(sha1(rand()), 0, 5));
     $this->type('email-Primary', $email);
 
     // fill billing details and register

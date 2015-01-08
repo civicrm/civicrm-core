@@ -168,7 +168,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
 
     // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
-    CRM_Utils_System::setTitle(ts('View Contribution from') .  ' ' . $displayName);
+    CRM_Utils_System::setTitle(ts('View Contribution from') . ' ' . $displayName);
 
     // add viewed contribution to recent items list
     $url = CRM_Utils_System::url('civicrm/contact/view/contribution',

@@ -54,9 +54,9 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
    */
   public function fileName ($key) {
     if (strlen($key) > 50) {
-      return CIVICRM_TEMPLATE_COMPILEDIR  . "CRM_" . md5($key) . ".php";
+      return CIVICRM_TEMPLATE_COMPILEDIR . "CRM_" . md5($key) . ".php";
     }
-    return CIVICRM_TEMPLATE_COMPILEDIR  . $key . ".php";
+    return CIVICRM_TEMPLATE_COMPILEDIR . $key . ".php";
   }
 
   /**

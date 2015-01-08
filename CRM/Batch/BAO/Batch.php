@@ -780,7 +780,7 @@ WHERE  {$where}
   public static function getBatchNames($batchIds) {
     $query = 'SELECT id, title
       FROM civicrm_batch
-      WHERE id IN (' .  $batchIds . ')';
+      WHERE id IN (' . $batchIds . ')';
 
     $batches = array();
     $dao = CRM_Core_DAO::executeQuery($query);

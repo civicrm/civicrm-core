@@ -146,7 +146,7 @@ class CiviReportTestCase extends CiviUnitTestCase {
       $this->assertEquals(
         count($actualCsvArray[$intKey]),
         count($expectedCsvArray[$intKey]),
-        'Arrays have different number of columns at row ' . $intKey . '; in line ' . __LINE__ .  '; data: ' . $rowData
+        'Arrays have different number of columns at row ' . $intKey . '; in line ' . __LINE__ . '; data: ' . $rowData
       );
       $this->assertEquals($expectedCsvArray[$intKey], $strVal);
     }

@@ -76,7 +76,7 @@ class CRM_Core_CodeGen_Main {
       unlink($this->digestPath);
     }
 
-    echo "\ncivicrm_domain.version := " .  $this->db_version . "\n\n";
+    echo "\ncivicrm_domain.version := " . $this->db_version . "\n\n";
     if ($this->buildVersion < 1.1) {
       echo "The Database is not compatible for this version";
       exit();

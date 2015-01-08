@@ -266,7 +266,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       $display[] = $val['label'];
     }
 
-    $el['html'] = implode('; ', $display) . '<input type="hidden" value="' .  $field->getValue() . '" name="' . $field->getAttribute('name') . '">';
+    $el['html'] = implode('; ', $display) . '<input type="hidden" value="' . $field->getValue() . '" name="' . $field->getAttribute('name') . '">';
   }
 
   /**

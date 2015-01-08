@@ -457,16 +457,16 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
   }
 
   if (!empty($result['api.email.get.1']['count'])) {
-    $values['billing-email' .  '-' . $locationTypeID] = $result['api.email.get.1']['values'][0]['email'];
+    $values['billing-email' . '-' . $locationTypeID] = $result['api.email.get.1']['values'][0]['email'];
   }
   elseif(!empty($result['api.email.get.2']['count'])) {
-    $values['billing-email' .  '-' . $locationTypeID] = $result['api.email.get.2']['values'][0]['email'];
+    $values['billing-email' . '-' . $locationTypeID] = $result['api.email.get.2']['values'][0]['email'];
   }
   else{
-    $values['billing-email' .  '-' . $locationTypeID] = $result['email'];
+    $values['billing-email' . '-' . $locationTypeID] = $result['email'];
   }
   // return both variants of email to reflect inconsistencies in form layer
-  $values['email' .  '-' . $locationTypeID] = $values['billing-email' .  '-' . $locationTypeID];
+  $values['email' . '-' . $locationTypeID] = $values['billing-email' . '-' . $locationTypeID];
   return $values;
 }
 

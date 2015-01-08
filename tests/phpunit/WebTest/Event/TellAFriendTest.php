@@ -75,7 +75,7 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->open($registerUrl);
     $this->waitForElementPresent('_qf_Register_upload-bottom');
 
-    $firstName = 'Jane'  . substr(sha1(rand()), 0, 7);
+    $firstName = 'Jane' . substr(sha1(rand()), 0, 7);
     $lastName = 'Doe' . substr(sha1(rand()), 0, 7);
     $this->type('first_name', "$firstName");
     $this->type('last_name', "$lastName");
