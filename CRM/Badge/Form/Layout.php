@@ -54,7 +54,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $resources = CRM_Core_Resources::singleton();
     $resources->addSetting(
       array(
-        'kcfinderPath' => $config->userFrameworkResourceURL  . 'packages'  . DIRECTORY_SEPARATOR
+        'kcfinderPath' => $config->userFrameworkResourceURL . 'packages' . DIRECTORY_SEPARATOR
       )
     );
     $resources->addScriptFile('civicrm', 'templates/CRM/Badge/Form/Layout.js', 1, 'html-header');

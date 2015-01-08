@@ -384,7 +384,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
               }
               else {
                 $opt['label'] =  '<span class="crm-price-amount-label">' . $opt['label'] . '</span>' . '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span>';
-                $opt['label'] .= '<span class="crm-price-amount-tax"> + ' .  CRM_Utils_Money::format($opt['tax_amount']) . ' ' . $taxTerm . '</span>';
+                $opt['label'] .= '<span class="crm-price-amount-tax"> + ' . CRM_Utils_Money::format($opt['tax_amount']) . ' ' . $taxTerm . '</span>';
               }
             }
             else {
@@ -794,7 +794,7 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
     }
     else {
       $label = CRM_Utils_Money::format($opt[$valueFieldName]);
-      $label .= '<span class="crm-price-amount-tax"> + ' .  CRM_Utils_Money::format($opt['tax_amount']) . ' ' . $taxTerm . '</span>';
+      $label .= '<span class="crm-price-amount-tax"> + ' . CRM_Utils_Money::format($opt['tax_amount']) . ' ' . $taxTerm . '</span>';
     }
 
     return $label;

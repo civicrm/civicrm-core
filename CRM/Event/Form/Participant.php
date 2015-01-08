@@ -1104,7 +1104,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       // also add location name to the array
       $params["address_name-{$this->_bltID}"] =
-        CRM_Utils_Array::value('billing_first_name', $params)  . ' ' .
+        CRM_Utils_Array::value('billing_first_name', $params) . ' ' .
         CRM_Utils_Array::value('billing_middle_name', $params) . ' ' .
         CRM_Utils_Array::value('billing_last_name', $params);
 

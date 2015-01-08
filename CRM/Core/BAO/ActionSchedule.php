@@ -1207,7 +1207,7 @@ reminder.action_schedule_id = %1";
         $date = $operator . "({$dateField}, INTERVAL {$actionSchedule->start_action_offset} {$actionSchedule->start_action_unit})";
         $startDateClause[] = "'{$now}' >= {$date}";
         if ($mapping->entity == 'civicrm_participant') {
-          $startDateClause[] = $operator .  "({$now}, INTERVAL 1 DAY ) {$op} " . $dateField;
+          $startDateClause[] = $operator . "({$now}, INTERVAL 1 DAY ) {$op} " . $dateField;
         }
         else {
           $startDateClause[] = "DATE_SUB({$now}, INTERVAL 1 DAY ) <= {$date}";
@@ -1390,7 +1390,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     }
 
     if (!empty($excludeIds)) {
-      $clause = "AND {$field} NOT IN ( "  . implode(', ', $excludeIds) . ' ) ';
+      $clause = "AND {$field} NOT IN ( " . implode(', ', $excludeIds) . ' ) ';
       return $clause;
     }
     return NULL;

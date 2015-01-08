@@ -390,7 +390,7 @@ class CRM_Financial_Page_AJAX {
       if ($statusID == CRM_Core_OptionGroup::getValue('batch_status', 'Open')) {
         if (isset($notPresent)) {
           $js = "enableActions('x')";
-          $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_x_" .  $financialItem->id . "' name='mark_x_" .  $financialItem->id . "' value='1' onclick={$js}></input>";
+          $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_x_" . $financialItem->id . "' name='mark_x_" . $financialItem->id . "' value='1' onclick={$js}></input>";
           $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
             CRM_Financial_Form_BatchTransaction::links(),
             NULL,
@@ -408,7 +408,7 @@ class CRM_Financial_Page_AJAX {
         }
         else {
           $js = "enableActions('y')";
-          $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_y_" .  $financialItem->id . "' name='mark_y_" .  $financialItem->id . "' value='1' onclick={$js}></input>";
+          $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_y_" . $financialItem->id . "' name='mark_y_" . $financialItem->id . "' value='1' onclick={$js}></input>";
           $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
             CRM_Financial_Page_BatchTransaction::links(),
             NULL,

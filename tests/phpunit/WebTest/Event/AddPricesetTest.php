@@ -459,7 +459,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Adding contact with randomized first name (so we can then select that contact when creating event registration)
     // We're using Quick Add block on the main page for this.
     $firstName = substr(sha1(rand()), 0, 7);
-    $lastName = 'Anderson' .  substr(sha1(rand()), 0, 7);
+    $lastName = 'Anderson' . substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, $lastName, TRUE);
     $contactName = "$lastName, $firstName";
     $displayName = "$firstName $lastName";
@@ -515,7 +515,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Adding contact with randomized first name (so we can then select that contact when creating event registration)
     // We're using Quick Add block on the main page for this.
     $firstName = substr(sha1(rand()), 0, 7);
-    $lastName = 'Anderson' .  substr(sha1(rand()), 0, 7);
+    $lastName = 'Anderson' . substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, $lastName, TRUE);
     $contactName = "$lastName, $firstName";
     $displayName = "$firstName $lastName";

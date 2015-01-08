@@ -106,7 +106,7 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
       }
     }
     if ($rev == '4.4.6') {
-      $postUpgradeMessage .= '<br /><br /><strong>' .  ts('Your contact image urls have been upgraded. If your contact image urls did not follow the standard format for image Urls they have not been upgraded. Please check the log to see image urls that were not upgraded.');
+      $postUpgradeMessage .= '<br /><br /><strong>' . ts('Your contact image urls have been upgraded. If your contact image urls did not follow the standard format for image Urls they have not been upgraded. Please check the log to see image urls that were not upgraded.');
     }
   }
 
@@ -311,7 +311,7 @@ ALTER TABLE civicrm_dashboard
       }
       elseif ($urlElements[1] == 'report') {
         $url = explode('&', $urlElements[3]);
-        $name = 'report/'  . $url[0];
+        $name = 'report/' . $url[0];
       }
       $values .= "
       WHEN {$dashboard->id} THEN '{$name}'
@@ -788,7 +788,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
     // add civicrm_report_instance.name
 
     $sql = "SELECT count(*) FROM information_schema.columns "
-      . "WHERE table_schema = database() AND table_name = 'civicrm_report_instance' AND COLUMN_NAME = 'name' ";
+     . "WHERE table_schema = database() AND table_name = 'civicrm_report_instance' AND COLUMN_NAME = 'name' ";
 
     $res = CRM_Core_DAO::singleValueQuery($sql);
 
