@@ -64,7 +64,7 @@ function civicrm_api3_participant_create($params) {
     }
   }
 
-  $value = array();
+  $values = $participant = array();
   _civicrm_api3_custom_format_params($params, $values, 'Participant');
   $params = array_merge($values, $params);
 
@@ -79,6 +79,7 @@ function civicrm_api3_participant_create($params) {
 }
 
 /**
+ * @todo this should be done in the BAO not the api
  * Create a default participant line item
  */
 function _civicrm_api3_participant_createlineitem(&$params, $participant) {
@@ -119,7 +120,7 @@ function _civicrm_api3_participant_createlineitem(&$params, $participant) {
 
     $dao = CRM_Core_DAO::executeQuery($sql, $qParams);
     if ($dao->fetch()) {
-      $lineItemparams = array(
+      $lineItemParams = array(
         'price_field_id' => $dao->priceFieldID,
         'price_field_value_id' => $dao->priceFieldValueID,
         'entity_table' => 'civicrm_participant',
@@ -129,9 +130,8 @@ function _civicrm_api3_participant_createlineitem(&$params, $participant) {
         'participant_count' => 0,
         'unit_price' => $dao->amount,
         'line_total' => $qty * $dao->amount,
-        'version' => 3,
       );
-      civicrm_api('line_item', 'create', $lineItemparams);
+      civicrm_api3('line_item', 'create', $lineItemParams);
     }
 
   }
