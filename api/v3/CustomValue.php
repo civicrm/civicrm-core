@@ -208,7 +208,7 @@ function civicrm_api3_custom_value_get($params) {
         $n = 0;
         $id = $fieldNumber;
       }
-      else{
+      else {
         $n = $idArray[2];
         $id = $fieldNumber . "." . $idArray[2];
       }

@@ -93,7 +93,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       $hook = 'create';
       $action = CRM_Core_Action::ADD;
     }
-    else{
+    else {
       $hook = 'edit';
       $action = CRM_Core_Action::UPDATE;
     }
@@ -240,7 +240,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
             $relationship->$defaultField = 'NULL';
           }
         }
-        else{
+        else {
           $relationship->$defaultField = $params[$defaultField];
         }
       }
@@ -1738,7 +1738,7 @@ AND cc.sort_name LIKE '%$name%'";
       elseif(!empty($clauses)) {
         return explode(' OR ', $clauses);
       }
-      else{
+      else {
         // effectively setting it to return no results
         $params['relationship_type_id'] = 0;
       }

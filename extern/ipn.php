@@ -48,7 +48,7 @@ else {
   $paypalIPN = new CRM_Core_Payment_PayPalIPN();
   // @todo upgrade standard per Pro
 }
-try{
+try {
   $paypalIPN->main();
 }
 catch(CRM_Core_Exception $e) {

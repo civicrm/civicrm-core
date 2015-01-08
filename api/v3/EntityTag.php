@@ -53,7 +53,7 @@ function civicrm_api3_entity_tag_get($params) {
   if (empty($params['entity_id'])) {
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
-  else{
+  else {
     //do legacy non-standard behaviour
     $values = CRM_Core_BAO_EntityTag::getTag($params['entity_id'], $params['entity_table']);
     $result = array();

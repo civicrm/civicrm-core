@@ -1018,7 +1018,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
             if ($specs['FKClassName'] == $baoString) {
               $entity[$fieldName] = (string) $entity2['id'];
             }
-            else{
+            else {
               $uniqueName = CRM_Utils_Array::value('uniqueName', $specs);
               if (!empty($entity[$fieldName])) {
                 $resetFKTo = array($fieldName => $entity[$fieldName]);

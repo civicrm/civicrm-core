@@ -393,11 +393,11 @@ ALTER TABLE civicrm_dashboard
           self::setContactImageUrl($dao->id,
               CRM_Utils_System::url('civicrm/contact/imagefile', 'photo=' . $photo, TRUE, NULL, TRUE, TRUE));
         }
-        else{
+        else {
           $failures[$dao->id] = $dao->image_url;
         }
       }
-      else{
+      else {
         $failures[$dao->id] = $dao->image_url;
       }
     }
