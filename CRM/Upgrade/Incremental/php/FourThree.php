@@ -476,7 +476,7 @@ WHERE  name IN ('Donation', 'Event Fee', 'Member Dues') AND is_active =1
 
     if ($daoFetchTypes->N < 3) {
       $modifiedDefaults = TRUE;
-      $insertStatments = array (
+      $insertStatments = array(
         'Donation' => "('Donation', 0, 1, 1)",
         'Member' => "('Member Dues', 0, 1, 1)",
         'Event Fee' => "('Event Fee', 0, 1, 0)",
