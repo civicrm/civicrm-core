@@ -47,19 +47,16 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
   /**
    * Maximum contacts that should be allowed to update
-   *
    */
   protected $_maxContacts = 100;
 
   /**
    * Maximum profile fields that will be displayed
-   *
    */
   protected $_maxFields = 9;
 
   /**
    * Variable to store redirect path
-   *
    */
   protected $_userContext;
 

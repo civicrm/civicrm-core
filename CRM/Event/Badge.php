@@ -44,7 +44,6 @@
  */
 class CRM_Event_Badge {
   /**
-   *
    */
   public function __construct() {
     $this->style        = array('width' => 0.1, 'cap' => 'round', 'join' => 'round', 'dash' => '2,2', 'color' => array(0, 0, 200));

@@ -279,7 +279,8 @@ class CRM_Contact_Task {
    * These tasks are the core set of tasks that the user can perform
    * on a contact / group of contacts
    *
-   * @return array the set of tasks for a group of contacts
+   * @return array
+   *   the set of tasks for a group of contacts
    * @static
    */
   public static function &taskTitles() {
@@ -316,7 +317,8 @@ class CRM_Contact_Task {
    * @param bool $deletedContacts
    *   Are these tasks for operating on deleted contacts?.
    *
-   * @return array set of tasks that are valid for the user
+   * @return array
+   *   set of tasks that are valid for the user
    */
   public static function &permissionedTaskTitles($permission, $deletedContacts = FALSE) {
     self::initTasks();
@@ -357,7 +359,8 @@ class CRM_Contact_Task {
   /**
    * These tasks get added based on the context the user is in
    *
-   * @return array the set of optional tasks for a group of contacts
+   * @return array
+   *   the set of optional tasks for a group of contacts
    * @static
    */
   public static function &optionalTaskTitle() {

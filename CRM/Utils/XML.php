@@ -38,7 +38,8 @@ class CRM_Utils_XML {
    *
    * @param $file
    *
-   * @return array (0 => SimpleXMLElement|FALSE, 1 => errorMessage|FALSE)
+   * @return array
+   *   (0 => SimpleXMLElement|FALSE, 1 => errorMessage|FALSE)
    */
   public static function parseFile($file) {
     $xml = FALSE; // SimpleXMLElement
@@ -69,7 +70,8 @@ class CRM_Utils_XML {
    *
    * @param $string
    *
-   * @return array (0 => SimpleXMLElement|FALSE, 1 => errorMessage|FALSE)
+   * @return array
+   *   (0 => SimpleXMLElement|FALSE, 1 => errorMessage|FALSE)
    */
   public static function parseString($string) {
     $xml = FALSE; // SimpleXMLElement

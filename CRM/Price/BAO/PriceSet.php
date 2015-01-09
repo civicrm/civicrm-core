@@ -102,7 +102,8 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    *
    * @internal param bool $is_active value we want to set the is_active field
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    * @static
    */
   public static function setIsActive($id, $isActive) {
@@ -115,10 +116,10 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    *
    * @param string $entity
    *
-   * @return array $defaultPriceSet default price set
+   * @return array
+   *   default price set
    *
    * @static
-   *
    */
   public static function getDefaultPriceSet($entity = 'contribution') {
     if (!empty(self::$_defaultPriceSet[$entity])) {
@@ -161,10 +162,10 @@ WHERE       ps.name = '{$entityName}'
    * @param int $id
    *   Id of price set.
    *
-   * @return string   title
+   * @return string
+   *   title
    *
    * @static
-   *
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $id, 'title');
@@ -284,7 +285,8 @@ WHERE     ct.id = cp.financial_type_id AND
    * @param int $id
    *   Price Set id.
    *
-   * @return boolean false if fields exist for this set, true if the
+   * @return boolean
+   *   false if fields exist for this set, true if the
    * set could be deleted
    *
    * @static
@@ -441,7 +443,8 @@ WHERE     ct.id = cp.financial_type_id AND
    *   Whether or not to include inactive entries.
    * @param bool|string $extendComponentName name of the component like 'CiviEvent','CiviContribute'
    *
-   * @return array associative array of id => name
+   * @return array
+   *   associative array of id => name
    */
   public static function getAssoc($withInactive = FALSE, $extendComponentName = FALSE) {
     $query = '
@@ -489,7 +492,8 @@ WHERE     ct.id = cp.financial_type_id AND
    *
    * @internal param int $setId - price set id whose details are needed
    *
-   * @return array $setTree - array consisting of field details
+   * @return array
+   *   array consisting of field details
    */
   public static function getSetDetail($setID, $required = TRUE, $validOnly = FALSE) {
     // create a new tree
@@ -1010,7 +1014,7 @@ WHERE  id = %1";
    * @param CRM_Core_Form $form
    * @param $defaults
    *
-   * @return array $defaults
+   * @return array
    */
   public static function setDefaultPriceSet(&$form, &$defaults) {
     if (!isset($form->_priceSet) || empty($form->_priceSet['fields'])) {
@@ -1082,7 +1086,8 @@ WHERE  id = %1";
    * @param int $id
    *   Price Set id.
    *
-   * @return array of the field ids
+   * @return array
+   *   of the field ids
    *
    * @static
    */
@@ -1232,7 +1237,8 @@ GROUP BY     mt.member_of_contact_id";
    * @param int $priceSetId
    *   Price set id.
    *
-   * @return int $autoRenewOption ( 0:hide, 1:optional 2:required )
+   * @return int
+   *   $autoRenewOption ( 0:hide, 1:optional 2:required )
    */
   public static function checkAutoRenewForPriceSet($priceSetId) {
     // auto-renew option should be visible if membership types associated with all the fields has
@@ -1280,7 +1286,8 @@ GROUP BY     mt.member_of_contact_id";
    * @param int $priceSetId
    *   Price set id.
    *
-   * @return array associate array of frequency interval and unit
+   * @return array
+   *   associate array of frequency interval and unit
    * @static
    */
   public static function getRecurDetails($priceSetId) {
@@ -1314,7 +1321,8 @@ GROUP BY     mt.member_of_contact_id";
    * @param bool $isQuickConfigValue we want to set the is_quick_config field.
    *   Value we want to set the is_quick_config field.
    *
-   * @return Object                   DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    * @static
    */
   public static function setIsQuickConfig($id, $isQuickConfig) {
@@ -1326,7 +1334,6 @@ GROUP BY     mt.member_of_contact_id";
    * user to select both auto-renew and non-auto-renew memberships
    *
    * @static
-   *
    */
   public static function checkMembershipPriceSet($id) {
     $query =
@@ -1412,8 +1419,6 @@ WHERE       ps.id = %1
 
   /*
    * Function to set tax_amount and tax_rate in LineItem
-   *
-   *
    */
   public static function setLineItem($field, $lineItem, $optionValueId) {
     if ($field['html_type'] == 'Text') {

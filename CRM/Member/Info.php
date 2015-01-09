@@ -46,8 +46,8 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    * Needs to be implemented in component's information
    * class.
    *
-   * @return array collection of required component settings
-   *
+   * @return array
+   *   collection of required component settings
    */
   /**
    * @return array
@@ -96,7 +96,6 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    *
    * @return array|null collection of required dashboard settings,
    *                    null if no element offered
-   *
    */
   /**
    * @return array|null
@@ -120,7 +119,6 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    *
    * @return array|null collection of required dashboard settings,
    *                    null if no element offered
-   *
    */
   /**
    * @return array|null
@@ -140,7 +138,6 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    *
    * @return array|null collection of required pane settings,
    *                    null if no element offered
-   *
    */
   /**
    * @return array|null
@@ -160,7 +157,6 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    * class.
    *
    * @return array|null collection of activity types
-   *
    */
   /**
    * @return array|null

@@ -40,7 +40,6 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
   /**
    * Membership price set status
-   *
    */
   public $_useForMember;
 

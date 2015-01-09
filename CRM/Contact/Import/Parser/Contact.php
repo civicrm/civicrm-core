@@ -262,7 +262,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
+   * @return boolean
+   *   the result of this processing
    */
   public function preview(&$values) {
     return $this->summary($values);
@@ -274,7 +275,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
+   * @return boolean
+   *   the result of this processing
    */
   public function summary(&$values) {
     $erroneousField = NULL;
@@ -447,7 +449,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    *
    * @param bool $doGeocodeAddress
    *
-   * @return boolean      the result of this processing
+   * @return boolean
+   *   the result of this processing
    */
   public function import($onDuplicate, &$values, $doGeocodeAddress = FALSE) {
     $config = CRM_Core_Config::singleton();
@@ -1107,7 +1110,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    *
    * @param null $csType
    * @param null $relationships
-   *
    */
   public static function isErrorInCustomData($params, &$errorMessage, $csType = NULL, $relationships = NULL) {
     $session = CRM_Core_Session::singleton();
@@ -1325,7 +1327,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param array $params
    * @param string $errorMessage
    *   A string containing all the error-fields.
-   *
    */
   public function isErrorInCoreData($params, &$errorMessage) {
     foreach ($params as $key => $value) {
@@ -1598,7 +1599,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param $valueArray
    *
    * @return bool
-   *
    */
   public function in_value($value, $valueArray) {
     foreach ($valueArray as $key => $v) {
@@ -1631,8 +1631,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
   /**
    * Method for creating contact
-   *
-   *
    */
   public function createContact(&$formatted, &$contactFields, $onDuplicate, $contactId = NULL, $requiredCheck = TRUE, $dedupeRuleGroupID = NULL) {
     $dupeCheck = FALSE;

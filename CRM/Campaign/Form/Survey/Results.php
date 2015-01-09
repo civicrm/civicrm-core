@@ -79,7 +79,8 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
    *
    * @param null
    *
-   * @return array    array of default values
+   * @return array
+   *   array of default values
    */
   public function setDefaultValues() {
     $defaults = $this->_values;
@@ -207,7 +208,6 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
 
   /**
    * Global validation rules for the form
-   *
    */
   public static function formRule($fields, $files, $form) {
     $errors = array();

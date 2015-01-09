@@ -9,7 +9,8 @@ class PaypalPro extends PHPUnit_Framework_Testcase {
    * Helper function to create
    * a payment processor of type Paypal Pro
    *
-   * @return int $paymentProcessor id of created payment processor@todo this appears not to be working but because it doesn't extend the test class
+   * @return int
+   *   $paymentProcessor id of created payment processor@todo this appears not to be working but because it doesn't extend the test class
    * callAPISuccess won't work
    * I have duplicated this on the main test class as a work around
    */
@@ -44,7 +45,8 @@ class PaypalPro extends PHPUnit_Framework_Testcase {
    * @param int $id
    *   Id of the PayPal Pro payment processor.
    * to be deleted
-   * @return boolean true if payment processor deleted, false otherwise
+   * @return boolean
+   *   true if payment processor deleted, false otherwise
    */
   public static function delete($id) {
     $pp = new CRM_Financial_DAO_PaymentProcessor();

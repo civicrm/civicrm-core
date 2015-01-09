@@ -143,13 +143,11 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * Build tags filter
-   *
    */
   protected $_tagFilter = FALSE;
 
   /**
    * Build groups filter
-   *
    */
   protected $_groupFilter = FALSE;
 
@@ -298,7 +296,6 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_currencyColumn = NULL;
 
   /**
-   *
    */
   public function __construct() {
     parent::__construct();
@@ -859,7 +856,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * Getter for $_defaultValues
-   * @return array $_defaultValues
+   * @return array
    */
   public function getDefaultValues() {
     return $this->_defaults;
@@ -2935,7 +2932,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   /*
    * Get Template file name - use default form template if a specific one has not been set up for this report
-   *
    */
   /**
    * Use the form name to create the tpl file name
@@ -3546,7 +3542,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * Fetch array of DAO tables having columns included in SELECT or ORDER BY clause
    * (building the array if it's unset)
    *
-   * @return Array $this->_selectedTables
+   * @return Array
+   *   >_selectedTables
    */
   public function selectedTables() {
     if (!$this->_selectedTables) {
@@ -3609,7 +3606,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * @param bool $filters
    * @param array $defaults
    *
-   * @return array address fields for construct clause
+   * @return array
+   *   address fields for construct clause
    */
   public function addAddressFields($groupBy = TRUE, $orderBy = FALSE, $filters = TRUE, $defaults = array('country_id' => TRUE)) {
     $addressFields = array(
@@ -3881,7 +3879,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *  - prefix Prefix to add to table (in case of more than one instance of the table)
    *  - prefix_label Label to give columns from this phone table instance
    *
-   * @return array phone columns definition
+   * @return array
+   *   phone columns definition
    */
   public function getPhoneColumns($options = array()) {
     $defaultOptions = array(
@@ -3912,7 +3911,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *  - prefix Prefix to add to table (in case of more than one instance of the table)
    *  - prefix_label Label to give columns from this address table instance
    *
-   * @return array address columns definition
+   * @return array
+   *   address columns definition
    */
   public function getAddressColumns($options = array()) {
     $options += array(

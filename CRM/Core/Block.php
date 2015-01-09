@@ -61,7 +61,6 @@ class CRM_Core_Block {
 
   /**
    * Class constructor
-   *
    */
   public function __construct() {
   }
@@ -188,7 +187,8 @@ class CRM_Core_Block {
    * @param string $property
    *   The desired property.
    *
-   * @return string  the value of the desired property
+   * @return string
+   *   the value of the desired property
    */
   public static function getProperty($id, $property) {
     if (!(self::$_properties)) {
@@ -219,7 +219,8 @@ class CRM_Core_Block {
   /**
    * Returns the whole $_properties array
    *
-   * @return array  the $_properties array
+   * @return array
+   *   the $_properties array
    */
   public static function properties() {
     if (!(self::$_properties)) {

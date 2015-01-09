@@ -29,7 +29,6 @@
    * Licensed to CiviCRM under the Academic Free License version 3.0.
    *
    * Written and contributed by Kirkdesigns (http://www.kirkdesigns.co.uk)
-   *
    */
 
 /**
@@ -120,7 +119,8 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    *
-   * @return array the result in a nice formatted array (or an error object)
+   * @return array
+   *   the result in a nice formatted array (or an error object)
    */
   public function doDirectPayment(&$params) {
 
@@ -263,7 +263,8 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    * @param string $xml
    *   an XML string.
    *
-   * @return array An array of the result with following keys:
+   * @return array
+   *   An array of the result with following keys:
    */
   public function xml_parse_into_assoc($xml) {
     $input = array();
@@ -433,7 +434,8 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    * @param int $invoiceId
    *   The ID to check.
    *
-   * @return bool                  True if ID exists, else false
+   * @return bool
+   *   True if ID exists, else false
    */
   public function _checkDupe($invoiceId) {
     $contribution = new CRM_Contribute_DAO_Contribution();
@@ -466,7 +468,8 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    * @param string $field
    * @param mixed $value
    *
-   * @return bool false if value is not a scalar, true if successful
+   * @return bool
+   *   false if value is not a scalar, true if successful
    */
   public function _setParam($field, $value) {
     if (!is_scalar($value)) {
@@ -513,7 +516,8 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   /**
    * This function checks to see if we have the right config values
    *
-   * @return string the error message if any
+   * @return string
+   *   the error message if any
    */
   public function checkConfig() {
     $error = array();

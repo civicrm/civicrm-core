@@ -72,7 +72,6 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   *
    */
   public function preProcess() {
     // process url params
@@ -257,7 +256,8 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    *
    * @param int $contactId
    *
-   * @return array contact fields in fixed order
+   * @return array
+   *   contact fields in fixed order
    */
   public static function getContactDetails($contactId) {
     return list($displayName,

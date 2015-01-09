@@ -43,7 +43,8 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * @param $groupIDs
    *   Of group that we are checking against.
    *
-   * @return boolean TRUE if we did not regenerate, FALSE if we did
+   * @return boolean
+   *   TRUE if we did not regenerate, FALSE if we did
    */
   public static function check($groupIDs) {
     if (empty($groupIDs)) {
@@ -62,7 +63,8 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * @param bool $includeHiddenGroups
    *   Hidden groups are excluded by default.
    *
-   * @return string the sql query which lists the groups that need to be refreshed
+   * @return string
+   *   the sql query which lists the groups that need to be refreshed
    * @static
    */
   public static function groupRefreshedClause($groupIDClause = NULL, $includeHiddenGroups = FALSE) {
@@ -101,7 +103,8 @@ AND     ( g.cache_date IS NULL OR
    * @param bool $includeHiddenGroups
    *   Hidden groups are excluded by default.
    *
-   * @return string the sql query which lists the groups that need to be refreshed
+   * @return string
+   *   the sql query which lists the groups that need to be refreshed
    * @static
    */
   public static function shouldGroupBeRefreshed($groupID, $includeHiddenGroups = FALSE) {
@@ -121,7 +124,8 @@ AND     ( g.cache_date IS NULL OR
    * @param int $limit
    *   Limits the number of groups we evaluate.
    *
-   * @return boolean TRUE if we did not regenerate, FALSE if we did
+   * @return boolean
+   *   TRUE if we did not regenerate, FALSE if we did
    */
   public static function loadAll($groupIDs = NULL, $limit = 0) {
     // ensure that all the smart groups are loaded
@@ -424,7 +428,6 @@ WHERE  id = %1
    *   The smart group that needs to be loaded.
    * @param bool $force
    *   Should we force a search through.
-   *
    */
   public static function load(&$group, $force = FALSE) {
     $groupID = $group->id;
@@ -609,7 +612,8 @@ AND  civicrm_group_contact.group_id = $groupID ";
    * @param bool $showHidden
    *   Hidden groups are shown only if this flag is set.
    *
-   * @return array an array of groups that this contact belongs to
+   * @return array
+   *   an array of groups that this contact belongs to
    */
   public static function contactGroup($contactID, $showHidden = FALSE) {
     if (empty($contactID)) {

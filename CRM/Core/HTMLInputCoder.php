@@ -32,7 +32,8 @@ class CRM_Core_HTMLInputCoder {
 
   /**
    * @param string $fldName
-   * @return bool TRUE if encoding should be skipped for this field
+   * @return bool
+   *   TRUE if encoding should be skipped for this field
    */
   public static function isSkippedField($fldName) {
     return CRM_Utils_API_HTMLInputCoder::singleton()->isSkippedField($fldName);

@@ -363,7 +363,8 @@ WHERE  inst.report_id = %1";
    *
    * @param int $instanceId
    *
-   * @return boolean true if yes, else false
+   * @return boolean
+   *   true if yes, else false
    * @static
    */
   public static function isInstanceGroupRoleAllowed($instanceId) {
@@ -465,7 +466,8 @@ WHERE  inst.report_id = %1";
    * @param array $params
    *   All effective report criteria, as in CRM_Report_Form::_params.
    *
-   * @return string URL query string
+   * @return string
+   *   URL query string
    */
   public static function getPreviewCriteriaQueryParams($defaults = array(), $params = array()) {
     static $query_string;

@@ -238,7 +238,8 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
    *
    * @param null
    *
-   * @return array   array of default values
+   * @return array
+   *   array of default values
    */
   public function setDefaultValues() {
     $defaults = array('is_active' => TRUE);

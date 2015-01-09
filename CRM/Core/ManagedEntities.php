@@ -325,7 +325,8 @@ class CRM_Core_ManagedEntities {
   /**
    * @param $modules
    *
-   * @return array indexed by is_active,name
+   * @return array
+   *   indexed by is_active,name
    */
   protected static function createModuleIndex($modules) {
     $result = array();
@@ -339,7 +340,8 @@ class CRM_Core_ManagedEntities {
    * @param $moduleIndex
    * @param $declarations
    *
-   * @return array indexed by module,name
+   * @return array
+   *   indexed by module,name
    */
   protected static function createDeclarationIndex($moduleIndex, $declarations) {
     $result = array();

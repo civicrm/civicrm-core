@@ -76,7 +76,8 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    *
    * @static
    */
@@ -89,7 +90,8 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    *
    * @param NULL
    *
-   * @return object           The default location type object on success,
+   * @return object
+   *   The default location type object on success,
    *                          null otherwise
    * @static
    */

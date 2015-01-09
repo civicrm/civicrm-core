@@ -1016,7 +1016,6 @@ ALTER TABLE civicrm_financial_account
   /**
    * Update financial_account_id for bad data in financial_trxn table
    * CRM-12844
-   *
    */
   public function updateFinancialTrxnData(CRM_Queue_TaskContext $ctx) {
     $upgrade = new CRM_Upgrade_Form();
@@ -1079,7 +1078,6 @@ id IN (' . implode(',', $val) . ')';
   /**
    * Update financial_account_id for bad data in financial_trxn table
    * CRM-12844
-   *
    */
   public function updateLineItemData(CRM_Queue_TaskContext $ctx) {
     $sql = "SELECT cc.id contribution_id, cc.contribution_recur_id,
@@ -1223,7 +1221,8 @@ AND cli.entity_table = 'civicrm_contribution' AND cli.id IN (" . implode(',', $v
    *
    * @param CRM_Queue_TaskContext $ctx
    *
-   * @return bool TRUE for success
+   * @return bool
+   *   TRUE for success
    */
   public function task_4_3_x_checkConstraints(CRM_Queue_TaskContext $ctx) {
     CRM_Core_DAO::executeQuery('ALTER TABLE `civicrm_financial_account` CHANGE `contact_id` `contact_id` INT( 10 ) UNSIGNED NULL DEFAULT NULL');
@@ -1283,7 +1282,8 @@ AND CONSTRAINT_SCHEMA = %1";
    *
    * @param CRM_Queue_TaskContext $ctx
    *
-   * @return bool TRUE for success
+   * @return bool
+   *   TRUE for success
    */
   public function task_4_3_x_checkIndexes(CRM_Queue_TaskContext $ctx) {
     $query = "
@@ -1308,7 +1308,8 @@ ADD INDEX UI_entity_financial_trxn_entity_id (entity_id);
    *
    * @param CRM_Queue_TaskContext $ctx
    *
-   * @return bool TRUE for success
+   * @return bool
+   *   TRUE for success
    */
   public static function phoneNumeric(CRM_Queue_TaskContext $ctx) {
     CRM_Core_DAO::executeQuery(CRM_Contact_BAO_Contact::DROP_STRIP_FUNCTION_43);

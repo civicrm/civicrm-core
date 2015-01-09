@@ -45,7 +45,8 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
    *
    * @param null
    *
-   * @return array    array of default values
+   * @return array
+   *   array of default values
    */
   public function setDefaultValues() {
     $defaults = array();

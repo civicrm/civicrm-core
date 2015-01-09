@@ -112,7 +112,8 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
    * @param $values
    * @param int $mappingTypeId
    *
-   * @return array list of errors to be posted back to the form
+   * @return array
+   *   list of errors to be posted back to the form
    * @static
    */
   public static function formRule($fields, $values, $mappingTypeId) {

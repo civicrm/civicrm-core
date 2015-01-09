@@ -42,7 +42,6 @@ class CRM_Core_Action {
    * constant from CRM_Core_Form for various modes.
    *
    * @var integer const
-   *
    */
   const
     NONE = 0,
@@ -78,7 +77,6 @@ class CRM_Core_Action {
    * @var array $_names  type of variable name to action constant
    *
    * @static
-   *
    */
   static $_names = array(
     'add' => self::ADD,
@@ -114,7 +112,8 @@ class CRM_Core_Action {
    * @param string $str
    *   The action to be resolved.
    *
-   * @return int the action mask corresponding to the input string
+   * @return int
+   *   the action mask corresponding to the input string
    * @static
    */
   public static function resolve($str) {
@@ -133,9 +132,9 @@ class CRM_Core_Action {
    * @param mixed $item
    *   Either a single string or an array of strings.
    *
-   * @return int the action mask corresponding to the input args
+   * @return int
+   *   the action mask corresponding to the input args
    * @static
-   *
    */
   public static function map($item) {
     $mask = 0;
@@ -157,9 +156,9 @@ class CRM_Core_Action {
    * @param string $item
    *   The input action to process.
    *
-   * @return int the action mask corresponding to the input string
+   * @return int
+   *   the action mask corresponding to the input string
    * @static
-   *
    */
   public static function mapItem($item) {
     $mask = CRM_Utils_Array::value(trim($item), self::$_names);
@@ -173,9 +172,9 @@ class CRM_Core_Action {
    * @param int $mask
    *   The action mask.
    *
-   * @return string the corresponding action description
+   * @return string
+   *   the corresponding action description
    * @static
-   *
    */
   public static function description($mask) {
     if (!isset($_description)) {
@@ -204,7 +203,8 @@ class CRM_Core_Action {
    * @param null $objectName
    * @param int $objectId
    *
-   * @return string       the html string
+   * @return string
+   *   the html string
    * @static
    */
   static function formLink(
@@ -315,7 +315,8 @@ class CRM_Core_Action {
    * @param array $values
    *   The array of values for parameter substitution in the str.
    *
-   * @return string        the substituted string
+   * @return string
+   *   the substituted string
    * @static
    */
   public static function &replace(&$str, &$values) {
@@ -330,7 +331,8 @@ class CRM_Core_Action {
    *
    * @param string the permission
    *
-   * @return int   the mask for the above permission
+   * @return int
+   *   the mask for the above permission
    * @static
    */
   public static function mask($permissions) {

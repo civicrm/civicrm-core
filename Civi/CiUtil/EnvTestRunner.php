@@ -15,7 +15,8 @@ class EnvTestRunner {
 
   /**
    * @param array $tests
-   * @return array (string $testName => string $status)
+   * @return array
+   *   (string $testName => string $status)
    */
   public function run($tests) {
     $envTests = implode(' ', $tests);

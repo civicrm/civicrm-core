@@ -80,7 +80,6 @@ ORDER By  v.weight
    * Browse all custom searches.
    *
    * @return content of the parents run method
-   *
    */
   public function browse() {
     $rows = self::info();

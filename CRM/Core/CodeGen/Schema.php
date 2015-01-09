@@ -5,7 +5,6 @@
  */
 class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
   /**
-   *
    */
   public function __construct() {
     parent::__construct();

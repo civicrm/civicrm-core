@@ -110,8 +110,6 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    * @param
    *
    * @return void
-   *
-   *
    */
   public function preProcess() {
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
@@ -233,7 +231,8 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    * Set the default form values
    *
    *
-   * @return array the default array reference
+   * @return array
+   *   the default array reference
    */
   public function setDefaultValues() {
     if ($this->_cdType || $this->_multiRecordDisplay == 'single') {

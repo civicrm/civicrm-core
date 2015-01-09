@@ -43,7 +43,8 @@
  *                       name/value pairs to insert in new 'survey'
  * @example SurveyCreate.php Std Create example
  *
- * @return array api result array
+ * @return array
+   *   api result array
  * {@getfields survey_create}
  * @access public
  */
@@ -70,7 +71,8 @@ function _civicrm_api3_survey_create_spec(&$params) {
  *                       property_name=>value pairs. If $params is set
  *                       as null, all surveys will be returned
  *
- * @return array  API result Array of matching surveys
+ * @return array
+   *   API result Array of matching surveys
  * {@getfields survey_get}
  * @access public
  */
@@ -88,7 +90,8 @@ function civicrm_api3_survey_get($params) {
  *   Array containing id of the group.
  *                       to be deleted
  *
- * @return array api result array
+ * @return array
+   *   api result array
  * {@getfields survey_delete}
  * @access public
  */

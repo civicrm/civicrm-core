@@ -39,7 +39,8 @@
 
 /**
  * @deprecated api notice
- * @return string to indicate this entire api entity is deprecated
+ * @return string
+   *   to indicate this entire api entity is deprecated
  */
 function _civicrm_api3_mailing_group_deprecation() {
   return 'The mailing_group api is deprecated. Use the mailing_event apis instead.';

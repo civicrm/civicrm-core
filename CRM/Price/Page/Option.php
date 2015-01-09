@@ -78,7 +78,8 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    *
    * @param null
    *
-   * @return array  array of action links that we need to display for the browse screen
+   * @return array
+   *   array of action links that we need to display for the browse screen
    */
   function &actionLinks() {
     if (!isset(self::$_actionLinks)) {

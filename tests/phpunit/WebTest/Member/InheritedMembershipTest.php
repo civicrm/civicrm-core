@@ -259,7 +259,6 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
 
   /*
    * Webtest for CRM-10146
-   *
    */
   public function testInheritedMembershipActivity() {
     // Log in using webtestLogin() method

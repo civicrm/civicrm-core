@@ -41,7 +41,8 @@
  *                       name/value pairs to insert in new 'contribution_recur'
  * @example ContributionRecurCreate.php Std Create example
  *
- * @return array api result array
+ * @return array
+   *   api result array
  * {@getfields contribution_recur_create}
  * @access public
  */
@@ -71,7 +72,8 @@ function _civicrm_api3_contribution_recur_create_spec(&$params) {
  *                       property_name=>value pairs. If $params is set
  *                       as null, all contribution_recurs will be returned
  *
- * @return array  API result Array of matching contribution_recurs
+ * @return array
+   *   API result Array of matching contribution_recurs
  * {@getfields contribution_recur_get}
  * @access public
  */
@@ -85,7 +87,8 @@ function civicrm_api3_contribution_recur_get($params) {
  * @param array $params
  *   (reference) array containing id of the recurring contribution.
  *
- * @return boolean  returns true is successfully cancelled
+ * @return boolean
+   *   returns true is successfully cancelled
  */
 
 function civicrm_api3_contribution_recur_cancel($params) {
@@ -103,7 +106,8 @@ function civicrm_api3_contribution_recur_cancel($params) {
  *   Array containing id of the group.
  *                       to be deleted
  *
- * @return array API result array
+ * @return array
+   *   API result array
  *                message otherwise
  * {@getfields contribution_recur_delete}
  * @access public

@@ -80,7 +80,8 @@ class CRM_Utils_Check_Security {
    * is browseable or visible to search engines; it means it can be
    * requested directly.
    *
-   * @return array of messages
+   * @return array
+   *   of messages
    * @see CRM-14091
    */
   public function checkLogFileIsNotAccessible() {
@@ -128,7 +129,8 @@ class CRM_Utils_Check_Security {
    * Being retrievable doesn't mean the files are browseable or visible
    * to search engines; it only means they can be requested directly.
    *
-   * @return array of messages
+   * @return array
+   *   of messages
    * @see CRM-14091
    *
    * @TODO: Test with WordPress, Joomla.
@@ -173,7 +175,8 @@ class CRM_Utils_Check_Security {
    * MAY trigger false positives (if you have files named 'a', 'e'
    * we'll probably match that).
    *
-   * @return array of messages
+   * @return array
+   *   of messages
    * @see CRM-14091
    *
    * @TODO: Test with WordPress, Joomla.
@@ -286,7 +289,8 @@ class CRM_Utils_Check_Security {
    *
    * @param string $targetDir
    *   Local path to a directory.
-   * @return string a guessed URL for $realDir
+   * @return string
+   *   a guessed URL for $realDir
    */
   public function guessUrl($targetDir) {
     $filePathMarker = $this->getFilePathMarker();

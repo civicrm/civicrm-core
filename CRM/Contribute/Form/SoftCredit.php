@@ -198,7 +198,8 @@ class CRM_Contribute_Form_SoftCredit {
    * @param $errors
    * @param $self
    *
-   * @return array of errors
+   * @return array
+   *   of errors
    * @static
    */
   public static function formRule($fields, $errors, $self) {

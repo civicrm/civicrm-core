@@ -651,7 +651,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param string $field
    *   Selector.
    * @param string $contactType
-   * @return array of contact attributes (id, names, email)
+   * @return array
+   *   of contact attributes (id, names, email)
    */
   public function createDialogContact($field = 'contact_id', $contactType = 'Individual') {
     $selectId = 's2id_' . $this->getAttribute($field . '@id');
@@ -741,7 +742,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @url      string url to parse or retrieve current url if null
    *
    * @param null $url
-   * @return array  returns an associative array containing any of the various components
+   * @return array
+   *   returns an associative array containing any of the various components
    *                  of the URL that are present. Querystring elements are returned in sub-array (elements.queryString)
    *                  http://php.net/manual/en/function.parse-url.php
    */
@@ -1036,7 +1038,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param bool $membershipsRequired
    * @internal param \can $User define pageTitle, hash and rand values for later data verification
    *
-   * @return null $pageId of newly created online contribution page.
+   * @return null
+   *   of newly created online contribution page.
    */
   function webtestAddContributionPage(
     $hash = NULL,

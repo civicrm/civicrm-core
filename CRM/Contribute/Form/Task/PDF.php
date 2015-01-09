@@ -244,7 +244,8 @@ AND    {$this->_componentClause}";
    * @param array $contactIds
    *   Contact Id.
    *
-   * @return array array of common elements
+   * @return array
+   *   array of common elements
    *
    * @static
    */

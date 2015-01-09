@@ -118,7 +118,8 @@ class CRM_Extension_Mapper {
    * @param string $clazz
    *   Extension class name.
    *
-   * @return string name of extension key
+   * @return string
+   *   name of extension key
    */
   public function classToKey($clazz) {
     return str_replace('_', '.', $clazz);
@@ -130,7 +131,8 @@ class CRM_Extension_Mapper {
    *
    * @param $clazz
    *
-   * @return string full path the extension .php file
+   * @return string
+   *   full path the extension .php file
    */
   public function classToPath($clazz) {
     $elements = explode('_', $clazz);
@@ -145,7 +147,8 @@ class CRM_Extension_Mapper {
    * @param string $key
    *   A string which might be an extension key.
    *
-   * @return boolean true if given string is an extension name
+   * @return boolean
+   *   true if given string is an extension name
    */
   public function isExtensionKey($key) {
     // check if the string is an extension name or the class
@@ -159,7 +162,8 @@ class CRM_Extension_Mapper {
    * @param string $clazz
    *   A string which might be an extension class name.
    *
-   * @return boolean true if given string is an extension class name
+   * @return boolean
+   *   true if given string is an extension class name
    */
   public function isExtensionClass($clazz) {
 
@@ -201,7 +205,8 @@ class CRM_Extension_Mapper {
    * @param string $key
    *   Extension key.
    *
-   * @return string name of extension's main class
+   * @return string
+   *   name of extension's main class
    */
   public function keyToClass($key) {
     return str_replace('.', '_', $key);
@@ -215,7 +220,8 @@ class CRM_Extension_Mapper {
    * @param string $key
    *   Extension key.
    *
-   * @return string path to file containing extension's main class
+   * @return string
+   *   path to file containing extension's main class
    */
   public function keyToPath($key) {
     $info = $this->keyToInfo($key);
@@ -228,7 +234,8 @@ class CRM_Extension_Mapper {
    *
    * @param string $key
    *   Extension key.
-   * @return string local path of the extension source tree
+   * @return string
+   *   local path of the extension source tree
    */
   public function keyToBasePath($key) {
     if ($key == 'civicrm') {
@@ -245,7 +252,8 @@ class CRM_Extension_Mapper {
    * @param string $key
    *   Extension key.
    *
-   * @return string url for resources in this extension
+   * @return string
+   *   url for resources in this extension
    */
   public function keyToUrl($key) {
     if ($key == 'civicrm') {
@@ -266,7 +274,8 @@ class CRM_Extension_Mapper {
    *
    * @param bool $fresh
    *   whether to forcibly reload extensions list from canonical store.
-   * @return array - array(array('prefix' => $, 'file' => $))
+   * @return array
+   *   array(array('prefix' => $, 'file' => $))
    */
   public function getActiveModuleFiles($fresh = FALSE) {
     $config = CRM_Core_Config::singleton();
@@ -318,7 +327,8 @@ class CRM_Extension_Mapper {
   /**
    * Get a list of base URLs for all active modules
    *
-   * @return array (string $extKey => string $baseUrl)
+   * @return array
+   *   (string $extKey => string $baseUrl)
    */
   public function getActiveModuleUrls() {
     // TODO optimization/caching
@@ -351,7 +361,8 @@ class CRM_Extension_Mapper {
   /**
    * Get a list of all installed modules, including enabled and disabled ones
    *
-   * @return array CRM_Core_Module
+   * @return array
+   *   CRM_Core_Module
    */
   public function getModules() {
     $result = array();
@@ -371,7 +382,8 @@ class CRM_Extension_Mapper {
    * @param string $clazz
    *   Extension class name.
    *
-   * @return string path to extension's templates directory
+   * @return string
+   *   path to extension's templates directory
    */
   public function getTemplatePath($clazz) {
     $path = $this->container->getPath($this->classToKey($clazz));
@@ -392,7 +404,8 @@ class CRM_Extension_Mapper {
    * @param string $clazz
    *   Extension class name.
    *
-   * @return string extension's template name
+   * @return string
+   *   extension's template name
    */
   public function getTemplateName($clazz) {
     $info = $this->keyToInfo($this->classToKey($clazz));

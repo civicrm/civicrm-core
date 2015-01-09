@@ -20,7 +20,6 @@ class test_extension_manager_paymenttest extends CRM_Core_Payment {
    *
    * @return object
    * @static
-   *
    */
   static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     $processorName = $paymentProcessor['name'];
@@ -55,7 +54,8 @@ class test_extension_manager_paymenttest extends CRM_Core_Payment {
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    *
-   * @return array the result in an nice formatted array (or an error object)
+   * @return array
+   *   the result in an nice formatted array (or an error object)
    * @abstract
    */
   function doDirectPayment(&$params) {

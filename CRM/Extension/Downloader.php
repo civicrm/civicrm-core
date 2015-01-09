@@ -59,7 +59,8 @@ class CRM_Extension_Downloader {
   /**
    * Determine whether downloading is supported
    *
-   * @return array list of error messages; empty if OK
+   * @return array
+   *   list of error messages; empty if OK
    */
   public function checkRequirements() {
     $errors = array();
@@ -101,7 +102,8 @@ class CRM_Extension_Downloader {
    *   The name of the extension being installed.
    * @param string $downloadUrl
    *   URL of a .zip file.
-   * @return bool TRUE for success
+   * @return bool
+   *   TRUE for success
    * @throws CRM_Extension_Exception
    */
   public function download($key, $downloadUrl) {
@@ -137,7 +139,8 @@ class CRM_Extension_Downloader {
    *   URL of a .zip file.
    * @param string $localFile
    *   Path at which to store the .zip file.
-   * @return boolean Whether the download was successful.
+   * @return boolean
+   *   Whether the download was successful.
    */
   public function fetch($remoteFile, $localFile) {
     $result = CRM_Utils_HttpClient::singleton()->fetch($remoteFile, $localFile);

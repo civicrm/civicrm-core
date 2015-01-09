@@ -418,7 +418,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
    */
   public function tearDown() {
     parent::tearDown();
@@ -567,7 +566,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
   /**
    * Test that the first and SECOND notifications are sent out
-   *
    */
   public function testMembershipEndDate_Repeat() {
     // creates membership with end_date = 20120615
@@ -880,7 +878,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
-   *
    */
   protected function _setUp() {
     $this->_testObjects = array();
@@ -889,7 +886,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
    */
   protected function _tearDown() {
     parent::tearDown();

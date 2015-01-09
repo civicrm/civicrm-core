@@ -1594,7 +1594,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   }
 
   /**
-   * @return array of field names which will be compared, so everything except ID.
+   * @return array
+   *   of field names which will be compared, so everything except ID.
    */
   public static function getContactFields() {
     $contactFields = CRM_Contact_DAO_Contact::fields();

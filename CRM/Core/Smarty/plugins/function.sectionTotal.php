@@ -48,7 +48,8 @@
  * @param object $smarty
  *   The Smarty object.
  *
- * @return string  the string, translated by gettext
+ * @return string
+   *   the string, translated by gettext
  */
 function smarty_function_sectionTotal($params, &$smarty) {
   /* section totals are stored in template variable 'sectionTotals',

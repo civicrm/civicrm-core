@@ -232,7 +232,6 @@ class CRM_Core_Session {
    *   A string to prefix the keys in the session with.
    *
    * @return void
-   *
    */
   public function set($name, $value = NULL, $prefix = NULL) {
     // create session scope
@@ -268,7 +267,6 @@ class CRM_Core_Session {
    *   : adds another level of scope to the session.
    *
    * @return mixed
-   *
    */
   public function get($name, $prefix = NULL) {
     // create session scope
@@ -302,7 +300,6 @@ class CRM_Core_Session {
    *   Will be stripped from the key before putting it in the return.
    *
    * @return void
-   *
    */
   public function getVars(&$vars, $prefix = '') {
     // create session scope
@@ -335,7 +332,6 @@ class CRM_Core_Session {
    *   : expiry time (in seconds).
    *
    * @return mixed
-   *
    */
   public function timer($name, $expire) {
     $ts = $this->get($name, 'timer');
@@ -355,8 +351,6 @@ class CRM_Core_Session {
    *   Should we do a dupe checking with the top element.
    *
    * @return void
-   *
-   *
    */
   public function pushUserContext($userContext, $check = TRUE) {
     if (empty($userContext)) {
@@ -394,8 +388,6 @@ class CRM_Core_Session {
    *   The url to return to when done.
    *
    * @return void
-   *
-   *
    */
   public function replaceUserContext($userContext) {
     if (empty($userContext)) {
@@ -411,8 +403,8 @@ class CRM_Core_Session {
   /**
    * Pops the top userContext stack
    *
-   * @return string the top of the userContext stack (also pops the top element)
-   *
+   * @return string
+   *   the top of the userContext stack (also pops the top element)
    */
   public function popUserContext() {
     $this->createScope(self::USER_CONTEXT);
@@ -423,8 +415,8 @@ class CRM_Core_Session {
   /**
    * Reads the top userContext stack
    *
-   * @return string the top of the userContext stack
-   *
+   * @return string
+   *   the top of the userContext stack
    */
   public function readUserContext() {
     $this->createScope(self::USER_CONTEXT);
@@ -454,7 +446,8 @@ class CRM_Core_Session {
    * @param bool $reset
    *   Should we reset the status variable?.
    *
-   * @return string        the status message if any
+   * @return string
+   *   the status message if any
    */
   public function getStatus($reset = FALSE) {
     $this->initialize();

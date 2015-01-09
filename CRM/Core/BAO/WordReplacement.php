@@ -44,7 +44,6 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @return \CRM_Core_DAO_WordReplacement
    */
   /**
-   *
    */
   public function __construct() {
     parent::__construct();
@@ -228,7 +227,8 @@ WHERE  domain_id = %1
    *
    * @param bool $rebuildEach
    *   Whether to perform rebuild after each individual API call.
-   * @return array Each item is $params for WordReplacement.create
+   * @return array
+   *   Each item is $params for WordReplacement.create
    * @see CRM_Core_BAO_WordReplacement::convertConfigArraysToAPIParams
    */
   public static function getConfigArraysAsAPIParams($rebuildEach) {

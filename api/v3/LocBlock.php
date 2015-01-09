@@ -43,7 +43,8 @@
  *                       name/value pairs to insert in new 'loc_block'
  * @example LocBlockCreate.php Std Create example
  *
- * @return array api result array
+ * @return array
+   *   api result array
  * {@getfields loc_block_create}
  * @access public
  */
@@ -94,7 +95,8 @@ function civicrm_api3_loc_block_create($params) {
  *   Array of one or more valid property_name=>value pairs. If $params is set.
  *  as null, all loc_blocks will be returned (default limit is 25)
  *
- * @return array  Array of matching loc_blocks
+ * @return array
+   *   Array of matching loc_blocks
  * {@getfields loc_block_get}
  * @access public
  */
@@ -132,7 +134,8 @@ function civicrm_api3_loc_block_get($params) {
  * @param array $params
  *   Array containing id of the record to be deleted.
  *
- * @return array API result array
+ * @return array
+   *   API result array
  * {@getfields loc_block_delete}
  * @access public
  */

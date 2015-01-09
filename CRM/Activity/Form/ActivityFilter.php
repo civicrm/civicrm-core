@@ -54,8 +54,8 @@ class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
    *
    * access        public
    *
-   * @return array reference to the array of default values
-   *
+   * @return array
+   *   reference to the array of default values
    */
   /**
    * This virtual function is used to set the default values of
@@ -63,8 +63,8 @@ class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
    *
    * access        public
    *
-   * @return array reference to the array of default values
-   *
+   * @return array
+   *   reference to the array of default values
    */
   /**
    * @return array

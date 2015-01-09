@@ -100,7 +100,8 @@ class Analyzer {
   /**
    * Get a list of all activities in the case
    *
-   * @return array list of activity records (api/v3 format)
+   * @return array
+   *   list of activity records (api/v3 format)
    */
   public function getActivities() {
     if ($this->activities === NULL) {
@@ -184,7 +185,8 @@ class Analyzer {
    *
    * @param array $keys
    *   List of properties by which to index activities.
-   * @return array list of activity records (api/v3 format), indexed by $keys
+   * @return array
+   *   list of activity records (api/v3 format), indexed by $keys
    */
   public function getActivityIndex($keys) {
     $key = implode(";", $keys);

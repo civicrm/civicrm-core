@@ -59,7 +59,6 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
   }
 
   /**
-   *
    */
   public function testCreatePriceSet() {
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__);
@@ -101,7 +100,6 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
   }
 
   /**
-   *
    */
   public function testGetBasicPriceSet() {
     $getParams = array(

@@ -389,7 +389,8 @@ class CRM_Core_BAO_CustomValueTable {
    *
    * @param bool $formatMultiRecordField
    *
-   * @return array      $fields        Array of custom values for the entity with key=>value
+   * @return array
+   *   Array of custom values for the entity with key=>value
    *                                   pairs specified as civicrm_custom_field.id => custom value.
    *                                   Empty array if no custom values found.
    * @static

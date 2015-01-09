@@ -45,7 +45,8 @@
  *   (reference) Associative array of property.
  *                       name/value pairs to insert in new 'campaign'
  *
- * @return array   campaign array
+ * @return array
+   *   campaign array
  * {@getfields campaign_create}
  * @access public
  */
@@ -72,7 +73,8 @@ function _civicrm_api3_campaign_create_spec(&$params) {
  *                       property_name=>value pairs. If $params is set
  *                       as null, all campaigns will be returned
  *
- * @return array  Array of matching campaigns
+ * @return array
+   *   Array of matching campaigns
  * @access public
  * {@getfields campaign_get}
  */
@@ -90,7 +92,8 @@ function civicrm_api3_campaign_get($params) {
  *   (reference) array containing id of the group.
  *                       to be deleted
  *
- * @return array  (reference) returns flag true if successful, error
+ * @return array
+   *   (reference) returns flag true if successful, error
  *                message otherwise
  * {@getfields campaign_delete}
  * @access public

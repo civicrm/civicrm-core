@@ -40,10 +40,8 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
   protected $_exposeContactID = FALSE;
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     $this->case_types = CRM_Case_PseudoConstant::caseType();

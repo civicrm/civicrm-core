@@ -45,7 +45,8 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   /**
    * Define action links
    *
-   * @return array self::$_links array of action links
+   * @return array
+   *   self::$_links array of action links
    */
   public function &links() {
   }
@@ -107,7 +108,8 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * @param int $title
    *   Name or title of the object.
    *
-   * @return string   the permission that the user has (or null)
+   * @return string
+   *   the permission that the user has (or null)
    */
   public function checkPermission($id, $title) {
     return CRM_Contact_BAO_Group::checkPermission($id, $title);

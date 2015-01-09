@@ -95,8 +95,8 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
    *
    * access        public
    *
-   * @return array reference to the array of default values
-   *
+   * @return array
+   *   reference to the array of default values
    */
   /**
    * @return array

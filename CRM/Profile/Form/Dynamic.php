@@ -49,8 +49,6 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
    * @param
    *
    * @return void
-   *
-   *
    */
   public function preProcess() {
     if ($this->get('register')) {

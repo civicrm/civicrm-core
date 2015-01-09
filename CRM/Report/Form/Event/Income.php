@@ -42,10 +42,8 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
   protected $_add2groupSupported = FALSE;
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
 

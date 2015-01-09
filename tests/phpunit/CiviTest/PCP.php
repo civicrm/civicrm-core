@@ -10,8 +10,8 @@ class PCPBlock extends PHPUnit_Framework_Testcase {
    * @param int $contributionPageId
    *   Id of the Contribution Page.
    * to be deleted
-   * @return array of created pcp block
-   *
+   * @return array
+   *   of created pcp block
    */
   public function create($contributionPageId) {
     $profileParams = array(
@@ -94,8 +94,8 @@ class PCPBlock extends PHPUnit_Framework_Testcase {
    * @param array key value pair
    * pcpBlockId - id of the PCP Block Id, profileID - id of Supporter Profile
    * to be deleted
-   * @return boolean true if success, false otherwise
-   *
+   * @return boolean
+   *   true if success, false otherwise
    */
   public function delete($params) {
 

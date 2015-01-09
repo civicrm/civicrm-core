@@ -39,7 +39,6 @@ class CRM_Core_OptionGroup {
   /*
    * $_domainIDGroups array maintains the list of option groups for whom
    * domainID is to be considered.
-   *
    */
   static $_domainIDGroups = array(
     'from_email_address',
@@ -112,7 +111,8 @@ class CRM_Core_OptionGroup {
    * @param string $keyColumnName
    *   the column to use for 'key'.
    *
-   * @return array      the values as specified by the above params
+   * @return array
+   *   the values as specified by the above params
    * @static
    * @void
    */
@@ -218,7 +218,8 @@ WHERE  v.option_group_id = g.id
    * @param bool $onlyActive
    * @param bool $fresh
    *
-   * @return array of values as specified by the above params
+   * @return array
+   *   of values as specified by the above params
    * @static
    * @void
    */
@@ -419,7 +420,8 @@ WHERE  v.option_group_id = g.id
    *
    * @static
    *
-   * @return string   the value from the row where is_default = true
+   * @return string
+   *   the value from the row where is_default = true
    */
   public static function getDefaultValue($groupName) {
     if (empty($groupName)) {
@@ -467,7 +469,8 @@ WHERE  v.option_group_id = g.id
    *
    * @static
    *
-   * @return int   the option group ID
+   * @return int
+   *   the option group ID
    */
   public static function createAssoc($groupName, &$values, &$defaultID, $groupTitle = NULL) {
     self::deleteAssoc($groupName);

@@ -65,7 +65,8 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
   /**
    * Get action Links
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
   public function &links() {
     if (!(self::$_links)) {
@@ -94,7 +95,6 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
    *   Create or delete.
    * @param array $owner
    *   Primary membership info (membership_id, contact_id, membership_type ...).
-   *
    */
   public function relAction($action, $owner) {
     switch ($action) {

@@ -319,7 +319,6 @@ class civicrm_cli_csv_exporter extends civicrm_cli {
   var $separator = ',';
 
   /**
-   *
    */
   function __construct() {
     $this->_required_arguments = array('entity');
@@ -365,7 +364,6 @@ class civicrm_cli_csv_file extends civicrm_cli {
   var $separator = ',';
 
   /**
-   *
    */
   function __construct() {
     $this->_required_arguments = array('entity', 'file');

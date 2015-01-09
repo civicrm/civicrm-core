@@ -100,7 +100,8 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param bool $all
    * @param null $condition
    *
-   * @return array - array of all events if any
+   * @return array
+   *   array of all events if any
    * @static
    */
   public static function event($id = NULL, $all = FALSE, $condition = NULL) {
@@ -137,7 +138,8 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param string $retColumn
    *   Tells populate() whether to return 'name' (default) or 'label' values.
    *
-   * @return array  - array reference of all participant statuses if any
+   * @return array
+   *   array reference of all participant statuses if any
    * @static
    */
   public static function &participantStatus($id = NULL, $cond = NULL, $retColumn = 'name') {
@@ -174,7 +176,8 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Return a status-type-keyed array of status classes
    *
-   * @return array  of status classes, keyed by status type
+   * @return array
+   *   of status classes, keyed by status type
    */
   public static function &participantStatusClass() {
     static $statusClasses = NULL;
@@ -193,7 +196,8 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param int $id
    * @param null $cond
    *
-   * @return array - array reference of all participant roles if any
+   * @return array
+   *   array reference of all participant roles if any
    * @static
    */
   public static function &participantRole($id = NULL, $cond = NULL) {
@@ -224,7 +228,8 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param int $id
    *
-   * @return array - array reference of all participant listings if any
+   * @return array
+   *   array reference of all participant listings if any
    * @static
    */
   public static function &participantListing($id = NULL) {
@@ -245,7 +250,8 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    *
    * @param int $id
-   * @return array - array reference of all event types.
+   * @return array
+   *   array reference of all event types.
    * @static
    */
   public static function &eventType($id = NULL) {
@@ -266,7 +272,8 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param int $id
    *
-   * @return array  of event id → template title pairs
+   * @return array
+   *   of event id → template title pairs
    */
   public static function &eventTemplates($id = NULL) {
     if (!self::$eventTemplates) {
@@ -303,7 +310,8 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    *
    * @param int $id
-   * @return array - array reference of all pcp if any
+   * @return array
+   *   array reference of all pcp if any
    * @static
    */
   public static function &pcPage($id = NULL) {

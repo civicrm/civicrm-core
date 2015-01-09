@@ -252,7 +252,6 @@ class CRM_Core_Page {
    *
    *
    * @return void
-   *
    */
   public function set($name, $value = NULL) {
     self::$_session->set($name, $value, $this->_name);
@@ -265,7 +264,6 @@ class CRM_Core_Page {
    *
    *
    * @return mixed
-   *
    */
   public function get($name) {
     return self::$_session->get($name, $this->_name);
@@ -376,7 +374,8 @@ class CRM_Core_Page {
   /**
    * Getter for embedded
    *
-   * @return boolean return the embedded value
+   * @return boolean
+   *   return the embedded value
    */
   public function getEmbedded() {
     return $this->_embedded;
@@ -396,7 +395,8 @@ class CRM_Core_Page {
   /**
    * Getter for print
    *
-   * @return boolean return the print value
+   * @return boolean
+   *   return the print value
    */
   public function getPrint() {
     return $this->_print;

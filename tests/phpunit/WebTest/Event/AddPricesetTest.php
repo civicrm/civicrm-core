@@ -505,7 +505,6 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
    * multiple price fields in price-set
    * CRM-11986
 
-   *
    */
   public function testEventWithPriceSet() {
 

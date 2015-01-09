@@ -76,7 +76,8 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
    * Set the default form values
    *
    *
-   * @return array the default array reference
+   * @return array
+   *   the default array reference
    */
   public function setDefaultValues() {
     $defaults = array();

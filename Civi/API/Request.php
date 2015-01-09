@@ -46,7 +46,8 @@ class Request {
    *   Who knows? ...
    *
    * @throws \API_Exception
-   * @return array the request descriptor; keys:
+   * @return array
+   *   the request descriptor; keys:
    *   - version: int
    *   - entity: string
    *   - action: string

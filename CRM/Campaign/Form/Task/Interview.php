@@ -47,7 +47,6 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
 
   /**
    * Variable to store redirect path
-   *
    */
   private $_userContext;
 

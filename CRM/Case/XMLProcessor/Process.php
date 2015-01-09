@@ -646,7 +646,8 @@ AND        a.is_deleted = 0
   /**
    * Retrieves AllowMultipleCaseClients setting
    *
-   * @return string 1 if allowed, 0 if not
+   * @return string
+   *   1 if allowed, 0 if not
    */
   public function getAllowMultipleCaseClients() {
     $xml = $this->retrieve("Settings");
@@ -659,7 +660,8 @@ AND        a.is_deleted = 0
   /**
    * Retrieves NaturalActivityTypeSort setting
    *
-   * @return string 1 if natural, 0 if alphabetic
+   * @return string
+   *   1 if natural, 0 if alphabetic
    */
   public function getNaturalActivityTypeSort() {
     $xml = $this->retrieve("Settings");

@@ -220,7 +220,8 @@ class CRM_Extension_Browser {
    * extensions.
    *
    *
-   * @return Array list of extension names
+   * @return Array
+   *   list of extension names
    */
   private function grabRemoteKeyList() {
 

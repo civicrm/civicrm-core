@@ -55,8 +55,6 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
    * @param
    *
    * @return void
-   *
-   *
    */
   public function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_CREATE;
@@ -313,7 +311,8 @@ SELECT module,is_reserved
    * This is a first version and will be tweaked over a period of time
    *
    *
-   * @return boolean   true if no error found
+   * @return boolean
+   *   true if no error found
    */
   public function validate() {
     $errors = parent::validate();

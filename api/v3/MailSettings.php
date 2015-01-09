@@ -42,7 +42,8 @@
  *                       name/value pairs to insert in new 'mail_settings'
  * @example mail_settingsCreate.php Std Create example
  *
- * @return array api result array
+ * @return array
+   *   api result array
  * {@getfields mail_settings_create}
  * @access public
  */
@@ -69,7 +70,8 @@ function _civicrm_api3_mail_settings_create_spec(&$params) {
  *                       property_name=>value pairs. If $params is set
  *                       as null, all mail_settings will be returned
  *
- * @return array Array of matching mail_settings
+ * @return array
+   *   Array of matching mail_settings
  * {@getfields mail_settings_get}
  * @access public
  */
@@ -87,7 +89,8 @@ function civicrm_api3_mail_settings_get($params) {
  *   Array containing id of the group.
  *                       to be deleted
  *
- * @return array api result array
+ * @return array
+   *   api result array
  * {@getfields mail_settings_delete}
  * @access public
  */

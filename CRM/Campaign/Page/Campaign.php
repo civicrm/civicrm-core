@@ -50,8 +50,7 @@ class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
   /**
    * Get the action links for this page.
    *
-   * @return array $_actionLinks
-   *
+   * @return array
    */
   public function &actionLinks() {
     // check if variable _actionsLinks is populated

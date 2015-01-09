@@ -99,7 +99,8 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    *
    * @param void
    *
-   * @return array   array of page orientations
+   * @return array
+   *   array of page orientations
    */
   public static function getPageOrientations() {
     return array(
@@ -113,7 +114,8 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    *
    * @param void
    *
-   * @return array   array of measurement units
+   * @return array
+   *   array of measurement units
    */
   public static function getUnits() {
     return array(
@@ -129,7 +131,8 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    *
    * @param void
    *
-   * @return int  Group ID (null if Group ID doesn't exist)
+   * @return int
+   *   Group ID (null if Group ID doesn't exist)
    */
   private static function _getGid() {
     if (!self::$_gid) {
@@ -162,7 +165,8 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    * @param bool $namesOnly
    *   Return simple list of names.
    *
-   * @return array  (reference)   PDF Page Format list
+   * @return array
+   *   (reference)   PDF Page Format list
    * @static
    */
   public static function &getList($namesOnly = FALSE) {
@@ -191,7 +195,8 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    *
    * @param NULL
    *
-   * @return array   Name/value pairs containing the default PDF Page Format values.
+   * @return array
+   *   Name/value pairs containing the default PDF Page Format values.
    * @static
    */
   public static function &getDefaultValues() {
@@ -218,7 +223,8 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    * @param int $val
    *   Field value to search for.
    *
-   * @return array  $values (reference) associative array of name/value pairs
+   * @return array
+   *   (reference) associative array of name/value pairs
    */
   public static function &getPdfFormat($field, $val) {
     $params = array('is_active' => 1, $field => $val);
@@ -237,7 +243,8 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    * @param int $name
    *   PDF Page Format name. Empty = get default PDF Page Format.
    *
-   * @return array  $values (reference) associative array of name/value pairs
+   * @return array
+   *   (reference) associative array of name/value pairs
    */
   public static function &getByName($name) {
     return self::getPdfFormat('name', $name);
@@ -249,7 +256,8 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    * @param int $id
    *   PDF Page Format id. 0 = get default PDF Page Format.
    *
-   * @return array  $values (reference) associative array of name/value pairs
+   * @return array
+   *   (reference) associative array of name/value pairs
    */
   public static function &getById($id) {
     return self::getPdfFormat('id', $id);

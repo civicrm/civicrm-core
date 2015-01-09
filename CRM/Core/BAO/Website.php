@@ -44,7 +44,8 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object       CRM_Core_BAO_Website object on success, null otherwise
+   * @return object
+   *   CRM_Core_BAO_Website object on success, null otherwise
    * @static
    */
   public static function add(&$params) {
@@ -163,7 +164,8 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    *
    * @param bool $updateBlankLocInfo
    *
-   * @return array  the array of website details
+   * @return array
+   *   the array of website details
    * @static
    */
   public static function allWebsites($id, $updateBlankLocInfo = FALSE) {

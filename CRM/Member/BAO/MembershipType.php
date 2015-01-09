@@ -77,7 +77,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -294,7 +295,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param int $numRenewTerms
    *   How many membership terms are being added to end date (default is 1).
    *
-   * @return array associated array with  start date, end date and join date for the membership
+   * @return array
+   *   associated array with  start date, end date and join date for the membership
    * @static
    */
   public static function getDatesForMembershipType($membershipTypeId, $joinDate = NULL, $startDate = NULL, $endDate = NULL, $numRenewTerms = 1) {
@@ -474,7 +476,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *
    * CRM-7297 Membership Upsell - Added $membershipTypeID param to facilitate calculations of dates when membership type changes
    *
-   * @return Array array fo the start date, end date and join date of the membership
+   * @return Array
+   *   array fo the start date, end date and join date of the membership
    * @static
    */
   public static function getRenewalDatesForMembershipType($membershipId, $changeToday = NULL, $membershipTypeID = NULL, $numRenewTerms = 1) {
@@ -581,7 +584,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param int $orgID
    *   Id of Organization.
    *
-   * @return Array array of the details of membership types
+   * @return Array
+   *   array of the details of membership types
    * @static
    */
   public static function getMembershipTypesByOrg($orgID) {
@@ -601,7 +605,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *
    * @param array membership types
    *
-   * @return Array array of the details of membership types with Member of Contact id
+   * @return Array
+   *   array of the details of membership types with Member of Contact id
    * @static
    */
   public static function getMemberOfContactByMemTypes($membershipTypes) {
@@ -645,7 +650,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * Funtion to retrieve organization and associated membership
    * types
    *
-   * @return array arrays of organization and membership types
+   * @return array
+   *   arrays of organization and membership types
    *
    * @static
    */

@@ -20,7 +20,8 @@ function civicrm_api3_option_group_get($params) {
  *   (reference) Associative array of property.
  *   name/value pairs to insert in new 'survey'
  *
- * @return array   survey array
+ * @return array
+   *   survey array
  *
  * @access public
  */
@@ -49,7 +50,8 @@ function _civicrm_api3_option_group_create_spec(&$params) {
  *   Array containing id of the group.
  *                       to be deleted
  *
- * @return array API Result Array
+ * @return array
+   *   API Result Array
  *                message otherwise
  * {@getfields OptionGroup_delete}
  * @access public

@@ -71,7 +71,8 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    *
    * @param bool $all
    *
-   * @return array of basic contact types information.
+   * @return array
+   *   of basic contact types information.
    * @static
    */
   public static function &basicTypeInfo($all = FALSE) {
@@ -117,7 +118,8 @@ WHERE  parent_id IS NULL
    *
    * @param bool $all
    *
-   * @return array of basic contact types
+   * @return array
+   *   of basic contact types
    * @static
    */
   public static function basicTypes($all = FALSE) {
@@ -150,7 +152,8 @@ WHERE  parent_id IS NULL
    * @param bool $ignoreCache
    * @param bool $reset
    *
-   * @return array of sub type information
+   * @return array
+   *   of sub type information
    * @static
    */
   public static function &subTypeInfo($contactType = NULL, $all = FALSE, $ignoreCache = FALSE, $reset = FALSE) {
@@ -219,7 +222,8 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    * @param string $columnName
    * @param bool $ignoreCache
    *
-   * @return array of all subtypes OR list of subtypes associated to
+   * @return array
+   *   of all subtypes OR list of subtypes associated to
    * a given basic contact type
    * @static
    */
@@ -261,7 +265,8 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    *
    * @param bool $all
    *
-   * @return array of basic types + all subtypes.
+   * @return array
+   *   of basic types + all subtypes.
    * @static
    */
   public static function contactTypes($all = FALSE) {
@@ -275,7 +280,8 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    * @param bool $all
    * @param bool $reset
    *
-   * @return array of basic types + all subtypes.
+   * @return array
+   *   of basic types + all subtypes.
    * @static
    */
   public static function contactTypeInfo($all = FALSE, $reset = FALSE) {
@@ -335,7 +341,8 @@ WHERE  type.name IS NOT NULL
    * @param null $typeName
    * @param null $delimiter
    *
-   * @return array of basictypes with name as 'built-in name' and 'label' as value
+   * @return array
+   *   of basictypes with name as 'built-in name' and 'label' as value
    * @static
    */
   public static function contactTypePairs($all = FALSE, $typeName = NULL, $delimiter = NULL) {
@@ -451,7 +458,8 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
    *   Contact subType.
    * @param bool $ignoreCache
    *
-   * @return boolean true if subType, false otherwise.
+   * @return boolean
+   *   true if subType, false otherwise.
    * @static
    */
   public static function isaSubType($subType, $ignoreCache = FALSE) {
@@ -464,7 +472,6 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
    * @param array/string $subType contact subType.
    * @return array/string of basicTypes.
    * @static
-   *
    */
   public static function getBasicType($subType) {
     static $_cache = NULL;
@@ -506,7 +513,8 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
    *   Contact subTypes.
    * @param bool $ignoreCache
    *
-   * @return array of suppressed subTypes.
+   * @return array
+   *   of suppressed subTypes.
    * @static
    */
   public static function suppressSubTypes(&$subTypes, $ignoreCache = FALSE) {
@@ -524,7 +532,8 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
    * @param bool $ignoreCache
    * @param string $columnName
    *
-   * @return boolean true if contact extends, false otherwise.
+   * @return boolean
+   *   true if contact extends, false otherwise.
    * @static
    */
   public static function isExtendsContactType($subType, $contactType, $ignoreCache = FALSE, $columnName = 'name') {
@@ -539,7 +548,8 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
   /**
    * Create shortcuts menu for contactTypes
    *
-   * @return array  of contactTypes
+   * @return array
+   *   of contactTypes
    * @static
    */
   public static function getCreateNewList() {
@@ -700,7 +710,8 @@ WHERE name = %1";
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on success, null otherwise
+   * @return Object
+   *   DAO object on success, null otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -739,7 +750,7 @@ WHERE name = %1";
    * @param string $subType
    *   Subtype.
    *
-   * @return boolean true/false.
+   * @return boolean
    * @static
    */
   public static function isAllowEdit($contactId, $subType = NULL) {

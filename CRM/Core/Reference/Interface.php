@@ -30,7 +30,8 @@ interface CRM_Core_Reference_Interface {
    *
    * @param CRM_Core_DAO $targetDao
    *   The instance for which we want references.
-   * @return array a record describing the reference; must include the keys:
+   * @return array
+   *   a record describing the reference; must include the keys:
    *  - 'type': string (not necessarily unique)
    *  - 'count': int
    */

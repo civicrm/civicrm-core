@@ -93,7 +93,8 @@ class CRM_Contact_Form_Inline_Lock {
    *
    * @param int $contactID
    *
-   * @return array extra options to return in JSON
+   * @return array
+   *   extra options to return in JSON
    */
   public static function getResponse($contactID) {
     $timestamps = CRM_Contact_BAO_Contact::getTimestamps($contactID);

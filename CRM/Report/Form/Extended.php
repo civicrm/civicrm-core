@@ -43,10 +43,8 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   protected $_baseTable = 'civicrm_contact';
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     parent::__construct();
@@ -706,7 +704,8 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
    * - order_by enable these fields for order by
    * - filters enable these fields for filtering
    * - defaults - (is this working?) values to pre-populate
-   * @return array address fields for construct clause
+   * @return array
+   *   address fields for construct clause
    */
   /**
    * Get address columns to add to array
@@ -715,7 +714,8 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
    *  - prefix Prefix to add to table (in case of more than one instance of the table)
    *  - prefix_label Label to give columns from this address table instance
    *
-   * @return array address columns definition
+   * @return array
+   *   address columns definition
    */
   /**
    * @param array $options

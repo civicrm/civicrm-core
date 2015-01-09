@@ -59,7 +59,8 @@ class CRM_Utils_Money {
    * @param string $valueFormat
    *   The desired monetary value display format (e.g. '%!i').
    *
-   * @return string  formatted monetary string
+   * @return string
+   *   formatted monetary string
    *
    * @static
    */

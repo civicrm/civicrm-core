@@ -99,7 +99,8 @@ function _civicrm_api3_custom_group_create_spec(&$params) {
  *
  * @param array id of the group to be deleted
  *
- * @return Null if success
+ * @return Null
+   *   if success
  * @access public
  * {@getfields CustomGroup_delete}
  * @example CustomGroupDelete.php

@@ -75,7 +75,8 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    *
    * @static
    */
@@ -88,7 +89,8 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    *
    * @param NULL
    *
-   * @return object           The default payment processor object on success,
+   * @return object
+   *   The default payment processor object on success,
    *                          null otherwise
    * @static
    */

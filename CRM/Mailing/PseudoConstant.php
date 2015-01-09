@@ -71,7 +71,8 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param $type
    *   The type of component needed.
    *
-   * @return array - array reference of all mailing components
+   * @return array
+   *   array reference of all mailing components
    * @static
    */
   public static function &component($type = NULL) {
@@ -112,7 +113,8 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param $undefined
    *   The value to use if no default is defined.
    *
-   * @return integer -The ID of the default mailing component.
+   * @return integer
+   *   The ID of the default mailing component.
    * @static
    */
   public static function &defaultComponent($type, $undefined = NULL) {
@@ -138,7 +140,8 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    * Get all the mailing templates
    *
    *
-   * @return array - array reference of all mailing templates if any
+   * @return array
+   *   array reference of all mailing templates if any
    * @static
    */
   public static function &template() {
@@ -154,7 +157,8 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param null $mode
    *
-   * @return array - array reference of all mailing templates if any
+   * @return array
+   *   array reference of all mailing templates if any
    * @static
    */
   public static function &completed($mode = NULL) {

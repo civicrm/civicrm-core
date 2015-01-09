@@ -49,8 +49,6 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
    * @param
    *
    * @return void
-   *
-   *
    */
   public function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_SEARCH;
@@ -61,7 +59,8 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
    * Set the default form values
    *
    *
-   * @return array the default array reference
+   * @return array
+   *   the default array reference
    */
   public function setDefaultValues() {
     $defaults = array();

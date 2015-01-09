@@ -40,7 +40,8 @@
  *
  * @param mixed $data
  *
- * @return string JSON
+ * @return string
+   *   JSON
  */
 function smarty_modifier_json($data) {
   return json_encode($data);

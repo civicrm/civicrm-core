@@ -65,7 +65,8 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    *
    * @param array The ids to be hashed
    *
-   * @return int      The hash
+   * @return int
+   *   The hash
    * @static
    */
   public static function hash($params) {
@@ -111,7 +112,8 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    * @param int $queue_id
    *   The queue event ID.
    *
-   * @return string               The email address
+   * @return string
+   *   The email address
    * @static
    */
   public static function getEmailAddress($queue_id) {
@@ -140,7 +142,8 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    * @param int $job_id
    *   Optional ID of a job to limit results.
    *
-   * @return int                  Number of matching events
+   * @return int
+   *   Number of matching events
    * @static
    */
   public static function getTotalCount($mailing_id, $job_id = NULL) {
@@ -181,7 +184,8 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    * @param array $sort
    *   Sort array.
    *
-   * @return array                Result set
+   * @return array
+   *   Result set
    * @static
    */
   public static function &getRows(
@@ -257,7 +261,8 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    *
    * @param
    *
-   * @return object           Mailing BAO
+   * @return object
+   *   Mailing BAO
    */
   public function &getMailing() {
     $mailing  = new CRM_Mailing_BAO_Mailing();

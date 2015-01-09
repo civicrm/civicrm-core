@@ -192,7 +192,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object            DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    *
    * @static
    */
@@ -213,10 +214,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @param int $id
    *   Id of field.
    *
-   * @return string name
+   * @return string
+   *   name
    *
    * @static
-   *
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $id, 'label');
@@ -566,7 +567,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @param bool $reset
    *   Ignore stored values\.
    *
-   * @return array array of options
+   * @return array
+   *   array of options
    */
   public static function getOptions($fieldId, $inactiveNeeded = FALSE, $reset = FALSE) {
     static $options = array();
@@ -631,7 +633,6 @@ WHERE
    * @return boolean
    *
    * @static
-   *
    */
   public static function deleteField($id) {
     $field = new CRM_Price_DAO_PriceField();
@@ -779,10 +780,10 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
    * @param string $displayOpt
    *   Tax display setting option.
    *
-   * @return string $label tax label for custom field
+   * @return string
+   *   tax label for custom field
    *
    * @static
-   *
    */
   public static function getTaxLabel($opt, $valueFieldName, $displayOpt, $taxTerm) {
     if ($displayOpt == 'Do_not_show') {

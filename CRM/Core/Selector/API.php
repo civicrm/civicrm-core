@@ -55,8 +55,6 @@ interface CRM_Core_Selector_API {
    * @param array params the array that the pagerParams will be inserted into
    *
    * @return void
-   *
-   *
    */
   public function getPagerParams($action, &$params);
 
@@ -65,8 +63,8 @@ interface CRM_Core_Selector_API {
    *
    * @param string action the action being performed
    *
-   * @return array the elements that can be sorted along with their properties
-   *
+   * @return array
+   *   the elements that can be sorted along with their properties
    */
   public function &getSortOrder($action);
 
@@ -79,7 +77,8 @@ interface CRM_Core_Selector_API {
    * @param enum $type
    *   What should the result set include (web/email/csv).
    *
-   * @return array the column headers that need to be displayed
+   * @return array
+   *   the column headers that need to be displayed
    */
   public function &getColumnHeaders($action = NULL, $type = NULL);
 
@@ -88,9 +87,8 @@ interface CRM_Core_Selector_API {
    *
    * @param string action the action being performed
    *
-   * @return int   the total number of rows for this action
-   *
-   *
+   * @return int
+   *   the total number of rows for this action
    */
   public function getTotalCount($action);
 
@@ -108,7 +106,8 @@ interface CRM_Core_Selector_API {
    * @param enum $type
    *   What should the result set include (web/email/csv).
    *
-   * @return int   the total number of rows for this action
+   * @return int
+   *   the total number of rows for this action
    */
   public function &getRows($action, $offset, $rowCount, $sort, $type = NULL);
 
@@ -119,7 +118,6 @@ interface CRM_Core_Selector_API {
    *   The action being performed.
    *
    * @return string
-   *
    */
   public function getTemplateFileName($action = NULL);
 
@@ -128,9 +126,9 @@ interface CRM_Core_Selector_API {
    *
    * @param string type the type of export required: csv/xml/foaf etc
    *
-   * @return string the fileName which we will munge to skip spaces and
+   * @return string
+   *   the fileName which we will munge to skip spaces and
    *                special characters to avoid various browser issues
-   *
    */
   public function getExportFileName($type = 'csv');
 }

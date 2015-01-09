@@ -139,7 +139,8 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
    * @param array $createParams
    * @param array $keys
    * @param bool $isMandatory
-   * @return array revised $createParams, including 'id' if known
+   * @return array
+   *   revised $createParams, including 'id' if known
    * @throws API_Exception
    */
   public function match($entity, $createParams, $keys, $isMandatory) {
@@ -176,7 +177,8 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
    * @param array $keys
    *   List of keys to match against.
    *
-   * @return array APIv3 $params
+   * @return array
+   *   APIv3 $params
    */
   public function createGetParams($origParams, $keys) {
     $params = array('version' => 3);

@@ -175,7 +175,8 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    * @param $files
    * @param $self
    *
-   * @return array list of errors to be posted back to the form
+   * @return array
+   *   list of errors to be posted back to the form
    * @static
    */
   public static function formRule($values, $files, $self) {
@@ -293,7 +294,8 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    * @param int $userContactID
    * @param string $actionName
    *
-   * @return array list of errors to be posted back to the form
+   * @return array
+   *   list of errors to be posted back to the form
    * @static
    */
   public function checkPermissions($action, $permissions, $createdID, $userContactID, $actionName) {

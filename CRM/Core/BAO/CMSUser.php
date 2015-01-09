@@ -228,7 +228,8 @@ class CRM_Core_BAO_CMSUser {
    * @param string $mail
    *   Email id for cms user.
    *
-   * @return int contact id that has been created
+   * @return int
+   *   contact id that has been created
    * @static
    */
   public static function create(&$params, $mail) {

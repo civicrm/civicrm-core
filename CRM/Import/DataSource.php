@@ -42,15 +42,13 @@ abstract class CRM_Import_DataSource {
   /**
    * Provides information about the data source
    *
-   * @return array collection of info about this data source
-   *
-   *
+   * @return array
+   *   collection of info about this data source
    */
   abstract public function getInfo();
 
   /**
    * Set variables up before form is built
-   *
    */
   abstract public function preProcess(&$form);
 
@@ -61,13 +59,13 @@ abstract class CRM_Import_DataSource {
    *
    * @param CRM_Core_Form $form
    *
-   * @return void (operates directly on form argument)
+   * @return void
+   *   (operates directly on form argument)
    */
   abstract public function buildQuickForm(&$form);
 
   /**
    * Process the form submission
-   *
    */
   abstract public function postProcess(&$params, &$db, &$form);
 }

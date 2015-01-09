@@ -65,7 +65,8 @@ class CRM_Event_Task {
    * These tasks are the core set of tasks that the user can perform
    * on a contact / group of contacts
    *
-   * @return array the set of tasks for a group of contacts
+   * @return array
+   *   the set of tasks for a group of contacts
    * @static
    */
   public static function &tasks() {
@@ -153,7 +154,8 @@ class CRM_Event_Task {
    * These tasks are the core set of task titles
    * for participants
    *
-   * @return array the set of task titles
+   * @return array
+   *   the set of task titles
    * @static
    */
   public static function &taskTitles() {
@@ -171,7 +173,8 @@ class CRM_Event_Task {
   /**
    * These tasks get added based on the context the user is in
    *
-   * @return array the set of optional tasks for a group of contacts
+   * @return array
+   *   the set of optional tasks for a group of contacts
    * @static
    */
   public static function &optionalTaskTitle() {
@@ -187,7 +190,8 @@ class CRM_Event_Task {
    *
    * @param int $permission
    *
-   * @return array set of tasks that are valid for the user
+   * @return array
+   *   set of tasks that are valid for the user
    */
   public static function &permissionedTaskTitles($permission) {
     $tasks = array();
@@ -216,7 +220,8 @@ class CRM_Event_Task {
    *
    * @param int $value
    *
-   * @return array the set of tasks for a group of participants
+   * @return array
+   *   the set of tasks for a group of participants
    * @static
    */
   public static function getTask($value) {

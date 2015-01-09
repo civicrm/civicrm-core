@@ -34,7 +34,6 @@
  */
 class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
   /**
-   *
    */
   public function __construct() {
     parent::__construct();
@@ -466,7 +465,8 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    * @param object $tag
    *   An object of a tag.
    *
-   * @return array   $contactIds    array of contact ids
+   * @return array
+   *   array of contact ids
    */
   public function getEntitiesByTag($tag) {
     $contactIds = array();

@@ -186,7 +186,8 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
   /**
    * @param array $fields
    *   List of fields to include in the profile.
-   * @return int field id
+   * @return int
+   *   field id
    */
   protected function createUFGroup($fields) {
     $ufGroup = CRM_Core_DAO::createTestObject('CRM_Core_DAO_UFGroup');

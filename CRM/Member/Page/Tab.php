@@ -460,7 +460,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * @param bool $isCancelSupported
    * @param bool $isUpdateBilling
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    * @static
    */
   static function &links(
@@ -547,7 +548,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   /**
    * Define action links for membership types of related organization
    *
-   * @return array self::$_membershipTypesLinks array of action links
+   * @return array
+   *   self::$_membershipTypesLinks array of action links
    */
   public static function &membershipTypesLinks() {
     if (!self::$_membershipTypesLinks) {
@@ -595,7 +597,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   /**
    * Get BAO Name
    *
-   * @return string Classname of BAO.
+   * @return string
+   *   Classname of BAO.
    */
   public function getBAOName() {
     return 'CRM_Member_BAO_Membership';

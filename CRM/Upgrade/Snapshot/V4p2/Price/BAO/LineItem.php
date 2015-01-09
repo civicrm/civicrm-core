@@ -104,7 +104,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem extends CRM_Upgrade_Snapshot_
    *
    * @param null $isQuick
    *
-   * @return array of line items
+   * @return array
+   *   of line items
    */
   public static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL) {
     $selectClause = $whereClause = $fromClause = NULL;

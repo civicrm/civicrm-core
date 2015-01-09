@@ -114,7 +114,8 @@ abstract class CRM_Queue_Queue {
    * @param int $lease_time
    *   Seconds.
    *
-   * @return object with key 'data' that matches the inputted data
+   * @return object
+   *   with key 'data' that matches the inputted data
    */
   public abstract function claimItem($lease_time = 3600);
 
@@ -124,7 +125,8 @@ abstract class CRM_Queue_Queue {
    * @param int $lease_time
    *   Seconds.
    *
-   * @return object with key 'data' that matches the inputted data
+   * @return object
+   *   with key 'data' that matches the inputted data
    */
   public abstract function stealItem($lease_time = 3600);
 

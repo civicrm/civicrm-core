@@ -114,7 +114,8 @@ class TransactionSubscriber implements EventSubscriberInterface {
    *   The API provider responsible for this request.
    * @param array $apiRequest
    *   The full API request.
-   * @return bool True if a new nested transaction is required; false if active tx may be used
+   * @return bool
+   *   True if a new nested transaction is required; false if active tx may be used
    */
   public function isNested($apiProvider, $apiRequest) {
     if ($this->isForceRollback($apiProvider, $apiRequest)) {

@@ -130,7 +130,8 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @param array $returnProperties
    *   If you want to return specific fields.
    *
-   * @return array associated array of field values
+   * @return array
+   *   associated array of field values
    * @static
    */
   public static function &getValues(&$params, &$values, $returnProperties = NULL) {
@@ -262,7 +263,6 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    *
    * @return mixed
    * @static
-   *
    */
   public static function deletePledge($id) {
     CRM_Utils_Hook::pre('delete', 'Pledge', $id, CRM_Core_DAO::$_nullArray);
@@ -451,7 +451,8 @@ GROUP BY  currency
    * @param int $honorId
    *   In Honor of Contact ID.
    *
-   * @return array return the list of pledge fields
+   * @return array
+   *   return the list of pledge fields
    *
    * @static
    */
@@ -498,7 +499,7 @@ GROUP BY  currency
    * @param array $params
    *   An assoc array of name/value pairs.
    *
-   * @return void.
+   * @return void
    */
   public static function sendAcknowledgment(&$form, $params) {
     //handle Acknowledgment.
@@ -691,7 +692,8 @@ GROUP BY  currency
   /**
    * Combine all the exportable fields from the lower levels object
    *
-   * @return array array of exportable Fields
+   * @return array
+   *   array of exportable Fields
    * @static
    */
   public static function &exportableFields() {
@@ -758,7 +760,8 @@ GROUP BY  currency
    * @param int $contactID
    *   Contact id.
    *
-   * @return array associated array of pledge id(s)
+   * @return array
+   *   associated array of pledge id(s)
    * @static
    */
   public static function getContactPledges($contactID) {
@@ -802,7 +805,8 @@ GROUP BY  currency
    *
    * @param int $contactID
    *
-   * @return int count of pledge records
+   * @return int
+   *   count of pledge records
    * @static
    */
   public static function getContactPledgeCount($contactID) {
@@ -1066,7 +1070,8 @@ SELECT  pledge.contact_id              as contact_id,
    * Find payments which can be safely canceled.
    *
    * @param int $pledgeID
-   * @return array of int (civicrm_pledge_payment.id)
+   * @return array
+   *   of int (civicrm_pledge_payment.id)
    */
   public static function findCancelablePayments($pledgeID) {
     $statuses = array_flip(CRM_Contribute_PseudoConstant::contributionStatus());
@@ -1093,7 +1098,8 @@ SELECT  pledge.contact_id              as contact_id,
    *
    * @param int $pledgeID
    * @param int $pledgeStatusID
-   * @return bool do financial transactions exist for this pledge?
+   * @return bool
+   *   do financial transactions exist for this pledge?
    */
   public static function pledgeHasFinancialTransactions($pledgeID, $pledgeStatusID) {
     if (empty($pledgeStatusID)) {
@@ -1113,7 +1119,8 @@ SELECT  pledge.contact_id              as contact_id,
    * @param int $statusID
    *   Pledge status id.
    *
-   * @return bool is it a transactional status?
+   * @return bool
+   *   is it a transactional status?
    */
   protected static function isTransactedStatus($statusID) {
     if (!in_array($statusID, self::getNonTransactionalStatus())) {
@@ -1124,7 +1131,8 @@ SELECT  pledge.contact_id              as contact_id,
 
   /**
    * Get array of non transactional statuses
-   * @return array non transactional status ids
+   * @return array
+   *   non transactional status ids
    */
   protected static function getNonTransactionalStatus() {
     $paymentStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -1133,7 +1141,8 @@ SELECT  pledge.contact_id              as contact_id,
 
   /**
    * Get array of non transactional statuses
-   * @return array non transactional status ids
+   * @return array
+   *   non transactional status ids
    */
   protected static function getTransactionalStatus() {
     $paymentStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');

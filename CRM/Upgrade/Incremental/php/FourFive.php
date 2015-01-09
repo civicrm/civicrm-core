@@ -227,7 +227,8 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    *
    * @param CRM_Queue_TaskContext $ctx
    *
-   * @return bool TRUE for success
+   * @return bool
+   *   TRUE for success
    */
   public static function addNameFieldOptions(CRM_Queue_TaskContext $ctx) {
     $query = "SELECT `value` FROM `civicrm_setting` WHERE `group_name` = 'CiviCRM Preferences' AND `name` = 'contact_edit_options'";
@@ -250,7 +251,8 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    *
    * @param CRM_Queue_TaskContext $ctx
    *
-   * @return bool TRUE for success
+   * @return bool
+   *   TRUE for success
    */
   public static function migrateHonoreeInfo(CRM_Queue_TaskContext $ctx) {
     $query = "ALTER TABLE `civicrm_uf_join`

@@ -155,7 +155,8 @@ class CRM_Core_InnoDBIndexer {
    * Get a list of FTS index names that are currently defined in the database.
    *
    * @param string $table
-   * @return array (string $indexName => string $indexName)
+   * @return array
+   *   (string $indexName => string $indexName)
    */
   public function findActualFtsIndexNames($table) {
     $mysqlVersion = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
@@ -186,7 +187,8 @@ class CRM_Core_InnoDBIndexer {
    * FTS index.
    *
    * @param $table
-   * @return array (string $indexName => string $sql)
+   * @return array
+   *   (string $indexName => string $sql)
    */
   public function buildIndexSql($table) {
     $sqls = array(); // array (string $idxName => string $sql)
@@ -203,7 +205,8 @@ class CRM_Core_InnoDBIndexer {
    * Generate a "DROP INDEX" statement for each existing FTS index
    *
    * @param string $table
-   * @return array (string $idxName => string $sql)
+   * @return array
+   *   (string $idxName => string $sql)
    */
   public function dropIndexSql($table) {
     $sqls = array();

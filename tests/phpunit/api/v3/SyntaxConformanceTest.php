@@ -218,7 +218,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    *
    * @param bool $sequential
    *
-   * @return array Entities that cannot be retrieved by ID
+   * @return array
+   *   Entities that cannot be retrieved by ID
    */
   public static function toBeSkipped_getByID($sequential = FALSE) {
     return array('MailingContact');
@@ -278,7 +279,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   /**
    * Generate list of entities to test for get by id functions
    * @param bool $sequential
-   * @return array Entities to be skipped
+   * @return array
+   *   Entities to be skipped
    */
   public static function toBeSkipped_automock($sequential = FALSE) {
     $entitiesWithoutGet = array('MailingContact', 'EntityTag', 'Participant', 'ParticipantPayment', 'Setting', 'SurveyRespondant', 'MailingRecipients', 'CustomSearch', 'Extension', 'ReportTemplate', 'System');
@@ -675,7 +677,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @dataProvider entities_getlimit
    *
    * @param string $entityName
-   *
    */
   public function testLimit($entityName) {
     $cases = array(); // each case is array(0 => $inputtedApiOptions, 1 => $expectedResultCount)
@@ -741,7 +742,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @dataProvider entities_getSqlOperators
    *
    * @param string $entityName
-   *
    */
   public function testSqlOperators($entityName) {
     $baoString = _civicrm_api3_get_BAO($entityName);
@@ -1201,7 +1201,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * Create two entities and make sure delete action only deletes one!
    *
    * @dataProvider entities_getfields
-   *
    */
   public function testGetfieldsHasTitle($entity) {
     $entities = $this->getEntitiesSupportingCustomFields();

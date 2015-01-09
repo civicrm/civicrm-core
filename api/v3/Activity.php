@@ -47,7 +47,8 @@
  * {@getfields activity_create}
  *
  * @throws API_Exception
- * @return array Array containing 'is_error' to denote success or failure and details of the created activity
+ * @return array
+   *   Array containing 'is_error' to denote success or failure and details of the created activity
  *
  * @example ActivityCreate.php Standard create example
  * @example Activity/ContactRefCustomField.php Create example including setting a contact reference custom field
@@ -255,7 +256,8 @@ function civicrm_api3_activity_get($params) {
  * @param array $params
  *   API request parameters.
  * @param array $activities
- * @return array new activities list
+ * @return array
+   *   new activities list
  */
 function _civicrm_api3_activity_get_formatResult($params, $activities) {
   $returns = CRM_Utils_Array::value('return', $params, array());
@@ -342,7 +344,8 @@ function civicrm_api3_activity_delete($params) {
  *
  * @throws API_Exception
  * @throws Exception
- * @return array $error array with errors
+ * @return array
+   *   array with errors
  */
 function _civicrm_api3_activity_check_params(&$params) {
 

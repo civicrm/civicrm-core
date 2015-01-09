@@ -197,7 +197,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    * @param int $orderNo
    *   <order-total> send by google.
    *
-   * @return array context of this call (test, component, payment processor id)
+   * @return array
+   *   context of this call (test, component, payment processor id)
    * @static
    */
   public static function getContext($privateData, $orderNo) {

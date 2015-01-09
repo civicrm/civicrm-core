@@ -42,10 +42,8 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
   protected $_add2groupSupported = FALSE;
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     $this->_columns = array(

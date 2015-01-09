@@ -55,7 +55,6 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
    */
   public function tearDown() {
     $this->relationshipTypeDelete($this->_relationshipTypeId);

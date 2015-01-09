@@ -59,7 +59,6 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
 
   /**
    * List blog articles as dashlet
-   *
    */
   public function run() {
     $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'dashlet');
@@ -75,7 +74,6 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
    * Refresh cache if expired
    *
    * @return array
-   *
    */
   private function _getBlog() {
     // Fetch data from cache
@@ -103,7 +101,6 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
    * @param $url
    *
    * @return array|NULL array of blog items; or NULL if not available
-   *
    */
   public function _getFeed($url) {
     $httpClient = new CRM_Utils_HttpClient(self::CHECK_TIMEOUT);

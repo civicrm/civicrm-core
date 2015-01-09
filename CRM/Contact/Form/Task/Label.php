@@ -94,7 +94,8 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    *
    * @param null
    *
-   * @return array   array of default values
+   * @return array
+   *   array of default values
    */
   public function setDefaultValues() {
     $defaults = array();

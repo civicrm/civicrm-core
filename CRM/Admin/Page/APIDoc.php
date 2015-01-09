@@ -58,7 +58,8 @@ class CRM_Admin_Page_APIDoc extends CRM_Core_Page {
    *
    * @param null $mode
    *
-   * @return string user context.
+   * @return string
+   *   user context.
    */
   public function userContext($mode = NULL) {
     return 'civicrm/api/doc';

@@ -47,19 +47,16 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
   /**
    * Gives all the statues for conribution
-   *
    */
   public $_contributionStatusId;
 
   /**
    * Gives the HTML template of PDF Invoice
-   *
    */
   public $_messageInvoice;
 
   /**
    * This variable is used to assign parameters for HTML template of PDF Invoice
-   *
    */
   public $_invoiceTemplate;
 
@@ -210,7 +207,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    *
    * @param array $values
    *
-   * @return array list of errors to be posted back to the form
+   * @return array
+   *   list of errors to be posted back to the form
    * @static
    */
   public static function formRule($values) {
@@ -248,7 +246,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @param CRM_Core_Form $form
    *   Form object.
    * @static
-   *
    */
   public static function printPDF($contribIDs, &$params, $contactIds, &$form) {
     // get all the details needed to generate a invoice

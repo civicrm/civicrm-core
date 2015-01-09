@@ -47,8 +47,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *   Email id for cms user.
    *
    * @return uid if user exists, false otherwise
-   *
-   *
    */
   public function createUser(&$params, $mail) {
     $user = \Drupal::currentUser();
@@ -188,8 +186,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *
    * @param CRM_Core_Form $form
    *   Form object representing the 'current' form - to which the user will be returned.
-   * @return string $destination destination value for URL
-   *
+   * @return string
+   *   destination value for URL
    */
   public function getLoginDestination(&$form) {
     $args = NULL;
@@ -227,7 +225,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @param string $destination
    *   If present, add destination to querystring (works for Drupal only).
    *
-   * @return string - loginURL for the current CMS
+   * @return string
+   *   loginURL for the current CMS
    * @static
    */
   public function getLoginURL($destination = '') {
@@ -300,7 +299,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addScriptUrl($url, $region) {
     $options = array('group' => JS_LIBRARY, 'weight' => 10);
@@ -329,7 +329,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addScript($code, $region) {
     $options = array('type' => 'inline', 'group' => JS_LIBRARY, 'weight' => 10);
@@ -356,7 +357,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addStyleUrl($url, $region) {
     if ($region != 'html-header') {
@@ -379,7 +381,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addStyle($code, $region) {
     if ($region != 'html-header') {
@@ -529,7 +532,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *
    * @param string $message
    *   The message to set.
-   *
    */
   public function setMessage($message) {
     drupal_set_message($message);
@@ -648,7 +650,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * Get currently logged in user uf id.
    *
-   * @return int $userID logged in user uf id.
+   * @return int
+   *   $userID logged in user uf id.
    */
   public function getLoggedInUfID() {
     if ($id = \Drupal::currentUser()->id()) {
@@ -660,7 +663,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * Get the default location for CiviCRM blocks
    *
    * @return string
-   *
    */
   public function getDefaultBlockLocation() {
     return 'sidebar_first';

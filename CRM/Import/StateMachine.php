@@ -43,7 +43,6 @@ class CRM_Import_StateMachine extends CRM_Core_StateMachine {
    *
    * @param object $controller
    * @param \const|int $action
-   *
    */
   public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);

@@ -139,7 +139,8 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    * @param $files
    * @param $self
    *
-   * @return array list of errors to be posted back to the form
+   * @return array
+   *   list of errors to be posted back to the form
    * @static
    */
   public static function formRule($values, $files, $self) {
@@ -416,7 +417,8 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   /**
    * CRM-9434 Hackish function to fetch fields with options.
    * FIXME: When our core fields contain reliable metadata this will be much simpler.
-   * @return array: (string => string) key: field_name value: api entity name
+   * @return array
+   *   (string => string) key: field_name value: api entity name
    * Note: options are fetched via ajax using the api "getoptions" method
    */
   public static function fieldOptions() {

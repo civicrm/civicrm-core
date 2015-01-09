@@ -95,7 +95,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @param array $values
    *   Output values of the object.
    *
-   * @return array (reference)   the values that could be potentially assigned to smarty
+   * @return array
+   *   (reference)   the values that could be potentially assigned to smarty
    * @static
    */
   public static function getValues(&$params, &$values) {
@@ -128,7 +129,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @param string $status
    * @param int $tracking
    *
-   * @return array             (total, added, notAdded) count of contacts added to group
+   * @return array
+   *   (total, added, notAdded) count of contacts added to group
    * @static
    */
   static function addContactsToGroup(
@@ -178,7 +180,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @param string $status
    * @param NULL $tracking
    *
-   * @return array             (total, removed, notRemoved) count of contacts removed to group
+   * @return array
+   *   (total, removed, notRemoved) count of contacts removed to group
    * @static
    */
   static function removeContactsFromGroup(
@@ -277,7 +280,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @param bool $visibility
    *
    *
-   * @return array $values this array has key-> group id and value group title
+   * @return array
+   *   this array has key-> group id and value group title
    * @static
    */
   public static function getGroupList($contactId = 0, $visibility = FALSE) {
@@ -331,7 +335,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *
    * @param bool $excludeHidden
    *
-   * @return array (reference )|int $values the relevant data object values for the contact or
+   * @return array
+   *   (reference )|int $values the relevant data object values for the contact or
    *                                 the total count when $count is TRUE
    *
    * $access public
@@ -458,7 +463,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @param string $method
    *   If we want the subscription history details for a specific method.
    *
-   * @return object of group contact
+   * @return object
+   *   of group contact
    * @static
    */
   public static function getMembershipDetail($contactId, $groupID, $method = 'Email') {
@@ -611,7 +617,8 @@ SELECT    *
    *
    * TODO: use the 3rd $sqls param to append sql statements rather than executing them here
    *
-   * @return void.
+   * @return void
+   *
    * @static
    */
   public static function mergeGroupContact($mainContactId, $otherContactId) {
@@ -719,7 +726,8 @@ AND       group_id IN ( $groupIDString )
    * @param string $status
    * @param NULL $tracking
    *
-   * @return array             (total, added, notAdded) count of contacts added to group
+   * @return array
+   *   (total, added, notAdded) count of contacts added to group
    * @static
    */
   static function bulkAddContactsToGroup(

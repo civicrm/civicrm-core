@@ -43,10 +43,8 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
   protected $_emailField = FALSE;
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     $this->_columns = array(

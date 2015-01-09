@@ -44,7 +44,8 @@ class CRM_Core_Permission_Soap extends CRM_Core_Permission_Base {
    * @param string $str
    *   The permission to check.
    *
-   * @return boolean true if yes, else false
+   * @return boolean
+   *   true if yes, else false
    */
 
   public function check($str) {

@@ -100,7 +100,8 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    * Set the default form values
    *
    *
-   * @return array the default array reference
+   * @return array
+   *   the default array reference
    */
   public function setDefaultValues() {
     $defaults = array();

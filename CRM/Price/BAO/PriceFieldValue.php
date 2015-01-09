@@ -151,7 +151,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *   For order by, default weight.
    * @param bool|int $isActive is_active, default false
    *
-   * @return array $values
+   * @return array
    *
    * @static
    */
@@ -177,10 +177,10 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param int $id
    *   Id of field option.
    *
-   * @return string name
+   * @return string
+   *   name
    *
    * @static
-   *
    */
   public static function getOptionLabel($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $id, 'label');
@@ -194,7 +194,8 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object            DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    *
    * @static
    */

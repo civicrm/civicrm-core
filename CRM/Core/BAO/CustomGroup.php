@@ -246,7 +246,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @param bool $is_activeValue we want to set the is_active field.
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -290,7 +291,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *
    * @param int $activityTypeId
    *
-   * @return bool TRUE if a group is found or created; FALSE on error
+   * @return bool
+   *   TRUE if a group is found or created; FALSE on error
    */
   public static function autoCreateByActivityType($activityTypeId) {
     if (self::hasCustomGroup('Activity', NULL, $activityTypeId)) {
@@ -327,7 +329,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @param bool $fromCache
    * @param bool $onlySubType
    *
-   * @return array $groupTree  - array  The returned array is keyed by group id and has the custom group table fields
+   * @return array
+   *   array  The returned array is keyed by group id and has the custom group table fields
    * and a subkey 'fields' holding the specific custom fields.
    * If entityId is passed in the fields keys have a subkey 'customValue' which holds custom data
    * if set for the given entity. This is structured as an array of values with each one having the keys 'id', 'data'
@@ -653,7 +656,8 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @param bool $getCount
    *
-   * @return boolean does this entity have data in this custom table
+   * @return boolean
+   *   does this entity have data in this custom table
    */
   static public function customGroupDataExistsForEntity($entityID, $table, $getCount = FALSE) {
     $query = "
@@ -874,10 +878,10 @@ ORDER BY civicrm_custom_group.weight,
    * @param int $id
    *   Id of group.
    *
-   * @return string title
+   * @return string
+   *   title
    *
    * @static
-   *
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $id, 'title');
@@ -897,7 +901,8 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @param null $inSelector
    *
-   * @return array $groupTree - array consisting of all group and field details
+   * @return array
+   *   array consisting of all group and field details
    *
    *
    * @static
@@ -1097,7 +1102,7 @@ ORDER BY civicrm_custom_group.weight,
    * @param string $entityType
    *   What entity are we extending here ?.
    *
-   * @return string $tableName
+   * @return string
    *
    * @static
    *
@@ -1246,10 +1251,10 @@ ORDER BY civicrm_custom_group.weight,
    * @param bool $force
    *   whether to force the deletion, even if there are custom fields.
    *
-   * @return boolean   false if field exists for this group, true if group gets deleted.
+   * @return boolean
+   *   false if field exists for this group, true if group gets deleted.
    *
    * @static
-   *
    */
   public static function deleteGroup($group, $force = FALSE) {
 
@@ -1703,7 +1708,8 @@ ORDER BY civicrm_custom_group.weight,
    *   Remove custom fields of a type eg: array("Individual") ;.
    *
    *
-   * @return boolean false if it matches else true
+   * @return boolean
+   *   false if it matches else true
    * @static
    */
   public static function checkCustomField($customFieldId, &$removeCustomFieldTypes) {
@@ -1814,7 +1820,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    *   Group count by default 1, but can varry for multiple value custom data.
    * @param object form object
    *
-   * @return array $formattedGroupTree
+   * @return array
    */
   public static function formatGroupTree(&$groupTree, $groupCount = 1, &$form) {
     $formattedGroupTree = array();
@@ -2213,7 +2219,8 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    * @param array $fieldIds
    *   Array of custom field ids.
    *
-   * @return array $groupLabels - array consisting of groups and fields labels with ids.
+   * @return array
+   *   array consisting of groups and fields labels with ids.
    */
   public static function getGroupTitles($fieldIds) {
     if (!is_array($fieldIds) && empty($fieldIds)) {
@@ -2259,7 +2266,8 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    * @param int $gID
    *   Custom group id.
    *
-   * @return boolean true if empty otherwise false.
+   * @return boolean
+   *   true if empty otherwise false.
    */
   public static function isGroupEmpty($gID) {
     if (!$gID) {
@@ -2287,7 +2295,8 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    * @param array $types
    *   Var which should have the list appended.
    *
-   * @return array of types.
+   * @return array
+   *   of types.
    */
   public static function getExtendedObjectTypes(&$types = array()) {
     static $flag = FALSE, $objTypes = array();

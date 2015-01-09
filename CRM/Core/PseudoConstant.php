@@ -630,7 +630,8 @@ class CRM_Core_PseudoConstant {
    *
    * @static
    *
-   * @return array - array reference of all activity types.
+   * @return array
+   *   array reference of all activity types.
    */
   public static function &activityType() {
     $args = func_get_args();
@@ -708,7 +709,8 @@ class CRM_Core_PseudoConstant {
    *
    * @param bool $limit
    *
-   * @return array - array reference of all State/Provinces.
+   * @return array
+   *   array reference of all State/Provinces.
    */
   public static function &stateProvince($id = FALSE, $limit = TRUE) {
     if (($id && !CRM_Utils_Array::value($id, self::$stateProvince)) || !self::$stateProvince || !$id) {
@@ -763,7 +765,8 @@ class CRM_Core_PseudoConstant {
    *
    * @param bool $limit
    *
-   * @return array - array reference of all State/Province abbreviations.
+   * @return array
+   *   array reference of all State/Province abbreviations.
    */
   public static function &stateProvinceAbbreviation($id = FALSE, $limit = TRUE) {
     if ($id > 1) {
@@ -830,7 +833,8 @@ WHERE  id = %1";
    *
    * @param bool $applyLimit
    *
-   * @return array - array reference of all countries.
+   * @return array
+   *   array reference of all countries.
    */
   public static function country($id = FALSE, $applyLimit = TRUE) {
     if (($id && !CRM_Utils_Array::value($id, self::$country)) || !self::$country || !$id) {
@@ -905,7 +909,8 @@ WHERE  id = %1";
    *
    * @param bool $id
    *
-   * @return array - array reference of all country ISO codes.
+   * @return array
+   *   array reference of all country ISO codes.
    */
   public static function &countryIsoCode($id = FALSE) {
     if (!self::$countryIsoCode) {
@@ -940,7 +945,8 @@ WHERE  id = %1";
    *
    * @static
    *
-   * @return array - array reference of all groups.
+   * @return array
+   *   array reference of all groups.
    */
   public static function &allGroup($groupType = NULL, $excludeHidden = TRUE) {
     $condition = CRM_Contact_BAO_Group::groupTypeCondition($groupType, $excludeHidden);
@@ -999,7 +1005,8 @@ WHERE  id = %1";
    *
    * @static
    *
-   * @return array - array reference of all groups.
+   * @return array
+   *   array reference of all groups.
    */
   public static function group($groupType = NULL, $excludeHidden = TRUE) {
     return CRM_Core_Permission::group($groupType, $excludeHidden);
@@ -1032,7 +1039,8 @@ WHERE  id = %1";
    * @param null $groupType
    * @param bool $excludeHidden
    *
-   * @return array - array reference of all groups.
+   * @return array
+   *   array reference of all groups.
    */
   public static function &staticGroup($onlyPublic = FALSE, $groupType = NULL, $excludeHidden = TRUE) {
     if (!self::$staticGroup) {
@@ -1071,7 +1079,8 @@ WHERE  id = %1";
    *
    * @static
    *
-   * @return array - array reference of all relationship types.
+   * @return array
+   *   array reference of all relationship types.
    */
   public static function &relationshipType($valueColumnName = 'label', $reset = FALSE) {
     if (!CRM_Utils_Array::value($valueColumnName, self::$relationshipType) || $reset) {
@@ -1109,7 +1118,8 @@ WHERE  id = %1";
    * so far, we use this for validation only, so there's no point of putting this into the database
    *
    *
-   * @return array - array reference of all currency codes
+   * @return array
+   *   array reference of all currency codes
    * @static
    */
   public static function &currencyCode() {
@@ -1400,7 +1410,8 @@ WHERE  id = %1";
    *
    * @param bool|int $id - Optional id to return
    *
-   * @return array - array reference of all Counties
+   * @return array
+   *   array reference of all Counties
    */
   public static function &county($id = FALSE) {
     if (!self::$county) {
@@ -1435,7 +1446,8 @@ WHERE  id = %1";
    *
    * @param null $additionalCond
    *
-   * @return array - array of all payment processors
+   * @return array
+   *   array of all payment processors
    */
   public static function &paymentProcessor($all = FALSE, $test = FALSE, $additionalCond = NULL) {
     $condition = "is_test = ";
@@ -1470,7 +1482,8 @@ WHERE  id = %1";
    * @param int $id
    * @param string $return
    *
-   * @return array - array of all payment processor types
+   * @return array
+   *   array of all payment processor types
    */
   public static function &paymentProcessorType($all = FALSE, $id = NULL, $return = 'title') {
     $cacheKey = $id . '_' . $return;
@@ -1489,7 +1502,8 @@ WHERE  id = %1";
    *
    * @param bool $id
    *
-   * @return array - array reference of all World Regions
+   * @return array
+   *   array reference of all World Regions
    * @static
    */
   public static function &worldRegion($id = FALSE) {
@@ -1520,7 +1534,8 @@ WHERE  id = %1";
    *
    * @param string $column
    *
-   * @return array - array reference of all activity statuses
+   * @return array
+   *   array reference of all activity statuses
    */
   public static function &activityStatus($column = 'label') {
     if (NULL === self::$activityStatus) {
@@ -1546,7 +1561,8 @@ WHERE  id = %1";
    *
    * @param string $column
    *
-   * @return array - array reference of all Visibility levels.
+   * @return array
+   *   array reference of all Visibility levels.
    */
   public static function &visibility($column = 'label') {
     if (!isset(self::$visibility)) {
@@ -1679,7 +1695,8 @@ ORDER BY name";
    *
    * @param int $stateID
    *
-   * @return int the country id that the state belongs to
+   * @return int
+   *   the country id that the state belongs to
    * @static
    */
   public static function countryIDForStateID($stateID) {
@@ -1709,7 +1726,8 @@ WHERE  id = %1
    *
    * @param string $columnName
    *
-   * @return array - array reference of all greetings.
+   * @return array
+   *   array reference of all greetings.
    */
   public static function greeting($filter, $columnName = 'label') {
     $index = $filter['greeting_type'] . '_' . $columnName;
@@ -1755,8 +1773,8 @@ WHERE  id = %1
    *
    * @static
    *
-   * @return array - array reference of default greetings.
-   *
+   * @return array
+   *   array reference of default greetings.
    */
   public static function &greetingDefaults() {
     if (!self::$greetingDefaults) {
@@ -1788,7 +1806,8 @@ WHERE  id = %1
    *
    * @static
    *
-   * @return array - array($fullyQualifiedName => $label) list of extensions
+   * @return array
+   *   array($fullyQualifiedName => $label) list of extensions
    */
   public static function &getExtensions() {
     if (!self::$extensions) {
@@ -1820,7 +1839,8 @@ WHERE  id = %1
    * @param int $id
    * @param null $condition
    *
-   * @return array - array reference of all Option Group Name
+   * @return array
+   *   array reference of all Option Group Name
    */
   public static function accountOptionValues($optionGroupName, $id = NULL, $condition = NULL) {
     $cacheKey = $optionGroupName . '_' . $condition;
@@ -1841,7 +1861,8 @@ WHERE  id = %1
    *   Whether to forcibly reload extensions list from canonical store.
    * @static
    *
-   * @return array - array(array('prefix' => $, 'file' => $))
+   * @return array
+   *   array(array('prefix' => $, 'file' => $))
    */
   public static function getModuleExtensions($fresh = FALSE) {
     return CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles($fresh);
@@ -1855,7 +1876,8 @@ WHERE  id = %1
    *
    * @static
    *
-   * @return array - array list of tax rates with the financial type
+   * @return array
+   *   array list of tax rates with the financial type
    */
   public static function getTaxRates() {
     if (!self::$taxRates) {

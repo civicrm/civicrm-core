@@ -61,7 +61,6 @@ class CRM_Core_ClassLoader {
   protected $_registered;
 
   /**
-   *
    */
   protected function __construct() {
     $this->_registered = FALSE;

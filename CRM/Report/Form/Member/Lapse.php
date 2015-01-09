@@ -45,10 +45,8 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
   public $_drilldownReport = array('member/detail' => 'Link to Detail Report');
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
 

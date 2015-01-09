@@ -62,7 +62,8 @@ class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
    *   <p>.
    * An offset to check for.
    * </p>
-   * @return boolean true on success or false on failure.
+   * @return boolean
+   *   true on success or false on failure.
    * </p>
    * <p>
    * The return value will be casted to boolean if non-boolean was returned.
@@ -132,7 +133,8 @@ class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
    * (PHP 5 &gt;= 5.1.0)<br/>
    * Count elements of an object
    * @link http://php.net/manual/en/countable.count.php
-   * @return int The custom count as an integer.
+   * @return int
+   *   The custom count as an integer.
    * </p>
    * <p>
    * The return value is cast to an integer.

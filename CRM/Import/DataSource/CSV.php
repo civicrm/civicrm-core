@@ -39,9 +39,8 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   /**
    * Provides information about the data source
    *
-   * @return array collection of info about this data source
-   *
-   *
+   * @return array
+   *   collection of info about this data source
    */
   public function getInfo() {
     return array('title' => ts('Comma-Separated Values (CSV)'));
@@ -49,7 +48,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
 
   /**
    * Set variables up before form is built
-   *
    */
   public function preProcess(&$form) {
   }
@@ -61,7 +59,8 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    *
    * @param CRM_Core_Form $form
    *
-   * @return void (operates directly on form argument)
+   * @return void
+   *   (operates directly on form argument)
    */
   public function buildQuickForm(&$form) {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_CSV');
@@ -82,7 +81,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
 
   /**
    * Process the form submission
-   *
    */
   public function postProcess(&$params, &$db, &$form) {
     $file = $params['uploadFile']['name'];
@@ -114,7 +112,8 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * @param string $fieldSeparator
    *   Character that seperates the various columns in the file.
    *
-   * @return string  name of the created table
+   * @return string
+   *   name of the created table
    */
   private static function _CsvToTable(
     &$db,

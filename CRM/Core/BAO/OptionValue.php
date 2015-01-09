@@ -151,7 +151,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -251,7 +252,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param int $activityTypeId
    *   Activity type id.
    *
-   * @return array  label and description
+   * @return array
+   *   label and description
    * @static
    */
   public static function getActivityTypeDetails($activityTypeId) {
@@ -274,10 +276,10 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param int $id
    *   Id of Option Value.
    *
-   * @return string title
+   * @return string
+   *   title
    *
    * @static
-   *
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $id, 'label');
@@ -449,7 +451,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param int $optionGroupID
    *   The option group for which we want the values from.
    *
-   * @return array an array of array of values for this option group
+   * @return array
+   *   an array of array of values for this option group
    * @static
    */
   public static function getOptionValuesArray($optionGroupID) {
@@ -482,7 +485,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param int $optionGroupID
    *   The option group for which we want the values from.
    *
-   * @return array an associative array of label, value pairs
+   * @return array
+   *   an associative array of label, value pairs
    * @static
    */
   public static function getOptionValuesAssocArray($optionGroupID) {
@@ -501,7 +505,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param string $optionGroupName
    *   The option group name for which we want the values from.
    *
-   * @return array an associative array of label, value pairs
+   * @return array
+   *   an associative array of label, value pairs
    * @static
    */
   public static function getOptionValuesAssocArrayFromName($optionGroupName) {

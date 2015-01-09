@@ -157,7 +157,8 @@ UPDATE civicrm_log
    *
    * @param int $contactID
    *
-   * @return int count of log records
+   * @return int
+   *   count of log records
    * @static
    */
   public static function getContactLogCount($contactID) {
@@ -170,7 +171,8 @@ UPDATE civicrm_log
    * Function for find out whether to use logging schema entries for contact
    * summary, instead of normal log entries.
    *
-   * @return int report id of Contact Logging Report (Summary) / false
+   * @return int
+   *   report id of Contact Logging Report (Summary) / false
    * @static
    */
   public static function useLoggingReport() {

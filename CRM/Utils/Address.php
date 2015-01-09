@@ -51,7 +51,8 @@ class CRM_Utils_Address {
    *
    * @param null $tokenFields
    *
-   * @return string  formatted address string
+   * @return string
+   *   formatted address string
    *
    * @static
    */

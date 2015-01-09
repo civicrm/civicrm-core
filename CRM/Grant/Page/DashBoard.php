@@ -43,7 +43,6 @@ class CRM_Grant_Page_DashBoard extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   *
    */
   public function preProcess() {
     $admin = CRM_Core_Permission::check('administer CiviCRM');

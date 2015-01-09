@@ -86,7 +86,6 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
    */
   public function tearDown() {
     $tablesToTruncate = array('civicrm_membership', 'civicrm_membership_log', 'civicrm_contribution', 'civicrm_membership_payment');

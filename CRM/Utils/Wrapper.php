@@ -43,7 +43,6 @@ class CRM_Utils_Wrapper {
    * Simple Controller
    *
    * The controller which will handle the display and processing of this page.
-   *
    */
   protected $_controller;
 
@@ -59,7 +58,7 @@ class CRM_Utils_Wrapper {
    * @param bool addSequence should we add a unique sequence number to the end of the key
    * @param bool ignoreKey should we not set a qfKey for this controller (for standalone forms)
    *
-   * @return void.
+   * @return void
    */
   public function run($formName, $formLabel = NULL, $arguments = NULL) {
     if (is_array($arguments)) {

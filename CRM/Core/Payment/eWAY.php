@@ -412,7 +412,8 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    * @param int $invoiceId
    *   The ID to check.
    *
-   * @return bool                 True if ID exists, else false
+   * @return bool
+   *   True if ID exists, else false
    */
   public function _checkDupe($invoiceId) {
     $contribution = new CRM_Contribute_DAO_Contribution();

@@ -40,7 +40,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   /**
    * Maximum profile fields that will be displayed
-   *
    */
   protected $_rowCount = 1;
 
@@ -268,7 +267,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @param array $self
    *   Form object.
    *
-   * @return array list of errors to be posted back to the form
+   * @return array
+   *   list of errors to be posted back to the form
    * @static
    */
   public static function formRule($params, $files, $self) {

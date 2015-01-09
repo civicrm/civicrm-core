@@ -47,7 +47,8 @@ class CRM_Pledge_BAO_PledgePayment extends CRM_Pledge_DAO_PledgePayment {
    * @param int $pledgeId
    *   Pledge id.
    *
-   * @return array associated array of pledge payment details
+   * @return array
+   *   associated array of pledge payment details
    * @static
    */
   public static function getPledgePayments($pledgeId) {
@@ -229,7 +230,8 @@ WHERE     pledge_id = %1
    *
    * @param int $id
    *
-   * @return int pledge payment id
+   * @return int
+   *   pledge payment id
    * @static
    */
   public static function del($id) {
@@ -259,7 +261,6 @@ WHERE     pledge_id = %1
    *
    * @return bool
    * @static
-   *
    */
   public static function deletePayments($id) {
     if (!CRM_Utils_Rule::positiveInteger($id)) {
@@ -341,7 +342,8 @@ WHERE     pledge_id = %1
    * @param bool $isScriptUpdate
    *   , is function being called from bin script?.
    *
-   * @return int $newStatus, updated status id (or 0)
+   * @return int
+   *   $newStatus, updated status id (or 0)
    */
   static function updatePledgePaymentStatus(
     $pledgeID,
@@ -516,7 +518,8 @@ WHERE  civicrm_pledge.id = %2
    *
    * @param array $params
    *
-   * @return array $newdate Next scheduled date as an array
+   * @return array
+   *   Next scheduled date as an array
    * @static
    */
   public static function calculateBaseScheduleDate(&$params) {
@@ -561,7 +564,6 @@ WHERE  civicrm_pledge.id = %2
    * be equal to basePaymentDate normalised to fit the 'pledge pattern' + number of installments
    *
    * @return formatted date
-   *
    */
   public static function calculateNextScheduledDate(&$params, $paymentNo, $basePaymentDate = NULL) {
     if (!$basePaymentDate) {
@@ -582,7 +584,8 @@ WHERE  civicrm_pledge.id = %2
    * @param int $pledgeId
    *   Pledge id.
    *
-   * @return int $statusId calculated status id of pledge
+   * @return int
+   *   $statusId calculated status id of pledge
    * @static
    */
   public static function calculatePledgeStatus($pledgeId) {
@@ -694,7 +697,8 @@ WHERE  civicrm_pledge_payment.id = {$paymentId}
    *
    * @param int $limit
    *
-   * @return array associated array of pledge details
+   * @return array
+   *   associated array of pledge details
    * @static
    */
   public static function getOldestPledgePayment($pledgeID, $limit = 1) {

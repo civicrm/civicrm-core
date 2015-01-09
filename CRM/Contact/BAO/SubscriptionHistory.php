@@ -43,7 +43,6 @@ class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHi
    * @return \CRM_Contact_DAO_SubscriptionHistory
    */
   /**
-   *
    */
   public function __construct() {
     parent::__construct();
@@ -55,7 +54,8 @@ class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHi
    * @param array $params
    *   Values for the new history record.
    *
-   * @return object $history  The new history object
+   * @return object
+   *   $history  The new history object
    * @static
    */
   public static function &create(&$params) {

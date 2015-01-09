@@ -166,7 +166,8 @@ class CRM_Core_ShowHideBlocks {
    * @param string $text
    * @param string $js
    *
-   * @return string      the formatted html link
+   * @return string
+   *   the formatted html link
    */
   public static function linkHtml($name, $href, $text, $js) {
     return '<a name="' . $name . '" id="' . $name . '" href="' . $href . '" ' . $js . ">$text</a>";

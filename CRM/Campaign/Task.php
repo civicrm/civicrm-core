@@ -62,7 +62,8 @@ class CRM_Campaign_Task {
    * These tasks are the core set of tasks that the user can perform
    * on a voter / group of voters
    *
-   * @return array the set of tasks for a group of voters.
+   * @return array
+   *   the set of tasks for a group of voters.
    * @static
    */
   public static function &tasks() {
@@ -109,7 +110,8 @@ class CRM_Campaign_Task {
    * These tasks are the core set of task titles
    * on voters.
    *
-   * @return array the set of task titles
+   * @return array
+   *   the set of task titles
    * @static
    */
   public static function &taskTitles() {
@@ -128,7 +130,8 @@ class CRM_Campaign_Task {
    *
    * @param int $permission
    *
-   * @return array set of tasks that are valid for the user
+   * @return array
+   *   set of tasks that are valid for the user
    */
   public static function &permissionedTaskTitles($permission) {
     $tasks = self::taskTitles();
@@ -142,7 +145,8 @@ class CRM_Campaign_Task {
    *
    * @param int $value
    *
-   * @return array the set of tasks for a group of voters.
+   * @return array
+   *   the set of tasks for a group of voters.
    * @static
    */
   public static function getTask($value) {

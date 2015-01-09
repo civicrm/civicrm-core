@@ -34,7 +34,6 @@
  */
 class CRM_Utils_Migrate_Import {
   /**
-   *
    */
   public function __construct() {
   }

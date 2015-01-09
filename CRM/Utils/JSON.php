@@ -58,7 +58,8 @@ class CRM_Utils_JSON {
    * @param string $identifier
    *   Identifier for the JSON array.
    *
-   * @return string $jsonObject JSON array
+   * @return string
+   *   JSON array
    * @static
    */
   public static function encode($params, $identifier = 'id') {
@@ -133,7 +134,6 @@ class CRM_Utils_JSON {
    * @param array $selectorElements
    *   Selector elements.
    * @return string
-   *
    */
   public static function encodeDataTableSelector($params, $sEcho, $iTotal, $iFilteredTotal, $selectorElements) {
     $sOutput = '{';

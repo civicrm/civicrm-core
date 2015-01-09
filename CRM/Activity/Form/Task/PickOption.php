@@ -47,19 +47,16 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
 
   /**
    * Maximum Activities that should be allowed to update
-   *
    */
   protected $_maxActivities = 100;
 
   /**
    * Variable to store redirect path
-   *
    */
   protected $_userContext;
 
   /**
    * Variable to store contact Ids
-   *
    */
   public $_contacts;
 
@@ -121,7 +118,8 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @return array list of errors to be posted back to the form
+   * @return array
+   *   list of errors to be posted back to the form
    * @static
    */
   public static function formRule($fields) {

@@ -1121,7 +1121,8 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
  *
  * @param <type> $params
  *
- * @return array <type>
+ * @return array
+   *   <type>
  */
 function _civicrm_api3_deprecated_duplicate_formatted_contact($params) {
   $id = CRM_Utils_Array::value('id', $params);
@@ -1303,7 +1304,8 @@ function _civicrm_api3_deprecated_participant_check_params($params, $checkDuplic
  * @param string $csType
  *   Contact subtype if exists/passed.
  *
- * @return null on success, error message otherwise
+ * @return null
+   *   on success, error message otherwise
  */
 function _civicrm_api3_deprecated_contact_check_custom_params($params, $csType = NULL) {
   empty($csType) ? $onlyParent = TRUE : $onlyParent = FALSE;
@@ -1474,7 +1476,8 @@ function _civicrm_api3_deprecated_contact_check_params(
  * @param $result
  * @param int $activityTypeID
  *
- * @return array <type> $params
+ * @return array
+   *   <type> $params
  */
 function _civicrm_api3_deprecated_activity_buildmailparams($result, $activityTypeID) {
   // get ready for collecting data about activity to be created

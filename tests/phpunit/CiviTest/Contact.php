@@ -10,7 +10,8 @@ class Contact extends CiviUnitTestCase {
    *
    * @param array $params
    *
-   * @return int $contactID id of created contact
+   * @return int
+   *   $contactID id of created contact
    */
   public static function create($params) {
     require_once "CRM/Contact/BAO/Contact.php";
@@ -23,7 +24,8 @@ class Contact extends CiviUnitTestCase {
    * a contact of type Individual
    *
    * @param array $params
-   * @return int $contactID id of created Individual
+   * @return int
+   *   $contactID id of created Individual
    */
   public static function createIndividual($params = NULL) {
     //compose the params, when not passed
@@ -87,7 +89,8 @@ class Contact extends CiviUnitTestCase {
    *
    * @param int $contactID
    *   Id of the contact to delete.
-   * @return boolean true if contact deleted, false otherwise
+   * @return boolean
+   *   true if contact deleted, false otherwise
    */
   public static function delete($contactID) {
     require_once 'CRM/Contact/BAO/Contact.php';

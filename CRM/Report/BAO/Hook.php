@@ -49,7 +49,6 @@ class CRM_Report_BAO_Hook {
    *
    * @return object
    * @static
-   *
    */
   public static function singleton() {
     static $singleton = NULL;
@@ -62,7 +61,8 @@ class CRM_Report_BAO_Hook {
  /**
   * Get or build the list of search objects (via hook)
   *
-  * @return array of CRM_Report_BAO_Hook_Interface objects
+  * @return array
+   *   of CRM_Report_BAO_Hook_Interface objects
   */
   public function getSearchQueryObjects() {
     if ($this->_queryObjects === NULL) {

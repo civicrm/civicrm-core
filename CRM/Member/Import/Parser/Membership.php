@@ -124,7 +124,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
+   * @return boolean
+   *   the result of this processing
    */
   public function preview(&$values) {
     return $this->summary($values);
@@ -136,7 +137,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
+   * @return boolean
+   *   the result of this processing
    */
   public function summary(&$values) {
     $erroneousField = NULL;
@@ -252,7 +254,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
+   * @return boolean
+   *   the result of this processing
    */
   public function import($onDuplicate, &$values) {
     try {
@@ -591,8 +594,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    *
    * @param $formatted
    *
-   * @return Array formatted containing date values
-   *
+   * @return Array
+   *   formatted containing date values
    */
   public function formattedDates($calcDates, &$formatted) {
     $dates = array(
