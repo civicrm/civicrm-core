@@ -168,7 +168,8 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
 
   /**
    * Get PaymentExpress IPN for a single transaction
-   * @return array array representing a Paypal IPN POST
+   * @return array
+   *   array representing a Paypal IPN POST
    */
   public function getPaypalExpressTransactionIPN() {
     return array(
@@ -217,7 +218,8 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
 
   /**
    * Get IPN results from follow on IPN transactions
-   * @return array array representing a Paypal IPN POST
+   * @return array
+   *   array representing a Paypal IPN POST
    */
   public function getSubsequentPaypalExpressTransaction() {
     return array(
@@ -273,7 +275,6 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     );
   }
   /**
-   *
    */
   public function getPaypalProRecurTransaction() {
     return array(

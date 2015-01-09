@@ -202,7 +202,6 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
    * Perform actions and display for user dashboard
    *
    * @return void
-   *
    */
   public function run() {
     $this->preProcess();
@@ -213,7 +212,8 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   /**
    * Get action links
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    * @static
    */
   static

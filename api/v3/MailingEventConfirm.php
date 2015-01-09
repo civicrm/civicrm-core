@@ -45,7 +45,8 @@
  *                       name/value pairs to insert in new 'survey'
  *
  * @throws Exception
- * @return array api result array
+ * @return array
+   *   api result array
  * {@getfields mailing_event_confirm_create}
  * @access public
  */

@@ -54,7 +54,6 @@ abstract class CRM_Core_Payment {
    * direct debit
    * or both
    * @todo create option group - nb omnipay uses a 3rd type - transparent redirect cc
-   *
    */
   const
     PAYMENT_TYPE_CREDIT_CARD = 1,
@@ -63,7 +62,6 @@ abstract class CRM_Core_Payment {
   /**
    * Subscription / Recurring payment Status
    * START, END
-   *
    */
   const
     RECURRING_PAYMENT_START = 'START',
@@ -178,7 +176,6 @@ abstract class CRM_Core_Payment {
    * Setter for the payment form that wants to use the processor
    * @deprecated
    * @param CRM_Core_Form $paymentForm
-   *
    */
   public function setForm(&$paymentForm) {
     $this->_paymentForm = $paymentForm;
@@ -267,7 +264,8 @@ abstract class CRM_Core_Payment {
    * Return an array of all the details about the fields potentially required for payment fields
    * Only those determined by getPaymentFormFields will actually be assigned to the form
    *
-   * @return array field metadata
+   * @return array
+   *   field metadata
    */
   public function getPaymentFormFieldsMetadata() {
     //@todo convert credit card type into an option value
@@ -402,7 +400,8 @@ abstract class CRM_Core_Payment {
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    *
-   * @return array the result in an nice formatted array (or an error object)
+   * @return array
+   *   the result in an nice formatted array (or an error object)
    * @abstract
    */
   abstract function doDirectPayment(&$params);
@@ -415,7 +414,8 @@ abstract class CRM_Core_Payment {
    *
    * @param $component
    *
-   * @return array $params (modified)
+   * @return array
+   *   (modified)
    * @throws CRM_Core_Exception
    */
   public function doPayment(&$params, $component) {
@@ -435,7 +435,8 @@ abstract class CRM_Core_Payment {
   /**
    * This function checks to see if we have the right config values
    *
-   * @return string the error message if any
+   * @return string
+   *   the error message if any
    */
   abstract function checkConfig();
 

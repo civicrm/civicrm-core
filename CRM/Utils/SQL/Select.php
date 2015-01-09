@@ -188,7 +188,8 @@ class CRM_Utils_SQL_Select {
    * PHP NULL's will be treated as SQL NULL's. The PHP string "null" will be treated as a string.
    *
    * @throws CRM_Core_Exception
-   * @return string SQL expression
+   * @return string
+   *   SQL expression
    */
   public function interpolate($expr, $args) {
     if ($args === NULL) {
@@ -226,14 +227,16 @@ class CRM_Utils_SQL_Select {
 
   /**
    * @param string|NULL $value
-   * @return string SQL expression, e.g. "it\'s great" (with-quotes) or NULL (without-quotes)
+   * @return string
+   *   SQL expression, e.g. "it\'s great" (with-quotes) or NULL (without-quotes)
    */
   protected function escapeString($value) {
     return $value === NULL ? 'NULL' : '"' . CRM_Core_DAO::escapeString($value) . '"';
   }
 
   /**
-   * @return string SQL statement
+   * @return string
+   *   SQL statement
    */
   public function toSQL() {
     if ($this->selects) {

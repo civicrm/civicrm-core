@@ -520,7 +520,6 @@ ORDER BY sort_name ";
 
   /**
    * Delete custom value
-   *
    */
   public static function deleteCustomValue() {
     $customValueID = CRM_Utils_Type::escape($_REQUEST['valueID'], 'Positive');
@@ -539,7 +538,6 @@ ORDER BY sort_name ";
 
   /**
    * Perform enable / disable actions on record.
-   *
    */
   public static function enableDisable() {
     $op        = CRM_Utils_Type::escape($_REQUEST['op'], 'String');
@@ -583,7 +581,6 @@ ORDER BY sort_name ";
 
   /**
    *  check the CMS username
-   *
    */
   static public function checkUserName() {
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), array('for', 'ts'));
@@ -897,7 +894,6 @@ LIMIT {$offset}, {$rowCount}
 
   /**
    * Process dupes.
-   *
    */
   public static function processDupes() {
     $oper = CRM_Utils_Type::escape($_REQUEST['op'], 'String');

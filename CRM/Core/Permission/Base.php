@@ -73,7 +73,8 @@ class CRM_Core_Permission_Base {
   /**
    * Get the current permission of this user
    *
-   * @return string the permission of the user (edit or view or null)
+   * @return string
+   *   the permission of the user (edit or view or null)
    */
   public function getPermission() {
     return CRM_Core_Permission::EDIT;
@@ -89,7 +90,8 @@ class CRM_Core_Permission_Base {
    * @param array $whereTables
    *   (reference ) add the tables that are needed for the where clause.
    *
-   * @return string the group where clause for this user
+   * @return string
+   *   the group where clause for this user
    */
   public function whereClause($type, &$tables, &$whereTables) {
     return '( 1 )';
@@ -104,7 +106,8 @@ class CRM_Core_Permission_Base {
    * @param array $whereTables
    *   (reference ) add the tables that are needed for the where clause.
    *
-   * @return string the group where clause for this user
+   * @return string
+   *   the group where clause for this user
    */
   public function getPermissionedStaticGroupClause($type, &$tables, &$whereTables) {
     $this->group();
@@ -120,7 +123,8 @@ class CRM_Core_Permission_Base {
    * @param bool|\boolen $excludeHidden exclude hidden groups.
    *
    *
-   * @return array - array reference of all groups.
+   * @return array
+   *   array reference of all groups.
    */
   public function group($groupType = NULL, $excludeHidden = TRUE) {
     return CRM_Core_PseudoConstant::allGroup($groupType, $excludeHidden);
@@ -136,7 +140,8 @@ class CRM_Core_Permission_Base {
    * @param array $whereTables
    *   (reference ) add the tables that are needed for the where clause.
    *
-   * @return string the group where clause for this user
+   * @return string
+   *   the group where clause for this user
    */
   public function groupClause($type, &$tables, &$whereTables) {
     return ' (1) ';
@@ -148,7 +153,8 @@ class CRM_Core_Permission_Base {
    * @param string $str
    *   The permission to check.
    *
-   * @return boolean true if yes, else false
+   * @return boolean
+   *   true if yes, else false
    */
 
   public function check($str) {
@@ -161,7 +167,8 @@ class CRM_Core_Permission_Base {
    * @param array $array
    *   The roles to check.
    *
-   * @return boolean true if yes, else false
+   * @return boolean
+   *   true if yes, else false
    */
 
   public function checkGroupRole($array) {
@@ -174,7 +181,8 @@ class CRM_Core_Permission_Base {
    * @param string $permissionName
    *   Name of the permission we are interested in.
    *
-   * @return string a comma separated list of email addresses
+   * @return string
+   *   a comma separated list of email addresses
    */
   public function permissionEmails($permissionName) {
     CRM_Core_Error::fatal("this function only works in Drupal 6 at the moment");
@@ -186,7 +194,8 @@ class CRM_Core_Permission_Base {
    * @param string $roleName
    *   Name of the role we are interested in.
    *
-   * @return string a comma separated list of email addresses
+   * @return string
+   *   a comma separated list of email addresses
    */
   public function roleEmails($roleName) {
     CRM_Core_Error::fatal("this function only works in Drupal 6 at the moment");
@@ -228,7 +237,8 @@ class CRM_Core_Permission_Base {
    *
    * @param $module
    *
-   * @return Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
+   * @return Array
+   *   of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    * @see CRM_Core_Permission::getCorePermissions
    */
   public static function getModulePermissions($module) {
@@ -246,7 +256,8 @@ class CRM_Core_Permission_Base {
    * Get the permissions defined in the hook_civicrm_permission implementation
    * in all enabled CiviCRM module extensions.
    *
-   * @return Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
+   * @return Array
+   *   of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */
   public function getAllModulePermissions() {
     $permissions = array();

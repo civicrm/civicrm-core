@@ -299,7 +299,6 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   }
 
   /**
-   *
    */
   public function testGetWithCustom() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
@@ -320,7 +319,6 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   }
 
   /**
-   *
    */
   public function testCreateAddressPrimaryHandlingChangeToPrimary() {
     $params = $this->_params;
@@ -337,7 +335,6 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   }
 
   /**
-   *
    */
   public function testCreateAddressPrimaryHandlingChangeExisting() {
     $address1 = $this->callAPISuccess('address', 'create', $this->_params);

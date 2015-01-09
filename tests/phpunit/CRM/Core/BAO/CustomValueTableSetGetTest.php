@@ -113,7 +113,6 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
 
   /**
    * Test setValues() and getValues() methods with custom field YesNo(Boolean) Radio
-   *
    */
   public function testSetGetValuesYesNoRadio() {
     $params = array();

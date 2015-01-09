@@ -182,7 +182,6 @@ class CRM_Case_Audit_Audit {
    *
    * This is intended to be called as a sort callback function, returning whether an activity's date is earlier or later than another's.
    * The type of date to use is specified in the config.
-   *
    */
 
   /**

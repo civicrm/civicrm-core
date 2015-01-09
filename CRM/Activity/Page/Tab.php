@@ -43,7 +43,6 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
    * Browse all activities for a particular contact
    *
    * @return void
-   *
    */
   public function browse() {
     $this->assign('admin', FALSE);
@@ -121,7 +120,6 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   *
    */
   public function preProcess() {
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
@@ -162,7 +160,6 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
    * Perform actions and display for activities.
    *
    * @return void
-   *
    */
   public function run() {
     $context   = CRM_Utils_Request::retrieve('context', 'String', $this);

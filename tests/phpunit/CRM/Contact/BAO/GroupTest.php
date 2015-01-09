@@ -38,7 +38,6 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
-   *
    */
   protected function setUp() {
     parent::setUp();
@@ -47,7 +46,6 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
    */
   protected function tearDown() {
     $this->quickCleanup(array('civicrm_mapping_field', 'civicrm_mapping', 'civicrm_group', 'civicrm_saved_search'));

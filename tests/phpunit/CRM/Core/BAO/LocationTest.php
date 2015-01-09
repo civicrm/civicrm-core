@@ -50,7 +50,6 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
    */
   public function tearDown() {
     $tablesToTruncate = array(
@@ -358,7 +357,6 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
    * DeleteLocBlock() method
    * delete the location block
    * created with various elements.
-   *
    */
   public function testDeleteLocBlock() {
     $this->_contactId = Contact::createIndividual();

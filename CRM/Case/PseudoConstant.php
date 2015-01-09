@@ -83,7 +83,8 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param null $condition
    * @param bool $fresh
    *
-   * @return array - array reference of all case statues
+   * @return array
+   *   array reference of all case statues
    * @static
    */
   public static function caseStatus($column = 'label', $onlyActive = TRUE, $condition = NULL, $fresh = FALSE) {
@@ -108,7 +109,8 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param null $filter
    *
-   * @return array - array reference of all redaction rules
+   * @return array
+   *   array reference of all redaction rules
    * @static
    */
 
@@ -138,7 +140,8 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param string $column
    * @param bool $onlyActive
    *
-   * @return array - array reference of all case type
+   * @return array
+   *   array reference of all case type
    * @static
    */
   public static function caseType($column = 'title', $onlyActive = TRUE) {
@@ -171,7 +174,8 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param string $column
    * @param bool $onlyActive
    *
-   * @return array - array reference of all Encounter Medium.
+   * @return array
+   *   array reference of all Encounter Medium.
    * @static
    */
   public static function encounterMedium($column = 'label', $onlyActive = TRUE) {
@@ -199,7 +203,8 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @static
    *
-   * @return array - array reference of all activity types.
+   * @return array
+   *   array reference of all activity types.
    */
   public static function &caseActivityType($indexName = TRUE, $all = FALSE) {
     $cache = (int) $indexName . '_' . (int) $all;

@@ -114,7 +114,8 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
   }
 
   /**
-   * @return array (localVersion, versionInfo, expectedResult)
+   * @return array
+   *   (localVersion, versionInfo, expectedResult)
    */
   public function newerVersionDataProvider() {
     $data = array();
@@ -150,7 +151,8 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
   }
 
   /**
-   * @return array (localVersion, versionInfo, expectedResult)
+   * @return array
+   *   (localVersion, versionInfo, expectedResult)
    */
   public function securityUpdateDataProvider() {
     $data = array();

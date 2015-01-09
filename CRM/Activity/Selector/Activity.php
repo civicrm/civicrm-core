@@ -288,7 +288,6 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    *
    * @param $action
    * @param array $params
-   *
    */
   public function getPagerParams($action, &$params) {
     $params['status']    = ts('Activities %%StatusMessage%%');
@@ -308,7 +307,8 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    * @param enum $output
    *   What should the result set include (web/email/csv).
    *
-   * @return array the column headers that need to be displayed
+   * @return array
+   *   the column headers that need to be displayed
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     if ($output == CRM_Core_Selector_Controller::EXPORT || $output == CRM_Core_Selector_Controller::SCREEN) {
@@ -333,7 +333,8 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    *
    * @param null $case
    *
-   * @return int Total number of rows
+   * @return int
+   *   Total number of rows
    */
   public function getTotalCount($action, $case = NULL) {
     $params = array(
@@ -365,7 +366,8 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    *
    * @param null $case
    *
-   * @return int   the total number of rows for this action
+   * @return int
+   *   the total number of rows for this action
    */
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL, $case = NULL) {
     $params = array(
@@ -486,7 +488,8 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    * @param string $output
    *   Type of output.
    *
-   * @return string name of the file
+   * @return string
+   *   name of the file
    */
   public function getExportFileName($output = 'csv') {
     return ts('CiviCRM Activity');
@@ -496,7 +499,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    * Get colunmn headers for search selector
    *
    *
-   * @return array $_columnHeaders
+   * @return array
    */
   private static function &_getColumnHeaders() {
     if (!isset(self::$_columnHeaders)) {

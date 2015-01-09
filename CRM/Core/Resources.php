@@ -295,7 +295,8 @@ class CRM_Core_Resources {
   /**
    * @param array $settings
    * @param array $additions
-   * @return array combination of $settings and $additions
+   * @return array
+   *   combination of $settings and $additions
    */
   protected function mergeSettings($settings, $additions) {
     foreach ($additions as $k => $v) {
@@ -613,7 +614,8 @@ class CRM_Core_Resources {
   /**
    * Create dynamic script for localizing js widgets
    *
-   * @return string javascript content
+   * @return string
+   *   javascript content
    */
   public static function outputLocalizationJS() {
     CRM_Core_Page_AJAX::setJsHeaders();
@@ -716,7 +718,8 @@ class CRM_Core_Resources {
   }
 
   /**
-   * @return bool - is this page request an ajax snippet?
+   * @return bool
+   *   is this page request an ajax snippet?
    */
   public static function isAjaxMode() {
     return in_array(CRM_Utils_Array::value('snippet', $_REQUEST), array(CRM_Core_Smarty::PRINT_SNIPPET, CRM_Core_Smarty::PRINT_NOFORM, CRM_Core_Smarty::PRINT_JSON));

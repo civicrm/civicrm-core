@@ -59,7 +59,6 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
    * Add a few specific things to view contact
    *
    * @return void
-   *
    */
   public function preProcess() {
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);

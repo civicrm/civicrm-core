@@ -43,7 +43,8 @@
  * @param array $params
  *   An associative array of name/value property values of civicrm_membership_block.
  *
- * @return array $result newly created or updated membership type property values.
+ * @return array
+   *   newly created or updated membership type property values.
  * @access public
  * {getfields MembershipBlock_get}
  */
@@ -73,7 +74,8 @@ function _civicrm_api3_membership_block_create_spec(&$params) {
  *   An associative array of name/value property values of civicrm_membership_block.
  * {getfields MembershipBlock_get}
  *
- * @return array api result array of all found membership block property values.
+ * @return array
+   *   api result array of all found membership block property values.
  * @access public
  */
 function civicrm_api3_membership_block_get($params) {
@@ -88,7 +90,8 @@ function civicrm_api3_membership_block_get($params) {
  *
  * @param array $params
  *
- * @return array api result array
+ * @return array
+   *   api result array
  * @access public
  * {getfields MembershipBlock_delete}
  */

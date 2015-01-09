@@ -38,7 +38,6 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
-   *
    */
   protected function setUp() {
     parent::setUp();
@@ -131,7 +130,6 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
 
   /**
    * Build params
-   *
    */
   private function pcpBlockParams() {
     $contribPage        = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');
@@ -156,7 +154,6 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
 
   /**
    * Build params
-   *
    */
   private function pcpParams() {
     $contact       = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
@@ -184,7 +181,6 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
    */
   protected function tearDown() {
   }

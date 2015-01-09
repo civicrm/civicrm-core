@@ -313,7 +313,8 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
    * @param bool $is_distinct
    *   Group by queue ID?.
    *
-   * @return int                  Number of rows in result set
+   * @return int
+   *   Number of rows in result set
    * @static
    */
   public static function getTotalCount(
@@ -373,7 +374,8 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
    * @param array $sort
    *   Sort array.
    *
-   * @return array                Result set
+   * @return array
+   *   Result set
    * @static
    */
   public static function &getRows(

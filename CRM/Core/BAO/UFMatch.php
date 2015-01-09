@@ -496,7 +496,8 @@ AND    domain_id    = %4
    * @param int $ufID
    *   Id of UF for which related contact_id is required.
    *
-   * @return int    contact_id on success, null otherwise
+   * @return int
+   *   contact_id on success, null otherwise
    * @static
    */
   public static function getContactId($ufID) {
@@ -520,7 +521,8 @@ AND    domain_id    = %4
    * @param int $contactID
    *   ID of the contact for which related uf_id is required.
    *
-   * @return int    uf_id of the given contact_id on success, null otherwise
+   * @return int
+   *   uf_id of the given contact_id on success, null otherwise
    * @static
    */
   public static function getUFId($contactID) {
@@ -550,7 +552,8 @@ AND    domain_id    = %4
    * Get the list of contact_id
    *
    *
-   * @return int    contact_id on success, null otherwise
+   * @return int
+   *   contact_id on success, null otherwise
    * @static
    */
   public static function getContactIDs() {
@@ -569,7 +572,8 @@ AND    domain_id    = %4
    *
    * @param int $openId
    *
-   * @return bool     true if allowed to login, false otherwise
+   * @return bool
+   *   true if allowed to login, false otherwise
    * @static
    */
   public static function getAllowedToLogin($openId) {
@@ -587,7 +591,8 @@ AND    domain_id    = %4
    * have id's (it uses OpenIDs, which go in a different field)
    *
    *
-   * @return int     next highest unused value for uf_id
+   * @return int
+   *   next highest unused value for uf_id
    * @static
    */
   public static function getNextUfIdValue() {

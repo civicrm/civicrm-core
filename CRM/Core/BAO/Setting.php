@@ -79,7 +79,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param int $domainID
    * @param bool $force
    *
-   * @return boolean true if item is already in cache
+   * @return boolean
+   *   true if item is already in cache
    * @static
    */
   static function inCache(
@@ -529,7 +530,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param bool $createMode
    *
    * @throws api_Exception
-   * @return array $fieldstoset name => value array of the fields to be set (with extraneous removed)
+   * @return array
+   *   name => value array of the fields to be set (with extraneous removed)
    */
   public static function validateSettingsInput($params, &$fields, $createMode = TRUE) {
     $group = CRM_Utils_Array::value('group', $params);
@@ -635,7 +637,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param int $domainID
    * @param null $profile
    *
-   * @return array $result - the following information as appropriate for each setting
+   * @return array
+   *   the following information as appropriate for each setting
    * - name
    * - type
    * - default

@@ -56,7 +56,8 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
   /**
    * Get BAO Name
    *
-   * @return string Classname of BAO.
+   * @return string
+   *   Classname of BAO.
    */
   public function getBAOName() {
     return 'CRM_Financial_BAO_FinancialTypeAccount';
@@ -65,7 +66,8 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
   /**
    * Get action Links
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
   public function &links() {
     if (!(self::$_links)) {
@@ -95,7 +97,6 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   *
    */
   public function run() {
     // get the requested action

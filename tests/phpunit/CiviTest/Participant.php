@@ -34,7 +34,8 @@ class Participant extends PHPUnit_Framework_Testcase {
    * Helper function to delete a participant
    *
    * @param int $participantId
-   * @return boolean true if participant deleted, false otherwise
+   * @return boolean
+   *   true if participant deleted, false otherwise
    */
   public static function delete($participantId) {
     require_once 'CRM/Event/BAO/Participant.php';

@@ -70,7 +70,6 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    * This method returns the links that are given for each search row.
    *
    * @return array
-   *
    */
   public static function &links() {
     return self::$_links;
@@ -81,7 +80,6 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    *
    * @param $action
    * @param array $params
-   *
    */
   public function getPagerParams($action, &$params) {
     $params['csvString'] = NULL;
@@ -100,7 +98,8 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    * @param enum $output
    *   What should the result set include (web/email/csv).
    *
-   * @return array the column headers that need to be displayed
+   * @return array
+   *   the column headers that need to be displayed
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
@@ -185,7 +184,8 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    *
    * @param
    *
-   * @return int Total number of rows
+   * @return int
+   *   Total number of rows
    */
   public function getTotalCount($action) {
     $job        = CRM_Mailing_BAO_MailingJob::getTableName();
@@ -222,7 +222,8 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
    * @param enum $output
    *   What should the result set include (web/email/csv).
    *
-   * @return int   the total number of rows for this action
+   * @return int
+   *   the total number of rows for this action
    */
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     static $actionLinks = NULL;
@@ -424,7 +425,8 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
    * @param string $output
    *   Type of output.
    *
-   * @return string name of the file
+   * @return string
+   *   name of the file
    */
   public function getExportFileName($output = 'csv') {
     return ts('CiviMail Mailings');

@@ -218,7 +218,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Register all the standard rules that most forms potentially use
    *
    * @return void
-   *
    */
   public function registerRules() {
     static $rules = array(
@@ -301,7 +300,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    *
    * @return void
-   *
    */
   public function preProcess() {
   }
@@ -316,7 +314,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    *
    * @return void
-   *
    */
   public function postProcess() {
   }
@@ -348,7 +345,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * case it needs to call this function so other modules can do the needful
    * Calling this function directly should be avoided if possible. In general a
    * better way is to do setUserContext so the framework does the redirect
-   *
    */
   public function postProcessHook() {
     CRM_Utils_Hook::postProcess(get_class($this), $this);
@@ -361,7 +357,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    *
    * @return void
-   *
    */
   public function buildQuickForm() {
   }
@@ -372,8 +367,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * access        public
    *
-   * @return array reference to the array of default values
-   *
+   * @return array
+   *   reference to the array of default values
    */
   public function setDefaultValues() {
   }
@@ -385,7 +380,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    *
    * @return void
-   *
    */
   public function addRules() {
   }
@@ -393,7 +387,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Performs the server side validation
    * @since     1.0
-   * @return boolean   true if no error found
+   * @return boolean
+   *   true if no error found
    * @throws    HTML_QuickForm_Error
    */
   public function validate() {
@@ -431,7 +426,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Core function that builds the form. We redefine this function
    * here and expect all CRM forms to build their form in the function
    * buildQuickForm.
-   *
    */
   public function buildForm() {
     $this->_formBuilt = TRUE;
@@ -492,8 +486,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *                formats
    *
    * @return void
-   *
-   *
    */
   public function addButtons($params) {
     $prevnext = $spacing = array();
@@ -754,7 +746,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    *
    * @return void
-   *
    */
   public function set($name, $value) {
     $this->controller->set($name, $value);
@@ -767,7 +758,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    *
    * @return mixed
-   *
    */
   public function get($name) {
     return $this->controller->get($name);
@@ -1278,7 +1268,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * );
    * @param bool $required
    *   True if required.
-   *
    */
   public function addDate($name, $label, $required = FALSE, $attributes = NULL) {
     if (!empty($attributes['formatType'])) {
@@ -1530,7 +1519,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Function that can be defined in Form to override or
    * perform specific action on cancel action
-   *
    */
   public function cancelAction() {
   }
@@ -1654,7 +1642,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   *
    */
   public function canUseAjaxContactLookups() {
     if (0 < (civicrm_api3('contact', 'getcount', array('check_permissions' => 1))) &&

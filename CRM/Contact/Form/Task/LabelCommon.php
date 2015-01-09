@@ -81,7 +81,8 @@ class CRM_Contact_Form_Task_LabelCommon {
    * @param bool $mergeSameHousehold
    *   UNUSED.
    *
-   * @return array of rows for labels
+   * @return array
+   *   of rows for labels
    */
 
   public static function getRows($contactIDs, $locationTypeID, $respectDoNotMail, $mergeSameAddress, $mergeSameHousehold) {
@@ -244,7 +245,8 @@ class CRM_Contact_Form_Task_LabelCommon {
 
   /**
    * Get array of return properties for address fields required for mailing label
-   * @return array return properites for address e.g
+   * @return array
+   *   return properites for address e.g
    * array (
    *  - [street_address] => 1,
    * -  [supplemental_address_1] => 1,

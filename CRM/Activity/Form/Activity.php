@@ -125,7 +125,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   /**
    * The _fields var can be used by sub class to set/unset/edit the
    * form fields based on their requirement
-   *
    */
   public function setFields() {
     $this->_fields = array(
@@ -1138,7 +1137,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
   /**
    * Shorthand for getting id by display name (makes code more readable)
-   *
    */
   protected function _getIdByDisplayName($displayName) {
     return CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
@@ -1150,7 +1148,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
   /**
    * Shorthand for getting display name by id (makes code more readable)
-   *
    */
   protected function _getDisplayNameById($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',

@@ -248,7 +248,8 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
   /**
    * Get action links
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    * @static
    */
   public static function &links() {
@@ -288,7 +289,8 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
   /**
    * Get action links for comments
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    * @static
    */
   public static function &commentLinks() {

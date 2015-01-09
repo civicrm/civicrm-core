@@ -70,7 +70,8 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -125,7 +126,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *
    * @return object
    * @static
-   *
    */
   public static function create(&$params) {
     $transaction = new CRM_Core_Transaction();
@@ -184,7 +184,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *
    * @return mixed|null
    * @static
-   *
    */
   public static function del($id) {
     if (!$id) {
@@ -323,7 +322,8 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
    *
    * @static
    *
-   * @return array Array of event summary values
+   * @return array
+   *   Array of event summary values
    */
   public static function getEventSummary() {
     $eventSummary = $eventIds = array();
@@ -597,7 +597,8 @@ $event_summary_limit
    *   Consider counted( is filter role) participant.
    *
    *
-   * @return array array with count of participants for each event based on status/role
+   * @return array
+   *   array with count of participants for each event based on status/role
    */
   public static function getParticipantCount(
     $eventId,
@@ -729,7 +730,8 @@ WHERE civicrm_address.geo_code_1 IS NOT NULL
    * @param bool $onlyPublicInclude public events only, default TRUE.
    *   Include public events only, default TRUE.
    *
-   * @return array  $all      array of all the events that are searched
+   * @return array
+   *   array of all the events that are searched
    * @static
    */
   static function &getCompleteInfo(
@@ -1730,7 +1732,8 @@ WHERE  id = $cfID
    *
    * @param bool $skipCancel
    *
-   * @return array $customProfile array of Additional participant's info OR array of Ids.
+   * @return array
+   *   array of Additional participant's info OR array of Ids.
    */
   static function buildCustomProfile(
     $participantId,
@@ -1843,7 +1846,8 @@ WHERE  id = $cfID
 
   /* Function to retrieve all events those having location block set.
    *
-   * @return array $events array of all events.
+   * @return array
+   *   array of all events.
    */
   /**
    * @return array
@@ -1932,7 +1936,8 @@ WHERE  ce.loc_block_id = $locBlockId";
    *
    * @param array $values
    *   Key/value event info.
-   * @return boolean true if allow registration otherwise false
+   * @return boolean
+   *   true if allow registration otherwise false
    */
   /**
    * @param $values
@@ -1969,7 +1974,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    *
    * @param array $params
    *   Key/value participant info.
-   * @return boolean $alreadyRegistered true/false
+   * @return boolean
    */
   /**
    * @param array $params
@@ -2003,7 +2008,8 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @param int $eventId
    * @param int $type
    *
-   * @return string   the permission that the user has (or null)
+   * @return string
+   *   the permission that the user has (or null)
    * @static
    */
   public static function checkPermission($eventId = NULL, $type = CRM_Core_Permission::VIEW) {
@@ -2067,7 +2073,8 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @param int $eventId
    *   The id of the event.
    *
-   * @return array         an array of email ids
+   * @return array
+   *   an array of email ids
    * @static
    */
   public static function getFromEmailIds($eventId = NULL) {
@@ -2103,7 +2110,8 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @param sting $extraWhereClause
    *   Extra filter on participants.
    *
-   * @return int   event total seats w/ given criteria.
+   * @return int
+   *   event total seats w/ given criteria.
    * @static
    */
   public static function eventTotalSeats($eventId, $extraWhereClause = NULL) {
@@ -2149,7 +2157,8 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
    * @param int $templateId
    *   Event template id.
    *
-   * @return array of custom data defaults.
+   * @return array
+   *   of custom data defaults.
    */
   public static function getTemplateDefaultValues($templateId) {
     $defaults = array();

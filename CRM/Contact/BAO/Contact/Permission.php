@@ -41,7 +41,8 @@ class CRM_Contact_BAO_Contact_Permission {
    *   Contact id.
    * @param int|string $type the type of operation (view|edit)
    *
-   * @return boolean true if the user has permission, false otherwise
+   * @return boolean
+   *   true if the user has permission, false otherwise
    * @static
    */
   public static function allow($id, $type = CRM_Core_Permission::VIEW) {
@@ -248,7 +249,8 @@ AND    $operationClause LIMIT 1";
    * @param int $contactID
    *   Contact id of the current contact.
    *
-   * @return bool true if logged in user has permission to view
+   * @return bool
+   *   true if logged in user has permission to view
    *   selected contact record else false
    * @static
    */

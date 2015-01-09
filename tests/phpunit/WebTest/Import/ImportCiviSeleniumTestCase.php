@@ -55,7 +55,6 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    *                             checkMapperHeaders : to override default check mapper headers
    *                             saveMapping        : save current mapping?
    *                             saveMappingName    : to override mapping name
-   *
    */
   function importCSVComponent(
     $component,
@@ -435,7 +434,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    * @param string $component
    *   Component name.
    *
-   * @return string import url
+   * @return string
+   *   import url
    */
   private function _getImportComponentUrl($component) {
     $importComponentUrl = array(
@@ -523,7 +523,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    * @param array $rows
    * @param string $contactType
    *
-   * @return array $contactIds  imported contact ids
+   * @return array
+   *   imported contact ids
    */
   public function _getImportedContactIds($rows, $contactType = 'Individual') {
     $contactIds = array();

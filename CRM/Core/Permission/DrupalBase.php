@@ -71,7 +71,8 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    *   Exclude hidden groups.
    *
    *
-   * @return array - array reference of all groups.
+   * @return array
+   *   array reference of all groups.
    */
   public function group($groupType = NULL, $excludeHidden = TRUE) {
     if (!isset($this->_viewPermissionedGroups)) {
@@ -143,7 +144,8 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    * @param array $whereTables
    *   (reference) add the tables that are needed for the where clause.
    *
-   * @return string the clause to add to the query retrieving viewable groups
+   * @return string
+   *   the clause to add to the query retrieving viewable groups
    */
   public function groupClause($type, &$tables, &$whereTables) {
     if (!isset($this->_viewPermissionedGroups)) {
@@ -206,7 +208,8 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
   /**
    * Get the current permission of this user
    *
-   * @return string the permission of the user (edit or view or null)
+   * @return string
+   *   the permission of the user (edit or view or null)
    */
   public function getPermission() {
     $this->group();
@@ -256,8 +259,8 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    * @param array $array
    *   The roles to check.
    *
-   * @return boolean true if yes, else false
-   *
+   * @return boolean
+   *   true if yes, else false
    */
   public function checkGroupRole($array) {
     if (function_exists('user_load') && isset($array)) {
@@ -285,7 +288,8 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    * @param string $permissionName
    *   Name of the permission we are interested in.
    *
-   * @return string a comma separated list of email addresses
+   * @return string
+   *   a comma separated list of email addresses
    */
   public function permissionEmails($permissionName) {
     static $_cache = array();
@@ -317,7 +321,6 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
 
   /**
    * {@inheritdoc}
-   *
    */
   public function upgradePermissions($permissions) {
     if (empty($permissions)) {

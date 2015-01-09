@@ -78,7 +78,6 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   *
    */
   public function getRecurTransaction() {
     return array(

@@ -272,7 +272,8 @@ abstract class CRM_Utils_Hook {
    * @param array $params
    *   The parameters used for object creation / editing.
    *
-   * @return null the return value is ignored
+   * @return null
+   *   the return value is ignored
    */
   public static function pre($op, $objectName, $id, &$params) {
     $event = new \Civi\Core\Event\PreEvent($op, $objectName, $id, $params);
@@ -322,7 +323,8 @@ abstract class CRM_Utils_Hook {
    * @param array $values
    *   (optional) the values to fill the links.
    *
-   * @return null  the return value is ignored
+   * @return null
+   *   the return value is ignored
    */
   public static function links($op, $objectName, &$objectId, &$links, &$mask = NULL, &$values = array()) {
     return self::singleton()->invoke(6, $op, $objectName, $objectId, $links, $mask, $values, 'civicrm_links');
@@ -336,7 +338,8 @@ abstract class CRM_Utils_Hook {
    * @param CRM_Core_Form $form
    *   Reference to the form object.
    *
-   * @return null the return value is ignored
+   * @return null
+   *   the return value is ignored
    */
   public static function preProcess($formName, &$form) {
     return self::singleton()
@@ -352,7 +355,8 @@ abstract class CRM_Utils_Hook {
    * @param CRM_Core_Form $form
    *   Reference to the form object.
    *
-   * @return null the return value is ignored
+   * @return null
+   *   the return value is ignored
    */
   public static function buildForm($formName, &$form) {
     return self::singleton()->invoke(2, $formName, $form,
@@ -370,7 +374,8 @@ abstract class CRM_Utils_Hook {
    * @param CRM_Core_Form $form
    *   Reference to the form object.
    *
-   * @return null the return value is ignored
+   * @return null
+   *   the return value is ignored
    */
   public static function postProcess($formName, &$form) {
     return self::singleton()->invoke(2, $formName, $form,
@@ -428,7 +433,8 @@ abstract class CRM_Utils_Hook {
    * @param array $params
    *   The parameters that were sent into the calling function.
    *
-   * @return null the return value is ignored
+   * @return null
+   *   the return value is ignored
    */
   public static function custom($op, $groupID, $entityID, &$params) {
     return self::singleton()
@@ -450,7 +456,8 @@ abstract class CRM_Utils_Hook {
    * @param string $where
    *   The currrent where clause.
    *
-   * @return null the return value is ignored
+   * @return null
+   *   the return value is ignored
    */
   public static function aclWhereClause($type, &$tables, &$whereTables, &$contactID, &$where) {
     return self::singleton()
@@ -472,7 +479,8 @@ abstract class CRM_Utils_Hook {
    * @param array $currentGroups
    *   The set of objects that are currently permissioned for this contact.
    *
-   * @return null the return value is ignored
+   * @return null
+   *   the return value is ignored
    */
   public static function aclGroup($type, $contactID, $tableName, &$allGroups, &$currentGroups) {
     return self::singleton()
@@ -485,7 +493,8 @@ abstract class CRM_Utils_Hook {
    * @param array $files
    *   The current set of files to process.
    *
-   * @return null the return value is ignored
+   * @return null
+   *   the return value is ignored
    */
   public static function xmlMenu(&$files) {
     return self::singleton()->invoke(1, $files,
@@ -500,7 +509,8 @@ abstract class CRM_Utils_Hook {
    * @param array $entities
    *   List of pending entities.
    *
-   * @return null the return value is ignored
+   * @return null
+   *   the return value is ignored
    */
   public static function managed(&$entities) {
     return self::singleton()->invoke(1, $entities,
@@ -518,7 +528,8 @@ abstract class CRM_Utils_Hook {
    *   (output parameter) where should the hook content be displayed.
    * relative to the activity list
    *
-   * @return string the html snippet to include in the dashboard
+   * @return string
+   *   the html snippet to include in the dashboard
    */
   public static function dashboard($contactID, &$contentPlacement = self::DASHBOARD_BELOW) {
     $retval = self::singleton()->invoke(2, $contactID, $contentPlacement,
@@ -973,7 +984,8 @@ abstract class CRM_Utils_Hook {
    * @param int $caseID
    *   The case ID.
    *
-   * @return array of data to be displayed, where the key is a unique id to be used for styling (div id's)
+   * @return array
+   *   of data to be displayed, where the key is a unique id to be used for styling (div id's)
    * and the value is an array with keys 'label' and 'value' specifying label/value pairs
    */
   public static function caseSummary($caseID) {
@@ -1248,7 +1260,8 @@ abstract class CRM_Utils_Hook {
    *
    * @internal param array $seletor the selector object. Allows you access to the context of the search
    *
-   * @return void  modify the header and values object to pass the data u need
+   * @return void
+   *   modify the header and values object to pass the data u need
    */
   public static function searchColumns($objectName, &$headers, &$rows, &$selector) {
     return self::singleton()->invoke(4, $objectName, $headers, $rows, $selector,
@@ -1703,7 +1716,8 @@ abstract class CRM_Utils_Hook {
    * @param array $participant
    *   Array of participant values.
    *
-   * @return null the return value is ignored
+   * @return null
+   *   the return value is ignored
    */
   public static function alterBadge($labelName, &$label, &$format, &$participant) {
     return self::singleton()
@@ -1832,7 +1846,8 @@ abstract class CRM_Utils_Hook {
    *
    * @param array $angularModules
    *   List of modules.
-   * @return null the return value is ignored
+   * @return null
+   *   the return value is ignored
    *
    * @code
    * function mymod_civicrm_angularModules(&$angularModules) {

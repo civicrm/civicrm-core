@@ -42,7 +42,8 @@
  * @param null $dateFormat
  * @param bool $onlyTime
  *
- * @return string human readable date format | invalid date message
+ * @return string
+   *   human readable date format | invalid date message
  */
 function smarty_modifier_crmDate($dateString, $dateFormat = NULL, $onlyTime = FALSE) {
   if ($dateString) {

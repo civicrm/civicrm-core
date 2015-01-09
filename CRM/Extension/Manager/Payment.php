@@ -164,7 +164,8 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
   /**
    * @param string $attr
    *   The attribute used to key the array.
-   * @return array ($$attr => $id)
+   * @return array
+   *   ($$attr => $id)
    */
   private function _getAllPaymentProcessorTypes($attr) {
     $ppt = array();

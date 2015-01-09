@@ -141,7 +141,6 @@ class CRM_Core_BAO_CustomQuery {
    *
    * @param bool $contactSearch
    * @param array $locationSpecificFields
-   *
    */
   public function __construct($ids, $contactSearch = FALSE, $locationSpecificFields = array()) {
     $this->_ids = &$ids;
@@ -329,7 +328,6 @@ SELECT label, value
    * @param NULL
    *
    * @return void
-   *
    */
   public function where() {
     foreach ($this->_ids as $id => $values) {
@@ -558,7 +556,8 @@ SELECT label, value
    *
    * @param NULL
    *
-   * @return array   array of strings
+   * @return array
+   *   array of strings
    */
   public function query() {
     $this->select();

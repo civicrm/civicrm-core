@@ -51,7 +51,8 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
   /**
    * Get BAO Name
    *
-   * @return string Classname of BAO.
+   * @return string
+   *   Classname of BAO.
    */
   public function getBAOName() {
     return 'CRM_Core_BAO_MailSettings';
@@ -60,7 +61,8 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
   /**
    * Get action Links
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
   public function &links() {
     if (!(self::$_links)) {
@@ -132,7 +134,8 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
   /**
    * Get name of edit form
    *
-   * @return string Classname of edit form.
+   * @return string
+   *   Classname of edit form.
    */
   public function editForm() {
     return 'CRM_Admin_Form_MailSettings';
@@ -141,7 +144,8 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
   /**
    * Get edit form name
    *
-   * @return string name of this page.
+   * @return string
+   *   name of this page.
    */
   public function editName() {
     return 'Mail Settings';
@@ -152,7 +156,8 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
    *
    * @param null $mode
    *
-   * @return string user context.
+   * @return string
+   *   user context.
    */
   public function userContext($mode = NULL) {
     return 'civicrm/admin/mailSettings';

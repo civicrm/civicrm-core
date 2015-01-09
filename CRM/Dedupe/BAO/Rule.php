@@ -53,7 +53,8 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
    * Return the SQL query for the given rule - either for finding matching
    * pairs of contacts, or for matching against the $params variable (if set).
    *
-   * @return string  SQL query performing the search
+   * @return string
+   *   SQL query performing the search
    */
   public function sql() {
     if ($this->params &&

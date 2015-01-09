@@ -155,7 +155,8 @@ WHERE  id IN ( $idString )
    * @param string $entityType
    * @param null $hashSize
    *
-   * @return array ( $cs, $ts, $live )
+   * @return array
+   *   ( $cs, $ts, $live )
    * @static
    */
   public static function generateChecksum($entityId, $ts = NULL, $live = NULL, $hash = NULL, $entityType = 'contact', $hashSize = NULL) {
@@ -223,7 +224,8 @@ WHERE  id IN ( $idString )
    * @param string $inputCheck
    *   Checksum to match against.
    *
-   * @return boolean           true if valid, else false
+   * @return boolean
+   *   true if valid, else false
    * @static
    */
   public static function validChecksum($contactID, $inputCheck) {
@@ -256,7 +258,8 @@ WHERE  id IN ( $idString )
    * @param int $contactId
    *   Contact id.
    *
-   * @return int $locationCount max locations for the contact
+   * @return int
+   *   $locationCount max locations for the contact
    * @static
    */
   public static function maxLocations($contactId) {
@@ -403,7 +406,6 @@ UNION
    *
    * @param array $currentEmployerParams
    *   Associated array of contact id and its employer id.
-   *
    */
   public static function setCurrentEmployer($currentEmployerParams) {
     foreach ($currentEmployerParams as $contactId => $orgId) {
@@ -422,7 +424,6 @@ WHERE contact_a.id ={$contactId} AND contact_b.id={$orgId}; ";
    *
    * @param int $organizationId
    *   Current employer id.
-   *
    */
   public static function updateCurrentEmployer($organizationId) {
     $query = "UPDATE civicrm_contact contact_a,civicrm_contact contact_b
@@ -439,7 +440,6 @@ WHERE contact_a.employer_id=contact_b.id AND contact_b.id={$organizationId}; ";
    *   Contact id ( mostly individual contact id).
    * @param int $employerId
    *   Contact id ( mostly organization contact id).
-   *
    */
   public static function clearCurrentEmployer($contactId, $employerId = NULL) {
     $query = "UPDATE civicrm_contact
@@ -563,7 +563,6 @@ WHERE id={$contactId}; ";
    *
    * @param int $employerId
    *   Contact id of employer ( organization id ).
-   *
    */
   public static function clearAllEmployee($employerId) {
     $query = "
@@ -585,7 +584,8 @@ UPDATE civicrm_contact
    *   Associated with the contact which is edited.
    *
    *
-   * @return array $contactViewLinks returns array with links to contact view
+   * @return array
+   *   returns array with links to contact view
    * @static
    */
   public static function formatContactIDSToLinks($contactIDs, $addViewLink = TRUE, $addEditLink = TRUE, $originalId = NULL) {
@@ -691,7 +691,8 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
    * @param array $returnProperties
    *   Array of return elements.
    *
-   * @return array $contactDetails array of contact info.
+   * @return array
+   *   array of contact info.
    * @static
    */
   public static function contactDetails($componentIds, $componentName, $returnProperties = array()) {
@@ -870,7 +871,8 @@ Group By  componentId";
    * @param array $addresses
    *   Associated array of.
    *
-   * @return array $contactNames associated array of contact names
+   * @return array
+   *   associated array of contact names
    * @static
    */
   public static function getAddressShareContactNames(&$addresses) {
@@ -1085,7 +1087,8 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    * @param string $greetingType
    *   Greeting type.
    *
-   * @return int or null
+   * @return int
+   *   or null
    */
   public static function defaultGreeting($contactType, $greetingType) {
     $contactTypeFilters = array('Individual' => 1, 'Household' => 2, 'Organization' => 3);

@@ -89,7 +89,8 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    * @param bool $id
    *   Mapping id.
    *
-   * @return array  associated array of all the drop downs in the form
+   * @return array
+   *   associated array of all the drop downs in the form
    * @static
    */
   public static function getSelection($id = NULL) {
@@ -322,7 +323,8 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    * @param null $entityValue
    * @param int $id
    *
-   * @return array  (reference)   reminder list
+   * @return array
+   *   (reference)   reminder list
    * @static
    */
   public static function &getList($namesOnly = FALSE, $entityValue = NULL, $id = NULL) {
@@ -589,7 +591,6 @@ AND   cas.entity_value = $id AND
    *
    * @return CRM_Core_DAO_ActionSchedule
    * @static
-   *
    */
   public static function add(&$params, $ids = array()) {
     $actionSchedule = new CRM_Core_DAO_ActionSchedule();
@@ -657,7 +658,8 @@ AND   cas.entity_value = $id AND
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on success, null otherwise
+   * @return Object
+   *   DAO object on success, null otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {

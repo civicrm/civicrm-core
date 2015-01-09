@@ -45,7 +45,8 @@
  *
  * @param array $params
  *
- * @return array of newly created phone property values.
+ * @return array
+   *   of newly created phone property values.
  * @access public
  */
 function civicrm_api3_phone_create($params) {
@@ -71,7 +72,8 @@ function _civicrm_api3_phone_create_spec(&$params) {
  *
  * @param array $params
  *
- * @return array Api Result
+ * @return array
+   *   Api Result
  * {@getfields phone_delete}
  * @example PhoneDelete.php
  * @access public

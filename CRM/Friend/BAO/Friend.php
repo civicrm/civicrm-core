@@ -39,7 +39,6 @@
  */
 class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   /**
-   *
    */
   public function __construct() {
     parent::__construct();
@@ -72,7 +71,8 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @param array $values
    *   Output values of the object.
    *
-   * @return array $values values
+   * @return array
+   *   values
    * @static
    */
   public static function retrieve(&$params, &$values) {

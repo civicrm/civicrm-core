@@ -79,7 +79,8 @@ class CRM_Utils_GlobalStack {
   /**
    * @param array $new
    *   The new, incoming frame.
-   * @return array frame
+   * @return array
+   *   frame
    */
   public function createBackup($new) {
     $frame = array();

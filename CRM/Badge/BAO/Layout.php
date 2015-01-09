@@ -72,7 +72,8 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on success, null otherwise
+   * @return Object
+   *   DAO object on success, null otherwise
    *
    * @static
    */
@@ -139,7 +140,8 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   /**
    *  get the list of print labels
    *
-   * @return array list of labels
+   * @return array
+   *   list of labels
    * @static
    */
   public static function getList() {
@@ -159,7 +161,8 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @param array $params
    *   Associated array of submitted values.
    *
-   * @return array $formattedLayout array formatted array
+   * @return array
+   *   array formatted array
    */
   public static function buildLayout(&$params) {
     $layoutParams = array('id' => $params['badge_id']);
@@ -177,7 +180,8 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @param json $jsonData
    *   Json object.
    *
-   * @return array associated array of decoded elements
+   * @return array
+   *   associated array of decoded elements
    * @static
    */
   static public function getDecodedData($jsonData) {

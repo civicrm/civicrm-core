@@ -66,7 +66,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
    */
   public function tearDown() {
     $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
@@ -359,7 +358,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Get membership joins/renewals
    * for a specified membership
    * type.
-   *
    */
   public function testgetMembershipStarts() {
     $contactId = Contact::createIndividual();
@@ -391,7 +389,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   /**
    * Get a count of membership for a specified membership type,
    * optionally for a specified date.
-   *
    */
   public function testGetMembershipCount() {
     $contactId = Contact::createIndividual();
@@ -424,7 +421,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   /**
    * Take sort name of contact during
    * batch update member via profile
-   *
    */
   public function testsortName() {
     $contactId = Contact::createIndividual();
@@ -459,7 +455,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Delete related memberships
-   *
    */
   public function testdeleteRelatedMemberships() {
     $contactId = Contact::createIndividual();
@@ -490,7 +485,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Renew membership with change in membership type
-   *
    */
   public function testRenewMembership() {
     $contactId = Contact::createIndividual();
@@ -553,7 +547,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Renew stale membership
-   *
    */
   public function testStaleMembership() {
     $statusId  = 3;

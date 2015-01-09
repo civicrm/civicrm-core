@@ -73,7 +73,8 @@ class CRM_Utils_Recent {
   /**
    * Return the recently viewed array
    *
-   * @return array the recently viewed array
+   * @return array
+   *   the recently viewed array
    * @static
    */
   public static function &get() {

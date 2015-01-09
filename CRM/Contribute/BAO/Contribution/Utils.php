@@ -57,7 +57,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
    *
    * @throws CRM_Core_Exception
    * @throws Exception
-   * @return array associated array
+   * @return array
+   *   associated array
    *
    * @static
    */
@@ -380,7 +381,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * @param int $param
    *   Year.
    *
-   * @return array associated array
+   * @return array
+   *   associated array
    *
    * @static
    */
@@ -420,7 +422,8 @@ INNER JOIN   civicrm_contact AS contact ON ( contact.id = contrib.contact_id )
   /**
    * Get the contribution details by year
    *
-   * @return array associated array
+   * @return array
+   *   associated array
    *
    * @static
    */
@@ -893,10 +896,10 @@ LIMIT 1
    * @param float $taxRate
    *   Tax rate of selected financial account for field.
    *
-   * @return array array of tax amount
+   * @return array
+   *   array of tax amount
    *
    * @static
-   *
    */
   public static function calculateTaxAmount($amount, $taxRate) {
     $taxAmount = array();

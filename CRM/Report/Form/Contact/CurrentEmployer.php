@@ -45,10 +45,8 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
 

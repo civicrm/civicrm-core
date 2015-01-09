@@ -54,10 +54,8 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
   private static $_surveyRespondentStatus;
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     //filter options for survey activity status.

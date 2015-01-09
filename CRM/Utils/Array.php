@@ -231,7 +231,6 @@ class CRM_Utils_Array {
    *   (optional) String to prepend to keys.
    * @param string $seperator
    *   (optional) String that separates the concatenated keys.
-   *
    */
   public static function flatten(&$list, &$flat, $prefix = '', $seperator = ".") {
     foreach ($list as $name => $value) {
@@ -259,7 +258,6 @@ class CRM_Utils_Array {
    *
    * @return array
    *   Array-encoded tree
-   *
    */
   public function unflatten($delim, &$arr) {
     $result = array();
@@ -349,7 +347,8 @@ class CRM_Utils_Array {
   /**
    * @param $subset
    * @param $superset
-   * @return bool TRUE if $subset is a subset of $superset
+   * @return bool
+   *   TRUE if $subset is a subset of $superset
    */
   public static function isSubset($subset, $superset) {
     foreach ($subset as $expected) {
@@ -372,7 +371,6 @@ class CRM_Utils_Array {
    *
    * @return bool
    *   True if $value was found, false otherwise.
-   *
    */
   public static function crmInArray($value, $params, $caseInsensitive = TRUE) {
     foreach ($params as $item) {

@@ -79,7 +79,8 @@ abstract class CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
    *                   NULL if no limit; or array(0 => $limit, 1 => $offset)
    * @param array|NULL $detailLimit final limit (applied when building $detailTable)
    *                   NULL if no limit; or array(0 => $limit, 1 => $offset)
-   * @return array keys: match-descriptor
+   * @return array
+   *   keys: match-descriptor
    *   - count: int
    */
   public abstract function fillTempTable($queryText, $entityIDTableName, $detailTable, $queryLimit, $detailLimit);
@@ -127,7 +128,8 @@ AND        cf.html_type IN ( 'Text', 'TextArea', 'RichTextEditor' )
    *   - sql: an array of SQL queries to execute
    *   - final: an array of SQL queries to execute at the end
    *   - *: All other keys are treated as table names
-   * @return array keys: match-descriptor
+   * @return array
+   *   keys: match-descriptor
    *   - count: int
    *   - files: NULL | array
    */
@@ -239,7 +241,8 @@ GROUP BY {$tableValues['id']}
    *   Eg "civicrm_note" or "civicrm_note mynote".
    * @param array|string $fullTextFields list of field names
    * @param string $queryText
-   * @return string SQL, eg "MATCH (col1) AGAINST (queryText)" or "col1 LIKE '%queryText%'"
+   * @return string
+   *   SQL, eg "MATCH (col1) AGAINST (queryText)" or "col1 LIKE '%queryText%'"
    */
   public function matchText($table, $fullTextFields, $queryText) {
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
@@ -327,7 +330,8 @@ GROUP BY {$tableValues['id']}
 
   /**
    * @param int|array $limit
-   * @return string SQL
+   * @return string
+   *   SQL
    * @see CRM_Contact_Form_Search_Custom_FullText::toLimit
    */
   public function toLimit($limit) {
@@ -346,7 +350,8 @@ GROUP BY {$tableValues['id']}
 
   /**
    * @param array|int $limit
-   * @return array (0 => $limit, 1 => $offset)
+   * @return array
+   *   (0 => $limit, 1 => $offset)
    */
   public function parseLimitOffset($limit) {
     if (is_scalar($limit)) {

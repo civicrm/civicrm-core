@@ -69,7 +69,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, NULL otherwise
+   * @return Object
+   *   DAO object on sucess, NULL otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -310,7 +311,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @param array $params
    *   A string-keyed array of function params, see function body for details.
    *
-   * @return array  of four parameters: a boolean whether the email was sent, and the subject, text and HTML templates
+   * @return array
+   *   of four parameters: a boolean whether the email was sent, and the subject, text and HTML templates
    */
   public static function sendTemplate($params) {
     $defaults = array(

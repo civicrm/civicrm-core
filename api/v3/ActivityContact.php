@@ -45,7 +45,8 @@
  *
  * @param array $params
  *
- * @return array of newly created activity contact records.
+ * @return array
+   *   of newly created activity contact records.
  * @access public
  */
 function civicrm_api3_activity_contact_create($params) {
@@ -69,7 +70,8 @@ function _civicrm_api3_activity_contact_create_spec(&$params) {
  *
  * @param array $params
  *
- * @return array Api Result
+ * @return array
+   *   Api Result
  *
  * @example ActivityContact.php
  * @access public
@@ -86,7 +88,8 @@ function civicrm_api3_activity_contact_delete($params) {
  * @param array $params
  *   An associative array of name/value pairs.
  *
- * @return array details of found tags else error
+ * @return array
+   *   details of found tags else error
  *
  * @access public
  */

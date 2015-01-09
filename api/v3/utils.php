@@ -55,7 +55,8 @@ function _civicrm_api3_initialize() {
  * @param array $keyoptions
  *   List of required fields options. One of the options is required.
  *
- * @return null or throws error if there the required fields not present
+ * @return null
+   *   or throws error if there the required fields not present
  * @
  */
 function civicrm_api3_verify_one_mandatory($params, $daoName = NULL, $keyoptions = array()) {
@@ -78,7 +79,8 @@ function civicrm_api3_verify_one_mandatory($params, $daoName = NULL, $keyoptions
  * @param bool $verifyDAO
  *
  * @throws API_Exception
- * @return null or throws error if there the required fields not present
+ * @return null
+   *   or throws error if there the required fields not present
  *
  * @todo see notes on _civicrm_api3_check_required_fields regarding removing $daoName param
  */
@@ -136,7 +138,8 @@ function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array()
  * @param array $data
  *
  * @throws API_Exception
- * @return array <type>
+ * @return array
+   *   <type>
  */
 function civicrm_api3_create_error($msg, $data = array()) {
   $data['is_error'] = 1;
@@ -168,7 +171,7 @@ function civicrm_api3_create_error($msg, $data = array()) {
  *   Additional values to be added to top level of result array(.
  *   - this param is currently used for legacy behaviour support
  *
- * @return array $result
+ * @return array
  */
 function civicrm_api3_create_success($values = 1, $params = array(), $entity = NULL, $action = NULL, &$dao = NULL, $extraReturnValues = array()) {
   $result = array();
@@ -413,7 +416,7 @@ function _civicrm_api3_filter_fields_for_bao($entity, &$params, &$values) {
  * @param array $params
  * @param array $values
  *
- * @return Bool $valueFound
+ * @return Bool
  */
 function _civicrm_api3_store_values(&$fields, &$params, &$values) {
   $valueFound = FALSE;
@@ -703,7 +706,8 @@ function _civicrm_api3_apply_filters_to_dao($filterField, $filterValue, &$dao) {
  * @param string $action
  *
  * @throws API_Exception
- * @return array $options options extracted from params
+ * @return array
+   *   options extracted from params
  */
 function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $entity = '', $action = '') {
   $is_count = FALSE;
@@ -1295,7 +1299,8 @@ function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
  * @param string $bao_name
  * @param array $params
  *
- * @return array API result array
+ * @return array
+   *   API result array
  * @throws API_Exception
  */
 function _civicrm_api3_basic_delete($bao_name, &$params) {

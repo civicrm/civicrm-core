@@ -265,7 +265,8 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
   /**
    * @param int $id
    *   e.g. file ID.
-   * @return array (0 => bool $isValid, 1 => string $entityTable, 2 => int $entityId)
+   * @return array
+   *   (0 => bool $isValid, 1 => string $entityTable, 2 => int $entityId)
    */
   public function getDelegate($id) {
     $query = \CRM_Core_DAO::executeQuery($this->lookupDelegateSql, array(

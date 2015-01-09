@@ -45,7 +45,6 @@ class CRM_Contact_Page_Inline_CustomData extends CRM_Core_Page {
    * This method is called after the page is created.
    *
    * @return void
-   *
    */
   public function run() {
     // get the emails for this contact

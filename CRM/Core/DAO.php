@@ -115,7 +115,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param string $fieldName
    * @param $fieldDef
    * @param array $params
-   *
    */
   protected function assignTestFK($fieldName, $fieldDef, $params) {
     $required = CRM_Utils_Array::value('required', $fieldDef);
@@ -274,7 +273,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * by resetting some of DAO's internal fields. Use this with caution
    *
    * @return void
-   *
    */
   public function reset() {
 
@@ -315,7 +313,8 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param bool $i18nRewrite
    *   Whether to rewrite the query.
    *
-   * @return object              the current DAO object after the query execution
+   * @return object
+   *   the current DAO object after the query execution
    */
   public function query($query, $i18nRewrite = TRUE) {
     // rewrite queries that should use $dbLocale-based views for multi-language installs
@@ -400,7 +399,8 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @static
    *
-   * @return array of CRM_Core_Reference_Interface
+   * @return array
+   *   of CRM_Core_Reference_Interface
    */
   public static function getReferenceColumns() {
     return array();
@@ -421,7 +421,8 @@ class CRM_Core_DAO extends DB_DataObject {
    * Get/set an associative array of table columns
    *
    * @param array key=>type array
-   * @return array (associative)
+   * @return array
+   *   (associative)
    */
   public function table() {
     $fields = &$this->fields();
@@ -506,7 +507,8 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param array $params
    *   (reference ) associative array of name/value pairs.
    *
-   * @return boolean      did we copy all null values into the object
+   * @return boolean
+   *   did we copy all null values into the object
    */
   public function copyValues(&$params) {
     $fields = &$this->fields();
@@ -624,7 +626,8 @@ class CRM_Core_DAO extends DB_DataObject {
    *   Field that i'm interested in or null if.
    *                          you want the attributes for all DAO text fields
    *
-   * @return array assoc array of name => attribute pairs
+   * @return array
+   *   assoc array of name => attribute pairs
    * @static
    */
   public static function getAttribute($class, $fieldName = NULL) {
@@ -672,7 +675,8 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param string $fieldName
    *   The name of the field in the DAO.
    *
-   * @return boolean     true if object exists
+   * @return boolean
+   *   true if object exists
    * @static
    */
   public static function objectExists($value, $daoName, $daoID, $fieldName = 'name') {
@@ -697,7 +701,8 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param bool $i18nRewrite
    *   Whether to rewrite the query on multilingual setups.
    *
-   * @return boolean true if exists, else false
+   * @return boolean
+   *   true if exists, else false
    * @static
    */
   public static function checkFieldExists($tableName, $columnName, $i18nRewrite = TRUE) {
@@ -782,7 +787,8 @@ LIKE %1
    * @param string $tableName
    * @param string $constraint
    *
-   * @return boolean true if constraint exists, false otherwise
+   * @return boolean
+   *   true if constraint exists, false otherwise
    * @static
    */
   public static function checkConstraintExists($tableName, $constraint) {
@@ -810,7 +816,8 @@ LIKE %1
    *
    * @throws Exception
    *
-   * @return boolean true if CONSTRAINT keyword exists, false otherwise
+   * @return boolean
+   *   true if CONSTRAINT keyword exists, false otherwise
    */
   public static function schemaRequiresRebuilding($tables = array("civicrm_contact")) {
     $show = array();
@@ -845,7 +852,8 @@ LIKE %1
    * @param string $tableName
    * @param string $columnName
    *
-   * @return boolean true if in format, false otherwise
+   * @return boolean
+   *   true if in format, false otherwise
    * @static
    */
   public static function checkFKConstraintInFormat($tableName, $columnName) {
@@ -874,7 +882,8 @@ LIKE %1
    * @param string $columnName
    * @param string $columnValue
    *
-   * @return boolean true if the value is always $columnValue, false otherwise
+   * @return boolean
+   *   true if the value is always $columnValue, false otherwise
    * @static
    */
   public static function checkFieldHasAlwaysValue($tableName, $columnName, $columnValue) {
@@ -891,7 +900,8 @@ LIKE %1
    * @param string $tableName
    * @param string $columnName
    *
-   * @return boolean true if if the value is always NULL, false otherwise
+   * @return boolean
+   *   true if if the value is always NULL, false otherwise
    * @static
    */
   public static function checkFieldIsAlwaysNull($tableName, $columnName) {
@@ -907,7 +917,8 @@ LIKE %1
    *
    * @param string $tableName
    *
-   * @return boolean true if exists, else false
+   * @return boolean
+   *   true if exists, else false
    * @static
    */
   public static function checkTableExists($tableName) {
@@ -943,7 +954,8 @@ FROM   civicrm_domain
    * @param int $id
    *   Id of the DAO object being searched for.
    *
-   * @return object Object of the type of the class that called this function.
+   * @return object
+   *   Object of the type of the class that called this function.
    */
   public static function findById($id) {
     $object = new static();
@@ -1018,7 +1030,8 @@ FROM   civicrm_domain
    * @param string $searchColumn
    *   Name of the column you want to search by.
    *
-   * @return boolean          true if we found and updated the object, else false
+   * @return boolean
+   *   true if we found and updated the object, else false
    * @static
    */
   public static function setFieldValue($daoName, $searchValue, $setColumn, $setValue, $searchColumn = 'id') {
@@ -1044,7 +1057,8 @@ FROM   civicrm_domain
    * @param string $default
    *   Default sort value.
    *
-   * @return string - sortString
+   * @return string
+   *   sortString
    * @static
    */
   public static function getSortString($sort, $default = NULL) {
@@ -1075,7 +1089,8 @@ FROM   civicrm_domain
    * @param array $returnProperities
    *   An assoc array of fields that need to be returned, eg array( 'first_name', 'last_name').
    *
-   * @return object an object of type referenced by daoName
+   * @return object
+   *   an object of type referenced by daoName
    * @static
    */
   public static function commonRetrieve($daoName, &$params, &$defaults, $returnProperities = NULL) {
@@ -1459,7 +1474,8 @@ SELECT contact_id
    * @param array $returnProperities
    *   An assoc array of fields that need to be returned, eg array( 'first_name', 'last_name').
    *
-   * @return object an object of type referenced by daoName
+   * @return object
+   *   an object of type referenced by daoName
    * @static
    */
   public static function commonRetrieveAll($daoName, $fieldIdName = 'id', $fieldId, &$details, $returnProperities = NULL) {
@@ -1537,7 +1553,8 @@ SELECT contact_id
    * @param array $strings
    * @param string $default
    *   the value to use if $strings has no elements.
-   * @return string eg "abc","def","ghi"
+   * @return string
+   *   eg "abc","def","ghi"
    */
   public static function escapeStrings($strings, $default = NULL) {
     static $_dao = NULL;
@@ -2006,7 +2023,8 @@ SELECT contact_id
   /**
    * Find all records which refer to this entity.
    *
-   * @return array of objects referencing this
+   * @return array
+   *   of objects referencing this
    */
   public function findReferences() {
     $links = self::getReferencesToTable(static::getTableName());
@@ -2029,7 +2047,8 @@ SELECT contact_id
   }
 
   /**
-   * @return array each item has keys:
+   * @return array
+   *   each item has keys:
    *  - name: string
    *  - type: string
    *  - count: int
@@ -2069,7 +2088,8 @@ SELECT contact_id
    * @param string $tableName
    *   Table referred to.
    *
-   * @return array structure of table and column, listing every table with a
+   * @return array
+   *   structure of table and column, listing every table with a
    * foreign key reference to $tableName, and the column where the key appears.
    */
   public static function getReferencesToTable($tableName) {

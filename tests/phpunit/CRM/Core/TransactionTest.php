@@ -315,7 +315,8 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    *   'sql-insert'|'bao-create' how to add the example record.
    * @param string $outcome
    *   'rollback'|'implicit-commit'|'explicit-commit' how to finish transaction.
-   * @return int cid
+   * @return int
+   *   cid
    */
   public function createContactWithTransaction($nesting, $insert, $outcome) {
     if ($nesting != 'reuse-tx' && $nesting != 'nest-tx') {
@@ -369,7 +370,8 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    *   See assertContactsMix.
    * @param string $outcome
    *   'rollback'|'implicit-commit'|'explicit-commit' how to finish transaction.
-   * @return int cid
+   * @return int
+   *   cid
    */
   public function runBatch($nesting, $callbacks, $existsByOffset, $outcome) {
     if ($nesting != 'reuse-tx' && $nesting != 'nest-tx') {

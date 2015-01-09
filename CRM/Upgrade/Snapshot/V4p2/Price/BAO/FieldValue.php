@@ -138,7 +138,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    *   For order by, default weight.
    * @param bool|int $isActive is_active, default false
    *
-   * @return array $values
+   * @return array
    *
    * @static
    */
@@ -164,10 +164,10 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @param int $id
    *   Id of field option.
    *
-   * @return string name
+   * @return string
+   *   name
    *
    * @static
-   *
    */
   public static function getOptionLabel($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue', $id, 'label');
@@ -181,7 +181,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object            DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    *
    * @static
    */

@@ -170,7 +170,8 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
    * This function should be shared from a similar one in
    * distmaker/utils/joomlaxml.php
    *
-   * @return array   civicrm permissions
+   * @return array
+   *   civicrm permissions
    */
   public static function getPermissionArray() {
     global $civicrm_root;

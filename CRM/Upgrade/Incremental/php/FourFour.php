@@ -516,7 +516,8 @@ AND image_URL IS NOT NULL
    *
    * @param CRM_Queue_TaskContext $ctx
    *
-   * @return bool TRUE for success
+   * @return bool
+   *   TRUE for success
    */
   public static function activityContacts(CRM_Queue_TaskContext $ctx) {
     $upgrade = new CRM_Upgrade_Form();
@@ -624,7 +625,8 @@ WHERE       source_contact_id IS NOT NULL";
    *
    * @param CRM_Queue_TaskContext $ctx
    *
-   * @return bool TRUE for success
+   * @return bool
+   *   TRUE for success
    * @see http://issues.civicrm.org/jira/browse/CRM-13187
    */
   public static function wordReplacements(CRM_Queue_TaskContext $ctx) {
@@ -656,7 +658,8 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
    * @param CRM_Queue_TaskContext $ctx
    * @param $rev
    *
-   * @return bool TRUE for success
+   * @return bool
+   *   TRUE for success
    * @see http://issues.civicrm.org/jira/browse/CRM-13655
    */
   public static function wordReplacements_patch(CRM_Queue_TaskContext $ctx, $rev) {
@@ -718,7 +721,8 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
    *
    * @param bool $rebuildEach
    *   Whether to perform rebuild after each individual API call.
-   * @return array Each item is $params for WordReplacement.create
+   * @return array
+   *   Each item is $params for WordReplacement.create
    * @see CRM_Core_BAO_WordReplacement::convertConfigArraysToAPIParams
    */
   public static function getConfigArraysAsAPIParams($rebuildEach) {
@@ -814,7 +818,8 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
 
   /**
    * @param array $params
-   * @return bool TRUE if $params is valid
+   * @return bool
+   *   TRUE if $params is valid
    */
   public static function isValidWordReplacement($params) {
     $result = strlen($params['find_word']) <= self::MAX_WORD_REPLACEMENT_SIZE && strlen($params['replace_word']) <= self::MAX_WORD_REPLACEMENT_SIZE;

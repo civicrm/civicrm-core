@@ -57,7 +57,8 @@
  * 'details' => str // html format
  *
  * @throws API_Exception
- * @return array api result array
+ * @return array
+   *   api result array
  *
  * @access public
  * {@getfields case_create}
@@ -196,7 +197,8 @@ function _civicrm_api3_case_delete_spec(&$params) {
  * {@getfields case_get}
  *
  * @throws API_Exception
- * @return array (get mode, case_id provided): Array with case details, case roles, case activity ids, (search mode, case_id not provided): Array of cases found
+ * @return array
+   *   (get mode, case_id provided): Array with case details, case roles, case activity ids, (search mode, case_id not provided): Array of cases found
  * @access public
  * @todo Erik Hommel 16 dec 2010 check if all DB fields are returned
  */
@@ -287,7 +289,8 @@ function civicrm_api3_case_activity_create($params) {
 
 /**
  * @deprecated api notice
- * @return array of deprecated actions
+ * @return array
+   *   of deprecated actions
  */
 function _civicrm_api3_case_deprecation() {
   return array('activity_create' => 'Case api "activity_create" action is deprecated. Use the activity api instead.');
@@ -306,7 +309,8 @@ function _civicrm_api3_case_deprecation() {
  * 'contact_id' => int // case client
  *
  * @throws API_Exception
- * @return array api result array
+ * @return array
+   *   api result array
  *
  * @access public
  */
@@ -372,7 +376,8 @@ function civicrm_api3_case_update($params) {
  * 'move_to_trash' => bool (defaults to false)
  *
  * @throws API_Exception
- * @return boolean: true if success, else false
+ * @return boolean
+   *   true if success, else false
  * {@getfields case_delete}
  * @access public
  */
@@ -401,7 +406,8 @@ function civicrm_api3_case_delete($params) {
  *
  * @param $options
  *
- * @return array case object
+ * @return array
+   *   case object
  */
 function _civicrm_api3_case_read($caseId, $options) {
   $return = CRM_Utils_Array::value('return', $options, array());

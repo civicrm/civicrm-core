@@ -34,7 +34,6 @@
  */
 class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
   /**
-   *
    */
   public function __construct() {
     parent::__construct();

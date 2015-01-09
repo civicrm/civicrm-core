@@ -224,7 +224,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * - Edit
    *
    * @return array
-   *
    */
   public static function &links() {
     list($context, $contextMenu, $key) = func_get_args();
@@ -298,7 +297,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    *
    * @param $action
    * @param array $params
-   *
    */
   public function getPagerParams($action, &$params) {
     $params['status']    = ts('Contact %%StatusMessage%%');
@@ -330,7 +328,8 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param enum $output
    *   What should the result set include (web/email/csv).
    *
-   * @return array the column headers that need to be displayed
+   * @return array
+   *   the column headers that need to be displayed
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     $headers = NULL;
@@ -481,7 +480,8 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    *
    * @param
    *
-   * @return int Total number of rows
+   * @return int
+   *   Total number of rows
    */
   public function getTotalCount($action) {
     // Use count from cache during paging/sorting
@@ -509,7 +509,8 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param enum $output
    *   What should the result set include (web/email/csv).
    *
-   * @return int   the total number of rows for this action
+   * @return int
+   *   the total number of rows for this action
    */
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     $config = CRM_Core_Config::singleton();
@@ -1079,7 +1080,8 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
    * @param array(
   reference)   $formValues   submitted formValues
    *
-   * @return array              $qill         which contains an array of strings
+   * @return array
+   *   which contains an array of strings
    */
 
   // the current internationalisation is bad, but should more or less work
@@ -1094,7 +1096,8 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
    * @param string $output
    *   Type of output.
    *
-   * @return string name of the file
+   * @return string
+   *   name of the file
    */
   public function getExportFileName($output = 'csv') {
     return ts('CiviCRM Contact Search');
@@ -1104,7 +1107,7 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
    * Get colunmn headers for search selector
    *
    *
-   * @return array $_columnHeaders
+   * @return array
    */
   private static function &_getColumnHeaders() {
     if (!isset(self::$_columnHeaders)) {

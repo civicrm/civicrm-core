@@ -72,7 +72,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on success, null otherwise
+   * @return Object
+   *   DAO object on success, null otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -717,7 +718,8 @@ WHERE entity_table = 'civicrm_contribution_page'
    * @param int $contributionPageId
    *   Contribution Page Id.
    *
-   * @return boolean true if payment processor supports recurring
+   * @return boolean
+   *   true if payment processor supports recurring
    * else false
    *
    * @static
@@ -742,7 +744,8 @@ WHERE entity_table = 'civicrm_contribution_page'
    * Get info for all sections enable/disable.
    *
    * @param array $contribPageIds
-   * @return array $info info regarding all sections.
+   * @return array
+   *   info regarding all sections.
    * @static
    */
   public static function getSectionInfo($contribPageIds = array()) {
@@ -913,7 +916,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
    *   Contribution Page Id.
    * @param int $userID
    *   Contact id for contributor.
-   * @return array $pdfHtml
+   * @return array
    */
   public static function addInvoicePdfToEmail($contributionId, $userID) {
     $contributionID = array($contributionId);
@@ -931,7 +934,8 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
    * Helper to determine if the page supports separate membership payments
    * @param int id form id
    *
-   * @return bool isSeparateMembershipPayment
+   * @return bool
+   *   isSeparateMembershipPayment
    */
   public static function getIsMembershipPayment($id) {
     $membershipBlocks = civicrm_api3('membership_block', 'get', array('entity_table' => 'civicrm_contribution_page', 'entity_id' => $id, 'sequential' => TRUE));

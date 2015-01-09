@@ -47,7 +47,8 @@ class CRM_Contribute_BAO_Query {
   /**
    * Function get the import/export fields for contribution
    *
-   * @return array self::$_contributionFields  associative array of contribution fields
+   * @return array
+   *   self::$_contributionFields  associative array of contribution fields
    * @static
    */
   public static function &getFields() {

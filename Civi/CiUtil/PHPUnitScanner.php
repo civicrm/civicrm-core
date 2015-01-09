@@ -26,7 +26,8 @@ class PHPUnitScanner {
   }
 
   /**
-   * @return array (string $file => string $class)
+   * @return array
+   *   (string $file => string $class)
    */
   public static function findTestClasses($paths) {
     $testClasses = array();
@@ -66,7 +67,8 @@ class PHPUnitScanner {
 
   /**
    * @param array $testClasses
-   * @return array each element is an array with keys:
+   * @return array
+   *   each element is an array with keys:
    *   - file: string
    *   - class: string
    *   - method: string

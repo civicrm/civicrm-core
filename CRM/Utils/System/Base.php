@@ -167,7 +167,8 @@ abstract class CRM_Utils_System_Base {
    * @param string $destination
    *   If present, add destination to querystring (works for Drupal only).
    *
-   * @return string - loginURL for the current CMS
+   * @return string
+   *   loginURL for the current CMS
    * @static
    */
   public abstract function getLoginURL($destination = '');
@@ -294,7 +295,6 @@ abstract class CRM_Utils_System_Base {
    * @param object $user
    *   Object as described by the User Framework.
    * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
-   *
    */
   public function getUniqueIdentifierFromUserObject($user) {
   }
@@ -304,7 +304,6 @@ abstract class CRM_Utils_System_Base {
    * @param object $user
    *   Object as described by the User Framework.
    * @return mixed <NULL, number>
-   *
    */
   public function getUserIDFromUserObject($user) {
   }
@@ -312,7 +311,8 @@ abstract class CRM_Utils_System_Base {
   /**
    * Get currently logged in user uf id.
    *
-   * @return int $userID logged in user uf id.
+   * @return int
+   *   $userID logged in user uf id.
    */
   public function getLoggedInUfID() {
   }
@@ -320,7 +320,8 @@ abstract class CRM_Utils_System_Base {
   /**
    * Get currently logged in user unique identifier - this tends to be the email address or user name.
    *
-   * @return string $userID logged in user unique identifier
+   * @return string
+   *   logged in user unique identifier
    */
   public function getLoggedInUniqueIdentifier() {
   }
@@ -334,7 +335,8 @@ abstract class CRM_Utils_System_Base {
    * Note there is already a function getUFId which takes $username as a param - we could add $user
    * as a second param to it but it seems messy - just overloading it because the name is taken
    * @param object $user
-   * @return int $ufid - user ID of UF System
+   * @return int
+   *   $ufid - user ID of UF System
    */
   public function getBestUFID($user = NULL) {
     if ($user) {
@@ -350,7 +352,8 @@ abstract class CRM_Utils_System_Base {
    * the function
    *
    * @param object $user
-   * @return string $uniqueIdentifier - unique identifier from the UF System
+   * @return string
+   *   unique identifier from the UF System
    */
   public function getBestUFUniqueIdentifier($user = NULL) {
     if ($user) {

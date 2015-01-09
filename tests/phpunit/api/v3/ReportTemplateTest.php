@@ -112,7 +112,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
-   *
    */
   public function testReportTemplateGetRowsContactSummary() {
     $description = "Retrieve rows from a report template (optionally providing the instance_id)";

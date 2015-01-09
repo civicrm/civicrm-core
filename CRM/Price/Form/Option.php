@@ -75,7 +75,8 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    *
    * @param null
    *
-   * @return array   array of default values
+   * @return array
+   *   array of default values
    */
   public function setDefaultValues() {
     if ($this->_action == CRM_Core_Action::DELETE) {
@@ -274,7 +275,8 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * @param $files
    * @param CRM_Core_Form $form
    *
-   * @return array    if errors then list of errors to be posted back to the form,
+   * @return array
+   *   if errors then list of errors to be posted back to the form,
    *                  true otherwise
    * @static
    */

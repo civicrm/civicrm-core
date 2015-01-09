@@ -69,7 +69,8 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    *
    * @param int $contactID
    *
-   * @return boolean true if yes, else false
+   * @return boolean
+   *   true if yes, else false
    */
   public function check($str, $contactID = NULL) {
     $str = $this->translatePermission($str, 'Drupal6', array(
@@ -94,7 +95,8 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    * @param array $array
    *   The roles to check.
    *
-   * @return boolean true if yes, else false
+   * @return boolean
+   *   true if yes, else false
    */
 
   public function checkGroupRole($array) {
@@ -116,7 +118,8 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    * @param string $roleName
    *   Name of the role we are interested in.
    *
-   * @return string a comma separated list of email addresses
+   * @return string
+   *   a comma separated list of email addresses
    */
   public function roleEmails($roleName) {
     static $_cache = array();
@@ -150,7 +153,8 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    * @param string $permissionName
    *   Name of the permission we are interested in.
    *
-   * @return string a comma separated list of email addresses
+   * @return string
+   *   a comma separated list of email addresses
    */
   public function permissionEmails($permissionName) {
     static $_cache = array();
@@ -200,7 +204,8 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    *
    * @param $module
    *
-   * @return Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
+   * @return Array
+   *   of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */
   public static function getModulePermissions($module) {
     $return_permissions = array();

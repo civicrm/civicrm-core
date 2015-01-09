@@ -38,7 +38,8 @@
 
 /**
  * @deprecated api notice
- * @return string to indicate this entire api entity is deprecated
+ * @return string
+   *   to indicate this entire api entity is deprecated
  */
 function _civicrm_api3_activity_type_deprecation() {
   return 'The activity_type api is deprecated. Please use the option_value api instead.';
@@ -49,7 +50,8 @@ function _civicrm_api3_activity_type_deprecation() {
  *
  * @param array $params
  *
- * @return array $activityTypes activity types keyed by id
+ * @return array
+   *   activity types keyed by id
  * @access public
  *
  * @example ActivityTypeGet.php
@@ -68,7 +70,8 @@ function civicrm_api3_activity_type_get($params) {
  *   Associated array of fields.
  *                 $params['option_value_id'] is required for updation of activity type
  *
- * @return array $activityType created / updated activity type
+ * @return array
+   *   created / updated activity type
  *
  * @access public
  *
@@ -109,7 +112,8 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
  * @param array $params
  *   Array including id of activity_type to delete.
 
- * @return array API result array
+ * @return array
+   *   API result array
  *
  * @access public
  *

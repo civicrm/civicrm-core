@@ -470,7 +470,8 @@ AND       CEF.entity_id    = %2";
    * @param string $separator
    *   The string separator where to implode the urls.
    *
-   * @return array              An array with 2 elements. The string and the number of attachments
+   * @return array
+   *   An array with 2 elements. The string and the number of attachments
    * @static
    */
   public static function attachmentInfo($entityTable, $entityID, $separator = '<br />') {

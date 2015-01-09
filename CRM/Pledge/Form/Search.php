@@ -61,7 +61,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Prefix for the controller
-   *
    */
   protected $_prefix = "pledge_";
 
@@ -314,7 +313,8 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * Set the default form values
    *
    *
-   * @return array the default array reference
+   * @return array
+   *   the default array reference
    */
   public function setDefaultValues() {
     $defaults = array();

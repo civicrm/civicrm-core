@@ -201,7 +201,8 @@ function _civicrm_api3_setting_fill_spec(&$params) {
  *                       name/value pairs + other vars as applicable - see getfields for more
  * @example SettingCreate.php Std Create example
  *
- * @return array api result array
+ * @return array
+   *   api result array
  * {@getfields setting_create}
  * @access public
  */
@@ -237,7 +238,8 @@ function _civicrm_api3_setting_create_spec(&$params) {
  *   Array of one or more valid.
  *                       property_name=>value pairs.
  *
- * @return array Array of matching settings
+ * @return array
+   *   Array of matching settings
  * {@getfields setting_get}
  * @access public
  */
@@ -271,7 +273,8 @@ function _civicrm_api3_setting_get_spec(&$params) {
  *   (reference) Array of one or more valid.
  *                       property_name=>value pairs.
  *
- * @return array Array of matching settings
+ * @return array
+   *   Array of matching settings
  * {@getfields setting_get}
  * @access public
  */

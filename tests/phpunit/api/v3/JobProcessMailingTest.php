@@ -73,7 +73,6 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
-   *
    */
   public function tearDown() {
     $this->_mut->stop();

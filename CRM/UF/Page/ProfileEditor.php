@@ -189,7 +189,8 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
    *   A string to use in section headers.
    * @param array $availableFields
    *   List of fields that are allowed in profiles, e.g. $availableFields['my_field']['field_type'].
-   * @return array with keys 'sections' and 'schema'
+   * @return array
+   *   with keys 'sections' and 'schema'
    * @see js/model/crm.core.js
    * @see js/model/crm.mappedcore.js
    */

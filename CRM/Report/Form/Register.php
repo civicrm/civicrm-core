@@ -60,8 +60,8 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
    *
    * access        public
    *
-   * @return array reference to the array of default values
-   *
+   * @return array
+   *   reference to the array of default values
    */
   /**
    * @return array

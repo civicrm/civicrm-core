@@ -51,7 +51,8 @@
  * @param array $params
  *   An associative array of name/value property values of civicrm_participant.
  *
- * @return array apiresult
+ * @return array
+   *   apiresult
  * {@getfields participant_create}
  * @access public
  */
@@ -163,7 +164,8 @@ function _civicrm_api3_participant_create_spec(&$params) {
  * @param array $params
  *   (reference ) input parameters.
  *
- * @return array (reference )        array of properties, if error an array with an error id and error message
+ * @return array
+   *   (reference )        array of properties, if error an array with an error id and error message
  * {@getfields participant_get}
  * @access public
  */

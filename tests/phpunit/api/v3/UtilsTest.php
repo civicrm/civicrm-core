@@ -42,7 +42,6 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
-   *
    */
   protected function setUp() {
     parent::setUp();
@@ -107,7 +106,8 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
    *
    * @throws API_Exception
    * @throws Exception
-   * @return bool TRUE or FALSE depending on the outcome of the authorization check
+   * @return bool
+   *   TRUE or FALSE depending on the outcome of the authorization check
    */
   public function runPermissionCheck($entity, $action, $params, $throws = FALSE) {
     $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();

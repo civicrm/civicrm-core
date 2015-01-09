@@ -48,7 +48,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   static $_exportableFields = NULL;
 
   /**
-   *
    */
   public function __construct() {
     parent::__construct();
@@ -310,7 +309,8 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param int $caseId
    * @param string $colName
    *
-   * @return string case type
+   * @return string
+   *   case type
    * @static
    */
   public static function getCaseType($caseId, $colName = 'title') {
@@ -334,7 +334,8 @@ WHERE civicrm_case.id = %1";
    *
    * @param bool $moveToTrash
    *
-   * @return bool is successful
+   * @return bool
+   *   is successful
    * @static
    */
   public static function deleteCase($caseId, $moveToTrash = FALSE) {
@@ -477,8 +478,6 @@ WHERE civicrm_case.id = %1";
    *   ID of the case.
    *
    * @return array
-   *
-   *
    */
   public static function getContactNames($caseId) {
     $contactNames = array();
@@ -524,7 +523,6 @@ WHERE civicrm_case.id = %1";
    * @param null $caseType
    *
    * @return array
-   *
    */
   public static function retrieveCaseIdsByContactId($contactID, $includeDeleted = FALSE, $caseType = NULL) {
     $query = "
@@ -726,8 +724,8 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
    *
    * @param string $context
    *
-   * @return array     Array of Cases
-   *
+   * @return array
+   *   Array of Cases
    */
   public static function getCases($allCases = TRUE, $userID = NULL, $type = 'upcoming', $context = 'dashboard') {
     $condition = NULL;
@@ -974,7 +972,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    *   Case id.
    * @param int $relationshipID
    *
-   * @return array case role / relationships
+   * @return array
+   *   case role / relationships
    *
    * @static
    */
@@ -1037,7 +1036,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param int $userID
    * @param null $type
    *
-   * @return array of case activities
+   * @return array
+   *   of case activities
    *
    * @static
    */
@@ -1377,7 +1377,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param bool $skipDetails
    *   If true include details of contacts.
    *
-   * @return array $searchRows array of return properties
+   * @return array
+   *   array of return properties
    *
    * @static
    */
@@ -1571,8 +1572,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    *   ID of the activity type.
    *
    * @return array
-   *
-   *
    */
   public static function getCaseActivityCount($caseId, $activityTypeId) {
     $queryParam = array(
@@ -1692,7 +1691,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    *
    * @param string $type
    *
-   * @return array  $activityInfo Array of scheduled activity type and date
+   * @return array
+   *   Array of scheduled activity type and date
    *
    *
    * @static
@@ -1731,7 +1731,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   /**
    * Combine all the exportable fields from the lower levels object
    *
-   * @return array array of exportable Fields
+   * @return array
+   *   array of exportable Fields
    * @static
    */
   public static function &exportableFields() {
@@ -1916,7 +1917,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    *   Case role assignee contactId.
    * @param int $contactId
    *
-   * @return void on success creates activity and case activity
+   * @return void
+   *   on success creates activity and case activity
    *
    * @static
    */
@@ -2010,7 +2012,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param int $caseId
    *   Case id.
    *
-   * @return array $caseManagerContact array of contact on success otherwise empty
+   * @return array
+   *   array of contact on success otherwise empty
    *
    * @static
    */
@@ -2055,7 +2058,8 @@ SELECT civicrm_contact.id as casemanager_id,
    * @param array $excludeCaseIds
    * @param bool $excludeDeleted
    *
-   * @return array of case and related data keyed on case id
+   * @return array
+   *   of case and related data keyed on case id
    */
   public static function getUnclosedCases($params = array(), $excludeCaseIds = array(), $excludeDeleted = TRUE, $includeClosed = FALSE) {
     //params from ajax call.
@@ -2184,7 +2188,6 @@ LEFT JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.case
    *   Do not include deleted cases.
    *
    * @return an array of cases.
-   *
    */
   public static function getContactCases($contactId, $excludeDeleted = TRUE) {
     $cases = array();
@@ -2228,7 +2231,6 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
    *   Do not include deleted cases.
    *
    * @return an array of related cases.
-   *
    */
   public static function getRelatedCases($mainCaseId, $contactId, $excludeDeleted = TRUE) {
     //FIXME : do check for permissions.
@@ -2819,7 +2821,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * @param bool $checkComponent
    *   Do we need to check component enabled.
    *
-   * @return boolean $allow  true/false
+   * @return boolean
    * @static
    */
   public static function checkPermission($activityId, $operation, $actTypeId = NULL, $contactId = NULL, $checkComponent = TRUE) {
@@ -3131,7 +3133,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * @param int $activityID
    *   Activity id.
    *
-   * @return boolean  $isCaseActivity true/false
+   * @return boolean
    */
   public static function isCaseActivity($activityID) {
     $isCaseActivity = FALSE;
@@ -3150,7 +3152,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * Get all the case type ids currently in use
    *
    *
-   * @return array $caseTypeIds
+   * @return array
    */
   public static function getUsedCaseType() {
     static $caseTypeIds;
@@ -3175,7 +3177,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * Get all the case status ids currently in use
    *
    *
-   * @return array $caseStatusIds
+   * @return array
    */
   public static function getUsedCaseStatuses() {
     static $caseStatusIds;
@@ -3218,7 +3220,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    *
    * @param int $contactId
    *
-   * @return array $configured
+   * @return array
    */
   public static function isCaseConfigured($contactId = NULL) {
     $configured = array_fill_keys(array('configured', 'allowToAddNewCase', 'redirectToCaseAdmin'), FALSE);
@@ -3373,7 +3375,8 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    *
    * @param int $caseId
    *
-   * @return array $clients associated array with client ids
+   * @return array
+   *   associated array with client ids
    * @static
    */
   public static function getCaseClients($caseId) {

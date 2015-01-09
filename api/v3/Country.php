@@ -46,7 +46,8 @@ require_once 'CRM/Core/DAO/Country.php';
  *
  * @example CountryCreate.php Standard Create Example
  *
- * @return array API result array
+ * @return array
+   *   API result array
  * {@getfields country_create}
  * @access public
  */
@@ -72,7 +73,8 @@ function _civicrm_api3_country_create_spec(&$params) {
  *
  * @example CountryDelete.php Standard Delete Example
  *
- * @return boolean | error  true if successfull, error otherwise
+ * @return boolean
+   *   | error  true if successfull, error otherwise
  * {@getfields country_delete}
  * @access public
  */
@@ -91,7 +93,8 @@ function civicrm_api3_country_delete($params) {
  * @param array $params
  *   An associative array of name/value pairs.
  *
- * @return array api result array
+ * @return array
+   *   api result array
  * {@getfields country_get}
  * @access public
  */

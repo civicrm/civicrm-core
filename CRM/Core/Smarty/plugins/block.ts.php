@@ -47,7 +47,8 @@
  * @param object $smarty
  *   The Smarty object.
  *
- * @return string  the string, translated by gettext
+ * @return string
+   *   the string, translated by gettext
  */
 function smarty_block_ts($params, $text, &$smarty) {
   if (!isset($params['domain'])) {

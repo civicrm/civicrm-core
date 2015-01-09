@@ -49,7 +49,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return object     CRM_Core_DAO_Tag object on success, otherwise null
+   * @return object
+   *   CRM_Core_DAO_Tag object on success, otherwise null
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -321,7 +322,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *
    * @return boolean
    * @static
-   *
    */
   public static function del($id) {
     // since this is a destructive operation, lets make sure
@@ -359,7 +359,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *   (optional) the array that holds all the db ids - we are moving away from this in bao.
    * signatures
    *
-   * @return object    CRM_Core_DAO_Tag object on success, otherwise null
+   * @return object
+   *   CRM_Core_DAO_Tag object on success, otherwise null
    * @static
    */
   public static function add(&$params, $ids = array()) {
@@ -429,7 +430,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param string $entityTable
    *   Entity_table.
    *
-   * @return array $tagSets array of tag sets
+   * @return array
+   *   array of tag sets
    * @static
    */
   public static function getTagSet($entityTable) {
@@ -447,7 +449,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   /**
    * Get the tags that are not children of a tagset.
    *
-   * @return array $tags associated array of tag name and id
+   * @return array
+   *   associated array of tag name and id
    * @access public
    * @static
    */

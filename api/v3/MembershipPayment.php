@@ -42,7 +42,8 @@
  * @param array $params
  *   (reference ) input parameters.
  *
- * @return array (reference )        membership_payment_id of created or updated record
+ * @return array
+   *   (reference )        membership_payment_id of created or updated record
  * {@getfields MembershipPayment_create}
  * @example MembershipPaymentCreate.php
  * @access public
@@ -70,7 +71,8 @@ function _civicrm_api3_membership_payment_create_spec(&$params) {
  * @param array $params
  *   Input parameters.
  *
- * @return array  array of properties, if error an array with an error id and error message
+ * @return array
+   *   array of properties, if error an array with an error id and error message
  * @example MembershipPaymentGet
  * {@getfields MembershipPayment_get}
  * @access public

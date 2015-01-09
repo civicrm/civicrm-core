@@ -49,7 +49,8 @@
  *   Array of one or more valid.
  * @param array $ids
  *
- * @return array API return Array of matching mailing jobs
+ * @return array
+   *   API return Array of matching mailing jobs
  * {@getfields mailing_recipient_get}
  * @access public
  */

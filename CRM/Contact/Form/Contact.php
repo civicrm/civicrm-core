@@ -452,7 +452,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   /**
    * Do the set default related to location type id,
    * primary location,  default country
-   *
    */
   public function blockSetDefaults(&$defaults) {
     $locationTypeKeys = array_filter(array_keys(CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id')), 'is_int');
@@ -588,7 +587,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @param int $contactId
    *   Contact id if doing update.
    *
-   * @return bool $primaryID email/openId
+   * @return bool
+   *   email/openId
    * @static
    */
   public static function formRule($fields, &$errors, $contactId = NULL) {
@@ -1061,7 +1061,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @param array $fields
    *   The hierarchical value representation of this location.
    *
-   * @return boolean true if data exists, false otherwise
+   * @return boolean
+   *   true if data exists, false otherwise
    * @static
    */
   public static function blockDataExists(&$fields) {
@@ -1109,7 +1110,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *   Contact id.
    * @param string $contactType
    *   Contact type.
-   *
    */
   public static function checkDuplicateContacts(&$fields, &$errors, $contactID, $contactType) {
     // if this is a forced save, ignore find duplicate rule
@@ -1196,7 +1196,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @param array $params
    *   of key value consist of address blocks.
    *
-   * @return array $parseSuccess as array of sucess/fails for each address block
+   * @return array
+   *   as array of sucess/fails for each address block
    * @static
    */
   public function parseAddress(&$params) {

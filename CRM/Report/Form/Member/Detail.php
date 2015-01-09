@@ -48,10 +48,8 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
   protected $_customGroupGroupBy = FALSE;
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
 

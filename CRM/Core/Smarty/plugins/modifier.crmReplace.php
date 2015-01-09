@@ -46,7 +46,8 @@
  * @param string $value
  *   The new attribute value.
  *
- * @return string        the new modified html string
+ * @return string
+   *   the new modified html string
  */
 function smarty_modifier_crmReplace($string, $attribute, $value) {
   // we need to search and replace the string: $attribute=XXX or $attribute="XXX"

@@ -59,7 +59,8 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
   /**
    * Get action Links
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
   public function &links() {
     if (!(self::$_actionLinks)) {
@@ -102,7 +103,8 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    *
    * @param $enableCart
    *
-   * @return array (reference) of tab links
+   * @return array
+   *   (reference) of tab links
    */
   public static function &tabs($enableCart) {
     $cacheKey = $enableCart ? 1 : 0;
@@ -186,7 +188,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   *
    */
   public function run() {
     // get the requested action

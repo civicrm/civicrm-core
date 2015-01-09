@@ -47,19 +47,16 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
 
   /**
    * Maximum contacts that should be allowed to update
-   *
    */
   protected $_maxContacts = 100;
 
   /**
    * Maximum profile fields that will be displayed
-   *
    */
   protected $_maxFields = 9;
 
   /**
    * Variable to store redirect path
-   *
    */
   protected $_userContext;
 
@@ -139,7 +136,8 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @return array list of errors to be posted back to the form
+   * @return array
+   *   list of errors to be posted back to the form
    * @static
    */
   public static function formRule($fields) {

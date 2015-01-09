@@ -72,8 +72,6 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
    * @param
    *
    * @return void
-   *
-   *
    */
   public function preProcess() {
     $this->_groupID   = CRM_Utils_Request::retrieve('groupID', 'Positive', $this, TRUE);

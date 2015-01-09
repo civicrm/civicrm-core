@@ -70,7 +70,8 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -137,7 +138,8 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    * @param int $optionGroupId
    *   Id of the Option Group.
    *
-   * @return String title
+   * @return String
+   *   title
    *
    * @static
    */

@@ -52,7 +52,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @return \CRM_Member_DAO_Membership
    */
   /**
-   *
    */
   public function __construct() {
     parent::__construct();
@@ -451,7 +450,8 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *
    * @param int $action
    *
-   * @return Array    array of contact_id of all related contacts.
+   * @return Array
+   *   array of contact_id of all related contacts.
    * @static
    */
   public static function checkMembershipRelationship($membershipId, $contactId, $action = CRM_Core_Action::ADD) {
@@ -557,7 +557,8 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @param int $membershipId
    *   Membership id of values to return.
    *
-   * @return array of key value pairs
+   * @return array
+   *   of key value pairs
    */
   public static function getStatusANDTypeValues($membershipId) {
     $values = array();
@@ -712,7 +713,8 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * @param string $status
    *   Active or inactive.
    *
-   * @return array $actives array of memberships based on status
+   * @return array
+   *   array of memberships based on status
    * @static
    */
   public static function activeMembers($memberships, $status = 'active') {
@@ -752,7 +754,8 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *   Thank you page.
    * @param null $isTest
    *
-   * @return bool Is this a separate membership payment
+   * @return bool
+   *   Is this a separate membership payment
    *
    * @static
    */
@@ -1087,7 +1090,8 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *   Contact type.
    * @param bool $status
    *
-   * @return array array of importable Fields
+   * @return array
+   *   array of importable Fields
    * @static
    */
   public static function &importableFields($contactType = 'Individual', $status = TRUE) {
@@ -1185,7 +1189,8 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * @param bool|int $isTest if true, membership is for a test site
    * @param bool|int $isOwner if true, only retrieve membership records for owners //LCD
    *
-   * @return integer the number of members of type $membershipTypeId whose
+   * @return integer
+   *   the number of members of type $membershipTypeId whose
    *         start_date is between $startDate and $endDate
    */
   //LCD
@@ -1671,7 +1676,8 @@ AND civicrm_membership.is_test = %2";
    *
    * @param int membershipId membership id
    *
-   * @return int $contributionPageId contribution page id
+   * @return int
+   *   $contributionPageId contribution page id
    * @static
    */
   public static function getContributionPageId($membershipID) {
@@ -1720,7 +1726,8 @@ SELECT c.contribution_page_id as pageID
    *
    * @param null $mode
    *
-   * @return array the list of membership fields
+   * @return array
+   *   the list of membership fields
    * @static
    */
   public static function getMembershipFields($mode = NULL) {
@@ -1937,7 +1944,8 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * @param int $membershipId
    *   Membsership id.
    *
-   * @return boolean  true if deleted false otherwise
+   * @return boolean
+   *   true if deleted false otherwise
    */
   public static function deleteMembershipPayment($membershipId) {
 
@@ -2078,7 +2086,8 @@ FROM   civicrm_membership_type
    * @param int $mid
    *   Membership id.
    *
-   * @return string $status contribution status
+   * @return string
+   *   contribution status
    * @static
    */
   public static function isSubscriptionCancelled($mid) {
@@ -2161,7 +2170,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *   Date on which to end counting.
    * @param bool|int $isTest if true, membership is for a test site
    *
-   * @return integer returns the number of members of type $membershipTypeId
+   * @return integer
+   *   returns the number of members of type $membershipTypeId
    *         whose join_date is before $startDate and
    *         whose start_date is between $startDate and $endDate
    */
@@ -2683,7 +2693,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @param int $membershipId
    *   Membership id.
    *
-   * @return integer contribution id
+   * @return integer
+   *   contribution id
    */
   public static function getMembershipContributionId($membershipId) {
 
@@ -2702,7 +2713,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * IMPORTANT:
    * Sending renewal reminders has been migrated from this job to the Scheduled Reminders function as of 4.3.
    *
-   * @return array $result
+   * @return array
    */
   public static function updateAllMembershipStatus() {
 
@@ -3058,7 +3069,8 @@ WHERE      civicrm_membership.is_test = 0";
    * @param bool $isTest
    *   Mode of payment.
    *
-   * @return array of membership type
+   * @return array
+   *   of membership type
    * @static
    */
   public static function getContactsCancelledMembership($contactID, $isTest = FALSE) {

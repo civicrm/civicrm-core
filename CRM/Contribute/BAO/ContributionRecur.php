@@ -40,8 +40,8 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object activity contact object
-   *
+   * @return object
+   *   activity contact object
    */
   public static function create(&$params) {
     return self::add($params);
@@ -112,7 +112,8 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @param array $duplicates
    *   (reference ) store ids of duplicate contribs.
    *
-   * @return boolean true if duplicate, false otherwise
+   * @return boolean
+   *   true if duplicate, false otherwise
    * static
    */
   public static function checkDuplicate($params, &$duplicates) {
@@ -182,7 +183,8 @@ SELECT r.payment_processor_id
    * @param array $ids
    *   (reference ) an array of recurring contribution ids.
    *
-   * @return array $totalCount an array of recurring ids count
+   * @return array
+   *   an array of recurring ids count
    * static
    */
   public static function getCount(&$ids) {
@@ -329,7 +331,8 @@ SELECT r.payment_processor_id
    * @param int $contactId
    *   Contact ID.
    *
-   * @return array list of recurring contribution fields
+   * @return array
+   *   list of recurring contribution fields
    *
    * @static
    */

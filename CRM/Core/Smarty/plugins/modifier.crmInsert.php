@@ -48,7 +48,8 @@
  * @param string $insertBefore
  *   The string before which we want this tag inserted.
  *
- * @return string        the new modified html string
+ * @return string
+   *   the new modified html string
  */
 function smarty_modifier_crmInsert($string, $attribute, $value, $insertBefore = '/>') {
   return str_replace($insertBefore, ' ' . $attribute . '="' . $value . '"' . $insertBefore, $string);

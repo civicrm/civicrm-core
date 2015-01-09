@@ -53,7 +53,8 @@ class CRM_Campaign_BAO_Query {
   /**
    * Function get the fields for campaign.
    *
-   * @return array self::$_campaignFields  an associative array of campaign fields
+   * @return array
+   *   self::$_campaignFields  an associative array of campaign fields
    * @static
    */
   public static function &getFields() {

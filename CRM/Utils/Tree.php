@@ -111,7 +111,6 @@ class CRM_Utils_Tree {
    *
    * @return array(
   ref) | false node if found else false
-   *
    */
   //public function &findNode(&$parentNode, $name)
   public function &findNode($name, &$parentNode) {
@@ -151,7 +150,6 @@ class CRM_Utils_Tree {
   ref) $node node which needs to checked
    *
    * @return boolean
-   *
    */
   public function isLeafNode(&$node) {
     return (count($node['children']) ? TRUE : FALSE);
@@ -162,8 +160,8 @@ class CRM_Utils_Tree {
    *
    * @param string $name
    *
-   * @return array (ref)
-   *
+   * @return array
+   *   (ref)
    */
   public function &createNode($name) {
     $node['name']     = $name;
@@ -181,7 +179,6 @@ class CRM_Utils_Tree {
    * @param array (ref) - node to be added
    *
    * @return void
-   *
    */
   public function addNode($parentName, &$node) {
     $temp = '';
@@ -199,7 +196,6 @@ class CRM_Utils_Tree {
    * @param string - key to be used (optional)
    *
    * @return void
-   *
    */
   public function addData($parentName, $childName, $data) {
     $temp = '';
@@ -219,7 +215,6 @@ class CRM_Utils_Tree {
    * @param none
    *
    * @return tree
-   *
    */
   public function getTree() {
     return $this->tree;
@@ -231,7 +226,6 @@ class CRM_Utils_Tree {
    * @param none
    *
    * @return void
-   *
    */
   public function display() {
     print_r($this->tree);

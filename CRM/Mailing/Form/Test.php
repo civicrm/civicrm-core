@@ -177,7 +177,8 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
    * @param array $self
    *   An current this object.
    *
-   * @return boolean          true on successful SMTP handoff
+   * @return boolean
+   *   true on successful SMTP handoff
    */
   public static function testMail($testParams, $files, $self) {
     $error = NULL;

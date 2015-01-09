@@ -61,7 +61,8 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @param int $componentID
    *   The optional component ID (so componenets can share the same name space).
    *
-   * @return object The data if present in cache, else null
+   * @return object
+   *   The data if present in cache, else null
    * @static
    */
   public static function &getItem($group, $path, $componentID = NULL) {
@@ -100,7 +101,8 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @param int $componentID
    *   The optional component ID (so componenets can share the same name space).
    *
-   * @return object The data if present in cache, else null
+   * @return object
+   *   The data if present in cache, else null
    * @static
    */
   public static function &getItems($group, $componentID = NULL) {
@@ -229,7 +231,6 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * The next two functions are internal functions used to store and retrieve session from
    * the database cache. This keeps the session to a limited size and allows us to
    * create separate session scopes for each form in a tab
-   *
    */
 
   /**

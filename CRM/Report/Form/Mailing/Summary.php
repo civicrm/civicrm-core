@@ -54,10 +54,8 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
   public $campaignEnabled = FALSE;
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     $this->_columns = array();

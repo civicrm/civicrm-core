@@ -166,7 +166,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   /**
    * Define the set of valid contexts that the search form operates on
    *
-   * @return array the valid context set and the titles
+   * @return array
+   *   the valid context set and the titles
    * @static
    */
   public static function &validContext() {

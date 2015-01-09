@@ -13,7 +13,8 @@ interface CRM_Core_FileSearchInterface {
    *  - xparent_id: int - business-entity to which file is attached (directly or indirectly)
    * @param int $limit
    * @param int $offset
-   * @return array each item has keys:
+   * @return array
+   *   each item has keys:
    *  - file_id: int
    *  - parent_table: string - entity to which file is directly attached
    *  - parent_id: int - entity to which file is directly attached

@@ -45,7 +45,8 @@
  * @param $params
  *   Array array holding id - Id of the contact membership to be deleted.
  *
- * @return array api result
+ * @return array
+   *   api result
  * {@getfields membership_delete}
  * @access public
  */
@@ -62,7 +63,8 @@ function civicrm_api3_membership_delete($params) {
  * @param array $params
  *   An associative array of name/value property values of civicrm_membership.
  *
- * @return array of newly created membership property values.
+ * @return array
+   *   of newly created membership property values.
  * {@getfields membership_create}
  * @access public
  */
@@ -187,7 +189,8 @@ function _civicrm_api3_membership_get_spec(&$params) {
  *          options affecting the desired results; has legacy support
  *          for just passing the contact_id itself as the argument
  *
- * @return Array of all found membership property values.
+ * @return Array
+   *   of all found membership property values.
  * @access public
  * @todo needs some love - basically only a get for a given contact right now
  * {@getfields membership_get}
@@ -237,7 +240,8 @@ function civicrm_api3_membership_get($params) {
  * @param int $membershipTypeId
  * @param $activeOnly
  *
- * @return array result for calling function
+ * @return array
+   *   result for calling function
  */
 function _civicrm_api3_membership_get_customv2behaviour(&$params, $membershipTypeId, $activeOnly) {
   // get the membership for the given contact ID
@@ -259,7 +263,8 @@ function _civicrm_api3_membership_get_customv2behaviour(&$params, $membershipTyp
  * @param $membershipValues
  * @param int $contactID
  *
- * @return array result for calling function
+ * @return array
+   *   result for calling function
  */
 function _civicrm_api3_membership_relationsship_get_customv2behaviour(&$params, $membershipValues, $contactID) {
   $relationships = array();

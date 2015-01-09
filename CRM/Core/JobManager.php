@@ -55,10 +55,8 @@ class CRM_Core_JobManager {
    * Class constructor
    *
    * @param void
-   *
    */
   /**
-   *
    */
   public function __construct() {
     $config = CRM_Core_Config::singleton();
@@ -70,7 +68,6 @@ class CRM_Core_JobManager {
   /*
    *
    * @param void
-   *
    */
   /**
    * @param bool $auth
@@ -100,7 +97,6 @@ class CRM_Core_JobManager {
    * Class destructor
    *
    * @param void
-   *
    */
   public function __destruct() {}
 
@@ -153,8 +149,8 @@ class CRM_Core_JobManager {
    * populates class param.
    *
    * @param void
-   * @return array ($id => CRM_Core_ScheduledJob)
-   *
+   * @return array
+   *   ($id => CRM_Core_ScheduledJob)
    */
   /**
    * @return array
@@ -178,7 +174,6 @@ class CRM_Core_JobManager {
    * and creates ScheduledJob object.
    *
    * @param void
-   *
    */
   /**
    * @param int $id
@@ -220,7 +215,6 @@ class CRM_Core_JobManager {
   /*
    *
    * @return array|null collection of permissions, null if none
-   *
    */
   /**
    * @param $message

@@ -114,7 +114,8 @@ function _civicrm_api3_entity_tag_delete_spec(&$params) {
  * @param <type> $params
  * @param string $op
  *
- * @return array <type>
+ * @return array
+   *   <type>
  */
 function _civicrm_api3_entity_tag_common($params, $op = 'add') {
 

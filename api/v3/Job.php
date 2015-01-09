@@ -74,7 +74,8 @@ function civicrm_api3_job_create($params) {
 /**
  * Retrieve one or more job
  * @param array input parameters
- * @return array api result array
+ * @return array
+   *   api result array
  * {@getfields email_get}
  * @access public
  */
@@ -87,7 +88,8 @@ function civicrm_api3_job_get($params) {
  *
  * @param array $params
  *
- * @return array API Result Array
+ * @return array
+   *   API Result Array
  * {@getfields Job_delete}
  * @static void
  * @access public
@@ -103,7 +105,8 @@ function civicrm_api3_job_delete($params) {
  * @param array $params
  *   (reference ) input parameters.
  *
- * @return array API Result Array
+ * @return array
+   *   API Result Array
  *
  * @static void
  * @access public
@@ -132,7 +135,8 @@ function _civicrm_api3_job_execute_spec(&$params) {
  * @param array $params
  *   (reference ) input parameters.
  *
- * @return array API Result Array
+ * @return array
+   *   API Result Array
  * {@getfields contact_geocode}
  *
  * @static void
@@ -175,7 +179,8 @@ function _civicrm_api3_job_geocode_spec(&$params) {
  *                        now - the time to use, in YmdHis format
  *                            - makes testing a bit simpler since we can simulate past/future time
  *
- * @return boolean        true if success, else false
+ * @return boolean
+   *   true if success, else false
  * @static void
  * @access public
  *
@@ -225,7 +230,8 @@ function _civicrm_api3_job_send_reminder(&$params) {
  *                        instanceId - Integer - the report instance ID
  *                        resetVal - Integer - should we reset form state (always true)?
  *
- * @return boolean        true if success, else false
+ * @return boolean
+   *   true if success, else false
  * @static void
  * @access public
  *
@@ -252,7 +258,8 @@ function civicrm_api3_job_mail_report($params) {
  *
  * @param array $params
  *
- * @return boolean        true if success, else false
+ * @return boolean
+   *   true if success, else false
  * @static
  * @access public
  */
@@ -311,7 +318,8 @@ function _civicrm_api3_job_update_greeting_spec(&$params) {
  * @param array $params
  *   (reference ) input parameters.
  *
- * @return boolean        true if success, else false
+ * @return boolean
+   *   true if success, else false
  * @static
  * @access public
  *
@@ -419,7 +427,8 @@ function civicrm_api3_job_fetch_activities($params) {
  * @param array $params
  *   (reference ) input parameters.
  *
- * @return array (reference )        array of properties, if error an array with an error id and error message
+ * @return array
+   *   (reference )        array of properties, if error an array with an error id and error message
  * @access public
  */
 function civicrm_api3_job_process_participant($params) {
@@ -444,7 +453,8 @@ function civicrm_api3_job_process_participant($params) {
  * @param array $params
  *   Input parameters NOT USED.
  *
- * @return boolean true if success, else false
+ * @return boolean
+   *   true if success, else false
  * @static void
  * @access public
  */
@@ -471,7 +481,8 @@ function civicrm_api3_job_process_membership($params) {
  * @param array $params
  *   (reference ) input parameters.
  *
- * @return boolean        true if success, else false
+ * @return boolean
+   *   true if success, else false
  * @static void
  * @access public
  */
@@ -499,7 +510,8 @@ function civicrm_api3_job_process_respondent($params) {
  *                      A 'safe' value skips the merge if there are no conflicts. Does a force merge otherwise.}
  * {boolean auto_flip   wether to let api decide which contact to retain and which to delete.}
  *
- * @return array  API Result Array
+ * @return array
+   *   API Result Array
  *
  * @static void
  * @access public
@@ -563,7 +575,8 @@ function civicrm_api3_job_run_payment_cron($params) {
  * @param array $params
  *   (reference ) - sends in various config parameters to decide what needs to be cleaned.
  *
- * @return boolean  true if success, else false
+ * @return boolean
+   *   true if success, else false
  * @static void
  * @access public
  */

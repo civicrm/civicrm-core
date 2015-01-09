@@ -165,8 +165,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   /**
    * Get the action links for this page.
    *
-   * @return array $_actionLinks
-   *
+   * @return array
    */
   public function &actionLinks() {
     return NULL;
@@ -179,7 +178,6 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * type of action and executes that action.
    *
    * @return void
-   *
    */
   public function run() {
     $template = CRM_Core_Smarty::singleton();

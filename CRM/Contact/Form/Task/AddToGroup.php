@@ -152,7 +152,8 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
    * Set the default form values
    *
    *
-   * @return array the default array reference
+   * @return array
+   *   the default array reference
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -180,7 +181,8 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
    *
    * @param array $params
    *
-   * @return array list of errors to be posted back to the form
+   * @return array
+   *   list of errors to be posted back to the form
    * @static
    */
   public static function formRule($params) {

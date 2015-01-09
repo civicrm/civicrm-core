@@ -235,7 +235,6 @@ Order By  camp.title";
   /**
    * Wrapper to self::getCampaigns( )
    * w/ permissions and component check.
-   *
    */
   public static function getPermissionedCampaigns(
     $includeId = NULL,
@@ -514,7 +513,8 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -542,7 +542,6 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
   /*
    * Add select element for campaign
    * and assign needful info to templates.
-   *
    */
   /**
    * @param CRM_Core_Form $form

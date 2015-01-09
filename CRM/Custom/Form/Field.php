@@ -174,7 +174,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    *
    * @param null
    *
-   * @return array    array of default values
+   * @return array
+   *   array of default values
    */
   public function setDefaultValues() {
     $defaults = $this->_values;
@@ -571,7 +572,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    * @param $files
    * @param $self
    *
-   * @return array    if errors then list of errors to be posted back to the form,
+   * @return array
+   *   if errors then list of errors to be posted back to the form,
    *                  true otherwise
    * @static
    */

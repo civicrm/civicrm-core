@@ -120,7 +120,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param int $id
    *
-   * @return array - array reference of all financial types if any
+   * @return array
+   *   array reference of all financial types if any
    * @static
    */
   public static function &financialType($id = NULL) {
@@ -154,7 +155,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param string $retrieveColumn
    * @param string $key
    *
-   * @return array - array reference of all financial accounts if any
+   * @return array
+   *   array reference of all financial accounts if any
    * @static
    */
   public static function &financialAccount($id = NULL, $financialAccountTypeId = NULL, $retrieveColumn = 'name', $key = 'id') {
@@ -208,7 +210,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *   Do we want all pages or only active pages.
    *
    *
-   * @return array - array reference of all contribution pages if any
+   * @return array
+   *   array reference of all contribution pages if any
    * @static
    */
   public static function &contributionPage($id = NULL, $all = FALSE) {
@@ -240,7 +243,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param string $columnName
    *
-   * @return array - array reference of all payment instruments if any
+   * @return array
+   *   array reference of all payment instruments if any
    * @static
    */
   public static function &paymentInstrument($columnName = 'label') {
@@ -257,7 +261,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * Get all the valid accepted credit cards
    *
    *
-   * @return array - array reference of all payment instruments if any
+   * @return array
+   *   array reference of all payment instruments if any
    * @static
    */
   public static function &creditCard() {
@@ -269,7 +274,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    *
    * @param int $pageID
-   * @return array - array of all Premiums if any
+   * @return array
+   *   array of all Premiums if any
    * @static
    */
   public static function products($pageID = NULL) {
@@ -317,7 +323,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param int $id
    * @param string $columnName
-   * @return array - array reference of all contribution statuses
+   * @return array
+   *   array reference of all contribution statuses
    * @static
    */
   public static function &contributionStatus($id = NULL, $columnName = 'label') {
@@ -342,7 +349,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param null $pageType
    * @param int $id
    *
-   * @return array - array reference of all pcp if any
+   * @return array
+   *   array reference of all pcp if any
    * @static
    */
   public static function &pcPage($pageType = NULL, $id = NULL) {
@@ -374,7 +382,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @static
    *
    * @param string $column
-   * @return array - array reference of all PCP activity statuses
+   * @return array
+   *   array reference of all PCP activity statuses
    */
   public static function &pcpStatus($column = 'label') {
     if (NULL === self::$pcpStatus) {
@@ -399,7 +408,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param int $financialTypeId
    * @param int $relationTypeId
-   * @return array - array reference of all financial accounts for a Financial type
+   * @return array
+   *   array reference of all financial accounts for a Financial type
    */
   public static function financialAccountType($financialTypeId, $relationTypeId = NULL) {
     if (!CRM_Utils_Array::value($financialTypeId, self::$financialTypeAccount)) {
@@ -428,7 +438,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    *
    * @param int $id
-   * @return array - array reference of all batches if any
+   * @return array
+   *   array reference of all batches if any
    * @static
    */
   public static function &batch($id = NULL) {

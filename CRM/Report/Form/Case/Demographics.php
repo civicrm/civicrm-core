@@ -42,10 +42,8 @@ class CRM_Report_Form_Case_Demographics extends CRM_Report_Form {
   protected $_phoneField = FALSE;
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     $this->_columns = array(

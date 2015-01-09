@@ -52,8 +52,8 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
    * @param array $params
    *   The values for this table: activity id, contact id, record type.
    *
-   * @return object activity_contact object
-   *
+   * @return object
+   *   activity_contact object
    */
   public static function create(&$params) {
     $activityContact = new CRM_Activity_DAO_ActivityContact();
@@ -73,7 +73,6 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
    * @param bool $alsoIDs
    *
    * @return array
-   *
    */
   public static function getNames($activityID, $recordTypeID, $alsoIDs = FALSE) {
     $names = array();
@@ -112,7 +111,6 @@ AND        contact_a.is_deleted = 0
    * @param int $recordTypeID
    *
    * @return mixed
-   *
    */
   public static function retrieveContactIdsByActivityId($activityID, $recordTypeID) {
     $activityContact = array();

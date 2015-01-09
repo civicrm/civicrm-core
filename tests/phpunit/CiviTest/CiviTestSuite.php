@@ -80,7 +80,6 @@ class CiviTestSuite extends PHPUnit_Framework_TestSuite {
   }
 
   /**
-   *
    */
   protected function implSuite($myfile) {
     $name = str_replace('_',

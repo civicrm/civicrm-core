@@ -55,10 +55,8 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
   );
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     $this->_columns = array();

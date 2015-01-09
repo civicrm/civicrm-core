@@ -45,7 +45,6 @@ class CRM_Case_Page_DashBoard extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   *
    */
   public function preProcess() {
     //check for civicase access.

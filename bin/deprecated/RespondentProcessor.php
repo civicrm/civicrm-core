@@ -39,7 +39,6 @@ require_once 'CRM/Core/Config.php';
  */
 class CRM_RespondentProcessor {
   /**
-   *
    */
   function __construct() {
     $config = CRM_Core_Config::singleton();

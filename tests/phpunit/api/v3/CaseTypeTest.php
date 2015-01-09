@@ -65,7 +65,6 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
    */
   public function tearDown() {
     parent::tearDown();

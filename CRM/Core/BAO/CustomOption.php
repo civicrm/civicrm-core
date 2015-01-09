@@ -68,7 +68,8 @@ class CRM_Core_BAO_CustomOption {
    * @param bool $inactiveNeededDo we need inactive options ?.
    *   Do we need inactive options ?.
    *
-   * @return array $customOption all active options for fieldId
+   * @return array
+   *   all active options for fieldId
    * @static
    */
   static function getCustomOption(
@@ -119,7 +120,8 @@ class CRM_Core_BAO_CustomOption {
    * @param string $dataType
    *   the data type of the field (optional).
    *
-   * @return string          the label to display for this custom field
+   * @return string
+   *   the label to display for this custom field
    * @static
    */
   public static function getOptionLabel($fieldId, $value, $htmlType = NULL, $dataType = NULL) {

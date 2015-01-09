@@ -72,7 +72,8 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    *
    * @param void
    *
-   * @return int  Group ID (null if Group ID doesn't exist)
+   * @return int
+   *   Group ID (null if Group ID doesn't exist)
    */
   private static function _getGid() {
     if (!self::$_gid) {
@@ -91,7 +92,8 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    * @param string $returnURL
    *   URL of page calling this function.
    *
-   * @return array  (reference)   List of Paper Sizes
+   * @return array
+   *   (reference)   List of Paper Sizes
    * @static
    */
   public static function &addOrder(&$list, $returnURL) {
@@ -105,7 +107,8 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    * @param bool $namesOnly
    *   Return simple list of names.
    *
-   * @return array  (reference)   Paper Size list
+   * @return array
+   *   (reference)   Paper Size list
    * @static
    */
   public static function &getList($namesOnly = FALSE) {
@@ -134,7 +137,8 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    *
    * @param NULL
    *
-   * @return array   Name/value pairs containing the default Paper Size values.
+   * @return array
+   *   Name/value pairs containing the default Paper Size values.
    * @static
    */
   public static function &getDefaultValues() {
@@ -158,7 +162,8 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    * @param int $val
    *   Field value to search for.
    *
-   * @return array  $values (reference) associative array of name/value pairs
+   * @return array
+   *   (reference) associative array of name/value pairs
    */
   public static function &getPaperFormat($field, $val) {
     $params = array('is_active' => 1, $field => $val);
@@ -177,7 +182,8 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    * @param int $name
    *   Paper Size name. Empty = get default Paper Size.
    *
-   * @return array  $values (reference) associative array of name/value pairs
+   * @return array
+   *   (reference) associative array of name/value pairs
    */
   public static function &getByName($name) {
     return self::getPaperFormat('name', $name);
@@ -189,7 +195,8 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    * @param int $id
    *   Paper Size id. 0 = get default Paper Size.
    *
-   * @return array  $values (reference) associative array of name/value pairs
+   * @return array
+   *   (reference) associative array of name/value pairs
    */
   public static function &getById($id) {
     return self::getPaperFormat('id', $id);

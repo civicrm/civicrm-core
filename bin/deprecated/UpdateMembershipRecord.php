@@ -44,7 +44,6 @@
  */
 class CRM_UpdateMembershipRecord {
   /**
-   *
    */
   function __construct() {
     // you can run this program either from an apache command, or from the cli

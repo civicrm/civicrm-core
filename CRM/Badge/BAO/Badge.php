@@ -82,7 +82,8 @@ class CRM_Badge_BAO_Badge {
    * @param array $layout
    *   Layout meta data.
    *
-   * @return array $formattedRow row with meta data
+   * @return array
+   *   row with meta data
    */
   public static function formatLabel(&$row, &$layout) {
     $formattedRow = array('labelFormat' => $layout['label_format_name']);

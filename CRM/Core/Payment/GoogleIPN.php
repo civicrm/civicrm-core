@@ -449,7 +449,8 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
    * @param $response
    * @param $serial
    * @internal param \xml $xml_response response send by google in xml format
-   * @return array context of this call (test, module, payment processor id)
+   * @return array
+   *   context of this call (test, module, payment processor id)
    * @static
    */
   public function getContext($privateData, $orderNo, $root, $response, $serial) {
@@ -517,7 +518,6 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
   /**
    * This method is handles the response that will be invoked (from extern/googleNotify) every time
    * a notification or request is sent by the Google Server.
-   *
    */
   public static function main($xml_response) {
     require_once 'Google/library/googleresponse.php';

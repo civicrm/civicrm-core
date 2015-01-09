@@ -104,7 +104,8 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @param string $name
    * @param array $definition
    *   The case-type defintion expressed as an array-tree.
-   * @return string XML
+   * @return string
+   *   XML
    * @static
    */
   public static function convertDefinitionToXML($name, $definition) {
@@ -187,7 +188,8 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @param SimpleXmlElement $xml
    *   A single case-type record.
    *
-   * @return array the definition of the case-type, expressed as PHP array-tree
+   * @return array
+   *   the definition of the case-type, expressed as PHP array-tree
    * @static
    */
   public static function convertXmlToDefinition($xml) {
@@ -373,7 +375,8 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * Determine if modifications are allowed on the case-type
    *
    * @param int $caseTypeId
-   * @return bool TRUE if the definition can be modified
+   * @return bool
+   *   TRUE if the definition can be modified
    */
   public static function isForkable($caseTypeId) {
     $caseTypeName = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseTypeId, 'name', 'id', TRUE);

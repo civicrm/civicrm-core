@@ -51,7 +51,8 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
   /**
    * Get action Links
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
   public function &links() {
     if (!(self::$_links)) {
@@ -91,7 +92,6 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   *
    */
   public function run() {
     $this->browse();

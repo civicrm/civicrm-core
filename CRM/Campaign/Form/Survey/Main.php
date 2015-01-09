@@ -106,7 +106,8 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
    *
    * @param null
    *
-   * @return array    array of default values
+   * @return array
+   *   array of default values
    */
   public function setDefaultValues() {
     if ($this->_cdType) {

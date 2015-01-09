@@ -43,7 +43,8 @@ class CRM_Mailing_MailStore {
    *   Name of the settings set from civimail_mail_settings to use (null for default).
    *
    * @throws Exception
-   * @return object        mail store implementation for processing CiviMail-bound emails
+   * @return object
+   *   mail store implementation for processing CiviMail-bound emails
    */
   public static function getStore($name = NULL) {
     $dao               = new CRM_Core_DAO_MailSettings;
@@ -85,7 +86,8 @@ class CRM_Mailing_MailStore {
   /**
    * Return all emails in the mail store
    *
-   * @return array  array of ezcMail objects
+   * @return array
+   *   array of ezcMail objects
    */
   public function allMails() {
     return $this->fetchNext(0);
@@ -103,7 +105,8 @@ class CRM_Mailing_MailStore {
    * @param int $count
    *   Number of messages to fetch (0 to fetch all).
    *
-   * @return array      array of ezcMail objects
+   * @return array
+   *   array of ezcMail objects
    */
   public function fetchNext($count = 1) {
     if (isset($this->_transport->options->uidReferencing) and $this->_transport->options->uidReferencing) {
@@ -146,7 +149,8 @@ class CRM_Mailing_MailStore {
    *   Name of the Maildir.
    *
    * @throws Exception
-   * @return string       path to the Maildir's cur directory
+   * @return string
+   *   path to the Maildir's cur directory
    */
   public function maildir($name) {
     $config = CRM_Core_Config::singleton();

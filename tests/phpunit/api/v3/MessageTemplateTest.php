@@ -68,7 +68,6 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
    * Test get function succeeds (this is actually largely tested in the get
    * action on create. Add extra checks for any 'special' return values or
    * behaviours
-   *
    */
   public function testGet() {
     $result = $this->callAPIAndDocument('MessageTemplate', 'get', $this->params, __FUNCTION__, __FILE__);

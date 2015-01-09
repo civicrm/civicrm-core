@@ -56,7 +56,8 @@ class CRM_Utils_Mail {
    *   (by reference).
    *
    *
-   * @return boolean true if a mail was sent, else false
+   * @return boolean
+   *   true if a mail was sent, else false
    */
   public static function send(&$params) {
     $returnPath       = CRM_Core_BAO_MailSettings::defaultReturnPath();
@@ -257,7 +258,8 @@ class CRM_Utils_Mail {
    * @param string $header
    *   The full name + email address string.
    *
-   * @return string          the plucked email address
+   * @return string
+   *   the plucked email address
    * @static
    */
   public static function pluckEmailFromHeader($header) {
@@ -272,7 +274,8 @@ class CRM_Utils_Mail {
   /**
    * Get the Active outBound email
    *
-   * @return boolean true if valid outBound email configuration found, false otherwise
+   * @return boolean
+   *   true if valid outBound email configuration found, false otherwise
    * @static
    */
   public static function validOutBoundMail() {
@@ -393,7 +396,7 @@ class CRM_Utils_Mail {
    * @param string $html
    * @param string $format
    *
-   * @return array $attachments
+   * @return array
    */
   public static function appendPDF($fileName, $html, $format = NULL) {
     $pdf_filename = CRM_Core_Config::singleton()->templateCompileDir . CRM_Utils_File::makeFileName($fileName);

@@ -94,7 +94,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    * the selector object to do a query
    *
    * @return void
-   *
    */
   public function preProcess() {
 

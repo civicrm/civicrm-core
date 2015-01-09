@@ -65,7 +65,8 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   /**
    * Return the domain from the default set of settings
    *
-   * @return string  default domain
+   * @return string
+   *   default domain
    */
   public static function defaultDomain() {
     return self::defaultDAO()->domain;
@@ -74,7 +75,8 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   /**
    * Return the localpart from the default set of settings
    *
-   * @return string  default localpart
+   * @return string
+   *   default localpart
    */
   public static function defaultLocalpart() {
     return self::defaultDAO()->localpart;
@@ -83,7 +85,8 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   /**
    * Return the return path from the default set of settings
    *
-   * @return string  default return path
+   * @return string
+   *   default return path
    */
   public static function defaultReturnPath() {
     return self::defaultDAO()->return_path;
@@ -92,7 +95,8 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   /**
    * Return the "include message ID" flag from the default set of settings.
    *
-   * @return boolean  default include message ID
+   * @return boolean
+   *   default include message ID
    */
   public static function includeMessageId() {
     return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
@@ -195,7 +199,6 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *
    * @return mixed|null
    * @static
-   *
    */
   public static function deleteMailSettings($id) {
     $results = NULL;

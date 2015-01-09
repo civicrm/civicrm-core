@@ -368,7 +368,6 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
 
   /*
    * Webtest for CRM-10983
-   *
    */
   public function testCheckDuplicateCustomDataLoad() {
     $this->webtestLogin();

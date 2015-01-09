@@ -60,7 +60,8 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param int $id
    * @param bool $force
    *
-   * @return array - array reference of all membership types if any
+   * @return array
+   *   array reference of all membership types if any
    * @static
    */
   public static function &membershipType($id = NULL, $force = FALSE) {
@@ -91,7 +92,8 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param string $column
    * @param bool $force
    *
-   * @return array - array reference of all membership statuss if any
+   * @return array
+   *   array reference of all membership statuss if any
    * @static
    */
   public static function &membershipStatus($id = NULL, $cond = NULL, $column = 'name', $force = FALSE, $allStatus = FALSE) {

@@ -122,7 +122,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    *
    * @static
    */
@@ -135,7 +136,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *
    * @param NULL
    *
-   * @return object           The default payment processor object on success,
+   * @return object
+   *   The default payment processor object on success,
    *                          null otherwise
    * @static
    */
@@ -183,7 +185,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param string $mode
    *   Payment mode ie test or live.
    *
-   * @return array  associated array with payment processor related fields
+   * @return array
+   *   associated array with payment processor related fields
    * @static
    */
   public static function getPayment($paymentProcessorID, $mode) {
@@ -259,7 +262,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param string $mode
    *   Payment mode ie test or live.
    *
-   * @return array  associated array with payment processor related fields
+   * @return array
+   *   associated array with payment processor related fields
    * @static
    */
   public static function buildPayment($dao, $mode) {
@@ -341,7 +345,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *
    * @param array $ids
    *
-   * @return array available processors
+   * @return array
+   *   available processors
    */
   public static function getPaymentProcessors($capabilities = array(), $ids = array()) {
     $mode = NULL;
@@ -395,7 +400,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param string $type
    *   Type of payment information to be retrieved.
    *
-   * @return int / array / object based on type
+   * @return int
+   *   / array / object based on type
    * @static
    */
   public static function getProcessorForEntity($entityID, $component = 'contribute', $type = 'id') {

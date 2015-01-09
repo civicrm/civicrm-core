@@ -81,7 +81,8 @@ class CRM_Core_CodeGen_Util_File {
    *
    * @param array $pairs
    *   Each item is an array(0 => $searchBaseDir, 1 => $filePattern).
-   * @return array of file paths
+   * @return array
+   *   of file paths
    */
   public static function findManyFiles($pairs) {
     $files = array();

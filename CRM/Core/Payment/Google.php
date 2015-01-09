@@ -78,7 +78,8 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
   /**
    * This function checks to see if we have the right config values
    *
-   * @return string the error message if any
+   * @return string
+   *   the error message if any
    */
   public function checkConfig() {
     $config = CRM_Core_Config::singleton();
@@ -108,7 +109,8 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    *
-   * @return array the result in an nice formatted array (or an error object)
+   * @return array
+   *   the result in an nice formatted array (or an error object)
    * @abstract
    */
   public function doDirectPayment(&$params) {
@@ -199,7 +201,6 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    *   Object of googel cart.
    *
    * @return void
-   *
    */
   public function submitPostParams($params, $component, $cart) {
     $url = rtrim($this->_paymentProcessor['url_site'], '/') . '/cws/v2/Merchant/' . $this->_paymentProcessor['user_name'] . '/checkout';

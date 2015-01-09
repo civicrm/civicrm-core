@@ -63,7 +63,8 @@ class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
    * @param int $count
    *   Number of messages to fetch FIXME: ignored in CiviCRM 2.2 (assumed to be 0, i.e., fetch all).
    *
-   * @return array      array of ezcMail objects
+   * @return array
+   *   array of ezcMail objects
    */
   public function fetchNext($count = 0) {
     $mails = array();
