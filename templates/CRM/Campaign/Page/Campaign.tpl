@@ -26,7 +26,9 @@
 {* this template is used for displaying survey information *}
 {if $campaigns}
   <div class="action-link">
-      <a href="{$addCampaignUrl}" class="button"><span>&raquo; {ts}Add Campaign{/ts}</span></a>
+      <a href="{$addCampaignUrl}" class="button">
+        <span><div class="icon ui-icon-circle-plus"></div> {ts}Add Campaign{/ts}</span>
+      </a>
   </div>
   {include file="CRM/common/enableDisableApi.tpl"}
   <div id="campaignType">
@@ -65,5 +67,7 @@
     </div>
 {/if}
 <div class="action-link">
-   <a href="{$addCampaignUrl}" class="button"><span>&raquo; {ts}Add Campaign{/ts}</span></a>
+  <a href="{$addCampaignUrl}" class="button">
+    <span><div class="icon ui-icon-circle-plus"></div> {ts}Add Campaign{/ts}</span>
+  </a>
 </div>

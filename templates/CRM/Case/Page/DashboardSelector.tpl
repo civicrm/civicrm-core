@@ -78,11 +78,11 @@
     {elseif $list eq 'recent'}
        <td class="crm-case-case_recent_activity">
    {if $row.case_recent_activity_viewable}
-       <a class="crm-popup" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid="}{$row.contact_id}&aid={$row.case_recent_activity_id}" title="{ts}View activity{/ts}">{$row.case_recent_activity_type}</a>
+       <a class="action-item crm-hover-button" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid="}{$row.contact_id}&aid={$row.case_recent_activity_id}" title="{ts}View activity{/ts}">{$row.case_recent_activity_type}</a>
     {else}
        {$row.case_recent_activity_type}
     {/if}
-    {if $row.case_recent_activity_editable and $row.case_recent_activity_type_name != 'Inbound Email' && $row.case_recent_activity_type_name != 'Email'}&nbsp;&nbsp;<a href="{crmURL p="civicrm/case/activity" q="reset=1&cid=`$row.contact_id`&caseid=`$row.case_id`&action=update&id=`$row.case_recent_activity_id`"}" title="{ts}Edit activity{/ts}"><span class="icon ui-icon-pencil"></span></a>
+    {if $row.case_recent_activity_editable and $row.case_recent_activity_type_name != 'Inbound Email' && $row.case_recent_activity_type_name != 'Email'}&nbsp;&nbsp;<a href="{crmURL p="civicrm/case/activity" q="reset=1&cid=`$row.contact_id`&caseid=`$row.case_id`&action=update&id=`$row.case_recent_activity_id`"}" title="{ts}Edit activity{/ts}" class="crm-hover-button crm-popup"><span class="icon ui-icon-pencil"></span></a>
     {/if}<br />
           {$row.case_recent_activity_date|crmDate}
    </td>

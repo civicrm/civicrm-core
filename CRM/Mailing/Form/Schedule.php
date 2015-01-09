@@ -242,7 +242,7 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
       CRM_Core_Session::setStatus($status, ts('Mailing Saved'), 'success');
       CRM_Utils_System::redirect($url);
     }
-    if (isset($params['now']) || CRM_Utils_Array::value('_qf_Schedule_back', $params) == '<< Previous') {
+    if (isset($params['now']) || CRM_Utils_Array::value('_qf_Schedule_back', $params) == ts('Previous')) {
       return TRUE;
     }
 
