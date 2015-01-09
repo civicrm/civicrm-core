@@ -68,9 +68,9 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
       $isDefault
     );
 
-    $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");
+    $this->waitForElementPresent("xpath=//table/tbody//tr/td[1]/div[text()='{$financialAccountTitle}']/../../td[9]/span/a[text()='Edit']");
 
-    $this->clickLink("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom', FALSE);
+    $this->clickLink("xpath=//table/tbody//tr/td[1]/div[text()='{$financialAccountTitle}']/../../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom', FALSE);
     //Varify Data after Adding new Financial Account
     $verifyData = array(
     'name' => $financialAccountTitle,
@@ -117,8 +117,8 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
     if ($orgNameEdit) {
       $orgName = $orgNameEdit;
     }
-    $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']");
-    $this->clickLink("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom', FALSE);
+    $this->waitForElementPresent("xpath=//table/tbody//tr/td[1]/div[text()='{$financialAccountTitle}']/../../td[9]/span/a[text()='Edit']");
+    $this->clickLink("xpath=//table/tbody//tr/td[1]/div[text()='{$financialAccountTitle}']/../../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom', FALSE);
 
     $verifyData = array(
     'name' => $financialAccountTitle,
@@ -136,7 +136,7 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
     $verifySelectFieldData = array('financial_account_type_id' => $financialAccountType);
     $this->_assertSelectVerify($verifySelectFieldData);
     $this->click('_qf_FinancialAccount_cancel-botttom');
-    $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Delete']");
+    $this->waitForElementPresent("xpath=//table/tbody//tr/td[1]/div[text()='{$financialAccountTitle}']/../../td[9]/span/a[text()='Delete']");
 
     //Delete Financial Account
     $this->_testDeleteFinancialAccount($financialAccountTitle);

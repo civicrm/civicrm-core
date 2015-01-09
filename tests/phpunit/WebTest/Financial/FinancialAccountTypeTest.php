@@ -65,7 +65,7 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     );
 
     $this->waitForElementPresent('newFinancialType');
-    $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[name]']/../td[7]/span/a[text()='Accounts']");
+    $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1]/div[text()='$financialType[name]']/../../td[7]/span/a[text()='Accounts']");
     $this->waitForElementPresent('newfinancialTypeAccount');
 
     foreach ($expected as $value => $label) {
@@ -73,8 +73,8 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     }
 
     $this->openCiviPage('admin/financial/financialType', 'reset=1', 'newFinancialType');
-    $this->verifyText("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[name]']/../td[3]", 'Accounts Receivable,Banking Fees,Premiums,' . $financialType['name']);
-    $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[name]']/../td[7]/span/a[text()='Accounts']");
+    $this->verifyText("xpath=id('ltype')/div/table/tbody/tr/td[1]/div[text()='$financialType[name]']/../../td[3]", 'Accounts Receivable,Banking Fees,Premiums,' . $financialType['name']);
+    $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1]/div[text()='$financialType[name]']/../../td[7]/span/a[text()='Accounts']");
     $this->waitForElementPresent('newfinancialTypeAccount');
     $this->click("xpath=//div[@id='ltype']/div/table/tbody/tr/td[2][text()='Banking Fees']/../td[7]/span/a[text()='Edit']");
     $this->waitForElementPresent('_qf_FinancialTypeAccount_next');
