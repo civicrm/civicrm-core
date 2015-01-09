@@ -40,7 +40,6 @@
  * Smarty function for checking change in a property's value, for example
  * when looping through an array.
  *
- *
  * Smarty param:  string $key     unique identifier for this property (REQUIRED)
  * Smarty param:  mixed  $value   the current value of the property
  * Smarty param:  string $assign  name of template variable to which to assign result

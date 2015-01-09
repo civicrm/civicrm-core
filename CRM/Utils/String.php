@@ -55,10 +55,8 @@ class CRM_Utils_String {
    *
    * @param int $maxLength
    *
-   * @return string  An equivalent variable name
-   *
-   *
-   * @return string (or null)
+   * @return string
+   *   An equivalent variable name.
    * @static
    */
   public static function titleToVar($title, $maxLength = 31) {

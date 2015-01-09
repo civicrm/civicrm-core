@@ -104,7 +104,8 @@ function civicrm_api3_generic_getfields($apiRequest) {
           'title' => 'Context',
         ),
       );
-        break;
+      break;
+
     default:
       // oddballs are on their own
       $metadata = array();

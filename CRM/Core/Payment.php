@@ -96,7 +96,6 @@ abstract class CRM_Core_Payment {
    *   Should we force a reload of this payment object.
    *
    * @return CRM_Core_Payment
-   * @return \CRM_Core_Payment
    * @throws \CRM_Core_Exception
    * @static
    */

@@ -136,9 +136,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * The 'Register' page gets loaded through ajax and following happens :
    * the setDefaults function is called with the variable _ppType set with selected payment processor type,
    * so in the 'if' condition checked whether the selected payment processor's billing mode is of 'billing form mode'. If its not, don't setDefaults for billing form and return instead.
-   *- For payment processors of billing mode 'Notify' - return from setDefaults before the code for billing profile population execution .
+   * - For payment processors of billing mode 'Notify' - return from setDefaults before the code for billing profile population execution .
    * (done this is because for payment processors with 'Notify' mode billing profile form doesn't get rendered on UI)
-   *
    *
    * @return void
    */
