@@ -126,7 +126,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *
    * @return object
    * @static
-   *
    */
   public static function create(&$params) {
     $transaction = new CRM_Core_Transaction();
@@ -185,7 +184,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *
    * @return mixed|null
    * @static
-   *
    */
   public static function del($id) {
     if (!$id) {

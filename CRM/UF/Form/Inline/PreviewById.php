@@ -48,8 +48,6 @@ class CRM_UF_Form_Inline_PreviewById extends CRM_UF_Form_AbstractPreview {
    * @param
    *
    * @return void
-   *
-   *
    */
   public function preProcess() {
     // Inline forms don't get menu-level permission checks

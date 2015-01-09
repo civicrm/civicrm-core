@@ -122,7 +122,6 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * @param null
    *
    * @return void
-   *
    */
   public function run() {
     // get the requested action

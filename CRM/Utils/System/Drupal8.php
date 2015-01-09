@@ -47,8 +47,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *   Email id for cms user.
    *
    * @return uid if user exists, false otherwise
-   *
-   *
    */
   public function createUser(&$params, $mail) {
     $user = \Drupal::currentUser();
@@ -190,7 +188,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *   Form object representing the 'current' form - to which the user will be returned.
    * @return string
    *   destination value for URL
-   *
    */
   public function getLoginDestination(&$form) {
     $args = NULL;
@@ -535,7 +532,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *
    * @param string $message
    *   The message to set.
-   *
    */
   public function setMessage($message) {
     drupal_set_message($message);
@@ -667,7 +663,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * Get the default location for CiviCRM blocks
    *
    * @return string
-   *
    */
   public function getDefaultBlockLocation() {
     return 'sidebar_first';

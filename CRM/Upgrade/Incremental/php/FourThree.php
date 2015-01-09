@@ -1016,7 +1016,6 @@ ALTER TABLE civicrm_financial_account
   /**
    * Update financial_account_id for bad data in financial_trxn table
    * CRM-12844
-   *
    */
   public function updateFinancialTrxnData(CRM_Queue_TaskContext $ctx) {
     $upgrade = new CRM_Upgrade_Form();
@@ -1079,7 +1078,6 @@ id IN (' . implode(',', $val) . ')';
   /**
    * Update financial_account_id for bad data in financial_trxn table
    * CRM-12844
-   *
    */
   public function updateLineItemData(CRM_Queue_TaskContext $ctx) {
     $sql = "SELECT cc.id contribution_id, cc.contribution_recur_id,

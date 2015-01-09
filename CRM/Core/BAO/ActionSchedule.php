@@ -591,7 +591,6 @@ AND   cas.entity_value = $id AND
    *
    * @return CRM_Core_DAO_ActionSchedule
    * @static
-   *
    */
   public static function add(&$params, $ids = array()) {
     $actionSchedule = new CRM_Core_DAO_ActionSchedule();

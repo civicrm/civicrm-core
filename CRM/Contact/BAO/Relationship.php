@@ -1261,7 +1261,6 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    *
    * @return array
    *   array reference of all relationship types with context to current contact type .
-   *
    */
   public function getRelationType($targetContactType) {
     $relationshipType = array();
@@ -1519,7 +1518,6 @@ SELECT count(*)
    * not.
    *
    * @static
-   *
    */
   public static function isDeleteRelatedMembership($relTypeIds, $contactId, $mainRelatedContactId, $relTypeId, $relIds) {
     if (in_array($relTypeId, $relTypeIds)) {
@@ -1594,7 +1592,6 @@ WHERE id IN ( {$contacts} )
    *
    * @return array
    *   array of employers.
-   *
    */
   public static function getPermissionedEmployer($contactID, $name = NULL) {
     //get the relationship id

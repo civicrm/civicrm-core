@@ -68,8 +68,6 @@ class CRM_Core_Selector_Base {
    *
    * @return string
    *   the attribute that matches the action if any
-   *
-   *
    */
   public function getActionAttribute($match, $attribute = 'name') {
     $links = &$this->links();

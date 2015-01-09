@@ -43,10 +43,8 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   protected $_baseTable = 'civicrm_contact';
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     parent::__construct();

@@ -197,7 +197,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    *   name
    *
    * @static
-   *
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field', $id, 'label');
@@ -530,7 +529,6 @@ WHERE
    * @return boolean
    *
    * @static
-   *
    */
   public static function deleteField($id) {
     $field = new CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field();

@@ -168,7 +168,6 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
    * Generate CSV array for export
    *
    * @param array $export
-   *
    */
   public function makeCSV($export) {
     foreach ($export as $batchId => $dao) {

@@ -199,7 +199,6 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    *
    * @param int $limit
    *   How many participations do we want returned.
-   *
    */
   public function setLimit($limit) {
     $this->_limit = $limit;
@@ -261,7 +260,6 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    *
    * @param $action
    * @param array $params
-   *
    */
   public function getPagerParams($action, &$params) {
     $params['status'] = ts('Event') . ' %%StatusMessage%%';

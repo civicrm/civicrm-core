@@ -295,7 +295,6 @@ abstract class CRM_Utils_System_Base {
    * @param object $user
    *   Object as described by the User Framework.
    * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
-   *
    */
   public function getUniqueIdentifierFromUserObject($user) {
   }
@@ -305,7 +304,6 @@ abstract class CRM_Utils_System_Base {
    * @param object $user
    *   Object as described by the User Framework.
    * @return mixed <NULL, number>
-   *
    */
   public function getUserIDFromUserObject($user) {
   }

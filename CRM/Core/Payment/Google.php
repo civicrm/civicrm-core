@@ -201,7 +201,6 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    *   Object of googel cart.
    *
    * @return void
-   *
    */
   public function submitPostParams($params, $component, $cart) {
     $url = rtrim($this->_paymentProcessor['url_site'], '/') . '/cws/v2/Merchant/' . $this->_paymentProcessor['user_name'] . '/checkout';

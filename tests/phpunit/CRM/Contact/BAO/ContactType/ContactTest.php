@@ -61,7 +61,6 @@ DELETE FROM civicrm_contact_type
   /**
    * Methods create Contact with valid data
    * success expected
-   *
    */
   public function testCreateContact() {
     //check for Type:Individual

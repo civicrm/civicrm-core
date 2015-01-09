@@ -38,10 +38,8 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
   protected $_exposeContactID = FALSE;
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     $this->_columns = array();

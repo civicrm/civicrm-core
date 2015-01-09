@@ -2340,7 +2340,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * and debug related fields are unset
    *
    * @param array $result
-   *
    */
   public function tidyExampleResult(&$result) {
     if (!is_array($result)) {
@@ -2571,7 +2570,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *   Should the entity be deleted as part of this check.
    * @param string $errorText
    *   Text to print on error.
-   *
    */
   /**
    * @param array $params
@@ -2649,7 +2647,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *   Actual calculated values.
    * @param array $expected
    *   Expected values.
-   *
    */
   public function checkArrayEquals(&$actual, &$expected) {
     self::unsetId($actual);
@@ -2661,7 +2658,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * Unset the key 'id' from the array
    * @param array $unformattedArray
    *   The array from which the 'id' has to be unset.
-   *
    */
   public static function unsetId(&$unformattedArray) {
     $formattedArray = array();
@@ -2979,7 +2975,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *  $this->createLoggedInUser();
    *   $this->_permissionedDisabledGroup = $this->groupCreate(array('title' => 'pick-me-disabled', 'is_active' => 0, 'name' => 'pick-me-disabled'));
    *   $this->_permissionedGroup = $this->groupCreate(array('title' => 'pick-me-active', 'is_active' => 1, 'name' => 'pick-me-active'));
-   *
    */
   public function setupACL() {
     global $_REQUEST;

@@ -43,7 +43,6 @@ class CRM_Dashlet_Page_Activity extends CRM_Core_Page {
    * List activities as dashlet
    *
    * @return void
-   *
    */
   public function run() {
     $session = CRM_Core_Session::singleton();

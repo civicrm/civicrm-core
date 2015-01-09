@@ -186,7 +186,6 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
    * - Edit
    *
    * @return array
-   *
    */
   static
   public function &links() {
@@ -198,7 +197,6 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
    *
    * @param $action
    * @param array $params
-   *
    */
   public function getPagerParams($action, &$params) {
     $params['csvString'] = NULL;

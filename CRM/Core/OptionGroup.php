@@ -39,7 +39,6 @@ class CRM_Core_OptionGroup {
   /*
    * $_domainIDGroups array maintains the list of option groups for whom
    * domainID is to be considered.
-   *
    */
   static $_domainIDGroups = array(
     'from_email_address',

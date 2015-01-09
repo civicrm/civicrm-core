@@ -71,7 +71,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *
    * @return boolean
    * @static
-   *
    */
   public static function del($id) {
     // delete from mapping_field table

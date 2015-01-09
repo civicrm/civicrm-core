@@ -596,7 +596,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    *
    * @return Array
    *   formatted containing date values
-   *
    */
   public function formattedDates($calcDates, &$formatted) {
     $dates = array(

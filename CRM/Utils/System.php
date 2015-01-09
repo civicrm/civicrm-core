@@ -182,7 +182,6 @@ class CRM_Utils_System {
    *   (optional) For maintenance mode.
    *
    * @return string
-   *
    */
   static function theme(
     &$content,
@@ -336,7 +335,6 @@ class CRM_Utils_System {
    *
    * @param string $title
    * @param string $pageTitle
-   *
    */
   public static function setTitle($title, $pageTitle = NULL) {
     self::$title = $title;
@@ -353,7 +351,6 @@ class CRM_Utils_System {
    *   Refererer should match any str in this array.
    * @param string $default
    *   (optional) The default userContext if no match found.
-   *
    */
   public static function setUserContext($names, $default = NULL) {
     $url = $default;
@@ -383,7 +380,6 @@ class CRM_Utils_System {
    *
    * @return string
    *   The class name of the object.
-   *
    */
   public static function getClassName($object) {
     return get_class($object);
@@ -394,7 +390,6 @@ class CRM_Utils_System {
    *
    * @param string $url
    *   The URL to provide to the browser via the Location header.
-   *
    */
   public static function redirect($url = NULL) {
     if (!$url) {
@@ -429,7 +424,6 @@ class CRM_Utils_System {
    *   (optional) The page title to use for the redirect page.
    * @param string $message
    *   (optional) The message to provide in the body of the redirect page.
-   *
    */
   static function jsRedirect(
     $url = NULL,
@@ -468,7 +462,6 @@ class CRM_Utils_System {
    * Append an additional breadcrumb tag to the existing breadcrumbs.
    *
    * @param $breadCrumbs
-   *
    */
   public static function appendBreadCrumb($breadCrumbs) {
     $config = CRM_Core_Config::singleton();
@@ -477,7 +470,6 @@ class CRM_Utils_System {
 
   /**
    * Reset an additional breadcrumb tag to the existing breadcrumb.
-   *
    */
   public static function resetBreadCrumb() {
     $config = CRM_Core_Config::singleton();
@@ -488,7 +480,6 @@ class CRM_Utils_System {
    * Append a string to the head of the HTML file.
    *
    * @param string $bc
-   *
    */
   public static function addHTMLHead($bc) {
     $config = CRM_Core_Config::singleton();
@@ -511,7 +502,6 @@ class CRM_Utils_System {
 
   /**
    * Rewrite various system URLs to https.
-   *
    */
   public static function mapConfigToSSL() {
     $config = CRM_Core_Config::singleton();
@@ -683,7 +673,6 @@ class CRM_Utils_System {
    *
    * @param string $message
    *   The message to set.
-   *
    */
   public static function setUFMessage($message) {
     $config = CRM_Core_Config::singleton();
@@ -1766,7 +1755,6 @@ class CRM_Utils_System {
   // getPluginList()
 
   /**
-   *
    */
   public static function executeScheduledJobs() {
     $facility = new CRM_Core_JobManager();

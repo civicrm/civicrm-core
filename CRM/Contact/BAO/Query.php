@@ -132,7 +132,6 @@ class CRM_Contact_BAO_Query {
    * The where string
    *
    * @var string
-   *
    */
   public $_whereClause;
 
@@ -140,7 +139,6 @@ class CRM_Contact_BAO_Query {
    * Additional permission Where Clause
    *
    * @var string
-   *
    */
   public $_permissionWhereClause;
 
@@ -148,7 +146,6 @@ class CRM_Contact_BAO_Query {
    * The from string
    *
    * @var string
-   *
    */
   public $_fromClause;
 
@@ -156,7 +153,6 @@ class CRM_Contact_BAO_Query {
    * Additional permission from clause
    *
    * @var string
-   *
    */
   public $_permissionFromClause;
 
@@ -172,7 +168,6 @@ class CRM_Contact_BAO_Query {
    * The having values
    *
    * @var string
-   *
    */
   public $_having;
 

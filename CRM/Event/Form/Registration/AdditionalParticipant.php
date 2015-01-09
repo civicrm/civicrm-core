@@ -42,13 +42,11 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
   /**
    * The defaults involved in this page
-   *
    */
   public $_defaults = array();
 
   /**
    * Pre-registered additional participant id.
-   *
    */
   public $additionalParticipantId = NULL;
 

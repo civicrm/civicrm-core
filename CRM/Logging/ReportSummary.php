@@ -40,7 +40,6 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
   protected $loggingDB;
 
   /**
-   *
    */
   public function __construct() {
     // don’t display the ‘Add these Contacts to Group’ button

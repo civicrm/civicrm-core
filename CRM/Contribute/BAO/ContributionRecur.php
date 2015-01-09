@@ -42,7 +42,6 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    *
    * @return object
    *   activity contact object
-   *
    */
   public static function create(&$params) {
     return self::add($params);

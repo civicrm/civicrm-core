@@ -39,7 +39,6 @@ class AuthorizeNet extends PHPUnit_Framework_Testcase {
    * to be deleted
    * @return boolean
    *   true if payment processor deleted, false otherwise
-   *
    */
   public function delete($id) {
     $paymentProcessor = new CRM_Financial_DAO_PaymentProcessor();

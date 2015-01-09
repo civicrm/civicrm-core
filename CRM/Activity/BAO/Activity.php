@@ -2070,7 +2070,6 @@ AND cl.modified_id  = c.id
    * @param array $params
    *
    * @return $this|null|object
-   *
    */
   public static function createFollowupActivity($activityId, $params) {
     if (!$activityId) {
@@ -2144,7 +2143,6 @@ AND cl.modified_id  = c.id
    *   Associated array.
    *
    * @return void
-   *
    */
   public static function restoreActivity(&$params) {
     $activity = new CRM_Activity_DAO_Activity();

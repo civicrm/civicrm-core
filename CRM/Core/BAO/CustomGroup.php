@@ -882,7 +882,6 @@ ORDER BY civicrm_custom_group.weight,
    *   title
    *
    * @static
-   *
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $id, 'title');
@@ -1256,7 +1255,6 @@ ORDER BY civicrm_custom_group.weight,
    *   false if field exists for this group, true if group gets deleted.
    *
    * @static
-   *
    */
   public static function deleteGroup($group, $force = FALSE) {
 

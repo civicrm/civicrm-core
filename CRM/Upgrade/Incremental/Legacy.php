@@ -345,7 +345,6 @@ SELECT  count( id ) as statusCount
   /**
    * This function should check if if need to skip current sql file
    * Name of this function will change according to the latest release
-   *
    */
   public static function upgrade_2_2_alpha3($rev) {
     // skip processing sql file, if fresh install -

@@ -43,7 +43,6 @@ class CRM_Dashlet_Page_MyCases extends CRM_Core_Page {
    * List activities as dashlet
    *
    * @return void
-   *
    */
   public function run() {
     $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'dashlet');

@@ -112,7 +112,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
 
   /**
    * Test the LoadObjects function with recurring membership data
-   *
    */
   public function testLoadMembershipObjects() {
     $this->_setUpMembershipObjects();
@@ -127,7 +126,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   }
   /**
    * Test the LoadObjects function with recurring membership data
-   *
    */
   public function testLoadMembershipObjectsLoadAll() {
     $this->_setUpMembershipObjects();
@@ -146,7 +144,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   }
   /**
    * Test the LoadObjects function with recurring membership data
-   *
    */
   public function testsendMailMembershipObjects() {
     $this->_setUpMembershipObjects();
@@ -161,7 +158,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
 
   /**
    * Test the LoadObjects function with recurring membership data
-   *
    */
   public function testsendMailMembershipWithoutLoadObjects() {
     $this->_setUpMembershipObjects();
@@ -202,7 +198,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   *
    */
   public function testComposeMailParticipantObjects() {
     $this->_setUpParticipantObjects();
@@ -302,7 +297,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
 
   /**
    * Test the LoadObjects function with a pledge
-   *
    */
   public function testsendMailPledge() {
     $this->_setUpPledgeObjects();
@@ -314,7 +308,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
 
   /**
    * Test that an error is returned if required set & no contribution page
-   *
    */
   public function testRequiredWithoutProcessorID() {
     $this->_setUpPledgeObjects();
@@ -343,7 +336,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
 
   /**
    * Test that an error is returned if required set & contribution page exists
-   *
    */
   public function testRequiredWithContributionPageError() {
     $this->_setUpContributionObjects();

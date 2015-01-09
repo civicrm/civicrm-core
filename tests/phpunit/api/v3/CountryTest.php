@@ -104,7 +104,6 @@ class api_v3_CountryTest extends CiviUnitTestCase {
   /**
    * If a new country is created and it is created again it should not create a second one.
    * We check on the iso code (there should be only one iso code
-   *
    */
   public function testCreateDuplicateFail() {
     $params = $this->_params;

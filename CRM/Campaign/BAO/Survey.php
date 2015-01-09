@@ -48,7 +48,6 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
    *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
-   *
    */
 
   /**
@@ -403,7 +402,6 @@ SELECT  survey.id    as id,
    *
    * @return mixed|null
    * @static
-   *
    */
   public static function del($id) {
     if (!$id) {
@@ -885,7 +883,6 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
 
   /**
    * Retrieve survey associated profile id.
-   *
    */
   public static function getSurveyProfileId($surveyId) {
     if (!$surveyId) {
@@ -932,7 +929,6 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
 
   /**
    * Decides the contact type for given survey.
-   *
    */
   public static function getSurveyContactType($surveyId) {
     $contactType = NULL;
@@ -951,7 +947,6 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
 
   /**
    * Get survey supportable profile types
-   *
    */
   public static function surveyProfileTypes() {
     static $profileTypes;

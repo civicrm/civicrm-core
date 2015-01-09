@@ -46,7 +46,6 @@ class CRM_Admin_Page_CMSUser extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   *
    */
   public function run() {
     //if javascript is enabled

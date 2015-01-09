@@ -191,7 +191,6 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    * - Edit
    *
    * @return array
-   *
    */
   public static function &links() {
     if (!(self::$_links)) {
@@ -228,7 +227,6 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    *
    * @param $action
    * @param array $params
-   *
    */
   public function getPagerParams($action, &$params) {
     $params['status'] = ts('Mailing Recipient') . ' %%StatusMessage%%';

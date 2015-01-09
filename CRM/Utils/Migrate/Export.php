@@ -53,7 +53,6 @@ class CRM_Utils_Migrate_Export {
   protected $_xml;
 
   /**
-   *
    */
   public function __construct() {
     $this->_xml = array(

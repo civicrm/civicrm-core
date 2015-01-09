@@ -107,7 +107,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *   title
    *
    * @static
-   *
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $id, 'title');
@@ -1389,7 +1388,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @return boolean
    *
    * @static
-   *
    */
   public static function usedByModule($id) {
     //check whether this group is used by any module(check uf join records)
@@ -1416,7 +1414,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @return boolean
    *
    * @static
-   *
    */
   public static function del($id) {
     //check whether this group contains  any profile fields
@@ -3243,7 +3240,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param bool $isStandalone
    *
    * @return void
-   *
    */
   public static function setComponentDefaults(&$fields, $componentId, $component, &$defaults, $isStandalone = FALSE) {
     if (!$componentId ||

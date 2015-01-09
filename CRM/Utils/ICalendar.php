@@ -49,7 +49,6 @@ class CRM_Utils_ICalendar {
    *   Text to escape.
    *
    * @return Escaped text
-   *
    */
   public static function formatText($text) {
     $text = strip_tags($text);

@@ -102,7 +102,6 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
    * method.
    *
    * @return void
-   *
    */
   public function run() {
     // get the requested action, default to 'browse'

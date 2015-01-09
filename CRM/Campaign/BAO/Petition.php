@@ -34,7 +34,6 @@
  */
 class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
   /**
-   *
    */
   public function __construct() {
     parent::__construct();

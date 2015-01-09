@@ -192,7 +192,6 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
-   *
    */
   protected function setUp() {
     $this->_testObjects = array();
@@ -202,7 +201,6 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
    */
   protected function tearDown() {
     parent::tearDown();

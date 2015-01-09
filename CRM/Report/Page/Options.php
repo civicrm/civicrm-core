@@ -77,7 +77,6 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
    * Obtains the group name from url and sets the title.
    *
    * @return void
-   *
    */
   public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);

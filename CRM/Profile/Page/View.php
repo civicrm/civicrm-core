@@ -58,7 +58,6 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   *
    */
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive',
@@ -166,7 +165,6 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
    * Build the outcome basing on the CRM_Profile_Page_Dynamic's HTML
    *
    * @return void
-   *
    */
   public function run() {
     $this->preProcess();

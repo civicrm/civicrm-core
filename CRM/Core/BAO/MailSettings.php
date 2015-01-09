@@ -199,7 +199,6 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *
    * @return mixed|null
    * @static
-   *
    */
   public static function deleteMailSettings($id) {
     $results = NULL;

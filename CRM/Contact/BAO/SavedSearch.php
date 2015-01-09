@@ -53,7 +53,6 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    *
    * @return array
    *   contains the search name as value and and id as key
-   *
    */
   public function getAll() {
     $savedSearch = new CRM_Contact_DAO_SavedSearch();

@@ -38,7 +38,6 @@
  */
 class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
-   *
    */
   public function __construct() {
     /**
@@ -59,7 +58,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *   Email id for cms user.
    *
    * @return uid if user exists, false otherwise
-   *
    */
   public function createUser(&$params, $mail) {
     $baseDir = JPATH_SITE;
@@ -575,7 +573,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *
    * @param array $data
    *   Array with user specific data.
-   *
    */
   public function setUserSession($data) {
     list($userID, $ufID) = $data;
@@ -591,7 +588,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *
    * @param string $message
    *   The message to set.
-   *
    */
   public function setMessage($message) {
     return;
@@ -748,7 +744,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @param object $user
    *   Object as described by the User Framework.
    * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
-   *
    */
   public function getUniqueIdentifierFromUserObject($user) {
     return ($user->guest) ? NULL : $user->email;

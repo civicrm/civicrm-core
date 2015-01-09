@@ -12,7 +12,6 @@ class PCPBlock extends PHPUnit_Framework_Testcase {
    * to be deleted
    * @return array
    *   of created pcp block
-   *
    */
   public function create($contributionPageId) {
     $profileParams = array(
@@ -97,7 +96,6 @@ class PCPBlock extends PHPUnit_Framework_Testcase {
    * to be deleted
    * @return boolean
    *   true if success, false otherwise
-   *
    */
   public function delete($params) {
 

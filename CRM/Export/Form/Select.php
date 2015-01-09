@@ -449,7 +449,6 @@ FROM   {$this->_componentTable}
 
   /**
    * Build mapping form element
-   *
    */
   public function buildMapping() {
     switch ($this->_exportMode) {

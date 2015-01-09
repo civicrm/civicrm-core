@@ -54,10 +54,8 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
   protected $_caseDetailExtra = array();
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     $this->case_statuses = CRM_Core_OptionGroup::values('case_status');

@@ -242,8 +242,6 @@ class CRM_Core_IDS {
 
   /**
    * //todo
-   *
-   *
    */
   private function warn($result) {
     return $result;
@@ -251,8 +249,6 @@ class CRM_Core_IDS {
 
   /**
    *  //todo
-   *
-   *
    */
   private function kick($result) {
     $session = CRM_Core_Session::singleton();

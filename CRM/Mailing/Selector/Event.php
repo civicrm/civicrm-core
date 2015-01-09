@@ -121,7 +121,6 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    *
    * @param $action
    * @param array $params
-   *
    */
   public function getPagerParams($action, &$params) {
     $params['csvString'] = NULL;

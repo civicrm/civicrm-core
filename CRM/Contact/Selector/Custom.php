@@ -164,7 +164,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * - Edit
    *
    * @return array
-   *
    */
   public static function &links() {
     list($key) = func_get_args();
@@ -208,7 +207,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    *
    * @param $action
    * @param array $params
-   *
    */
   public function getPagerParams($action, &$params) {
     $params['status']    = ts('Contact %%StatusMessage%%');

@@ -108,7 +108,6 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    * Finally it calls the parent's run method.
    *
    * @return void
-   *
    */
   public function run() {
 

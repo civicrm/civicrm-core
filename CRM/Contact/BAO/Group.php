@@ -76,7 +76,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @return NULL
    * @static
-   *
    */
   public static function discard($id) {
     CRM_Utils_Hook::pre('delete', 'Group', $id, CRM_Core_DAO::$_nullArray);
@@ -144,7 +143,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
   /**
    * Returns an array of the contacts in the given group.
-   *
    */
   public static function getGroupContacts($id) {
     $params = array(array('group', 'IN', array($id => 1), 0, 0));

@@ -139,7 +139,6 @@ class CRM_Utils_Pager extends Pager_Sliding {
    *
    *
    * @return void
-   *
    */
   public function initialize(&$params) {
     /* set the mode for the pager to Sliding */
@@ -230,7 +229,6 @@ class CRM_Utils_Pager extends Pager_Sliding {
    *
    * @return int
    *   the rowCount value to use
-   *
    */
   public function getPageRowCount($defaultPageRowCount = self::ROWCOUNT) {
     // POST has higher priority than GET vars
@@ -253,8 +251,6 @@ class CRM_Utils_Pager extends Pager_Sliding {
    *
    * @return array
    *   an array of the pageID and offset
-   *
-   *
    */
   public function getOffsetAndRowCount() {
     $pageId = $this->getCurrentPageID();

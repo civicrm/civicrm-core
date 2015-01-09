@@ -106,7 +106,6 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
    * Finally it calls the parent's run method.
    *
    * @return void
-   *
    */
   public function run() {
     // get the requested action

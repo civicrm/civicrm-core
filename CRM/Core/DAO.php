@@ -115,7 +115,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param string $fieldName
    * @param $fieldDef
    * @param array $params
-   *
    */
   protected function assignTestFK($fieldName, $fieldDef, $params) {
     $required = CRM_Utils_Array::value('required', $fieldDef);
@@ -274,7 +273,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * by resetting some of DAO's internal fields. Use this with caution
    *
    * @return void
-   *
    */
   public function reset() {
 

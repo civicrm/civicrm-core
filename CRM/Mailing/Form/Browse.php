@@ -48,7 +48,6 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   *
    */
   public function preProcess() {
     $this->_mailingId = CRM_Utils_Request::retrieve('mid', 'Positive', $this);

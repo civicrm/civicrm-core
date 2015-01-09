@@ -131,7 +131,6 @@ class CRM_Contact_StateMachine_Search extends CRM_Core_StateMachine {
   /**
    * Since this is a state machine for search and we want to come back to the same state
    * we dont want to issue a reset of the state session when we are done processing a task
-   *
    */
   public function shouldReset() {
     return FALSE;

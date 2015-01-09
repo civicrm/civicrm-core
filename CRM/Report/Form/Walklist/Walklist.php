@@ -52,10 +52,8 @@ class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
   );
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     $this->_columns = array(

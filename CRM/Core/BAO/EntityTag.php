@@ -120,7 +120,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *
    * @return CRM_Core_BAO_EntityTag object
    * @static
-   *
    */
   public static function del(&$params) {
     $entityTag = new CRM_Core_BAO_EntityTag();

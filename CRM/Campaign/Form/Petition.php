@@ -253,7 +253,6 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
 
   /**
    * Global validation rules for the form
-   *
    */
   public static function formRule($fields, $files, $form) {
     $errors = array();

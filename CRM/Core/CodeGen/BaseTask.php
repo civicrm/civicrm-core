@@ -7,7 +7,6 @@ abstract class CRM_Core_CodeGen_BaseTask implements CRM_Core_CodeGen_ITask {
   protected $config;
 
   /**
-   *
    */
   public function __construct() {
   }

@@ -56,7 +56,6 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @param
    *
    * @return array
-   *
    */
   public function &actionLinks() {
     // check if variable _actionsLinks is populated

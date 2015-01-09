@@ -46,10 +46,8 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
   public $_drilldownReport = array('event/income' => 'Link to Detail Report');
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     $this->_columns = array(

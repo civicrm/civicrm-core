@@ -39,8 +39,6 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
    *
    * @return array
    *   collection of info about this data source
-   *
-   *
    */
   public function getInfo() {
     return array('title' => ts('SQL Query'));
@@ -48,7 +46,6 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
 
   /**
    * Set variables up before form is built
-   *
    */
   public function preProcess(&$form) {
   }
@@ -92,7 +89,6 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
 
   /**
    * Process the form submission
-   *
    */
   public function postProcess(&$params, &$db, &$form) {
     $importJob = new CRM_Contact_Import_ImportJob(

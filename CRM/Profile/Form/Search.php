@@ -49,8 +49,6 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
    * @param
    *
    * @return void
-   *
-   *
    */
   public function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_SEARCH;

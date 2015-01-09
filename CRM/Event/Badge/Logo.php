@@ -5,7 +5,6 @@
  */
 class CRM_Event_Badge_Logo extends CRM_Event_Badge {
   /**
-   *
    */
   public function __construct() {
     parent::__construct();

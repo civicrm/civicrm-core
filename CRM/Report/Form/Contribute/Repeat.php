@@ -39,10 +39,8 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     $this->_columns = array(

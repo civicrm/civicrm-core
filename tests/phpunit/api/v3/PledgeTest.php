@@ -102,7 +102,6 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   }
 
   /*
-   *
    */
   public function testgetfieldspledge() {
     $result = $this->callAPISuccess('pledge', 'getfields', array('action' => 'get'));
@@ -300,7 +299,6 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
    *
    * Pledge status id left empty as it is not a required field
    * http://issues.civicrm.org/jira/browse/CRM-8551
-   *
    */
   public function testCreatePledgeSinglePayment() {
     $params = array(

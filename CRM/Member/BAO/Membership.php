@@ -52,7 +52,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @return \CRM_Member_DAO_Membership
    */
   /**
-   *
    */
   public function __construct() {
     parent::__construct();

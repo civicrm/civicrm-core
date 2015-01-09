@@ -863,7 +863,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
   /**
    * Process the form submission
-   *
    */
   public function postProcess() {
     // get the submitted form values.

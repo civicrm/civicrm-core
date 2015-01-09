@@ -113,7 +113,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    *
    * @return string
    *   an HTML string containing a link to the given path.
-   *
    */
   public function url($path = NULL, $query = NULL, $absolute = TRUE, $fragment = NULL) {
     if (isset(self::$ufClass)) {
@@ -173,7 +172,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
 
   /**
    * Swap the current UF for soap
-   *
    */
   public function swapUF() {
     $config = CRM_Core_Config::singleton();

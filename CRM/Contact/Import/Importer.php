@@ -39,7 +39,6 @@
  */
 class CRM_Contact_Import_Importer {
   /**
-   *
    */
   public function __construct() {
     // may not need this

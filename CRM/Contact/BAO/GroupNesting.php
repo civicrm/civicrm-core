@@ -306,7 +306,6 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *   The id of the child group being removed.
    *
    * @return void
-   *
    */
   public static function remove($parentID, $childID) {
     $dao = new CRM_Contact_DAO_GroupNesting();
@@ -323,7 +322,6 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *   The id of the child group being removed.
    *
    * @return void
-   *
    */
   public static function removeAllParentForChild($childID) {
     $dao = new CRM_Contact_DAO_GroupNesting();
@@ -342,7 +340,6 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *
    * @return boolean
    *   True if association is found, false otherwise.
-   *
    */
   public static function isParentChild($parentID, $childID) {
     $dao = new CRM_Contact_DAO_GroupNesting();
@@ -363,7 +360,6 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *
    * @return boolean
    *   True if 1 or more child groups are found, false otherwise.
-   *
    */
   public static function hasChildGroups($groupId) {
     $dao = new CRM_Contact_DAO_GroupNesting();
@@ -407,7 +403,6 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *
    * @return boolean
    *   True if $checkGroupId points to a group that is a parent of one of the $groupIds groups, false otherwise.
-   *
    */
   public static function isParentGroup($groupIds, $checkGroupId) {
     if (!is_array($groupIds)) {
@@ -440,7 +435,6 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *
    * @return boolean
    *   True if $checkGroupId points to a group that is a child of one of the $groupIds groups, false otherwise.
-   *
    */
   public static function isChildGroup($groupIds, $checkGroupId) {
 
@@ -475,7 +469,6 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *
    * @return boolean
    *   True if $checkGroupId points to a group that is an ancestor of one of the $groupIds groups, false otherwise.
-   *
    */
   public static function isAncestorGroup($groupIds, $checkGroupId) {
     if (!is_array($groupIds)) {
@@ -517,7 +510,6 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *
    * @return boolean
    *   True if $checkGroupId points to a group that is a descendent of one of the $groupIds groups, false otherwise.
-   *
    */
   public static function isDescendentGroup($groupIds, $checkGroupId) {
     if (!is_array($groupIds)) {

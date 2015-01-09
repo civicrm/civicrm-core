@@ -48,8 +48,6 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
    * @param
    *
    * @return void
-   *
-   *
    */
   public function preProcess() {
     $flag = FALSE;

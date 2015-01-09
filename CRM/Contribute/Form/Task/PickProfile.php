@@ -47,13 +47,11 @@ class CRM_Contribute_Form_Task_PickProfile extends CRM_Contribute_Form_Task {
 
   /**
    * Maximum contributions that should be allowed to update
-   *
    */
   protected $_maxContributions = 100;
 
   /**
    * Variable to store redirect path
-   *
    */
   protected $_userContext;
 

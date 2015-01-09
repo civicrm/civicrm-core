@@ -48,7 +48,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   static $_exportableFields = NULL;
 
   /**
-   *
    */
   public function __construct() {
     parent::__construct();
@@ -479,8 +478,6 @@ WHERE civicrm_case.id = %1";
    *   ID of the case.
    *
    * @return array
-   *
-   *
    */
   public static function getContactNames($caseId) {
     $contactNames = array();
@@ -526,7 +523,6 @@ WHERE civicrm_case.id = %1";
    * @param null $caseType
    *
    * @return array
-   *
    */
   public static function retrieveCaseIdsByContactId($contactID, $includeDeleted = FALSE, $caseType = NULL) {
     $query = "
@@ -730,7 +726,6 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
    *
    * @return array
    *   Array of Cases
-   *
    */
   public static function getCases($allCases = TRUE, $userID = NULL, $type = 'upcoming', $context = 'dashboard') {
     $condition = NULL;
@@ -1577,8 +1572,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    *   ID of the activity type.
    *
    * @return array
-   *
-   *
    */
   public static function getCaseActivityCount($caseId, $activityTypeId) {
     $queryParam = array(
@@ -2195,7 +2188,6 @@ LEFT JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.case
    *   Do not include deleted cases.
    *
    * @return an array of cases.
-   *
    */
   public static function getContactCases($contactId, $excludeDeleted = TRUE) {
     $cases = array();
@@ -2239,7 +2231,6 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
    *   Do not include deleted cases.
    *
    * @return an array of related cases.
-   *
    */
   public static function getRelatedCases($mainCaseId, $contactId, $excludeDeleted = TRUE) {
     //FIXME : do check for permissions.
