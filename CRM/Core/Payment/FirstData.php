@@ -31,24 +31,26 @@
  -----------------------------------------------------------------------------------------------
  **/
 
-/*From Payment processor documentation
-For testing purposes, you can use any of the card numbers listed below. The test card numbers
-will not result in any charges to the card. Use these card numbers with any expiration date in the
-future.
-     Visa Level 2 - 4275330012345675 (replies with a referral message)
-     JCB - 3566007770003510
-     Discover - 6011000993010978
-     MasterCard - 5424180279791765
-     Visa - 4005550000000019 or 4111111111111111
-     MasterCard Level 2 - 5404980000008386
-     Diners - 36555565010005
-     Amex - 372700997251009
-*
-***************************
-*Lines starting with CRM_Core_Error::debug_log_message output messages to files/upload/civicrm.log - you may with to comment them out once it is working satisfactorily
-
-*For live testing uncomment the result field below and set the value to the response you wish to get from the payment processor
-***************************/
+/**
+ * From Payment processor documentation
+ * For testing purposes, you can use any of the card numbers listed below. The test card numbers
+ * will not result in any charges to the card. Use these card numbers with any expiration date in the
+ * future.
+ *      Visa Level 2 - 4275330012345675 (replies with a referral message)
+ *      JCB - 3566007770003510
+ *      Discover - 6011000993010978
+ *      MasterCard - 5424180279791765
+ *      Visa - 4005550000000019 or 4111111111111111
+ *      MasterCard Level 2 - 5404980000008386
+ *      Diners - 36555565010005
+ *      Amex - 372700997251009
+ *
+ * **************************
+ * Lines starting with CRM_Core_Error::debug_log_message output messages to files/upload/civicrm.log - you may with to comment them out once it is working satisfactorily
+ *
+ * For live testing uncomment the result field below and set the value to the response you wish to get from the payment processor
+ * **************************
+ */
 class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
   # (not used, implicit in the API, might need to convert?)
   const CHARSET = 'UFT-8';

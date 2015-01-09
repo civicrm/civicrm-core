@@ -1477,15 +1477,13 @@ AND civicrm_membership.is_test = %2";
   /**
    * Function for updating a membership record's contribution_recur_id
    *
-   * @param object CRM_Member_DAO_Membership $membership
+   * @param CRM_Member_DAO_Membership $membership
    * @param \CRM_Contribute_BAO_Contribution|\CRM_Contribute_DAO_Contribution $contribution
    *
    * @return void
    * @static
    */
-  static public function updateRecurMembership(
-    CRM_Member_DAO_Membership $membership,
-                                               CRM_Contribute_BAO_Contribution $contribution) {
+  static public function updateRecurMembership(CRM_Member_DAO_Membership $membership, CRM_Contribute_BAO_Contribution $contribution) {
 
     if (empty($contribution->contribution_recur_id)) {
       return;

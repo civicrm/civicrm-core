@@ -39,7 +39,6 @@
 /**
  * Smarty block function for printintg the correct report section total
  *
- *
  * Smarty param:  string $key     value of the current section column
  * Smarty param:  int    $depth   the depth of the current section
  *                                (sections declared first have lesser depth, starting at 0)

@@ -65,7 +65,7 @@ describe('crmCaseType', function() {
               "id": "784",
               "option_group_id": "2",
               "label": "ADC referral",
-              "value": "62", 
+              "value": "62",
               "name": "ADC referral",
               "filter": "0",
               "is_default": "0",
@@ -89,7 +89,7 @@ describe('crmCaseType', function() {
               "is_reserved": "1",
               "is_active": "1",
               "component_id": "7"
-            } 
+            }
           }
         },
         'relTypes': {
@@ -136,7 +136,7 @@ describe('crmCaseType', function() {
             ],
             "activitySets": [
               {
-                "name": "standard_timeline", 
+                "name": "standard_timeline",
                 "label": "Standard Timeline",
                 "timeline": "1",
                 "activityTypes": [

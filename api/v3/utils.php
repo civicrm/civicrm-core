@@ -1125,9 +1125,9 @@ function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
  *
  * @daoName string DAO to check params agains
  *
- * @return bool should the missing fields be returned as an array (core error created as default)
- *
- * @return bool true if all fields present, depending on $result a core error is created of an array of missing fields is returned
+ * @return bool 
+ *   Sshould the missing fields be returned as an array (core error created as default)
+ *   true if all fields present, depending on $result a core error is created of an array of missing fields is returned
  * @access public
  */
 function _civicrm_api3_check_required_fields($params, $daoName, $return = FALSE) {
