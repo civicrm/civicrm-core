@@ -124,7 +124,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * Confirm that without check permissions we still get 2 contacts returned
    */
   public function testContactGetHookLimitingHookDontCheck() {
-    //
     $result = $this->callAPISuccess('contact', 'get', array(
       'check_permissions' => 0,
       'return' => 'display_name',

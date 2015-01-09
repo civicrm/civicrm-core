@@ -15,6 +15,5 @@ describe('Mailing Controllers', function() {
       expect(scope.cool_api.length).toBe(3);
 
     });
-	});
+  });
 });
-
