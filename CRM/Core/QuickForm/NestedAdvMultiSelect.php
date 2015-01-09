@@ -57,7 +57,7 @@ class CRM_Core_QuickForm_NestedAdvMultiSelect extends HTML_QuickForm_advmultisel
    *   (optional) See function detail.
    *
    * @since      version 1.5.0 (2009-02-15)
-   * @return     PEAR_Error|NULL on error and TRUE on success
+   * @return PEAR_Error|NULL on error and TRUE on success
    * @throws     PEAR_Error
    * @see        loadArray()
    */

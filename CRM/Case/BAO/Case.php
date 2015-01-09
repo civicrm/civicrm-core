@@ -292,7 +292,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param int $activityId
    *   Activity id.
    *
-   * @return  case subject or null
+   * @return string|null
    * @static
    */
   public static function getCaseSubject($activityId) {
@@ -308,10 +308,9 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * Get the case type.
    *
    * @param int $caseId
-   *
    * @param string $colName
    *
-   * @return  case type
+   * @return string case type
    * @static
    */
   public static function getCaseType($caseId, $colName = 'title') {

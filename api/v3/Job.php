@@ -74,7 +74,7 @@ function civicrm_api3_job_create($params) {
 /**
  * Retrieve one or more job
  * @param array input parameters
- * @return  array api result array
+ * @return array api result array
  * {@getfields email_get}
  * @access public
  */

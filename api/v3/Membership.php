@@ -187,7 +187,7 @@ function _civicrm_api3_membership_get_spec(&$params) {
  *          options affecting the desired results; has legacy support
  *          for just passing the contact_id itself as the argument
  *
- * @return  Array of all found membership property values.
+ * @return Array of all found membership property values.
  * @access public
  * @todo needs some love - basically only a get for a given contact right now
  * {@getfields membership_get}

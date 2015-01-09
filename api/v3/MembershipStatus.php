@@ -61,7 +61,7 @@ function civicrm_api3_membership_status_create($params) {
  * @param array $params
  *   An associative array of name/value property values of civicrm_membership_status.
  *
- * @return  Array of all found membership status property values.
+ * @return Array of all found membership status property values.
  * {@getfields MembershipStatus_get}
  * @access public
  */

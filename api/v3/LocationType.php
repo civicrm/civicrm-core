@@ -96,7 +96,7 @@ function civicrm_api3_location_type_delete($params) {
  * @param array $params
  *   An associative array of name/value pairs.
  *
- * @return  array api result
+ * @return array api result
  * {@getfields LocationType_get}
  * @access public
  */

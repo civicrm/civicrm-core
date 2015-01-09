@@ -104,7 +104,7 @@ function _civicrm_api3_event_create_legacy_support_42(&$params) {
  *   An associative array of name/value property values of civicrm_event.
  * {@getfields event_get}
  *
- * @return  Array of all found event property values.
+ * @return Array of all found event property values.
  * @access public
  *
  */

@@ -50,7 +50,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    * @param string $fileName
    *   The name of the file to save the label in.
    *
-   * @return  null
+   * @return null
    */
   public static function createLabel(&$contactRows, &$format, $fileName = 'MailingLabels_CiviCRM.pdf') {
     $pdf = new CRM_Utils_PDF_Label($format, 'mm');

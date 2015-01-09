@@ -192,7 +192,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return   Object            DAO object on sucess, null otherwise
+   * @return Object            DAO object on sucess, null otherwise
    *
    * @static
    */
@@ -628,7 +628,7 @@ WHERE
    * @param int $id
    *   Field Id.
    *
-   * @return  boolean
+   * @return boolean
    *
    * @static
    *
