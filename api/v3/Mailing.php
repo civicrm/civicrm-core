@@ -79,11 +79,13 @@ function civicrm_api3_mailing_get_token($params) {
     case 'Mailing':
       $tokens = array_merge(CRM_Core_SelectValues::mailingTokens(), $tokens);
       break;
+
     case 'ScheduleEventReminder':
       $tokens = array_merge(CRM_Core_SelectValues::activityTokens(), $tokens);
       $tokens = array_merge(CRM_Core_SelectValues::eventTokens(), $tokens);
       $tokens = array_merge(CRM_Core_SelectValues::membershipTokens(), $tokens);
       break;
+
     case 'ManageEventScheduleReminder':
       $tokens = array_merge(CRM_Core_SelectValues::eventTokens(), $tokens);
       break;
@@ -553,21 +555,25 @@ function civicrm_api3_mailing_stats($params) {
           $detail =>  CRM_Mailing_Event_BAO_Delivered::getTotalCount($params['mailing_id'], $params['job_id'], FALSE, $params['date']),
         );
         break;
+
       case 'Bounces':
         $stats[$params['mailing_id']] += array(
           $detail =>  CRM_Mailing_Event_BAO_Bounce::getTotalCount($params['mailing_id'], $params['job_id'], FALSE, $params['date']),
         );
         break;
+
       case 'Unsubscribers':
         $stats[$params['mailing_id']] += array(
           $detail =>  CRM_Mailing_Event_BAO_Unsubscribe::getTotalCount($params['mailing_id'], $params['job_id'], FALSE, NULL, $params['date']),
         );
         break;
+
       case 'Unique Clicks':
         $stats[$params['mailing_id']] += array(
           $detail =>  CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($params['mailing_id'], $params['job_id'], FALSE, NULL, $params['date']),
         );
         break;
+
       case 'Opened':
         $stats[$params['mailing_id']] += array(
           $detail =>  CRM_Mailing_Event_BAO_Opened::getTotalCount($params['mailing_id'], $params['job_id'], FALSE, $params['date']),

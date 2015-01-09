@@ -592,12 +592,15 @@ class CRM_Report_Form extends CRM_Core_Form {
                   case CRM_Utils_Type::T_FLOAT:
                     $this->_columns[$tableName][$fieldGrp][$fieldName]['operatorType'] = CRM_Report_Form::OP_FLOAT;
                     break;
+
                   case CRM_Utils_Type::T_INT:
                     $this->_columns[$tableName][$fieldGrp][$fieldName]['operatorType'] = CRM_Report_Form::OP_INT;
                     break;
+
                   case CRM_Utils_Type::T_DATE:
                     $this->_columns[$tableName][$fieldGrp][$fieldName]['operatorType'] = CRM_Report_Form::OP_DATE;
                     break;
+
                   case CRM_Utils_Type::T_BOOLEAN:
                     $this->_columns[$tableName][$fieldGrp][$fieldName]['operatorType'] = CRM_Report_Form::OP_SELECT;
                     if (!array_key_exists('options', $this->_columns[$tableName][$fieldGrp][$fieldName])) {
@@ -609,6 +612,7 @@ class CRM_Report_Form extends CRM_Core_Form {
                         );
                     }
                     break;
+
                   default:
                     if ($daoOrBaoName &&
                       array_key_exists('pseudoconstant', $this->_columns[$tableName][$fieldGrp][$fieldName])
@@ -1276,7 +1280,6 @@ class CRM_Report_Form extends CRM_Core_Form {
           'nll' => ts('Is empty (Null)'),
           'nnll' => ts('Is not empty (Null)'),
         );
-        break;
 
       case CRM_Report_Form::OP_SELECT:
         return array(
@@ -1290,14 +1293,12 @@ class CRM_Report_Form extends CRM_Core_Form {
           'in' => ts('Is one of'),
           'notin' => ts('Is not one of'),
         );
-        break;
 
       case CRM_Report_Form::OP_DATE:
         return array(
           'nll' => ts('Is empty (Null)'),
           'nnll' => ts('Is not empty (Null)'),
         );
-        break;
 
       case CRM_Report_Form::OP_MULTISELECT_SEPARATOR:
         // use this operator for the values, concatenated with separator. For e.g if

@@ -3214,6 +3214,7 @@ WHERE  contribution_id = %1 ";
           $params['condition'] = 'id IN (' . implode(',', $types) . ')';
         }
         break;
+
       // CRM-13981 This field was combined with soft_credits in 4.5 but the api still supports it
       case 'honor_type_id':
         $className = 'CRM_Contribute_BAO_ContributionSoft';

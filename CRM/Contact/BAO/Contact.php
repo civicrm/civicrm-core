@@ -537,6 +537,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
             'cid' => $this->id,
           ),
         );
+
       case CRM_Core_Action::UPDATE:
         return array(
           'title' => $this->display_name,
@@ -3324,6 +3325,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
           $params['condition'] = "parent_id = (SELECT id FROM civicrm_contact_type WHERE name='{$props['contact_type']}')";
         }
         break;
+
       case 'contact_type':
         if ($context == 'search') {
           // CRM-15495 - EntityRef filters and basic search forms expect this format

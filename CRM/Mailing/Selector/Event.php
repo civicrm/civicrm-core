@@ -267,7 +267,6 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
         return $event->getTotalCount($this->_mailing_id,
           $this->_job_id
         );
-      break;
 
       case 'delivered':
         $event = new CRM_Mailing_Event_BAO_Delivered();
@@ -275,7 +274,6 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           $this->_job_id,
           $this->_is_distinct
         );
-      break;
 
       case 'opened':
         $event = new CRM_Mailing_Event_BAO_Opened();
@@ -283,7 +281,6 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           $this->_job_id,
           $this->_is_distinct
         );
-      break;
 
       case 'bounce':
         $event = new CRM_Mailing_Event_BAO_Bounce();
@@ -291,7 +288,6 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           $this->_job_id,
           $this->_is_distinct
         );
-      break;
 
       case 'forward':
         $event = new CRM_Mailing_Event_BAO_Forward();
@@ -299,7 +295,6 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           $this->_job_id,
           $this->_is_distinct
         );
-      break;
 
       case 'reply':
         $event = new CRM_Mailing_Event_BAO_Reply();
@@ -307,7 +302,6 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           $this->_job_id,
           $this->_is_distinct
         );
-      break;
 
       case 'unsubscribe':
         $event = new CRM_Mailing_Event_BAO_Unsubscribe();
@@ -315,7 +309,6 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           $this->_job_id,
           $this->_is_distinct
         );
-      break;
 
       case 'optout':
         $event = new CRM_Mailing_Event_BAO_Unsubscribe();
@@ -324,7 +317,6 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           $this->_is_distinct,
           FALSE
         );
-      break;
 
       case 'click':
         $event = new CRM_Mailing_Event_BAO_TrackableURLOpen();
@@ -333,7 +325,6 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           $this->_is_distinct,
           $this->_url_id
         );
-      break;
 
       default:
         return 0;
@@ -370,21 +361,18 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort
         );
-      break;
 
       case 'opened':
         return CRM_Mailing_Event_BAO_Opened::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort
         );
-      break;
 
       case 'bounce':
         return CRM_Mailing_Event_BAO_Bounce::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort
         );
-      break;
 
       case 'forward':
         return CRM_Mailing_Event_BAO_Forward::getRows($this->_mailing_id,
@@ -397,21 +385,18 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort
         );
-      break;
 
       case 'unsubscribe':
         return CRM_Mailing_Event_BAO_Unsubscribe::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort, TRUE
         );
-      break;
 
       case 'optout':
         return CRM_Mailing_Event_BAO_Unsubscribe::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort, FALSE
         );
-      break;
 
       case 'click':
         return CRM_Mailing_Event_BAO_TrackableURLOpen::getRows(
@@ -419,7 +404,6 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           $this->_is_distinct, $this->_url_id,
           $offset, $rowCount, $sort
         );
-      break;
 
       default:
         return NULL;

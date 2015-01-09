@@ -732,10 +732,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           unset($status[CRM_Utils_Array::key('Pending', $statusName)]);
           unset($status[CRM_Utils_Array::key('Failed', $statusName)]);
           break;
+
         case 'Pending':
         case 'In Progress':
           unset($status[CRM_Utils_Array::key('Refunded', $statusName)]);
           break;
+
         case 'Failed':
           foreach (array(
                      'Pending',

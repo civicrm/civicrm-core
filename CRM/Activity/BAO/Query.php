@@ -356,6 +356,7 @@ class CRM_Activity_BAO_Query {
         );
         CRM_Campaign_BAO_Query::componentSearchClause($campParams, $query);
         break;
+
       case 'activity_result':
         if (is_array($value)) {
           $safe = NULL;

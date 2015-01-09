@@ -145,12 +145,15 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       case CRM_Core_Action::VIEW:
         CRM_Utils_System::setTitle(ts('View Relationship for %1', array(1 => $this->_display_name_a)));
         break;
+
       case CRM_Core_Action::ADD:
         CRM_Utils_System::setTitle(ts('Add Relationship for %1', array(1 => $this->_display_name_a)));
         break;
+
       case CRM_Core_Action::UPDATE:
         CRM_Utils_System::setTitle(ts('Edit Relationship for %1', array(1 => $this->_display_name_a)));
         break;
+
       case CRM_Core_Action::DELETE:
         CRM_Utils_System::setTitle(ts('Delete Relationship for %1', array(1 => $this->_display_name_a)));
         break;

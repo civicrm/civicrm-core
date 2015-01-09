@@ -273,9 +273,11 @@ class CRM_Core_ManagedEntities {
       case 'always':
         $doDelete = TRUE;
         break;
+
       case 'never':
         $doDelete = FALSE;
         break;
+
       case 'unused':
         $getRefCount = civicrm_api3($dao->entity_type, 'getrefcount', array(
           'debug' => 1,
@@ -289,6 +291,7 @@ class CRM_Core_ManagedEntities {
 
         $doDelete = ($total == 0);
         break;
+
       default:
         throw new \Exception('Unrecognized cleanup policy: ' . $policy);
     }

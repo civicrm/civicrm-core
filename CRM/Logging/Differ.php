@@ -91,15 +91,19 @@ class CRM_Logging_Differ {
       case 'civicrm_contact':
         $contactIdClause = "AND id = %3";
         break;
+
       case 'civicrm_note':
         $contactIdClause = "AND (( entity_id = %3 AND entity_table = 'civicrm_contact' ) OR (entity_id IN (SELECT note.id FROM `{$this->db}`.log_civicrm_note note WHERE note.entity_id = %3 AND note.entity_table = 'civicrm_contact') AND entity_table = 'civicrm_note'))";
         break;
+
       case 'civicrm_entity_tag':
         $contactIdClause = "AND entity_id = %3 AND entity_table = 'civicrm_contact'";
         break;
+
       case 'civicrm_relationship':
         $contactIdClause = "AND (contact_id_a = %3 OR contact_id_b = %3)";
         break;
+
       case 'civicrm_activity':
         $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
         $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
@@ -112,9 +116,11 @@ LEFT JOIN civicrm_activity_contact aa ON aa.activity_id = lt.id AND aa.contact_i
 LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND source.contact_id = %3 AND source.record_type_id = {$sourceID} ";
         $contactIdClause = "AND (at.id IS NOT NULL OR aa.id IS NOT NULL OR source.id IS NOT NULL)";
         break;
+
       case 'civicrm_case':
         $contactIdClause = "AND id = (select case_id FROM civicrm_case_contact WHERE contact_id = %3 LIMIT 1)";
         break;
+
       default:
         if (array_key_exists($table, $addressCustomTables)) {
           $join  = "INNER JOIN `{$this->db}`.`log_civicrm_address` et ON et.id = lt.entity_id";
@@ -297,6 +303,7 @@ WHERE lt.log_conn_id = %1 AND
           case 'civicrm_case':
             $values[$table]['status_id'] = CRM_Case_PseudoConstant::caseStatus('label', FALSE);
             break;
+
           case 'civicrm_activity':
             $values[$table]['status_id'] = CRM_Core_PseudoConstant::activityStatus();
             break;

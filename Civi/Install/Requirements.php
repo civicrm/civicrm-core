@@ -142,10 +142,13 @@ class Requirements {
     switch (strtolower(substr($memString, -1))) {
       case "k":
         return round(substr($memString, 0, -1) * 1024);
+
       case "m":
         return round(substr($memString, 0, -1) * 1024 * 1024);
+
       case "g":
         return round(substr($memString, 0, -1) * 1024 * 1024 * 1024);
+
       default:
         return round($memString);
     }

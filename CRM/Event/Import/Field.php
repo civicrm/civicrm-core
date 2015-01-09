@@ -113,6 +113,7 @@ class CRM_Event_Import_Field {
 
       case 'register_date':
         return CRM_Utils_Rule::date($this->_value);
+
       /*
         case 'event_id':
             static $events = null;
