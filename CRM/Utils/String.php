@@ -561,7 +561,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * This function is used to clean the URL 'path' variable that we use
+   * clean the URL 'path' variable that we use
    * to construct CiviCRM urls by removing characters from the path variable
    *
    * @param string $string

@@ -82,7 +82,7 @@ function civicrm_api3_im_delete($params) {
  * @param array $params
  *   An associative array of name/value pairs.
  *
- * @return  array details of found IM
+ * @return array details of found IM
  *
  * @access public
  */

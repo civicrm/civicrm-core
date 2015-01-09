@@ -370,7 +370,7 @@ AND         cp.page_type = 'contribute'
   }
 
   /**
-   * This function is to make a copy of a contribution page, including
+   * make a copy of a contribution page, including
    * all the fields in the page
    *
    * @return void

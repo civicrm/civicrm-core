@@ -727,7 +727,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @strings  array    array of strings or a single string
    *
    * @param $strings
-   * @return   void
+   * @return void
    */
   public function assertStringsPresent($strings) {
     foreach ((array) $strings as $string) {
@@ -741,7 +741,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @url      string url to parse or retrieve current url if null
    *
    * @param null $url
-   * @return   array  returns an associative array containing any of the various components
+   * @return array  returns an associative array containing any of the various components
    *                  of the URL that are present. Querystring elements are returned in sub-array (elements.queryString)
    *                  http://php.net/manual/en/function.parse-url.php
    */

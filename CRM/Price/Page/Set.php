@@ -55,7 +55,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    *
    * @param null
    *
-   * @return  array   array of action links that we need to display for the browse screen
+   * @return array   array of action links that we need to display for the browse screen
    */
   function &actionLinks() {
     // check if variable _actionsLinks is populated
@@ -316,7 +316,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   }
 
   /**
-   * This function is to make a copy of a price set, including
+   * make a copy of a price set, including
    * all the fields in the page
    *
    * @return void

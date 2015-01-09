@@ -85,7 +85,7 @@ function civicrm_api3_file_create($params) {
  * @param array $params
  *   An associative array of name/value property values of civicrm_file.
  *
- * @return  Array of all found file object property values.
+ * @return Array of all found file object property values.
  * @access public
  */
 function civicrm_api3_file_get($params) {

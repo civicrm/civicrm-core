@@ -616,7 +616,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * This function is to make a copy of a contribution page, including
+   * make a copy of a contribution page, including
    * all the blocks in the page
    *
    * @param int $id

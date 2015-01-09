@@ -103,7 +103,8 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
    * @param array $errors
    *   List of errors to be posted back to the form.
    *
-   * @return array $errors@static
+   * @return array $errors
+   * @static
    */
   public static function formRule($fields, $errors) {
     $hasData = $hasPrimary = $errors = array();

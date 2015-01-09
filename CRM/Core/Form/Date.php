@@ -40,7 +40,7 @@ class CRM_Core_Form_Date {
   const DATE_yyyy_mm_dd = 1, DATE_mm_dd_yy = 2, DATE_mm_dd_yyyy = 4, DATE_Month_dd_yyyy = 8, DATE_dd_mon_yy = 16, DATE_dd_mm_yyyy = 32;
 
   /**
-   * This function is to build the date-format form
+   * build the date-format form
    *
    * @param CRM_Core_Form $form
    *   The form object that we are operating on.
@@ -71,7 +71,7 @@ class CRM_Core_Form_Date {
 
 
   /**
-   * This function is to retrieve the date range - relative or absolute
+   * retrieve the date range - relative or absolute
    * and assign it to the form
    *
    * @param CRM_Core_Form $form
@@ -112,7 +112,7 @@ class CRM_Core_Form_Date {
   }
 
   /**
-   * This function is to build the date range array that will provide the form option values
+   * build the date range array that will provide the form option values
    * It can be - relative or absolute
    *
    * @param CRM_Core_Form $form
@@ -227,7 +227,7 @@ class CRM_Core_Form_Date {
   }
 
   /**
-   * This function is to build the date range - relative or absolute
+   * build the date range - relative or absolute
    *
    * @param CRM_Core_Form $form
    *   The form object that we are operating on.

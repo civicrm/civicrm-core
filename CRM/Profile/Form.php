@@ -98,7 +98,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   public $_fields;
 
   /**
-   * To store contact details
+   * store contact details
    *
    * @var array
    */

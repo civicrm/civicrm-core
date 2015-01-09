@@ -48,7 +48,7 @@ class CRM_Utils_ICalendar {
    * @param $text
    *   Text to escape.
    *
-   * @return  Escaped text
+   * @return Escaped text
    *
    */
   public static function formatText($text) {
@@ -70,7 +70,7 @@ class CRM_Utils_ICalendar {
    *
    * @param bool $gdata
    *
-   * @return  Escaped date
+   * @return Escaped date
    */
   public static function formatDate($date, $gdata = FALSE) {
 

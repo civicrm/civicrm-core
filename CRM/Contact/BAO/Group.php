@@ -712,7 +712,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * This function is a wrapper for ajax group selector
+   * wrapper for ajax group selector
    *
    * @param array $params
    *   Associated array for params record id.

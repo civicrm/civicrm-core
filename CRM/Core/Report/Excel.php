@@ -48,7 +48,7 @@ class CRM_Core_Report_Excel {
    *
    * @param bool $outputHeader
    *
-   * @return  mixed    empty if output is printed, else output
+   * @return mixed    empty if output is printed, else output
    *
    * @static
    */

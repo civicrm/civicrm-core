@@ -352,7 +352,8 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    * @param bool $returnWaitingCount
    * @param bool $considerTestParticipant
    *
-   * @return bool|int|null|string 1. false                 => If event having some empty spaces.@static
+   * @return bool|int|null|string 1. false                 => If event having some empty spaces.
+   * @static
    */
   static function eventFull(
     $eventId,
@@ -840,7 +841,7 @@ WHERE  civicrm_participant.id = {$participantId}
   }
 
   /**
-   * This function is used to convert associative array names to values
+   * convert associative array names to values
    * and vice-versa.
    *
    * This function is used by both the web form layer and the api. Note that
@@ -1807,7 +1808,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   }
 
   /**
-   * To create trxn entry if an event has discount.
+   * create trxn entry if an event has discount.
    *
    * @param int $eventID
    *   Event id.

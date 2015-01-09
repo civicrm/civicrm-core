@@ -927,7 +927,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-   * This function is a wrapper of getScheduleReminderDetailsById function
+   * wrapper of getScheduleReminderDetailsById function
    *
    * @param int $scheduleReminderId
    *   Primary key of civicrm_action_schedule table .

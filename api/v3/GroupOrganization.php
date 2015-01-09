@@ -49,7 +49,7 @@
  * {@getfields GroupOrganization_get}
  * @example GroupOrganizationGet.php
  *
- * @return  array  list of groups, given contact subsribed to
+ * @return array  list of groups, given contact subsribed to
  */
 function civicrm_api3_group_organization_get($params) {
   return _civicrm_api3_basic_get('CRM_Contact_DAO_GroupOrganization', $params);

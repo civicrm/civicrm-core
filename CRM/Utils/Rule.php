@@ -557,7 +557,7 @@ class CRM_Utils_Rule {
    *
    * @param array Uploaded file info (from $_FILES)
    *
-   * @return    bool      true if file has been uploaded, false otherwise
+   * @return bool      true if file has been uploaded, false otherwise
    */
   public static function asciiFile($elementValue) {
     if ((isset($elementValue['error']) && $elementValue['error'] == 0) ||
@@ -573,7 +573,7 @@ class CRM_Utils_Rule {
    *
    * @param array Uploaded file info (from $_FILES)
    *
-   * @return    bool      whether file has been uploaded properly and is now in UTF-8
+   * @return bool      whether file has been uploaded properly and is now in UTF-8
    */
   public static function utf8File($elementValue) {
     $success = FALSE;
@@ -602,7 +602,7 @@ class CRM_Utils_Rule {
    *
    * @param array Uploaded file info (from $_FILES)
    *
-   * @return    bool      true if file has been uploaded, false otherwise
+   * @return bool      true if file has been uploaded, false otherwise
    */
   public static function htmlFile($elementValue) {
     if ((isset($elementValue['error']) && $elementValue['error'] == 0) ||

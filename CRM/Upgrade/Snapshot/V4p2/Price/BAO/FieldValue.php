@@ -181,7 +181,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return   Object            DAO object on sucess, null otherwise
+   * @return Object            DAO object on sucess, null otherwise
    *
    * @static
    */
@@ -215,7 +215,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @param int $id
    *   Id.
    *
-   * @return  boolean
+   * @return boolean
    *
    * @static
    */

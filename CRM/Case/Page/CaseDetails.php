@@ -35,7 +35,7 @@
 class CRM_Case_Page_CaseDetails extends CRM_Core_Page {
 
   /**
-   * This function is the main function that is called when the page loads,
+   * the main function that is called when the page loads,
    * it decides the which action has to be taken for the page.
    *
    * return null

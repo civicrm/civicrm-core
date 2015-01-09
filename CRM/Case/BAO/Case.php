@@ -218,7 +218,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   }
 
   /**
-   * This function is used to convert associative array names to values
+   * convert associative array names to values
    * and vice-versa.
    *
    * This function is used by both the web form layer and the api. Note that
@@ -292,7 +292,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param int $activityId
    *   Activity id.
    *
-   * @return  case subject or null
+   * @return string|null
    * @static
    */
   public static function getCaseSubject($activityId) {
@@ -308,10 +308,9 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * Get the case type.
    *
    * @param int $caseId
-   *
    * @param string $colName
    *
-   * @return  case type
+   * @return string case type
    * @static
    */
   public static function getCaseType($caseId, $colName = 'title') {
@@ -1601,7 +1600,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param int $file
    *   Email sent.
    *
-   * @return array|void $activity object of newly creted activity via email@access public
+   * @return array|void $activity object of newly creted activity via email
+   * @access public
    */
   public static function recordActivityViaEmail($file) {
     if (!file_exists($file) ||

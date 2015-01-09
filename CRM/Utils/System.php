@@ -305,7 +305,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * This function is called from a template to compose a url.
+   * called from a template to compose a url.
    *
    * @param array $params
    *   List of parameters.
