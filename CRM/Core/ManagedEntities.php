@@ -129,8 +129,8 @@ class CRM_Core_ManagedEntities {
    * Create, update, and delete entities declared by an active module
    *
    * @param \CRM_Core_Module|string $module string
-   * @param $todos
-   *   Array $name => array().
+   * @param array $todos
+   *   $name => array().
    */
   public function reconcileEnabledModule(CRM_Core_Module $module, $todos) {
     $dao = new CRM_Core_DAO_Managed();

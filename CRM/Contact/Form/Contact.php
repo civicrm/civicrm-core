@@ -1192,8 +1192,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * This function either parse street address in to child
    * elements or build street address from child elements.
    *
-   * @param $params
-   *   Array of key value consist of address blocks.
+   * @param array $params
+   *   of key value consist of address blocks.
    *
    * @return array $parseSuccess as array of sucess/fails for each address block@static
    */
@@ -1278,7 +1278,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * Check parse result and if some address block fails then this
    * function return the status message for all address blocks.
    *
-   * @param $parseResult
+   * @param array $parseResult
    *   An array of address blk instance and its status.
    *
    * @return null|string $statusMsg   string status message for all address blocks.@static
@@ -1309,8 +1309,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * Convert normal number to ordinal number format.
    * like 1 => 1st, 2 => 2nd and so on...
    *
-   * @param $number
-   *   Int number to convert in to ordinal number.
+   * @param int $number
+   *   number to convert in to ordinal number.
    *
    * @return ordinal number for given number.
    * @static
@@ -1346,8 +1346,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * Update membership status to deceased
    * function return the status message for updated membership.
    *
-   * @param $deceasedParams
-   *   Array having contact id and deceased value.
+   * @param array $deceasedParams
+   *   having contact id and deceased value.
    *
    * @return null|string $updateMembershipMsg string  status message for updated membership.
    */

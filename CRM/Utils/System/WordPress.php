@@ -174,8 +174,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Add a script file
    *
    * @param $url: string, absolute path to file
-   * @param $region
-   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
+   * @param string $region
+   *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -190,8 +190,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Add an inline script
    *
    * @param $code: string, javascript code
-   * @param $region
-   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
+   * @param string $region
+   *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -206,8 +206,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Add a css file
    *
    * @param $url: string, absolute path to file
-   * @param $region
-   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
+   * @param string $region
+   *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -222,8 +222,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Add an inline style
    *
    * @param $code: string, css code
-   * @param $region
-   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
+   * @param string $region
+   *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -267,20 +267,20 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Generate an internal CiviCRM URL (copied from DRUPAL/includes/common.inc#url)
    *
-   * @param $path
-   *   String The path being linked to, such as "civicrm/add".
-   * @param $query
-   *   String A query string to append to the link.
-   * @param $absolute
-   *   Boolean Whether to force the output to be an absolute link (beginning with http:).
+   * @param string $path
+   *   The path being linked to, such as "civicrm/add".
+   * @param string $query
+   *   A query string to append to the link.
+   * @param bool $absolute
+   *   Whether to force the output to be an absolute link (beginning with http:).
    *                           Useful for links that will be displayed outside the site, such as in an
    *                           RSS feed.
-   * @param $fragment
-   *   String A fragment identifier (named anchor) to append to the link.
-   * @param $htmlize
-   *   Boolean whether to convert to html eqivalant.
-   * @param $frontend
-   *   Boolean a gross joomla hack.
+   * @param string $fragment
+   *   A fragment identifier (named anchor) to append to the link.
+   * @param bool $htmlize
+   *   whether to convert to html eqivalant.
+   * @param bool $frontend
+   *   a gross joomla hack.
    *
    * @param bool $forceBackend
    *
@@ -488,10 +488,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Load wordpress bootstrap
    *
-   * @param $name
-   *   String optional username for login.
-   * @param $pass
-   *   String optional password for login.
+   * @param string $name
+   *   optional username for login.
+   * @param string $pass
+   *   optional password for login.
    *
    * @return bool
    */

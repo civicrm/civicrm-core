@@ -1277,12 +1277,12 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    * membership is is extedned by the same relationship type to that
    * of the existing relationship.
    *
-   * @param $contactId
-   *   Int contact id.
-   * @param $params
-   *   Array array of values submitted by POST.
-   * @param $ids
-   *   Array array of ids.
+   * @param int $contactId
+   *   contact id.
+   * @param array $params
+   *   array of values submitted by POST.
+   * @param array $ids
+   *   array of ids.
    * @param \const|\which $action which action called this function
    *
    * @param bool $active
@@ -1575,11 +1575,11 @@ WHERE id IN ( {$contacts} )
   /**
    * Return list of permissioned employer for a given contact.
    *
-   * @param $contactID
-   *   Int contact id whose employers.
+   * @param int $contactID
+   *   contact id whose employers.
    * are to be found.
-   * @param $name
-   *   String employers sort name.
+   * @param string $name
+   *   employers sort name.
    *
    * @static
    *
@@ -1599,12 +1599,11 @@ WHERE id IN ( {$contacts} )
   /**
    * Function to return list of permissioned contacts for a given contact and relationship type
    *
-   * @param $contactID
-   *   Int contact id whose permissioned contacts are to be found.
-   * @param $relTypeId
-   *   String one or more relationship type id's.
-   * @param $name
-   *   String.
+   * @param int $contactID
+   *   contact id whose permissioned contacts are to be found.
+   * @param string $relTypeId
+   *   one or more relationship type id's.
+   * @param string $name
    *
    * @static
    *

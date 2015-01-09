@@ -1677,8 +1677,7 @@ ORDER BY name";
    * Given a state ID return the country ID, this allows
    * us to populate forms and values for downstream code
    *
-   * @param $stateID
-   *   Int.
+   * @param int $stateID
    *
    * @return int the country id that the state belongs to
    * @static
@@ -1838,8 +1837,8 @@ WHERE  id = %1
   /**
    * Fetch the list of active extensions of type 'module'
    *
-   * @param $fresh
-   *   Bool whether to forcibly reload extensions list from canonical store.
+   * @param bool $fresh
+   *   Whether to forcibly reload extensions list from canonical store.
    * @static
    *
    * @return array - array(array('prefix' => $, 'file' => $))

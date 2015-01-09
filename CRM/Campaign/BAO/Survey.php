@@ -341,8 +341,8 @@ SELECT  survey.id    as id,
   /**
    * Get Surveys custom groups
    *
-   * @param $surveyTypes
-   *   Array an array of survey type id.
+   * @param array $surveyTypes
+   *   an array of survey type id.
    *
    * @return array
    * @static

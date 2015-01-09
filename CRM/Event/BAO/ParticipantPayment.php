@@ -38,10 +38,10 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
   /**
    * Creates or updates a participant payment record
    *
-   * @param $params
-   *   Array of values to initialize the record with.
-   * @param $ids
-   *   Array with one values of id for this participantPayment record (for update).
+   * @param array $params
+   *   of values to initialize the record with.
+   * @param array $ids
+   *   with one values of id for this participantPayment record (for update).
    *
    * @return object the partcipant payment record
    * @static

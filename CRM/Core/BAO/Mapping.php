@@ -194,10 +194,10 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   /**
    * Check Duplicate Mapping Name
    *
-   * @param $nameField
-   *   String mapping Name.
-   * @param $mapTypeId
-   *   String mapping Type.
+   * @param string $nameField
+   *   mapping Name.
+   * @param string $mapTypeId
+   *   mapping Type.
    *
    * @return boolean
    */

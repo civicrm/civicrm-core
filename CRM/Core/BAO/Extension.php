@@ -79,10 +79,9 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
   /**
    * Change the schema version of an extension
    *
-   * @param $fullName
-   *   String, the fully-qualified name (eg "com.example.myextension").
-   * @param $schemaVersion
-   *   String.
+   * @param string $fullName
+   *   the fully-qualified name (eg "com.example.myextension").
+   * @param string $schemaVersion
    * @return void
    */
   public static function setSchemaVersion($fullName, $schemaVersion) {
@@ -97,8 +96,8 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
   /**
    * Determine the schema version of an extension
    *
-   * @param $fullName
-   *   String, the fully-qualified name (eg "com.example.myextension").
+   * @param string $fullName
+   *   the fully-qualified name (eg "com.example.myextension").
    * @return string
    */
   public static function getSchemaVersion($fullName) {

@@ -548,12 +548,12 @@ SET    version = '$version'
   /**
    * Fill the queue with upgrade tasks
    *
-   * @param $currentVer
-   *   String, the original revision.
-   * @param $latestVer
-   *   String, the target (final) revision.
-   * @param $postUpgradeMessageFile
-   *   String, path of a modifiable file which lists the post-upgrade messages.
+   * @param string $currentVer
+   *   the original revision.
+   * @param string $latestVer
+   *   the target (final) revision.
+   * @param string $postUpgradeMessageFile
+   *   path of a modifiable file which lists the post-upgrade messages.
    *
    * @return CRM_Queue
    */
@@ -616,8 +616,8 @@ SET    version = '$version'
    * Perform an incremental version update
    *
    * @param CRM_Queue_TaskContext $ctx
-   * @param $rev
-   *   String, the target (intermediate) revision e.g '3.2.alpha1'.
+   * @param string $rev
+   *   the target (intermediate) revision e.g '3.2.alpha1'.
    *
    * @return bool
    */
@@ -635,14 +635,14 @@ SET    version = '$version'
    * Perform an incremental version update
    *
    * @param CRM_Queue_TaskContext $ctx
-   * @param $rev
-   *   String, the target (intermediate) revision e.g '3.2.alpha1'.
-   * @param $originalVer
-   *   String, the original revision.
-   * @param $latestVer
-   *   String, the target (final) revision.
-   * @param $postUpgradeMessageFile
-   *   String, path of a modifiable file which lists the post-upgrade messages.
+   * @param string $rev
+   *   the target (intermediate) revision e.g '3.2.alpha1'.
+   * @param string $originalVer
+   *   the original revision.
+   * @param string $latestVer
+   *   the target (final) revision.
+   * @param string $postUpgradeMessageFile
+   *   path of a modifiable file which lists the post-upgrade messages.
    *
    * @return bool
    */
@@ -700,14 +700,14 @@ SET    version = '$version'
    * Perform an incremental version update
    *
    * @param CRM_Queue_TaskContext $ctx
-   * @param $rev
-   *   String, the target (intermediate) revision e.g '3.2.alpha1'.
-   * @param $currentVer
-   *   String, the original revision.
-   * @param $latestVer
-   *   String, the target (final) revision.
-   * @param $postUpgradeMessageFile
-   *   String, path of a modifiable file which lists the post-upgrade messages.
+   * @param string $rev
+   *   the target (intermediate) revision e.g '3.2.alpha1'.
+   * @param string $currentVer
+   *   the original revision.
+   * @param string $latestVer
+   *   the target (final) revision.
+   * @param string $postUpgradeMessageFile
+   *   path of a modifiable file which lists the post-upgrade messages.
    *
    * @return bool
    */
@@ -751,8 +751,8 @@ SET    version = '$version'
    * by calling the 'setPreUpgradeMessage' on each incremental upgrade
    * object.
    *
-   * @param $preUpgradeMessage
-   *   String, alterable.
+   * @param string $preUpgradeMessage
+   *   alterable.
    * @param $currentVer
    * @param $latestVer
    */
