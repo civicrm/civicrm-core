@@ -63,7 +63,7 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
     $customRecId = CRM_Utils_Request::retrieve('customRecId', 'Positive', $this, FALSE, 1, $_REQUEST);
     $cgcount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $this, FALSE, 1, $_REQUEST);
     $subType = CRM_Contact_BAO_Contact::getContactSubType($this->_contactId, ',');
-    CRM_Custom_Form_CustomData::preProcess($this, null, $subType, $cgcount,
+    CRM_Custom_Form_CustomData::preProcess($this, NULL, $subType, $cgcount,
       $this->_contactType, $this->_contactId);
   }
 

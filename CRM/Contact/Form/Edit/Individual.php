@@ -123,7 +123,7 @@ class CRM_Contact_Form_Edit_Individual {
         TRUE
       );
 
-      if ($checkSimilar == null) {
+      if ($checkSimilar == NULL) {
         $checkSimilar = 0;
       }
       $form->assign('checkSimilar', $checkSimilar);

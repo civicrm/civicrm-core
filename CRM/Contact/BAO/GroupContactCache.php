@@ -65,7 +65,7 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * @return string the sql query which lists the groups that need to be refreshed
    * @static
    */
-  public static function groupRefreshedClause($groupIDClause = null, $includeHiddenGroups = FALSE) {
+  public static function groupRefreshedClause($groupIDClause = NULL, $includeHiddenGroups = FALSE) {
     $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
     $now = CRM_Utils_Date::getUTCTime();
 
@@ -123,11 +123,11 @@ AND     ( g.cache_date IS NULL OR
    *
    * @return boolean true if we did not regenerate, false if we did
    */
-  public static function loadAll($groupIDs = null, $limit = 0) {
+  public static function loadAll($groupIDs = NULL, $limit = 0) {
     // ensure that all the smart groups are loaded
     // this function is expensive and should be sparingly used if groupIDs is empty
     if (empty($groupIDs)) {
-      $groupIDClause = null;
+      $groupIDClause = NULL;
       $groupIDs = array();
     }
     else {
@@ -315,7 +315,7 @@ WHERE  id IN ( $groupIDs )
       unset(self::$_alreadyLoaded[$groupID]);
     }
 
-    $refresh = null;
+    $refresh = NULL;
     $params  = array();
     $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
 
@@ -642,7 +642,7 @@ ORDER BY   gc.contact_id, g.children
 
     $dao = CRM_Core_DAO::executeQuery($sql);
     $contactGroup = array();
-    $prevContactID = null;
+    $prevContactID = NULL;
     while ($dao->fetch()) {
       if (
         $prevContactID &&

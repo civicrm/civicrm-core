@@ -69,7 +69,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object             DAO object on sucess, NULL otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -160,7 +160,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @param int $messageTemplateID
    * @param $from
    *
-   * @return bool|null
+   * @return bool|NULL
    */
   public static function sendReminder($contactId, $email, $messageTemplateID, $from) {
 
@@ -205,7 +205,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       }
       list($details) = CRM_Utils_Token::getTokenDetails(array($contactId),
                                                         $returnProperties,
-                                                        null, null, false,
+                                                        NULL, NULL, false,
                                                         $tokens,
                                                         'CRM_Core_BAO_MessageTemplate');
       $contact = reset($details);

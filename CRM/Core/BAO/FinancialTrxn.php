@@ -58,7 +58,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @return CRM_Core_BAO_FinancialTrxn object
    * @static
    */
-  public static function create(&$params, $trxnEntityTable = null) {
+  public static function create(&$params, $trxnEntityTable = NULL) {
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->copyValues($params);
     $fids = array();
@@ -137,7 +137,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
       CRM_Core_DAO::storeValues($financialItem, $defaults);
       return $financialItem;
     }
-    return null;
+    return NULL;
   }
 
   /**
@@ -288,7 +288,7 @@ WHERE lt.entity_id = %1 ";
       return $result;
     }
     else {
-      return null;
+      return NULL;
     }
   }
 
@@ -425,9 +425,9 @@ WHERE ceft.entity_id = %1";
    * @param int $entityId
    * @param string $entityName
    * @param bool $returnType
-   * @param null $lineItemTotal
+   * @param NULL $lineItemTotal
    *
-   * @return array|int|null|string
+   * @return array|int|NULL|string
    */
   public static function getPartialPaymentWithType($entityId, $entityName = 'participant', $returnType = TRUE, $lineItemTotal = NULL) {
     $value = NULL;

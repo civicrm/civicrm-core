@@ -50,7 +50,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param int $id
    *   Id of the note to retrieve.
    *
-   * @return string   the note text or null if note not found
+   * @return string   the note text or NULL if note not found
    *
    * @static
    */
@@ -64,7 +64,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param int $id
    *   Id of the note to retrieve.
    *
-   * @return string   the note subject or null if note not found
+   * @return string   the note subject or NULL if note not found
    *
    * @static
    */
@@ -289,7 +289,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param bool $showStatus
    *   Do we need to set status or not.
    *
-   * @return mixed|null $return no of deleted notes on success, false otherwise@access public
+   * @return mixed|NULL $return no of deleted notes on success, false otherwise@access public
    * @static
    */
   public static function del($id, $showStatus = TRUE) {

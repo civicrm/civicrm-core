@@ -689,7 +689,7 @@ class CRM_Contribute_BAO_Query {
    * @param $mode
    * @param $side
    *
-   * @return null|string
+   * @return NULL|string
    */
   public static function from($name, $mode, $side) {
     $from = NULL;
@@ -896,7 +896,7 @@ class CRM_Contribute_BAO_Query {
    * @param $mode
    * @param bool $includeCustomFields
    *
-   * @return array|null
+   * @return array|NULL
    */
   public static function defaultReturnProperties($mode, $includeCustomFields = TRUE) {
     $properties = NULL;

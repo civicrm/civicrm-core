@@ -179,7 +179,7 @@ class CRM_Contact_Form_Search_Custom_Group
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param null $sort
+   * @param NULL $sort
    * @param bool $includeContactIDs
    * @param bool $justIDs
    *
@@ -229,7 +229,7 @@ class CRM_Contact_Form_Search_Custom_Group
       // adding a groupBy clause and saving it as a smart group messes up the query and
       // bad things happen
       // andrew hunt seemed to have rewritten this piece when he worked on this search
-      $groupBy = null;
+      $groupBy = NULL;
     }
 
     $sql = "SELECT $selectClause $from WHERE  $where $groupBy";
@@ -608,7 +608,7 @@ WHERE  gcc.group_id = {$ssGroup->id}
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param null $sort
+   * @param NULL $sort
    * @param bool $returnSQL
    *
    * @return string
@@ -625,7 +625,7 @@ WHERE  gcc.group_id = {$ssGroup->id}
   }
 
   /**
-   * @return null
+   * @return NULL
    */
   public function summary() {
     return NULL;

@@ -53,7 +53,7 @@ class CRM_Contact_BAO_Contact_Optimizer {
     $oldWebsiteValues = CRM_Utils_Array::value('website', $oldValues);
     $newWebsiteValues = CRM_Utils_Array::value('website', $newValues);
 
-    if ($oldWebsiteValues == null || $newWebsiteValues == null) {
+    if ($oldWebsiteValues == NULL || $newWebsiteValues == NULL) {
       return;
     }
 
@@ -116,7 +116,7 @@ class CRM_Contact_BAO_Contact_Optimizer {
     $oldEmailValues = CRM_Utils_Array::value('email', $oldValues);
     $newEmailValues = CRM_Utils_Array::value('email', $newValues);
 
-    if ($oldEmailValues == null || $newEmailValues == null) {
+    if ($oldEmailValues == NULL || $newEmailValues == NULL) {
       return;
     }
 

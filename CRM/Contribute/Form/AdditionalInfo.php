@@ -197,7 +197,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @param array $params
    * @param int $contributionID
    * @param int $premiumID
-   * @param null $options
+   * @param NULL $options
    * @return void
    */
   public static function processPremium(&$params, $contributionID, $premiumID = NULL, &$options = NULL) {

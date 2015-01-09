@@ -52,7 +52,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object             DAO object on sucess, NULL otherwise
    *
    * @static
    */
@@ -130,7 +130,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_BAO_Navigation object on success, null otherwise
+   * @return CRM_Core_BAO_Navigation object on success, NULL otherwise
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
