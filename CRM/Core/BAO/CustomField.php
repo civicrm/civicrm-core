@@ -341,7 +341,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return   Object            DAO object on sucess, null otherwise
+   * @return Object            DAO object on sucess, null otherwise
    *
    * @static
    */
@@ -1091,7 +1091,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param object $field
    *   The field object.
    *
-   * @return  boolean
+   * @return boolean
    *
    * @static
    *
@@ -1130,7 +1130,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param int $contactID
    * @param int $fieldID
    *
-   * @return  string   the display value
+   * @return string   the display value
    *
    * @static
    */
@@ -2106,7 +2106,8 @@ AND    cf.id = %1";
    * for inactive fields : CRM-5369
    *
    *
-   * @return mixed $customOptionGroup@static
+   * @return mixed $customOptionGroup
+   * @static
    */
   public static function &customOptionGroup($includeFieldIds = NULL) {
     static $customOptionGroup = NULL;

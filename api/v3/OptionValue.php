@@ -8,7 +8,7 @@
  * {@example OptionValueGet.php 0}
  * @example OptionValueGet.php
  *
- * @return  array details of found Option Values
+ * @return array details of found Option Values
  * {@getfields OptionValue_get}
  * @access public
  */

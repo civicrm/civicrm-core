@@ -42,7 +42,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
   const GROUP = 1, TAG = 2, ALL = 3;
 
   /**
-   * This function is to build form elements
+   * build form elements
    * params object $form object of the form
    *
    * @param CRM_Core_Form $form

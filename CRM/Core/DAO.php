@@ -1290,7 +1290,7 @@ FROM   civicrm_domain
   }
 
   /**
-   * This function is to make a shallow copy of an object
+   * make a shallow copy of an object
    * and all the fields in the object
    *
    * @param string $daoName

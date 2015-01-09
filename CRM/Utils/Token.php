@@ -1088,7 +1088,8 @@ class CRM_Utils_Token {
    * @param string $string
    *   The input string to parse for tokens.
    *
-   * @return array $tokens array of tokens mentioned in field@access public
+   * @return array $tokens array of tokens mentioned in field
+   * @access public
    * @static
    */
   public static function getTokens($string) {

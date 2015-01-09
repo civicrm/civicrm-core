@@ -86,7 +86,7 @@ function civicrm_api3_activity_contact_delete($params) {
  * @param array $params
  *   An associative array of name/value pairs.
  *
- * @return  array details of found tags else error
+ * @return array details of found tags else error
  *
  * @access public
  */

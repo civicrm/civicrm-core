@@ -294,7 +294,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * This function is called before buildForm. Any pre-processing that
+   * called before buildForm. Any pre-processing that
    * needs to be done for buildForm should be done here
    *
    * This is a virtual function and should be redefined if needed
@@ -307,7 +307,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * This function is called after the form is validated. Any
+   * called after the form is validated. Any
    * processing of form state etc should be done in this function.
    * Typically all processing associated with a form should be done
    * here and relevant state should be stored in the session
@@ -322,7 +322,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * This function is just a wrapper, so that we can call all the hook functions
+   * just a wrapper, so that we can call all the hook functions
    * @param bool $allowAjax
    *   FIXME: This feels kind of hackish, ideally we would take the json-related code from this function.
    *                          and bury it deeper down in the controller
@@ -393,7 +393,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Performs the server side validation
    * @since     1.0
-   * @return    boolean   true if no error found
+   * @return boolean   true if no error found
    * @throws    HTML_QuickForm_Error
    */
   public function validate() {

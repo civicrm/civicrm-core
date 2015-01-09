@@ -50,7 +50,7 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
   public $_contactId = NULL;
 
   /**
-   * This function is called when action is browse
+   * called when action is browse
    *
    * return null
    */
@@ -71,7 +71,7 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
   }
 
   /**
-   * This function is called when action is view
+   * called when action is view
    *
    * return null
    */
@@ -85,7 +85,7 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
   }
 
   /**
-   * This function is called when action is update or new
+   * called when action is update or new
    *
    * return null
    */
@@ -130,7 +130,7 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
   }
 
   /**
-   * This function is the main function that is called when the page loads,
+   * the main function that is called when the page loads,
    * it decides the which action has to be taken for the page.
    *
    * return null

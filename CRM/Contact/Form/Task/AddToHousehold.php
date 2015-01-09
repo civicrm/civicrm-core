@@ -173,7 +173,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
   }
 
   /**
-   * This function is to get the result of the search for Add to * forms
+   * get the result of the search for Add to * forms
    *
    * @param CRM_Core_Form $form
    * @param array $params

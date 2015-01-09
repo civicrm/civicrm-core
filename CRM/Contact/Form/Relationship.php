@@ -276,7 +276,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   * This function is used to add the rules for form.
+   * add the rules for form.
    *
    * @return void
    */

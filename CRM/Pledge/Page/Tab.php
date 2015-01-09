@@ -37,7 +37,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   public $_contactId = NULL;
 
   /**
-   * This function is called when action is browse
+   * called when action is browse
    *
    * return null
    */
@@ -64,7 +64,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * This function is called when action is view
+   * called when action is view
    *
    * return null
    */
@@ -81,7 +81,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * This function is called when action is update or new
+   * called when action is update or new
    *
    * return null
    */
@@ -123,7 +123,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * This function is the main function that is called when the page loads, it decides the which action has to be taken for the page.
+   * the main function that is called when the page loads, it decides the which action has to be taken for the page.
    *
    * return null
    */

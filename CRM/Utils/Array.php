@@ -390,7 +390,7 @@ class CRM_Utils_Array {
   }
 
   /**
-   * This function is used to convert associative array names to values
+   * convert associative array names to values
    * and vice-versa.
    *
    * This function is used by both the web form layer and the api. Note that

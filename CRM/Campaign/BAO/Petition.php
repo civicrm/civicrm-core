@@ -466,7 +466,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    * @param object $tag
    *   An object of a tag.
    *
-   * @return  array   $contactIds    array of contact ids
+   * @return array   $contactIds    array of contact ids
    */
   public function getEntitiesByTag($tag) {
     $contactIds = array();

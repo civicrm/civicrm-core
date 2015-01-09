@@ -75,7 +75,7 @@ class CRM_Event_Badge {
    *
    * @param array $participants
    *
-   * @return  null
+   * @return null
    */
   public function run(&$participants) {
     // fetch the 1st participant, and take her event to retrieve its attributes
@@ -176,7 +176,7 @@ class CRM_Event_Badge {
    *
    * @param array $participants
    *
-   * @return  null
+   * @return null
    */
   public function createLabels(&$participants) {
 

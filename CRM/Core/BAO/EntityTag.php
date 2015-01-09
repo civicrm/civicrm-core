@@ -273,7 +273,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @param object $tag
    *   An object of a tag.
    *
-   * @return  array   $entityIds    array of entity ids
+   * @return array   $entityIds    array of entity ids
    */
   public function getEntitiesByTag($tag) {
     $entityIds = array();

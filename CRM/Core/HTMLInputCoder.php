@@ -39,7 +39,7 @@ class CRM_Core_HTMLInputCoder {
   }
 
   /**
-   * This function is going to filter the
+   * going to filter the
    * submitted values across XSS vulnerability.
    *
    * @param array|string $values

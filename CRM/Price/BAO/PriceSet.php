@@ -1097,7 +1097,7 @@ WHERE  id = %1";
   }
 
   /**
-   * This function is to make a copy of a price set, including
+   * make a copy of a price set, including
    * all the fields
    *
    * @param int $id
@@ -1146,7 +1146,7 @@ WHERE  id = %1";
   }
 
   /**
-   * This function is to check price set permission
+   * check price set permission
    *
    * @param int $sid
    *   The price set id.

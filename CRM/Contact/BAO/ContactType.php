@@ -71,7 +71,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    *
    * @param bool $all
    *
-   * @return  array of basic contact types information.
+   * @return array of basic contact types information.
    * @static
    */
   public static function &basicTypeInfo($all = FALSE) {
@@ -117,7 +117,7 @@ WHERE  parent_id IS NULL
    *
    * @param bool $all
    *
-   * @return  array of basic contact types
+   * @return array of basic contact types
    * @static
    */
   public static function basicTypes($all = FALSE) {
@@ -150,7 +150,7 @@ WHERE  parent_id IS NULL
    * @param bool $ignoreCache
    * @param bool $reset
    *
-   * @return  array of sub type information
+   * @return array of sub type information
    * @static
    */
   public static function &subTypeInfo($contactType = NULL, $all = FALSE, $ignoreCache = FALSE, $reset = FALSE) {
@@ -219,7 +219,7 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    * @param string $columnName
    * @param bool $ignoreCache
    *
-   * @return  array of all subtypes OR list of subtypes associated to
+   * @return array of all subtypes OR list of subtypes associated to
    * a given basic contact type
    * @static
    */
@@ -261,7 +261,7 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    *
    * @param bool $all
    *
-   * @return  array of basic types + all subtypes.
+   * @return array of basic types + all subtypes.
    * @static
    */
   public static function contactTypes($all = FALSE) {
@@ -275,7 +275,7 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    * @param bool $all
    * @param bool $reset
    *
-   * @return  array of basic types + all subtypes.
+   * @return array of basic types + all subtypes.
    * @static
    */
   public static function contactTypeInfo($all = FALSE, $reset = FALSE) {
@@ -451,7 +451,7 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
    *   Contact subType.
    * @param bool $ignoreCache
    *
-   * @return  boolean true if subType, false otherwise.
+   * @return boolean true if subType, false otherwise.
    * @static
    */
   public static function isaSubType($subType, $ignoreCache = FALSE) {

@@ -550,7 +550,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * This function is used to add the rules (mainly global rules) for form.
+   * add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
    * @return void
@@ -588,7 +588,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @param int $contactId
    *   Contact id if doing update.
    *
-   * @return bool $primaryID email/openId@static
+   * @return bool $primaryID email/openId
+   * @static
    */
   public static function formRule($fields, &$errors, $contactId = NULL) {
     $config = CRM_Core_Config::singleton();
@@ -1195,7 +1196,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @param array $params
    *   of key value consist of address blocks.
    *
-   * @return array $parseSuccess as array of sucess/fails for each address block@static
+   * @return array $parseSuccess as array of sucess/fails for each address block
+   * @static
    */
   public function parseAddress(&$params) {
     $parseSuccess = $parsedFields = array();
@@ -1281,7 +1283,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @param array $parseResult
    *   An array of address blk instance and its status.
    *
-   * @return null|string $statusMsg   string status message for all address blocks.@static
+   * @return null|string $statusMsg   string status message for all address blocks.
+   * @static
    */
   public static function parseAddressStatusMsg($parseResult) {
     $statusMsg = NULL;

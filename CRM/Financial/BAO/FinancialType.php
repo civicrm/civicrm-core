@@ -165,7 +165,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * To fetch financial type having relationship as Income Account is
+   * fetch financial type having relationship as Income Account is
    *
    *
    * @return array  all financial type with income account is relationship

@@ -35,7 +35,7 @@
 class CRM_Contact_Form_Edit_Notes {
 
   /**
-   * This function is to build form elements
+   * build form elements
    * params object $form object of the form
    *
    * @static

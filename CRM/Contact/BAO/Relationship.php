@@ -1551,7 +1551,8 @@ SELECT count(*)
    * @param $contactIds
    *   Contact Ids.
    *
-   * @return array $currentEmployer array of the current employer@static
+   * @return array $currentEmployer array of the current employer
+   * @static
    */
   public static function getCurrentEmployer($contactIds) {
     $contacts = implode(',', $contactIds);
@@ -1760,7 +1761,7 @@ AND cc.sort_name LIKE '%$name%'";
 
 
   /**
-   * This function is a wrapper for contact relationship selector
+   * wrapper for contact relationship selector
    *
    * @param array $params
    *   Associated array for params record id.

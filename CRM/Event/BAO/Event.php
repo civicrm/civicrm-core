@@ -729,7 +729,7 @@ WHERE civicrm_address.geo_code_1 IS NOT NULL
    * @param bool $onlyPublicInclude public events only, default TRUE.
    *   Include public events only, default TRUE.
    *
-   * @return  array  $all      array of all the events that are searched
+   * @return array  $all      array of all the events that are searched
    * @static
    */
   static function &getCompleteInfo(
@@ -907,7 +907,7 @@ WHERE civicrm_event.is_active = 1
   }
 
   /**
-   * This function is to make a copy of a Event, including
+   * make a copy of a Event, including
    * all the fields in the event Wizard
    *
    * @param int $id
