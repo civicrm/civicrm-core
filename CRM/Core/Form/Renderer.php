@@ -211,29 +211,29 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    */
   public static function preProcessEntityRef($field) {
     $val = $field->getValue();
-    // Support array values
-    if (is_array($val)) {
-      $val = implode(',', $val);
-      $field->setValue($val);
+    // Temporarily convert string values to an array
+    if (!is_array($val)) {
+      // Try to auto-detect method of serialization
+      $val = strpos($val, ',') ? explode(',', str_replace(', ', ',', $val)) : (array) CRM_Utils_Array::explodePadded($val);
     }
     if ($val) {
       $entity = $field->getAttribute('data-api-entity');
       // Get api params, ensure it is an array
       $params = $field->getAttribute('data-api-params');
       $params = $params ? json_decode($params, TRUE) : array();
-      // Support serialized values
-      if (strpos($val, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
-        $val = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($val, CRM_Core_DAO::VALUE_SEPARATOR));
-        $field->setValue($val);
-      }
       $result = civicrm_api3($entity, 'getlist', array('id' => $val) + $params);
       if ($field->isFrozen()) {
+        // Prevent js from treating frozen entityRef as a "live" field
         $field->removeAttribute('class');
       }
       if (!empty($result['values'])) {
         $field->setAttribute('data-entity-value', json_encode($result['values']));
       }
+      // CRM-15803 - Remove invalid values
+      $val = array_intersect($val, CRM_Utils_Array::collect('id', $result['values']));
     }
+    // Convert array values back to a string
+    $field->setValue(implode(',', $val));
   }
 
   /**
