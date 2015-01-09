@@ -515,7 +515,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
         else {
           $this->clickLink("xpath=//fieldset/legend[text()='Delivery Summary']/../table//tr[td/a[text()='{$key}']]/descendant::td[3]/span/a[2][text()='Advanced Search']");
         }
-        $this-> _verifyCriteria($key, $dataToCheck, $entity);
+        $this->_verifyCriteria($key, $dataToCheck, $entity);
       }
     }
   }

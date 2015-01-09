@@ -17,7 +17,7 @@
  *  - version: string
  *  - function: callback (mixed)
  *  - params: array, varies
- *  @return array API success object
+ * @return array API success object
  */
 function civicrm_api3_generic_getfields($apiRequest) {
   static $results = array();

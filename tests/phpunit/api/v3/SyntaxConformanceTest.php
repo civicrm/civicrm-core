@@ -1262,7 +1262,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       $this->assertTrue(is_integer($baoObj->id), 'check first id');
       $this->deletableTestObjects[$baoString][] = $baoObj->id;
       $baos[] = $baoObj;
-      $i ++;
+      $i++;
     }
     return $baos;
   }

@@ -75,15 +75,15 @@ function civicrm_api3_mailing_get_token($params) {
 
   $tokens = CRM_Core_SelectValues::contactTokens();
   switch ($params['usage']) {
-    case 'Mailing' :
+    case 'Mailing':
       $tokens = array_merge(CRM_Core_SelectValues::mailingTokens(), $tokens);
       break;
-    case 'ScheduleEventReminder' :
+    case 'ScheduleEventReminder':
       $tokens = array_merge(CRM_Core_SelectValues::activityTokens(), $tokens);
       $tokens = array_merge(CRM_Core_SelectValues::eventTokens(), $tokens);
       $tokens = array_merge(CRM_Core_SelectValues::membershipTokens(), $tokens);
       break;
-    case 'ManageEventScheduleReminder' :
+    case 'ManageEventScheduleReminder':
       $tokens = array_merge(CRM_Core_SelectValues::eventTokens(), $tokens);
       break;
   }

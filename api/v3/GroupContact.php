@@ -187,7 +187,7 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
   $tracking = CRM_Utils_Array::value('tracking', $params);
 
   if ($op == 'Added' || $op == 'Pending') {
-    $extraReturnValues= array(
+    $extraReturnValues = array(
       'total_count' => 0,
       'added' => 0,
       'not_added' => 0,
@@ -205,7 +205,7 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
     }
   }
   else {
-    $extraReturnValues= array(
+    $extraReturnValues = array(
       'total_count' => 0,
       'removed' => 0,
       'not_removed' => 0,

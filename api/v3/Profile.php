@@ -486,9 +486,8 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
  *   0 = don't resolve, 1 = resolve non-aggressively, 2 = resolve aggressively - ie include country & state.
  * @param $is_flush
  *
- * @return
+ * @return array
  */
-
 function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour = 1, $is_flush) {
   static $profileFields = array();
   if ($is_flush) {

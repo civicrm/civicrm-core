@@ -120,7 +120,7 @@ class Frame {
   }
 
   /**
-   * @param type $newState
+   * @param int $newState
    * @void
    */
   public function finish($newState = self::F_DONE) {
