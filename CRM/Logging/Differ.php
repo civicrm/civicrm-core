@@ -217,7 +217,7 @@ WHERE lt.log_conn_id = %1 AND
         // hack: case_type_id column is a varchar with separator. For proper mapping to type labels,
         // we need to make sure separators are trimmed
         if ($diff == 'case_type_id') {
-          foreach (array('original', 'changed') as $var)  {
+          foreach (array('original', 'changed') as $var) {
             if (!empty($$var[$diff])) {
               $holder =& $$var;
               $val = explode(CRM_Case_BAO_Case::VALUE_SEPARATOR, $holder[$diff]);
