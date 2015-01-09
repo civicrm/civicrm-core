@@ -262,7 +262,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
           'limit' => 1,
           'version' => 3,
         );
-        $note = civicrm_api('Note' ,'getsingle', $noteParams);
+        $note = civicrm_api('Note', 'getsingle', $noteParams);
         $defaults['note'] = CRM_Utils_Array::value('note', $note);
       }
     }
@@ -486,7 +486,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
           'entity_id' => $id,
           'entity_table' => 'civicrm_relationship',
         );
-        $existing = civicrm_api3('note' ,'get', $noteParams);
+        $existing = civicrm_api3('note', 'get', $noteParams);
         if (!empty($existing['id'])) {
           $noteParams['id'] = $existing['id'];
         }

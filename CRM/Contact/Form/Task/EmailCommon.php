@@ -383,7 +383,7 @@ class CRM_Contact_Form_Task_EmailCommon {
               $ccValues['details'][] = "<a href='{$contactURL}'>" . $form->_contactDetails[$contactId]['display_name'] . "</a>";
               break;
             case 'bcc_id':
-              $bccValues['email'][]= '"' . $form->_contactDetails[$contactId]['sort_name'] . '" <' . $email . '>';
+              $bccValues['email'][] = '"' . $form->_contactDetails[$contactId]['sort_name'] . '" <' . $email . '>';
               $bccValues['details'][] = "<a href='{$contactURL}'>" . $form->_contactDetails[$contactId]['display_name'] . "</a>";
               break;
           }

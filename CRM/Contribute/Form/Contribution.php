@@ -1000,7 +1000,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   public function postProcess() {
     $sendReceipt = $pId = $contribution = $isRelatedId = FALSE;
-    $softParams = $softIDs =array();
+    $softParams = $softIDs = array();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Contribute_BAO_Contribution::deleteContribution($this->_id);
@@ -1116,7 +1116,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $submittedValues['tax_amount'] = 'null';
         }
         if ($lineItems[$itemId]['tax_rate']) {
-          $lineItems[$itemId]['tax_amount'] = ($lineItems[$itemId]['tax_rate']/100) * $lineItems[$itemId]['line_total'];
+          $lineItems[$itemId]['tax_amount'] = ($lineItems[$itemId]['tax_rate'] / 100) * $lineItems[$itemId]['line_total'];
           $submittedValues['total_amount'] = $lineItems[$itemId]['line_total'] + $lineItems[$itemId]['tax_amount'];
           $submittedValues['tax_amount'] = $lineItems[$itemId]['tax_amount'];
         }

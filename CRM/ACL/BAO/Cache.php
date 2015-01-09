@@ -140,7 +140,9 @@ WHERE contact_id = %1
     CRM_Contact_BAO_Contact_Permission::cache($id, CRM_Core_Permission::VIEW, TRUE);
   }
 
-  // deletes all the cache entries
+  /**
+   * Deletes all the cache entries.
+   */
   public static function resetCache() {
     // reset any static caching
     self::$_cache = NULL;

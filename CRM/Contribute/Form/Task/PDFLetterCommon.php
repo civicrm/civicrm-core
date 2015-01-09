@@ -76,7 +76,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         $contact['is_sent'][$groupBy][$groupByID] = TRUE;
         if (!empty($formValues['email_options'])) {
           if (self::emailLetter($contact, $html[$contributionId], $isPDF, $formValues, $emailParams)) {
-            $emailed ++;
+            $emailed++;
             if (!stristr($formValues['email_options'], 'both')) {
               unset($html[$contributionId]);
             }

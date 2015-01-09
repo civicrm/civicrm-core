@@ -36,8 +36,7 @@
 /**
  * This class contains payment processor related functions.
  */
-class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProcessor
-{
+class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProcessor {
   /**
    * Static holder for the default payment processor
    */

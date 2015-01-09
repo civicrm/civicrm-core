@@ -333,7 +333,7 @@ class CRM_Core_Resources {
    * Variable substitutions can happen from client-side
    *
    * Note: this function rarely needs to be called directly and is mostly for internal use.
-   * @see CRM_Core_Resources::addScriptFile which automatically adds translated strings from js files
+   * See CRM_Core_Resources::addScriptFile which automatically adds translated strings from js files
    *
    * Simple example:
    * // From php:

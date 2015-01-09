@@ -807,7 +807,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $setDynamic = TRUE;
       }
       else {
-        $selector = new  self::$_selectorName (
+        $selector = new self::$_selectorName(
           $this->_params,
           $this->_action,
           NULL,

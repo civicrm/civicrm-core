@@ -985,9 +985,9 @@ WHERE id={$id}; ";
    * Validate type of contact image
    *
    * @param array $params
-   * @param String $imageIndex
+   * @param string $imageIndex
    *   Index of image field.
-   * @param String $statusMsg
+   * @param string $statusMsg
    *   Status message to be set after operation.
    * @param string $opType
    *   Type of operation like fatal, bounce etc.
@@ -1052,8 +1052,10 @@ WHERE id={$id}; ";
   /**
    *  Function to set is_delete true or restore deleted contact
    *
-   * @param int $contact Contact DAO object
-   * @param boolean $restore true to set the is_delete = 1 else false to restore deleted contact,
+   * @param int $contact
+   *   Contact DAO object.
+   * @param bool $restore
+   *   True to set the is_delete = 1 else false to restore deleted contact,
    *                                i.e. is_delete = 0
    *
    * @return void

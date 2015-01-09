@@ -1151,7 +1151,7 @@ class CRM_Contribute_BAO_Query {
     }
     // we only have recurring dates using this ATM so lets' short cut to find the table name
     $table = 'contribution_recur';
-    $fieldName = split($table . '_', $field);
+    $fieldName = explode($table . '_', $field);
     $query->dateQueryBuilder($values,
       'civicrm_' . $table, $field, $fieldName[1], $title
     );
