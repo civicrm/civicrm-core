@@ -660,8 +660,8 @@
           }
         });
         if (this.model.get('field_name').split('_')[0] == 'custom') {
-          this.$('.crm-designer-field-summary > div').append('<button class="crm-designer-edit-custom">&raquo; ' + ts('Edit Custom Field') + '</button>');
-          this.$('button.crm-designer-edit-custom').button().attr('title', ts('Edit global settings for this custom field.'));
+          this.$('.crm-designer-field-summary > div').append('<button class="crm-designer-edit-custom">' + ts('Edit Custom Field') + '</button>');
+          this.$('button.crm-designer-edit-custom').button({icons: {primary: 'ui-icon-pencil'}}).attr('title', ts('Edit global settings for this custom field.'));
         }
       }
     },
@@ -672,23 +672,9 @@
         reset: 1,
         id: this.model.get('field_name').split('_')[1]
       });
-      var form1 = CRM.loadForm(url, {openInline: '.crm-custom-field-form-block-data_type a'})
+      var form1 = CRM.loadForm(url)
         .on('crmFormLoad', function() {
           $(this).prepend('<div class="messages status"><div class="icon inform-icon"></div>' + ts('Note: This will modify the field system-wide, not just in this profile form.') + '</div>');
-          var $link = $('.action-link a', this);
-          if ($link.length) {
-            $link.detach();
-            var buttons = {};
-            buttons[$link.text()] = function() {
-              var form2 = CRM.loadForm($link.attr('href'), {
-                dialog: {
-                  width: '60%',
-                  height: '70%'
-                }
-              });
-            };
-            $(this).dialog('option', 'buttons', buttons);
-          }
         });
     },
     onChangeIsDuplicate: function(model, value, options) {

@@ -151,7 +151,10 @@ function custom_option_html_type( ) {
                 {/if}
     {if $action eq 2 and $changeFieldType}
     <br />
-    ( <a href='{crmURL p="civicrm/admin/custom/group/field/changetype" q="reset=1&id=`$id`"}'>{ts}Change Input Field Type{/ts}</a> )
+    <a class="action-item crm-hover-button" href='{crmURL p="civicrm/admin/custom/group/field/changetype" q="reset=1&id=`$id`"}'>
+      <span class="icon ui-icon-gear"></span>
+      {ts}Change Input Field Type{/ts}
+    </a>
     <div class='clear'></div>
     {/if}
             </td>
@@ -347,6 +350,8 @@ function custom_option_html_type( ) {
 {* Give link to view/edit choice options if in edit mode and html_type is one of the multiple choice types *}
 {if $action eq 2 AND ($form.data_type.value.1.0 eq 'CheckBox' OR ($form.data_type.value.1.0 eq 'Radio' AND $form.data_type.value.0.0 neq 6) OR $form.data_type.value.1.0 eq 'Select' OR ($form.data_type.value.1.0 eq 'Multi-Select' AND $dontShowLink neq 1 ) ) }
     <div class="action-link">
-        <a href="{crmURL p="civicrm/admin/custom/group/field/option" q="reset=1&action=browse&fid=`$id`&gid=`$gid`"}">&raquo; {ts}View / Edit Multiple Choice Options{/ts}</a>
+      <a href="{crmURL p="civicrm/admin/custom/group/field/option" q="reset=1&action=browse&fid=`$id`&gid=`$gid`"}" class="button">
+        <span><div class="icon ui-icon-pencil"></div>{ts}View / Edit Multiple Choice Options{/ts}</span>
+      </a>
     </div>
 {/if}

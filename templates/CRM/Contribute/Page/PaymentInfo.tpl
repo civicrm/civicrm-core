@@ -63,7 +63,10 @@ CRM.$(function($) {
     <td class='right'>
       {if $paymentInfo.paid > 0}
         {$paymentInfo.paid|crmMoney}<br/>
-        <a class="crm-hover-button crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&cid=`$cid`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&action=browse"}'>&raquo; {ts}view payments{/ts}</a>
+        <a class="crm-hover-button action-item medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&cid=`$cid`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&action=browse"}'>
+          <span class="icon ui-icon-zoomin"></span>
+          {ts}view payments{/ts}
+        </a>
       {/if}
     </td>
     <td class='right'>{$paymentInfo.balance|crmMoney}</td>
