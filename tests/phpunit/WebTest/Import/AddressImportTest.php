@@ -142,8 +142,8 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->click('_qf_Field_done-bottom');
 
     $this->waitForText('crm-notification-container', "Custom field '{$customField}' has been saved.");
-    $this->waitForElementPresent("xpath=//span[text()='$customField']");
-    $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField']/../../td[8]/span/a@href"));
+    $this->assertTrue($this->isTextPresent($customField), 'Missing text: ' . $customField);
+    $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$customField']/../../td[8]/span/a@href"));
     $customFieldId = $customFieldId[1];
 
     // create custom field - Integer
@@ -157,8 +157,8 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->click('_qf_Field_done-bottom');
     $this->waitForElementPresent('newCustomField');
     $this->waitForText('crm-notification-container', "Custom field '{$customField1}' has been saved.");
-    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField1']");
-    $customFieldId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField1']/../../td[8]/span/a@href"));
+    $this->assertTrue($this->isTextPresent($customField1), 'Missing text: ' . $customField1);
+    $customFieldId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$customField1']/../../td[8]/span/a@href"));
     $customFieldId1 = $customFieldId1[1];
 
     // create custom field - Number
@@ -172,8 +172,8 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->click('_qf_Field_done-bottom');
     $this->waitForElementPresent('newCustomField');
     $this->waitForText('crm-notification-container', "Custom field '{$customField2}' has been saved.");
-    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField2']");
-    $customFieldId2 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField2']/../../td[8]/span/a@href"));
+    $this->assertTrue($this->isTextPresent($customField2), 'Missing text: ' . $customField2);
+    $customFieldId2 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$customField2']/../../td[8]/span/a@href"));
     $customFieldId2 = $customFieldId2[1];
 
     // create custom field - "alphanumeric select"
@@ -223,8 +223,8 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->click('_qf_Field_done-bottom');
     $this->waitForElementPresent('newCustomField');
     $this->waitForText('crm-notification-container', "Custom field '{$customField9}' has been saved.");
-    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField9']");
-    $customFieldId9 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField9']/../../td[8]/span/a@href"));
+    $this->assertTrue($this->isTextPresent($customField9), 'Missing text: ' . $customField9);
+    $customFieldId9 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$customField9']/../../td[8]/span/a@href"));
     $customFieldId9 = $customFieldId9[1];
 
     // create custom field - Date
@@ -239,8 +239,8 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->click('_qf_Field_done-bottom');
     $this->waitForElementPresent('newCustomField');
     $this->waitForText('crm-notification-container', "Custom field '{$customField10}' has been saved.");
-    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField10']");
-    $customFieldId10 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField10']/../../td[8]/span/a@href"));
+    $this->assertTrue($this->isTextPresent($customField9), 'Missing text: ' . $customField9);
+    $customFieldId10 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$customField10']/../../td[8]/span/a@href"));
     $customFieldId10 = $customFieldId10[1];
 
     return array(
@@ -307,8 +307,8 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->click('_qf_Field_done-bottom');
     $this->waitForElementPresent('newCustomField');
     $this->waitForText('crm-notification-container', "Custom field '{$customFieldName}' has been saved.");
-    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customFieldName']");
-    $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customFieldName']/../../td[8]/span/a@href"));
+    $this->assertTrue($this->isTextPresent($customFieldName), 'Missing text: ' . $customFieldName);
+    $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$customFieldName']/../../td[8]/span/a@href"));
     $customFieldId = $customFieldId[1];
     return $customFieldId;
   }

@@ -1832,8 +1832,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->openCiviPage("admin/financial/financialAccount", "reset=1");
     }
 
-    $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$editfinancialAccount}']/../td[9]/span/a[text()='Edit']");
-    $this->clickLink("xpath=//table/tbody//tr/td[1][text()='{$editfinancialAccount}']/../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom', FALSE);
+    $this->waitForElementPresent("xpath=//table/tbody//tr/td[1]/div[text()='{$editfinancialAccount}']/../../td[9]/span/a[text()='Edit']");
+    $this->clickLink("xpath=//table/tbody//tr/td[1]/div[text()='{$editfinancialAccount}']/../../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom', FALSE);
 
     // Change Financial Account Name
     if ($financialAccountTitle) {
@@ -1904,7 +1904,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * Delete Financial Account
    */
   public function _testDeleteFinancialAccount($financialAccountTitle) {
-    $this->click("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Delete']");
+    $this->click("xpath=//table/tbody//tr/td[1]/div[text()='{$financialAccountTitle}']/../../td[9]/span/a[text()='Delete']");
     $this->waitForElementPresent('_qf_FinancialAccount_next-botttom');
     $this->click('_qf_FinancialAccount_next-botttom');
     $this->waitForElementPresent('link=Add Financial Account');
@@ -1944,9 +1944,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->openCiviPage("admin/financial/financialType", "reset=1");
 
     if ($option == 'Delete') {
-      $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[name]']/../td[7]/span[2]");
+      $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1]/div[text()='$financialType[name]']/../../td[7]/span[2]");
       $this->waitForElementPresent("css=span.btn-slide-active");
-      $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[name]']/../td[7]/span[2]/ul/li[2]/a");
+      $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1]/div[text()='$financialType[name]']/../../td[7]/span[2]/ul/li[2]/a");
       $this->waitForElementPresent("_qf_FinancialType_next");
       $this->click("_qf_FinancialType_next");
       $this->waitForElementPresent("newFinancialType");
@@ -1957,7 +1957,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->click("link=Add Financial Type");
     }
     else {
-      $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[oldname]']/../td[7]/span/a[text()='Edit']");
+      $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1]/div[text()='$financialType[oldname]']/../../td[7]/span/a[text()='Edit']");
     }
     $this->waitForElementPresent("name");
     $this->type('name', $financialType['name']);
