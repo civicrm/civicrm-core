@@ -100,7 +100,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
           'version' => 3,
           'name' => $setting,
           'group' => $group,
-          'default_value' => CRM_Utils_Array::value('default', $settingMetaData['values'][$setting])
+          'default_value' => CRM_Utils_Array::value('default', $settingMetaData['values'][$setting]),
           )
         );
       }

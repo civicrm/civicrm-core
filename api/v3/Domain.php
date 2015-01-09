@@ -63,7 +63,7 @@ function civicrm_api3_domain_get($params) {
     if (!empty($domain['contact_id'])) {
       $values = array();
       $locparams = array(
-        'contact_id' => $domain['contact_id']
+        'contact_id' => $domain['contact_id'],
       );
       $values['location'] = CRM_Core_BAO_Location::getValues($locparams, TRUE);
 
@@ -89,7 +89,7 @@ function civicrm_api3_domain_get($params) {
         'phone' => CRM_Utils_Array::value(
           'phone',
         $values['location']['phone'][1]
-        )
+        ),
         );
       }
 

@@ -353,7 +353,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'CiviMember',
       'CiviMail',
       'CiviReport',
-      'CiviPledge'
+      'CiviPledge',
     ));
 
     return TRUE;
@@ -1135,7 +1135,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
           'Acme',
           'Roberts and Sons',
           'Cryo Space Labs',
-          'Sharper Pens'
+          'Sharper Pens',
         ),
       ),
       'Household' => array(
@@ -1720,7 +1720,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         'state_province' => 'Michigan',
         'supplemental_address_1' => 'Hallmark Ct',
         'supplemental_address_2' => 'Jersey Village',
-      )
+      ),
     );
 
     $params = array(
@@ -2020,7 +2020,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     //have a crack @ deleting it first in the hope this will prevent derailing our tests
     $this->callAPISuccess('custom_group', 'get', array(
         'title' => $params['title'],
-        array('api.custom_group.delete' => 1)
+        array('api.custom_group.delete' => 1),
       ));
 
     return $this->callAPISuccess('custom_group', 'create', $params);
@@ -2065,7 +2065,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     $customField = $this->customFieldCreate(array(
         'custom_group_id' => $ids['custom_group_id'],
-        'label' => 'field_1' . $ids['custom_group_id']
+        'label' => 'field_1' . $ids['custom_group_id'],
       ));
 
     $ids['custom_field_id'][] = $customField['id'];
@@ -2073,14 +2073,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $customField = $this->customFieldCreate(array(
         'custom_group_id' => $ids['custom_group_id'],
         'default_value' => '',
-        'label' => 'field_2' . $ids['custom_group_id']
+        'label' => 'field_2' . $ids['custom_group_id'],
       ));
     $ids['custom_field_id'][] = $customField['id'];
 
     $customField = $this->customFieldCreate(array(
         'custom_group_id' => $ids['custom_group_id'],
         'default_value' => '',
-        'label' => 'field_3' . $ids['custom_group_id']
+        'label' => 'field_3' . $ids['custom_group_id'],
       ));
     $ids['custom_field_id'][] = $customField['id'];
 
@@ -2787,167 +2787,167 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $GLOBALS['_HTML_QuickForm_registered_rules'] = array(
       'required' => array(
         'html_quickform_rule_required',
-        'HTML/QuickForm/Rule/Required.php'
+        'HTML/QuickForm/Rule/Required.php',
       ),
       'maxlength' => array(
         'html_quickform_rule_range',
-        'HTML/QuickForm/Rule/Range.php'
+        'HTML/QuickForm/Rule/Range.php',
       ),
       'minlength' => array(
         'html_quickform_rule_range',
-        'HTML/QuickForm/Rule/Range.php'
+        'HTML/QuickForm/Rule/Range.php',
       ),
       'rangelength' => array(
         'html_quickform_rule_range',
-        'HTML/QuickForm/Rule/Range.php'
+        'HTML/QuickForm/Rule/Range.php',
       ),
       'email' => array(
         'html_quickform_rule_email',
-        'HTML/QuickForm/Rule/Email.php'
+        'HTML/QuickForm/Rule/Email.php',
       ),
       'regex' => array(
         'html_quickform_rule_regex',
-        'HTML/QuickForm/Rule/Regex.php'
+        'HTML/QuickForm/Rule/Regex.php',
       ),
       'lettersonly' => array(
         'html_quickform_rule_regex',
-        'HTML/QuickForm/Rule/Regex.php'
+        'HTML/QuickForm/Rule/Regex.php',
       ),
       'alphanumeric' => array(
         'html_quickform_rule_regex',
-        'HTML/QuickForm/Rule/Regex.php'
+        'HTML/QuickForm/Rule/Regex.php',
       ),
       'numeric' => array(
         'html_quickform_rule_regex',
-        'HTML/QuickForm/Rule/Regex.php'
+        'HTML/QuickForm/Rule/Regex.php',
       ),
       'nopunctuation' => array(
         'html_quickform_rule_regex',
-        'HTML/QuickForm/Rule/Regex.php'
+        'HTML/QuickForm/Rule/Regex.php',
       ),
       'nonzero' => array(
         'html_quickform_rule_regex',
-        'HTML/QuickForm/Rule/Regex.php'
+        'HTML/QuickForm/Rule/Regex.php',
       ),
       'callback' => array(
         'html_quickform_rule_callback',
-        'HTML/QuickForm/Rule/Callback.php'
+        'HTML/QuickForm/Rule/Callback.php',
       ),
       'compare' => array(
         'html_quickform_rule_compare',
-        'HTML/QuickForm/Rule/Compare.php'
-      )
+        'HTML/QuickForm/Rule/Compare.php',
+      ),
     );
     // FIXME: …ditto for $GLOBALS['HTML_QUICKFORM_ELEMENT_TYPES']
     $GLOBALS['HTML_QUICKFORM_ELEMENT_TYPES'] = array(
       'group' => array(
         'HTML/QuickForm/group.php',
-        'HTML_QuickForm_group'
+        'HTML_QuickForm_group',
       ),
       'hidden' => array(
         'HTML/QuickForm/hidden.php',
-        'HTML_QuickForm_hidden'
+        'HTML_QuickForm_hidden',
       ),
       'reset' => array(
         'HTML/QuickForm/reset.php',
-        'HTML_QuickForm_reset'
+        'HTML_QuickForm_reset',
       ),
       'checkbox' => array(
         'HTML/QuickForm/checkbox.php',
-        'HTML_QuickForm_checkbox'
+        'HTML_QuickForm_checkbox',
       ),
       'file' => array(
         'HTML/QuickForm/file.php',
-        'HTML_QuickForm_file'
+        'HTML_QuickForm_file',
       ),
       'image' => array(
         'HTML/QuickForm/image.php',
-        'HTML_QuickForm_image'
+        'HTML_QuickForm_image',
       ),
       'password' => array(
         'HTML/QuickForm/password.php',
-        'HTML_QuickForm_password'
+        'HTML_QuickForm_password',
       ),
       'radio' => array(
         'HTML/QuickForm/radio.php',
-        'HTML_QuickForm_radio'
+        'HTML_QuickForm_radio',
       ),
       'button' => array(
         'HTML/QuickForm/button.php',
-        'HTML_QuickForm_button'
+        'HTML_QuickForm_button',
       ),
       'submit' => array(
         'HTML/QuickForm/submit.php',
-        'HTML_QuickForm_submit'
+        'HTML_QuickForm_submit',
       ),
       'select' => array(
         'HTML/QuickForm/select.php',
-        'HTML_QuickForm_select'
+        'HTML_QuickForm_select',
       ),
       'hiddenselect' => array(
         'HTML/QuickForm/hiddenselect.php',
-        'HTML_QuickForm_hiddenselect'
+        'HTML_QuickForm_hiddenselect',
       ),
       'text' => array(
         'HTML/QuickForm/text.php',
-        'HTML_QuickForm_text'
+        'HTML_QuickForm_text',
       ),
       'textarea' => array(
         'HTML/QuickForm/textarea.php',
-        'HTML_QuickForm_textarea'
+        'HTML_QuickForm_textarea',
       ),
       'fckeditor' => array(
         'HTML/QuickForm/fckeditor.php',
-        'HTML_QuickForm_FCKEditor'
+        'HTML_QuickForm_FCKEditor',
       ),
       'tinymce' => array(
         'HTML/QuickForm/tinymce.php',
-        'HTML_QuickForm_TinyMCE'
+        'HTML_QuickForm_TinyMCE',
       ),
       'dojoeditor' => array(
         'HTML/QuickForm/dojoeditor.php',
-        'HTML_QuickForm_dojoeditor'
+        'HTML_QuickForm_dojoeditor',
       ),
       'link' => array(
         'HTML/QuickForm/link.php',
-        'HTML_QuickForm_link'
+        'HTML_QuickForm_link',
       ),
       'advcheckbox' => array(
         'HTML/QuickForm/advcheckbox.php',
-        'HTML_QuickForm_advcheckbox'
+        'HTML_QuickForm_advcheckbox',
       ),
       'date' => array(
         'HTML/QuickForm/date.php',
-        'HTML_QuickForm_date'
+        'HTML_QuickForm_date',
       ),
       'static' => array(
         'HTML/QuickForm/static.php',
-        'HTML_QuickForm_static'
+        'HTML_QuickForm_static',
       ),
       'header' => array(
         'HTML/QuickForm/header.php',
-        'HTML_QuickForm_header'
+        'HTML_QuickForm_header',
       ),
       'html' => array(
         'HTML/QuickForm/html.php',
-        'HTML_QuickForm_html'
+        'HTML_QuickForm_html',
       ),
       'hierselect' => array(
         'HTML/QuickForm/hierselect.php',
-        'HTML_QuickForm_hierselect'
+        'HTML_QuickForm_hierselect',
       ),
       'autocomplete' => array(
         'HTML/QuickForm/autocomplete.php',
-        'HTML_QuickForm_autocomplete'
+        'HTML_QuickForm_autocomplete',
       ),
       'xbutton' => array(
         'HTML/QuickForm/xbutton.php',
-        'HTML_QuickForm_xbutton'
+        'HTML_QuickForm_xbutton',
       ),
       'advmultiselect' => array(
         'HTML/QuickForm/advmultiselect.php',
-        'HTML_QuickForm_advmultiselect'
-      )
+        'HTML_QuickForm_advmultiselect',
+      ),
     );
   }
 
@@ -3024,13 +3024,13 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->callAPISuccess('price_set', 'create', array(
         'id' => $contributionPriceSet['id'],
         'is_active' => 0,
-        'name' => 'old'
+        'name' => 'old',
       ));
     unset($contributionPriceSet['id']);
     $newPriceSet = $this->callAPISuccess('price_set', 'create', $contributionPriceSet);
     $priceField = $this->callAPISuccess('price_field', 'getsingle', array(
         'price_set_id' => $firstID,
-        'options' => array('limit' => 1)
+        'options' => array('limit' => 1),
       ));
     unset($priceField['id']);
     $priceField['price_set_id'] = $newPriceSet['id'];
@@ -3038,7 +3038,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $priceFieldValue = $this->callAPISuccess('price_field_value', 'getsingle', array(
         'price_set_id' => $firstID,
         'sequential' => 1,
-        'options' => array('limit' => 1)
+        'options' => array('limit' => 1),
       ));
 
     unset($priceFieldValue['id']);
@@ -3108,7 +3108,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'contact_id' => $this->_contactID,
         'contribution_page_id' => $this->_contributionPageID,
         'payment_processor_id' => $this->_paymentProcessorID,
-      )
+      ),
     ));
     $this->_contributionRecurID = $contributionRecur['id'];
     $this->_contributionID = $contributionRecur['values']['0']['api.contribution.create']['id'];
@@ -3143,16 +3143,16 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'financial_type_id' => 1,
       'price_field_id' => $this->callAPISuccess('price_field', 'getvalue', array(
           'return' => 'id',
-          'label' => 'Membership Amount'
+          'label' => 'Membership Amount',
         )),
       'price_field_value_id' => $this->callAPISuccess('price_field_value', 'getvalue', array(
           'return' => 'id',
-          'label' => 'General'
+          'label' => 'General',
         )),
     ));
     $this->callAPISuccess('membership_payment', 'create', array(
         'contribution_id' => $this->_contributionID,
-        'membership_id' => $this->ids['membership']
+        'membership_id' => $this->ids['membership'],
       ));
   }
 

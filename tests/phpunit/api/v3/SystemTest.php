@@ -77,7 +77,7 @@ class api_v3_SystemTest extends CiviUnitTestCase {
     $this->callAPISuccess('system', 'log', array('level' => 'info', 'message' => 'We wish you a merry Christmas'));
     $result = $this->callAPISuccess('SystemLog', 'getsingle', array(
         'sequential' => 1,
-        'message' => array('LIKE' => '%Chris%')
+        'message' => array('LIKE' => '%Chris%'),
       ));
     $this->assertEquals($result['message'], 'We wish you a merry Christmas');
     $this->assertEquals($result['level'], 'info');
@@ -90,7 +90,7 @@ class api_v3_SystemTest extends CiviUnitTestCase {
     $this->callAPISuccess('system', 'log', array('message' => 'We wish you a merry Christmas', 'level' => 'alert'));
     $result = $this->callAPISuccess('SystemLog', 'getsingle', array(
       'sequential' => 1,
-      'message' => array('LIKE' => '%Chris%')
+      'message' => array('LIKE' => '%Chris%'),
     ));
     $this->assertEquals($result['message'], 'We wish you a merry Christmas');
     $this->assertEquals($result['level'], 'alert');

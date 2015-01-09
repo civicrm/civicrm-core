@@ -79,7 +79,7 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
       'tax_rate'   => $taxRate,
       'is_tax' => 'on',
       'is_deductible' => 'off',
-      'is_default' => 'off'
+      'is_default' => 'off',
     );
 
     $this->assertEquals($orgName, $this->getText("xpath=//*[@id='s2id_contact_id']/a/span[1]"));

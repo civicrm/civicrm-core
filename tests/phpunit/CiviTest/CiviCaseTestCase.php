@@ -60,7 +60,7 @@ class CiviCaseTestCase extends CiviUnitTestCase {
     // state where tests could run afterwards without re-loading.
     $this->caseStatusGroup = $this->callAPISuccess('option_group', 'get', array(
         'name' => 'case_status',
-        'format.only_id' => 1
+        'format.only_id' => 1,
       )
     );
     $optionValues = array(

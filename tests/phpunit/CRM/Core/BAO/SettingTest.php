@@ -147,7 +147,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
       'version' => 3,
       'name' => 'max_attachments',
       'group' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'domain_id' => 2
+      'domain_id' => 2,
     ));
 
     $this->assertEquals(3, $value);
@@ -221,7 +221,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
         'description' => NULL,
         'help_text' => NULL,
         'on_change' => array(// list of callbacks
-          array(__CLASS__, '_testOnChange_onChangeExample')
+          array(__CLASS__, '_testOnChange_onChangeExample'),
         ),
       ),
     ));

@@ -310,7 +310,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Donation',
       $amountLabel => $amountValue,
-      'Contribution Status' => 'Completed'
+      'Contribution Status' => 'Completed',
     );
     $this->webtestVerifyTabularData($expected);
   }

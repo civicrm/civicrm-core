@@ -591,7 +591,7 @@ class CRM_Core_Permission {
     static $permissions = array();
     if (empty($permissions)) {
       $permissions = array(
-        'administer CiviCRM'
+        'administer CiviCRM',
       );
       $components = CRM_Core_Component::getComponents();
       foreach ($components as $comp) {

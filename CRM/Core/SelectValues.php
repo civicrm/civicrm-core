@@ -120,7 +120,7 @@ class CRM_Core_SelectValues {
       'automatic' => ts("Automatic"),
       'location-only' => ts("Only send to email addresses assigned to the specified location"),
       'location-prefer' => ts("Prefer email addresses assigned to the specified location"),
-      'location-exclude' => ts("Exclude email addresses assigned to the specified location")
+      'location-exclude' => ts("Exclude email addresses assigned to the specified location"),
     );
   }
 
@@ -143,7 +143,7 @@ class CRM_Core_SelectValues {
     return array(
       ts('No auto-renew option'),
       ts('Give option, but not required'),
-      ts('Auto-renew required')
+      ts('Auto-renew required'),
     );
   }
 
@@ -519,7 +519,7 @@ class CRM_Core_SelectValues {
       '{event.fee_amount}' => ts('Event Fees'),
       '{event.info_url}' => ts('Event Info URL'),
       '{event.registration_url}' => ts('Event Registration URL'),
-      '{event.balance}' => ts('Event Balance')
+      '{event.balance}' => ts('Event Balance'),
     );
   }
 

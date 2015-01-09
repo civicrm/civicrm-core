@@ -470,7 +470,7 @@ WHERE ac.contact_id IN ( $ids )
         'id' => $dao->acID,
         'contact_id' => $dao->contact_id,
         'activity_id' => $dao->activity_id,
-        'record_type_id' => $dao->record_type_id
+        'record_type_id' => $dao->record_type_id,
       );
       $this->appendValue($dao->acID, 'civicrm_activity_contact', $activityContacts);
 

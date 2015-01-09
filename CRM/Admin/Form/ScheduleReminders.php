@@ -306,12 +306,12 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $recipientKind = array(
       'participant_role' => array(
         'name' => 'participant role',
-        'target_id' => 'recipient_listing'
+        'target_id' => 'recipient_listing',
       ),
       'manual' => array(
         'name' => 'recipient',
-        'target_id' => 'recipient_manual_id'
-      )
+        'target_id' => 'recipient_manual_id',
+      ),
     );
     if (!empty($fields['limit_to']) && array_key_exists($fields['recipient'], $recipientKind) && empty($fields[$recipientKind[$fields['recipient']]['target_id']])) {
       $errors[$recipientKind[$fields['recipient']]['target_id']] = ts('If "Also include" or "Limit to" are selected, you must specify at least one %1', array(1 => $recipientKind[$fields['recipient']]['name']));

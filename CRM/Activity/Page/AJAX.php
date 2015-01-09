@@ -118,7 +118,7 @@ class CRM_Activity_Page_AJAX {
       0 => 'relation',
     1 => 'name',
     2 => 'phone',
-    3 => 'email'
+    3 => 'email',
     );
 
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -183,7 +183,7 @@ class CRM_Activity_Page_AJAX {
     1 => 'name',
     2 => 'phone',
     3 => 'email',
-    4 => 'actions'
+    4 => 'actions',
     );
 
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -374,7 +374,7 @@ class CRM_Activity_Page_AJAX {
       }
       else {
         $otherActivity->subject = ts('(Filed on case %1)', array(
-            1 => $params['caseID']
+            1 => $params['caseID'],
           )) . ' ' . $otherActivity->subject;
       }
       $otherActivity->activity_date_time = $actDateTime;
@@ -398,7 +398,7 @@ class CRM_Activity_Page_AJAX {
     $src_params = array(
       'activity_id' => $mainActivityId,
       'contact_id' => $sourceContactID,
-      'record_type_id' => $sourceID
+      'record_type_id' => $sourceID,
     );
     CRM_Activity_BAO_ActivityContact::create($src_params);
 
@@ -406,7 +406,7 @@ class CRM_Activity_Page_AJAX {
       $targ_params = array(
         'activity_id' => $mainActivityId,
         'contact_id' => $value,
-        'record_type_id' => $targetID
+        'record_type_id' => $targetID,
       );
       CRM_Activity_BAO_ActivityContact::create($targ_params);
     }
@@ -420,7 +420,7 @@ class CRM_Activity_Page_AJAX {
       $assigneeParams = array(
         'activity_id' => $mainActivityId,
         'contact_id' => $value,
-        'record_type_id' => $assigneeID
+        'record_type_id' => $assigneeID,
       );
       CRM_Activity_BAO_ActivityContact::create($assigneeParams);
     }

@@ -197,14 +197,14 @@ class CRM_Core_BAO_CMSUser {
       $status .= ' ' . ts('Checked one user record.',
         array(
           'count' => $contactCount,
-          'plural' => 'Checked %count user records.'
+          'plural' => 'Checked %count user records.',
         )
       );
       if ($contactMatching) {
         $status .= ' ' . ts('Found one matching contact record.',
           array(
             'count' => $contactMatching,
-            'plural' => 'Found %count matching contact records.'
+            'plural' => 'Found %count matching contact records.',
           )
         );
       }
@@ -212,7 +212,7 @@ class CRM_Core_BAO_CMSUser {
       $status .= ' ' . ts('Created one new contact record.',
         array(
           'count' => $contactCreated,
-          'plural' => 'Created %count new contact records.'
+          'plural' => 'Created %count new contact records.',
         )
       );
       CRM_Core_Session::setStatus($status, ts('Saved'), 'success');

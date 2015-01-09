@@ -61,8 +61,8 @@ class CRM_Admin_Form_Preferences_Event extends CRM_Admin_Form_Preferences {
           'title' => ts('Dashboard entries'),
           'weight' => 2,
           'description' => ts('Configure how many events should be shown on the dashboard. This overrides the default value of 10 entries.'),
-          'option_values' => array('' => ts('- select -')) + $optionValues + array(-1 => ts('show all'))
-        )
+          'option_values' => array('' => ts('- select -')) + $optionValues + array(-1 => ts('show all')),
+        ),
       ),
     );
 

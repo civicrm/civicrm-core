@@ -114,7 +114,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
     $cases[] = array(
       'FakeFile',
       'create',
-      array('entity_table' => 'fake_widget', 'entity_id' => self::WIDGET_ID)
+      array('entity_table' => 'fake_widget', 'entity_id' => self::WIDGET_ID),
     );
     $cases[] = array('FakeFile', 'get', array('entity_table' => 'fake_widget'));
 
@@ -137,13 +137,13 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
       'FakeFile',
       'create',
       array('entity_table' => 'fake_forbidden', 'entity_id' => self::FORBIDDEN_ID),
-      '/Authorization failed/'
+      '/Authorization failed/',
     );
     $cases[] = array(
       'FakeFile',
       'get',
       array('entity_table' => 'fake_forbidden', 'entity_id' => self::FORBIDDEN_ID),
-      '/Authorization failed/'
+      '/Authorization failed/',
     );
 
     $cases[] = array('FakeFile', 'create', array(), "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table/");

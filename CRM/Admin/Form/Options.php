@@ -431,7 +431,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
           'entity_table' => 'civicrm_option_value',
           'entity_id' => $optionValue->id,
           'account_relationship' => $relationTypeId,
-          'financial_account_id' => $params['financial_account_id']
+          'financial_account_id' => $params['financial_account_id'],
         );
         CRM_Financial_BAO_FinancialTypeAccount::add($params);
       }

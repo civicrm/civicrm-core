@@ -65,7 +65,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'option_group_id' => 2,
       'name' => 'Test activity type',
       'label' => 'Test activity type',
-      'sequential' => 1
+      'sequential' => 1,
     ));
     $this->test_activity_type_value = $activityTypes['values'][0]['value'];
     $this->test_activity_type_id = $activityTypes['id'];
@@ -982,7 +982,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
         'return.assignee_contact_id' => 1,
         'return.target_contact_id' => 1,
         'return.source_contact_id' => 1,
-        'id' => $result['id']
+        'id' => $result['id'],
       )
     );
 

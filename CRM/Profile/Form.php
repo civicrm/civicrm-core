@@ -1073,7 +1073,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
             $sql = "DELETE FROM {$tableName} WHERE id = %1 AND entity_id = %2";
             $sqlParams = array(
                           1 => array($this->_recordId, 'Integer'),
-                          2 => array($this->_id, 'Integer')
+                          2 => array($this->_id, 'Integer'),
                          );
             CRM_Core_DAO::executeQuery($sql, $sqlParams);
             CRM_Core_Session::setStatus(ts('Your record has been deleted.'), ts('Deleted'), 'success');

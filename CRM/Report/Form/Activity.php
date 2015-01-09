@@ -36,7 +36,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   protected $_selectAliasesTotal = array();
 
   protected $_customGroupExtends = array(
-    'Activity'
+    'Activity',
   );
 
   protected $_nonDisplayFields = array();
@@ -207,7 +207,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             ),
             'details' => array(
               'title' => ts('Activity Details'),
-            )
+            ),
           ),
           'filters' => array(
             'activity_date_time' => array(
@@ -228,18 +228,18 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'details' => array(
               'title' => ts('Activity Details'),
               'type' => CRM_Utils_Type::T_TEXT,
-            )
+            ),
           ),
           'order_bys' => array(
             'activity_date_time' => array(
               'title' => ts('Activity Date'),
               'default_weight' => '1',
-              'dbAlias' => 'civicrm_activity_activity_date_time'
+              'dbAlias' => 'civicrm_activity_activity_date_time',
             ),
             'activity_type_id' => array(
               'title' => ts('Activity Type'),
               'default_weight' => '2',
-              'dbAlias' => "option_value_civireport"
+              'dbAlias' => "option_value_civireport",
             ),
           ),
           'grouping' => 'activity-fields',

@@ -140,7 +140,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
       'modified_date' => '2011-01-31',
       'subject' => NULL,
-      'version' => $this->_apiversion
+      'version' => $this->_apiversion,
     );
     try {
       $result = civicrm_api3_verify_mandatory($params, 'CRM_Core_BAO_Note', array('note', 'subject'));

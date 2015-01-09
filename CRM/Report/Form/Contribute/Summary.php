@@ -408,7 +408,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       foreach (array(
                  'total_count_value',
                  'total_sum_value',
-                 'total_avg_value'
+                 'total_avg_value',
                ) as $val) {
         if (!empty($fields[$val])) {
           $errors[$val] = ts("Please select the Amount Statistics");

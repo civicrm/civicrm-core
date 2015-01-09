@@ -96,7 +96,7 @@ class CRM_Core_ClassLoader {
     $include_paths = array(
       '.',
       $civicrm_base_path,
-      $packages_path
+      $packages_path,
     );
     $include_paths = implode(PATH_SEPARATOR, $include_paths);
     set_include_path($include_paths . PATH_SEPARATOR . get_include_path());

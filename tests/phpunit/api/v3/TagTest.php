@@ -193,7 +193,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
     $description = "Demonstrates use of api.getlist for autocomplete and quicksearch applications";
     $params = array(
       'input' => $this->tag['name'],
-      'extra' => array('used_for')
+      'extra' => array('used_for'),
     );
     $result = $this->callAPIAndDocument('tag', 'getlist', $params, __FUNCTION__, __FILE__, $description);
     $this->assertEquals($this->tag['id'], $result['values'][0]['id'], 'In line ' . __LINE__);

@@ -171,20 +171,20 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
     $this->assertDBQuery($expectedA, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', array(
         1 => array(
           $this->_mailingID_A,
-          'Integer'
-        )
+          'Integer',
+        ),
       ));
     $this->assertDBQuery($expectedB, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', array(
         1 => array(
           $this->_mailingID_B,
-          'Integer'
-        )
+          'Integer',
+        ),
       ));
     $this->assertDBQuery($expectedC, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', array(
         1 => array(
           $this->_mailingID_C,
-          'Integer'
-        )
+          'Integer',
+        ),
       ));
   }
 }

@@ -45,7 +45,7 @@ class CRM_Core_InnoDBIndexer {
     if ($fresh || self::$singleton === NULL) {
       $indices = array(
         'civicrm_address' => array(
-          array('street_address', 'city', 'postal_code')
+          array('street_address', 'city', 'postal_code'),
         ),
         'civicrm_activity' => array(
           array('subject', 'details'),
@@ -57,7 +57,7 @@ class CRM_Core_InnoDBIndexer {
           array('source', 'amount_level', 'trxn_Id', 'invoice_id'),
         ),
         'civicrm_email' => array(
-          array('email')
+          array('email'),
         ),
         'civicrm_membership' => array(
           array('source'),

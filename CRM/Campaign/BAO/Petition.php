@@ -244,7 +244,7 @@ SELECT  petition.id                         as id,
     $params = array(
       1 => array($activity_id, 'Integer'),
       2 => array($contact_id, 'Integer'),
-      3 => array($sourceID, 'Integer')
+      3 => array($sourceID, 'Integer'),
     );
     CRM_Core_DAO::executeQuery($sql, $params);
 
@@ -305,7 +305,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $params = array(
       1 => array($surveyId, 'Integer'),
-      2 => array($sourceID, 'Integer')
+      2 => array($sourceID, 'Integer'),
     );
     $sql .= " GROUP BY civicrm_address.country_id";
     $fields = array('total', 'country_id', 'country_iso', 'country');
@@ -515,7 +515,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
       2 => array($surveyId, 'Integer'),
       3 => array($surveyInfo['activity_type_id'], 'Integer'),
       4 => array($contactId, 'Integer'),
-      5 => array($sourceID, 'Integer')
+      5 => array($sourceID, 'Integer'),
     );
 
     $dao = CRM_Core_DAO::executeQuery($sql, $params);

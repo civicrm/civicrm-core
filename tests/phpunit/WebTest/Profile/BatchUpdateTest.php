@@ -62,8 +62,8 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
       array(
         'type' => 'Individual',
         'name' => 'Last Name',
-        'label' => 'Last Name'
-      )
+        'label' => 'Last Name',
+      ),
     );
     $this->addProfile($profileTitle, $profileFields);
     $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');

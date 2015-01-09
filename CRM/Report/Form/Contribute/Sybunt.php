@@ -528,7 +528,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     if ($fieldName == 'yid') {
       return array(
         'calendar' => ts('Is Calendar Year'),
-        'fiscal' => ts('Fiscal Year Starting')
+        'fiscal' => ts('Fiscal Year Starting'),
       );
     }
     return parent::getOperationPair($type, $fieldName);

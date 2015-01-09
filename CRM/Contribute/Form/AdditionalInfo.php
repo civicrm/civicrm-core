@@ -154,7 +154,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     $form->add('select', 'contribution_page_id',
       ts('Online Contribution Page'),
       array(
-        '' => ts('- select -')
+        '' => ts('- select -'),
       ) +
       CRM_Contribute_PseudoConstant::contributionPage()
     );
@@ -239,7 +239,7 @@ class CRM_Contribute_Form_AdditionalInfo {
         'cost' => CRM_Utils_Array::value('cost', $productDetails),
         'currency' => CRM_Utils_Array::value('currency', $productDetails),
         'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $productDetails),
-        'contributionId' => $contributionID
+        'contributionId' => $contributionID,
       );
       if ($isDeleted) {
         $params['oldPremium']['product_id'] = $premoumDAO->product_id;
@@ -356,7 +356,7 @@ class CRM_Contribute_Form_AdditionalInfo {
       foreach ($params['soft_credit'] as $key => $softCredit) {
         $softCredits[$key] = array(
           'Name' => $softCredit['contact_name'],
-          'Amount' => CRM_Utils_Money::format($softCredit['amount'], $softCredit['currency'])
+          'Amount' => CRM_Utils_Money::format($softCredit['amount'], $softCredit['currency']),
         );
         $softCreditTypes[$key] = $softCredit['soft_credit_type_label'];
       }

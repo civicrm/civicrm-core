@@ -347,7 +347,7 @@ AND    domain_id    = %4
             1 => $ufmatch->contact_id,
             2 => $uf,
             3 => $ufmatch->uf_id,
-            4 => $conflict
+            4 => $conflict,
           )
         );
         unset($conflict);

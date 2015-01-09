@@ -117,7 +117,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
           'table'         => 'civicrm_price_set_entity',
           'findCriteria'  => array(
             'entity_id'    => $this->_id,
-            'entity_table' => 'civicrm_event'
+            'entity_table' => 'civicrm_event',
           ),
           'linkedColumns' => array('entity_id'),
           'isRecurringEntityRecord' => FALSE,
@@ -126,7 +126,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
           'table'         => 'civicrm_uf_join',
           'findCriteria'  => array(
             'entity_id'    => $this->_id,
-            'entity_table' => 'civicrm_event'
+            'entity_table' => 'civicrm_event',
           ),
           'linkedColumns' => array('entity_id'),
           'isRecurringEntityRecord' => FALSE,
@@ -135,7 +135,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
           'table'         => 'civicrm_tell_friend',
           'findCriteria'  => array(
             'entity_id'    => $this->_id,
-            'entity_table' => 'civicrm_event'
+            'entity_table' => 'civicrm_event',
           ),
           'linkedColumns' => array('entity_id'),
           'isRecurringEntityRecord' => TRUE,
@@ -144,7 +144,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
           'table'         => 'civicrm_pcp_block',
           'findCriteria'  => array(
             'entity_id'    => $this->_id,
-            'entity_table' => 'civicrm_event'
+            'entity_table' => 'civicrm_event',
           ),
           'linkedColumns' => array('entity_id'),
           'isRecurringEntityRecord' => TRUE,

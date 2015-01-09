@@ -65,7 +65,7 @@ class CRM_Contact_Page_AJAX {
       'context' => 'context',
       'rel' => 'rel',
       'contact_sub_type' => 'contact_sub_type',
-      'contact_type' => 'contact_type'
+      'contact_type' => 'contact_type',
     );
     foreach ($whitelist as $key => $param) {
       if (!empty($_GET[$key])) {
@@ -308,7 +308,7 @@ class CRM_Contact_Page_AJAX {
         $ret = array(
           'is_error' => 1,
           'error_message' => ts('The relationship type definition for the case role is not valid for the client and / or staff contact types. You can review and edit relationship types at <a href="%1">Administer >> Option Lists >> Relationship Types</a>.',
-            array(1 => CRM_Utils_System::url('civicrm/admin/reltype', 'reset=1')))
+            array(1 => CRM_Utils_System::url('civicrm/admin/reltype', 'reset=1'))),
         );
       }
     }

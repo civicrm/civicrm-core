@@ -516,7 +516,7 @@ MODIFY      {$columnName} varchar( $length )
           array(
             1 => $tableName,
             2 => $columnName,
-            3 => $customFieldID
+            3 => $customFieldID,
           )
         ));
     }

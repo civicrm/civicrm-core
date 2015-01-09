@@ -281,7 +281,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $triggerElement = array('name' => 'financial_type_id', 'type' => 'select');
     $customSets = array(
       array('entity' => 'Contribution', 'subEntity' => 'Donation', 'triggerElement' => $triggerElement),
-      array('entity' => 'Contribution', 'subEntity' => 'Member Dues', 'triggerElement' => $triggerElement)
+      array('entity' => 'Contribution', 'subEntity' => 'Member Dues', 'triggerElement' => $triggerElement),
     );
 
     $pageUrl = array('url' => 'contribute/add', 'args' => 'reset=1&action=add&context=standalone');

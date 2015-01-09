@@ -76,7 +76,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
         2 => 'Cool City',
         3 => 1,
         4 => 0,
-      )
+      ),
     );
     $returnProperties = array(
       'contact_type' => 1,
@@ -114,7 +114,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
         2 => 'Dumb City',
         3 => 1,
         4 => 0,
-      )
+      ),
     );
     $returnProperties = array(
       'contact_type' => 1,
@@ -153,7 +153,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
           2 => 'Cool City',
           3 => 1,
           4 => 0,
-        )
+        ),
       );
     $returnProperties = array(
         'contact_type' => 1,

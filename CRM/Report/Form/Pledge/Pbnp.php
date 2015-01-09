@@ -41,7 +41,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
   public $_drilldownReport = array('pledge/summary' => 'Link to Detail Report');
 
   protected $_customGroupExtends = array(
-    'Pledge'
+    'Pledge',
   );
 
   /**
@@ -233,7 +233,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     foreach (array(
                'Pending',
                'In Progress',
-               'Overdue'
+               'Overdue',
              ) as $statusKey) {
       if ($key = CRM_Utils_Array::key($statusKey, $allStatus)) {
         $unpaidStatus[] = $key;

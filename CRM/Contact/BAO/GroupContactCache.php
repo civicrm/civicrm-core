@@ -661,7 +661,7 @@ ORDER BY   gc.contact_id, g.children
           'id' => $dao->group_id,
           'title' => $dao->title,
           'description' => $dao->description,
-          'children' => $dao->children
+          'children' => $dao->children,
         );
       $contactGroup[$dao->contact_id]['groupTitle'][] = $dao->title;
     }

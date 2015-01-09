@@ -50,7 +50,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
   protected $_pledgeStatuses = array();
   protected $_customGroupExtends = array(
     'Pledge',
-    'Individual'
+    'Individual',
   );
 
   /**
@@ -223,7 +223,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
       $this->_totalPaid = TRUE; // add pledge_payment join
       $this->_columnHeaders["{$tableName}_{$fieldName}"] = array(
         'title' => $field['title'],
-        'type' => $field['type']
+        'type' => $field['type'],
       );
       return "COALESCE(sum({$this->_aliases[$tableName]}.actual_amount), 0) as {$tableName}_{$fieldName}";
     }
@@ -234,7 +234,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
       $this->_columnHeaders["{$tableName}_{$fieldName}"] = $field['title'];
       $this->_columnHeaders["{$tableName}_{$fieldName}"] = array(
         'title' => $field['title'],
-        'type' => $field['type']
+        'type' => $field['type'],
       );
       return "IF({$this->_aliases['civicrm_pledge']}.status_id IN({$cancelledStatus}, $completedStatus), 0, COALESCE({$this->_aliases['civicrm_pledge']}.amount, 0) - COALESCE(sum({$this->_aliases[$tableName]}.actual_amount),0)) as {$tableName}_{$fieldName}";
     }
@@ -436,7 +436,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
      */
     $tableHeaders = array(
       'civicrm_pledge_payment_total_paid',
-      'civicrm_pledge_payment_balance_due'
+      'civicrm_pledge_payment_balance_due',
     );
 
     foreach ($tableHeaders as $header) {

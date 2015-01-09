@@ -420,7 +420,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
     $this->enterValues(1, 1, 'Contribution', 'Financial Type', NULL, 'IN', array(
       $financialTypeName1,
-      $financialTypeName2
+      $financialTypeName2,
     ));
     $this->clickLink('_qf_Builder_refresh');
 

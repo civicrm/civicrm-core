@@ -1638,7 +1638,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         'id_field' => 'select_contact_id',
         'placeholder' => ts('Select someone else ...'),
         'show_hide' => TRUE,
-        'api' => array('params' => array('contact_type' => 'Individual'))
+        'api' => array('params' => array('contact_type' => 'Individual')),
       ), $autoCompleteField);
 
     if ($this->canUseAjaxContactLookups()) {

@@ -38,7 +38,7 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
   protected $_addressField = FALSE;
 
   protected $_customGroupExtends = array(
-    'Grant'
+    'Grant',
   );
 
   /**

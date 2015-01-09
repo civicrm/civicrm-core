@@ -315,7 +315,7 @@ abstract class CRM_Core_Payment {
         'attributes' => array(
           'size' => 20,
           'maxlength' => 20,
-          'autocomplete' => 'off'
+          'autocomplete' => 'off',
         ),
         'is_required' => TRUE,
       ),
@@ -327,7 +327,7 @@ abstract class CRM_Core_Payment {
         'attributes' => array(
           'size' => 5,
           'maxlength' => 10,
-          'autocomplete' => 'off'
+          'autocomplete' => 'off',
         ),
         'is_required' => CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
           'cvv_backoffice_required',
@@ -371,7 +371,7 @@ abstract class CRM_Core_Payment {
         'attributes' => array(
           'size' => 20,
           'maxlength' => 34,
-          'autocomplete' => 'on'
+          'autocomplete' => 'on',
         ),
         'is_required' => TRUE,
       ),
@@ -384,7 +384,7 @@ abstract class CRM_Core_Payment {
         'attributes' => array(
           'size' => 20,
           'maxlength' => 34,
-          'autocomplete' => 'off'
+          'autocomplete' => 'off',
         ),
         'rules' => array(
           array(
@@ -403,7 +403,7 @@ abstract class CRM_Core_Payment {
         'attributes' => array(
           'size' => 20,
           'maxlength' => 11,
-          'autocomplete' => 'off'
+          'autocomplete' => 'off',
         ),
         'is_required' => TRUE,
         'rules' => array(
@@ -421,11 +421,11 @@ abstract class CRM_Core_Payment {
         'attributes' => array(
           'size' => 20,
           'maxlength' => 64,
-          'autocomplete' => 'off'
+          'autocomplete' => 'off',
         ),
         'is_required' => TRUE,
 
-      )
+      ),
     );
   }
 

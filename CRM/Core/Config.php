@@ -484,7 +484,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
           $url = CRM_Utils_System::url('civicrm/admin/setting/path', 'reset=1');
           CRM_Core_Session::setStatus(ts('%1 has an incorrect directory path. Please go to the <a href="%2">path setting page</a> and correct it.', array(
             1 => $key,
-            2 => $url
+            2 => $url,
           )), ts('Check Settings'), 'alert');
         }
       }

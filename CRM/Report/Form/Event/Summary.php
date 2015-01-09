@@ -46,7 +46,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
   protected $_add2groupSupported = FALSE;
 
   protected $_customGroupExtends = array(
-    'Event'
+    'Event',
   );
   public $_drilldownReport = array('event/income' => 'Link to Detail Report');
 

@@ -434,7 +434,7 @@ WHERE  inst.report_id = %1";
             'default' => 'null',
           ),
         ),
-        'ignoreKey' => TRUE
+        'ignoreKey' => TRUE,
       );
       $messages[] = $wrapper->run($templateInfo['name'], NULL, $arguments);
     }

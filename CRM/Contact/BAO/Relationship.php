@@ -320,8 +320,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         $result = CRM_Core_DAO::executeQuery("SELECT " . implode(',', $fieldsToFill) . " FROM civicrm_relationship WHERE id = %1", array(
             1 => array(
               $params['id'],
-              'Integer'
-            )
+              'Integer',
+            ),
           ));
         while ($result->fetch()) {
           foreach ($fieldsToFill as $field) {
@@ -1466,7 +1466,7 @@ SELECT relationship_type_id, relationship_direction
             foreach (array(
                        'join_date',
                        'start_date',
-                       'end_date'
+                       'end_date',
                      ) as $dateField) {
               if (!empty($membershipValues[$dateField])) {
                 $membershipValues[$dateField] = CRM_Utils_Date::processDate($membershipValues[$dateField]);
@@ -1723,7 +1723,7 @@ AND cc.sort_name LIKE '%$name%'";
   public static function membershipTypeToRelationshipTypes(&$params, $direction = NULL) {
     $membershipType = civicrm_api3('membership_type', 'getsingle', array(
         'id' => $params['membership_type_id'],
-        'return' => 'relationship_type_id, relationship_direction'
+        'return' => 'relationship_type_id, relationship_direction',
       ));
     $relationshipTypes = $membershipType['relationship_type_id'];
     if (empty($relationshipTypes)) {

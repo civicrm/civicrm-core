@@ -78,7 +78,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
         'entity_table' => 'civicrm_payment_processor',
         'entity_id' => $processor->id,
         'account_relationship' => $relationTypeId,
-        'financial_account_id' => $params['financial_account_id']
+        'financial_account_id' => $params['financial_account_id'],
       );
       CRM_Financial_BAO_FinancialTypeAccount::add($values);
     }

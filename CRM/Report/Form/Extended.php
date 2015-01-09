@@ -358,7 +358,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
           'event_id' => array(
             'title' => ts('Event'),
             'default_weight' => '1',
-            'default_order' => 'ASC'
+            'default_order' => 'ASC',
           ),
         ),
         'group_bys' => array(
@@ -623,41 +623,41 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
         'fields' => array(
           'id' => array(
             'title' => ts('Case ID'),
-            'required' => FALSE
+            'required' => FALSE,
           ),
           'subject' => array(
             'title' => ts('Case Subject'),
-            'default' => TRUE
+            'default' => TRUE,
           ),
           'status_id' => array(
             'title' => ts('Status'),
-            'default' => TRUE
+            'default' => TRUE,
           ),
           'case_type_id' => array(
             'title' => ts('Case Type'),
-            'default' => TRUE
+            'default' => TRUE,
           ),
           'case_start_date' => array(
             'title' => ts('Case Start Date'),
             'name' => 'start_date',
-            'default' => TRUE
+            'default' => TRUE,
           ),
           'case_end_date' => array(
             'title' => ts('Case End Date'),
             'name' => 'end_date',
-            'default' => TRUE
+            'default' => TRUE,
           ),
           'case_duration' => array(
             'name' => 'duration',
             'title' => ts('Duration (Days)'),
-            'default' => FALSE
+            'default' => FALSE,
           ),
           'case_is_deleted' => array(
             'name' => 'is_deleted',
             'title' => ts('Case Deleted?'),
             'default' => FALSE,
-            'type' => CRM_Utils_Type::T_INT
-          )
+            'type' => CRM_Utils_Type::T_INT,
+          ),
         ),
         'filters' => array(
           'case_start_date' => array(
@@ -670,18 +670,18 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
             'title' => ts('Case End Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
-            'name' => 'end_date'
+            'name' => 'end_date',
           ),
           'case_type_id' => array(
             'title' => ts('Case Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $this->case_types
+            'options' => $this->case_types,
           ),
           'case_status_id' => array(
             'title' => ts('Case Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->case_statuses,
-            'name' => 'status_id'
+            'name' => 'status_id',
           ),
           'case_is_deleted' => array(
             'title' => ts('Case Deleted?'),
@@ -689,10 +689,10 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => $this->deleted_labels,
             'default' => 0,
-            'name' => 'is_deleted'
-          )
-        )
-      )
+            'name' => 'is_deleted',
+          ),
+        ),
+      ),
     );
   }
 
@@ -730,7 +730,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
       'order_by' => TRUE,
       'filters' => TRUE,
       'defaults' => array(
-        'country_id' => TRUE
+        'country_id' => TRUE,
       ),
     );
 

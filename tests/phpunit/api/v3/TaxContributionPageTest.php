@@ -67,7 +67,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'pay_later_text' => 'I will pay later',
       'pay_later_receipt' => "I will pay later",
       'is_monetary' => TRUE,
-      'is_billing_required' => TRUE
+      'is_billing_required' => TRUE,
     );
 
     $this->_priceSetParams = array(
@@ -79,7 +79,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'extends' => 2,
       'financial_type_id' => 3,
       'is_quick_config' => 0,
-      'is_reserved' => 0
+      'is_reserved' => 0,
     );
     // Financial Account with 20% tax rate
     $financialAccountSetparams = array(
@@ -109,7 +109,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_financial_type',
       'entity_id' => $this->financialtypeID,
       'account_relationship' => 10,
-      'financial_account_id' => $this->financialAccountId
+      'financial_account_id' => $this->financialAccountId,
     );
     $financialRelation = CRM_Financial_BAO_FinancialTypeAccount::add($financialRelationParams);
 
@@ -122,7 +122,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'tax_rate' => 5.00,
       'is_reserved' => 0,
       'is_active' => 1,
-      'is_default' => 0
+      'is_default' => 0,
     );
     $halfFinancialAccount = CRM_Financial_BAO_FinancialAccount::add($financialAccHalftax);
     $this->halfFinancialAccId = $halfFinancialAccount->id;
@@ -138,7 +138,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_financial_type',
       'entity_id' => $this->halfFinancialTypeId,
       'account_relationship' => 10,
-      'financial_account_id' => $this->halfFinancialAccId
+      'financial_account_id' => $this->halfFinancialAccId,
     );
 
     $halfFinancialRelation = CRM_Financial_BAO_FinancialTypeAccount::add($financialRelationHalftax);
@@ -172,7 +172,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'class_name' => 'Payment_Dummy',
       'billing_mode' => 1,
       'is_recur' => 1,
-      'payment_type' => 1
+      'payment_type' => 1,
     );
     $result = $this->callAPISuccess('payment_processor', 'create', $paymentProceParams);
     $this->_ids['paymentProcessID'] = $result['id'];
@@ -195,7 +195,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'civicrm_contact',
       'civicrm_membership',
       'civicrm_membership_payment',
-      'civicrm_payment_processor'
+      'civicrm_payment_processor',
     ));
     CRM_Core_PseudoConstant::flush('taxRates');
   }
@@ -223,14 +223,14 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
         'price_field_id' => $priceField['id'],
         'label' => 'Long Haired Goat',
         'amount' => 100,
-        'financial_type_id' => $this->financialtypeID
+        'financial_type_id' => $this->financialtypeID,
       ));
       $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
         'price_set_id' => $priceSetID,
         'price_field_id' => $priceField['id'],
         'label' => 'Shoe-eating Goat',
         'amount' => 300,
-        'financial_type_id' => $this->halfFinancialTypeId
+        'financial_type_id' => $this->halfFinancialTypeId,
       ));
       $this->_ids['price_field_value'] = array($priceFieldValue['id']);
     }
@@ -252,7 +252,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'trxn_id' => 12345,
       'invoice_id' => 67890,
       'source' => 'SSF',
-      'contribution_status_id' => 1
+      'contribution_status_id' => 1,
     );
 
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
@@ -389,7 +389,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $newParams = array(
       'id' => $contribution['id'],
       'financial_type_id'   => 1, // without tax rate i.e Donation
-      'total_amount' => '300'
+      'total_amount' => '300',
     );
     $contribution = $this->callAPISuccess('contribution', 'update', $newParams);
 

@@ -616,7 +616,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                 'value' => CRM_Utils_Rule::cleanMoney(trim($values[$i])),
                 'weight' => $i,
                 'is_active' => 1,
-                'is_default' => $default == $i
+                'is_default' => $default == $i,
               );
             }
           }
@@ -697,7 +697,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                     'value' => CRM_Utils_Rule::cleanMoney(trim($values[$i][$j])),
                     'weight' => $i,
                     'is_active' => 1,
-                    'is_default' => $default == $i
+                    'is_default' => $default == $i,
                   );
                 }
               }

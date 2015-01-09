@@ -118,7 +118,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
         'option_group_id',
         ts('Select Result Set'),
         array(
-          '' => ts('- select -')
+          '' => ts('- select -'),
         ) + $optionGroups, FALSE,
         array('onChange' => 'loadOptionGroup( )')
       );
@@ -128,7 +128,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
       ts('Survey Responses'),
       $optionTypes,
       array(
-        'onclick' => "showOptionSelect();"
+        'onclick' => "showOptionSelect();",
       ), '<br/>', TRUE
     );
 
@@ -199,7 +199,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
 
     $this->addFormRule(array(
         'CRM_Campaign_Form_Survey_Results',
-        'formRule'
+        'formRule',
       ), $this);
 
     parent::buildQuickForm();
@@ -429,7 +429,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
         array(
           1 => array(
             'column' => 'sort_name',
-            'order' => 'ASC'
+            'order' => 'ASC',
           ),
         );
       // for WalkList or default
@@ -440,7 +440,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
         'street_number',
         'street_name',
         'street_unit',
-        'survey_response'
+        'survey_response',
       );
       if (CRM_Core_OptionGroup::getValue('activity_type', 'WalkList') ==
         $this->_values['activity_type_id']
@@ -449,19 +449,19 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
           array(
             1 => array(
               'column' => 'street_name',
-              'order' => 'ASC'
+              'order' => 'ASC',
             ),
             2 => array(
               'column' => 'street_number_odd_even',
-              'order' => 'ASC'
+              'order' => 'ASC',
             ),
             3 => array(
               'column' => 'street_number',
-              'order' => 'ASC'
+              'order' => 'ASC',
             ),
             4 => array(
               'column' => 'sort_name',
-              'order' => 'ASC'
+              'order' => 'ASC',
             ),
           );
       }
@@ -488,8 +488,8 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
       $reportID = CRM_Core_DAO::singleValueQuery($query, array(
           1 => array(
             "survey_{$survey->id}",
-            'String'
-          )
+            'String',
+          ),
         ));
       if ($reportID) {
         $url = CRM_Utils_System::url("civicrm/report/instance/{$reportID}", 'reset=1');

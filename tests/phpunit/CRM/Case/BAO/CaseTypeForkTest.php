@@ -36,7 +36,7 @@ class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
           array('name' => 'First act'),
           array('name' => 'Second act'),
         ),
-      )
+      ),
     ));
 
     $this->assertTrue(CRM_Case_BAO_CaseType::isForkable($caseTypeId));
@@ -71,7 +71,7 @@ class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
           array('name' => 'First act'),
           array('name' => 'Second act'),
         ),
-      )
+      ),
     ));
 
     $this->assertFalse(CRM_Case_BAO_CaseType::isForkable($caseTypeId));

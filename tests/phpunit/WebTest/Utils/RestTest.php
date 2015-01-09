@@ -66,7 +66,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     if (isset($this->nocms_contact_id)) {
       $deleteParams = array(
         "id" => $this->nocms_contact_id,
-        "skip_undelete" => 1
+        "skip_undelete" => 1,
       );
       $res = $this->webtest_civicrm_api("Contact", "delete", $deleteParams);
       unset($this->nocms_contact_id);
@@ -214,7 +214,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $contactParams = array(
       "api_key" => $test_key,
       "contact_type" => "Individual",
-      "first_name" => "RestTester1"
+      "first_name" => "RestTester1",
     );
     $contact = $this->webtest_civicrm_api("Contact", "create", $contactParams);
     $this->nocms_contact_id = $contact["id"];
@@ -225,7 +225,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       "action" => "get",
       "key" => $this->settings->siteKey,
       "json" => "1",
-      "api_key" => $test_key
+      "api_key" => $test_key,
     );
     list($status, $data) = $client->post($this->url, $params);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
@@ -246,7 +246,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $contactParams = array(
       "api_key" => $test_key,
       "contact_type" => "Individual",
-      "first_name" => "RestTester1"
+      "first_name" => "RestTester1",
     );
     $contact = $this->webtest_civicrm_api("Contact", "create", $contactParams);
     $this->nocms_contact_id = $contact["id"];
@@ -256,7 +256,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       "q" => "civicrm/contact/get",
       "key" => $this->settings->siteKey,
       "json" => "1",
-      "api_key" => $test_key
+      "api_key" => $test_key,
     );
     list($status, $data) = $client->post($this->url, $params);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);

@@ -58,11 +58,11 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       self::$webResponses = array(
         'http-error' => array(
           CRM_Utils_HttpClient::STATUS_DL_ERROR,
-          NULL
+          NULL,
         ),
         'bad-json' => array(
           CRM_Utils_HttpClient::STATUS_OK,
-          '<html>this is not json!</html>'
+          '<html>this is not json!</html>',
         ),
         'invalid-ttl-document' => array(
           CRM_Utils_HttpClient::STATUS_OK,
@@ -74,7 +74,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
                 'markup' => '<h1>Invalid document</h1>',
               ),
             ),
-          ))
+          )),
         ),
         'first-valid-response' => array(
           CRM_Utils_HttpClient::STATUS_OK,
@@ -86,7 +86,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
                 'markup' => '<h1>First valid response</h1>',
               ),
             ),
-          ))
+          )),
         ),
         'second-valid-response' => array(
           CRM_Utils_HttpClient::STATUS_OK,
@@ -98,7 +98,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
                 'markup' => '<h1>Second valid response</h1>',
               ),
             ),
-          ))
+          )),
         ),
         'two-messages' => array(
           CRM_Utils_HttpClient::STATUS_OK,
@@ -115,7 +115,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
                 'components' => array('CiviMail'),
               ),
             ),
-          ))
+          )),
         ),
         'two-messages-halfbadcomp' => array(
           CRM_Utils_HttpClient::STATUS_OK,
@@ -132,7 +132,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
                 'components' => array('CiviMail'),
               ),
             ),
-          ))
+          )),
         ),
       );
     }

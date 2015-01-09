@@ -76,7 +76,7 @@ class CRM_Financial_Page_AJAX {
       array(
         'name'  => ts('- select -'),
         'value' => 'select',
-      )
+      ),
     );
 
     if (!empty($result)) {
@@ -121,7 +121,7 @@ class CRM_Financial_Page_AJAX {
       array(
         'name'  => ts('- Select Financial Account Relationship -'),
         'value' => 'select',
-      )
+      ),
     );
 
     $countResult = count($financialAccountType[$financialAccountTypeId]);
@@ -397,7 +397,7 @@ class CRM_Financial_Page_AJAX {
             array(
               'id' => $financialItem->id,
               'contid' => $financialItem->contributionID,
-              'cid' => $financialItem->contact_id
+              'cid' => $financialItem->contact_id,
             ),
             ts('more'),
             FALSE,
@@ -415,7 +415,7 @@ class CRM_Financial_Page_AJAX {
             array(
               'id' => $financialItem->id,
               'contid' => $financialItem->contributionID,
-              'cid' => $financialItem->contact_id
+              'cid' => $financialItem->contact_id,
             ),
             ts('more'),
             FALSE,
@@ -435,7 +435,7 @@ class CRM_Financial_Page_AJAX {
           array(
             'id' => $financialItem->id,
             'contid' => $financialItem->contributionID,
-            'cid' => $financialItem->contact_id
+            'cid' => $financialItem->contact_id,
           ),
           ts('more'),
           FALSE,

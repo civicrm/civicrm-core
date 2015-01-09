@@ -58,7 +58,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
         'caseRoles' => array(
           array('name' => 'First role', 'creator' => 1, 'manager' => 1),
         ),
-      )
+      ),
     );
   }
 

@@ -216,7 +216,7 @@ class CRM_Mailing_BAO_Query {
         'mailing_job_end_date' => 1,
         'contact_type' => 1,
         'contact_sub_type' => 1,
-        'mailing_recipients_id' => 1
+        'mailing_recipients_id' => 1,
       );
     }
     return $properties;
@@ -399,7 +399,7 @@ class CRM_Mailing_BAO_Query {
       'Complete' => 'Complete',
       'Scheduled' => 'Scheduled',
       'Running' => 'Running',
-      'Canceled' => 'Canceled'
+      'Canceled' => 'Canceled',
     );
     $form->addElement('select', 'mailing_job_status', ts('Mailing Job Status'), $mailingJobStatuses, FALSE);
 

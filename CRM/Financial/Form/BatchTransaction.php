@@ -137,7 +137,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     'type' => 'submit',
           'name' => ts('Search'),
           'isDefault' => TRUE,
-        )
+        ),
       )
     );
 
@@ -189,7 +189,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
           'ref'   => 'disable-action',
           'title' => ts('Assign Transaction'),
           'extra' => 'onclick = "assignRemove( %%id%%,\'' . 'assign' . '\' );"',
-        )
+        ),
       );
     }
     return self::$_links;

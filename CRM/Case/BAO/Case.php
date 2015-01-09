@@ -2698,7 +2698,7 @@ SELECT  id
             1 => $otherCaseId,
             2 => $otherContactDisplayName,
             3 => $mainContactDisplayName,
-            4 => $mainCaseId
+            4 => $mainCaseId,
           )
         );
       }
@@ -2709,7 +2709,7 @@ SELECT  id
             1 => $otherCaseId,
             2 => $otherContactId,
             3 => $mainContactId,
-            4 => $mainCaseId
+            4 => $mainCaseId,
           )
         );
       }
@@ -2902,7 +2902,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
           //need to check activity object specific.
           if (in_array($operation, array(
             'view',
-            'edit'
+            'edit',
           ))
           ) {
             //do we have supper permission.
@@ -2988,7 +2988,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
         'Link Cases',
         'Assign Case Role',
         'Email',
-        'Inbound Email'
+        'Inbound Email',
       );
 
       //do not allow to delete these activities, CRM-4543
@@ -3006,7 +3006,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
         'Reassigned Case',
         'Merge Case',
         'Link Cases',
-        'Assign Case Role'
+        'Assign Case Role',
       );
 
       if (in_array($actTypeName, $singletonNames)) {

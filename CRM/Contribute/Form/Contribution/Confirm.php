@@ -111,7 +111,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       //setting to make available to hook - although seems wrong to set on form for BAO hook availability
       'soft_credit_to' => $softCreditToID,
       'line_item' => $lineItems,
-      'skipLineItem' => CRM_Utils_Array::value('skipLineItem', $params, 0)
+      'skipLineItem' => CRM_Utils_Array::value('skipLineItem', $params, 0),
     );
     if (!$online && isset($params['thankyou_date'])) {
       $contributionParam['thankyou_date'] = $params['thankyou_date'];
@@ -403,7 +403,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       foreach (array(
                  'phone',
                  'email',
-                 'address'
+                 'address',
                ) as $blk) {
         if (isset($this->_params[$blk])) {
           unset($this->_params[$blk]);
@@ -613,7 +613,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         foreach ($contact[$name] as $fieldName => $fieldValue) {
           if (is_array($fieldValue) && !in_array($this->_fields[$name][$fieldName]['html_type'], array(
               'Multi-Select',
-              'AdvMulti-Select'
+              'AdvMulti-Select',
             ))
           ) {
             foreach ($fieldValue as $key => $value) {
@@ -639,7 +639,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         elseif (in_array($name, array(
             'addressee',
             'email_greeting',
-            'postal_greeting'
+            'postal_greeting',
           )) && !empty($contact[$name . '_custom'])
         ) {
           $defaults[$name . '_custom'] = $contact[$name . '_custom'];
@@ -782,7 +782,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           elseif (!(strstr($fld, '-'))) {
             if (in_array($fld, array(
               'contribution_campaign_id',
-              'member_campaign_id'
+              'member_campaign_id',
             ))) {
               $fld = 'campaign_id';
             }
@@ -1194,7 +1194,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           'cost' => $productDAO->cost,
           'currency' => $productDAO->currency,
           'financial_type_id' => $params['financial_type_id'],
-          'contributionId' => $contribution->id
+          'contributionId' => $contribution->id,
         );
         CRM_Core_BAO_FinancialTrxn::createPremiumTrxn($trxnParams);
       }
@@ -1752,7 +1752,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
                  'pcp_display_in_roll',
                  'pcp_roll_nickname',
                  'pcp_personal_note',
-                 'amount'
+                 'amount',
                ) as $val) {
         if (!empty($params[$val])) {
           $contributionSoftParams[$val] = $params[$val];
@@ -1797,7 +1797,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
                'pcp_display_in_roll',
                'pcp_is_anonymous',
                'pcp_roll_nickname',
-               'pcp_personal_note'
+               'pcp_personal_note',
              ) as $val) {
       if (!empty($params[$val])) {
         $page->assign($val, $params[$val]);
@@ -1994,7 +1994,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       else {
         $params['is_pay_later'] = civicrm_api3('contribution_page', 'getvalue', array(
           'id' => $id,
-          'return' => 'is_pay_later'
+          'return' => 'is_pay_later',
         ));
       }
     }

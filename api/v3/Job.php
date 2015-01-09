@@ -213,7 +213,7 @@ function _civicrm_api3_job_send_reminder(&$params) {
   // as it is calling the api fn to set the filters - update getfields to reflect
   $params['id'] = array(
     'type' => CRM_Utils_Type::T_INT,
-    'title' => 'Action Schedule ID'
+    'title' => 'Action Schedule ID',
   );
 }
 /**
