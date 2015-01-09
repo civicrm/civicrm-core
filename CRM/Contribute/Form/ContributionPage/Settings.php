@@ -144,14 +144,24 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     // is on behalf of an organization ?
     $this->addElement('checkbox', 'is_organization', ts('Allow individuals to contribute and / or signup for membership on behalf of an organization?'), NULL, array('onclick' => "showHideByValue('is_organization',true,'for_org_text','table-row','radio',false);showHideByValue('is_organization',true,'for_org_option','table-row','radio',false);"));
 
-    $allowCoreTypes = array_merge(array('Contact', 'Organization'), CRM_Contact_BAO_ContactType::subTypes('Organization'));
-    $allowSubTypes = array();
-    $entities = array(
-      array(
-        'entity_name' => 'contact_1',
-        'entity_type' => 'OrganizationModel',
-      ),
+    //CRM-15787 - If applicable, register 'membership_1'
+    $member = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
+    $allowMemberCoreTypes = '';
+
+    $entities[] = array(
+      'entity_name' => array ('contact_1'),
+      'entity_type' => 'OrganizationModel',
     );
+
+    if ($member && $member['is_active']) {
+      $allowMemberCoreTypes = 'Membership';
+      $entities[] = array(
+        'entity_name' => array ('membership_1'),
+        'entity_type' => 'MembershipModel',
+      );
+    }
+    $allowCoreTypes = array_merge(array('Contact', 'Organization', $allowMemberCoreTypes), CRM_Contact_BAO_ContactType::subTypes('Organization'));
+    $allowSubTypes = array();
 
     $this->addProfileSelector('onbehalf_profile_id', ts('Organization Profile'), $allowCoreTypes, $allowSubTypes, $entities);
 
