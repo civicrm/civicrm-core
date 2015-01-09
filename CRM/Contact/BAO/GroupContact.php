@@ -176,7 +176,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *
    * @param string $method
    * @param string $status
-   * @param null $tracking
+   * @param NULL $tracking
    *
    * @return array             (total, removed, notRemoved) count of contacts removed to group
    * @static
@@ -462,7 +462,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @static
    */
   public static function getMembershipDetail($contactId, $groupID, $method = 'Email') {
-    $leftJoin = $where = $orderBy = null;
+    $leftJoin = $where = $orderBy = NULL;
 
     if ($method) {
       //CRM-13341 add group_id clause
@@ -717,7 +717,7 @@ AND       group_id IN ( $groupIDString )
    *   The id of the group.
    * @param string $method
    * @param string $status
-   * @param null $tracking
+   * @param NULL $tracking
    *
    * @return array             (total, added, notAdded) count of contacts added to group
    * @static

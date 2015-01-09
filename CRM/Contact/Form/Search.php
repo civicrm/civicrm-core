@@ -668,7 +668,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $selector = new self::$_selectorName(
         $this->_params,
         $this->_action,
-        null, false, null,
+        NULL, false, NULL,
         "search", "advanced"
       );
     }
@@ -810,9 +810,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $selector = new  self::$_selectorName (
           $this->_params,
           $this->_action,
-          null,
+          NULL,
           false,
-          null,
+          NULL,
           "search",
           "advanced"
         );
@@ -851,7 +851,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * @return null
+   * @return NULL
    */
   public function &returnProperties() {
     return CRM_Core_DAO::$_nullObject;

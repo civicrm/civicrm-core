@@ -49,7 +49,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return object     CRM_Core_DAO_Mapping object on success, otherwise null
+   * @return object     CRM_Core_DAO_Mapping object on success, otherwise NULL
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -100,7 +100,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param array $params
    *   An array of name/value pairs.
    *
-   * @return object    CRM_Core_DAO_Mapper object on success, otherwise null
+   * @return object    CRM_Core_DAO_Mapper object on success, otherwise NULL
    * @static
    */
   public static function add($params) {
@@ -248,7 +248,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param int $columnNo
    * @param int $blockCount
    *   (no of blocks shown).
-   * @param null $exportMode
+   * @param NULL $exportMode
    *
    * @return void
    * @static
@@ -1156,7 +1156,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param int $mappingId
    *   Mapping id.
    *
-   * @return null
+   * @return NULL
    * @static
    */
   public static function saveMappingFields(&$params, $mappingId) {

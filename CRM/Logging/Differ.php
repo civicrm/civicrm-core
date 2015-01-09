@@ -73,7 +73,7 @@ class CRM_Logging_Differ {
    *
    * @return array
    */
-  public function diffsInTable($table, $contactID = null) {
+  public function diffsInTable($table, $contactID = NULL) {
     $diffs = array();
 
     $params = array(

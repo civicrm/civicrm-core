@@ -299,7 +299,7 @@ class CRM_Core_Invoke {
             $addSequence = $addSequence ? 'true' : 'false';
             unset($pageArgs['addSequence']);
           }
-          $object = new $item['page_callback'] ($title, true, $mode, null, $addSequence);
+          $object = new $item['page_callback'] ($title, true, $mode, NULL, $addSequence);
         }
         else {
           CRM_Core_Error::fatal();

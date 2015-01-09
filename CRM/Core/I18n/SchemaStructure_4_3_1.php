@@ -38,7 +38,7 @@ class CRM_Core_I18n_SchemaStructure_4_3_1
    */
   public static function &columns()
   {
-    static $result = null;
+    static $result = NULL;
     if (!$result) {
       $result = array(
         'civicrm_location_type' => array(
@@ -192,7 +192,7 @@ class CRM_Core_I18n_SchemaStructure_4_3_1
    */
   public static function &indices()
   {
-    static $result = null;
+    static $result = NULL;
     if (!$result) {
       $result = array(
         'civicrm_custom_group' => array(
@@ -234,7 +234,7 @@ class CRM_Core_I18n_SchemaStructure_4_3_1
    */
   public static function &tables()
   {
-    static $result = null;
+    static $result = NULL;
     if (!$result) {
       $result = array_keys(self::columns());
     }

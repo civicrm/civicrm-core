@@ -80,7 +80,7 @@ class CRM_Core_BAO_SchemaHandler {
     if ($config->logging) {
       // logging support
       $logging = new CRM_Logging_Schema;
-      $logging->fixSchemaDifferencesFor($params['name'], null, FALSE);
+      $logging->fixSchemaDifferencesFor($params['name'], NULL, FALSE);
     }
 
     // always do a trigger rebuild for this table
@@ -164,7 +164,7 @@ class CRM_Core_BAO_SchemaHandler {
    * @param $separator
    * @param $prefix
    *
-   * @return null|string
+   * @return NULL|string
    */
   public static function buildPrimaryKeySQL(&$params, $separator, $prefix) {
     $sql = NULL;
@@ -183,7 +183,7 @@ class CRM_Core_BAO_SchemaHandler {
    * @param $prefix
    * @param bool $indexExist
    *
-   * @return null|string
+   * @return NULL|string
    */
   public static function buildSearchIndexSQL(&$params, $separator, $prefix, $indexExist = FALSE) {
     $sql = NULL;
@@ -277,7 +277,7 @@ ALTER TABLE {$tableName}
    * @param $prefix
    * @param string $tableName
    *
-   * @return null|string
+   * @return NULL|string
    */
   public static function buildForeignKeySQL(&$params, $separator, $prefix, $tableName) {
     $sql = NULL;
