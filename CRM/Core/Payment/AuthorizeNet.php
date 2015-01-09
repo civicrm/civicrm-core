@@ -66,36 +66,6 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
-   * Singleton function used to manage this object
-   *
-   * @param string $mode
-   *   The mode of operation: live or test.
-   * @param array $paymentProcessor
-   *   The details of the payment processor being invoked.
-   * @param CRM_Core_Form $paymentForm
-   *   Reference to the form object if available.
-   * @param bool $force
-   *   Should we force a reload of this payment object.
-   *
-   * @return object
-   * @static
-   *
-   */
-  public static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
-    if (!empty($paymentProcessor['id'])) {
-      $cacheKey = $paymentProcessor['id'];
-    }
-    else {
-      //@todo eliminated instances of this in favour of id-specific instances.
-      $cacheKey = $mode . '_' . $paymentProcessor['name'];
-    }
-    if (!isset(self::$_singleton[$cacheKey]) || self::$_singleton[$cacheKey] === NULL) {
-      self::$_singleton[$cacheKey] = new CRM_Core_Payment_AuthorizeNet($mode, $paymentProcessor);
-    }
-    return self::$_singleton[$cacheKey];
-  }
-
-  /**
    * Should the first payment date be configurable when setting up back office recurring payments
    * In the case of Authorize.net this is an option
    * @return bool

@@ -25,6 +25,7 @@
  +--------------------------------------------------------------------+
 */
 
+use Civi\Payment\System;
 /**
  *
  * @package CRM
@@ -52,6 +53,7 @@ abstract class CRM_Core_Payment {
    * credit card
    * direct debit
    * or both
+   * @todo create option group - nb omnipay uses a 3rd type - transparent redirect cc
    *
    */
   const
@@ -67,24 +69,13 @@ abstract class CRM_Core_Payment {
     RECURRING_PAYMENT_START = 'START',
     RECURRING_PAYMENT_END = 'END';
 
-  /**
-   * We only need one instance of this object. So we use the singleton
-   * pattern and cache the instance in this variable
-   *
-   * @var object
-   * @static
-   */
-  static private $_singleton = NULL;
-
-  protected $_paymentProcessor;
-
-  /**
-   * @var CRM_Core_Form
-   */
-  protected $_paymentForm = NULL;
+   protected $_paymentProcessor;
 
   /**
    * Singleton function used to manage this object
+   * We will migrate to calling Civi\Payment\System::singleton()->getByProcessor($paymentProcessor)
+   * & Civi\Payment\System::singleton()->getById($paymentProcessor) directly as the main access methods & work
+   * to remove this function all together
    *
    * @param string $mode
    *   The mode of operation: live or test.
@@ -105,39 +96,15 @@ abstract class CRM_Core_Payment {
     if (empty($paymentProcessor)) {
       return CRM_Core_DAO::$_nullObject;
     }
-
-    $cacheKey = "{$mode}_{$paymentProcessor['id']}_" . (int) isset($paymentForm);
-
-    if (!isset(self::$_singleton[$cacheKey]) || $force) {
-      $config = CRM_Core_Config::singleton();
-      $ext = CRM_Extension_System::singleton()->getMapper();
-      if ($ext->isExtensionKey($paymentProcessor['class_name'])) {
-        $paymentClass = $ext->keyToClass($paymentProcessor['class_name'], 'payment');
-        require_once $ext->classToPath($paymentClass);
-      }
-      else {
-        $paymentClass = 'CRM_Core_' . $paymentProcessor['class_name'];
-        if (empty($paymentClass)) {
-          throw new CRM_Core_Exception('no class provided');
-        }
-        require_once str_replace('_', DIRECTORY_SEPARATOR, $paymentClass) . '.php';
-      }
-
-      //load the object.
-      self::$_singleton[$cacheKey] = $paymentClass::singleton($mode, $paymentProcessor);
-    }
-
-    //load the payment form for required processor.
-    //if ($paymentForm !== NULL) {
-    //self::$_singleton[$cacheKey]->setForm($paymentForm);
-    //}
-
-    return self::$_singleton[$cacheKey];
+    //we use two lines because we can't remove the '&singleton' without risking breakage
+    //of extension classes that extend this one
+    $object =  Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
+    return $object;
   }
 
   /**
    * @param array $params
-   *
+   * @todo move to factory class \Civi\Payment\System (or similar)
    * @return mixed
    */
   public static function logPaymentNotification($params) {
@@ -209,7 +176,7 @@ abstract class CRM_Core_Payment {
 
   /**
    * Setter for the payment form that wants to use the processor
-   *
+   * @deprecated
    * @param CRM_Core_Form $paymentForm
    *
    */
@@ -219,7 +186,7 @@ abstract class CRM_Core_Payment {
 
   /**
    * Getter for payment form that is using the processor
-   *
+   * @deprecated
    * @return CRM_Core_Form  A form object
    */
   public function getForm() {
@@ -228,7 +195,7 @@ abstract class CRM_Core_Payment {
 
   /**
    * Getter for accessing member vars
-   *
+   * @todo believe this is unused
    * @param string $name
    *
    * @return null
@@ -239,7 +206,7 @@ abstract class CRM_Core_Payment {
 
   /**
    * Get name for the payment information type
-   *
+   * @todo - use option group + name field (like Omnipay does)
    * @return string
    */
   public function getPaymentTypeName() {
@@ -248,7 +215,7 @@ abstract class CRM_Core_Payment {
 
   /**
    * Get label for the payment information type
-   *
+   * @todo - use option group + labels (like Omnipay does)
    * @return string
    */
   public function getPaymentTypeLabel() {
@@ -448,6 +415,7 @@ abstract class CRM_Core_Payment {
    *
    * @param $component
    *
+   * @return array $params (modified)
    * @throws CRM_Core_Exception
    */
   public function doPayment(&$params, $component) {
@@ -473,7 +441,7 @@ abstract class CRM_Core_Payment {
 
   /**
    * @param $paymentProcessor
-   *
+   * @todo move to paypal class or remover
    * @return bool
    */
   public static function paypalRedirect(&$paymentProcessor) {
@@ -493,6 +461,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * @todo move to0 \Civi\Payment\System factory method
    * Page callback for civicrm/payment/ipn
    */
   public static function handleIPN() {
@@ -511,6 +480,7 @@ abstract class CRM_Core_Payment {
    * Note that processor_id is more reliable as one site may have more than one instance of a
    * processor & ideally the processor will be validating the results
    * Load requested payment processor and call that processor's handle<$method> method
+   * @todo move to0 \Civi\Payment\System factory method
    *
    * @param $method
    * @param array $params
@@ -579,7 +549,7 @@ abstract class CRM_Core_Payment {
       }
 
       // Instantiate PP
-      $processorInstance = $paymentClass::singleton($mode, $paymentProcessor);
+      $processorInstance = new $paymentClass($mode, $paymentProcessor);
 
       // Does PP implement this method, and can we call it?
       if (!method_exists($processorInstance, $method) ||

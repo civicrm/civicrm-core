@@ -47,33 +47,6 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
     $this->_processorName = ts('PayJunction');
   }
 
-  /**
-   * Singleton function used to manage this object
-   *
-   * @param string $mode
-   *   The mode of operation: live or test.
-   *
-   * @param object $paymentProcessor
-   * @param null $paymentForm
-   * @param bool $force
-   *
-   * @return object
-   * @static
-   */
-  public static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
-    if (!empty($paymentProcessor['id'])) {
-      $cacheKey = $paymentProcessor['id'];
-    }
-    else {
-      //@todo eliminated instances of this in favour of id-specific instances.
-      $cacheKey = $mode . '_' . $paymentProcessor['name'];
-    }
-    if (self::$_singleton[$cacheKey] === NULL) {
-      self::$_singleton[$cacheKey] = new CRM_Core_Payment_PayJunction($mode, $paymentProcessor);
-    }
-    return self::$_singleton[$cacheKey];
-  }
-
   /*
    * This function sends request and receives response from
    * PayJunction payment process

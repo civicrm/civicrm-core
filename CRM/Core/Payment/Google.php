@@ -76,31 +76,6 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
   }
 
   /**
-   * Singleton function used to manage this object
-   *
-   * @param string $mode
-   *   The mode of operation: live or test.
-   *
-   * @param object $paymentProcessor
-   *
-   * @return object
-   * @static
-   */
-  public static function &singleton($mode, &$paymentProcessor) {
-    if (!empty($paymentProcessor['id'])) {
-      $cacheKey = $paymentProcessor['id'];
-    }
-    else {
-      //@todo eliminated instances of this in favour of id-specific instances.
-      $cacheKey = $mode . '_' . $paymentProcessor['name'];
-    }
-    if (!isset(self::$_singleton[$cacheKey]) || self::$_singleton[$cacheKey] === NULL) {
-      self::$_singleton[$cacheKey] = new CRM_Core_Payment_Google($mode, $paymentProcessor);
-    }
-    return self::$_singleton[$cacheKey];
-  }
-
-  /**
    * This function checks to see if we have the right config values
    *
    * @return string the error message if any

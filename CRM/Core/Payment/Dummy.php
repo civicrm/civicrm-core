@@ -58,33 +58,6 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   }
 
   /**
-   * Singleton function used to manage this object
-   *
-   * @param string $mode
-   *   The mode of operation: live or test.
-   *
-   * @param object $paymentProcessor
-   * @param null $paymentForm
-   * @param bool $force
-   *
-   * @return object
-   * @static
-   */
-  public static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
-    if (!empty($paymentProcessor['id'])) {
-      $cacheKey = $paymentProcessor['id'];
-    }
-    else {
-      //@todo eliminated instances of this in favour of id-specific instances.
-      $cacheKey = $mode . '_' . $paymentProcessor['name'];
-    }
-    if (CRM_Utils_Array::value($cacheKey, self::$_singleton) === NULL) {
-      self::$_singleton[$cacheKey] = new CRM_Core_Payment_Dummy($mode, $paymentProcessor);
-    }
-    return self::$_singleton[$cacheKey];
-  }
-
-  /**
    * Submit a payment using Advanced Integration Method
    *
    * @param array $params
