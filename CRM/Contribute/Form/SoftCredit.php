@@ -48,8 +48,8 @@ class CRM_Contribute_Form_SoftCredit {
    */
   static function buildQuickForm(&$form) {
     $prefix = 'soft_credit_';
-    // by default generate 5 blocks
-    $item_count = 6;
+    // by default generate 19 blocks
+    $item_count = 20;
 
     $showSoftCreditRow = 2;
     $showCreateNew = TRUE;
