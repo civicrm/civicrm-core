@@ -87,8 +87,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $group,
     $name,
     $componentID = NULL,
-    $contactID   = NULL,
-    $load        = FALSE,
+    $contactID = NULL,
+    $load = FALSE,
     $domainID = NULL,
     $force = FALSE
   ) {
@@ -165,9 +165,9 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    */
   static function dao(
     $group,
-    $name        = NULL,
+    $name = NULL,
     $componentID = NULL,
-    $contactID   = NULL,
+    $contactID = NULL,
     $domainID = NULL
   ) {
     if (self::isUpgradeFromPreFourOneAlpha1()) {
@@ -179,11 +179,11 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
     $dao = new CRM_Core_DAO_Setting();
 
-    $dao->group_name   = $group;
-    $dao->name         = $name;
+    $dao->group_name = $group;
+    $dao->name = $name;
     $dao->component_id = $componentID;
     if (empty($domainID)) {
-      $dao->domain_id    = CRM_Core_Config::domainID();
+      $dao->domain_id  = CRM_Core_Config::domainID();
     }
     else {
       $dao->domain_id = $domainID;
@@ -221,11 +221,11 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    */
   static function getItem(
     $group,
-    $name         = NULL,
-    $componentID  = NULL,
+    $name = NULL,
+    $componentID = NULL,
     $defaultValue = NULL,
-    $contactID    = NULL,
-    $domainID     = NULL
+    $contactID = NULL,
+    $domainID = NULL
   ) {
 
     if (NULL !== ($override = self::getOverride($group, $name, NULL))) {
@@ -352,9 +352,9 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $group,
     $name,
     $componentID = NULL,
-    $contactID   = NULL,
-    $createdID   = NULL,
-    $domainID    = NULL
+    $contactID = NULL,
+    $createdID = NULL,
+    $domainID = NULL
   ) {
     $fields = array();
     $fieldsToSet = self::validateSettingsInput(array($name => $value), $fields);
@@ -387,9 +387,9 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $group,
     $name,
     $componentID = NULL,
-    $contactID   = NULL,
-    $createdID   = NULL,
-    $domainID    = NULL
+    $contactID = NULL,
+    $createdID = NULL,
+    $domainID = NULL
   ) {
     if (empty($domainID)) {
       $domainID = CRM_Core_Config::domainID();
@@ -837,12 +837,12 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   static function valueOptions(
     $group,
     $name,
-    $system              = TRUE,
-    $userID              = NULL,
-    $localize            = FALSE,
-    $returnField         = 'name',
+    $system = TRUE,
+    $userID = NULL,
+    $localize = FALSE,
+    $returnField = 'name',
     $returnNameANDLabels = FALSE,
-    $condition           = NULL
+    $condition = NULL
   ) {
     $optionValue = self::getItem($group, $name);
 
@@ -897,8 +897,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $group,
     $name,
     $value,
-    $system   = TRUE,
-    $userID   = NULL,
+    $system = TRUE,
+    $userID = NULL,
     $keyField = 'name'
   ) {
     if (empty($value)) {

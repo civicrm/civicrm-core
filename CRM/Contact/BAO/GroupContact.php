@@ -136,8 +136,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   static function addContactsToGroup(
     $contactIds,
     $groupId,
-    $method   = 'Admin',
-    $status   = 'Added',
+    $method = 'Admin',
+    $status = 'Added',
     $tracking = NULL
   ) {
 
@@ -187,8 +187,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   static function removeContactsFromGroup(
     &$contactIds,
     $groupId,
-    $method   = 'Admin',
-    $status   = 'Removed',
+    $method = 'Admin',
+    $status = 'Removed',
     $tracking = NULL
   ) {
     if (!is_array($contactIds)) {
@@ -214,8 +214,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
 
     foreach ($contactIds as $contactId) {
       if ($status == 'Deleted') {
-        $query         = "DELETE FROM civicrm_group_contact WHERE contact_id=$contactId AND group_id=$groupId";
-        $dao           = CRM_Core_DAO::executeQuery($query);
+        $query = "DELETE FROM civicrm_group_contact WHERE contact_id=$contactId AND group_id=$groupId";
+        $dao = CRM_Core_DAO::executeQuery($query);
         $historyParams = array(
           'group_id' => $groupId,
           'contact_id' => $contactId,
@@ -290,8 +290,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
     $select = $from = $where = '';
 
     $select = 'SELECT DISTINCT civicrm_group.id, civicrm_group.title ';
-    $from   = ' FROM civicrm_group ';
-    $where  = " WHERE civicrm_group.is_active = 1 ";
+    $from = ' FROM civicrm_group ';
+    $where = " WHERE civicrm_group.is_active = 1 ";
     if ($contactId) {
       $from .= ' , civicrm_group_contact ';
       $where .= " AND civicrm_group.id = civicrm_group_contact.group_id
@@ -343,13 +343,13 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    */
   static function &getContactGroup(
     $contactId,
-    $status           = NULL,
-    $numGroupContact  = NULL,
-    $count            = FALSE,
+    $status = NULL,
+    $numGroupContact = NULL,
+    $count = FALSE,
     $ignorePermission = FALSE,
     $onlyPublicGroups = FALSE,
-    $excludeHidden    = TRUE,
-    $groupId          = NULL
+    $excludeHidden = TRUE,
+    $groupId = NULL
   ) {
     if ($count) {
       $select = 'SELECT count(DISTINCT civicrm_group_contact.id)';
@@ -734,8 +734,8 @@ AND       group_id IN ( $groupIDString )
   static function bulkAddContactsToGroup(
     $contactIDs,
     $groupID,
-    $method   = 'Admin',
-    $status   = 'Added',
+    $method = 'Admin',
+    $status = 'Added',
     $tracking = NULL
   ) {
 
