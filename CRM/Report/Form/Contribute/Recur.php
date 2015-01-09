@@ -85,7 +85,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
           'total_amount' => array(
             'title' => ts('Amount Contributed to Date'),
             'statistics' => array(
-              'sum' => ts("Total Amount Contributed")
+              'sum' => ts("Total Amount Contributed"),
             ),
           ),
         ),
@@ -200,10 +200,10 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
             'title' => ts('Calculated end date (either end date or date all installments will be made)'),
             'description' => "does this work?",
             'operatorType' => CRM_Report_Form::OP_DATE,
-            'pseudofield' => TRUE
+            'pseudofield' => TRUE,
           ),
         ),
-      )
+      ),
     );
     $this->_currencyColumn = 'civicrm_contribution_recur_currency';
     parent::__construct();

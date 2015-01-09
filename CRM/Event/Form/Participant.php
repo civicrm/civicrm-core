@@ -647,7 +647,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'select' => array('minimumInputLength' => 0),
       'api' => array(
         'extra' => array('campaign_id', 'default_role_id', 'event_type_id'),
-      )
+      ),
     );
 
     if ($this->_mode) {
@@ -752,7 +752,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $path = CRM_Utils_System::currentPath();
     $excludeForPaths = array(
       'civicrm/contact/search',
-      'civicrm/group/search'
+      'civicrm/group/search',
     );
     if (!in_array($path, $excludeForPaths)) {
       $buttons[] = array(

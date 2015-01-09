@@ -203,7 +203,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
             CRM_Core_Error::statusBounce(ts("You can not add another '%1' activity to this case. %2",
                 array(
                   1 => $this->_activityTypeName,
-                  2 => "Do you want to <a href='$editUrl'>edit the existing activity</a> ?"
+                  2 => "Do you want to <a href='$editUrl'>edit the existing activity</a> ?",
                 )
               ),
               $url
@@ -282,7 +282,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       unset($aTypes[$openCaseID]);
       asort($aTypes);
       $this->_fields['followup_activity_type_id']['attributes'] = array(
-          '' => '- select activity type -'
+          '' => '- select activity type -',
         ) + $aTypes;
     }
 
@@ -405,7 +405,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
       $tagParams = array(
         'entity_table' => 'civicrm_activity',
-        'entity_id' => $this->_activityId
+        'entity_id' => $this->_activityId,
       );
       CRM_Core_BAO_EntityTag::del($tagParams);
 
@@ -706,7 +706,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
           1 => $this->_activityTypeName,
           2 => $recordStatus,
           3 => $followupStatus,
-          4 => $mailStatus
+          4 => $mailStatus,
         )
       ), 'info');
     }

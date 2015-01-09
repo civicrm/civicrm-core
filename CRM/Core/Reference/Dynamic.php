@@ -74,7 +74,7 @@ EOS;
       'type' => get_class($this),
       'table' => $this->getReferenceTable(),
       'key' => $this->getReferenceKey(),
-      'count' => CRM_Core_DAO::singleValueQuery($sql, $params)
+      'count' => CRM_Core_DAO::singleValueQuery($sql, $params),
     );
   }
 

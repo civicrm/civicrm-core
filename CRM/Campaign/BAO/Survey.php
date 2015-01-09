@@ -669,7 +669,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
         'status_id' => $activity->status_id,
         'interviewer_id' => $activity->interviewer_id,
         'result' => $activity->result,
-        'activity_date_time' => $activity->activity_date_time
+        'activity_date_time' => $activity->activity_date_time,
       );
     }
 

@@ -81,7 +81,7 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
           array(
             1 => $activityTypes[$subTypeId],
             2 => CRM_Utils_System::url('civicrm/admin/custom/group', 'action=add&reset=1'),
-            3 => '_blank'
+            3 => '_blank',
           )
         )
       );

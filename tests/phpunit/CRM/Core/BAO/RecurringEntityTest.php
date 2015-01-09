@@ -72,7 +72,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
       'repetition_frequency_unit' => 'month',
       'repetition_frequency_interval' => 3,
       'start_action_offset' => 5,
-      'used_for'            => 'activity'
+      'used_for'            => 'activity',
     );
 
     $generatedEntities = $recursion->generate();
@@ -82,7 +82,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
       '20141227103000',
       '20150328103000',
       '20150627103000',
-      '20150926103000'
+      '20150926103000',
     );
     foreach ($generatedEntities['civicrm_activity'] as $entityID) {
       $this->assertDBNotNull('CRM_Activity_DAO_Activity', $entityID, 'id',
@@ -146,7 +146,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
       'repetition_frequency_unit'     => 'week',
       'repetition_frequency_interval' => 1,
       'start_action_offset'           => 4,
-      'used_for'                      => 'event'
+      'used_for'                      => 'event',
     );
 
     $recursion->linkedEntities = array(
@@ -154,7 +154,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
         'table'         => 'civicrm_tell_friend',
         'findCriteria'  => array(
           'entity_id'    => $recursion->entity_id,
-          'entity_table' => 'civicrm_event'
+          'entity_table' => 'civicrm_event',
         ),
         'linkedColumns' => array('entity_id'),
         'isRecurringEntityRecord' => TRUE,
@@ -169,7 +169,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
       '20141027103000' => '20141029103000',
       '20141103103000' => '20141105103000',
       '20141110103000' => '20141112103000',
-      '20141117103000' => '20141119103000'
+      '20141117103000' => '20141119103000',
     );
 
     $this->assertCount($recursion->schedule['start_action_offset'], $generatedEntities['civicrm_event'], 'Check if the number of events created are right');
@@ -214,22 +214,22 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     //Cross check event exists before we test deletion
     $searchParamsEventBeforeDelete = array(
       'entity_id'    => $generatedEntities['civicrm_event'][$key],
-      'entity_table' => 'civicrm_event'
+      'entity_table' => 'civicrm_event',
     );
     $expectedValuesEventBeforeDelete = array(
       'entity_id'    => $generatedEntities['civicrm_event'][$key],
-      'entity_table' => 'civicrm_event'
+      'entity_table' => 'civicrm_event',
     );
     $this->assertDBCompareValues('CRM_Core_DAO_RecurringEntity', $searchParamsEventBeforeDelete, $expectedValuesEventBeforeDelete);
 
     //Cross check event exists before we test deletion
     $searchParamsTellAFriendBeforeDelete = array(
       'entity_id'    => $generatedEntities['civicrm_tell_friend'][$actKey],
-      'entity_table' => 'civicrm_tell_friend'
+      'entity_table' => 'civicrm_tell_friend',
     );
     $expectedValuesTellAFriendBeforeDelete = array(
       'entity_id'    => $generatedEntities['civicrm_tell_friend'][$actKey],
-      'entity_table' => 'civicrm_tell_friend'
+      'entity_table' => 'civicrm_tell_friend',
     );
     $this->assertDBCompareValues('CRM_Core_DAO_RecurringEntity', $searchParamsTellAFriendBeforeDelete, $expectedValuesTellAFriendBeforeDelete);
 
@@ -245,7 +245,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $this->assertDBNull('CRM_Event_DAO_Event', $generatedEntities['civicrm_event'][$key], 'id', 'id', 'Check if event was deleted');
     $searchParams = array(
       'entity_id' => $generatedEntities['civicrm_event'][$key],
-      'entity_table' => 'civicrm_event'
+      'entity_table' => 'civicrm_event',
     );
     $compareParams = array();
     $this->assertDBCompareValues('CRM_Core_DAO_RecurringEntity', $searchParams, $compareParams);
@@ -253,7 +253,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     //Find tell_a_friend id if that was deleted from civicrm
     $searchActParams = array(
       'entity_id' => $generatedEntities['civicrm_tell_friend'][$actKey],
-      'entity_table' => 'civicrm_tell_friend'
+      'entity_table' => 'civicrm_tell_friend',
     );
     $compareActParams = array();
     $this->assertDBCompareValues('CRM_Friend_DAO_Friend', $searchActParams, $compareActParams);

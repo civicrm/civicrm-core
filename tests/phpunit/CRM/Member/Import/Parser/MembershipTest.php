@@ -72,7 +72,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'visibility' => 'Public',
       'is_active' => 1,
       'fixed_period_start_day' => 101,
-      'fixed_period_rollover_day' => 1231
+      'fixed_period_rollover_day' => 1231,
     );
     $ids = array();
     $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);

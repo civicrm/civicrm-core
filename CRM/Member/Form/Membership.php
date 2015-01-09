@@ -426,7 +426,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       if ($buildPriceSet) {
         $this->add('select', 'price_set_id', ts('Choose price set'),
           array(
-            '' => ts('Choose price set')
+            '' => ts('Choose price set'),
           ) + $priceSets,
           NULL, array('onchange' => "buildAmount( this.value );")
         );
@@ -553,7 +553,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
                          'id',
                          'auto_renew',
                          'duration_unit',
-                         'duration_interval'
+                         'duration_interval',
                        ) as $fld) {
                 $this->_recurMembershipTypes[$recurMembershipTypes->id][$fld] = $recurMembershipTypes->$fld;
               }
@@ -652,7 +652,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         foreach ($statusNames as $val => $name) {
           if (in_array($name, array(
             'In Progress',
-            'Overdue'
+            'Overdue',
           ))
           ) {
             continue;
@@ -1645,7 +1645,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       foreach ($membershipTypes as $memType => $membershipType) {
         $statusMsg[$memType] = ts('%1 membership for %2 has been added.', array(
           1 => $membershipType,
-          2 => $this->_memberDisplayName
+          2 => $this->_memberDisplayName,
         ));
 
         $membership = $createdMemberships[$memType];
@@ -1859,7 +1859,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         'PDFFilename' => ts('receipt') . '.pdf',
         'isEmailPdf' => $isEmailPdf,
         'contributionId' => $formValues['contribution_id'],
-        'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW)
+        'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW),
       )
     );
 

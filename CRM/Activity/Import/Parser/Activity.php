@@ -82,7 +82,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       'activity_label' => array(
         'title' => ts('Activity Type Label'),
         'headerPattern' => '/(activity.)?type label?/i',
-      )
+      ),
     ));
 
     foreach ($fields as $name => $field) {

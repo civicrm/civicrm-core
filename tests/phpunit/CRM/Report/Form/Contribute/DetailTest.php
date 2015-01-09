@@ -63,7 +63,7 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
         ),
         'fixtures/dataset-ascii.sql',
         'fixtures/report-ascii.csv',
-      )
+      ),
     );
   }
 

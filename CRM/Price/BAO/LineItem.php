@@ -506,7 +506,7 @@ AND li.entity_id = {$entityId}
           'unit_price' => $totalAmount,
           'line_total' => $totalAmount,
           'financial_type_id' => $financialType,
-          'membership_type_id' => $values['membership_type_id']
+          'membership_type_id' => $values['membership_type_id'],
         );
         break;
       }

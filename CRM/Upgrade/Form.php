@@ -501,7 +501,7 @@ SET    version = '$version'
                array(
                  1 => $minPhpVersion,
                  2 => $phpVersion,
-                 3 => $latestVer
+                 3 => $latestVer,
                ));
     }
 
@@ -514,7 +514,7 @@ SET    version = '$version'
     if (CRM_Core_DAO::getGlobalSetting('thread_stack', 0) < (1024 * self::MINIMUM_THREAD_STACK)) {
       $error = ts('CiviCRM %1 requires MySQL thread stack >= %2k', array(
         1 => $latestVer,
-        2 => self::MINIMUM_THREAD_STACK
+        2 => self::MINIMUM_THREAD_STACK,
       ));
     }
 

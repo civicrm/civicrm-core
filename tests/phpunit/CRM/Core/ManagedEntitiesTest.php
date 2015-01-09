@@ -180,7 +180,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
 
     // create first managed entity ('foo')
     $decls[] = array_merge($this->fixtures['com.example.one-foo'], array(
-      'cleanup' => 'never'
+      'cleanup' => 'never',
     ));
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
@@ -209,7 +209,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
 
     // create first managed entity ('foo')
     $decls[] = array_merge($this->fixtures['com.example.one-foo'], array(
-      'cleanup' => 'unused'
+      'cleanup' => 'unused',
     ));
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
@@ -224,7 +224,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
           'name' => 'mock',
           'type' => 'mock',
           'count' => 1,
-        )
+        ),
       ));
     });
 

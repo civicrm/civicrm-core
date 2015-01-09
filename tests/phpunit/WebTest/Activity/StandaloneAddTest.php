@@ -169,7 +169,7 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     $triggerElement = array('name' => 'activity_type_id', 'type' => 'select');
     $customSets = array(
       array('entity' => 'Activity', 'subEntity' => 'Interview', 'triggerElement' => $triggerElement),
-      array('entity' => 'Activity', 'subEntity' => 'Meeting', 'triggerElement' => $triggerElement)
+      array('entity' => 'Activity', 'subEntity' => 'Meeting', 'triggerElement' => $triggerElement),
     );
 
     $pageUrl = array('url' => 'activity', 'args' => 'reset=1&action=add&context=standalone');

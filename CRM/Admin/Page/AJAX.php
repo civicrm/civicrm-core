@@ -102,7 +102,7 @@ class CRM_Admin_Page_AJAX {
             $comps = array(
               'Event' => 'civicrm_event',
               'Contribution' => 'civicrm_contribution_page',
-              'EventTemplate' => 'civicrm_event_template'
+              'EventTemplate' => 'civicrm_event_template',
             );
             $contexts = array();
             foreach ($comps as $name => $table) {

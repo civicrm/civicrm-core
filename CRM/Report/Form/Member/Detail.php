@@ -111,7 +111,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'title' => ts('Last Name, First Name'),
             'default' => '1',
             'default_weight' => '0',
-            'default_order' => 'ASC'
+            'default_order' => 'ASC',
           ),
         ),
         'grouping' => 'contact-fields',

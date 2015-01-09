@@ -120,7 +120,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
       'end_action' => 'before',
       'end_date' => 'activity_date_time',
       'body_html' => 'Test description',
-      'subject' => 'Test subject'
+      'subject' => 'Test subject',
     );
     $actionSchedule = $this->callAPISuccess('action_schedule', 'create', $params);
     $this->assertTrue(is_numeric($actionSchedule['id']), "In line " . __LINE__);

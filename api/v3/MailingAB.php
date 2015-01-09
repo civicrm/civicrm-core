@@ -223,8 +223,8 @@ function civicrm_api3_mailing_a_b_graph_stats($params) {
         $graphStats[$name] = array(
           $params['split_count_select'] => array(
             'count' => CRM_Mailing_Event_BAO_Opened::getTotalCount($mailingAB[$column], NULL, TRUE, $toDate),
-            'time' => CRM_Utils_Date::customFormat($toDate)
-          )
+            'time' => CRM_Utils_Date::customFormat($toDate),
+          ),
         );
         break;
       case 'total unique clicks':
@@ -237,8 +237,8 @@ function civicrm_api3_mailing_a_b_graph_stats($params) {
         $graphStats[$name] = array(
           $params['split_count_select'] => array(
             'count' => CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($params['mailing_id'], NULL, FALSE, NULL, $toDate),
-            'time' => CRM_Utils_Date::customFormat($toDate)
-          )
+            'time' => CRM_Utils_Date::customFormat($toDate),
+          ),
         );
         break;
       case 'total clicks on a particular link':
@@ -256,8 +256,8 @@ function civicrm_api3_mailing_a_b_graph_stats($params) {
         $graphStats[$name] = array(
           $params['split_count_select'] => array(
             'count' => CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($params['mailing_id'], NULL, FALSE, $url_id, $toDate),
-            'time' => CRM_Utils_Date::customFormat($toDate)
-          )
+            'time' => CRM_Utils_Date::customFormat($toDate),
+          ),
         );
         break;
     }

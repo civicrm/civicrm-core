@@ -93,7 +93,7 @@ AND        contact_a.is_deleted = 0
 ";
     $params = array(
       1 => array($activityID, 'Integer'),
-      2 => array($recordTypeID, 'Integer')
+      2 => array($recordTypeID, 'Integer'),
     );
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
@@ -130,7 +130,7 @@ AND        civicrm_contact.is_deleted = 0
 ";
     $params = array(
       1 => array($activityID, 'Integer'),
-      2 => array($recordTypeID, 'Integer')
+      2 => array($recordTypeID, 'Integer'),
     );
 
     $dao = CRM_Core_DAO::executeQuery($sql, $params);

@@ -158,14 +158,14 @@ function _civicrm_api3_contribution_create_legacy_support_45(&$params) {
     $params['soft_credit'][] = array(
       'contact_id'          => $params['soft_credit_to'],
       'amount'              => $params['total_amount'],
-      'soft_credit_type_id' => CRM_Core_OptionGroup::getDefaultValue("soft_credit_type")
+      'soft_credit_type_id' => CRM_Core_OptionGroup::getDefaultValue("soft_credit_type"),
     );
   }
   if (!empty($params['honor_contact_id'])) {
     $params['soft_credit'][] = array(
       'contact_id'          => $params['honor_contact_id'],
       'amount'              => $params['total_amount'],
-      'soft_credit_type_id' => CRM_Utils_Array::value('honor_type_id', $params, CRM_Core_OptionGroup::getValue('soft_credit_type', 'in_honor_of', 'name'))
+      'soft_credit_type_id' => CRM_Utils_Array::value('honor_type_id', $params, CRM_Core_OptionGroup::getValue('soft_credit_type', 'in_honor_of', 'name')),
     );
   }
 }
@@ -381,7 +381,7 @@ function civicrm_api3_contribution_sendconfirmation($params) {
 function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
   $params['id'] = array(
     'api.required' => 1,
-    'title' => 'Contribution ID'
+    'title' => 'Contribution ID',
   );
   $params['receipt_from_email'] = array(
     'api.required' => 1,

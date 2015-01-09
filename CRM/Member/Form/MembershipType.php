@@ -322,7 +322,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
         'fixed_period_start_day',
         'fixed_period_rollover_day',
         'month_fixed_period_rollover_day',
-        'max_related'
+        'max_related',
       );
 
       $params = $ids = array();

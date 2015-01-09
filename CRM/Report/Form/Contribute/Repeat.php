@@ -503,7 +503,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
             $erorrGrps = implode(',', $invlidGroups);
             $tempErrors[] = ts("Do not select field %1 with Group by %2.", array(
                 1 => $idMapping[$fld_id],
-                2 => $erorrGrps
+                2 => $erorrGrps,
               ));
           }
         }
@@ -623,7 +623,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2
       $contact_sums[$dao->contact_id] =
         array(
           'contribution1_total_amount_sum' => $dao->contribution1_total_amount_sum,
-          'contribution2_total_amount_sum' => $dao->contribution2_total_amount_sum
+          'contribution2_total_amount_sum' => $dao->contribution2_total_amount_sum,
         );
     }
 

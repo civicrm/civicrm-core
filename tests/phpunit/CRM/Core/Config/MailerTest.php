@@ -60,7 +60,7 @@ class CRM_Core_Config_MailerTest extends CiviUnitTestCase {
       $test->calls['send']++;
       $test->assertEquals(array('to@example.org'), $recipients);
       $test->assertEquals('Subject Example', $headers['Subject']);
-    }
+    },
     ));
 
     CRM_Utils_Hook::singleton()->setHook('civicrm_alterMailer',

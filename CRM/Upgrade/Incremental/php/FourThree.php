@@ -516,7 +516,7 @@ AND       ceft.entity_table = 'civicrm_contribution'
     $queryParams = array(
       1 => array($completedStatus, 'Integer'),
       2 => array($pendingStatus, 'Integer'),
-      3 => array($cancelledStatus, 'Integer')
+      3 => array($cancelledStatus, 'Integer'),
     );
 
     $accountType = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name = 'Asset' "));
@@ -872,7 +872,7 @@ WHERE     cc.contact_type = 'Organization' AND cc.organization_name = %1
           'display_name' => $dao->name,
           'legal_name' => $dao->name,
           'organization_name' => $dao->name,
-          'contact_type' => 'Organization'
+          'contact_type' => 'Organization',
         );
         $contact = CRM_Contact_BAO_Contact::add($params);
         $contactID = $contact->id;

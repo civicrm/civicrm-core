@@ -56,7 +56,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
     $this->deleted_labels = array(
       '' => ts('- select -'),
       0 => ts('No'),
-      1 => ts('Yes')
+      1 => ts('Yes'),
     );
 
     $this->_columns = array(

@@ -569,7 +569,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
   public function transactionExists($trxn_id) {
     if (CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_contribution WHERE trxn_id = %1",
       array(
-        1 => array($trxn_id, 'String')
+        1 => array($trxn_id, 'String'),
       ))) {
       return TRUE;
     }

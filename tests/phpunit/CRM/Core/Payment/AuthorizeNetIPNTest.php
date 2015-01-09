@@ -125,7 +125,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'x_avs_code' => 'Z',
       'x_response_reason_text' => 'This transaction has been approved.',
       'x_response_reason_code' => '1',
-      'x_response_code' => '1'
+      'x_response_code' => '1',
     );
   }
 

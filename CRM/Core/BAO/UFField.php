@@ -825,7 +825,7 @@ SELECT  id
       'city',
       'state_province',
       'postal_code',
-      'country'
+      'country',
     );
     $requiredBillingFields = array_diff($validBillingFields, array('middle_name', 'supplemental_address_1'));
     $validProfileFields = array();

@@ -170,7 +170,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function testCallUpdateGreetingSuccess() {
     $result = $this->callAPISuccess($this->_entity, 'update_greeting', array(
         'gt' => 'postal_greeting',
-        'ct' => 'Individual'
+        'ct' => 'Individual',
       ));
   }
 
@@ -211,7 +211,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       $this->callAPISuccess('group_contact', 'create', array(
           'contact_id' => $contactID,
           'status' => 'Added',
-          'group_id' => $groupID
+          'group_id' => $groupID,
         ));
     }
     $result = $this->callAPISuccess('job', 'send_reminder', array());
@@ -238,7 +238,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
         $this->callAPISuccess('group_contact', 'create', array(
             'contact_id' => $contactID,
             'status' => 'Added',
-            'group_id' => $groupID
+            'group_id' => $groupID,
           ));
       }
       if ($i > 1) {
@@ -275,7 +275,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_pre', array($this, 'hookPreRelationship'));
     $relationshipTypeID = $this->callAPISuccess('relationship_type', 'getvalue', array(
         'return' => 'id',
-        'name_a_b' => 'Employee of'
+        'name_a_b' => 'Employee of',
       ));
     $result = $this->callAPISuccess('relationship', 'create', array(
       'relationship_type_id' => $relationshipTypeID,

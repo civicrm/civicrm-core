@@ -478,7 +478,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         array(
           'title' => ts('Report Templates'),
           'url' => CRM_Utils_System::url('civicrm/admin/report/template/list', 'reset=1'),
-        )
+        ),
       );
 
     CRM_Utils_System::appendBreadCrumb($breadCrumbs);
@@ -597,7 +597,7 @@ class CRM_Report_Form extends CRM_Core_Form {
                         array(
                           '' => ts('Any'),
                           '0' => ts('No'),
-                          '1' => ts('Yes')
+                          '1' => ts('Yes'),
                         );
                     }
                     break;
@@ -962,7 +962,7 @@ class CRM_Report_Form extends CRM_Core_Form {
                 $this->addChainSelect($fieldName . '_value', array(
                   'multiple' => TRUE,
                   'label' => NULL,
-                  'class' => 'huge'
+                  'class' => 'huge',
                 ));
               }
               else {
@@ -1114,13 +1114,13 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     if (!empty($options)) {
       $options = array(
-          '-' => ' - none - '
+          '-' => ' - none - ',
         ) + $options;
       for ($i = 1; $i <= 5; $i++) {
         $this->addElement('select', "order_bys[{$i}][column]", ts('Order by Column'), $options);
         $this->addElement('select', "order_bys[{$i}][order]", ts('Order by Order'), array(
           'ASC' => 'Ascending',
-          'DESC' => 'Descending'
+          'DESC' => 'Descending',
         ));
         $this->addElement('checkbox', "order_bys[{$i}][section]", ts('Order by Section'), FALSE, array('id' => "order_by_section_$i"));
         $this->addElement('checkbox', "order_bys[{$i}][pageBreak]", ts('Page Break'), FALSE, array('id' => "order_by_pagebreak_$i"));
@@ -1195,7 +1195,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     //add form rule for report
     if (is_callable(array(
       $this,
-      'formRule'
+      'formRule',
     ))) {
       $this->addFormRule(array(get_class($this), 'formRule'), $this);
     }
@@ -1715,7 +1715,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       'data_type',
       'html_type',
       'option_group_id',
-      'id'
+      'id',
     );
 
     // skip for type date and ContactReference since date format is already handled
@@ -1812,7 +1812,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       case 'Int':
         if (in_array($htmlType, array(
           'Text',
-          'TextArea'
+          'TextArea',
         ))) {
           $retValue = $value;
           break;
@@ -3227,7 +3227,7 @@ ORDER BY cg.weight, cf.weight";
         foreach (array(
                    'fields',
                    'filters',
-                   'group_bys'
+                   'group_bys',
                  ) as $colKey) {
           if (!array_key_exists($colKey, $this->_columns[$curTable])) {
             $this->_columns[$curTable][$colKey] = array();
@@ -3298,7 +3298,7 @@ ORDER BY cg.weight, cf.weight";
             if (in_array($customDAO->html_type, array(
               'Multi-Select',
               'AdvMulti-Select',
-              'CheckBox'
+              'CheckBox',
             ))) {
               $curFilters[$fieldName]['operatorType'] = CRM_Report_Form::OP_MULTISELECT_SEPARATOR;
             }
@@ -3310,8 +3310,8 @@ ORDER BY cg.weight, cf.weight";
               $ogDAO = CRM_Core_DAO::executeQuery("SELECT ov.value, ov.label FROM civicrm_option_value ov WHERE ov.option_group_id = %1 ORDER BY ov.weight", array(
                 1 => array(
                   $customDAO->option_group_id,
-                  'Integer'
-                )
+                  'Integer',
+                ),
               ));
               while ($ogDAO->fetch()) {
                 $curFilters[$fieldName]['options'][$ogDAO->value] = $ogDAO->label;
@@ -3322,7 +3322,7 @@ ORDER BY cg.weight, cf.weight";
 
         case 'StateProvince':
           if (in_array($customDAO->html_type, array(
-            'Multi-Select State/Province'
+            'Multi-Select State/Province',
           ))) {
             $curFilters[$fieldName]['operatorType'] = CRM_Report_Form::OP_MULTISELECT_SEPARATOR;
           }
@@ -3334,7 +3334,7 @@ ORDER BY cg.weight, cf.weight";
 
         case 'Country':
           if (in_array($customDAO->html_type, array(
-            'Multi-Select Country'
+            'Multi-Select Country',
           ))) {
             $curFilters[$fieldName]['operatorType'] = CRM_Report_Form::OP_MULTISELECT_SEPARATOR;
           }
@@ -3470,7 +3470,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
                    'max',
                    'relative',
                    'from',
-                   'to'
+                   'to',
                  ) as $attach) {
           if (isset($this->_params[$fieldAlias . '_' . $attach]) &&
             (!empty($this->_params[$fieldAlias . '_' . $attach])
@@ -3899,7 +3899,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'fields' => array(
           $options['prefix'] . 'phone' => array(
             'title' => ts($options['prefix_label'] . 'Phone'),
-            'name' => 'phone'
+            'name' => 'phone',
           ),
         ),
       ),

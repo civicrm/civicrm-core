@@ -123,7 +123,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
     for ($count = 0; $count < self::RULES_COUNT; $count++) {
       $this->add('select', "where_$count", ts('Field'),
         array(
-          NULL => ts('- none -')
+          NULL => ts('- none -'),
         ) + $this->_fields, FALSE, $disabled
       );
       $this->add('text', "length_$count", ts('Length'), $attributes);

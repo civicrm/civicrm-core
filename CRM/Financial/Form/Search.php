@@ -113,7 +113,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
           'type' => 'refresh',
           'name' => ts('Search'),
           'isDefault' => TRUE,
-        )
+        ),
       )
     );
     parent::buildQuickForm();

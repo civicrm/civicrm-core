@@ -302,7 +302,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       $this->assertEquals($params['scheduled_date'], $submitResult['values'][$id]['scheduled_date']);
     }
     $this->assertDBQuery($expectedJobCount, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', array(
-      1 => array($id, 'Integer')
+      1 => array($id, 'Integer'),
     ));
   }
 
@@ -350,7 +350,7 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
       'Bounces' => 20,
       'Opened' => 20,
       'Unique Clicks' => 0,
-      'Unsubscribers' => 20
+      'Unsubscribers' => 20,
     );
     $this->checkArrayEquals($expectedResult, $result['values'][$mail['id']]);
   }
@@ -461,7 +461,7 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
     $createResult = $this->callAPISuccess('mailing', 'create', $createParams, __FUNCTION__, __FILE__);
     $this->assertTrue(is_numeric($createResult['id']));
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', array(
-      1 => array($createResult['id'], 'Integer')
+      1 => array($createResult['id'], 'Integer'),
     ));
     return $createResult['id'];
   }

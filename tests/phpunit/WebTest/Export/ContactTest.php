@@ -436,7 +436,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $genderLabelArray = array(
       1 => 'Female',
       2 => 'Male',
-      3 => 'Transgender'
+      3 => 'Transgender',
     );
     $prefix = rand(1, 4);
     $suffix = rand(1, 8);
@@ -468,7 +468,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
       'sequential' => 1,
       'option_group_name' => $optionGroupName,
       'value' => $optionValue,
-      'return' => 'label'
+      'return' => 'label',
     );
     $optionLabel = $this->webtest_civicrm_api("OptionValue", "getvalue", $params);
     return $optionLabel;

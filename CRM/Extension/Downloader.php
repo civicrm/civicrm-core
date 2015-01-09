@@ -75,7 +75,7 @@ class CRM_Extension_Downloader {
             //1 => $this->containerDir,
             1 => $url,
           )
-        )
+        ),
       );
     }
 

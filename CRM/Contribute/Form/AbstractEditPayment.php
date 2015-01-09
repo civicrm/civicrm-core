@@ -331,7 +331,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
             $statusMsg .= "<br />" . ts("Membership for %1 has been updated. The membership End Date is %2.",
               array(
                 1 => $userDisplayName,
-                2 => $endDate
+                2 => $endDate,
               )
             );
           }
@@ -550,7 +550,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
             CRM_Core_Session::setStatus(ts('This contact has a pending or overdue pledge payment of %2 which is scheduled for %3. <a href="%1">Click here to enter a pledge payment</a>.', array(
               1 => $ppUrl,
               2 => $ppAmountDue,
-              3 => $ppSchedDate
+              3 => $ppSchedDate,
             )), ts('Notice'), 'alert');
           }
         }

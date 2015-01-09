@@ -68,7 +68,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
       // (as least it will once the pseudoconstant s in the schema)
       'payment_processor_type_id' => $this->callAPISuccess('payment_processor_type', 'getvalue', array(
         'return' => 'id',
-        'name' => 'AuthNet'
+        'name' => 'AuthNet',
       )),
     );
 

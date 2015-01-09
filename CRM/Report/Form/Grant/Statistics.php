@@ -215,7 +215,7 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (in_array($tableName, array(
         'civicrm_address',
-        'civicrm_world_region'
+        'civicrm_world_region',
       ))) {
         $this->_addressField = TRUE;
       }

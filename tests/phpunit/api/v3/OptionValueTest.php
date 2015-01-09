@@ -198,7 +198,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'sequential' => 1,
       'api.option_value.create' => array(
         'component_id' => 'CiviContribute',
-        'name' => 'my@y.com'
+        'name' => 'my@y.com',
       ),
 
     ));
@@ -220,7 +220,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'sequential' => 1,
       'api.option_value.create' => array(
         'component_id' => 'CiviContribute',
-        'name' => 'my@y.com'
+        'name' => 'my@y.com',
       ),
 
     ));
@@ -329,7 +329,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     // create a option group
     $og = $this->callAPISuccess('option_group', 'create', array(
         'name' => 'our test Option Group for with group id',
-        'is_active' => 1
+        'is_active' => 1,
       ));
     // create a option value
     $ov = $this->callAPISuccess('option_value', 'create',
@@ -339,7 +339,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     $this->callAPISuccess('option_value', 'create', array(
         'id' => $ov['id'],
         'option_group_id' => $og['id'],
-        'is_active' => 0
+        'is_active' => 0,
       ));
     $val = $this->callAPISuccess('option_value', 'getvalue', array(
       'id' => $ov['id'],

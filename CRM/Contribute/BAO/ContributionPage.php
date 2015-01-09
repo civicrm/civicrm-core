@@ -875,9 +875,9 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
             'soft_credit_types' => $params['soft_credit_types'],
             'default' => array(
               'honor_block_title' => $params['honor_block_title'],
-              'honor_block_text' => $params['honor_block_text']
-            )
-          )
+              'honor_block_text' => $params['honor_block_text'],
+            ),
+          ),
         )
       );
     }
@@ -889,9 +889,9 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
           'soft_credit_types' => $params['soft_credit_types'],
           $config->lcMessages => array(
             'honor_block_title' => $params['honor_block_title'],
-            'honor_block_text' => $params['honor_block_text']
-          )
-        )
+            'honor_block_text' => $params['honor_block_text'],
+          ),
+        ),
       );
 
       $ufJoinDAO = new CRM_Core_DAO_UFJoin();
@@ -920,7 +920,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     $contactId = array($userID);
     $pdfParams = array(
       'output' => 'pdf_invoice',
-      'forPage' => 'confirmpage'
+      'forPage' => 'confirmpage',
     );
     $pdfHtml = CRM_Contribute_Form_Task_Invoice::printPDF($contributionID,
       $pdfParams, $contactId, CRM_Core_DAO::$_nullObject);

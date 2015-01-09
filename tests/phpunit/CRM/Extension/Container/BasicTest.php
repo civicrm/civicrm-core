@@ -114,7 +114,7 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
   public function testConvertPathsToUrls() {
     $relPaths = array(
       'foo.bar' => 'foo\bar',
-      'whiz.bang' => 'tests\extensions\whiz\bang'
+      'whiz.bang' => 'tests\extensions\whiz\bang',
     );
     $expectedRelUrls = array(
       'foo.bar' => 'foo/bar',

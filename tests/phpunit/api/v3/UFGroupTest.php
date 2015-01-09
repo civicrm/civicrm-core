@@ -104,7 +104,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       'title' => 'Edited Test Profile',
       'help_post' => 'Profile Pro help text.',
       'is_active' => 1,
-      'id' => $this->_ufGroupId
+      'id' => $this->_ufGroupId,
      );
 
     $result = $this->callAPISuccess('uf_group', 'create', $params);

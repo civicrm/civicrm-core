@@ -121,12 +121,12 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
             1 => array(
           'label' => 'Chicken',
               'amount' => '30.00',
-              'financial_type_id' => 'Donation'
+              'financial_type_id' => 'Donation',
             ),
             2 => array(
               'label' => 'Vegetarian',
               'amount' => '25.00',
-              'financial_type_id' => 'Donation'
+              'financial_type_id' => 'Donation',
             ),
           );
           $this->addMultipleChoiceOptions($options, $validateStrings);
@@ -140,13 +140,13 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
             1 => array(
           'label' => 'Yes',
               'amount' => '50.00',
-              'financial_type_id' => 'Donation'
+              'financial_type_id' => 'Donation',
 
              ),
             2 => array(
               'label' => 'No',
               'amount' => '0',
-              'financial_type_id' => 'Donation'
+              'financial_type_id' => 'Donation',
             ),
           );
           $this->addMultipleChoiceOptions($options, $validateStrings);
@@ -161,12 +161,12 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
             1 => array(
           'label' => 'First Night',
               'amount' => '15.00',
-              'financial_type_id' => 'Donation'
+              'financial_type_id' => 'Donation',
             ),
             2 => array(
               'label' => 'Second Night',
               'amount' => '15.00',
-              'financial_type_id' => 'Donation'
+              'financial_type_id' => 'Donation',
             ),
           );
           $this->addMultipleChoiceOptions($options, $validateStrings);

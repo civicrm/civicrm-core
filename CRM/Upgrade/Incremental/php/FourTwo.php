@@ -108,7 +108,7 @@ ORDER BY mp.contribution_id, mp.membership_id";
       // note: error conditions are also checked in upgrade_4_2_beta2()
       if (!defined('CIVICRM_SETTINGS_PATH')) {
         $preUpgradeMessage .= '<br />' . ts('Could not determine path to civicrm.settings.php. Please manually locate it and add these lines at the bottom: <pre>%1</pre>', array(
-          1 => self::SETTINGS_SNIPPET
+          1 => self::SETTINGS_SNIPPET,
         ));
       }
       elseif (preg_match(self::SETTINGS_SNIPPET_PATTERN, file_get_contents(CIVICRM_SETTINGS_PATH))) {
@@ -117,7 +117,7 @@ ORDER BY mp.contribution_id, mp.membership_id";
       elseif (!is_writable(CIVICRM_SETTINGS_PATH)) {
         $preUpgradeMessage .= '<br />' . ts('The settings file (%1) must be updated. Please make it writable or manually add these lines:<pre>%2</pre>', array(
           1 => CIVICRM_SETTINGS_PATH,
-          2 => self::SETTINGS_SNIPPET
+          2 => self::SETTINGS_SNIPPET,
         ));
       }
     }
@@ -160,7 +160,7 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
       $config = CRM_Core_Config::singleton();
       if (!empty($config->extensionsDir)) {
         $postUpgradeMessage .= '<br />' . ts('Please <a href="%1" target="_blank">configure the Extension Resource URL</a>.', array(
-          1 => CRM_Utils_System::url('civicrm/admin/setting/url', 'reset=1')
+          1 => CRM_Utils_System::url('civicrm/admin/setting/url', 'reset=1'),
         ));
       }
     }
@@ -398,11 +398,11 @@ HAVING COUNT(cpse.price_set_id) > 1 AND MIN(cpse1.id) <> cpse.id ";
     $daoName = array(
         'civicrm_contribution_page' => array(
           'CRM_Contribute_BAO_ContributionPage',
-          CRM_Core_Component::getComponentID('CiviContribute')
+          CRM_Core_Component::getComponentID('CiviContribute'),
         ),
         'civicrm_event' => array(
           'CRM_Event_BAO_Event',
-          CRM_Core_Component::getComponentID('CiviEvent')
+          CRM_Core_Component::getComponentID('CiviEvent'),
         ),
       );
 

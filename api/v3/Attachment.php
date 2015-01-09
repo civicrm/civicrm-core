@@ -147,7 +147,7 @@ function civicrm_api3_attachment_create($params) {
   }
 
   $result = array(
-    $fileDao->id => _civicrm_api3_attachment_format_result($fileDao, $entityFileDao, $returnContent, $isTrusted)
+    $fileDao->id => _civicrm_api3_attachment_format_result($fileDao, $entityFileDao, $returnContent, $isTrusted),
   );
   return civicrm_api3_create_success($result, $params, 'Attachment', 'create');
 }

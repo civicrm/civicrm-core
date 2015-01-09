@@ -1,6 +1,6 @@
 <?php
 CRM_Core_Resources::singleton()->addSetting(array(
-    'strings' => array('One, two, three' => 'Un, deux, trois')
+    'strings' => array('One, two, three' => 'Un, deux, trois'),
   )
 );
 // CRM_Core_Resources::singleton()->addScriptFile(...);

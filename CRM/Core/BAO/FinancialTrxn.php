@@ -335,7 +335,7 @@ WHERE ceft.entity_id = %1";
         'trxn_date' => date('YmdHis'),
         'total_amount' => CRM_Utils_Array::value('cost', $params) ? $params['cost'] : 0,
         'currency' => CRM_Utils_Array::value('currency', $params),
-        'status_id' => array_search('Completed', $contributionStatuses)
+        'status_id' => array_search('Completed', $contributionStatuses),
       );
       $trxnEntityTable['entity_table'] = 'civicrm_contribution';
       $trxnEntityTable['entity_id'] = $params['contributionId'];
@@ -344,7 +344,7 @@ WHERE ceft.entity_id = %1";
 
     if (!empty($params['oldPremium'])) {
       $premiumParams = array(
-        'id' => $params['oldPremium']['product_id']
+        'id' => $params['oldPremium']['product_id'],
       );
       $productDetails = array();
       CRM_Contribute_BAO_ManagePremiums::retrieve($premiumParams, $productDetails);
@@ -353,7 +353,7 @@ WHERE ceft.entity_id = %1";
         'currency' => CRM_Utils_Array::value('currency', $productDetails),
         'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $productDetails),
         'contributionId' => $params['oldPremium']['contribution_id'],
-        'isDeleted' => TRUE
+        'isDeleted' => TRUE,
       );
       CRM_Core_BAO_FinancialTrxn::createPremiumTrxn($params);
     }

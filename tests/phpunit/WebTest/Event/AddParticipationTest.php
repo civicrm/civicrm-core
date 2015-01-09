@@ -360,7 +360,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     'entity' => 'ParticipantEventName',
     'subEntity' => 'Fall Fundraiser Dinner',
         'triggerElement' => array('name' => "event_id", 'type' => "select2")),
-      array('entity' => 'ParticipantRole', 'subEntity' => 'Attendee', 'triggerElement' => array('name' => 'role_id', 'type' => "select"))
+      array('entity' => 'ParticipantRole', 'subEntity' => 'Attendee', 'triggerElement' => array('name' => 'role_id', 'type' => "select")),
     );
     $pageUrl = array('url' => "participant/add", 'args' => "reset=1&action=add&context=standalone");
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl, TRUE);
@@ -387,7 +387,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     'subEntity' => 'Rain-forest Cup Youth Soccer Tournament',
         'triggerElement' => array('name' => "event_id", 'type' => "select")),
       array('entity' => 'ParticipantRole', 'subEntity' => '- Any -', 'triggerElement' => array('type' => "checkbox")),
-      array('entity' => 'ParticipantRole', 'subEntity' => 'Volunteer', 'triggerElement' => array('type' => "checkbox"))
+      array('entity' => 'ParticipantRole', 'subEntity' => 'Volunteer', 'triggerElement' => array('type' => "checkbox")),
     );
 
     $return = $this->addCustomGroupField($customSets);

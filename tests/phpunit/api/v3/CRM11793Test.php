@@ -59,7 +59,7 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
       'contact',
       'get',
       array(
-        'contact_type' => $contactType
+        'contact_type' => $contactType,
       )
     );
 

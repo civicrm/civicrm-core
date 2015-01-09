@@ -644,8 +644,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         'contribution_status' => array(
           'title' => ts('Contribution Status'),
           'name' => 'contribution_status',
-          'data_type' => CRM_Utils_Type::T_STRING
-        )
+          'data_type' => CRM_Utils_Type::T_STRING,
+        ),
       );
 
       $contributionNote = array(
@@ -653,8 +653,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           array(
             'title' => ts('Contribution Note'),
             'name' => 'contribution_note',
-            'data_type' => CRM_Utils_Type::T_TEXT
-          )
+            'data_type' => CRM_Utils_Type::T_TEXT,
+          ),
       );
 
       $contributionRecurId = array(
@@ -662,14 +662,14 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           'title' => ts('Recurring Contributions ID'),
           'name' => 'contribution_recur_id',
           'where' => 'civicrm_contribution.contribution_recur_id',
-          'data_type' => CRM_Utils_Type::T_INT
-        )
+          'data_type' => CRM_Utils_Type::T_INT,
+        ),
       );
 
       $extraFields = array(
         'contribution_batch' => array(
-          'title' => ts('Batch Name')
-        )
+          'title' => ts('Batch Name'),
+        ),
       );
 
       $softCreditFields = array(
@@ -677,25 +677,25 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           'name' => 'contribution_soft_credit_name',
           'title' => 'Soft Credit For',
           'where' => 'civicrm_contact_d.display_name',
-          'data_type' => CRM_Utils_Type::T_STRING
+          'data_type' => CRM_Utils_Type::T_STRING,
         ),
         'contribution_soft_credit_amount' => array(
           'name' => 'contribution_soft_credit_amount',
           'title' => 'Soft Credit Amount',
           'where' => 'civicrm_contribution_soft.amount',
-          'data_type' => CRM_Utils_Type::T_MONEY
+          'data_type' => CRM_Utils_Type::T_MONEY,
         ),
         'contribution_soft_credit_type' => array(
           'name' => 'contribution_soft_credit_type',
           'title' => 'Soft Credit Type',
           'where' => 'contribution_softcredit_type.label',
-          'data_type' => CRM_Utils_Type::T_STRING
+          'data_type' => CRM_Utils_Type::T_STRING,
         ),
         'contribution_soft_credit_contribution_id' => array(
           'name' => 'contribution_soft_credit_contribution_id',
           'title' => 'Soft Credit For Contribution ID',
           'where' => 'civicrm_contribution_soft.contribution_id',
-          'data_type' => CRM_Utils_Type::T_INT
+          'data_type' => CRM_Utils_Type::T_INT,
         ),
       );
 
@@ -2436,7 +2436,7 @@ WHERE  contribution_id = %1 ";
           $softCreditTypes[$key] = $softCredit['soft_credit_type_label'];
           $softCredits[$key] = array(
             'Name' => $softCredit['contact_name'],
-            'Amount' => CRM_Utils_Money::format($softCredit['amount'], $softCredit['currency'])
+            'Amount' => CRM_Utils_Money::format($softCredit['amount'], $softCredit['currency']),
           );
         }
         $template->assign('softCreditTypes', $softCreditTypes);
@@ -2527,7 +2527,7 @@ WHERE  contribution_id = %1 ";
       $primaryEmail = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Email', $this->_relatedObjects['participant']->contact_id, 'email', 'contact_id');
       $primaryAmount[] = array(
         'label' => $this->_relatedObjects['participant']->fee_level . ' - ' . $primaryEmail,
-        'amount' => $this->_relatedObjects['participant']->fee_amount
+        'amount' => $this->_relatedObjects['participant']->fee_amount,
       );
       //build an array of cId/pId of participants
       $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($this->_relatedObjects['participant']->id, NULL, $this->_relatedObjects['contact']->id, $isTest, TRUE);
@@ -2556,7 +2556,7 @@ WHERE  contribution_id = %1 ";
           $amount[0] = array('label' => $additional->fee_level, 'amount' => $additional->fee_amount);
           $primaryAmount[] = array(
             'label' => $additional->fee_level . ' - ' . $additionalParticipantInfo,
-            'amount' => $additional->fee_amount
+            'amount' => $additional->fee_amount,
           );
           $additional->save();
           $additional->free();
@@ -2744,7 +2744,7 @@ WHERE  contribution_id = %1 ";
       $skipRecords = TRUE;
       $pendingStatus = array(
         array_search('Pending', $contributionStatuses),
-        array_search('In Progress', $contributionStatuses)
+        array_search('In Progress', $contributionStatuses),
       );
       if (in_array(CRM_Utils_Array::value('contribution_status_id', $params), $pendingStatus)) {
         $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
@@ -3101,7 +3101,7 @@ WHERE  contribution_id = %1 ";
             'status_id' => $prevfinancialItem->status_id,
             'financial_account_id' => $financialAccount,
             'entity_table' => 'civicrm_line_item',
-            'entity_id' => $fieldValues['id']
+            'entity_id' => $fieldValues['id'],
           );
           CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
 
@@ -3148,13 +3148,13 @@ WHERE  contribution_id = %1 ";
       'Completed' => array('Cancelled', 'Refunded'),
       'Pending' => array('Cancelled', 'Completed', 'Failed'),
       'In Progress' => array('Cancelled', 'Completed', 'Failed'),
-      'Refunded' => array('Cancelled', 'Completed')
+      'Refunded' => array('Cancelled', 'Completed'),
     );
 
     if (!in_array($contributionStatuses[$fields['contribution_status_id']], $checkStatus[$contributionStatuses[$values['contribution_status_id']]])) {
       $errors['contribution_status_id'] = ts("Cannot change contribution status from %1 to %2.", array(
           1 => $contributionStatuses[$values['contribution_status_id']],
-          2 => $contributionStatuses[$fields['contribution_status_id']]
+          2 => $contributionStatuses[$fields['contribution_status_id']],
         ));
     }
   }
@@ -3201,7 +3201,7 @@ WHERE  contribution_id = %1 ";
         if (!empty($props['contribution_page_id'])) {
           $page = civicrm_api('contribution_page', 'getsingle', array(
             'version' => 3,
-            'id' => ($props['contribution_page_id'])
+            'id' => ($props['contribution_page_id']),
           ));
           $types = (array) CRM_Utils_Array::value('payment_processor', $page, 0);
           $params['condition'] = 'id IN (' . implode(',', $types) . ')';
@@ -3383,7 +3383,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
           'amount' => $financialTrxn->total_amount,
           'status_id' => array_search('Paid', $financialItemStatus),
           'entity_id' => $lineItemId->id,
-          'entity_table' => 'civicrm_line_item'
+          'entity_table' => 'civicrm_line_item',
         );
         $trxnIds['id'] = $financialTrxn->id;
         CRM_Financial_BAO_FinancialItem::create($addFinancialEntry, NULL, $trxnIds);

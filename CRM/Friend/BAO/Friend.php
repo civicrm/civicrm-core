@@ -157,7 +157,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
       $targetParams = array(
         'activity_id' => $activity->id,
         'contact_id'  => $contact,
-        'record_type_id' => $targetID
+        'record_type_id' => $targetID,
       );
 
       // See if it already exists

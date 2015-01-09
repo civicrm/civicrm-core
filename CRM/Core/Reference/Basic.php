@@ -79,7 +79,7 @@ class CRM_Core_Reference_Basic implements CRM_Core_Reference_Interface {
   public function findReferences($targetDao) {
     $targetColumn = $this->getTargetKey();
     $params = array(
-      1 => array($targetDao->$targetColumn, 'String')
+      1 => array($targetDao->$targetColumn, 'String'),
     );
     $sql = <<<EOS
 SELECT id
@@ -100,7 +100,7 @@ EOS;
   public function getReferenceCount($targetDao) {
     $targetColumn = $this->getTargetKey();
     $params = array(
-      1 => array($targetDao->$targetColumn, 'String')
+      1 => array($targetDao->$targetColumn, 'String'),
     );
     $sql = <<<EOS
 SELECT count(id)
@@ -113,7 +113,7 @@ EOS;
       'type' => get_class($this),
       'table' => $this->getReferenceTable(),
       'key' => $this->getReferenceKey(),
-      'count' => CRM_Core_DAO::singleValueQuery($sql, $params)
+      'count' => CRM_Core_DAO::singleValueQuery($sql, $params),
     );
   }
 }

@@ -48,7 +48,7 @@ class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
     'Contact',
     'Individual',
     'Household',
-    'Organization'
+    'Organization',
   );
 
   /**
@@ -84,7 +84,7 @@ class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
           'sort_name' => array(
             'title' => ts('Contact Name'),
             'required' => TRUE,
-          )
+          ),
         ),
       ),
       'civicrm_address' => array(

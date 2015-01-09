@@ -80,7 +80,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   public function tearDown() {
     $this->eventDelete($this->_eventID);
     $tablesToTruncate = array(
-      'civicrm_custom_group', 'civicrm_custom_field', 'civicrm_contact', 'civicrm_participant'
+      'civicrm_custom_group', 'civicrm_custom_field', 'civicrm_contact', 'civicrm_participant',
     );
     // true tells quickCleanup to drop any tables that might have been created in the test
     $this->quickCleanup($tablesToTruncate, TRUE);
@@ -138,7 +138,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
         'event_id',
         'participant_register_date',
         'participant_source',
-      )
+      ),
     );
     $result = $this->callAPISuccess('participant', 'get', $params);
     $this->assertAPISuccess($result, " in line " . __LINE__);
@@ -199,7 +199,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
     'return.status_id' => 1,
       'return.participant_status_id' => 1,
-      'options' => array('limit' => 1)
+      'options' => array('limit' => 1),
     );
     $result = $this->callAPISuccess('participant', 'get', $params);
     $this->assertArrayHasKey('participant_status_id', $result['values'][$result['id']]);
@@ -513,7 +513,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   public function testUpdate() {
     $participantId = $this->participantCreate(array(
       'contactID' => $this->_individualId,
-      'eventID' => $this->_eventID
+      'eventID' => $this->_eventID,
     ));
     $params = array(
       'id' => $participantId,

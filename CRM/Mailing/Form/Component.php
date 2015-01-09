@@ -140,7 +140,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
 
     $component = CRM_Mailing_BAO_Component::add($params);
     CRM_Core_Session::setStatus(ts('The mailing component \'%1\' has been saved.', array(
-        1 => $component->name
+        1 => $component->name,
       )
     ), ts('Saved'), 'success');
 

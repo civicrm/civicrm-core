@@ -223,7 +223,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
 
     $relationshipInfo = array();
     $relationshipInfo['data'] = array(
-       array('field' => 'Relationship Is Active', 'changed_from' => 'true', 'changed_to' => 'false')
+       array('field' => 'Relationship Is Active', 'changed_from' => 'true', 'changed_to' => 'false'),
     );
     $relationshipInfo = array_merge($relationshipInfo, $data[2]);
 

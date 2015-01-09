@@ -72,7 +72,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
     'email_on_hold',
     'contact_opt_out',
     'mailing_job_status',
-    'mailing_job_end_date'
+    'mailing_job_end_date',
   );
 
   /**

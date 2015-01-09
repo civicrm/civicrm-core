@@ -45,7 +45,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
     'Contact',
     'Individual',
     'Household',
-    'Organization'
+    'Organization',
   );
 
   protected $_charts = array(
@@ -92,7 +92,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
         'sort_name' => array(
           'title' => ts('Contact Name'),
           'default' => TRUE,
-          'default_order' => 'ASC'
+          'default_order' => 'ASC',
         ),
       ),
       'grouping' => 'contact-fields',

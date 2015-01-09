@@ -39,7 +39,7 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
 
   protected $_customGroupExtends = array(
     'Contact',
-    'Individual'
+    'Individual',
   );
 
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
@@ -302,7 +302,7 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
     // get the acl clauses built before we assemble the query
     $this->buildACLClause(array(
         $this->_aliases['civicrm_contact'],
-        $this->_aliases['civicrm_employer']
+        $this->_aliases['civicrm_employer'],
       ));
     parent::postProcess();
   }

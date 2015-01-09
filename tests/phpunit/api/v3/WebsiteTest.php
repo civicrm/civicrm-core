@@ -91,7 +91,7 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
   public function testGetMetadata() {
     $result = $this->callAPIAndDocument($this->_entity, 'get', array(
       'options' => array(
-    'metadata' => array('fields')
+    'metadata' => array('fields'),
     )), __FUNCTION__, __FILE__, 'Demonostrates returning field metadata', 'GetWithMetadata');
     $this->assertEquals('Website', $result['metadata']['fields']['url']['title']);
   }

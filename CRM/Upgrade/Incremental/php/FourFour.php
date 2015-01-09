@@ -69,7 +69,7 @@ class CRM_Upgrade_Incremental_php_FourFour {
       }
       if ($oversizedEntries > 0) {
         $preUpgradeMessage .= '<br/>' . ts("WARNING: There are %1 word-replacement entries which will not be valid in v4.4+ (eg with over 255 characters). They will be dropped during upgrade. For details, consult the CiviCRM log.", array(
-          1 => $oversizedEntries
+          1 => $oversizedEntries,
         ));
       }
     }
