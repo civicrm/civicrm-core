@@ -230,7 +230,7 @@ function _civicrm_api3_event_getisfull(&$event, $event_id) {
 
 
 /**
- * @see _civicrm_api3_generic_getlist_params.
+ * @see _civicrm_api3_generic_getlist_params
  *
  * @param $request
  *   Array.

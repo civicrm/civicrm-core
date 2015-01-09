@@ -40,7 +40,7 @@
 /**
  * API to Create or update a Membership Type
  *
- * @param array$params
+ * @param array $params
  *   An associative array of name/value property values of civicrm_membership_block.
  *
  * @return array $result newly created or updated membership type property values.
