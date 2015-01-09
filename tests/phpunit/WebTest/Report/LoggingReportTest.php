@@ -266,6 +266,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
 
     //disable the logging
     $this->openCiviPage('admin/setting/misc', 'reset=1');
+    $this->waitForElementPresent("xpath=//tr[@class='crm-miscellaneous-form-block-logging']/td[2]/label[text()='No']");
     $this->click("xpath=//tr[@class='crm-miscellaneous-form-block-logging']/td[2]/label[text()='No']");
     $this->click("_qf_Miscellaneous_next-top");
     $this->waitForTextPresent("Changes Saved");

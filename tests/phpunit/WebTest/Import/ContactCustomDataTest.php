@@ -57,7 +57,7 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText("crm-notification-container", "The rule '{$newRuleTitle}' has been saved.");
 
-    $rgId = explode('&rgid=', $this->getAttribute("xpath=//div[@id='browseValues_Individual']//table/tbody//tr/td[text()='{$newRuleTitle}']/../td[3]/span/a[text()='Use Rule']@href"));
+    $rgId = explode('&rgid=', $this->getAttribute("xpath=//div[@id='browseValues_Individual']/div/div/table/tbody//tr/td[text()='{$newRuleTitle}']/../td[3]/span/a[1][text()='Use Rule']@href"));
     $rgId = explode('&', $rgId[1]);
 
     // Add Contact
@@ -185,7 +185,7 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td");
 
     $this->waitForText('crm-notification-container', "Custom field '{$customField}' has been saved.");
-    $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField']/../../td[8]/span/a@href"));
+    $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$customField']/../../td[8]/span/a@href"));
     $customFieldId = $customFieldId[1];
 
     return array("custom_{$customFieldId}", $customField, $customGroupTitle);
