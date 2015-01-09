@@ -42,7 +42,7 @@
  *
  * @param array $params
  *
- * @return array $result
+ * @return array
  * @access public
  * {@getfields UFMatch_get}
  * @example UFMatchGet.php
@@ -60,7 +60,8 @@ function civicrm_api3_uf_match_get($params) {
  *                       name/value pairs to insert in new 'survey'
  * @example UFMatch.php Std Create example
  *
- * @return array api result array
+ * @return array
+   *   api result array
  * {@getfields uf_match_create}
  * @access public
  */
@@ -89,7 +90,8 @@ function _civicrm_api3_uf_match_create_spec(&$params) {
  *                       name/value pairs to insert in new 'survey'
  * @example UFMatch.php Std Create example
  *
- * @return array api result array
+ * @return array
+   *   api result array
  * {@getfields uf_match_create}
  * @access public
  */

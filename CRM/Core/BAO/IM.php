@@ -44,7 +44,8 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object       CRM_Core_BAO_IM object on success, null otherwise
+   * @return object
+   *   CRM_Core_BAO_IM object on success, null otherwise
    * @static
    */
   public static function add(&$params) {
@@ -80,7 +81,8 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
    *
    * @param bool $updateBlankLocInfo
    *
-   * @return array  the array of im details
+   * @return array
+   *   the array of im details
    * @static
    */
   public static function allIMs($id, $updateBlankLocInfo = FALSE) {
@@ -131,7 +133,8 @@ ORDER BY
    *   The array containing entity_id and.
    * entity_table name
    *
-   * @return array  the array of im details
+   * @return array
+   *   the array of im details
    * @static
    */
   public static function allEntityIMs(&$entityElements) {

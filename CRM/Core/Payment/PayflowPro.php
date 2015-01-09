@@ -57,7 +57,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    *
-   * @return array the result in an nice formatted array (or an error object)
+   * @return array
+   *   the result in an nice formatted array (or an error object)
    * @abstract
    */
   public function doDirectPayment(&$params) {
@@ -352,7 +353,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * @param int $invoiceId
    *   The ID to check.
    *
-   * @return bool                  True if ID exists, else false
+   * @return bool
+   *   True if ID exists, else false
    */
   public function _checkDupe($invoiceId) {
     //copied from Eway but not working and not really sure it should!
@@ -416,7 +418,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    *
    * @internal param string $mode the mode we are operating in (live or test)
    *
-   * @return string the error message if any
+   * @return string
+   *   the error message if any
    */
   public function checkConfig() {
     $errorMsg = array();

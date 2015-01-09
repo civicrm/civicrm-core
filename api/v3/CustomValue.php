@@ -139,7 +139,8 @@ function _civicrm_api3_custom_value_create_spec(&$params) {
  * If you do not know the ID, you may use group name : field name, for example 'return.foo_stuff:my_field' => 1
  *
  * @throws API_Exception
- * @return array.
+ * @return array
+   *
  *
  * @access public
  */

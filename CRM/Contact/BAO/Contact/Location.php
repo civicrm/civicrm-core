@@ -43,7 +43,8 @@ class CRM_Contact_BAO_Contact_Location {
    * @param bool $isPrimary
    * @param int $locationTypeID
    *
-   * @return array  of display_name, email, location type and location id if found, or (null,null,null, null)
+   * @return array
+   *   of display_name, email, location type and location id if found, or (null,null,null, null)
    * @static
    */
   public static function getEmailDetails($id, $isPrimary = TRUE, $locationTypeID = NULL) {
@@ -83,7 +84,8 @@ WHERE     civicrm_contact.id = %1";
    *
    * @param null $type
    *
-   * @return array    tuple of display_name and sms if found, or (null,null)
+   * @return array
+   *   tuple of display_name and sms if found, or (null,null)
    * @static
    */
   public static function getPhoneDetails($id, $type = NULL) {

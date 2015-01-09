@@ -225,7 +225,8 @@ class CRM_Utils_Rule {
    * @param bool $monthRequired
    *   Check whether month is mandatory.
    *
-   * @return bool true if valid date
+   * @return bool
+   *   true if valid date
    * @static
    */
   public static function currentDate($date, $monthRequired = TRUE) {
@@ -316,7 +317,8 @@ class CRM_Utils_Rule {
    *
    * @param string $date
    *
-   * @return bool true if valid date
+   * @return bool
+   *   true if valid date
    * @static
    */
   public static function mysqlDate($date) {
@@ -557,7 +559,8 @@ class CRM_Utils_Rule {
    *
    * @param array Uploaded file info (from $_FILES)
    *
-   * @return bool      true if file has been uploaded, false otherwise
+   * @return bool
+   *   true if file has been uploaded, false otherwise
    */
   public static function asciiFile($elementValue) {
     if ((isset($elementValue['error']) && $elementValue['error'] == 0) ||
@@ -573,7 +576,8 @@ class CRM_Utils_Rule {
    *
    * @param array Uploaded file info (from $_FILES)
    *
-   * @return bool      whether file has been uploaded properly and is now in UTF-8
+   * @return bool
+   *   whether file has been uploaded properly and is now in UTF-8
    */
   public static function utf8File($elementValue) {
     $success = FALSE;
@@ -602,7 +606,8 @@ class CRM_Utils_Rule {
    *
    * @param array Uploaded file info (from $_FILES)
    *
-   * @return bool      true if file has been uploaded, false otherwise
+   * @return bool
+   *   true if file has been uploaded, false otherwise
    */
   public static function htmlFile($elementValue) {
     if ((isset($elementValue['error']) && $elementValue['error'] == 0) ||
@@ -621,7 +626,8 @@ class CRM_Utils_Rule {
    * @param array $options
    *   The daoName and fieldName (optional ).
    *
-   * @return boolean     true if object exists
+   * @return boolean
+   *   true if object exists
    * @static
    */
   public static function objectExists($value, $options) {
@@ -748,7 +754,8 @@ class CRM_Utils_Rule {
    *
    * @param array $date
    *
-   * @return bool true if valid date
+   * @return bool
+   *   true if valid date
    * @static
    */
   public static function qfDate($date) {

@@ -659,7 +659,8 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    *
    * @param string $token       The token for which we will be doing adata lookup
    *
-   * @return array $funcStruct  An array that holds the token itself and the type.
+   * @return array
+   *   An array that holds the token itself and the type.
    *                             the type will tell us which function to use for the data lookup
    *                             if we need to do a lookup at all
    */
@@ -767,7 +768,8 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    *  that the user has uploaded or declared (if they have dome that)
    *
    *
-   * @return array reference to an assoc array
+   * @return array
+   *   reference to an assoc array
    *
    **/
   private function &getTemplates() {
@@ -834,7 +836,8 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    *  this function needs to have some sort of a body assigned
    *  either text or html for this to have any meaningful impact
    *
-   * @return array               reference to an assoc array
+   * @return array
+   *   reference to an assoc array
    *
    **/
   public function &getTokens() {
@@ -867,7 +870,8 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    * Returns the token set for all 3 parts as one set. This allows it to be sent to the
    * hook in one call and standardizes it across other token workflows
    *
-   * @return array               reference to an assoc array
+   * @return array
+   *   reference to an assoc array
    *
    **/
   public function &getFlattenedTokens() {
@@ -1035,7 +1039,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @param string $email
    *   Destination address.
    *
-   * @return array (reference) array    array ref that hold array refs to the verp info and urls
+   * @return array
+   *   (reference) array    array ref that hold array refs to the verp info and urls
    */
   public static function getVerpAndUrls($job_id, $event_queue_id, $hash, $email) {
     // create a skeleton object and set its properties that are required by getVerpAndUrlsAndHeaders()
@@ -1063,7 +1068,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @param bool $isForward
    *
-   * @return array (reference) array    array ref that hold array refs to the verp info, urls, and headers
+   * @return array
+   *   (reference) array    array ref that hold array refs to the verp info, urls, and headers
    * @access private
    */
   private function getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email, $isForward = FALSE) {
@@ -1502,7 +1508,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * Return a list of group names for this mailing.  Does not work with
    * prior-mailing targets.
    *
-   * @return array        Names of groups receiving this mailing
+   * @return array
+   *   Names of groups receiving this mailing
    */
   public function &getGroupNames() {
     if (!isset($this->id)) {
@@ -1583,7 +1590,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @param array $params
    * @param array $ids
    *
-   * @return object $mailing      The new mailing object
+   * @return object
+   *   $mailing      The new mailing object
    * @static
    */
   public static function create(&$params, $ids = array()) {
@@ -1768,7 +1776,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @param bool $isSMS
    *
-   * @return array        Associative array of reporting data
+   * @return array
+   *   Associative array of reporting data
    * @static
    */
   public static function &report($id, $skipDetails = FALSE, $isSMS = FALSE) {
@@ -2239,7 +2248,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @param
    *
-   * @return int              Count
+   * @return int
+   *   Count
    */
   public function getCount() {
     $this->selectAdd();
@@ -2300,7 +2310,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * where the user has access to ALL groups, and hence ALL mailings and return a
    * value of TRUE (to avoid the downstream where clause with a list of mailing list IDs
    *
-   * @return boolean | array - TRUE if the user has access to all mailings, else array of mailing IDs (possibly empty)
+   * @return boolean
+   *   | array - TRUE if the user has access to all mailings, else array of mailing IDs (possibly empty)
    * @static
    */
   public static function mailingACLIDs() {
@@ -2354,7 +2365,8 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    * @param null $additionalClause
    * @param array $additionalParams
    *
-   * @return array            The rows
+   * @return array
+   *   The rows
    */
   public function &getRows($offset, $rowCount, $sort, $additionalClause = NULL, $additionalParams = NULL) {
     $mailing = self::getTableName();
@@ -2687,7 +2699,8 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   /**
    * Get the search based mailing Ids
    *
-   * @return array $mailingIDs, searched base mailing ids.
+   * @return array
+   *   , searched base mailing ids.
    */
   public function searchMailingIDs() {
     $group = CRM_Mailing_DAO_MailingGroup::getTableName();
@@ -2719,7 +2732,8 @@ SELECT  $mailing.id as mailing_id
    *
    * @param bool $isSMS
    *
-   * @return array $report array content/component.
+   * @return array
+   *   array content/component.
    * @access public
    */
   public static function getMailingContent(&$report, &$form, $isSMS = FALSE) {
@@ -2922,7 +2936,8 @@ AND        m.id = %1
    * @param array $params
    *   Associated array for params record id.
    *
-   * @return array   $contactActivities associated array of contact activities
+   * @return array
+   *   associated array of contact activities
    */
   public static function getContactMailingSelector(&$params) {
     // format the params
@@ -3008,7 +3023,8 @@ AND        m.id = %1
    * @param array $params
    *   Associated array.
    *
-   * @return array of mailings for a contact
+   * @return array
+   *   of mailings for a contact
    *
    * @static
    */
@@ -3028,7 +3044,8 @@ AND        m.id = %1
    * @param array $params
    *   Associated array.
    *
-   * @return int count of mailings for a contact
+   * @return int
+   *   count of mailings for a contact
    *
    * @static
    */

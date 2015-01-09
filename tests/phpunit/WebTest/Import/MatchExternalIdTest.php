@@ -239,7 +239,8 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
    * @param string $lastName
    * @param int $externalId
    *
-   * @return int external id
+   * @return int
+   *   external id
    */
   public function _addContact($firstName, $lastName, $externalId) {
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
@@ -266,7 +267,8 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
    *
    * @param array $params
    *
-   * @return array event details of newly created event
+   * @return array
+   *   event details of newly created event
    */
   public function _addNewEvent($params = array()) {
     if (empty($params)) {

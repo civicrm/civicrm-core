@@ -65,7 +65,8 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
   /**
    * Get action Links
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
   public function &links() {
     if (!(self::$_links)) {

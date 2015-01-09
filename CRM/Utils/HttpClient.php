@@ -118,7 +118,8 @@ class CRM_Utils_HttpClient {
    *
    * @param string $remoteFile
    *   URL of remote file.
-   * @return array array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
+   * @return array
+   *   array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
    */
   public function get($remoteFile) {
     // Download extension zip file ...
@@ -157,7 +158,8 @@ class CRM_Utils_HttpClient {
    *   URL of a .zip file.
    * @param array $params
    *
-   * @return array array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
+   * @return array
+   *   array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
    */
   public function post($remoteFile, $params) {
     // Download extension zip file ...
@@ -190,7 +192,8 @@ class CRM_Utils_HttpClient {
 
   /**
    * @param string $remoteFile
-   * @return array (0 => resource, 1 => CA_Config_Curl)
+   * @return array
+   *   (0 => resource, 1 => CA_Config_Curl)
    */
   protected function createCurl($remoteFile) {
     require_once 'CA/Config/Curl.php';

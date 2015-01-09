@@ -80,7 +80,8 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    *
-   * @return array the result in a nice formatted array (or an error object)
+   * @return array
+   *   the result in a nice formatted array (or an error object)
    */
   public function doDirectPayment(&$params) {
     if (!defined('CURLOPT_SSLCERT')) {
@@ -379,7 +380,8 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    * @param int $invoiceId
    *   The ID to check.
    *
-   * @return bool                 True if ID exists, else false
+   * @return bool
+   *   True if ID exists, else false
    */
   public function _checkDupe($invoiceId) {
     $contribution = new CRM_Contribute_DAO_Contribution();
@@ -393,7 +395,8 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    * @param string $key
    * @param string $data
    *
-   * @return string the HMAC_MD5 encoding string
+   * @return string
+   *   the HMAC_MD5 encoding string
    **/
   public function hmac($key, $data) {
     if (function_exists('mhash')) {
@@ -455,7 +458,8 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   /**
    * Calculate and return the transaction fingerprint
    *
-   * @return string fingerprint
+   * @return string
+   *   fingerprint
    **/
   public function CalculateFP() {
     $x_tran_key  = $this->_getParam('paymentKey');
@@ -475,7 +479,8 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    * @param string $data
    *   A single CSV line.
    *
-   * @return array CSV fields
+   * @return array
+   *   CSV fields
    */
   public function explode_csv($data) {
     $data = trim($data);
@@ -511,7 +516,8 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    * @param string $content
    *   XML reply from Authorize.Net.
    *
-   * @return array refId, resultCode, code, text, subscriptionId
+   * @return array
+   *   refId, resultCode, code, text, subscriptionId
    */
   public function _parseArbReturn($content) {
     $refId          = $this->_substring_between($content, '<refId>', '</refId>');
@@ -587,7 +593,8 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    * @param string $field
    * @param mixed $value
    *
-   * @return bool false if value is not a scalar, true if successful
+   * @return bool
+   *   false if value is not a scalar, true if successful
    */
   public function _setParam($field, $value) {
     if (!is_scalar($value)) {
@@ -601,7 +608,8 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   /**
    * This function checks to see if we have the right config values
    *
-   * @return string the error message if any
+   * @return string
+   *   the error message if any
    */
   public function checkConfig() {
     $error = array();

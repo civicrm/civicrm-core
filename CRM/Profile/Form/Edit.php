@@ -313,7 +313,8 @@ SELECT module,is_reserved
    * This is a first version and will be tweaked over a period of time
    *
    *
-   * @return boolean   true if no error found
+   * @return boolean
+   *   true if no error found
    */
   public function validate() {
     $errors = parent::validate();

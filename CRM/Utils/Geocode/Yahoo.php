@@ -65,7 +65,8 @@ class CRM_Utils_Geocode_Yahoo {
    * @param bool $stateName
    *   This parameter currently has no function.
    *
-   * @return boolean true if we modified the address, false otherwise
+   * @return boolean
+   *   true if we modified the address, false otherwise
    * @static
    */
   public static function format(&$values, $stateName = FALSE) {

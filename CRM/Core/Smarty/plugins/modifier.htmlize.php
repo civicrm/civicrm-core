@@ -39,7 +39,8 @@
  * @param string $text
  *   Text to HTML-ize.
  *
- * @return string HTML-ized version of $text
+ * @return string
+   *   HTML-ized version of $text
  */
 function smarty_modifier_htmlize($text) {
   $text = preg_replace('@(https?://([-\w\.]+)+(:\d+)?(/([-\w/_\.]*(\?\S+)?)?)?)@', '<a href="$1">$1</a>', $text);

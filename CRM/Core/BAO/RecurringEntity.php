@@ -224,7 +224,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * This function builds a "When" object based on schedule/reminder params
    *
-   * @return object When object
+   * @return object
+   *   When object
    */
   public function generateRecursion() {
     // return if already generated
@@ -315,7 +316,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * This function iterates through when object criterias and
    * generates recursive dates based on that
    *
-   * @return array array of dates
+   * @return array
+   *   array of dates
    */
   public function generateRecursiveDates() {
     $this->generateRecursion();
@@ -403,7 +405,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @static
    *
-   * @return array an array of child ids
+   * @return array
+   *   an array of child ids
    */
   static public function getEntitiesForParent($parentId, $entityTable, $includeParent = TRUE, $mode = 3, $initiatorId = NULL) {
     $entities = array();
@@ -471,7 +474,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @static
    *
-   * @return array array of connected ids
+   * @return array
+   *   array of connected ids
    */
   static public function getEntitiesFor($entityId, $entityTable, $includeParent = TRUE, $mode = 3) {
     $parentId = self::getParentFor($entityId, $entityTable);
@@ -493,7 +497,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @static
    *
-   * @return int unsigned $parentId Parent ID
+   * @return int
+   *   unsigned $parentId Parent ID
    */
   static public function getParentFor($entityId, $entityTable, $includeParent = TRUE) {
     if (empty($entityId) || empty($entityTable)) {
@@ -951,7 +956,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param array $scheduleReminderDetails
    *   Array of repeat criterias saved in civicrm_action_schedule table .
    *
-   * @return object When object
+   * @return object
+   *   When object
    */
   public function getRecursionFromSchedule($scheduleReminderDetails = array()) {
     $r = new When();
@@ -1059,7 +1065,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @static
    *
-   * @return object DateTime object which contain time difference
+   * @return object
+   *   DateTime object which contain time difference
    */
   static public function getInterval($startDate, $endDate) {
     if ($startDate && $endDate) {

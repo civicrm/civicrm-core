@@ -55,7 +55,8 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   /**
    * An array of action links
    *
-   * @return array (reference)
+   * @return array
+   *   (reference)
    */
   abstract function &links();
 
@@ -103,7 +104,8 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * @param int $name
    *   The name or title of the object.
    *
-   * @return string   permission value if permission is granted, else null
+   * @return string
+   *   permission value if permission is granted, else null
    */
   public function checkPermission($id, $name) {
     return CRM_Core_Permission::EDIT;

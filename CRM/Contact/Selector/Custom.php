@@ -228,7 +228,8 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * @param enum $output
    *   What should the result set include (web/email/csv).
    *
-   * @return array the column headers that need to be displayed
+   * @return array
+   *   the column headers that need to be displayed
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     $columns = $this->_search->columns();
@@ -258,7 +259,8 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    *
    * @param
    *
-   * @return int Total number of rows
+   * @return int
+   *   Total number of rows
    */
   public function getTotalCount($action) {
     return $this->_search->count();
@@ -278,7 +280,8 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * @param enum $output
    *   What should the result set include (web/email/csv).
    *
-   * @return int   the total number of rows for this action
+   * @return int
+   *   the total number of rows for this action
    */
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
 
@@ -379,7 +382,8 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * @param array(
   reference)   $formValues   submitted formValues
    *
-   * @return array              $qill         which contains an array of strings
+   * @return array
+   *   which contains an array of strings
    */
   public function getQILL() {
     return NULL;
@@ -398,7 +402,8 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * @param string $output
    *   Type of output.
    *
-   * @return string name of the file
+   * @return string
+   *   name of the file
    */
   public function getExportFileName($output = 'csv') {
     return ts('CiviCRM Custom Search');

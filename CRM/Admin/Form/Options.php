@@ -328,7 +328,8 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    * @param array $self
    *   Current form object.
    *
-   * @return array array of errors / empty array.
+   * @return array
+   *   array of errors / empty array.
    * @static
    */
   public static function formRule($fields, $files, $self) {

@@ -396,7 +396,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO
     /**
      * returns an array containing the enum fields of the civicrm_price_field table
      *
-     * @return array (reference)  the array of enum fields
+     * @return array
+   *   (reference)  the array of enum fields
      */
     static function &getEnums()
     {
@@ -413,7 +414,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO
      * @param string $value
      *   The enum value up for translation.
      *
-     * @return string  the display value of the enum
+     * @return string
+   *   the display value of the enum
      */
     public static function tsEnum($field, $value)
     {

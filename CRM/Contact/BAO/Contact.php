@@ -471,7 +471,8 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    *
    * @param bool $type
    *
-   * @return array the displayName and contactImage for this contact
+   * @return array
+   *   the displayName and contactImage for this contact
    * @static
    */
   public static function getDisplayAndImage($id, $type = FALSE) {
@@ -764,7 +765,8 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @param bool $skipUndelete
    *   Whether to force contact delete or not.
    *
-   * @return boolean true if contact deleted, false otherwise
+   * @return boolean
+   *   true if contact deleted, false otherwise
    * @static
    */
   public static function deleteContact($id, $restore = FALSE, $skipUndelete = FALSE) {
@@ -897,7 +899,8 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @param int $id
    *   Id of the contact.
    *
-   * @return boolean true if contact image is deleted
+   * @return boolean
+   *   true if contact image is deleted
    */
   public static function deleteContactImage($id) {
     if (!$id) {
@@ -918,7 +921,8 @@ WHERE id={$id}; ";
    * @param string $absolutePath
    *   Absolute path.
    *
-   * @return String $relativePath Relative url of uploaded image
+   * @return String
+   *   Relative url of uploaded image
    */
   public static function getRelativePath($absolutePath) {
     $relativePath = NULL;
@@ -959,7 +963,8 @@ WHERE id={$id}; ";
    * @param Integer $imageHeight
    *   Height of image.
    *
-   * @return Array thumb dimension of image
+   * @return Array
+   *   thumb dimension of image
    */
   public static function getThumbSize($imageWidth, $imageHeight) {
     $thumbWidth = 100;
@@ -992,7 +997,8 @@ WHERE id={$id}; ";
    * @param string $opType
    *   Type of operation like fatal, bounce etc.
    *
-   * @return boolean true if valid image extension
+   * @return boolean
+   *   true if valid image extension
    */
   public static function processImageParams(
     &$params,
@@ -1088,7 +1094,8 @@ WHERE id={$id}; ";
    * @param int $id
    *   Id of the contact whose contact type is needed.
    *
-   * @return string contact_type if $id found else null ""
+   * @return string
+   *   contact_type if $id found else null ""
    *
    *
    * @static
@@ -1106,7 +1113,8 @@ WHERE id={$id}; ";
    *
    * @param null $implodeDelimiter
    *
-   * @return string contact_sub_type if $id found else null ""
+   * @return string
+   *   contact_sub_type if $id found else null ""
    *
    *
    * @static
@@ -1177,7 +1185,8 @@ WHERE id={$id}; ";
    *
    * @param bool $withMultiCustomFields
    *
-   * @return array array of importable Fields
+   * @return array
+   *   array of importable Fields
    * @static
    */
   static function importableFields(
@@ -1376,7 +1385,8 @@ WHERE id={$id}; ";
    *
    * @param bool $withMultiRecord
    *
-   * @return array array of exportable Fields
+   * @return array
+   *   array of exportable Fields
    * @static
    */
   public static function &exportableFields($contactType = 'Individual', $status = FALSE, $export = FALSE, $search = FALSE, $withMultiRecord = FALSE) {
@@ -1637,7 +1647,8 @@ WHERE id={$id}; ";
    * @param int $contactId
    *   Contact id.
    *
-   * @return array a hierarchical property tree if appropriate
+   * @return array
+   *   a hierarchical property tree if appropriate
    * @static
    */
   public static function &makeHierReturnProperties($fields, $contactId = NULL) {
@@ -1712,7 +1723,8 @@ WHERE id={$id}; ";
    * @param bool $skipDefaultPriamry
    * @param null $block
    *
-   * @return int $locationType location_type_id
+   * @return int
+   *   $locationType location_type_id
    * @static
    */
   public static function getPrimaryLocationType($contactId, $skipDefaultPriamry = FALSE, $block = NULL) {
@@ -1775,7 +1787,8 @@ WHERE  civicrm_contact.id = %1 ";
    * @param int $id
    *   Id of the contact.
    *
-   * @return array  of display_name, email if found, do_not_email or (null,null,null)
+   * @return array
+   *   of display_name, email if found, do_not_email or (null,null,null)
    * @static
    */
   public static function getContactDetails($id) {
@@ -1831,7 +1844,8 @@ ORDER BY civicrm_email.is_primary DESC";
    *   Basically lets us know where this request is coming from.
    *                                if via a profile from web, we restrict what groups are changed
    *
-   * @return int contact id created/edited
+   * @return int
+   *   contact id created/edited
    * @static
    */
   static function createProfileContact(
@@ -2305,7 +2319,8 @@ ORDER BY civicrm_email.is_primary DESC";
    * @param string $ctype
    *   Contact type.
    *
-   * @return object $dao contact details
+   * @return object
+   *   $dao contact details
    * @static
    */
   public static function &matchContactOnEmail($mail, $ctype = NULL) {
@@ -2357,7 +2372,8 @@ WHERE      civicrm_email.email = %1 AND civicrm_contact.is_deleted=0";
    * @param string $ctype
    *   Contact type.
    *
-   * @return object $dao contact details
+   * @return object
+   *   $dao contact details
    * @static
    */
   public static function &matchContactOnOpenId($openId, $ctype = NULL) {
@@ -2394,7 +2410,8 @@ WHERE      civicrm_openid.openid = %1";
    * @param int $contactID
    *   Contact id.
    *
-   * @return string $dao->email  email address if present else null
+   * @return string
+   *   >email  email address if present else null
    * @static
    */
   public static function getPrimaryEmail($contactID) {
@@ -2422,7 +2439,8 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
    * @param int $contactID
    *   Contact id.
    *
-   * @return string $dao->openid   OpenID if present else null
+   * @return string
+   *   >openid   OpenID if present else null
    * @static
    */
   public static function getPrimaryOpenId($contactID) {
@@ -2775,7 +2793,8 @@ AND       civicrm_openid.is_primary = 1";
    * @param string $condOperator
    *   Operator use for grouping multiple conditions.
    *
-   * @return array  $locBlockIds  loc block ids which fulfill condition.
+   * @return array
+   *   loc block ids which fulfill condition.
    * @static
    */
   public static function getLocBlockIds($contactId, $criteria = array(), $condOperator = 'AND') {
@@ -2824,7 +2843,8 @@ AND       civicrm_openid.is_primary = 1";
    *
    * @param int $contactId
    *
-   * @return array of context menu for logged in user.
+   * @return array
+   *   of context menu for logged in user.
    * @static
    */
   public static function contextMenu($contactId = NULL) {
@@ -3266,7 +3286,8 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    * @param int $contactId
    *   Contact id.
    *
-   * @return bool true if present else false.
+   * @return bool
+   *   true if present else false.
    * @static
    */
   public static function checkDomainContact($contactId) {

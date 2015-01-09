@@ -115,7 +115,8 @@ WHERE  civicrm_pcp.contact_id = civicrm_contact.id
    *
    * @param int $contactId
    *
-   * @return array     array of Pcp if found
+   * @return array
+   *   array of Pcp if found
    * @static
    */
   public static function getPcpDashboardInfo($contactId) {
@@ -258,7 +259,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *
    * @static
    *
-   * @return array $honor
+   * @return array
    */
   public static function honorRoll($pcpId) {
     $query = "
@@ -283,7 +284,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Get action links
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    * @static
    */
   public static function &pcpLinks() {

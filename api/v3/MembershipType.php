@@ -43,7 +43,8 @@
  * @param array $params
  *   An associative array of name/value property values of civicrm_membership_type.
  *
- * @return array $result newly created or updated membership type property values.
+ * @return array
+   *   newly created or updated membership type property values.
  * @access public
  * {getfields MembershipType_get}
  */
@@ -87,7 +88,8 @@ function _civicrm_api3_membership_type_create_spec(&$params) {
  *   An associative array of name/value property values of civicrm_membership_type.
  * {getfields MembershipType_get}
  *
- * @return Array of all found membership type property values.
+ * @return Array
+   *   of all found membership type property values.
  * @access public
  */
 function civicrm_api3_membership_type_get($params) {
@@ -102,7 +104,8 @@ function civicrm_api3_membership_type_get($params) {
  *
  * @param array $params
  *
- * @return boolean        true if success, else false
+ * @return boolean
+   *   true if success, else false
  * @access public
  * {getfields MembershipType_delete}
  */

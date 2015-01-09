@@ -74,7 +74,8 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
   }
 
   /**
-   * @return array of contact details
+   * @return array
+   *   of contact details
    */
   public function _testOfflineContribution() {
     // Create a contact to be used as soft creditor

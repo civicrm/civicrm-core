@@ -57,7 +57,8 @@ class CRM_Mailing_Event_BAO_Unsubscribe extends CRM_Mailing_Event_DAO_Unsubscrib
    * @param string $hash
    *   The hash.
    *
-   * @return boolean          Was the contact successfully unsubscribed?
+   * @return boolean
+   *   Was the contact successfully unsubscribed?
    * @static
    */
   public static function unsub_from_domain($job_id, $queue_id, $hash) {
@@ -424,7 +425,8 @@ WHERE  email = %2
    *
    * @param null $org_unsubscribe
    *
-   * @return int                  Number of rows in result set
+   * @return int
+   *   Number of rows in result set
    * @static
    */
   public static function getTotalCount(
@@ -496,7 +498,8 @@ WHERE  email = %2
    *   Sort array.
    *
    * @param null $org_unsubscribe
-   * @return array                Result set
+   * @return array
+   *   Result set
    * @static
    */
   public static function &getRows(

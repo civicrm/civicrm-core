@@ -83,7 +83,8 @@ function _civicrm_api3_word_replacement_create_spec(&$params) {
  *   Array containing id of the word_replacement.
  *  to be deleted
  *
- * @return array api result array
+ * @return array
+   *   api result array
  *
  * @access public
  */

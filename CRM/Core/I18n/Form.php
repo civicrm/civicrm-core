@@ -84,7 +84,8 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
    *
    * access        public
    *
-   * @return array reference to the array of default values
+   * @return array
+   *   reference to the array of default values
    *
    */
   public function setDefaultValues() {

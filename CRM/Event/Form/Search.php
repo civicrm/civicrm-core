@@ -362,7 +362,8 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * Set the default form values
    *
    *
-   * @return array the default array reference
+   * @return array
+   *   the default array reference
    */
   public function setDefaultValues() {
     $defaults = array();

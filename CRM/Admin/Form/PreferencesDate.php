@@ -93,7 +93,8 @@ class CRM_Admin_Form_PreferencesDate extends CRM_Admin_Form {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @return array    if errors then list of errors to be posted back to the form,
+   * @return array
+   *   if errors then list of errors to be posted back to the form,
    *                  true otherwise
    * @static
    */

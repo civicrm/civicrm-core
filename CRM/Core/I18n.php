@@ -109,7 +109,8 @@ class CRM_Core_I18n {
   /**
    * Returns whether gettext is running natively or using PHP-Gettext.
    *
-   * @return bool True if gettext is native
+   * @return bool
+   *   True if gettext is native
    */
   public function isNative() {
     return $this->_nativegettext;
@@ -121,7 +122,8 @@ class CRM_Core_I18n {
    * @param bool $justEnabled
    *   whether to return all languages or just the enabled ones.
    *
-   * @return array    of code/language name mappings
+   * @return array
+   *   of code/language name mappings
    */
   public static function languages($justEnabled = FALSE) {
     static $all = NULL;
@@ -176,7 +178,8 @@ class CRM_Core_I18n {
    *   source string.
    * @param mixed arguments, can be passed in an array or through single variables
    *
-   * @return string  modified string
+   * @return string
+   *   modified string
    */
   public function strarg($str) {
     $tr = array();
@@ -215,7 +218,8 @@ class CRM_Core_I18n {
    * @param array $params
    *   the params of the translation (if any).
    *
-   * @return string  the translated string
+   * @return string
+   *   the translated string
    */
   public function crm_translate($text, $params = array()) {
     if (isset($params['escape'])) {
@@ -347,7 +351,8 @@ class CRM_Core_I18n {
    * @param string $string
    *   this string should be translated.
    *
-   * @return string  the translated string
+   * @return string
+   *   the translated string
    */
   public function translate($string) {
     return ($this->_phpgettext) ? $this->_phpgettext->translate($string) : $string;
@@ -406,7 +411,8 @@ class CRM_Core_I18n {
    * @param $key
    *   Key of the extension (can be 'civicrm', or 'org.example.foo').
    *
-   * @return Boolean True if the domain was changed for an extension.
+   * @return Boolean
+   *   True if the domain was changed for an extension.
    */
   public function setGettextDomain($key) {
     /* No domain changes for en_US */
@@ -475,7 +481,8 @@ class CRM_Core_I18n {
   /**
    * Set the LC_TIME locale if it's not set already (for a given language choice).
    *
-   * @return string  the final LC_TIME that got set
+   * @return string
+   *   the final LC_TIME that got set
    */
   public static function setLcTime() {
     static $locales = array();
@@ -499,7 +506,8 @@ class CRM_Core_I18n {
  * @param $params
  *   Array an array of additional parameters.
  *
- * @return string  the translated string
+ * @return string
+   *   the translated string
  */
 function ts($text, $params = array()) {
   static $config = NULL;

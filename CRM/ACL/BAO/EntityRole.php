@@ -80,7 +80,8 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {

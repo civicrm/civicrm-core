@@ -73,7 +73,7 @@ class CRM_Utils_SoapServer {
    * @param string $var
    *   The string to be echoed.
    *
-   * @return string       $var
+   * @return string
    */
   public function ping($var) {
     $session = CRM_Core_Session::singleton();
@@ -123,7 +123,8 @@ class CRM_Utils_SoapServer {
    * @param bool $loadCMSBootstrap
    *
    * @throws SoapFault
-   * @return string           The SOAP Client key
+   * @return string
+   *   The SOAP Client key
    * @static
    */
   public function authenticate($name, $pass, $loadCMSBootstrap = FALSE) {

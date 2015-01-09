@@ -44,7 +44,8 @@ class CRM_Utils_File {
    * @param string $name
    *   Name of file.
    *
-   * @return boolean     true if file is ascii
+   * @return boolean
+   *   true if file is ascii
    */
   public static function isAscii($name) {
     $fd = fopen($name, "r");
@@ -71,7 +72,8 @@ class CRM_Utils_File {
    * @param string $name
    *   Name of file.
    *
-   * @return boolean     true if file is html
+   * @return boolean
+   *   true if file is html
    */
   public static function isHtml($name) {
     $fd = fopen($name, "r");
@@ -203,7 +205,8 @@ class CRM_Utils_File {
    * @param string $name
    *   Name of file.
    *
-   * @return boolean  whether the file was recoded properly
+   * @return boolean
+   *   whether the file was recoded properly
    */
   public static function toUtf8($name) {
     static $config = NULL;
@@ -347,7 +350,8 @@ class CRM_Utils_File {
    * @param string $name
    *   Name of file.
    *
-   * @return boolean  whether the file can be include()d or require()d
+   * @return boolean
+   *   whether the file can be include()d or require()d
    */
   public static function isIncludable($name) {
     $x = @fopen($name, 'r', TRUE);
@@ -679,7 +683,8 @@ HTACCESS;
    *   The new location of the directory.
    * @param bool $verbose
    *
-   * @return bool TRUE on success
+   * @return bool
+   *   TRUE on success
    */
   public static function replaceDir($fromDir, $toDir, $verbose = FALSE) {
     if (is_dir($toDir)) {

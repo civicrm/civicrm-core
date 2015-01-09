@@ -52,7 +52,8 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
    * @param array $params
    *   The values for this table: activity id, contact id, record type.
    *
-   * @return object activity_contact object
+   * @return object
+   *   activity_contact object
    *
    */
   public static function create(&$params) {

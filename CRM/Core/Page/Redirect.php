@@ -29,7 +29,8 @@ class CRM_Core_Page_Redirect extends CRM_Core_Page {
    *   Any parameters passed as part of this page request.
    * @param bool $absolute
    *   Whether to return an absolute URL.
-   * @return string URL
+   * @return string
+   *   URL
    */
   public static function createUrl($requestPath, $requestArgs, $pageArgs, $absolute) {
     if (empty($pageArgs['url'])) {

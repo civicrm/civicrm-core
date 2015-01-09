@@ -213,7 +213,8 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   /**
    * Get action links
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    * @static
    */
   static

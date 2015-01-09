@@ -411,7 +411,8 @@ class CRM_Core_Session {
   /**
    * Pops the top userContext stack
    *
-   * @return string the top of the userContext stack (also pops the top element)
+   * @return string
+   *   the top of the userContext stack (also pops the top element)
    *
    */
   public function popUserContext() {
@@ -423,7 +424,8 @@ class CRM_Core_Session {
   /**
    * Reads the top userContext stack
    *
-   * @return string the top of the userContext stack
+   * @return string
+   *   the top of the userContext stack
    *
    */
   public function readUserContext() {
@@ -454,7 +456,8 @@ class CRM_Core_Session {
    * @param bool $reset
    *   Should we reset the status variable?.
    *
-   * @return string        the status message if any
+   * @return string
+   *   the status message if any
    */
   public function getStatus($reset = FALSE) {
     $this->initialize();

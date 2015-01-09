@@ -77,7 +77,8 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -191,7 +192,8 @@ WHERE cft.id = %1
    *
    * @param \account|string $accountTypeCode account type code
    *
-   * @return integer count
+   * @return integer
+   *   count
    * @static
    */
   public static function getARAccounts($financialAccountId, $financialAccountTypeId = NULL, $accountTypeCode = 'ar') {

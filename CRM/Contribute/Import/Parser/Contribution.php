@@ -152,7 +152,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
+   * @return boolean
+   *   the result of this processing
    */
   public function preview(&$values) {
     return $this->summary($values);
@@ -164,7 +165,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
+   * @return boolean
+   *   the result of this processing
    */
   public function summary(&$values) {
     $erroneousField = NULL;
@@ -242,7 +244,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
+   * @return boolean
+   *   the result of this processing
    */
   public function import($onDuplicate, &$values) {
     // first make sure this is a valid line

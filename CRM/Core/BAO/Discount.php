@@ -70,7 +70,8 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return object    CRM_Core_DAO_Discount object on success, otherwise null
+   * @return object
+   *   CRM_Core_DAO_Discount object on success, otherwise null
    * @static
    */
   public static function add(&$params) {
@@ -89,7 +90,8 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * @param string $entityTable
    *   Entity table to be searched.
    *
-   * @return array    $optionGroupIDs option group Ids associated with discount
+   * @return array
+   *   option group Ids associated with discount
    *
    */
   public static function getOptionGroup($entityId, $entityTable) {
@@ -112,7 +114,8 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * @param string $entityTable
    *   Entity table to be searched.
    *
-   * @return integer  $dao->id       discount id of the set which matches
+   * @return integer
+   *   $dao->id       discount id of the set which matches
    *                                 the date criteria
    */
   public static function findSet($entityID, $entityTable) {

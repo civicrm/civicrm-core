@@ -127,7 +127,8 @@ class CRM_Core_Form_Date {
    *   Additional Operator Selections to add.
    * @param string $dateFormat
    * @param bool $displayTime
-   * @return array Values for Selector
+   * @return array
+   *   Values for Selector
    */
   static function returnDateRangeSelector(
     &$form, $fieldName, $count = 1,

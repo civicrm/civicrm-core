@@ -37,7 +37,8 @@ class AuthorizeNet extends PHPUnit_Framework_Testcase {
    * @param int $id
    *   Id of the PayPal Pro payment processor.
    * to be deleted
-   * @return boolean true if payment processor deleted, false otherwise
+   * @return boolean
+   *   true if payment processor deleted, false otherwise
    *
    */
   public function delete($id) {

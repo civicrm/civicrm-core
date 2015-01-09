@@ -47,7 +47,8 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object soft contribution of object that is added
+   * @return object
+   *   soft contribution of object that is added
    *
    */
   public static function add(&$params) {
@@ -148,7 +149,8 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @param bool $all
    *   Include PCP data.
    *
-   * @return array of soft contribution ids, amounts, and associated contact ids
+   * @return array
+   *   of soft contribution ids, amounts, and associated contact ids
    * @static
    */
   public static function getSoftContribution($contributionID, $all = FALSE) {

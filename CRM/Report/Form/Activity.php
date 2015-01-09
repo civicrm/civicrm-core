@@ -298,7 +298,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   }
 
   /** adding address fields with dbAlias for order clause
-   * @return array address fields
+   * @return array
+   *   address fields
    */
   public function addressFields($orderBy = FALSE) {
     $address = parent::addAddressFields(FALSE, TRUE);

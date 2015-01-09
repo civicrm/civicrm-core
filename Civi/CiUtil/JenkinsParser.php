@@ -8,7 +8,8 @@ class JenkinsParser {
   /**
    * @param string $content
    *   Xml data.
-   * @return array (string $testName => string $status)
+   * @return array
+   *   (string $testName => string $status)
    */
   public static function parseXmlResults($content) {
     $xml = simplexml_load_string($content);

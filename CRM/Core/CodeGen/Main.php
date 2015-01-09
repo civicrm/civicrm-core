@@ -123,7 +123,8 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   }
 
   /**
-   * @return array of class names; each class implements CRM_Core_CodeGen_ITask
+   * @return array
+   *   of class names; each class implements CRM_Core_CodeGen_ITask
    */
   public function getTasks() {
     $components = array(

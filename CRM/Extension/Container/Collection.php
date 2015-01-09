@@ -148,7 +148,8 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
    * Get a list of all keys in these containers -- and the
    * name of the container which defines each key.
    *
-   * @return array ($key => $containerName)
+   * @return array
+   *   ($key => $containerName)
    */
   public function getKeysToContainer() {
     if ($this->cache) {

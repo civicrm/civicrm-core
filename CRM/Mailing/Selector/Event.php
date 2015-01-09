@@ -140,7 +140,8 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    * @param enum $output
    *   What should the result set include (web/email/csv).
    *
-   * @return array the column headers that need to be displayed
+   * @return array
+   *   the column headers that need to be displayed
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
@@ -257,7 +258,8 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    *
    * @param
    *
-   * @return int Total number of rows
+   * @return int
+   *   Total number of rows
    */
   public function getTotalCount($action) {
     switch ($this->_event_type) {
@@ -353,7 +355,8 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    * @param enum $output
    *   What should the result set include (web/email/csv).
    *
-   * @return int   the total number of rows for this action
+   * @return int
+   *   the total number of rows for this action
    */
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     switch ($this->_event_type) {
@@ -430,7 +433,8 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    * @param string $output
    *   Type of output.
    *
-   * @return string name of the file
+   * @return string
+   *   name of the file
    */
   public function getExportFileName($output = 'csv') {}
 

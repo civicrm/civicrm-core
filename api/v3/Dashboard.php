@@ -45,7 +45,8 @@
  *   Array of property name/value.
  *                             pairs for the Dashlet.
  *
- * @return array Array containing 'is_error' to denote success or failure and details of the created activity
+ * @return array
+   *   Array containing 'is_error' to denote success or failure and details of the created activity
  *
  */
 function civicrm_api3_dashboard_create($params) {

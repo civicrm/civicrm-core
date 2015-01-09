@@ -73,7 +73,8 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param string $returnColumn
    *
-   * @return array - array reference of all survey activity types.
+   * @return array
+   *   array reference of all survey activity types.
    * @static
    */
   public static function &activityType($returnColumn = 'name') {
@@ -100,7 +101,8 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @static
    *
-   * @return array - array reference of all campaign types.
+   * @return array
+   *   array reference of all campaign types.
    *
    */
   public static function &campaignType() {
@@ -119,7 +121,8 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @static
    *
-   * @return array - array reference of all campaign status.
+   * @return array
+   *   array reference of all campaign status.
    *
    */
   public static function &campaignStatus() {
@@ -138,7 +141,8 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @static
    *
-   * @return array - array reference of all Engagement Level.
+   * @return array
+   *   array reference of all Engagement Level.
    */
   public static function &engagementLevel() {
     if (!isset(self::$engagementLevel)) {

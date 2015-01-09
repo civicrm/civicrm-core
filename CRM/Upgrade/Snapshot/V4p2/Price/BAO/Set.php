@@ -87,7 +87,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
    * @param bool $isActive
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    * @static
    */
   public static function setIsActive($id, $isActive) {
@@ -139,7 +140,8 @@ WHERE       ps.name = '{$entityName}'
    * @param int $id
    *   Id of price set.
    *
-   * @return string   title
+   * @return string
+   *   title
    *
    * @static
    *
@@ -256,7 +258,8 @@ WHERE     ct.id = cp.contribution_type_id AND
    * @param int $id
    *   Price Set id.
    *
-   * @return boolean false if fields exist for this set, true if the
+   * @return boolean
+   *   false if fields exist for this set, true if the
    * set could be deleted
    *
    * @static
@@ -413,7 +416,8 @@ WHERE     ct.id = cp.contribution_type_id AND
    *   Whether or not to include inactive entries.
    * @param bool|string $extendComponentName name of the component like 'CiviEvent','CiviContribute'
    *
-   * @return array associative array of id => name
+   * @return array
+   *   associative array of id => name
    */
   public static function getAssoc($withInactive = FALSE, $extendComponentName = FALSE) {
     $query = "
@@ -460,7 +464,8 @@ WHERE     ct.id = cp.contribution_type_id AND
    * @param bool $required
    * @param bool $validOnly
    *
-   * @return array $setTree - array consisting of field details
+   * @return array
+   *   array consisting of field details
    */
   public static function getSetDetail($setID, $required = TRUE, $validOnly = FALSE) {
     // create a new tree
@@ -875,7 +880,7 @@ WHERE  id = %1";
    * @param CRM_Core_Form $form
    * @param $defaults
    *
-   * @return array $defaults
+   * @return array
    */
   static function setDefaultPriceSet(&$form, &$defaults) {
     if (!isset($form->_priceSet) || empty($form->_priceSet['fields'])) {
@@ -902,7 +907,8 @@ WHERE  id = %1";
    *
    * @param int id Price Set id
    *
-   * @return array of the field ids
+   * @return array
+   *   of the field ids
    *
    * @static
    */
@@ -1054,7 +1060,8 @@ GROUP BY     mt.member_of_contact_id";
    * @param int $priceSetId
    *   Price set id.
    *
-   * @return int $autoRenewOption ( 0:hide, 1:optional 2:required )
+   * @return int
+   *   $autoRenewOption ( 0:hide, 1:optional 2:required )
    */
   public static function checkAutoRenewForPriceSet($priceSetId) {
     // auto-renew option should be visible if membership types associated with all the fields has
@@ -1102,7 +1109,8 @@ GROUP BY     mt.member_of_contact_id";
    * @param int $priceSetId
    *   Price set id.
    *
-   * @return array associate array of frequency interval and unit
+   * @return array
+   *   associate array of frequency interval and unit
    * @static
    */
   public static function getRecurDetails($priceSetId) {
@@ -1136,7 +1144,8 @@ GROUP BY     mt.member_of_contact_id";
    * @param bool $isQuickConfigValue we want to set the is_quick_config field.
    *   Value we want to set the is_quick_config field.
    *
-   * @return Object                   DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    * @static
    */
   public static function setIsQuickConfig($id, $isQuickConfig) {

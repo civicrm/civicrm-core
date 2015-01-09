@@ -47,7 +47,8 @@
  * @param array $params
  * @param array $ids
  *
- * @return array API Success Array
+ * @return array
+   *   API Success Array
  */
 function civicrm_api3_mailing_a_b_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -59,7 +60,8 @@ function civicrm_api3_mailing_a_b_create($params) {
  * @param array $params
  * @param array $ids
  *
- * @return array API Success Array
+ * @return array
+   *   API Success Array
  */
 function civicrm_api3_mailing_a_b_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

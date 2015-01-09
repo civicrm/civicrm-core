@@ -100,7 +100,8 @@ class CRM_Core_IDS {
    * @param bool $force
    *   Should we recreate it irrespective if it exists or not.
    *
-   * @return string the full path to the config file
+   * @return string
+   *   the full path to the config file
    * @static
    */
   public static function createConfigFile($force = FALSE) {

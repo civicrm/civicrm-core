@@ -98,7 +98,8 @@ class CRM_Utils_Zip {
    * @param ZipArchive $zip
    * @param $expected
    *
-   * @return string or FALSE
+   * @return string
+   *   or FALSE
    */
   static public function guessBasedir(ZipArchive $zip, $expected) {
     $candidate = FALSE;

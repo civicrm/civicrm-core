@@ -68,7 +68,8 @@ class CRM_Core_OptionValue {
    * @param array $links
    *   Has links like edit, delete, disable ..etc.
    *
-   * @return array of option-values
+   * @return array
+   *   of option-values
    *
    * @static
    */
@@ -254,7 +255,8 @@ class CRM_Core_OptionValue {
    * @param string $fieldName
    *   The name of the field in the DAO.
    *
-   * @return boolean     true if object exists
+   * @return boolean
+   *   true if object exists
    * @static
    */
   public static function optionExists($value, $daoName, $daoID, $optionGroupID, $fieldName = 'name') {
@@ -276,7 +278,8 @@ class CRM_Core_OptionValue {
    * @param string $mode
    * @param string $contactType
    *
-   * @return boolean     true if object exists
+   * @return boolean
+   *   true if object exists
    * @static
    */
   public static function getFields($mode = '', $contactType = 'Individual') {
@@ -384,7 +387,8 @@ class CRM_Core_OptionValue {
    * @param bool $isActiveDo you want only active option values?.
    *   Do you want only active option values?.
    *
-   * @return array of option-values
+   * @return array
+   *   of option-values
    *
    * @static
    */

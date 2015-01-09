@@ -404,7 +404,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    *
    * @param null
    *
-   * @return array   array of default values
+   * @return array
+   *   array of default values
    */
   public function setDefaultValues() {
     $defaults = &$this->_defaults;
@@ -527,7 +528,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @param array $list
    *   Array of relationship name.
    *
-   * @return array of relationship name.
+   * @return array
+   *   of relationship name.
    */
   public static function getFormattedList(&$list) {
     $relName = array();

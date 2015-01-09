@@ -43,7 +43,8 @@
  *
  * @param array $params
  *
- * @return array of newly created sms_provider property values.
+ * @return array
+   *   of newly created sms_provider property values.
  * @access public
  */
 function civicrm_api3_sms_provider_create($params) {
@@ -59,7 +60,8 @@ function civicrm_api3_sms_provider_create($params) {
  *
  * @param array $params
  *
- * @return array of retrieved sms_provider property values.
+ * @return array
+   *   of retrieved sms_provider property values.
  * @access public
  */
 function civicrm_api3_sms_provider_get($params) {
@@ -75,7 +77,8 @@ function civicrm_api3_sms_provider_get($params) {
  *
  * @param array $params
  *
- * @return array of deleted values.
+ * @return array
+   *   of deleted values.
  * @access public
  */
 function civicrm_api3_sms_provider_delete($params) {

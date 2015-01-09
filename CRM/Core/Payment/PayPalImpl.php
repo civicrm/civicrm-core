@@ -91,7 +91,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    *
-   * @return array the result in an nice formatted array (or an error object)
+   * @return array
+   *   the result in an nice formatted array (or an error object)
    */
   public function setExpressCheckOut(&$params) {
     $args = array();
@@ -135,7 +136,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param string $token
    *   The key associated with this transaction.
    *
-   * @return array the result in an nice formatted array (or an error object)
+   * @return array
+   *   the result in an nice formatted array (or an error object)
    */
   public function getExpressCheckoutDetails($token) {
     $args = array();
@@ -177,7 +179,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *
    * @internal param string $token the key associated with this transaction
    *
-   * @return array the result in an nice formatted array (or an error object)
+   * @return array
+   *   the result in an nice formatted array (or an error object)
    */
   public function doExpressCheckout(&$params) {
     $args = array();
@@ -295,7 +298,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *   Assoc array of input parameters for this transaction.
    *
    * @param string $component
-   * @return array the result in an nice formatted array (or an error object)
+   * @return array
+   *   the result in an nice formatted array (or an error object)
    */
   public function doDirectPayment(&$params, $component = 'contribute') {
     $args = array();
@@ -371,7 +375,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   /**
    * This function checks to see if we have the right config values
    *
-   * @return string the error message if any
+   * @return string
+   *   the error message if any
    */
   public function checkConfig() {
     $error = array();

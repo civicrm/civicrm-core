@@ -530,7 +530,8 @@ FROM   {$this->_tableName} contact_a
 
   /**
    * @param int|array $limit
-   * @return string SQL
+   * @return string
+   *   SQL
    * @see CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery::toLimit
    */
   public function toLimit($limit) {

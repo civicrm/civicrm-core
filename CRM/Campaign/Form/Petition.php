@@ -125,7 +125,8 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
    *
    * @param null
    *
-   * @return array    array of default values
+   * @return array
+   *   array of default values
    */
   public function setDefaultValues() {
     $defaults = $this->_values;

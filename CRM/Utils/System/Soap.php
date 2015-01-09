@@ -65,7 +65,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @param string $str
    *   The permission to check.
    *
-   * @return boolean true if yes, else false
+   * @return boolean
+   *   true if yes, else false
    * @static
    */
   public function checkPermission($str) {
@@ -110,7 +111,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @param string $fragment
    *   A fragment identifier (named anchor) to append to the link.
    *
-   * @return string            an HTML string containing a link to the given path.
+   * @return string
+   *   an HTML string containing a link to the given path.
    *
    */
   public function url($path = NULL, $query = NULL, $absolute = TRUE, $fragment = NULL) {
@@ -129,7 +131,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    *
    * @param the default action if one is pre-specified
    *
-   * @return string the url to post the form
+   * @return string
+   *   the url to post the form
    */
   public function postURL($action) {
     return NULL;
@@ -154,7 +157,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @param string $pass
    *   Login password.
    *
-   * @return array            Result array
+   * @return array
+   *   Result array
    */
   public function &authenticate($name, $pass) {
     if (isset(self::$ufClass)) {
@@ -184,7 +188,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   /**
    * Get the locale set in the hosting CMS
    *
-   * @return null  as the language is set elsewhere
+   * @return null
+   *   as the language is set elsewhere
    */
   public function getUFLocale() {
     return NULL;
@@ -197,7 +202,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    *   If present, add destination to querystring (works for Drupal only).
    *
    * @throws Exception
-   * @return string - loginURL for the current CMS
+   * @return string
+   *   loginURL for the current CMS
    * @static
    */
   public function getLoginURL($destination = '') {

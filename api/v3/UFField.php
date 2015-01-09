@@ -45,7 +45,8 @@
  *
  * @throws API_Exception
  *
- * @return array Newly created $ufFieldArray
+ * @return array
+   *   Newly created $ufFieldArray
  *
  * @access public
  * {@getfields UFField_create}
@@ -114,7 +115,8 @@ function civicrm_api3_uf_field_create($params) {
  *
  * @param array $params
  *
- * @return array fields valid for other functions
+ * @return array
+   *   fields valid for other functions
  */
 function _civicrm_api3_uf_field_create_spec(&$params) {
   $params['option.autoweight'] = array(
@@ -135,7 +137,8 @@ function _civicrm_api3_uf_field_create_spec(&$params) {
  *                       property_name=>value pairs. If $params is set
  *                       as null, all surveys will be returned
  *
- * @return array  (reference) Array
+ * @return array
+   *   (reference) Array
  * {@getfields UFField_get
  * @example UFFieldGet.php
  * @access public

@@ -54,7 +54,8 @@ function _civicrm_api3_uf_group_create_spec(&$params) {
  * @param $params
  *   Array Associative array of property name/value pairs to insert in group.
  *
- * @return array API result array
+ * @return array
+   *   API result array
  * {@getfields UFGroup_create}
  * @example UFGroupCreate.php
  * @access public
@@ -71,7 +72,8 @@ function civicrm_api3_uf_group_create($params) {
  *                       property_name=>value pairs. If $params is set
  *                       as null, all surveys will be returned
  *
- * @return array   Array of matching profiles
+ * @return array
+   *   Array of matching profiles
  * {@getfields UFGroup_get}
  * @example UFGroupGet.php
  * @access public

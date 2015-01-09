@@ -49,7 +49,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param bool $maintenance
    *   For maintenance mode.
    *
-   * @return void           prints content on stdout
+   * @return void
+   *   prints content on stdout
    */
   public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
     // TODO: Simplify; this was copied verbatim from CiviCRM 3.4's multi-UF theming function, but that's more complex than necessary
@@ -222,7 +223,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * @param CRM_Core_Form $form
    *   Form object representing the 'current' form - to which the user will be returned.
-   * @return string $destination destination value for URL
+   * @return string
+   *   destination value for URL
    *
    */
   public function getLoginDestination(&$form) {
@@ -339,7 +341,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addScriptUrl($url, $region) {
     // CRM-15450 - D6 doesn't order internal/external links correctly so we can't use drupal_add_js
@@ -356,7 +359,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addScript($code, $region) {
     // CRM-15450 - ensure scripts are in correct order
@@ -373,7 +377,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addStyleUrl($url, $region) {
     if ($region != 'html-header' || !$this->formatResourceUrl($url)) {
@@ -393,7 +398,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addStyle($code, $region) {
     return FALSE;
@@ -417,7 +423,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param mix $action
    *   The default action if one is pre-specified.
    *
-   * @return string the url to post the form
+   * @return string
+   *   the url to post the form
    */
   public function postURL($action) {
     if (!empty($action)) {
@@ -566,7 +573,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Get the locale set in the hosting CMS
    *
-   * @return string  with the locale or null for none
+   * @return string
+   *   with the locale or null for none
    */
   public function getUFLocale() {
     // return CiviCRM’s xx_YY locale that either matches Drupal’s Chinese locale
@@ -764,7 +772,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Check is user logged in.
    *
-   * @return boolean true/false.
+   * @return boolean
    */
   public function isUserLoggedIn() {
     $isloggedIn = FALSE;
@@ -778,7 +786,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Get currently logged in user uf id.
    *
-   * @return int $userID logged in user uf id.
+   * @return int
+   *   $userID logged in user uf id.
    */
   public function getLoggedInUfID() {
     $ufID = NULL;
@@ -800,7 +809,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param bool $addLanguagePart
    * @param bool $removeLanguagePart
    *
-   * @return string $url, formatted url.
+   * @return string
+   *   , formatted url.
    * @static
    */
   public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
@@ -893,7 +903,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Get a list of all installed modules, including enabled and disabled ones
    *
-   * @return array CRM_Core_Module
+   * @return array
+   *   CRM_Core_Module
    */
   public function getModules() {
     $result = array();
@@ -910,7 +921,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param string $destination
    *   If present, add destination to querystring (works for Drupal only).
    *
-   * @return string - loginURL for the current CMS
+   * @return string
+   *   loginURL for the current CMS
    * @static
    */
   public function getLoginURL($destination = '') {
@@ -950,7 +962,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
 
   /**
    * Over-ridable function to get timezone as a string eg.
-   * @return string Timezone e.g. 'America/Los_Angeles'
+   * @return string
+   *   Timezone e.g. 'America/Los_Angeles'
    */
   public function getTimeZoneString() {
     global $user;

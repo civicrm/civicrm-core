@@ -49,7 +49,8 @@ class Requirements {
    *     - file_paths
    *     - db_config
    *
-   * @return array An array of check summaries. Each array contains the keys 'title', 'severity', and 'details'.
+   * @return array
+   *   An array of check summaries. Each array contains the keys 'title', 'severity', and 'details'.
    */
   public function checkAll(array $config) {
     return array_merge($this->checkSystem($config['file_paths']), $this->checkDatabase($config['db_config']));

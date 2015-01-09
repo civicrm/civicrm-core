@@ -43,7 +43,8 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
    * @param array $ids
    *   with one values of id for this participantPayment record (for update).
    *
-   * @return object the partcipant payment record
+   * @return object
+   *   the partcipant payment record
    * @static
    */
   public static function create(&$params, &$ids) {
@@ -91,7 +92,8 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
    * @param array $params
    *   Associative array whose values match the record to be deleted.
    *
-   * @return boolean  true if deleted false otherwise
+   * @return boolean
+   *   true if deleted false otherwise
    * @static
    */
   public static function deleteParticipantPayment($params) {

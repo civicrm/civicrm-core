@@ -61,7 +61,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * @param string dir base civicrm directory
    * Return default Site Settings
-   * @return array array
+   * @return array
+   *   array
    * - $url, (Joomla - non admin url)
    * - $siteName,
    * - $siteRoot
@@ -93,7 +94,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    *
    * @param url (reference)
    *
-   * @return bool: TRUE for internal paths, FALSE for external. The drupal_add_js fn is able to add js more
+   * @return bool
+   *   TRUE for internal paths, FALSE for external. The drupal_add_js fn is able to add js more
    * efficiently if it is known to be in the drupal site
    */
   public function formatResourceUrl(&$url) {
@@ -129,7 +131,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    *
    * @param string $url
    *   Potential resource url based on standard folder assumptions.
-   * @return string $url with civicrm-core directory appended if not standard civi dir
+   * @return string
+   *   with civicrm-core directory appended if not standard civi dir
    */
   public function appendCoreDirectoryToResourceBase($url) {
     global $civicrm_root;
@@ -160,7 +163,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @param bool $forceBackend
    *   a gross joomla hack.
    *
-   * @return string an HTML string containing a link to the given path.
+   * @return string
+   *   an HTML string containing a link to the given path.
    *
    */
   function url(
@@ -247,7 +251,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * Get currently logged in user unique identifier - this tends to be the email address or user name.
    *
-   * @return string $userID logged in user unique identifier
+   * @return string
+   *   logged in user unique identifier
    */
   public function getLoggedInUniqueIdentifier() {
     global $user;
@@ -320,7 +325,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * Get a list of all installed modules, including enabled and disabled ones
    *
-   * @return array CRM_Core_Module
+   * @return array
+   *   CRM_Core_Module
    *
    */
   public function getModules() {
@@ -356,7 +362,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    *
    * @param string $url
    *
-   * @return string $url, formatted url.
+   * @return string
+   *   , formatted url.
    * @static
    */
   public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
@@ -435,7 +442,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * Get the locale set in the hosting CMS
    *
-   * @return string  with the locale or null for none
+   * @return string
+   *   with the locale or null for none
    *
    */
   public function getUFLocale() {
@@ -482,7 +490,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @param mix $action
    *   The default action if one is pre-specified.
    *
-   * @return string the url to post the form
+   * @return string
+   *   the url to post the form
    */
   public function postURL($action) {
     if (!empty($action)) {

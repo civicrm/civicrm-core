@@ -213,7 +213,8 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
    *
    * @param
    *
-   * @return int Total number of rows
+   * @return int
+   *   Total number of rows
    */
   public function getTotalCount($action) {
     return $this->_query->searchQuery(0, 0, NULL,
@@ -239,7 +240,8 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
    * @param enum $output
    *   What should the result set include (web/email/csv).
    *
-   * @return int   the total number of rows for this action
+   * @return int
+   *   the total number of rows for this action
    */
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     $result = $this->_query->searchQuery($offset, $rowCount, $sort,
@@ -309,7 +311,8 @@ FROM {$from}
   }
 
   /**
-   * @return array   $qill which contains an array of strings
+   * @return array
+   *   which contains an array of strings
    **/
   public function getQILL() {
     return $this->_query->qill();
@@ -324,7 +327,8 @@ FROM {$from}
    * @param enum $output
    *   What should the result set include (web/email/csv).
    *
-   * @return array the column headers that need to be displayed
+   * @return array
+   *   the column headers that need to be displayed
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     self::$_columnHeaders = array();
@@ -380,7 +384,8 @@ FROM {$from}
    * @param string $output
    *   Type of output.
    *
-   * @return string name of the file
+   * @return string
+   *   name of the file
    */
   public function getExportFileName($output = 'csv') {
     return ts('CiviCRM Respondent Search');

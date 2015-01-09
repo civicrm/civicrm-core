@@ -46,7 +46,8 @@
  *
  * @param array $params
  *
- * @return array of newly created website property values.
+ * @return array
+   *   of newly created website property values.
  * @access public
  * @todo convert to using basic create - BAO function non-std
  */
@@ -77,7 +78,8 @@ function _civicrm_api3_website_create_spec(&$params) {
  * {@getfields website_delete}
  * @example WebsiteDelete.php Std Delete Example
  *
- * @return array API result Array
+ * @return array
+   *   API result Array
  * @access public
  * @todo convert to using Basic delete - BAO function non standard
  */
@@ -108,7 +110,8 @@ function civicrm_api3_website_delete($params) {
  * @param array $params
  *   An associative array of name/value pairs.
  *
- * @return array details of found websites
+ * @return array
+   *   details of found websites
  *
  * @access public
  */

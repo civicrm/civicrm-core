@@ -151,7 +151,8 @@ class CRM_Utils_Token {
    * @param string $str
    *   The string to search.
    *
-   * @return boolean          Was there a match
+   * @return boolean
+   *   Was there a match
    * @static
    */
   public static function token_match($type, $var, &$str) {
@@ -172,7 +173,8 @@ class CRM_Utils_Token {
    *
    * @param bool $escapeSmarty
    *
-   * @return string           The processed string
+   * @return string
+   *   The processed string
    * @static
    */
   public static function &token_replace($type, $var, $value, &$str, $escapeSmarty = FALSE) {
@@ -193,7 +195,8 @@ class CRM_Utils_Token {
    * @param string $token_type
    *   A string indicating the the type of token to be used in the expression.
    *
-   * @return string           regular expression sutiable for using in preg_replace
+   * @return string
+   *   regular expression sutiable for using in preg_replace
    * @static
    */
   private static function tokenRegex($token_type) {
@@ -206,7 +209,8 @@ class CRM_Utils_Token {
    * @param string $string
    *   A string that needs to be escaped from smarty parsing.
    *
-   * @return string           the escaped string
+   * @return string
+   *   the escaped string
    * @static
    */
   private static function tokenEscapeSmarty($string) {
@@ -227,7 +231,8 @@ class CRM_Utils_Token {
    * @param null $knownTokens
    * @param bool $escapeSmarty
    *
-   * @return string           The processed string
+   * @return string
+   *   The processed string
    * @static
    */
   public static function &replaceDomainTokens(
@@ -327,7 +332,8 @@ class CRM_Utils_Token {
    *
    * @param bool $escapeSmarty
    *
-   * @return string           The processed string
+   * @return string
+   *   The processed string
    * @static
    */
   public static function &replaceOrgTokens($str, &$org, $html = FALSE, $escapeSmarty = FALSE) {
@@ -410,7 +416,8 @@ class CRM_Utils_Token {
    * @param null $knownTokens
    * @param bool $escapeSmarty
    *
-   * @return string           The processed sstring
+   * @return string
+   *   The processed sstring
    * @static
    */
   public static function &replaceMailingTokens(
@@ -544,7 +551,8 @@ class CRM_Utils_Token {
    *
    * @param bool $escapeSmarty
    *
-   * @return string             The processed string
+   * @return string
+   *   The processed string
    * @static
    */
   public static function &replaceActionTokens(
@@ -637,7 +645,8 @@ class CRM_Utils_Token {
    *
    * @param bool $escapeSmarty
    *
-   * @return string                    The processed string
+   * @return string
+   *   The processed string
    * @static
    */
   public static function &replaceContactTokens(
@@ -781,7 +790,8 @@ class CRM_Utils_Token {
    *
    * @param bool $escapeSmarty
    *
-   * @return string             The processed string
+   * @return string
+   *   The processed string
    * @static
    */
   public static function &replaceHookTokens(
@@ -808,7 +818,8 @@ class CRM_Utils_Token {
    * @param string $tokenHtml
    * @param array $entity
    * @param string $entityType
-   * @return string html parsed through smarty
+   * @return string
+   *   html parsed through smarty
    */
   public static function parseThroughSmarty($tokenHtml, $entity, $entityType = 'contact') {
     if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
@@ -856,7 +867,8 @@ class CRM_Utils_Token {
    *  this routine will remove the extra backslashes and braces
    *
    * @param $str ref to the string that will be scanned and modified
-   * @return void  this function works directly on the string that is passed
+   * @return void
+   *   this function works directly on the string that is passed
    * @access public
    * @static
    */
@@ -879,7 +891,8 @@ class CRM_Utils_Token {
    *   The contact ID.
    * @param string hash The security hash of the unsub event
    *
-   * @return string               The processed string
+   * @return string
+   *   The processed string
    * @static
    */
   public static function &replaceUnsubscribeTokens(
@@ -925,7 +938,8 @@ class CRM_Utils_Token {
    *   The contact ID.
    * @param string hash The security hash of the resub event
    *
-   * @return string               The processed string
+   * @return string
+   *   The processed string
    * @static
    */
   public static function &replaceResubscribeTokens(
@@ -952,7 +966,8 @@ class CRM_Utils_Token {
    * @param bool $html
    *   Replace tokens with html or plain text.
    *
-   * @return string               The processed string
+   * @return string
+   *   The processed string
    * @static
    */
   public static function &replaceSubscribeTokens($str, $group, $url, $html) {
@@ -971,7 +986,8 @@ class CRM_Utils_Token {
    * @param string $str
    *   The string with tokens to be replaced.
    *
-   * @return string               The processed string
+   * @return string
+   *   The processed string
    * @static
    */
   public static function &replaceSubscribeInviteTokens($str) {
@@ -1018,7 +1034,8 @@ class CRM_Utils_Token {
    * @param bool $html
    *   Replace tokens with html or plain text.
    *
-   * @return string               The processed string
+   * @return string
+   *   The processed string
    * @static
    */
   public static function &replaceWelcomeTokens($str, $group, $html) {
@@ -1034,7 +1051,8 @@ class CRM_Utils_Token {
    * @param string $str
    *   The string to search.
    *
-   * @return array            Array of tokens that weren't replaced
+   * @return array
+   *   Array of tokens that weren't replaced
    * @static
    */
   public static function &unmatchedTokens(&$str) {
@@ -1056,7 +1074,8 @@ class CRM_Utils_Token {
    * @param bool $escapeSmarty
    * @param bool $returnEmptyToken
    *
-   * @return string           The processed string
+   * @return string
+   *   The processed string
    * @static
    */
   public static function &replaceComponentTokens(&$str, $contact, $components, $escapeSmarty = FALSE, $returnEmptyToken = TRUE) {
@@ -1088,7 +1107,8 @@ class CRM_Utils_Token {
    * @param string $string
    *   The input string to parse for tokens.
    *
-   * @return array $tokens array of tokens mentioned in field
+   * @return array
+   *   array of tokens mentioned in field
    * @access public
    * @static
    */
@@ -1119,7 +1139,8 @@ class CRM_Utils_Token {
    * Function to determine which values to retrieve to insert into tokens. The heavy resemblance between this function
    * and getTokens appears to be historical rather than intentional and should be reviewed
    * @param $string
-   * @return array fields to pass in as return properties when populating token
+   * @return array
+   *   fields to pass in as return properties when populating token
    *
    */
   public static function getReturnProperties(&$string) {
@@ -1290,7 +1311,8 @@ class CRM_Utils_Token {
    * @param string $className
    *   Sent as context to the hook.
    * @param string $jobID
-   * @return array contactDetails with hooks swapped out
+   * @return array
+   *   contactDetails with hooks swapped out
    */
   public function getAnonymousTokenDetails($contactIDs = array(
     0),
@@ -1499,7 +1521,8 @@ class CRM_Utils_Token {
    * @param null $knownTokens
    * @param bool $escapeSmarty
    *
-   * @return string           The processed string
+   * @return string
+   *   The processed string
    * @static
    */
   public static function &replaceUserTokens($str, $knownTokens = NULL, $escapeSmarty = FALSE) {
@@ -1585,7 +1608,8 @@ class CRM_Utils_Token {
    * @param array $knownTokens
    *   Array of tokens present.
    * @param bool $escapeSmarty
-   * @return string string with replacements made
+   * @return string
+   *   string with replacements made
    */
   public static function replaceEntityTokens($entity, $entityArray, $str, $knownTokens = array(), $escapeSmarty = FALSE) {
     if (!$knownTokens || empty($knownTokens[$entity])) {
@@ -1680,7 +1704,8 @@ class CRM_Utils_Token {
    * @param array $membership
    *   An api result array for a single membership.
    * @param bool $escapeSmarty
-   * @return string token replacement
+   * @return string
+   *   token replacement
    */
   public static function getMembershipTokenReplacement($token, $membership, $escapeSmarty = FALSE) {
     $entity = 'membership';
@@ -1764,7 +1789,8 @@ class CRM_Utils_Token {
   }
 
   /**
-   * @return array: legacy_token => new_token
+   * @return array
+   *   legacy_token => new_token
    */
   public static function legacyContactTokens() {
     return array(

@@ -52,7 +52,8 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object activity type of object that is added
+   * @return object
+   *   activity type of object that is added
    */
   public static function create(&$params) {
     $assignment = new CRM_Activity_BAO_ActivityContact();

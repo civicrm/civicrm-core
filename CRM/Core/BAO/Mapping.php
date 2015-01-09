@@ -49,7 +49,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return object     CRM_Core_DAO_Mapping object on success, otherwise NULL
+   * @return object
+   *   CRM_Core_DAO_Mapping object on success, otherwise NULL
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -100,7 +101,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param array $params
    *   An array of name/value pairs.
    *
-   * @return object    CRM_Core_DAO_Mapper object on success, otherwise NULL
+   * @return object
+   *   CRM_Core_DAO_Mapper object on success, otherwise NULL
    * @static
    */
   public static function add($params) {
@@ -117,7 +119,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param string $mappingTypeId
    *   Mapping type id.
    *
-   * @return array $mapping array of mapping name
+   * @return array
+   *   array of mapping name
    * @static
    */
   public static function getMappings($mappingTypeId) {
@@ -139,7 +142,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param int $mappingId
    *   Mapping id.
    *
-   * @return array $mappingFields array of mapping fields
+   * @return array
+   *   array of mapping fields
    * @static
    */
   public static function getMappingFields($mappingId) {
@@ -214,7 +218,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param int $smartGroupId
    *   Smart group id.
    *
-   * @return array $returnFields  associated array of elements
+   * @return array
+   *   associated array of elements
    * @static
    */
   public static function getFormattedFields($smartGroupId) {
@@ -917,7 +922,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param int $relationshipTypeId
    *   Related relationship type id.
    *
-   * @return array all custom field titles
+   * @return array
+   *   all custom field titles
    */
   public function getRelationTypeCustomGroupData($relationshipTypeId) {
 
@@ -961,7 +967,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *   Row no of the fields.
    *
    *
-   * @return array $returnFields  formatted associated array of elements
+   * @return array
+   *   formatted associated array of elements
    * @static
    */
   public static function formattedFields(&$params, $row = FALSE) {

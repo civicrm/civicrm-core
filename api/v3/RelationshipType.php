@@ -108,7 +108,8 @@ function civicrm_api3_relationship_type_get($params) {
  *
  * @param id of relationship type $id
  *
- * @return array API Result Array
+ * @return array
+   *   API Result Array
  * {@getfields RelationshipType_delete}
  * @static void
  * @access public

@@ -240,7 +240,8 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
    *
    * @param array $values
    *
-   * @return array list of errors to be posted back to the form
+   * @return array
+   *   list of errors to be posted back to the form
    * @static
    */
   public static function formRule($values) {
@@ -349,7 +350,8 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
    * @param int $templateId
    *   Event template id.
    *
-   * @return array of custom data defaults.
+   * @return array
+   *   of custom data defaults.
    */
   public function templateCustomDataValues($templateId) {
     $defaults = array();

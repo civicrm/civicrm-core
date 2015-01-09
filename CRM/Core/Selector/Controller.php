@@ -260,7 +260,8 @@ class CRM_Core_Selector_Controller {
    * @param int $reset
    *   Are we being reset.
    *
-   * @return boolean   if the GET params are different from the session params
+   * @return boolean
+   *   if the GET params are different from the session params
    */
   public function hasChanged($reset) {
 
@@ -391,7 +392,8 @@ class CRM_Core_Selector_Controller {
    *
    * @param CRM_Core_Form $form
    *
-   * @return array of rows
+   * @return array
+   *   of rows
    */
   public function getRows($form) {
     if ($form->_output == self::EXPORT || $form->_output == self::SCREEN) {
@@ -409,7 +411,8 @@ class CRM_Core_Selector_Controller {
    * Default function for qill, if needed to be implemented, we
    * expect the subclass to do it
    *
-   * @return string the status message
+   * @return string
+   *   the status message
    */
   public function getQill() {
     return $this->_object->getQill();
@@ -496,7 +499,8 @@ class CRM_Core_Selector_Controller {
   /**
    * Getter for embedded
    *
-   * @return boolean return the embedded value
+   * @return boolean
+   *   return the embedded value
    */
   public function getEmbedded() {
     return $this->_embedded;
@@ -516,7 +520,8 @@ class CRM_Core_Selector_Controller {
   /**
    * Getter for print
    *
-   * @return boolean return the print value
+   * @return boolean
+   *   return the print value
    */
   public function getPrint() {
     return $this->_print;

@@ -385,7 +385,8 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
   /**
    * Creates display name
    *
-   * @return string  the constructed display name
+   * @return string
+   *   the constructed display name
    */
   public function displayName() {
     $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');

@@ -361,7 +361,8 @@ class CRM_Utils_Migrate_Export {
   /**
    * Render the in-memory representation as XML
    *
-   * @return string XML
+   * @return string
+   *   XML
    */
   public function toXML() {
     $buffer = '<?xml version="1.0" encoding="iso-8859-1" ?>';
@@ -435,7 +436,8 @@ class CRM_Utils_Migrate_Export {
    *   Each item is an array(0 => MappedEntityname, 1 => InputFieldName (id-field), 2 => OutputFieldName (name-field), 3 => OptionalPrefix).
    * @param CRM_Core_DAO $dao
    *   The entity for which we want to prepare mapped fields.
-   * @return array new fields
+   * @return array
+   *   new fields
    */
   public function computeMappedFields($mappedFields, $dao) {
     $keyValues = array();
@@ -541,7 +543,8 @@ class CRM_Utils_Migrate_Export {
    * @param string $tagName
    * @param array $keyValues
    * @throws Exception
-   * @return string XML
+   * @return string
+   *   XML
    */
   public function renderKeyValueXML($tagName, $keyValues) {
     $xml = "    <$tagName>";
@@ -560,7 +563,8 @@ class CRM_Utils_Migrate_Export {
    * @param string $prefix
    *
    * @throws Exception
-   * @return string XML
+   * @return string
+   *   XML
    */
   public function renderTextTag($name, $value, $prefix = '') {
     if (!preg_match('/^[a-zA-Z0-9\_]+$/', $name)) {

@@ -68,7 +68,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @param NULL
    *
-   * @return array        Data type => Description
+   * @return array
+   *   Data type => Description
    * @static
    */
   public static function &dataType() {
@@ -341,7 +342,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object            DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    *
    * @static
    */
@@ -360,7 +362,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param int $id
    *   Id of field.
    *
-   * @return string name
+   * @return string
+   *   name
    *
    * @static
    *
@@ -389,7 +392,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param bool $checkPermission
    *   If false, do not include permissioning clause.
    *
-   * @return array      $fields - an array of active custom fields.
+   * @return array
+   *   an array of active custom fields.
    *
    * @static
    */
@@ -612,7 +616,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @param bool $withMultiple
    *
-   * @return array   $fields -
+   * @return array
+   *
    *
    * @static
    */
@@ -1130,7 +1135,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param int $contactID
    * @param int $fieldID
    *
-   * @return string   the display value
+   * @return string
+   *   the display value
    *
    * @static
    */
@@ -1587,7 +1593,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param bool $includeViewOnly
    *   If true, fields marked 'View Only' are included. Required for APIv3.
    *
-   * @return array $customFormatted formatted custom field array
+   * @return array
+   *   formatted custom field array
    * @static
    */
   static function formatCustomField(
@@ -2068,7 +2075,8 @@ WHERE  id IN ( %1, %2 )
    * @param bool $force
    *   Force the sql to be run again (primarily used for tests).
    *
-   * @return array           - fatal is fieldID does not exists, else array of tableName, columnName
+   * @return array
+   *   fatal is fieldID does not exists, else array of tableName, columnName
    * @static
    */
   public static function getTableColumnGroup($fieldID, $force = FALSE) {
@@ -2412,7 +2420,8 @@ WHERE      f.id IN ($ids)";
    *   Custom data submitted.
    * ie array( 'custom_1' => 'validate me' );
    *
-   * @return array $errors validation errors.
+   * @return array
+   *   validation errors.
    * @static
    */
   public static function validateCustomData($params) {

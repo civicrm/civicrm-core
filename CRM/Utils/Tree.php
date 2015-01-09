@@ -162,7 +162,8 @@ class CRM_Utils_Tree {
    *
    * @param string $name
    *
-   * @return array (ref)
+   * @return array
+   *   (ref)
    *
    */
   public function &createNode($name) {

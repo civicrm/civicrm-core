@@ -44,7 +44,8 @@
  * @param array $params
  *
  * @throws API_Exception
- * @return array of newly created mailing_component property values.
+ * @return array
+   *   of newly created mailing_component property values.
  * @access public
  */
 function civicrm_api3_mailing_component_create($params) {
@@ -60,7 +61,8 @@ function civicrm_api3_mailing_component_create($params) {
  *
  * @param array $params
  *
- * @return array of retrieved mailing_component property values.
+ * @return array
+   *   of retrieved mailing_component property values.
  * @access public
  */
 function civicrm_api3_mailing_component_get($params) {
@@ -77,7 +79,8 @@ function civicrm_api3_mailing_component_get($params) {
  * @param array $params
  *
  * @throws API_Exception
- * @return array of deleted values.
+ * @return array
+   *   of deleted values.
  * @access public
  */
 function civicrm_api3_mailing_component_delete($params) {

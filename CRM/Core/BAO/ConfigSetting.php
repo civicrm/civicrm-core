@@ -205,7 +205,7 @@ class CRM_Core_BAO_ConfigSetting {
    *
    * @param $defaults
    *
-   * @return array $defaults
+   * @return array
    * @static
    */
   public static function retrieve(&$defaults) {
@@ -484,7 +484,8 @@ class CRM_Core_BAO_ConfigSetting {
 
   /**
    * Return likely default settings
-   * @return array site settings
+   * @return array
+   *   site settings
    *  -$url,
    * - $dir Base Directory
    * - $siteName
@@ -660,7 +661,8 @@ WHERE  option_group_id = (
    * @param string $componentName
    *   Name of the component to be enabled, needs to be valid.
    *
-   * @return boolean - true if valid component name and enabling succeeds, else false
+   * @return boolean
+   *   true if valid component name and enabling succeeds, else false
    * @static
    */
   public static function enableComponent($componentName) {

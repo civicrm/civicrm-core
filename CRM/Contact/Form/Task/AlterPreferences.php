@@ -69,7 +69,8 @@ class CRM_Contact_Form_Task_AlterPreferences extends CRM_Contact_Form_Task {
    * Set the default form values
    *
    *
-   * @return array the default array reference
+   * @return array
+   *   the default array reference
    */
   public function setDefaultValues() {
     $defaults = array();

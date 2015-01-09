@@ -115,7 +115,8 @@ abstract class CRM_Core_Component_Info {
   /**
    * EXPERIMENTAL: Get a list of AngularJS modules
    *
-   * @return array list of modules; same format as CRM_Utils_Hook::angularModules(&$angularModules)
+   * @return array
+   *   list of modules; same format as CRM_Utils_Hook::angularModules(&$angularModules)
    * @see CRM_Utils_Hook::angularModules
    */
   public function getAngularModules() {
@@ -127,7 +128,8 @@ abstract class CRM_Core_Component_Info {
    * Needs to be implemented in component's information
    * class.
    *
-   * @return array collection of required component settings
+   * @return array
+   *   collection of required component settings
    *
    */
   abstract public function getInfo();
@@ -135,7 +137,8 @@ abstract class CRM_Core_Component_Info {
   /**
    * Get a list of entities to register via API
    *
-   * @return array list of entities; same format as CRM_Utils_Hook::managedEntities(&$entities)
+   * @return array
+   *   list of entities; same format as CRM_Utils_Hook::managedEntities(&$entities)
    * @see CRM_Utils_Hook::managedEntities
    */
   public function getManagedEntities() {
@@ -145,7 +148,8 @@ abstract class CRM_Core_Component_Info {
   /**
    * Provides permissions that are unwise for Anonymous Roles to have
    *
-   * @return array list of permissions
+   * @return array
+   *   list of permissions
    * @see CRM_Component_Info::getPermissions
    */
   public function getAnonymousPermissionWarnings() {
@@ -171,7 +175,8 @@ abstract class CRM_Core_Component_Info {
    *
    * @param CRM_Core_DAO $dao
    *   The item for which we want a reference count.
-   * @return array each item in the array is an array with keys:
+   * @return array
+   *   each item in the array is an array with keys:
    *   - name: string, eg "sql:civicrm_email:contact_id"
    *   - type: string, eg "sql"
    *   - count: int, eg "5" if there are 5 email addresses that refer to $dao
@@ -225,7 +230,8 @@ abstract class CRM_Core_Component_Info {
    * Provides information whether given component is currently
    * marked as enabled in configuration.
    *
-   * @return boolean true if component is enabled, false if not
+   * @return boolean
+   *   true if component is enabled, false if not
    *
    */
   public function isEnabled() {
@@ -309,7 +315,8 @@ abstract class CRM_Core_Component_Info {
   /**
    * Provides component's advanced search pane's template path.
    *
-   * @return string component's advanced search pane's template path
+   * @return string
+   *   component's advanced search pane's template path
    *
    */
   public function getAdvancedSearchPaneTemplatePath() {
@@ -320,7 +327,8 @@ abstract class CRM_Core_Component_Info {
   /**
    * Provides information whether given component uses system wide search.
    *
-   * @return boolean true if component needs search integration
+   * @return boolean
+   *   true if component needs search integration
    *
    */
   public function usesSearch() {
@@ -330,7 +338,8 @@ abstract class CRM_Core_Component_Info {
   /**
    * Provides the xml menu files
    *
-   * @return array array of menu files
+   * @return array
+   *   array of menu files
    *
    */
   public function menuFiles() {
@@ -342,7 +351,8 @@ abstract class CRM_Core_Component_Info {
    * FIXME: It should be protected so the keyword is not
    * FIXME: accessed from beyond component infrastructure.
    *
-   * @return string component keyword
+   * @return string
+   *   component keyword
    *
    */
   public function getKeyword() {

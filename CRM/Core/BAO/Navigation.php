@@ -52,7 +52,8 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, NULL otherwise
+   * @return Object
+   *   DAO object on sucess, NULL otherwise
    *
    * @static
    */
@@ -64,7 +65,8 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
    * Get existing / build navigation for CiviCRM Admin Menu
    *
    * @static
-   * @return array associated array
+   * @return array
+   *   associated array
    */
   public static function getMenus() {
     $menus = array();
@@ -86,7 +88,8 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
    *
    * @param array associated array of submitted values
    *
-   * @return object navigation object
+   * @return object
+   *   navigation object
    * @static
    */
   public static function add(&$params) {
@@ -154,7 +157,8 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
    * @param int $menuID
    *   Menu id.
    *
-   * @return int $weight string
+   * @return int
+   *   $weight string
    * @static
    */
   public static function calculateWeight($parentID = NULL, $menuID = NULL) {
@@ -179,7 +183,8 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   /**
    * Get formatted menu list
    *
-   * @return array $navigations returns associated array
+   * @return array
+   *   returns associated array
    * @static
    */
   public static function getNavigationList() {
@@ -272,7 +277,8 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
    * @param bool $navigationMenu
    *   True when called for building top navigation menu.
    *
-   * @return array $navigationTree nested array of menus
+   * @return array
+   *   nested array of menus
    * @static
    */
   public static function buildNavigationTree(&$navigationTree, $parentID, $navigationMenu = TRUE) {
@@ -579,7 +585,8 @@ ORDER BY parent_id, weight";
    * @param int $contactID
    *   Contact id.
    *
-   * @return string $navigation returns navigation html
+   * @return string
+   *   returns navigation html
    * @static
    */
   public static function createNavigation($contactID) {
@@ -802,7 +809,8 @@ ORDER BY parent_id, weight";
    * @param int $navigationID
    *   Navigation id.
    *
-   * @return array associated array
+   * @return array
+   *   associated array
    * @static
    */
   public static function getNavigationInfo($navigationID) {

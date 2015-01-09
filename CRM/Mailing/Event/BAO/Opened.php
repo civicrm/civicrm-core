@@ -78,7 +78,8 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    * @param bool $is_distinct
    *   Group by queue ID?.
    *
-   * @return int                  Number of rows in result set
+   * @return int
+   *   Number of rows in result set
    * @static
    */
   public static function getTotalCount(
@@ -134,7 +135,8 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    *
    * @param $mailingIDs
    *
-   * @return array          Opened count per mailing ID
+   * @return array
+   *   Opened count per mailing ID
    * @static
    */
   public static function getMailingTotalCount($mailingIDs) {
@@ -174,7 +176,8 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    * @param int $contactID
    *   ID of the contact.
    *
-   * @return array            Count per mailing ID
+   * @return array
+   *   Count per mailing ID
    * @static
    */
   public static function getMailingContactCount($mailingIDs, $contactID) {
@@ -226,7 +229,8 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    *
    * @param int $contact_id
    *
-   * @return array                Result set
+   * @return array
+   *   Result set
    * @static
    */
   public static function &getRows(

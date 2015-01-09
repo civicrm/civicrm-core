@@ -297,7 +297,8 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * @param enum $output
    *   What should the result set include (web/email/csv).
    *
-   * @return array the column headers that need to be displayed
+   * @return array
+   *   the column headers that need to be displayed
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     static $skipFields = array('group', 'tag');
@@ -387,7 +388,8 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    *
    * @param
    *
-   * @return int Total number of rows
+   * @return int
+   *   Total number of rows
    */
   public function getTotalCount($action) {
     $additionalWhereClause = 'contact_a.is_deleted = 0';
@@ -437,7 +439,8 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * @param enum $output
    *   What should the result set include (web/email/csv).
    *
-   * @return int   the total number of rows for this action
+   * @return int
+   *   the total number of rows for this action
    */
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL, $extraWhereClause = NULL) {
 
@@ -725,7 +728,8 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * @param string $output
    *   Type of output.
    *
-   * @return string name of the file
+   * @return string
+   *   name of the file
    */
   public function getExportFileName($output = 'csv') {
     return ts('CiviCRM Profile Listings');

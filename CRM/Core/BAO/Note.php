@@ -50,7 +50,8 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param int $id
    *   Id of the note to retrieve.
    *
-   * @return string   the note text or NULL if note not found
+   * @return string
+   *   the note text or NULL if note not found
    *
    * @static
    */
@@ -64,7 +65,8 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param int $id
    *   Id of the note to retrieve.
    *
-   * @return string   the note subject or NULL if note not found
+   * @return string
+   *   the note subject or NULL if note not found
    *
    * @static
    */
@@ -78,7 +80,8 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param object $note
    *   Either the id of the note to retrieve, or the CRM_Core_DAO_Note object itself.
    *
-   * @return boolean TRUE if the note should be displayed, otherwise FALSE
+   * @return boolean
+   *   TRUE if the note should be displayed, otherwise FALSE
    *
    * @static
    */
@@ -136,7 +139,8 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param array $ids
    *   (deprecated) associated array with note id - preferably set $params['id'].
    *
-   * @return object $note CRM_Core_BAO_Note object
+   * @return object
+   *   $note CRM_Core_BAO_Note object
    * @static
    */
   public static function &add(&$params, $ids = array()) {
@@ -245,7 +249,8 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param int $numNotes
    *   The maximum number of notes to return (0 if all).
    *
-   * @return object $notes  Object of CRM_Core_BAO_Note
+   * @return object
+   *   $notes  Object of CRM_Core_BAO_Note
    * @static
    */
   public static function &getValues(&$params, &$values, $numNotes = self::MAX_NOTES) {
@@ -364,7 +369,8 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    *
    * @param string $entityTable
    *
-   * @return array $viewNote array of note properties
+   * @return array
+   *   array of note properties
    *
    * @static
    */
@@ -395,7 +401,8 @@ ORDER BY  modified_date desc";
    *
    * @param int $contactID
    *
-   * @return int $count count of log records
+   * @return int
+   *   $count count of log records
    *
    * @static
    */
@@ -423,7 +430,8 @@ ORDER BY  modified_date desc";
    * @param bool $snippet
    *   If TRUE, returned values will be pre-formatted for display in a table of notes.
    *
-   * @return array Nested associative array beginning with direct children of given note.
+   * @return array
+   *   Nested associative array beginning with direct children of given note.
    *
    * @static
    */
@@ -437,7 +445,8 @@ ORDER BY  modified_date desc";
    * @param int $id
    *   Note ID.
    *
-   * @return int $count Number of notes having the give note as parent
+   * @return int
+   *   $count Number of notes having the give note as parent
    *
    * @static
    */
@@ -469,7 +478,8 @@ ORDER BY  modified_date desc";
    * @param int $depth
    *   Depth of current iteration within the descendent tree (used for comparison against maxDepth).
    *
-   * @return array Nested associative array beginning with direct children of given note.
+   * @return array
+   *   Nested associative array beginning with direct children of given note.
    * @static
    */
   private static function buildNoteTree($parentId, $maxDepth = 0, $snippet = FALSE, &$tree = array(), $depth = 0) {
@@ -533,7 +543,8 @@ ORDER BY  modified_date desc";
    * @param array $ids
    *   (reference) one-dimensional array to store found descendent ids.
    *
-   * @return array $ids One-dimensional array containing ids of all desendent notes
+   * @return array
+   *   One-dimensional array containing ids of all desendent notes
    */
   public static function getDescendentIds($parentId, &$ids = array()) {
     // get direct children of given parentId note

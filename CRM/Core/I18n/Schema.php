@@ -368,7 +368,8 @@ class CRM_Core_I18n_Schema {
    * @param string $query
    *   the query for rewrite.
    *
-   * @return string        the rewritten query
+   * @return string
+   *   the rewritten query
    */
   public static function rewriteQuery($query) {
     global $dbLocale;
@@ -443,7 +444,8 @@ class CRM_Core_I18n_Schema {
    * @param string $class
    *   schema structure class to use.
    *
-   * @return array          array of CREATE INDEX queries
+   * @return array
+   *   array of CREATE INDEX queries
    */
   private static function createIndexQueries($locale, $table, $class = 'CRM_Core_I18n_SchemaStructure') {
     $indices =& $class::indices();
@@ -487,7 +489,8 @@ class CRM_Core_I18n_Schema {
    * @param string $class
    *   schema structure class to use.
    *
-   * @return array          array of CREATE INDEX queries
+   * @return array
+   *   array of CREATE INDEX queries
    */
   private static function createViewQuery($locale, $table, &$dao, $class = 'CRM_Core_I18n_SchemaStructure') {
     $columns =& $class::columns();

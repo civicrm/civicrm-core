@@ -121,7 +121,8 @@ class CRM_Member_Form_Task_PickProfile extends CRM_Member_Form_Task {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @return array list of errors to be posted back to the form
+   * @return array
+   *   list of errors to be posted back to the form
    * @static
    */
   public static function formRule($fields) {

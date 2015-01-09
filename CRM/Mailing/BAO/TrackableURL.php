@@ -52,7 +52,8 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
    * @param int $queue_id
    *   The queue event id (contact clicking through).
    *
-   * @return string $redirect The redirect/tracking url
+   * @return string
+   *   The redirect/tracking url
    * @static
    */
   public static function getTrackerURL($url, $mailing_id, $queue_id) {

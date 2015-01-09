@@ -44,7 +44,8 @@
  * @param string $attribute
  *   The attribute to modify.
  *
- * @return string        the new modified html string
+ * @return string
+   *   the new modified html string
  */
 function smarty_modifier_crmDelete($string, $attribute) {
   static $endOfElement = '/>';

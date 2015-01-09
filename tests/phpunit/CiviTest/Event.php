@@ -36,7 +36,8 @@ class Event extends PHPUnit_Framework_Testcase {
    * Helper function to delete an Event
    *
    * @param int $eventId
-   * @return boolean true if event deleted, false otherwise
+   * @return boolean
+   *   true if event deleted, false otherwise
    */
   public static function delete($eventId) {
     return CRM_Event_BAO_Event::del($eventId);

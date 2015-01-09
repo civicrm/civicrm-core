@@ -56,7 +56,8 @@ class CRM_Core_BAO_Block {
    * @param array $params
    *   Input parameters to find object.
    *
-   * @return array of $block objects.
+   * @return array
+   *   of $block objects.
    * @static
    */
   public static function &getValues($blockName, $params) {
@@ -102,7 +103,8 @@ class CRM_Core_BAO_Block {
    * @param string $blockName
    *   Name of the above object.
    *
-   * @return array of $block objects.
+   * @return array
+   *   of $block objects.
    * @static
    */
   public static function retrieveBlock(&$block, $blockName) {
@@ -133,7 +135,8 @@ class CRM_Core_BAO_Block {
    * @param array $params
    *   Associated array of submitted fields.
    *
-   * @return boolean              true if the block has data, otherwise false
+   * @return boolean
+   *   true if the block has data, otherwise false
    * @static
    */
   public static function dataExists($blockFields, &$params) {
@@ -153,7 +156,8 @@ class CRM_Core_BAO_Block {
    * @param array $params
    *   Associated array of submitted fields.
    *
-   * @return boolean             true if the block exits, otherwise false
+   * @return boolean
+   *   true if the block exits, otherwise false
    * @static
    */
   public static function blockExists($blockName, &$params) {
@@ -176,7 +180,8 @@ class CRM_Core_BAO_Block {
    * @param null $entityElements
    * @param bool $updateBlankLocInfo
    *
-   * @return array $contactBlockIds formatted array of block ids
+   * @return array
+   *   formatted array of block ids
    *
    * @static
    */
@@ -219,7 +224,8 @@ class CRM_Core_BAO_Block {
    * @param null $entity
    * @param int $contactId
    *
-   * @return object       CRM_Core_BAO_Block object on success, null otherwise
+   * @return object
+   *   CRM_Core_BAO_Block object on success, null otherwise
    * @static
    */
   public static function create($blockName, &$params, $entity = NULL, $contactId = NULL) {
