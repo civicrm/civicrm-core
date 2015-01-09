@@ -255,15 +255,15 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   /**
    * Get current/future Events
    *
-   * @param $all
-   *   Int 0 returns current and future events.
+   * @param int $all
+   *   0 returns current and future events.
    *                                  1 if events all are required
    *                                  2 returns events since 3 months ago
    * @param bool|int $id int id of a specific event to return
-   * @param $isActive
-   *   Boolean true if you need only active events.
-   * @param $checkPermission
-   *   Boolean true if you need to check permission else false.
+   * @param bool $isActive
+   *   true if you need only active events.
+   * @param bool $checkPermission
+   *   true if you need to check permission else false.
    *
    * @return array
    * @static

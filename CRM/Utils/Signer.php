@@ -60,9 +60,9 @@ class CRM_Utils_Signer {
   /**
    * Instantiate a signature-processor
    *
-   * @param $secret
-   *   String, private.
-   * @param $paramNames
+   * @param string $secret
+   *   private.
+   * @param array $paramNames
    *   Array, fields which should be part of the signature.
    */
   public function __construct($secret, $paramNames) {
@@ -76,10 +76,10 @@ class CRM_Utils_Signer {
   /**
    * Generate a signature for a set of key-value pairs
    *
-   * @param $params
+   * @param array $params
    *   Array, key-value pairs.
-   * @param $salt
-   *   String, the salt (if known) or NULL (for auto-generated).
+   * @param string $salt
+   *   the salt (if known) or NULL (for auto-generated).
    * @return string, the full public token representing the signature
    */
   public function sign($params, $salt = NULL) {
@@ -111,9 +111,9 @@ class CRM_Utils_Signer {
   /**
    * Determine whether a token represents a proper signature for $params
    *
-   * @param $token
-   *   String, the full public token representing the signature.
-   * @param $params
+   * @param string $token
+   *   the full public token representing the signature.
+   * @param array $params
    *   Array, key-value pairs.
    *
    * @throws Exception

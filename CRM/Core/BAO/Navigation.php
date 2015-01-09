@@ -149,9 +149,9 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   /**
    * Calculate navigation weight
    *
-   * @param $parentID
+   * @param int $parentID
    *   Parent_id of a menu.
-   * @param $menuID
+   * @param int $menuID
    *   Menu id.
    *
    * @return int $weight string@static

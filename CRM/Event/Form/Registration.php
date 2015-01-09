@@ -1023,7 +1023,7 @@ WHERE  v.option_group_id = g.id
   /* Format user submitted price set params.
    * Convert price set each param as an array.
    *
-   * @param $params
+   * @param array $params
    *   An array of user submitted params.
    *
    *

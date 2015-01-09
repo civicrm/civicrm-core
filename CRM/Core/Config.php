@@ -187,10 +187,10 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   /**
    * Singleton function used to manage this object.
    *
-   * @param $loadFromDB
-   *   Boolean whether to load from the database.
-   * @param $force
-   *   Boolean whether to force a reconstruction.
+   * @param bool $loadFromDB
+   *   whether to load from the database.
+   * @param bool $force
+   *   whether to force a reconstruction.
    *
    * @return CRM_Core_Config
    * @static

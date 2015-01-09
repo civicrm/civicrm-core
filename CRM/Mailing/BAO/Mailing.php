@@ -2710,8 +2710,8 @@ SELECT  $mailing.id as mailing_id
   /**
    * Get the content/components of mailing based on mailing Id
    *
-   * @param $report
-   *   Array of mailing report.
+   * @param array $report
+   *   of mailing report.
    *
    * @param $form
    *   Reference of this.

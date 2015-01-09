@@ -84,7 +84,7 @@ class CRM_Core_Region {
    * Note: This function does not perform any extra encoding of markup, script code, or etc. If
    * you're passing in user-data, you must clean it yourself.
    *
-   * @param $snippet
+   * @param array $snippet
    *   Array; keys:.
    *   - type: string (auto-detected for markup, template, callback, script, scriptUrl, jquery, style, styleUrl)
    *   - name: string, optional

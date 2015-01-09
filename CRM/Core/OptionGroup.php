@@ -92,25 +92,25 @@ class CRM_Core_OptionGroup {
    * (radio, select, checkbox etc). OptionGroups for most cases have the
    * 'label' in the label colum and the 'id' or 'name' in the value column
    *
-   * @param $name
-   *   String name of the option group.
-   * @param $flip
-   *   Boolean results are return in id => label format if false.
+   * @param string $name
+   *   name of the option group.
+   * @param bool $flip
+   *   results are return in id => label format if false.
    *                            if true, the results are reversed
-   * @param $grouping
-   *   Boolean if true, return the value in 'grouping' column.
-   * @param $localize
-   *   Boolean if true, localize the results before returning.
-   * @param $condition
-   *   String add another condition to the sql query.
-   * @param $labelColumnName
-   *   String the column to use for 'label'.
-   * @param $onlyActive
-   *   Boolean return only the action option values.
-   * @param $fresh
-   *   Boolean ignore cache entries and go back to DB.
-   * @param $keyColumnName
-   *   String the column to use for 'key'.
+   * @param bool $grouping
+   *   if true, return the value in 'grouping' column.
+   * @param bool $localize
+   *   if true, localize the results before returning.
+   * @param string $condition
+   *   add another condition to the sql query.
+   * @param string $labelColumnName
+   *   the column to use for 'label'.
+   * @param bool $onlyActive
+   *   return only the action option values.
+   * @param bool $fresh
+   *   ignore cache entries and go back to DB.
+   * @param string $keyColumnName
+   *   the column to use for 'key'.
    *
    * @return array      the values as specified by the above params
    * @static
@@ -204,22 +204,21 @@ WHERE  v.option_group_id = g.id
    * (radio, select, checkbox etc). OptionGroups for most cases have the
    * 'label' in the label colum and the 'id' or 'name' in the value column
    *
-   * @param $id
-   *   Integer id of the option group.
-   * @param $flip
-   *   Boolean results are return in id => label format if false.
-   *                            if true, the results are reversed
-   * @param $grouping
-   *   Boolean if true, return the value in 'grouping' column.
-   * @param $localize
-   *   Boolean if true, localize the results before returning.
-   * @param $labelColumnName
-   *   String the column to use for 'label'.
-   *
+   * @param int $id
+   *   id of the option group.
+   * @param bool $flip
+   *   results are return in id => label format if false.
+   *   if true, the results are reversed
+   * @param bool $grouping
+   *   if true, return the value in 'grouping' column.
+   * @param bool $localize
+   *   if true, localize the results before returning.
+   * @param string $labelColumnName
+   *   the column to use for 'label'.
    * @param bool $onlyActive
    * @param bool $fresh
    *
-   * @return array      the values as specified by the above params
+   * @return array of values as specified by the above params
    * @static
    * @void
    */
@@ -262,16 +261,15 @@ WHERE  v.option_group_id = g.id
    *
    * @param array $params
    *   Reference array of values submitted by the form. Based on.
-   *                           $flip, creates new elements in $params for each field in
-   *                           the $names array.
-   *                           If $flip = false, adds     root field name     => title
-   *                           If $flip = true, adds      actual field name   => id
+   *   $flip, creates new elements in $params for each field in
+   *   the $names array.
+   *   If $flip = false, adds root field name => title
+   *   If $flip = true, adds actual field name => id
    *
    * @param array $names
    *   Reference array of fieldnames we want transformed.
-   *                           Array key = 'postName' (field name submitted by form in $params).
-   *                           Array value = array(
-  'newName' => $newName, 'groupName' => $groupName).
+   *   Array key = 'postName' (field name submitted by form in $params).
+   *   Array value = array('newName' => $newName, 'groupName' => $groupName).
    *
    *
    * @param bool $flip

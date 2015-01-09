@@ -50,8 +50,8 @@ class CRM_Upgrade_Incremental_php_FourFive {
    * revision to the database.
    *
    * @param $preUpgradeMessage
-   * @param $rev
-   *   String, a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'.
+   * @param string $rev
+   *   a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'.
    * @param null $currentVer
    *
    * @return void
@@ -62,10 +62,10 @@ class CRM_Upgrade_Incremental_php_FourFive {
   /**
    * Compute any messages which should be displayed after upgrade
    *
-   * @param $postUpgradeMessage
-   *   String, alterable.
-   * @param $rev
-   *   String, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
+   * @param string $postUpgradeMessage
+   *   alterable.
+   * @param string $rev
+   *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
@@ -153,10 +153,10 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    *
    *
    * @param CRM_Queue_TaskContext $ctx
-   * @param $startId
-   *   Int, the first/lowest entity ID to convert.
-   * @param $endId
-   *   Int, the last/highest entity ID to convert.
+   * @param int $startId
+   *   the first/lowest entity ID to convert.
+   * @param int $endId
+   *   the last/highest entity ID to convert.
    * @param
    *
    * @return bool

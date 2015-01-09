@@ -5365,22 +5365,22 @@ AND   displayRelType.is_active = 1
   /**
    * Builds the necessary structures for all fields that are similar to option value lookups
    *
-   * @param $name
-   *   String the name of the field.
-   * @param $op
-   *   String the sql operator, this function should handle ALL SQL operators.
-   * @param $value
-   *   String|integer|array depends on the operator and who's calling the query builder.
-   * @param $grouping
-   *   Int the index where to place the where clause.
+   * @param string $name
+   *   the name of the field.
+   * @param string $op
+   *   the sql operator, this function should handle ALL SQL operators.
+   * @param string $value
+   *   depends on the operator and who's calling the query builder.
+   * @param int $grouping
+   *   the index where to place the where clause.
    * @param $selectValues
    *   The key value pairs for this element. This allows us to use this function for things besides option-value pairs.
-   * @param $field
-   *   Array an array that contains various properties of the field identified by $name.
-   * @param $label
-   *   String The label for this field element.
-   * @param $dataType
-   *   String The data type for this element.
+   * @param array $field
+   *   an array that contains various properties of the field identified by $name.
+   * @param string $label
+   *   The label for this field element.
+   * @param string $dataType
+   *   The data type for this element.
    * @param bool $useIDsOnly
    *
    * @return void     adds the where clause and qill to the query object

@@ -2093,8 +2093,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param string $function
    *   __FUNCTION__.
-   * @param $filename
-   *   String $file __FILE__.
+   * @param string $filename
+   *   $file __FILE__.
    *
    * @return array $ids ids of created objects
    */

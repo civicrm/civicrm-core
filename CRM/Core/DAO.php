@@ -1534,10 +1534,9 @@ SELECT contact_id
   /**
    * Escape a list of strings for use with "WHERE X IN (...)" queries.
    *
-   * @param $strings
-   *   Array.
-   * @param $default
-   *   String the value to use if $strings has no elements.
+   * @param array $strings
+   * @param string $default
+   *   the value to use if $strings has no elements.
    * @return string eg "abc","def","ghi"
    */
   public static function escapeStrings($strings, $default = NULL) {
@@ -1812,8 +1811,8 @@ SELECT contact_id
    * Build a list of triggers via hook and add them to (err, reconcile them
    * with) the database.
    *
-   * @param $tableName
-   *   String the specific table requiring a rebuild; or NULL to rebuild all tables.
+   * @param string $tableName
+   *   the specific table requiring a rebuild; or NULL to rebuild all tables.
    * @param bool $force
    *
    * @see CRM-9716
@@ -1856,8 +1855,8 @@ SELECT contact_id
   /**
    * Wrapper function to drop triggers
    *
-   * @param $tableName
-   *   String the specific table requiring a rebuild; or NULL to rebuild all tables.
+   * @param string $tableName
+   *   the specific table requiring a rebuild; or NULL to rebuild all tables.
    */
   public static function dropTriggers($tableName = NULL) {
     $info = array();
@@ -1870,10 +1869,10 @@ SELECT contact_id
   }
 
   /**
-   * @param $info
-   *   Array per hook_civicrm_triggerInfo.
-   * @param $onlyTableName
-   *   String the specific table requiring a rebuild; or NULL to rebuild all tables.
+   * @param array $info
+   *   per hook_civicrm_triggerInfo.
+   * @param string $onlyTableName
+   *   the specific table requiring a rebuild; or NULL to rebuild all tables.
    */
   public static function createTriggers(&$info, $onlyTableName = NULL) {
     // Validate info array, should probably raise errors?
@@ -2203,12 +2202,12 @@ SELECT contact_id
    *
    * @param string $fieldName
    *   Name of fields.
-   * @param $filter
-   *   Array filter to be applied indexed by operator.
-   * @param $type
-   *   String type of field (not actually used - nor in api @todo ).
-   * @param $alias
-   *   String alternative field name ('as') @todo- not actually used.
+   * @param array $filter
+   *   filter to be applied indexed by operator.
+   * @param string $type
+   *   type of field (not actually used - nor in api @todo ).
+   * @param string $alias
+   *   alternative field name ('as') @todo- not actually used.
    * @param bool $returnSanitisedArray
    *   Return a sanitised array instead of a clause.
    *  this is primarily so we can add filters @ the api level to the Query object based fields
