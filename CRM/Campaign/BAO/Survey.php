@@ -576,13 +576,13 @@ INNER JOIN  civicrm_activity_contact activityAssignment
    * This function retrieve survey related activities.
    *
    * @param int $surveyId
-   *   Survey id.
-   *
    * @param int $interviewerId
-   * @param null $statusIds
-   * @param null $voterIds
+   * @param array $statusIds
+   * @param array $voterIds
    * @param bool $onlyCount
-   * @return array $activities an array of survey activity.
+   *
+   * @return array
+   *   An array of survey activity.
    * @static
    */
   static function getSurveyActivities(
