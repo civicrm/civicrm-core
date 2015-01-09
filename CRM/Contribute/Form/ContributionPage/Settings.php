@@ -146,7 +146,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
     //CRM-15787 - If applicable, register 'membership_1'
     $member = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
-    $allowMemberCoreTypes = '';
+    $coreTypes = array('Contact', 'Organization');
 
     $entities[] = array(
       'entity_name' => array ('contact_1'),
@@ -154,13 +154,13 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     );
 
     if ($member && $member['is_active']) {
-      $allowMemberCoreTypes = 'Membership';
+      $coreTypes[] = 'Membership';
       $entities[] = array(
         'entity_name' => array ('membership_1'),
         'entity_type' => 'MembershipModel',
       );
     }
-    $allowCoreTypes = array_merge(array('Contact', 'Organization', $allowMemberCoreTypes), CRM_Contact_BAO_ContactType::subTypes('Organization'));
+    $allowCoreTypes = array_merge($coreTypes, CRM_Contact_BAO_ContactType::subTypes('Organization'));
     $allowSubTypes = array();
 
     $this->addProfileSelector('onbehalf_profile_id', ts('Organization Profile'), $allowCoreTypes, $allowSubTypes, $entities);
