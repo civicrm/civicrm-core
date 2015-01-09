@@ -43,7 +43,7 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * @param $groupIDs
    *   Of group that we are checking against.
    *
-   * @return boolean TRUE if we did not regenerate, false if we did
+   * @return boolean TRUE if we did not regenerate, FALSE if we did
    */
   public static function check($groupIDs) {
     if (empty($groupIDs)) {
@@ -121,7 +121,7 @@ AND     ( g.cache_date IS NULL OR
    * @param int $limit
    *   Limits the number of groups we evaluate.
    *
-   * @return boolean TRUE if we did not regenerate, false if we did
+   * @return boolean TRUE if we did not regenerate, FALSE if we did
    */
   public static function loadAll($groupIDs = NULL, $limit = 0) {
     // ensure that all the smart groups are loaded

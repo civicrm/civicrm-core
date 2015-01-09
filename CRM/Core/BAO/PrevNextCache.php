@@ -211,7 +211,7 @@ WHERE  cacheKey = %1
    * @return bool
    */
   public static function is_serialized($string) {
-    return (@unserialize($string) !== false);
+    return (@unserialize($string) !== FALSE);
   }
 
   /**

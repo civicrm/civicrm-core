@@ -755,7 +755,7 @@ ORDER BY parent_id, weight";
       $newWeight = $newWeight + 1;
 
       // since this is a last node we don't need to increment other nodes
-      $incrementOtherNodes = false;
+      $incrementOtherNodes = FALSE;
     }
 
     $transaction = new CRM_Core_Transaction();

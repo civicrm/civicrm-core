@@ -120,7 +120,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
           $visibility = CRM_Core_PseudoConstant::visibility('name');
 
           // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
-          $adminFieldVisible = false;
+          $adminFieldVisible = FALSE;
           if (CRM_Core_Permission::check('administer CiviCRM')) {
             $adminFieldVisible = TRUE;
           }
@@ -128,7 +128,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
           foreach ($priceSetFields as $fid => $fieldValues) {
             if (!is_array($fieldValues['options']) ||
               empty($fieldValues['options']) ||
-              (CRM_Utils_Array::value('visibility_id', $fieldValues) != array_search('public', $visibility) && $adminFieldVisible == false)
+              (CRM_Utils_Array::value('visibility_id', $fieldValues) != array_search('public', $visibility) && $adminFieldVisible == FALSE)
             ) {
               continue;
             }

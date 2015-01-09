@@ -337,7 +337,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     }
     else {
       $className = $this->_modeValue['taskClassName'];
-      $tasks += $className::permissionedTaskTitles($permission, false);
+      $tasks += $className::permissionedTaskTitles($permission, FALSE);
     }
 
     if (isset($this->_ssID)) {
@@ -658,7 +658,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $this->_params,
         $this->_returnProperties,
         $this->_action,
-        false, TRUE,
+        FALSE, TRUE,
         $this->_context,
         $this->_contextMenu
       );
@@ -668,7 +668,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $selector = new self::$_selectorName(
         $this->_params,
         $this->_action,
-        NULL, false, NULL,
+        NULL, FALSE, NULL,
         "search", "advanced"
       );
     }
@@ -799,7 +799,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           $this->_params,
           $this->_returnProperties,
           $this->_action,
-          false,
+          FALSE,
           $searchChildGroups,
           $this->_context,
           $this->_contextMenu
@@ -811,7 +811,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           $this->_params,
           $this->_action,
           NULL,
-          false,
+          FALSE,
           NULL,
           "search",
           "advanced"

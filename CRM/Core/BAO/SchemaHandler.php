@@ -66,7 +66,7 @@ class CRM_Core_BAO_SchemaHandler {
    *
    * @param array $params
    *
-   * @return TRUE if successfully created, false otherwise
+   * @return TRUE if successfully created, FALSE otherwise
    *
    * @static
    */
@@ -367,7 +367,7 @@ ALTER TABLE {$tableName}
    *   Name of the table to be created.
    *
    * @return bool
-   *   TRUE if successfully deleted, false otherwise.
+   *   TRUE if successfully deleted, FALSE otherwise.
    *
    * @static
    */

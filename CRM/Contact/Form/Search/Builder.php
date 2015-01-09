@@ -475,7 +475,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       $v2empty = TRUE;
       foreach ($val as $vk => $vv) {
         if (!empty($vk)) {
-          $v2empty = false;
+          $v2empty = FALSE;
         }
       }
       if ($v2empty) {

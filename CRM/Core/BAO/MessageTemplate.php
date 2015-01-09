@@ -205,7 +205,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       }
       list($details) = CRM_Utils_Token::getTokenDetails(array($contactId),
                                                         $returnProperties,
-                                                        NULL, NULL, false,
+                                                        NULL, NULL, FALSE,
                                                         $tokens,
                                                         'CRM_Core_BAO_MessageTemplate');
       $contact = reset($details);
@@ -222,7 +222,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
         if ($$bodyType) {
           CRM_Utils_Token::replaceGreetingTokens($$bodyType, NULL, $contact['contact_id']);
           $$bodyType = CRM_Utils_Token::replaceDomainTokens($$bodyType, $domain, TRUE, $tokens, TRUE);
-          $$bodyType = CRM_Utils_Token::replaceContactTokens($$bodyType, $contact, false, $tokens, false, TRUE);
+          $$bodyType = CRM_Utils_Token::replaceContactTokens($$bodyType, $contact, FALSE, $tokens, FALSE, TRUE);
           $$bodyType = CRM_Utils_Token::replaceComponentTokens($$bodyType, $contact, $tokens, TRUE);
           $$bodyType = CRM_Utils_Token::replaceHookTokens($$bodyType, $contact , $categories, TRUE);
         }
@@ -237,7 +237,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       }
 
       // do replacements in message subject
-      $messageSubject = CRM_Utils_Token::replaceContactTokens($body_subject, $contact, false, $tokens);
+      $messageSubject = CRM_Utils_Token::replaceContactTokens($body_subject, $contact, FALSE, $tokens);
       $messageSubject = CRM_Utils_Token::replaceDomainTokens($messageSubject, $domain, TRUE, $tokens);
       $messageSubject = CRM_Utils_Token::replaceComponentTokens($messageSubject, $contact, $tokens, TRUE);
       $messageSubject = CRM_Utils_Token::replaceHookTokens($messageSubject, $contact, $categories, TRUE);
