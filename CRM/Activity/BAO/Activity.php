@@ -2053,8 +2053,8 @@ AND cl.modified_id  = c.id
   /**
    * Create a follow up a given activity
    *
-   * @param $activityId
-   *   Int activity id of parent activity.
+   * @param int $activityId
+   *   activity id of parent activity.
    * @param array $params
    *
    * @return $this|null|object

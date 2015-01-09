@@ -244,10 +244,9 @@ AND    g.refresh_date IS NULL
   /**
    * Change the cache_date
    *
-   * @param $groupID
-   *   Array(int).
-   * @param $processed
-   *   Bool, whether the cache data was recently modified.
+   * @param array $groupID
+   * @param bool $processed
+   *   Whether the cache data was recently modified.
    */
   public static function updateCacheTime($groupID, $processed) {
     // only update cache entry if we had any values
@@ -279,10 +278,10 @@ WHERE  id IN ( $groupIDs )
    * cache date, i.e. the removal is not done if the group was recently
    * loaded into the cache.
    *
-   * @param $groupID
-   *   Int the groupID to delete cache entries, NULL for all groups.
-   * @param $onceOnly
-   *   Boolean run the function exactly once for all groups.
+   * @param int $groupID
+   *   the groupID to delete cache entries, NULL for all groups.
+   * @param bool $onceOnly
+   *   run the function exactly once for all groups.
    *
    * @return void
    * @static

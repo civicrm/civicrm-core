@@ -569,8 +569,7 @@ HTACCESS;
    *
    * TODO: Automatic file cleanup using, eg, TTL policy
    *
-   * @param $prefix
-   *   String.
+   * @param string $prefix
    *
    * @return string, path to an openable/writable file
    * @see tempnam
@@ -588,8 +587,7 @@ HTACCESS;
    *
    * TODO: Automatic file cleanup using, eg, TTL policy
    *
-   * @param $prefix
-   *   String.
+   * @param string $prefix
    *
    * @return string, path to an openable/writable directory; ends with '/'
    * @see tempnam
@@ -606,10 +604,10 @@ HTACCESS;
    *
    * Note: Dot-directories (like "..", ".git", or ".svn") will be ignored.
    *
-   * @param $dir
-   *   String, base dir.
-   * @param $pattern
-   *   String, glob pattern, eg "*.txt".
+   * @param string $dir
+   *   base dir.
+   * @param string $pattern
+   *   glob pattern, eg "*.txt".
    * @return array(string)
    */
   public static function findFiles($dir, $pattern) {

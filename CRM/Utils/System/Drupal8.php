@@ -294,8 +294,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * Add a script file
    *
    * @param $url: string, absolute path to file
-   * @param $region
-   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
+   * @param string $region
+   *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -323,8 +323,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * Add an inline script
    *
    * @param $code: string, javascript code
-   * @param $region
-   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
+   * @param string $region
+   *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -350,8 +350,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * Add a css file
    *
    * @param $url: string, absolute path to file
-   * @param $region
-   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
+   * @param string $region
+   *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -373,8 +373,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * Add an inline style
    *
    * @param $code: string, css code
-   * @param $region
-   *   String, location within the document: 'html-header', 'page-header', 'page-footer'.
+   * @param string $region
+   *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()

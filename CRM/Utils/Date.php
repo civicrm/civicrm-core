@@ -1784,8 +1784,8 @@ class CRM_Utils_Date {
   /**
    * Get the time in UTC for the current time. You can optionally send an offset from the current time if needed
    *
-   * @param $offset
-   *   Int the offset from the current time in seconds.
+   * @param int $offset
+   *   the offset from the current time in seconds.
    *
    * @return the time in UTC
    * @static

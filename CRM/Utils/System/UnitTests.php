@@ -152,22 +152,22 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   /**
    * Generate an internal CiviCRM URL (copied from DRUPAL/includes/common.inc#url)
    *
-   * @param $path
-   *   String The path being linked to, such as "civicrm/add".
-   * @param $query
-   *   String A query string to append to the link.
-   * @param $absolute
-   *   Boolean Whether to force the output to be an absolute link (beginning with http:).
+   * @param string $path
+   *   The path being linked to, such as "civicrm/add".
+   * @param string $query
+   *   A query string to append to the link.
+   * @param bool $absolute
+   *   Whether to force the output to be an absolute link (beginning with http:).
    *                           Useful for links that will be displayed outside the site, such as in an
    *                           RSS feed.
-   * @param $fragment
-   *   String A fragment identifier (named anchor) to append to the link.
-   * @param $htmlize
-   *   Boolean whether to convert to html eqivalant.
-   * @param $frontend
-   *   Boolean a gross joomla hack.
-   * @param $forceBackend
-   *   Boolean a gross joomla hack.
+   * @param string $fragment
+   *   A fragment identifier (named anchor) to append to the link.
+   * @param bool $htmlize
+   *   whether to convert to html eqivalant.
+   * @param bool $frontend
+   *   a gross joomla hack.
+   * @param bool $forceBackend
+   *   a gross joomla hack.
    *
    * @return string an HTML string containing a link to the given path.
    *

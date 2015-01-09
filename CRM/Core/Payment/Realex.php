@@ -260,7 +260,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   /**
    * Helper function to convert XML string to multi-dimension array.
    *
-   * @param $xml
+   * @param string $xml
    *   an XML string.
    *
    * @return array An array of the result with following keys:
@@ -297,8 +297,8 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     return $result;
   }
 
-  // private helper for  xml_parse_into_assoc, to recusively parsing the result
   /**
+   * Private helper for  xml_parse_into_assoc, to recusively parsing the result
    * @param $input
    * @param int $depth
    *

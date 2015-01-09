@@ -110,14 +110,14 @@ class CRM_Core_BAO_CustomOption {
    * Returns the option label for a custom field with a specific value. Handles all
    * custom field data and html types
    *
-   * @param $fieldId
-   *   Int the custom field ID.
+   * @param int $fieldId
+   *   the custom field ID.
    * @pram  $value    string the value (typically from the DB) of this custom field
    * @param $value
-   * @param $htmlType
-   *   String the html type of the field (optional).
-   * @param $dataType
-   *   String the data type of the field (optional).
+   * @param string $htmlType
+   *   the html type of the field (optional).
+   * @param string $dataType
+   *   the data type of the field (optional).
    *
    * @return string          the label to display for this custom field
    * @static

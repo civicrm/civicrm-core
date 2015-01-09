@@ -1624,14 +1624,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   /**
    * Add on behalf of organization and it's location
    *
-   * @param $behalfOrganization
-   *   Array array of organization info.
-   * @param $contactID
-   *   Int individual contact id. One.
+   * @param array $behalfOrganization
+   *   array of organization info.
+   * @param int $contactID
+   *   individual contact id. One.
    * who is doing the process of signup / contribution.
    *
-   * @param $values
-   *   Array form values array.
+   * @param array $values
+   *   form values array.
    * @param array $params
    * @param null $fields
    *

@@ -1509,8 +1509,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   /**
    * @param $submittedValues
    * @param $config
-   * @param $session
-   *   CRM_Core_Session.
+   * @param CRM_Core_Session $session
    * @param $lineItem
    *
    * @throws CRM_Core_Exception

@@ -97,10 +97,10 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem extends CRM_Upgrade_Snapshot_
    * Given a participant id/contribution id,
    * return contribution/fee line items
    *
-   * @param $entityId
-   *   Int participant/contribution id.
-   * @param $entity
-   *   String participant/contribution.
+   * @param int $entityId
+   *   participant/contribution id.
+   * @param string $entity
+   *   participant/contribution.
    *
    * @param null $isQuick
    *

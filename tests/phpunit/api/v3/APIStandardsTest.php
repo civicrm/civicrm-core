@@ -146,8 +146,8 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
 
   /**
    * Require once  Files
-   * @param $files
-   *   Array list of files to load.
+   * @param array $files
+   *   list of files to load.
    */
   public function requireOnceFilesArray($files) {
     foreach ($files as $key => $file) {

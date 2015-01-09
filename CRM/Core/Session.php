@@ -473,16 +473,13 @@ class CRM_Core_Session {
   /**
    * Stores an alert to be displayed to the user via crm-messages
    *
-   * @param $text
-   *   String.
+   * @param string $text
    *   The status message
    *
-   * @param $title
-   *   String.
+   * @param string $title
    *   The optional title of this message
    *
-   * @param $type
-   *   String.
+   * @param string $type
    *   The type of this message (printed as a css class). Possible options:
    *     - 'alert' (default)
    *     - 'info'
@@ -491,8 +488,7 @@ class CRM_Core_Session {
    *               until the user dismisses it)
    *     - 'no-popup' (will display in the document like old-school)
    *
-   * @param $options
-   *   Array.
+   * @param array $options
    *   Additional options. Possible values:
    *     - 'unique' (default: true) Check if this message was already set before adding
    *     - 'expires' how long to display this message before fadeout (in ms)

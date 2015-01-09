@@ -264,8 +264,8 @@ class CRM_Extension_Mapper {
   /**
    * Fetch the list of active extensions of type 'module'
    *
-   * @param $fresh
-   *   Bool whether to forcibly reload extensions list from canonical store.
+   * @param bool $fresh
+   *   whether to forcibly reload extensions list from canonical store.
    * @return array - array(array('prefix' => $, 'file' => $))
    */
   public function getActiveModuleFiles($fresh = FALSE) {

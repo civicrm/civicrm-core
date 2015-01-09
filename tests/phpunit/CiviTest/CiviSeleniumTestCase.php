@@ -191,10 +191,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * Open an internal path beginning with 'civicrm/'
    *
-   * @param $url
-   *   (str) omit the 'civicrm/' it will be added for you.
-   * @param $args
-   *   (str|array) optional url arguments.
+   * @param string $url
+   *   omit the 'civicrm/' it will be added for you.
+   * @param string|array $args
+   *   optional url arguments.
    * @param $waitFor
    *   Page element to wait for - using this is recommended to ensure the document is fully loaded.
    *
@@ -953,8 +953,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * Create new relationship type w/ user specified params or default.
    *
-   * @param $params
-   *   Array of required params.
+   * @param array $params
+   *   of required params.
    *
    * @return an array of saved params values.
    */

@@ -99,16 +99,16 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   /**
    * Generate an internal CiviCRM URL
    *
-   * @param $path
-   *   String The path being linked to, such as "civicrm/add".
-   * @param $query
-   *   String A query string to append to the link.
-   * @param $absolute
-   *   Boolean Whether to force the output to be an absolute link (beginning with http:).
+   * @param string $path
+   *   The path being linked to, such as "civicrm/add".
+   * @param string $query
+   *   A query string to append to the link.
+   * @param bool $absolute
+   *   Whether to force the output to be an absolute link (beginning with http:).
    *                           Useful for links that will be displayed outside the site, such as in an
    *                           RSS feed.
-   * @param $fragment
-   *   String A fragment identifier (named anchor) to append to the link.
+   * @param string $fragment
+   *   A fragment identifier (named anchor) to append to the link.
    *
    * @return string            an HTML string containing a link to the given path.
    *
