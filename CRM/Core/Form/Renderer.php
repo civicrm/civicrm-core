@@ -36,7 +36,7 @@
 require_once 'HTML/QuickForm/Renderer/ArraySmarty.php';
 
 /**
- * customize the output to meet our specific requirements
+ * Customize QF output to meet our specific requirements
  */
 class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
 
@@ -94,12 +94,11 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    * make the html compliant with our css etc
    *
    *
-   * @param $element
-   *   HTML_QuickForm_element.
-   * @param $required
-   *   Bool - Whether an element is required.
-   * @param $error
-   *   String - Error associated with the element.
+   * @param HTML_QuickForm_element $element
+   * @param bool $required
+   *   Whether an element is required.
+   * @param string $error
+   *   Error associated with the element.
    *
    * @return array
    */
@@ -145,12 +144,11 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    * based attributes so we can style this form element better
    *
    *
-   * @param $element
-   *   HTML_QuickForm_element object.
-   * @param $required
-   *   Bool Whether an element is required.
-   * @param $error
-   *   String Error associated with the element.
+   * @param HTML_QuickForm_element $element
+   * @param bool $required
+   *   Whether an element is required.
+   * @param string $error
+   *   Error associated with the element.
    *
    * @return array
    * @static
@@ -209,8 +207,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   /**
    * Convert IDs to values and format for display
    *
-   * @param $field
-   *   HTML_QuickForm_element.
+   * @param HTML_QuickForm_element $field
    */
   public static function preProcessEntityRef($field) {
     $val = $field->getValue();
@@ -242,10 +239,9 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   /**
    * Render entity references as text.
    * If user has permission, format as link (for now limited to contacts).
-   * @param $el
-   *   Array.
-   * @param $field
-   *   HTML_QuickForm_element.
+   *
+   * @param array $el
+   * @param HTML_QuickForm_element $field
    */
   public function renderFrozenEntityRef(&$el, $field) {
     $entity = $field->getAttribute('data-api-entity');
@@ -274,8 +270,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    *
    * Todo: Migrate contact reference fields to use EntityRef
    *
-   * @param $field
-   *   HTML_QuickForm_element.
+   * @param HTML_QuickForm_element $field
    */
   public static function preprocessContactReference($field) {
     $val = $field->getValue();
