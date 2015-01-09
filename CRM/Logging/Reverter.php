@@ -132,6 +132,7 @@ class CRM_Logging_Reverter {
             $dao->reset();
           }
           break;
+
         // custom data tables
 
         case in_array($table, array_keys($ctypes)):

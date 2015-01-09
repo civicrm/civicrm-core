@@ -48,6 +48,7 @@ class Events {
           $caseId = $event->object->case_id;
         }
         break;
+
       case 'Case':
         // by the time we get the post-delete event, the record is gone, so
         // there's nothing to analyze
@@ -55,6 +56,7 @@ class Events {
           $caseId = $event->id;
         }
         break;
+
       default:
         throw new \CRM_Core_Exception("CRM_Case_Listener does not support entity {$event->entity}");
     }

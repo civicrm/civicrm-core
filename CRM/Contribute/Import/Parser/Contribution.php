@@ -279,9 +279,11 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
         case 'thankyou_date':
           $params[$key] = CRM_Utils_Date::formatDate($params[$key], $dateType);
           break;
+
         case 'pledge_payment':
           $params[$key] = CRM_Utils_String::strtobool($val);
           break;
+
         }
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
           if ($customFields[$customFieldID]['data_type'] == 'Date') {

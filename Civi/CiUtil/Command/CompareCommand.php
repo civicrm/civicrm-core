@@ -17,18 +17,23 @@ class CompareCommand {
         case '--phpunit-json':
           $parser = array('\Civi\CiUtil\PHPUnitParser', 'parseJsonResults');
           break;
+
         case '--jenkins-xml':
           $parser = array('\Civi\CiUtil\JenkinsParser', 'parseXmlResults');
           break;
+
         case '--csv':
           $parser = array('\Civi\CiUtil\CSVParser', 'parseResults');
           break;
+
         case '--out=txt':
           $printerType = 'txt';
           break;
+
         case '--out=csv':
           $printerType = 'csv';
           break;
+
         default:
           $suites[] = array(
             'file' => $argv[$i],

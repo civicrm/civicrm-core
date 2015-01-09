@@ -1008,15 +1008,19 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
           case 'first':
             $startActionDate1 = 1;
             break;
+
           case 'second':
             $startActionDate1 = 2;
             break;
+
           case 'third':
             $startActionDate1 = 3;
             break;
+
           case 'fourth':
             $startActionDate1 = 4;
             break;
+
           case 'last':
             $startActionDate1 = -1;
             break;
