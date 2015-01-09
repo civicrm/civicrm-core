@@ -97,11 +97,11 @@ class CRM_Contact_Form_Search_Custom_Base {
    */
   function sql(
     $selectClause,
-    $offset   = 0,
+    $offset = 0,
     $rowcount = 0,
     $sort = NULL,
     $includeContactIDs = FALSE,
-    $groupBy           = NULL
+    $groupBy = NULL
   ) {
 
     $sql = "SELECT $selectClause " . $this->from();
