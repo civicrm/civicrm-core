@@ -1211,7 +1211,7 @@ WHERE id={$id}; ";
         'Individual',
         'Household',
         'Organization',
-        'All'
+        'All',
       ))) {
         $fields = array_merge($fields, CRM_Core_OptionValue::getFields('', $contactType));
       }
@@ -1262,7 +1262,7 @@ WHERE id={$id}; ";
             'household_name',
             'legal_name',
             'sic_code',
-            'organization_name'
+            'organization_name',
           ),
           'Household' => array(
             'first_name',
@@ -1420,7 +1420,7 @@ WHERE id={$id}; ";
             'name' => 'location_type',
             'where' => 'civicrm_location_type.name',
             'title' => ts('Location Type'),
-          )
+          ),
         );
 
         $IMProvider = array(
@@ -1428,7 +1428,7 @@ WHERE id={$id}; ";
             'name' => 'im_provider',
             'where' => 'civicrm_im.provider_id',
             'title' => ts('IM Provider'),
-          )
+          ),
         );
 
         $locationFields = array_merge($locationType,
@@ -1472,7 +1472,7 @@ WHERE id={$id}; ";
           foreach (array(
                      'Individual',
                      'Household',
-                     'Organization'
+                     'Organization',
                    ) as $type) {
             $fields = array_merge($fields,
               CRM_Core_BAO_CustomField::getFieldsForImport($type, FALSE, FALSE, $search, TRUE, $withMultiRecord)
@@ -1554,7 +1554,7 @@ WHERE id={$id}; ";
               'postal_greeting_custom',
               'addressee_custom',
               'prefix_id',
-              'suffix_id'
+              'suffix_id',
             ),
             'Organization' => array(
               'first_name',
@@ -1671,7 +1671,7 @@ WHERE id={$id}; ";
             'im',
             'email',
             'openid',
-            'phone_ext'
+            'phone_ext',
           ))) {
             if ($type) {
               $returnProperties['location'][$locationTypeName][$fieldName . '-' . $type] = 1;
@@ -2253,7 +2253,7 @@ ORDER BY civicrm_email.is_primary DESC";
                 'gender_id',
                 'current_employer',
                 'prefix_id',
-                'suffix_id'
+                'suffix_id',
               )) &&
             ($value == '' || !isset($value)) &&
             ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0
@@ -2488,7 +2488,7 @@ AND       civicrm_openid.is_primary = 1";
         'preferred_communication_method' => array(
           'newName' => 'preferred_communication_method_display',
           'groupName' => 'preferred_communication_method',
-        )
+        ),
       );
 
       CRM_Core_OptionGroup::lookupValues($temp, $names, FALSE);
@@ -3042,7 +3042,7 @@ AND       civicrm_openid.is_primary = 1";
             $hasAllPermissions = TRUE;
           }
           elseif (in_array($values['ref'], array(
-            'new-email'
+            'new-email',
           ))) {
             // grant permissions for these tasks.
             $hasAllPermissions = TRUE;
@@ -3058,7 +3058,7 @@ AND       civicrm_openid.is_primary = 1";
       // build directly accessible action menu.
       if (in_array($values['ref'], array(
         'view-contact',
-        'edit-contact'
+        'edit-contact',
       ))) {
         $contextMenu['primaryActions'][$key] = array(
           'title' => $values['title'],

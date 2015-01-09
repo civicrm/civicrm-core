@@ -304,7 +304,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     $formattedTags = array();
     foreach ($tags as $key => $tag) {
       if (!empty($tag[2])) {
-        $key = $tag[2] .  "-" . $key;
+        $key = $tag[2] . "-" . $key;
       }
       $formattedTags[$key] = $tag[0] . $tag[1];
     }

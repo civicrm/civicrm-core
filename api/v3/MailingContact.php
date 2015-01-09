@@ -92,7 +92,7 @@ function _civicrm_api3_mailing_contact_get_spec(&$params) {
     'options' => array(
       'Delivered' => 'Delivered',
       'Bounced' => 'Bounced',
-    )
+    ),
   );
 }
 
@@ -136,13 +136,13 @@ GROUP BY   m.id
 ";
 
     $qParams = array(
-      1 => array($contactID, 'Integer')
+      1 => array($contactID, 'Integer'),
     );
     $dao = CRM_Core_DAO::executeQuery($sql, $qParams);
 
     $params = array(
       'type'   => $type,
-      'contact_id' => $contactID
+      'contact_id' => $contactID,
     );
 
     $results = $dao->N;
@@ -196,7 +196,7 @@ LIMIT %2, %3
     $qParams = array(
       1 => array($contactID, 'Integer'),
       2 => array($offset, 'Integer'),
-      3 => array($limit, 'Integer')
+      3 => array($limit, 'Integer'),
     );
     $dao = CRM_Core_DAO::executeQuery($sql, $qParams);
 

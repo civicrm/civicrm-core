@@ -106,7 +106,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $tmp = civicrm_api('Entity', 'Get', array('version' => 3));
     if (getenv('SYNTAX_CONFORMANCE_ENTITIES')) {
       $tmp = array(
-        'values' => explode(' ', getenv('SYNTAX_CONFORMANCE_ENTITIES'))
+        'values' => explode(' ', getenv('SYNTAX_CONFORMANCE_ENTITIES')),
       );
     }
 
@@ -351,7 +351,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'PaymentProcessor',
       'Setting',
       'MailingContact',
-      'SystemLog' //skip this because it doesn't make sense to update logs
+      'SystemLog' //skip this because it doesn't make sense to update logs,
     );
     if ($sequential === TRUE) {
       return $entitiesWithout;
@@ -420,7 +420,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'state_province_id', //issues with country id - need to ensure same country
           'master_id', //creates relationship
         ),
-        'cant_return' => array()
+        'cant_return' => array(),
       ),
       'Batch' => array(
         'cant_update' => array(
@@ -428,19 +428,19 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         ),
         'cant_return' => array(
           'entity_table',
-        )
+        ),
       ),
       'CaseType' => array(
         'cant_update' => array(
           'definition',
-        )
+        ),
       ),
       'MembershipBlock' => array(
         'cant_update' => array(
           // The fake/auto-generated values leave us unable to properly cleanup fake data
           'entity_type',
           'entity_id',
-        )
+        ),
       ),
       'Pledge' => array(
         'cant_update' => array(
@@ -448,7 +448,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'installments',
           'original_installment_amount',
           'next_pay_date',
-          'amount' // can't be changed through API
+          'amount' // can't be changed through API,
         ),
         'break_return' => array(// if these are passed in they are retrieved from the wrong table
           'honor_contact_id',
@@ -456,7 +456,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'contribution_page_id',
           'financial_account_id',
           'financial_type_id',
-          'currency'
+          'currency',
         ),
         'cant_return' => array(// can't be retrieved from api
           'honor_type_id', //due to uniquename missing
@@ -474,7 +474,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'pledge_status_id',
           'pledge_campaign_id',
           'pledge_financial_type_id',
-        )
+        ),
       ),
       'PaymentProcessorType' => array(
         'cant_update' => array(
@@ -1018,7 +1018,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
             if ($specs['FKClassName'] == $baoString) {
               $entity[$fieldName] = (string) $entity2['id'];
             }
-            else{
+            else {
               $uniqueName = CRM_Utils_Array::value('uniqueName', $specs);
               if (!empty($entity[$fieldName])) {
                 $resetFKTo = array($fieldName => $entity[$fieldName]);
@@ -1370,10 +1370,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->assertAPISuccess($createResult);
     $eventId = $createResult['id'];
     $this->assertDBQuery('createNew: CiviCRM &lt;&gt; TheRest', 'SELECT title FROM civicrm_event WHERE id = %1', array(
-      1 => array($eventId, 'Integer')
+      1 => array($eventId, 'Integer'),
     ));
     $this->assertDBQuery('createNew: TheRest <> CiviCRM', 'SELECT description FROM civicrm_event WHERE id = %1', array(
-      1 => array($eventId, 'Integer')
+      1 => array($eventId, 'Integer'),
     ));
 
     // Verify that "create" handles encoding for updates
@@ -1385,10 +1385,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     ));
     $this->assertAPISuccess($createWithIdResult);
     $this->assertDBQuery('createWithId:  CiviCRM &lt;&gt; TheRest', 'SELECT title FROM civicrm_event WHERE id = %1', array(
-      1 => array($eventId, 'Integer')
+      1 => array($eventId, 'Integer'),
     ));
     $this->assertDBQuery('createWithId:  TheRest <> CiviCRM', 'SELECT description FROM civicrm_event WHERE id = %1', array(
-      1 => array($eventId, 'Integer')
+      1 => array($eventId, 'Integer'),
     ));
 
     // Verify that "setvalue" handles encoding for updates
@@ -1400,7 +1400,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     ));
     $this->assertAPISuccess($setValueTitleResult);
     $this->assertDBQuery('setValueTitle: CiviCRM &lt;&gt; TheRest', 'SELECT title FROM civicrm_event WHERE id = %1', array(
-      1 => array($eventId, 'Integer')
+      1 => array($eventId, 'Integer'),
     ));
     $setValueDescriptionResult = civicrm_api('Event', 'setvalue', array(
       'version' => 3,
@@ -1411,7 +1411,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     //$this->assertTrue((bool)$setValueDescriptionResult['is_error']); // not supported by setValue
     $this->assertAPISuccess($setValueDescriptionResult);
     $this->assertDBQuery('setValueDescription: TheRest <> CiviCRM', 'SELECT description FROM civicrm_event WHERE id = %1', array(
-      1 => array($eventId, 'Integer')
+      1 => array($eventId, 'Integer'),
     ));
   }
 }

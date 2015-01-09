@@ -179,7 +179,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
         'fields' => array(
-          'email' => NULL
+          'email' => NULL,
         ),
         'grouping' => 'contact-fields',
       ),
@@ -353,7 +353,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
     $this->beginPostProcess();
     $this->buildACLClause(array(
         $this->_aliases['civicrm_contact'],
-        $this->_aliases['civicrm_contact_household']
+        $this->_aliases['civicrm_contact_household'],
       ));
     $sql = $this->buildQuery(TRUE);
     $rows = array();

@@ -45,7 +45,7 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
     'Contact',
     'Individual',
     'Household',
-    'Organization'
+    'Organization',
   );
 
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
@@ -152,8 +152,8 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
           'fields' => array(
             'phone' => NULL,
             'phone_ext' => array(
-              'title' => ts('Phone Extension')
-            )
+              'title' => ts('Phone Extension'),
+            ),
           ),
           'grouping' => 'contact-fields',
         ),

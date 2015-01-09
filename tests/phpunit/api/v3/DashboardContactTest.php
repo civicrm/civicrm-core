@@ -62,7 +62,7 @@ class api_v3_DashboardContactTest extends CiviUnitTestCase {
         'first_name' => 'abc1',
         'contact_type' => 'Individual',
         'last_name' => 'xyz1',
-        'email' => 'abc@abc.com'
+        'email' => 'abc@abc.com',
       )
     );
     $oldCount = CRM_Core_DAO::singleValueQuery("select count(*) from civicrm_dashboard_contact where contact_id = {$contact['id']} AND is_active = 1 AND dashboard_id = {$dashresult['id']}");

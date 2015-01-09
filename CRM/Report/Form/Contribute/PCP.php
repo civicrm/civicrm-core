@@ -278,22 +278,22 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
     $statistics['counts']['goal_total'] = array(
       'title' => ts('Goal Total'),
       'value' => $dao->goal_total,
-      'type' => CRM_Utils_Type::T_MONEY
+      'type' => CRM_Utils_Type::T_MONEY,
     );
     $statistics['counts']['committed_total'] = array(
       'title' => ts('Total Committed'),
       'value' => $dao->committed_total,
-      'type' => CRM_Utils_Type::T_MONEY
+      'type' => CRM_Utils_Type::T_MONEY,
     );
     $statistics['counts']['received_total'] = array(
       'title' => ts('Total Received'),
       'value' => $dao->received_total,
-      'type' => CRM_Utils_Type::T_MONEY
+      'type' => CRM_Utils_Type::T_MONEY,
     );
     $statistics['counts']['donors_total'] = array(
       'title' => ts('Total Donors'),
       'value' => $dao->donors_total,
-      'type' => CRM_Utils_Type::T_INT
+      'type' => CRM_Utils_Type::T_INT,
     );
     return $statistics;
   }

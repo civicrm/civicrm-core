@@ -135,7 +135,7 @@ class api_v3_APITest extends CiviUnitTestCase {
    * Test that calling via wrapper works
    */
   public function testv3Wrapper() {
-    try{
+    try {
       $result = civicrm_api3('contact', 'get', array());
     }
     catch (CRM_Exception $e) {
@@ -149,7 +149,7 @@ class api_v3_APITest extends CiviUnitTestCase {
    * Test exception is thrown
    */
   public function testv3WrapperException() {
-    try{
+    try {
       $result = civicrm_api3('contact', 'create', array('debug' => 1));
     }
     catch (CiviCRM_API3_Exception $e) {

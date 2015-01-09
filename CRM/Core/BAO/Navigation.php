@@ -630,7 +630,7 @@ ORDER BY parent_id, weight";
           <ul id='civicrm-home'>
             <li><a href='$homeURL'>$homeLabel</a></li>
             <li><a href='#' class='crm-hidemenu'>$hideLabel</a></li>
-            <li><a href='$logoutURL' class='crm-logout-link'>" .  ts('Log out')  . "</a></li>
+            <li><a href='$logoutURL' class='crm-logout-link'>" . ts('Log out') . "</a></li>
           </ul>";
       // <li> tag doesn't need to be closed
     }

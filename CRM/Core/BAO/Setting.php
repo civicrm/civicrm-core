@@ -663,7 +663,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       $settingsMetadata = CRM_Core_BAO_Cache::getItem('CiviCRM setting Spec', 'All', $componentID);
       if (empty($settingsMetadata)) {
         global $civicrm_root;
-        $metaDataFolders = array($civicrm_root .  '/settings');
+        $metaDataFolders = array($civicrm_root . '/settings');
         CRM_Utils_Hook::alterSettingsFolders($metaDataFolders);
         $settingsMetadata = self::loadSettingsMetaDataFolders($metaDataFolders);
         CRM_Core_BAO_Cache::setItem($settingsMetadata,'CiviCRM setting Spec', 'All', $componentID);

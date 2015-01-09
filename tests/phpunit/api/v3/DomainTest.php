@@ -74,7 +74,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
         'api.email.create' => array(
           'location_type_id' => $defaultLocationType->id,
           'email' => 'my@email.com',
-        )
+        ),
       )
     );
 

@@ -124,7 +124,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       array(
         'url' => $url,
         'title' => ts('Search Results'),
-      )
+      ),
     );
 
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
@@ -188,7 +188,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
     $this->addWysiwyg('email_comment', ts('If you would like to add personal message to email please add it here. (If sending to more then one receipient the same message will be sent to each contact.)'), array(
       'rows' => 2,
-      'cols' => 40
+      'cols' => 40,
     ));
 
     $this->addButtons(array(
@@ -553,7 +553,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         CRM_Utils_PDF_Utils::html2pdf($messageInvoice, 'Invoice.pdf', FALSE, array(
           'margin_top' => 10,
           'margin_left' => 65,
-          'metric' => 'px'
+          'metric' => 'px',
         ));
         // functions call for adding activity with attachment
         $fileName = self::putFile($html);
@@ -605,7 +605,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'name'
       );
     }
-    else{
+    else {
       $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
         'Emailed Invoice',
         'name'

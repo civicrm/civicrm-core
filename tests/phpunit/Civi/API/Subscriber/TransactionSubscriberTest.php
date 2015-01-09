@@ -67,7 +67,7 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
       'first_name' => 'Me',
       'last_name' => 'Myself',
       'options' => array(
-        'force_rollback' => TRUE
+        'force_rollback' => TRUE,
       ),
     ));
     $this->assertTrue(is_numeric($result['id']));

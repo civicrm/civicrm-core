@@ -352,7 +352,7 @@ class CRM_Contact_Form_Search_Criteria {
       $form->addElement('text', 'prox_distance', ts('Find contacts within'), array('class' => 'six'));
       $form->addElement('select', 'prox_distance_unit', NULL, array(
         'miles' => ts('Miles'),
-        'kilos' => ts('Kilometers')
+        'kilos' => ts('Kilometers'),
       ));
       $form->addRule('prox_distance', ts('Please enter positive number as a distance'), 'numeric');
     }

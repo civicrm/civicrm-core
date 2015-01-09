@@ -406,7 +406,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       'entity_table' => 'civicrm_payment_processor',
       'entity_id' => $dao->id,
       'account_relationship' => $relationTypeId,
-      'financial_account_id' => $values['financial_account_id']
+      'financial_account_id' => $values['financial_account_id'],
     );
     CRM_Financial_BAO_FinancialTypeAccount::add($params);
   }

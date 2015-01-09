@@ -169,7 +169,7 @@ class CRM_Report_Form_Case_Demographics extends CRM_Report_Form {
             'options' => array(
               1 => ts('Exclude non-case'),
               2 => ts('Exclude cases'),
-              3 => ts('Include Both')
+              3 => ts('Include Both'),
             ),
             'default' => 3,
           ),

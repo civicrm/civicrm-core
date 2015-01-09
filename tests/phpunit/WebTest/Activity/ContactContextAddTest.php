@@ -221,7 +221,7 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
 
     $this->clickLink('_qf_Search_refresh');
 
-    $targetContacts = array("Summerson, " .  $firstName1, "Andersonnn, " .  $firstName2, "Anderson, " .  $firstName3);
+    $targetContacts = array("Summerson, " . $firstName1, "Andersonnn, " . $firstName2, "Anderson, " . $firstName3);
 
     //check whether separate activities are created for the target contacts
     foreach ($targetContacts as $contact) {

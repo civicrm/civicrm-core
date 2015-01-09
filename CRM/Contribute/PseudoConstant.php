@@ -160,7 +160,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   public static function &financialAccount($id = NULL, $financialAccountTypeId = NULL, $retrieveColumn = 'name', $key = 'id') {
     $condition = NULL;
     if ($financialAccountTypeId) {
-      $condition = " financial_account_type_id = " .  $financialAccountTypeId;
+      $condition = " financial_account_type_id = " . $financialAccountTypeId;
     }
     $cacheKey = "{$id}_{$financialAccountTypeId}_{$retrieveColumn}_{$key}";
     if (!isset(self::$financialAccount[$cacheKey])) {

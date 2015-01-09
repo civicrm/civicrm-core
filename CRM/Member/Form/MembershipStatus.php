@@ -112,7 +112,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form_MembershipConfig 
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      try{
+      try {
         CRM_Member_BAO_MembershipStatus::del($this->_id);
       }
       catch(CRM_Core_Exception $e) {

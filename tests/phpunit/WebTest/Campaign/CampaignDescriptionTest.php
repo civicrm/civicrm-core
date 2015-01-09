@@ -88,7 +88,7 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
     $triggerElement = array('name' => 'campaign_type_id', 'type' => 'select');
     $customSets = array(
       array('entity' => 'Campaign', 'subEntity' => 'Referral Program', 'triggerElement' => $triggerElement),
-      array('entity' => 'Campaign', 'subEntity' => 'Constituent Engagement', 'triggerElement' => $triggerElement)
+      array('entity' => 'Campaign', 'subEntity' => 'Constituent Engagement', 'triggerElement' => $triggerElement),
     );
 
     $pageUrl = array('url' => 'campaign/add', 'args' => 'reset=1');

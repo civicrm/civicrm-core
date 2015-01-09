@@ -83,7 +83,7 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
     $entity = $this->createTestEntity();
     $result = $this->callAPIAndDocument('MessageTemplate', 'delete', array('id' => $entity['id']), __FUNCTION__, __FILE__);
     $checkDeleted = $this->callAPISuccess($this->entity, 'get', array(
-      'id' => $entity['id']
+      'id' => $entity['id'],
     ));
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }

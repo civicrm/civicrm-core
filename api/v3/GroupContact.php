@@ -190,7 +190,7 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
     $extraReturnValues= array(
       'total_count' => 0,
       'added' => 0,
-      'not_added' => 0
+      'not_added' => 0,
     );
     foreach ($groupIDs as $groupID) {
       list($tc, $a, $na) = CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIDs,
@@ -208,7 +208,7 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
     $extraReturnValues= array(
       'total_count' => 0,
       'removed' => 0,
-      'not_removed' => 0
+      'not_removed' => 0,
     );
     foreach ($groupIDs as $groupID) {
       list($tc, $r, $nr) = CRM_Contact_BAO_GroupContact::removeContactsFromGroup($contactIDs, $groupID, $method, $status, $tracking);

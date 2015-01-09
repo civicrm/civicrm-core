@@ -436,18 +436,18 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $contribution = $this->callAPISuccess('contribution', 'get', array(
       'sequential' => 1,
-      'id' => $contribution['id']
+      'id' => $contribution['id'],
     ));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
     $this->assertEquals('EFT', $contribution['values'][0]['payment_instrument']);
 
     $this->callAPISuccess('contribution', 'create', array(
         'id' => $contribution['id'],
-        'payment_instrument' => 'Credit Card'
+        'payment_instrument' => 'Credit Card',
       ));
     $contribution = $this->callAPISuccess('contribution', 'get', array(
       'sequential' => 1,
-      'id' => $contribution['id']
+      'id' => $contribution['id'],
     ));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
     $this->assertEquals('Credit Card', $contribution['values'][0]['payment_instrument']);
@@ -460,35 +460,35 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'create', $params2);
     $contribution = $this->callAPISuccess('contribution', 'get', array(
         'sequential' => 1,
-        'contribution_payment_instrument_id' => 'Cash'
+        'contribution_payment_instrument_id' => 'Cash',
       ));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
     $this->assertEquals('Cash', $contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1, $contribution['count']);
     $contribution = $this->callAPISuccess('contribution', 'get', array(
         'sequential' => 1,
-        'payment_instrument_id' => 'EFT'
+        'payment_instrument_id' => 'EFT',
       ));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
     $this->assertEquals('EFT', $contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1, $contribution['count']);
     $contribution = $this->callAPISuccess('contribution', 'get', array(
         'sequential' => 1,
-        'payment_instrument_id' => 5
+        'payment_instrument_id' => 5,
       ));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
     $this->assertEquals('EFT', $contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1, $contribution['count']);
     $contribution = $this->callAPISuccess('contribution', 'get', array(
         'sequential' => 1,
-        'payment_instrument' => 'EFT'
+        'payment_instrument' => 'EFT',
       ));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
     $this->assertEquals('EFT', $contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1, $contribution['count']);
     $contribution = $this->callAPISuccess('contribution', 'create', array(
         'id' => $contribution['id'],
-        'payment_instrument' => 'Credit Card'
+        'payment_instrument' => 'Credit Card',
       ));
     $contribution = $this->callAPISuccess('contribution', 'get', array('sequential' => 1, 'id' => $contribution['id']));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
@@ -603,7 +603,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('note', 'get', array(
         'entity_table' => 'civicrm_contribution',
         'entity_id' => $contribution['id'],
-        'sequential' => 1
+        'sequential' => 1,
       ));
     $this->assertEquals('my contribution note', $result['values'][0]['note']);
     $this->callAPISuccess('contribution', 'delete', array('id' => $contribution['id']));
@@ -630,7 +630,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('note', 'get', array(
         'entity_table' => 'civicrm_contribution',
         'entity_id' => $contribution['id'],
-        'sequential' => 1
+        'sequential' => 1,
       ));
     $this->assertEquals('my contribution note', $result['values'][0]['note']);
     $this->callAPISuccess('contribution', 'delete', array('id' => $contribution['id']));
@@ -645,12 +645,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $subfile = "ContributionCreateWithSoftCredit";
     $contact2 = $this->callAPISuccess('Contact', 'create', array(
         'display_name' => 'superman',
-        'contact_type' => 'Individual'
+        'contact_type' => 'Individual',
       ));
     $softparams = array(
       'contact_id' => $contact2['id'],
       'amount' => 50,
-      'soft_credit_type_id' => 3
+      'soft_credit_type_id' => 3,
     );
 
     $params = $this->_params + array('soft_credit' => array(1 => $softparams));
@@ -670,7 +670,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $subfile = "ContributionCreateWithSoftCreditDefaults";
     $contact2 = $this->callAPISuccess('Contact', 'create', array(
         'display_name' => 'superman',
-        'contact_type' => 'Individual'
+        'contact_type' => 'Individual',
       ));
     $params = $this->_params + array(
         'soft_credit_to' => $contact2['id'],
@@ -692,7 +692,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $subfile = "ContributionCreateWithHonoreeContact";
     $contact2 = $this->callAPISuccess('Contact', 'create', array(
         'display_name' => 'superman',
-        'contact_type' => 'Individual'
+        'contact_type' => 'Individual',
       ));
     $params = $this->_params + array(
         'honor_contact_id' => $contact2['id'],
@@ -899,7 +899,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array(
         'id' => $contribution['id'],
-        'api.contribution.delete' => 1
+        'api.contribution.delete' => 1,
       ));
     $this->assertEquals(1, $contribution['contribution_status_id']);
     $this->assertEquals('Check', $contribution['payment_instrument']);
@@ -924,7 +924,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $newParams = array(
 
       'id' => $contribution['id'],
-      'total_amount' => '125'
+      'total_amount' => '125',
     );
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
 
@@ -1101,7 +1101,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'create', array('id' => $contribution['id'], 'source' => 'new source'));
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array(
         'id' => $contribution['id'],
-        'api.contribution.delete' => 1
+        'api.contribution.delete' => 1,
       ));
     $this->assertEquals(2, $contribution['contribution_status_id']);
   }
@@ -1358,7 +1358,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
     $participantStatus = $this->callAPISuccessGetValue('participant', array(
         'id' => $this->_ids['participant'],
-        'return' => 'participant_status_id'
+        'return' => 'participant_status_id',
       ));
     $this->assertEquals(1, $participantStatus);
     $mut->checkMailLog(array(
@@ -1421,7 +1421,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'is_quick_config' => 0,
       'extends' => 'CiviMember',
       'financial_type_id' => 1,
-      'title' => 'my Page'
+      'title' => 'my Page',
     ));
     $priceSetID = $priceSet['id'];
 
@@ -1518,7 +1518,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'Contribution Information',
         'Please print this confirmation for your records',
       ), array(
-        'Event'
+        'Event',
       )
     );
     $mut->stop();
@@ -1603,7 +1603,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $this->callAPISuccess('participant_payment', 'create', array(
         'contribution_id' => $contribution['id'],
-        'participant_id' => $participantID
+        'participant_id' => $participantID,
       ));
     $this->callAPISuccess('line_item', 'get', array(
       'entity_id' => $contribution['id'],

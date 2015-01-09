@@ -146,14 +146,14 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         'type' => 'text',
         'label' => ts('Location'),
         'attributes' => CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity', 'location'),
-        'required' => FALSE
+        'required' => FALSE,
       ),
       'details' => array(
         'type' => 'wysiwyg',
         'label' => ts('Details'),
         // forces a smaller edit window
         'attributes' => array('rows' => 4, 'cols' => 60),
-        'required' => FALSE
+        'required' => FALSE,
       ),
       'status_id' => array(
         'type' => 'select',
@@ -166,12 +166,12 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       'source_contact_id' => array(
         'type' => 'entityRef',
         'label' => ts('Added By'),
-        'required' => FALSE
+        'required' => FALSE,
       ),
       'target_contact_id' => array(
         'type' => 'entityRef',
         'label' => ts('With Contact'),
-        'attributes' => array('multiple' => TRUE, 'create' => TRUE)
+        'attributes' => array('multiple' => TRUE, 'create' => TRUE),
       ),
       'assignee_contact_id' => array(
         'type' => 'entityRef',
@@ -195,8 +195,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         'label' => ts('Subject'),
         'attributes' => CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity',
           'subject'
-        )
-      )
+        ),
+      ),
     );
 
     if (($this->_context == 'standalone') &&
@@ -279,7 +279,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     if ($this->_activityId &&
       in_array($this->_action, array(
         CRM_Core_Action::UPDATE,
-        CRM_Core_Action::VIEW
+        CRM_Core_Action::VIEW,
       )) &&
       !CRM_Activity_BAO_Activity::checkPermission($this->_activityId, $this->_action)
     ) {
@@ -417,7 +417,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       'standalone',
       'home',
       'dashlet',
-      'dashletFullscreen'
+      'dashletFullscreen',
     ))
     ) {
       $urlParams = 'reset=1';
@@ -610,12 +610,12 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           'type' => 'next',
           'name' => $button,
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE
+          'isDefault' => TRUE,
         ),
         array(
           'type' => 'cancel',
-          'name' => ts('Cancel')
-        )
+          'name' => ts('Cancel'),
+        ),
       ));
       return;
     }
@@ -765,7 +765,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $buttons = array();
       $buttons[] = array(
         'type' => 'cancel',
-        'name' => ts('Done')
+        'name' => ts('Done'),
       );
       $this->addButtons($buttons);
     }
@@ -780,12 +780,12 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
             'type' => 'upload',
             'name' => ts('Save'),
             'js' => $js,
-            'isDefault' => TRUE
+            'isDefault' => TRUE,
           ),
           array(
             'type' => 'cancel',
-            'name' => ts('Cancel')
-          )
+            'name' => ts('Cancel'),
+          ),
         )
       );
     }
@@ -875,7 +875,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       // delete tags for the entity
       $tagParams = array(
         'entity_table' => 'civicrm_activity',
-        'entity_id' => $this->_activityId
+        'entity_id' => $this->_activityId,
       );
 
       CRM_Core_BAO_EntityTag::del($tagParams);
@@ -987,7 +987,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         ),
         'linkedColumns' => array('activity_id'),
         'isRecurringEntityRecord' => FALSE,
-      )
+      ),
     );
     CRM_Core_Form_RecurringEntity::postProcess($params, 'civicrm_activity', $linkedEntities);
 
@@ -1129,7 +1129,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       array(
         1 => $subject,
         2 => $followupStatus,
-        3 => $mailStatus
+        3 => $mailStatus,
       )
     ), ts('Saved'), 'success');
 

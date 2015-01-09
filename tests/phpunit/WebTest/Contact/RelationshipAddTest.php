@@ -187,7 +187,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
 
     //test for individual contact and household subtype contact
     //relationship
-    $typeb = "Household__" .  $householdSubtypeName;
+    $typeb = "Household__" . $householdSubtypeName;
 
     //create a relationship type between different contact types
     $params = array(
@@ -360,7 +360,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $triggerElement = array('name' => 'relationship_type_id', 'type' => 'select');
     $customSets = array(
       array('entity' => 'Relationship', 'subEntity' => 'Partner of', 'triggerElement' => $triggerElement),
-      array('entity' => 'Relationship', 'subEntity' => 'Spouse of', 'triggerElement' => $triggerElement)
+      array('entity' => 'Relationship', 'subEntity' => 'Spouse of', 'triggerElement' => $triggerElement),
     );
 
     $pageUrl = array('url' => 'contact/view/rel', 'args' => "cid={$contactId[1]}&action=add&reset=1");

@@ -49,7 +49,7 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
     $surveyID = $survey['id'];
     $this->params = array(
       'sequential' => '1',
-      'survey_id' => $surveyID
+      'survey_id' => $surveyID,
     );
   }
 

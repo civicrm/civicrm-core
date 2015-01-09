@@ -125,7 +125,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
       "edit-{$roleId}-access-civireport",
       "edit-{$roleId}-view-all-contacts",
       "edit-{$roleId}-administer-reports",
-      "edit-{$roleId}-access-civicrm"
+      "edit-{$roleId}-access-civicrm",
     );
     $this->changePermissions($permissions);
 
@@ -141,7 +141,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
       "edit-{$roleId}-view-all-contacts",
       "edit-{$roleId}-administer-reports",
       "edit-{$roleId}-access-civicrm",
-      "edit-{$roleId}-administer-reserved-reports"
+      "edit-{$roleId}-administer-reserved-reports",
     );
     $this->changePermissions($permissions);
 

@@ -317,7 +317,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     //ensure that correct number of payments created & last payment has the right date
     $payments = $this->callAPISuccess('PledgePayment', 'Get', array(
       'pledge_id' => $pledge['id'],
-      'sequential' => 1
+      'sequential' => 1,
     ));
     $this->assertEquals(1, $payments['count'], 'In line ' . __LINE__);
     $this->assertEquals(2, $payments['values'][0]['status_id'], 'In line ' . __LINE__);

@@ -553,7 +553,7 @@ WHERE {$clause}
       'source_contact_id' => 'source_contact',
       'location' => 'activity_location',
       'campaign_id' => 'activity_campaign_id',
-      'duration' => 'activity_duration'
+      'duration' => 'activity_duration',
     );
     foreach ($activityParams as $key => $field) {
       if (!empty($params[$field])) {

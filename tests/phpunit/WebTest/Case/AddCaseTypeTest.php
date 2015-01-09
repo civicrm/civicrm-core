@@ -54,7 +54,7 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage('a/#/caseType/new');
 
-    $caseTypeLabel = "Case Type" .  substr(sha1(rand()), 0, 7);
+    $caseTypeLabel = "Case Type" . substr(sha1(rand()), 0, 7);
     $this->waitForElementPresent('title');
     $this->type('title', $caseTypeLabel);
 
@@ -123,7 +123,7 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     $this->click("xpath=//table/tbody//tr/td[1][text()='{$caseTypeLabel}']/../td[5]/span/a[text()='Edit']");
     $this->waitForElementPresent("xpath=//div[@class='crm-submit-buttons']/span/input[@value='Save']");
 
-    $editCaseTypeLabel = "Case Type Edit" .  substr(sha1(rand()), 0, 7);
+    $editCaseTypeLabel = "Case Type Edit" . substr(sha1(rand()), 0, 7);
     $this->waitForElementPresent('title');
     $this->type('title', $editCaseTypeLabel);
 

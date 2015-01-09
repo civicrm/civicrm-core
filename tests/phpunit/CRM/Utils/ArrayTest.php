@@ -12,33 +12,33 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
       'lang' => 'en',
       'msgid' => 'greeting',
       'familiar' => FALSE,
-      'value' => 'Hello'
+      'value' => 'Hello',
     );
     $inputs[] = array(
       'lang' => 'en',
       'msgid' => 'parting',
-      'value' => 'Goodbye'
+      'value' => 'Goodbye',
     );
     $inputs[] = array(
       'lang' => 'fr',
       'msgid' => 'greeting',
-      'value' => 'Bon jour'
+      'value' => 'Bon jour',
     );
     $inputs[] = array(
       'lang' => 'fr',
       'msgid' => 'parting',
-      'value' => 'Au revoir'
+      'value' => 'Au revoir',
     );
     $inputs[] = array(
       'lang' => 'en',
       'msgid' => 'greeting',
       'familiar' => TRUE,
-      'value' => 'Hey'
+      'value' => 'Hey',
     );
     $inputs[] = array(
       'msgid' => 'greeting',
       'familiar' => TRUE,
-      'value' => 'Universal greeting'
+      'value' => 'Universal greeting',
     );
 
     $byLangMsgid = CRM_Utils_Array::index(array('lang', 'msgid'), $inputs);

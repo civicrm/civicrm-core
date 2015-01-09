@@ -39,7 +39,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
       $this->assertEquals(1, count($value['api.Address.get']['values']));
     }
     CRM_core_DAO::executeQuery('DELETE FROM civicrm_address WHERE contact_id=%1', array(
-      1 => array($this->noise['individual'], 'Positive')
+      1 => array($this->noise['individual'], 'Positive'),
     ));
     $this->callAPISuccess('Contact', 'delete', array(
       'id' => $this->noise['individual'],

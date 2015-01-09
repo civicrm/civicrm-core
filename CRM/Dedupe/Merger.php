@@ -1039,7 +1039,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             array(
               1 => $block,
               2 => $count,
-              3 => $allLocationTypes[$locTypeId]
+              3 => $allLocationTypes[$locTypeId],
             )
           );
 
@@ -1633,7 +1633,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           'start_date' => CRM_Utils_Date::isoToMysql($dao->start_date),
           'end_date' => CRM_Utils_Date::isoToMysql($dao->end_date),
           'source' => $dao->source,
-          'status_id' => $dao->status_id
+          'status_id' => $dao->status_id,
         );
         // create/update membership(s) for related contact(s)
         CRM_Member_BAO_Membership::createRelatedMemberships($membershipParams, $dao);

@@ -428,7 +428,7 @@ class CRM_Utils_Rule {
                           'CRM_Contribute_DAO_Contribution',
                           'currency', array(
                                            'keyColumn' => 'name',
-                                           'labelColumn' => 'symbol'
+                                           'labelColumn' => 'symbol',
                                             ));
     $value = str_replace($currencySymbols, '', $value);
 

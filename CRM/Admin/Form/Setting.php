@@ -100,7 +100,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
           'version' => 3,
           'name' => $setting,
           'group' => $group,
-          'default_value' => CRM_Utils_Array::value('default', $settingMetaData['values'][$setting])
+          'default_value' => CRM_Utils_Array::value('default', $settingMetaData['values'][$setting]),
           )
         );
       }
@@ -149,7 +149,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
             $props['html_type'] == 'select' ? CRM_Utils_Array::value('html_attributes', $props) : NULL
           );
         }
-        else{
+        else {
           $this->$add($setting, ts($props['title']));
         }
         $this->assign("{$setting}_description", ts($props['description']));

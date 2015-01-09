@@ -41,7 +41,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   protected $_phoneField_a = FALSE;
   protected $_phoneField_b = FALSE;
   protected $_customGroupExtends = array(
-    'Relationship'
+    'Relationship',
   );
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
@@ -169,11 +169,11 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         'fields' => array(
           'phone_b' => array(
             'title' => ts('Phone (Contact B)'),
-            'name' => 'phone'
+            'name' => 'phone',
           ),
           'phone_ext_b' => array(
             'title' => ts('Phone Ext (Contact B)'),
-            'name' => 'phone_ext'
+            'name' => 'phone_ext',
           ),
         ),
         'grouping' => 'conact_b_fields',
@@ -224,7 +224,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'title' => ts('Relationship'),
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => array(
-                '' => '- any relationship type -'
+                '' => '- any relationship type -',
               ) +
               CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE),
             'type' => CRM_Utils_Type::T_INT,
@@ -542,7 +542,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
 
     $this->buildACLClause(array(
         $this->_aliases['civicrm_contact'],
-        $this->_aliases['civicrm_contact_b']
+        $this->_aliases['civicrm_contact_b'],
       ));
     $sql = $this->buildQuery();
     $this->buildRows($sql, $rows);

@@ -160,7 +160,7 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
    */
   public function testBasicXMLExports($customGroupParams, $fieldParams, $expectedXmlFilePath) {
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_custom_group WHERE title = %1', array(
-      1 => array($customGroupParams['title'], 'String')
+      1 => array($customGroupParams['title'], 'String'),
     ));
     $customGroup = $this->customGroupCreate($customGroupParams);
     $fieldParams['custom_group_id'] = $customGroup['id'];
@@ -185,7 +185,7 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
    */
   public function testBasicXMLImports($expectCustomGroup, $expectCustomField, $inputXmlFilePath) {
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_custom_group WHERE title = %1', array(
-      1 => array($expectCustomGroup['title'], 'String')
+      1 => array($expectCustomGroup['title'], 'String'),
     ));
 
     $importer = new CRM_Utils_Migrate_Import();

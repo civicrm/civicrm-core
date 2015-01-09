@@ -96,7 +96,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       if (CRM_Utils_Array::value(0, $params['extends']) == 'Relationship') {
         $extendsChildType = str_replace(array('_a_b', '_b_a'), array(
             '',
-            ''
+            '',
           ), $extendsChildType);
       }
       if (substr($extendsChildType, 0, 1) != CRM_Core_DAO::VALUE_SEPARATOR) {
@@ -123,7 +123,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       'help_pre',
       'help_post',
       'is_active',
-      'is_multiple'
+      'is_multiple',
     );
     foreach ($fields as $field) {
       $group->$field = CRM_Utils_Array::value($field, $params, FALSE);
@@ -377,7 +377,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         'date_format',
         'time_format',
         'option_group_id',
-        'in_selector'
+        'in_selector',
       ),
       'civicrm_custom_group' => array(
         'id',
@@ -610,7 +610,7 @@ ORDER BY civicrm_custom_group.weight,
         $groupTree['info']['from'][] = $table;
         $select = array(
           "{$table}.id as {$table}_id",
-          "{$table}.entity_id as {$table}_entity_id"
+          "{$table}.entity_id as {$table}_entity_id",
         );
         foreach ($fields as $column => $dontCare) {
           $select[] = "{$table}.{$column} as {$table}_{$column}";
@@ -1610,7 +1610,7 @@ ORDER BY civicrm_custom_group.weight,
       'Multi-Select',
       'AdvMulti-Select',
       'Select',
-      'Radio'
+      'Radio',
     );
 
     foreach ($groupTree as $group) {
@@ -2024,7 +2024,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
           'dd-mm' => "%E%f %B $customTimeFormat",
           'yy' => "%Y $customTimeFormat",
           'M yy' => "%b %Y $customTimeFormat",
-          'yy-mm' => "%Y-%m $customTimeFormat"
+          'yy-mm' => "%Y-%m $customTimeFormat",
         );
 
         if ($format = CRM_Utils_Array::value('date_format', $field)) {

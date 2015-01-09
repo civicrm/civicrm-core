@@ -200,7 +200,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         'String',
         'Int',
         'Float',
-        'Money'
+        'Money',
       ))
     ) {
 
@@ -788,13 +788,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       'Multi-Select Country',
       'AdvMulti-Select',
       'CheckBox',
-      'Radio'
+      'Radio',
     )));
 
     if ($isSelect) {
       $options = CRM_Utils_Array::value('values', civicrm_api3('contact', 'getoptions', array(
         'field' => "custom_$fieldId",
-        'context' => $search ? 'search' : 'create'
+        'context' => $search ? 'search' : 'create',
       ), array()));
 
       // Consolidate widget types to simplify the below switch statement
@@ -989,7 +989,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $attributes = array(
           'rows' => $field->note_rows,
           'cols' => $field->note_columns,
-          'data-crm-custom' => $dataCrmCustomVal
+          'data-crm-custom' => $dataCrmCustomVal,
         );
         if ($field->text_length) {
           $attributes['maxlength'] = $field->text_length;

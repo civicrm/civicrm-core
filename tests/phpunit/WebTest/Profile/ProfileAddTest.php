@@ -157,7 +157,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $fields = array(
       'first_name' => 'Individual',
       'last_name'  => 'Individual',
-      'email'      => 'Contact'
+      'email'      => 'Contact',
     );
     $this->waitForElementPresent("field_name_0");
     foreach ($fields as $field => $type) {
@@ -199,7 +199,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->clickLink("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td[1]/span[text() = '$groupName']/parent::td/following-sibling::td[@class=' crm-group-group_links']/span/a");
     $contactEmails = array(
       1 => "$lastName1, $firstName1",
-      2 => "$lastName2, $firstName2"
+      2 => "$lastName2, $firstName2",
     );
     foreach ($contactEmails as $row => $name) {
       $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[$row]/td[4]/a[contains(text(), '$name')]"));

@@ -621,7 +621,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $contactEmails = array(
       1 => "{$firstName}.{$lastName}@example.com",
       2 => "{$firstName2}.{$lastName2}@example.com",
-      3 => "{$firstName3}.{$lastName3}@example.com"
+      3 => "{$firstName3}.{$lastName3}@example.com",
     );
 
     foreach ($contactEmails as $key => $value) {
@@ -721,7 +721,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
       return array(
         'mainId' => $mainId,
-        'duplicateId' => $duplicateId
+        'duplicateId' => $duplicateId,
       );
     }
   }

@@ -109,7 +109,7 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
       array(
         '@escaped' => 'foo"bar',
         '!unescaped' => 'concat(foo,bar)',
-        '#validated' => 15.2
+        '#validated' => 15.2,
       )
     );
     $this->assertLike('"foo\"bar" concat(foo,bar) 15.2', $actual);
@@ -121,7 +121,7 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
       array(
         '@escaped' => array('foo"bar', "whiz", "null", NULL, "bang"),
         '!unescaped' => array('foo"bar', 'bar'),
-        '#validated' => array(1, 10, NULL, 100.1)
+        '#validated' => array(1, 10, NULL, 100.1),
       )
     );
     $this->assertLike('("foo\\"bar", "whiz", "null", NULL, "bang") (foo"bar, bar) (1, 10, NULL, 100.1)', $actual);
@@ -130,7 +130,7 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
   public function testInterpolateBadNumber() {
     try {
       $result = CRM_Utils_SQL_Select::from('ignore')->interpolate('#num', array(
-        '#num' => '5not-a-number5'
+        '#num' => '5not-a-number5',
       ));
       $this->fail('Expected exception; got: ' . var_export($result, TRUE));
     }
@@ -140,7 +140,7 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
 
     try {
       $result = CRM_Utils_SQL_Select::from('ignore')->interpolate('#num', array(
-        '#num' => array(1, '5not-a-number5', 2)
+        '#num' => array(1, '5not-a-number5', 2),
       ));
       $this->fail('Expected exception; got: ' . var_export($result, TRUE));
     }
@@ -152,7 +152,7 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
   public function testInterpolateBadKey() {
     try {
       $result = CRM_Utils_SQL_Select::from('ignore')->interpolate('this is a {var}', array(
-        '{var}' => 'not a well-formed variable name'
+        '{var}' => 'not a well-formed variable name',
       ));
       $this->fail('Expected exception; got: ' . var_export($result, TRUE));
     }

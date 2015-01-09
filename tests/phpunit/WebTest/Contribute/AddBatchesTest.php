@@ -297,7 +297,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
       $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
       $expected = array(
         2 => 'General',
-        4 => 'New'
+        4 => 'New',
       );
       foreach ($expected as $label => $value) {
         $this->verifyText("xpath=id('MembershipView')/div[2]/div/table[1]/tbody/tr[$label]/td[2]", preg_quote($value));

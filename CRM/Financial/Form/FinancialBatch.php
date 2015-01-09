@@ -91,7 +91,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
 
     if (isset($this->_id)) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $this->_id, 'title');
-      CRM_Utils_System::setTitle($this->_title  . ' - ' . ts('Accounting Batch'));
+      CRM_Utils_System::setTitle($this->_title . ' - ' . ts('Accounting Batch'));
       $this->assign('batchTitle', $this->_title);
       $contactID = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $this->_id, 'created_id');
       $contactName = CRM_Contact_BAO_Contact::displayName($contactID);
@@ -245,7 +245,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
     //create activity.
     $activityParams = array(
       'activity_type_id' => array_search($activityTypeName, $activityTypes),
-      'subject' => $batch->title  . "- Batch",
+      'subject' => $batch->title . "- Batch",
       'status_id' => 2,
       'priority_id' => 2,
       'activity_date_time' => date('YmdHis'),

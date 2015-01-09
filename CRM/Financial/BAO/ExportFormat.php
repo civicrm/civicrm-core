@@ -197,14 +197,14 @@ class CRM_Financial_BAO_ExportFormat {
     $details = '<p>' . ts('Record:') . ' ' . $values['title'] . '</p><p>' . ts('Description:') . '</p><p>' . ts('Created By:') . " $createdBy" . '</p><p>' . ts('Created Date:') . ' ' . $values['created_date'] . '</p><p>' . ts('Last Modified By:') . ' ' . $modifiedBy . '</p><p>' . ts('Payment Instrument:') . ' ' . $values['payment_instrument_id'] . '</p>';
     $subject = '';
     if (!empty($values['total'])) {
-      $subject .= ts('Total') . '[' .  CRM_Utils_Money::format($values['total'])  . '],';
+      $subject .= ts('Total') . '[' . CRM_Utils_Money::format($values['total']) . '],';
     }
     if (!empty($values['item_count'])) {
-      $subject .= ' ' . ts('Count') . '[' .  $values['item_count']  . '],';
+      $subject .= ' ' . ts('Count') . '[' . $values['item_count'] . '],';
     }
 
     //create activity.
-    $subject .= ' ' . ts('Batch') . '[' .  $values['title']  . ']';
+    $subject .= ' ' . ts('Batch') . '[' . $values['title'] . ']';
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
     $activityParams = array(
       'activity_type_id' => array_search('Export Accounting Batch', $activityTypes),

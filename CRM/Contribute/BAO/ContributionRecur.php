@@ -274,7 +274,7 @@ SELECT r.payment_processor_id
 <br/>' . ts('The recurring contribution of %1, every %2 %3 has been cancelled.', array(
           1 => $dao->amount,
               2 => $dao->frequency_interval,
-              3 => $dao->frequency_unit
+              3 => $dao->frequency_unit,
             ));
         }
         $activityParams = array(

@@ -997,7 +997,7 @@ SELECT is_primary,
       // CRM-15120
       $formatted = array(
         'first_name' => $rows[$rowID]['first_name'],
-        'individual_prefix' => $rows[$rowID]['individual_prefix']
+        'individual_prefix' => $rows[$rowID]['individual_prefix'],
       );
       $format = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'display_name_format');
       $firstNameWithPrefix = CRM_Utils_Address::format($formatted, $format, FALSE, FALSE, TRUE);

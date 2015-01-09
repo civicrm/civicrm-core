@@ -351,7 +351,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $acParams = array(
         'activity_id' => $activityId,
         'contact_id' => $params['source_contact_id'],
-        'record_type_id' => $sourceID
+        'record_type_id' => $sourceID,
       );
       self::deleteActivityContact($activityId, $sourceID);
       CRM_Activity_BAO_ActivityContact::create($acParams);
@@ -1564,7 +1564,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $activityTargetParams = array(
       'activity_id' => $activityID,
       'contact_id' => $toID,
-      'record_type_id' => $targetID
+      'record_type_id' => $targetID,
     );
     CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
 
@@ -1648,7 +1648,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $activityTargetParams = array(
       'activity_id' => $activityID,
       'contact_id' => $toID,
-      'record_type_id' => $targetID
+      'record_type_id' => $targetID,
     );
     CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
     return TRUE;
@@ -2182,7 +2182,7 @@ AND cl.modified_id  = c.id
           'case_recent_activity_date' => array('title' => ts('Activity Actual Date'), 'type' => CRM_Utils_Type::T_DATE),
           'case_scheduled_activity_date' => array(
             'title' => ts('Activity Scheduled Date'),
-            'type' => CRM_Utils_Type::T_DATE
+            'type' => CRM_Utils_Type::T_DATE,
           ),
           'case_recent_activity_type' => array('title' => ts('Activity Type'), 'type' => CRM_Utils_Type::T_STRING),
           'case_activity_status' => array('title' => ts('Activity Status'), 'type' => CRM_Utils_Type::T_STRING),
@@ -2191,7 +2191,7 @@ AND cl.modified_id  = c.id
           'case_activity_details' => array('title' => ts('Activity Details'), 'type' => CRM_Utils_Type::T_TEXT),
           'case_activity_is_auto' => array(
             'title' => ts('Activity Auto-generated?'),
-            'type' => CRM_Utils_Type::T_BOOLEAN
+            'type' => CRM_Utils_Type::T_BOOLEAN,
           ),
         );
 

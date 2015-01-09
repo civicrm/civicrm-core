@@ -54,7 +54,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $resources = CRM_Core_Resources::singleton();
     $resources->addSetting(
       array(
-        'kcfinderPath' => $config->userFrameworkResourceURL  . 'packages'  . DIRECTORY_SEPARATOR
+        'kcfinderPath' => $config->userFrameworkResourceURL . 'packages' . DIRECTORY_SEPARATOR,
       )
     );
     $resources->addScriptFile('civicrm', 'templates/CRM/Badge/Form/Layout.js', 1, 'html-header');
@@ -75,7 +75,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
       '{event.event_id}' => ts('Event ID'),
       '{event.title}' => ts('Event Title'),
       '{event.start_date}' => ts('Event Start Date'),
-      '{event.end_date}' => ts('Event End Date')
+      '{event.end_date}' => ts('Event End Date'),
     );
     $participantTokens = CRM_Core_SelectValues::participantTokens();
 

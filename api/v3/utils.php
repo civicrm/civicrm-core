@@ -780,7 +780,7 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
       $legacyreturnProperties[substr($n, 7)] = $v;
     }
     elseif ($n == 'id') {
-      $inputParams[$entity .  '_id'] = $v;
+      $inputParams[$entity . '_id'] = $v;
     }
     elseif (in_array($n, $otherVars)) {
     }
@@ -1888,7 +1888,7 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
   if (!is_array($value)) {
     $value = (string) $value;
   }
-  else{
+  else {
     //@todo what do we do about passed in arrays. For many of these fields
     // the missing piece of functionality is separating them to a separated string
     // & many save incorrectly. But can we change them wholesale?

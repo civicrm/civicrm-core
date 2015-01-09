@@ -197,7 +197,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       4 => 'Donation',
       2 => '50.00',
       6 => 'Completed',
-      1 => "{$firstName} {$lastName}"
+      1 => "{$firstName} {$lastName}",
     );
     foreach ($expected as $value => $label) {
       $this->verifyText("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[2]/td[$value]", preg_quote($label));
@@ -429,7 +429,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       'Financial Type' => 'Donation',
       'Total Amount' => '0.00',
       'Contribution Status' => 'Completed',
-      'Paid By' => 'Credit Card'
+      'Paid By' => 'Credit Card',
     );
     $this->webtestVerifyTabularData($expected);
   }

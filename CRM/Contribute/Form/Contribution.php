@@ -597,7 +597,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $allPanes[$name] = array(
         'url' => CRM_Utils_System::url('civicrm/contact/view/contribution', $urlParams),
         'open' => $open,
-        'id' => $type
+        'id' => $type,
       );
 
       // see if we need to include this paneName in the current form
@@ -647,8 +647,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           ),
           array(
             'type' => 'cancel',
-            'name' => ts('Cancel')
-          )
+            'name' => ts('Cancel'),
+          ),
         )
       );
       return;
@@ -695,7 +695,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       foreach (array(
                  'Cancelled',
                  'Failed',
-                 'In Progress'
+                 'In Progress',
                ) as $suppress) {
         unset($status[CRM_Utils_Array::key($suppress, $statusName)]);
       }
@@ -711,7 +711,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if (!$suppressFlag) {
         foreach (array(
                    'Overdue',
-                   'In Progress'
+                   'In Progress',
                  ) as $suppress) {
           unset($status[CRM_Utils_Array::key($suppress, $statusName)]);
         }
@@ -742,7 +742,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
                      'Refunded',
                      'Completed',
                      'In Progress',
-                     'Cancelled'
+                     'Cancelled',
                    ) as $suppress) {
             unset($status[CRM_Utils_Array::key($suppress, $statusName)]);
           }
@@ -820,7 +820,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $hasPriceSets = TRUE;
         $element = $this->add('select', 'price_set_id', ts('Choose price set'),
           array(
-            '' => ts('Choose price set')
+            '' => ts('Choose price set'),
           ) + $priceSets,
           NULL, array('onchange' => "buildAmount( this.value );")
         );
@@ -834,7 +834,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         if ($this->_online || $this->_ppID) {
           $attributes['total_amount'] = array_merge($attributes['total_amount'], array(
             'READONLY' => TRUE,
-            'style' => "background-color:#EBECE4"
+            'style' => "background-color:#EBECE4",
           ));
           $optionTypes = array(
             '1' => ts('Adjust Pledge Payment Schedule?'),
@@ -880,17 +880,17 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           'type' => 'upload',
           'name' => ts('Save'),
           'js' => $js,
-          'isDefault' => TRUE
+          'isDefault' => TRUE,
         ),
         array(
           'type' => 'upload',
           'name' => ts('Save and New'),
           'js' => $js,
-          'subName' => 'new'
+          'subName' => 'new',
         ),
         array(
           'type' => 'cancel',
-          'name' => ts('Cancel')
+          'name' => ts('Cancel'),
         ),
       )
     );
@@ -1082,7 +1082,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $isRelatedId = FALSE;
         $participantParams = array(
           'fee_amount' => $submittedValues['total_amount'],
-          'id' => $entityID
+          'id' => $entityID,
         );
         CRM_Event_BAO_Participant::add($participantParams);
         if (empty($this->_lineItems)) {

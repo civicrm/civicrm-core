@@ -294,7 +294,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      try{
+      try {
       CRM_Member_BAO_MembershipType::del($this->_id);
       }
       catch(CRM_Core_Exception $e) {
@@ -322,7 +322,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
         'fixed_period_start_day',
         'fixed_period_rollover_day',
         'month_fixed_period_rollover_day',
-        'max_related'
+        'max_related',
       );
 
       $params = $ids = array();

@@ -236,14 +236,14 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->click("link=Add Field");
     $this->waitForElementPresent('_qf_Field_next-bottom');
     $this->select('field_name[0]', 'value=Membership');
-    $label = $checkboxFieldLabel . ' :: ' .  $customGroupTitle;
+    $label = $checkboxFieldLabel . ' :: ' . $customGroupTitle;
     $this->select('field_name[1]', "label=$label");
     $this->click('field_name[1]');
     $this->click('_qf_Field_next_new-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->select('field_name[0]', 'value=Membership');
-    $label = $radioFieldLabel . ' :: ' .  $customGroupTitle;
+    $label = $radioFieldLabel . ' :: ' . $customGroupTitle;
     $this->select('field_name[1]', "label=$label");
     $this->click('field_name[1]');
     $this->click('_qf_Field_next-bottom');
@@ -251,8 +251,8 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("Your CiviCRM Profile Field '{$radioFieldLabel}' has been saved to 'On Behalf Of Organization'."));
 
     //create organisation
-    $orgName = "Org WebAccess " .  substr(sha1(rand()), 0, 7);
-    $orgEmail = "org" .  substr(sha1(rand()), 0, 7) . "@web.com";
+    $orgName = "Org WebAccess " . substr(sha1(rand()), 0, 7);
+    $orgEmail = "org" . substr(sha1(rand()), 0, 7) . "@web.com";
     $this->webtestAddOrganization($orgName, $orgEmail);
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -482,8 +482,8 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //create organisation
-    $orgName = "Org WebAccess " .  substr(sha1(rand()), 0, 7);
-    $orgEmail = "org" .  substr(sha1(rand()), 0, 7) . "@web.com";
+    $orgName = "Org WebAccess " . substr(sha1(rand()), 0, 7);
+    $orgEmail = "org" . substr(sha1(rand()), 0, 7) . "@web.com";
     $this->webtestAddOrganization($orgName, $orgEmail);
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -564,8 +564,8 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     //create organisation
-    $orgName = "Org WebAccess " .  substr(sha1(rand()), 0, 7);
-    $orgEmail = "org" .  substr(sha1(rand()), 0, 7) . "@web.com";
+    $orgName = "Org WebAccess " . substr(sha1(rand()), 0, 7);
+    $orgEmail = "org" . substr(sha1(rand()), 0, 7) . "@web.com";
     $contactSubType = 'Sponsor';
     $this->webtestAddOrganization($orgName, $orgEmail, $contactSubType);
 

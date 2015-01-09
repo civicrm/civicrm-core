@@ -89,7 +89,7 @@ class CRM_Report_Form_Instance {
       ts('Limit Dashboard Results'),
       array(
     'maxlength' => 64,
-        'size' => 5
+        'size' => 5,
       )
     );
 

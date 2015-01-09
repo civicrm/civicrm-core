@@ -95,7 +95,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
         'description' => 'My test description',
         'options' => array(
           'move-file' => $this->tmpFile('mytest.txt'),
-        )
+        ),
       ),
       'This comes from a file',
     );
@@ -134,7 +134,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
         'description' => 'My test description',
         'content' => 'too much content',
         'options' => array(
-          'move-file' => $this->tmpFile('too-much.txt')
+          'move-file' => $this->tmpFile('too-much.txt'),
         ),
       ),
       "/'content' and 'options.move-file' are mutually exclusive/",
@@ -185,7 +185,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
           'check_permissions' => 1,
           $readOnlyField => $newValue,
         ),
-        "/Cannot modify $readOnlyField/"
+        "/Cannot modify $readOnlyField/",
       );
     }
 
@@ -539,10 +539,10 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->assertTrue(is_numeric($fileId));
     $this->assertEquals($exists, file_exists($apiResult['values'][$fileId]['path']));
     $this->assertDBQuery($exists ? 1 : 0, 'SELECT count(*) FROM civicrm_file WHERE id = %1', array(
-      1 => array($fileId, 'Int')
+      1 => array($fileId, 'Int'),
     ));
     $this->assertDBQuery($exists ? 1 : 0, 'SELECT count(*) FROM civicrm_entity_file WHERE id = %1', array(
-      1 => array($fileId, 'Int')
+      1 => array($fileId, 'Int'),
     ));
   }
 

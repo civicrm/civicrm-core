@@ -57,7 +57,7 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
       'last_name' => 'Last',
       'nick_name' => 'Firstie',
       'options' => array(
-        'reload' => 1
+        'reload' => 1,
       ),
     ));
     $this->assertEquals('First', $result['values'][$result['id']]['first_name']);
@@ -78,7 +78,7 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
         'email' => 'test@example.com',
       ),
       'options' => array(
-        'reload' => 1
+        'reload' => 1,
       ),
     ));
     $this->assertEquals('First', $result['values'][$result['id']]['first_name']);
@@ -99,7 +99,7 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
       CRM_Core_DAO::executeQuery(
         "UPDATE civicrm_contact SET nick_name = 'munged' WHERE id = %1",
         array(
-          1 => array($objectId, 'Integer')
+          1 => array($objectId, 'Integer'),
         )
       );
     }

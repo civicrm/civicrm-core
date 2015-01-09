@@ -1695,7 +1695,7 @@ class CRM_Utils_Token {
         break;
 
       case 'fee':
-        try{
+        try {
           $value = civicrm_api3('membership_type', 'getvalue', array('id' => $membership['membership_type_id'], 'return' => 'minimum_fee'));
         }
         catch (CiviCRM_API3_Exception $e) {

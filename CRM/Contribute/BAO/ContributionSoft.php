@@ -191,7 +191,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
           'amount' => $dao->amount,
           'contact_name' => $dao->display_name,
           'soft_credit_type' => $dao->soft_credit_type_id,
-          'soft_credit_type_label' => CRM_Core_OptionGroup::getLabel('soft_credit_type', $dao->soft_credit_type_id)
+          'soft_credit_type_label' => CRM_Core_OptionGroup::getLabel('soft_credit_type', $dao->soft_credit_type_id),
         );
         $count++;
       }
@@ -281,7 +281,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
 
     $params = array(
       1 => array($contact_id, 'Integer'),
-      2 => array($isTest, 'Integer')
+      2 => array($isTest, 'Integer'),
     );
     $cs = CRM_Core_DAO::executeQuery($query, $params);
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();

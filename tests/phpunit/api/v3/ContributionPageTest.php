@@ -77,7 +77,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'is_quick_config' => 1,
       'extends' => 'CiviContribute',
       'financial_type_id' => 'Donation',
-      'title' => 'my Page'
+      'title' => 'my Page',
     );
   }
 
@@ -142,7 +142,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $submitParams = array(
       'price_' . $priceFieldID => $priceFieldValueID,
       'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10
+      'amount' => 10,
     );
 
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
@@ -246,7 +246,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL, 'Submit');
     $contributions = $this->callAPISuccess('contribution', 'get', array(
         'contribution_page_id' => $this->_ids['contribution_page'],
-        'contribution_status_id' => 1
+        'contribution_status_id' => 1,
       ));
     $this->assertCount(2, $contributions['values']);
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
@@ -292,7 +292,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL, 'Submit');
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array(
         'contribution_page_id' => $this->_ids['contribution_page'],
-        'contribution_status_id' => 1
+        'contribution_status_id' => 1,
       ));
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
     $this->assertEquals($membershipPayment['contribution_id'], $contribution['id']);
@@ -309,7 +309,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'getsingle', array(
         'id' => array('NOT IN' => array($contribution['id'])),
         'contribution_page_id' => $this->_ids['contribution_page'],
-        'contribution_status_id' => 1
+        'contribution_status_id' => 1,
       ));
     $renewedMembership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals(date('Y-m-d', strtotime('+ 1 year', strtotime($membership['end_date']))), $renewedMembership['end_date']);
@@ -354,7 +354,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL, 'Submit');
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array(
         'contribution_page_id' => $this->_ids['contribution_page'],
-        'contribution_status_id' => 2
+        'contribution_status_id' => 2,
       ));
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
     $this->assertEquals($membershipPayment['contribution_id'], $contribution['id']);
@@ -365,7 +365,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     //$this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id'], 'entity_id' => $membership['id']));
     $this->callAPISuccess('contribution', 'completetransaction', array(
         'id' => $contribution['id'],
-        'trxn_id' => 'ipn_called'
+        'trxn_id' => 'ipn_called',
       ));
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     //renew it with processor setting completed - should extend membership
@@ -380,10 +380,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $newContribution = $this->callAPISuccess('contribution', 'getsingle', array(
         'id' => array(
-          'NOT IN' => array($contribution['id'])
+          'NOT IN' => array($contribution['id']),
         ),
         'contribution_page_id' => $this->_ids['contribution_page'],
-        'contribution_status_id' => 2
+        'contribution_status_id' => 2,
       )
     );
 
@@ -425,7 +425,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   public function setUpMembershipBlockPriceSet() {
     $this->_ids['price_set'][] = $this->callAPISuccess('price_set', 'getvalue', array(
         'name' => 'default_membership_type_amount',
-        'return' => 'id'
+        'return' => 'id',
       ));
     if (empty($this->_ids['membership_type'])) {
       $this->_ids['membership_type'] = array($this->membershipTypeCreate(array('minimum_fee' => 2)));

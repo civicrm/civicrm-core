@@ -213,13 +213,13 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
         'email' => array(
       1 => array(
           'location_type_id' => $phoneloc,
-          'email' => $stripFrom . '@mobile.sms'
+          'email' => $stripFrom . '@mobile.sms',
         )),
         'phone' => array(
       1 => array(
           'phone_type_id' => $phonetype,
           'location_type_id' => $phoneloc,
-          'phone' => $stripFrom
+          'phone' => $stripFrom,
         )),
       );
       $fromContact = CRM_Contact_BAO_Contact::create($contactparams, FALSE, TRUE, FALSE);
@@ -246,7 +246,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
         'activity_date_time' => date('YmdHis'),
         'status_id' => $actStatusIDs['Completed'],
         'details' => $body,
-        'phone_number' => $from
+        'phone_number' => $from,
       );
       if ($trackID) {
         $trackID = CRM_Utils_Type::escape($trackID, 'String');

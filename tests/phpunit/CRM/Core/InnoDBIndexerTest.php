@@ -20,7 +20,7 @@ class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
     $idx = new CRM_Core_InnoDBIndexer(TRUE, array(
       'civicrm_contact' => array(
         array('first_name', 'last_name'),
-        array('foo')
+        array('foo'),
       ),
       'civicrm_email' => array(
         array('whiz'),

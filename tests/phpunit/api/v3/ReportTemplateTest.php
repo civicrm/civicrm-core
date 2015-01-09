@@ -118,7 +118,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $description = "Retrieve rows from a report template (optionally providing the instance_id)";
     $result = $this->callAPIAndDocument('report_template', 'getrows', array(
       'report_id' => 'contact/summary',
-      'options' => array('metadata' => array('labels', 'title'))
+      'options' => array('metadata' => array('labels', 'title')),
     ), __FUNCTION__, __FILE__, $description, 'Getrows', 'getrows');
     $this->assertEquals('Contact Name', $result['metadata']['labels']['civicrm_contact_sort_name']);
 
@@ -195,7 +195,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
         $reportTemplates[] = array($report['value']);
       }
       else {
-        $reportTemplates[] = array($report['value'] .  " has existing issues :  " . $reportsToSkip[$report['value']]);
+        $reportTemplates[] = array($report['value'] . " has existing issues :  " . $reportsToSkip[$report['value']]);
       }
     }
 

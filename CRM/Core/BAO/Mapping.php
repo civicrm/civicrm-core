@@ -1022,7 +1022,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
               'Multi-Select',
               'AdvMulti-Select',
               'Multi-Select State/Province',
-              'Multi-Select Country'
+              'Multi-Select Country',
             );
 
             // override the operator to handle separator ( note: this might have some performance issues )

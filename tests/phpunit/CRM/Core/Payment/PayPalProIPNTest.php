@@ -153,7 +153,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   public function testIPNPaymentExpressNoError() {
     $this->setupRecurringPaymentProcessorTransaction();
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalExpressTransactionIPN());
-    try{
+    try {
       $paypalIPN->main();
     }
     catch(CRM_Core_Exception $e) {
@@ -269,7 +269,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'shipping' => '0.00',
       'product_type' => '1',
       'time_created' => '12:02:25 May 14, 2013 PDT',
-      'ipn_track_id' => '912e5010eb5a6'
+      'ipn_track_id' => '912e5010eb5a6',
     );
   }
   /**
@@ -322,7 +322,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'receiver_email' => 'nil@civicrm.org',
       'next_payment_date' => '03:00:00 Aug 14, 2013 PDT',
       'tax' => '0.00',
-      'residence_country' => 'US'
+      'residence_country' => 'US',
     );
   }
 

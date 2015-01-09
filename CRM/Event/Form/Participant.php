@@ -647,7 +647,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'select' => array('minimumInputLength' => 0),
       'api' => array(
         'extra' => array('campaign_id', 'default_role_id', 'event_type_id'),
-      )
+      ),
     );
 
     if ($this->_mode) {
@@ -752,7 +752,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $path = CRM_Utils_System::currentPath();
     $excludeForPaths = array(
       'civicrm/contact/search',
-      'civicrm/group/search'
+      'civicrm/group/search',
     );
     if (!in_array($path, $excludeForPaths)) {
       $buttons[] = array(
@@ -1104,7 +1104,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       // also add location name to the array
       $params["address_name-{$this->_bltID}"] =
-        CRM_Utils_Array::value('billing_first_name', $params)  . ' ' .
+        CRM_Utils_Array::value('billing_first_name', $params) . ' ' .
         CRM_Utils_Array::value('billing_middle_name', $params) . ' ' .
         CRM_Utils_Array::value('billing_last_name', $params);
 

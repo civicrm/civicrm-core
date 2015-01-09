@@ -295,7 +295,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
           array(
             1 => $this->_subscriptionDetails->amount,
             2 => $this->_subscriptionDetails->frequency_interval,
-            3 => $this->_subscriptionDetails->frequency_unit
+            3 => $this->_subscriptionDetails->frequency_unit,
           )
         );
         $msgTitle = ts('Details Updated');

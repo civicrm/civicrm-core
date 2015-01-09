@@ -205,7 +205,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
       $date = CRM_Utils_Date::isoToMysql($row['log_civicrm_entity_log_date']);
 
       if ('Update' == CRM_Utils_Array::value('log_civicrm_entity_log_action', $row)) {
-        $q = "reset=1&log_conn_id={$row['log_civicrm_entity_log_conn_id']}&log_date=" .  $date;
+        $q = "reset=1&log_conn_id={$row['log_civicrm_entity_log_conn_id']}&log_date=" . $date;
         if ($this->cid) {
           $q .= '&cid=' . $this->cid;
         }

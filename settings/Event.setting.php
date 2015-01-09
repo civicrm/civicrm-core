@@ -49,6 +49,6 @@ return array(
       'is_domain' => 1,
       'is_contact' => 1,
       'description' => "WRITE ME",
-      'help_text' => 'WRITE ME'
+      'help_text' => 'WRITE ME',
   ),
 );

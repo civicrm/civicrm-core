@@ -354,7 +354,7 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
       foreach (array(
                  'receive_date',
                  $this->_interval,
-                 'value'
+                 'value',
                ) as $ignore) {
         unset($graphRows[$ignore][$count - 1]);
       }

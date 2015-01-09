@@ -44,7 +44,7 @@ class CRM_Core_BAO_Block {
     'email' => array('email'),
     'phone' => array('phone'),
     'im' => array('name'),
-    'openid' => array('openid')
+    'openid' => array('openid'),
   );
 
   /**

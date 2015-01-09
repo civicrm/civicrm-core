@@ -75,7 +75,7 @@ class CRM_Utils_Migrate_Export {
         'mappedFields' => array(
           array('optionGroup', 'option_group_id', 'option_group_name'),
           array('customGroup', 'custom_group_id', 'custom_group_name'),
-        )
+        ),
       ),
       'optionGroup' => array(
         'data' => array(),
@@ -127,7 +127,7 @@ class CRM_Utils_Migrate_Export {
         'required' => FALSE,
         'idNameMap' => array(),
         'mappedFields' => array(
-          array('profileGroup', 'uf_group_id', 'profile_group_name')
+          array('profileGroup', 'uf_group_id', 'profile_group_name'),
         ),
       ),
       'profileJoin' => array(
@@ -137,7 +137,7 @@ class CRM_Utils_Migrate_Export {
         'required' => FALSE,
         'idNameMap' => array(),
         'mappedFields' => array(
-          array('profileGroup', 'uf_group_id', 'profile_group_name')
+          array('profileGroup', 'uf_group_id', 'profile_group_name'),
         ),
       ),
       'mappingGroup' => array(
@@ -149,7 +149,7 @@ class CRM_Utils_Migrate_Export {
         'idNameMap' => array(),
         'mappedFields' => array(
           array('optionValue', 'mapping_type_id', 'mapping_type_name', 'mapping_type'),
-        )
+        ),
       ),
       'mappingField' => array(
         'data' => array(),

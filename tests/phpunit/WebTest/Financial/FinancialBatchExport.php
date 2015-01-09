@@ -134,7 +134,7 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
     $this->clickLink("xpath=//div[@id='recently-viewed']/ul/li[1]/a", "_qf_Activity_cancel-bottom");
     $this->webtestVerifyTabularData(
       array(
-        'Current Attachment(s)' => 'Financial_Transactions_'
+        'Current Attachment(s)' => 'Financial_Transactions_',
       )
     );
   }

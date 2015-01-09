@@ -69,7 +69,7 @@ class CRM_Upgrade_Incremental_php_FourFour {
       }
       if ($oversizedEntries > 0) {
         $preUpgradeMessage .= '<br/>' . ts("WARNING: There are %1 word-replacement entries which will not be valid in v4.4+ (eg with over 255 characters). They will be dropped during upgrade. For details, consult the CiviCRM log.", array(
-          1 => $oversizedEntries
+          1 => $oversizedEntries,
         ));
       }
     }
@@ -106,7 +106,7 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
       }
     }
     if ($rev == '4.4.6') {
-      $postUpgradeMessage .= '<br /><br /><strong>' .  ts('Your contact image urls have been upgraded. If your contact image urls did not follow the standard format for image Urls they have not been upgraded. Please check the log to see image urls that were not upgraded.');
+      $postUpgradeMessage .= '<br /><br /><strong>' . ts('Your contact image urls have been upgraded. If your contact image urls did not follow the standard format for image Urls they have not been upgraded. Please check the log to see image urls that were not upgraded.');
     }
   }
 
@@ -311,7 +311,7 @@ ALTER TABLE civicrm_dashboard
       }
       elseif ($urlElements[1] == 'report') {
         $url = explode('&', $urlElements[3]);
-        $name = 'report/'  . $url[0];
+        $name = 'report/' . $url[0];
       }
       $values .= "
       WHEN {$dashboard->id} THEN '{$name}'
@@ -393,11 +393,11 @@ ALTER TABLE civicrm_dashboard
           self::setContactImageUrl($dao->id,
               CRM_Utils_System::url('civicrm/contact/imagefile', 'photo=' . $photo, TRUE, NULL, TRUE, TRUE));
         }
-        else{
+        else {
           $failures[$dao->id] = $dao->image_url;
         }
       }
-      else{
+      else {
         $failures[$dao->id] = $dao->image_url;
       }
     }
@@ -788,7 +788,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
     // add civicrm_report_instance.name
 
     $sql = "SELECT count(*) FROM information_schema.columns "
-      . "WHERE table_schema = database() AND table_name = 'civicrm_report_instance' AND COLUMN_NAME = 'name' ";
+     . "WHERE table_schema = database() AND table_name = 'civicrm_report_instance' AND COLUMN_NAME = 'name' ";
 
     $res = CRM_Core_DAO::singleValueQuery($sql);
 

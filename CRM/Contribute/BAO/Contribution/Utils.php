@@ -152,7 +152,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
               // this does not return
               $result = $payment->doTransferCheckout($form->_params, 'contribute');
             }
-            else{
+            else {
               CRM_Core_Error::fatal($paymentObjError);
             }
           }

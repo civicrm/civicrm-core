@@ -22,7 +22,7 @@ class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
       ->row(array('first' => '1', 'second' => '2'))
       ->rows(array(
       array('second' => '2b', 'first' => '1b'),
-      array('first' => '1c', 'second' => '2c')
+      array('first' => '1c', 'second' => '2c'),
       ))
       ->row(array('second' => '2d', 'first' => '1d'));
     $expected = '

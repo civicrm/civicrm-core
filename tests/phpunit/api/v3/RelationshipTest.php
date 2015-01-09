@@ -55,7 +55,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->_cId_a_2 = $this->individualCreate(array(
         'last_name' => 'c2',
         'email' => 'c@w.com',
-        'contact_type' => 'Individual'
+        'contact_type' => 'Individual',
       ));
     $this->_cId_b = $this->organizationCreate();
     $this->_cId_b2 = $this->organizationCreate(array('organization_name' => ' Org 2'));
@@ -693,7 +693,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $rel1 = $this->callAPISuccess('relationship', 'create', $this->_params);
 
     $getParams = array(
-      'filters' => array('is_current' => 1)
+      'filters' => array('is_current' => 1),
     );
     $description = "demonstrates is_current filter";
     $subfile = 'filterIsCurrent';
@@ -762,7 +762,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       array('relationship_type_id' => $relationType4)));
 
     $getParams = array(
-      'relationship_type_id' => array('IN' => array($relationType2, $relationType3))
+      'relationship_type_id' => array('IN' => array($relationType2, $relationType3)),
     );
 
     $description = "demonstrates use of IN filter";
@@ -775,7 +775,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $description = "demonstrates use of NOT IN filter";
     $subfile = 'NotInRelationshipType';
     $getParams = array(
-      'relationship_type_id' => array('NOT IN' => array($relationType2, $relationType3))
+      'relationship_type_id' => array('NOT IN' => array($relationType2, $relationType3)),
     );
     $result = $this->callAPIAndDocument('relationship', 'get', $getParams, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals($result['count'], 2);
@@ -784,7 +784,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $description = "demonstrates use of BETWEEN filter";
     $subfile = 'BetweenRelationshipType';
     $getParams = array(
-      'relationship_type_id' => array('BETWEEN' => array($relationType2, $relationType4))
+      'relationship_type_id' => array('BETWEEN' => array($relationType2, $relationType4)),
     );
     $result = $this->callAPIAndDocument('relationship', 'get', $getParams, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals($result['count'], 3);
@@ -793,7 +793,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $description = "demonstrates use of Not BETWEEN filter";
     $subfile = 'NotBetweenRelationshipType';
     $getParams = array(
-      'relationship_type_id' => array('NOT BETWEEN' => array($relationType2, $relationType4))
+      'relationship_type_id' => array('NOT BETWEEN' => array($relationType2, $relationType4)),
     );
     $result = $this->callAPIAndDocument('relationship', 'get', $getParams, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals($result['count'], 1);
@@ -936,7 +936,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType2,
-        'contact_id_b' => $this->_cId_b2
+        'contact_id_b' => $this->_cId_b2,
       ))
     );
 
@@ -944,7 +944,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType3,
-        'contact_id_b' => $org3
+        'contact_id_b' => $org3,
       ))
     );
 
@@ -976,7 +976,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType2,
-        'contact_id_b' => $this->_cId_b2
+        'contact_id_b' => $this->_cId_b2,
       ))
     );
 
@@ -984,7 +984,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType3,
-        'contact_id_b' => $org3
+        'contact_id_b' => $org3,
       ))
     );
 
@@ -1022,7 +1022,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType2,
-        'contact_id_b' => $this->_cId_b2
+        'contact_id_b' => $this->_cId_b2,
       ))
     );
 
@@ -1030,7 +1030,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType3,
-        'contact_id_b' => $org3
+        'contact_id_b' => $org3,
       ))
     );
 
@@ -1039,7 +1039,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       array_merge($this->_params, array(
         'relationship_type_id' => $relType1,
         'contact_id_a' => $this->_cId_a,
-        'contact_id_b' => $this->_cId_a_2
+        'contact_id_b' => $this->_cId_a_2,
       ))
     );
 
@@ -1077,7 +1077,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType2,
-        'contact_id_b' => $this->_cId_b2
+        'contact_id_b' => $this->_cId_b2,
       ))
     );
 
@@ -1085,7 +1085,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType3,
-        'contact_id_b' => $org3
+        'contact_id_b' => $org3,
       ))
     );
 
@@ -1094,7 +1094,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       array_merge($this->_params, array(
         'relationship_type_id' => $relType1,
         'contact_id_a' => $this->_cId_a,
-        'contact_id_b' => $this->_cId_a_2
+        'contact_id_b' => $this->_cId_a_2,
       ))
     );
 

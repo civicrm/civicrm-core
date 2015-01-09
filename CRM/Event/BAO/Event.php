@@ -702,7 +702,7 @@ WHERE civicrm_address.geo_code_1 IS NOT NULL
       $addressValues = CRM_Core_BAO_Location::getValues($params, TRUE);
       $location['address'] = str_replace(array(
           "\r",
-          "\n"
+          "\n",
         ), '', addslashes(nl2br($addressValues['address'][1]['display_text'])));
 
       $location['url'] = CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $dao->event_id);
@@ -930,7 +930,7 @@ WHERE civicrm_event.is_active = 1
       'is_show_location',
       'default_fee_id',
       'default_discount_fee_id',
-      'is_template'
+      'is_template',
     );
 
     CRM_Core_DAO::commonRetrieve('CRM_Event_DAO_Event', $eventParams, $eventValues, $returnProperties);
@@ -1524,7 +1524,7 @@ WHERE civicrm_event.is_active = 1
         elseif (in_array($name, array(
           'addressee',
           'email_greeting',
-          'postal_greeting'
+          'postal_greeting',
         ))) {
           $filterCondition = array('greeting_type' => $name);
           $greeting = CRM_Core_PseudoConstant::greeting($filterCondition);
@@ -1589,7 +1589,7 @@ WHERE civicrm_event.is_active = 1
           if (in_array($fieldName, array(
             'state_province',
             'country',
-            'county'
+            'county',
           ))) {
             $values[$index] = $params[$detailName];
             $idx = $detailName . '_id';
@@ -1700,7 +1700,7 @@ WHERE  id = $cfID
             elseif (in_array($name, array(
               'birth_date',
               'deceased_date',
-              'participant_register_date'
+              'participant_register_date',
             ))) {
               $values[$index] = CRM_Utils_Date::customFormat(CRM_Utils_Date::format($params[$name]));
             }

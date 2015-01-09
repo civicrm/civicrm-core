@@ -50,7 +50,7 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Resource URLs'));
     $settingFields = civicrm_api('setting', 'getfields', array(
-      'version' => 3
+      'version' => 3,
     ));
 
     $this->addElement('text', 'userFrameworkResourceURL', ts('CiviCRM Resource URL'));

@@ -413,7 +413,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
               'COLUMN_NAME' => $dao->COLUMN_NAME,
               'DATA_TYPE'   => $dao->DATA_TYPE,
               'IS_NULLABLE' => $dao->IS_NULLABLE,
-              'COLUMN_DEFAULT' => $dao->COLUMN_DEFAULT
+              'COLUMN_DEFAULT' => $dao->COLUMN_DEFAULT,
             );
       }
     }

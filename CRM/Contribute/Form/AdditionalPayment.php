@@ -245,7 +245,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         $allPanes[$name] = array(
           'url' => CRM_Utils_System::url('civicrm/payment/add', $urlParams),
           'open' => $open,
-          'id' => $type
+          'id' => $type,
         );
 
         CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE);
@@ -325,11 +325,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
           'type' => 'upload',
           'name' => ts('%1', array(1 => $buttonName)),
           'js' => $js,
-          'isDefault' => TRUE
+          'isDefault' => TRUE,
         ),
         array(
           'type' => 'cancel',
-          'name' => ts('Cancel')
+          'name' => ts('Cancel'),
         ),
       )
     );

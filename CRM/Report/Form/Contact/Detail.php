@@ -41,7 +41,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     'Contact',
     'Individual',
     'Household',
-    'Organization'
+    'Organization',
   );
 
   /**
@@ -100,7 +100,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
             'title' => ts('Last Name, First Name'),
             'default' => '1',
             'default_weight' => '0',
-            'default_order' => 'ASC'
+            'default_order' => 'ASC',
           ),
         ),
       ),
@@ -335,8 +335,8 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
         'fields' => array(
           'phone' => NULL,
           'phone_ext' => array(
-            'title' => ts('Phone Extension')
-          )
+            'title' => ts('Phone Extension'),
+          ),
         ),
         'grouping' => 'contact-fields',
       ),
@@ -359,7 +359,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
       'membership_civireport',
       'participant_civireport',
       'relationship_civireport',
-      'activity_civireport'
+      'activity_civireport',
     );
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
