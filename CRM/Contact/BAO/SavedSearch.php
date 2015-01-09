@@ -289,6 +289,8 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   /**
    * Given a label and a set of normalized POST
    * formValues, create a smart group with that
+   * @param $params
+   * @return \CRM_Contact_DAO_SavedSearch
    */
   public static function create(&$params) {
     $savedSearch = new CRM_Contact_DAO_SavedSearch();

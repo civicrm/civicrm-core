@@ -977,6 +977,9 @@ WHERE  id = %1";
   /**
    * Check the current Membership
    * having end date null.
+   * @param $options
+   * @param $userid
+   * @return bool
    */
   public static function checkCurrentMembership(&$options, $userid) {
     if (!$userid || empty($options)) {
@@ -1311,10 +1314,11 @@ GROUP BY     mt.member_of_contact_id";
    *
    * @param int $id
    *   Id of the database record.
-   * @param bool $isQuickConfigValue we want to set the is_quick_config field.
+   * @param $isQuickConfig
+   * @return Object DAO object on sucess, null otherwise
+   * @internal param bool $isQuickConfigValue we want to set the is_quick_config field.
    *   Value we want to set the is_quick_config field.
    *
-   * @return Object                   DAO object on sucess, null otherwise
    * @static
    */
   public static function setIsQuickConfig($id, $isQuickConfig) {
@@ -1326,7 +1330,8 @@ GROUP BY     mt.member_of_contact_id";
    * user to select both auto-renew and non-auto-renew memberships
    *
    * @static
-   *
+   * @param $id
+   * @return bool
    */
   public static function checkMembershipPriceSet($id) {
     $query =

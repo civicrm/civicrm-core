@@ -45,6 +45,9 @@ class CRM_Core_I18n_NativeGettext {
 
   /**
    * Based on php-gettext, since native gettext does not support this as is.
+   * @param $context
+   * @param $text
+   * @return string
    */
   public function pgettext($context, $text) {
     $key = $context . chr(4) . $text;

@@ -78,6 +78,9 @@ class CRM_Core_Config_Defaults {
    * Format size
    *
    * @static
+   * @param $size
+   * @param bool $checkForPostMax
+   * @return int
    */
 
   public static function formatUnitSize($size, $checkForPostMax = FALSE) {

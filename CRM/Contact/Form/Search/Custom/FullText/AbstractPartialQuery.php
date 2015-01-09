@@ -127,9 +127,11 @@ AND        cf.html_type IN ( 'Text', 'TextArea', 'RichTextEditor' )
    *   - sql: an array of SQL queries to execute
    *   - final: an array of SQL queries to execute at the end
    *   - *: All other keys are treated as table names
+   * @param $entityIDTableName
+   * @param $limit
    * @return array keys: match-descriptor
    *   - count: int
-   *   - files: NULL | array
+   * @throws \CRM_Core_Exception
    */
   public function runQueries($queryText, &$tables, $entityIDTableName, $limit) {
     $sql = "TRUNCATE {$entityIDTableName}";

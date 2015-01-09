@@ -247,9 +247,11 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @param int $entityId
    *   Id.
-   * @param string $entityTableEntity table.
+   * @param $entityTable
+   * @param $financialTypeID
+   * @internal param string $entityTableEntity table.
    *   Entity table.
-   * @param string $financialTypeIDFinancial type id.
+   * @internal param string $financialTypeIDFinancial type id.
    *   Financial type id.
    *
    * @static

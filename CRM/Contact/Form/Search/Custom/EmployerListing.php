@@ -103,6 +103,12 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
 
   /**
    * Construct the search query
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   * @return string
    */
   function all(
     $offset = 0, $rowcount = 0, $sort = NULL,

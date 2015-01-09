@@ -236,6 +236,9 @@ WHERE  inst.report_id = %1";
   /**
    * Utility function for export2csv and CRM_Report_Form::endPostProcess
    * - make CSV file content and return as string.
+   * @param $form
+   * @param $rows
+   * @return string
    */
   public static function makeCsv(&$form, &$rows) {
     $config = CRM_Core_Config::singleton();

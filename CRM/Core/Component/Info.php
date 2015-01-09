@@ -279,7 +279,7 @@ abstract class CRM_Core_Component_Info {
   /**
    * Builds advanced search form's component specific pane.
    *
-   *
+   * @param $form
    */
   public function buildAdvancedSearchPaneForm(&$form) {
     $bao = $this->getBAOQueryObject();

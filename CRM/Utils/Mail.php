@@ -370,6 +370,8 @@ class CRM_Utils_Mail {
    * and if so does the needful and return the formatted name
    *
    * This code has been copied and adapted from ezc/Mail/src/tools.php
+   * @param $name
+   * @return string
    */
   public static function formatRFC2822Name($name) {
     $name = trim($name);

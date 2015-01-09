@@ -120,6 +120,9 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
    * Retrieve surveys for dashboard.
    *
    * @static
+   * @param array $params
+   * @param bool $onlyCount
+   * @return array|int
    */
   public static function getSurveySummary($params = array(), $onlyCount = FALSE) {
     //build the limit and order clause.
@@ -307,6 +310,8 @@ SELECT  survey.id    as id,
    *
    *
    * @static
+   * @param string $returnColumn
+   * @param bool $includePetitionActivityType
    */
   static function getSurveyActivityType(
     $returnColumn = 'label',
@@ -874,7 +879,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
 
   /**
    * Retrieve survey associated profile id.
-   *
+   * @param $surveyId
+   * @return mixed|null
    */
   public static function getSurveyProfileId($surveyId) {
     if (!$surveyId) {
@@ -921,7 +927,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
 
   /**
    * Decides the contact type for given survey.
-   *
+   * @param $surveyId
+   * @return null|string
    */
   public static function getSurveyContactType($surveyId) {
     $contactType = NULL;

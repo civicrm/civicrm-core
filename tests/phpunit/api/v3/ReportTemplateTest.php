@@ -137,6 +137,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider getReportTemplates
+   * @param $reportID
+   * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testReportTemplateGetRowsAllReports($reportID) {
     if (stristr($reportID, 'has existing issues')) {
@@ -149,6 +151,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider getReportTemplates
+   * @param $reportID
+   * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testReportTemplateGetStatisticsAllReports($reportID) {
     if (stristr($reportID, 'has existing issues')) {

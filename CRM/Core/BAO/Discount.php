@@ -84,13 +84,13 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * Determine whether the given table/id
    * has discount associated with it
    *
-   * @param int $entityIdEntity id to be searched.
-   *   Entity id to be searched.
+   * @param $entityId
    * @param string $entityTable
    *   Entity table to be searched.
+   * @return array $optionGroupIDs option group Ids associated with discount
    *
-   * @return array    $optionGroupIDs option group Ids associated with discount
-   *
+   * @internal param int $entityIdEntity id to be searched.
+   *   Entity id to be searched.
    */
   public static function getOptionGroup($entityId, $entityTable) {
     $optionGroupIDs    = array();

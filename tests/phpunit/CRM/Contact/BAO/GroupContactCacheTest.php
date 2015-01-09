@@ -215,6 +215,10 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    * created entities and provides for brainless clenaup.
    *
    * @see CRM_Core_DAO::createTestObject
+   * @param $daoName
+   * @param array $params
+   * @param int $numObjects
+   * @param bool $createOnly
    */
   function createTestObject($daoName, $params = array(), $numObjects = 1, $createOnly = FALSE) {
     $objects = CRM_Core_DAO::createTestObject($daoName, $params, $numObjects, $createOnly);

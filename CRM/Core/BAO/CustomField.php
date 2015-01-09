@@ -1490,6 +1490,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param int $fileID
    * @param bool $absolute
    *
+   * @param null $multiRecordWhereClause
    * @return array
    */
   public static function getFileURL($contactID, $cfID, $fileID = NULL, $absolute = FALSE, $multiRecordWhereClause = NULL) {
@@ -2379,7 +2380,8 @@ WHERE      ( f.label = %1 OR f.name = %1 )
 
   /**
    * Given ID of a custom field, return its name as well as the name of the custom group it belongs to.
-   *
+   * @param $ids
+   * @return array
    */
   public static function getNameFromID($ids) {
     if (is_array($ids)) {

@@ -58,6 +58,8 @@ class CRM_Core_Module {
 
   /**
    * Get a list of all known modules
+   * @param bool $fresh
+   * @return array
    */
   public static function getAll($fresh = FALSE) {
     static $result;

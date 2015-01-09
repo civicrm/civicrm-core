@@ -392,6 +392,9 @@ HAVING COUNT(cpse.price_set_id) > 1 AND MIN(cpse1.id) <> cpse.id ";
    * (Queue Task Callback)
    *
    * Upgrade code to create priceset for contribution pages and events
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param $rev
+   * @return bool
    */
   public static function task_4_2_alpha1_createPriceSets(CRM_Queue_TaskContext $ctx, $rev) {
     $upgrade = new CRM_Upgrade_Form();
@@ -443,6 +446,9 @@ WHERE     cpse.price_set_id IS NULL";
 
   /**
    * (Queue Task Callback)
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param $rev
+   * @return bool
    */
   public static function task_4_2_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
     $upgrade = new CRM_Upgrade_Form();
@@ -458,6 +464,9 @@ WHERE     cpse.price_set_id IS NULL";
   /**
    *
    * create price sets
+   * @param $daoName
+   * @param $addTo
+   * @param array $options
    */
   public static function createPriceSet($daoName, $addTo, $options = array()) {
     $query = "SELECT title FROM {$addTo[0]} where id =%1";
@@ -806,6 +815,8 @@ AND       cli.entity_id IS NULL AND cp.fee_amount IS NOT NULL";
    * (Queue Task Callback)
    *
    * Create an event registration profile with a single email field CRM-9587
+   * @param \CRM_Queue_TaskContext $ctx
+   * @return bool
    */
   public static function task_4_2_alpha1_eventProfile(CRM_Queue_TaskContext $ctx) {
     $upgrade = new CRM_Upgrade_Form();
@@ -882,6 +893,8 @@ VALUES
    *
    * After passing the $funcName, you can also pass parameters that will go to
    * the function. Note that all params must be serializable.
+   * @param $title
+   * @param $funcName
    */
   protected function addTask($title, $funcName) {
     $queue = CRM_Queue_Service::singleton()->load(array(

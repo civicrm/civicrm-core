@@ -155,7 +155,11 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   /**********************************************************
    * This function sends request and receives response from
    * eWAY payment process
-   **********************************************************/
+   *********************************************************
+   * @param array $params
+   * @return array|object
+   * @throws \Exception
+   */
   public function doDirectPayment(&$params) {
     if (CRM_Utils_Array::value('is_recur', $params) == TRUE) {
       CRM_Core_Error::fatal(ts('eWAY - recurring payments not implemented'));
@@ -450,7 +454,10 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
 
   /*************************************************************************************************
    * This function checks the eWAY response status - returning a boolean false if status != 'true'
-   *************************************************************************************************/
+   ************************************************************************************************
+   * @param $response
+   * @return bool
+   */
   public function isError(&$response) {
     $status = $response->Status();
 
@@ -462,7 +469,11 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
 
   /**************************************************
    * Produces error message and returns from class
-   **************************************************/
+   *************************************************
+   * @param null $errorCode
+   * @param null $errorMessage
+   * @return object
+   */
   public function &errorExit($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
 
@@ -477,7 +488,11 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
 
   /**************************************************
    * NOTE: 'doTransferCheckout' not implemented
-   **************************************************/
+   *************************************************
+   * @param $params
+   * @param $component
+   * @throws \Exception
+   */
   public function doTransferCheckout(&$params, $component) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }

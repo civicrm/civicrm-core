@@ -51,6 +51,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
 
   /**
    * Class constructor
+   * @param bool $styleLabels
+   * @param string $styleIndent
    */
   public function __construct($styleLabels = FALSE, $styleIndent = "&nbsp;--&nbsp;") {
     parent::__construct();

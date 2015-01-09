@@ -41,6 +41,9 @@
  * Get CiviCRM domain details
  * {@getfields domain_create}
  * @example DomainGet.php
+ * @param $params
+ * @return array
+ * @throws \API_Exception
  */
 function civicrm_api3_domain_get($params) {
 

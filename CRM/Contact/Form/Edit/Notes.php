@@ -39,6 +39,7 @@ class CRM_Contact_Form_Edit_Notes {
    * params object $form object of the form
    *
    * @static
+   * @param $form
    */
   public static function buildQuickForm(&$form) {
     $form->applyFilter('__ALL__', 'trim');

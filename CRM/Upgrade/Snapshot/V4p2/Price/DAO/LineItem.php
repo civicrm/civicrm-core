@@ -264,12 +264,15 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem extends CRM_Core_DAO
     {
         return self::$_log;
     }
-    /**
-     * returns the list of fields that can be imported
-     *
-     * return array
-     * @static
-     */
+
+  /**
+   * returns the list of fields that can be imported
+   *
+   * return array
+   * @static
+   * @param bool $prefix
+   * @return array
+   */
     static function &import($prefix = false)
     {
         if (!(self::$_import)) {
@@ -288,12 +291,15 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem extends CRM_Core_DAO
         }
         return self::$_import;
     }
-    /**
-     * returns the list of fields that can be exported
-     *
-     * return array
-     * @static
-     */
+
+  /**
+   * returns the list of fields that can be exported
+   *
+   * return array
+   * @static
+   * @param bool $prefix
+   * @return array
+   */
     static function &export($prefix = false)
     {
         if (!(self::$_export)) {

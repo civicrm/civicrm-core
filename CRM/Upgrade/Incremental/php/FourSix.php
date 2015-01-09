@@ -75,9 +75,11 @@ class CRM_Upgrade_Incremental_php_FourSix {
   }
 
 
-
   /**
    * (Queue Task Callback)
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param $rev
+   * @return bool
    */
   public static function task_4_6_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
     $upgrade = new CRM_Upgrade_Form();
@@ -92,6 +94,8 @@ class CRM_Upgrade_Incremental_php_FourSix {
    *
    * After passing the $funcName, you can also pass parameters that will go to
    * the function. Note that all params must be serializable.
+   * @param $title
+   * @param $funcName
    */
   protected function addTask($title, $funcName) {
     $queue = CRM_Queue_Service::singleton()->load(array(

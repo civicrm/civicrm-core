@@ -177,10 +177,10 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields
-   *   Posted values of the form.
-   *
+   * @param $params
    * @return array list of errors to be posted back to the form
+   * @internal param array $fields Posted values of the form.*   Posted values of the form.
+   *
    * @static
    */
   public static function formRule($params) {

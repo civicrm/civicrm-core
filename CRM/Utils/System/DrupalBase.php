@@ -288,6 +288,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
   /**
    * Log error to CMS
+   * @param $message
    */
   public function logger($message) {
     if (CRM_Core_Config::singleton()->userFrameworkLogging) {
@@ -304,6 +305,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
   /**
    * Append to coreResourcesList
+   * @param $list
    */
   public function appendCoreResources(&$list) {
     $list[] = 'js/crm.drupal.js';
@@ -352,11 +354,14 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       }
     }
   }
+
   /**
    * Format the url as per language Negotiation.
    *
    * @param string $url
    *
+   * @param bool $addLanguagePart
+   * @param bool $removeLanguagePart
    * @return string $url, formatted url.
    * @static
    */

@@ -78,7 +78,8 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    * @param bool $is_distinct
    *   Group by queue ID?.
    *
-   * @return int                  Number of rows in result set
+   * @param null $toDate
+   * @return int Number of rows in result set
    * @static
    */
   public static function getTotalCount(

@@ -157,6 +157,8 @@ class CRM_Dedupe_Merger {
 
   /**
    * Returns the related tables groups for which a contact has any info entered
+   * @param $cid
+   * @return array
    */
   public static function getActiveRelTables($cid) {
     $cid = (int) $cid;
@@ -319,6 +321,10 @@ WHERE
 
   /**
    * Return payment update Query.
+   * @param $tableName
+   * @param $mainContactId
+   * @param $otherContactId
+   * @return array
    */
   public static function paymentSql($tableName, $mainContactId, $otherContactId) {
     $sqls = array();
@@ -416,6 +422,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * belongings of the other contact to the main one.
    *
    * @static
+   * @param $mainId
+   * @param $otherId
+   * @param bool $tables
+   * @param array $tableOperations
    */
   public static function moveContactBelongings($mainId, $otherId, $tables = FALSE, $tableOperations = array()) {
     $cidRefs = self::cidRefs();
@@ -565,11 +575,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Helps decide how to behave when there are conflicts.
    *                              A 'safe' value skips the merge if there are any un-resolved conflicts.
    *                              Does a force merge otherwise.
-   * @param bool $autoFlipWether to let api decide which contact to retain and which to delete.
-   *   Wether to let api decide which contact to retain and which to delete.
+   * @param bool $autoFlip
    * @param bool $redirectForPerformance
-   *
    * @return array|bool
+   * @internal param bool $autoFlipWether to let api decide which contact to retain and which to delete.
+   *   Wether to let api decide which contact to retain and which to delete.
    * @static
    */
   public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $redirectForPerformance = FALSE) {
@@ -611,13 +621,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Helps decide how to behave when there are conflicts.
    *                             A 'safe' value skips the merge if there are any un-resolved conflicts.
    *                             Does a force merge otherwise (aggressive mode).
-   * @param bool $autoFlipWether to let api decide which contact to retain and which to delete.
+   * @param bool $autoFlip
+   * @param bool $redirectForPerformance
+   * @return array|bool
+   * @internal param bool $autoFlipWether to let api decide which contact to retain and which to delete.
    *   Wether to let api decide which contact to retain and which to delete.
    *
    *
-   * @param bool $redirectForPerformance
-   *
-   * @return array|bool
    * @static
    */
   public static function merge($dupePairs = array(), $cacheParams = array(), $mode = 'safe',

@@ -1283,10 +1283,11 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    *   Array array of values submitted by POST.
    * @param $ids
    *   Array array of ids.
-   * @param \const|\which $action which action called this function
+   * @param \const|int|\which $action which action called this function
    *
    * @param bool $active
    *
+   * @throws \CRM_Core_Exception
    * @static
    */
   public static function relatedMemberships($contactId, &$params, $ids, $action = CRM_Core_Action::ADD, $active = TRUE) {
@@ -1512,7 +1513,12 @@ SELECT count(*)
    * not.
    *
    * @static
-   *
+   * @param $relTypeIds
+   * @param $contactId
+   * @param $mainRelatedContactId
+   * @param $relTypeId
+   * @param $relIds
+   * @return bool
    */
   public static function isDeleteRelatedMembership($relTypeIds, $contactId, $mainRelatedContactId, $relTypeId, $relIds) {
     if (in_array($relTypeId, $relTypeIds)) {

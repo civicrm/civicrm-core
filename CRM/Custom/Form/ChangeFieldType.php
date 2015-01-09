@@ -262,6 +262,8 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
   /**
    * Take a single-value column (eg: a Radio or Select etc ) and convert
    * value to the multi listed value (eg:"^Foo^")
+   * @param $table
+   * @param $column
    */
   public function firstValueToFlatten($table, $column) {
     $selectSql = "SELECT id, $column FROM $table WHERE $column IS NOT NULL";
@@ -283,6 +285,8 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
   /**
    * Take a multi-value column (e.g. a Multi-Select or CheckBox column), and convert
    * all values (of the form "^^" or "^Foo^" or "^Foo^Bar^") to the first listed value ("Foo")
+   * @param $table
+   * @param $column
    */
   public function flattenToFirstValue($table, $column) {
     $selectSql = "SELECT id, $column FROM $table WHERE $column IS NOT NULL";

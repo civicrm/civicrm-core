@@ -43,6 +43,13 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
 
   /**
    * Create a new forward event, create a new contact if necessary
+   * @param $job_id
+   * @param $queue_id
+   * @param $hash
+   * @param $forward_email
+   * @param null $fromEmail
+   * @param null $comment
+   * @return bool
    */
   public static function &forward($job_id, $queue_id, $hash, $forward_email, $fromEmail = NULL, $comment = NULL) {
     $q = CRM_Mailing_Event_BAO_Queue::verify($job_id, $queue_id, $hash);

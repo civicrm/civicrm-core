@@ -387,6 +387,7 @@ abstract class CRM_Utils_System_Base {
 
   /**
    * Log error to CMS
+   * @param $message
    */
   public function logger($message) {
 
@@ -394,6 +395,7 @@ abstract class CRM_Utils_System_Base {
 
   /**
    * Append to coreResourcesList
+   * @param $list
    */
   public function appendCoreResources(&$list) {
   }

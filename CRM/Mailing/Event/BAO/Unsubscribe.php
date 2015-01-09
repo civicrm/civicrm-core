@@ -424,7 +424,8 @@ WHERE  email = %2
    *
    * @param null $org_unsubscribe
    *
-   * @return int                  Number of rows in result set
+   * @param null $toDate
+   * @return int Number of rows in result set
    * @static
    */
   public static function getTotalCount(

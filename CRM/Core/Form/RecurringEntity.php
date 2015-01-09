@@ -231,10 +231,10 @@ class CRM_Core_Form_RecurringEntity {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields
-   *   Posted values of the form .
-   *
+   * @param $values
    * @return array list of errors to be posted back to the form
+   * @internal param array $fields Posted values of the form .*   Posted values of the form .
+   *
    * @static
    */
   public static function formRule($values) {
@@ -317,7 +317,11 @@ class CRM_Core_Form_RecurringEntity {
    * Process the form submission
    *
    *
-   * @return None
+   * @param array $params
+   * @param $type
+   * @param array $linkedEntities
+   * @return \None
+   * @throws \CiviCRM_API3_Exception
    */
   public static function postProcess($params = array(), $type, $linkedEntities = array()) {
     //Check entity_id not present in params take it from class variable

@@ -97,6 +97,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
 
   /**
    * Add checkboxes for each row plus a master checkbox
+   * @param $rows
    */
   public function addRowSelectors($rows) {
     $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('class' => 'select-rows'));

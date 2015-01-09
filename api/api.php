@@ -113,8 +113,13 @@ function _civicrm_api_get_camel_name($entity) {
 /**
  * Swap out any $values vars - ie. the value after $value is swapped for the parent $result
  * 'activity_type_id' => '$value.testfield',
-   'tag_id'  => '$value.api.tag.create.id',
-    'tag1_id' => '$value.api.entity.create.0.id'
+ * 'tag_id'  => '$value.api.tag.create.id',
+ * 'tag1_id' => '$value.api.entity.create.0.id'
+ * @param $entity
+ * @param $action
+ * @param $params
+ * @param $parentResult
+ * @param string $separator
  */
 function _civicrm_api_replace_variables($entity, $action, &$params, &$parentResult, $separator = '.') {
 

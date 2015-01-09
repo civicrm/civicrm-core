@@ -492,6 +492,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
   /**
    * Load user into session
+   * @param $username
+   * @return bool
    */
   public function loadUser($username) {
     $user = user_load_by_name($username);

@@ -46,6 +46,9 @@ class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
    * Get Petition Details for dashboard.
    *
    * @static
+   * @param array $params
+   * @param bool $onlyCount
+   * @return array|int
    */
   public static function getPetitionSummary($params = array(), $onlyCount = FALSE) {
     //build the limit and order clause.

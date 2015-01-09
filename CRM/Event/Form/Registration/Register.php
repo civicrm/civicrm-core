@@ -951,7 +951,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
   /**
    * Check if profiles are complete when event registration occurs(CRM-9587)
-   *
+   * @param $fields
+   * @param $errors
+   * @param $eventId
    */
   public static function checkProfileComplete($fields, &$errors, $eventId) {
     $email = '';

@@ -580,6 +580,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @value mixed value of the setting to be set
    * @fieldSpec array Metadata for given field (drawn from the xml)
+   * @param $value
+   * @param $fieldSpec
+   * @return bool
+   * @throws \api_Exception
    */
   public static function validateSetting(&$value, $fieldSpec) {
     if ($fieldSpec['type'] == 'String' && is_array($value)) {
@@ -601,6 +605,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @value mixed value of the setting to be set
    * @fieldSpec array Metadata for given field (drawn from the xml)
+   * @param $value
+   * @param $fieldSpec
+   * @return bool
+   * @throws \api_Exception
    */
   public static function validateBoolSetting(&$value, $fieldSpec) {
     if (!CRM_Utils_Rule::boolean($value)) {
@@ -710,6 +718,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
   /**
    * Load up settings metadata from files
+   * @param $metaDataFolder
+   * @return array
    */
   public static function loadSettingsMetadata($metaDataFolder) {
     $settingMetaData = array();
@@ -782,6 +792,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * remove from config - as appropriate based on metadata
    *
    * Note that where the key name is being changed the 'legacy_key' will give us the old name
+   * @param $name
+   * @param null $domainID
    */
   public static function convertConfigToSetting($name, $domainID = NULL) {
     // we have to force this here in case more than one domain is in play.

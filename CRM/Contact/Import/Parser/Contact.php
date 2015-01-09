@@ -101,6 +101,18 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
   /**
    * Class constructor
+   * @param $mapperKeys
+   * @param null $mapperLocType
+   * @param null $mapperPhoneType
+   * @param null $mapperImProvider
+   * @param null $mapperRelated
+   * @param null $mapperRelatedContactType
+   * @param null $mapperRelatedContactDetails
+   * @param null $mapperRelatedContactLocType
+   * @param null $mapperRelatedContactPhoneType
+   * @param null $mapperRelatedContactImProvider
+   * @param null $mapperWebsiteType
+   * @param null $mapperRelatedContactWebsiteType
    */
   function __construct(
     &$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL, $mapperImProvider = NULL, $mapperRelated = NULL, $mapperRelatedContactType = NULL, $mapperRelatedContactDetails = NULL, $mapperRelatedContactLocType = NULL, $mapperRelatedContactPhoneType = NULL, $mapperRelatedContactImProvider = NULL,
@@ -1632,7 +1644,13 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * Method for creating contact
    *
-   *
+   * @param $formatted
+   * @param $contactFields
+   * @param $onDuplicate
+   * @param null $contactId
+   * @param bool $requiredCheck
+   * @param null $dedupeRuleGroupID
+   * @return array|bool|\CRM_Contact_BAO_Contact|\CRM_Core_Error|null
    */
   public function createContact(&$formatted, &$contactFields, $onDuplicate, $contactId = NULL, $requiredCheck = TRUE, $dedupeRuleGroupID = NULL) {
     $dupeCheck = FALSE;

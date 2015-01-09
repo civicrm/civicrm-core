@@ -133,10 +133,9 @@ function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array()
 
 /**
  *
+ * @param $msg
  * @param array $data
- *
- * @throws API_Exception
- * @return array <type>
+ * @return array
  */
 function civicrm_api3_create_error($msg, $data = array()) {
   $data['is_error'] = 1;
@@ -269,6 +268,8 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
 
 /**
  * Load the DAO of the entity
+ * @param $entity
+ * @return bool
  */
 function _civicrm_api3_load_DAO($entity) {
   $dao = _civicrm_api3_get_DAO($entity);
@@ -372,7 +373,7 @@ function _civicrm_api3_get_BAO($name) {
 
 /**
  *  Recursive function to explode value-separated strings into arrays
- *
+ * @param $values
  */
 function _civicrm_api3_separate_values(&$values) {
   $sp = CRM_Core_DAO::VALUE_SEPARATOR;
@@ -820,6 +821,9 @@ function _civicrm_api3_apply_options_to_dao(&$params, &$dao, $entity) {
 /**
  * build fields array. This is the array of fields as it relates to the given DAO
  * returns unique fields as keys by default but if set but can return by DB fields
+ * @param $bao
+ * @param bool $unique
+ * @return
  */
 function _civicrm_api3_build_fields_array(&$bao, $unique = TRUE) {
   $fields = $bao->fields();
@@ -953,6 +957,9 @@ function _civicrm_api3_object_to_array(&$dao, &$values, $uniqueFields = FALSE) {
 
 /**
  * Wrapper for _civicrm_object_to_array when api supports unique fields
+ * @param $dao
+ * @param $values
+ * @return array
  */
 function _civicrm_api3_object_to_array_unique_fields(&$dao, &$values) {
   return _civicrm_api3_object_to_array($dao, $values, TRUE);
@@ -1685,6 +1692,9 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array()) {
 /**
  * Return an array of fields for a given entity - this is the same as the BAO function but
  * fields are prefixed with 'custom_' to represent api params
+ * @param $entity
+ * @param $params
+ * @return array
  */
 function _civicrm_api_get_custom_fields($entity, &$params) {
   $entity = _civicrm_api_get_camel_name($entity);
@@ -1714,8 +1724,11 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
   }
   return $ret;
 }
+
 /**
  * Translate the custom field data_type attribute into a std 'type'
+ * @param $dataType
+ * @return
  */
 function _getStandardTypeFromCustomDataType($dataType) {
   $mapping = array(
@@ -1741,6 +1754,8 @@ function _getStandardTypeFromCustomDataType($dataType) {
  * If multiple aliases the last takes precedence
  *
  * Function also swaps unique fields for non-unique fields & vice versa.
+ * @param $apiRequest
+ * @param $fields
  */
 function _civicrm_api3_swap_out_aliases(&$apiRequest, $fields) {
   foreach ($fields as $field => $values) {

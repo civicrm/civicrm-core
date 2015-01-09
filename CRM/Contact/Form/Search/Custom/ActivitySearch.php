@@ -152,6 +152,12 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
 
   /**
    * Construct the search query
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   * @return string
    */
   function all(
     $offset = 0, $rowcount = 0, $sort = NULL,

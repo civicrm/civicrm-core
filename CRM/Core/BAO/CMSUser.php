@@ -420,10 +420,11 @@ class CRM_Core_BAO_CMSUser {
   /**
    * Check if a cms user already exists.
    *
-   * @param array $contactArray of contact-details.
-   *   Array of contact-details.
+   * @param $contact
+   * @return \uid if user exists, false otherwise
    *
-   * @return uid if user exists, false otherwise
+   * @internal param array $contactArray of contact-details.
+   *   Array of contact-details.
    *
    * @static
    */

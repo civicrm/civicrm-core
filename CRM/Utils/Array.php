@@ -396,6 +396,11 @@ class CRM_Utils_Array {
    * This function is used by both the web form layer and the api. Note that
    * the api needs the name => value conversion, also the view layer typically
    * requires value => name conversion
+   * @param $defaults
+   * @param $property
+   * @param $lookup
+   * @param $reverse
+   * @return bool
    */
   public static function lookupValue(&$defaults, $property, $lookup, $reverse) {
     $id = $property . '_id';

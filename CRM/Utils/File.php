@@ -363,6 +363,8 @@ class CRM_Utils_File {
   /**
    * Remove the 32 bit md5 we add to the fileName
    * also remove the unknown tag if we added it
+   * @param $name
+   * @return mixed
    */
   public static function cleanFileName($name) {
     // replace the last 33 character before the '.' with null
@@ -471,6 +473,8 @@ HTACCESS;
   /**
    * Create the base file path from which all our internal directories are
    * offset. This is derived from the template compile directory set
+   * @param null $templateCompileDir
+   * @return string
    */
   public static function baseFilePath($templateCompileDir = NULL) {
     static $_path = NULL;

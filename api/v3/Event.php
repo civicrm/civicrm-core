@@ -89,6 +89,7 @@ function _civicrm_api3_event_create_spec(&$params) {
  * The main purpose of the API is to provide integrators a level of stability not provided by
  * the core code or schema - this means we have to provide support for api calls (where possible)
  * across schema changes.
+ * @param $params
  */
 function _civicrm_api3_event_create_legacy_support_42(&$params) {
   if (!empty($params['payment_processor_id'])) {
@@ -174,6 +175,8 @@ function _civicrm_api3_event_get_spec(&$params) {
  * The main purpose of the API is to provide integrators a level of stability not provided by
  * the core code or schema - this means we have to provide support for api calls (where possible)
  * across schema changes.
+ * @param $event
+ * @param $event_id
  */
 function _civicrm_api3_event_get_legacy_support_42(&$event, $event_id) {
   if (!empty($event[$event_id]['payment_processor'])) {
@@ -189,10 +192,11 @@ function _civicrm_api3_event_get_legacy_support_42(&$event, $event_id) {
  *
  * This API is used for deleting a event
  *
- * @param array $paramsArray containing event_id to be deleted.
+ * @param $params
+ * @return bool true if success, error otherwise
+ * @internal param array $paramsArray containing event_id to be deleted.
  *   Array containing event_id to be deleted.
  *
- * @return boolean        true if success, error otherwise
  * @access public
  *   note API has legacy support for 'event_id'
  *  {@getfields event_delete}

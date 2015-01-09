@@ -574,6 +574,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * contribution for the membership
    * @form array $form (ref.) an assoc array of name/value pairs
    * return null
+   * @param null $contactId
+   * @param null $membershipId
    */
   public static function associatedContribution($contactId = NULL, $membershipId = NULL) {
     $controller = new CRM_Core_Controller_Simple(

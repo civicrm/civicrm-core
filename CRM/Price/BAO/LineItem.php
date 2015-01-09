@@ -479,7 +479,7 @@ AND li.entity_id = {$entityId}
    * @param string $entityTable
    *   Entity Table.
    *
-   * @return void
+   * @param bool $isRelatedID
    * @static
    */
   public static function getLineItemArray(&$params, $entityId = NULL, $entityTable = 'contribution', $isRelatedID = FALSE) {

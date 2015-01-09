@@ -30,7 +30,10 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
+ * @param $string
+ * @param $position
+ * @param $length
+ * @return string
  */
 
 /*

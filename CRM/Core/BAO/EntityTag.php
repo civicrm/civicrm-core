@@ -288,6 +288,9 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
 
   /**
    * Get contact tags
+   * @param $contactID
+   * @param bool $count
+   * @return array
    */
   public static function getContactTags($contactID, $count = FALSE) {
     $contactTags = array();
@@ -321,6 +324,10 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
 
   /**
    * Get child contact tags given parentId
+   * @param $parentId
+   * @param $entityId
+   * @param string $entityTable
+   * @return array
    */
   public static function getChildEntityTags($parentId, $entityId, $entityTable = 'civicrm_contact') {
     $entityTags = array();
@@ -343,6 +350,9 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
 
   /**
    * Merge two tags: tag B into tag A.
+   * @param $tagAId
+   * @param $tagBId
+   * @return array
    */
   public function mergeTags($tagAId, $tagBId) {
     $queryParams = array(

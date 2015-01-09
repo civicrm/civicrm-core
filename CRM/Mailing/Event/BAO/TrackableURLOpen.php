@@ -107,7 +107,8 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
    * @param int $url_id
    *   Optional ID of a url to filter on.
    *
-   * @return int                  Number of rows in result set
+   * @param null $toDate
+   * @return int Number of rows in result set
    * @static
    */
   public static function getTotalCount(

@@ -48,6 +48,14 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
   /**
    * Ensure that API parameters "is_transactional" and "force_rollback" are parsed correctly
    * @dataProvider transactionOptions
+   * @param $version
+   * @param $entity
+   * @param $action
+   * @param $params
+   * @param $isTransactional
+   * @param $isForceRollback
+   * @param $isNested
+   * @throws \API_Exception
    */
   public function testTransactionOptions($version, $entity, $action, $params, $isTransactional, $isForceRollback, $isNested) {
     $txs = new TransactionSubscriber();

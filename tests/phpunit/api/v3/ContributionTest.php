@@ -1568,6 +1568,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * This function does a GET & compares the result against the $params
    * Use as a double check on Creates
+   * @param $params
+   * @param $id
+   * @param int $delete
    */
   public function contributionGetnCheck($params, $id, $delete = 1) {
 

@@ -243,10 +243,11 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *
    * @param int $id
    *   Id of the database record.
-   * @param bool $is_activeValue we want to set the is_active field.
+   * @param $is_active
+   * @return Object DAO object on sucess, null otherwise
+   * @internal param bool $is_activeValue we want to set the is_active field.
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {

@@ -323,6 +323,8 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
 
   /**
    * Create relationship type.
+   * @param null $params
+   * @return mixed
    */
   public function _relationshipTypeCreate($params = NULL) {
     if (!is_array($params) || empty($params)) {

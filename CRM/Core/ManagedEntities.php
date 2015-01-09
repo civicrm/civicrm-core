@@ -72,7 +72,10 @@ class CRM_Core_ManagedEntities {
   /**
    * Read the managed entity
    *
+   * @param $moduleName
+   * @param $name
    * @return array|NULL API representation, or NULL if the entity does not exist
+   * @throws \Exception
    */
   public function get($moduleName, $name) {
     $dao = new CRM_Core_DAO_Managed();

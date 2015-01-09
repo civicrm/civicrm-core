@@ -573,7 +573,9 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
   /**
    * Build the campaign clause for component serach.
    *
-   **/
+   * @param $params
+   * @param $query
+   */
   public static function componentSearchClause(&$params, &$query) {
     $op        = CRM_Utils_Array::value('op', $params, '=');
     $campaign  = CRM_Utils_Array::value('campaign', $params);

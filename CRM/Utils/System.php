@@ -534,6 +534,9 @@ class CRM_Utils_System {
   }
 
   /**
+   * @param $message
+   * @param $abort
+   * @return bool
    */
   public static function authenticateAbort($message, $abort) {
     if ($abort) {
@@ -772,6 +775,9 @@ class CRM_Utils_System {
 
   /**
    * Get a setting from a loaded PHP module.
+   * @param $pModuleName
+   * @param $pSetting
+   * @return
    */
   public static function getModuleSetting($pModuleName, $pSetting) {
     $vModules = self::parsePHPModules();
@@ -1154,6 +1160,8 @@ class CRM_Utils_System {
   }
 
   /**
+   * @param bool $abort
+   * @throws \Exception
    */
   public static function redirectToSSL($abort = FALSE) {
     $config = CRM_Core_Config::singleton();
@@ -1401,6 +1409,8 @@ class CRM_Utils_System {
   }
 
   /**
+   * @param $errorMessage
+   * @return bool
    */
   public static function isDBVersionValid(&$errorMessage) {
     $dbVersion = CRM_Core_BAO_Domain::version();

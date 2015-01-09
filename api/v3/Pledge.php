@@ -95,6 +95,7 @@ function _civicrm_api3_pledge_delete_spec(&$params) {
 
 /**
  * return field specification specific to get requests
+ * @param $params
  */
 function _civicrm_api3_pledge_get_spec(&$params) {
   $params['next_pay_date'] = array(
@@ -111,6 +112,7 @@ function _civicrm_api3_pledge_get_spec(&$params) {
 
 /**
  * return field specification specific to get requests
+ * @param $params
  */
 function _civicrm_api3_pledge_create_spec(&$params) {
 

@@ -726,6 +726,10 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @methodName is name of API  method.
    * @nvpStr is nvp string.
    * returns an associtive array containing the response from the server.
+   * @param $args
+   * @param null $url
+   * @return array|object
+   * @throws \Exception
    */
   public function invokeAPI($args, $url = NULL) {
 
@@ -800,6 +804,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * It is usefull to search for a particular key and displaying arrays.
    * @nvpstr is NVPString.
    * @nvpArray is Associative Array.
+   * @param $str
+   * @return array
    */
   public static function deformat($str) {
     $result = array();

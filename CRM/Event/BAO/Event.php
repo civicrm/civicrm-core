@@ -587,17 +587,20 @@ $event_summary_limit
    * Get participant count
    *
    * @param int $eventId
-   * @param bool $considerStatusConsider status for participant count.
+   * @param bool $considerStatus
+   * @param bool $status
+   * @param bool $considerRole
+   * @param bool $role
+   * @return array array with count of participants for each event based on status/role
+   * @internal param bool $considerStatusConsider status for participant count.
    *   Consider status for participant count.
-   * @param bool $statusConsider counted participant.
+   * @internal param bool $statusConsider counted participant.
    *   Consider counted participant.
-   * @param bool $considerRoleConsider role for participant count.
+   * @internal param bool $considerRoleConsider role for participant count.
    *   Consider role for participant count.
-   * @param bool $roleConsider counted( is filter role) participant.
+   * @internal param bool $roleConsider counted( is filter role) participant.
    *   Consider counted( is filter role) participant.
    *
-   *
-   * @return array array with count of participants for each event based on status/role
    */
   public static function getParticipantCount(
     $eventId,
@@ -720,16 +723,19 @@ WHERE civicrm_address.geo_code_1 IS NOT NULL
    *
    * @param date $start
    *   Get events with start date >= this date.
-   * @param int $typeGet events on the a specific event type (by event_type_id).
-   *   Get events on the a specific event type (by event_type_id).
-   * @param int $eventIdReturn a single event - by event id.
-   *   Return a single event - by event id.
+   * @param null $type
+   * @param null $eventId
    * @param date $end
    *   Also get events with end date >= this date.
-   * @param bool $onlyPublicInclude public events only, default TRUE.
+   * @param bool $onlyPublic
+   * @return array $all      array of all the events that are searched
+   * @internal param int $typeGet events on the a specific event type (by event_type_id).
+   *   Get events on the a specific event type (by event_type_id).
+   * @internal param int $eventIdReturn a single event - by event id.
+   *   Return a single event - by event id.
+   * @internal param bool $onlyPublicInclude public events only, default TRUE.
    *   Include public events only, default TRUE.
    *
-   * @return  array  $all      array of all the events that are searched
    * @static
    */
   static function &getCompleteInfo(
@@ -1039,6 +1045,8 @@ WHERE civicrm_event.is_active = 1
   /**
    * This is sometimes called in a loop (during event search)
    * hence we cache the values to prevent repeated calls to the db
+   * @param $id
+   * @return
    */
   public static function isMonetary($id) {
     static $isMonetary = array();
@@ -1054,6 +1062,8 @@ WHERE civicrm_event.is_active = 1
   /**
    * This is sometimes called in a loop (during event search)
    * hence we cache the values to prevent repeated calls to the db
+   * @param $id
+   * @return
    */
   public static function usesPriceSet($id) {
     static $usesPriceSet = array();

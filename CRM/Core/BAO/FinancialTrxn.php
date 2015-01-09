@@ -317,6 +317,7 @@ WHERE ceft.entity_id = %1";
    * Create financial transaction for premium
    *
    * @static
+   * @param $params
    */
   public static function createPremiumTrxn($params) {
     if ((empty($params['financial_type_id']) || empty($params['contributionId'])) && empty($params['oldPremium'])) {

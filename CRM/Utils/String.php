@@ -758,9 +758,9 @@ class CRM_Utils_String {
    * (because most other odd characters are %-escaped in URLs; and %-escaped
    * strings don't need any extra escaping in HTML).
    *
-   * @param string $url
-   *   URL with HTML entities.
+   * @param $htmlUrl
    * @return string URL without HTML entities
+   * @internal param string $url URL with HTML entities.*   URL with HTML entities.
    */
   public static function unstupifyUrl($htmlUrl) {
     return str_replace('&amp;', '&', $htmlUrl);

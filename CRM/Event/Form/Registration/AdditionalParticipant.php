@@ -761,7 +761,8 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   /**
    * Reset values for all options those are full.
    *
-   **/
+   * @param array $optionFullIds
+   */
   public function resetElementValue($optionFullIds = array()) {
     if (!is_array($optionFullIds) ||
       empty($optionFullIds) ||

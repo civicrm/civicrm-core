@@ -1148,10 +1148,8 @@ class CRM_Utils_Token {
    * @param $contactIDs
    * @param array $returnProperties
    *   Of required properties.
-   * @param bool $skipOnHoldDon't return on_hold contact info also.
-   *   Don't return on_hold contact info also.
-   * @param bool $skipDeceasedDon't return deceased contact info.
-   *   Don't return deceased contact info.
+   * @param bool $skipOnHold
+   * @param bool $skipDeceased
    * @param array $extraParams
    *   Extra params.
    * @param array $tokens
@@ -1159,8 +1157,12 @@ class CRM_Utils_Token {
    * @param null $className
    * @param int $jobID
    *   The mailing list jobID - this is a legacy param.
-   *
    * @return array
+   * @throws \Exception
+   * @internal param bool $skipOnHoldDon 't return on_hold contact info also.
+   *   Don't return on_hold contact info also.
+   * @internal param bool $skipDeceasedDon 't return deceased contact info.
+   *   Don't return deceased contact info.
    * @static
    */
   static function getTokenDetails(
@@ -1387,9 +1389,14 @@ class CRM_Utils_Token {
     $memberships = civicrm_api3('membership', 'get', array('options' => array('limit' => 200000), 'membership_id' => array('IN' => (array) $membershipIDs)));
     return $memberships['values'];
   }
+
   /**
    * Replace greeting tokens exists in message/subject
-   *
+   * @param $tokenString
+   * @param null $contactDetails
+   * @param null $contactId
+   * @param null $className
+   * @param bool $escapeSmarty
    */
   public static function replaceGreetingTokens(&$tokenString, $contactDetails = NULL, $contactId = NULL, $className = NULL, $escapeSmarty = FALSE) {
 

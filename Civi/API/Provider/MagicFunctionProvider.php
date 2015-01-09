@@ -75,6 +75,8 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
 
   /**
    * {inheritdoc}
+   * @param array $apiRequest
+   * @return array
    */
   public function invoke($apiRequest) {
     $function = $apiRequest['function'];
@@ -92,6 +94,8 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
 
   /**
    * {inheritdoc}
+   * @param int $version
+   * @return array
    */
   public function getEntityNames($version) {
     $entities = array();
@@ -132,6 +136,9 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
 
   /**
    * {inheritdoc}
+   * @param int $version
+   * @param string $entity
+   * @return array
    */
   public function getActionNames($version, $entity) {
     $entity = _civicrm_api_get_camel_name($entity);

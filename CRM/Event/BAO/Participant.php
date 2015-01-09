@@ -846,6 +846,11 @@ WHERE  civicrm_participant.id = {$participantId}
    * This function is used by both the web form layer and the api. Note that
    * the api needs the name => value conversion, also the view layer typically
    * requires value => name conversion
+   * @param $defaults
+   * @param $property
+   * @param $lookup
+   * @param $reverse
+   * @return bool
    */
   public static function lookupValue(&$defaults, $property, $lookup, $reverse) {
     $id = $property . '_id';
@@ -2078,6 +2083,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
    * @param $updatedAmount
    * @param $paidAmount
    * @param int $contributionId
+   * @param null $taxAmount
    */
   public static function recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount = NULL) {
     $balanceAmt = $updatedAmount - $paidAmount;

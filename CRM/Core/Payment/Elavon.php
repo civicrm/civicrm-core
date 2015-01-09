@@ -84,7 +84,10 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
    * from the params object  as visually clear as possible for easy editing
    *
    *  Comment out irrelevant fields
-   **********************************************************/
+   *********************************************************
+   * @param $params
+   * @return
+   */
   public function mapProcessorFieldstoParams($params) {
 
     /**********************************************************
@@ -140,7 +143,11 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   /**********************************************************
    * This function sends request and receives response from
    * the processor
-   **********************************************************/
+   *********************************************************
+   * @param array $params
+   * @return array|object
+   * @throws \Exception
+   */
   public function doDirectPayment(&$params) {
     if (isset($params['is_recur']) && $params['is_recur'] == TRUE) {
       CRM_Core_Error::fatal(ts('Elavon - recurring payments not implemented'));
@@ -330,7 +337,11 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
 
   /**************************************************
    * Produces error message and returns from class
-   **************************************************/
+   *************************************************
+   * @param null $errorCode
+   * @param null $errorMessage
+   * @return object
+   */
   public function &errorExit($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
     if ($errorCode) {
@@ -344,7 +355,11 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
 
   /**************************************************
    * NOTE: 'doTransferCheckout' not implemented
-   **************************************************/
+   *************************************************
+   * @param $params
+   * @param $component
+   * @throws \Exception
+   */
   public function doTransferCheckout(&$params, $component) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
@@ -450,7 +465,11 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
    *
    * It returns the NodeValue for a given NodeName
    * or returns an empty string.
-   ************************************************************************/
+   ***********************************************************************
+   * @param $NodeName
+   * @param $strXML
+   * @return string
+   */
   public function GetNodeValue($NodeName, &$strXML) {
     $OpeningNodeName = "<" . $NodeName . ">";
     $ClosingNodeName = "</" . $NodeName . ">";

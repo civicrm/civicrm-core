@@ -234,7 +234,15 @@ Order By  camp.title";
   /**
    * Wrapper to self::getCampaigns( )
    * w/ permissions and component check.
-   *
+   * @param null $includeId
+   * @param null $excludeId
+   * @param bool $onlyActive
+   * @param bool $onlyCurrent
+   * @param bool $appendDatesToTitle
+   * @param bool $forceAll
+   * @param bool $doCheckForComponent
+   * @param bool $doCheckForPermissions
+   * @return
    */
   public static function getPermissionedCampaigns(
     $includeId = NULL,
@@ -318,6 +326,9 @@ Order By  camp.title";
    * Retrieve campaigns for dashboard.
    *
    * @static
+   * @param array $params
+   * @param bool $onlyCount
+   * @return array|int
    */
   public static function getCampaignSummary($params = array(), $onlyCount = FALSE) {
     $campaigns = array();

@@ -76,6 +76,8 @@ class CRM_Contact_BAO_ProximityQuery {
    * Latitudes in all of U. S.: from -7.2 (American Samoa) to 70.5 (Alaska).
    * Latitudes in continental U. S.: from 24.6 (Florida) to 49.0 (Washington).
    * Average latitude of all U. S. zipcodes: 37.9.
+   * @param $latitude
+   * @return float
    */
 
   /*
@@ -95,6 +97,10 @@ class CRM_Contact_BAO_ProximityQuery {
   /**
    * Convert longitude and latitude to earth-centered earth-fixed coordinates.
    * X axis is 0 long, 0 lat; Y axis is 90 deg E; Z axis is north pole.
+   * @param $longitude
+   * @param $latitude
+   * @param int $height
+   * @return array
    */
   public static function earthXYZ($longitude, $latitude, $height = 0) {
     $long = deg2rad($longitude);
@@ -116,6 +122,9 @@ class CRM_Contact_BAO_ProximityQuery {
 
   /**
    * Convert a given angle to earth-surface distance.
+   * @param $angle
+   * @param $latitude
+   * @return float
    */
   public static function earthArcLength($angle, $latitude) {
     return deg2rad($angle) * self::earthRadius($latitude);
@@ -123,6 +132,10 @@ class CRM_Contact_BAO_ProximityQuery {
 
   /**
    * Estimate the min and max longitudes within $distance of a given location.
+   * @param $longitude
+   * @param $latitude
+   * @param $distance
+   * @return array
    */
   public static function earthLongitudeRange($longitude, $latitude, $distance) {
     $long   = deg2rad($longitude);
@@ -149,6 +162,10 @@ class CRM_Contact_BAO_ProximityQuery {
 
   /**
    * Estimate the min and max latitudes within $distance of a given location.
+   * @param $longitude
+   * @param $latitude
+   * @param $distance
+   * @return array
    */
   public static function earthLatitudeRange($longitude, $latitude, $distance) {
     $long   = deg2rad($longitude);

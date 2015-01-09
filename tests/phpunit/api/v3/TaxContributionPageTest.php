@@ -503,8 +503,9 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param array $params
    * @param int $financialTypeId
+   * @return mixed
+   * @internal param array $params
    */
   public function _getFinancialAccountId($financialTypeId) {
     $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));

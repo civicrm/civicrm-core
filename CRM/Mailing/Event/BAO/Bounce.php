@@ -43,6 +43,8 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
 
   /**
    * Create a new bounce event, update the email address if necessary
+   * @param $params
+   * @return bool|null
    */
   public static function &create(&$params) {
     $q = &CRM_Mailing_Event_BAO_Queue::verify($params['job_id'],
@@ -128,7 +130,8 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
    * @param bool $is_distinct
    *   Group by queue ID?.
    *
-   * @return int                  Number of rows in result set
+   * @param null $toDate
+   * @return int Number of rows in result set
    * @static
    */
   public static function getTotalCount($mailing_id, $job_id = NULL, $is_distinct = FALSE, $toDate = NULL) {

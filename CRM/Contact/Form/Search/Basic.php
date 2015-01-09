@@ -239,6 +239,8 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   /**
    * Add a form rule for this form. If Go is pressed then we must select some checkboxes
    * and an action
+   * @param $fields
+   * @return array|bool
    */
   public static function formRule($fields) {
     // check actionName and if next, then do not repeat a search, since we are going to the next page

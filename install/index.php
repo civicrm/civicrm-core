@@ -273,6 +273,8 @@ class InstallRequirements {
 
   /**
    * Just check that the database configuration is okay
+   * @param $databaseConfig
+   * @param $dbName
    */
   function checkdatabase($databaseConfig, $dbName) {
     if ($this->requireFunction('mysql_connect',

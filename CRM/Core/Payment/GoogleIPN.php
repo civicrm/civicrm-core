@@ -515,7 +515,7 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
   /**
    * This method is handles the response that will be invoked (from extern/googleNotify) every time
    * a notification or request is sent by the Google Server.
-   *
+   * @param $xml_response
    */
   public static function main($xml_response) {
     require_once 'Google/library/googleresponse.php';
@@ -692,6 +692,8 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
   /**
    * Converts the comma separated name-value pairs in <merchant-private-data>
    * to an array of name-value pairs.
+   * @param $str
+   * @return array
    */
   public static function stringToArray($str) {
     $vars = $labels = array();

@@ -337,6 +337,8 @@ class CRM_Core_Payment_Form {
   /**
    * Make sure that credit card number and cvv are valid
    * Called within the scope of a QF formRule function
+   * @param $values
+   * @param $errors
    */
   public static function validateCreditCard($values, &$errors) {
     if (!empty($values['credit_card_type'])) {

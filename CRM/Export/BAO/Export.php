@@ -1692,7 +1692,11 @@ WHERE  id IN ( $deleteIDString )
    * The function unsets static part of the string, if token is the dynamic part.
    * Example: 'Hello {contact.first_name}' => converted to => '{contact.first_name}'
    * i.e 'Hello Alan' => converted to => 'Alan'
-   *
+   * @param $parsedString
+   * @param $defaultGreeting
+   * @param $addressMergeGreetings
+   * @param string $greetingType
+   * @return mixed
    */
   static function _trimNonTokens(
     &$parsedString, $defaultGreeting,
@@ -1961,7 +1965,8 @@ LIMIT $offset, $limit
 
   /**
    * Manipulate header rows for relationship fields
-   *
+   * @param $headerRows
+   * @param $contactRelationshipTypes
    */
   public static function manipulateHeaderRows(&$headerRows, $contactRelationshipTypes) {
     foreach ($headerRows as & $header) {
@@ -1976,7 +1981,10 @@ LIMIT $offset, $limit
   /**
    * Exclude contacts who are deceased, have "Do not mail" privacy setting,
    * or have no street address
-   *
+   * @param $exportTempTable
+   * @param $headerRows
+   * @param $sqlColumns
+   * @param $exportParams
    */
   public static function postalMailingFormat($exportTempTable, &$headerRows, &$sqlColumns, $exportParams) {
     $whereClause = array();

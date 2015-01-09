@@ -492,6 +492,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
 
   /**
    * Load user into session
+   * @param $username
+   * @return bool
    */
   public function loadUser($username) {
     global $user;
@@ -714,7 +716,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   *
+   * @param null $scriptFilename
+   * @return null|string
    */
   public function cmsRootPath($scriptFilename = NULL) {
     $cmsRoot = $valid = NULL;

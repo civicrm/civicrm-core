@@ -147,7 +147,15 @@ class CRM_Utils_SoapServer {
     return sha1($result[2]);
   }
 
-  /*** MAILER API ***/
+  /*** MAILER API **
+   * @param $key
+   * @param $job
+   * @param $queue
+   * @param $hash
+   * @param $body
+   * @return array|int
+   * @throws \SoapFault
+   */
   public function mailer_event_bounce($key, $job, $queue, $hash, $body) {
     $this->verify($key);
     $params = array(

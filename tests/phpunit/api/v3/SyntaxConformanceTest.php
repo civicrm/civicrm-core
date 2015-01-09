@@ -295,6 +295,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * At this stage exclude the ones that don't pass & add them as we can troubleshoot them
+   * @param bool $sequential
+   * @return array
    */
   public static function toBeSkipped_updatesingle($sequential = FALSE) {
     $entitiesWithout = array(
@@ -500,6 +502,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   /**
    * @dataProvider toBeSkipped_get
   entities that don't need a get action
+   * @param $Entity
    */
   public function testNotImplemented_get($Entity) {
     $result = civicrm_api($Entity, 'Get', array('version' => 3));
@@ -511,6 +514,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   /**
    * @dataProvider entities
    * @expectedException PHPUnit_Framework_Error
+   * @param $Entity
    */
   public function testWithoutParam_get($Entity) {
     // should get php complaining that a param is missing
@@ -519,6 +523,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities
+   * @param $Entity
    */
   public function testGetFields($Entity) {
     if (in_array($Entity, $this->deprecatedAPI) || $Entity == 'Entity' || $Entity == 'CustomValue') {
@@ -534,6 +539,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities_get
+   * @param $Entity
    */
   public function testEmptyParam_get($Entity) {
 
@@ -545,8 +551,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
     $this->assertContains("Mandatory key(s) missing from params array", $result['error_message']);
   }
+
   /**
    * @dataProvider entities_get
+   * @param $Entity
    */
   public function testEmptyParam_getString($Entity) {
 
@@ -558,9 +566,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->assertEquals(2000, $result['error_code']);
     $this->assertEquals('Input variable `params` is not an array', $result['error_message']);
   }
+
   /**
    * @dataProvider entities_get
    * @Xdepends testEmptyParam_get // no need to test the simple if the empty doesn't work/is skipped. doesn't seem to work
+   * @param $Entity
    */
   public function testSimple_get($Entity) {
     // $this->markTestSkipped("test gives core error on test server (but not on our locals). Skip until we can get server to pass");
@@ -583,6 +593,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider custom_data_entities_get
+   * @param $entityName
    */
   public function testCustomDataGet($entityName) {
     $this->createLoggedInUser();// so subsidiary activities are created
@@ -603,6 +614,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities_get
+   * @param $Entity
    */
   public function testAcceptsOnlyID_get($Entity) {
     // big random number. fun fact: if you multiply it by pi^e, the result is another random number, but bigger ;)
@@ -637,6 +649,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * limitations include the problem with avoiding loops when creating test objects -
    * hence FKs only set by createTestObject when required. e.g parent_id on campaign is not being followed through
    * Currency - only seems to support US
+   * @param $entityName
    */
   public function testByID_get($entityName) {
     if (in_array($entityName, self::toBeSkipped_automock(TRUE))) {
@@ -788,6 +801,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       $this->assertEquals($limit, count($result['values']), $message);
     }
   }
+
   /**
    * Create two entities and make sure we can fetch them individually by ID (e.g. using "contact_id=>2"
    * or "group_id=>4")
@@ -797,6 +811,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * limitations include the problem with avoiding loops when creating test objects -
    * hence FKs only set by createTestObject when required. e.g parent_id on campaign is not being followed through
    * Currency - only seems to support US
+   * @param $entityName
+   * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testByIDAlias_get($entityName) {
     if (in_array($entityName, self::toBeSkipped_automock(TRUE))) {
@@ -843,6 +859,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities_get
+   * @param $Entity
    */
   public function testNonExistantID_get($Entity) {
     // cf testAcceptsOnlyID_get
@@ -870,6 +887,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   /**
    * @dataProvider toBeSkipped_create
   entities that don't need a create action
+   * @param $Entity
    */
   public function testNotImplemented_create($Entity) {
     $result = civicrm_api($Entity, 'Create', array('version' => 3));
@@ -880,6 +898,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   /**
    * @dataProvider entities
    * @expectedException PHPUnit_Framework_Error
+   * @param $Entity
    */
   public function testWithoutParam_create($Entity) {
     // should create php complaining that a param is missing
@@ -888,6 +907,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities_create
+   * @param $Entity
+   * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testEmptyParam_create($Entity) {
     $this->markTestIncomplete("fixing this test to test the api functions fails on numberous tests
@@ -906,6 +927,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @dataProvider entities_create
    *
    * Check that create doesn't work with an invalid
+   * @param $Entity
+   * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testInvalidID_create($Entity) {
     // turn test off for noew
@@ -933,6 +956,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * limitations include the problem with avoiding loops when creating test objects -
    * hence FKs only set by createTestObject when required. e.g parent_id on campaign is not being followed through
    * Currency - only seems to support US
+   * @param $entityName
    */
   public function testCreateSingleValueAlter($entityName) {
     if (in_array($entityName, $this->toBeImplemented['create'])) {
@@ -1102,6 +1126,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   /**
    * @dataProvider toBeSkipped_delete
   entities that don't need a delete action
+   * @param $Entity
    */
   public function testNotImplemented_delete($Entity) {
     $nonExistantID = 151416349;
@@ -1113,6 +1138,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   /**
    * @dataProvider entities
    * @expectedException PHPUnit_Framework_Error
+   * @param $Entity
    */
   public function testWithoutParam_delete($Entity) {
     // should delete php complaining that a param is missing
@@ -1121,6 +1147,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities_delete
+   * @param $Entity
    */
   public function testEmptyParam_delete($Entity) {
     if (in_array($Entity, $this->toBeImplemented['delete'])) {
@@ -1131,8 +1158,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
     $this->assertContains("Mandatory key(s) missing from params array", $result['error_message']);
   }
+
   /**
    * @dataProvider entities_delete
+   * @param $Entity
+   * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testInvalidID_delete($Entity) {
     // turn test off for now
@@ -1161,6 +1191,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * limitations include the problem with avoiding loops when creating test objects -
    * hence FKs only set by createTestObject when required. e.g parent_id on campaign is not being followed through
    * Currency - only seems to support US
+   * @param $entityName
+   * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testByID_delete($entityName) {
     // turn test off for noew
@@ -1201,7 +1233,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * Create two entities and make sure delete action only deletes one!
    *
    * @dataProvider entities_getfields
-   *
+   * @param $entity
    */
   public function testGetfieldsHasTitle($entity) {
     $entities = $this->getEntitiesSupportingCustomFields();

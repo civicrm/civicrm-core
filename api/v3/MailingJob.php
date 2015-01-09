@@ -43,6 +43,9 @@
 
 /**
  * Handle creation of a Mailing Job for a Mailing.
+ * @param $params
+ * @return array
+ * @throws \API_Exception
  */
 function civicrm_api3_mailing_job_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -78,6 +81,9 @@ function civicrm_api3_mailing_job_get($params, $ids = array()) {
 
 /**
  * Handle deletion of a Mailing Job for a Mailing.
+ * @param $params
+ * @return array
+ * @throws \API_Exception
  */
 function civicrm_api3_mailing_job_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

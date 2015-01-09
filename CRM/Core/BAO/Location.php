@@ -97,7 +97,9 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
 
   /**
    * Creates the entry in the civicrm_loc_block
-   *
+   * @param $location
+   * @param $entityElements
+   * @return null
    */
   public static function createLocBlock(&$location, &$entityElements) {
     $locId = self::findExisting($entityElements);
@@ -133,6 +135,8 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
   /**
    * Takes an entity array and finds the existing location block
    * @static
+   * @param $entityElements
+   * @return
    */
   public static function findExisting($entityElements) {
     $eid    = $entityElements['entity_id'];

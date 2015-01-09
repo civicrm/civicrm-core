@@ -627,7 +627,9 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    * Returns the regex patterns that are used for preparing the text and html templates
    *
    *
-   **/
+   * @param bool $onlyHrefs
+   * @return array|string
+   */
   private function &getPatterns($onlyHrefs = FALSE) {
 
     $patterns = array();
@@ -891,10 +893,9 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    *  structures to represent the order in which tokens were found from left to right, top to bottom.
    *
    *
-   * @param string $propName of the property that holds the text that we want to scan for tokens (html, text).
+   * @param $prop
+   * @internal param string $propName of the property that holds the text that we want to scan for tokens (html, text).
    *   Name of the property that holds the text that we want to scan for tokens (html, text).
-   *
-   * @return void
    */
   private function _getTokens($prop) {
     $templates = $this->getTemplates();
@@ -1405,7 +1406,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * get mailing object and replaces subscribeInvite,
    * domain and mailing tokens
-   *
+   * @param $mailing
    */
   public static function tokenReplace(&$mailing) {
     $domain = CRM_Core_BAO_Domain::getDomain();
@@ -1429,7 +1430,13 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    *  getTokenData receives a token from an email
    *  and returns the appropriate data for the token
-   *
+   * @param $token_a
+   * @param bool $html
+   * @param $contact
+   * @param $verp
+   * @param $urls
+   * @param $event_queue_id
+   * @return bool|mixed|null|string
    */
   private function getTokenData(&$token_a, $html = FALSE, &$contact, &$verp, &$urls, $event_queue_id) {
     $type  = $token_a['type'];
@@ -1747,6 +1754,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
   /**
    * Get hash value of the mailing
+   * @param $id
+   * @return null|string
    */
   public static function getMailingHash($id) {
     $hash = NULL;

@@ -437,7 +437,8 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * @param enum $output
    *   What should the result set include (web/email/csv).
    *
-   * @return int   the total number of rows for this action
+   * @param null $extraWhereClause
+   * @return int the total number of rows for this action
    */
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL, $extraWhereClause = NULL) {
 
@@ -734,6 +735,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   /**
    *  set the _multiRecordTableName to display the result set
    *  according to multi record custom field values
+   * @param $fields
    */
   public function setMultiRecordTableName($fields) {
     $customGroupId = $multiRecordTableName = NULL;

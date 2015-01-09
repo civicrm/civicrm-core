@@ -123,6 +123,8 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
 
   /**
    * {inheritdoc}
+   * @param array $apiRequest
+   * @return array|mixed
    */
   public function invoke($apiRequest) {
     return call_user_func($this->actions[strtolower($apiRequest['action'])]['callback'], $apiRequest);
@@ -130,6 +132,8 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
 
   /**
    * {inheritdoc}
+   * @param int $version
+   * @return array
    */
   public function getEntityNames($version) {
     return array($this->entity);
@@ -137,6 +141,9 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
 
   /**
    * {inheritdoc}
+   * @param int $version
+   * @param string $entity
+   * @return array
    */
   public function getActionNames($version, $entity) {
     if ($version == $this->version && $entity == $this->entity) {

@@ -3493,6 +3493,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   /**
    * Check for empty order_by configurations and remove them; also set
    * template to hide them.
+   * @param $formValues
    */
   public function preProcessOrderBy(&$formValues) {
     // Object to show/hide form elements

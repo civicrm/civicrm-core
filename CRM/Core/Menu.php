@@ -71,9 +71,8 @@ class CRM_Core_Menu {
   /**
    * This function fetches the menu items from xml and xmlMenu hooks
    *
-   * @param boolen $fetchFromXML
+   * @param bool|\boolen $fetchFromXML
    *   Fetch the menu items from xml and not from cache.
-   *
    * @return array
    */
   public static function &xmlItems($fetchFromXML = FALSE) {
@@ -163,9 +162,10 @@ class CRM_Core_Menu {
   /**
    * This function defines information for various menu items
    *
-   * @param boolen $fetchFromXML
+   * @param bool|\boolen $fetchFromXML
    *   Fetch the menu items from xml and not from cache.
    *
+   * @return array
    * @static
    */
   public static function &items($fetchFromXML = FALSE) {
@@ -243,7 +243,7 @@ class CRM_Core_Menu {
    * 2. Compute local tasks value if any
    * 3. Propagate access argument, access callback, page callback to the menu item
    * 4. Build the global navigation block
-   *
+   * @param $menu
    */
   public static function build(&$menu) {
     foreach ($menu as $path => $menuItems) {

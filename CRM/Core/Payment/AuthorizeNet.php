@@ -563,6 +563,10 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    *
    * Function is from Authorize.Net sample code, and used to avoid using
    * PHP5 XML functions
+   * @param $haystack
+   * @param $start
+   * @param $end
+   * @return bool|string
    */
   public function _substring_between(&$haystack, $start, $end) {
     if (strpos($haystack, $start) === FALSE || strpos($haystack, $end) === FALSE) {

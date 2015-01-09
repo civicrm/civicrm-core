@@ -110,6 +110,12 @@ class CRM_Queue_ErrorPolicy {
    * Receive (semi) recoverable error notices
    *
    * @see set_error_handler
+   * @param $errno
+   * @param $errstr
+   * @param $errfile
+   * @param $errline
+   * @return bool
+   * @throws \Exception
    */
   public function onError($errno, $errstr, $errfile, $errline) {
     if (!(error_reporting() & $errno)) {

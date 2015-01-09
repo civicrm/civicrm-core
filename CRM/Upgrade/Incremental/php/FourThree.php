@@ -954,6 +954,10 @@ ALTER TABLE civicrm_financial_account
   /**
    * Read creation and modification times from civicrm_log; add
    * them to civicrm_contact.
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param $startId
+   * @param $endId
+   * @return bool
    */
   public function convertTimestamps(CRM_Queue_TaskContext $ctx, $startId, $endId) {
     $sql = "
@@ -985,6 +989,8 @@ ALTER TABLE civicrm_financial_account
 
   /**
    * Change index and add missing constraints for civicrm_contribution_recur
+   * @param \CRM_Queue_TaskContext $ctx
+   * @return bool
    */
   public function addMissingConstraints(CRM_Queue_TaskContext $ctx) {
     $query = "SHOW KEYS FROM `civicrm_contribution_recur` WHERE key_name = 'UI_contrib_payment_instrument_id'";
@@ -1016,7 +1022,8 @@ ALTER TABLE civicrm_financial_account
   /**
    * Update financial_account_id for bad data in financial_trxn table
    * CRM-12844
-   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @return bool
    */
   public function updateFinancialTrxnData(CRM_Queue_TaskContext $ctx) {
     $upgrade = new CRM_Upgrade_Form();
@@ -1079,7 +1086,8 @@ id IN (' . implode(',', $val) . ')';
   /**
    * Update financial_account_id for bad data in financial_trxn table
    * CRM-12844
-   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @return bool
    */
   public function updateLineItemData(CRM_Queue_TaskContext $ctx) {
     $sql = "SELECT cc.id contribution_id, cc.contribution_recur_id,
@@ -1144,6 +1152,10 @@ AND cli.entity_table = 'civicrm_contribution' AND cli.id IN (" . implode(',', $v
   /**
    * Replace contribution_type to financial_type in table
    * civicrm_saved_search and Structure civicrm_report_instance
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param $query
+   * @param $table
+   * @return bool
    */
   public function replaceContributionTypeId(CRM_Queue_TaskContext $ctx, $query, $table) {
     $dao = CRM_Core_DAO::executeQuery($query);
@@ -1319,6 +1331,9 @@ ADD INDEX UI_entity_financial_trxn_entity_id (entity_id);
 
   /**
    * (Queue Task Callback)
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param $rev
+   * @return bool
    */
   public static function task_4_3_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
     $upgrade = new CRM_Upgrade_Form();
@@ -1333,6 +1348,8 @@ ADD INDEX UI_entity_financial_trxn_entity_id (entity_id);
    *
    * After passing the $funcName, you can also pass parameters that will go to
    * the function. Note that all params must be serializable.
+   * @param $title
+   * @param $funcName
    */
   protected function addTask($title, $funcName) {
     $queue = CRM_Queue_Service::singleton()->load(array(

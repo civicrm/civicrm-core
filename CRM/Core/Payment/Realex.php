@@ -86,6 +86,8 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @param object $paymentProcessor
    *
+   * @param null $paymentForm
+   * @param bool $force
    * @return object
    * @static
    */
@@ -358,6 +360,8 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
 
   /**
    *  Format the params from the form ready for sending to Realex.  Also perform some validation
+   * @param $params
+   * @return bool
    */
   public function setRealexFields(&$params) {
     if ((int) $params['amount'] <= 0) {

@@ -416,7 +416,7 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
   /**
    * This method is handles the response that will be invoked (from extern/googleNotify) every time
    * a notification or request is sent by the Google Server.
-   *
+   * @param $xml_response
    */
   static
   function main($xml_response) {
@@ -562,10 +562,12 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
       return TRUE;
     }
 
-    /**
-     * Converts the comma separated name-value pairs in <merchant-private-data>
-     * to an array of name-value pairs.
-     */
+  /**
+   * Converts the comma separated name-value pairs in <merchant-private-data>
+   * to an array of name-value pairs.
+   * @param $str
+   * @return array
+   */
     static
     function stringToArray($str) {
       $vars = $labels = array();

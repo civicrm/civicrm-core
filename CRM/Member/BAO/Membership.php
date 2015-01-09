@@ -1315,9 +1315,8 @@ AND civicrm_membership.is_test = %2";
    * @param int $defaultContributionTypeID
    * @param array $membershipLineItems
    *   Line items specific to membership payment that is separate to contribution.
-   * @throws CRM_Core_Exception
-   *
-   * @return void
+   * @param $isPayLater
+   * @throws \CRM_Core_Exception
    */
   public static function postProcessMembership(
     $membershipParams, $contactID, &$form, $premiumParams,
@@ -1768,7 +1767,9 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * @param CRM_Core_DAO $dao
    *   Membership object.
    *
-   * @return null|array     array of memberships if created
+   * @param bool $reset
+   * @return array|null array of memberships if created
+   * @throws \CRM_Core_Exception
    * @static
    */
   public static function createRelatedMemberships(&$params, &$dao, $reset = FALSE) {

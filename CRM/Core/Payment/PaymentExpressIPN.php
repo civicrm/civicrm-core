@@ -286,6 +286,13 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    * hex string from paymentexpress is passed to this function as hex string. Code based on googleIPN
    * mac_key is only passed if the processor is pxaccess as it is used for decryption
    * $dps_method is either pxaccess or pxpay
+   * @param $dps_method
+   * @param $rawPostData
+   * @param $dps_url
+   * @param $dps_user
+   * @param $dps_key
+   * @param $mac_key
+   * @throws \Exception
    */
   public static function main($dps_method, $rawPostData, $dps_url, $dps_user, $dps_key, $mac_key) {
 
@@ -438,6 +445,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * Converts the comma separated name-value pairs in <TxnData2>
    * to an array of values.
+   * @param $str
+   * @return array
    */
   public static function stringToArray($str) {
     $vars = $labels = array();

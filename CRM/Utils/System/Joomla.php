@@ -898,6 +898,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
   /**
    * Append to coreResourcesList
+   * @param $list
    */
   public function appendCoreResources(&$list) {
     $list[] = 'js/crm.joomla.js';

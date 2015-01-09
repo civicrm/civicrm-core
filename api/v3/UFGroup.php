@@ -39,6 +39,7 @@
 
 /**
  * Files required for this package
+ * @param $params
  */
 function _civicrm_api3_uf_group_create_spec(&$params) {
   $session = CRM_Core_Session::singleton();

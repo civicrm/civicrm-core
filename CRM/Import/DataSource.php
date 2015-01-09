@@ -50,7 +50,8 @@ abstract class CRM_Import_DataSource {
 
   /**
    * Set variables up before form is built
-   *
+   * @param $form
+   * @return
    */
   abstract public function preProcess(&$form);
 
@@ -67,7 +68,10 @@ abstract class CRM_Import_DataSource {
 
   /**
    * Process the form submission
-   *
+   * @param $params
+   * @param $db
+   * @param $form
+   * @return
    */
   abstract public function postProcess(&$params, &$db, &$form);
 }

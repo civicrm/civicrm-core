@@ -354,11 +354,13 @@ ALTER TABLE civicrm_dashboard
   }
 
   /**
-   * @param CRM_Queue_TaskContext $ctx
-   * @param int $startId
-   * @param int $endId
-   *
+   * @param $rev
+   * @param $originalVer
+   * @param $latestVer
    * @return bool
+   * @internal param \CRM_Queue_TaskContext $ctx
+   * @internal param int $startId
+   * @internal param int $endId
    */
   public function upgrade_4_4_7($rev, $originalVer, $latestVer) {
     // For WordPress/Joomla(?), cleanup broken image_URL from 4.4.6 upgrades - https://issues.civicrm.org/jira/browse/CRM-14971
@@ -674,6 +676,9 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
 
   /**
    * (Queue Task Callback)
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param $rev
+   * @return bool
    */
   public static function task_4_4_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
     $upgrade = new CRM_Upgrade_Form();
@@ -688,6 +693,8 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
    *
    * After passing the $funcName, you can also pass parameters that will go to
    * the function. Note that all params must be serializable.
+   * @param $title
+   * @param $funcName
    */
   protected function addTask($title, $funcName) {
     $queue = CRM_Queue_Service::singleton()->load(array(

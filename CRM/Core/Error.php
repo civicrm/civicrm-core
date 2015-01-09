@@ -290,7 +290,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Also, if we do not return any value the PEAR_ErrorStack::push() then does the
    * action of PEAR_ERRORSTACK_PUSHANDLOG which displays the errors on the screen,
    * since the logger set for this error stack is 'display' - see CRM_Core_Config::getLog();
-   *
+   * @param $pearError
+   * @return int
    */
   public static function handlePES($pearError) {
     return PEAR_ERRORSTACK_PUSH;
@@ -603,6 +604,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
   /**
    * Append to the query log (if enabled)
+   * @param $string
    */
   public static function debug_query($string) {
     if (defined('CIVICRM_DEBUG_LOG_QUERY')) {
@@ -952,6 +954,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
   /**
    * Terminate execution abnormally
+   * @param $code
    */
   protected static function abend($code) {
     // do a hard rollback of any pending transactions

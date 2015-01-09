@@ -471,6 +471,9 @@ class CRM_Pledge_BAO_Query {
 
   /**
    * Ideally this function should include fields that are displayed in the selector
+   * @param $mode
+   * @param bool $includeCustomFields
+   * @return array|null
    */
   static function defaultReturnProperties(
     $mode,
@@ -506,6 +509,8 @@ class CRM_Pledge_BAO_Query {
 
   /**
    * This includes any extra fields that might need for export etc
+   * @param $mode
+   * @return array|null
    */
   public static function extraReturnProperties($mode) {
     $properties = NULL;

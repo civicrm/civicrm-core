@@ -45,9 +45,10 @@
  * Handle a create mailing ab testing
  *
  * @param array $params
- * @param array $ids
- *
  * @return array API Success Array
+ * @throws \API_Exception
+ * @internal param array $ids
+ *
  */
 function civicrm_api3_mailing_a_b_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -57,9 +58,10 @@ function civicrm_api3_mailing_a_b_create($params) {
  * Handle a delete event.
  *
  * @param array $params
- * @param array $ids
- *
  * @return array API Success Array
+ * @throws \API_Exception
+ * @internal param array $ids
+ *
  */
 function civicrm_api3_mailing_a_b_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

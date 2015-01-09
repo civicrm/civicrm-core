@@ -69,6 +69,7 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
    * Create a few queue items; alternately enqueue and dequeue various
    *
    * @dataProvider getQueueSpecs
+   * @param $queueSpec
    */
   public function testPriorities($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);

@@ -65,10 +65,11 @@ class CRM_Core_BAO_CustomOption {
    *
    * @param int $fieldID
    *   Field whose options are needed.
-   * @param bool $inactiveNeededDo we need inactive options ?.
+   * @param bool $inactiveNeeded
+   * @return array $customOption all active options for fieldId
+   * @internal param bool $inactiveNeededDo we need inactive options ?.
    *   Do we need inactive options ?.
    *
-   * @return array $customOption all active options for fieldId
    * @static
    */
   static function getCustomOption(
@@ -171,6 +172,7 @@ WHERE  id = %1
    * param $optionId integer option id
    *
    * @static
+   * @param $optionId
    */
   public static function del($optionId) {
     // get the customFieldID

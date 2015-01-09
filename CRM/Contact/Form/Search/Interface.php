@@ -36,11 +36,14 @@ interface CRM_Contact_Form_Search_Interface {
 
   /**
    * The constructor gets the submitted form values
+   * @param $formValues
    */
   public function __construct(&$formValues);
 
   /**
    * Builds the quickform for this search
+   * @param $form
+   * @return
    */
   public function buildForm(&$form);
 
@@ -67,12 +70,22 @@ interface CRM_Contact_Form_Search_Interface {
    * List of contact ids that match the current input parameters
    * Used by different tasks. Will be also used to optimize the
    * 'all' query below to avoid excessive LEFT JOIN blowup
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @return
    */
   public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL);
 
   /**
    * Retrieve all the values that match the current input parameters
    * Used by the selector
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   * @return
    */
   public function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE);
 
@@ -93,6 +106,8 @@ interface CRM_Contact_Form_Search_Interface {
 
   /**
    * The where clause for the query
+   * @param bool $includeContactIDs
+   * @return
    */
   public function where($includeContactIDs = FALSE);
 

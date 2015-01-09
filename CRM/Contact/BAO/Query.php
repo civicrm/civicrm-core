@@ -2742,6 +2742,7 @@ class CRM_Contact_BAO_Query {
   /**
    * @param $value
    * @param $grouping
+   * @param string $op
    */
   public function includeContactSubTypes($value, $grouping, $op = 'LIKE') {
 

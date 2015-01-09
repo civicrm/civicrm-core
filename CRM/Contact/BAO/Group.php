@@ -144,7 +144,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
   /**
    * Returns an array of the contacts in the given group.
-   *
+   * @param $id
+   * @return
    */
   public static function getGroupContacts($id) {
     $params = array(array('group', 'IN', array($id => 1), 0, 0));

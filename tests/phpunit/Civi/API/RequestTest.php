@@ -123,6 +123,9 @@ class RequestTest extends \CiviUnitTestCase {
 
   /**
    * @dataProvider validEntityActionPairs
+   * @param $input
+   * @param $expected
+   * @throws \API_Exception
    */
   public function testCreateRequest_EntityActionMunging($input, $expected) {
     list ($inEntity, $inAction, $inVersion) = $input;
@@ -147,6 +150,10 @@ class RequestTest extends \CiviUnitTestCase {
   /**
    * @dataProvider invalidEntityActionPairs
    * @expectedException \API_Exception
+   * @param $inEntity
+   * @param $inAction
+   * @param $inVersion
+   * @throws \API_Exception
    */
   public function testCreateRequest_InvalidEntityAction($inEntity, $inAction, $inVersion) {
     Request::create($inEntity, $inAction, array('version' => $inVersion), NULL);

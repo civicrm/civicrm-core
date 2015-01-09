@@ -43,12 +43,12 @@ class CRM_Core_Report_Excel {
    * @param string $rows
    *   (reference ) result set rows.
    * @param null $titleHeader
-   * @param bool $printShould the output be printed.
-   *   Should the output be printed.
-   *
+   * @param bool $print
    * @param bool $outputHeader
+   * @return mixed empty if output is printed, else output
    *
-   * @return  mixed    empty if output is printed, else output
+   * @internal param bool $printShould the output be printed.
+   *   Should the output be printed.
    *
    * @static
    */

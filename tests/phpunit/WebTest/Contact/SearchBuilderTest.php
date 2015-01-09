@@ -238,6 +238,13 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
 
   /**
    * Enter form values in a Search Builder row
+   * @param $set
+   * @param $row
+   * @param $entity
+   * @param $field
+   * @param $loc
+   * @param $op
+   * @param string $value
    */
   public function enterValues($set, $row, $entity, $field, $loc, $op, $value = '') {
     if ($set > 1 && $row == 1) {

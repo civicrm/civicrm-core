@@ -79,6 +79,7 @@ class CRM_Core_TemporaryErrorScope {
 
   /**
    * Set the active error-handler settings
+   * @param $frame
    */
   public static function setActive($frame) {
     $GLOBALS['_PEAR_default_error_mode'] = $frame['_PEAR_default_error_mode'];

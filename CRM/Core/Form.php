@@ -1360,6 +1360,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    *  Function that will add date and time
+   * @param $name
+   * @param $label
+   * @param bool $required
+   * @param null $attributes
    */
   public function addDateTime($name, $label, $required = FALSE, $attributes = NULL) {
     $addTime = array('addTime' => TRUE);
@@ -1375,6 +1379,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Add a currency and money element to the form
+   * @param $name
+   * @param $label
+   * @param bool $required
+   * @param null $attributes
+   * @param bool $addCurrency
+   * @param string $currencyName
+   * @param null $defaultCurrency
+   * @param bool $freezeCurrency
+   * @return \HTML_QuickForm_Element
    */
   function addMoney(
     $name,
@@ -1398,6 +1411,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Add currency element to the form
+   * @param string $name
+   * @param null $label
+   * @param bool $required
+   * @param null $defaultCurrency
+   * @param bool $freezeCurrency
    */
   function addCurrency(
     $name = 'currency',
@@ -1538,6 +1556,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Helper function to verify that required fields have been filled
    * Typically called within the scope of a FormRule function
+   * @param $fields
+   * @param $values
+   * @param $errors
    */
   public static function validateMandatoryFields($fields, $values, &$errors) {
     foreach ($fields as $name => $fld) {
@@ -1670,6 +1691,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * that small pieces of duplication are not being refactored into separate functions because their only shared parent
    * is this form. Inserting a class FrontEndForm.php between the contribution & event & this class would allow functions like this
    * and a dozen other small ones to be refactored into a shared parent with the reduction of much code duplication
+   * @param $onlinePaymentProcessorEnabled
    */
   public function addCIDZeroOptions($onlinePaymentProcessorEnabled) {
     $this->assign('nocid', TRUE);

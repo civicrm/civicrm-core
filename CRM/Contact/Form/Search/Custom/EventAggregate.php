@@ -102,6 +102,12 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
 
   /**
    * Construct the search query
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   * @return string
    */
   function all(
     $offset = 0, $rowcount = 0, $sort = NULL,

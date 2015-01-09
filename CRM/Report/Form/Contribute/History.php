@@ -522,6 +522,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   }
 
   /**
+   * @param $sql
    * @param $rows
    */
   public function buildRows($sql, &$rows) {

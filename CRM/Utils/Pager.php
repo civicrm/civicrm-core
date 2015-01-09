@@ -321,6 +321,9 @@ class CRM_Utils_Pager extends Pager_Sliding {
 
   /**
    * Build a url for pager links
+   * @param $key
+   * @param $value
+   * @return string
    */
   public function makeURL($key, $value) {
     $href = CRM_Utils_System::makeURL($key, TRUE);

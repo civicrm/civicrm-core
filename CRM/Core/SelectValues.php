@@ -79,6 +79,8 @@ class CRM_Core_SelectValues {
   /**
    * Various pre defined unit list
    * @static
+   * @param null $unitType
+   * @return array
    */
   public static function unitList($unitType = NULL) {
     $unitList = array(
@@ -740,6 +742,9 @@ class CRM_Core_SelectValues {
    *
    *
    * @static
+   * @param int $start
+   * @param int $end
+   * @return array
    */
   public static function getNumericOptions($start = 0, $end = 10) {
     $numericOptions = array();

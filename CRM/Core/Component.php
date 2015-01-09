@@ -439,7 +439,8 @@ class CRM_Core_Component {
 
   /**
    * Get components info from info file
-   *
+   * @param $crmFolderDir
+   * @return array
    */
   public static function getComponentsFromFile($crmFolderDir) {
     $components = array();

@@ -4,6 +4,7 @@
 
 /**
  * (Delegated) Implementation of hook_civicrm_config
+ * @param null $config
  */
 function _multisite_civix_civicrm_config(&$config = NULL) {
   static $configured = FALSE;
@@ -27,6 +28,7 @@ function _multisite_civix_civicrm_config(&$config = NULL) {
 
 /**
  * (Delegated) Implementation of hook_civicrm_alterSettingsMetaData
+ * @param null $metaDataFolders
  */
 function _multisite_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
   static $configured = FALSE;
@@ -153,10 +155,12 @@ function _multisite_civix_find_files($dir, $pattern) {
   }
   return $result;
 }
+
 /**
  * (Delegated) Implementation of hook_civicrm_managed
  *
  * Find any *.mgd.php files, merge their content, and return.
+ * @param $entities
  */
 function _multisite_civix_civicrm_managed(&$entities) {
   $mgdFiles = _multisite_civix_find_files(__DIR__, '*.mgd.php');

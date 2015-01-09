@@ -7,7 +7,8 @@ use Symfony\Component\Finder\Finder;
  */
 class PHPUnitScanner {
   /**
-   * @return array<string> class names
+   * @param $path
+   * @return array <string> class names
    */
   public static function _findTestClasses($path) {
 //    print_r(array(
@@ -26,7 +27,9 @@ class PHPUnitScanner {
   }
 
   /**
+   * @param $paths
    * @return array (string $file => string $class)
+   * @throws \Exception
    */
   public static function findTestClasses($paths) {
     $testClasses = array();
@@ -65,11 +68,11 @@ class PHPUnitScanner {
   }
 
   /**
-   * @param array $testClasses
+   * @param $paths
    * @return array each element is an array with keys:
    *   - file: string
-   *   - class: string
-   *   - method: string
+   * @throws \Exception
+   * @internal param array $testClasses
    */
   public static function findTestsByPath($paths) {
     $r = array();

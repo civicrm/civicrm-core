@@ -717,17 +717,17 @@ class CRM_Utils_Date {
    * actuall today pass 'dayParams' as null. or else pass the day,
    * month, year values as array values
    * Example: $dayParams = array(
-  'day' => '25', 'month' => '10',
+   * 'day' => '25', 'month' => '10',
    *                              'year' => '2007' );
    *
-   * @param array $dayParamsArray of the day, month, year.
-   *   Array of the day, month, year.
-   *                             values.
+   * @param null $dayParams
    * @param string $format
    *   Expected date format( default.
    *                             format is 2007-12-21 )
-   *
-   * @return string  Return the customized todays date (Y-m-d)
+   * @return string Return the customized todays date (Y-m-d)
+   * @internal param array $dayParamsArray of the day, month, year.
+   *   Array of the day, month, year.
+   *                             values.
    * @static
    */
   public static function getToday($dayParams = NULL, $format = "Y-m-d") {

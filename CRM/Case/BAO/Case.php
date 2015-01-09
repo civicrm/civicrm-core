@@ -224,6 +224,11 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * This function is used by both the web form layer and the api. Note that
    * the api needs the name => value conversion, also the view layer typically
    * requires value => name conversion
+   * @param $defaults
+   * @param $property
+   * @param $lookup
+   * @param $reverse
+   * @return bool
    */
   public static function lookupValue(&$defaults, $property, &$lookup, $reverse) {
     $id = $property . '_id';
@@ -2055,6 +2060,7 @@ SELECT civicrm_contact.id as casemanager_id,
    * @param array $excludeCaseIds
    * @param bool $excludeDeleted
    *
+   * @param bool $includeClosed
    * @return array of case and related data keyed on case id
    */
   public static function getUnclosedCases($params = array(), $excludeCaseIds = array(), $excludeDeleted = TRUE, $includeClosed = FALSE) {
@@ -2335,6 +2341,8 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
    * @see CRM_Dedupe_Merger::cpTables()
    *
    * TODO: use the 3rd $sqls param to append sql statements rather than executing them here
+   * @param $mainContactId
+   * @param $otherContactId
    */
   public static function mergeContacts($mainContactId, $otherContactId) {
     self::mergeCases($mainContactId, NULL, $otherContactId);
@@ -3299,6 +3307,8 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
 
   /**
    * Helper function, also used by the upgrade in case of error
+   * @param string $section
+   * @return string
    */
   public static function createCaseViewsQuery($section = 'upcoming') {
     $sql = "";

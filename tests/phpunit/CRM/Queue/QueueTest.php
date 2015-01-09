@@ -72,6 +72,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    * Create a few queue items; alternately enqueue and dequeue various
    *
    * @dataProvider getQueueSpecs
+   * @param $queueSpec
    */
   public function testBasicUsage($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
@@ -118,6 +119,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    * Claim an item from the queue and release it back for subsequent processing
    *
    * @dataProvider getQueueSpecs
+   * @param $queueSpec
    */
   public function testManualRelease($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
@@ -144,6 +146,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    * Test that item leases expire at the expected time
    *
    * @dataProvider getQueueSpecs
+   * @param $queueSpec
    */
   public function testTimeoutRelease($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
@@ -178,6 +181,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    * Test that item leases can be ignored
    *
    * @dataProvider getQueueSpecs
+   * @param $queueSpec
    */
   public function testStealItem($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
@@ -212,6 +216,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    * Test that queue content is reset when reset=>TRUE
    *
    * @dataProvider getQueueSpecs
+   * @param $queueSpec
    */
   public function testCreateResetTrue($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
@@ -234,6 +239,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    * Test that queue content is not reset when reset is omitted
    *
    * @dataProvider getQueueSpecs
+   * @param $queueSpec
    */
   public function testCreateResetFalse($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
@@ -258,6 +264,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    * Test that queue content is not reset when using load()
    *
    * @dataProvider getQueueSpecs
+   * @param $queueSpec
    */
   public function testLoad($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);

@@ -92,6 +92,8 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
 
   /**
    * Return array of defaults for the given API (function is a wrapper on getfields).
+   * @param $fields
+   * @return array
    */
   public function getDefaults($fields) {
     $defaults = array();
@@ -106,6 +108,8 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
 
   /**
    * Return array of required fields for the given API (function is a wrapper on getfields).
+   * @param $fields
+   * @return array
    */
   public function getRequired($fields) {
     $required = array('version');

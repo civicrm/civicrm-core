@@ -505,6 +505,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * This function is used by both the web form layer and the api. Note that
    * the api needs the name => value conversion, also the view layer typically
    * requires value => name conversion
+   * @param $defaults
+   * @param $property
+   * @param $lookup
+   * @param $reverse
+   * @return bool
    */
   public static function lookupValue(&$defaults, $property, &$lookup, $reverse) {
     $id = $property . '_id';
@@ -1387,6 +1392,10 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
 
   /**
    * This function update contribution as well as related objects.
+   * @param $params
+   * @param bool $processContributionObject
+   * @return array
+   * @throws \Exception
    */
   public static function transitionComponents($params, $processContributionObject = FALSE) {
     // get minimum required values.
@@ -1743,6 +1752,8 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
 
   /**
    * This function returns all contribution related object ids.
+   * @param $contributionId
+   * @return array
    */
   public static function getComponentDetails($contributionId) {
     $componentDetails = $pledgePayment = array();

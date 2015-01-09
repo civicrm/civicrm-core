@@ -56,6 +56,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
 
   /**
    * Class constructor
+   * @param $mapperKeys
+   * @param null $mapperSoftCredit
+   * @param null $mapperPhoneType
+   * @param null $mapperSoftCreditType
    */
   public function __construct(&$mapperKeys, $mapperSoftCredit = NULL, $mapperPhoneType = NULL, $mapperSoftCreditType = NULL) {
     parent::__construct();
@@ -566,6 +570,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
 
   /**
    * Process pledge payments
+   * @param $formatted
+   * @return int
    */
   public function processPledgePayments(&$formatted) {
     if (!empty($formatted['pledge_payment_id']) && !empty($formatted['pledge_id'])) {

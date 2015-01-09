@@ -770,7 +770,8 @@ AND    u.status = 1
   }
 
   /**
-   *
+   * @param null $scriptFilename
+   * @return null|string
    */
   public function cmsRootPath($scriptFilename = NULL) {
     $cmsRoot = $valid = NULL;

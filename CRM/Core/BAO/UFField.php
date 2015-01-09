@@ -155,6 +155,8 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
 
   /**
    * Does profile consists of a multi-record custom field
+   * @param $gId
+   * @return bool
    */
   public static function checkMultiRecordFieldExists($gId) {
     $queryString = "SELECT f.field_name
@@ -397,6 +399,8 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   /**
    * Find out whether given profile group using Activity
    * Profile fields with contact fields
+   * @param $ufGroupId
+   * @return bool
    */
   public static function checkContactActivityProfileType($ufGroupId) {
     $ufGroup = new CRM_Core_DAO_UFGroup();

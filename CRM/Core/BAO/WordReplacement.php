@@ -193,6 +193,8 @@ WHERE  domain_id = %1
 
   /**
    * Rebuild
+   * @param bool $clearCaches
+   * @return bool
    */
   public static function rebuild($clearCaches = TRUE) {
     $id = CRM_Core_Config::domainID();

@@ -91,6 +91,7 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param string $column
    * @param bool $force
    *
+   * @param bool $allStatus
    * @return array - array reference of all membership statuss if any
    * @static
    */

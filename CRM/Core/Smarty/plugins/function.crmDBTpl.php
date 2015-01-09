@@ -36,7 +36,8 @@
 /**
  * load a context. If name is asked for only name data is returned.
  * And if name is not provided whole context is returned.
- *
+ * @param $params
+ * @param $smarty
  */
 function smarty_function_crmDBTpl($params, &$smarty) {
   // $vars = array('context', 'name', 'assign' ); out of which name is optional

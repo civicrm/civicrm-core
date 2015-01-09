@@ -133,6 +133,9 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider composeQueryExamples
+   * @param $inputSql
+   * @param $inputParams
+   * @param $expectSql
    */
   public function testComposeQuery($inputSql, $inputParams, $expectSql) {
     $actualSql = CRM_Core_DAO::composeQuery($inputSql, $inputParams);
@@ -177,6 +180,10 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider sqlNameDataProvider
+   * @param $inputData
+   * @param $length
+   * @param $makeRandom
+   * @param $expectedResult
    */
   public function testShortenSQLName($inputData, $length, $makeRandom, $expectedResult) {
     $this->assertEquals($expectedResult, CRM_Core_DAO::shortenSQLName($inputData, $length, $makeRandom));

@@ -1501,14 +1501,13 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    * @param int $toID
    *   The contact id of the recipient.
    * @param $tokenText
-   * @param $tokenHtml
    * @param array $smsParams
    *   The params used for sending sms.
    * @param int $activityID
    *   The activity ID that tracks the message.
    * @param int $userID
-   *
-   * @return mixed                    true on success or PEAR_Error object
+   * @return mixed true on success or PEAR_Error object
+   * @internal param $tokenHtml
    * @static
    */
   static function sendSMSMessage(

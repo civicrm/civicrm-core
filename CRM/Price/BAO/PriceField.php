@@ -779,10 +779,10 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
    * @param string $displayOpt
    *   Tax display setting option.
    *
+   * @param $taxTerm
    * @return string $label tax label for custom field
    *
    * @static
-   *
    */
   public static function getTaxLabel($opt, $valueFieldName, $displayOpt, $taxTerm) {
     if ($displayOpt == 'Do_not_show') {

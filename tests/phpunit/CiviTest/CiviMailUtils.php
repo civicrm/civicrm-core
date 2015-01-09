@@ -272,6 +272,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
 
   /**
    * Check that mail log is empty
+   * @param string $prefix
    */
   public function assertMailLogEmpty($prefix = '') {
     $mail = $this->getMostRecentEmail('raw');

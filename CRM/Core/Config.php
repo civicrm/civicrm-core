@@ -701,6 +701,9 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
   /**
    * One function to get domain ID
+   * @param null $domainID
+   * @param bool $reset
+   * @return int|null
    */
   public static function domainID($domainID = NULL, $reset = FALSE) {
     static $domain;
@@ -717,6 +720,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   /**
    * Do general cleanup of caches, temp directories and temp tables
    * CRM-8739
+   * @param bool $sessionReset
    */
   public function cleanupCaches($sessionReset = TRUE) {
     // cleanup templates_c directory
@@ -828,6 +832,8 @@ AND
 
   /**
    * Check if running in upgrade mode
+   * @param null $path
+   * @return bool
    */
   public static function isUpgradeMode($path = NULL) {
     if (defined('CIVICRM_UPGRADE_ACTIVE')) {
@@ -854,6 +860,7 @@ AND
 
   /**
    * Wrapper function to allow unit tests to switch user framework on the fly
+   * @param null $userFramework
    */
   public function setUserFramework($userFramework = NULL) {
     $this->userFramework = $userFramework;

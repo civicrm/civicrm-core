@@ -1582,8 +1582,6 @@ SELECT contact_id
    * @param array $params
    * @param int $numObjects
    * @param bool $createOnly
-   *
-   * @return
    */
   static function createTestObject(
     $daoName,
