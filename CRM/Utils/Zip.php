@@ -61,7 +61,8 @@ class CRM_Utils_Zip {
         else {
           return FALSE;
         }
-      }  elseif (0 != substr_compare($base, $filename, 0, $baselen)) {
+      }
+      elseif (0 != substr_compare($base, $filename, 0, $baselen)) {
         return FALSE;
       }
     }

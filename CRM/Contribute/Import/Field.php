@@ -176,7 +176,7 @@ class CRM_Contribute_Import_Field {
         else {
           return FALSE;
         }
-          break;
+        break;
 
       case 'payment_instrument':
         static $paymentInstruments = NULL;

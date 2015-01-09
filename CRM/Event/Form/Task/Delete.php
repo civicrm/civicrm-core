@@ -125,7 +125,7 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
 
     $status = array(ts('Participant(s) Deleted: %1 (Total Selected: %2)', array(1 => $deletedParticipants, 2 => count($this->_participantIds))));
     if (!empty($participantLinks)) {
-      $status[] = ts('The following participants no longer have an event fee recorded. You can edit their registration and record a replacement contribution by clicking the links below:') . '<br>' . $participantLinks;
+      $status[] = ts('The following participants no longer have an event fee recorded. You can edit their registration and record a replacement contribution by clicking the links below:') . '<br/>' . $participantLinks;
     }
     foreach ($status as $text) {
       CRM_Core_Session::setStatus($text, '', 'info');

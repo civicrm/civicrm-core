@@ -186,7 +186,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
         );
         if ($isMultiple) {
           $this->assign('multiRecordDisplay', $this->_multiRecordDisplay);
-          $saveButtonName = $this->_copyValueId ? 'Save a Copy': 'Save';
+          $saveButtonName = $this->_copyValueId ? 'Save a Copy' : 'Save';
           $this->addButtons(array(
               array(
                 'type' => 'upload',

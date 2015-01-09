@@ -1123,7 +1123,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           if ($fixed_period_start_day) {
             $date = explode('-', date('Y-m-d'));
             $month = substr($fixed_period_start_day, 0, strlen($fixed_period_start_day) - 2);
-            $day = substr($fixed_period_start_day, -2) . "<br>";
+            $day = substr($fixed_period_start_day, -2) . "<br/>";
             $year = $date[0];
             $startDate = $year . '-' . $month . '-' . $day;
           }

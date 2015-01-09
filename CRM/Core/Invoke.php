@@ -107,7 +107,7 @@ class CRM_Core_Invoke {
    * @void
    */
   static public function hackMenuRebuild($args) {
-    if (array('civicrm','menu','rebuild') == $args || array('civicrm', 'clearcache') == $args) {
+    if (array('civicrm', 'menu', 'rebuild') == $args || array('civicrm', 'clearcache') == $args) {
       // ensure that the user has a good privilege level
       if (CRM_Core_Permission::check('administer CiviCRM')) {
         self::rebuildMenuAndCaches();
@@ -268,7 +268,7 @@ class CRM_Core_Invoke {
 
       $result = NULL;
       if (is_array($item['page_callback'])) {
-        require_once (str_replace('_', DIRECTORY_SEPARATOR, $item['page_callback'][0]) . '.php');
+        require_once str_replace('_', DIRECTORY_SEPARATOR, $item['page_callback'][0]) . '.php';
         $result = call_user_func($item['page_callback']);
       }
       elseif (strstr($item['page_callback'], '_Form')) {
@@ -281,7 +281,7 @@ class CRM_Core_Invoke {
       }
       else {
         $newArgs = explode('/', $_GET[$config->userFrameworkURLVar]);
-        require_once (str_replace('_', DIRECTORY_SEPARATOR, $item['page_callback']) . '.php');
+        require_once str_replace('_', DIRECTORY_SEPARATOR, $item['page_callback']) . '.php';
         $mode = 'null';
         if (isset($pageArgs['mode'])) {
           $mode = $pageArgs['mode'];

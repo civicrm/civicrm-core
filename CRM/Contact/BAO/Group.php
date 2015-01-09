@@ -720,8 +720,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @return array   $groupList associated array of group list
    *  -rp = rowcount
    *  -page= offset
-   *  @todo there seems little reason for the small number of functions that call this to pass in
-   *  params that then need to be translated in this function since they are coding them when calling
+   * @todo there seems little reason for the small number of functions that call this to pass in
+   * params that then need to be translated in this function since they are coding them when calling
    */
   static public function getGroupListSelector(&$params) {
     // format the params

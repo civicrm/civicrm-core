@@ -328,7 +328,7 @@ ACOS(
 
     $query->_tables['civicrm_address'] = $query->_whereTables['civicrm_address'] = 1;
 
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $fnName) . '.php');
+    require_once str_replace('_', DIRECTORY_SEPARATOR, $fnName) . '.php';
     $fnName::format($proximityAddress);
     if (
       !is_numeric(CRM_Utils_Array::value('geo_code_1', $proximityAddress)) ||

@@ -36,7 +36,7 @@
 /**
  *
  */
-class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
+class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase {
 
   /**
    * Is this user someone with access for the entire system

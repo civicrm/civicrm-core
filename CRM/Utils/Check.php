@@ -115,8 +115,7 @@ class CRM_Utils_Check {
    * plugin status page or the Drupal admin/reports/status path.
    *
    * @return array of messages
-   * @see Drupal's hook_requirements() -
-   * https://api.drupal.org/api/drupal/modules%21system%21system.api.php/function/hook_requirements
+   * @link https://api.drupal.org/api/drupal/modules%21system%21system.api.php/function/hook_requirements
    */
   public function checkAll() {
     $checks = array();

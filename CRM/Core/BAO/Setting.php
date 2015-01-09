@@ -555,7 +555,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     );
     $settingParams = array_diff_key($params, array_fill_keys($ignoredParams, TRUE));
     $getFieldsParams = array('version' => 3);
-    if (count($settingParams) ==1) {
+    if (count($settingParams) == 1) {
       // ie we are only setting one field - we'll pass it into getfields for efficiency
       list($name) = array_keys($settingParams);
       $getFieldsParams['name'] = $name;
@@ -788,7 +788,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     // whenever there is a possibility of more than one domain we must force it
     $config = CRM_Core_Config::singleton();
     if (empty($domainID)) {
-      $domainID= CRM_Core_Config::domainID();
+      $domainID = CRM_Core_Config::domainID();
     }
     $domain = new CRM_Core_DAO_Domain();
     $domain->id = $domainID;

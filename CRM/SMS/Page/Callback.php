@@ -33,8 +33,7 @@
  *
  */
 
-class CRM_SMS_Page_Callback
-{
+class CRM_SMS_Page_Callback {
 
   public function run() {
     $provider = CRM_SMS_Provider::singleton($_REQUEST);

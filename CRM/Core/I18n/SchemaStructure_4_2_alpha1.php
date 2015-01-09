@@ -31,13 +31,11 @@
  * $Id$
  *
  */
-class CRM_Core_I18n_SchemaStructure_4_2_alpha1
-{
+class CRM_Core_I18n_SchemaStructure_4_2_alpha1 {
   /**
    * @return array
    */
-  public static function &columns()
-  {
+  public static function &columns() {
     static $result = NULL;
     if (!$result) {
       $result = array(

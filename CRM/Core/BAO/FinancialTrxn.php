@@ -205,7 +205,7 @@ WHERE ft.entity_table = 'civicrm_contribution' AND ft.entity_id = %1
         ";
 
     $sqlParams = array(1 => array($entity_id, 'Integer'));
-    return  CRM_Core_DAO::singleValueQuery($query, $sqlParams);
+    return CRM_Core_DAO::singleValueQuery($query, $sqlParams);
 
   }
 
@@ -328,7 +328,7 @@ WHERE ceft.entity_id = %1";
       $financialAccountType = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id']);
       $accountRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND label IN ('Premiums Inventory Account is', 'Cost of Sales Account is')");
       $toFinancialAccount = !empty($params['isDeleted']) ? 'Premiums Inventory Account is' : 'Cost of Sales Account is';
-      $fromFinancialAccount = !empty($params['isDeleted']) ? 'Cost of Sales Account is': 'Premiums Inventory Account is';
+      $fromFinancialAccount = !empty($params['isDeleted']) ? 'Cost of Sales Account is' : 'Premiums Inventory Account is';
       $accountRelationship = array_flip($accountRelationship);
       $financialtrxn = array(
         'to_financial_account_id' => $financialAccountType[$accountRelationship[$toFinancialAccount]],

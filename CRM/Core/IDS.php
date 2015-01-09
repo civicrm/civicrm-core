@@ -181,7 +181,7 @@ class CRM_Core_IDS {
    *
    * @return boolean
    */
-  private function react(IDS_Report$result) {
+  private function react(IDS_Report $result) {
 
     $impact = $result->getImpact();
     if ($impact >= $this->threshold['kick']) {
