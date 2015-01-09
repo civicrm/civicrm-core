@@ -133,7 +133,6 @@ function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array()
 
 /**
  *
- * @param <type> $data
  * @param array $data
  *
  * @throws API_Exception
@@ -1831,7 +1830,7 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
  *   E.g. "user_contact_id" or "@user:username".
  * @return int|NULL|'unknown-user'
  */
-function  _civicrm_api3_resolve_contactID($contactIdExpr) {
+function _civicrm_api3_resolve_contactID($contactIdExpr) {
   //if value = 'user_contact_id' replace value with logged in user id
   if ($contactIdExpr == "user_contact_id") {
     return CRM_Core_Session::getLoggedInContactID();
