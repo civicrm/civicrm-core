@@ -241,7 +241,8 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
    *
    * @return void
    */
-  public function postProcess() {}
+  public function postProcess() {
+  }
 
   /**
    * Return a descriptive name for the page, used in wizard header

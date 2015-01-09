@@ -192,7 +192,8 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addElement('select',
       'operator',
       ts('Search Operator'),
-      array('AND' => ts('AND'),
+      array(
+        'AND' => ts('AND'),
         'OR' => ts('OR'),
       )
     );
@@ -234,7 +235,8 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addElement('select',
       'privacy_operator',
       ts('Operator'),
-      array('OR' => ts('OR'),
+      array(
+        'OR' => ts('OR'),
         'AND' => ts('AND'),
       )
     );

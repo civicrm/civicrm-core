@@ -1045,7 +1045,8 @@ WHERE  ( group_name = %1
 OR       group_name = %2 )
 AND domain_id = %3
 ";
-    $sqlParams = array(1 => array(self::DIRECTORY_PREFERENCES_NAME, 'String'),
+    $sqlParams = array(
+      1 => array(self::DIRECTORY_PREFERENCES_NAME, 'String'),
       2 => array(self::URL_PREFERENCES_NAME, 'String'),
       3 => array(CRM_Core_Config::domainID(), 'Integer'),
     );

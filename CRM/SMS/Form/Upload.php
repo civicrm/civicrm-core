@@ -170,7 +170,8 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     $this->addFormRule(array('CRM_SMS_Form_Upload', 'formRule'), $this);
 
     $buttons = array(
-      array('type' => 'back',
+      array(
+        'type' => 'back',
         'name' => ts('Previous'),
       ),
       array(
@@ -314,7 +315,8 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     $mailing->find(TRUE);
 
     $session = CRM_Core_Session::singleton();
-    $values = array('contact_id' => $session->get('userID'),
+    $values = array(
+      'contact_id' => $session->get('userID'),
       'version' => 3,
     );
     require_once 'api/api.php';

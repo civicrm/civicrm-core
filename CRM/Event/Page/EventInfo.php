@@ -214,10 +214,12 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
         }
       }
 
-      $center = array('lat' => (float ) $sumLat / count($locations),
+      $center = array(
+        'lat' => (float ) $sumLat / count($locations),
         'lng' => (float ) $sumLng / count($locations),
       );
-      $span = array('lat' => (float )($maxLat - $minLat),
+      $span = array(
+        'lat' => (float )($maxLat - $minLat),
         'lng' => (float )($maxLng - $minLng),
       );
       $this->assign_by_ref('center', $center);
@@ -310,7 +312,8 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $this->assign('allowRegistration', $allowRegistration);
 
     $session = CRM_Core_Session::singleton();
-    $params = array('contact_id' => $session->get('userID'),
+    $params = array(
+      'contact_id' => $session->get('userID'),
       'event_id' => CRM_Utils_Array::value('id', $values['event']),
       'role_id' => CRM_Utils_Array::value('default_role_id', $values['event']),
     );

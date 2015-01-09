@@ -213,7 +213,8 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
         // save the changes
         $result = CRM_Contribute_BAO_ContributionRecur::add($params);
         $status = ts('Recurring contribution has been updated to: %1, every %2 %3(s) for %4 installments.',
-                     array(1 => CRM_Utils_Money::format($params['amount'], $this->_subscriptionDetails->currency),
+                     array(
+                           1 => CRM_Utils_Money::format($params['amount'], $this->_subscriptionDetails->currency),
                            2 => $this->_subscriptionDetails->frequency_interval,
                            3 => $this->_subscriptionDetails->frequency_unit,
                            4 => $params['installments'],

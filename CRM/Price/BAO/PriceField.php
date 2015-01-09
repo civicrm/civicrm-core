@@ -334,7 +334,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         $element = &$qf->add('text', $elementName, $label,
                    array_merge($extra,
-                     array('price' => json_encode(array($optionKey, $priceVal)),
+                     array(
+                       'price' => json_encode(array($optionKey, $priceVal)),
                        'size' => '4',
                      )
                    ),
@@ -395,7 +396,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
           $priceVal = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value));
-          $extra = array('price' => json_encode(array($elementName, $priceVal)),
+          $extra = array(
+                   'price' => json_encode(array($elementName, $priceVal)),
                    'data-amount' => $opt[$valueFieldName],
                    'data-currency' => $currencyName,
           );
@@ -530,7 +532,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           }
           $priceVal = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value));
           $check[$opId] = &$qf->createElement('checkbox', $opt['id'], NULL, $opt['label'],
-            array('price' => json_encode(array($opt['id'], $priceVal)),
+            array(
+             'price' => json_encode(array($opt['id'], $priceVal)),
              'data-amount' => $opt[$valueFieldName],
              'data-currency' => $currencyName,
             )

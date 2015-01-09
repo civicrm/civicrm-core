@@ -51,7 +51,8 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT implements CRM_Contact_Form_Se
       ts('Contribution Amount') => 'donation_amount',
     );
 
-    $this->_amounts = array('min_amount_1' => ts('Min Amount One'),
+    $this->_amounts = array(
+      'min_amount_1' => ts('Min Amount One'),
       'max_amount_1' => ts('Max Amount One'),
       'min_amount_2' => ts('Min Amount Two'),
       'max_amount_2' => ts('Max Amount Two'),
@@ -59,7 +60,8 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT implements CRM_Contact_Form_Se
       'exclude_max_amount' => ts('Exclusion Max Amount'),
     );
 
-    $this->_dates = array('start_date_1' => ts('Start Date One'),
+    $this->_dates = array(
+      'start_date_1' => ts('Start Date One'),
       'end_date_1' => ts('End Date One'),
       'start_date_2' => ts('Start Date Two'),
       'end_date_2' => ts('End Date Two'),

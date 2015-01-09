@@ -64,9 +64,10 @@ WHERE  cacheKey     = %3 AND
        entity_table = 'civicrm_contact'
 ";
 
-      $params = array(1 => array($id1, 'Integer'),
-                2 => array($id2, 'Integer'),
-                3 => array($cacheKey, 'String'),
+      $params = array(
+        1 => array($id1, 'Integer'),
+        2 => array($id2, 'Integer'),
+        3 => array($cacheKey, 'String'),
       );
 
       $mergeId = CRM_Core_DAO::singleValueQuery($query, $params);
@@ -81,8 +82,9 @@ WHERE  cacheKey     = %3 AND
         $where = " AND {$where}";
 
       }
-      $p = array(1 => array($mergeId, 'Integer'),
-           2 => array($cacheKey, 'String'),
+      $p = array(
+        1 => array($mergeId, 'Integer'),
+        2 => array($cacheKey, 'String'),
       );
       $sql       = "SELECT pn.id, pn.entity_id1, pn.entity_id2, pn.data FROM civicrm_prevnext_cache pn {$join} ";
       $wherePrev = " WHERE pn.id < %1 AND pn.cacheKey = %2 {$where} ORDER BY ID DESC LIMIT 1";

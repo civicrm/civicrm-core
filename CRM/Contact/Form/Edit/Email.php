@@ -73,7 +73,8 @@ class CRM_Contact_Form_Edit_Email {
 
       //On-hold select
       if ($multipleBulk) {
-        $holdOptions = array(0 => ts('- select -'),
+        $holdOptions = array(
+          0 => ts('- select -'),
           1 => ts('On Hold Bounce'),
           2 => ts('On Hold Opt Out'),
         );

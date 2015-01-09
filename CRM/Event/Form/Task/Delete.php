@@ -74,7 +74,8 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
    * @return void
    */
   public function buildQuickForm() {
-    $deleteParticipants = array(1 => ts('Delete this participant record along with associated participant record(s).'),
+    $deleteParticipants = array(
+      1 => ts('Delete this participant record along with associated participant record(s).'),
       2 => ts('Delete only this participant record.'),
     );
 

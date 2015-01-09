@@ -435,7 +435,8 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    * @return string
    *   name of the file
    */
-  public function getExportFileName($output = 'csv') {}
+  public function getExportFileName($output = 'csv') {
+  }
 
   public function eventToTitle() {
     static $events = NULL;

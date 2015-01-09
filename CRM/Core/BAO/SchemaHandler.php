@@ -482,7 +482,8 @@ UPDATE civicrm_custom_field
 SET    text_length = %1
 WHERE  id = %2
 ";
-    $params = array(1 => array($length, 'Integer'),
+    $params = array(
+      1 => array($length, 'Integer'),
       2 => array($customFieldID, 'Integer'),
     );
     CRM_Core_DAO::executeQuery($sql, $params);

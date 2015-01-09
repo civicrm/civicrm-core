@@ -355,7 +355,8 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * @return void
    * @see valid_date
    */
-  public function addRules() {}
+  public function addRules() {
+  }
 
   /**
    * Set the default form values

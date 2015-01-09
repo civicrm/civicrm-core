@@ -83,7 +83,8 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
     $this->addFormRule(array('CRM_SMS_Form_Schedule', 'formRule'), $this);
 
     $buttons = array(
-      array('type' => 'back',
+      array(
+        'type' => 'back',
         'name' => ts('Previous'),
       ),
       array(

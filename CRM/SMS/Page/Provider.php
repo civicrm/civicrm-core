@@ -106,7 +106,8 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
   public function run() {
     // set title and breadcrumb
     CRM_Utils_System::setTitle(ts('Settings - SMS Provider'));
-    $breadCrumb = array(array('title' => ts('SMS Provider'),
+    $breadCrumb = array(array(
+        'title' => ts('SMS Provider'),
         'url' => CRM_Utils_System::url('civicrm/admin/sms/provider',
           'reset=1'
         ),

@@ -141,8 +141,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    * We are retrieving primary here - checking the actual sql seems super prescriptive - but since the massive query object has
    * so few tests detecting any change seems good here :-)
    */
-  public function testSearchProfilePrimaryCityCRM14263()
-    {
+  public function testSearchProfilePrimaryCityCRM14263() {
     $contactID = $this->individualCreate();
     CRM_Core_Config::singleton()->defaultSearchProfileID = 1;
     $this->callAPISuccess('address', 'create', array('contact_id' => $contactID, 'city' => 'Cool City', 'location_type_id' => 1));
