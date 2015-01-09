@@ -49,7 +49,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return object     CRM_Core_DAO_Mapping object on success, otherwise null
+   * @return object     CRM_Core_DAO_Mapping object on success, otherwise NULL
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -100,7 +100,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param array $params
    *   An array of name/value pairs.
    *
-   * @return object    CRM_Core_DAO_Mapper object on success, otherwise null
+   * @return object    CRM_Core_DAO_Mapper object on success, otherwise NULL
    * @static
    */
   public static function add($params) {
@@ -248,7 +248,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param int $columnNo
    * @param int $blockCount
    *   (no of blocks shown).
-   * @param null $exportMode
+   * @param NULL $exportMode
    *
    * @return void
    * @static
@@ -598,7 +598,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
               // FIX ME: For now let's not expose custom data related to relationship
               $relationshipCustomFields = array();
               //$relationshipCustomFields    = self::getRelationTypeCustomGroupData( $id );
-              //asort( $relationshipCustomFields ) ;
+              //asort($relationshipCustomFields);
 
               $relationshipType = new CRM_Contact_BAO_RelationshipType();
               $relationshipType->id = $id;
@@ -1037,7 +1037,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           }
 
           // CRM-14983: verify if values are comma separated convert to array
-          if (!is_array($value) && (strpos($value,',') !== false || strstr($value, '(')) && empty($isCustomField) && $params['operator'][$key][$k] == 'IN') {
+          if (!is_array($value) && (strpos($value,',') !== FALSE || strstr($value, '(')) && empty($isCustomField) && $params['operator'][$key][$k] == 'IN') {
             preg_match('#\((.*?)\)#', $value, $match);
             $tmpArray = explode(',', $match[1]);
             $value = array_combine(array_values($tmpArray),array_values($tmpArray));
@@ -1156,7 +1156,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param int $mappingId
    *   Mapping id.
    *
-   * @return null
+   * @return NULL
    * @static
    */
   public static function saveMappingFields(&$params, $mappingId) {

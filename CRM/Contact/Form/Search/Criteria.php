@@ -85,7 +85,7 @@ class CRM_Contact_Form_Search_Criteria {
 
       $used_for = CRM_Core_OptionGroup::values('tag_used_for');
       $tagsTypes = array();
-      $showAllTagTypes = false;
+      $showAllTagTypes = FALSE;
       foreach ($used_for as $key => $value) {
         //check tags for every type and find if there are any defined
         $tags = CRM_Core_BAO_Tag::getTagsUsedFor($key, FALSE, TRUE, NULL);
@@ -94,7 +94,7 @@ class CRM_Contact_Form_Search_Criteria {
         if (count($tags) && $key != 'civicrm_file' && $key != 'civicrm_contact') {
           //if tags exists then add type to display in adv search form help text
           $tagsTypes[] = ts($value);
-          $showAllTagTypes = true;
+          $showAllTagTypes = TRUE;
         }
       }
       $tagTypesText = implode(" or ", $tagsTypes);

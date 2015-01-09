@@ -182,7 +182,7 @@ function _civicrm_api3_membership_get_spec(&$params) {
  * This api will return the membership records for the contacts
  * having membership based on the relationship with the direct members.
  *
- * @param Array $params
+ * @param array $params
  *   Key/value pairs for contact_id and some.
  *          options affecting the desired results; has legacy support
  *          for just passing the contact_id itself as the argument

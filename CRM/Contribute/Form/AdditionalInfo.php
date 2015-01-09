@@ -197,7 +197,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @param array $params
    * @param int $contributionID
    * @param int $premiumID
-   * @param null $options
+   * @param NULL $options
    * @return void
    */
   public static function processPremium(&$params, $contributionID, $premiumID = NULL, &$options = NULL) {
@@ -377,8 +377,7 @@ class CRM_Contribute_Form_AdditionalInfo {
         $params['product_name'] = $productDAO->name;
         $params['product_sku'] = $productDAO->sku;
 
-        if (empty($params['product_option']) && !empty($form->_options
-[$params['product_name'][0]])) {
+        if (empty($params['product_option']) && !empty($form->_options[$params['product_name'][0]])) {
           $params['product_option'] = $form->_options[$params['product_name'][0]][$params['product_name'][1]];
         }
       }

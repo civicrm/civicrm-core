@@ -58,7 +58,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @return CRM_Core_BAO_FinancialTrxn object
    * @static
    */
-  public static function create(&$params, $trxnEntityTable = null) {
+  public static function create(&$params, $trxnEntityTable = NULL) {
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->copyValues($params);
     $fids = array();
@@ -133,11 +133,11 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   public static function retrieve(&$params, &$defaults) {
     $financialItem = new CRM_Financial_DAO_FinancialTrxn();
     $financialItem->copyValues($params);
-    if ($financialItem->find(true)) {
+    if ($financialItem->find(TRUE)) {
       CRM_Core_DAO::storeValues($financialItem, $defaults);
       return $financialItem;
     }
-    return null;
+    return NULL;
   }
 
   /**
@@ -205,7 +205,7 @@ WHERE ft.entity_table = 'civicrm_contribution' AND ft.entity_id = %1
         ";
 
     $sqlParams = array(1 => array($entity_id, 'Integer'));
-    return  CRM_Core_DAO::singleValueQuery($query, $sqlParams);
+    return CRM_Core_DAO::singleValueQuery($query, $sqlParams);
 
   }
 
@@ -288,7 +288,7 @@ WHERE lt.entity_id = %1 ";
       return $result;
     }
     else {
-      return null;
+      return NULL;
     }
   }
 
@@ -296,7 +296,8 @@ WHERE lt.entity_id = %1 ";
    * Delete financial transaction
    *
    * @param int $entity_id
-   * @return true on success, false otherwise
+   * @return bool
+   *   TRUE on success, FALSE otherwise.
    * @static
    */
   public static function deleteFinancialTrxn($entity_id) {
@@ -327,7 +328,7 @@ WHERE ceft.entity_id = %1";
       $financialAccountType = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id']);
       $accountRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND label IN ('Premiums Inventory Account is', 'Cost of Sales Account is')");
       $toFinancialAccount = !empty($params['isDeleted']) ? 'Premiums Inventory Account is' : 'Cost of Sales Account is';
-      $fromFinancialAccount = !empty($params['isDeleted']) ? 'Cost of Sales Account is': 'Premiums Inventory Account is';
+      $fromFinancialAccount = !empty($params['isDeleted']) ? 'Cost of Sales Account is' : 'Premiums Inventory Account is';
       $accountRelationship = array_flip($accountRelationship);
       $financialtrxn = array(
         'to_financial_account_id' => $financialAccountType[$accountRelationship[$toFinancialAccount]],
@@ -425,9 +426,9 @@ WHERE ceft.entity_id = %1";
    * @param int $entityId
    * @param string $entityName
    * @param bool $returnType
-   * @param null $lineItemTotal
+   * @param NULL $lineItemTotal
    *
-   * @return array|int|null|string
+   * @return array|int|NULL|string
    */
   public static function getPartialPaymentWithType($entityId, $entityName = 'participant', $returnType = TRUE, $lineItemTotal = NULL) {
     $value = NULL;

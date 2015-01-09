@@ -154,7 +154,7 @@ class Manager {
    */
   public function getBaseFrame() {
     if (empty($this->frames)) return NULL;
-    return $this->frames[count($this->frames)-1];
+    return $this->frames[count($this->frames) - 1];
   }
 
   /**

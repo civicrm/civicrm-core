@@ -14,7 +14,7 @@ describe('crmMailing', function() {
     beforeEach(function() {
       navigator = jasmine.createSpyObj('crmNavigator', ['redirect']);
       module(function ($provide) {
-        $provide.value('crmNavigator', navigator) 
+        $provide.value('crmNavigator', navigator)
       });
       inject(['crmLegacy', function(crmLegacy) {
         crmLegacy.url({back: '/*path*?*query*', front: '/*path*?*query*'});

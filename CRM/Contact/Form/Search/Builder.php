@@ -468,18 +468,18 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    * CRM-10338
    * tags and groups use array keys for selection list.
    * if using IS NULL/NOT NULL, an array with no array key is created
-   * convert that to simple null so processing can proceed
+   * convert that to simple NULL so processing can proceed
    */
   public static function checkArrayKeyEmpty($val) {
     if (is_array($val)) {
-      $v2empty = true;
+      $v2empty = TRUE;
       foreach ($val as $vk => $vv) {
         if (!empty($vk)) {
-          $v2empty = false;
+          $v2empty = FALSE;
         }
       }
       if ($v2empty) {
-        $val = null;
+        $val = NULL;
       }
     }
     return $val;

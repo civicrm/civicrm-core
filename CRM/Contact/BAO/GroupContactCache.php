@@ -43,7 +43,7 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * @param $groupIDs
    *   Of group that we are checking against.
    *
-   * @return boolean true if we did not regenerate, false if we did
+   * @return boolean TRUE if we did not regenerate, FALSE if we did
    */
   public static function check($groupIDs) {
     if (empty($groupIDs)) {
@@ -65,7 +65,7 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * @return string the sql query which lists the groups that need to be refreshed
    * @static
    */
-  public static function groupRefreshedClause($groupIDClause = null, $includeHiddenGroups = FALSE) {
+  public static function groupRefreshedClause($groupIDClause = NULL, $includeHiddenGroups = FALSE) {
     $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
     $now = CRM_Utils_Date::getUTCTime();
 
@@ -121,13 +121,13 @@ AND     ( g.cache_date IS NULL OR
    * @param int $limit
    *   Limits the number of groups we evaluate.
    *
-   * @return boolean true if we did not regenerate, false if we did
+   * @return boolean TRUE if we did not regenerate, FALSE if we did
    */
-  public static function loadAll($groupIDs = null, $limit = 0) {
+  public static function loadAll($groupIDs = NULL, $limit = 0) {
     // ensure that all the smart groups are loaded
     // this function is expensive and should be sparingly used if groupIDs is empty
     if (empty($groupIDs)) {
-      $groupIDClause = null;
+      $groupIDClause = NULL;
       $groupIDs = array();
     }
     else {
@@ -291,7 +291,7 @@ WHERE  id IN ( $groupIDs )
     static $invoked = FALSE;
 
     // typically this needs to happy only once per instance
-    // this is especially true in import, where we dont need
+    // this is especially TRUE in import, where we dont need
     // to do this all the time
     // this optimization is done only when no groupID is passed
     // i.e. cache is reset for all groups
@@ -315,7 +315,7 @@ WHERE  id IN ( $groupIDs )
       unset(self::$_alreadyLoaded[$groupID]);
     }
 
-    $refresh = null;
+    $refresh = NULL;
     $params  = array();
     $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
 
@@ -397,7 +397,8 @@ WHERE  id = %1
    * Removes one or more contacts from the smart group cache
    * @param int|array $cid
    * @param int $groupId
-   * @return bool - true if successful
+   * @return bool
+   *   TRUE if successful.
    */
   public static function removeContact($cid, $groupId = NULL) {
     $cids = array();
@@ -642,7 +643,7 @@ ORDER BY   gc.contact_id, g.children
 
     $dao = CRM_Core_DAO::executeQuery($sql);
     $contactGroup = array();
-    $prevContactID = null;
+    $prevContactID = NULL;
     while ($dao->fetch()) {
       if (
         $prevContactID &&

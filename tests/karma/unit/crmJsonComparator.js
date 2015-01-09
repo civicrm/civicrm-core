@@ -10,7 +10,7 @@ describe('crmJsonComparator', function() {
   beforeEach(function() {
     inject(function(crmJsonComparator) {
       comparator = crmJsonComparator;
-    }); 
+    });
   });
 
   it('should return false when comparing different objects', function() {
@@ -23,7 +23,7 @@ describe('crmJsonComparator', function() {
     expect(result.pass).toBe(true);
   });
 
-  it('should explain what part of the comparison failed when comparing objects', function() { 
+  it('should explain what part of the comparison failed when comparing objects', function() {
     var result = comparator.compare({'foo': 'bar'}, {'bar': 'foo'});
     expect(result.message).toBe('Could not find key \'bar\' in actual data at root.');
   });

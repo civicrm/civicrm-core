@@ -531,7 +531,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     }
     $input['invoice'] = self::getValue('i', FALSE);
     $this->getInput($input, $ids);
-    if ($this-> transactionExists($input['trxn_id'])) {
+    if ($this->transactionExists($input['trxn_id'])) {
       throw new CRM_Core_Exception('This transaction has already been processed');
     }
 

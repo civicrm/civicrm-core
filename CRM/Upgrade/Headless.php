@@ -35,7 +35,6 @@ class CRM_Upgrade_Headless {
    *
    * @param bool $enablePrint
    *
-   * @throws
    * @throws Exception
    * @return array, with keys:
    *   - message: string, HTML-ish blob

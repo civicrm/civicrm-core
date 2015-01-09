@@ -842,7 +842,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * Setter for $_limitValue
    *
-   * @param number $_limitValue
+   * @param int $_limitValue
    */
   public function setLimitValue($_limitValue) {
     $this->_limitValue = $_limitValue;
@@ -851,7 +851,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * Setter for $_offsetValue
    *
-   * @param number $_offsetValue
+   * @param int $_offsetValue
    */
   public function setOffsetValue($_offsetValue) {
     $this->_offsetValue = $_offsetValue;
@@ -2752,9 +2752,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
               if (in_array($op, array('bw', 'nbw')) && ($min || $max)) {
                 $value = "{$pair[$op]} $min " . ts('and') . " $max";
               }
-              elseif ($val && CRM_Utils_Array::value('operatorType', $field) &
-                self::OP_ENTITYREF
-              ) {
+              elseif ($val && CRM_Utils_Array::value('operatorType', $field) & self::OP_ENTITYREF) {
                 $this->setEntityRefDefaults($field, $tableName);
                 $result = civicrm_api3($field['attributes']['entity'], 'getlist',
                   array('id' => $val) +

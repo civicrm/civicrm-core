@@ -33,9 +33,8 @@
  *
  */
 
-/**r
- * This class generates form components for the display preferences
- *
+/**
+ * This class generates form components for the display preferences.
  */
 class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   public function preProcess() {

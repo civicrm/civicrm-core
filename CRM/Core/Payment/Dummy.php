@@ -14,9 +14,8 @@
  * $Id: Dummy.php 45429 2013-02-06 22:11:18Z lobo $
  */
 
-/* NOTE:
- * When looking up response codes in the Authorize.Net API, they
- * begin at one, so always delete one from the "Position in Response"
+/**
+ * Dummy payment processor
  */
 class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   const CHARSET = 'iso-8859-1';

@@ -196,7 +196,7 @@ WHERE pp.payment_processor_type_id = ppt.id AND ppt.id = %1";
     $paymentProcessorType = new CRM_Financial_DAO_PaymentProcessorType();
     $paymentProcessorType->id = $paymentProcessorTypeId;
     if ($paymentProcessorType->delete()) {
-      CRM_Core_Session::setStatus(ts('Selected Payment Processor type has been deleted.<br>'), '', 'success');
+      CRM_Core_Session::setStatus(ts('Selected Payment Processor type has been deleted.<br/>'), '', 'success');
       return TRUE;
     }
   }

@@ -52,7 +52,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object             DAO object on sucess, NULL otherwise
    *
    * @static
    */
@@ -130,7 +130,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_BAO_Navigation object on success, null otherwise
+   * @return CRM_Core_BAO_Navigation object on success, NULL otherwise
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -739,7 +739,7 @@ ORDER BY parent_id, weight";
       $parentClause = 'parent_id IS NULL';
     }
 
-    $incrementOtherNodes = true;
+    $incrementOtherNodes = TRUE;
     $sql    = "SELECT weight from civicrm_navigation WHERE {$parentClause} ORDER BY weight LIMIT %1, 1";
     $params = array(1 => array($position, 'Positive'));
     $newWeight = CRM_Core_DAO::singleValueQuery($sql, $params);
@@ -755,7 +755,7 @@ ORDER BY parent_id, weight";
       $newWeight = $newWeight + 1;
 
       // since this is a last node we don't need to increment other nodes
-      $incrementOtherNodes = false;
+      $incrementOtherNodes = FALSE;
     }
 
     $transaction = new CRM_Core_Transaction();
