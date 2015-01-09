@@ -568,12 +568,12 @@ function civicrm_api3_job_run_payment_cron($params) {
  * @access public
  */
 function civicrm_api3_job_cleanup($params) {
-  $session   = CRM_Utils_Array::value('session'   , $params, true );
+  $session   = CRM_Utils_Array::value('session', $params, true );
   $tempTable = CRM_Utils_Array::value('tempTables', $params, true );
-  $jobLog    = CRM_Utils_Array::value('jobLog'    , $params, true );
-  $prevNext  = CRM_Utils_Array::value('prevNext'  , $params, true );
-  $dbCache   = CRM_Utils_Array::value('dbCache'   , $params, false);
-  $memCache  = CRM_Utils_Array::value('memCache'  , $params, false);
+  $jobLog    = CRM_Utils_Array::value('jobLog', $params, true );
+  $prevNext  = CRM_Utils_Array::value('prevNext', $params, true );
+  $dbCache   = CRM_Utils_Array::value('dbCache', $params, false);
+  $memCache  = CRM_Utils_Array::value('memCache', $params, false);
 
   if ($session || $tempTable || $prevNext) {
     CRM_Core_BAO_Cache::cleanup($session, $tempTable, $prevNext);

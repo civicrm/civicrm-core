@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-Class CRM_Contact_Form_Edit_Notes {
+class CRM_Contact_Form_Edit_Notes {
 
   /**
    * This function is to build form elements

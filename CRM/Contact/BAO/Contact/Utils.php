@@ -471,8 +471,8 @@ WHERE id={$contactId}; ";
         if ($relationship->find(TRUE)) {
           CRM_Contact_BAO_Relationship::setIsActive($relationship->id, FALSE);
           CRM_Contact_BAO_Relationship::relatedMemberships($contactId, $relMembershipParams,
-            $ids = array(
-              ), CRM_Core_Action::DELETE
+            $ids = array(),
+            CRM_Core_Action::DELETE
           );
         }
         $relationship->free();

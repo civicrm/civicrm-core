@@ -13,7 +13,8 @@
  * @author Marshal Newrock <marshal@idealso.com>
  */
 
-/* NOTE:
+/**
+ * NOTE:
  * When looking up response codes in the Authorize.Net API, they
  * begin at one, so always delete one from the "Position in Response"
  */

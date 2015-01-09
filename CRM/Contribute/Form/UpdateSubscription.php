@@ -199,7 +199,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     $message = '';
 
     $params['subscriptionId'] = $this->_subscriptionDetails->subscription_id;
-    $updateSubscription = true;
+    $updateSubscription = TRUE;
     if ($this->_paymentProcessorObj->isSupported('changeSubscriptionAmount')) {
         $updateSubscription = $this->_paymentProcessorObj->changeSubscriptionAmount($message, $params);
     }

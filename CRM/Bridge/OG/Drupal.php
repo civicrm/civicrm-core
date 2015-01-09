@@ -33,7 +33,9 @@
  *
  */
 
-// d6 compatible
+/**
+ * d6 compatible?
+ */
 class CRM_Bridge_OG_Drupal {
 
   /**

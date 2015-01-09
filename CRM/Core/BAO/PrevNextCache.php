@@ -43,8 +43,8 @@ class CRM_Core_BAO_PrevNextCache extends CRM_Core_DAO_PrevNextCache {
    * @param $id1
    * @param $id2
    * @param int $mergeId
-   * @param null $join
-   * @param null $where
+   * @param NULL $join
+   * @param NULL $where
    * @param bool $flip
    *
    * @return array
@@ -113,7 +113,7 @@ WHERE  cacheKey     = %3 AND
 
   /**
    * @param int $id
-   * @param null $cacheKey
+   * @param NULL $cacheKey
    * @param string $entityTable
    */
   public static function deleteItem($id = NULL, $cacheKey = NULL, $entityTable = 'civicrm_contact') {
@@ -137,7 +137,7 @@ WHERE  cacheKey     = %3 AND
   /**
    * @param $id1
    * @param $id2
-   * @param null $cacheKey
+   * @param NULL $cacheKey
    * @param bool $isViceVersa
    * @param string $entityTable
    */
@@ -163,8 +163,8 @@ WHERE  cacheKey     = %3 AND
 
   /**
    * @param $cacheKey
-   * @param null $join
-   * @param null $where
+   * @param NULL $join
+   * @param NULL $where
    * @param int $offset
    * @param int $rowCount
    *
@@ -211,7 +211,7 @@ WHERE  cacheKey = %1
    * @return bool
    */
   public static function is_serialized($string) {
-    return (@unserialize($string) !== false);
+    return (@unserialize($string) !== FALSE);
   }
 
   /**
@@ -227,8 +227,8 @@ WHERE  cacheKey = %1
 
   /**
    * @param $cacheKey
-   * @param null $join
-   * @param null $where
+   * @param NULL $join
+   * @param NULL $where
    * @param string $op
    *
    * @return int
@@ -250,7 +250,7 @@ WHERE cacheKey $op %1
   /**
    * @param int $rgid
    * @param int $gid
-   * @param null $cacheKeyString
+   * @param NULL $cacheKeyString
    */
   public static function refillCache($rgid = NULL, $gid = NULL, $cacheKeyString = NULL) {
     if (!$cacheKeyString && $rgid) {

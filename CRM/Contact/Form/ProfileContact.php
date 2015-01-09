@@ -113,7 +113,7 @@ class CRM_Contact_Form_ProfileContact {
   public static function postProcess($form) {
     $params = $form->_params;
     if (!empty($form->_honor_block_is_active) && !empty($params['soft_credit_type_id'])) {
-      $honorId = null;
+      $honorId = NULL;
 
       //check if there is any duplicate contact
       $profileContactType = CRM_Core_BAO_UFGroup::getContactType($params['honoree_profile_id']);

@@ -337,7 +337,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     }
     else {
       $className = $this->_modeValue['taskClassName'];
-      $tasks += $className::permissionedTaskTitles($permission, false);
+      $tasks += $className::permissionedTaskTitles($permission, FALSE);
     }
 
     if (isset($this->_ssID)) {
@@ -533,8 +533,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
     // get user submitted values
     // get it from controller only if form has been submitted, else preProcess has set this
-    // $this->controller->isModal( ) returns true if page is
-    // valid, i.e all the validations are true
+    // $this->controller->isModal( ) returns TRUE if page is
+    // valid, i.e all the validations are TRUE
 
     if (!empty($_POST) && !$this->controller->isModal()) {
       $this->_formValues = $this->controller->exportValues($this->_name);
@@ -658,7 +658,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $this->_params,
         $this->_returnProperties,
         $this->_action,
-        false, true,
+        FALSE, TRUE,
         $this->_context,
         $this->_contextMenu
       );
@@ -668,7 +668,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $selector = new self::$_selectorName(
         $this->_params,
         $this->_action,
-        null, false, null,
+        NULL, FALSE, NULL,
         "search", "advanced"
       );
     }
@@ -799,7 +799,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           $this->_params,
           $this->_returnProperties,
           $this->_action,
-          false,
+          FALSE,
           $searchChildGroups,
           $this->_context,
           $this->_contextMenu
@@ -807,12 +807,12 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $setDynamic = TRUE;
       }
       else {
-        $selector = new  self::$_selectorName (
+        $selector = new self::$_selectorName(
           $this->_params,
           $this->_action,
-          null,
-          false,
-          null,
+          NULL,
+          FALSE,
+          NULL,
           "search",
           "advanced"
         );
@@ -851,7 +851,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * @return null
+   * @return NULL
    */
   public function &returnProperties() {
     return CRM_Core_DAO::$_nullObject;

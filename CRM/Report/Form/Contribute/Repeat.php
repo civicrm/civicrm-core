@@ -509,7 +509,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
         }
       }
       if (!empty($tempErrors)) {
-        $errors['fields'] = implode("<br>", $tempErrors);
+        $errors['fields'] = implode("<br/>", $tempErrors);
       }
     }
 

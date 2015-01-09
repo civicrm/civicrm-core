@@ -74,7 +74,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param int $id
    *   Group id.
    *
-   * @return null
+   * @return NULL
    * @static
    *
    */
@@ -230,9 +230,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *   Which properties should be included in the returned group objects.
    *                                       (member_count should be last element.)
    *
-   * @param null $sort
-   * @param null $offset
-   * @param null $rowCount
+   * @param NULL $sort
+   * @param NULL $offset
+   * @param NULL $rowCount
    *
    * @return array of group objects.
    *
@@ -309,7 +309,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param int $id
    *   The id of the object.
    *
-   * @return string   the permission that the user has (or null)
+   * @return string   the permission that the user has (or NULL)
    * @static
    */
   public static function checkPermission($id) {
@@ -348,7 +348,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $params
    *   Associative array of parameters.
    *
-   * @return object|null      The new group BAO (if created)
+   * @return object|NULL      The new group BAO (if created)
    * @static
    */
   public static function &create(&$params) {
@@ -530,7 +530,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $params
    *   Associative array of parameters.
    *
-   * @return object|null      The new group BAO (if created)
+   * @return object|NULL      The new group BAO (if created)
    * @static
    */
   public static function createSmartGroup(&$params) {
@@ -560,7 +560,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param bool $isActive
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object             DAO object on sucess, NULL otherwise
    * @static
    */
   public static function setIsActive($id, $isActive) {
@@ -720,8 +720,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @return array   $groupList associated array of group list
    *  -rp = rowcount
    *  -page= offset
-   *  @todo there seems little reason for the small number of functions that call this to pass in
-   *  params that then need to be translated in this function since they are coding them when calling
+   * @todo there seems little reason for the small number of functions that call this to pass in
+   * params that then need to be translated in this function since they are coding them when calling
    */
   static public function getGroupListSelector(&$params) {
     // format the params
@@ -938,10 +938,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         );
 
         // If group has children, add class for link to view children
-        $values[$object->id]['is_parent'] = false;
+        $values[$object->id]['is_parent'] = FALSE;
         if (array_key_exists('children', $values[$object->id])) {
           $values[$object->id]['class'][] = "crm-group-parent";
-          $values[$object->id]['is_parent'] = true;
+          $values[$object->id]['is_parent'] = TRUE;
         }
 
         // If group is a child, add child class
@@ -989,7 +989,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $groupIDs
    *   Array of group ids.
    *
-   * @param null $parents
+   * @param NULL $parents
    * @param string $spacer
    * @param bool $titleOnly
    *
@@ -1121,7 +1121,7 @@ WHERE  id IN $groupIdString
   /**
    * @param array $params
    *
-   * @return null|string
+   * @return NULL|string
    */
   public static function getGroupCount(&$params) {
     $whereClause = self::whereClause($params, FALSE);
@@ -1222,7 +1222,7 @@ WHERE {$whereClause}";
     if ($excludeHidden) {
       $clauses[] = 'groups.is_hidden = 0';
     }
-    ;
+
     $clauses[] = self::getPermissionClause();
 
 

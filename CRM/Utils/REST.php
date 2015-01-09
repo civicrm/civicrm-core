@@ -476,7 +476,7 @@ class CRM_Utils_REST {
       die ("SECURITY FATAL: the url can't contain '..'. Please report the issue on the forum at civicrm.org");
     }
 
-    $request = split('/', $request);
+    $request = explode('/', $request);
     $entity = _civicrm_api_get_camel_name($request[2]);
     $tplfile = _civicrm_api_get_camel_name($request[3]);
 
@@ -500,7 +500,7 @@ class CRM_Utils_REST {
     $smarty->assign_by_ref("request", $param);
 
     if  (! array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
-      $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest" )  {
+      $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest" ) {
 
       $smarty->assign('tplFile', $tpl);
       $config = CRM_Core_Config::singleton();

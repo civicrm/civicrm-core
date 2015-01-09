@@ -133,7 +133,6 @@ function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array()
 
 /**
  *
- * @param <type> $data
  * @param array $data
  *
  * @throws API_Exception
@@ -447,7 +446,7 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
  * @param bool $getCount
  *   Are we just after the count.
  *
- * @return
+ * @return array
  */
 function _civicrm_api3_get_using_query_object($entity, $params, $additional_options = array(), $getCount = NULL) {
 
@@ -1126,9 +1125,9 @@ function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
  *
  * @daoName string DAO to check params agains
  *
- * @return bool should the missing fields be returned as an array (core error created as default)
- *
- * @return bool true if all fields present, depending on $result a core error is created of an array of missing fields is returned
+ * @return bool
+ *   Sshould the missing fields be returned as an array (core error created as default)
+ *   true if all fields present, depending on $result a core error is created of an array of missing fields is returned
  * @access public
  */
 function _civicrm_api3_check_required_fields($params, $daoName, $return = FALSE) {
@@ -1831,7 +1830,7 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
  *   E.g. "user_contact_id" or "@user:username".
  * @return int|NULL|'unknown-user'
  */
-function  _civicrm_api3_resolve_contactID($contactIdExpr) {
+function _civicrm_api3_resolve_contactID($contactIdExpr) {
   //if value = 'user_contact_id' replace value with logged in user id
   if ($contactIdExpr == "user_contact_id") {
     return CRM_Core_Session::getLoggedInContactID();

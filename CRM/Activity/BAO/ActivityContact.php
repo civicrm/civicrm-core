@@ -143,7 +143,6 @@ AND        civicrm_contact.is_deleted = 0
   /**
    * Get the links associate array  as defined by the links.ini file.
    *
-   *
    * Experimental... -
    * Should look a bit like
    *       [local_col_name] => "related_tablename:related_col_name"

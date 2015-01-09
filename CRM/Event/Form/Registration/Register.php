@@ -136,9 +136,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * The 'Register' page gets loaded through ajax and following happens :
    * the setDefaults function is called with the variable _ppType set with selected payment processor type,
    * so in the 'if' condition checked whether the selected payment processor's billing mode is of 'billing form mode'. If its not, don't setDefaults for billing form and return instead.
-   *- For payment processors of billing mode 'Notify' - return from setDefaults before the code for billing profile population execution .
+   * - For payment processors of billing mode 'Notify' - return from setDefaults before the code for billing profile population execution .
    * (done this is because for payment processors with 'Notify' mode billing profile form doesn't get rendered on UI)
-   *
    *
    * @return void
    */
@@ -350,8 +349,16 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         // Hardcode maximum number of additional participants here for now. May need to make this configurable per event.
         // Label is value + 1, since the code sees this is ADDITIONAL participants (in addition to "self")
         $additionalOptions = array(
-          '' => '1', 1 => '2', 2 => '3', 3 => '4', 4 => '5',
-          5 => '6', 6 => '7', 7 => '8', 8 => '9', 9 => '10',
+          '' => '1',
+          1 => '2',
+          2 => '3',
+          3 => '4',
+          4 => '5',
+          5 => '6',
+          6 => '7',
+          7 => '8',
+          8 => '9',
+          9 => '10',
         );
         $element = $this->add('select', 'additional_participants',
           ts('How many people are you registering?'),
@@ -611,15 +618,15 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $form->add('hidden', 'priceSetId', $form->_priceSetId);
 
       // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
-      $adminFieldVisible = false;
+      $adminFieldVisible = FALSE;
       if (CRM_Core_Permission::check('administer CiviCRM')) {
-        $adminFieldVisible = true;
+        $adminFieldVisible = TRUE;
       }
 
       foreach ($form->_feeBlock as $field) {
         // public AND admin visibility fields are included for back-office registration and back-office change selections
         if (CRM_Utils_Array::value('visibility', $field) == 'public' ||
-          (CRM_Utils_Array::value('visibility', $field) == 'admin' && $adminFieldVisible == true) ||
+          (CRM_Utils_Array::value('visibility', $field) == 'admin' && $adminFieldVisible == TRUE) ||
           $className == 'CRM_Event_Form_Participant' ||
           $className == 'CRM_Event_Form_ParticipantFeeSelection'
         ) {
@@ -803,7 +810,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @param $self
    *
    *
-   * @return true if no errors, else array of errors
+   * @return TRUE if no errors, else array of errors
    * @static
    */
   public static function formRule($fields, $files, $self) {

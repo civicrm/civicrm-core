@@ -130,7 +130,8 @@ set_include_path($include_path);
 
 if (function_exists('variable_get') && variable_get('clean_url', '0') != '0') {
   define('CIVICRM_CLEANURL', 1);
-} else {
+}
+else {
   define('CIVICRM_CLEANURL', 0);
 }
 

@@ -73,7 +73,7 @@ class CRM_Logging_Differ {
    *
    * @return array
    */
-  public function diffsInTable($table, $contactID = null) {
+  public function diffsInTable($table, $contactID = NULL) {
     $diffs = array();
 
     $params = array(
@@ -128,7 +128,7 @@ LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND sour
         if (empty($contactIdClause)) {
           $contactIdClause = "AND contact_id = %3";
         }
-        if (strpos($table, 'civicrm_value') !== false) {
+        if (strpos($table, 'civicrm_value') !== FALSE) {
           $contactIdClause = "AND entity_id = %3";
         }
       }
@@ -217,7 +217,7 @@ WHERE lt.log_conn_id = %1 AND
         // hack: case_type_id column is a varchar with separator. For proper mapping to type labels,
         // we need to make sure separators are trimmed
         if ($diff == 'case_type_id') {
-          foreach (array('original', 'changed') as $var)  {
+          foreach (array('original', 'changed') as $var) {
             if (!empty($$var[$diff])) {
               $holder =& $$var;
               $val = explode(CRM_Case_BAO_Case::VALUE_SEPARATOR, $holder[$diff]);

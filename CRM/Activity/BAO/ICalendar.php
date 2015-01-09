@@ -65,7 +65,7 @@ class CRM_Activity_BAO_ICalendar {
    * @param array $contacts
    *   Array of contacts (attendees).
    *
-   * @return string   Array index of the added attachment in the $attachments array, or else null.
+   * @return string   Array index of the added attachment in the $attachments array, or else NULL.
    */
   public function addAttachment(&$attachments, $contacts) {
     // Check preferences setting
@@ -101,7 +101,7 @@ class CRM_Activity_BAO_ICalendar {
         }
       }
     }
-    return null;
+    return NULL;
   }
 
   public function cleanup() {

@@ -5,8 +5,7 @@
  * Date: 8/12/2014
  * Time: 10:33 AM
  */
-
-class CRM_Contribute_Exception_InactiveContributionPageException extends Exception{
+class CRM_Contribute_Exception_InactiveContributionPageException extends Exception {
   private $id;
   public function __construct($message, $id) {
     parent::__construct(ts($message));

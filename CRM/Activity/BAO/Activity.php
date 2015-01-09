@@ -2593,7 +2593,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
 
   /**
    * Used to copy custom fields and attachments from an existing activity to another.
-   * @see CRM_Case_Page_AJAX::_convertToCaseActivity() for example
+   * @see CRM_Case_Page_AJAX::_convertToCaseActivity()
    *
    * @param array $params
    */

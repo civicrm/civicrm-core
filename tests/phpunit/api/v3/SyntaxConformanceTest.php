@@ -893,7 +893,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->markTestIncomplete("fixing this test to test the api functions fails on numberous tests
       which will either create a completely blank entity (batch, participant status) or
       have a damn good crack at it (e.g mailing job). Marking this as incomplete beats false success");
-    //
     return;
     if (in_array($Entity, $this->toBeImplemented['create'])) {
       // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
@@ -1263,7 +1262,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       $this->assertTrue(is_integer($baoObj->id), 'check first id');
       $this->deletableTestObjects[$baoString][] = $baoObj->id;
       $baos[] = $baoObj;
-      $i ++;
+      $i++;
     }
     return $baos;
   }
