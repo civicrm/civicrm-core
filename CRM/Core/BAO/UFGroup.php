@@ -2717,7 +2717,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * This function is to make a copy of a profile, including
+   * make a copy of a profile, including
    * all the fields in the profile
    *
    * @param int $id
@@ -3210,7 +3210,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * This function is used to setDefault componet specific profile fields.
+   * setDefault componet specific profile fields.
    *
    * @param array $fields
    *   Profile fields.

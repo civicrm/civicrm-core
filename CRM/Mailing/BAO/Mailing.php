@@ -2917,7 +2917,7 @@ AND        m.id = %1
   }
 
   /**
-   * This function is a wrapper for ajax activity selector
+   * wrapper for ajax activity selector
    *
    * @param array $params
    *   Associated array for params record id.

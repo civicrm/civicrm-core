@@ -114,7 +114,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
   }
 
   /**
-   * This function is going to filter the
+   * going to filter the
    * submitted values across XSS vulnerability.
    *
    * @param array|string $values

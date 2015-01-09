@@ -394,7 +394,7 @@ ORDER BY start_date desc
   }
 
   /**
-   * This function is to make a copy of a Event, including
+   * make a copy of a Event, including
    * all the fields in the event wizard
    *
    * @return void

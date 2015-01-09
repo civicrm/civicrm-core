@@ -1038,7 +1038,7 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
   }
 
   /**
-   * This function is called to rebuild prev next cache using full sql in case of core search ( excluding custom search)
+   * called to rebuild prev next cache using full sql in case of core search ( excluding custom search)
    *
    * @param int $start
    *   Start for limit clause.

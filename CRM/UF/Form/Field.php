@@ -74,7 +74,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   protected $_selectFields;
 
   /**
-   * To store fields with if locationtype exits status
+   * store fields with if locationtype exits status
    *
    * @var array
    */

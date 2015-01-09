@@ -120,7 +120,7 @@ class CRM_Utils_JSON {
   }
 
   /**
-   * This function is used to encode data for dataTable plugin
+   * encode data for dataTable plugin
    *
    * @param array $params
    *   Associated array of row elements.

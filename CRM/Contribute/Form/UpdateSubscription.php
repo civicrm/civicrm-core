@@ -180,7 +180,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
   }
 
   /**
-   * This function is called after the user submits the form
+   * called after the user submits the form
    *
    *
    * @return void

@@ -375,7 +375,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
   }
 
   /**
-   * To find fields related to a rule group.
+   * find fields related to a rule group.
    *
    * @param array $params
    *

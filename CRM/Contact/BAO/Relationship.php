@@ -1761,7 +1761,7 @@ AND cc.sort_name LIKE '%$name%'";
 
 
   /**
-   * This function is a wrapper for contact relationship selector
+   * wrapper for contact relationship selector
    *
    * @param array $params
    *   Associated array for params record id.
