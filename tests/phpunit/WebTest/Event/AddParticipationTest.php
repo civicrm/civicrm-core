@@ -410,8 +410,6 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param string $firstName
-   * @param string $lastName
    * @param int $processorId
    */
   public function _fillParticipantDetails($processorId) {

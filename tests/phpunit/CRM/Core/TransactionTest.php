@@ -371,7 +371,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    *   'rollback'|'implicit-commit'|'explicit-commit' how to finish transaction.
    * @return int cid
    */
-  public function runBatch($nesting, $callbacks, $existsByOffset, $outcome)  {
+  public function runBatch($nesting, $callbacks, $existsByOffset, $outcome) {
     if ($nesting != 'reuse-tx' && $nesting != 'nest-tx') {
       throw new RuntimeException('Bad test data: nesting=' . $nesting);
     }
