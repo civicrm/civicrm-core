@@ -1551,7 +1551,8 @@ SELECT count(*)
    * @param $contactIds
    *   Contact Ids.
    *
-   * @return array $currentEmployer array of the current employer@static
+   * @return array $currentEmployer array of the current employer
+   * @static
    */
   public static function getCurrentEmployer($contactIds) {
     $contacts = implode(',', $contactIds);

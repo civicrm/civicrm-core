@@ -78,7 +78,8 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * @internal param \csvString $string the title of the link to be displayed for the export
    * @internal param \perPage $int the number of items displayed per page
    *
-   * @return \CRM_Utils_Pager the newly created and initialized pager object@access public
+   * @return \CRM_Utils_Pager the newly created and initialized pager object
+   * @access public
    */
   public function __construct($params) {
     if ($params['status'] === NULL) {

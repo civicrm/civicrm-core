@@ -2696,7 +2696,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param $fields
    * @param $defaults
    *
-   * @return mixed $defaults@static
+   * @return mixed $defaults
+   * @static
    */
   public static function setRegisterDefaults(&$fields, &$defaults) {
     $config = CRM_Core_Config::singleton();

@@ -2106,7 +2106,8 @@ AND    cf.id = %1";
    * for inactive fields : CRM-5369
    *
    *
-   * @return mixed $customOptionGroup@static
+   * @return mixed $customOptionGroup
+   * @static
    */
   public static function &customOptionGroup($includeFieldIds = NULL) {
     static $customOptionGroup = NULL;

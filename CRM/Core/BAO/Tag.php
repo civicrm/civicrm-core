@@ -447,7 +447,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   /**
    * Get the tags that are not children of a tagset.
    *
-   * @return array $tags associated array of tag name and id@access public
+   * @return array $tags associated array of tag name and id
+   * @access public
    * @static
    */
   public static function getTagsNotInTagset() {
