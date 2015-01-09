@@ -397,6 +397,8 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
   }
 
   /**
+   * @deprecated
+   * Payment processor singletons removed - this is an IPN so left but probably can go
    * Singleton function used to manage this object
    *
    * @param string $mode
