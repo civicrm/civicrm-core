@@ -290,7 +290,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Also, if we do not return any value the PEAR_ErrorStack::push() then does the
    * action of PEAR_ERRORSTACK_PUSHANDLOG which displays the errors on the screen,
    * since the logger set for this error stack is 'display' - see CRM_Core_Config::getLog();
-   *
    */
   public static function handlePES($pearError) {
     return PEAR_ERRORSTACK_PUSH;

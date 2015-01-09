@@ -41,7 +41,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
   /**
    * Define default MembershipType Id
-   *
    */
   public $_defaultMemTypeId;
 
@@ -189,7 +188,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * @return void
    */
   /**
-   *
    */
   public function setDefaultValues() {
     // check if the user is registered and we have a contact ID
@@ -626,7 +624,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
   /**
    * Build elements to enable pay on behalf of an organization.
-   *
    */
   public function buildOnBehalfOrganization() {
     if ($this->_membershipContactID) {

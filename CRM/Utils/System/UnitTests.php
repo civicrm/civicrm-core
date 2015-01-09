@@ -38,7 +38,6 @@
  */
 class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   /**
-   *
    */
   public function __construct() {
     $this->is_drupal = FALSE;
@@ -172,7 +171,6 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    *
    * @return string
    *   an HTML string containing a link to the given path.
-   *
    */
   /**
    * @param null|string $path
@@ -268,7 +266,6 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    *
    * @param string $message
    *   The message to set.
-   *
    */
   /**
    * @param string $message

@@ -41,7 +41,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
   /**
    * Variable defined for Contribution Page Id
-   *
    */
 
   public $_pageId = NULL;

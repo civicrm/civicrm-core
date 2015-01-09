@@ -275,7 +275,6 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     );
   }
   /**
-   *
    */
   public function getPaypalProRecurTransaction() {
     return array(

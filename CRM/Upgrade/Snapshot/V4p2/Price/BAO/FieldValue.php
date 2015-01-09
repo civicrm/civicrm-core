@@ -168,7 +168,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    *   name
    *
    * @static
-   *
    */
   public static function getOptionLabel($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue', $id, 'label');

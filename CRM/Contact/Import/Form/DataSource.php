@@ -239,7 +239,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
    *
    * @return array
    *   reference to the array of default values
-   *
    */
   /**
    * @return array

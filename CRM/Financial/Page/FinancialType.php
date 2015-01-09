@@ -107,7 +107,6 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    * Finally it calls the parent's run method.
    *
    * @return void
-   *
    */
   public function run() {
     // get the requested action

@@ -224,7 +224,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * - Edit
    *
    * @return array
-   *
    */
   public static function &links() {
     list($context, $contextMenu, $key) = func_get_args();
@@ -298,7 +297,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    *
    * @param $action
    * @param array $params
-   *
    */
   public function getPagerParams($action, &$params) {
     $params['status']    = ts('Contact %%StatusMessage%%');

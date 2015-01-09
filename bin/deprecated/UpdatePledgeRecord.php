@@ -41,7 +41,6 @@ require_once 'CRM/Core/Config.php';
  */
 class CRM_UpdatePledgeRecord {
   /**
-   *
    */
   function __construct() {
     $config = CRM_Core_Config::singleton();

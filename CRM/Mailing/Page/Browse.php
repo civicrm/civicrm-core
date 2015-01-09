@@ -81,7 +81,6 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   *
    */
   public function preProcess() {
     $this->_unscheduled = $this->_archived = $archiveLinks = FALSE;

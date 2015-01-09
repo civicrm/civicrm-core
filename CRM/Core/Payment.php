@@ -54,7 +54,6 @@ abstract class CRM_Core_Payment {
    * direct debit
    * or both
    * @todo create option group - nb omnipay uses a 3rd type - transparent redirect cc
-   *
    */
   const
     PAYMENT_TYPE_CREDIT_CARD = 1,
@@ -63,7 +62,6 @@ abstract class CRM_Core_Payment {
   /**
    * Subscription / Recurring payment Status
    * START, END
-   *
    */
   const
     RECURRING_PAYMENT_START = 'START',
@@ -178,7 +176,6 @@ abstract class CRM_Core_Payment {
    * Setter for the payment form that wants to use the processor
    * @deprecated
    * @param CRM_Core_Form $paymentForm
-   *
    */
   public function setForm(&$paymentForm) {
     $this->_paymentForm = $paymentForm;

@@ -29,7 +29,6 @@
    * Licensed to CiviCRM under the Academic Free License version 3.0.
    *
    * Written and contributed by Kirkdesigns (http://www.kirkdesigns.co.uk)
-   *
    */
 
 /**

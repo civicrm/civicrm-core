@@ -216,7 +216,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * @param string $separator
    *
    * @return array
-   *
    */
   public static function buildContributionArray($groupBy, $form, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator) {
     $contributions = $contacts = $notSent = array();

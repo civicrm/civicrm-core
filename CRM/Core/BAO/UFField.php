@@ -71,7 +71,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    *   title
    *
    * @static
-   *
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $groupId, 'title');
@@ -113,7 +112,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    * @return boolean
    *
    * @static
-   *
    */
   public static function del($id) {
     //delete  field field
@@ -208,7 +206,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * @return CRM_Core_BAO_UFField object
    *
    * @static
-   *
    */
   public static function add(&$params, $ids = array()) {
     // set values for uf field properties and save
@@ -774,7 +771,6 @@ SELECT  id
    * @param int $profileID
    *
    * @return void
-   *
    */
   public function resetInSelectorANDSearchable($profileID) {
     if (!$profileID) {

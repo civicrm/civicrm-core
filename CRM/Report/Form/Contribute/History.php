@@ -52,10 +52,8 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   protected $_yearStatisticsTo = '';
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     $yearsInPast = 4;

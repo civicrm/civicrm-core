@@ -61,7 +61,6 @@ class CRM_Core_Block {
 
   /**
    * Class constructor
-   *
    */
   public function __construct() {
   }

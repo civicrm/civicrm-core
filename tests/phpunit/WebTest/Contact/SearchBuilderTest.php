@@ -373,7 +373,6 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
 
   /*
    * Webtest for CRM-12148
-   *
    */
   public function testSearchBuilderfinancialType() {
     $this->webtestLogin();
@@ -429,7 +428,6 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
 
   /*
    * Webtest for CRM-12588
-   *
    */
   public function testSearchBuilderMembershipType() {
     $this->webtestLogin();

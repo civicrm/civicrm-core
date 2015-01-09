@@ -47,13 +47,11 @@ class CRM_Member_Form_Task_PickProfile extends CRM_Member_Form_Task {
 
   /**
    * Maximum members that should be allowed to update
-   *
    */
   protected $_maxMembers = 100;
 
   /**
    * Variable to store redirect path
-   *
    */
   protected $_userContext;
 

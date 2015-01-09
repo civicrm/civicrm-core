@@ -68,7 +68,6 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
   );
 
   /**
-   *
    */
   public function __construct() {
     parent::__construct();

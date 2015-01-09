@@ -900,7 +900,6 @@ LIMIT 1
    *   array of tax amount
    *
    * @static
-   *
    */
   public static function calculateTaxAmount($amount, $taxRate) {
     $taxAmount = array();

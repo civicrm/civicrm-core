@@ -261,7 +261,6 @@ WHERE     pledge_id = %1
    *
    * @return bool
    * @static
-   *
    */
   public static function deletePayments($id) {
     if (!CRM_Utils_Rule::positiveInteger($id)) {
@@ -565,7 +564,6 @@ WHERE  civicrm_pledge.id = %2
    * be equal to basePaymentDate normalised to fit the 'pledge pattern' + number of installments
    *
    * @return formatted date
-   *
    */
   public static function calculateNextScheduledDate(&$params, $paymentNo, $basePaymentDate = NULL) {
     if (!$basePaymentDate) {

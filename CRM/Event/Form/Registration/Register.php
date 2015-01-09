@@ -42,19 +42,16 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
   /**
    * The fields involved in this page
-   *
    */
   public $_fields;
 
   /**
    * The defaults involved in this page
-   *
    */
   public $_defaults;
 
   /**
    * The status message that user view.
-   *
    */
   protected $_waitlistMsg = NULL;
   protected $_requireApprovalMsg = NULL;
@@ -951,7 +948,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
   /**
    * Check if profiles are complete when event registration occurs(CRM-9587)
-   *
    */
   public static function checkProfileComplete($fields, &$errors, $eventId) {
     $email = '';
@@ -1218,7 +1214,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *
    * @return void
    * access public
-   *
    */
   /**
    * @param array $params

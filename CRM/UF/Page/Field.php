@@ -63,7 +63,6 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    * Get the action links for this page.
    *
    * @return array
-   *
    */
   function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
@@ -233,7 +232,6 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    * type of action and executes that action.
    *
    * @return void
-   *
    */
   public function run() {
     // get the group id

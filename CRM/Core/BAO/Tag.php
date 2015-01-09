@@ -322,7 +322,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *
    * @return boolean
    * @static
-   *
    */
   public static function del($id) {
     // since this is a destructive operation, lets make sure

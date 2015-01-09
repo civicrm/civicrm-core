@@ -45,10 +45,8 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
   );
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     $this->_columns = array(

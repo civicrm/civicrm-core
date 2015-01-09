@@ -120,7 +120,6 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    *   default price set
    *
    * @static
-   *
    */
   public static function getDefaultPriceSet($entity = 'contribution') {
     if (!empty(self::$_defaultPriceSet[$entity])) {
@@ -167,7 +166,6 @@ WHERE       ps.name = '{$entityName}'
    *   title
    *
    * @static
-   *
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $id, 'title');
@@ -1336,7 +1334,6 @@ GROUP BY     mt.member_of_contact_id";
    * user to select both auto-renew and non-auto-renew memberships
    *
    * @static
-   *
    */
   public static function checkMembershipPriceSet($id) {
     $query =
@@ -1422,8 +1419,6 @@ WHERE       ps.id = %1
 
   /*
    * Function to set tax_amount and tax_rate in LineItem
-   *
-   *
    */
   public static function setLineItem($field, $lineItem, $optionValueId) {
     if ($field['html_type'] == 'Text') {

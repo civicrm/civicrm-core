@@ -54,7 +54,6 @@ class CRM_Contact_Page_SavedSearch extends CRM_Core_Page {
    *   Id of saved search.
    *
    * @return void
-   *
    */
   public function delete($id) {
     // first delete the group associated with this saved search
@@ -75,7 +74,6 @@ class CRM_Contact_Page_SavedSearch extends CRM_Core_Page {
    * Browse all saved searches.
    *
    * @return content of the parents run method
-   *
    */
   public function browse() {
     $rows = array();

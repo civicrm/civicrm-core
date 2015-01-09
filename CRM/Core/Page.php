@@ -252,7 +252,6 @@ class CRM_Core_Page {
    *
    *
    * @return void
-   *
    */
   public function set($name, $value = NULL) {
     self::$_session->set($name, $value, $this->_name);
@@ -265,7 +264,6 @@ class CRM_Core_Page {
    *
    *
    * @return mixed
-   *
    */
   public function get($name) {
     return self::$_session->get($name, $this->_name);

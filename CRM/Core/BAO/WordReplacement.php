@@ -44,7 +44,6 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @return \CRM_Core_DAO_WordReplacement
    */
   /**
-   *
    */
   public function __construct() {
     parent::__construct();

@@ -36,12 +36,10 @@
 class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
 
   /**
-   *
    */
   const CUSTOM_SEARCH_GROUP_NAME = 'custom_search';
 
   /**
-   *
    */
   public function __construct() {
     parent::__construct(TRUE);

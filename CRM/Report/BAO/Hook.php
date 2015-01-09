@@ -49,7 +49,6 @@ class CRM_Report_BAO_Hook {
    *
    * @return object
    * @static
-   *
    */
   public static function singleton() {
     static $singleton = NULL;

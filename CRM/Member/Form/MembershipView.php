@@ -95,7 +95,6 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
    *   Create or delete.
    * @param array $owner
    *   Primary membership info (membership_id, contact_id, membership_type ...).
-   *
    */
   public function relAction($action, $owner) {
     switch ($action) {

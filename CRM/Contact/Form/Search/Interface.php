@@ -83,7 +83,6 @@ interface CRM_Contact_Form_Search_Interface {
    * The from clause should be a valid sql from clause including the word FROM
    * CiviMail will pick up the contacts where the email is primary and
    * is not on hold / opt out / do not email
-   *
    */
 
   /**

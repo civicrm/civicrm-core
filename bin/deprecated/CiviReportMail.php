@@ -31,7 +31,6 @@
  */
 class CiviReportMail {
   /**
-   *
    */
   function __construct() {
     $this->initialize();

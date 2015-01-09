@@ -51,7 +51,6 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    * Obtains the group name from url and sets the title.
    *
    * @return void
-   *
    */
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviCRM Extensions'));

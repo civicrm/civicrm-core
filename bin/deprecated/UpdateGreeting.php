@@ -43,7 +43,6 @@
  */
 class CRM_UpdateGreeting {
   /**
-   *
    */
   function __construct() {
     $this->initialize();

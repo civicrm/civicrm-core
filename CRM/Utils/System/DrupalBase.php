@@ -45,7 +45,6 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    */
   var $supports_UF_Logging = TRUE;
   /**
-   *
    */
   public function __construct() {
     /**
@@ -165,7 +164,6 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    *
    * @return string
    *   an HTML string containing a link to the given path.
-   *
    */
   function url(
     $path = NULL, $query = NULL, $absolute = FALSE,
@@ -242,7 +240,6 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @param object $user
    *   Object as described by the User Framework.
    * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
-   *
    */
   public function getUniqueIdentifierFromUserObject($user) {
     return empty($user->mail) ? NULL : $user->mail;
@@ -327,7 +324,6 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    *
    * @return array
    *   CRM_Core_Module
-   *
    */
   public function getModules() {
     $result = array();
@@ -444,7 +440,6 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    *
    * @return string
    *   with the locale or null for none
-   *
    */
   public function getUFLocale() {
     // return CiviCRM’s xx_YY locale that either matches Drupal’s Chinese locale
@@ -478,7 +473,6 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @param array params
    *
    * FIXME: Document values accepted/required by $params
-   *
    */
   public function userLoginFinalize($params = array()) {
     user_login_finalize($params);

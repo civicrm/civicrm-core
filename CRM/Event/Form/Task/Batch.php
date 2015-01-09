@@ -47,19 +47,16 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
 
   /**
    * Maximum profile fields that will be displayed
-   *
    */
   protected $_maxFields = 9;
 
   /**
    * Variable to store redirect path
-   *
    */
   protected $_userContext;
 
   /**
    * Variable to store previous status id.
-   *
    */
   protected $_fromStatusIds;
 

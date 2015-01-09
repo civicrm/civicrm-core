@@ -92,7 +92,6 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    *
    * @return array|null collection of required dashboard settings,
    *                    null if no element offered
-   *
    */
   /**
    * @return array|null
@@ -114,7 +113,6 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    *
    * @return array|null collection of required dashboard settings,
    *                    null if no element offered
-   *
    */
   /**
    * @return array|null
@@ -134,7 +132,6 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    *
    * @return array|null collection of required pane settings,
    *                    null if no element offered
-   *
    */
   /**
    * @return array|null
@@ -154,7 +151,6 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    * class.
    *
    * @return array|null collection of activity types
-   *
    */
   /**
    * @return array|null

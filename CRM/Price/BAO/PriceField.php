@@ -218,7 +218,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *   name
    *
    * @static
-   *
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $id, 'label');
@@ -634,7 +633,6 @@ WHERE
    * @return boolean
    *
    * @static
-   *
    */
   public static function deleteField($id) {
     $field = new CRM_Price_DAO_PriceField();
@@ -786,7 +784,6 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
    *   tax label for custom field
    *
    * @static
-   *
    */
   public static function getTaxLabel($opt, $valueFieldName, $displayOpt, $taxTerm) {
     if ($displayOpt == 'Do_not_show') {

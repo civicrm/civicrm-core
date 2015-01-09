@@ -181,7 +181,6 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *   name
    *
    * @static
-   *
    */
   public static function getOptionLabel($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $id, 'label');

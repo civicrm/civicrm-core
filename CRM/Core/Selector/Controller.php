@@ -300,7 +300,6 @@ class CRM_Core_Selector_Controller {
    *
    *
    * @return void
-   *
    */
   public function run() {
 

@@ -55,25 +55,21 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
   /**
    * This is a string which is either a_b or  b_a  used to determine the relationship between to contacts
-   *
    */
   public $_rtype;
 
   /**
    * This is a string which is used to determine the relationship between to contacts
-   *
    */
   public $_rtypeId;
 
   /**
    * Display name of contact a
-   *
    */
   public $_display_name_a;
 
   /**
    * Display name of contact b
-   *
    */
   public $_display_name_b;
 

@@ -65,7 +65,6 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Prefix for the controller
-   *
    */
   protected $_prefix = "grant_";
 

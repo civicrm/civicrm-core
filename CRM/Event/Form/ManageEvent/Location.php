@@ -64,7 +64,6 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
 
   /**
    * Get the db values for this form
-   *
    */
   public $_values = array();
 

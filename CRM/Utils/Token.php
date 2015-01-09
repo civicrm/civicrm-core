@@ -1141,7 +1141,6 @@ class CRM_Utils_Token {
    * @param $string
    * @return array
    *   fields to pass in as return properties when populating token
-   *
    */
   public static function getReturnProperties(&$string) {
     $returnProperties = array();
@@ -1412,7 +1411,6 @@ class CRM_Utils_Token {
   }
   /**
    * Replace greeting tokens exists in message/subject
-   *
    */
   public static function replaceGreetingTokens(&$tokenString, $contactDetails = NULL, $contactId = NULL, $className = NULL, $escapeSmarty = FALSE) {
 
@@ -1572,7 +1570,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   *
    */
   protected static function _buildContributionTokens() {
     $key = 'contribution';

@@ -104,7 +104,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
    * @return id $priceSetID
    *
    * @static
-   *
    */
   public static function getDefaultPriceSet($entity = 'contribution') {
     if ($entity == 'contribution') {
@@ -144,7 +143,6 @@ WHERE       ps.name = '{$entityName}'
    *   title
    *
    * @static
-   *
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set', $id, 'title');

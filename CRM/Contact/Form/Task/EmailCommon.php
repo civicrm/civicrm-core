@@ -325,7 +325,6 @@ class CRM_Contact_Form_Task_EmailCommon {
    *   Additional values form 'this'.
    *
    * @return TRUE if no errors, else array of errors
-   *
    */
   public static function formRule($fields, $dontCare, $self) {
     $errors = array();

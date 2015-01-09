@@ -111,7 +111,6 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
    * @param null
    *
    * @return void
-   *
    */
   public function run() {
     // get the requested action

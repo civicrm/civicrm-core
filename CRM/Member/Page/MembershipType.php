@@ -92,7 +92,6 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   *
    */
   public function run() {
     $this->browse();

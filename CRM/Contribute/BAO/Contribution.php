@@ -75,7 +75,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @return \CRM_Contribute_DAO_Contribution
    */
   /**
-   *
    */
   public function __construct() {
     parent::__construct();

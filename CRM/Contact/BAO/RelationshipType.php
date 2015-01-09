@@ -89,7 +89,6 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
    *
    * @return CRM_Contact_DAO_RelationshipType
    * @static
-   *
    */
   public static function add(&$params, &$ids) {
     //to change name, CRM-3336

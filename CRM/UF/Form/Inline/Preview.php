@@ -48,8 +48,6 @@ class CRM_UF_Form_Inline_Preview extends CRM_UF_Form_AbstractPreview {
    * @param
    *
    * @return void
-   *
-   *
    */
   public function preProcess() {
     if ($_SERVER['REQUEST_METHOD'] != 'POST') {

@@ -55,7 +55,6 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    *                             checkMapperHeaders : to override default check mapper headers
    *                             saveMapping        : save current mapping?
    *                             saveMappingName    : to override mapping name
-   *
    */
   function importCSVComponent(
     $component,

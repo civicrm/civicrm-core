@@ -70,7 +70,6 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    * This method returns the links that are given for each search row.
    *
    * @return array
-   *
    */
   public static function &links() {
     return self::$_links;
@@ -81,7 +80,6 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    *
    * @param $action
    * @param array $params
-   *
    */
   public function getPagerParams($action, &$params) {
     $params['csvString'] = NULL;

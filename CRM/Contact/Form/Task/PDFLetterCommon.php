@@ -211,7 +211,6 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    *
    * @return bool
    *   TRUE if no errors, else array of errors.
-   *
    */
   public static function formRule($fields, $dontCare, $self) {
     $errors = array();

@@ -43,7 +43,6 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
   static $_pcpLinks = NULL;
 
   /**
-   *
    */
   public function __construct() {
     parent::__construct();
@@ -358,7 +357,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *
    * @return null
    * @static
-   *
    */
   public static function deleteById($id) {
     CRM_Utils_Hook::pre('delete', 'Campaign', $id, CRM_Core_DAO::$_nullArray);
@@ -795,7 +793,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *
    * @return Boolean
    * @static
-   *
    */
   public static function getPcpBlockInUse($id) {
     $query = "

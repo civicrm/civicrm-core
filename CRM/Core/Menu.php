@@ -243,7 +243,6 @@ class CRM_Core_Menu {
    * 2. Compute local tasks value if any
    * 3. Propagate access argument, access callback, page callback to the menu item
    * 4. Build the global navigation block
-   *
    */
   public static function build(&$menu) {
     foreach ($menu as $path => $menuItems) {

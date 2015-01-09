@@ -112,7 +112,6 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
    * Finally it calls the parent's run method.
    *
    * @return void
-   *
    */
   public function run() {
     // set title and breadcrumb

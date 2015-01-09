@@ -1775,7 +1775,6 @@ WHERE  id = %1
    *
    * @return array
    *   array reference of default greetings.
-   *
    */
   public static function &greetingDefaults() {
     if (!self::$greetingDefaults) {

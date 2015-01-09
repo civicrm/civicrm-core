@@ -40,7 +40,6 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @return \CRM_Financial_DAO_FinancialTrxn
    */
   /**
-   *
    */
   public function __construct() {
     parent::__construct();

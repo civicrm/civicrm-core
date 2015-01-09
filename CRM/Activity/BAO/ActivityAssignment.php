@@ -72,7 +72,6 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
    * @param int $activity_id
    *
    * @return array
-   *
    */
   public static function retrieveAssigneeIdsByActivityId($activity_id) {
     $assigneeArray = array();
@@ -110,8 +109,6 @@ AND        civicrm_contact.is_deleted = 0
    *   If false returns all details of assignee contact.
    *
    * @return array
-   *
-   *
    */
   public static function getAssigneeNames($activityIDs, $isDisplayName = FALSE, $skipDetails = TRUE) {
     $assigneeNames = array();

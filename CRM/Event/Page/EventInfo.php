@@ -46,7 +46,6 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   *
    */
   public function run() {
     //get the event id.

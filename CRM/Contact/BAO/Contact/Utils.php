@@ -406,7 +406,6 @@ UNION
    *
    * @param array $currentEmployerParams
    *   Associated array of contact id and its employer id.
-   *
    */
   public static function setCurrentEmployer($currentEmployerParams) {
     foreach ($currentEmployerParams as $contactId => $orgId) {
@@ -425,7 +424,6 @@ WHERE contact_a.id ={$contactId} AND contact_b.id={$orgId}; ";
    *
    * @param int $organizationId
    *   Current employer id.
-   *
    */
   public static function updateCurrentEmployer($organizationId) {
     $query = "UPDATE civicrm_contact contact_a,civicrm_contact contact_b
@@ -442,7 +440,6 @@ WHERE contact_a.employer_id=contact_b.id AND contact_b.id={$organizationId}; ";
    *   Contact id ( mostly individual contact id).
    * @param int $employerId
    *   Contact id ( mostly organization contact id).
-   *
    */
   public static function clearCurrentEmployer($contactId, $employerId = NULL) {
     $query = "UPDATE civicrm_contact
@@ -566,7 +563,6 @@ WHERE id={$contactId}; ";
    *
    * @param int $employerId
    *   Contact id of employer ( organization id ).
-   *
    */
   public static function clearAllEmployee($employerId) {
     $query = "

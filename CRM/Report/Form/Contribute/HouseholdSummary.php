@@ -44,10 +44,8 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
   protected $_summary = NULL;
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     self::validRelationships();

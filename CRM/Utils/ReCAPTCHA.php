@@ -58,7 +58,6 @@ class CRM_Utils_ReCAPTCHA {
    *
    * @return object
    * @static
-   *
    */
   public static function &singleton() {
     if (self::$_singleton === NULL) {
@@ -68,14 +67,12 @@ class CRM_Utils_ReCAPTCHA {
   }
 
   /**
-   *
    */
   public function __construct() {
   }
 
   /**
    * Add element to form
-   *
    */
   public static function add(&$form) {
     $error  = NULL;

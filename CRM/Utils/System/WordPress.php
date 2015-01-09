@@ -38,7 +38,6 @@
  */
 class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
-   *
    */
   public function __construct() {
     /**
@@ -737,7 +736,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @param object $user
    *   Object as described by the User Framework.
    * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
-   *
    */
   public function getUniqueIdentifierFromUserObject($user) {
     return empty($user->user_email) ? NULL : $user->user_email;
@@ -751,7 +749,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    *
    * @return string
    *   loginURL for the current CMS
-   *
    */
   public function getLoginURL($destination = '') {
     $config = CRM_Core_Config::singleton();
@@ -772,7 +769,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    *
    * @return string
    *   version number
-   *
    */
   public function getVersion() {
     if (function_exists('get_bloginfo')) {

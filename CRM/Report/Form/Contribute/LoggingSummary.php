@@ -35,7 +35,6 @@
  */
 class CRM_Report_Form_Contribute_LoggingSummary extends CRM_Logging_ReportSummary {
   /**
-   *
    */
   public function __construct() {
     $this->_columns = array(

@@ -47,7 +47,6 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   *
    */
   public function run() {
     $session         = CRM_Core_Session::singleton();

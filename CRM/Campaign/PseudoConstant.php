@@ -103,7 +103,6 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return array
    *   array reference of all campaign types.
-   *
    */
   public static function &campaignType() {
     if (!self::$campaignType) {
@@ -123,7 +122,6 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return array
    *   array reference of all campaign status.
-   *
    */
   public static function &campaignStatus() {
     if (!self::$campaignStatus) {

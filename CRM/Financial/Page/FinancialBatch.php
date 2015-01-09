@@ -77,7 +77,6 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
    * Finally it calls the parent's run method.
    *
    * @return void
-   *
    */
   public function run() {
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);

@@ -366,7 +366,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *   name
    *
    * @static
-   *
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $id, 'label');
@@ -1099,7 +1098,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @return boolean
    *
    * @static
-   *
    */
   public static function deleteField($field) {
     CRM_Utils_System::flushCache();
@@ -2388,7 +2386,6 @@ WHERE      ( f.label = %1 OR f.name = %1 )
 
   /**
    * Given ID of a custom field, return its name as well as the name of the custom group it belongs to.
-   *
    */
   public static function getNameFromID($ids) {
     if (is_array($ids)) {

@@ -235,7 +235,6 @@ Order By  camp.title";
   /**
    * Wrapper to self::getCampaigns( )
    * w/ permissions and component check.
-   *
    */
   public static function getPermissionedCampaigns(
     $includeId = NULL,
@@ -543,7 +542,6 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
   /*
    * Add select element for campaign
    * and assign needful info to templates.
-   *
    */
   /**
    * @param CRM_Core_Form $form

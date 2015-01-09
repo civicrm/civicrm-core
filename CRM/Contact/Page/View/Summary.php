@@ -44,7 +44,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   *
    */
   public function preProcess() {
     parent::preProcess();
@@ -90,7 +89,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   *
    */
   public function run() {
     $this->preProcess();

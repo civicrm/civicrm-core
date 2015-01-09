@@ -85,7 +85,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    * Sets the title.
    *
    * @return void
-   *
    */
   public function preProcess() {
     if (!self::$_gName && !empty($this->urlPath[3])) {

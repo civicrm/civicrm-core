@@ -47,13 +47,11 @@ class CRM_Event_Form_Task_PickProfile extends CRM_Event_Form_Task {
 
   /**
    * Maximum event participations that should be allowed to update
-   *
    */
   protected $_maxParticipations = 100;
 
   /**
    * Variable to store redirect path
-   *
    */
   protected $_userContext;
 

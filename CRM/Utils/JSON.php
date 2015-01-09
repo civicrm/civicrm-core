@@ -134,7 +134,6 @@ class CRM_Utils_JSON {
    * @param array $selectorElements
    *   Selector elements.
    * @return string
-   *
    */
   public static function encodeDataTableSelector($params, $sEcho, $iTotal, $iFilteredTotal, $selectorElements) {
     $sOutput = '{';

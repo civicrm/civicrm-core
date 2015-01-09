@@ -472,7 +472,6 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
    * @param array/string $subType contact subType.
    * @return array/string of basicTypes.
    * @static
-   *
    */
   public static function getBasicType($subType) {
     static $_cache = NULL;

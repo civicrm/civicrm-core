@@ -386,7 +386,6 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *
    *
    * @return void
-   *
    */
   public function addActions($uploadDirectory = NULL, $uploadNames = NULL) {
     $names = array(
@@ -526,7 +525,6 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *
    *
    * @return void
-   *
    */
   public function set($name, $value = NULL) {
     self::$_session->set($name, $value, $this->_scope);
@@ -541,7 +539,6 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
 
    *
    * @return mixed
-   *
    */
   public function get($name) {
     return self::$_session->get($name, $this->_scope);
@@ -855,7 +852,6 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * and present the user a better message and/or redirect to the same page with a reset url
    *
    * @return void
-   *
    */
   public function invalidKey() {
     self::invalidKeyCommon();

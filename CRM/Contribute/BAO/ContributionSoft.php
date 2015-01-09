@@ -49,7 +49,6 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    *
    * @return object
    *   soft contribution of object that is added
-   *
    */
   public static function add(&$params) {
     $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();

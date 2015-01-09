@@ -143,13 +143,11 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * Build tags filter
-   *
    */
   protected $_tagFilter = FALSE;
 
   /**
    * Build groups filter
-   *
    */
   protected $_groupFilter = FALSE;
 
@@ -298,7 +296,6 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_currencyColumn = NULL;
 
   /**
-   *
    */
   public function __construct() {
     parent::__construct();
@@ -2935,7 +2932,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   /*
    * Get Template file name - use default form template if a specific one has not been set up for this report
-   *
    */
   /**
    * Use the form name to create the tpl file name

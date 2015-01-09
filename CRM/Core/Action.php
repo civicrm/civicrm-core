@@ -42,7 +42,6 @@ class CRM_Core_Action {
    * constant from CRM_Core_Form for various modes.
    *
    * @var integer const
-   *
    */
   const
     NONE = 0,
@@ -78,7 +77,6 @@ class CRM_Core_Action {
    * @var array $_names  type of variable name to action constant
    *
    * @static
-   *
    */
   static $_names = array(
     'add' => self::ADD,
@@ -137,7 +135,6 @@ class CRM_Core_Action {
    * @return int
    *   the action mask corresponding to the input args
    * @static
-   *
    */
   public static function map($item) {
     $mask = 0;
@@ -162,7 +159,6 @@ class CRM_Core_Action {
    * @return int
    *   the action mask corresponding to the input string
    * @static
-   *
    */
   public static function mapItem($item) {
     $mask = CRM_Utils_Array::value(trim($item), self::$_names);
@@ -179,7 +175,6 @@ class CRM_Core_Action {
    * @return string
    *   the corresponding action description
    * @static
-   *
    */
   public static function description($mask) {
     if (!isset($_description)) {

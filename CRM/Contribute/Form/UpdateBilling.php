@@ -137,7 +137,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
    *
    * @return array
    *   reference to the array of default values
-   *
    */
   /**
    * @return array

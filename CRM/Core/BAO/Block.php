@@ -517,7 +517,6 @@ class CRM_Core_BAO_Block {
    * Sort location array so primary element is first
    *
    * @param array $locations
-   *
    */
   public static function sortPrimaryFirst(&$locations) {
     uasort($locations, 'self::primaryComparison');

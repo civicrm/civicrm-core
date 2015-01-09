@@ -104,7 +104,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    *
    * @return array
    *   reference to the array of default values
-   *
    */
   /**
    * @return array

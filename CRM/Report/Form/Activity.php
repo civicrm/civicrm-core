@@ -42,10 +42,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   protected $_nonDisplayFields = array();
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     // There could be multiple contacts. We not clear on which contact id to display.

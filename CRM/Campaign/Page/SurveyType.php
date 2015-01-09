@@ -76,7 +76,6 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    * Obtains the group name from url and sets the title.
    *
    * @return void
-   *
    */
   public function preProcess() {
     $this->_gName = 'activity_type';

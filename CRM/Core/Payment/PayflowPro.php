@@ -407,7 +407,6 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    *   The mode we are operating in (live or test) - not used.
    *
    * returns string $errorMsg if any errors found - null if OK
-   *
    */
 
   //  function checkConfig( $mode )          // CiviCRM V1.9 Declaration
@@ -461,7 +460,6 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * Submit transaction using CuRL
    * @submiturl string Url to direct HTTPS GET to
    * @payflow_query value string to be posted
-   *
    */
   /**
    * @param $submiturl

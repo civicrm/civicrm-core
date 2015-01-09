@@ -186,7 +186,6 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
    * - Edit
    *
    * @return array
-   *
    */
   public static function &links() {
     $args = func_get_args();
@@ -236,7 +235,6 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
    *
    * @param $action
    * @param array $params
-   *
    */
   public function getPagerParams($action, &$params) {
     $params['status'] = ts('Pledge') . ' %%StatusMessage%%';

@@ -47,10 +47,8 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   protected $lifeTime_where = NULL;
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
     $yearsInPast = 10;

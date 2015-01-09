@@ -63,7 +63,6 @@ class CRM_Core_CodeGen_Main {
 
   /**
    * Automatically generate a variety of files
-   *
    */
   public function main() {
     if (!empty($this->digestPath) && file_exists($this->digestPath) && $this->hasExpectedFiles()) {

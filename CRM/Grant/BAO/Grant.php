@@ -259,7 +259,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *
    * @return object
    * @static
-   *
    */
   public static function create(&$params, &$ids) {
     $transaction = new CRM_Core_Transaction();
@@ -338,7 +337,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *
    * @return bool|mixed
    * @static
-   *
    */
   public static function del($id) {
     CRM_Utils_Hook::pre('delete', 'Grant', $id, CRM_Core_DAO::$_nullArray);

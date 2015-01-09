@@ -52,7 +52,6 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
   private $cache;
 
   /**
-   *
    */
   public function __construct() {
     $this->cache = array();

@@ -45,10 +45,8 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
   protected $_customGroupExtends = array('Contribution');
 
   /**
-   *
    */
   /**
-   *
    */
   public function __construct() {
 

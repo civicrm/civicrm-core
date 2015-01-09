@@ -339,7 +339,6 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    * default is to always check permissioning but public pages for example might not want
    * permission to be checked for anonymous users. Refer CRM-6211. We might be beaking
    * Multi-Site dedupe for public pages.
-   *
    */
   public function thresholdQuery($checkPermission = TRUE) {
     $this->_aclFrom = '';

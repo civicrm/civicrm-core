@@ -428,7 +428,6 @@ WHERE  id = %1
    *   The smart group that needs to be loaded.
    * @param bool $force
    *   Should we force a search through.
-   *
    */
   public static function load(&$group, $force = FALSE) {
     $groupID = $group->id;

@@ -39,7 +39,6 @@ class CRM_Utils_Migrate_ImportJSON {
   protected $_saveMapping;
 
   /**
-   *
    */
   public function __construct() {
     $this->_lookupCache = array();

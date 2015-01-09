@@ -95,7 +95,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * @return \CRM_Contact_DAO_Contact
    */
   /**
-   *
    */
   public function __construct() {
     parent::__construct();
@@ -1099,7 +1098,6 @@ WHERE id={$id}; ";
    *
    *
    * @static
-   *
    */
   public static function getContactType($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $id, 'contact_type');
@@ -1143,7 +1141,6 @@ WHERE id={$id}; ";
    *
    *
    * @static
-   *
    */
   public static function getContactTypes($id) {
     $params = array('id' => $id);

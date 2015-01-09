@@ -1881,7 +1881,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * $this->_params['amount'] = null;
    *
    * @param int $priceSetID
-   *
    */
   public function setFormAmountFields($priceSetID) {
     $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_params['priceSetId'], 'is_quick_config');

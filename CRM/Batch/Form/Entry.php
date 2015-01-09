@@ -40,7 +40,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   /**
    * Maximum profile fields that will be displayed
-   *
    */
   protected $_rowCount = 1;
 

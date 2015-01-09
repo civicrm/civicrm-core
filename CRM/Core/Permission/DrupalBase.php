@@ -261,7 +261,6 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    *
    * @return boolean
    *   true if yes, else false
-   *
    */
   public function checkGroupRole($array) {
     if (function_exists('user_load') && isset($array)) {
@@ -322,7 +321,6 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
 
   /**
    * {@inheritdoc}
-   *
    */
   public function upgradePermissions($permissions) {
     if (empty($permissions)) {
