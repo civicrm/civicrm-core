@@ -247,7 +247,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
     $this->click('toggleSelect');
     $this->click('_qf_Merge_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForPageToLoad($this->getTimeoutMsec() * 4);
     $this->assertTrue($this->isTextPresent("Staff, Student"));
   }
   /**
@@ -915,7 +915,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // Check if Membership for the individual is created
     $this->waitForElementPresent("xpath=//li[@id='tab_member']/a/em");
-    $this->verifyText("xpath=//li[@id='tab_member']/a/em", 1);
+    $this->verifyText("xpath=//li[@id='tab_member']/a/em", 0);
   }
 
   /**
