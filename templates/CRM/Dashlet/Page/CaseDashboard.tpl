@@ -33,7 +33,9 @@
    {if $newClient}
     <tr>
       <td>
-        <a href="{$newCaseURL}" class="button"><span>&raquo; {ts}New Case{/ts}</span></a>
+        <a href="{$newCaseURL}" class="button">
+          <span><div class="icon ui-icon-circle-plus"></div> {ts}New Case{/ts}</span>
+        </a>
       </td>
     </tr>
    {/if}

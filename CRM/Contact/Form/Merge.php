@@ -261,47 +261,33 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Merge %1s', array(1 => $this->_contactType)));
-    $name = ts('Merge');
-    if ($this->next) {
-      $name = ts('Merge and Goto Next Pair');
-    }
+    $buttons = array();
+
+    $buttons[] = array(
+      'type' => 'next',
+      'name' => $this->next ? ts('Merge and Goto Next Pair') : ts('Merge'),
+      'isDefault' => TRUE,
+      'icon' => $this->next ? 'circle-triangle-e' : 'check',
+    );
 
     if ($this->next || $this->prev) {
-      $button = array(
-        array(
-          'type' => 'next',
-          'name' => $name,
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'submit',
-          'name' => ts('Merge and Goto Listing'),
-        ),
-        array(
-          'type' => 'done',
-          'name' => ts('Merge and View Result'),
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
+      $buttons[] = array(
+        'type' => 'submit',
+        'name' => ts('Merge and Goto Listing'),
       );
-    }
-    else {
-      $button = array(
-        array(
-          'type' => 'next',
-          'name' => $name,
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
+      $buttons[] = array(
+        'type' => 'done',
+        'name' => ts('Merge and View Result'),
+        'icon' => 'circle-check'
       );
     }
 
-    $this->addButtons($button);
+    $buttons[] = array(
+      'type' => 'cancel',
+      'name' => ts('Cancel'),
+    );
+
+    $this->addButtons($buttons);
     $this->addFormRule(array('CRM_Contact_Form_Merge', 'formRule'), $this);
   }
 

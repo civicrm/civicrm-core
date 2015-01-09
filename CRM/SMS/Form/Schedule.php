@@ -131,7 +131,7 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
       $url = CRM_Utils_System::url('civicrm/mailing/browse/unscheduled', 'scheduled=false&reset=1&sms=1');
       CRM_Utils_System::redirect($url);
     }
-    if (isset($params['now']) || CRM_Utils_Array::value('_qf_Schedule_back', $params) == '<< Previous') {
+    if (isset($params['now']) || CRM_Utils_Array::value('_qf_Schedule_back', $params) == ts('Previous')) {
       return TRUE;
     }
 
