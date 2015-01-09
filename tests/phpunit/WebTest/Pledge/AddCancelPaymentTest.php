@@ -101,6 +101,7 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Contribution_upload-bottom");
     $this->select('contribution_status_id', 'value=3');
     $this->click("_qf_Contribution_upload-bottom");
+    $this->waitForAjaxContent();
     $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
     $this->click("_qf_ContributionView_cancel-bottom");
 

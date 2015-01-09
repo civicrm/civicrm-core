@@ -105,6 +105,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
 
     // Fill Email Subject
     $this->click("xpath=//div[@id='mainTabContainer']/ul/li[5]/a");
+    $this->waitForAjaxContent();
     $this->type("email_subject", $emaiSubject);
 
     // Fill Email To
@@ -173,6 +174,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
 
     // Is correct email Subject?
     $this->click("xpath=//div[@id='mainTabContainer']/ul/li[5]/a");
+    $this->waitForAjaxContent();
     $this->assertContains($emaiSubject, $this->getValue("email_subject"), "Email Subject expected $emaiSubject");
 
     // Is correct email to?

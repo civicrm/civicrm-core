@@ -127,8 +127,8 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('title');
     $this->type('title', $editCaseTypeLabel);
 
-    $this->select2("xpath=//tr[@class='addRow']/td/span/div/a", 'Sibling of', FALSE, TRUE);
-    $this->click("xpath=//*[@id='crm-main-content-wrapper']/div/div/form/div/div[3]/table/tbody/tr[4]/td[2]/input[@type='checkbox']");
+    $this->select2("xpath=//div[@id='crm-main-content-wrapper']/div/div/form/div/div[4]/table/tfoot/tr/td/span/div/a",'Sibling of', FALSE, TRUE);
+    $this->click("xpath=//*[@id='crm-main-content-wrapper']/div/div/form/div/div[4]/table/tbody/tr[4]/td[2]/input[@type='checkbox']");
 
     $this->click("xpath=//a[text()='Standard Timeline']");
     $this->select2("xpath=//tr[@class='addRow']/td[contains(text(),'Add activity:')]/span/div/a", 'SMS', FALSE, TRUE);
