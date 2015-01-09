@@ -477,7 +477,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *                useful when we die during initialization and permissioning
    *                subsystem is not initialized - CRM-13765
    *
-   * @return string the generated output
+   * @return string
+   *   the generated output
    * @static
    */
   public static function debug($name, $variable = NULL, $log = TRUE, $html = TRUE, $checkPermission = TRUE) {
@@ -526,7 +527,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param string $comp
    *   Variable name.
    *
-   * @return string the generated output
+   * @return string
+   *   the generated output
    *
    *
    * @static
@@ -575,7 +577,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @param string $comp
    *   Message to be output.
-   * @return string format of the backtrace
+   * @return string
+   *   format of the backtrace
    *
    *
    * @static
@@ -688,7 +691,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *   TRUE if we should try to display content of function arguments (which could be sensitive); FALSE to display only the type of each function argument.
    * @param int $maxArgLen
    *   Maximum number of characters to show from each argument string.
-   * @return string printable plain-text
+   * @return string
+   *   printable plain-text
    */
   public static function formatBacktrace($backTrace, $showArgs = TRUE, $maxArgLen = 80) {
     $message = '';
@@ -781,7 +785,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Render an exception as HTML string
    *
    * @param Exception $e
-   * @return string printable HTML text
+   * @return string
+   *   printable HTML text
    */
   public static function formatHtmlException(Exception $e) {
     $msg = '';
@@ -816,7 +821,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Write details of an exception to the log
    *
    * @param Exception $e
-   * @return string printable plain text
+   * @return string
+   *   printable plain text
    */
   public static function formatTextException(Exception $e) {
     $msg = get_class($e) . ": \"" . $e->getMessage() . "\"\n";
@@ -901,7 +907,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @param object $obj
    *   The PEAR_ERROR object.
-   * @return object $obj
+   * @return object
+   *   $obj
    * @static
    */
   public static function nullHandler($obj) {

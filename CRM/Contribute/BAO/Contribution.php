@@ -559,7 +559,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param string $contactType
    * @param bool $status
    *
-   * @return array array of importable Fields
+   * @return array
+   *   array of importable Fields
    * @static
    */
   public static function &importableFields($contactType = 'Individual', $status = TRUE) {
@@ -849,7 +850,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    *
    * @param int $id
    *
-   * @return boolean true if duplicate, false otherwise
+   * @return boolean
+   *   true if duplicate, false otherwise
    * static
    */
   public static function checkDuplicate($input, &$duplicates, $id = NULL) {
@@ -919,7 +921,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    * @param bool $addExtraFields
    *   True if special fields needs to be added.
    *
-   * @return array the list of contribution fields
+   * @return array
+   *   the list of contribution fields
    * @static
    */
   public static function getContributionFields($addExtraFields = TRUE) {
@@ -1154,7 +1157,8 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
    * @param array $params
    *   An assoc array of name/value pairs.
    *
-   * @return array contribution id if success else NULL
+   * @return array
+   *   contribution id if success else NULL
    * static
    */
   public static function checkDuplicateIds($params) {
@@ -1186,7 +1190,8 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
    * @param string $componentIds
    *   Component ids.
    *
-   * @return array associated array
+   * @return array
+   *   associated array
    *
    * @static
    */
@@ -1840,7 +1845,8 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * @param int $contributorId
    *   Contributor id.
    *
-   * @return array $ids containing organization id and individual id
+   * @return array
+   *   containing organization id and individual id
    */
   public static function getOnbehalfIds($contributionId, $contributorId = NULL) {
 
@@ -2137,7 +2143,8 @@ WHERE  contribution_id = %1 ";
    *   Distinguishes between whether to send message or return.
    *   message text. We are working towards this function ALWAYS returning message text & calling
    *   function doing emails / pdfs with it
-   * @return array $messageArray - messages
+   * @return array
+   *   messages
    */
   /**
    * @param $input
@@ -2279,7 +2286,7 @@ WHERE  contribution_id = %1 ";
    * @param array $ids
    *   The set of ids related to the inpurt.
    *
-   * @return array $values
+   * @return array
    *
    * NB don't add direct calls to the function as we intend to change the signature
    */
@@ -2628,7 +2635,8 @@ WHERE  contribution_id = %1 ";
    * @param int $contributionId
    *   Contribution id.
    *
-   * @return string $status contribution status
+   * @return string
+   *   contribution status
    * @static
    */
   public static function isSubscriptionCancelled($contributionId) {

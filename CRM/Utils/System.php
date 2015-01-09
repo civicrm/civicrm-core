@@ -297,7 +297,8 @@ class CRM_Utils_System {
   /**
    * What menu path are we currently on. Called for the primary tpl
    *
-   * @return string the current menu path
+   * @return string
+   *   the current menu path
    */
   public static function currentPath() {
     $config = CRM_Core_Config::singleton();
@@ -310,7 +311,8 @@ class CRM_Utils_System {
    * @param array $params
    *   List of parameters.
    *
-   * @return string url
+   * @return string
+   *   url
    */
   public static function crmURL($params) {
     $p = CRM_Utils_Array::value('p', $params);
@@ -1248,7 +1250,8 @@ class CRM_Utils_System {
   /**
    * Returns wiki (alternate) documentation URL base.
    *
-   * @return string documentation url
+   * @return string
+   *   documentation url
    */
   public static function getWikiBaseURL() {
     // FIXME: move this to configuration at some stage
@@ -1626,7 +1629,8 @@ class CRM_Utils_System {
    *
    * @param string $url
    *
-   * @return string $url, clean url
+   * @return string
+   *   , clean url
    */
   public static function cleanUrl($url) {
     if (!$url) {
@@ -1648,7 +1652,8 @@ class CRM_Utils_System {
    * @param bool $addLanguagePart
    * @param bool $removeLanguagePart
    *
-   * @return string $url, formatted url.
+   * @return string
+   *   , formatted url.
    */
   static function languageNegotiationURL(
     $url,

@@ -59,7 +59,8 @@ function civicrm_api3($entity, $action, $params = array()) {
  * @todo other output modifiers include contact_type
  *
  * @param array $apiRequest
- * @return array getfields output
+ * @return array
+   *   getfields output
  */
 function _civicrm_api3_api_getfields(&$apiRequest) {
   if (strtolower($apiRequest['action'] == 'getfields')) {
@@ -88,7 +89,8 @@ function _civicrm_api3_api_getfields(&$apiRequest) {
  *
  * @param $result
  *
- * @return boolean true if error, false otherwise
+ * @return boolean
+   *   true if error, false otherwise
  * @static void
  * @access public
  */
@@ -157,7 +159,7 @@ function _civicrm_api_replace_variables($entity, $action, &$params, &$parentResu
  * @param string $entity
  *   Entity name in various formats e.g. Contribution, contribution,
  *   OptionValue, option_value, UFJoin, uf_join.
- * @return string $entity
+ * @return string
  *   Entity name in underscore separated format.
  *
  * @fixme Why isn't this called first thing in civicrm_api wrapper?

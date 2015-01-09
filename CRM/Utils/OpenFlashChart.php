@@ -57,7 +57,8 @@ class CRM_Utils_OpenFlashChart {
    * @param array $params
    *   Assoc array of name/value pairs.
    *
-   * @return object $chart   object of open flash chart.
+   * @return object
+   *   $chart   object of open flash chart.
    * @static
    */
   public static function &barChart(&$params) {
@@ -187,7 +188,8 @@ class CRM_Utils_OpenFlashChart {
    * @param array $params
    *   Assoc array of name/value pairs.
    *
-   * @return object $chart   object of open flash chart.
+   * @return object
+   *   $chart   object of open flash chart.
    * @static
    */
   public static function &pieChart(&$params) {
@@ -251,7 +253,8 @@ class CRM_Utils_OpenFlashChart {
    * @param array $params
    *   Assoc array of name/value pairs.
    *
-   * @return object $chart   object of open flash chart.
+   * @return object
+   *   $chart   object of open flash chart.
    * @static
    */
   public static function &bar_3dChart(&$params) {

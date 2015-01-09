@@ -41,7 +41,8 @@
  * @param object $smarty
  *   Reference to the smarty object.
  *
- * @return string the help html to be inserted
+ * @return string
+   *   the help html to be inserted
  */
 function smarty_function_help($params, &$smarty) {
   if (!isset($params['id']) || !isset($smarty->_tpl_vars['config'])) {

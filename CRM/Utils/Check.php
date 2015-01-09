@@ -114,7 +114,8 @@ class CRM_Utils_Check {
    * We might even expose the results of these checks on the Wordpress
    * plugin status page or the Drupal admin/reports/status path.
    *
-   * @return array of messages
+   * @return array
+   *   of messages
    * @link https://api.drupal.org/api/drupal/modules%21system%21system.api.php/function/hook_requirements
    */
   public function checkAll() {

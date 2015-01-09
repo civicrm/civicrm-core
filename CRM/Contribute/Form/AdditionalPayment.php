@@ -153,7 +153,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    *
    * access        public
    *
-   * @return array reference to the array of default values
+   * @return array
+   *   reference to the array of default values
    *
    */
   /**

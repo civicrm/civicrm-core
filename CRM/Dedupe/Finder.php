@@ -48,7 +48,8 @@ class CRM_Dedupe_Finder {
    * @param array $cids
    *   Contact ids to limit the search to.
    *
-   * @return array  array of (cid1, cid2, weight) dupe triples
+   * @return array
+   *   array of (cid1, cid2, weight) dupe triples
    */
   public static function dupes($rgid, $cids = array()) {
     $rgBao             = new CRM_Dedupe_BAO_RuleGroup();
@@ -91,7 +92,8 @@ class CRM_Dedupe_Finder {
    * @param int $ruleGroupID
    *   The id of the dedupe rule we should be using.
    *
-   * @return array  matching contact ids
+   * @return array
+   *   matching contact ids
    */
   static function dupesByParams(
     $params,
@@ -147,7 +149,8 @@ class CRM_Dedupe_Finder {
    * @param int $gid
    *   Contact group id (currently, works only with non-smart groups).
    *
-   * @return array  array of (cid1, cid2, weight) dupe triples
+   * @return array
+   *   array of (cid1, cid2, weight) dupe triples
    */
   public static function dupesInGroup($rgid, $gid) {
     $cids = array_keys(CRM_Contact_BAO_Group::getMember($gid));
@@ -167,7 +170,8 @@ class CRM_Dedupe_Finder {
    * @param string $ctype
    *   Contact type of the given contact.
    *
-   * @return array  array of dupe contact_ids
+   * @return array
+   *   array of dupe contact_ids
    */
   public static function dupesOfContact($cid, $used = 'Unsupervised', $ctype = NULL) {
     // if not provided, fetch the contact type from the database
@@ -209,7 +213,8 @@ class CRM_Dedupe_Finder {
    * @param string $ctype
    *   Contact type of the given contact.
    *
-   * @return array  valid $params array for dedupe
+   * @return array
+   *   valid $params array for dedupe
    */
   public static function formatParams($fields, $ctype) {
     $flat = array();

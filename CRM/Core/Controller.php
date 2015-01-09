@@ -486,7 +486,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * we have two submit buttons, we could have one displayed as a button and
    * the other as an image, both are of type 'submit'.
    *
-   * @return string the name of the button that has been pressed by the user
+   * @return string
+   *   the name of the button that has been pressed by the user
    */
   public function getButtonName() {
     $data = &$this->container();
@@ -666,7 +667,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * Getter for embedded
    *
-   * @return boolean return the embedded value
+   * @return boolean
+   *   return the embedded value
    */
   public function getEmbedded() {
     return $this->_embedded;
@@ -686,7 +688,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * Getter for skipRedirection
    *
-   * @return boolean return the skipRedirection value
+   * @return boolean
+   *   return the skipRedirection value
    */
   public function getSkipRedirection() {
     return $this->_skipRedirection;
@@ -741,7 +744,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * Getter for print
    *
-   * @return boolean return the print value
+   * @return boolean
+   *   return the print value
    */
   public function getPrint() {
     return $this->_print;

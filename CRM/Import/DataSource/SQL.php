@@ -37,7 +37,8 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
   /**
    * Provides information about the data source
    *
-   * @return array collection of info about this data source
+   * @return array
+   *   collection of info about this data source
    *
    *
    */
@@ -59,7 +60,8 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
    *
    * @param CRM_Core_Form $form
    *
-   * @return void (operates directly on form argument)
+   * @return void
+   *   (operates directly on form argument)
    */
   public function buildQuickForm(&$form) {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_SQL');

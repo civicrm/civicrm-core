@@ -1703,7 +1703,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
    * @param object $membership
    *   Object.
    *
-   * @return boolean true if mail was sent successfully
+   * @return boolean
+   *   true if mail was sent successfully
    * @static
    */
   public static function emailReceipt(&$form, &$formValues, &$membership) {

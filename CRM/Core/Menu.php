@@ -487,7 +487,8 @@ class CRM_Core_Menu {
    * @param string $path
    *   Path for which breadcrumb is to be build.
    *
-   * @return array  The breadcrumb for this path
+   * @return array
+   *   The breadcrumb for this path
    *
    * @static
    */

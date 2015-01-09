@@ -47,7 +47,8 @@ class CRM_Utils_Network {
    * @param float $interval
    *   Seconds to wait in between pollings.
    *
-   * @return bool TRUE if service is online
+   * @return bool
+   *   TRUE if service is online
    */
   public static function waitForServiceStartup($host, $port, $serverStartupTimeOut, $interval = 0.333) {
     $start = time();

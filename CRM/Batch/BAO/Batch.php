@@ -59,7 +59,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param string $context
    *   String.
    *
-   * @return object $batch batch object
+   * @return object
+   *   $batch batch object
    */
   public static function create(&$params, $ids = NULL, $context = NULL) {
     if (empty($params['id'])) {
@@ -84,7 +85,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return array CRM_Batch_BAO_Batch object on success, null otherwise
+   * @return array
+   *   CRM_Batch_BAO_Batch object on success, null otherwise
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -103,7 +105,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param int $batchTypeId
    *   Batch type id.
    *
-   * @return int  $profileId   profile id
+   * @return int
+   *   $profileId   profile id
    * @static
    */
   public static function getProfileId($batchTypeId) {
@@ -185,7 +188,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param array $params
    *   Associated array for params record id.
    *
-   * @return array   $batchList associated array of batch list
+   * @return array
+   *   associated array of batch list
    */
   public function getBatchListSelector(&$params) {
     // format the params
@@ -423,7 +427,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    *
    * @param null $context
    *
-   * @return array $links array of action links
+   * @return array
+   *   array of action links
    */
   public function links($context = NULL) {
     if ($context == 'financialBatch') {
@@ -500,7 +505,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Get batch list
    *
-   * @return array array of all batches
+   * @return array
+   *   array of all batches
    * excluding batches with data entry in progress
    */
   public static function getBatches() {
@@ -775,7 +781,8 @@ WHERE  {$where}
    * Get batch names
    * @param string $batchIds
    *
-   * @return array array of batches
+   * @return array
+   *   array of batches
    */
   public static function getBatchNames($batchIds) {
     $query = 'SELECT id, title
@@ -795,7 +802,8 @@ WHERE  {$where}
    *
    * @param string $batchIds
    *
-   * @return array array of batches
+   * @return array
+   *   array of batches
    */
   public static function getBatchStatuses($batchIds) {
     $query = 'SELECT id, status_id

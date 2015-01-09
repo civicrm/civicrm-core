@@ -20,7 +20,8 @@ class PHPUnitParser {
   /**
    * @param string $content
    *   Json stream.
-   * @return array (string $testName => string $status)
+   * @return array
+   *   (string $testName => string $status)
    */
   public static function parseJsonResults($content) {
     $records = self::parseJsonStream($content);

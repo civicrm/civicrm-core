@@ -45,7 +45,8 @@
  *                    - key: type, value: Delivered | Bounced - optional, defaults to Delivered
  *                    - Future extensions will include: Opened, Clicked, Forwarded
  *
- * @return array API result
+ * @return array
+   *   API result
  * @static void
  * @access public
  * @example CRM/Mailing/BAO/Mailing.php
@@ -293,7 +294,8 @@ INNER JOIN civicrm_mailing_event_bounce meb ON meb.event_queue_id = meq.id
  *                    - key: type, value: Delivered | Bounced - optional, defaults to Delivered
  *                    - Future extensions will include: Opened, Clicked, Forwarded
  *
- * @return array API result
+ * @return array
+   *   API result
  * @static void
  * @access public
  * @example CRM/Mailing/BAO/Mailing.php

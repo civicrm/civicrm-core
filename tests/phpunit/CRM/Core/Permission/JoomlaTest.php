@@ -8,7 +8,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Core_Permission_JoomlaTest extends CiviUnitTestCase {
 
   /**
-   * @return array (0 => input to translatePermission, 1 => expected output from translatePermission)
+   * @return array
+   *   (0 => input to translatePermission, 1 => expected output from translatePermission)
    */
   public function translateData() {
     $cases = array();

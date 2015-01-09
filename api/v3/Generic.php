@@ -17,7 +17,8 @@
  *  - version: string
  *  - function: callback (mixed)
  *  - params: array, varies
- * @return array API success object
+ * @return array
+   *   API success object
  */
 function civicrm_api3_generic_getfields($apiRequest) {
   static $results = array();
@@ -148,7 +149,8 @@ function civicrm_api3_generic_getfields($apiRequest) {
  *   Api request as an array. Keys are.
  *
  * @throws API_Exception
- * @return integer count of results
+ * @return integer
+   *   count of results
  */
 function civicrm_api3_generic_getcount($apiRequest) {
   $apiRequest['params']['options']['is_count'] = TRUE;
@@ -168,7 +170,8 @@ function civicrm_api3_generic_getcount($apiRequest) {
  * @param array $apiRequest
  *   Api request as an array. Keys are.
  *
- * @return integer count of results
+ * @return integer
+   *   count of results
  */
 function civicrm_api3_generic_getsingle($apiRequest) {
   // so the first entity is always result['values'][0]
@@ -192,7 +195,8 @@ function civicrm_api3_generic_getsingle($apiRequest) {
  * @param array $apiRequest
  *   Api request as an array. Keys are.
  *
- * @return integer count of results
+ * @return integer
+   *   count of results
  */
 function civicrm_api3_generic_getvalue($apiRequest) {
   $apiRequest['params']['sequential'] = 1;
@@ -232,7 +236,8 @@ function _civicrm_api3_generic_getrefcount_spec(&$params) {
  *   Api request as an array.
  *
  * @throws API_Exception
- * @return array API result (int 0 or 1)
+ * @return array
+   *   API result (int 0 or 1)
  */
 function civicrm_api3_generic_getrefcount($apiRequest) {
   $entityToClassMap = CRM_Core_DAO_AllCoreTables::daoToClass();
@@ -258,7 +263,8 @@ function civicrm_api3_generic_getrefcount($apiRequest) {
  * @param array $apiRequest
  *   Api request as an array. Keys are.
  *
- * @return integer count of results
+ * @return integer
+   *   count of results
  */
 function civicrm_api3_generic_replace($apiRequest) {
   return _civicrm_api3_generic_replace($apiRequest['entity'], $apiRequest['params']);
@@ -270,7 +276,8 @@ function civicrm_api3_generic_replace($apiRequest) {
  * @param array $apiRequest
  *   Api request as an array.
  *
- * @return array of results
+ * @return array
+   *   of results
  */
 function civicrm_api3_generic_getoptions($apiRequest) {
   // Resolve aliases

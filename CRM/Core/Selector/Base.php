@@ -66,7 +66,8 @@ class CRM_Core_Selector_Base {
    * @param string match the action to match against
    * @param string attribute the attribute to return ( name, link, title )
    *
-   * @return string            the attribute that matches the action if any
+   * @return string
+   *   the attribute that matches the action if any
    *
    *
    */
@@ -103,7 +104,8 @@ class CRM_Core_Selector_Base {
    * @param string $action
    *   The action being performed.
    *
-   * @return string template file name
+   * @return string
+   *   template file name
    */
   public function getTemplateFileName($action = NULL) {
     return (str_replace('_', DIRECTORY_SEPARATOR, CRM_Utils_System::getClassName($this)) . ".tpl");
@@ -114,7 +116,8 @@ class CRM_Core_Selector_Base {
    *
    * @param string action the action being performed
    *
-   * @return array the elements that can be sorted along with their properties
+   * @return array
+   *   the elements that can be sorted along with their properties
    */
   public function &getSortOrder($action) {
     $columnHeaders = &$this->getColumnHeaders(NULL);

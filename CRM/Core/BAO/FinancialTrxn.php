@@ -150,7 +150,8 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    *   To get single trxn id for a entity table i.e last or first.
    * @param bool $newTrxn
    *
-   * @return array $tag array of category id's the contact belongs to.
+   * @return array
+   *   array of category id's the contact belongs to.
    *
    * @static
    */
@@ -193,7 +194,8 @@ LIMIT 1;";
    * @param int $entity_id
    *   Id of the entity usually the contactID.
    *
-   * @return array $tag array of catagory id's the contact belongs to.
+   * @return array
+   *   array of catagory id's the contact belongs to.
    *
    * @static
    */
@@ -216,7 +218,8 @@ WHERE ft.entity_table = 'civicrm_contribution' AND ft.entity_id = %1
    *   Id of the latest payment.
    *
    *
-   * @return array $payment array of previous payments
+   * @return array
+   *   array of previous payments
    *
    * @static
    */
@@ -269,7 +272,8 @@ WHERE  ef2.financial_trxn_id =%1
    * @param string $entity_table
    *   Name of the entity table usually 'civicrm_contact'.
    *
-   * @return array $tag array of catagory id's the contact belongs to.
+   * @return array
+   *   array of catagory id's the contact belongs to.
    *
    * @static
    */

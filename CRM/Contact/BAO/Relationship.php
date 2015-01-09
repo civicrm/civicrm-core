@@ -352,7 +352,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   /**
    * Specifiy defaults for creating a relationship
    *
-   * @return array $defaults array of defaults for creating relationship
+   * @return array
+   *   array of defaults for creating relationship
    * @static
    */
   public static function getdefaults() {
@@ -408,7 +409,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @static
    *
-   * @return array - array reference of all relationship types with context to current contact.
+   * @return array
+   *   array reference of all relationship types with context to current contact.
    */
   static function getContactRelationshipType(
     $contactId = NULL,
@@ -675,7 +677,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param int $relationshipTypeId
    *   Relationship type id.
    *
-   * @return boolean  true if it is valid relationship else false
+   * @return boolean
+   *   true if it is valid relationship else false
    * @static
    */
   public static function checkRelationshipType($contact_a, $contact_b, $relationshipTypeId) {
@@ -748,7 +751,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param int $relationshipId
    *   This is relationship id for the contact.
    *
-   * @return boolean true if record exists else false
+   * @return boolean
+   *   true if record exists else false
    * @static
    */
   public static function checkDuplicateRelationship(&$params, $id, $contactId = 0, $relationshipId = 0) {
@@ -825,7 +829,8 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
    *   Value we want to set the is_active field.
    *
    * @throws CiviCRM_API3_Exception
-   * @return Object             DAO object on success, null otherwise
+   * @return Object
+   *   DAO object on success, null otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -860,7 +865,8 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
    * @param array $values
    *   Output values of the object.
    *
-   * @return array (reference)   the values that could be potentially assigned to smarty
+   * @return array
+   *   (reference)   the values that could be potentially assigned to smarty
    * @static
    */
   public static function &getValues(&$params, &$values) {
@@ -1253,7 +1259,8 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    * @param string $targetContactType
    *   It's valid contact tpye(may be Individual , Organization , Household).
    *
-   * @return array - array reference of all relationship types with context to current contact type .
+   * @return array
+   *   array reference of all relationship types with context to current contact type .
    *
    */
   public function getRelationType($targetContactType) {
@@ -1551,7 +1558,8 @@ SELECT count(*)
    * @param $contactIds
    *   Contact Ids.
    *
-   * @return array $currentEmployer array of the current employer
+   * @return array
+   *   array of the current employer
    * @static
    */
   public static function getCurrentEmployer($contactIds) {
@@ -1584,7 +1592,8 @@ WHERE id IN ( {$contacts} )
    *
    * @static
    *
-   * @return array array of employers.
+   * @return array
+   *   array of employers.
    *
    */
   public static function getPermissionedEmployer($contactID, $name = NULL) {
@@ -1608,7 +1617,8 @@ WHERE id IN ( {$contacts} )
    *
    * @static
    *
-   * @return array of contacts
+   * @return array
+   *   of contacts
    */
   public static function getPermissionedContacts($contactID, $relTypeId, $name = NULL) {
     $contacts = array();
@@ -1766,7 +1776,8 @@ AND cc.sort_name LIKE '%$name%'";
    * @param array $params
    *   Associated array for params record id.
    *
-   * @return array   $contactRelationships associated array of contact relationships
+   * @return array
+   *   associated array of contact relationships
    */
   public static function getContactRelationshipSelector(&$params) {
     // format the params

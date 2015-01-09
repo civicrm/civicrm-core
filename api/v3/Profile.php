@@ -156,7 +156,8 @@ function _civicrm_api3_profile_get_spec(&$params) {
  * @param array $params
  *
  * @throws API_Exception
- * @return array API result array
+ * @return array
+   *   API result array
  */
 function civicrm_api3_profile_submit($params) {
   $profileID = _civicrm_api3_profile_getProfileID($params['profile_id']);
@@ -295,7 +296,8 @@ function civicrm_api3_profile_submit($params) {
  * @param string $fieldName
  *   API field name.
  *
- * @return string BAO Field Name
+ * @return string
+   *   BAO Field Name
  */
 function _civicrm_api3_profile_translate_fieldnames_for_bao($fieldName) {
   $fieldName = str_replace('url', 'URL', $fieldName);
@@ -335,7 +337,8 @@ function _civicrm_api3_profile_submit_spec(&$params, $apirequest) {
  *   Associative array of property name/value.
  *                             pairs to update profile field values
  *
- * @return array Updated Contact/ Activity object|CRM_Error
+ * @return array
+   *   Updated Contact/ Activity object|CRM_Error
  *
  *
  */
@@ -736,7 +739,8 @@ function _civicrm_api3_profile_appendaliases($values, $entity) {
 
 /**
  * @deprecated api notice
- * @return array of deprecated actions
+ * @return array
+   *   of deprecated actions
  */
 function _civicrm_api3_profile_deprecation() {
   return array(

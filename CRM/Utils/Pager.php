@@ -195,7 +195,8 @@ class CRM_Utils_Pager extends Pager_Sliding {
    *
    * @param array $params
    *
-   * @return int                new pageId to display to the user
+   * @return int
+   *   new pageId to display to the user
    */
   public function getPageID($defaultPageId = 1, &$params) {
     // POST has higher priority than GET vars
@@ -227,7 +228,8 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * @param int $defaultPageRowCount
    *   The default value if not set.
    *
-   * @return int                     the rowCount value to use
+   * @return int
+   *   the rowCount value to use
    *
    */
   public function getPageRowCount($defaultPageRowCount = self::ROWCOUNT) {
@@ -249,7 +251,8 @@ class CRM_Utils_Pager extends Pager_Sliding {
    *
    * @param void
    *
-   * @return array: an array of the pageID and offset
+   * @return array
+   *   an array of the pageID and offset
    *
    *
    */

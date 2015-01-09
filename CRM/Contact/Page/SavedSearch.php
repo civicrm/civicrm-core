@@ -149,7 +149,8 @@ class CRM_Contact_Page_SavedSearch extends CRM_Core_Page {
   /**
    * Get action Links
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    * @static
    */
   public static function &links() {

@@ -1027,7 +1027,8 @@ WHERE  v.option_group_id = g.id
    *   An array of user submitted params.
    *
    *
-   * @return array $formatted, formatted price set params.
+   * @return array
+   *   , formatted price set params.
    */
   /**
    * @param CRM_Core_Form $form
@@ -1077,7 +1078,8 @@ WHERE  v.option_group_id = g.id
    *   Form object.
    *
    *
-   * @return array $optionsCount, array of each option w/ count total.
+   * @return array
+   *   , array of each option w/ count total.
    */
   /**
    * @param $form

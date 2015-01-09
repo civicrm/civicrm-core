@@ -250,7 +250,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * @param bool $perClass
    * @param null $object
-   * @return bool TRUE if the populate logic runs; FALSE if it is skipped
+   * @return bool
+   *   TRUE if the populate logic runs; FALSE if it is skipped
    */
   protected static function _populateDB($perClass = FALSE, &$object = NULL) {
 
@@ -1065,7 +1066,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * so the distinction between set
    * up & tested functions is clearer
    *
-   * @return array api Result
+   * @return array
+   *   api Result
    */
   public function createTestEntity() {
     return $entity = $this->callAPISuccess($this->entity, 'create', $this->params);
@@ -1077,7 +1079,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array parameters for civicrm_contact_add api function call
    * @param int sequence number if creating multiple organizations
    *
-   * @return int    id of Organisation created
+   * @return int
+   *   id of Organisation created
    */
   public function organizationCreate($params = array(), $seq = 0) {
     if (!$params) {
@@ -1093,7 +1096,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array parameters for civicrm_contact_add api function call
    * @param int sequence number if creating multiple individuals
    *
-   * @return int    id of Individual created
+   * @return int
+   *   id of Individual created
    */
   public function individualCreate($params = array(), $seq = 0) {
     $params = array_merge($this->sampleContact('Individual', $seq), $params);
@@ -1106,7 +1110,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array parameters for civicrm_contact_add api function call
    * @param int sequence number if creating multiple households
    *
-   * @return int    id of Household created
+   * @return int
+   *   id of Household created
    */
   public function householdCreate($params = array(), $seq = 0) {
     $params = array_merge($this->sampleContact('Household', $seq), $params);
@@ -1119,7 +1124,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param enum contact type: Individual, Organization
    * @param int sequence number for the values of this type
    *
-   * @return array   properties of sample contact (ie. $params for API call)
+   * @return array
+   *   properties of sample contact (ie. $params for API call)
    */
   public function sampleContact($contact_type, $seq = 0) {
     $samples = array(
@@ -1164,7 +1170,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @throws Exception
    *
-   * @return int    id of Household created
+   * @return int
+   *   id of Household created
    */
   private function _contactCreate($params) {
     $result = $this->callAPISuccess('contact', 'create', $params);
@@ -1371,7 +1378,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $params
    *   Array of contact id and event id values.
    *
-   * @return int $id of participant created
+   * @return int
+   *   $id of participant created
    */
   public function participantCreate($params) {
     if (empty($params['contact_id'])) {
@@ -1398,7 +1406,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Create Payment Processor
    *
-   * @return object of Payment Processsor
+   * @return object
+   *   of Payment Processsor
    */
   public function processorCreate() {
     $processorParams = array(
@@ -1420,7 +1429,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Create contribution page
    *
    * @param array $params
-   * @return object of contribution page
+   * @return object
+   *   of contribution page
    */
   public function contributionPageCreate($params) {
     $this->_pageParams = array(
@@ -1442,7 +1452,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Create Tag
    *
    * @param array $params
-   * @return array result of created tag
+   * @return array
+   *   result of created tag
    */
   public function tagCreate($params = array()) {
     $defaults = array(
@@ -1488,7 +1499,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param int $cID
    *   Contact_id.
    *
-   * @return int id of created contribution
+   * @return int
+   *   id of created contribution
    */
   public function pledgeCreate($cID) {
     $params = array(
@@ -1534,7 +1546,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param int $trxnID
    * @param int $paymentInstrumentID
    * @param bool $isFee
-   * @return int id of created contribution
+   * @return int
+   *   id of created contribution
    */
   public function contributionCreate($cID, $cTypeID = 1, $invoiceID = 67890, $trxnID = 12345, $paymentInstrumentID = 1, $isFee = TRUE) {
     $params = array(
@@ -1570,7 +1583,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param int $invoiceID
    * @param int $trxnID
-   * @return int id of created contribution
+   * @return int
+   *   id of created contribution
    */
   public function onlineContributionCreate($params, $financialType, $invoiceID = 67890, $trxnID = 12345) {
     $contribParams = array(
@@ -1610,7 +1624,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $params
    *   Name-value pair for an event.
    *
-   * @return array $event
+   * @return array
    */
   public function eventCreate($params = array()) {
     // if no contact was passed, make up a dummy event creator
@@ -1678,7 +1692,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param int $participantID
    * @param int $contributionID
-   * @return int $id of created payment
+   * @return int
+   *   $id of created payment
    */
   public function participantPaymentCreate($participantID, $contributionID = NULL) {
     //Create Participant Payment record With Values
@@ -1707,7 +1722,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Add a Location
    *
    * @param int $contactID
-   * @return int location id of created location
+   * @return int
+   *   location id of created location
    */
   public function locationAdd($contactID) {
     $address = array(
@@ -1784,7 +1800,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Add a Group
    *
    * @param array $params
-   * @return int groupId of created group
+   * @return int
+   *   groupId of created group
    */
   public function groupCreate($params = array()) {
     $params = array_merge(array(
@@ -1811,7 +1828,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @params array to add group
    *
    * @param array $params
-   * @return int groupId of created group
+   * @return int
+   *   groupId of created group
    */
   public function groupContactCreate($groupID, $totalCount = 10) {
     $params = array('group_id' => $groupID);
@@ -1866,7 +1884,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Add a UF Join Entry
    *
    * @param array $params
-   * @return int $id of created UF Join
+   * @return int
+   *   $id of created UF Join
    */
   public function ufjoinCreate($params = NULL) {
     if ($params === NULL) {
@@ -2096,7 +2115,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $filename
    *   $file __FILE__.
    *
-   * @return array $ids ids of created objects
+   * @return array
+   *   ids of created objects
    */
   public function entityCustomGroupWithSingleFieldCreate($function, $filename) {
     $params = array('title' => $function);
@@ -2165,7 +2185,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Create note
    *
    * @param int $cId
-   * @return array $note
+   * @return array
    */
   public function noteCreate($cId) {
     $params = array(
@@ -2703,7 +2723,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * Generate a temporary folder
    *
    * @param string $prefix
-   * @return string $string
+   * @return string
    */
   public function createTempDir($prefix = 'test-') {
     $tempDir = CRM_Utils_File::tempdir($prefix);

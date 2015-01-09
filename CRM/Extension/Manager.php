@@ -387,7 +387,8 @@ class CRM_Extension_Manager {
    *
    * @param $key
    *
-   * @return string constant (STATUS_INSTALLED, STATUS_DISABLED, STATUS_UNINSTALLED, STATUS_UNKNOWN)
+   * @return string
+   *   constant (STATUS_INSTALLED, STATUS_DISABLED, STATUS_UNINSTALLED, STATUS_UNKNOWN)
    */
   public function getStatus($key) {
     $statuses = $this->getStatuses();
@@ -402,7 +403,8 @@ class CRM_Extension_Manager {
   /**
    * Determine the status of all extensions
    *
-   * @return array ($key => status_constant)
+   * @return array
+   *   ($key => status_constant)
    */
   public function getStatuses() {
     if (!is_array($this->statuses)) {
@@ -450,7 +452,8 @@ class CRM_Extension_Manager {
    * @param $key
    *
    * @throws CRM_Extension_Exception
-   * @return array (0 => CRM_Extension_Info, 1 => CRM_Extension_Manager_Interface)
+   * @return array
+   *   (0 => CRM_Extension_Info, 1 => CRM_Extension_Manager_Interface)
    */
   private function _getInfoTypeHandler($key) {
     $info = $this->mapper->keyToInfo($key); // throws Exception
@@ -468,7 +471,8 @@ class CRM_Extension_Manager {
    * @param $key
    *
    * @throws CRM_Extension_Exception
-   * @return array (0 => CRM_Extension_Info, 1 => CRM_Extension_Manager_Interface)
+   * @return array
+   *   (0 => CRM_Extension_Info, 1 => CRM_Extension_Manager_Interface)
    */
   private function _getMissingInfoTypeHandler($key) {
     $info = $this->createInfoFromDB($key);

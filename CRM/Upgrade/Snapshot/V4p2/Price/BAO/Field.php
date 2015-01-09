@@ -178,7 +178,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object            DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    *
    * @static
    */
@@ -192,7 +193,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * @param int $id
    *   Id of field.
    *
-   * @return string name
+   * @return string
+   *   name
    *
    * @static
    *
@@ -473,7 +475,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * @param bool $reset
    *   Ignore stored values\.
    *
-   * @return array array of options
+   * @return array
+   *   array of options
    */
   public static function getOptions($fieldId, $inactiveNeeded = FALSE, $reset = FALSE) {
     static $options = array();

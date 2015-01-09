@@ -51,7 +51,8 @@ class CRM_Activity_BAO_ActivityTarget extends CRM_Activity_DAO_ActivityContact {
    *
    * @param array $params
    *
-   * @return object activity type of object that is added
+   * @return object
+   *   activity type of object that is added
    */
   public static function create(&$params) {
     $target = new CRM_Activity_BAO_ActivityContact();

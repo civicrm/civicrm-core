@@ -165,7 +165,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   /**
    * Get the action links for this page.
    *
-   * @return array $_actionLinks
+   * @return array
    *
    */
   public function &actionLinks() {

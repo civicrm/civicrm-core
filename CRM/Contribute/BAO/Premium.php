@@ -77,7 +77,8 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -247,7 +248,8 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   /**
    * Retrieve premium product and their options
    *
-   * @return array product and option arrays
+   * @return array
+   *   product and option arrays
    * @static
    */
   public static function getPremiumProductInfo() {

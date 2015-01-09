@@ -60,7 +60,8 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    * @param string $requestedType
    *   The requested contact type.
    *
-   * @return array  a table-keyed array of field-keyed arrays holding supported fields' titles
+   * @return array
+   *   a table-keyed array of field-keyed arrays holding supported fields' titles
    */
   public static function &supportedFields($requestedType) {
     static $fields = NULL;
@@ -379,7 +380,8 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    *
    * @param array $params
    *
-   * @return array (rule field => weight) array and threshold associated to rule group
+   * @return array
+   *   (rule field => weight) array and threshold associated to rule group
    * @access public
    */
   public static function dedupeRuleFieldsWeight($params) {
@@ -434,7 +436,8 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    *
    * @static
    *
-   * @return array id => "nice name" of rule group
+   * @return array
+   *   id => "nice name" of rule group
    */
   public static function getByType($contactType = NULL) {
     $dao = new CRM_Dedupe_DAO_RuleGroup();

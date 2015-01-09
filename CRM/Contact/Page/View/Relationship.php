@@ -271,7 +271,8 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   /**
    * Get action links
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    * @static
    */
   public static function &links() {

@@ -496,7 +496,8 @@ SELECT  event.event_full_text,
    * @param bool $considerWaiting
    * @param bool $considerTestParticipants
    *
-   * @return array $optionsCount an array of each option id and total count
+   * @return array
+   *   an array of each option id and total count
    * @static
    */
   static function priceSetOptionsCount(
@@ -574,7 +575,8 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
    * @param int $eventId
    *   Event id.
    *
-   * @return int $spaces  Number of Empty Seats/null.
+   * @return int
+   *   $spaces  Number of Empty Seats/null.
    * @static
    */
   public static function pendingToConfirmSpaces($eventId) {
@@ -623,7 +625,8 @@ GROUP BY  participant.event_id
    * @param bool $status
    * @param bool $onlyParticipant
    *
-   * @return array array of importable Fields
+   * @return array
+   *   array of importable Fields
    * @static
    */
   public static function &importableFields($contactType = 'Individual', $status = TRUE, $onlyParticipant = FALSE) {
@@ -735,7 +738,8 @@ GROUP BY  participant.event_id
   /**
    * Combine all the exportable fields from the lower levels object
    *
-   * @return array array of exportable Fields
+   * @return array
+   *   array of exportable Fields
    * @static
    */
   public static function &exportableFields() {
@@ -800,7 +804,8 @@ GROUP BY  participant.event_id
    * @param int $participantId
    *   Id of the participant.
    *
-   * @return array $name associated array with sort_name and event title
+   * @return array
+   *   associated array with sort_name and event title
    * @static
    */
   public static function participantDetails($participantId) {
@@ -1021,7 +1026,7 @@ WHERE  civicrm_participant.id = {$participantId}
    *
    * @param int $oldStatusId
    *
-   * @return array $additionalParticipantIds
+   * @return array
    * @static
    */
   public static function getAdditionalParticipantIds($primaryParticipantId, $excludeCancel = TRUE, $oldStatusId = NULL) {
@@ -1063,7 +1068,7 @@ WHERE  civicrm_participant.id = {$participantId}
    * @param bool $hasLineItems
    *   Do fetch from line items.
    *
-   * @return array $feeDetails
+   * @return array
    * @static
    */
   public function getFeeDetails($participantIds, $hasLineItems = FALSE) {
@@ -1138,7 +1143,8 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    * @param int $primaryParticipantID
    *   Id of primary participant record.
    *
-   * @return array $additionalParticipants $displayName => $viewUrl
+   * @return array
+   *   $displayName => $viewUrl
    * @static
    */
   public static function getAdditionalParticipants($primaryParticipantID) {
@@ -1737,7 +1743,8 @@ UPDATE  civicrm_participant
    *
    * @param int $contactID
    *
-   * @return int count of participant records
+   * @return int
+   *   count of participant records
    * @static
    */
   public static function getContactParticipantCount($contactID) {
@@ -1756,7 +1763,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
    * @param bool $excludeCancelled
    *   Exclude cancelled additional participant.
    *
-   * @return array $participantsId
+   * @return array
    * @static
    */
   public static function getParticipantIds($contributionId, $excludeCancelled = FALSE) {
@@ -1788,7 +1795,8 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
    * @param array $participantIds
    *   An array of additional participant ids.
    *
-   * @return array of Urls.
+   * @return array
+   *   of Urls.
    * @static
    */
   public static function getAdditionalParticipantUrl($participantIds) {

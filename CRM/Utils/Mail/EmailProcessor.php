@@ -46,7 +46,8 @@ class CRM_Utils_Mail_EmailProcessor {
   /**
    * Process the default mailbox (ie. that is used by civiMail for the bounce)
    *
-   * @return boolean always returns true (for the api). at a later stage we should
+   * @return boolean
+   *   always returns true (for the api). at a later stage we should
    *                 fix this to return true on success / false on failure etc
    */
   public static function processBounces() {

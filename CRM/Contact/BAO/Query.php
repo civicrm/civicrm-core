@@ -1301,7 +1301,8 @@ class CRM_Contact_BAO_Query {
    * @param bool $groupContacts
    * @param bool $onlyDeleted
    *
-   * @return array sql query parts as an array
+   * @return array
+   *   sql query parts as an array
    */
   public function query($count = FALSE, $sortByChar = FALSE, $groupContacts = FALSE, $onlyDeleted = FALSE) {
     // build permission clause
@@ -2305,7 +2306,8 @@ class CRM_Contact_BAO_Query {
    *
    * @param CRM_Core_DAO $dao
    *
-   * @return array values for this query
+   * @return array
+   *   values for this query
    */
   public function store($dao) {
     $value = array();
@@ -2403,7 +2405,8 @@ class CRM_Contact_BAO_Query {
    * @param bool $primaryLocation
    * @param int $mode
    *
-   * @return string the from clause
+   * @return string
+   *   the from clause
    * @static
    */
   public static function fromClause(&$tables, $inner = NULL, $right = NULL, $primaryLocation = TRUE, $mode = 1) {
@@ -4210,7 +4213,8 @@ civicrm_relationship.is_permission_a_b = 0
    *
    * @param int $mode
    *
-   * @return array derault return properties
+   * @return array
+   *   derault return properties
    */
   public static function &defaultReturnProperties($mode = 1) {
     if (!isset(self::$_defaultReturnProperties)) {
@@ -5147,7 +5151,8 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
    * @param string $dataType
    *   Data type of the field.
    *
-   * @return string where clause for the query
+   * @return string
+   *   where clause for the query
    */
   public static function buildClause($field, $op, $value = NULL, $dataType = NULL) {
     $op = trim($op);
@@ -5383,7 +5388,8 @@ AND   displayRelType.is_active = 1
    *   The data type for this element.
    * @param bool $useIDsOnly
    *
-   * @return void     adds the where clause and qill to the query object
+   * @return void
+   *   adds the where clause and qill to the query object
    */
   function optionValueQuery(
     $name,

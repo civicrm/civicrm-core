@@ -153,7 +153,8 @@ class CRM_Core_JobManager {
    * populates class param.
    *
    * @param void
-   * @return array ($id => CRM_Core_ScheduledJob)
+   * @return array
+   *   ($id => CRM_Core_ScheduledJob)
    *
    */
   /**

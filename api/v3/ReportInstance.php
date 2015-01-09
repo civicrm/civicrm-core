@@ -6,7 +6,8 @@
  * @param array $params
  *   Input parameters.
  *
- * @return array details of found instances
+ * @return array
+   *   details of found instances
  * @access public
  */
 function civicrm_api3_report_instance_get($params) {
@@ -18,7 +19,8 @@ function civicrm_api3_report_instance_get($params) {
  *
  * @param array $params
  *
- * @return array of newly created report instance property values.
+ * @return array
+   *   of newly created report instance property values.
  * @access public
  */
 function civicrm_api3_report_instance_create($params) {
@@ -42,7 +44,8 @@ function _civicrm_api3_report_instance_create_spec(&$params) {
  *
  * @param array $params
  *
- * @return array Api result
+ * @return array
+   *   Api result
  * @access public
  */
 function civicrm_api3_report_instance_delete($params) {

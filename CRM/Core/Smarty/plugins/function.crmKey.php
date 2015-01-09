@@ -41,7 +41,8 @@
  * @param object $smarty
  *   The Smarty object.
  *
- * @return string the generated key
+ * @return string
+   *   the generated key
  */
 function smarty_function_crmKey($params, &$smarty) {
   return

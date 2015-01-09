@@ -280,7 +280,8 @@ class CRM_Core_SelectValues {
    * @param null $minOffset
    * @param null $maxOffset
    *
-   * @return array         the date array
+   * @return array
+   *   the date array
    * @static
    */
   public static function date($type = NULL, $format = NULL, $minOffset = NULL, $maxOffset = NULL) {
@@ -398,7 +399,8 @@ class CRM_Core_SelectValues {
   /**
    * Get the Map Provider
    *
-   * @return array $map array of map providers
+   * @return array
+   *   array of map providers
    * @static
    */
   public static function mapProvider() {
@@ -412,7 +414,8 @@ class CRM_Core_SelectValues {
   /**
    * Get the Geocoding Providers from available plugins
    *
-   * @return array $geo array of geocoder providers
+   * @return array
+   *   array of geocoder providers
    * @static
    */
   public static function geoProvider() {
@@ -427,7 +430,8 @@ class CRM_Core_SelectValues {
    * Get the Address Standardization Providers from available
    * plugins
    *
-   * @return array $addr array of address standardization providers
+   * @return array
+   *   array of address standardization providers
    * @static
    */
   public static function addressProvider() {

@@ -58,7 +58,8 @@ class CRM_Contact_Form_Search_Custom_FullText_Activity extends CRM_Contact_Form_
   /**
    * @param string $queryText
    * @param string $entityIDTableName
-   * @return array list tables/queries (for runQueries)
+   * @return array
+   *   list tables/queries (for runQueries)
    */
   public function prepareQueries($queryText, $entityIDTableName) {
     // Note: For available full-text indices, see CRM_Core_InnoDBIndexer

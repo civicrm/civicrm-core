@@ -54,7 +54,8 @@ class CRM_ACL_API {
    * @param int $contactID
    *   The contactID for whom the check is made.
    *
-   * @return boolean true if yes, else false
+   * @return boolean
+   *   true if yes, else false
    * @static
    */
   public static function check($str, $contactID = NULL) {
@@ -88,7 +89,8 @@ class CRM_ACL_API {
    *   Don't add delete clause if this is true,.
    *               this means it is handled by generating query
    *
-   * @return string the group where clause for this user
+   * @return string
+   *   the group where clause for this user
    */
   public static function whereClause(
     $type,
@@ -153,7 +155,8 @@ class CRM_ACL_API {
    * @param null $allGroups
    * @param null $includedGroups
    *
-   * @return array the ids of the groups for which the user has permissions
+   * @return array
+   *   the ids of the groups for which the user has permissions
    */
   public static function group(
     $type,
@@ -189,7 +192,8 @@ class CRM_ACL_API {
    * @param null $includedGroups
    * @param bool $flush
    *
-   * @return array the ids of the groups for which the user has permissions
+   * @return array
+   *   the ids of the groups for which the user has permissions
    */
   public static function groupPermission(
     $type,

@@ -51,7 +51,8 @@
  *   An associative array of name/value property values of civicrm_note.
  * {@getfields note_create}
  *
- * @return array API result array
+ * @return array
+   *   API result array
  * @access public
  * @example NoteCreate.php Create example
  *
@@ -99,7 +100,8 @@ function civicrm_api3_note_delete($params) {
  * @param array $params
  *   Input parameters.
  *
- * @return array  array of properties,
+ * @return array
+   *   array of properties,
  * if error an array with an error id and error message
  * {@getfields note_get}
  * @static void
@@ -127,7 +129,8 @@ function _civicrm_api3_note_get_spec(&$params) {
  * @param array $params
  *   Associative array; only required 'id' parameter is used.
  *
- * @return array Nested associative array beginning with direct children of given note.
+ * @return array
+   *   Nested associative array beginning with direct children of given note.
  */
 function &civicrm_api3_note_tree_get($params) {
 

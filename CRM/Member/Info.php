@@ -46,7 +46,8 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    * Needs to be implemented in component's information
    * class.
    *
-   * @return array collection of required component settings
+   * @return array
+   *   collection of required component settings
    *
    */
   /**

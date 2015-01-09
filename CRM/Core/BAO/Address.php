@@ -49,7 +49,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *
    * @param null $entity
    *
-   * @return array $blocks array of created address
+   * @return array
+   *   array of created address
    * @static
    */
   public static function create(&$params, $fixAddress = TRUE, $entity = NULL) {
@@ -141,7 +142,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *   True if you need to fix (format) address values.
    *                               before inserting in db
    *
-   * @return object       CRM_Core_BAO_Address object on success, null otherwise
+   * @return object
+   *   CRM_Core_BAO_Address object on success, null otherwise
    * @static
    */
   public static function add(&$params, $fixAddress) {
@@ -463,7 +465,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *   If microformat output is required.
    * @param int|string $fieldName conditional field name
    *
-   * @return array  $addresses     array with address fields
+   * @return array
+   *   array with address fields
    * @static
    */
   public static function &getValues($entityBlock, $microformat = FALSE, $fieldName = 'contact_id') {
@@ -589,7 +592,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *
    * @param bool $updateBlankLocInfo
    *
-   * @return array  the array of adrress data
+   * @return array
+   *   the array of adrress data
    * @static
    */
   public static function allAddress($id, $updateBlankLocInfo = FALSE) {
@@ -625,7 +629,8 @@ ORDER BY civicrm_address.is_primary DESC, address_id ASC";
    *   The array containing entity_id and.
    * entity_table name
    *
-   * @return array  the array of adrress data
+   * @return array
+   *   the array of adrress data
    * @static
    */
   public static function allEntityAddress(&$entityElements) {
@@ -659,7 +664,8 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
   /**
    * Get address sequence
    *
-   * @return array of address sequence.
+   * @return array
+   *   of address sequence.
    */
   public static function addressSequence() {
     $config = CRM_Core_Config::singleton();
@@ -702,7 +708,8 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    * @param string Street address including number and apt
    * @param string Locale - to set locale used to parse address
    *
-   * @return array    $parseFields    parsed fields values.
+   * @return array
+   *   parsed fields values.
    * @static
    */
   public static function parseStreetAddress($streetAddress, $locale = NULL) {
@@ -837,7 +844,8 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    * @param array $fields
    *   An array of importable/exportable contact fields.
    *
-   * @return array   $fields an array of contact fields and only the enabled address options
+   * @return array
+   *   an array of contact fields and only the enabled address options
    * @static
    */
   public static function validateAddressOptions($fields) {
@@ -1131,7 +1139,7 @@ SELECT is_primary,
    * @param bool $returnStatus
    *   By default false.
    *
-   * @return string $statusMessage
+   * @return string
    * @static
    */
   public static function setSharedAddressDeleteStatus($addressId = NULL, $contactId = NULL, $returnStatus = FALSE) {

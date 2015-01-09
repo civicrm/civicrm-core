@@ -93,7 +93,8 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
    *
    * @param null
    *
-   * @return array   the default array reference
+   * @return array
+   *   the default array reference
    */
   public function setDefaultValues() {
     $defaults = array();

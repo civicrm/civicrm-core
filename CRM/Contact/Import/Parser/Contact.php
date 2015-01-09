@@ -262,7 +262,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
+   * @return boolean
+   *   the result of this processing
    */
   public function preview(&$values) {
     return $this->summary($values);
@@ -274,7 +275,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
+   * @return boolean
+   *   the result of this processing
    */
   public function summary(&$values) {
     $erroneousField = NULL;
@@ -447,7 +449,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    *
    * @param bool $doGeocodeAddress
    *
-   * @return boolean      the result of this processing
+   * @return boolean
+   *   the result of this processing
    */
   public function import($onDuplicate, &$values, $doGeocodeAddress = FALSE) {
     $config = CRM_Core_Config::singleton();

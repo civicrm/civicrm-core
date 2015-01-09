@@ -588,7 +588,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @param int $contactId
    *   Contact id if doing update.
    *
-   * @return bool $primaryID email/openId
+   * @return bool
+   *   email/openId
    * @static
    */
   public static function formRule($fields, &$errors, $contactId = NULL) {
@@ -1061,7 +1062,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @param array $fields
    *   The hierarchical value representation of this location.
    *
-   * @return boolean true if data exists, false otherwise
+   * @return boolean
+   *   true if data exists, false otherwise
    * @static
    */
   public static function blockDataExists(&$fields) {
@@ -1196,7 +1198,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @param array $params
    *   of key value consist of address blocks.
    *
-   * @return array $parseSuccess as array of sucess/fails for each address block
+   * @return array
+   *   as array of sucess/fails for each address block
    * @static
    */
   public function parseAddress(&$params) {

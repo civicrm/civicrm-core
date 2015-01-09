@@ -62,7 +62,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
   /**
    * Get the action links for this page.
    *
-   * @return array $_actionLinks
+   * @return array
    *
    */
   function &actionLinks() {

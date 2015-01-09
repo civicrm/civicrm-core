@@ -54,7 +54,7 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
    *
    * @param null $entity
    *
-   * @return array   $location
+   * @return array
    * @static
    */
   public static function create(&$params, $fixAddress = TRUE, $entity = NULL) {
@@ -156,7 +156,8 @@ WHERE e.id = %1";
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object       CRM_Core_BAO_locBlock object on success, null otherwise
+   * @return object
+   *   CRM_Core_BAO_locBlock object on success, null otherwise
    * @static
    */
   public static function addLocBlock(&$params) {
@@ -236,7 +237,8 @@ WHERE e.id = %1";
    * @param $entityBlock
    * @param bool $microformat
    *
-   * @return array   array of objects(CRM_Core_BAO_Location)
+   * @return array
+   *   array of objects(CRM_Core_BAO_Location)
    * @static
    */
   public static function &getValues($entityBlock, $microformat = FALSE) {
@@ -306,7 +308,8 @@ WHERE e.id = %1";
    * @param int $updateLocBlockId
    *   Update location block id.
    *
-   * @return int  newly created/updated location block id.
+   * @return int
+   *   newly created/updated location block id.
    */
   public static function copyLocBlock($locBlockId, $updateLocBlockId = NULL) {
     //get the location info.

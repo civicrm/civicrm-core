@@ -161,7 +161,8 @@ function civicrm_api3_custom_field_get($params) {
  * @param array $errors
  *   Collect validation errors.
  *
- * @return array  Validation errors
+ * @return array
+   *   Validation errors
  * @todo remove this function - not in use but need to review functionality before
  * removing as it might be useful in wrapper layer
  */

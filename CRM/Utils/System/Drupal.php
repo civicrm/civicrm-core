@@ -184,7 +184,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    *
    * @param CRM_Core_Form $form
    *   Form object representing the 'current' form - to which the user will be returned.
-   * @return string $destination destination value for URL
+   * @return string
+   *   destination value for URL
    *
    */
   /**
@@ -228,7 +229,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @param string $destination
    *   If present, add destination to querystring (works for Drupal only).
    *
-   * @return string - loginURL for the current CMS
+   * @return string
+   *   loginURL for the current CMS
    * @static
    */
   public function getLoginURL($destination = '') {
@@ -328,7 +330,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addScriptUrl($url, $region) {
     $params = array('group' => JS_LIBRARY, 'weight' => 10);
@@ -357,7 +360,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addScript($code, $region) {
     $params = array('type' => 'inline', 'group' => JS_LIBRARY, 'weight' => 10);
@@ -384,7 +388,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addStyleUrl($url, $region) {
     if ($region != 'html-header') {
@@ -407,7 +412,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addStyle($code, $region) {
     if ($region != 'html-header') {
@@ -436,7 +442,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @param mix $action
    *   The default action if one is pre-specified.
    *
-   * @return string the url to post the form
+   * @return string
+   *   the url to post the form
    */
   public function postURL($action) {
     if (!empty($action)) {
@@ -625,7 +632,8 @@ AND    u.status = 1
   /**
    * Get the locale set in the hosting CMS
    *
-   * @return string  with the locale or null for none
+   * @return string
+   *   with the locale or null for none
    */
   public function getUFLocale() {
     // return CiviCRM’s xx_YY locale that either matches Drupal’s Chinese locale
@@ -820,7 +828,7 @@ AND    u.status = 1
   /**
    * Check is user logged in.
    *
-   * @return boolean true/false.
+   * @return boolean
    */
   public function isUserLoggedIn() {
     $isloggedIn = FALSE;
@@ -834,7 +842,8 @@ AND    u.status = 1
   /**
    * Get currently logged in user uf id.
    *
-   * @return int $userID logged in user uf id.
+   * @return int
+   *   $userID logged in user uf id.
    */
   public function getLoggedInUfID() {
     $ufID = NULL;
@@ -856,7 +865,8 @@ AND    u.status = 1
    * @param bool $addLanguagePart
    * @param bool $removeLanguagePart
    *
-   * @return string $url, formatted url.
+   * @return string
+   *   , formatted url.
    * @static
    */
   public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
@@ -944,7 +954,8 @@ AND    u.status = 1
   /**
    * Get a list of all installed modules, including enabled and disabled ones
    *
-   * @return array CRM_Core_Module
+   * @return array
+   *   CRM_Core_Module
    */
   public function getModules() {
     $result = array();
@@ -1001,7 +1012,8 @@ AND    u.status = 1
 
   /**
    * Over-ridable function to get timezone as a string eg.
-   * @return string Timezone e.g. 'America/Los_Angeles'
+   * @return string
+   *   Timezone e.g. 'America/Los_Angeles'
    */
   public function getTimeZoneString() {
     global $user;

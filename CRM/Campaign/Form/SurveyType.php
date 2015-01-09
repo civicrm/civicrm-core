@@ -101,7 +101,8 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
    *
    * @param null
    *
-   * @return array    array of default values
+   * @return array
+   *   array of default values
    */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();

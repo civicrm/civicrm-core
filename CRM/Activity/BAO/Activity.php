@@ -657,7 +657,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *    - context     string         page on which selector is build
    *    - activity_type_id int|string the activitiy types we want to restrict by
    *
-   * @return array (reference)      $values the relevant data object values of open activities
+   * @return array
+   *   (reference)      $values the relevant data object values of open activities
    *
    * @static
    */
@@ -906,7 +907,8 @@ ORDER BY    fixed_sort_order
    * user has permission. To decide whether we are going to include
    * component related activities w/ core activity retrieve process.
    *
-   * @return array of component id and name.
+   * @return array
+   *   of component id and name.
    * @static
    **/
   public static function activityComponents() {
@@ -946,7 +948,8 @@ ORDER BY    fixed_sort_order
    *    - context     string         page on which selector is build
    *    - activity_type_id int|string the activity types we want to restrict by
    *
-   * @return int   count of activities
+   * @return int
+   *   count of activities
    *
    * @static
    */
@@ -983,7 +986,8 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
    *    - count       boolean        are we interested in the count clause only?
    *    - activity_type_id int|string the activity types we want to restrict by
    *
-   * @return int   count of activities
+   * @return int
+   *   count of activities
    *
    * @static
    */
@@ -1176,7 +1180,8 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    * @param string $additionalDetails
    *   The additional information of CC and BCC appended to the activity Details.
    *
-   * @return array               ( sent, activityId) if any email is sent and activityId
+   * @return array
+   *   ( sent, activityId) if any email is sent and activityId
    * @static
    */
   static function sendEmail(
@@ -1591,7 +1596,8 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    * @param null $cc
    * @param null $bcc
    *
-   * @return boolean             true if successfull else false.
+   * @return boolean
+   *   true if successfull else false.
    * @static
    */
   static function sendMessage(
@@ -1663,7 +1669,8 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    *
    * @param bool $status
    *
-   * @return array    array of importable Fields
+   * @return array
+   *   array of importable Fields
    * @static
    */
   public static function &importableFields($status = FALSE) {
@@ -1717,7 +1724,8 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    * @param int $contactId
    *   Id of the contact whose activities need to find.
    *
-   * @return array    array of activity fields
+   * @return array
+   *   array of activity fields
    */
   public static function getContactActivity($contactId) {
     $activities = array();
@@ -1910,7 +1918,8 @@ SELECT  display_name
    * @param int $activityId
    *   Current activity id.
    *
-   * @return int $parentId  Id of parent activity otherwise false.
+   * @return int
+   *   $parentId  Id of parent activity otherwise false.
    */
   public static function getParentActivity($activityId) {
     static $parentActivities = array();
@@ -1937,7 +1946,8 @@ SELECT  display_name
    * @param $activityID
    *   Current activity id.
    *
-   * @return int $params  count of prior activities otherwise false.
+   * @return int
+   *   $params  count of prior activities otherwise false.
    */
   public static function getPriorCount($activityID) {
     static $priorCounts = array();
@@ -1975,7 +1985,8 @@ AND id < {$activityID}
    *   Current activity id.
    * @param bool $onlyPriorRevisions
    *
-   * @return array $result  prior activities info.
+   * @return array
+   *   prior activities info.
    */
   public static function getPriorAcitivities($activityID, $onlyPriorRevisions = FALSE) {
     static $priorActivities = array();
@@ -2024,7 +2035,8 @@ AND cl.modified_id  = c.id
    * @param int $activityID
    *   Prior activity id.
    *
-   * @return int current activity id.
+   * @return int
+   *   current activity id.
    */
   public static function getLatestActivityId($activityID) {
     static $latestActivityIds = array();
@@ -2150,7 +2162,8 @@ AND cl.modified_id  = c.id
    * @param string $name
    *   If it is called by case $name = Case else $name = Activity.
    *
-   * @return array array of exportable Fields
+   * @return array
+   *   array of exportable Fields
    * @static
    */
   public static function &exportableFields($name = 'Activity') {
@@ -2210,7 +2223,8 @@ AND cl.modified_id  = c.id
   /**
    * Get the allowed profile fields for Activities
    *
-   * @return array array of activity profile Fields
+   * @return array
+   *   array of activity profile Fields
    */
   public static function getProfileFields() {
     $exportableFields = self::exportableFields('Activity');
@@ -2298,7 +2312,7 @@ AND cl.modified_id  = c.id
    * @param int $action
    *   Edit/view.
    *
-   * @return boolean $allow true/false
+   * @return boolean
    */
   public static function checkPermission($activityId, $action) {
     $allow = FALSE;
@@ -2448,7 +2462,8 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
    * @param array $params
    *   Associated array for params record id.
    *
-   * @return array   $contactActivities associated array of contact activities
+   * @return array
+   *   associated array of contact activities
    */
   public static function getContactActivitySelector(&$params) {
     // format the params

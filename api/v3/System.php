@@ -45,7 +45,8 @@
  *                          - triggers: bool, whether to drop/create SQL triggers; default: FALSE
  *                          - session:  bool, whether to reset the CiviCRM session data; defaul: FALSE
  *
- * @return boolean        true if success, else false
+ * @return boolean
+   *   true if success, else false
  * @static void
  * @access public
  * @example SystemFlush.php
@@ -88,7 +89,8 @@ function _civicrm_api3_system_check_spec(&$spec) {
  * System.Check API
  *
  * @param array $params
- * @return array API result descriptor; return items are alert codes/messages
+ * @return array
+   *   API result descriptor; return items are alert codes/messages
  * @see civicrm_api3_create_success
  * @see civicrm_api3_create_error
  * @throws API_Exception

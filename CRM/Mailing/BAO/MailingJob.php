@@ -866,7 +866,8 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
    * @param string $status
    *   The status enum.
    *
-   * @return string               The translated version
+   * @return string
+   *   The translated version
    * @static
    */
   public static function status($status) {
@@ -888,7 +889,8 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
    * Return a workflow clause for use in SQL queries,
    * to only process jobs that are approved.
    *
-   * @return string        For use in a WHERE clause
+   * @return string
+   *   For use in a WHERE clause
    * @static
    */
   public static function workflowClause() {

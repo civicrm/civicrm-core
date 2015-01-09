@@ -435,7 +435,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    * @param string $component
    *   Component name.
    *
-   * @return string import url
+   * @return string
+   *   import url
    */
   private function _getImportComponentUrl($component) {
     $importComponentUrl = array(
@@ -523,7 +524,8 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    * @param array $rows
    * @param string $contactType
    *
-   * @return array $contactIds  imported contact ids
+   * @return array
+   *   imported contact ids
    */
   public function _getImportedContactIds($rows, $contactType = 'Individual') {
     $contactIds = array();

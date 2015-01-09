@@ -47,7 +47,8 @@
  *   Associative array of property.
  *                       name/value pairs to insert in new 'group'
  *
- * @return array  API result array
+ * @return array
+   *   API result array
  * @example GroupCreate.php
  * {@getfields group_create}
  * @access public
@@ -76,7 +77,8 @@ function _civicrm_api3_group_create_spec(&$params) {
  *                       property_name=>value pairs. If $params is set
  *                       as null, all groups will be returned
  *
- * @return array  Array of matching groups
+ * @return array
+   *   Array of matching groups
  * @example GroupGet.php
  * {@getfields group_get}
  * @access public
@@ -104,7 +106,8 @@ function civicrm_api3_group_get($params) {
  *   Array containing id of the group.
  *                       to be deleted
  *
- * @return array API result array
+ * @return array
+   *   API result array
  * @example GroupDelete.php
  * {@getfields group_delete}
  *

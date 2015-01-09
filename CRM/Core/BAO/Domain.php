@@ -135,7 +135,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    *
    * @param NULL
    *
-   * @return array        Location::getValues
+   * @return array
+   *   Location::getValues
    */
   public function &getLocationValues() {
     if ($this->_location == NULL) {
@@ -158,7 +159,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @param array $params
    * @param int $id
    *
-   * @return array domain
+   * @return array
+   *   domain
    */
   public static function edit(&$params, &$id) {
     $domain = new CRM_Core_DAO_Domain();
@@ -173,7 +175,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    *
    * @param array $params
    *
-   * @return array domain
+   * @return array
+   *   domain
    */
   public static function create($params) {
     $domain = new CRM_Core_DAO_Domain();
@@ -200,7 +203,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * @param bool $skipFatal
    *
-   * @return array name & email for domain
+   * @return array
+   *   name & email for domain
    * @throws Exception
    */
   public static function getNameAndEmail($skipFatal = FALSE) {

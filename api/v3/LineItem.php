@@ -43,7 +43,8 @@
  *                       name/value pairs to insert in new 'line_item'
  * @example LineItemCreate.php Std Create example
  *
- * @return array api result array
+ * @return array
+   *   api result array
  * {@getfields line_item_create}
  * @access public
  */
@@ -74,7 +75,8 @@ function _civicrm_api3_line_item_create_spec(&$params) {
  *   Array of one or more valid property_name=>value pairs. If $params is set.
  *  as null, all line_items will be returned (default limit is 25)
  *
- * @return array  Array of matching line_items
+ * @return array
+   *   Array of matching line_items
  * {@getfields line_item_get}
  * @access public
  */
@@ -92,7 +94,8 @@ function civicrm_api3_line_item_get($params) {
  *   Array containing id of the group.
  *  to be deleted
  *
- * @return array API result array
+ * @return array
+   *   API result array
  * {@getfields line_item_delete}
  * @access public
  */

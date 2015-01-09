@@ -54,7 +54,8 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
    * @param $params
    * @param array $ids
    *
-   * @return object $mailingab      The new mailingab object
+   * @return object
+   *   $mailingab      The new mailingab object
    * @static
    */
   public static function create(&$params, $ids = array()) {

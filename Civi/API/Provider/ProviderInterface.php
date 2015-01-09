@@ -36,7 +36,8 @@ interface ProviderInterface {
   /**
    * @param array $apiRequest
    *   The full description of the API request.
-   * @return array structured response data (per civicrm_api3_create_success)
+   * @return array
+   *   structured response data (per civicrm_api3_create_success)
    * @see civicrm_api3_create_success
    * @throws \API_Exception
    */

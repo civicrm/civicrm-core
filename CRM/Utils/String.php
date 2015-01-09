@@ -83,7 +83,8 @@ class CRM_Utils_String {
    *   Length of valid variables.
    *
    *
-   * @return string returns the manipulated string
+   * @return string
+   *   returns the manipulated string
    * @static
    */
   public static function munge($name, $char = '_', $len = 63) {
@@ -107,7 +108,8 @@ class CRM_Utils_String {
    * membership_payment returns MembershipPayment
    * @param string $string
    *
-   * @return string string
+   * @return string
+   *   string
    */
   public static function convertStringToCamel($string) {
     $fragments = explode('_', $string);
@@ -130,7 +132,8 @@ class CRM_Utils_String {
    * @param int $len
    *   Length of valid variables.
    *
-   * @return string  Randomized Variable Name
+   * @return string
+   *   Randomized Variable Name
    * @static
    */
   public static function rename($name, $len = 4) {
@@ -147,7 +150,8 @@ class CRM_Utils_String {
    * @param \char|string $char $char the character used to demarcate the componets
    *
    *
-   * @return string the last component
+   * @return string
+   *   the last component
    * @static
    */
   public static function getClassName($string, $char = '_') {
@@ -210,7 +214,8 @@ class CRM_Utils_String {
    * @param bool $utf8
    *   Attempt utf8 match on failure (default yes).
    *
-   * @return boolean    true if string is ascii
+   * @return boolean
+   *   true if string is ascii
    * @static
    */
   public static function isAscii($str, $utf8 = TRUE) {
@@ -254,7 +259,8 @@ class CRM_Utils_String {
    * @param array $regexRules
    *   Regular expression to be matched w/ replacements.
    *
-   * @return array $match      array of strings w/ corresponding redacted outputs
+   * @return array
+   *   array of strings w/ corresponding redacted outputs
    * @static
    */
   public static function regex($str, $regexRules) {
@@ -344,7 +350,8 @@ class CRM_Utils_String {
    * @param string $url2
    *   The second url to be matched against.
    *
-   * @return boolean true if the urls match, else false
+   * @return boolean
+   *   true if the urls match, else false
    * @static
    */
   public static function match($url1, $url2) {
@@ -438,7 +445,8 @@ class CRM_Utils_String {
    * @param string $html
    *   The string to be converted.
    *
-   * @return string       the converted string
+   * @return string
+   *   the converted string
    * @static
    */
   public static function htmlToText($html) {
@@ -530,7 +538,8 @@ class CRM_Utils_String {
    * @param string $full
    *   All alternatives as a long string (or some other text).
    *
-   * @return string       only the first alternative found (or the text without alternatives)
+   * @return string
+   *   only the first alternative found (or the text without alternatives)
    */
   public static function stripAlternatives($full) {
     $matches = array();
@@ -553,7 +562,8 @@ class CRM_Utils_String {
    * @param string $string
    *   Input string to be cleaned.
    *
-   * @return string the cleaned string
+   * @return string
+   *   the cleaned string
    * @static
    */
   public static function stripSpaces($string) {
@@ -571,7 +581,8 @@ class CRM_Utils_String {
    * @param string $replace
    *   The character to replace it with.
    *
-   * @return string the sanitized string
+   * @return string
+   *   the sanitized string
    * @static
    */
   static function stripPathChars(
@@ -616,7 +627,8 @@ class CRM_Utils_String {
    * @param string $string
    *   The input string.
    *
-   * @return string the cleaned up string
+   * @return string
+   *   the cleaned up string
    * @static
    */
   public static function purifyHTML($string) {
@@ -678,7 +690,8 @@ class CRM_Utils_String {
    *   E.g. "view all contacts". Syntax: "[prefix:]name".
    * @param null $defaultPrefix
    *
-   * @return array (0 => string|NULL $prefix, 1 => string $value)
+   * @return array
+   *   (0 => string|NULL $prefix, 1 => string $value)
    */
   public static function parsePrefix($delim, $string, $defaultPrefix = NULL) {
     $pos = strpos($string, $delim);
@@ -700,7 +713,8 @@ class CRM_Utils_String {
    * @param int $percent
    *   The percentage of the user portion to be masked.
    *
-   * @return string returns the masked Email address
+   * @return string
+   *   returns the masked Email address
    */
   public static function maskEmail($email, $maskChar = '*', $percent = 50) {
     list($user, $domain) = preg_split("/@/", $email);
@@ -725,7 +739,8 @@ class CRM_Utils_String {
    * @param bool $case
    *   Boolean indicating whether you want the comparison to be case sensitive or not.
    *
-   * @return boolean TRUE (string are identical); FALSE (strings are not identical)
+   * @return boolean
+   *   TRUE (string are identical); FALSE (strings are not identical)
    */
   public static function compareStr($strOne, $strTwo, $case) {
     if ($case == TRUE) {
@@ -760,7 +775,8 @@ class CRM_Utils_String {
    *
    * @param string $url
    *   URL with HTML entities.
-   * @return string URL without HTML entities
+   * @return string
+   *   URL without HTML entities
    */
   public static function unstupifyUrl($htmlUrl) {
     return str_replace('&amp;', '&', $htmlUrl);

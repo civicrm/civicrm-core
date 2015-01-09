@@ -234,7 +234,8 @@ class CRM_Core_Form_RecurringEntity {
    * @param array $fields
    *   Posted values of the form .
    *
-   * @return array list of errors to be posted back to the form
+   * @return array
+   *   list of errors to be posted back to the form
    * @static
    */
   public static function formRule($values) {

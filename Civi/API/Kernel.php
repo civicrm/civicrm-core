@@ -281,7 +281,8 @@ class Kernel {
    *   An unhandled exception.
    * @param array $apiRequest
    *   The full description of the API request.
-   * @return array (API response)
+   * @return array
+   *   (API response)
    */
   public function formatApiException($e, $apiRequest) {
     $data = $e->getExtraParams();

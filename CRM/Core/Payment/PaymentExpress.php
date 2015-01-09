@@ -72,7 +72,8 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    *
    * @internal param string $mode the mode we are operating in (live or test)
    *
-   * @return string the error message if any
+   * @return string
+   *   the error message if any
    */
   public function checkConfig() {
     $config = CRM_Core_Config::singleton();
@@ -129,7 +130,8 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    *
-   * @return array the result in an nice formatted array (or an error object)
+   * @return array
+   *   the result in an nice formatted array (or an error object)
    * @abstract
    */
   public function doDirectPayment(&$params) {

@@ -47,7 +47,8 @@ class CRM_Utils_Date {
    *   The seperator to use when formatting the date.
    * @param int|string $invalidDate what to return if the date is invalid
    *
-   * @return string - formatted string for date
+   * @return string
+   *   formatted string for date
    *
    * @static
    */
@@ -168,7 +169,8 @@ class CRM_Utils_Date {
   /**
    * Return abbreviated weekday names according to the locale
    *
-   * @return array  0-based array with abbreviated weekday names
+   * @return array
+   *   0-based array with abbreviated weekday names
    *
    * @static
    */
@@ -189,7 +191,8 @@ class CRM_Utils_Date {
   /**
    * Return full weekday names according to the locale
    *
-   * @return array  0-based array with full weekday names
+   * @return array
+   *   0-based array with full weekday names
    *
    * @static
    */
@@ -212,7 +215,8 @@ class CRM_Utils_Date {
    *
    * @param bool $month
    *
-   * @return array  1-based array with abbreviated month names
+   * @return array
+   *   1-based array with abbreviated month names
    *
    * @static
    */
@@ -235,7 +239,8 @@ class CRM_Utils_Date {
   /**
    * Return full month names according to the locale
    *
-   * @return array  1-based array with full month names
+   * @return array
+   *   1-based array with full month names
    *
    * @static
    */
@@ -297,7 +302,8 @@ class CRM_Utils_Date {
    * @param array $dateParts
    *   An array with the desired date parts.
    *
-   * @return string  the $format-formatted $date
+   * @return string
+   *   the $format-formatted $date
    * @static
    */
   public static function customFormat($dateString, $format = NULL, $dateParts = NULL) {
@@ -431,7 +437,8 @@ class CRM_Utils_Date {
    * @param string $mysql
    *   Date/datetime in MySQL format.
    *
-   * @return string        date/datetime in ISO format
+   * @return string
+   *   date/datetime in ISO format
    * @static
    */
   public static function mysqlToIso($mysql) {
@@ -474,7 +481,8 @@ class CRM_Utils_Date {
    * @param string $iso
    *   Date/datetime in ISO format.
    *
-   * @return string      date/datetime in MySQL format
+   * @return string
+   *   date/datetime in MySQL format
    * @static
    */
   public static function isoToMysql($iso) {
@@ -727,7 +735,8 @@ class CRM_Utils_Date {
    *   Expected date format( default.
    *                             format is 2007-12-21 )
    *
-   * @return string  Return the customized todays date (Y-m-d)
+   * @return string
+   *   Return the customized todays date (Y-m-d)
    * @static
    */
   public static function getToday($dayParams = NULL, $format = "Y-m-d") {
@@ -785,7 +794,8 @@ class CRM_Utils_Date {
    * @param $from
    * @param $to
    *
-   * @return array start date, end date
+   * @return array
+   *   start date, end date
    * @static
    */
   public static function getFromTo($relative, $from, $to) {
@@ -809,7 +819,8 @@ class CRM_Utils_Date {
    * @param date $birthDate
    *   Birth Date.
    *
-   * @return int array $results contains years or months
+   * @return int
+   *   array $results contains years or months
    * @static
    */
   static public function calculateAge($birthDate) {
@@ -873,7 +884,8 @@ class CRM_Utils_Date {
    *
    * @param bool $dontCareTime
    *
-   * @return array $result contains new date with added interval
+   * @return array
+   *   contains new date with added interval
    */
   public static function intervalAdd($unit, $interval, $date, $dontCareTime = FALSE) {
     if (is_array($date)) {
@@ -965,7 +977,8 @@ class CRM_Utils_Date {
    * @param int $unit
    *   Frequency unit like year, month, week etc.
    *
-   * @return array $dateRange    start date and end date for the relative time frame
+   * @return array
+   *   start date and end date for the relative time frame
    * @static
    */
   public static function relativeToAbsolute($relativeTerm, $unit) {
@@ -1637,7 +1650,8 @@ class CRM_Utils_Date {
    * @param int $fyMonth
    *   Fiscal Start Month.
    *
-   * @return int $fy       Current Fiscl Year
+   * @return int
+   *   $fy       Current Fiscl Year
    * @static
    */
   public static function calculateFiscalYear($fyDate, $fyMonth) {
@@ -1671,7 +1685,8 @@ class CRM_Utils_Date {
    * @param string $format
    *   Expected return date format.( default is mysql ).
    *
-   * @return string $mysqlDate date format that is excepted by mysql
+   * @return string
+   *   date format that is excepted by mysql
    */
   public static function processDate($date, $time = NULL, $returnNullString = FALSE, $format = 'YmdHis') {
     $mysqlDate = NULL;
@@ -1697,7 +1712,8 @@ class CRM_Utils_Date {
    * @param null $format
    * @param null $timeFormat
    *
-   * @return array $date and time
+   * @return array
+   *   and time
    */
   public static function setDateDefaults($mysqlDate = NULL, $formatType = NULL, $format = NULL, $timeFormat = NULL) {
     // if date is not passed assume it as today
@@ -1764,7 +1780,7 @@ class CRM_Utils_Date {
    * @param string $formatType
    *   Date name e.g. birth.
    *
-   * @return string $format
+   * @return string
    */
   public static function getDateFormat($formatType = NULL) {
     $format = NULL;

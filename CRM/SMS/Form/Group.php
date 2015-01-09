@@ -309,7 +309,8 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @return array list of errors to be posted back to the form
+   * @return array
+   *   list of errors to be posted back to the form
    * @static
    */
   public static function formRule($fields) {

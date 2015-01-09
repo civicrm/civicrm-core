@@ -51,7 +51,8 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
 
   /**
    * @param string $fldName
-   * @return bool TRUE if encoding should be skipped for this field
+   * @return bool
+   *   TRUE if encoding should be skipped for this field
    */
   public function isSkippedField($fldName) {
     $skipFields = $this->getSkipFields();

@@ -180,7 +180,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addScriptUrl($url, $region) {
     return FALSE;
@@ -196,7 +197,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addScript($code, $region) {
     return FALSE;
@@ -212,7 +214,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addStyleUrl($url, $region) {
     return FALSE;
@@ -228,7 +231,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addStyle($code, $region) {
     return FALSE;
@@ -253,7 +257,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @param mix $action
    *   The default action if one is pre-specified.
    *
-   * @return string the url to post the form
+   * @return string
+   *   the url to post the form
    * @static
    */
   public function postURL($action) {
@@ -284,7 +289,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    *
    * @param bool $forceBackend
    *
-   * @return string            an HTML string containing a link to the given path.
+   * @return string
+   *   an HTML string containing a link to the given path.
    */
   function url(
     $path = NULL,
@@ -467,7 +473,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Get the locale set in the hosting CMS
    *
-   * @return string  with the locale or null for none
+   * @return string
+   *   with the locale or null for none
    */
   public function getUFLocale() {
     // WPML plugin
@@ -671,7 +678,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Check is user logged in.
    *
-   * @return boolean true/false.
+   * @return boolean
    */
   public function isUserLoggedIn() {
     $isloggedIn = FALSE;
@@ -695,7 +702,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Get currently logged in user uf id.
    *
-   * @return int $userID logged in user uf id.
+   * @return int
+   *   $userID logged in user uf id.
    */
   public function getLoggedInUfID() {
     $ufID = NULL;
@@ -706,7 +714,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Get currently logged in user unique identifier - this tends to be the email address or user name.
    *
-   * @return string $userID logged in user unique identifier
+   * @return string
+   *   logged in user unique identifier
    */
   public function getLoggedInUniqueIdentifier() {
     $user = $this->getLoggedInUserObject();
@@ -740,7 +749,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @param string $destination
    *   If present, add destination to querystring (works for Drupal only).
    *
-   * @return string - loginURL for the current CMS
+   * @return string
+   *   loginURL for the current CMS
    *
    */
   public function getLoginURL($destination = '') {
@@ -760,7 +770,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Return the current WordPress version if relevant function exists
    *
-   * @return string - version number
+   * @return string
+   *   version number
    *
    */
   public function getVersion() {
@@ -774,7 +785,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   /**
    * Get timezone as a string
-   * @return string Timezone e.g. 'America/Los_Angeles'
+   * @return string
+   *   Timezone e.g. 'America/Los_Angeles'
    */
   public function getTimeZoneString() {
     return get_option('timezone_string');

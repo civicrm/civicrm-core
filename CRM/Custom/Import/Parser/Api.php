@@ -66,7 +66,8 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
+   * @return boolean
+   *   the result of this processing
    */
   public function preview(&$values) {
     return $this->summary($values);
@@ -76,7 +77,8 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
+   * @return boolean
+   *   the result of this processing
    * It is called from both the preview & the import actions
    * (non-PHPdoc)
    * @see CRM_Custom_Import_Parser_BaseClass::summary()
@@ -129,7 +131,8 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
+   * @return boolean
+   *   the result of this processing
    */
   public function import($onDuplicate, &$values) {
     $response = $this->summary($values);
@@ -212,7 +215,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @param int $id
    *   Custom group ID.
    *
-   * @return array   $importableFields
+   * @return array
    *
    * @static
    */

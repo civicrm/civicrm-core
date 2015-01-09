@@ -138,7 +138,8 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @param mix $action
    *   The default action if one is pre-specified.
    *
-   * @return string the url to post the form
+   * @return string
+   *   the url to post the form
    */
   /**
    * @param mix $action
@@ -169,7 +170,8 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @param bool $forceBackend
    *   a gross joomla hack.
    *
-   * @return string an HTML string containing a link to the given path.
+   * @return string
+   *   an HTML string containing a link to the given path.
    *
    */
   /**
@@ -287,7 +289,8 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   /**
    * Get the locale set in the hosting CMS
    *
-   * @return string  with the locale or null for none
+   * @return string
+   *   with the locale or null for none
    */
   /**
    * @return string
@@ -299,7 +302,8 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   /**
    * Get a list of all installed modules, including enabled and disabled ones
    *
-   * @return array CRM_Core_Module
+   * @return array
+   *   CRM_Core_Module
    */
   /**
    * @return array
@@ -315,7 +319,8 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    *   If present, add destination to querystring (works for Drupal only).
    *
    * @throws Exception
-   * @return string - loginURL for the current CMS
+   * @return string
+   *   loginURL for the current CMS
    * @static
    */
   public function getLoginURL($destination = '') {
@@ -324,7 +329,8 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
 
   /**
    * Over-ridable function to get timezone as a string eg.
-   * @return string Timezone e.g. 'America/Los_Angeles'
+   * @return string
+   *   Timezone e.g. 'America/Los_Angeles'
    */
   public function getTimeZoneString() {
     // This class extends Drupal, but we don't want Drupal's behavior; reproduce CRM_Utils_System_Base::getTimeZoneString

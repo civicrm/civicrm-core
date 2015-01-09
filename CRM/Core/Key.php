@@ -40,7 +40,8 @@ class CRM_Core_Key {
   /**
    * Generate a private key per session and store in session
    *
-   * @return string private key for this session
+   * @return string
+   *   private key for this session
    * @static
    */
   public static function privateKey() {
@@ -78,7 +79,8 @@ class CRM_Core_Key {
    * @param bool $addSequence
    *   Should we add a unique sequence number to the end of the key.
    *
-   * @return string       valid formID
+   * @return string
+   *   valid formID
    * @static
    */
   public static function get($name, $addSequence = FALSE) {
@@ -101,7 +103,8 @@ class CRM_Core_Key {
    * @param string $name
    * @param bool $addSequence
    *
-   * @return string $formKey if valid, else null
+   * @return string
+   *   if valid, else null
    * @static
    */
   public static function validate($key, $name, $addSequence = FALSE) {

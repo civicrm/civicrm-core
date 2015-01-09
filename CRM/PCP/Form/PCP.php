@@ -124,7 +124,8 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
    *
    * @param null
    *
-   * @return array   array of default values
+   * @return array
+   *   array of default values
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -194,7 +195,8 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
    * @param $files
    * @param CRM_Core_Form $form
    *
-   * @return array list of errors to be posted back to the form
+   * @return array
+   *   list of errors to be posted back to the form
    * @static
    */
   public static function formRule($fields, $files, $form) {

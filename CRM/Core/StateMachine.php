@@ -195,7 +195,8 @@ class CRM_Core_StateMachine {
    * @param string $name
    *   The state name.
    *
-   * @return object the state object
+   * @return object
+   *   the state object
    */
   public function find($name) {
     if (array_key_exists($name, $this->_states)) {
@@ -209,7 +210,8 @@ class CRM_Core_StateMachine {
   /**
    * Return the list of state objects
    *
-   * @return array array of states in the state machine
+   * @return array
+   *   array of states in the state machine
    */
   public function getStates() {
     return $this->_states;
@@ -245,7 +247,8 @@ class CRM_Core_StateMachine {
   /**
    * Return the list of form objects
    *
-   * @return array array of pages in the state machine
+   * @return array
+   *   array of pages in the state machine
    */
   public function getPages() {
     return $this->_pages;

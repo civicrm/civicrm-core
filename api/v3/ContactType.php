@@ -45,7 +45,8 @@
  *   (reference) Associative array of property.
  *                       name/value pairs to insert in new 'contact_type'
  *
- * @return array   contact_type array
+ * @return array
+   *   contact_type array
  *
  * @access public
  */
@@ -73,7 +74,8 @@ function civicrm_api3_contact_type_create($params) {
  *                       property_name=>value pairs. If $params is set
  *                       as null, all contact_types will be returned
  *
- * @return array Array of matching contact_types
+ * @return array
+   *   Array of matching contact_types
  * @access public
  */
 function civicrm_api3_contact_type_get($params) {
@@ -91,7 +93,8 @@ function civicrm_api3_contact_type_get($params) {
  *   Array containing id of the group.
  *                       to be deleted
  *
- * @return array  API Result Array
+ * @return array
+   *   API Result Array
  *
  * @access public
  */

@@ -748,7 +748,8 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    *
    * @param bool $isButtonJs
    *
-   * @return boolean ture on success.
+   * @return boolean
+   *   ture on success.
    */
   public function isLastParticipant($isButtonJs = FALSE) {
     $participant = $isButtonJs ? $this->_params[0]['additional_participants'] : $this->_params[0]['additional_participants'] + 1;

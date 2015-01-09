@@ -49,7 +49,8 @@
  * {@getfields GroupOrganization_get}
  * @example GroupOrganizationGet.php
  *
- * @return array  list of groups, given contact subsribed to
+ * @return array
+   *   list of groups, given contact subsribed to
  */
 function civicrm_api3_group_organization_get($params) {
   return _civicrm_api3_basic_get('CRM_Contact_DAO_GroupOrganization', $params);
@@ -97,7 +98,8 @@ function _civicrm_api3_group_organization_create_spec(&$params) {
  * @param array $params
  *   With 'id' = ID of the Group Organization to be deleted.
  *
- * @return array API Result
+ * @return array
+   *   API Result
  * {@getfields GroupOrganization_delete}
  * @example GroupOrganizationDelete.php
  * @access public

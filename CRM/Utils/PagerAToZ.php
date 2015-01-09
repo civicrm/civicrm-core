@@ -49,7 +49,8 @@ class CRM_Utils_PagerAToZ {
    *
    * @param bool $isDAO
    *
-   * @return string                 The html formatted string
+   * @return string
+   *   The html formatted string
    * @static
    */
   public static function getAToZBar(&$query, $sortByCharacter, $isDAO = FALSE) {
@@ -60,7 +61,8 @@ class CRM_Utils_PagerAToZ {
   /**
    * Return the all the static characters
    *
-   * @return array $staticAlphabets is a array of static characters
+   * @return array
+   *   is a array of static characters
    * @static
    */
   public static function getStaticCharacters() {
@@ -74,7 +76,8 @@ class CRM_Utils_PagerAToZ {
    * @param $query
    * @param $isDAO
    *
-   * @return array $dynamicAlphabets is a array of dynamic characters
+   * @return array
+   *   is a array of dynamic characters
    * @static
    */
   public static function getDynamicCharacters(&$query, $isDAO) {
@@ -105,7 +108,8 @@ class CRM_Utils_PagerAToZ {
    *
    * @param $isDAO
    *
-   * @return array with links
+   * @return array
+   *   with links
    * @static
    */
   public static function createLinks(&$query, $sortByCharacter, $isDAO) {

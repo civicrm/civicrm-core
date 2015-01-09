@@ -85,7 +85,8 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * the default values are retrieved from the database
    *
    *
-   * @return array defaults
+   * @return array
+   *   defaults
    */
   public function setDefaultValues() {
     $defaults = array();

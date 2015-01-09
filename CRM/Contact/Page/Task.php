@@ -45,7 +45,8 @@ class CRM_Contact_Page_Task extends CRM_Core_Page {
   /**
    * Returns the page title
    *
-   * @return string the title of the page
+   * @return string
+   *   the title of the page
    */
   public function getTitle() {
     return "Task Results";

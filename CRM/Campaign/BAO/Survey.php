@@ -387,7 +387,8 @@ SELECT  survey.id    as id,
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -424,7 +425,8 @@ SELECT  survey.id    as id,
    * @param array $returnProperties
    *   An array of return elements.
    *
-   * @return array $voterDetails array of contact info.
+   * @return array
+   *   array of contact info.
    * @static
    */
   public static function voterDetails($voterIds, $returnProperties = array()) {
@@ -518,7 +520,8 @@ Group By  contact.id";
    * @param int $interviewerId
    * @param array $statusIds
    *
-   * @return array $activityDetails array of survey activity.
+   * @return array
+   *   array of survey activity.
    * @static
    */
   static function voterActivityDetails(
@@ -722,7 +725,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    * This function retrieve all option groups which are created as a result set
    *
    * @param string $valueColumnName
-   * @return array $resultSets an array of option groups.
+   * @return array
+   *   an array of option groups.
    * @static
    */
   public static function getResultSets($valueColumnName = 'title') {
@@ -743,7 +747,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    *
    * @param int $activityId
    *   Activity id.
-   * @return boolean $isSurveyActivity true/false
+   * @return boolean
    * @static
    */
   public static function isSurveyActivity($activityId) {
@@ -772,7 +776,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    *
    * @param int $surveyId
    *   Survey id.
-   * @return array $responseOptions an array of option values
+   * @return array
+   *   an array of option values
    * @static
    */
   public static function getResponsesOptions($surveyId) {
@@ -968,7 +973,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    * @param int $surveyTypeId
    *   Survey activity type id.
    *
-   * @return array an array of valid survey response fields.
+   * @return array
+   *   an array of valid survey response fields.
    */
   public static function getSurveyResponseFields($surveyId, $surveyTypeId = NULL) {
     if (empty($surveyId)) {
@@ -1035,7 +1041,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   /**
    * Get all interviewers of surveys.
    *
-   * @return array an array of valid survey response fields.
+   * @return array
+   *   an array of valid survey response fields.
    */
   public static function getInterviewers() {
     static $interviewers;
@@ -1076,7 +1083,8 @@ INNER JOIN  civicrm_survey survey ON ( activity.source_record_id = survey.id )
    *
    * @param array $params
    *
-   * @return array success message
+   * @return array
+   *   success message
    */
   public static function releaseRespondent($params) {
     $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');

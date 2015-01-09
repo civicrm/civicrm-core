@@ -349,7 +349,8 @@ class CRM_Utils_Array {
   /**
    * @param $subset
    * @param $superset
-   * @return bool TRUE if $subset is a subset of $superset
+   * @return bool
+   *   TRUE if $subset is a subset of $superset
    */
   public static function isSubset($subset, $superset) {
     foreach ($subset as $expected) {

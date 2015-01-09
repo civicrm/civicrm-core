@@ -63,7 +63,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * @param bool $checkPermission
    *   All or only authorized for the current user.
    *
-   * @return array $widgets  array of dashlets
+   * @return array
+   *   array of dashlets
    * @static
    */
   public static function getDashlets($all = TRUE, $checkPermission = TRUE) {
@@ -104,7 +105,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *   Provide the dashlets for the contact id.
    * passed rather than the current user.
    *
-   * @return array $dashlets array of dashlets
+   * @return array
+   *   array of dashlets
    * @static
    */
   public static function getContactDashlets($flatFormat = FALSE, $contactID = NULL) {
@@ -153,7 +155,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * When a user accesses their dashboard for the first time, set up
    * the default dashlets.
    *
-   * @return array of dashboard_id's
+   * @return array
+   *   of dashboard_id's
    */
   public static function initializeDashlets() {
     $dashlets = array();
@@ -194,7 +197,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *   Comma separated list.
    * @param string $operator
    *
-   * @return boolean true if use has permission else false
+   * @return boolean
+   *   true if use has permission else false
    */
   public static function checkPermission($permission, $operator) {
     if ($permission) {
@@ -268,7 +272,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * @param int $dashletID
    *   Widget ID.
    *
-   * @return array associted array title and content
+   * @return array
+   *   associted array title and content
    * @static
    */
   public static function getDashletInfo($dashletID) {
@@ -406,7 +411,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * @param array $params
    *   Associated array.
    *
-   * @return object $dashlet returns dashlet object
+   * @return object
+   *   $dashlet returns dashlet object
    * @static
    */
   public static function addDashlet(&$params) {

@@ -161,7 +161,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @param bool $countChildGroups
    *
-   * @return int count of members in the group with above status
+   * @return int
+   *   count of members in the group with above status
    */
   public static function memberCount($id, $status = 'Added', $countChildGroups = FALSE) {
     $groupContact = new CRM_Contact_DAO_GroupContact();
@@ -205,7 +206,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param int $groupID
    * @param bool $useCache
    *
-   * @return array $aMembers this array contains the list of members for this group id
+   * @return array
+   *   this array contains the list of members for this group id
    * @static
    */
   public static function &getMember($groupID, $useCache = TRUE) {
@@ -234,7 +236,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param NULL $offset
    * @param NULL $rowCount
    *
-   * @return array of group objects.
+   * @return array
+   *   of group objects.
    *
    *
    * @todo other BAO functions that use returnProperties (e.g. Query Objects) receive the array flipped & filled with 1s and
@@ -309,7 +312,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param int $id
    *   The id of the object.
    *
-   * @return string   the permission that the user has (or NULL)
+   * @return string
+   *   the permission that the user has (or NULL)
    * @static
    */
   public static function checkPermission($id) {
@@ -560,7 +564,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param bool $isActive
    *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, NULL otherwise
+   * @return Object
+   *   DAO object on sucess, NULL otherwise
    * @static
    */
   public static function setIsActive($id, $isActive) {
@@ -574,7 +579,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *   Type of group(Access/Mailing) OR the key of the group.
    * @param bool|\boolen $excludeHidden exclude hidden groups.
    *
-   * @return string $condition
+   * @return string
    * @static
    */
   public static function groupTypeCondition($groupType = NULL, $excludeHidden = TRUE) {
@@ -647,7 +652,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $params
    *   ( reference ) an assoc array of name/value pairs.
    *
-   * @return array ( smartGroupId, ssId ) smart group id and saved search id
+   * @return array
+   *   ( smartGroupId, ssId ) smart group id and saved search id
    * @static
    */
   public static function createHiddenSmartGroup($params) {
@@ -717,7 +723,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $params
    *   Associated array for params record id.
    *
-   * @return array   $groupList associated array of group list
+   * @return array
+   *   associated array of group list
    *  -rp = rowcount
    *  -page= offset
    * @todo there seems little reason for the small number of functions that call this to pass in
@@ -1232,7 +1239,8 @@ WHERE {$whereClause}";
   /**
    * Define action links
    *
-   * @return array $links array of action links
+   * @return array
+   *   array of action links
    */
   public static function actionLinks() {
     $links = array(

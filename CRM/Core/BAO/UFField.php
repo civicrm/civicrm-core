@@ -67,7 +67,8 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    * @param int $id
    *   Id of uf_form.
    *
-   * @return string title
+   * @return string
+   *   title
    *
    * @static
    *
@@ -84,7 +85,8 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object              DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -371,7 +373,8 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * @param int $UFFieldId
    *
-   * @return boolean   false if custom field are disabled else true
+   * @return boolean
+   *   false if custom field are disabled else true
    * @static
    */
   public static function checkUFStatus($UFFieldId) {
@@ -461,7 +464,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * @param array $optional
    *   Array of types those are optional.
    *
-   * @return boolean $valid
+   * @return boolean
    * @static
    */
   public static function checkValidProfileType($ufGroupId, $required, $optional = NULL) {
@@ -578,7 +581,8 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * @param bool $skipComponentType
    *
-   * @return string profile group_type
+   * @return string
+   *   profile group_type
    * @static
    *
    * TODO Why is this function in this class? It seems to be about the UFGroup.
@@ -602,7 +606,8 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *   True if only pure profiles are required.
    * @param bool $skipComponentType
    *
-   * @return string profile group_type
+   * @return string
+   *   profile group_type
    * @static
    *
    * TODO Why is this function in this class? It seems to be about the UFGroup.
@@ -740,7 +745,7 @@ SELECT ufg.id as id
    *
    * @param int $profileID
    *
-   * @return boolean $result    true/false.
+   * @return boolean
    */
   public static function checkSearchableORInSelector($profileID) {
     $result = FALSE;
@@ -768,7 +773,8 @@ SELECT  id
    *
    * @param int $profileID
    *
-   * @return void.
+   * @return void
+   *
    */
   public function resetInSelectorANDSearchable($profileID) {
     if (!$profileID) {
@@ -801,7 +807,8 @@ SELECT  id
    *   Filter to apply to profile fields - expected usage is to only fill based on.
    * the bottom profile per CRM-13726
    *
-   * @return bool Can the address block be hidden safe in the knowledge all fields are elsewhere collected (see CRM-15118)
+   * @return bool
+   *   Can the address block be hidden safe in the knowledge all fields are elsewhere collected (see CRM-15118)
    */
   public static function assignAddressField($key, &$profileAddressFields, $profileFilter) {
     $billing_id = CRM_Core_BAO_LocationType::getBilling();

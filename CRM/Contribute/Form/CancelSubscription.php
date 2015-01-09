@@ -188,7 +188,8 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
    *
    * @param null
    *
-   * @return array    array of default values
+   * @return array
+   *   array of default values
    */
   public function setDefaultValues() {
     $defaults = array('is_notify' => 1);

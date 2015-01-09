@@ -271,7 +271,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addScriptUrl($url, $region) {
     return FALSE;
@@ -287,7 +288,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addScript($code, $region) {
     return FALSE;
@@ -303,7 +305,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addStyleUrl($url, $region) {
     if ($region == 'html-header') {
@@ -324,7 +327,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
    */
   public function addStyle($code, $region) {
     if ($region == 'html-header') {
@@ -355,7 +359,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *
    * @param bool $forceBackend
    *
-   * @return string            an HTML string containing a link to the given path.
+   * @return string
+   *   an HTML string containing a link to the given path.
    */
   function url(
     $path = NULL, $query = NULL, $absolute = TRUE,
@@ -434,7 +439,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @param $action
    *   The default action if one is pre-specified.
    *
-   * @return string the url to post the form
+   * @return string
+   *   the url to post the form
    */
   public function postURL($action) {
     if (!empty($action)) {
@@ -612,7 +618,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Get the locale set in the hosting CMS
    *
-   * @return string  the used locale or null for none
+   * @return string
+   *   the used locale or null for none
    */
   public function getUFLocale() {
     if (defined('_JEXEC')) {
@@ -698,7 +705,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Check is user logged in.
    *
-   * @return boolean true/false.
+   * @return boolean
    */
   public function isUserLoggedIn() {
     $user = JFactory::getUser();
@@ -708,7 +715,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Get currently logged in user uf id.
    *
-   * @return int logged in user uf id.
+   * @return int
+   *   logged in user uf id.
    */
   public function getLoggedInUfID() {
     $user = JFactory::getUser();
@@ -718,7 +726,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Get currently logged in user unique identifier - this tends to be the email address or user name.
    *
-   * @return string $userID logged in user unique identifier
+   * @return string
+   *   logged in user unique identifier
    */
   public function getLoggedInUniqueIdentifier() {
     $user = JFactory::getUser();
@@ -748,7 +757,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Get a list of all installed modules, including enabled and disabled ones
    *
-   * @return array CRM_Core_Module
+   * @return array
+   *   CRM_Core_Module
    */
   public function getModules() {
     $result = array();
@@ -774,7 +784,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @param string $destination
    *   If present, add destination to querystring (works for Drupal only).
    *
-   * @return string - loginURL for the current CMS
+   * @return string
+   *   loginURL for the current CMS
    * @static
    */
   public function getLoginURL($destination = '') {
@@ -830,7 +841,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *
    * @param $dir
    *
-   * @return array array
+   * @return array
+   *   array
    * - $url, (Joomla - non admin url)
    * - $siteName,
    * - $siteRoot

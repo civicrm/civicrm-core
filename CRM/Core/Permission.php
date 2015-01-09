@@ -73,7 +73,8 @@ class CRM_Core_Permission {
   /**
    * Get the current permission of this user
    *
-   * @return string the permission of the user (edit or view or null)
+   * @return string
+   *   the permission of the user (edit or view or null)
    */
   public static function getPermission() {
     $config = CRM_Core_Config::singleton();
@@ -113,7 +114,8 @@ class CRM_Core_Permission {
    *    array('access CiviEvent', 'access CiviContribute')
    *  ),
    *
-   * @return boolean true if yes, else false
+   * @return boolean
+   *   true if yes, else false
    * @static
    */
   public static function check($permissions) {
@@ -161,7 +163,8 @@ class CRM_Core_Permission {
    * @param array $array
    *   The group/role to check.
    *
-   * @return boolean true if yes, else false
+   * @return boolean
+   *   true if yes, else false
    * @static
    */
   public static function checkGroupRole($array) {
@@ -179,7 +182,8 @@ class CRM_Core_Permission {
    * @param array $whereTables
    *   (reference ) add the tables that are needed for the where clause.
    *
-   * @return string the group where clause for this user
+   * @return string
+   *   the group where clause for this user
    */
   public static function getPermissionedStaticGroupClause($type, &$tables, &$whereTables) {
     $config = CRM_Core_Config::singleton();
@@ -196,7 +200,8 @@ class CRM_Core_Permission {
    *
    * @static
    *
-   * @return array - array reference of all groups.
+   * @return array
+   *   array reference of all groups.
    */
   public static function group($groupType, $excludeHidden = TRUE) {
     $config = CRM_Core_Config::singleton();
@@ -748,7 +753,8 @@ class CRM_Core_Permission {
    * @param string $permissionName
    *   Name of the permission we are interested in.
    *
-   * @return string a comma separated list of email addresses
+   * @return string
+   *   a comma separated list of email addresses
    */
   public static function permissionEmails($permissionName) {
     $config = CRM_Core_Config::singleton();
@@ -761,7 +767,8 @@ class CRM_Core_Permission {
    * @param string $roleName
    *   Name of the role we are interested in.
    *
-   * @return string a comma separated list of email addresses
+   * @return string
+   *   a comma separated list of email addresses
    */
   public static function roleEmails($roleName) {
     $config = CRM_Core_Config::singleton();

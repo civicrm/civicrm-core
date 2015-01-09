@@ -83,7 +83,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
    * Retrieves report instances, optionally filtered by parent report template ($ovID)
    * or by component ($compID)
    *
-   * @return array  $rows
+   * @return array
    * @static
    */
   public function &info() {

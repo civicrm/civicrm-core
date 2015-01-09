@@ -83,7 +83,8 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    *
    * access        public
    *
-   * @return array reference to the array of default values
+   * @return array
+   *   reference to the array of default values
    *
    */
   /**

@@ -306,7 +306,8 @@ SELECT     civicrm_email.id as email_id
    * @param int $subscribe_id
    *   ID of the subscribe event.
    *
-   * @return object $domain       The domain owning the event
+   * @return object
+   *   $domain       The domain owning the event
    * @static
    */
   public static function &getDomain($subscribe_id) {
@@ -321,7 +322,8 @@ SELECT     civicrm_email.id as email_id
    * @param int $contactID
    *   ContactID if we want an exact match.
    *
-   * @return array $groups    array of group ids
+   * @return array
+   *   array of group ids
    */
   public static function getContactGroups($email, $contactID = NULL) {
     if ($contactID) {

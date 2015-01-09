@@ -54,7 +54,8 @@ class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
    *
    * access        public
    *
-   * @return array reference to the array of default values
+   * @return array
+   *   reference to the array of default values
    *
    */
   /**
@@ -63,7 +64,8 @@ class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
    *
    * access        public
    *
-   * @return array reference to the array of default values
+   * @return array
+   *   reference to the array of default values
    *
    */
   /**

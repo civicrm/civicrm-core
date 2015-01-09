@@ -55,7 +55,8 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *
    * @param bool $admin
    *
-   * @return array Array of event summary values
+   * @return array
+   *   Array of event summary values
    */
   public static function getGrantSummary($admin = FALSE) {
     $query = "
@@ -93,7 +94,8 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *
    * @static
    *
-   * @return array Array of event summary values
+   * @return array
+   *   Array of event summary values
    */
   public static function getGrantStatusOptGroup() {
 
@@ -117,7 +119,8 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *
    * @param bool $admin
    *
-   * @return array Array of grant summary statistics
+   * @return array
+   *   Array of grant summary statistics
    */
   public static function getGrantStatistics($admin = FALSE) {
     $grantStatuses = array();
@@ -363,7 +366,8 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Combine all the exportable fields from the lower levels object
    *
-   * @return array array of exportable Fields
+   * @return array
+   *   array of exportable Fields
    * @static
    */
   public static function &exportableFields() {
@@ -421,7 +425,8 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *
    * @param int $contactID
    *
-   * @return int count of grant records
+   * @return int
+   *   count of grant records
    * @static
    */
   public static function getContactGrantCount($contactID) {

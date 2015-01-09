@@ -140,7 +140,8 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
+   * @return boolean
+   *   the result of this processing
    */
   public function preview(&$values) {
     return $this->summary($values);
@@ -152,7 +153,8 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
+   * @return boolean
+   *   the result of this processing
    */
   public function summary(&$values) {
     $erroneousField = NULL;
@@ -270,7 +272,8 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
+   * @return boolean
+   *   the result of this processing
    */
   public function import($onDuplicate, &$values) {
 
