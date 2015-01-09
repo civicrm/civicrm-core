@@ -48,11 +48,13 @@ function civicrm_api3($entity, $action, $params = array()) {
 }
 
 /**
- * call getfields from api wrapper. This function ensures that settings that could alter
- * getfields output (e.g. action for all api & profile_id for profile api ) are consistently passed in.
+ * Call getfields from api wrapper. This function ensures that settings that
+ * could alter getfields output (e.g. action for all api & profile_id for
+ * profile api ) are consistently passed in.
  *
- * We check whether the api call is 'getfields' because if getfields is being called we return an empty array
- * as no alias swapping, validation or default filling is done on getfields & we want to avoid a loop
+ * We check whether the api call is 'getfields' because if getfields is
+ * being called we return an empty array as no alias swapping, validation or
+ * default filling is done on getfields & we want to avoid a loop
  *
  * @todo other output modifiers include contact_type
  *
@@ -153,10 +155,12 @@ function _civicrm_api_replace_variables($entity, $action, &$params, &$parentResu
  * Convert possibly camel name to underscore separated entity name
  *
  * @param string $entity
- *   Entity name in various formats e.g. Contribution, contribution, OptionValue, option_value, UFJoin, uf_join.
- * @return string $entity entity name in underscore separated format
+ *   Entity name in various formats e.g. Contribution, contribution,
+ *   OptionValue, option_value, UFJoin, uf_join.
+ * @return string $entity
+ *   Entity name in underscore separated format.
  *
- * FIXME: Why isn't this called first thing in civicrm_api wrapper?
+ * @fixme Why isn't this called first thing in civicrm_api wrapper?
  */
 function _civicrm_api_get_entity_name_from_camel($entity) {
   if ($entity == strtolower($entity)) {

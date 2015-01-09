@@ -9,8 +9,12 @@
  */
 
 /**
- * This api exception returns more information than the default one. The aim it let the api consumer know better what is exactly the error without having to parse the error message.
- * If you consume an api that doesn't return an error_code or the extra data you need, consider improving the api and contribute
+ * This api exception returns more information than the default one. The aim
+ * it let the api consumer know better what is exactly the error without
+ * having to parse the error message.
+ *
+ * If you consume an api that doesn't return an error_code or the extra data
+ * you need, consider improving the api and contribute.
  */
 class API_Exception extends Exception {
   const UNAUTHORIZED = 'unauthorized';
