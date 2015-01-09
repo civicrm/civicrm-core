@@ -103,16 +103,16 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
 
     $this->add('select', 'paper_size', ts('Sheet Size'),
       array(
-        0 => ts('- default -')
+        0 => ts('- default -'),
       ) + CRM_Core_BAO_PaperSize::getList(TRUE), FALSE,
       array(
-        'onChange' => "selectPaper( this.value );"
+        'onChange' => "selectPaper( this.value );",
       ) + $disabled
     );
     $this->add('static', 'paper_dimensions', NULL, ts('Sheet Size (w x h)'));
     $this->add('select', 'orientation', ts('Orientation'), CRM_Core_BAO_LabelFormat::getPageOrientations(), FALSE,
       array(
-        'onChange' => "updatePaperDimensions();"
+        'onChange' => "updatePaperDimensions();",
       ) + $disabled
     );
     $this->add('select', 'font_name', ts('Font Name'), CRM_Core_BAO_LabelFormat::getFontNames($this->_group));
@@ -137,7 +137,7 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
 
     $this->addRule('label', ts('Name already exists in Database.'), 'objectExists', array(
       'CRM_Core_BAO_LabelFormat',
-      $this->_id
+      $this->_id,
     ));
     $this->addRule('NX', ts('Must be an integer'), 'integer');
     $this->addRule('NY', ts('Must be an integer'), 'integer');

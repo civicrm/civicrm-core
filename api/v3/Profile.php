@@ -124,7 +124,7 @@ function civicrm_api3_profile_get($params) {
         $values[$profileID][strtolower($fieldName)] = $field;
       }
     }
-    else{
+    else {
       $values[$profileID] = array_fill_keys(array_keys($profileFields), '');
     }
   }
@@ -218,14 +218,14 @@ function civicrm_api3_profile_submit($params) {
   if (isset($contactParams['api.contribution.create']) && isset($contactParams['api.membership.create'])) {
     $contactParams['api.membership_payment.create'] = array(
       'contribution_id' => '$value.api.contribution.create.id',
-      'membership_id' => '$value.api.membership.create.id'
+      'membership_id' => '$value.api.membership.create.id',
     );
   }
 
   if (isset($contactParams['api.contribution.create']) && isset($contactParams['api.participant.create'])) {
     $contactParams['api.participant_payment.create'] = array(
       'contribution_id' => '$value.api.contribution.create.id',
-      'participant_id' => '$value.api.participant.create.id'
+      'participant_id' => '$value.api.participant.create.id',
     );
   }
 
@@ -450,23 +450,23 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
       $values['billing_' . $fieldname . '-' . $locationTypeID] = isset($result['api.address.get.2']['values'][0][$fieldname]) ? $result['api.address.get.2']['values'][0][$fieldname] : '';
     }
   }
-  else{
+  else {
     foreach ($addressFields as $fieldname) {
       $values['billing_' . $fieldname . '-' . $locationTypeID] = isset($result[$fieldname]) ? $result[$fieldname] : '';
     }
   }
 
   if (!empty($result['api.email.get.1']['count'])) {
-    $values['billing-email' .  '-' . $locationTypeID] = $result['api.email.get.1']['values'][0]['email'];
+    $values['billing-email' . '-' . $locationTypeID] = $result['api.email.get.1']['values'][0]['email'];
   }
   elseif(!empty($result['api.email.get.2']['count'])) {
-    $values['billing-email' .  '-' . $locationTypeID] = $result['api.email.get.2']['values'][0]['email'];
+    $values['billing-email' . '-' . $locationTypeID] = $result['api.email.get.2']['values'][0]['email'];
   }
-  else{
-    $values['billing-email' .  '-' . $locationTypeID] = $result['email'];
+  else {
+    $values['billing-email' . '-' . $locationTypeID] = $result['email'];
   }
   // return both variants of email to reflect inconsistencies in form layer
-  $values['email' .  '-' . $locationTypeID] = $values['billing-email' .  '-' . $locationTypeID];
+  $values['email' . '-' . $locationTypeID] = $values['billing-email' . '-' . $locationTypeID];
   return $values;
 }
 
@@ -567,7 +567,7 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
           // which entity 'status_id' belongs to
           $fieldName = $entityGetFieldsResult[$realName]['uniqueName'];
         }
-        else{
+        else {
           if (isset($entityGetFieldsResult[$realName]['name'])) {
             // this will sort out membership_type_id vs membership_type
             $fieldName = $entityGetFieldsResult[$realName]['name'];
@@ -638,7 +638,7 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
     if ($fieldName == 'email') {
       $entity = 'email';
     }
-    else{
+    else {
       $entity = 'address';
     }
     $fieldName .= '-' . $field['location_type_id'];

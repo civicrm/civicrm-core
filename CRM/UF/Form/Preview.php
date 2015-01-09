@@ -91,7 +91,7 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
         'county',
         'phone',
         'email',
-        'im'
+        'im',
       );
 
       if ($fieldDAO->location_type_id) {

@@ -476,7 +476,7 @@ WHERE  name IN ('Donation', 'Event Fee', 'Member Dues') AND is_active =1
 
     if ($daoFetchTypes->N < 3) {
       $modifiedDefaults = TRUE;
-      $insertStatments = array (
+      $insertStatments = array(
         'Donation' => "('Donation', 0, 1, 1)",
         'Member' => "('Member Dues', 0, 1, 1)",
         'Event Fee' => "('Event Fee', 0, 1, 0)",
@@ -516,7 +516,7 @@ AND       ceft.entity_table = 'civicrm_contribution'
     $queryParams = array(
       1 => array($completedStatus, 'Integer'),
       2 => array($pendingStatus, 'Integer'),
-      3 => array($cancelledStatus, 'Integer')
+      3 => array($cancelledStatus, 'Integer'),
     );
 
     $accountType = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name = 'Asset' "));
@@ -872,7 +872,7 @@ WHERE     cc.contact_type = 'Organization' AND cc.organization_name = %1
           'display_name' => $dao->name,
           'legal_name' => $dao->name,
           'organization_name' => $dao->name,
-          'contact_type' => 'Organization'
+          'contact_type' => 'Organization',
         );
         $contact = CRM_Contact_BAO_Contact::add($params);
         $contactID = $contact->id;
@@ -1111,7 +1111,7 @@ cfi.financial_account_id = %4,
 cfi.description = %5,
 cli.financial_type_id = %6
 WHERE cfi.entity_table = 'civicrm_line_item'
-AND cli.entity_table = 'civicrm_contribution' AND cli.id IN (" . implode(',', $value) .  ');';
+AND cli.entity_table = 'civicrm_contribution' AND cli.id IN (" . implode(',', $value) . ');';
       $params =  array(
         1 => array($financialTrxn[$key]['label'], 'String'),
         2 => array($financialTrxn[$key]['price_field_id'], 'Integer'),

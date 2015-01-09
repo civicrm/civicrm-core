@@ -41,7 +41,7 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
       array(
         'field_name' => 'activity_date_time',
         'field_type' => 'Activity',
-      )
+      ),
     ));
     $fields = CRM_Core_BAO_UFField::getAvailableFields($ufGroupId);
 

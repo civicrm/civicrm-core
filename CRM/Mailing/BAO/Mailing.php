@@ -2973,7 +2973,7 @@ AND        m.id = %1
           'url' => 'civicrm/mailing/report',
           'qs' => "mid=%%mid%%&reset=1&cid=%%cid%%&context=mailing",
           'title' => ts('View Mailing Report'),
-        )
+        ),
       );
 
       $mailingKey = $values['mailing_id'];

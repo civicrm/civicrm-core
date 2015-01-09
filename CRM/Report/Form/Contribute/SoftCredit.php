@@ -103,7 +103,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
         'filters' => array(
           'sort_name' => array(
             'name' => 'sort_name',
-            'title' => ts('Soft Credit Name')
+            'title' => ts('Soft Credit Name'),
           ),
         ),
         'grouping' => 'contact-fields',
@@ -152,7 +152,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
             'name' => 'id',
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialType()
+            'options' => CRM_Contribute_PseudoConstant::financialType(),
           ),
         ),
         'grouping' => 'softcredit-fields',

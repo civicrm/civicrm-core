@@ -73,7 +73,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         ),
         'order_bys' => array(
           'sort_name' => array(
-            'title' => ts('Contact Name')
+            'title' => ts('Contact Name'),
           ),
         ),
         'grouping' => 'contact-fields',
@@ -88,7 +88,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         ),
         'order_bys' => array(
           'email' => array(
-            'title' => ts('Email')
+            'title' => ts('Email'),
           ),
         ),
         'grouping' => 'contact-fields',
@@ -97,7 +97,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         'dao' => 'CRM_Core_DAO_Email',
         'fields' => array(
           'phone' => array(
-            'title' => 'Phone'
+            'title' => 'Phone',
           ),
         ),
         'grouping' => 'contact-fields',
@@ -126,7 +126,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         ),
         'filters' => array(
           'activity_date_time' => array(
-            'operatorType' => CRM_Report_Form::OP_DATE
+            'operatorType' => CRM_Report_Form::OP_DATE,
           ),
           'activity_type_id' => array(
             'title' => ts('Activity Type'),
@@ -156,10 +156,10 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         ),
         'order_bys' => array(
           'activity_date_time' => array(
-            'title' => ts('Activity Date')
+            'title' => ts('Activity Date'),
           ),
           'activity_type_id' => array(
-            'title' => ts('Activity Type')
+            'title' => ts('Activity Type'),
           ),
         ),
         'grouping' => 'activity-fields',

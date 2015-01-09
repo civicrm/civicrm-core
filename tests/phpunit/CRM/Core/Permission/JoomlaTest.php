@@ -19,7 +19,7 @@ class CRM_Core_Permission_JoomlaTest extends CiviUnitTestCase {
     $cases[] = array("cms:unknown universal name", CRM_Core_Permission::ALWAYS_DENY_PERMISSION);
     $cases[] = array(
       "Joomla:civicrmplusplus.extragood:com_civicrmplusplus",
-      array("civicrmplusplus.extragood", "com_civicrmplusplus")
+      array("civicrmplusplus.extragood", "com_civicrmplusplus"),
     );
     $cases[] = array("otherruntime:foo", CRM_Core_Permission::ALWAYS_DENY_PERMISSION);
     $cases[] = array(CRM_Core_Permission::ALWAYS_DENY_PERMISSION, CRM_Core_Permission::ALWAYS_DENY_PERMISSION);

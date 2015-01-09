@@ -362,7 +362,7 @@ function _civicrm_api3_contact_check_params(&$params, $dupeCheck = TRUE, $dupeEr
     $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $params['contact_type'], 'Unsupervised', array());
 
     if (count($ids) > 0) {
-      throw new API_Exception("Found matching contacts: " .  implode(',', $ids), "duplicate", array("ids" => $ids));
+      throw new API_Exception("Found matching contacts: " . implode(',', $ids), "duplicate", array("ids" => $ids));
     }
   }
 
@@ -393,7 +393,7 @@ function _civicrm_api3_contact_check_params(&$params, $dupeCheck = TRUE, $dupeEr
     else {
       $result = civicrm_api3('contact', 'create', array(
         'organization_name' => $params['current_employer'],
-        'contact_type' => 'Organization'
+        'contact_type' => 'Organization',
       ));
       $params['employer_id'] = $result['id'];
     }
@@ -834,16 +834,16 @@ LIMIT    0, {$limit}
         $contactList = array(
           array(
           'data' => $currEmpDetails['data'],
-            'id'   => $currEmpDetails['id']
-          )
+            'id'   => $currEmpDetails['id'],
+          ),
         );
       }
       else {
         $contactList = array(
           array(
             'data' => $name,
-            'id'   => $name
-          )
+            'id'   => $name,
+          ),
         );
       }
     }

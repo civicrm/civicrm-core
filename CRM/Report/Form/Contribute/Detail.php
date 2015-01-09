@@ -101,7 +101,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
               'title' => ts('Last Name, First Name'),
               'default' => '1',
               'default_weight' => '0',
-              'default_order' => 'ASC'
+              'default_order' => 'ASC',
             ),
           ),
           'grouping' => 'contact-fields',
@@ -174,15 +174,15 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'net_amount' => NULL,
             'contribution_or_soft' => array(
               'title' => ts('Contribution OR Soft Credit?'),
-              'dbAlias' => "'Contribution'"
+              'dbAlias' => "'Contribution'",
             ),
             'soft_credits' => array(
               'title' => ts('Soft Credits'),
-              'dbAlias' => "NULL"
+              'dbAlias' => "NULL",
             ),
             'soft_credit_for' => array(
               'title' => ts('Soft Credit For'),
-              'dbAlias' => "NULL"
+              'dbAlias' => "NULL",
             ),
           ),
           'filters' => array(
@@ -898,7 +898,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
         foreach ($totals as $key => $total) {
           $totalandsum[$key] = ts($title, array(
             1 => $total,
-            2 => CRM_Utils_Money::format($sumcontribs[$key])
+            2 => CRM_Utils_Money::format($sumcontribs[$key]),
           ));
         }
         $this->assign('sectionTotals', $totalandsum);

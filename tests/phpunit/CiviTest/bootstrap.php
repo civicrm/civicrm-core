@@ -2,8 +2,8 @@
 // ADAPTED FROM tools/scripts/phpunit
 
 $GLOBALS['base_dir'] = dirname(dirname(dirname(__DIR__)));
-$tests_dir = $GLOBALS['base_dir']  . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'phpunit';
-$civi_pkgs_dir = $GLOBALS['base_dir'] .   DIRECTORY_SEPARATOR . 'packages';
+$tests_dir = $GLOBALS['base_dir'] . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'phpunit';
+$civi_pkgs_dir = $GLOBALS['base_dir'] . DIRECTORY_SEPARATOR . 'packages';
 ini_set('safe_mode', 0);
 ini_set('include_path',
         "{$GLOBALS['base_dir']}" . PATH_SEPARATOR .

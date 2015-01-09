@@ -112,7 +112,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $this->assertEquals($expectedValue, $savedValue);
 
     //let's try with 2 params already separated
-    $expectedValue = CRM_Core_DAO::VALUE_SEPARATOR . 'valley' . CRM_Core_DAO::VALUE_SEPARATOR . 'goat' .  CRM_Core_DAO::VALUE_SEPARATOR;
+    $expectedValue = CRM_Core_DAO::VALUE_SEPARATOR . 'valley' . CRM_Core_DAO::VALUE_SEPARATOR . 'goat' . CRM_Core_DAO::VALUE_SEPARATOR;
     $this->params[$customFieldLabel] = $expectedValue;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $savedValue = CRM_Core_DAO::singleValueQuery("SELECT {$columnName} FROM $customTable WHERE entity_id = {$result['id']}");

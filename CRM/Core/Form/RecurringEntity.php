@@ -173,7 +173,7 @@ class CRM_Core_Form_RecurringEntity {
                           'thursday'  => 'Thursday',
                           'friday'    => 'Friday',
                           'saturday'  => 'Saturday',
-                          'sunday'    => 'Sunday'
+                          'sunday'    => 'Sunday',
                          );
     $form->add('select', 'repetition_frequency_unit', ts('Repeats:'), $freqUnitsDisplay);
     $numericOptions = CRM_Core_SelectValues::getNumericOptions(1, 30);
@@ -195,7 +195,7 @@ class CRM_Core_Form_RecurringEntity {
                             'second' => 'Second',
                             'third' => 'Third',
                             'fourth' => 'Fourth',
-                            'last'  => 'Last'
+                            'last'  => 'Last',
                          );
     $form->add('select', 'entity_status_1', ts(''), $dayOfTheWeekNo);
     $form->add('select', 'entity_status_2', ts(''), $dayOfTheWeek);
@@ -222,7 +222,7 @@ class CRM_Core_Form_RecurringEntity {
         ),
         array(
           'type' => 'cancel',
-          'name' => ts('Cancel')
+          'name' => ts('Cancel'),
         ),
       )
     );
@@ -370,7 +370,7 @@ class CRM_Core_Form_RecurringEntity {
                 'name'        => $type . '_repeat_exclude_dates_' . $actionScheduleObj->entity_value,
                 'title'       => $type . ' recursion',
                 'is_reserved' => 0,
-                'is_active'   => 1
+                'is_active'   => 1,
               );
           $opGroup = CRM_Core_BAO_OptionGroup::add($optionGroupParams);
           if ($opGroup->id) {
@@ -385,7 +385,7 @@ class CRM_Core_Form_RecurringEntity {
                     'name'            => $opGroup->name,
                     'description'     => 'Used for recurring ' . $type,
                     'weight'          => CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_OptionValue', $oldWeight, CRM_Utils_Array::value('weight', $params), $fieldValues),
-                    'is_active'       => 1
+                    'is_active'       => 1,
                   );
               $excludeDateList[] = $optionGroupValue['value'];
               CRM_Core_BAO_OptionValue::add($optionGroupValue);

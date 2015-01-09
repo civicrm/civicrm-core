@@ -129,7 +129,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'create', array_merge($this->_params, $individualParams));
     $this->callAPISuccess('relationship', 'getcount', array(
         'contact_id_a' => $individualID,
-        'contact_id_b' => $this->_contactID
+        'contact_id_b' => $this->_contactID,
       ));
   }
 
@@ -146,7 +146,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'create', array_merge($this->_params, $individualParams));
     $this->callAPISuccess('relationship', 'getcount', array(
         'contact_id_a' => $individualID,
-        'contact_id_b' => $this->_contactID
+        'contact_id_b' => $this->_contactID,
       ));
   }
 
@@ -172,7 +172,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('relationship', array(
         'contact_id_a' => $individualID,
         'is_active' => TRUE,
-        'contact_id_b' => $organisation2ID
+        'contact_id_b' => $organisation2ID,
       ), 1);
 
   }

@@ -43,7 +43,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
         array('version' => '4.2.16', 'date' => '2014-02-18'),
         array('version' => '4.2.17', 'date' => '2014-07-01', 'security' => TRUE),
         array('version' => '4.2.18', 'date' => '2014-08-06'),
-        array('version' => '4.2.19', 'date' => '2014-09-17', 'security' => TRUE)
+        array('version' => '4.2.19', 'date' => '2014-09-17', 'security' => TRUE),
       ),
     ),
     '4.3' => array(
@@ -58,7 +58,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
         array('version' => '4.3.6', 'date' => '2013-09-25'),
         array('version' => '4.3.7', 'date' => '2013-10-02', 'security' => TRUE),
         array('version' => '4.3.8', 'date' => '2013-11-06', 'security' => TRUE),
-        array('version' => '4.3.9', 'date' => '2014-09-07', 'security' => TRUE)
+        array('version' => '4.3.9', 'date' => '2014-09-07', 'security' => TRUE),
       ),
     ),
     '4.4' => array(
@@ -75,7 +75,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
         array('version' => '4.4.8', 'date' => '2014-10-14'),
         array('version' => '4.4.9', 'date' => '2014-11-05'),
         array('version' => '4.4.10', 'date' => '2014-11-19'),
-        array('version' => '4.4.11', 'date' => '2014-12-17', 'security' => TRUE)
+        array('version' => '4.4.11', 'date' => '2014-12-17', 'security' => TRUE),
       ),
     ),
     '4.5' => array(
@@ -87,14 +87,14 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
         array('version' => '4.5.3', 'date' => '2014-11-05'),
         array('version' => '4.5.4', 'date' => '2014-11-19'),
         array('version' => '4.5.5', 'date' => '2014-12-17', 'security' => TRUE),
-      )
+      ),
     ),
     '4.6' => array(
       'status' => 'testing',
       'releases' => array(
         array('version' => '4.6.alpha1', 'date' => '2015-02-01'),
         array('version' => '4.6.beta1', 'date' => '2015-03-01'),
-      )
+      ),
     ),
   );
 

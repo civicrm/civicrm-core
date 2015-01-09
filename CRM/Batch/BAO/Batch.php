@@ -469,7 +469,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
           'url'   => 'civicrm/file',
           'qs'    => 'reset=1&id=%%fid%%&eid=%%eid%%',
           'title' => ts('Download Batch'),
-        )
+        ),
       );
     }
     else {
@@ -491,7 +491,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
           'url' => 'civicrm/batch',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Batch'),
-        )
+        ),
       );
     }
     return $links;
@@ -780,7 +780,7 @@ WHERE  {$where}
   public static function getBatchNames($batchIds) {
     $query = 'SELECT id, title
       FROM civicrm_batch
-      WHERE id IN (' .  $batchIds . ')';
+      WHERE id IN (' . $batchIds . ')';
 
     $batches = array();
     $dao = CRM_Core_DAO::executeQuery($query);

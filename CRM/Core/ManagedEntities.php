@@ -279,7 +279,7 @@ class CRM_Core_ManagedEntities {
       case 'unused':
         $getRefCount = civicrm_api3($dao->entity_type, 'getrefcount', array(
           'debug' => 1,
-          'id' => $dao->entity_id
+          'id' => $dao->entity_id,
         ));
 
         $total = 0;
@@ -304,7 +304,7 @@ class CRM_Core_ManagedEntities {
       }
 
       CRM_Core_DAO::executeQuery('DELETE FROM civicrm_managed WHERE id = %1', array(
-        1 => array($dao->id, 'Integer')
+        1 => array($dao->id, 'Integer'),
       ));
     }
   }

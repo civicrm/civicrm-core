@@ -128,7 +128,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
         'Member Since' => $joinDate,
         'Start date' => $startDate,
         'End date' => $endDate,
-        'Max related' => "5"
+        'Max related' => "5",
       )
     );
 

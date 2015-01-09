@@ -41,7 +41,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
   protected $_summary = NULL;
 
   protected $_customGroupExtends = array(
-    'Membership'
+    'Membership',
   );
 
   /**
@@ -176,7 +176,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
         'dao' => 'CRM_Contribute_DAO_Contribution',
         'fields' => array(
           'receive_date' => array(
-            'default' => TRUE
+            'default' => TRUE,
           ),
           'invoice_id' => array(
             'title' => ts('Invoice ID'),

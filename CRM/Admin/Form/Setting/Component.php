@@ -125,8 +125,6 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
    * @param bool $lineMode
    */
   public static function loadCaseSampleData($dsn, $fileName, $lineMode = FALSE) {
-    global $crmPath;
-
     $db = &DB::connect($dsn);
     if (PEAR::isError($db)) {
       die("Cannot open $dsn: " . $db->getMessage());

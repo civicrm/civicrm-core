@@ -234,7 +234,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
 
     if (!in_array($op, array(
       'eq',
-      'lte'
+      'lte',
     ))
     ) {
       $errors['total_range_op'] = ts("Please select 'Is equal to' OR 'Is Less than or equal to' operator");

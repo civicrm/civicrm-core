@@ -743,7 +743,7 @@ class CRM_Contact_BAO_Query {
                       'idCol' => "{$tName}_id",
                       'bao' => 'CRM_Core_BAO_Address',
                       'table' => "civicrm_{$tName}",
-                      'join' => " LEFT JOIN civicrm_{$tName} ON civicrm_address.{$tName}_id = civicrm_{$tName}.id "
+                      'join' => " LEFT JOIN civicrm_{$tName} ON civicrm_address.{$tName}_id = civicrm_{$tName}.id ",
                     );
 
                   $this->_pseudoConstantsSelect[$tName] =
@@ -751,7 +751,7 @@ class CRM_Contact_BAO_Query {
                       'pseudoField' => 'state_province_abbreviation',
                       'idCol' => "{$tName}_id",
                       'table' => "civicrm_{$tName}",
-                      'join' => " LEFT JOIN civicrm_{$tName} ON civicrm_address.{$tName}_id = civicrm_{$tName}.id "
+                      'join' => " LEFT JOIN civicrm_{$tName} ON civicrm_address.{$tName}_id = civicrm_{$tName}.id ",
                     );
                 }
                 else {
@@ -761,7 +761,7 @@ class CRM_Contact_BAO_Query {
                       'idCol' => "{$tName}_id",
                       'bao' => 'CRM_Core_BAO_Address',
                       'table' => "civicrm_{$tName}",
-                      'join' => " LEFT JOIN civicrm_{$tName} ON civicrm_address.{$tName}_id = civicrm_{$tName}.id "
+                      'join' => " LEFT JOIN civicrm_{$tName} ON civicrm_address.{$tName}_id = civicrm_{$tName}.id ",
                     );
                 }
 
@@ -796,28 +796,28 @@ class CRM_Contact_BAO_Query {
                     $this->_pseudoConstantsSelect['individual_prefix'] = array(
                       'pseudoField' => 'prefix_id',
                       'idCol' => "prefix_id",
-                      'bao' => 'CRM_Contact_BAO_Contact'
+                      'bao' => 'CRM_Contact_BAO_Contact',
                     );
                   }
                   if ($fieldName == 'suffix_id') {
                     $this->_pseudoConstantsSelect['individual_suffix'] = array(
                       'pseudoField' => 'suffix_id',
                       'idCol' => "suffix_id",
-                      'bao' => 'CRM_Contact_BAO_Contact'
+                      'bao' => 'CRM_Contact_BAO_Contact',
                     );
                   }
                   if ($fieldName == 'gender_id') {
                     $this->_pseudoConstantsSelect['gender'] = array(
                       'pseudoField' => 'gender_id',
                       'idCol' => "gender_id",
-                      'bao' => 'CRM_Contact_BAO_Contact'
+                      'bao' => 'CRM_Contact_BAO_Contact',
                     );
                   }
                   if ($name == 'communication_style_id') {
                     $this->_pseudoConstantsSelect['communication_style'] = array(
                       'pseudoField' => 'communication_style_id',
                       'idCol' => "communication_style_id",
-                      'bao' => 'CRM_Contact_BAO_Contact'
+                      'bao' => 'CRM_Contact_BAO_Contact',
                     );
                   }
                   $this->_select[$name] = "contact_a.{$fieldName}  as `$name`";
@@ -1136,7 +1136,7 @@ class CRM_Contact_BAO_Query {
                 $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"] = array(
                   'pseudoField' => "{$pf}_id",
                   'idCol' => "{$tName}_id",
-                  'bao' => 'CRM_Core_BAO_Address'
+                  'bao' => 'CRM_Core_BAO_Address',
                 );
                 $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['select'] = "`$tName`.$fieldName as `{$name}-{$elementFullName}`";
               }
@@ -5411,7 +5411,7 @@ AND   displayRelType.is_active = 1
       'gender_id',
       'prefix_id',
       'suffix_id',
-      'communication_style_id'
+      'communication_style_id',
     );
 
     if (is_numeric($value)) {

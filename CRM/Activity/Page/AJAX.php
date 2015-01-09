@@ -92,7 +92,7 @@ class CRM_Activity_Page_AJAX {
     //CRM-14466 initialize variable to avoid php notice
     $sortSQL = "";
     if ($sort && $sortOrder) {
-      $sortSQL = $sort  . ' ' . $sortOrder;
+      $sortSQL = $sort . ' ' . $sortOrder;
     }
 
     // get the activities related to given case
@@ -118,7 +118,7 @@ class CRM_Activity_Page_AJAX {
       0 => 'relation',
     1 => 'name',
     2 => 'phone',
-    3 => 'email'
+    3 => 'email',
     );
 
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -129,7 +129,7 @@ class CRM_Activity_Page_AJAX {
 
     $params = $_POST;
     if ($sort && $sortOrder) {
-      $sortSQL = $sort  . ' ' . $sortOrder;
+      $sortSQL = $sort . ' ' . $sortOrder;
     }
 
     // Retrieve ALL client relationships
@@ -183,7 +183,7 @@ class CRM_Activity_Page_AJAX {
     1 => 'name',
     2 => 'phone',
     3 => 'email',
-    4 => 'actions'
+    4 => 'actions',
     );
 
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -194,7 +194,7 @@ class CRM_Activity_Page_AJAX {
 
     $params = $_POST;
     if ($sort && $sortOrder) {
-      $sortSQL = $sort  . ' ' . $sortOrder;
+      $sortSQL = $sort . ' ' . $sortOrder;
     }
 
     $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($contactID, $caseID);
@@ -270,12 +270,12 @@ class CRM_Activity_Page_AJAX {
       list($typeLabel) = explode('<', $row['relation']);
       // view user links
       if (!empty($row['cid'])) {
-        $row['name'] = '<a class="view-contact" title="' .  ts('View Contact')  . '" href=' . CRM_Utils_System::url('civicrm/contact/view',
+        $row['name'] = '<a class="view-contact" title="' . ts('View Contact') . '" href=' . CRM_Utils_System::url('civicrm/contact/view',
           'action=view&reset=1&cid=' . $row['cid']) . '>' . $row['name'] . '</a>';
       }
       // email column links/icon
       if ($row['email']) {
-        $row['email'] = '<a class="crm-hover-button crm-popup" href="' . CRM_Utils_System::url('civicrm/activity/email/add', 'reset=1&action=add&atype=3&cid=' . $row['cid']) . '&caseid=' . $caseID . '" title="' .  ts('Send an Email') . '"><span class="icon ui-icon-mail-closed"></span></a>';
+        $row['email'] = '<a class="crm-hover-button crm-popup" href="' . CRM_Utils_System::url('civicrm/activity/email/add', 'reset=1&action=add&atype=3&cid=' . $row['cid']) . '&caseid=' . $caseID . '" title="' . ts('Send an Email') . '"><span class="icon ui-icon-mail-closed"></span></a>';
       }
       // edit links
       $row['actions'] = '';
@@ -285,17 +285,17 @@ class CRM_Activity_Page_AJAX {
         switch ($row['source']) {
           case 'caseRel':
             $row['actions'] =
-            '<a href="#editCaseRoleDialog" title="' .  ts('Reassign %1', array(1 => $typeLabel))  . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' .  $row['relation_type']  . '" data-rel_id="' .  $row['rel_id']  . '"data-key="' .  CRM_Core_Key::get('civicrm/ajax/relation')  . '">' .
+            '<a href="#editCaseRoleDialog" title="' . ts('Reassign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '" data-rel_id="' . $row['rel_id'] . '"data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
               '<span class="icon ui-icon-pencil"></span>' .
             '</a>' .
-            '<a href="#deleteCaseRoleDialog" title="' .  ts('Remove %1', array(1 => $typeLabel))  . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '" data-key="' .  CRM_Core_Key::get('civicrm/ajax/delcaserole')  . '">' .
+            '<a href="#deleteCaseRoleDialog" title="' . ts('Remove %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/delcaserole') . '">' .
               '<span class="icon delete-icon"></span>' .
             '</a>';
             break;
 
           case 'caseRoles':
             $row['actions'] =
-            '<a href="#editCaseRoleDialog" title="' .  ts('Assign %1', array(1 => $typeLabel))  . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' .  $row['relation_type']  . '" data-key="' .  CRM_Core_Key::get('civicrm/ajax/relation')  . '">' .
+            '<a href="#editCaseRoleDialog" title="' . ts('Assign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
               '<span class="icon ui-icon-pencil"></span>' .
             '</a>';
             break;
@@ -374,7 +374,7 @@ class CRM_Activity_Page_AJAX {
       }
       else {
         $otherActivity->subject = ts('(Filed on case %1)', array(
-            1 => $params['caseID']
+            1 => $params['caseID'],
           )) . ' ' . $otherActivity->subject;
       }
       $otherActivity->activity_date_time = $actDateTime;
@@ -398,7 +398,7 @@ class CRM_Activity_Page_AJAX {
     $src_params = array(
       'activity_id' => $mainActivityId,
       'contact_id' => $sourceContactID,
-      'record_type_id' => $sourceID
+      'record_type_id' => $sourceID,
     );
     CRM_Activity_BAO_ActivityContact::create($src_params);
 
@@ -406,7 +406,7 @@ class CRM_Activity_Page_AJAX {
       $targ_params = array(
         'activity_id' => $mainActivityId,
         'contact_id' => $value,
-        'record_type_id' => $targetID
+        'record_type_id' => $targetID,
       );
       CRM_Activity_BAO_ActivityContact::create($targ_params);
     }
@@ -420,7 +420,7 @@ class CRM_Activity_Page_AJAX {
       $assigneeParams = array(
         'activity_id' => $mainActivityId,
         'contact_id' => $value,
-        'record_type_id' => $assigneeID
+        'record_type_id' => $assigneeID,
       );
       CRM_Activity_BAO_ActivityContact::create($assigneeParams);
     }

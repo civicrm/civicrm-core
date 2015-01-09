@@ -479,7 +479,7 @@ function civicrm_api3_mailing_send_test($params) {
         $contact   = civicrm_api3('Contact', 'create',
           array('contact_type' => 'Individual',
             'email' => $email,
-            'api.Email.get' => array('return' => 'id')
+            'api.Email.get' => array('return' => 'id'),
           )
         );
         $contactId = $contact['id'];
@@ -488,7 +488,7 @@ function civicrm_api3_mailing_send_test($params) {
       civicrm_api3('MailingEventQueue', 'create',
         array('job_id' => $job['id'],
           'email_id' => $emailId,
-          'contact_id' => $contactId
+          'contact_id' => $contactId,
         )
       );
     }
@@ -545,27 +545,27 @@ function civicrm_api3_mailing_stats($params) {
     switch ($detail) {
       case 'Delivered':
         $stats[$params['mailing_id']] += array(
-          $detail =>  CRM_Mailing_Event_BAO_Delivered::getTotalCount($params['mailing_id'], $params['job_id'], FALSE, $params['date'])
+          $detail =>  CRM_Mailing_Event_BAO_Delivered::getTotalCount($params['mailing_id'], $params['job_id'], FALSE, $params['date']),
         );
         break;
       case 'Bounces':
         $stats[$params['mailing_id']] += array(
-          $detail =>  CRM_Mailing_Event_BAO_Bounce::getTotalCount($params['mailing_id'], $params['job_id'], FALSE, $params['date'])
+          $detail =>  CRM_Mailing_Event_BAO_Bounce::getTotalCount($params['mailing_id'], $params['job_id'], FALSE, $params['date']),
         );
         break;
       case 'Unsubscribers':
         $stats[$params['mailing_id']] += array(
-          $detail =>  CRM_Mailing_Event_BAO_Unsubscribe::getTotalCount($params['mailing_id'], $params['job_id'], FALSE, NULL, $params['date'])
+          $detail =>  CRM_Mailing_Event_BAO_Unsubscribe::getTotalCount($params['mailing_id'], $params['job_id'], FALSE, NULL, $params['date']),
         );
         break;
       case 'Unique Clicks':
         $stats[$params['mailing_id']] += array(
-          $detail =>  CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($params['mailing_id'], $params['job_id'], FALSE, NULL, $params['date'])
+          $detail =>  CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($params['mailing_id'], $params['job_id'], FALSE, NULL, $params['date']),
         );
         break;
       case 'Opened':
         $stats[$params['mailing_id']] += array(
-          $detail =>  CRM_Mailing_Event_BAO_Opened::getTotalCount($params['mailing_id'], $params['job_id'], FALSE, $params['date'])
+          $detail =>  CRM_Mailing_Event_BAO_Opened::getTotalCount($params['mailing_id'], $params['job_id'], FALSE, $params['date']),
         );
         break;
     }

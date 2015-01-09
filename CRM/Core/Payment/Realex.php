@@ -314,7 +314,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
           array(
             1 => xml_get_error_code($xmlparser),
             2 => xml_get_current_line_number($xmlparser),
-            3 => xml_get_current_column_number($xmlparser)
+            3 => xml_get_current_column_number($xmlparser),
           )
         );
       }

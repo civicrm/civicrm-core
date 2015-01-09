@@ -147,7 +147,7 @@ class WebTest_Contact_AddressParsingTest extends CiviSeleniumTestCase {
         'street_number' => '121',
         'street_name' => 'SW Sherman Way',
         'street_unit' => 'Suite 15',
-      )
+      ),
     );
     foreach ($verifyData as $loc => $values) {
       $num = $address[$loc];

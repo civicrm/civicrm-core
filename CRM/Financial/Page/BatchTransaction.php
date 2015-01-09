@@ -109,7 +109,7 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
           'title' => ts('Accounting Batches'),
           'url' => CRM_Utils_System::url('civicrm/financial/financialbatches',
             "reset=1&batchStatus=$statusID"),
-        )
+        ),
       );
 
     CRM_Utils_System::appendBreadCrumb($breadCrumb);

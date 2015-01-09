@@ -208,7 +208,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       $buttons[] = array(
         'type' => 'upload',
         'name' => ts('Save and Record Payment'),
-        'subName' => 'new'
+        'subName' => 'new',
       );
     }
     $buttons[] = array(

@@ -340,7 +340,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $result = $this->webtest_civicrm_api("OptionValue", "getvalue", array(
       'option_group_name' => $option_group_name,
       'option.limit' => 1,
-      'return' => 'value'
+      'return' => 'value',
     ));
     return $result;
   }
@@ -383,7 +383,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $result = $this->webtest_civicrm_api("Domain", "getvalue", array(
         'current_domain' => 1,
         'option.limit' => 1,
-        'return' => 'config_backend'
+        'return' => 'config_backend',
       ));
       $_config_backend = unserialize($result);
     }
@@ -2219,8 +2219,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         "{$customSet['entity']}_{$customSet['subEntity']}" => array(
           'cgtitle' => $customGroupTitle,
           'gid' => $gid,
-          'triggerElement' => $customSet['triggerElement']
-        )
+          'triggerElement' => $customSet['triggerElement'],
+        ),
       );
 
       // Go home for a sec to give time for caches to clear

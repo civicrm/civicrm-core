@@ -216,7 +216,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
                      array(1 => CRM_Utils_Money::format($params['amount'], $this->_subscriptionDetails->currency),
                            2 => $this->_subscriptionDetails->frequency_interval,
                            3 => $this->_subscriptionDetails->frequency_unit,
-                           4 => $params['installments']
+                           4 => $params['installments'],
                            )
                      );
 
@@ -229,7 +229,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
             $message .= "<br /> " . ts("Recurring contribution amount has been updated from %1 to %2 for this subscription.",
               array(
                 1 => CRM_Utils_Money::format($this->_subscriptionDetails->amount, $this->_subscriptionDetails->currency),
-                2 => CRM_Utils_Money::format($params['amount'], $this->_subscriptionDetails->currency)
+                2 => CRM_Utils_Money::format($params['amount'], $this->_subscriptionDetails->currency),
               )) . ' ';
         }
 

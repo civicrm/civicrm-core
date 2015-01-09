@@ -163,7 +163,7 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
             'type' => CRM_Utils_Type::T_INT,
             'attributes' => array(
               'entity' => 'event',
-              'select' => array('minimumInputLength' => 0)
+              'select' => array('minimumInputLength' => 0),
             ),
           ),
           'sid' => array(

@@ -217,7 +217,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
     $this->_locBlockIds = array(
       'main' => $rowsElementsAndInfo['main_details']['loc_block_ids'],
-      'other' => $rowsElementsAndInfo['other_details']['loc_block_ids']
+      'other' => $rowsElementsAndInfo['other_details']['loc_block_ids'],
     );
 
     // add elements

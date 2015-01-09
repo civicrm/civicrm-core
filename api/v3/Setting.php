@@ -46,7 +46,7 @@ function civicrm_api3_setting_getfields($params) {
         'api.required' => 0,
         'title' => 'Setting Group',
         'description' => 'Settings Group. This is required if the setting is not stored in config',
-        'type' => CRM_Utils_Type::T_STRING)
+        'type' => CRM_Utils_Type::T_STRING),
       );
     return civicrm_api3_create_success($result, $params, 'setting', 'getfields');
   }
@@ -96,7 +96,7 @@ function civicrm_api3_setting_getdefaults(&$params) {
       if (array_key_exists('default', $spec) && !is_null($spec['default'])) {
         $defaults[$domainID][$setting] = $spec['default'];
       }
-      else{
+      else {
         $noDefaults[$setting] = 1;
       }
     }
@@ -168,7 +168,7 @@ function civicrm_api3_setting_fill(&$params) {
   foreach ($domains as $domainID) {
     $apiArray = array(
       'version' => $params['version'],
-      'domain_id' => $domainID
+      'domain_id' => $domainID,
     );
     $existing = civicrm_api3('setting', 'get', $apiArray);
     $valuesToFill = array_diff_key($defaults['values'][$domainID], $existing['values'][$domainID]);
@@ -189,7 +189,7 @@ function _civicrm_api3_setting_fill_spec(&$params) {
     'api.default' => 'current_domain',
     'title' => 'Setting Domain',
     'description' => 'Defaults may differ by domain - if you do not pass in a domain id this will default to the current domain
-      an array or "all" are acceptable values for multiple domains'
+      an array or "all" are acceptable values for multiple domains',
   );
 }
 
@@ -222,11 +222,11 @@ function _civicrm_api3_setting_create_spec(&$params) {
     'api.default' => 'current_domain',
     'title' => 'Setting Domain',
     'description' => 'if you do not pass in a domain id this will default to the current domain
-      an array or "all" are acceptable values for multiple domains'
+      an array or "all" are acceptable values for multiple domains',
    );
   $params['group'] = array(
      'title' => 'Setting Group',
-     'description' => 'if you know the group defining it will make the api more efficient'
+     'description' => 'if you know the group defining it will make the api more efficient',
    );
 }
 
@@ -256,11 +256,11 @@ function _civicrm_api3_setting_get_spec(&$params) {
   $params['domain_id'] = array(
     'api.default' => 'current_domain',
     'title' => 'Setting Domain',
-    'description' => 'if you do not pass in a domain id this will default to the current domain'
+    'description' => 'if you do not pass in a domain id this will default to the current domain',
   );
   $params['group'] = array(
     'title' => 'Setting Group',
-    'description' => 'if you know the group defining it will make the api more efficient'
+    'description' => 'if you know the group defining it will make the api more efficient',
   );
 }
 /**
@@ -317,7 +317,7 @@ function _civicrm_api3_setting_getvalue_spec(&$params) {
   );
   $params['domain_id'] = array(
     'title' => 'Setting Domain',
-    'description' => 'if you do not pass in a domain id this will default to the current domain'
+    'description' => 'if you do not pass in a domain id this will default to the current domain',
   );
 }
 
@@ -343,14 +343,14 @@ function _civicrm_api3_setting_getDomainArray(&$params) {
     if (isset($domainAPIResult['values'])) {
       $params['domain_id'] = array_keys($domainAPIResult['values']);
     }
-    else{
+    else {
       throw new Exception('All domains not retrieved - problem with Domain Get api call ' . $domainAPIResult['error_message']);
     }
   }
   if (is_array($params['domain_id'])) {
     $domains = $params['domain_id'];
   }
-  else{
+  else {
     $domains = array($params['domain_id']);
   }
   return $domains;

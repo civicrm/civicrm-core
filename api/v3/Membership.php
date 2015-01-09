@@ -113,7 +113,7 @@ function civicrm_api3_membership_create($params) {
   // Fixme: This code belongs in the BAO
   $action = CRM_Core_Action::ADD;
   // we need user id during add mode
-    $ids = array ();
+    $ids = array();
     if (!empty($params['contact_id'])) {
       $ids['userId'] = $params['contact_id'];
     }
@@ -158,7 +158,7 @@ function _civicrm_api3_membership_create_spec(&$params) {
   $params['membership_type_id']['api.aliases'] = array('membership_type');
   $params['status_id']['api.aliases'] = array('membership_status');
   $params['skipStatusCal'] = array(
-    'title' => 'Skip status calculation. By default this is 0 if id is not set and 1 if it is set.'
+    'title' => 'Skip status calculation. By default this is 0 if id is not set and 1 if it is set.',
   );
   $params['num_terms'] = array(
     'title' => 'Number of terms to add/renew. If this parameter is passed, dates will be calculated automatically. If no id is passed (new membership) and no dates are given, num_terms will be assumed to be 1.',

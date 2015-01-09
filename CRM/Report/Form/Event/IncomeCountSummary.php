@@ -45,7 +45,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
   protected $_add2groupSupported = FALSE;
 
   protected $_customGroupExtends = array(
-    'Event'
+    'Event',
   );
 
   public $_drilldownReport = array('event/participantlist' => 'Link to Detail Report');
@@ -75,7 +75,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
             'title' => ts('Event Type'),
           ),
           'fee_label' => array(
-            'title' => ts('Fee Label')
+            'title' => ts('Fee Label'),
           ),
           'event_start_date' => array(
             'title' => ts('Event Start Date'),

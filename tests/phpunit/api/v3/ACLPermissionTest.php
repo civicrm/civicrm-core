@@ -167,7 +167,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'phone_type_id',
       'phone',
       'worldregion_id',
-      'world_region'
+      'world_region',
     );
     $expectedReturnElements = array_diff(array_keys($fullresult['values'][0]), $elementsReturnDoesntSupport);
     $result = $this->callAPISuccess('contact', 'get', array(
@@ -235,12 +235,12 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->_permissionedDisabledGroup = $this->groupCreate(array(
         'title' => 'pick-me-disabled',
         'is_active' => 0,
-        'name' => 'pick-me-disabled'
+        'name' => 'pick-me-disabled',
       ));
     $this->_permissionedGroup = $this->groupCreate(array(
         'title' => 'pick-me-active',
         'is_active' => 1,
-        'name' => 'pick-me-active'
+        'name' => 'pick-me-active',
       ));
     $this->setupACL();
   }

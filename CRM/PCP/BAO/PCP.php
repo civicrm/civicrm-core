@@ -394,7 +394,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
     }
     CRM_Core_DAO::commonRetrieveAll('CRM_Core_DAO_UFGroup', 'is_cms_user', $isUserRequired, $profiles, array(
       'title',
-      'is_active'
+      'is_active',
     ));
     if (!empty($profiles)) {
       foreach ($profiles as $key => $value) {
@@ -614,7 +614,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
 
     CRM_Core_Session::setStatus(ts("%1 status has been updated to %2.", array(
       1 => $pcpTitle,
-      2 => $pcpStatus
+      2 => $pcpStatus,
     )), 'Status Updated', 'success');
 
     // send status change mail

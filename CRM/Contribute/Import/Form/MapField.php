@@ -390,7 +390,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       $requiredFields = array(
         $contactORContributionId == 'contribution_id' ? 'contribution_id' : 'contribution_contact_id' => $contactORContributionId == 'contribution_id' ? ts('Contribution ID') : ts('Contact ID'),
         'total_amount' => ts('Total Amount'),
-        'financial_type' => ts('Financial Type')
+        'financial_type' => ts('Financial Type'),
       );
 
       foreach ($requiredFields as $field => $title) {
@@ -403,7 +403,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
               $self->_onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE
             ) {
               $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', array(
-                  1 => $threshold
+                  1 => $threshold,
                 )) . '<br />';
             }
             elseif ($self->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE &&
@@ -416,7 +416,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
           }
           else {
             $errors['_qf_default'] .= ts('Missing required field: %1', array(
-                1 => $title
+                1 => $title,
               )) . '<br />';
           }
         }

@@ -174,7 +174,7 @@ class CRM_Utils_Geocode_Yahoo {
             if (CRM_Utils_System::isUserLoggedIn()) {
               $msg = ts('The Yahoo Geocoding system returned a different postal code (%1) than the one you entered (%2). If you want the Yahoo value, please delete the current postal code and save again.', array(
                 1 => $ret['postal'],
-                2 => $current_pc_suffix ? "$current_pc-$current_pc_suffix" : $current_pc
+                2 => $current_pc_suffix ? "$current_pc-$current_pc_suffix" : $current_pc,
               ));
 
               CRM_Core_Session::setStatus($msg, ts('Postal Code Mismatch'), 'error');

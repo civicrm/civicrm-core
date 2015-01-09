@@ -134,7 +134,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
         $labelRows[$id] = $rows[$membership['contact_id']];
       }
     }
-    else{
+    else {
       $labelRows = $rows;
     }
     //call function to create labels

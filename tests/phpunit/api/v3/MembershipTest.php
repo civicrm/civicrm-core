@@ -60,7 +60,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->_membershipTypeID2 = $this->membershipTypeCreate(array(
       'period_type' => 'fixed',
       'fixed_period_start_day' => '301',
-      'fixed_period_rollover_day' => '1111'
+      'fixed_period_rollover_day' => '1111',
     ));
     $this->_membershipStatusID = $this->membershipStatusCreate('test status');
 
@@ -103,7 +103,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $membershipID = $this->contactMembershipCreate($this->_params);
     $this->assertDBRowExist('CRM_Member_DAO_Membership', $membershipID);
     $params = array(
-      'id' => $membershipID
+      'id' => $membershipID,
     );
     $this->callAPIAndDocument('membership', 'delete', $params, __FUNCTION__, __FILE__);
     $this->assertDBRowNotExist('CRM_Member_DAO_Membership', $membershipID);
@@ -678,7 +678,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
     $check = $this->callAPISuccess($this->_entity, 'get', array(
       'id' => $result['id'],
-      'contact_id' => $this->_contactID
+      'contact_id' => $this->_contactID,
     ));
     $this->assertEquals("custom string", $check['values'][$result['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
   }
@@ -814,11 +814,11 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
     $result = $this->callAPISuccess($this->_entity, 'create', array(
       'id' => $result['id'],
-      'custom_' . $ids['custom_field_id'] => "new custom"
+      'custom_' . $ids['custom_field_id'] => "new custom",
     ));
     $check = $this->callAPISuccess($this->_entity, 'get', array(
       'id' => $result['id'],
-      'contact_id' => $this->_contactID
+      'contact_id' => $this->_contactID,
     ));
 
     $this->assertEquals("new custom", $check['values'][$result['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);

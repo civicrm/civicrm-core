@@ -40,7 +40,7 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
   protected $_phoneField = FALSE;
   protected $_charts = array('' => 'Tabular');
   protected $_customGroupExtends = array(
-    'Membership'
+    'Membership',
   );
   public $_drilldownReport = array('member/detail' => 'Link to Detail Report');
 

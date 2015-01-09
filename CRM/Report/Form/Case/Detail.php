@@ -70,7 +70,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     $this->deleted_labels = array(
       '' => ts('- select -'),
       0 => ts('No'),
-      1 => ts('Yes')
+      1 => ts('Yes'),
     );
 
     $this->caseActivityTypes = array();
@@ -279,7 +279,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     $elements = array();
     $elements[] = &$this->createElement('select', 'case_activity_all_dates', NULL,
       array(
-        '' => ts('- select -')
+        '' => ts('- select -'),
       ) + $this->caseActivityTypes
     );
     $this->addGroup($elements, 'case_detail_extra');

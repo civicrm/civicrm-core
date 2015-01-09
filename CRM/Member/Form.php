@@ -135,12 +135,12 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
           array(
             'type' => 'upload',
             'name' => ts('Renew'),
-            'isDefault' => TRUE
+            'isDefault' => TRUE,
           ),
           array(
             'type' => 'cancel',
-            'name' => ts('Cancel')
-          )
+            'name' => ts('Cancel'),
+          ),
         )
       );
     }
@@ -149,12 +149,12 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
           array(
             'type' => 'next',
             'name' => ts('Delete'),
-            'isDefault' => TRUE
+            'isDefault' => TRUE,
           ),
           array(
             'type' => 'cancel',
-            'name' => ts('Cancel')
-          )
+            'name' => ts('Cancel'),
+          ),
         )
       );
     }
@@ -163,17 +163,17 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
           array(
             'type' => 'upload',
             'name' => ts('Save'),
-            'isDefault' => TRUE
+            'isDefault' => TRUE,
           ),
           array(
             'type' => 'upload',
             'name' => ts('Save and New'),
-            'subName' => 'new'
+            'subName' => 'new',
           ),
           array(
             'type' => 'cancel',
-            'name' => ts('Cancel')
-          )
+            'name' => ts('Cancel'),
+          ),
         )
       );
     }

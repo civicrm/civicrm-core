@@ -348,7 +348,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     if (!empty($params['relate_contribution_id'])) {
       CRM_Member_BAO_MembershipPayment::create(array(
           'membership_id' => $membership->id,
-          'contribution_id' => $params['relate_contribution_id']
+          'contribution_id' => $params['relate_contribution_id'],
         ));
     }
 
@@ -534,7 +534,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       $statusANDType = self::getStatusANDTypeValues($membership->id);
       foreach (array(
                  'status',
-                 'membership_type'
+                 'membership_type',
                ) as $fld) {
         $defaults[$fld] = CRM_Utils_Array::value($fld, $statusANDType[$membership->id]);
       }
@@ -583,7 +583,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
       'membership_type',
       'membership_type_id',
       'is_current_member',
-      'relationship_type_id'
+      'relationship_type_id',
     );
     while ($dao->fetch()) {
       foreach ($properties as $property) {
@@ -644,7 +644,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
       'Membership Renewal',
       'Change Membership Status',
       'Change Membership Type',
-      'Membership Renewal Reminder'
+      'Membership Renewal Reminder',
     );
     foreach ($membershipActivities as $membershipActivity) {
       $activityId = array_search($membershipActivity, $activityTypes);
@@ -1163,7 +1163,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
         'name' => 'membership_status',
         'type' => CRM_Utils_Type::T_STRING,
         'where' => 'civicrm_membership_status.name',
-      )
+      ),
     );
     //CRM-6161 fix for customdata export
     $fields = array_merge($fields, $membershipStatus, CRM_Core_BAO_CustomField::getFieldsForImport('Membership'));
@@ -1454,7 +1454,7 @@ AND civicrm_membership.is_test = %2";
         try {
           civicrm_api3('contribution', 'completetransaction', array(
               'id' => $membershipContribution->id,
-              'trxn_id' => $membershipContribution->trxn_id
+              'trxn_id' => $membershipContribution->trxn_id,
             ));
         }
         catch (CiviCRM_API3_Exception $e) {
@@ -2289,7 +2289,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   public static function linkMembershipPayment($membership, $membershipContribution) {
     CRM_Member_BAO_MembershipPayment::create(array(
         'membership_id' => $membership->id,
-        'contribution_id' => $membershipContribution->id
+        'contribution_id' => $membershipContribution->id,
       ));
   }
 
@@ -2824,7 +2824,7 @@ WHERE      civicrm_membership.is_test = 0";
           array(
             'membership_id' => $dao->membership_id,
             'version' => 3,
-            'ignore_admin_only' => FALSE
+            'ignore_admin_only' => FALSE,
           ), TRUE
         );
         $statusId = CRM_Utils_Array::value('id', $newStatus);
@@ -2864,7 +2864,7 @@ WHERE      civicrm_membership.is_test = 0";
     $result['is_error'] = 0;
     $result['messages'] = ts('Processed %1 membership records. Updated %2 records.', array(
         1 => $processCount,
-        2 => $updateCount
+        2 => $updateCount,
       ));
     return $result;
   }
@@ -2946,7 +2946,7 @@ WHERE      civicrm_membership.is_test = 0";
       'is_pay_later',
       'membership_id',
       'tax_amount',
-      'skipLineItem'
+      'skipLineItem',
     );
     foreach ($recordContribution as $f) {
       $contributionParams[$f] = CRM_Utils_Array::value($f, $params);
@@ -2994,7 +2994,7 @@ WHERE      civicrm_membership.is_test = 0";
     if (empty($ids['contribution']) || !empty($params['is_recur'])) {
       CRM_Member_BAO_MembershipPayment::create(array(
           'membership_id' => $membershipId,
-          'contribution_id' => $contribution->id
+          'contribution_id' => $contribution->id,
         ));
     }
     return $contribution;
@@ -3082,7 +3082,7 @@ WHERE      civicrm_membership.is_test = 0";
             TRUE
           )
         ),
-        'Integer'
+        'Integer',
       ),
       3 => array($isTest, 'Boolean'),
     );

@@ -463,7 +463,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
               'name' => ts('Soft Credit Amount'),
               'sort' => 'contribution_soft_credit_amount',
               'direction' => CRM_Utils_Sort::DONTCARE,
-            )
+            ),
           )
         );
     }
@@ -535,7 +535,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     self::$_columnHeaders =
       array_merge(
         self::$_columnHeaders, array(
-          array('desc' => ts('Actions'))
+          array('desc' => ts('Actions')),
         )
       );
     return self::$_columnHeaders;

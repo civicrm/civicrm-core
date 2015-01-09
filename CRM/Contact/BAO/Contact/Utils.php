@@ -88,7 +88,7 @@ class CRM_Contact_BAO_Contact_Utils {
         if ($addProfileOverlay) {
           $imageInfo[$contactType]['image'] = "<div class=\"icon crm-icon {$type}-icon\"></div>";
         }
-        else{
+        else {
           $imageInfo[$contactType]['image'] = "<div class=\"icon crm-icon {$type}-icon\" title=\"{$contactType}\"></div>";
         }
         $imageInfo[$contactType]['url'] = NULL;

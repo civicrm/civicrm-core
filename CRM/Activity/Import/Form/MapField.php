@@ -325,7 +325,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
               $errors['_qf_default'] .= ts('Missing required field: Provide %1 or %2',
                 array(
                   1 => $title,
-                  2 => 'Activity Type Label'
+                  2 => 'Activity Type Label',
                 )) . '<br />';
             }
           }

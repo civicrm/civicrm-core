@@ -45,7 +45,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $permissions = array(
       'edit-2-profile-listings-and-forms',
       'edit-2-access-all-custom-data',
-      'edit-2-access-civicrm'
+      'edit-2-access-civicrm',
     );
     $this->changePermissions($permissions);
     list($id, $profileTitle) = $this->_addNewProfile(TRUE, FALSE, TRUE);

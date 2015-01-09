@@ -91,7 +91,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'qs' => 'reset=1&action=copy&id=%%id%%',
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
           'title' => ts('Copy Event'),
-        )
+        ),
       );
     }
     return self::$_actionLinks;
@@ -114,7 +114,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
         array(
           'title' => ts('Info and Settings'),
           'url' => 'civicrm/event/manage/settings',
-          'field' => 'id'
+          'field' => 'id',
         );
       self::$_tabLinks[$cacheKey]['location'] =
         array(

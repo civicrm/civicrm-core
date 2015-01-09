@@ -926,7 +926,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
               elseif (is_object($relDAO) && in_array($relationField, array(
                   'email_greeting',
                   'postal_greeting',
-                  'addressee'
+                  'addressee',
                 ))
               ) {
                 //special case for greeting replacement
@@ -1047,7 +1047,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
             elseif (in_array($field, array(
               'email_greeting',
               'postal_greeting',
-              'addressee'
+              'addressee',
             ))) {
               //special case for greeting replacement
               $fldValue = "{$field}_display";
@@ -1410,7 +1410,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $changeFields = array(
           'groups',
           'tags',
-          'notes'
+          'notes',
         );
 
         if (in_array($fieldName, $changeFields)) {
@@ -1844,7 +1844,7 @@ WHERE  id IN ( $deleteIDString )
       'contact_is_deleted' => 'is_deleted',
       'name' => 'address_name',
       'provider_id' => 'im_service_provider',
-      'phone_type_id' => 'phone_type'
+      'phone_type_id' => 'phone_type',
     );
 
     //figure out which columns are to be replaced by which ones

@@ -272,7 +272,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
           'start_date',
           'end_date',
           'is_current_member',
-          'status'
+          'status',
         );
 
         while ($dao->fetch()) {

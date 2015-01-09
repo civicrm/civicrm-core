@@ -158,7 +158,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
         $relationshipId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
         $params = array(
           'financial_account_id'  => $self->_id,
-          'account_relationship' => $relationshipId
+          'account_relationship' => $relationshipId,
         );
         $result = CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $defaults);
         if ($result) {

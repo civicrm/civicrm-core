@@ -206,7 +206,7 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     // custom group id
     $this->add('select', 'profile_id', ts('Activity Profile'),
       array(
-        '' => ts('- select -')
+        '' => ts('- select -'),
       ) + $customProfiles
     );
 

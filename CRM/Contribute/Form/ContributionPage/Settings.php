@@ -89,7 +89,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
         }
         $defaults['soft_credit_types'] = array(
           CRM_Utils_Array::value('in_honor_of', $soft_credit_types),
-          CRM_Utils_Array::value('in_memory_of', $soft_credit_types)
+          CRM_Utils_Array::value('in_memory_of', $soft_credit_types),
         );
       }
     }
@@ -103,7 +103,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       }
       $defaults['soft_credit_types'] = array(
         CRM_Utils_Array::value('in_honor_of', $soft_credit_types),
-        CRM_Utils_Array::value('in_memory_of', $soft_credit_types)
+        CRM_Utils_Array::value('in_memory_of', $soft_credit_types),
       );
     }
 
@@ -181,7 +181,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       'entity' => 'ContributionSoft',
       'field' => 'soft_credit_type_id',
       'multiple' => TRUE,
-      'class' => 'huge'
+      'class' => 'huge',
     ));
 
     $entities = array(
@@ -344,7 +344,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
           'module' => 'soft_credit',
           'entity_table' => 'civicrm_contribution_page',
           'entity_id' => $dao->id,
-        )
+        ),
     );
 
     foreach ($ufJoinParams as $index => $ufJoinParam) {

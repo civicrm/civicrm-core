@@ -31,11 +31,14 @@ require_once 'CiviTest/CiviSeleniumTestCase.php';
  */
 class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
 
+  /**
+   * {@inheritDoc}
+   */
   protected function setUp() {
     parent::setUp();
   }
 
-  /*
+  /**
    * test individual pane seperatly.
    */
   public function testAdvancedSearch() {
@@ -156,7 +159,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
   /**
    * @param array $openedPanes
    */
-  function _checkOpenedPanes($openedPanes = array()) {
+  public function _checkOpenedPanes($openedPanes = array()) {
     if (!$this->isTextPresent('None found.')) {
       $this->click('css=div.crm-advanced_search_form-accordion div.crm-accordion-header');
     }
@@ -178,7 +181,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
    * @param $paneRef
    * @param array $selectFields
    */
-  function _selectPaneFields($paneRef, $selectFields = array()) {
+  public function _selectPaneFields($paneRef, $selectFields = array()) {
     $pane = $this->_advanceSearchPanesDateFilter($paneRef);
 
     $this->click("css=div.crm-accordion-wrapper {$pane['headerLocator']}");
@@ -233,130 +236,105 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
 
     if (!isset($_advance_search_panes) || empty($_advance_search_panes)) {
       $_advance_search_panes = array(
-         'activity' =>
-        array(
+        'activity' => array(
           'headerLocator' => 'div#activity',
           'bodyLocator' => 'select#activity_date_relative',
           'title' => 'Activities',
-          'fields' =>
-          array(
-           'Activity Dates' =>
-                array(
-                      'type' => 'select',
-                      'locator' => 'activity_date_relative',
-                      'values' => array('This Year'),
+          'fields' => array(
+            'Activity Dates' => array(
+              'type' => 'select',
+              'locator' => 'activity_date_relative',
+              'values' => array('This Year'),
             ),
-              ),
-              ),
-        'demographics' =>
-        array(
+          ),
+        ),
+        'demographics' => array(
           'headerLocator' => 'div#demographics',
           'bodyLocator' => 'input#birth_date_low_display',
           'title' => 'Demographics',
-          'fields' =>
-          array(
-                'Deceased Dates' =>
-                array(
-                      'type' => 'select',
-                      'locator' => 'deceased_date_relative',
-                      'values' => array('This Quarter'),
-                      ),
-                ),
-              ),
-        'change_log' =>
-        array(
+          'fields' => array(
+            'Deceased Dates' => array(
+              'type' => 'select',
+              'locator' => 'deceased_date_relative',
+              'values' => array('This Quarter'),
+            ),
+          ),
+        ),
+        'change_log' => array(
           'headerLocator' => 'div#changeLog',
           'bodyLocator' => 'input#changed_by',
           'title' => 'Change Log',
-          'fields' =>
-          array(
-                 'Modified Between' =>
-                array(
-                      'type' => 'select',
-                      'locator' => 'log_date_relative',
-                      'values' => array('This Week'),
+          'fields' => array(
+            'Modified Between' => array(
+              'type' => 'select',
+              'locator' => 'log_date_relative',
+              'values' => array('This Week'),
             ),
           ),
-              ),
-        'mailing' =>
-        array(
+        ),
+        'mailing' => array(
           'headerLocator' => 'div#CiviMail',
           'bodyLocator' => 'select#mailing_date_relative',
           'title' => 'Mailings',
-          'fields' =>
-          array(
-            'Mailing Date' =>
-                array(
-                      'type' => 'select',
-                      'locator' => 'mailing_date_relative',
-                      'values' => array('Prior to Previous Quarter'),
+          'fields' => array(
+            'Mailing Date' => array(
+              'type' => 'select',
+              'locator' => 'mailing_date_relative',
+              'values' => array('Prior to Previous Quarter'),
             ),
           ),
         ),
-
-        'contribution' =>
-        array(
+        'contribution' => array(
           'headerLocator' => 'div#CiviContribute',
           'bodyLocator' => 'select#financial_type_id',
           'title' => 'Contributions',
-          'fields' =>
-          array(
-            'Contribution Dates' =>
-                array(
-                      'type' => 'select',
-                      'locator' => 'contribution_date_relative',
-                      'values' => array('Today'),
+          'fields' => array(
+            'Contribution Dates' => array(
+              'type' => 'select',
+              'locator' => 'contribution_date_relative',
+              'values' => array('Today'),
             ),
           ),
         ),
-         'pledge' =>
-         array(
+        'pledge' => array(
           'headerLocator' => 'div#CiviPledge',
           'bodyLocator' => 'select#pledge_payment_date_relative',
           'title' => 'Pledges',
-          'fields' =>
-          array(
-            'Contribution Dates' =>
-                array(
-                      'type' => 'select',
-                      'locator' => 'pledge_payment_date_relative',
-                      'values' => array('Prior to Previous Month'),
+          'fields' => array(
+            'Contribution Dates' => array(
+              'type' => 'select',
+              'locator' => 'pledge_payment_date_relative',
+              'values' => array('Prior to Previous Month'),
             ),
           ),
         ),
-        'membership' =>
-        array(
+        'membership' => array(
           'headerLocator' => 'div#CiviMember',
           'bodyLocator' => 'input#member_source',
           'title' => 'Memberships',
-          'fields' =>
-          array(
-                 'Member Since' =>
-                array(
-                      'type' => 'select',
-                      'locator' => 'member_join_date_relative',
-                      'values' => array('Previous Year'),
+          'fields' => array(
+            'Member Since' => array(
+              'type' => 'select',
+              'locator' => 'member_join_date_relative',
+              'values' => array('Previous Year'),
             ),
 
           ),
         ),
-        'event' =>
-        array(
+        'event' => array(
           'headerLocator' => 'div#CiviEvent',
           'bodyLocator' => 'input#event_id',
           'title' => 'Events',
-          'fields' =>
-          array(
-                'Event Dates' =>
-                array(
-                      'type' => 'select',
-                      'locator' => 'event_relative',
-                      'values' => array('Previous Week'),
+          'fields' => array(
+            'Event Dates' => array(
+              'type' => 'select',
+              'locator' => 'event_relative',
+              'values' => array('Previous Week'),
             ),
-                ),
-              ),
+          ),
+        ),
 
-                                     );
+      );
     }
 
     if ($paneRef) {

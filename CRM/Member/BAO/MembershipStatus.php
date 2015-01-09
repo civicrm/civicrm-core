@@ -98,7 +98,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     if (!empty($params['id'])) {
       $ids['membershipStatus']  = $params['id'];
     }
-    else{
+    else {
       //don't allow duplicate names - if id not set
       $status = new CRM_Member_DAO_MembershipStatus();
       $status->name = $params['name'];

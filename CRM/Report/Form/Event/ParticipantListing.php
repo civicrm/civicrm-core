@@ -47,7 +47,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
     'Participant',
     'Contact',
     'Individual',
-    'Event'
+    'Event',
   );
 
   public $_drilldownReport = array('event/income' => 'Link to Detail Report');
@@ -142,7 +142,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           'birth_date' => array(
             'title' => 'Birth Date',
             'operatorType' => CRM_Report_Form::OP_DATE,
-            'type' => CRM_Utils_Type::T_DATE
+            'type' => CRM_Utils_Type::T_DATE,
           ),
         ),
       ),
@@ -215,7 +215,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'type' => CRM_Utils_Type::T_INT,
             'attributes' => array(
               'entity' => 'event',
-              'select' => array('minimumInputLength' => 0)
+              'select' => array('minimumInputLength' => 0),
             ),
           ),
           'sid' => array(
@@ -252,7 +252,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           'event_id' => array(
             'title' => ts('Event'),
             'default_weight' => '1',
-            'default_order' => 'ASC'
+            'default_order' => 'ASC',
           ),
         ),
       ),
@@ -290,7 +290,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           'event_type_id' => array(
             'title' => ts('Event Type'),
             'default_weight' => '2',
-            'default_order' => 'ASC'
+            'default_order' => 'ASC',
           ),
         ),
       ),
@@ -314,11 +314,11 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           ),
           'currency' => array(
             'required' => TRUE,
-            'no_display' => TRUE
+            'no_display' => TRUE,
           ),
           'trxn_id' => NULL,
           'fee_amount' => array('title' => ts('Transaction Fee')),
-          'net_amount' => NULL
+          'net_amount' => NULL,
         ),
         'grouping' => 'contrib-fields',
         'filters' => array(
@@ -347,7 +347,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
-            'default' => NULL
+            'default' => NULL,
           ),
         ),
       ),

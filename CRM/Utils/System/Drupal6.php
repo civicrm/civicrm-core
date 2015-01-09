@@ -207,7 +207,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
             array(1 => $email)
           );
         }
-        else{
+        else {
           $errors[$emailName] = ts('This email %1 is already registered. Please select another email.',
             array(1 => $email)
           );
@@ -473,7 +473,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       if (!$contactID) {
         return FALSE;
       }
-      else{//success
+      else { //success
         if ($loadCMSBootstrap) {
           $bootStrapParams = array();
           if ($name && $password) {

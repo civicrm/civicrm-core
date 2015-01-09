@@ -380,7 +380,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
           if (!empty($formatted['fee_level'])) {
             $otherParams = array(
               'fee_label' => $formatted['fee_level'],
-              'event_id' => $newParticipant->event_id
+              'event_id' => $newParticipant->event_id,
             );
             CRM_Price_BAO_LineItem::syncLineItems($newParticipant->id, 'civicrm_participant', $newParticipant->fee_amount, $otherParams);
           }

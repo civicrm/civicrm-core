@@ -292,7 +292,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       ts('Used For'),
       array(
         'name' => 'extends[0]',
-        'style' => 'vertical-align: top;'
+        'style' => 'vertical-align: top;',
       ),
       TRUE
     );

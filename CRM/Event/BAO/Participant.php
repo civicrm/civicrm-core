@@ -244,7 +244,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     $hasNoteField = FALSE;
     foreach (array(
                'note',
-               'participant_note'
+               'participant_note',
              ) as $noteFld) {
       if (array_key_exists($noteFld, $params)) {
         $noteValue = $params[$noteFld];
@@ -646,7 +646,7 @@ GROUP BY  participant.event_id
           'title' => ts('Participant Note'),
           'name' => 'participant_note',
           'headerPattern' => '/(participant.)?note$/i',
-        )
+        ),
       );
 
       // Split status and status id into 2 fields
@@ -656,7 +656,7 @@ GROUP BY  participant.event_id
           'title' => ts('Participant Status'),
           'name' => 'participant_status',
           'data_type' => CRM_Utils_Type::T_STRING,
-        )
+        ),
       );
       $tmpFields['participant_status_id']['title'] = ts('Participant Status Id');
 
@@ -667,7 +667,7 @@ GROUP BY  participant.event_id
           'title' => ts('Participant Role'),
           'name' => 'participant_role',
           'data_type' => CRM_Utils_Type::T_STRING,
-        )
+        ),
       );
       $tmpFields['participant_role_id']['title'] = ts('Participant Role Id');
 
@@ -676,7 +676,7 @@ GROUP BY  participant.event_id
           'title' => ts('Event Type'),
           'name' => 'event_type',
           'data_type' => CRM_Utils_Type::T_STRING,
-        )
+        ),
       );
 
       $tmpContactField = $contactFields = array();
@@ -750,21 +750,21 @@ GROUP BY  participant.event_id
         'participant_note' => array(
           'title' => 'Participant Note',
           'name' => 'participant_note',
-        )
+        ),
       );
 
       $participantStatus = array(
         'participant_status' => array(
           'title' => 'Participant Status',
           'name' => 'participant_status',
-        )
+        ),
       );
 
       $participantRole = array(
         'participant_role' => array(
           'title' => 'Participant Role',
           'name' => 'participant_role',
-        )
+        ),
       );
 
       //CRM-13595 add event id to participant export
@@ -772,13 +772,13 @@ GROUP BY  participant.event_id
         'event_id' => array(
           'title' => 'Event ID',
           'name' => 'event_id',
-        )
+        ),
       );
       $eventtitle = array(
         'event_title' => array(
           'title' => 'Event Title',
           'name' => 'event_title',
-        )
+        ),
       );
 
       $discountFields = CRM_Core_DAO_Discount::export();
@@ -1649,7 +1649,7 @@ UPDATE  civicrm_participant
     if (is_string($emptySeats) && $emptySeats !== NULL) {
       $maxParticipants = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventId, 'max_participants');
       $eventfullMsg = ts("This event currently has the maximum number of participants registered (%1). However, you can still override this limit and register additional participants using this form.", array(
-          1 => $maxParticipants
+          1 => $maxParticipants,
         )) . '<br />';
     }
 
@@ -1772,7 +1772,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     // get additional participant ids (including cancelled)
     if ($participantId) {
       $ids = array_merge(array(
-        $participantId
+        $participantId,
       ), self::getAdditionalParticipantIds($participantId,
         $excludeCancelled
       ));
@@ -1829,7 +1829,7 @@ LEFT JOIN civicrm_price_field cpf ON cpfv.price_field_id = cpf.id
 WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
       $params = array(
         1 => array($priceSetId, 'Integer'),
-        2 => array($feeLevel, 'String')
+        2 => array($feeLevel, 'String'),
       );
       $mainAmount = CRM_Core_DAO::singleValueQuery($query, $params);
       $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Discounts Account is' "));
@@ -2127,7 +2127,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
           'payment_instrument_id' => $updatedContribution->payment_instrument_id,
           'contribution_id' => $updatedContribution->id,
           'trxn_date' => date('YmdHis'),
-          'currency' => $updatedContribution->currency
+          'currency' => $updatedContribution->currency,
         );
         $adjustedTrxn = CRM_Core_BAO_FinancialTrxn::create($adjustedTrxnValues);
       }

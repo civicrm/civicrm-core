@@ -24,7 +24,7 @@ class CRM_Core_Page_RedirectTest extends CiviUnitTestCase {
       '',
       'gid=2&reset=1',
       'url=civicrm/newfoo/%%gid%%?reset=%%reset%%',
-      '/index.php?q=civicrm/newfoo/2&amp;reset=1'
+      '/index.php?q=civicrm/newfoo/2&amp;reset=1',
     );
 
     return $cases;

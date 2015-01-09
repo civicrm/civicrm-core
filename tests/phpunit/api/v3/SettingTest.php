@@ -169,7 +169,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
         'description' => NULL,
         'help_text' => NULL,
         'on_change' => array(// list of callbacks
-          array(__CLASS__, '_testOnChange_onChangeExample')
+          array(__CLASS__, '_testOnChange_onChangeExample'),
         ),
       ),
     ));
@@ -308,7 +308,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
 
     $params = array(
       'domain_id' => 'all',
-      'return' => 'uniq_email_per_site'
+      'return' => 'uniq_email_per_site',
     );
     // we'll check it with a 'get'
     $description = "shows getting a variable for all domains";
@@ -411,12 +411,12 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   public function testGetSetConfigSettingMultipleDomains() {
     $settings = $this->callAPISuccess('setting', 'create', array(
         'defaultCurrency' => 'USD',
-        'domain_id' => $this->_currentDomain
+        'domain_id' => $this->_currentDomain,
       )
     );
     $settings = $this->callAPISuccess('setting', 'create', array(
         'defaultCurrency' => 'CAD',
-        'domain_id' => $this->_domainID2
+        'domain_id' => $this->_domainID2,
       )
     );
     $settings = $this->callAPISuccess('setting', 'get', array(
@@ -445,7 +445,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   public function testGetValue() {
     $params = array(
       'name' => 'petition_contacts',
-      'group' => 'Campaign Preferences'
+      'group' => 'Campaign Preferences',
     );
     $description = "Demonstrates getvalue action - intended for runtime use as better caching than get";
 
@@ -478,7 +478,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('setting', 'create', $params);
     $this->assertAPISuccess($result, "in line " . __LINE__);
     $revertParams = array(
-      'name' => 'address_format'
+      'name' => 'address_format',
     );
     $result = $this->callAPISuccess('setting', 'get', $params);
     //make sure it's set

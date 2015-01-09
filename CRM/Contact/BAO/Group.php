@@ -1039,14 +1039,14 @@ WHERE  id IN $groupIdString
       $allGroups[$dao->id] = array(
         'title' => $dao->title,
         'visibility' => $dao->visibility,
-        'description' => $dao->description
+        'description' => $dao->description,
       );
 
       if ($dao->parents == $parents) {
         $roots[] = array(
           'id' => $dao->id,
           'prefix' => '',
-          'title' => $dao->title
+          'title' => $dao->title,
         );
       }
       else {
@@ -1057,7 +1057,7 @@ WHERE  id IN $groupIdString
           'id' => $dao->id,
           'prefix' => '',
           'title' => $dao->title,
-          'parents' => $parent
+          'parents' => $parent,
         );
       }
     }
@@ -1082,7 +1082,7 @@ WHERE  id IN $groupIdString
             $new_roots[] = array(
               'id' => $row['id'],
               'prefix' => $groups[$root['id']][0] . $spacer,
-              'title' => $row['title']
+              'title' => $row['title'],
             );
             unset($rows[$key]);
           }

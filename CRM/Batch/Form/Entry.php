@@ -175,12 +175,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         array(
           'type' => 'upload',
           'name' => ts('Validate & Process the Batch'),
-          'isDefault' => TRUE
+          'isDefault' => TRUE,
         ),
         array(
           'type' => 'cancel',
           'name' => ts('Save & Continue Later'),
-        )
+        ),
       )
     );
 
@@ -352,7 +352,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         'join_date' => $currentDate,
         'receive_date' => $currentDate,
         'receive_date_time' => $currentTime,
-        'contribution_status_id' => $completeStatus
+        'contribution_status_id' => $completeStatus,
       );
 
       for ($rowNumber = 1; $rowNumber <= $this->_batchInfo['item_count']; $rowNumber++) {
@@ -492,7 +492,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         // build line item params
         $this->_priceSet['fields'][$priceFieldID]['options'][$priceFieldValueID]['amount'] = $value['total_amount'];
-        $value['price_' .  $priceFieldID] = 1;
+        $value['price_' . $priceFieldID] = 1;
 
         $lineItem = array();
         CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'], $value, $lineItem[$priceSetId]);
@@ -589,14 +589,14 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $dateTypes = array(
       'join_date' => 'joinDate',
       'membership_start_date' => 'startDate',
-      'membership_end_date' => 'endDate'
+      'membership_end_date' => 'endDate',
     );
 
     $dates = array(
       'join_date',
       'start_date',
       'end_date',
-      'reminder_date'
+      'reminder_date',
     );
 
     // get the price set associated with offline memebership
@@ -713,7 +713,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         $editedFieldParams = array(
           'price_set_id' => $priceSetId,
-          'name' => $value['membership_type'][0]
+          'name' => $value['membership_type'][0],
         );
 
         $editedResults = array();
@@ -726,7 +726,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $fid = $editedResults['id'];
           $editedFieldParams = array(
             'price_field_id' => $editedResults['id'],
-            'membership_type_id' => $value['membership_type_id']
+            'membership_type_id' => $value['membership_type_id'],
           );
 
           $editedResults = array();

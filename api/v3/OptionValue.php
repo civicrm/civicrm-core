@@ -88,7 +88,7 @@ function civicrm_api3_option_value_delete($params) {
     civicrm_api('option_value', 'getfields', array('version' => 3, 'cache_clear' => 1, 'option_group_id' => $optionGroupID));
     return civicrm_api3_create_success();
   }
-  else{
+  else {
     civicrm_api3_create_error('Could not delete OptionValue ' . $params['id']);
   }
 }

@@ -388,7 +388,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       'componentName' => 'Event',
       'contribution_id' => $contributionId,
       'contribution_status_id' => $contributionStatusId,
-      'skipComponentSync' => 1
+      'skipComponentSync' => 1,
     );
 
     //change related contribution status.

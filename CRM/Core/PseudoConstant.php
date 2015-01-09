@@ -1473,7 +1473,7 @@ WHERE  id = %1";
    * @return array - array of all payment processor types
    */
   public static function &paymentProcessorType($all = FALSE, $id = NULL, $return = 'title') {
-    $cacheKey = $id . '_'  . $return;
+    $cacheKey = $id . '_' . $return;
     if (empty(self::$paymentProcessorType[$cacheKey])) {
       self::populate(self::$paymentProcessorType[$cacheKey], 'CRM_Financial_DAO_PaymentProcessorType', $all, $return, 'is_active', NULL, "is_default, $return", 'id');
     }

@@ -160,7 +160,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
           'options' => array(
             '' => ts('Any'),
             '0' => ts('No'),
-            '1' => ts('Yes')
+            '1' => ts('Yes'),
           ),
           'clause' => 'mailing_event_unsubscribe_civireport.id IS NULL',
         ),
@@ -171,7 +171,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
           'options' => array(
             '' => ts('Any'),
             '0' => ts('No'),
-            '1' => ts('Yes')
+            '1' => ts('Yes'),
           ),
           'clause' => 'mailing_event_unsubscribe_civireport2.id IS NULL',
         ),
@@ -196,7 +196,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
           'options' => array(
             '' => ts('Any'),
             '0' => ts('No'),
-            '1' => ts('Yes')
+            '1' => ts('Yes'),
           ),
           'clause' => 'mailing_event_reply_civireport.id IS NULL',
         ),
@@ -221,7 +221,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
           'options' => array(
             '' => ts('Any'),
             '0' => ts('No'),
-            '1' => ts('Yes')
+            '1' => ts('Yes'),
           ),
           'clause' => 'mailing_event_forward_civireport.id IS NULL',
         ),
@@ -264,7 +264,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
               'unsubscribe_id',
               'optout_id',
               'forward_id',
-              'reply_id'
+              'reply_id',
             ))) {
               $select[] = "IF({$field['dbAlias']} IS NULL, 'No', 'Yes') as {$tableName}_{$fieldName}";
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);

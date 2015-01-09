@@ -47,7 +47,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     'Individual',
     'Household',
     'Organization',
-    'Activity'
+    'Activity',
   );
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
@@ -101,9 +101,9 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => array(
-                '' => ts('- any interviewer -')
+                '' => ts('- any interviewer -'),
               ) + $allSurveyInterviewers,
-          )
+          ),
         ),
         'grouping' => 'survey-interviewer-fields',
       ),
@@ -125,14 +125,14 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
           'sort_name' => array(
             'title' => ts('Respondent Name'),
             'operator' => 'like',
-          )
+          ),
         ),
         'grouping' => 'contact-fields',
         'order_bys' => array(
           'sort_name' => array(
             'title' => ts('Respondent Name'),
             'required' => TRUE,
-          )
+          ),
         ),
       ),
       'civicrm_phone' => array(
@@ -141,7 +141,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
           'phone' => array(
             'name' => 'phone',
             'title' => ts('Phone'),
-          )
+          ),
         ),
         'grouping' => 'location-fields',
       ),
@@ -233,7 +233,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
           'email' => array(
             'name' => 'email',
             'title' => ts('Email'),
-          )
+          ),
         ),
         'grouping' => 'location-fields',
       ),
@@ -458,7 +458,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     $orderBys = CRM_Utils_Array::value('order_bys', $this->_params, array());
     if (in_array($this->_outputMode, array(
       'print',
-      'pdf'
+      'pdf',
     ))) {
 
       $outPut = array();
@@ -814,7 +814,7 @@ INNER JOIN  civicrm_custom_group cg ON ( cg.id = cf.custom_group_id )
         $value = $responseField->label;
         if (in_array($this->_outputMode, array(
           'print',
-          'pdf'
+          'pdf',
         ))) {
           $value = $responseField->value;
         }
@@ -941,7 +941,7 @@ INNER  JOIN  civicrm_custom_field cf ON ( cg.id = cf.custom_group_id )
       $title = $responseFields[$fieldName]['title'];
       if (in_array($this->_outputMode, array(
         'print',
-        'pdf'
+        'pdf',
       ))) {
         $title = 'Q' . $fildCnt++;
       }

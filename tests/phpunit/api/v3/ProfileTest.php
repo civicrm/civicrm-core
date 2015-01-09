@@ -859,7 +859,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
           'field_type' => 'Contact',
           'location_type_id' => 1,
           'phone_type_id' => 1,
-          'label' => 'Phone'
+          'label' => 'Phone',
         ),
         array(
           'field_name' => 'country',
@@ -867,7 +867,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
           'visibility' => 'Public Pages and Listings',
           'field_type' => 'Contact',
           'location_type_id' => 1,
-          'label' => 'Country'
+          'label' => 'Country',
         ),
         array(
           'field_name' => 'state_province',
@@ -875,14 +875,14 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
           'visibility' => 'Public Pages and Listings',
           'field_type' => 'Contact',
           'location_type_id' => 1,
-          'label' => 'State Province'
+          'label' => 'State Province',
         ),
         array(
           'field_name' => 'postal_code',
           'is_required' => 0,
           'field_type' => 'Contact',
           'location_type_id' => 1,
-          'label' => 'State Province'
+          'label' => 'State Province',
          ),
       ),
     );

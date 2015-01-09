@@ -251,7 +251,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
         //delete tags from entity tag table
         $tagParams = array(
           'entity_table' => 'civicrm_file',
-          'entity_id' => $fId
+          'entity_id' => $fId,
         );
 
         CRM_Core_BAO_EntityTag::del($tagParams);
@@ -442,7 +442,7 @@ AND       CEF.entity_id    = %2";
       $form->addElement('text', "attachDesc_$i", NULL, array(
         'size' => 40,
         'maxlength' => 255,
-        'placeholder' => ts('Description')
+        'placeholder' => ts('Description'),
       ));
 
       if (!empty($tags)) {
@@ -451,7 +451,7 @@ AND       CEF.entity_id    = %2";
             'id' => "tags_$i",
             'multiple' => 'multiple',
             'class' => 'huge crm-select2',
-            'placeholder' => ts('- none -')
+            'placeholder' => ts('- none -'),
           )
         );
       }
@@ -535,7 +535,7 @@ AND       CEF.entity_id    = %2";
           'description' => $formValues[$attachDesc],
           'upload_date' => $now,
           'tag' => $tagParams,
-          'attachment_taglist' => CRM_Utils_Array::value($attachFreeTags, $formValues, array())
+          'attachment_taglist' => CRM_Utils_Array::value($attachFreeTags, $formValues, array()),
         );
 
         $params[$attachName] = $fileParams;
