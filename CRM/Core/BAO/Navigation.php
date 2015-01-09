@@ -739,7 +739,7 @@ ORDER BY parent_id, weight";
       $parentClause = 'parent_id IS NULL';
     }
 
-    $incrementOtherNodes = true;
+    $incrementOtherNodes = TRUE;
     $sql    = "SELECT weight from civicrm_navigation WHERE {$parentClause} ORDER BY weight LIMIT %1, 1";
     $params = array(1 => array($position, 'Positive'));
     $newWeight = CRM_Core_DAO::singleValueQuery($sql, $params);

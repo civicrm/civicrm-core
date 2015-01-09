@@ -58,7 +58,7 @@ class CRM_Contact_BAO_Contact_Optimizer {
     }
 
     // check if we had a value in the old
-    $oldEmpty = $newEmpty = true;
+    $oldEmpty = $newEmpty = TRUE;
     $old = $new = array();
 
     foreach ($oldWebsiteValues as $idx => $value) {
@@ -93,7 +93,7 @@ class CRM_Contact_BAO_Contact_Optimizer {
           $old['website_type_id'] == $new['website_type_id'] &&
           $old['url'] == $new['url']
         ) {
-          $found = true;
+          $found = TRUE;
           unset($new[$newID]);
           break;
         }
@@ -121,7 +121,7 @@ class CRM_Contact_BAO_Contact_Optimizer {
     }
 
     // check if we had a value in the old
-    $oldEmpty = $newEmpty = true;
+    $oldEmpty = $newEmpty = TRUE;
     $old = $new = array();
 
     foreach ($oldEmailValues as $idx => $value) {
@@ -172,7 +172,7 @@ class CRM_Contact_BAO_Contact_Optimizer {
           $old['email_type_id'] == $new['email_type_id'] &&
           $old['url'] == $new['url']
         ) {
-          $found = true;
+          $found = TRUE;
           unset($new[$newID]);
           break;
         }

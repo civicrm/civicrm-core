@@ -94,7 +94,7 @@ class CRM_Contact_Form_Search_Criteria {
         if (count($tags) && $key != 'civicrm_file' && $key != 'civicrm_contact') {
           //if tags exists then add type to display in adv search form help text
           $tagsTypes[] = ts($value);
-          $showAllTagTypes = true;
+          $showAllTagTypes = TRUE;
         }
       }
       $tagTypesText = implode(" or ", $tagsTypes);

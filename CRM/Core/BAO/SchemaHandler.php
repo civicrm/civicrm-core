@@ -51,7 +51,7 @@
  *                                             'class'         => FIELD_CLASS_TYPE,
  *                                             'primary'       => BOOLEAN,
  *                                             'required'      => BOOLEAN,
- *                                             'searchable'    => true,
+ *                                             'searchable'    => TRUE,
  *                                             'fk_table_name' => FOREIGN_KEY_TABLE_NAME,
  *                                             'fk_field_name' => FOREIGN_KEY_FIELD_NAME,
  *                                             'comment'       => COMMENT,
@@ -66,7 +66,7 @@ class CRM_Core_BAO_SchemaHandler {
    *
    * @param array $params
    *
-   * @return true if successfully created, false otherwise
+   * @return TRUE if successfully created, false otherwise
    *
    * @static
    */
@@ -366,7 +366,8 @@ ALTER TABLE {$tableName}
    * @param String $tableName
    *   Name of the table to be created.
    *
-   * @return true if successfully deleted, false otherwise
+   * @return bool
+   *   TRUE if successfully deleted, false otherwise.
    *
    * @static
    */

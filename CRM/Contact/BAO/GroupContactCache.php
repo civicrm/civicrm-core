@@ -43,7 +43,7 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * @param $groupIDs
    *   Of group that we are checking against.
    *
-   * @return boolean true if we did not regenerate, false if we did
+   * @return boolean TRUE if we did not regenerate, false if we did
    */
   public static function check($groupIDs) {
     if (empty($groupIDs)) {
@@ -121,7 +121,7 @@ AND     ( g.cache_date IS NULL OR
    * @param int $limit
    *   Limits the number of groups we evaluate.
    *
-   * @return boolean true if we did not regenerate, false if we did
+   * @return boolean TRUE if we did not regenerate, false if we did
    */
   public static function loadAll($groupIDs = NULL, $limit = 0) {
     // ensure that all the smart groups are loaded
@@ -291,7 +291,7 @@ WHERE  id IN ( $groupIDs )
     static $invoked = FALSE;
 
     // typically this needs to happy only once per instance
-    // this is especially true in import, where we dont need
+    // this is especially TRUE in import, where we dont need
     // to do this all the time
     // this optimization is done only when no groupID is passed
     // i.e. cache is reset for all groups
@@ -397,7 +397,8 @@ WHERE  id = %1
    * Removes one or more contacts from the smart group cache
    * @param int|array $cid
    * @param int $groupId
-   * @return bool - true if successful
+   * @return bool
+   *   TRUE if successful.
    */
   public static function removeContact($cid, $groupId = NULL) {
     $cids = array();
