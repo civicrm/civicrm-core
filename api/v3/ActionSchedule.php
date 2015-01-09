@@ -82,7 +82,7 @@ function _civicrm_api3_action_schedule_create_spec(&$params) {
  *
  * @param array $params
  *   Array containing id of the action_schedule.
- * to be deleted
+ *   to be deleted
  *
  * @return array API result array
  *
