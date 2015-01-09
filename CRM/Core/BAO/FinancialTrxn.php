@@ -297,7 +297,7 @@ WHERE lt.entity_id = %1 ";
    *
    * @param int $entity_id
    * @return bool
-   *   TRUE on success, false otherwise.
+   *   TRUE on success, FALSE otherwise.
    * @static
    */
   public static function deleteFinancialTrxn($entity_id) {

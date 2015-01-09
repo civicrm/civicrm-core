@@ -164,7 +164,7 @@ class CRM_Campaign_Form_Survey_TabHeader {
 
     $tabs = $form->get('tabHeader');
     if (is_array($tabs)) {
-      $current = false;
+      $current = FALSE;
       foreach ($tabs as $subPage => $pageVal) {
         if ($current) {
           $next = $subPage;

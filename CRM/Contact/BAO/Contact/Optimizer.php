@@ -63,14 +63,14 @@ class CRM_Contact_BAO_Contact_Optimizer {
 
     foreach ($oldWebsiteValues as $idx => $value) {
       if (! empty($value['url'])) {
-        $oldEmpty = false;
+        $oldEmpty = FALSE;
         $old[] = array('website_type_id' => $value['website_type_id'], 'url' => $value['url']);
       }
     }
 
     foreach ($newWebsiteValues as $idx => $value) {
       if (! empty($value['url'])) {
-        $newEmpty = false;
+        $newEmpty = FALSE;
         $new[] = array('website_type_id' => $value['website_type_id'], 'url' => $value['url']);
       }
     }
@@ -87,7 +87,7 @@ class CRM_Contact_BAO_Contact_Optimizer {
 
     // same number of entries, check if they are exactly the same
     foreach ($old as $oldID => $oldValues) {
-      $found = false;
+      $found = FALSE;
       foreach ($new as $newID => $newValues) {
         if (
           $old['website_type_id'] == $new['website_type_id'] &&
@@ -126,7 +126,7 @@ class CRM_Contact_BAO_Contact_Optimizer {
 
     foreach ($oldEmailValues as $idx => $value) {
       if (! empty($value['email'])) {
-        $oldEmpty = false;
+        $oldEmpty = FALSE;
         $old[] = array(
           'email'            => $value['email'],
           'location_type_id' => $value['location_type_id'],
@@ -141,7 +141,7 @@ class CRM_Contact_BAO_Contact_Optimizer {
 
     foreach ($newEmailValues as $idx => $value) {
       if (! empty($value['email'])) {
-        $newEmpty = false;
+        $newEmpty = FALSE;
         $new[] = array(
           'email'            => $value['email'],
           'location_type_id' => $value['location_type_id'],
@@ -166,7 +166,7 @@ class CRM_Contact_BAO_Contact_Optimizer {
 
     // same number of entries, check if they are exactly the same
     foreach ($old as $oldID => $oldValues) {
-      $found = false;
+      $found = FALSE;
       foreach ($new as $newID => $newValues) {
         if (
           $old['email_type_id'] == $new['email_type_id'] &&
