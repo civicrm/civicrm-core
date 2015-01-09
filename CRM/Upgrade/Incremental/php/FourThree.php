@@ -51,8 +51,8 @@ class CRM_Upgrade_Incremental_php_FourThree {
    * revision to the database.
    *
    * @param $preUpgradeMessage
-   * @param $rev
-   *   String, a version number, e.g. '4.3.alpha1', '4.3.beta3', '4.3.0'.
+   * @param string $rev
+   *   a version number, e.g. '4.3.alpha1', '4.3.beta3', '4.3.0'.
    * @param null $currentVer
    *
    * @return void|bool
@@ -118,10 +118,10 @@ WHERE {$key}.id IS NULL";
   /**
    * Compute any messages which should be displayed after upgrade
    *
-   * @param $postUpgradeMessage
-   *   String, alterable.
-   * @param $rev
-   *   String, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
+   * @param string $postUpgradeMessage
+   *   alterable.
+   * @param string $rev
+   *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {

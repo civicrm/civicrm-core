@@ -55,8 +55,8 @@ class CRM_Core_I18n {
   /**
    * A locale-based constructor that shouldn't be called from outside of this class (use singleton() instead).
    *
-   * @param $locale
-   *   String the base of this certain object's existence.
+   * @param string $locale
+   *   the base of this certain object's existence.
    *
    * @return \CRM_Core_I18n
    */
@@ -118,8 +118,8 @@ class CRM_Core_I18n {
   /**
    * Return languages available in this instance of CiviCRM.
    *
-   * @param $justEnabled
-   *   Boolean whether to return all languages or just the enabled ones.
+   * @param bool $justEnabled
+   *   whether to return all languages or just the enabled ones.
    *
    * @return             array    of code/language name mappings
    */
@@ -172,8 +172,8 @@ class CRM_Core_I18n {
   /**
    * Replace arguments in a string with their values. Arguments are represented by % followed by their number.
    *
-   * @param $str
-   *   String source string.
+   * @param string $str
+   *   source string.
    * @param mixed arguments, can be passed in an array or through single variables
    *
    * @return      string  modified string
@@ -210,10 +210,10 @@ class CRM_Core_I18n {
    *   - count - The item count for plural mode (3rd parameter of ngettext())
    *   - context - gettext context of that string (for homonym handling)
    *
-   * @param $text
-   *   String the original string.
-   * @param $params
-   *   Array the params of the translation (if any).
+   * @param string $text
+   *   the original string.
+   * @param array $params
+   *   the params of the translation (if any).
    *
    * @return        string  the translated string
    */
@@ -344,8 +344,8 @@ class CRM_Core_I18n {
   /**
    * Translate a string to the current locale.
    *
-   * @param $string
-   *   String this string should be translated.
+   * @param string $string
+   *   this string should be translated.
    *
    * @return         string  the translated string
    */
@@ -356,10 +356,10 @@ class CRM_Core_I18n {
   /**
    * Localize (destructively) array values.
    *
-   * @param $array
-   *   Array the array for localization (in place).
-   * @param $params
-   *   Array an array of additional parameters.
+   * @param array $array
+   *   the array for localization (in place).
+   * @param array $params
+   *   an array of additional parameters.
    *
    * @return        void
    */
@@ -383,8 +383,8 @@ class CRM_Core_I18n {
   /**
    * Localize (destructively) array elements with keys of 'title'.
    *
-   * @param $array
-   *   Array the array for localization (in place).
+   * @param array $array
+   *   the array for localization (in place).
    *
    * @return        void
    */

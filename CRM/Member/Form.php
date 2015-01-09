@@ -193,8 +193,8 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * If the member & contributor are the same then the values will be the same. But if different people paid
    * then they weill differ
    *
-   * @param $formValues
-   *   Array values from form. The important values we are looking for are.
+   * @param array $formValues
+   *   values from form. The important values we are looking for are.
    *  - contact_id
    *  - soft_credit_contact_id
    */

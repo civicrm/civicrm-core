@@ -484,12 +484,12 @@ WHERE id={$contactId}; ";
    * Build form for related contacts / on behalf of organization.
    *
    * @param CRM_Core_Form $form
-   * @param $contactType
-   *   String contact type.
+   * @param string $contactType
+   *   contact type.
    * @param int $countryID
    * @param int $stateID
-   * @param $title
-   *   String fieldset title.
+   * @param string $title
+   *   fieldset title.
    *
    * @static
    */

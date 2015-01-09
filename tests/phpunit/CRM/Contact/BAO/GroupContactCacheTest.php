@@ -164,10 +164,9 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   /**
    * Assert that the cache for a group contains exactly the listed contacts
    *
-   * @param $expectedContactIds
+   * @param array $expectedContactIds
    *   Array(int).
-   * @param $groupId
-   *   Int.
+   * @param int $groupId
    */
   public function assertCacheMatches($expectedContactIds, $groupId) {
     $sql = 'SELECT contact_id FROM civicrm_group_contact_cache WHERE group_id = %1';
@@ -228,8 +227,8 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $objects
-   *   Array DAO or BAO objects.
+   * @param array $objects
+   *   DAO or BAO objects.
    */
   public function registerTestObjects($objects) {
     //if (is_object($objects)) {

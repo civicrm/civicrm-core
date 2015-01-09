@@ -1158,8 +1158,7 @@ ORDER BY civicrm_custom_group.weight,
    * If there are custom-groups which only apply to certain subtypes,
    * those WILL be included.
    *
-   * @param $entityType
-   *   String.
+   * @param string $entityType
    *
    * @return CRM_Core_DAO_CustomGroup
    */
@@ -1244,8 +1243,8 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @param $group
    *   Object the DAO custom group object.
-   * @param $force
-   *   Boolean whether to force the deletion, even if there are custom fields.
+   * @param bool $force
+   *   whether to force the deletion, even if there are custom fields.
    *
    * @return boolean   false if field exists for this group, true if group gets deleted.
    *

@@ -2399,8 +2399,7 @@ WHERE  contribution_id = %1 ";
    *
    * @param $values
    * @param $input
-   * @param $template
-   *   CRM_Core_SMARTY.
+   * @param CRM_Core_SMARTY $template
    * @param bool $recur
    * @param bool $returnMessageText
    *

@@ -1694,13 +1694,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * Format params for update and fill mode
    *
-   * @param $params
-   *   Array reference to an array containing all the.
+   * @param array $params
+   *   reference to an array containing all the.
    * values for import
-   * @param $onDuplicate
-   *   Int.
-   * @param $cid
-   *   Int contact id.
+   * @param int $onDuplicate
+   * @param int $cid
+   *   contact id.
    */
   public function formatParams(&$params, $onDuplicate, $cid) {
     if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {

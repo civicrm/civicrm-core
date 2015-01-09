@@ -102,8 +102,8 @@ class CRM_Core_Resources {
   /**
    * Get or set the single instance of CRM_Core_Resources
    *
-   * @param $instance
-   *   CRM_Core_Resources, new copy of the manager.
+   * @param CRM_Core_Resources $instance
+   *   New copy of the manager.
    * @return CRM_Core_Resources
    */
   static public function singleton(CRM_Core_Resources $instance = NULL) {
@@ -152,14 +152,14 @@ class CRM_Core_Resources {
   /**
    * Add a JavaScript file to the current page using <SCRIPT SRC>.
    *
-   * @param $ext
-   *   String, extension name; use 'civicrm' for core.
-   * @param $file
-   *   String, file path -- relative to the extension base dir.
-   * @param $weight
-   *   Int, relative weight within a given region.
-   * @param $region
-   *   String, location within the file; 'html-header', 'page-header', 'page-footer'.
+   * @param string $ext
+   *   extension name; use 'civicrm' for core.
+   * @param string $file
+   *   file path -- relative to the extension base dir.
+   * @param int $weight
+   *   relative weight within a given region.
+   * @param string $region
+   *   location within the file; 'html-header', 'page-header', 'page-footer'.
    * @param $translate, whether to parse this file for strings enclosed in ts()
    *
    * @return CRM_Core_Resources
@@ -181,12 +181,11 @@ class CRM_Core_Resources {
   /**
    * Add a JavaScript file to the current page using <SCRIPT SRC>.
    *
-   * @param $url
-   *   String.
-   * @param $weight
-   *   Int, relative weight within a given region.
-   * @param $region
-   *   String, location within the file; 'html-header', 'page-header', 'page-footer'.
+   * @param string $url
+   * @param int $weight
+   *   relative weight within a given region.
+   * @param string $region
+   *   location within the file; 'html-header', 'page-header', 'page-footer'.
    * @return CRM_Core_Resources
    */
   public function addScriptUrl($url, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
@@ -203,12 +202,12 @@ class CRM_Core_Resources {
   /**
    * Add a JavaScript file to the current page using <SCRIPT SRC>.
    *
-   * @param $code
-   *   String, JavaScript source code.
-   * @param $weight
-   *   Int, relative weight within a given region.
-   * @param $region
-   *   String, location within the file; 'html-header', 'page-header', 'page-footer'.
+   * @param string $code
+   *   JavaScript source code.
+   * @param int $weight
+   *   relative weight within a given region.
+   * @param string $region
+   *   location within the file; 'html-header', 'page-header', 'page-footer'.
    * @return CRM_Core_Resources
    */
   public function addScript($code, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
@@ -250,8 +249,7 @@ class CRM_Core_Resources {
    * This function is usually reserved for low-level system use.
    * Extensions and components should generally use addVars instead.
    *
-   * @param $settings
-   *   Array.
+   * @param array $settings
    * @return CRM_Core_Resources
    */
   public function addSetting($settings) {
@@ -353,8 +351,7 @@ class CRM_Core_Resources {
    * CRM_Core_Resources::singleton()->addSetting(array('myNamespace' => array('myString' => ts('Your %1 has been %2', array(subs)))));
    * And from javascript access it at CRM.myNamespace.myString
    *
-   * @param $text
-   *   String|array.
+   * @param string|array $text
    * @return CRM_Core_Resources
    */
   public function addString($text) {
@@ -372,14 +369,14 @@ class CRM_Core_Resources {
   /**
    * Add a CSS file to the current page using <LINK HREF>.
    *
-   * @param $ext
-   *   String, extension name; use 'civicrm' for core.
-   * @param $file
-   *   String, file path -- relative to the extension base dir.
-   * @param $weight
-   *   Int, relative weight within a given region.
-   * @param $region
-   *   String, location within the file; 'html-header', 'page-header', 'page-footer'.
+   * @param string $ext
+   *   extension name; use 'civicrm' for core.
+   * @param string $file
+   *   file path -- relative to the extension base dir.
+   * @param int $weight
+   *   relative weight within a given region.
+   * @param string $region
+   *   location within the file; 'html-header', 'page-header', 'page-footer'.
    * @return CRM_Core_Resources
    */
   public function addStyleFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
@@ -389,12 +386,11 @@ class CRM_Core_Resources {
   /**
    * Add a CSS file to the current page using <LINK HREF>.
    *
-   * @param $url
-   *   String.
-   * @param $weight
-   *   Int, relative weight within a given region.
-   * @param $region
-   *   String, location within the file; 'html-header', 'page-header', 'page-footer'.
+   * @param string $url
+   * @param int $weight
+   *   relative weight within a given region.
+   * @param string $region
+   *   location within the file; 'html-header', 'page-header', 'page-footer'.
    * @return CRM_Core_Resources
    */
   public function addStyleUrl($url, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
@@ -411,12 +407,12 @@ class CRM_Core_Resources {
   /**
    * Add a CSS content to the current page using <STYLE>.
    *
-   * @param $code
-   *   String, CSS source code.
-   * @param $weight
-   *   Int, relative weight within a given region.
-   * @param $region
-   *   String, location within the file; 'html-header', 'page-header', 'page-footer'.
+   * @param string $code
+   *   CSS source code.
+   * @param int $weight
+   *   relative weight within a given region.
+   * @param string $region
+   *   location within the file; 'html-header', 'page-header', 'page-footer'.
    * @return CRM_Core_Resources
    */
   public function addStyle($code, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
@@ -433,10 +429,10 @@ class CRM_Core_Resources {
   /**
    * Determine file path of a resource provided by an extension
    *
-   * @param $ext
-   *   String, extension name; use 'civicrm' for core.
-   * @param $file
-   *   String, file path -- relative to the extension base dir.
+   * @param string $ext
+   *   extension name; use 'civicrm' for core.
+   * @param string $file
+   *   file path -- relative to the extension base dir.
    *
    * @return bool|string (string|bool), full file path or FALSE if not found
    */
@@ -452,10 +448,10 @@ class CRM_Core_Resources {
   /**
    * Determine public URL of a resource provided by an extension
    *
-   * @param $ext
-   *   String, extension name; use 'civicrm' for core.
-   * @param $file
-   *   String, file path -- relative to the extension base dir.
+   * @param string $ext
+   *   extension name; use 'civicrm' for core.
+   * @param string $file
+   *   file path -- relative to the extension base dir.
    * @param bool $addCacheCode
    *
    * @return string, URL
@@ -588,10 +584,10 @@ class CRM_Core_Resources {
   /**
    * Translate strings in a javascript file
    *
-   * @param $ext
-   *   String, extension name.
-   * @param $file
-   *   String, file path.
+   * @param string $ext
+   *   extension name.
+   * @param string $file
+   *   file path.
    * @return void
    */
   private function translateScript($ext, $file) {

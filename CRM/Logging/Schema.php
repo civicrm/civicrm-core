@@ -213,12 +213,12 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
   /**
    * Add missing (potentially specified) log table columns for the given table.
    *
-   * @param $table
-   *   String name of the relevant table.
-   * @param $cols
+   * @param string $table
+   *   name of the relevant table.
+   * @param array $cols
    *   Mixed array of columns to add or null (to check for the missing columns).
-   * @param $rebuildTrigger
-   *   Boolean should we rebuild the triggers.
+   * @param bool $rebuildTrigger
+   *   should we rebuild the triggers.
    *
    * @return void
    */

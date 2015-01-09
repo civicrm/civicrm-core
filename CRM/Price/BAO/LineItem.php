@@ -138,10 +138,10 @@ AND li.entity_id = {$entityId}
    * Given a participant id/contribution id,
    * return contribution/fee line items
    *
-   * @param $entityId
-   *   Int participant/contribution id.
-   * @param $entity
-   *   String participant/contribution.
+   * @param int $entityId
+   *   participant/contribution id.
+   * @param string $entity
+   *   participant/contribution.
    *
    * @param null $isQuick
    * @param bool $isQtyZero
@@ -535,7 +535,7 @@ AND li.entity_id = {$entityId}
   /**
    * Calculate tax rate in percentage
    *
-   * @param $lineItemId
+   * @param array $lineItemId
    *   An assoc array of lineItem.
    *
    * @return tax rate

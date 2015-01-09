@@ -419,8 +419,8 @@ AND    domain_id    = %4
   /**
    * Update the email value for the contact and user profile
    *
-   * @param $contactId
-   *   Int Contact ID of the user.
+   * @param int $contactId
+   *   Contact ID of the user.
    * @param $emailAddress
    *   Email to be modified for the user.
    *

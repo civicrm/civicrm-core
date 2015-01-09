@@ -147,9 +147,8 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
 
   /**
    * @param $input
-   * @param $expected
-   *   Bool.
-   * @dataProvider booleanDataProvider
+   * @param bool $expected
+   *     * @dataProvider booleanDataProvider
    */
   public function testStrToBool($input, $expected) {
     $actual = CRM_Utils_String::strtobool($input);

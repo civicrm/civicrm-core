@@ -395,8 +395,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * Returns true if checkGroupId is a parent of one of the groups in
    * groupIds, false otherwise.
    *
-   * @param $groupIds
-   *   Array of group ids (or one group id) to serve as the starting point.
+   * @param array $groupIds
+   *   of group ids (or one group id) to serve as the starting point.
    * @param $checkGroupId
    *   The group id to check if it is a parent of the $groupIds group(s).
    *
@@ -427,8 +427,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * Returns true if checkGroupId is a child of one of the groups in
    * groupIds, false otherwise.
    *
-   * @param $groupIds
-   *   Array of group ids (or one group id) to serve as the starting point.
+   * @param array $groupIds
+   *   of group ids (or one group id) to serve as the starting point.
    * @param $checkGroupId
    *   The group id to check if it is a child of the $groupIds group(s).
    *
@@ -461,8 +461,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * Returns true if checkGroupId is an ancestor of one of the groups in
    * groupIds, false otherwise.
    *
-   * @param $groupIds
-   *   Array of group ids (or one group id) to serve as the starting point.
+   * @param array $groupIds
+   *   of group ids (or one group id) to serve as the starting point.
    * @param $checkGroupId
    *   The group id to check if it is an ancestor of the $groupIds group(s).
    *
@@ -502,8 +502,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * Returns true if checkGroupId is a descendent of one of the groups in
    * groupIds, false otherwise.
    *
-   * @param $groupIds
-   *   Array of group ids (or one group id) to serve as the starting point.
+   * @param array $groupIds
+   *   of group ids (or one group id) to serve as the starting point.
    * @param $checkGroupId
    *   The group id to check if it is a descendent of the $groupIds group(s).
    *
@@ -542,7 +542,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
   /**
    * Returns array of group ids of ancestor groups of the specified group.
    *
-   * @param $groupIds
+   * @param array $groupIds
    *   An array of valid group ids (passed by reference).
    *
    * @param bool $includeSelf
@@ -579,7 +579,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
   /**
    * Returns array of ancestor groups of the specified group.
    *
-   * @param $groupIds
+   * @param array $groupIds
    *   An array of valid group ids (passed by reference).
    *
    * @param bool $includeSelf
@@ -594,7 +594,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
   /**
    * Returns array of group ids of child groups of the specified group.
    *
-   * @param $groupIds
+   * @param array $groupIds
    *   An array of valid group ids (passed by reference).
    *
    * @return array $groupIdArray List of groupIds that represent the requested group and its children@access public
@@ -616,7 +616,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
   /**
    * Returns array of group ids of parent groups of the specified group.
    *
-   * @param $groupIds
+   * @param array $groupIds
    *   An array of valid group ids (passed by reference).
    *
    * @return array $groupIdArray         List of groupIds that represent the requested group and its parents@access public
@@ -638,7 +638,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
   /**
    * Returns array of group ids of descendent groups of the specified group.
    *
-   * @param $groupIds
+   * @param array $groupIds
    *   An array of valid group ids (passed by reference).
    *
    * @param bool $includeSelf
@@ -672,7 +672,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
   /**
    * Returns array of descendent groups of the specified group.
    *
-   * @param $groupIds
+   * @param array $groupIds
    *   An array of valid group ids (passed by reference).
    *
    * @param bool $includeSelf

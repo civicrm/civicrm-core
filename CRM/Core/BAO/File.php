@@ -463,12 +463,12 @@ AND       CEF.entity_id    = %2";
    * Return a clean url string and the number of attachment for a
    * given entityTable, entityID
    *
-   * @param $entityTable
-   *   String The entityTable to which the file is attached.
-   * @param $entityID
-   *   Int The id of the object in the above entityTable.
-   * @param $separator
-   *   String The string separator where to implode the urls.
+   * @param string $entityTable
+   *   The entityTable to which the file is attached.
+   * @param int $entityID
+   *   The id of the object in the above entityTable.
+   * @param string $separator
+   *   The string separator where to implode the urls.
    *
    * @return array              An array with 2 elements. The string and the number of attachments
    * @static
@@ -652,11 +652,11 @@ AND       CEF.entity_id    = %2";
   /**
    * Display paper icon for a file attachment -- CRM-13624
    *
-   * @param $entityTable
-   *   String The entityTable to which the file is attached. eg "civicrm_contact", "civicrm_note", "civicrm_activity".
+   * @param string $entityTable
+   *   The entityTable to which the file is attached. eg "civicrm_contact", "civicrm_note", "civicrm_activity".
    *                             If you have the ID of a specific row in civicrm_file, use $entityTable='*'
-   * @param $entityID
-   *   Int The id of the object in the above entityTable.
+   * @param int $entityID
+   *   The id of the object in the above entityTable.
    *
    * @return array|NULL          list of HTML snippets; one HTML snippet for each attachment. If none found, then NULL
    *
