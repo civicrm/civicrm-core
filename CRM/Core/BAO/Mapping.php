@@ -214,7 +214,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param int $smartGroupId
    *   Smart group id.
    *
-   * @return array $returnFields  associated array of elements@static
+   * @return array $returnFields  associated array of elements
+   * @static
    */
   public static function getFormattedFields($smartGroupId) {
     $returnFields = array();
@@ -935,7 +936,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param int $customfieldId
    *   Related file id.
    *
-   * @return null|string $customGroupName all custom group names@static
+   * @return null|string $customGroupName all custom group names
+   * @static
    */
   public static function getCustomGroupName($customfieldId) {
     if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($customfieldId)) {
@@ -959,7 +961,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *   Row no of the fields.
    *
    *
-   * @return array $returnFields  formatted associated array of elements@static
+   * @return array $returnFields  formatted associated array of elements
+   * @static
    */
   public static function formattedFields(&$params, $row = FALSE) {
     $fields = array();

@@ -352,7 +352,8 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    * @param bool $returnWaitingCount
    * @param bool $considerTestParticipant
    *
-   * @return bool|int|null|string 1. false                 => If event having some empty spaces.@static
+   * @return bool|int|null|string 1. false                 => If event having some empty spaces.
+   * @static
    */
   static function eventFull(
     $eventId,

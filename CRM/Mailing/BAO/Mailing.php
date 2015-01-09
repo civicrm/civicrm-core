@@ -1063,7 +1063,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @param bool $isForward
    *
-   * @return array (reference) array    array ref that hold array refs to the verp info, urls, and headers@access private
+   * @return array (reference) array    array ref that hold array refs to the verp info, urls, and headers
+   * @access private
    */
   private function getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email, $isForward = FALSE) {
     $config = CRM_Core_Config::singleton();
@@ -2718,7 +2719,8 @@ SELECT  $mailing.id as mailing_id
    *
    * @param bool $isSMS
    *
-   * @return array $report array content/component.@access public
+   * @return array $report array content/component.
+   * @access public
    */
   public static function getMailingContent(&$report, &$form, $isSMS = FALSE) {
     $htmlHeader = $textHeader = NULL;

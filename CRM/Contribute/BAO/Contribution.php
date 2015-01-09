@@ -771,7 +771,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    *
    * @param int $id
    *
-   * @return mixed|null $results no of deleted Contribution on success, false otherwise@access public
+   * @return mixed|null $results no of deleted Contribution on success, false otherwise
+   * @access public
    * @static
    */
   public static function deleteContribution($id) {

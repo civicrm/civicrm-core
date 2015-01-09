@@ -691,7 +691,8 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
    * @param array $returnProperties
    *   Array of return elements.
    *
-   * @return array $contactDetails array of contact info.@static
+   * @return array $contactDetails array of contact info.
+   * @static
    */
   public static function contactDetails($componentIds, $componentName, $returnProperties = array()) {
     $contactDetails = array();
@@ -869,7 +870,8 @@ Group By  componentId";
    * @param array $addresses
    *   Associated array of.
    *
-   * @return array $contactNames associated array of contact names@static
+   * @return array $contactNames associated array of contact names
+   * @static
    */
   public static function getAddressShareContactNames(&$addresses) {
     $contactNames = array();

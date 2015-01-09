@@ -518,7 +518,8 @@ Group By  contact.id";
    * @param int $interviewerId
    * @param array $statusIds
    *
-   * @return array $activityDetails array of survey activity.@static
+   * @return array $activityDetails array of survey activity.
+   * @static
    */
   static function voterActivityDetails(
     $surveyId, $voterIds, $interviewerId = NULL,
@@ -581,7 +582,8 @@ INNER JOIN  civicrm_activity_contact activityAssignment
    * @param null $statusIds
    * @param null $voterIds
    * @param bool $onlyCount
-   * @return array $activities an array of survey activity.@static
+   * @return array $activities an array of survey activity.
+   * @static
    */
   static function getSurveyActivities(
     $surveyId,
@@ -719,7 +721,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    * This function retrieve all option groups which are created as a result set
    *
    * @param string $valueColumnName
-   * @return array $resultSets an array of option groups.@static
+   * @return array $resultSets an array of option groups.
+   * @static
    */
   public static function getResultSets($valueColumnName = 'title') {
     $resultSets = array();
@@ -768,7 +771,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    *
    * @param int $surveyId
    *   Survey id.
-   * @return array $responseOptions an array of option values@static
+   * @return array $responseOptions an array of option values
+   * @static
    */
   public static function getResponsesOptions($surveyId) {
     $responseOptions = array();
@@ -790,7 +794,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    * @param int $surveyId
    * @param bool $enclosedInUL
    * @param string $extraULName
-   * @return array|string $url array of permissioned links@static
+   * @return array|string $url array of permissioned links
+   * @static
    */
   public static function buildPermissionLinks($surveyId, $enclosedInUL = FALSE, $extraULName = 'more') {
     $menuLinks = array();

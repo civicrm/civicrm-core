@@ -87,7 +87,8 @@ class CRM_Contact_Form_Edit_Household {
    *   Unused.
    * @param int $contactID
    *
-   * @return array|bool $error@static
+   * @return array|bool $error
+   * @static
    */
   public static function formRule($fields, $files, $contactID = NULL) {
     $errors = array();
