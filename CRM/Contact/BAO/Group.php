@@ -1222,7 +1222,7 @@ WHERE {$whereClause}";
     if ($excludeHidden) {
       $clauses[] = 'groups.is_hidden = 0';
     }
-    ;
+
     $clauses[] = self::getPermissionClause();
 
 

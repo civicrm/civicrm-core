@@ -508,7 +508,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
         if (empty($params['attachments'])) {
           $params['attachments'] = array();
         }
-        $params['attachments'][] =  CRM_Utils_Mail::appendPDF('Invoice.pdf', $pdfHtml, $format) ;
+        $params['attachments'][] = CRM_Utils_Mail::appendPDF('Invoice.pdf', $pdfHtml, $format);
       }
       $pdf_filename = '';
       if ($config->doNotAttachPDFReceipt &&

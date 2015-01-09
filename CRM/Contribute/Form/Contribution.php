@@ -1112,7 +1112,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $lineItems[$itemId]['tax_rate'] = $financialItemsId[$submittedValues['financial_type_id']];
         }
         else {
-          $lineItems[$itemId]['tax_rate'] = $lineItems[$itemId]['tax_amount'] = "" ;
+          $lineItems[$itemId]['tax_rate'] = $lineItems[$itemId]['tax_amount'] = "";
           $submittedValues['tax_amount'] = 'null';
         }
         if ($lineItems[$itemId]['tax_rate']) {
