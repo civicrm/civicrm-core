@@ -16,8 +16,7 @@
  *
  * @return string
  */
-function smarty_block_crmRegion($params, $content, &$smarty, &$repeat)
-{
+function smarty_block_crmRegion($params, $content, &$smarty, &$repeat) {
   if ($repeat) {
     return;
   }

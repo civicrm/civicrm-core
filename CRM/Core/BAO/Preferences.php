@@ -102,7 +102,8 @@ AND    v.name = %3
       else {
         $value = CRM_Utils_System::relativeURL($value);
       }
-      $sqlParams = array(1 => array($value, 'String'),
+      $sqlParams = array(
+        1 => array($value, 'String'),
         2 => array($optionName, 'String'),
         3 => array($name, 'String'),
       );

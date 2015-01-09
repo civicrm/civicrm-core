@@ -64,7 +64,8 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     }
 
     // set breadcrumb to return to Custom Search listings page
-    $breadCrumb = array(array('title' => ts('Custom Searches'),
+    $breadCrumb = array(array(
+        'title' => ts('Custom Searches'),
         'url' => CRM_Utils_System::url('civicrm/contact/search/custom/list',
           'reset=1'
         ),

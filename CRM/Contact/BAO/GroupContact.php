@@ -622,7 +622,8 @@ SELECT    *
    * @static
    */
   public static function mergeGroupContact($mainContactId, $otherContactId) {
-    $params = array(1 => array($mainContactId, 'Integer'),
+    $params = array(
+      1 => array($mainContactId, 'Integer'),
       2 => array($otherContactId, 'Integer'),
     );
 
@@ -765,7 +766,8 @@ WHERE  group_id = %1
 AND    status = %2
 AND    contact_id IN ( $contactStr )
 ";
-      $params = array(1 => array($groupID, 'Integer'),
+      $params = array(
+        1 => array($groupID, 'Integer'),
         2 => array($status, 'String'),
       );
 

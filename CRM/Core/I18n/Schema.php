@@ -573,7 +573,8 @@ class CRM_Core_I18n_Schema {
       }
 
       $sql = implode(' ', $trigger);
-      $info[] = array('table' => array($table),
+      $info[] = array(
+        'table' => array($table),
         'when' => 'BEFORE',
         'event' => array('UPDATE'),
         'sql' => $sql,
@@ -602,7 +603,8 @@ class CRM_Core_I18n_Schema {
       }
 
       $sql = implode(' ', $trigger);
-      $info[] = array('table' => array($table),
+      $info[] = array(
+        'table' => array($table),
         'when' => 'BEFORE',
         'event' => array('INSERT'),
         'sql' => $sql,

@@ -862,7 +862,8 @@ WHERE  v.option_group_id = g.id
     }
 
     $participantFields = CRM_Event_DAO_Participant::fields();
-    $participantParams = array('id' => CRM_Utils_Array::value('participant_id', $params),
+    $participantParams = array(
+      'id' => CRM_Utils_Array::value('participant_id', $params),
       'contact_id' => $contactID,
       'event_id' => $form->_eventId ? $form->_eventId : $params['event_id'],
       'status_id' => CRM_Utils_Array::value('participant_status',

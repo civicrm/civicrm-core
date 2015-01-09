@@ -166,7 +166,8 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     $this->addFormRule(array('CRM_SMS_Form_Group', 'formRule'));
 
     $buttons = array(
-      array('type' => 'next',
+      array(
+        'type' => 'next',
         'name' => ts('Next'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
