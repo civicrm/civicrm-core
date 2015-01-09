@@ -49,7 +49,7 @@
  *   Name value pair of contact information.
  * {@getfields GroupContact_get}
  *
- * @return  array  list of groups, given contact subsribed to
+ * @return array  list of groups, given contact subsribed to
  */
 function civicrm_api3_group_contact_get($params) {
 

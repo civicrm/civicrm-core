@@ -558,7 +558,7 @@ SELECT label, value
    *
    * @param NULL
    *
-   * @return  array   array of strings
+   * @return array   array of strings
    */
   public function query() {
     $this->select();

@@ -10,7 +10,7 @@
  * {@example OptionValueGet.php 0}
  * @example OptionValueGet.php
  *
- * @return  array details of found Option Values
+ * @return array details of found Option Values
  * {@getfields OptionValue_get}
  * @access public
  */
@@ -87,7 +87,7 @@ function civicrm_api3_report_template_delete($params) {
  * @param array $params
  *   Input parameters.
  *
- * @return  array details of found instances
+ * @return array details of found instances
  * @access public
  */
 function civicrm_api3_report_template_getrows($params) {
@@ -164,7 +164,7 @@ function civicrm_api3_report_template_getstatistics($params) {
  * @param array $params
  *   Input parameters.
  *
- * @return  array details of found instances
+ * @return array details of found instances
  * @access public
  */
 function _civicrm_api3_report_template_getrows_spec(&$params) {

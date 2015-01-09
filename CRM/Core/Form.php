@@ -393,7 +393,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Performs the server side validation
    * @since     1.0
-   * @return    boolean   true if no error found
+   * @return boolean   true if no error found
    * @throws    HTML_QuickForm_Error
    */
   public function validate() {

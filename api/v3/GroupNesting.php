@@ -44,7 +44,7 @@
  *   An array containing at least child_group_id or parent_group_id.
  * {@getfields GroupNesting_get}
  *
- * @return  array  list of group nesting records
+ * @return array  list of group nesting records
  */
 function civicrm_api3_group_nesting_get($params) {
 

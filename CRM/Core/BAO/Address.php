@@ -659,7 +659,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
   /**
    * Get address sequence
    *
-   * @return  array of address sequence.
+   * @return array of address sequence.
    */
   public static function addressSequence() {
     $config = CRM_Core_Config::singleton();

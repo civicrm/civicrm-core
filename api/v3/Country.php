@@ -91,7 +91,7 @@ function civicrm_api3_country_delete($params) {
  * @param array $params
  *   An associative array of name/value pairs.
  *
- * @return  array api result array
+ * @return array api result array
  * {@getfields country_get}
  * @access public
  */

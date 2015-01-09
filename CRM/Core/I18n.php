@@ -121,7 +121,7 @@ class CRM_Core_I18n {
    * @param bool $justEnabled
    *   whether to return all languages or just the enabled ones.
    *
-   * @return             array    of code/language name mappings
+   * @return array    of code/language name mappings
    */
   public static function languages($justEnabled = FALSE) {
     static $all = NULL;
@@ -176,7 +176,7 @@ class CRM_Core_I18n {
    *   source string.
    * @param mixed arguments, can be passed in an array or through single variables
    *
-   * @return      string  modified string
+   * @return string  modified string
    */
   public function strarg($str) {
     $tr = array();
@@ -215,7 +215,7 @@ class CRM_Core_I18n {
    * @param array $params
    *   the params of the translation (if any).
    *
-   * @return        string  the translated string
+   * @return string  the translated string
    */
   public function crm_translate($text, $params = array()) {
     if (isset($params['escape'])) {
@@ -347,7 +347,7 @@ class CRM_Core_I18n {
    * @param string $string
    *   this string should be translated.
    *
-   * @return         string  the translated string
+   * @return string  the translated string
    */
   public function translate($string) {
     return ($this->_phpgettext) ? $this->_phpgettext->translate($string) : $string;
@@ -361,7 +361,7 @@ class CRM_Core_I18n {
    * @param array $params
    *   an array of additional parameters.
    *
-   * @return        void
+   * @return void
    */
   function localizeArray(
     &$array,
@@ -386,7 +386,7 @@ class CRM_Core_I18n {
    * @param array $array
    *   the array for localization (in place).
    *
-   * @return        void
+   * @return void
    */
   public function localizeTitles(&$array) {
     foreach ($array as $key => $value) {
@@ -499,7 +499,7 @@ class CRM_Core_I18n {
  * @param $params
  *   Array an array of additional parameters.
  *
- * @return         string  the translated string
+ * @return string  the translated string
  */
 function ts($text, $params = array()) {
   static $config = NULL;

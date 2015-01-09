@@ -729,7 +729,7 @@ WHERE civicrm_address.geo_code_1 IS NOT NULL
    * @param bool $onlyPublicInclude public events only, default TRUE.
    *   Include public events only, default TRUE.
    *
-   * @return  array  $all      array of all the events that are searched
+   * @return array  $all      array of all the events that are searched
    * @static
    */
   static function &getCompleteInfo(

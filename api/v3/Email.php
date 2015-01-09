@@ -93,7 +93,7 @@ function civicrm_api3_email_delete($params) {
  * @param array $params
  *   An associative array of name/value pairs.
  *
- * @return  array api result array
+ * @return array api result array
  * {@getfields email_get}
  * @access public
  */

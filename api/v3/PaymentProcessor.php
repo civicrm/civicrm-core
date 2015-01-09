@@ -83,7 +83,7 @@ function civicrm_api3_payment_processor_delete($params) {
  * @param array $params
  *   An associative array of name/value pairs.
  *
- * @return  array details of found PaymentProcessor
+ * @return array details of found PaymentProcessor
  * @access public
  */
 function civicrm_api3_payment_processor_get($params) {

@@ -6,7 +6,7 @@
  * @param array $params
  *   Input parameters.
  *
- * @return  array details of found instances
+ * @return array details of found instances
  * @access public
  */
 function civicrm_api3_report_instance_get($params) {

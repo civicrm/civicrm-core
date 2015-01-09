@@ -60,7 +60,7 @@
  *   Array Associative array of property name/value pairs to insert in group.
  * {@getfields CustomGroup_create}
  *
- * @return   Newly create custom_group object
+ * @return Newly create custom_group object
  * @todo $params['extends'] is array format - is that std compatible
  * @access public
  */

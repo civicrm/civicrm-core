@@ -95,7 +95,7 @@ function civicrm_api3_contribution_soft_delete($params) {
  * @param array $params
  *   An associative array of name/value pairs.
  *
- * @return  array api result
+ * @return array api result
  * {@getfields contribution_soft_get}
  * @access public
  */

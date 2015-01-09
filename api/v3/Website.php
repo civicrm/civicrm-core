@@ -108,7 +108,7 @@ function civicrm_api3_website_delete($params) {
  * @param array $params
  *   An associative array of name/value pairs.
  *
- * @return  array details of found websites
+ * @return array details of found websites
  *
  * @access public
  */
