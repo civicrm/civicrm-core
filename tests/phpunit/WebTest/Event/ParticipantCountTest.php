@@ -176,6 +176,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
 
     foreach ($fields as $label => $field) {
       $this->type('label', $label);
+      $this->waitForAjaxContent();
       $this->select('html_type', "value={$field['type']}");
 
       if ($field['type'] == 'Text') {
