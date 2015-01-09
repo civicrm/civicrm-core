@@ -180,7 +180,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * This function is a wrapper for ajax batch selector
+   * wrapper for ajax batch selector
    *
    * @param array $params
    *   Associated array for params record id.

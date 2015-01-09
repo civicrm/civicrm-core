@@ -41,7 +41,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
 
 
   /**
-   * To store contactType
+   * store contactType
    *
    * @var int
    * @static

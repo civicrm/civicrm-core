@@ -34,7 +34,7 @@
  */
 
 /**
- * This class is a heart of search query building mechanism.
+ * This is the heart of the search query building mechanism.
  */
 class CRM_Contact_BAO_Query {
 

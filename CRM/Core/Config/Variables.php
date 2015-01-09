@@ -439,7 +439,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $formKeyDisable = FALSE;
 
   /**
-   * To determine whether the call is from cms or civicrm
+   * determine whether the call is from cms or civicrm
    */
   public $inCiviCRM = FALSE;
 

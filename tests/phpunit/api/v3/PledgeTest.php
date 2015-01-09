@@ -373,7 +373,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   }
 
   /**
-   * To Update Pledge
+   * Update Pledge
    */
   public function testCreateUpdatePledge() {
     // we test 'sequential' param here too

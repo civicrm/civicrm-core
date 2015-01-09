@@ -350,7 +350,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * This function is used to add the rules (mainly global rules) for form.
+   * add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
    * @return void

@@ -188,7 +188,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * This function is to make a copy of a profile, including
+   * make a copy of a profile, including
    * all the fields in the profile
    *
    * @return void
@@ -203,7 +203,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * This function is for profile mode (standalone html form ) for uf group
+   * for profile mode (standalone html form ) for uf group
    *
    * @return void
    */
@@ -380,7 +380,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * This function is for preview mode for ufoup
+   * for preview mode for ufoup
    *
    * @param int $id
    *   Uf group id.

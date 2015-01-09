@@ -316,7 +316,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   }
 
   /**
-   * This function is to make a copy of a price set, including
+   * make a copy of a price set, including
    * all the fields in the page
    *
    * @return void

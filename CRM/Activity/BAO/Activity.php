@@ -1712,7 +1712,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   }
 
   /**
-   * To get the Activities of a target contact
+   * get the Activities of a target contact
    *
    * @param int $contactId
    *   Id of the contact whose activities need to find.
@@ -2443,7 +2443,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
   /**
-   * This function is a wrapper for ajax activity selector
+   * wrapper for ajax activity selector
    *
    * @param array $params
    *   Associated array for params record id.
@@ -2592,7 +2592,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
   /**
-   * Used to copy custom fields and attachments from an existing activity to another.
+   * copy custom fields and attachments from an existing activity to another.
    * @see CRM_Case_Page_AJAX::_convertToCaseActivity()
    *
    * @param array $params

@@ -679,7 +679,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   }
 
   /**
-   * This function retrieve survey voter information.
+   * Retrieve survey voter information.
    *
    * @param int $surveyId
    *   Survey id.
@@ -688,7 +688,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    * @param array $statusIds
    *   Survey status ids.
    *
-   * @return array $$contactIds survey related contact ids.
+   * @return array
+   *   Survey related contact ids.
    * @static
    */
   public static function getSurveyVoterInfo($surveyId, $interviewerId = NULL, $statusIds = array()) {
@@ -738,7 +739,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   }
 
   /**
-   * This function is to check survey activity.
+   * check survey activity.
    *
    * @param int $activityId
    *   Activity id.

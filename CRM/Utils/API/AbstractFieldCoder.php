@@ -78,7 +78,7 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
   }
 
   /**
-   * This function is going to filter the
+   * going to filter the
    * submitted values.
    *
    * @param array|string $values the field value from the API
