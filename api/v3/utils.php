@@ -446,7 +446,7 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
  * @param bool $getCount
  *   Are we just after the count.
  *
- * @return
+ * @return array
  */
 function _civicrm_api3_get_using_query_object($entity, $params, $additional_options = array(), $getCount = NULL) {
 
@@ -1125,7 +1125,7 @@ function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
  *
  * @daoName string DAO to check params agains
  *
- * @return bool 
+ * @return bool
  *   Sshould the missing fields be returned as an array (core error created as default)
  *   true if all fields present, depending on $result a core error is created of an array of missing fields is returned
  * @access public

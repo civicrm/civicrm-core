@@ -71,7 +71,7 @@ function _civicrm_api3_membership_payment_create_spec(&$params) {
  *   Input parameters.
  *
  * @return array  array of properties, if error an array with an error id and error message
- *  @example MembershipPaymentGet
+ * @example MembershipPaymentGet
  * {@getfields MembershipPayment_get}
  * @access public
  */

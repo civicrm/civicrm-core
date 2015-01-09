@@ -87,7 +87,7 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Implementation of hook_civicrm_post used with all our test cases
+   * An implementation of hook_civicrm_post used with all our test cases.
    *
    * @param $op
    * @param string $objectName

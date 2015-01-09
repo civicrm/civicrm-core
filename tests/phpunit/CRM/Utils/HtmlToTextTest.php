@@ -7,7 +7,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Utils_HtmlToTextTest extends CiviUnitTestCase {
   protected $_testInput = array(
-    '<br><p>' => '', // empty test
+    '<br/><p>' => '', // empty test
     '
 <p>
 This is a paragraph with <b>Bold</b> and <i>italics</i>
