@@ -941,7 +941,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         $values[$object->id]['is_parent'] = false;
         if (array_key_exists('children', $values[$object->id])) {
           $values[$object->id]['class'][] = "crm-group-parent";
-          $values[$object->id]['is_parent'] = true;
+          $values[$object->id]['is_parent'] = TRUE;
         }
 
         // If group is a child, add child class

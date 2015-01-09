@@ -472,7 +472,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    */
   public static function checkArrayKeyEmpty($val) {
     if (is_array($val)) {
-      $v2empty = true;
+      $v2empty = TRUE;
       foreach ($val as $vk => $vv) {
         if (!empty($vk)) {
           $v2empty = false;

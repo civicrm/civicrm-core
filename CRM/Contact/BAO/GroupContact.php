@@ -332,7 +332,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @param bool $excludeHidden
    *
    * @return array (reference )|int $values the relevant data object values for the contact or
-   *                                 the total count when $count is true
+   *                                 the total count when $count is TRUE
    *
    * $access public
    */

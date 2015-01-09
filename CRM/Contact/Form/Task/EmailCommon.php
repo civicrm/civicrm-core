@@ -324,7 +324,7 @@ class CRM_Contact_Form_Task_EmailCommon {
    * @param array $self
    *   Additional values form 'this'.
    *
-   * @return true if no errors, else array of errors
+   * @return TRUE if no errors, else array of errors
    *
    */
   public static function formRule($fields, $dontCare, $self) {
@@ -376,7 +376,7 @@ class CRM_Contact_Form_Task_EmailCommon {
         $allEmails = explode(',', $formValues[$element]);
         foreach ($allEmails as $value) {
           list($contactId, $email) = explode('::', $value);
-          $contactURL = CRM_Utils_System::url('civicrm/contact/view', "reset=1&force=1&cid={$contactId}", true);
+          $contactURL = CRM_Utils_System::url('civicrm/contact/view', "reset=1&force=1&cid={$contactId}", TRUE);
           switch ($element) {
             case 'cc_id':
               $ccValues['email'][] = '"' . $form->_contactDetails[$contactId]['sort_name'] . '" <' . $email . '>';

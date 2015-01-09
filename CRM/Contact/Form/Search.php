@@ -533,8 +533,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
     // get user submitted values
     // get it from controller only if form has been submitted, else preProcess has set this
-    // $this->controller->isModal( ) returns true if page is
-    // valid, i.e all the validations are true
+    // $this->controller->isModal( ) returns TRUE if page is
+    // valid, i.e all the validations are TRUE
 
     if (!empty($_POST) && !$this->controller->isModal()) {
       $this->_formValues = $this->controller->exportValues($this->_name);
@@ -658,7 +658,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $this->_params,
         $this->_returnProperties,
         $this->_action,
-        false, true,
+        false, TRUE,
         $this->_context,
         $this->_contextMenu
       );

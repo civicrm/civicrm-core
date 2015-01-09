@@ -152,7 +152,8 @@ class CRM_Contact_Form_Edit_Individual {
    *   The uploaded files if any.
    * @param int $contactID
    *
-   * @return true if no errors, else array of errors
+   * @return bool
+   *   TRUE if no errors, else array of errors.
    * @static
    */
   public static function formRule($fields, $files, $contactID = NULL) {

@@ -133,7 +133,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   public static function retrieve(&$params, &$defaults) {
     $financialItem = new CRM_Financial_DAO_FinancialTrxn();
     $financialItem->copyValues($params);
-    if ($financialItem->find(true)) {
+    if ($financialItem->find(TRUE)) {
       CRM_Core_DAO::storeValues($financialItem, $defaults);
       return $financialItem;
     }
@@ -296,7 +296,8 @@ WHERE lt.entity_id = %1 ";
    * Delete financial transaction
    *
    * @param int $entity_id
-   * @return true on success, false otherwise
+   * @return bool
+   *   TRUE on success, false otherwise.
    * @static
    */
   public static function deleteFinancialTrxn($entity_id) {

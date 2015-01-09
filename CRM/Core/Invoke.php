@@ -86,7 +86,7 @@ class CRM_Core_Invoke {
       // Symfony-based invocation path
       require_once CIVICRM_SYMFONY_PATH . '/app/bootstrap.php.cache';
       require_once CIVICRM_SYMFONY_PATH . '/app/AppKernel.php';
-      $kernel = new AppKernel('dev', true);
+      $kernel = new AppKernel('dev', TRUE);
       $kernel->loadClassCache();
       $response = $kernel->handle(Symfony\Component\HttpFoundation\Request::createFromGlobals());
       if (preg_match(':^text/html:', $response->headers->get('Content-Type'))) {
@@ -299,7 +299,7 @@ class CRM_Core_Invoke {
             $addSequence = $addSequence ? 'true' : 'false';
             unset($pageArgs['addSequence']);
           }
-          $object = new $item['page_callback'] ($title, true, $mode, NULL, $addSequence);
+          $object = new $item['page_callback'] ($title, TRUE, $mode, NULL, $addSequence);
         }
         else {
           CRM_Core_Error::fatal();
