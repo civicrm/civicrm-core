@@ -51,7 +51,7 @@
  * @example ContactCreate.php Example of Create Call
  *
  * @return array
-   *   API Result Array
+ *   API Result Array
  *
  * @static void
  * @access public
@@ -146,7 +146,7 @@ function _civicrm_api3_contact_create_spec(&$params) {
  * @param array input parameters
  *
  * @return array
-   *   API Result Array
+ *   API Result Array
  * (@getfields contact_get}
  * @static void
  * @access public
@@ -273,7 +273,7 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
  *   (reference ) input parameters, contact_id element required.
  *
  * @return array
-   *   API Result Array
+ *   API Result Array
  * @access public
  *
  * @example ContactDelete.php
@@ -857,7 +857,7 @@ LIMIT    0, {$limit}
 /**
  * @deprecated api notice
  * @return array
-   *   of deprecated actions
+ *   of deprecated actions
  */
 function _civicrm_api3_contact_deprecation() {
   return array('getquick' => 'The "getquick" action is deprecated in favor of "getlist".');
@@ -877,7 +877,7 @@ function _civicrm_api3_contact_deprecation() {
  * {boolean auto_flip   wether to let api decide which contact to retain and which to delete.}
  *
  * @return array
-   *   API Result Array
+ *   API Result Array
  *
  * @static void
  * @access public

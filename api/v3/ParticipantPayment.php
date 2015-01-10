@@ -53,7 +53,7 @@
  * {@example ParticipantPaymentCreate.php 0}
  *
  * @return array
-   *   of newly created payment property values.
+ *   of newly created payment property values.
  * {@getfields ParticipantPayment_create}
  * @access public
  */
@@ -91,7 +91,7 @@ function _civicrm_api3_participant_payment_create_spec(&$params) {
  * @param array $params
  *
  * @return array
-   *   API result
+ *   API result
  * @example ParticipantPaymentDelete.php
  * {@getfields ParticipantPayment_delete}
  * @access public
@@ -109,7 +109,7 @@ function civicrm_api3_participant_payment_delete($params) {
  *   Input parameters.
  *
  * @return array
-   *   array of properties, if error an array with an error id and error message
+ *   array of properties, if error an array with an error id and error message
  * @example ParticipantPaymentGet
  * {@getfields ParticipantPayment_get}
  * @access public

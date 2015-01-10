@@ -120,7 +120,8 @@ class CRM_Contact_BAO_Contact_Utils {
    * @param array $contactIds
    *   Array of contact ids.
    *
-   * @return boolen true or false true if mix contact array else fale
+   * @return bool
+   *   true if mix contact array else false
    *
    * @static
    */
@@ -259,7 +260,7 @@ WHERE  id IN ( $idString )
    *   Contact id.
    *
    * @return int
-   *   $locationCount max locations for the contact
+   *   max locations for the contact
    * @static
    */
   public static function maxLocations($contactId) {

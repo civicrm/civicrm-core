@@ -94,7 +94,8 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
    * @param int $id
    *   Id for the PCP.
    *
-   * @return null|string     Dispaly name of the contact if found
+   * @return null|string
+   *   Dispaly name of the contact if found
    * @static
    */
   public static function displayName($id) {
@@ -236,7 +237,8 @@ ORDER BY target_entity_type, target_entity_id
    *
    * @static
    *
-   * @return total amount
+   * @return total
+   *   amount
    */
   public static function thermoMeter($pcpId) {
     $query = "

@@ -927,7 +927,8 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    * @param int $addressId
    *   Address id.
    *
-   * @return count of contacts that use this shared address
+   * @return int
+   *   count of contacts that use this shared address
    * @static
    */
   public static function checkContactSharedAddress($addressId) {

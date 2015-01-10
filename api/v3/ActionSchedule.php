@@ -85,7 +85,7 @@ function _civicrm_api3_action_schedule_create_spec(&$params) {
  *   to be deleted
  *
  * @return array
-   *   API result array
+ *   API result array
  *
  * @access public
  */

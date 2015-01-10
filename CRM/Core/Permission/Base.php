@@ -50,7 +50,8 @@ class CRM_Core_Permission_Base {
    *   Array($portableName => $nativeName).
    *
    * @internal param string $name e.g. "administer CiviCRM", "cms:access user record", "Drupal:administer content", "Joomla:action:com_asset"
-   * @return NULL|string a permission name
+   * @return NULL|string
+   *   a permission name
    */
   public function translatePermission($perm, $nativePrefix, $map) {
     list ($civiPrefix, $name) = CRM_Utils_String::parsePrefix(':', $perm, NULL);

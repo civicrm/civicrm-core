@@ -66,7 +66,8 @@ class CRM_Core_BAO_SchemaHandler {
    *
    * @param array $params
    *
-   * @return TRUE if successfully created, FALSE otherwise
+   * @return bool
+   *   TRUE if successfully created, FALSE otherwise
    *
    * @static
    */

@@ -886,7 +886,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * @param CRM_Core_Form $form
    *   The form object.
    *
-   * @return true if no errors, else array of errors
+   * @return bool|array
+   *   true if no errors, else array of errors
    * @static
    */
   public static function formRule($fields, $files, $form) {

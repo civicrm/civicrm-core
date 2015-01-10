@@ -39,7 +39,7 @@
 /**
  * @deprecated api notice
  * @return string
-   *   to indicate this entire api entity is deprecated
+ *   to indicate this entire api entity is deprecated
  */
 function _civicrm_api3_constant_deprecation() {
   return 'The constant api is deprecated as of CiviCRM 4.4. Please use the getoptions api action instead.';

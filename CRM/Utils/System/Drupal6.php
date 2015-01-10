@@ -79,11 +79,11 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * Create a user in Drupal.
    *
    * @param array $params
-   *   Associated array.
    * @param string $mail
    *   Email id for cms user.
    *
-   * @return uid if user exists, false otherwise
+   * @return int|bool
+   *   uid if user exists, false otherwise
    */
   public function createUser(&$params, $mail) {
     $form_state = array();
@@ -443,9 +443,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *   Load cms bootstrap?.
    * @param NULL|string $realPath filename of script
    *
-   * @return mixed false if no auth
-   *               array(
-   *  contactID, ufID, unique string ) if success
+   * @return array|bool
+   *   [contactID, ufID, uniqueString] if success else false if no auth
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     //@todo this 'PEAR-y' stuff is only required when bookstrap is not being loaded which is rare

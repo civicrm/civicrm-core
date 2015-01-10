@@ -44,7 +44,7 @@
  *                             pairs to get profile field values
  *
  * @throws API_Exception
- * @return Profile field values|CRM_Error
+ * @return array|CRM_Error
  *
  * NOTE this api is not standard & since it is tested we need to honour that
  * but the correct behaviour is for it to return an id indexed array as this supports
@@ -157,7 +157,7 @@ function _civicrm_api3_profile_get_spec(&$params) {
  *
  * @throws API_Exception
  * @return array
-   *   API result array
+ *   API result array
  */
 function civicrm_api3_profile_submit($params) {
   $profileID = _civicrm_api3_profile_getProfileID($params['profile_id']);
@@ -297,7 +297,7 @@ function civicrm_api3_profile_submit($params) {
  *   API field name.
  *
  * @return string
-   *   BAO Field Name
+ *   BAO Field Name
  */
 function _civicrm_api3_profile_translate_fieldnames_for_bao($fieldName) {
   $fieldName = str_replace('url', 'URL', $fieldName);
@@ -338,7 +338,7 @@ function _civicrm_api3_profile_submit_spec(&$params, $apirequest) {
  *                             pairs to update profile field values
  *
  * @return array
-   *   Updated Contact/ Activity object|CRM_Error
+ *   Updated Contact/ Activity object|CRM_Error
  *
  *
  */
@@ -355,7 +355,7 @@ function civicrm_api3_profile_set($params) {
  *                             pairs to profile field values
  *
  * @throws API_Exception
- * @return formatted profile field values|CRM_Error
+ * @return array|CRM_Error
  *
  * @todo add example
  * @todo add test cases
@@ -740,7 +740,7 @@ function _civicrm_api3_profile_appendaliases($values, $entity) {
 /**
  * @deprecated api notice
  * @return array
-   *   of deprecated actions
+ *   of deprecated actions
  */
 function _civicrm_api3_profile_deprecation() {
   return array(

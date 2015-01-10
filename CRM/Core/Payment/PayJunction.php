@@ -214,7 +214,8 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
    * @param string $field
    *   The field.
    *
-   * @return mixed value of the field, or empty string if the field is
+   * @return mixed
+   *   value of the field, or empty string if the field is
    * not set
    */
   public function _getParam($field) {

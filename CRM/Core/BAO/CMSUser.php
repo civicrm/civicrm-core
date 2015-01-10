@@ -226,7 +226,6 @@ class CRM_Core_BAO_CMSUser {
    * Create CMS user using Profile
    *
    * @param array $params
-   *   Associated array.
    * @param string $mail
    *   Email id for cms user.
    *
@@ -263,7 +262,8 @@ class CRM_Core_BAO_CMSUser {
    *   True if the profile field has email(primary).
    * @param \const|int $action
    *
-   * @return FALSE|void WTF
+   * @return FALSE|void
+   *   WTF
    *
    * @static
    */
@@ -421,12 +421,14 @@ class CRM_Core_BAO_CMSUser {
   }
 
   /**
-   * Check if a cms user already exists.
+   * @deprecated
+   * This function is not used anywhere
    *
-   * @param array $contactArray of contact-details.
+   * @param array $contact
    *   Array of contact-details.
    *
-   * @return uid if user exists, false otherwise
+   * @return int|bool
+   *   uid if user exists, false otherwise
    *
    * @static
    */

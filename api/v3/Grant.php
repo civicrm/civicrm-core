@@ -46,7 +46,7 @@
  *                       name/value pairs to insert in new 'grant'
  *
  * @return array
-   *   grant array
+ *   grant array
  * {@getfields grant_create}
  * @access public
  */
@@ -75,7 +75,7 @@ function _civicrm_api3_grant_create_spec(&$params) {
  *                       as null, all grants will be returned
  *
  * @return array
-   *   Array of matching grants
+ *   Array of matching grants
  * {@getfields grant_get}
  * @access public
  */
@@ -94,7 +94,7 @@ function civicrm_api3_grant_get($params) {
  *                       to be deleted
  *
  * @return array
-   *   API Result Array
+ *   API Result Array
  * {@getfields grant_delete}
  * @access public
  */

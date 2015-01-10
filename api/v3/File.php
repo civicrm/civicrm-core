@@ -49,7 +49,7 @@
  *   An associative array of name/value property values of civicrm_file.
  *
  * @return array
-   *   of newly created file property values.
+ *   of newly created file property values.
  * @access public
  */
 function civicrm_api3_file_create($params) {
@@ -87,7 +87,7 @@ function civicrm_api3_file_create($params) {
  *   An associative array of name/value property values of civicrm_file.
  *
  * @return Array
-   *   of all found file object property values.
+ *   of all found file object property values.
  * @access public
  */
 function civicrm_api3_file_get($params) {
@@ -105,7 +105,7 @@ function civicrm_api3_file_get($params) {
  *   An array of name/value property values of civicrm_file.
  *
  * @return array
-   *   of updated file object property values
+ *   of updated file object property values
  * @access public
  */
 function civicrm_api3_file_update($params) {
@@ -137,7 +137,7 @@ function civicrm_api3_file_update($params) {
  * @param array $params
  *
  * @return array
-   *   API result array
+ *   API result array
  * @access public
  */
 function civicrm_api3_file_delete($params) {

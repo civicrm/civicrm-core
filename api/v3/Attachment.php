@@ -90,7 +90,7 @@ function _civicrm_api3_attachment_create_spec(&$spec) {
  *
  * @param array $params
  * @return array
-   *   of newly created file property values.
+ *   of newly created file property values.
  * @access public
  * @throws API_Exception validation errors
  */
@@ -166,7 +166,7 @@ function _civicrm_api3_attachment_get_spec(&$spec) {
 /**
  * @param array $params
  * @return array
-   *   per APIv3
+ *   per APIv3
  * @throws API_Exception validation errors
  */
 function civicrm_api3_attachment_get($params) {
@@ -296,7 +296,7 @@ function __civicrm_api3_attachment_find($params, $id, $file, $entityFile, $isTru
 /**
  * @param array $params
  * @return array
-   *   (0 => int $id, 1 => array $file, 2 => array $entityFile, 3 => string $name, 4 => string $content, 5 => string $moveFile, 6 => $isTrusted, 7 => bool $returnContent)
+ *   (0 => int $id, 1 => array $file, 2 => array $entityFile, 3 => string $name, 4 => string $content, 5 => string $moveFile, 6 => $isTrusted, 7 => bool $returnContent)
  *  - array $file: whitelisted fields that can pass through directly to civicrm_file
  *  - array $entityFile: whitelisted fields that can pass through directly to civicrm_entity_file
  *  - string $name: the printable name
@@ -397,7 +397,7 @@ function _civicrm_api3_attachment_format_result($fileDao, $entityFileDao, $retur
 
 /**
  * @return array
-   *   list of fields (indexed by name)
+ *   list of fields (indexed by name)
  */
 function _civicrm_api3_attachment_getfields() {
   $fileFields = CRM_Core_DAO_File::fields();

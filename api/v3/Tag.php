@@ -45,7 +45,7 @@
  * @param array $params
  *
  * @return array
-   *   of newly created tag property values.
+ *   of newly created tag property values.
  * {@getfields tag_create}
  * @access public
  */
@@ -73,7 +73,7 @@ function _civicrm_api3_tag_create_spec(&$params) {
  * @example TagDelete.ph
  *
  * @return array
-   *   API result array
+ *   API result array
  * {@getfields tag_delete}
  * @access public
  */
@@ -93,7 +93,7 @@ function civicrm_api3_tag_delete($params) {
  *   An associative array of name/value pairs.
  *
  * @return array
-   *   details of found tags else error
+ *   details of found tags else error
  * {@getfields tag_get}
  * @access public
  */

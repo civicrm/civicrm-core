@@ -791,8 +791,8 @@ LIMIT 1;";
    * Update contribution status - this is only called from one place in the code &
    * it is unclear whether it is a function on the way in or on the way out
    *
-   * @param unknown_type $params
-   * @return void|Ambigous <value, unknown, array>
+   * @param array $params
+   * @return void|int
    */
   public function updateContributionStatus(&$params) {
     // get minimum required values.

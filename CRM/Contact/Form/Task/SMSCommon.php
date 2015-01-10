@@ -310,7 +310,8 @@ class CRM_Contact_Form_Task_SMSCommon {
    * @param array $self
    *   Additional values form 'this'.
    *
-   * @return true if no errors, else array of errors
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
   public static function formRule($fields, $dontCare, $self) {
     $errors = array();

@@ -964,7 +964,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param int $customfieldId
    *   Related file id.
    *
-   * @return null|string $customGroupName all custom group names
+   * @return null|string
+   *   $customGroupName all custom group names
    * @static
    */
   public static function getCustomGroupName($customfieldId) {

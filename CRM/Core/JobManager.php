@@ -215,7 +215,8 @@ class CRM_Core_JobManager {
 
   /*
    *
-   * @return array|null collection of permissions, null if none
+   * @return array|null
+   *   collection of permissions, null if none
    */
   /**
    * @param $message

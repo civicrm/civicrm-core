@@ -96,8 +96,9 @@ class CRM_Utils_Token {
    * @param string $str
    *   The message.
    *
-   * @return true|array           true if all required tokens are found,
-   *                              else an array of the missing tokens
+   * @return bool|array
+   *    true if all required tokens are found,
+   *    else an array of the missing tokens
    * @static
    */
   public static function requiredTokens(&$str) {
@@ -1648,7 +1649,7 @@ class CRM_Utils_Token {
    * @param string $knownTokens
    * @param bool|string $escapeSmarty
    *
-   * @return unknown|Ambigous <string, mixed>|mixed
+   * @return mixed
    */
   public static function replaceContributionTokens($str, &$contribution, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
     $key = 'contribution';

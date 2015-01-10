@@ -520,7 +520,8 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    *  - action: int, CRM_Core_Action::UPDATE or CRM_Core_Action::VIEW [default: VIEW]
    *  - entity_table: string, eg "civicrm_contact"
    *  - entity_id: int
-   * @return array|NULL NULL if unavailable, or an array. array has keys:
+   * @return array|NULL
+   *   NULL if unavailable, or an array. array has keys:
    *  - path: string
    *  - query: string
    *  - title: string
@@ -743,7 +744,8 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @param int $id
    *   Id of the contact.
    *
-   * @return null|string     display name of the contact if found
+   * @return null|string
+   *   display name of the contact if found
    * @static
    */
   public static function displayName($id) {
@@ -2558,7 +2560,8 @@ AND       civicrm_openid.is_primary = 1";
    * @param string $tableName
    *   Optional tableName if component is custom group.
    *
-   * @return total number of count of occurence in database
+   * @return int
+   *   total number in database
    * @static
    */
   public static function getCountComponent($component, $contactId, $tableName = NULL) {
@@ -3114,7 +3117,8 @@ AND       civicrm_openid.is_primary = 1";
    * @param int $contactId
    *   Contact id.
    *
-   * @return display name |null the found display name or null.
+   * @return string|null
+   *   the found display name or null.
    * @static
    */
   public static function getMasterDisplayName($masterAddressId = NULL, $contactId = NULL) {

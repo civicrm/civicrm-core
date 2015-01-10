@@ -241,7 +241,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    *
    * @param CRM_Core_Form $form
    *
-   * @return array( $categories, $html_message, $messageToken, $returnProperties )
+   * @return array
+   *   [$categories, $html_message, $messageToken, $returnProperties]
    */
   static protected function processMessageTemplate(&$form) {
     $formValues = $form->controller->exportValues($form->getName());

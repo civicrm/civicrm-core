@@ -283,7 +283,8 @@ SELECT id
    * @param $self
    *
    *
-   * @return true if no errors, else array of errors
+   * @return bool|array
+   *   true if no errors, else array of errors
    * @static
    */
   public static function formRule($fields, $files, $self) {

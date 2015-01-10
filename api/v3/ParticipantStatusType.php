@@ -46,7 +46,7 @@
  *                       name/value pairs to insert in new 'participant_status'
  *
  * @return array
-   *   participant_status array
+ *   participant_status array
  * {@getfields ParticipantStatusType_create}
  * @example ParticipantStatusTypeCreate.php
  * @access public
@@ -64,7 +64,7 @@ function civicrm_api3_participant_status_type_create($params) {
  *                       as null, all participant_statuses will be returned
  *
  * @return array
-   *   Array of matching participant_statuses
+ *   Array of matching participant_statuses
  * {@getfields ParticipantStatusType_get}
  * @example ParticipantStatusTypeGet.php
  * @access public
@@ -84,7 +84,7 @@ function civicrm_api3_participant_status_type_get($params) {
  *                       to be deleted
  *
  * @return array
-   *   api result array
+ *   api result array
  * {@getfields ParticipantStatusType_delete}
  * @example ParticipantStatusTypeDelete.php
  * @access public

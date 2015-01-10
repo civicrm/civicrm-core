@@ -771,7 +771,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    *
    * @param int $id
    *
-   * @return mixed|null $results no of deleted Contribution on success, false otherwise
+   * @return mixed|null
+   *   $results no of deleted Contribution on success, false otherwise
    * @access public
    * @static
    */
@@ -1018,7 +1019,8 @@ GROUP BY p.id
    * @param int $honorId
    *   In Honor of Contact ID.
    *
-   * @return return the list of contribution fields
+   * @return array
+   *   list of contribution fields
    *
    * @static
    */
@@ -1056,7 +1058,8 @@ GROUP BY p.id
    * @param int $id
    *   Id of the contribution.
    *
-   * @return null|string     sort name of the contact if found
+   * @return null|string
+   *   sort name of the contact if found
    * @static
    */
   public static function sortName($id) {
@@ -1254,7 +1257,8 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
    *   An associated array.
    * @param int $billingLocationTypeID
    *
-   * @return address id
+   * @return int
+   *   address id
    * @static
    */
   public static function createAddress(&$params, $billingLocationTypeID) {

@@ -808,7 +808,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    * @param int $surveyId
    * @param bool $enclosedInUL
    * @param string $extraULName
-   * @return array|string $url array of permissioned links
+   * @return array|string
+   *   $url array of permissioned links
    * @static
    */
   public static function buildPermissionLinks($surveyId, $enclosedInUL = FALSE, $extraULName = 'more') {

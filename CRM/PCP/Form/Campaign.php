@@ -155,7 +155,8 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
    * @param $self
    *
    *
-   * @return true if no errors, else array of errors
+   * @return bool|array
+   *   true if no errors, else array of errors
    * @static
    */
   public static function formRule($fields, $files, $self) {

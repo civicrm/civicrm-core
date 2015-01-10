@@ -199,7 +199,8 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
    * @param array $fields
    *   The input form values.
    *
-   * @return true if no errors, else array of errors
+   * @return bool|array
+   *   true if no errors, else array of errors
    * @static
    */
   public static function formRule($fields) {

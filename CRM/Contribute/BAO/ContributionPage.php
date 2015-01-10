@@ -623,7 +623,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param int $id
    *   The contribution page id to copy.
    *
-   * @return the copy object
+   * @return CRM_Contribute_DAO_ContributionPage
    * @static
    */
   public static function copy($id) {

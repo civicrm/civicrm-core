@@ -254,11 +254,10 @@ class CRM_Core_BAO_CustomValueTable {
    * Given a field return the mysql data type associated with it
    *
    * @param string $type
-   *   The civicrm type string.
-   *
    * @param int $maxLength
    *
-   * @return the mysql data store placeholder
+   * @return string
+   *   the mysql data store placeholder
    * @static
    */
   public static function fieldToSQLType($type, $maxLength = 255) {

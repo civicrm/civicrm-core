@@ -231,7 +231,8 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    *
    * @param int $id
    *
-   * @return mixed $results no of deleted Instance on success, false otherwise
+   * @return mixed
+   *   $results no of deleted Instance on success, false otherwise
    * @access public
    */
   public static function del($id = NULL) {

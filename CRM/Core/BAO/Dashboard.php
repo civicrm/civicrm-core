@@ -347,7 +347,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * Save changes made by use to the Dashlet
    *
    * @param array $columns
-   *   Associated array.
    *
    * @param int $contactID
    *
@@ -416,7 +415,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * Add dashlets
    *
    * @param array $params
-   *   Associated array.
    *
    * @return object
    *   $dashlet returns dashlet object

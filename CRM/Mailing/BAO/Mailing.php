@@ -3055,7 +3055,6 @@ AND        m.id = %1
    * Retrieve contact mailing
    *
    * @param array $params
-   *   Associated array.
    *
    * @return array
    *   of mailings for a contact
@@ -3076,7 +3075,6 @@ AND        m.id = %1
    * Retrieve contact mailing count
    *
    * @param array $params
-   *   Associated array.
    *
    * @return int
    *   count of mailings for a contact

@@ -540,7 +540,8 @@ AND li.entity_id = {$entityId}
    * @param array $lineItemId
    *   An assoc array of lineItem.
    *
-   * @return tax rate
+   * @return number|void
+   *   tax rate
    *
    * @static
    */
