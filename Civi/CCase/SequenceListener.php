@@ -58,7 +58,7 @@ class SequenceListener implements CaseChangeListener {
 
     // OK, the activity has completed every step in the sequence!
     civicrm_api3('Case', 'create', array(
-      'id'  => $analyzer->getCaseId(),
+      'id' => $analyzer->getCaseId(),
       'status_id' => 'Closed',
     ));
     $analyzer->flush();

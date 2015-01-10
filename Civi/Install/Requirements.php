@@ -481,7 +481,7 @@ class Requirements {
     $conn = @mysql_connect($db_config['server'], $db_config['username'], $db_config['password']);
     if (!$conn) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
-      $results['details'] =  'Could not connect to database';
+      $results['details'] = 'Could not connect to database';
       return $results;
     }
 
