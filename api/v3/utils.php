@@ -56,7 +56,7 @@ function _civicrm_api3_initialize() {
  *   List of required fields options. One of the options is required.
  *
  * @return null
-   *   or throws error if there the required fields not present
+ *   or throws error if there the required fields not present
  * @
  */
 function civicrm_api3_verify_one_mandatory($params, $daoName = NULL, $keyoptions = array()) {
@@ -80,7 +80,7 @@ function civicrm_api3_verify_one_mandatory($params, $daoName = NULL, $keyoptions
  *
  * @throws API_Exception
  * @return null
-   *   or throws error if there the required fields not present
+ *   or throws error if there the required fields not present
  *
  * @todo see notes on _civicrm_api3_check_required_fields regarding removing $daoName param
  */
@@ -139,7 +139,7 @@ function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array()
  *
  * @throws API_Exception
  * @return array
-   *   <type>
+ *   <type>
  */
 function civicrm_api3_create_error($msg, $data = array()) {
   $data['is_error'] = 1;
@@ -707,7 +707,7 @@ function _civicrm_api3_apply_filters_to_dao($filterField, $filterValue, &$dao) {
  *
  * @throws API_Exception
  * @return array
-   *   options extracted from params
+ *   options extracted from params
  */
 function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $entity = '', $action = '') {
   $is_count = FALSE;
@@ -1300,7 +1300,7 @@ function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
  * @param array $params
  *
  * @return array
-   *   API result array
+ *   API result array
  * @throws API_Exception
  */
 function _civicrm_api3_basic_delete($bao_name, &$params) {
@@ -2000,7 +2000,8 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
  * @param $fieldName
  *   : any variation of a field's name (name, unique_name, api.alias).
  *
- * @return bool|string (string|bool) fieldName or FALSE if the field does not exist
+ * @return bool|string
+ *   fieldName or FALSE if the field does not exist
  */
 function _civicrm_api3_api_resolve_alias($entity, $fieldName) {
   if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {

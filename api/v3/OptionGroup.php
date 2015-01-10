@@ -21,7 +21,7 @@ function civicrm_api3_option_group_get($params) {
  *   name/value pairs to insert in new 'survey'
  *
  * @return array
-   *   survey array
+ *   survey array
  *
  * @access public
  */
@@ -51,7 +51,7 @@ function _civicrm_api3_option_group_create_spec(&$params) {
  *                       to be deleted
  *
  * @return array
-   *   API Result Array
+ *   API Result Array
  *                message otherwise
  * {@getfields OptionGroup_delete}
  * @access public

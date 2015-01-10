@@ -283,10 +283,10 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
 
   /**
    * @param CRM_Utils_Cache_Interface $cache
-   * @param null $cacheKey
+   * @param string $cacheKey
    *
-   * @internal param string $appendPathGarbage
-   * @return array(string $basedir, CRM_Extension_Container_Interface, CRM_Extension_Mapper)
+   * @return array
+   *   [string $basedir, CRM_Extension_Container_Interface, CRM_Extension_Mapper]
    */
   public function _createMapper(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
     $basedir = rtrim($this->createTempDir('ext-'), '/');

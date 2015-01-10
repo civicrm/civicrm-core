@@ -2,7 +2,7 @@
 /**
  * params must contain at least id=xx & {one of the fields from getfields}=value
  *
- * @param $apiRequest
+ * @param array $apiRequest
  *
  * @throws API_Exception
  * @return array

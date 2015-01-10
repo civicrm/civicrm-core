@@ -328,7 +328,8 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    * @param array $tables
    *   Tables that will be needed in the FROM.
    *
-   * @return string|null  -   WHERE-style clause to filter results,
+   * @return string|null
+   *   WHERE-style clause to filter results,
    * or null if $table or $id is null
    * @static
    */

@@ -10,7 +10,8 @@ class Participant extends PHPUnit_Framework_Testcase {
    * @param int $contactId
    * @param int $eventId
    *
-   * @return mixed $participant id of created Participant
+   * @return int
+   *   id of created Participant
    */
   public static function create($contactId, $eventId) {
     $params = array(

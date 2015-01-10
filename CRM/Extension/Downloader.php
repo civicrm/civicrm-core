@@ -160,7 +160,8 @@ class CRM_Extension_Downloader {
    *   The name of the extension being installed; this usually matches the basedir in the .zip.
    * @param string $zipFile
    *   The local path to a .zip file.
-   * @return string|FALSE zip file path
+   * @return string|FALSE
+   *   zip file path
    */
   public function extractFiles($key, $zipFile) {
     $config = CRM_Core_Config::singleton();

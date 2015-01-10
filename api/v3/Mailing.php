@@ -48,7 +48,7 @@
  * @param array $ids
  *
  * @return array
-   *   API Success Array
+ *   API Success Array
  */
 function civicrm_api3_mailing_create($params, $ids = array()) {
   if (CRM_Mailing_Info::workflowEnabled()) {
@@ -117,7 +117,7 @@ function _civicrm_api3_mailing_create_spec(&$params) {
  * @param array $ids
  *
  * @return array
-   *   API Success Array
+ *   API Success Array
  */
 function civicrm_api3_mailing_delete($params, $ids = array()) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -242,7 +242,7 @@ function civicrm_api3_mailing_event_confirm($params) {
 /**
  * @deprecated api notice
  * @return array
-   *   of deprecated actions
+ *   of deprecated actions
  */
 function _civicrm_api3_mailing_deprecation() {
   return array('event_confirm' => 'Mailing api "event_confirm" action is deprecated. Use the mailing_event_confirm api instead.');

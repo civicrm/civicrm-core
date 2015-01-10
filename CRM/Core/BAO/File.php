@@ -659,7 +659,8 @@ AND       CEF.entity_id    = %2";
    * @param int $entityID
    *   The id of the object in the above entityTable.
    *
-   * @return array|NULL          list of HTML snippets; one HTML snippet for each attachment. If none found, then NULL
+   * @return array|NULL
+   *   list of HTML snippets; one HTML snippet for each attachment. If none found, then NULL
    *
    * @static
    */

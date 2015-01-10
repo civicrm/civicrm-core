@@ -46,7 +46,7 @@
  *
  * @throws API_Exception
  * @return array
-   *   API result array
+ *   API result array
  *
  * @static void
  * @access public
@@ -75,7 +75,7 @@ function civicrm_api3_case_type_create($params) {
  * @param array $params
  *
  * @return array
-   *   case types keyed by id
+ *   case types keyed by id
  * @access public
  */
 function civicrm_api3_case_type_get($params) {
@@ -116,7 +116,7 @@ function _civicrm_api3_case_type_get_formatResult(&$result) {
  *   Array including id of case_type to delete.
 
  * @return array
-   *   API result array
+ *   API result array
  *
  * @access public
  *

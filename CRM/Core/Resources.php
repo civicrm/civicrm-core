@@ -435,7 +435,8 @@ class CRM_Core_Resources {
    * @param string $file
    *   file path -- relative to the extension base dir.
    *
-   * @return bool|string (string|bool), full file path or FALSE if not found
+   * @return bool|string
+   *   full file path or FALSE if not found
    */
   public function getPath($ext, $file) {
     // TODO consider caching results

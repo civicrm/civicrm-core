@@ -42,7 +42,7 @@
  * @example ContributionRecurCreate.php Std Create example
  *
  * @return array
-   *   api result array
+ *   api result array
  * {@getfields contribution_recur_create}
  * @access public
  */
@@ -73,7 +73,7 @@ function _civicrm_api3_contribution_recur_create_spec(&$params) {
  *                       as null, all contribution_recurs will be returned
  *
  * @return array
-   *   API result Array of matching contribution_recurs
+ *   API result Array of matching contribution_recurs
  * {@getfields contribution_recur_get}
  * @access public
  */
@@ -88,7 +88,7 @@ function civicrm_api3_contribution_recur_get($params) {
  *   (reference) array containing id of the recurring contribution.
  *
  * @return boolean
-   *   returns true is successfully cancelled
+ *   returns true is successfully cancelled
  */
 
 function civicrm_api3_contribution_recur_cancel($params) {
@@ -107,7 +107,7 @@ function civicrm_api3_contribution_recur_cancel($params) {
  *                       to be deleted
  *
  * @return array
-   *   API result array
+ *   API result array
  *                message otherwise
  * {@getfields contribution_recur_delete}
  * @access public

@@ -89,7 +89,8 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
    * @param array $options
    *   Additional user data.
    *
-   * @return true if no errors, else array of errors
+   * @return bool|array
+   *   true if no errors, else array of errors
    * @static
    */
   public static function formRule($fields, $files, $options) {

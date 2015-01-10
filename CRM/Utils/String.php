@@ -375,7 +375,8 @@ class CRM_Utils_String {
    * @param mix $query
    *   This is basically url.
    *
-   * @return mix $v  returns civicrm url (eg: civicrm/contact/search/...)
+   * @return mix
+   *   $v  returns civicrm url (eg: civicrm/contact/search/...)
    * @static
    */
   public static function extractURLVarValue($query) {

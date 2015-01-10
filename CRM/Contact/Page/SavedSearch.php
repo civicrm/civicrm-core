@@ -73,7 +73,8 @@ class CRM_Contact_Page_SavedSearch extends CRM_Core_Page {
   /**
    * Browse all saved searches.
    *
-   * @return content of the parents run method
+   * @return mixed
+   *   content of the parents run method
    */
   public function browse() {
     $rows = array();

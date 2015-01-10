@@ -85,7 +85,8 @@ class CRM_Utils_JSON {
    * @param array $selectorElements
    *   Selector rows.
    *
-   * @return json encode string
+   * @return string
+   *   json encoded string
    */
   public static function encodeSelector(&$params, $page, $total, $selectorElements) {
     $json = "";

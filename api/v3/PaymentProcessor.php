@@ -43,7 +43,7 @@
  * @param array $params
  *
  * @return array
-   *   of newly created PaymentProcessor property values.
+ *   of newly created PaymentProcessor property values.
  * @access public
  */
 function civicrm_api3_payment_processor_create($params) {
@@ -70,7 +70,7 @@ function _civicrm_api3_payment_processor_create_spec(&$params) {
  * {@getfields payment_processor_delete}
  *
  * @return array
-   *   API result Array
+ *   API result Array
  * @access public
  */
 function civicrm_api3_payment_processor_delete($params) {
@@ -86,7 +86,7 @@ function civicrm_api3_payment_processor_delete($params) {
  *   An associative array of name/value pairs.
  *
  * @return array
-   *   details of found PaymentProcessor
+ *   details of found PaymentProcessor
  * @access public
  */
 function civicrm_api3_payment_processor_get($params) {

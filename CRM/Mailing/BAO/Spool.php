@@ -44,25 +44,22 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
   /**
    * Store Mails into Spool table.
    *
-   * @param $recipient
+   * @param string|array $recipient
+   *   Either a comma-seperated list of recipients
+   *   (RFC822 compliant), or an array of recipients,
+   *   each RFC822 valid. This may contain recipients not
+   *   specified in the headers, for Bcc:, resending
+   *   messages, etc.
    * @param array $headers
-   *   The string of headers to send with the mail.
+   *   The array of headers to send with the mail.
    *
    * @param string $body
-   *   The full text of the message body, including any.
-   *               Mime parts, etc.
+   *   The full text of the message body, including any mime parts, etc.
    *
    * @param int $job_id
    *
-   * @internal param mixed $recipients Either a comma-seperated list of recipients
-   *              (RFC822 compliant), or an array of recipients,
-   *              each RFC822 valid. This may contain recipients not
-   *              specified in the headers, for Bcc:, resending
-   *              messages, etc.
-   *
-   * @return mixed Returns true on success, or a CRM_Eore_Error
-   *               containing a descriptive error message on
-   *               failure.
+   * @return bool|CRM_Core_Error
+   *   true if successful
    */
   public function send($recipient, $headers, $body, $job_id = NULL) {
     $headerStr = array();

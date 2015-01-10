@@ -157,7 +157,8 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
    * @param array $self
    *   This object.
    *
-   * @return true if no errors, else an array of errors
+   * @return bool|array
+   *   true if no errors, else an array of errors
    * @static
    */
   public static function formRule($fields, $files, $self) {

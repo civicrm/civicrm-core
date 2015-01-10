@@ -11,7 +11,7 @@
  * @example OptionValueGet.php
  *
  * @return array
-   *   details of found Option Values
+ *   details of found Option Values
  * {@getfields OptionValue_get}
  * @access public
  */
@@ -33,7 +33,7 @@ function civicrm_api3_custom_search_get($params) {
  * @param array $params
  *
  * @return array
-   *   of newly created option_value property values.
+ *   of newly created option_value property values.
  * {@getfields OptionValue_create}
  * @access public
  */
@@ -73,7 +73,7 @@ function _civicrm_api3_custom_search_create_spec(&$params) {
  * {@example ReportTemplateDelete.php 0}
  *
  * @return array
-   *   Api result
+ *   Api result
  * {@getfields ReportTemplate_create}
  * @access public
  */

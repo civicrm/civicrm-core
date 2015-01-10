@@ -59,7 +59,7 @@ function _civicrm_api3_message_template_create_spec(&$params) {
  * @param array $params
  *
  * @return boolean
-   *   | error  true if successfull, error otherwise
+ *   | error  true if successfull, error otherwise
  * {@getfields message_template_delete}
  * @access public
  */
@@ -85,7 +85,7 @@ function _civicrm_api3_message_template_get_spec(&$params) {
  *   An associative array of name/value pairs.
  *
  * @return array
-   *   api result array
+ *   api result array
  * {@getfields message_template_get}
  * @access public
  */

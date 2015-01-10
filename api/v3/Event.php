@@ -53,7 +53,7 @@
  * {@getfields event_create}
  *
  * @return array
-   *   API result Array.
+ *   API result Array.
  * @access public
  */
 function civicrm_api3_event_create($params) {
@@ -106,7 +106,7 @@ function _civicrm_api3_event_create_legacy_support_42(&$params) {
  * {@getfields event_get}
  *
  * @return Array
-   *   of all found event property values.
+ *   of all found event property values.
  * @access public
  *
  */
@@ -195,7 +195,7 @@ function _civicrm_api3_event_get_legacy_support_42(&$event, $event_id) {
  *   Array containing event_id to be deleted.
  *
  * @return boolean
-   *   true if success, error otherwise
+ *   true if success, error otherwise
  * @access public
  *   note API has legacy support for 'event_id'
  *  {@getfields event_delete}

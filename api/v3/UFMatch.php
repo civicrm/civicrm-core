@@ -61,7 +61,7 @@ function civicrm_api3_uf_match_get($params) {
  * @example UFMatch.php Std Create example
  *
  * @return array
-   *   api result array
+ *   api result array
  * {@getfields uf_match_create}
  * @access public
  */
@@ -91,7 +91,7 @@ function _civicrm_api3_uf_match_create_spec(&$params) {
  * @example UFMatch.php Std Create example
  *
  * @return array
-   *   api result array
+ *   api result array
  * {@getfields uf_match_create}
  * @access public
  */

@@ -918,7 +918,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *   The current contact id (hence excluded from matching).
    * @param string $contactType
    *
-   * @return int|null contact_id if found, null otherwise
+   * @return int|null
+   *   contact_id if found, null otherwise
    * @static
    */
   public static function findContact(&$params, $id = NULL, $contactType = 'Individual') {
@@ -2706,10 +2707,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   /**
    * Get default value for Register.
    *
-   * @param $fields
-   * @param $defaults
+   * @param array $fields
+   * @param array $defaults
    *
-   * @return mixed $defaults
+   * @return array
    * @static
    */
   public static function setRegisterDefaults(&$fields, &$defaults) {
@@ -2906,7 +2907,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * Format fields for dupe Contact Matching
    *
    * @param array $params
-   *   Associated array.
    *
    * @param int $contactId
    *

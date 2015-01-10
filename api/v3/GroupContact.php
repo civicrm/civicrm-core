@@ -50,7 +50,7 @@
  * {@getfields GroupContact_get}
  *
  * @return array
-   *   list of groups, given contact subsribed to
+ *   list of groups, given contact subsribed to
  */
 function civicrm_api3_group_contact_get($params) {
 
@@ -86,7 +86,7 @@ function civicrm_api3_group_contact_get($params) {
  * {@example GroupContactCreate.php 0}
  *
  * @return array
-   *   Information about operation results
+ *   Information about operation results
  *
  * On success, the return array will be structured as follows:
  * <code>array(
@@ -125,10 +125,10 @@ function civicrm_api3_group_contact_create($params) {
 
 /**
  *
- * @param <type> $params
+ * @param array $params
  *
  * @return array
-   *   <type>
+ *   <type>
  * @deprecated
  */
 function civicrm_api3_group_contact_delete($params) {
@@ -147,9 +147,9 @@ function _civicrm_api3_group_contact_delete_spec(&$params) {
 
 /**
  *
- * @param <type> $params
+ * @param array $params
  *
- * @return array|int <type>
+ * @return array|int
  * @deprecated
  */
 function civicrm_api3_group_contact_pending($params) {
@@ -247,7 +247,7 @@ function civicrm_api3_group_contact_update_status($params) {
 /**
  * @deprecated api notice
  * @return array
-   *   of deprecated actions
+ *   of deprecated actions
  */
 function _civicrm_api3_group_contact_deprecation() {
   return array(

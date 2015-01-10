@@ -47,7 +47,7 @@
  * @example ContributionSoftCreate.php Standard Create Example //FIXME
  *
  * @return array
-   *   API result array
+ *   API result array
  * {@getfields contribution_soft_create}
  * @access public
  */
@@ -76,7 +76,7 @@ function _civicrm_api3_contribution_soft_create_spec(&$params) {
  * @example ContributionSoftDelete.php Standard Delete Example
  *
  * @return boolean
-   *   | error  true if successfull, error otherwise
+ *   | error  true if successfull, error otherwise
  * {@getfields contribution_soft_delete}
  * @access public
  */
@@ -98,7 +98,7 @@ function civicrm_api3_contribution_soft_delete($params) {
  *   An associative array of name/value pairs.
  *
  * @return array
-   *   api result
+ *   api result
  * {@getfields contribution_soft_get}
  * @access public
  */

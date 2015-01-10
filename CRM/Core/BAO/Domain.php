@@ -68,7 +68,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    *
    * @param null $reset
    *
-   * @return null|object CRM_Core_BAO_Domain
+   * @return CRM_Core_BAO_Domain|null
    * @static
    */
   public static function &getDomain($reset = NULL) {

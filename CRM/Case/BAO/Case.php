@@ -1599,7 +1599,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param int $file
    *   Email sent.
    *
-   * @return array|void $activity object of newly creted activity via email
+   * @return array|void
+   *   $activity object of newly creted activity via email
    * @access public
    */
   public static function recordActivityViaEmail($file) {
@@ -1763,7 +1764,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param int $caseId
    *   Id of the case to restore.
    *
-   * @return true if success.
+   * @return bool
    * @static
    */
   public static function restoreCase($caseId) {
@@ -1861,9 +1862,10 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param array $criteriaParams
    *   Given criteria.
    * @param bool $latestDate
-   *   If set newest or oldest date is selceted.
+   *   If set newest or oldest date is selected.
    *
-   * @return returns case activities due dates
+   * @return array
+   *   case activities due dates
    *
    * @static
    */
@@ -2059,7 +2061,7 @@ SELECT civicrm_contact.id as casemanager_id,
    * @param bool $excludeDeleted
    *
    * @return array
-   *   of case and related data keyed on case id
+   *   case and related data keyed on case id
    */
   public static function getUnclosedCases($params = array(), $excludeCaseIds = array(), $excludeDeleted = TRUE, $includeClosed = FALSE) {
     //params from ajax call.
@@ -2187,7 +2189,7 @@ LEFT JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.case
    * @param bool $excludeDeleted
    *   Do not include deleted cases.
    *
-   * @return an array of cases.
+   * @return array
    */
   public static function getContactCases($contactId, $excludeDeleted = TRUE) {
     $cases = array();
@@ -2230,7 +2232,7 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
    * @param bool $excludeDeleted
    *   Do not include deleted cases.
    *
-   * @return an array of related cases.
+   * @return array
    */
   public static function getRelatedCases($mainCaseId, $contactId, $excludeDeleted = TRUE) {
     //FIXME : do check for permissions.
@@ -3151,7 +3153,6 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   /**
    * Get all the case type ids currently in use
    *
-   *
    * @return array
    */
   public static function getUsedCaseType() {
@@ -3176,7 +3177,6 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   /**
    * Get all the case status ids currently in use
    *
-   *
    * @return array
    */
   public static function getUsedCaseStatuses() {
@@ -3197,6 +3197,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
 
   /**
    * Get all the encounter medium ids currently in use
+   *
    * @return array
    */
   public static function getUsedEncounterMediums() {
@@ -3267,6 +3268,8 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
 
   /**
    * Used during case component enablement and during ugprade
+   *
+   * @return bool
    */
   public static function createCaseViews() {
     $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
@@ -3301,6 +3304,8 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
 
   /**
    * Helper function, also used by the upgrade in case of error
+   *
+   * @return string
    */
   public static function createCaseViewsQuery($section = 'upcoming') {
     $sql = "";
@@ -3398,9 +3403,9 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    *
    * @param string $fieldName
    * @param string $context
-   *   : @see CRM_Core_DAO::buildOptionsContext.
+   *   @see CRM_Core_DAO::buildOptionsContext.
    * @param array $props
-   *   : whatever is known about this dao object.
+   *   Whatever is known about this dao object.
    *
    * @return Array|bool
    */

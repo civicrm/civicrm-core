@@ -44,7 +44,7 @@
  * @example ContributionPageCreate.php Std Create example
  *
  * @return array
-   *   api result array
+ *   api result array
  * {@getfields contribution_page_create}
  * @access public
  */
@@ -75,7 +75,7 @@ function _civicrm_api3_contribution_page_create_spec(&$params) {
  *   Array of one or more valid property_name=>value pairs.
  *
  * @return array
-   *   API Result array Array of matching contribution_pages
+ *   API Result array Array of matching contribution_pages
  * {@getfields contribution_page_get}
  * @access public
  */
@@ -94,7 +94,7 @@ function civicrm_api3_contribution_page_get($params) {
  *                       to be deleted
  *
  * @return array
-   *   API result Array
+ *   API result Array
  * {@getfields contribution_page_delete}
  * @access public
  */
@@ -113,7 +113,7 @@ function civicrm_api3_contribution_page_delete($params) {
  *                       to be deleted
  *
  * @return array
-   *   API result array
+ *   API result array
  * {@getfields contribution_page_delete}
  * @access public
  */

@@ -46,7 +46,7 @@
  * @param array $params
  *
  * @return array
-   *   of newly created tag property values.
+ *   of newly created tag property values.
  * @access public
  */
 function civicrm_api3_address_create(&$params) {
@@ -133,7 +133,7 @@ function _civicrm_api3_address_get_spec(&$params) {
  * {@example AddressDelete.php 0}
  *
  * @return array
-   *   api result array
+ *   api result array
  * @access public
  */
 function civicrm_api3_address_delete($params) {
@@ -151,7 +151,7 @@ function civicrm_api3_address_delete($params) {
  *   An associative array of name/value pairs.
  *
  * @return array
-   *   details of found addresses else error
+ *   details of found addresses else error
  * {@getfields address_get}
  * @access public
  */

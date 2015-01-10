@@ -63,7 +63,8 @@ class CRM_Admin_Form_Setting_Mapping extends CRM_Admin_Form_Setting {
    * @param array $fields
    *   The input form values.
    *
-   * @return true if no errors, else array of errors
+   * @return bool|array
+   *   true if no errors, else array of errors
    * @static
    */
   public static function formRule($fields) {

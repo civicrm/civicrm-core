@@ -11,7 +11,7 @@
  *   An associative array of name/value pairs.
  *
  * @return array
-   *   details of found phones else error
+ *   details of found phones else error
  * @access public
  * This function has been declared there instead than in api/v3/Phone.php for no specific reasons, beside to demonstrate this feature (that might be useful in your module, eg if you want to implement a civicrm_api ('Phone','Dial') that you would then simply put in your module under api/v3/Phone/Dial.php .
  */

@@ -230,7 +230,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * Get User ID from UserFramework system (Drupal)
    * @param object $user
    *   Object as described by the CMS.
-   * @return mixed <NULL, number>
+   * @return mixed
+   *   <NULL, number>
    */
   public function getUserIDFromUserObject($user) {
     return !empty($user->uid) ? $user->uid : NULL;
@@ -240,7 +241,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * Get Unique Identifier from UserFramework system (CMS)
    * @param object $user
    *   Object as described by the User Framework.
-   * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
+   * @return mixed
+   *   $uniqueIdentifer Unique identifier from the user Framework system
    */
   public function getUniqueIdentifierFromUserObject($user) {
     return empty($user->mail) ? NULL : $user->mail;

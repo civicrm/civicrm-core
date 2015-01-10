@@ -1317,7 +1317,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @param array $parseResult
    *   An array of address blk instance and its status.
    *
-   * @return null|string $statusMsg   string status message for all address blocks.
+   * @return null|string
+   *   $statusMsg   string status message for all address blocks.
    * @static
    */
   public static function parseAddressStatusMsg($parseResult) {
@@ -1349,7 +1350,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @param int $number
    *   number to convert in to ordinal number.
    *
-   * @return ordinal number for given number.
+   * @return string
+   *   ordinal number for given number.
    * @static
    */
   public static function ordinalNumber($number) {
@@ -1386,7 +1388,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @param array $deceasedParams
    *   having contact id and deceased value.
    *
-   * @return null|string $updateMembershipMsg string  status message for updated membership.
+   * @return null|string
+   *   $updateMembershipMsg string  status message for updated membership.
    */
   public function updateMembershipStatus($deceasedParams) {
     $updateMembershipMsg = NULL;

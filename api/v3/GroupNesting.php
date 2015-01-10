@@ -45,7 +45,7 @@
  * {@getfields GroupNesting_get}
  *
  * @return array
-   *   list of group nesting records
+ *   list of group nesting records
  */
 function civicrm_api3_group_nesting_get($params) {
 
@@ -60,7 +60,7 @@ function civicrm_api3_group_nesting_get($params) {
  *   Parameters array - allowed array keys include:.
  *
  * @return array
-   *   TBD
+ *   TBD
  * {@getfields GroupNesting_create
  * @todo Work out the return value.
  */
@@ -93,7 +93,7 @@ function _civicrm_api3_group_nesting_create_spec(&$params) {
  * {@getfields GroupNesting_delete}
  *
  * @return array
-   *   API Success or fail array
+ *   API Success or fail array
  *
  * @todo Work out the return value.
  */

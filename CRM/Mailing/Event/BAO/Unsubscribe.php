@@ -126,7 +126,8 @@ WHERE  email = %2
    * @param bool $return
    *   If true return the list of groups.
    *
-   * @return array|null $groups    Array of all groups from which the contact was removed, or null if the queue event could not be found.
+   * @return array|null
+   *   $groups    Array of all groups from which the contact was removed, or null if the queue event could not be found.
    * @static
    */
   public static function &unsub_from_mailing($job_id, $queue_id, $hash, $return = FALSE) {

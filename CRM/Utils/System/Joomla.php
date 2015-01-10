@@ -53,11 +53,11 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * Create a user of Joomla.
    *
    * @param array $params
-   *   Associated array.
    * @param string $mail
    *   Email id for cms user.
    *
-   * @return uid if user exists, false otherwise
+   * @return int|bool
+   *   uid if user exists, false otherwise
    */
   public function createUser(&$params, $mail) {
     $baseDir = JPATH_SITE;
@@ -475,9 +475,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @param bool $loadCMSBootstrap
    *   load cms bootstrap?.
    *
-   * @return mixed false if no auth
-   *               array(
-   * contactID, ufID, unique string ) if success
+   * @return array|bool
+   *   [contactID, ufID, uniqueString] if success else false if no auth
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE) {
     require_once 'DB.php';
@@ -734,7 +733,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * Get User ID from UserFramework system (Joomla)
    * @param object $user
    *   Object as described by the CMS.
-   * @return mixed <NULL, number>
+   * @return mixed
+   *   <NULL, number>
    */
   public function getUserIDFromUserObject($user) {
     return !empty($user->id) ? $user->id : NULL;
@@ -744,7 +744,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * Get Unique Identifier from UserFramework system (CMS)
    * @param object $user
    *   Object as described by the User Framework.
-   * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
+   * @return mixed
+   *   $uniqueIdentifer Unique identifier from the user Framework system
    */
   public function getUniqueIdentifierFromUserObject($user) {
     return ($user->guest) ? NULL : $user->email;

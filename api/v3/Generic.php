@@ -18,7 +18,7 @@
  *  - function: callback (mixed)
  *  - params: array, varies
  * @return array
-   *   API success object
+ *   API success object
  */
 function civicrm_api3_generic_getfields($apiRequest) {
   static $results = array();
@@ -151,7 +151,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
  *
  * @throws API_Exception
  * @return integer
-   *   count of results
+ *   count of results
  */
 function civicrm_api3_generic_getcount($apiRequest) {
   $apiRequest['params']['options']['is_count'] = TRUE;
@@ -172,7 +172,7 @@ function civicrm_api3_generic_getcount($apiRequest) {
  *   Api request as an array. Keys are.
  *
  * @return integer
-   *   count of results
+ *   count of results
  */
 function civicrm_api3_generic_getsingle($apiRequest) {
   // so the first entity is always result['values'][0]
@@ -197,7 +197,7 @@ function civicrm_api3_generic_getsingle($apiRequest) {
  *   Api request as an array. Keys are.
  *
  * @return integer
-   *   count of results
+ *   count of results
  */
 function civicrm_api3_generic_getvalue($apiRequest) {
   $apiRequest['params']['sequential'] = 1;
@@ -238,7 +238,7 @@ function _civicrm_api3_generic_getrefcount_spec(&$params) {
  *
  * @throws API_Exception
  * @return array
-   *   API result (int 0 or 1)
+ *   API result (int 0 or 1)
  */
 function civicrm_api3_generic_getrefcount($apiRequest) {
   $entityToClassMap = CRM_Core_DAO_AllCoreTables::daoToClass();
@@ -265,7 +265,7 @@ function civicrm_api3_generic_getrefcount($apiRequest) {
  *   Api request as an array. Keys are.
  *
  * @return integer
-   *   count of results
+ *   count of results
  */
 function civicrm_api3_generic_replace($apiRequest) {
   return _civicrm_api3_generic_replace($apiRequest['entity'], $apiRequest['params']);
@@ -278,7 +278,7 @@ function civicrm_api3_generic_replace($apiRequest) {
  *   Api request as an array.
  *
  * @return array
-   *   of results
+ *   of results
  */
 function civicrm_api3_generic_getoptions($apiRequest) {
   // Resolve aliases
@@ -316,7 +316,7 @@ function civicrm_api3_generic_getoptions($apiRequest) {
  *
  * @param array $metadata
  *   The array of metadata that will form the result of the getfields function.
- * @param $apiRequest
+ * @param array $apiRequest
  * @param string $fieldname
  *   Field currently being processed.
  * @param array $fieldSpec

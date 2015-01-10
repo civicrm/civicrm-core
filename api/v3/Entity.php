@@ -4,7 +4,7 @@
  * @deprecated api notice
  * @param array entities
  * @return array
-   *   of deprecated api entities
+ *   of deprecated api entities
  */
 function _civicrm_api3_entity_deprecation($entities) {
   $deprecated = array();

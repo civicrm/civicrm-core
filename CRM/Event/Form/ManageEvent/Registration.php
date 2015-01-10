@@ -366,7 +366,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * Create initializers for addprofileSelector
    *
-   * @return array( 'allowCoreTypes' => array(), 'allowSubTypes' => array(), 'profileEntities' => array() )
+   * @return array
+   *   ['allowCoreTypes' => array, 'allowSubTypes' => array, 'profileEntities' => array]
    **/
   public static function getProfileSelectorTypes() {
     $configs = array(

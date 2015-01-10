@@ -44,7 +44,7 @@
  * @example LocBlockCreate.php Std Create example
  *
  * @return array
-   *   api result array
+ *   api result array
  * {@getfields loc_block_create}
  * @access public
  */
@@ -96,7 +96,7 @@ function civicrm_api3_loc_block_create($params) {
  *  as null, all loc_blocks will be returned (default limit is 25)
  *
  * @return array
-   *   Array of matching loc_blocks
+ *   Array of matching loc_blocks
  * {@getfields loc_block_get}
  * @access public
  */
@@ -135,7 +135,7 @@ function civicrm_api3_loc_block_get($params) {
  *   Array containing id of the record to be deleted.
  *
  * @return array
-   *   API result array
+ *   API result array
  * {@getfields loc_block_delete}
  * @access public
  */

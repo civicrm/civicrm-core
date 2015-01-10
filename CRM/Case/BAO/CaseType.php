@@ -359,7 +359,8 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * Determine if the case-type has *both* DB and file-based definitions.
    *
    * @param int $caseTypeId
-   * @return bool|null TRUE if there are *both* DB and file-based definitions
+   * @return bool|null
+   *   TRUE if there are *both* DB and file-based definitions
    */
   public static function isForked($caseTypeId) {
     $caseTypeName = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseTypeId, 'name', 'id', TRUE);

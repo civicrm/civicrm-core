@@ -74,7 +74,8 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    *
    * @param bool $getAllUnconditionally
    *
-   * @return array|null collection of permissions, null if none
+   * @return array|null
+   *   collection of permissions, null if none
    */
   /**
    * @param bool $getAllUnconditionally
@@ -91,7 +92,8 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    * Provides information about user dashboard element
    * offered by this component.
    *
-   * @return array|null collection of required dashboard settings,
+   * @return array|null
+   *   collection of required dashboard settings,
    *                    null if no element offered
    */
   /**
@@ -105,7 +107,8 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
   /**
    * Provides component's user dashboard page object.
    *
-   * @return mixed component's User Dashboard applet object
+   * @return mixed
+   *   component's User Dashboard applet object
    */
   /**
    * @return mixed
@@ -120,7 +123,8 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    * Provides information about user dashboard element
    * offered by this component.
    *
-   * @return array|null collection of required dashboard settings,
+   * @return array|null
+   *   collection of required dashboard settings,
    *                    null if no element offered
    */
   /**
@@ -136,7 +140,8 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    * Provides information about advanced search pane
    * offered by this component.
    *
-   * @return array|null collection of required pane settings,
+   * @return array|null
+   *   collection of required pane settings,
    *                    null if no element offered
    */
   /**
@@ -154,7 +159,8 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    * Needs to be implemented in component's information
    * class.
    *
-   * @return array|null collection of activity types
+   * @return array|null
+   *   collection of activity types
    */
   /**
    * @return array|null

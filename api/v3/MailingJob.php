@@ -69,7 +69,7 @@ function _civicrm_api3_mailing_job_create_spec(&$params) {
  * @param array $ids
  *
  * @return array
-   *   API return Array of matching mailing jobs
+ *   API return Array of matching mailing jobs
  * {@getfields mailing_job_get}
  * @access public
  */

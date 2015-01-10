@@ -89,7 +89,8 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    * @param string $hash
    *   The hash to validate against.
    *
-   * @return object|null      The queue event if verified, or null
+   * @return object|null
+   *   The queue event if verified, or null
    * @static
    */
   public static function &verify($job_id, $queue_id, $hash) {

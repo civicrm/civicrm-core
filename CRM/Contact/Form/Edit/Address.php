@@ -279,7 +279,8 @@ class CRM_Contact_Form_Edit_Address {
    * @param $files
    * @param $self
    *
-   * @return array|bool if no errors
+   * @return array|bool
+   *   if no errors
    *
    * @static
    */

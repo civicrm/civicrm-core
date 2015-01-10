@@ -1815,7 +1815,6 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    * Function returns formatted groupTree, sothat form can be easily build in template
    *
    * @param array $groupTree
-   *   Associated array.
    * @param int $groupCount
    *   Group count by default 1, but can varry for multiple value custom data.
    * @param object form object
@@ -1889,7 +1888,6 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    * @param CRM_Core_Form $form
    *   Page object.
    * @param array $groupTree
-   *   Associated array.
    * @param bool $returnCount
    *   True if customValue count needs to be returned.
    * @param int $gID
@@ -1982,7 +1980,6 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    * @param array $values
    *   Associated array of custom values.
    * @param array $field
-   *   Associated array.
    * @param bool $dncOptionPerLine
    *   True if optionPerLine should not be consider.
    *

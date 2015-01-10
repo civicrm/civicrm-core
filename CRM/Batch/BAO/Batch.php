@@ -53,7 +53,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * Create a new batch
    *
    * @param array $params
-   *   Associated array.
    * @param array $ids
    *   Associated array of ids.
    * @param string $context
@@ -131,7 +130,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Generate batch name
    *
-   * @return batch name
+   * @return string
+   *   batch name
    * @static
    */
   public static function generateBatchName() {
@@ -142,9 +142,9 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
   /**
    * Create entity batch entry
+   *
    * @param array $params
-   *   Associated array.
-   * @return batch array
+   * @return array
    */
   public static function addBatchEntity(&$params) {
     $entityBatch = new CRM_Batch_DAO_EntityBatch();
@@ -156,7 +156,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Remove entries from entity batch
    * @param array $params
-   *   Associated array.
    * @return CRM_Batch_DAO_EntityBatch
    */
   public static function removeBatchEntity($params) {
@@ -172,7 +171,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param int $batchId
    *   Batch id.
    *
-   * @return void
+   * @return bool
    */
   public static function deleteBatch($batchId) {
     // delete entry from batch table
@@ -506,8 +505,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * Get batch list
    *
    * @return array
-   *   array of all batches
-   * excluding batches with data entry in progress
+   *   all batches excluding batches with data entry in progress
    */
   public static function getBatches() {
     $dataEntryStatusId = CRM_Core_OptionGroup::getValue('batch_status', 'Data Entry', 'name');
@@ -553,8 +551,10 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Format markup for comparing two totals
    *
-   * @param $actual : calculated total
-   * @param $expected : user-entered total
+   * @param $actual
+   *   calculated total
+   * @param $expected
+   *   user-entered total
    * @return array
    */
   public static function displayTotals($actual, $expected) {
@@ -643,11 +643,11 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    *
    * @param int $entityID
    * @param array $returnValues
-   * @param null $notPresent
+   * @param bool $notPresent
    * @param array $params
    * @param bool $getCount
    *
-   * @return Object
+   * @return CRM_Core_DAO
    */
   public static function getBatchFinancialItems($entityID, $returnValues, $notPresent = NULL, $params = NULL, $getCount = FALSE) {
     if (!$getCount) {

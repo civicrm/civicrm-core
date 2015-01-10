@@ -60,7 +60,7 @@
  *   Array Associative array of property name/value pairs to insert in group.
  * {@getfields CustomGroup_create}
  *
- * @return Newly create custom_group object
+ * @return array
  * @todo $params['extends'] is array format - is that std compatible
  * @access public
  */
@@ -100,7 +100,7 @@ function _civicrm_api3_custom_group_create_spec(&$params) {
  * @param array id of the group to be deleted
  *
  * @return Null
-   *   if success
+ *   if success
  * @access public
  * {@getfields CustomGroup_delete}
  * @example CustomGroupDelete.php

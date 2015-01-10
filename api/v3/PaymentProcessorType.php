@@ -47,7 +47,7 @@
  * @param array $params
  *   Associative array of property name/value pairs to insert in new payment_processor type.
  *
- * @return Newly created PaymentProcessor_type object
+ * @return array
  * {@getfields PaymentProcessorType_create}
  * @access public
  * {@schema Core/PaymentProcessorType.xml}
@@ -102,7 +102,7 @@ function civicrm_api3_payment_processor_type_get($params) {
  * @param id of payment_processor type $id
  *
  * @return array
-   *   API Result Array
+ *   API Result Array
  * {@getfields PaymentProcessorType_delete}
  * @static void
  * @access public
