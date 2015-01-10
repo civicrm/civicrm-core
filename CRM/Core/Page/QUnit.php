@@ -40,8 +40,8 @@ class CRM_Core_Page_QUnit extends CRM_Core_Page {
 
     CRM_Utils_System::setTitle(ts('QUnit: %2 (%1)', array(1 => $ext, 2 => $suite)));
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'packages/qunit/qunit.js', 1, 'html-header')
-      ->addStyleFile('civicrm', 'packages/qunit/qunit.css', 1, 'html-header');
+      ->addScriptFile('civicrm', 'bower_components/qunit/qunit/qunit.js', 1, 'html-header')
+      ->addStyleFile('civicrm', 'bower_components/qunit/qunit/qunit.css', 1, 'html-header');
     parent::run();
   }
 
