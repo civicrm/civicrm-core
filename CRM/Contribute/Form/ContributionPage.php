@@ -266,16 +266,18 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
         $defaults['is_pledge_active'] = TRUE;
       }
       $pledgeBlock = array(
-        'is_pledge_interval', 'max_reminders',
-        'initial_reminder_day', 'additional_reminder_day',
+        'is_pledge_interval',
+        'max_reminders',
+        'initial_reminder_day',
+        'additional_reminder_day',
       );
       foreach ($pledgeBlock as $key) {
         $defaults[$key] = CRM_Utils_Array::value($key, $pledgeBlockDefaults);
       }
       if (!empty($pledgeBlockDefaults['pledge_frequency_unit'])) {
         $defaults['pledge_frequency_unit'] = array_fill_keys(explode(CRM_Core_DAO::VALUE_SEPARATOR,
-            $pledgeBlockDefaults['pledge_frequency_unit']
-          ), '1');
+          $pledgeBlockDefaults['pledge_frequency_unit']
+        ), '1');
       }
 
       // fix the display of the monetary value, CRM-4038
@@ -311,8 +313,8 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
     if (!empty($defaults['recur_frequency_unit'])) {
       $defaults['recur_frequency_unit'] = array_fill_keys(explode(CRM_Core_DAO::VALUE_SEPARATOR,
-          $defaults['recur_frequency_unit']
-        ), '1');
+        $defaults['recur_frequency_unit']
+      ), '1');
     }
     else {
       # CRM 10860
@@ -357,17 +359,17 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       //this is quite painful because StateMachine is full of protected variables
       //so we have to retrieve all pages, find current page, and then retrieve next
       $stateMachine = new CRM_Contribute_StateMachine_ContributionPage($this);
-      $states       = $stateMachine->getStates();
-      $statesList   = array_keys($states);
-      $currKey      = array_search($className, $statesList);
-      $nextPage     = (array_key_exists($currKey + 1, $statesList)) ? $statesList[$currKey + 1] : '';
+      $states = $stateMachine->getStates();
+      $statesList = array_keys($states);
+      $currKey = array_search($className, $statesList);
+      $nextPage = (array_key_exists($currKey + 1, $statesList)) ? $statesList[$currKey + 1] : '';
 
       //unfortunately, some classes don't map to subpage names, so we alter the exceptions
 
       switch ($className) {
         case 'Contribute':
-          $attributes  = $this->getVar('_attributes');
-          $subPage     = strtolower(basename(CRM_Utils_Array::value('action', $attributes)));
+          $attributes = $this->getVar('_attributes');
+          $subPage = strtolower(basename(CRM_Utils_Array::value('action', $attributes)));
           $subPageName = ucfirst($subPage);
           if ($subPage == 'friend') {
             $nextPage = 'custom';
@@ -378,15 +380,15 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
           break;
 
         case 'MembershipBlock':
-          $subPage     = 'membership';
+          $subPage = 'membership';
           $subPageName = 'MembershipBlock';
-          $nextPage    = 'thankyou';
+          $nextPage = 'thankyou';
           break;
 
         default:
-          $subPage     = strtolower($className);
+          $subPage = strtolower($className);
           $subPageName = $className;
-          $nextPage    = strtolower($nextPage);
+          $nextPage = strtolower($nextPage);
 
           if ($subPage == 'amount') {
             $nextPage = 'membership';
@@ -398,26 +400,26 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       }
 
       CRM_Core_Session::setStatus(ts("'%1' information has been saved.",
-          array(1 => $subPageName)
-        ), ts('Saved'), 'success');
+        array(1 => $subPageName)
+      ), ts('Saved'), 'success');
 
       $this->postProcessHook();
 
       if ($this->controller->getButtonName('submit') == "_qf_{$className}_next") {
         CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/admin/contribute/{$subPage}",
-            "action=update&reset=1&id={$this->_id}"
-          ));
+          "action=update&reset=1&id={$this->_id}"
+        ));
       }
       elseif ($this->controller->getButtonName('submit') == "_qf_{$className}_submit_savenext") {
         if ($nextPage) {
           CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/admin/contribute/{$nextPage}",
-              "action=update&reset=1&id={$this->_id}"
-            ));
+            "action=update&reset=1&id={$this->_id}"
+          ));
         }
         else {
           CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/admin/contribute",
-              "reset=1"
-            ));
+            "reset=1"
+          ));
         }
       }
       else {

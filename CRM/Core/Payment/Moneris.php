@@ -148,10 +148,10 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
     // add a recurring payment if requested
     if ($params['is_recur'] && $params['installments'] > 1) {
       //Recur Variables
-      $recurUnit     = $params['frequency_unit'];
+      $recurUnit = $params['frequency_unit'];
       $recurInterval = $params['frequency_interval'];
-      $next          = time();
-      $day           = 60 * 60 * 24;
+      $next = time();
+      $day = 60 * 60 * 24;
       switch ($recurUnit) {
         case 'day':
           $next += $recurInterval * $day;

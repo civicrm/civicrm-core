@@ -59,19 +59,19 @@ class CRM_Utils_PDF_Utils {
       // PDF Page Format ID passed in
       $format = CRM_Core_BAO_PdfFormat::getById($pdfFormat);
     }
-    $paperSize    = CRM_Core_BAO_PaperSize::getByName($format['paper_size']);
-    $paper_width  = self::convertMetric($paperSize['width'], $paperSize['metric'], 'pt');
+    $paperSize = CRM_Core_BAO_PaperSize::getByName($format['paper_size']);
+    $paper_width = self::convertMetric($paperSize['width'], $paperSize['metric'], 'pt');
     $paper_height = self::convertMetric($paperSize['height'], $paperSize['metric'], 'pt');
     // dompdf requires dimensions in points
-    $paper_size  = array(0, 0, $paper_width, $paper_height);
+    $paper_size = array(0, 0, $paper_width, $paper_height);
     $orientation = CRM_Core_BAO_PdfFormat::getValue('orientation', $format);
-    $metric      = CRM_Core_BAO_PdfFormat::getValue('metric', $format);
-    $t           = CRM_Core_BAO_PdfFormat::getValue('margin_top', $format);
-    $r           = CRM_Core_BAO_PdfFormat::getValue('margin_right', $format);
-    $b           = CRM_Core_BAO_PdfFormat::getValue('margin_bottom', $format);
-    $l           = CRM_Core_BAO_PdfFormat::getValue('margin_left', $format);
+    $metric = CRM_Core_BAO_PdfFormat::getValue('metric', $format);
+    $t = CRM_Core_BAO_PdfFormat::getValue('margin_top', $format);
+    $r = CRM_Core_BAO_PdfFormat::getValue('margin_right', $format);
+    $b = CRM_Core_BAO_PdfFormat::getValue('margin_bottom', $format);
+    $l = CRM_Core_BAO_PdfFormat::getValue('margin_left', $format);
 
-    $stationery_path_partial  = CRM_Core_BAO_PdfFormat::getValue('stationery', $format);
+    $stationery_path_partial = CRM_Core_BAO_PdfFormat::getValue('stationery', $format);
 
     $stationery_path = NULL;
     if (strlen($stationery_path_partial)) {
@@ -79,7 +79,7 @@ class CRM_Utils_PDF_Utils {
       $stationery_path = $doc_root . "/" . $stationery_path_partial;
     }
 
-    $margins     = array($metric, $t, $r, $b, $l);
+    $margins = array($metric, $t, $r, $b, $l);
 
     $config = CRM_Core_Config::singleton();
     $html = "
@@ -131,7 +131,7 @@ class CRM_Utils_PDF_Utils {
     require_once 'tcpdf/tcpdf.php';
     require_once 'FPDI/fpdi.php'; // This library is only in the 'packages' area as of version 4.5
 
-    $paper_size_arr  = array($paper_size[2], $paper_size[3]);
+    $paper_size_arr = array($paper_size[2], $paper_size[3]);
 
     $pdf = new TCPDF($orientation, 'pt', $paper_size_arr);
     $pdf->Open();
@@ -396,13 +396,13 @@ class CRM_Utils_PDF_Utils {
         return $buf;
       }
     }
-    catch(PDFlibException$excp) {
+    catch (PDFlibException$excp) {
       CRM_Core_Error::statusBounce('PDFlib Error: Exception' .
         "[" . $excp->get_errnum() . "] " . $excp->get_apiname() . ": " .
         $excp->get_errmsg()
       );
     }
-    catch(Exception$excp) {
+    catch (Exception$excp) {
       CRM_Core_Error::statusBounce("PDFlib Error: " . $excp->get_errmsg());
     }
   }

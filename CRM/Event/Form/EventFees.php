@@ -184,12 +184,12 @@ class CRM_Event_Form_EventFees {
     if ($priceSetId) {
       // get price set default values, CRM-4090
       if (in_array(get_class($form),
-          array(
-            'CRM_Event_Form_Participant',
-            'CRM_Event_Form_Registration_Register',
-            'CRM_Event_Form_Registration_AdditionalParticipant',
-          )
-        )) {
+        array(
+          'CRM_Event_Form_Participant',
+          'CRM_Event_Form_Registration_Register',
+          'CRM_Event_Form_Registration_AdditionalParticipant',
+        )
+      )) {
         $priceSetValues = self::setDefaultPriceSet($form->_pId, $form->_eventId);
         if (!empty($priceSetValues)) {
           $defaults[$form->_pId] = array_merge($defaults[$form->_pId], $priceSetValues);
@@ -234,7 +234,13 @@ class CRM_Event_Form_EventFees {
       $contribution = new CRM_Contribute_DAO_Contribution();
       $contribution->id = $contriId;
       $contribution->find(TRUE);
-      foreach (array('financial_type_id', 'payment_instrument_id', 'contribution_status_id', 'receive_date', 'total_amount') as $f) {
+      foreach (array(
+                 'financial_type_id',
+                 'payment_instrument_id',
+                 'contribution_status_id',
+                 'receive_date',
+                 'total_amount'
+               ) as $f) {
         if ($f == 'receive_date') {
           list($defaults[$form->_pId]['receive_date']) = CRM_Utils_Date::setDateDefaults($contribution->$f);
         }
@@ -356,8 +362,9 @@ SELECT  id, html_type
 
     if ($form->_pId) {
       if (CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
-          $form->_pId, 'contribution_id', 'participant_id'
-        )) {
+        $form->_pId, 'contribution_id', 'participant_id'
+      )
+      ) {
         $form->_online = TRUE;
       }
     }
@@ -394,7 +401,8 @@ SELECT  id, html_type
         $element = $form->add('select', 'discount_id',
           ts('Discount Set'),
           array(
-            0 => ts('- select -')) + $discounts,
+            0 => ts('- select -')
+          ) + $discounts,
           FALSE,
           array('onchange' => "buildFeeBlock( {$form->_eventId}, this.value );")
         );
@@ -484,7 +492,7 @@ SELECT  id, html_type
       if ($form->_contactId) {
         list($form->_contributorDisplayName,
           $form->_contributorEmail
-        ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($form->_contactId);
+          ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($form->_contactId);
         $form->assign('email', $form->_contributorEmail);
       }
       else {

@@ -97,7 +97,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     if ($this->_contactID) {
       list($this->userDisplayName,
         $this->userEmail
-      ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
+        ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
       $this->assign('displayName', $this->userDisplayName);
     }
 
@@ -183,7 +183,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $defaults['max_reminders'] = 1;
       $defaults['additional_reminder_day'] = 5;
       $defaults['frequency_unit'] = array_search('month', $this->_freqUnits);
-      $defaults['financial_type_id']    = array_search('Donation', CRM_Contribute_PseudoConstant::financialType());
+      $defaults['financial_type_id'] = array_search('Donation', CRM_Contribute_PseudoConstant::financialType());
     }
 
     $pledgeStatus = CRM_Contribute_PseudoConstant::contributionStatus();
@@ -197,9 +197,9 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     //assign status.
     $this->assign('status', CRM_Utils_Array::value(CRM_Utils_Array::value('status_id', $this->_values),
-        $pledgeStatus,
-        $defaultPledgeStatus
-      ));
+      $pledgeStatus,
+      $defaultPledgeStatus
+    ));
 
     if (isset($this->userEmail)) {
       $this->assign('email', $this->userEmail);
@@ -235,7 +235,10 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
 
     if ($this->_context == 'standalone') {
-      $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE, 'api' => array('extra' => array('email'))), TRUE);
+      $this->addEntityRef('contact_id', ts('Contact'), array(
+          'create' => TRUE,
+          'api' => array('extra' => array('email'))
+        ), TRUE);
     }
 
     $showAdditionalInfo = FALSE;
@@ -249,7 +252,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     foreach ($paneNames as $name => $type) {
       $urlParams = "snippet=4&formType={$type}";
       $allPanes[$name] = array(
-      'url' => CRM_Utils_System::url('civicrm/contact/view/pledge', $urlParams),
+        'url' => CRM_Utils_System::url('civicrm/contact/view/pledge', $urlParams),
         'open' => 'false',
         'id' => $type,
       );
@@ -330,7 +333,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $element = &$this->add('select', 'frequency_unit',
       ts('Frequency'),
       array(
-        '' => ts('- select -')) + $freqUnitsDisplay,
+        '' => ts('- select -')
+      ) + $freqUnitsDisplay,
       TRUE
     );
 
@@ -348,7 +352,11 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $element->freeze();
     }
 
-    $this->add('text', 'eachPaymentAmount', ts('each'), array('size' => 10, 'style' => "background-color:#EBECE4", 'READONLY'));
+    $this->add('text', 'eachPaymentAmount', ts('each'), array(
+        'size' => 10,
+        'style' => "background-color:#EBECE4",
+        'READONLY'
+      ));
 
     //add various dates
     if (!$this->_id || $this->_isPending) {
@@ -379,8 +387,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $this->addDate('acknowledge_date', ts('Acknowledgment Date'));
 
     $this->add('select', 'financial_type_id',
-                   ts('Financial Type'),
-                   array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType(),
+      ts('Financial Type'),
+      array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType(),
       TRUE
     );
 
@@ -398,7 +406,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
     $ele = $this->add('select', 'contribution_page_id', ts('Self-service Payments Page'),
       array(
-        '' => ts('- select -')) + $pledgePages
+        '' => ts('- select -')
+      ) + $pledgePages
     );
 
     $mailingInfo = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
@@ -609,7 +618,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       if (!isset($this->userEmail)) {
         list($this->userDisplayName,
           $this->userEmail
-        ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
+          ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
       }
 
       $statusMsg .= ' ' . ts("An acknowledgment email has been sent to %1.<br />", array(1 => $this->userEmail));
@@ -626,7 +635,10 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
           "billing_mode IN ( 1, 3 )"
         );
         if (count($processors) > 0) {
-          $statusMsg .= ' ' . ts("If a payment is due now, you can record <a href='%1'>a check, EFT, or cash payment for this pledge</a> OR <a href='%2'>submit a credit card payment</a>.", array(1 => $contribURL, 2 => $creditURL));
+          $statusMsg .= ' ' . ts("If a payment is due now, you can record <a href='%1'>a check, EFT, or cash payment for this pledge</a> OR <a href='%2'>submit a credit card payment</a>.", array(
+                1 => $contribURL,
+                2 => $creditURL
+              ));
         }
         else {
           $statusMsg .= ' ' . ts("If a payment is due now, you can record <a href='%1'>a check, EFT, or cash payment for this pledge</a>.", array(1 => $contribURL));
@@ -639,19 +651,19 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     if ($this->_context == 'standalone') {
       if ($buttonName == $this->getButtonName('upload', 'new')) {
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/pledge/add',
-            'reset=1&action=add&context=standalone'
-          ));
+          'reset=1&action=add&context=standalone'
+        ));
       }
       else {
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
-            "reset=1&cid={$this->_contactID}&selectedChild=pledge"
-          ));
+          "reset=1&cid={$this->_contactID}&selectedChild=pledge"
+        ));
       }
     }
     elseif ($buttonName == $this->getButtonName('upload', 'new')) {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view/pledge',
-          "reset=1&action=add&context=pledge&cid={$this->_contactID}"
-        ));
+        "reset=1&action=add&context=pledge&cid={$this->_contactID}"
+      ));
     }
   }
 }

@@ -53,7 +53,7 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
   public static function del($entityId, $entityTable) {
     // delete all discount records with the selected discounted id
     $discount = new CRM_Core_DAO_Discount();
-    $discount->entity_id    = $entityId;
+    $discount->entity_id = $entityId;
     $discount->entity_table = $entityTable;
     if ($discount->delete()) {
       return TRUE;
@@ -94,9 +94,9 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    *   option group Ids associated with discount
    */
   public static function getOptionGroup($entityId, $entityTable) {
-    $optionGroupIDs    = array();
+    $optionGroupIDs = array();
     $dao = new CRM_Core_DAO_Discount();
-    $dao->entity_id    = $entityId;
+    $dao->entity_id = $entityId;
     $dao->entity_table = $entityTable;
     $dao->find();
     while ($dao->fetch()) {
@@ -125,7 +125,7 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
     }
 
     $dao = new CRM_Core_DAO_Discount();
-    $dao->entity_id    = $entityID;
+    $dao->entity_id = $entityID;
     $dao->entity_table = $entityTable;
     $dao->find();
 

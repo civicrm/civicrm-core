@@ -328,7 +328,7 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
 ";
       }
       $params = array(
-      1 => array($contactID, 'Integer'),
+        1 => array($contactID, 'Integer'),
         2 => array($selectedContactID, 'Integer'),
       );
       return CRM_Core_DAO::singleValueQuery($query, $params);
@@ -346,8 +346,9 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
   public static function validateOnlyChecksum($contactID, &$form, $redirect = TRUE) {
     // check if this is of the format cs=XXX
     if (!CRM_Contact_BAO_Contact_Utils::validChecksum($contactID,
-        CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE)
-      )) {
+      CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE)
+    )
+    ) {
       if ($redirect) {
         // also set a message in the UF framework
         $message = ts('You do not have permission to edit this contact record. Contact the site administrator if you need assistance.');

@@ -41,13 +41,13 @@
  * structure, similar to what is used in GenCode.php
  *
  * $table = array(
-    'name'       => TABLE_NAME,
+ * 'name'       => TABLE_NAME,
  *                'attributes' => ATTRIBUTES,
  *                'fields'     => array(
  *                                      array(
-    'name'          => FIELD_NAME,
+ * 'name'          => FIELD_NAME,
  *                                             'type'          => FIELD_SQL_TYPE,
- // can be field, index, constraint
+ * // can be field, index, constraint
  *                                             'class'         => FIELD_CLASS_TYPE,
  *                                             'primary'       => BOOLEAN,
  *                                             'required'      => BOOLEAN,
@@ -437,7 +437,12 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
         $lengthName = isset($substrLenghts[$table][$field]) ? "_{$substrLenghts[$table][$field]}" : '';
         $lengthSize = isset($substrLenghts[$table][$field]) ? "({$substrLenghts[$table][$field]})" : '';
 
-        $names = array("index_{$field}{$lengthName}", "FK_{$table}_{$field}{$lengthName}", "UI_{$field}{$lengthName}", "{$createIndexPrefix}_{$field}{$lengthName}");
+        $names = array(
+          "index_{$field}{$lengthName}",
+          "FK_{$table}_{$field}{$lengthName}",
+          "UI_{$field}{$lengthName}",
+          "{$createIndexPrefix}_{$field}{$lengthName}"
+        );
 
         // skip to the next $field if one of the above $names exists; handle multilingual for CRM-4126
         foreach ($names as $name) {
@@ -482,7 +487,8 @@ UPDATE civicrm_custom_field
 SET    text_length = %1
 WHERE  id = %2
 ";
-    $params = array(1 => array($length, 'Integer'),
+    $params = array(
+      1 => array($length, 'Integer'),
       2 => array($customFieldID, 'Integer'),
     );
     CRM_Core_DAO::executeQuery($sql, $params);
@@ -514,12 +520,12 @@ MODIFY      {$columnName} varchar( $length )
     }
     else {
       CRM_Core_Error::fatal(ts('Could Not Find Custom Field Details for %1, %2, %3',
-          array(
-            1 => $tableName,
-            2 => $columnName,
-            3 => $customFieldID,
-          )
-        ));
+        array(
+          1 => $tableName,
+          2 => $columnName,
+          3 => $customFieldID,
+        )
+      ));
     }
   }
 }

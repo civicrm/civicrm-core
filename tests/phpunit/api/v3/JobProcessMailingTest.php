@@ -38,6 +38,7 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 //@todo - why doesn't class loader find these (I tried renaming)
 require_once 'CiviTest/CiviMailUtils.php';
+
 /**
  * Class api_v3_JobTest
  */
@@ -101,7 +102,11 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   public function createContactsInGroup($count, $groupID) {
     for ($i = 1; $i <= $count; $i++) {
       $contactID = $this->individualCreate(array('first_name' => $count, 'email' => 'mail' . $i . '@nul.com'));
-      $this->callAPISuccess('group_contact', 'create', array('contact_id' => $contactID, 'group_id' => $groupID, 'status' => 'Added'));
+      $this->callAPISuccess('group_contact', 'create', array(
+          'contact_id' => $contactID,
+          'group_id' => $groupID,
+          'status' => 'Added'
+        ));
     }
   }
 

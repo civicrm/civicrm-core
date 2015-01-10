@@ -123,7 +123,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
       $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999, 'html-header');
     }
 
-    $priceField    = array();
+    $priceField = array();
     $priceFieldBAO = new CRM_Price_BAO_PriceField();
 
     // fkey is sid
@@ -218,7 +218,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    *
    * @param string $action
    *   The action to be invoked.
-
    *
    * @return void
    */

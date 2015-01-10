@@ -88,5 +88,6 @@ AND    c.id IN ( $contactIDs )";
    *
    * @return void
    */
-  public function postProcess() {}
+  public function postProcess() {
+  }
 }

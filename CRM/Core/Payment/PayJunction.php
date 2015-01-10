@@ -63,7 +63,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
    * @abstract
    */
   public function doDirectPayment(&$params) {
-    $logon    = $this->_paymentProcessor['user_name'];
+    $logon = $this->_paymentProcessor['user_name'];
     $password = $this->_paymentProcessor['password'];
     $url_site = $this->_paymentProcessor['url_site'];
 
@@ -122,9 +122,9 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
 
       // Recur Variables
       $dc_schedule_create = $params['is_recur'];
-      $recurUnit          = $params['frequency_unit'];
-      $recurInterval      = $params['frequency_interval'];
-      $dc_schedule_start  = $params['dc_schedule_start'];
+      $recurUnit = $params['frequency_unit'];
+      $recurInterval = $params['frequency_interval'];
+      $dc_schedule_start = $params['dc_schedule_start'];
 
       // next payment in moneris required format
       $startDate = date("Y/m/d", $next);

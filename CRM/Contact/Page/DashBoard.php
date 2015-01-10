@@ -72,8 +72,8 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
     }
 
     //check that default FROM email address, owner (domain) organization name and default mailbox are configured.
-    $fromEmailOK      = TRUE;
-    $ownerOrgOK       = TRUE;
+    $fromEmailOK = TRUE;
+    $ownerOrgOK = TRUE;
     $defaultMailboxOK = TRUE;
 
     // Don't put up notices if user doesn't have administer CiviCRM permission

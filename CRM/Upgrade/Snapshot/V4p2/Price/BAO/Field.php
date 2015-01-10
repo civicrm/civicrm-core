@@ -121,10 +121,10 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
     for ($index = 1; $index <= $maxIndex; $index++) {
 
       if (array_key_exists('option_amount', $params) &&
-          array_key_exists($index, $params['option_amount']) &&
-          (CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_label', $params)) || !empty($params['is_quick_config'])) &&
-          !CRM_Utils_System::isNull($params['option_amount'][$index])
-          ) {
+        array_key_exists($index, $params['option_amount']) &&
+        (CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_label', $params)) || !empty($params['is_quick_config'])) &&
+        !CRM_Utils_System::isNull($params['option_amount'][$index])
+      ) {
         $options = array(
           'price_field_id' => $priceField->id,
           'label' => trim($params['option_label'][$index]),
@@ -269,9 +269,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
     switch ($field->html_type) {
       case 'Text':
         $optionKey = key($customOption);
-        $count     = CRM_Utils_Array::value('count', $customOption[$optionKey], '');
+        $count = CRM_Utils_Array::value('count', $customOption[$optionKey], '');
         $max_value = CRM_Utils_Array::value('max_value', $customOption[$optionKey], '');
-        $priceVal  = implode($seperator, array($customOption[$optionKey][$valueFieldName], $count, $max_value));
+        $priceVal = implode($seperator, array($customOption[$optionKey][$valueFieldName], $count, $max_value));
 
         $extra = array();
         if (property_exists($qf, '_quickConfig') && $qf->_quickConfig && property_exists($qf, '_contributionAmount') && $qf->_contributionAmount) {
@@ -296,7 +296,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
         $element = &$qf->add('text', $elementName, $label,
           array_merge($extra,
             array(
-        'price' => json_encode(array($optionKey, $priceVal)),
+              'price' => json_encode(array($optionKey, $priceVal)),
               'size' => '4',
             )
           ),
@@ -333,22 +333,22 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
             $opt['label'] = !empty($opt['label']) ? $opt['label'] . '&nbsp;-&nbsp;' : '';
             $opt['label'] .= CRM_Utils_Money::format($opt[$valueFieldName]);
           }
-          $count     = CRM_Utils_Array::value('count', $opt, '');
+          $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
-          $priceVal  = implode($seperator, array($opt[$valueFieldName], $count, $max_value));
+          $priceVal = implode($seperator, array($opt[$valueFieldName], $count, $max_value));
           $extra = array(
-          'price' => json_encode(array($elementName, $priceVal)),
-                         'data-amount' => $opt[$valueFieldName],
-                         'data-currency' => $currencyName,
-                         );
+            'price' => json_encode(array($elementName, $priceVal)),
+            'data-amount' => $opt[$valueFieldName],
+            'data-currency' => $currencyName,
+          );
           if (property_exists($qf, '_quickConfig') && $qf->_quickConfig && $field->name == 'contribution_amount') {
             $extra += array('onclick' => 'clearAmountOther();');
           }
           elseif (property_exists($qf, '_quickConfig') && $qf->_quickConfig && $field->name == 'membership_amount') {
             $extra += array(
-            'onclick' => "return showHideAutoRenew({$opt['membership_type_id']});",
-                            'membership-type' => $opt['membership_type_id'],
-                            );
+              'onclick' => "return showHideAutoRenew({$opt['membership_type_id']});",
+              'membership-type' => $opt['membership_type_id'],
+            );
             $qf->assign('membershipFieldID', $field->id);
           }
           $choice[$opId] = $qf->createElement('radio', NULL, '', $opt['label'], $opt['id'], $extra);
@@ -416,7 +416,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
         }
         $element = &$qf->add('select', $elementName, $label,
           array(
-            '' => ts('- select -')) + $selectOption,
+            '' => ts('- select -')
+          ) + $selectOption,
           $useRequired && $field->is_required,
           array('price' => json_encode($priceVal))
         );
@@ -432,9 +433,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
 
         $check = array();
         foreach ($customOption as $opId => $opt) {
-          $count     = CRM_Utils_Array::value('count', $opt, '');
+          $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
-          $priceVal  = implode($seperator, array($opt[$valueFieldName], $count, $max_value));
+          $priceVal = implode($seperator, array($opt[$valueFieldName], $count, $max_value));
 
           if ($field->is_display_amounts) {
             $opt['label'] .= '&nbsp;-&nbsp;';
@@ -442,7 +443,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
           }
           $check[$opId] = &$qf->createElement('checkbox', $opt['id'], NULL, $opt['label'],
             array(
-          'price' => json_encode(array($opt['id'], $priceVal)),
+              'price' => json_encode(array($opt['id'], $priceVal)),
               'data-amount' => $opt[$valueFieldName],
               'data-currency' => $currencyName,
             )
@@ -513,7 +514,10 @@ WHERE
     AND option_group.id    = option_value.option_group_id
     AND option_value.label = %2";
 
-    $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($optionGroupName, 'String'), 2 => array($optionLabel, 'String')));
+    $dao = CRM_Core_DAO::executeQuery($query, array(
+        1 => array($optionGroupName, 'String'),
+        2 => array($optionLabel, 'String')
+      ));
 
     while ($dao->fetch()) {
       return $dao->id;

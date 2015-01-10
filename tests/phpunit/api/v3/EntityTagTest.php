@@ -31,8 +31,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_entity_tag_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Core
+ * @package CiviCRM_APIv3
+ * @subpackage API_Core
  */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -96,10 +96,10 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
   }
 
   public function testAddDouble() {
-    $individualId   = $this->_individualID;
+    $individualId = $this->_individualID;
     $organizationId = $this->_organizationID;
-    $tagID          = $this->_tagID;
-    $params         = array(
+    $tagID = $this->_tagID;
+    $params = array(
       'contact_id' => $individualId,
       'tag_id' => $tagID,
     );
@@ -122,8 +122,8 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
   ///////////////// civicrm_entity_tag_get methods
   public function testGetNoEntityID() {
     $ContactId = $this->_individualID;
-    $tagID     = $this->_tagID;
-    $params    = array(
+    $tagID = $this->_tagID;
+    $params = array(
       'contact_id' => $ContactId,
       'tag_id' => $tagID,
     );
@@ -136,8 +136,8 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
 
   public function testIndividualEntityTagGet() {
     $contactId = $this->_individualID;
-    $tagID     = $this->_tagID;
-    $params    = array(
+    $tagID = $this->_tagID;
+    $params = array(
       'contact_id' => $contactId,
       'tag_id' => $tagID,
     );
@@ -153,8 +153,8 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
 
   public function testHouseholdEntityGet() {
     $ContactId = $this->_householdID;
-    $tagID     = $this->_tagID;
-    $params    = array(
+    $tagID = $this->_tagID;
+    $params = array(
       'contact_id' => $ContactId,
       'tag_id' => $tagID,
     );
@@ -165,8 +165,8 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
 
   public function testOrganizationEntityGet() {
     $ContactId = $this->_organizationID;
-    $tagID     = $this->_tagID;
-    $params    = array(
+    $tagID = $this->_tagID;
+    $params = array(
       'contact_id' => $ContactId,
       'tag_id' => $tagID,
     );

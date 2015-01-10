@@ -53,10 +53,10 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     parent::setUp();
     $this->_cId_a = $this->individualCreate();
     $this->_cId_a_2 = $this->individualCreate(array(
-        'last_name' => 'c2',
-        'email' => 'c@w.com',
-        'contact_type' => 'Individual',
-      ));
+      'last_name' => 'c2',
+      'email' => 'c@w.com',
+      'contact_type' => 'Individual',
+    ));
     $this->_cId_b = $this->organizationCreate();
     $this->_cId_b2 = $this->organizationCreate(array('organization_name' => ' Org 2'));
     $this->_entity = 'relationship';

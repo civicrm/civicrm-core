@@ -143,8 +143,8 @@ class CRM_Activity_Form_Task extends CRM_Core_Form {
     }
     else {
       $session->replaceUserContext(CRM_Utils_System::url("civicrm/contact/search/$searchFormName",
-          $urlParams
-        ));
+        $urlParams
+      ));
     }
   }
 

@@ -308,7 +308,8 @@ ORDER BY parent_id, weight";
 
       // for each menu get their children
       $navigationTree[$navigation->id] = array(
-        'attributes' => array('label' => $label,
+        'attributes' => array(
+          'label' => $label,
           'name' => $navigation->name,
           'url' => $navigation->url,
           'permission' => $navigation->permission,
@@ -317,7 +318,8 @@ ORDER BY parent_id, weight";
           'parentID' => $navigation->parent_id,
           'navID' => $navigation->id,
           'active' => $navigation->is_active,
-        ));
+        )
+      );
       self::buildNavigationTree($navigationTree[$navigation->id]['child'], $navigation->id, $navigationMenu);
     }
 
@@ -479,15 +481,15 @@ ORDER BY parent_id, weight";
     // want to use ts() as it would throw the ts-extractor off
     $i18n = CRM_Core_I18n::singleton();
 
-    $name       = $i18n->crm_translate($value['attributes']['label'], array('context' => 'menu'));
-    $url        = $value['attributes']['url'];
+    $name = $i18n->crm_translate($value['attributes']['label'], array('context' => 'menu'));
+    $url = $value['attributes']['url'];
     $permission = $value['attributes']['permission'];
-    $operator   = $value['attributes']['operator'];
-    $parentID   = $value['attributes']['parentID'];
-    $navID      = $value['attributes']['navID'];
-    $active     = $value['attributes']['active'];
-    $menuName   = $value['attributes']['name'];
-    $target     = CRM_Utils_Array::value('target', $value['attributes']);
+    $operator = $value['attributes']['operator'];
+    $parentID = $value['attributes']['parentID'];
+    $navID = $value['attributes']['navID'];
+    $active = $value['attributes']['active'];
+    $menuName = $value['attributes']['name'];
+    $target = CRM_Utils_Array::value('target', $value['attributes']);
 
     if (in_array($parentID, $skipMenuItems) || !$active) {
       $skipMenuItems[] = $navID;
@@ -496,7 +498,9 @@ ORDER BY parent_id, weight";
 
     //we need to check core view/edit or supported acls.
     if (in_array($menuName, array(
-      'Search...', 'Contacts'))) {
+      'Search...',
+      'Contacts'
+    ))) {
       if (!CRM_Core_Permission::giveMeAllACLs()) {
         $skipMenuItems[] = $navID;
         return FALSE;
@@ -692,11 +696,11 @@ ORDER BY parent_id, weight";
    * @static
    */
   public static function processNavigation(&$params) {
-    $nodeID      = (int)str_replace("node_", "", $params['id']);
-    $referenceID = (int)str_replace("node_", "", $params['ref_id']);
-    $position    = $params['ps'];
-    $type        = $params['type'];
-    $label       = CRM_Utils_Array::value('data', $params);
+    $nodeID = (int) str_replace("node_", "", $params['id']);
+    $referenceID = (int) str_replace("node_", "", $params['ref_id']);
+    $position = $params['ps'];
+    $type = $params['type'];
+    $label = CRM_Utils_Array::value('data', $params);
 
     switch ($type) {
       case "move":
@@ -748,14 +752,14 @@ ORDER BY parent_id, weight";
     }
 
     $incrementOtherNodes = TRUE;
-    $sql    = "SELECT weight from civicrm_navigation WHERE {$parentClause} ORDER BY weight LIMIT %1, 1";
+    $sql = "SELECT weight from civicrm_navigation WHERE {$parentClause} ORDER BY weight LIMIT %1, 1";
     $params = array(1 => array($position, 'Positive'));
     $newWeight = CRM_Core_DAO::singleValueQuery($sql, $params);
 
     // this means node is moved to last position, so you need to get the weight of last element + 1
     if (!$newWeight) {
       $lastPosition = $position - 1;
-      $sql    = "SELECT weight from civicrm_navigation WHERE {$parentClause} ORDER BY weight LIMIT %1, 1";
+      $sql = "SELECT weight from civicrm_navigation WHERE {$parentClause} ORDER BY weight LIMIT %1, 1";
       $params = array(1 => array($lastPosition, 'Positive'));
       $newWeight = CRM_Core_DAO::singleValueQuery($sql, $params);
 
@@ -814,9 +818,9 @@ ORDER BY parent_id, weight";
    * @static
    */
   public static function getNavigationInfo($navigationID) {
-    $query  = "SELECT parent_id, weight FROM civicrm_navigation WHERE id = %1";
+    $query = "SELECT parent_id, weight FROM civicrm_navigation WHERE id = %1";
     $params = array($navigationID, 'Integer');
-    $dao    = CRM_Core_DAO::executeQuery($query, array(1 => $params));
+    $dao = CRM_Core_DAO::executeQuery($query, array(1 => $params));
     $dao->fetch();
     return array(
       'parent_id' => $dao->parent_id,

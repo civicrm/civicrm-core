@@ -85,16 +85,20 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
 
     //we allow the controller to set force/reset externally,
     //useful when we are being driven by the wizard framework
-    $this->_limit   = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
-    $this->_force   = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
+    $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
+    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
-    $this->_reset   = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
 
     //operation for state machine.
     $this->_operation = CRM_Utils_Request::retrieve('op', 'String', $this, FALSE, 'reserve');
     //validate operation.
     if (!in_array($this->_operation, array(
-      'reserve', 'release', 'interview'))) {
+      'reserve',
+      'release',
+      'interview'
+    ))
+    ) {
       $this->_operation = 'reserve';
       $this->set('op', $this->_operation);
     }
@@ -228,7 +232,8 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
         $taskValue = array(
           $currentTaskValue => ts('Record %1 Responses',
             array(1 => $activityTypes[$surveyTypeId])
-          ));
+          )
+        );
       }
 
       $this->addTaskMenu($taskValue);
@@ -350,7 +355,10 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     //apply filter of survey contact type for search.
     $contactType = CRM_Campaign_BAO_Survey::getSurveyContactType(CRM_Utils_Array::value('campaign_survey_id', $this->_formValues));
     if ($contactType && in_array($this->_operation, array(
-      'reserve', 'interview'))) {
+        'reserve',
+        'interview'
+      ))
+    ) {
       $this->_formValues['contact_type'][$contactType] = 1;
     }
 
@@ -367,7 +375,9 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
         $groups = CRM_Utils_Array::value('group', $this->_formValues);
         if ($campaignId && CRM_Utils_System::isNull($groups)) {
           $campGroups = CRM_Campaign_BAO_Campaign::getCampaignGroups($campaignId);
-          foreach ($campGroups as $id => $title) $this->_formValues['group'][$id] = 1;
+          foreach ($campGroups as $id => $title) {
+            $this->_formValues['group'][$id] = 1;
+          }
         }
 
         //carry servey id w/ this.

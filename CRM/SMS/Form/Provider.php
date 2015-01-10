@@ -97,7 +97,10 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
       $attributes['title'], TRUE
     );
 
-    $this->addRule('title', ts('This Title already exists in Database.'), 'objectExists', array('CRM_SMS_DAO_Provider', $this->_id));
+    $this->addRule('title', ts('This Title already exists in Database.'), 'objectExists', array(
+        'CRM_SMS_DAO_Provider',
+        $this->_id
+      ));
 
     $this->add('text', 'username', ts('Username'),
       $attributes['username'], TRUE

@@ -39,7 +39,6 @@
  * $Id$
  *
  */
-
 class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
   private $skipFields = NULL;
 

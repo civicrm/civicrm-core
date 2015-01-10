@@ -111,7 +111,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
 
     $breadCrumb = array(
       array(
-    'title' => ts('Financial Type Accounts'),
+        'title' => ts('Financial Type Accounts'),
         'url' => $url,
       ),
     );
@@ -165,14 +165,14 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
     if ($this->_action == CRM_Core_Action::ADD) {
       if (!empty($this->_submitValues['account_relationship']) || !empty($this->_submitValues['financial_account_id'])) {
         $financialAccountType = array(
-           '5' => 5, //expense
-           '3' => 1, //AR relation
-           '1' => 3, //revenue
-           '6' => 1, //Asset
-           '7' => 4, //cost of sales
-           '8' => 1, //premium inventory
-           '9' => 3 //discount account is,
-          );
+          '5' => 5, //expense
+          '3' => 1, //AR relation
+          '1' => 3, //revenue
+          '6' => 1, //Asset
+          '7' => 4, //cost of sales
+          '8' => 1, //premium inventory
+          '9' => 3 //discount account is,
+        );
 
         $financialAccountType = CRM_Utils_Array::value($this->_submitValues['account_relationship'], $financialAccountType);
         $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);
@@ -181,8 +181,8 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
       }
       else {
         $financialAccountSelect = array(
-          'select' => ts('- select -'),
-        ) + CRM_Contribute_PseudoConstant::financialAccount();
+            'select' => ts('- select -'),
+          ) + CRM_Contribute_PseudoConstant::financialAccount();
       }
     }
     if ($this->_action == CRM_Core_Action::UPDATE) {
@@ -194,7 +194,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
         '7' => 4, //cost of sales
         '8' => 1, //premium inventory
         '9' => 3 //discount account is,
-       );
+      );
 
       $financialAccountType = $financialAccountType[$this->_defaultValues['account_relationship']];
       $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);
@@ -210,20 +210,21 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
     );
 
     $this->addButtons(array(
-      array(
-        'type'      => 'next',
-        'name'      => ts('Save'),
-        'isDefault' => TRUE,
-      ),
-      array(
-        'type'      => 'next',
-        'name'      => ts('Save and New'),
-        'subName'   => 'new',
-      ),
-      array(
-        'type'      => 'cancel',
-        'name'      => ts('Cancel'),
-      ))
+        array(
+          'type' => 'next',
+          'name' => ts('Save'),
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'next',
+          'name' => ts('Save and New'),
+          'subName' => 'new',
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        )
+      )
     );
     $this->addFormRule(array('CRM_Financial_Form_FinancialTypeAccount', 'formRule'), $this);
   }
@@ -265,7 +266,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
     if (!empty($values['account_relationship']) && !empty($values['financial_account_id'])) {
       $params = array(
         'account_relationship' => $values['account_relationship'],
-        'entity_id'            => $self->_aid,
+        'entity_id' => $self->_aid,
       );
       $defaults = array();
       if ($self->_action == CRM_Core_Action::ADD) {

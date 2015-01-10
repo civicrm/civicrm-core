@@ -116,9 +116,12 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
           $toDisplayName = $toEmail;
         }
 
-        $to                = '"' . $toDisplayName . '"' . "<$toEmail>";
-        $from              = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
-        $testMailStatusMsg = ts('Sending test email. FROM: %1 TO: %2.<br />', array(1 => $domainEmailAddress, 2 => $toEmail));
+        $to = '"' . $toDisplayName . '"' . "<$toEmail>";
+        $from = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
+        $testMailStatusMsg = ts('Sending test email. FROM: %1 TO: %2.<br />', array(
+            1 => $domainEmailAddress,
+            2 => $toEmail
+          ));
 
         $params = array();
         if ($formValues['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_SMTP) {
@@ -131,7 +134,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
           if ($formValues['smtpAuth']) {
             $params['username'] = $formValues['smtpUsername'];
             $params['password'] = $formValues['smtpPassword'];
-            $params['auth']     = TRUE;
+            $params['auth'] = TRUE;
           }
           else {
             $params['auth'] = FALSE;
@@ -154,8 +157,8 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
           $mailerName = 'sendmail';
         }
         elseif ($formValues['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_MAIL) {
-          $subject    = "Test for PHP mail settings";
-          $message    = "mail settings are correct.";
+          $subject = "Test for PHP mail settings";
+          $message = "mail settings are correct.";
           $mailerName = 'mail';
         }
 

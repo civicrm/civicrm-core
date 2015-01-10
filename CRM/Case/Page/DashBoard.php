@@ -85,9 +85,9 @@ class CRM_Case_Page_DashBoard extends CRM_Core_Page {
     ) {
       $this->assign('newClient', TRUE);
     }
-    $summary  = CRM_Case_BAO_Case::getCasesSummary($allCases, $userID);
+    $summary = CRM_Case_BAO_Case::getCasesSummary($allCases, $userID);
     $upcoming = CRM_Case_BAO_Case::getCases($allCases, $userID, 'upcoming');
-    $recent   = CRM_Case_BAO_Case::getCases($allCases, $userID, 'recent');
+    $recent = CRM_Case_BAO_Case::getCases($allCases, $userID, 'recent');
 
     foreach ($upcoming as $key => $value) {
       if (strtotime($value['case_scheduled_activity_date']) < time()) {

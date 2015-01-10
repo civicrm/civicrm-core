@@ -1,6 +1,7 @@
 body {
   background: #eee;
 }
+
 #All {
   font-family: Arial, sans-serif;
   width: auto;
@@ -11,9 +12,11 @@ body {
   background: #fff;
   max-width: 1200px;
 }
+
 form {
   margin: 0;
 }
+
 h1 {
   margin-top: 0;
 }
@@ -48,6 +51,7 @@ p.error {
   color: white;
   clear: both;
 }
+
 p.warning {
   padding: 0.5em;
   background-color: #e70;
@@ -55,6 +59,7 @@ p.warning {
   color: white;
   clear: both;
 }
+
 p.good {
   padding: 0.5em;
   background-color: #0c0;
@@ -71,6 +76,7 @@ p.error a {
   border-collapse: collapse;
   font-size: 80%;
 }
+
 .testResults td {
   border: 1px #ccc solid;
   width: 400px;

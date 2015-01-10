@@ -37,24 +37,24 @@
  */
 class CRM_Activity_Page_AJAX {
   public static function getCaseActivity() {
-    $caseID    = CRM_Utils_Type::escape($_GET['caseID'], 'Integer');
+    $caseID = CRM_Utils_Type::escape($_GET['caseID'], 'Integer');
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
-    $userID    = CRM_Utils_Type::escape($_GET['userID'], 'Integer');
-    $context   = CRM_Utils_Type::escape(CRM_Utils_Array::value('context', $_GET), 'String');
+    $userID = CRM_Utils_Type::escape($_GET['userID'], 'Integer');
+    $context = CRM_Utils_Type::escape(CRM_Utils_Array::value('context', $_GET), 'String');
 
     $sortMapper = array(
       0 => 'display_date',
-    1 => 'ca.subject',
-    2 => 'ca.activity_type_id',
+      1 => 'ca.subject',
+      2 => 'ca.activity_type_id',
       3 => 'acc.sort_name',
-    4 => 'cc.sort_name',
-    5 => 'ca.status_id',
+      4 => 'cc.sort_name',
+      5 => 'ca.status_id',
     );
 
-    $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
-    $offset    = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
-    $rowCount  = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
-    $sort      = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
+    $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
+    $offset = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
+    $rowCount = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
+    $sort = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
 
     $params = $_POST;
@@ -69,7 +69,16 @@ class CRM_Activity_Page_AJAX {
     $activities = CRM_Case_BAO_Case::getCaseActivity($caseID, $params, $contactID, $context, $userID);
 
     $iFilteredTotal = $iTotal = $params['total'];
-    $selectorElements = array('display_date', 'subject', 'type', 'with_contacts', 'reporter', 'status', 'links', 'class');
+    $selectorElements = array(
+      'display_date',
+      'subject',
+      'type',
+      'with_contacts',
+      'reporter',
+      'status',
+      'links',
+      'class'
+    );
 
     echo CRM_Utils_JSON::encodeDataTableSelector($activities, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
@@ -78,14 +87,14 @@ class CRM_Activity_Page_AJAX {
   public static function getCaseGlobalRelationships() {
     $sortMapper = array(
       0 => 'sort_name',
-    1 => 'phone',
-    2 => 'email',
+      1 => 'phone',
+      2 => 'email',
     );
 
-    $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
-    $offset    = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
-    $rowCount  = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
-    $sort      = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
+    $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
+    $offset = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
+    $rowCount = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
+    $sort = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
 
     $params = $_POST;
@@ -111,20 +120,20 @@ class CRM_Activity_Page_AJAX {
   }
 
   public static function getCaseClientRelationships() {
-    $caseID    = CRM_Utils_Type::escape($_GET['caseID'], 'Integer');
+    $caseID = CRM_Utils_Type::escape($_GET['caseID'], 'Integer');
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
 
     $sortMapper = array(
       0 => 'relation',
-    1 => 'name',
-    2 => 'phone',
-    3 => 'email',
+      1 => 'name',
+      2 => 'phone',
+      3 => 'email',
     );
 
-    $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
-    $offset    = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
-    $rowCount  = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
-    $sort      = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : 'relation';
+    $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
+    $offset = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
+    $rowCount = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
+    $sort = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : 'relation';
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
 
     $params = $_POST;
@@ -151,7 +160,7 @@ class CRM_Activity_Page_AJAX {
 
     // sort clientRelationships array using jquery call params
     foreach ($clientRelationships as $key => $row) {
-      $sortArray[$key]  = $row[$sort];
+      $sortArray[$key] = $row[$sort];
     }
     $sort_type = "SORT_" . strtoupper($sortOrder);
     array_multisort($sortArray, constant($sort_type), $clientRelationships);
@@ -163,7 +172,7 @@ class CRM_Activity_Page_AJAX {
     // after sort we can update username fields to be a url
     foreach ($clientRelationships as $key => $value) {
       $clientRelationships[$key]['name'] = '<a href=' . CRM_Utils_System::url('civicrm/contact/view',
-       'action=view&reset=1&cid=' . $clientRelationships[$key]['cid']) . '>' . $clientRelationships[$key]['name'] . '</a>';
+          'action=view&reset=1&cid=' . $clientRelationships[$key]['cid']) . '>' . $clientRelationships[$key]['name'] . '</a>';
     }
 
     $iFilteredTotal = $iTotal = $params['total'] = count($allClientRelationships);
@@ -175,21 +184,21 @@ class CRM_Activity_Page_AJAX {
 
 
   public static function getCaseRoles() {
-    $caseID    = CRM_Utils_Type::escape($_GET['caseID'], 'Integer');
+    $caseID = CRM_Utils_Type::escape($_GET['caseID'], 'Integer');
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
 
     $sortMapper = array(
       0 => 'relation',
-    1 => 'name',
-    2 => 'phone',
-    3 => 'email',
-    4 => 'actions',
+      1 => 'name',
+      2 => 'phone',
+      3 => 'email',
+      4 => 'actions',
     );
 
-    $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
-    $offset    = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
-    $rowCount  = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
-    $sort      = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : 'relation';
+    $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
+    $offset = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
+    $rowCount = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
+    $sort = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : 'relation';
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
 
     $params = $_POST;
@@ -200,7 +209,7 @@ class CRM_Activity_Page_AJAX {
     $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($contactID, $caseID);
     $caseTypeName = CRM_Case_BAO_Case::getCaseType($caseID, 'name');
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
-    $caseRoles    = $xmlProcessor->get($caseTypeName, 'CaseRoles');
+    $caseRoles = $xmlProcessor->get($caseTypeName, 'CaseRoles');
 
     $hasAccessToAllCases = CRM_Core_Permission::check('access all cases and activities');
 
@@ -252,7 +261,7 @@ class CRM_Activity_Page_AJAX {
 
     // sort clientRelationships array using jquery call params
     foreach ($caseRelationships as $key => $row) {
-      $sortArray[$key]  = $row[$sort];
+      $sortArray[$key] = $row[$sort];
     }
 
     $sort_type = "SORT_" . strtoupper($sortOrder);
@@ -271,7 +280,7 @@ class CRM_Activity_Page_AJAX {
       // view user links
       if (!empty($row['cid'])) {
         $row['name'] = '<a class="view-contact" title="' . ts('View Contact') . '" href=' . CRM_Utils_System::url('civicrm/contact/view',
-          'action=view&reset=1&cid=' . $row['cid']) . '>' . $row['name'] . '</a>';
+            'action=view&reset=1&cid=' . $row['cid']) . '>' . $row['name'] . '</a>';
       }
       // email column links/icon
       if ($row['email']) {
@@ -285,19 +294,19 @@ class CRM_Activity_Page_AJAX {
         switch ($row['source']) {
           case 'caseRel':
             $row['actions'] =
-            '<a href="#editCaseRoleDialog" title="' . ts('Reassign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '" data-rel_id="' . $row['rel_id'] . '"data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
+              '<a href="#editCaseRoleDialog" title="' . ts('Reassign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '" data-rel_id="' . $row['rel_id'] . '"data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
               '<span class="icon ui-icon-pencil"></span>' .
-            '</a>' .
-            '<a href="#deleteCaseRoleDialog" title="' . ts('Remove %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/delcaserole') . '">' .
+              '</a>' .
+              '<a href="#deleteCaseRoleDialog" title="' . ts('Remove %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/delcaserole') . '">' .
               '<span class="icon delete-icon"></span>' .
-            '</a>';
+              '</a>';
             break;
 
           case 'caseRoles':
             $row['actions'] =
-            '<a href="#editCaseRoleDialog" title="' . ts('Assign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
+              '<a href="#editCaseRoleDialog" title="' . ts('Assign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
               '<span class="icon ui-icon-pencil"></span>' .
-            '</a>';
+              '</a>';
             break;
         }
       }
@@ -365,7 +374,9 @@ class CRM_Activity_Page_AJAX {
      */
 
     if (in_array($params['mode'], array(
-      'move', 'file'))) {
+      'move',
+      'file'
+    ))) {
       $caseActivity = new CRM_Case_DAO_CaseActivity();
       $caseActivity->case_id = $params['caseID'];
       $caseActivity->activity_id = $otherActivity->id;
@@ -521,9 +532,15 @@ class CRM_Activity_Page_AJAX {
 
     $iFilteredTotal = $iTotal = $params['total'];
     $selectorElements = array(
-      'activity_type', 'subject', 'source_contact',
-      'target_contact', 'assignee_contact',
-      'activity_date', 'status', 'links', 'class',
+      'activity_type',
+      'subject',
+      'source_contact',
+      'target_contact',
+      'assignee_contact',
+      'activity_date',
+      'status',
+      'links',
+      'class',
     );
 
     echo CRM_Utils_JSON::encodeDataTableSelector($activities, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);

@@ -94,7 +94,7 @@ class CRM_Mailing_Form_Task extends CRM_Core_Form {
     else {
       $queryParams = $form->get('queryParams');
       $sortOrder = NULL;
-      if ($form->get(CRM_Utils_Sort::SORT_ORDER )) {
+      if ($form->get(CRM_Utils_Sort::SORT_ORDER)) {
         $sortOrder = $form->get(CRM_Utils_Sort::SORT_ORDER);
       }
 

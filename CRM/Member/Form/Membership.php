@@ -457,7 +457,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     if ($this->_context == 'standalone') {
-      $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE, 'api' => array('extra' => array('email'))), TRUE);
+      $this->addEntityRef('contact_id', ts('Contact'), array(
+          'create' => TRUE,
+          'api' => array('extra' => array('email'))
+        ), TRUE);
     }
 
     $selOrgMemType[0][0] = $selMemTypeOrg[0] = ts('- select -');
@@ -561,7 +564,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           }
           $memTypeJs = array(
             'onChange' =>
-            "CRM.buildCustomData( 'Membership', this.value ); buildAutoRenew(this.value, null );",
+              "CRM.buildCustomData( 'Membership', this.value ); buildAutoRenew(this.value, null );",
           );
         }
       }
@@ -580,7 +583,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_Membership', 'max_related')
     );
 
-    $sel = & $this->addElement('hierselect',
+    $sel = &$this->addElement('hierselect',
       'membership_type_id',
       ts('Membership Organization and Type'),
       $memTypeJs
@@ -889,7 +892,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
             }
             if (empty($params['status_id']) || in_array($params['status_id'], $status_ids) == FALSE) {
               $errors['status_id'] = ts('Please enter a status that does NOT represent a current membership status.');
-              $errors['is_override']  = ts('This must be checked because you set an End Date for a lifetime membership');
+              $errors['is_override'] = ts('This must be checked because you set an End Date for a lifetime membership');
             }
           }
           else {
@@ -948,7 +951,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
     if (isset($params['is_override']) &&
-      $params['is_override'] && empty($params['status_id'])) {
+      $params['is_override'] && empty($params['status_id'])
+    ) {
       $errors['status_id'] = ts('Please enter the status.');
     }
 
@@ -1202,7 +1206,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       if (!$this->_onlinePendingContributionId) {
         if (empty($formValues['source'])) {
-          $params['contribution_source'] = ts('%1 Membership: Offline signup (by %2)', array(1 => $membershipType, 2 => $userName));
+          $params['contribution_source'] = ts('%1 Membership: Offline signup (by %2)', array(
+              1 => $membershipType,
+              2 => $userName
+            ));
         }
         else {
           $params['contribution_source'] = $formValues['source'];

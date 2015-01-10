@@ -172,7 +172,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Add a script file
    *
-   * @param $url: string, absolute path to file
+   * @param $url : string, absolute path to file
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -189,7 +189,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Add an inline script
    *
-   * @param $code: string, javascript code
+   * @param $code : string, javascript code
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -206,7 +206,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Add a css file
    *
-   * @param $url: string, absolute path to file
+   * @param $url : string, absolute path to file
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -223,7 +223,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Add an inline style
    *
-   * @param $code: string, css code
+   * @param $code : string, css code
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -300,10 +300,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
-    $config    = CRM_Core_Config::singleton();
-    $script    = '';
+    $config = CRM_Core_Config::singleton();
+    $script = '';
     $separator = $htmlize ? '&amp;' : '&';
-    $wpPageParam    = '';
+    $wpPageParam = '';
     $fragment = isset($fragment) ? ('#' . $fragment) : '';
 
     $path = CRM_Utils_String::stripPathChars($path);
@@ -371,7 +371,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @return mixed|null|string
    */
   private function getBaseUrl($absolute, $frontend, $forceBackend) {
-    $config    = CRM_Core_Config::singleton();
+    $config = CRM_Core_Config::singleton();
 
     if (!isset($config->useFrameworkRelativeBase)) {
       $base = parse_url($config->userFrameworkBaseURL);
@@ -630,7 +630,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   public function updateCMSName($ufID, $ufName) {
     // CRM-10620
     if (function_exists('wp_update_user')) {
-      $ufID   = CRM_Utils_Type::escape($ufID, 'Integer');
+      $ufID = CRM_Utils_Type::escape($ufID, 'Integer');
       $ufName = CRM_Utils_Type::escape($ufName, 'String');
 
       $values = array('ID' => $ufID, 'user_email' => $ufName);
@@ -648,8 +648,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     $config = CRM_Core_Config::singleton();
 
-    $dao   = new CRM_Core_DAO();
-    $name  = $dao->escape(CRM_Utils_Array::value('name', $params));
+    $dao = new CRM_Core_DAO();
+    $name = $dao->escape(CRM_Utils_Array::value('name', $params));
     $email = $dao->escape(CRM_Utils_Array::value('mail', $params));
 
     if (!empty($params['name'])) {
@@ -693,11 +693,13 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function getLoggedInUserObject() {
     if (function_exists('is_user_logged_in') &&
-    is_user_logged_in()) {
+      is_user_logged_in()
+    ) {
       global $current_user;
     }
     return $current_user;
   }
+
   /**
    * Get currently logged in user uf id.
    *
@@ -797,7 +799,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function getUserRecordUrl($contactID) {
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
-    if (CRM_Core_Session::singleton()->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm(array('cms:administer users'))) {
+    if (CRM_Core_Session::singleton()
+        ->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm(array('cms:administer users'))
+    ) {
       return CRM_Core_Config::singleton()->userFrameworkBaseURL . "wp-admin/user-edit.php?user_id=" . $uid;
     }
   }

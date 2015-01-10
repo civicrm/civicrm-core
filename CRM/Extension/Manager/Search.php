@@ -92,8 +92,8 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
       CRM_Core_Error::fatal('This custom search is not registered.');
     }
 
-    $cs          = $this->getCustomSearchesById();
-    $id          = $cs[$customSearchesByName[$info->key]];
+    $cs = $this->getCustomSearchesById();
+    $id = $cs[$customSearchesByName[$info->key]];
     $optionValue = CRM_Core_BAO_OptionValue::del($id);
 
     return TRUE;
@@ -104,8 +104,8 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
    */
   public function onPreDisable(CRM_Extension_Info $info) {
     $customSearchesByName = $this->getCustomSearchesByName();
-    $cs          = $this->getCustomSearchesById();
-    $id          = $cs[$customSearchesByName[$info->key]];
+    $cs = $this->getCustomSearchesById();
+    $id = $cs[$customSearchesByName[$info->key]];
     $optionValue = CRM_Core_BAO_OptionValue::setIsActive($id, 0);
   }
 
@@ -114,8 +114,8 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
    */
   public function onPreEnable(CRM_Extension_Info $info) {
     $customSearchesByName = $this->getCustomSearchesByName();
-    $cs          = $this->getCustomSearchesById();
-    $id          = $cs[$customSearchesByName[$info->key]];
+    $cs = $this->getCustomSearchesById();
+    $id = $cs[$customSearchesByName[$info->key]];
     $optionValue = CRM_Core_BAO_OptionValue::setIsActive($id, 1);
   }
 

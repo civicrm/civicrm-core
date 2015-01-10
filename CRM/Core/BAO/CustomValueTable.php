@@ -48,29 +48,29 @@ class CRM_Core_BAO_CustomValueTable {
 
     foreach ($customParams as $tableName => $tables) {
       foreach ($tables as $index => $fields) {
-        $sqlOP      = NULL;
-        $hookID     = NULL;
-        $hookOP     = NULL;
-        $entityID   = NULL;
+        $sqlOP = NULL;
+        $hookID = NULL;
+        $hookOP = NULL;
+        $entityID = NULL;
         $isMultiple = FALSE;
-        $set        = array();
-        $params     = array();
-        $count      = 1;
+        $set = array();
+        $params = array();
+        $count = 1;
         foreach ($fields as $field) {
           if (!$sqlOP) {
-            $entityID   = $field['entity_id'];
-            $hookID     = $field['custom_group_id'];
+            $entityID = $field['entity_id'];
+            $hookID = $field['custom_group_id'];
             $isMultiple = $field['is_multiple'];
             if (array_key_exists('id', $field)) {
-              $sqlOP          = "UPDATE $tableName ";
-              $where          = " WHERE  id = %{$count}";
+              $sqlOP = "UPDATE $tableName ";
+              $where = " WHERE  id = %{$count}";
               $params[$count] = array($field['id'], 'Integer');
               $count++;
               $hookOP = 'edit';
             }
             else {
-              $sqlOP  = "INSERT INTO $tableName ";
-              $where  = NULL;
+              $sqlOP = "INSERT INTO $tableName ";
+              $where = NULL;
               $hookOP = 'create';
             }
           }
@@ -227,9 +227,9 @@ class CRM_Core_BAO_CustomValueTable {
             $params[$count] = array($entityID, 'Integer');
             $count++;
 
-            $fieldNames  = implode(',', array_keys($set));
+            $fieldNames = implode(',', array_keys($set));
             $fieldValues = implode(',', array_values($set));
-            $query       = "$sqlOP ( $fieldNames ) VALUES ( $fieldValues )";
+            $query = "$sqlOP ( $fieldNames ) VALUES ( $fieldValues )";
             // for multiple values we dont do on duplicate key update
             if (!$isMultiple) {
               $query .= " ON DUPLICATE KEY UPDATE $setClause";
@@ -518,8 +518,8 @@ AND    $cond
         $fieldID = (int ) $customFieldInfo[0];
         if (CRM_Utils_Type::escape($fieldID, 'Integer', FALSE) === NULL) {
           return CRM_Core_Error::createAPIError(ts('field ID needs to be of type Integer for index %1',
-              array(1 => $fieldID)
-            ));
+            array(1 => $fieldID)
+          ));
         }
         if (!array_key_exists($fieldID, $fieldValues)) {
           $fieldValues[$fieldID] = array();
@@ -582,11 +582,11 @@ AND    cf.id IN ( $fieldIDList )
         // Ensure that value is of the right data type
         elseif (CRM_Utils_Type::escape($fieldValue['value'], $dataType, FALSE) === NULL) {
           return CRM_Core_Error::createAPIError(ts('value: %1 is not of the right field data type: %2',
-              array(
-                1 => $fieldValue['value'],
-                2 => $dao->data_type,
-              )
-            ));
+            array(
+              1 => $fieldValue['value'],
+              2 => $dao->data_type,
+            )
+          ));
         }
 
         $cvParam = array(
@@ -667,8 +667,8 @@ AND    cf.id IN ( $fieldIDList )
         $idx = substr($n, 7);
         if (CRM_Utils_Type::escape($idx, 'Integer', FALSE) === NULL) {
           return CRM_Core_Error::createAPIError(ts('field ID needs to be of type Integer for index %1',
-              array(1 => $idx)
-            ));
+            array(1 => $idx)
+          ));
         }
         $fieldIDs[] = (int ) $idx;
       }

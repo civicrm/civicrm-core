@@ -64,7 +64,11 @@ class CRM_Contact_Form_Edit_IM {
     $form->addSelect("im[$blockId][provider_id]", array('entity' => 'im', 'class' => 'eight', 'placeholder' => NULL));
 
     //Block type select
-    $form->addSelect("im[$blockId][location_type_id]", array('entity' => 'im', 'class' => 'eight', 'placeholder' => NULL));
+    $form->addSelect("im[$blockId][location_type_id]", array(
+        'entity' => 'im',
+        'class' => 'eight',
+        'placeholder' => NULL
+      ));
 
     //IM box
     $form->addElement('text', "im[$blockId][name]", ts('Instant Messenger'),

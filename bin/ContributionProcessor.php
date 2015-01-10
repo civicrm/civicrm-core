@@ -190,9 +190,9 @@ class CiviContributeProcessor {
           $dao->trxn_id = $value;
           if ($dao->find(TRUE)) {
             preg_match('/(\d+)$/', $name, $matches);
-            $seq   = $matches[1];
+            $seq = $matches[1];
             $email = $result["l_email{$seq}"];
-            $amt   = $result["l_amt{$seq}"];
+            $amt = $result["l_amt{$seq}"];
             CRM_Core_Error::debug_log_message("Skipped (already recorded) - $email, $amt, $value ..<p>", TRUE);
             continue;
           }
@@ -234,9 +234,9 @@ class CiviContributeProcessor {
         }
       }
       if ($result['l_errorcode0'] == '11002') {
-        $end             = $result['l_timestamp99'];
-        $end_time        = strtotime("{$end}", time());
-        $end_date        = date('Y-m-d\T00:00:00.00\Z', $end_time);
+        $end = $result['l_timestamp99'];
+        $end_time = strtotime("{$end}", time());
+        $end_date = date('Y-m-d\T00:00:00.00\Z', $end_time);
         $args['enddate'] = $end_date;
       }
     } while ($result['l_errorcode0'] == '11002');
@@ -272,8 +272,8 @@ class CiviContributeProcessor {
       if (is_array($response[1][$response[0]]['notifications']['charge-amount-notification'])) {
 
         if (array_key_exists('google-order-number',
-            $response[1][$response[0]]['notifications']['charge-amount-notification']
-          )) {
+          $response[1][$response[0]]['notifications']['charge-amount-notification']
+        )) {
           // sometimes 'charge-amount-notification' itself is an absolute
           // array and not array of arrays. This is the case when there is only one
           // charge-amount-notification. Hack for this special case -
@@ -283,10 +283,10 @@ class CiviContributeProcessor {
         }
 
         foreach ($response[1][$response[0]]['notifications']['charge-amount-notification']
- as $amtData
+                 as $amtData
         ) {
           $searchParams = array(
-          'order-numbers' => array($amtData['google-order-number']['VALUE']),
+            'order-numbers' => array($amtData['google-order-number']['VALUE']),
             'notification-types' => array('risk-information', 'new-order', 'charge-amount'),
           );
           $response = CRM_Core_Payment_Google::invokeAPI($paymentProcessor,
@@ -323,9 +323,9 @@ class CiviContributeProcessor {
 
   static
   function csv() {
-    $csvFile   = '/home/deepak/Desktop/crm-4247.csv';
+    $csvFile = '/home/deepak/Desktop/crm-4247.csv';
     $delimiter = ";";
-    $row       = 1;
+    $row = 1;
 
     $handle = fopen($csvFile, "r");
     if (!$handle) {

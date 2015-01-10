@@ -149,7 +149,10 @@ class CRM_Case_Form_Activity_OpenCase {
       return;
     }
     if ($form->_context == 'standalone') {
-      $form->addEntityRef('client_id', ts('Client'), array('create' => TRUE, 'multiple' => $form->_allowMultiClient), TRUE);
+      $form->addEntityRef('client_id', ts('Client'), array(
+          'create' => TRUE,
+          'multiple' => $form->_allowMultiClient
+        ), TRUE);
     }
 
     $caseTypes = CRM_Case_PseudoConstant::caseType();
@@ -356,13 +359,13 @@ class CRM_Case_Form_Activity_OpenCase {
     if ($buttonName == $form->getButtonName('upload', 'new')) {
       if ($form->_context == 'standalone') {
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/case/add',
-            'reset=1&action=add&context=standalone'
-          ));
+          'reset=1&action=add&context=standalone'
+        ));
       }
       else {
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view/case',
-            "reset=1&action=add&context=case&cid={$form->_contactID}"
-          ));
+          "reset=1&action=add&context=case&cid={$form->_contactID}"
+        ));
       }
     }
   }

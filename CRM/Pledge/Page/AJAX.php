@@ -45,16 +45,16 @@ class CRM_Pledge_Page_AJAX {
 
     $getRecords = FALSE;
     if (isset($_GET['name']) && $_GET['name']) {
-      $name        = CRM_Utils_Type::escape($_GET['name'], 'String');
-      $name        = str_replace('*', '%', $name);
+      $name = CRM_Utils_Type::escape($_GET['name'], 'String');
+      $name = str_replace('*', '%', $name);
       $whereClause = "p.creator_pledge_desc LIKE '%$name%' ";
-      $getRecords  = TRUE;
+      $getRecords = TRUE;
     }
 
     if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-      $pledgeId    = CRM_Utils_Type::escape($_GET['id'], 'Integer');
+      $pledgeId = CRM_Utils_Type::escape($_GET['id'], 'Integer');
       $whereClause = "p.id = {$pledgeId} ";
-      $getRecords  = TRUE;
+      $getRecords = TRUE;
     }
 
     if ($getRecords) {
@@ -79,7 +79,7 @@ WHERE {$whereClause}
         $name = $_GET['id'];
       }
       $elements[] = array(
-      'name' => trim($name, '*'),
+        'name' => trim($name, '*'),
         'value' => trim($name, '*'),
       );
     }
@@ -87,6 +87,7 @@ WHERE {$whereClause}
     echo CRM_Utils_JSON::encode($elements, 'value');
     CRM_Utils_System::civiExit();
   }
+
   /**
    * Function to setDefaults according to Pledge Id
    * for batch entry pledges

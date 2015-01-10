@@ -147,20 +147,20 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     if (isset($defaults['start_date'])) {
       list($defaults['start_date'],
         $defaults['start_date_time']
-      ) = CRM_Utils_Date::setDateDefaults($defaults['start_date'],
+        ) = CRM_Utils_Date::setDateDefaults($defaults['start_date'],
         'activityDateTime'
       );
     }
     else {
       list($defaults['start_date'],
         $defaults['start_date_time']
-      ) = CRM_Utils_Date::setDateDefaults();
+        ) = CRM_Utils_Date::setDateDefaults();
     }
 
     if (isset($defaults['end_date'])) {
       list($defaults['end_date'],
         $defaults['end_date_time']
-      ) = CRM_Utils_Date::setDateDefaults($defaults['end_date'],
+        ) = CRM_Utils_Date::setDateDefaults($defaults['end_date'],
         'activityDateTime'
       );
     }
@@ -267,8 +267,8 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $this->addWysiwyg('goal_general', ts('Campaign Goals'), array('rows' => 2, 'cols' => 40));
     $this->add('text', 'goal_revenue', ts('Revenue Goal'), array('size' => 8, 'maxlength' => 12));
     $this->addRule('goal_revenue', ts('Please enter a valid money value (e.g. %1).',
-        array(1 => CRM_Utils_Money::format('99.99', ' '))
-      ), 'money');
+      array(1 => CRM_Utils_Money::format('99.99', ' '))
+    ), 'money');
 
     // is this Campaign active
     $this->addElement('checkbox', 'is_active', ts('Is Active?'));
@@ -351,9 +351,9 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $params['groups'] = $groups;
 
     // delete previous includes/excludes, if campaign already existed
-    $groupTableName    = CRM_Contact_BAO_Group::getTableName();
-    $dao               = new CRM_Campaign_DAO_CampaignGroup();
-    $dao->campaign_id  = $this->_campaignId;
+    $groupTableName = CRM_Contact_BAO_Group::getTableName();
+    $dao = new CRM_Campaign_DAO_CampaignGroup();
+    $dao->campaign_id = $this->_campaignId;
     $dao->entity_table = $groupTableName;
     $dao->find();
     while ($dao->fetch()) {

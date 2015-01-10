@@ -541,9 +541,9 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     }
 
     $this->buildACLClause(array(
-        $this->_aliases['civicrm_contact'],
-        $this->_aliases['civicrm_contact_b'],
-      ));
+      $this->_aliases['civicrm_contact'],
+      $this->_aliases['civicrm_contact_b'],
+    ));
     $sql = $this->buildQuery();
     $this->buildRows($sql, $rows);
 

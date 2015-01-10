@@ -31,6 +31,7 @@ require_once 'CiviTest/CiviSeleniumTestCase.php';
  */
 class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
   protected $pageno = '';
+
   protected function setUp() {
     parent::setUp();
   }
@@ -380,7 +381,11 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
 
     $gid = $this->urlArg('gid');
 
-    $this->openCiviPage('admin/uf/group/field/add', array('action' => 'add', 'reset' => 1, 'gid' => $gid), 'field_name[0]');
+    $this->openCiviPage('admin/uf/group/field/add', array(
+        'action' => 'add',
+        'reset' => 1,
+        'gid' => $gid
+      ), 'field_name[0]');
     $this->select('field_name[0]', "value=Membership");
     $this->select('field_name[1]', "label={$checkboxFieldLabel} :: {$customGroupTitle}");
     $this->click('field_name[1]');
@@ -1369,8 +1374,8 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
 
     // Check confirmation alert.
     $this->assertTrue((bool) preg_match("/^Are you sure you want to delete this relationship?/",
-        $this->getConfirmation()
-      ));
+      $this->getConfirmation()
+    ));
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isTextPresent('Selected relationship has been deleted successfully.'),
@@ -1505,7 +1510,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
 
     //header("Content-Type: image/png");
     $im = imagecreate(110, 20)
-      or die("Cannot Initialize new GD image stream");
+    or die("Cannot Initialize new GD image stream");
     $background_color = imagecolorallocate($im, 0, 0, 0);
     $text_color = imagecolorallocate($im, 233, 14, 91);
     imagestring($im, 1, 5, 5, "On Behalf-Org Logo", $text_color);

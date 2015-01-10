@@ -47,7 +47,8 @@ class CRM_Financial_Page_AJAX {
    */
   public static function jqFinancial($config) {
     if (!isset($_GET['_value']) ||
-      empty($_GET['_value'])) {
+      empty($_GET['_value'])
+    ) {
       CRM_Utils_System::civiExit();
     }
     $defaultId = NULL;
@@ -73,7 +74,7 @@ class CRM_Financial_Page_AJAX {
     }
     $elements = array(
       array(
-        'name'  => ts('- select -'),
+        'name' => ts('- select -'),
         'value' => 'select',
       ),
     );
@@ -85,9 +86,9 @@ class CRM_Financial_Page_AJAX {
           $selectedArray['selected'] = 'Selected';
         }
         $elements[] = array(
-          'name'  => $name,
-          'value' => $id,
-        ) + $selectedArray;
+            'name' => $name,
+            'value' => $id,
+          ) + $selectedArray;
       }
     }
     CRM_Utils_JSON::output($elements);
@@ -98,7 +99,8 @@ class CRM_Financial_Page_AJAX {
    */
   public static function jqFinancialRelation($config) {
     if (!isset($_GET['_value']) ||
-      empty($_GET['_value'])) {
+      empty($_GET['_value'])
+    ) {
       CRM_Utils_System::civiExit();
     }
 
@@ -118,7 +120,7 @@ class CRM_Financial_Page_AJAX {
 
     $elements = array(
       array(
-        'name'  => ts('- Select Financial Account Relationship -'),
+        'name' => ts('- Select Financial Account Relationship -'),
         'value' => 'select',
       ),
     );
@@ -126,24 +128,24 @@ class CRM_Financial_Page_AJAX {
     $countResult = count($financialAccountType[$financialAccountTypeId]);
     if (!empty($result)) {
       foreach ($result as $id => $name) {
-        if (in_array($id, $financialAccountType[$financialAccountTypeId])  && $_GET['_value'] != 'select') {
+        if (in_array($id, $financialAccountType[$financialAccountTypeId]) && $_GET['_value'] != 'select') {
           if ($countResult != 1) {
             $elements[] = array(
-              'name'  => $name,
+              'name' => $name,
               'value' => $id,
             );
           }
           else {
             $elements[] = array(
-              'name'     => $name,
-              'value'    => $id,
+              'name' => $name,
+              'value' => $id,
               'selected' => 'Selected',
             );
           }
         }
         elseif ($_GET['_value'] == 'select') {
           $elements[] = array(
-            'name'  => $name,
+            'name' => $name,
             'value' => $id,
           );
         }
@@ -156,8 +158,9 @@ class CRM_Financial_Page_AJAX {
    * @param $config
    */
   public static function jqFinancialType($config) {
-    if (! isset($_GET['_value']) ||
-      empty($_GET['_value'])) {
+    if (!isset($_GET['_value']) ||
+      empty($_GET['_value'])
+    ) {
       CRM_Utils_System::civiExit();
     }
 
@@ -178,7 +181,7 @@ class CRM_Financial_Page_AJAX {
       }
     }
 
-    $entityID  = CRM_Utils_Array::value('entityID', $_POST);
+    $entityID = CRM_Utils_Array::value('entityID', $_POST);
     $methods = array(
       'assign' => 'addBatchEntity',
       'remove' => 'removeBatchEntity',
@@ -262,26 +265,26 @@ class CRM_Financial_Page_AJAX {
     $sortMapper =
       array(
         0 => '',
-    1 => '',
-    2 => 'sort_name',
+        1 => '',
+        2 => 'sort_name',
         3 => 'amount',
-    4 => 'trxn_id',
-    5 => 'transaction_date',
-    6 => 'payment_method',
-    7 => 'status',
-    8 => 'name',
+        4 => 'trxn_id',
+        5 => 'transaction_date',
+        6 => 'payment_method',
+        7 => 'status',
+        8 => 'name',
       );
 
-    $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
-    $offset    = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
-    $rowCount  = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
-    $sort      = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
+    $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
+    $offset = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
+    $rowCount = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
+    $sort = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
-    $context   = isset($_REQUEST['context']) ? CRM_Utils_Type::escape($_REQUEST['context'], 'String') : NULL;
-    $entityID  = isset($_REQUEST['entityID']) ? CRM_Utils_Type::escape($_REQUEST['entityID'], 'String') : NULL;
+    $context = isset($_REQUEST['context']) ? CRM_Utils_Type::escape($_REQUEST['context'], 'String') : NULL;
+    $entityID = isset($_REQUEST['entityID']) ? CRM_Utils_Type::escape($_REQUEST['entityID'], 'String') : NULL;
     $notPresent = isset($_REQUEST['notPresent']) ? CRM_Utils_Type::escape($_REQUEST['notPresent'], 'String') : NULL;
-    $statusID  = isset($_REQUEST['statusID']) ? CRM_Utils_Type::escape($_REQUEST['statusID'], 'String') : NULL;
-    $search    = isset($_REQUEST['search']) ? TRUE : FALSE;
+    $statusID = isset($_REQUEST['statusID']) ? CRM_Utils_Type::escape($_REQUEST['statusID'], 'String') : NULL;
+    $search = isset($_REQUEST['search']) ? TRUE : FALSE;
 
     $params = $_POST;
     if ($sort && $sortOrder) {
@@ -309,11 +312,11 @@ class CRM_Financial_Page_AJAX {
       array(
         'contact_type' => '',
         'sort_name' => ts('Contact Name'),
-        'amount'   => ts('Amount'),
-        'trxn_id'  => ts('Trxn ID'),
+        'amount' => ts('Amount'),
+        'trxn_id' => ts('Trxn ID'),
         'transaction_date' => ts('Received'),
         'payment_method' => ts('Payment Method'),
-        'status'  => ts('Status'),
+        'status' => ts('Status'),
         'name' => ts('Type'),
       );
 
@@ -325,10 +328,10 @@ class CRM_Financial_Page_AJAX {
     $params['rp'] = $rowCount;
 
     $params['context'] = $context;
-    $params['offset']   = ($params['page'] - 1) * $params['rp'];
+    $params['offset'] = ($params['page'] - 1) * $params['rp'];
     $params['rowCount'] = $params['rp'];
-    $params['sort']     = CRM_Utils_Array::value('sortBy', $params);
-    $params['total']    = 0;
+    $params['sort'] = CRM_Utils_Array::value('sortBy', $params);
+    $params['total'] = 0;
 
     // get batch list
     if (isset($notPresent)) {
@@ -450,8 +453,16 @@ class CRM_Financial_Page_AJAX {
     $iFilteredTotal = $iTotal = $params['total'];
     $selectorElements =
       array(
-        'check', 'contact_type', 'sort_name',
-        'amount', 'trxn_id', 'transaction_date', 'payment_method', 'status', 'name', 'action',
+        'check',
+        'contact_type',
+        'sort_name',
+        'amount',
+        'trxn_id',
+        'transaction_date',
+        'payment_method',
+        'status',
+        'name',
+        'action',
       );
 
     echo CRM_Utils_JSON::encodeDataTableSelector($financialitems, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
@@ -461,7 +472,7 @@ class CRM_Financial_Page_AJAX {
   public static function bulkAssignRemove() {
     $checkIDs = $_REQUEST['ID'];
     $entityID = CRM_Utils_Type::escape($_REQUEST['entityID'], 'String');
-    $action   = CRM_Utils_Type::escape($_REQUEST['action'], 'String');
+    $action = CRM_Utils_Type::escape($_REQUEST['action'], 'String');
     foreach ($checkIDs as $key => $value) {
       if ((substr($value, 0, 7) == "mark_x_" && $action == 'Assign') || (substr($value, 0, 7) == "mark_y_" && $action == 'Remove')) {
         $contributions = explode("_", $value);
@@ -473,7 +484,7 @@ class CRM_Financial_Page_AJAX {
     $paymentInstrument = CRM_Core_OptionGroup::getLabel('payment_instrument', $batchPID);
     foreach ($cIDs as $key => $value) {
       $recordPID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $value, 'payment_instrument_id');
-      if ($action == 'Remove' || ($recordPID == $batchPID && $action == 'Assign')  || !isset($batchPID)) {
+      if ($action == 'Remove' || ($recordPID == $batchPID && $action == 'Assign') || !isset($batchPID)) {
         $params =
           array(
             'entity_id' => $value,

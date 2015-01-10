@@ -43,9 +43,9 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     $this->webtestAddPaymentProcessor($processorName, 'AuthNet');
 
     // create a new contact for whom recurring contribution is to be created
-    $firstName  = 'Jane' . substr(sha1(rand()), 0, 7);
+    $firstName = 'Jane' . substr(sha1(rand()), 0, 7);
     $middleName = 'Middle';
-    $lastName   = 'Recuroff_' . substr(sha1(rand()), 0, 7);
+    $lastName = 'Recuroff_' . substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, $lastName, "{$firstName}@example.com");
     $contactName = "$firstName $lastName";
 
@@ -97,7 +97,7 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     // View Recurring Contribution Record
     $verifyData = array(
       'From' => "$contactName",
-                          'Financial Type'    => 'Donation (test)',
+      'Financial Type' => 'Donation (test)',
       'Total Amount' => 'Installments: 12, Interval: 1 month(s)',
       'Contribution Status' => 'Pending : Incomplete Transaction',
       'Paid By' => 'Credit Card',

@@ -42,7 +42,7 @@
  *   The Smarty object.
  *
  * @return string
-   *   the generated key
+ *   the generated key
  */
 function smarty_function_crmKey($params, &$smarty) {
   return

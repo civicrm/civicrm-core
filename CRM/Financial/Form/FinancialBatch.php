@@ -64,13 +64,15 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
             'edit own manual batches',
             'edit all manual batches',
           ),
-          'actionName' => 'edit'),
+          'actionName' => 'edit'
+        ),
         CRM_Core_Action::DELETE => array(
           'permission' => array(
             'delete own manual batches',
             'delete all manual batches',
           ),
-          'actionName' => 'delete'),
+          'actionName' => 'delete'
+        ),
       );
 
       $createdID = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $this->_id, 'created_id');
@@ -275,7 +277,8 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm', 'reset=1'));
     }
     elseif (($buttonName == $this->getButtonName('next') & $this->_action == CRM_Core_Action::UPDATE) ||
-      ($buttonName == $this->getButtonName('next') & $this->_action == CRM_Core_Action::ADD & $context == 1)) {
+      ($buttonName == $this->getButtonName('next') & $this->_action == CRM_Core_Action::ADD & $context == 1)
+    ) {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/financial/financialbatches',
         "reset=1&batchStatus=1"));
     }

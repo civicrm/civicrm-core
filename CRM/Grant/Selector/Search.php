@@ -158,8 +158,8 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     // submitted form values
     $this->_queryParams = &$queryParams;
 
-    $this->_single  = $single;
-    $this->_limit   = $limit;
+    $this->_single = $single;
+    $this->_limit = $limit;
     $this->_context = $context;
 
     $this->_grantClause = $grantClause;
@@ -208,7 +208,7 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
       if ($cid) {
         $delLink = array(
           CRM_Core_Action::DELETE => array(
-        'name' => ts('Delete'),
+            'name' => ts('Delete'),
             'url' => 'civicrm/contact/view/grant',
             'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%&selectedChild=grant' . $extraParams,
             'title' => ts('Delete Grant'),
@@ -358,7 +358,7 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     if (!isset(self::$_columnHeaders)) {
       self::$_columnHeaders = array(
         array(
-      'name' => ts('Status'),
+          'name' => ts('Status'),
           'sort' => 'grant_status',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),

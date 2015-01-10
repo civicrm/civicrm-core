@@ -156,7 +156,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
     }
     else {
       //get tokens that are not contact specific resolved
-      $params  = array('contact_id' => 0);
+      $params = array('contact_id' => 0);
       $details = CRM_Utils_Token::getAnonymousTokenDetails($params,
         $returnProperties,
         TRUE, TRUE, NULL,

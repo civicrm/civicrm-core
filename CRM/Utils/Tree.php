@@ -110,7 +110,7 @@ class CRM_Utils_Tree {
    * @param array (ref) $parentNode which parent node should we search in ?
    *
    * @return array(
-  ref) | false node if found else false
+   * ref) | false node if found else false
    */
   //public function &findNode(&$parentNode, $name)
   public function &findNode($name, &$parentNode) {
@@ -146,8 +146,8 @@ class CRM_Utils_Tree {
    * Check if node is a leaf node.
    * Currently leaf nodes are strings and non-leaf nodes are arrays
    *
-   * @param array(
-  ref) $node node which needs to checked
+   * @param array (
+   * ref) $node node which needs to checked
    *
    * @return boolean
    */
@@ -164,9 +164,9 @@ class CRM_Utils_Tree {
    *   (ref)
    */
   public function &createNode($name) {
-    $node['name']     = $name;
+    $node['name'] = $name;
     $node['children'] = array();
-    $node['data']     = array();
+    $node['data'] = array();
 
     return $node;
   }

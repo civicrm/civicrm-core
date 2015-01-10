@@ -166,7 +166,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
 
       if (CRM_Campaign_BAO_Campaign::isCampaignEnable()) {
         self::$_columnHeaders[] = array(
-        'name' => ts('Campaign'),
+          'name' => ts('Campaign'),
           'sort' => 'campaign_id',
           'direction' => CRM_Utils_Sort::DONTCARE,
         );
@@ -188,8 +188,8 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    *   Total number of rows
    */
   public function getTotalCount($action) {
-    $job        = CRM_Mailing_BAO_MailingJob::getTableName();
-    $mailing    = CRM_Mailing_BAO_Mailing::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
+    $mailing = CRM_Mailing_BAO_Mailing::getTableName();
     $mailingACL = CRM_Mailing_BAO_Mailing::mailingACL();
 
     //get the where clause.
@@ -228,8 +228,8 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     static $actionLinks = NULL;
     if (empty($actionLinks)) {
-      $cancelExtra  = ts('Are you sure you want to cancel this mailing?');
-      $deleteExtra  = ts('Are you sure you want to delete this mailing?');
+      $cancelExtra = ts('Are you sure you want to cancel this mailing?');
+      $deleteExtra = ts('Are you sure you want to delete this mailing?');
       $archiveExtra = ts('Are you sure you want to archive this mailing?');
 
       $actionLinks = array(
@@ -361,7 +361,10 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           }
         }
         if (in_array($row['status'], array(
-          'Scheduled', 'Running', 'Paused'))) {
+          'Scheduled',
+          'Running',
+          'Paused'
+        ))) {
           if ($allAccess ||
             ($showApprovalLinks && $showCreateLinks && $showScheduleLinks)
           ) {
@@ -378,7 +381,8 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         }
 
         if (in_array($row['status'], array('Complete', 'Canceled')) &&
-          !$row['archived']) {
+          !$row['archived']
+        ) {
           if ($allAccess || $showCreateLinks) {
             $actionMask |= CRM_Core_Action::RENEW;
           }
@@ -447,7 +451,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
    */
   public function whereClause(&$params, $sortBy = TRUE) {
     $values = $clauses = array();
-    $isFormSubmitted   = $this->_parent->get('hidden_find_mailings');
+    $isFormSubmitted = $this->_parent->get('hidden_find_mailings');
 
     $title = $this->_parent->get('mailing_name');
     if ($title) {
@@ -482,7 +486,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         $dateClause1[] = 'civicrm_mailing_job.start_date <= %3';
         $dateClause2[] = 'civicrm_mailing_job.scheduled_date <= %3';
       }
-      $params[3]     = array($to, 'String');
+      $params[3] = array($to, 'String');
     }
 
     $dateClauses = array();
@@ -505,8 +509,8 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
     }
 
     // get values submitted by form
-    $isDraft       = $this->_parent->get('status_unscheduled');
-    $isArchived    = $this->_parent->get('is_archived');
+    $isDraft = $this->_parent->get('status_unscheduled');
+    $isArchived = $this->_parent->get('is_archived');
     $mailingStatus = $this->_parent->get('mailing_status');
 
     if (!$isFormSubmitted && $this->_parent->get('scheduled')) {

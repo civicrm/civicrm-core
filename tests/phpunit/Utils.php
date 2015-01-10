@@ -52,7 +52,7 @@ class Utils {
         array(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => TRUE)
       );
     }
-    catch(PDOException$e) {
+    catch (PDOException$e) {
       echo "Can't connect to MySQL server:" . PHP_EOL . $e->getMessage() . PHP_EOL;
       exit(1);
     }
@@ -91,40 +91,40 @@ class Utils {
     }
 
     /*******
-     if ( $this->pdo->errorCode() == 0 ) {
-     //echo "returning the PDOStmt\n";
-     return $stmt;
-     }
-
-     //  operation failed, so output description of where and why
-     $errorInfo = $this->pdo->errorInfo();
-     echo "Oops, can't do query:\n    {$query}\n    in "
-     . basename( __FILE__) . " line " . __LINE__.":\n    "
-     . $errorInfo[0] . ": " . $errorInfo[2] . "\n    Call stack:\n";
-     $backtrace = debug_backtrace();
-     $dir_name  = dirname( __FILE__ );
-     $cwd_len   = strlen( $dir_name ) + 1;
-     foreach ($backtrace as $frame ) {
-     echo "      ";
-     if ( array_key_exists( 'class', $frame ) ) {
-     echo " class {$frame['class']}";
-     if ( array_key_exists( 'function', $frame ) ) {
-     echo " method {$frame['function']}";
-     }
-     }
-     else {
-     if ( array_key_exists( 'function', $frame ) ) {
-     echo " function {$frame['function']}";
-     }
-     }
-     if ( array_key_exists( 'file', $frame ) ) {
-     echo " file ". substr( $frame['file'], $cwd_len );
-     }
-     if ( array_key_exists( 'line', $frame ) ) {
-     echo " line {$frame['line']}";
-     }
-     echo "\n";
-     }
+     * if ( $this->pdo->errorCode() == 0 ) {
+     * //echo "returning the PDOStmt\n";
+     * return $stmt;
+     * }
+     *
+     * //  operation failed, so output description of where and why
+     * $errorInfo = $this->pdo->errorInfo();
+     * echo "Oops, can't do query:\n    {$query}\n    in "
+     * . basename( __FILE__) . " line " . __LINE__.":\n    "
+     * . $errorInfo[0] . ": " . $errorInfo[2] . "\n    Call stack:\n";
+     * $backtrace = debug_backtrace();
+     * $dir_name  = dirname( __FILE__ );
+     * $cwd_len   = strlen( $dir_name ) + 1;
+     * foreach ($backtrace as $frame ) {
+     * echo "      ";
+     * if ( array_key_exists( 'class', $frame ) ) {
+     * echo " class {$frame['class']}";
+     * if ( array_key_exists( 'function', $frame ) ) {
+     * echo " method {$frame['function']}";
+     * }
+     * }
+     * else {
+     * if ( array_key_exists( 'function', $frame ) ) {
+     * echo " function {$frame['function']}";
+     * }
+     * }
+     * if ( array_key_exists( 'file', $frame ) ) {
+     * echo " file ". substr( $frame['file'], $cwd_len );
+     * }
+     * if ( array_key_exists( 'line', $frame ) ) {
+     * echo " line {$frame['line']}";
+     * }
+     * echo "\n";
+     * }
      ******/
     return TRUE;
   }

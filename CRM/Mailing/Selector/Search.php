@@ -163,9 +163,9 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
     // submitted form values
     $this->_queryParams = &$queryParams;
 
-    $this->_single      = $single;
-    $this->_limit       = $limit;
-    $this->_context     = $context;
+    $this->_single = $single;
+    $this->_limit = $limit;
+    $this->_context = $context;
     $this->_compContext = $compContext;
 
     $this->_mailingClause = $mailingClause;
@@ -199,24 +199,24 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
       $searchContext = ($context) ? "&context=$context" : NULL;
 
       self::$_links = array(
-      CRM_Core_Action::VIEW => array(
-        'name' => ts('View'),
-        'url' => 'civicrm/contact/view',
-        'qs' => "reset=1&cid=%%cid%%{$searchContext}{$extraParams}",
-        'title' => ts('View Contact Details'),
-      ),
-      CRM_Core_Action::UPDATE => array(
-        'name' => ts('Edit'),
-        'url' => 'civicrm/contact/add',
-        'qs' => "reset=1&action=update&cid=%%cid%%{$searchContext}{$extraParams}",
-        'title' => ts('Edit Contact Details'),
-      ),
-      CRM_Core_Action::DELETE => array(
-        'name' => ts('Delete'),
-        'url' => 'civicrm/contact/view/delete',
-        'qs' => "reset=1&delete=1&cid=%%cid%%{$searchContext}{$extraParams}",
-        'title' => ts('Delete Contact'),
-      ),
+        CRM_Core_Action::VIEW => array(
+          'name' => ts('View'),
+          'url' => 'civicrm/contact/view',
+          'qs' => "reset=1&cid=%%cid%%{$searchContext}{$extraParams}",
+          'title' => ts('View Contact Details'),
+        ),
+        CRM_Core_Action::UPDATE => array(
+          'name' => ts('Edit'),
+          'url' => 'civicrm/contact/add',
+          'qs' => "reset=1&action=update&cid=%%cid%%{$searchContext}{$extraParams}",
+          'title' => ts('Edit Contact Details'),
+        ),
+        CRM_Core_Action::DELETE => array(
+          'name' => ts('Delete'),
+          'url' => 'civicrm/contact/view/delete',
+          'qs' => "reset=1&delete=1&cid=%%cid%%{$searchContext}{$extraParams}",
+          'title' => ts('Delete Contact'),
+        ),
       );
     }
     return self::$_links;

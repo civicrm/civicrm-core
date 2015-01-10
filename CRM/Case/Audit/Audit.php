@@ -49,11 +49,11 @@ class CRM_Case_Audit_Audit {
 
         $ifBlankReplacements = array();
 
-        $completed  = FALSE;
+        $completed = FALSE;
         $sortValues = array('1970-01-01');
-        $category   = '';
+        $category = '';
         $fieldindex = 1;
-        $fields     = $activity->getElementsByTagName("Field");
+        $fields = $activity->getElementsByTagName("Field");
         foreach ($fields as $field) {
           $datatype_elements = $field->getElementsByTagName("Type");
           $datatype = $datatype_elements->item(0)->nodeValue;
@@ -99,7 +99,10 @@ class CRM_Case_Audit_Audit {
               //CRM-4570
               if ($printReport) {
                 if (!in_array($label, array(
-                  'Activity Type', 'Status'))) {
+                  'Activity Type',
+                  'Status'
+                ))
+                ) {
                   $caseActivities[$activityindex][$fieldindex] = array();
                   $caseActivities[$activityindex][$fieldindex]['label'] = $label;
                   $caseActivities[$activityindex][$fieldindex]['datatype'] = $datatype;
@@ -198,7 +201,7 @@ class CRM_Case_Audit_Audit {
     }
 
     if ($aval < $bval) {
-      return - 1;
+      return -1;
     }
     elseif ($aval > $bval) {
       return 1;

@@ -55,7 +55,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
     if (empty($mailSettings[$domainID]) || $reset) {
       $dao = new self;
       $dao->is_default = 1;
-      $dao->domain_id  = $domainID;
+      $dao->domain_id = $domainID;
       $dao->find(TRUE);
       $mailSettings[$domainID] = $dao;
     }
@@ -204,9 +204,9 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
     $results = NULL;
     $transaction = new CRM_Core_Transaction();
 
-    $mailSettings     = new CRM_Core_DAO_MailSettings();
+    $mailSettings = new CRM_Core_DAO_MailSettings();
     $mailSettings->id = $id;
-    $results          = $mailSettings->delete();
+    $results = $mailSettings->delete();
 
     $transaction->commit();
 

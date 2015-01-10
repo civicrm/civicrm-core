@@ -86,7 +86,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
    * @return void
    */
   public function postProcess() {
-    $formValues  = $this->controller->exportValues($this->_name);
+    $formValues = $this->controller->exportValues($this->_name);
     $locationTypeID = $formValues['location_type_id'];
     $respectDoNotMail = CRM_Utils_Array::value('do_not_mail', $formValues);
     $labelName = $formValues['label_name'];
@@ -115,7 +115,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
     // format the addresses according to CIVICRM_ADDRESS_FORMAT (CRM-1327)
     foreach ($rows as $id => $row) {
       if ($commMethods = CRM_Utils_Array::value('preferred_communication_method', $row)) {
-        $val  = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $commMethods));
+        $val = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $commMethods));
         $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
         $temp = array();
         foreach ($val as $vals) {
@@ -130,7 +130,10 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
 
     if ($isPerMembership) {
       $labelRows = array();
-      $memberships = civicrm_api3('membership', 'get', array('id' => array('IN' => $this->_memberIds), 'return' => 'contact_id'));
+      $memberships = civicrm_api3('membership', 'get', array(
+          'id' => array('IN' => $this->_memberIds),
+          'return' => 'contact_id'
+        ));
       foreach ($memberships['values'] as $id => $membership) {
         $labelRows[$id] = $rows[$membership['contact_id']];
       }

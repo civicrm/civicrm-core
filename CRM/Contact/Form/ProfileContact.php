@@ -89,11 +89,11 @@ class CRM_Contact_Form_ProfileContact {
 
     $prefix = 'honor';
     $honoreeProfileFields = CRM_Core_BAO_UFGroup::getFields($form->_honoreeProfileId, FALSE, NULL,
-        NULL, NULL,
-        FALSE, NULL,
-        TRUE, NULL,
-        CRM_Core_Permission::CREATE
-      );
+      NULL, NULL,
+      FALSE, NULL,
+      TRUE, NULL,
+      CRM_Core_Permission::CREATE
+    );
     $form->addElement('hidden', 'honoree_profile_id', $form->_honoreeProfileId);
     $form->assign('honoreeProfileFields', $honoreeProfileFields);
 

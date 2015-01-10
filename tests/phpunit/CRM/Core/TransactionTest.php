@@ -202,10 +202,22 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   public function testCallback_commit() {
     $tx = new CRM_Core_Transaction();
 
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, array($this, '_preCommit'), array('qwe', 'rty'));
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, array($this, '_postCommit'), array('uio', 'p[]'));
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_ROLLBACK, array($this, '_preRollback'), array('asd', 'fgh'));
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_ROLLBACK, array($this, '_postRollback'), array('jkl', ';'));
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, array($this, '_preCommit'), array(
+        'qwe',
+        'rty'
+      ));
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, array($this, '_postCommit'), array(
+        'uio',
+        'p[]'
+      ));
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_ROLLBACK, array(
+        $this,
+        '_preRollback'
+      ), array('asd', 'fgh'));
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_ROLLBACK, array(
+        $this,
+        '_postRollback'
+      ), array('jkl', ';'));
 
     CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET id = 100 WHERE id = 100');
 
@@ -218,10 +230,22 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   public function testCallback_rollback() {
     $tx = new CRM_Core_Transaction();
 
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, array($this, '_preCommit'), array('ewq', 'ytr'));
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, array($this, '_postCommit'), array('oiu', '][p'));
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_ROLLBACK, array($this, '_preRollback'), array('dsa', 'hgf'));
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_ROLLBACK, array($this, '_postRollback'), array('lkj', ';'));
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, array($this, '_preCommit'), array(
+        'ewq',
+        'ytr'
+      ));
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, array($this, '_postCommit'), array(
+        'oiu',
+        '][p'
+      ));
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_ROLLBACK, array(
+        $this,
+        '_preRollback'
+      ), array('dsa', 'hgf'));
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_ROLLBACK, array(
+        $this,
+        '_postRollback'
+      ), array('lkj', ';'));
 
     CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET id = 100 WHERE id = 100');
     $tx->rollback();
@@ -241,7 +265,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    */
   public function testRun_ok($createStyle, $commitStyle) {
     $test = $this;
-    CRM_Core_Transaction::create(TRUE)->run(function($tx) use (&$test, $createStyle, $commitStyle) {
+    CRM_Core_Transaction::create(TRUE)->run(function ($tx) use (&$test, $createStyle, $commitStyle) {
       $test->createContactWithTransaction('nest-tx', $createStyle, $commitStyle);
       $test->assertContactsExistByOffset(array(0 => TRUE));
     });
@@ -260,7 +284,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     $test = $this;
     $e = NULL; // Exception
     try {
-      CRM_Core_Transaction::create(TRUE)->run(function($tx) use (&$test, $createStyle, $commitStyle) {
+      CRM_Core_Transaction::create(TRUE)->run(function ($tx) use (&$test, $createStyle, $commitStyle) {
         $test->createContactWithTransaction('nest-tx', $createStyle, $commitStyle);
         $test->assertContactsExistByOffset(array(0 => TRUE));
         throw new Exception("Ruh-roh");

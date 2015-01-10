@@ -84,9 +84,9 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form {
   function preProcess() {
     $values = $this->controller->exportValues('Search');
 
-    $this->_task   = $values['task'];
+    $this->_task = $values['task'];
     $campaignTasks = CRM_Campaign_Task::tasks();
-    $taskName      = CRM_Utils_Array::value($this->_task, $campaignTasks);
+    $taskName = CRM_Utils_Array::value($this->_task, $campaignTasks);
     $this->assign('taskName', $taskName);
 
     $ids = array();
@@ -98,9 +98,9 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form {
       }
     }
     else {
-      $qfKey    = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
+      $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
       $cacheKey = "civicrm search {$qfKey}";
-      $allCids  = CRM_Core_BAO_PrevNextCache::getSelection($cacheKey, "getall");
+      $allCids = CRM_Core_BAO_PrevNextCache::getSelection($cacheKey, "getall");
       $ids = array_keys($allCids[$cacheKey]);
       $this->assign('totalSelectedVoters', count($ids));
     }
@@ -114,8 +114,8 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form {
     $this->assign('totalSelectedContacts', count($this->_contactIds));
 
     //set the context for redirection for any task actions
-    $session   = CRM_Core_Session::singleton();
-    $qfKey     = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
+    $session = CRM_Core_Session::singleton();
+    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
     $urlParams = 'force=1';
     if (CRM_Utils_Rule::qfKey($qfKey)) {
       $urlParams .= '&qfKey=' . $qfKey;

@@ -181,7 +181,8 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $statusOptions = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     $this->add('select', 'status_id', ts('Participant Status'),
       array(
-        '' => ts('- select -')) + $statusOptions,
+        '' => ts('- select -')
+      ) + $statusOptions,
       TRUE
     );
 
@@ -265,8 +266,8 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     if ($buttonName == $this->getButtonName('upload', 'new')) {
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url('civicrm/payment/add',
-          "reset=1&action=add&component=event&id={$this->_participantId}&cid={$this->_contactId}"
-        ));
+        "reset=1&action=add&component=event&id={$this->_participantId}&cid={$this->_contactId}"
+      ));
     }
   }
 

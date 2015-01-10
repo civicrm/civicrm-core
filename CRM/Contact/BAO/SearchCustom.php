@@ -82,9 +82,9 @@ class CRM_Contact_BAO_SearchCustom {
 
     if (!$ext->isExtensionKey($customSearchClass)) {
       $customSearchFile = str_replace('_',
-        DIRECTORY_SEPARATOR,
-        $customSearchClass
-      ) . '.php';
+          DIRECTORY_SEPARATOR,
+          $customSearchClass
+        ) . '.php';
     }
     else {
       $customSearchFile = $ext->keyToPath($customSearchClass);

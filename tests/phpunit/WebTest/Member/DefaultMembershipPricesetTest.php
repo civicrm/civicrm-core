@@ -39,11 +39,11 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $title            = substr(sha1(rand()), 0, 7);
-    $setTitle         = "Membership Fees - $title";
-    $usedFor          = 'Membership';
+    $title = substr(sha1(rand()), 0, 7);
+    $setTitle = "Membership Fees - $title";
+    $usedFor = 'Membership';
     $contributionType = 'Member Dues';
-    $setHelp          = 'Select your membership options.';
+    $setHelp = 'Select your membership options.';
     $this->_testAddSet($setTitle, $usedFor, $contributionType, $setHelp);
 
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
@@ -64,9 +64,9 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     $memPriceSetId = $sid;
     $membershipContributionPageId = $this->webtestAddContributionPage($hash, $rand, $pageTitle, array($processorName => 'Dummy'), TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, $memPriceSetId, FALSE, NULL, NULL, TRUE, FALSE, FALSE, TRUE, FALSE, FALSE, TRUE);
 
-    $firstName     = 'John_' . substr(sha1(rand()), 0, 7);
-    $lastName      = 'Anderson_' . substr(sha1(rand()), 0, 7);
-    $email         = "{$firstName}.{$lastName}@example.com";
+    $firstName = 'John_' . substr(sha1(rand()), 0, 7);
+    $lastName = 'Anderson_' . substr(sha1(rand()), 0, 7);
+    $email = "{$firstName}.{$lastName}@example.com";
     $contactParams = array(
       'first_name' => $firstName,
       'last_name' => $lastName,
@@ -219,19 +219,19 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     }
     elseif (!$defaultPriceSet) {
       $memTypeParams1 = $this->webtestAddMembershipType();
-      $memTypeTitle1  = $memTypeParams1['membership_type'];
-      $memTypeId1     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
-      $memTypeId1     = $memTypeId1[1];
+      $memTypeTitle1 = $memTypeParams1['membership_type'];
+      $memTypeId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
+      $memTypeId1 = $memTypeId1[1];
 
       $memTypeParams2 = $this->webtestAddMembershipType();
-      $memTypeTitle2  = $memTypeParams2['membership_type'];
-      $memTypeId2     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[12]/span/a[3]@href"));
-      $memTypeId2     = $memTypeId2[1];
+      $memTypeTitle2 = $memTypeParams2['membership_type'];
+      $memTypeId2 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[12]/span/a[3]@href"));
+      $memTypeId2 = $memTypeId2[1];
 
       $memTypeParams3 = $this->webtestAddMembershipType();
-      $memTypeTitle3  = $memTypeParams3['membership_type'];
-      $memTypeId3     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[text()='{$memTypeTitle3}']/../td[12]/span/a[3]@href"));
-      $memTypeId3     = $memTypeId3[1];
+      $memTypeTitle3 = $memTypeParams3['membership_type'];
+      $memTypeId3 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[text()='{$memTypeTitle3}']/../td[12]/span/a[3]@href"));
+      $memTypeId3 = $memTypeId3[1];
     }
 
     $this->openCiviPage("admin/price/field", "reset=1&action=add&sid={$sid}");
@@ -246,7 +246,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
         case 'Radio':
           $options = array(
             1 => array(
-          'label' => "$memTypeTitle1",
+              'label' => "$memTypeTitle1",
               'membership_type_id' => $memTypeId1,
               'amount' => '100.00',
             ),
@@ -267,7 +267,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
         case 'CheckBox':
           $options = array(
             1 => array(
-          'label' => "$memTypeTitle1",
+              'label' => "$memTypeTitle1",
               'membership_type_id' => $memTypeId1,
               'amount' => '100.00',
             ),

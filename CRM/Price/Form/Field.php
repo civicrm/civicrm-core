@@ -80,7 +80,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
     $this->_sid = CRM_Utils_Request::retrieve('sid', 'Positive', $this, FALSE, NULL, 'REQUEST');
     $this->_fid = CRM_Utils_Request::retrieve('fid', 'Positive', $this, FALSE, NULL, 'REQUEST');
-    $url        = CRM_Utils_System::url('civicrm/admin/price/field', "reset=1&action=browse&sid={$this->_sid}");
+    $url = CRM_Utils_System::url('civicrm/admin/price/field', "reset=1&action=browse&sid={$this->_sid}");
     $breadCrumb = array(array('title' => ts('Price Set Fields'), 'url' => $url));
 
     $this->_extendComponentId = array();
@@ -125,13 +125,13 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       if (!empty($defaults['active_on'])) {
         list($defaults['active_on'],
           $defaults['active_on_time']
-        ) = CRM_Utils_Date::setDateDefaults($defaults['active_on'], 'activityDateTime');
+          ) = CRM_Utils_Date::setDateDefaults($defaults['active_on'], 'activityDateTime');
       }
 
       if (!empty($defaults['expire_on'])) {
         list($defaults['expire_on'],
           $defaults['expire_on_time']
-        ) = CRM_Utils_Date::setDateDefaults($defaults['expire_on'], 'activityDateTime');
+          ) = CRM_Utils_Date::setDateDefaults($defaults['expire_on'], 'activityDateTime');
       }
     }
     else {
@@ -151,7 +151,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     $enabledComponents = CRM_Core_Component::getEnabledComponents();
     $eventComponentId = NULL;
     if (array_key_exists('CiviEvent', $enabledComponents)) {
-      $eventComponentId  = CRM_Core_Component::getComponentID('CiviEvent');
+      $eventComponentId = CRM_Core_Component::getComponentID('CiviEvent');
     }
 
     if (isset($this->_sid) && $this->_action == CRM_Core_Action::ADD) {
@@ -198,13 +198,13 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     $enabledComponents = CRM_Core_Component::getEnabledComponents();
     $eventComponentId = $memberComponentId = NULL;
     if (array_key_exists('CiviEvent', $enabledComponents)) {
-      $eventComponentId  = CRM_Core_Component::getComponentID('CiviEvent');
+      $eventComponentId = CRM_Core_Component::getComponentID('CiviEvent');
     }
     if (array_key_exists('CiviMember', $enabledComponents)) {
       $memberComponentId = CRM_Core_Component::getComponentID('CiviMember');
     }
 
-    $attributes        = CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceFieldValue');
+    $attributes = CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceFieldValue');
 
     $this->add('select', 'financial_type_id',
       ts('Financial Type'),
@@ -292,8 +292,9 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
         $this->add('select', 'membership_type_id[' . $i . ']', ts('Membership Type'),
           array(
-            '' => ' ') + $membershipTypes, FALSE, $js
-          );
+            '' => ' '
+          ) + $membershipTypes, FALSE, $js
+        );
         $this->add('text', 'membership_num_terms[' . $i . ']', ts('Number of Terms'), CRM_Utils_Array::value('membership_num_terms', $attributes));
       }
 
@@ -412,7 +413,8 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     }
 
     if (($form->_action & CRM_Core_Action::ADD || $form->_action & CRM_Core_Action::UPDATE) &&
-         $fields['html_type'] == 'Text' && $fields['financial_type_id'] == '') {
+      $fields['html_type'] == 'Text' && $fields['financial_type_id'] == ''
+    ) {
       $errors['financial_type_id'] = ts('Financial Type is a required field');
     }
 
@@ -616,7 +618,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     $params['is_display_amounts'] = CRM_Utils_Array::value('is_display_amounts', $params, FALSE);
     $params['is_required'] = CRM_Utils_Array::value('is_required', $params, FALSE);
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $params['financial_type_id']  = CRM_Utils_Array::value('financial_type_id', $params, FALSE);
+    $params['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params, FALSE);
     if (isset($params['active_on'])) {
       $params['active_on'] = CRM_Utils_Date::processDate($params['active_on'],
         CRM_Utils_Array::value('active_on_time', $params),

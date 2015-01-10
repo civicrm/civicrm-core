@@ -102,7 +102,7 @@ class CRM_Pledge_BAO_Query {
     }
 
     if (!empty($query->_returnProperties['pledge_financial_type'])) {
-      $query->_select['pledge_financial_type']  = "(SELECT civicrm_financial_type.name FROM civicrm_financial_type WHERE civicrm_financial_type.id = civicrm_pledge.financial_type_id) as pledge_financial_type";
+      $query->_select['pledge_financial_type'] = "(SELECT civicrm_financial_type.name FROM civicrm_financial_type WHERE civicrm_financial_type.id = civicrm_pledge.financial_type_id) as pledge_financial_type";
       $query->_element['pledge_financial_type'] = 1;
       $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
     }

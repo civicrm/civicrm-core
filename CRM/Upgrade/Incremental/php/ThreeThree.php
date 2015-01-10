@@ -68,7 +68,7 @@ class CRM_Upgrade_Incremental_php_ThreeThree {
       $name = CRM_Utils_String::munge($customField->label, '_', 64);
       $fldCnt = CRM_Core_DAO::singleValueQuery($customFldCntQuery,
         array(
-      1 => array($name, 'String'),
+          1 => array($name, 'String'),
           2 => array($customField->id, 'Integer'),
         ), TRUE, FALSE
       );
@@ -81,7 +81,7 @@ SET `name` = %1
 WHERE id = %2
 ";
       $customFieldParams = array(
-      1 => array($name, 'String'),
+        1 => array($name, 'String'),
         2 => array($customField->id, 'Integer'),
       );
       CRM_Core_DAO::executeQuery($customFieldQuery, $customFieldParams, TRUE, NULL, FALSE, FALSE);
@@ -97,7 +97,7 @@ WHERE id = %2
       $name = CRM_Utils_String::munge($customGroup->title, '_', 64);
       $grpCnt = CRM_Core_DAO::singleValueQuery($customGrpCntQuery,
         array(
-      1 => array($name, 'String'),
+          1 => array($name, 'String'),
           2 => array($customGroup->id, 'Integer'),
         )
       );
@@ -117,7 +117,7 @@ WHERE id = %2
       $name = CRM_Utils_String::munge($ufGroup->title, '_', 64);
       $ufGrpCnt = CRM_Core_DAO::singleValueQuery($ufGrpCntQuery,
         array(
-      1 => array($name, 'String'),
+          1 => array($name, 'String'),
           2 => array($ufGroup->id, 'Integer'),
         )
       );
@@ -221,7 +221,7 @@ WHERE id = %2
         // Used query to avoid line by line update.
         if ($labelFound || $priceFound) {
           $lineItemParams = array(
-          1 => array($fieldValueDAO->id, 'Integer'),
+            1 => array($fieldValueDAO->id, 'Integer'),
             2 => array($opValueDAO->label, 'String'),
           );
           $updateLineItems = "UPDATE civicrm_line_item SET price_field_value_id = %1 WHERE label = %2";
@@ -261,8 +261,8 @@ WHERE id = %2
   public function upgrade_3_3_beta3($rev) {
     // get the duplicate Ids of line item entries
     $dupeLineItemIds = array();
-    $fields          = array('entity_table', 'entity_id', 'price_field_id', 'price_field_value_id');
-    $mainLineItem    = new CRM_Price_BAO_LineItem();
+    $fields = array('entity_table', 'entity_id', 'price_field_id', 'price_field_value_id');
+    $mainLineItem = new CRM_Price_BAO_LineItem();
     $mainLineItem->find(TRUE);
     while ($mainLineItem->fetch()) {
       $dupeLineItem = new CRM_Price_BAO_LineItem();
@@ -362,8 +362,15 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id )
     if (CRM_Mailing_Info::workflowEnabled()) {
       $config = CRM_Core_Config::singleton();
       if (is_callable(array(
-        $config->userSystem, 'replacePermission'))) {
-        $config->userSystem->replacePermission('access CiviMail', array('access CiviMail', 'create mailings', 'approve mailings', 'schedule mailings'));
+        $config->userSystem,
+        'replacePermission'
+      ))) {
+        $config->userSystem->replacePermission('access CiviMail', array(
+            'access CiviMail',
+            'create mailings',
+            'approve mailings',
+            'schedule mailings'
+          ));
       }
     }
 

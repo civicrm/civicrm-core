@@ -128,9 +128,9 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     );
     $this->callAPISuccess('address', 'create', array_merge($this->_params, $individualParams));
     $this->callAPISuccess('relationship', 'getcount', array(
-        'contact_id_a' => $individualID,
-        'contact_id_b' => $this->_contactID,
-      ));
+      'contact_id_a' => $individualID,
+      'contact_id_b' => $this->_contactID,
+    ));
   }
 
   /**
@@ -145,9 +145,9 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     );
     $this->callAPISuccess('address', 'create', array_merge($this->_params, $individualParams));
     $this->callAPISuccess('relationship', 'getcount', array(
-        'contact_id_a' => $individualID,
-        'contact_id_b' => $this->_contactID,
-      ));
+      'contact_id_a' => $individualID,
+      'contact_id_b' => $this->_contactID,
+    ));
   }
 
   /**
@@ -170,10 +170,10 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->markTestIncomplete('Remainder of test checks that employer relationship is disabled when new one is created but turns out to be not happening - by design?');
     $this->callAPISuccessGetCount('relationship', array('contact_id_a' => $individualID, 'is_active' => FALSE), 1);
     $this->callAPISuccessGetCount('relationship', array(
-        'contact_id_a' => $individualID,
-        'is_active' => TRUE,
-        'contact_id_b' => $organisation2ID,
-      ), 1);
+      'contact_id_a' => $individualID,
+      'is_active' => TRUE,
+      'contact_id_b' => $organisation2ID,
+    ), 1);
 
   }
 

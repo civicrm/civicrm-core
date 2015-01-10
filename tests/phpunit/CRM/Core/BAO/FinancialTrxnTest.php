@@ -39,10 +39,10 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    * Check method create()
    */
   public function testCreate() {
-    $contactId          = $this->individualCreate();
+    $contactId = $this->individualCreate();
     $financialTypeId = 1;
-    $contributionId     = $this->contributionCreate($contactId, $financialTypeId);
-    $params             = array(
+    $contributionId = $this->contributionCreate($contactId, $financialTypeId);
+    $params = array(
       'contribution_id' => $financialTypeId,
       'to_financial_account_id' => 1,
       'trxn_date' => 20091021184930,

@@ -98,7 +98,8 @@ class CRM_Core_JobManager {
    *
    * @param void
    */
-  public function __destruct() {}
+  public function __destruct() {
+  }
 
   /**
    * @param $entity
@@ -137,7 +138,7 @@ class CRM_Core_JobManager {
     try {
       $result = civicrm_api($job->api_entity, $job->api_action, $params);
     }
-    catch(Exception$e) {
+    catch (Exception$e) {
       $this->logEntry('Error while executing ' . $job->name . ': ' . $e->getMessage());
     }
     $this->logEntry('Finished execution of ' . $job->name . ' with result: ' . $this->_apiResultToMessage($result));
@@ -187,8 +188,8 @@ class CRM_Core_JobManager {
     if (is_null($id) && is_null($action)) {
       CRM_Core_Error::fatal('You need to provide either id or name to use this method');
     }
-    $dao             = new CRM_Core_DAO_Job();
-    $dao->id         = $id;
+    $dao = new CRM_Core_DAO_Job();
+    $dao->id = $id;
     $dao->api_entity = $entity;
     $dao->api_action = $action;
     $dao->find();
@@ -229,10 +230,10 @@ class CRM_Core_JobManager {
       $dao->description .= " (...)";
     }
     if ($this->currentJob) {
-      $dao->job_id  = $this->currentJob->id;
-      $dao->name    = $this->currentJob->name;
+      $dao->job_id = $this->currentJob->id;
+      $dao->name = $this->currentJob->name;
       $dao->command = ts("Entity:") . " " . $this->currentJob->api_entity . " " . ts("Action:") . " " . $this->currentJob->api_action;
-      $data         = "";
+      $data = "";
       if (!empty($this->currentJob->parameters)) {
         $data .= "\n\nParameters raw (from db settings): \n" . $this->currentJob->parameters;
       }
@@ -259,8 +260,8 @@ class CRM_Core_JobManager {
    */
   private function _apiResultToMessage($apiResult) {
     $status = $apiResult['is_error'] ? ts('Failure') : ts('Success');
-    $msg    = CRM_Utils_Array::value('error_message', $apiResult, 'empty error_message!');
-    $vals   = CRM_Utils_Array::value('values', $apiResult, 'empty values!');
+    $msg = CRM_Utils_Array::value('error_message', $apiResult, 'empty error_message!');
+    $vals = CRM_Utils_Array::value('values', $apiResult, 'empty values!');
     if (is_array($msg)) {
       $msg = serialize($msg);
     }

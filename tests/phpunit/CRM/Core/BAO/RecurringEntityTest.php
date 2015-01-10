@@ -60,17 +60,17 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $daoActivity->save();
 
     $recursion = new CRM_Core_BAO_RecurringEntity();
-    $recursion->entity_id    = $daoActivity->id;
+    $recursion->entity_id = $daoActivity->id;
     $recursion->entity_table = 'civicrm_activity';
-    $recursion->dateColumns  = array('activity_date_time');
-    $recursion->schedule     = array(
-      'entity_value'      => $daoActivity->id,
-      'start_action_date'     => $daoActivity->activity_date_time,
+    $recursion->dateColumns = array('activity_date_time');
+    $recursion->schedule = array(
+      'entity_value' => $daoActivity->id,
+      'start_action_date' => $daoActivity->activity_date_time,
       'entity_status' => 'fourth saturday',
       'repetition_frequency_unit' => 'month',
       'repetition_frequency_interval' => 3,
       'start_action_offset' => 5,
-      'used_for'            => 'activity',
+      'used_for' => 'activity',
     );
 
     $generatedEntities = $recursion->generate();
@@ -117,7 +117,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $daoEvent->event_type_id = 3;
     $daoEvent->is_public = 1;
     $daoEvent->start_date = date('YmdHis', strtotime('2014-10-26 10:30:00'));
-    $daoEvent->end_date   = date('YmdHis', strtotime('2014-10-28 10:30:00'));
+    $daoEvent->end_date = date('YmdHis', strtotime('2014-10-28 10:30:00'));
     $daoEvent->created_date = date('YmdHis');
     $daoEvent->is_active = 1;
     $daoEvent->save();
@@ -134,24 +134,24 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
 
     // time to use recursion
     $recursion = new CRM_Core_BAO_RecurringEntity();
-    $recursion->entity_id    = $daoEvent->id;
+    $recursion->entity_id = $daoEvent->id;
     $recursion->entity_table = 'civicrm_event';
-    $recursion->dateColumns  = array('start_date');
-    $recursion->schedule     = array(
-      'entity_value'                  => $daoEvent->id,
-      'start_action_date'             => $daoEvent->start_date,
-      'start_action_condition'        => 'monday',
-      'repetition_frequency_unit'     => 'week',
+    $recursion->dateColumns = array('start_date');
+    $recursion->schedule = array(
+      'entity_value' => $daoEvent->id,
+      'start_action_date' => $daoEvent->start_date,
+      'start_action_condition' => 'monday',
+      'repetition_frequency_unit' => 'week',
       'repetition_frequency_interval' => 1,
-      'start_action_offset'           => 4,
-      'used_for'                      => 'event',
+      'start_action_offset' => 4,
+      'used_for' => 'event',
     );
 
     $recursion->linkedEntities = array(
       array(
-        'table'         => 'civicrm_tell_friend',
-        'findCriteria'  => array(
-          'entity_id'    => $recursion->entity_id,
+        'table' => 'civicrm_tell_friend',
+        'findCriteria' => array(
+          'entity_id' => $recursion->entity_id,
           'entity_table' => 'civicrm_event',
         ),
         'linkedColumns' => array('entity_id'),
@@ -211,22 +211,22 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
 
     //Cross check event exists before we test deletion
     $searchParamsEventBeforeDelete = array(
-      'entity_id'    => $generatedEntities['civicrm_event'][$key],
+      'entity_id' => $generatedEntities['civicrm_event'][$key],
       'entity_table' => 'civicrm_event',
     );
     $expectedValuesEventBeforeDelete = array(
-      'entity_id'    => $generatedEntities['civicrm_event'][$key],
+      'entity_id' => $generatedEntities['civicrm_event'][$key],
       'entity_table' => 'civicrm_event',
     );
     $this->assertDBCompareValues('CRM_Core_DAO_RecurringEntity', $searchParamsEventBeforeDelete, $expectedValuesEventBeforeDelete);
 
     //Cross check event exists before we test deletion
     $searchParamsTellAFriendBeforeDelete = array(
-      'entity_id'    => $generatedEntities['civicrm_tell_friend'][$actKey],
+      'entity_id' => $generatedEntities['civicrm_tell_friend'][$actKey],
       'entity_table' => 'civicrm_tell_friend',
     );
     $expectedValuesTellAFriendBeforeDelete = array(
-      'entity_id'    => $generatedEntities['civicrm_tell_friend'][$actKey],
+      'entity_id' => $generatedEntities['civicrm_tell_friend'][$actKey],
       'entity_table' => 'civicrm_tell_friend',
     );
     $this->assertDBCompareValues('CRM_Core_DAO_RecurringEntity', $searchParamsTellAFriendBeforeDelete, $expectedValuesTellAFriendBeforeDelete);

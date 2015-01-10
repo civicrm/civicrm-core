@@ -263,10 +263,10 @@ class CRM_Extension_Browser {
     if (empty($exts)) {
       $config = CRM_Core_Config::singleton();
       CRM_Core_Session::setStatus(ts('There are currently no extensions on the CiviCRM public extension directory which are compatible with version %2 (<a href="%1">requested extensions from here</a>). If you want to install an extension which is not marked as compatible, you may be able to <a href="%3">download and install extensions manually</a> (depending on access to your web server).<br />', array(
-            1 => $this->getRepositoryUrl(),
-            2 => $config->civiVersion,
-            3 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Extensions',
-          )), ts('No Extensions Available for this Version'), 'info');
+        1 => $this->getRepositoryUrl(),
+        2 => $config->civiVersion,
+        3 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Extensions',
+      )), ts('No Extensions Available for this Version'), 'info');
     }
 
     ini_restore('allow_url_fopen');

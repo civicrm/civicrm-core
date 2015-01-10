@@ -93,4 +93,3 @@ function _civicrm_api3_mailing_event_subscribe_create_spec(&$params) {
   $params['group_id']['api.required'] = 1;
   $params['group_id']['title'] = 'Unsubscribe From Group';
 }
-

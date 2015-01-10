@@ -9,23 +9,23 @@ class CRM_Event_Badge_Logo extends CRM_Event_Badge {
   public function __construct() {
     parent::__construct();
     // A4
-    $pw           = 210;
-    $ph           = 297;
-    $h            = 50;
-    $w            = 75;
+    $pw = 210;
+    $ph = 297;
+    $h = 50;
+    $w = 75;
     $this->format = array(
       'name' => 'Sigel 3C',
-    'paper-size' => 'A4',
-    'metric' => 'mm',
-    'lMargin' => ($pw - $w * 2) / 2,
+      'paper-size' => 'A4',
+      'metric' => 'mm',
+      'lMargin' => ($pw - $w * 2) / 2,
       'tMargin' => ($ph - $h * 5) / 2,
-    'NX' => 2,
-    'NY' => 5,
-    'SpaceX' => 0,
-    'SpaceY' => 0,
+      'NX' => 2,
+      'NY' => 5,
+      'SpaceX' => 0,
+      'SpaceY' => 0,
       'width' => $w,
-    'height' => $h,
-    'font-size' => 12,
+      'height' => $h,
+      'font-size' => 12,
     );
     $this->lMarginLogo = 20;
     $this->tMarginName = 20;
@@ -39,7 +39,13 @@ class CRM_Event_Badge_Logo extends CRM_Event_Badge {
     $x = $this->pdf->GetAbsX();
     $y = $this->pdf->GetY();
     $this->printBackground(TRUE);
-    $this->pdf->SetLineStyle(array('width' => 0.1, 'cap' => 'round', 'join' => 'round', 'dash' => '2,2', 'color' => array(0, 0, 200)));
+    $this->pdf->SetLineStyle(array(
+        'width' => 0.1,
+        'cap' => 'round',
+        'join' => 'round',
+        'dash' => '2,2',
+        'color' => array(0, 0, 200)
+      ));
 
     $this->pdf->SetFontSize(8);
     $this->pdf->MultiCell($this->pdf->width - $this->lMarginLogo, 0, $participant['event_title'], $this->border, "L", 0, 1, $x + $this->lMarginLogo, $y);

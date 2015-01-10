@@ -86,7 +86,11 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
     CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
     $this->assertCacheMatches(
-      array(/* deceased[0], */ $deceased[1]->id, $deceased[2]->id, $living[0]->id),
+      array(/* deceased[0], */
+        $deceased[1]->id,
+        $deceased[2]->id,
+        $living[0]->id
+      ),
       $group->id
     );
   }
@@ -146,7 +150,10 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     // Assert $c1 not in $parent
     CRM_Contact_BAO_GroupContactCache::load($parent, TRUE);
     $this->assertCacheMatches(
-      array(/* deceased[0], */ $deceased[1]->id, $deceased[2]->id),
+      array(/* deceased[0], */
+        $deceased[1]->id,
+        $deceased[2]->id
+      ),
       $parent->id
     );
 

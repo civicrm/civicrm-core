@@ -162,8 +162,8 @@ ORDER BY  civicrm_email.is_primary DESC, email_id ASC ";
     );
 
     $emails = $values = array();
-    $dao    = CRM_Core_DAO::executeQuery($query, $params);
-    $count  = 1;
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    $count = 1;
     while ($dao->fetch()) {
       $values = array(
         'locationType' => $dao->locationType,
@@ -269,8 +269,8 @@ AND    reset_date IS NULL
 ";
         if (CRM_Core_DAO::singleValueQuery($sql, $params)) {
           //set reset date only if it is not set and if hold date is set
-          $email->on_hold    = FALSE;
-          $email->hold_date  = 'null';
+          $email->on_hold = FALSE;
+          $email->hold_date = 'null';
           $email->reset_date = date('YmdHis');
         }
       }
@@ -291,8 +291,8 @@ AND    reset_date IS NULL
    * @static
    */
   public static function getFromEmail() {
-    $session         = CRM_Core_Session::singleton();
-    $contactID       = $session->get('userID');
+    $session = CRM_Core_Session::singleton();
+    $contactID = $session->get('userID');
     $fromEmailValues = array();
 
     // add all configured FROM email addresses

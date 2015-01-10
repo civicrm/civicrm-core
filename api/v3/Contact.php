@@ -316,8 +316,7 @@ function civicrm_api3_contact_delete($params) {
  * @throws API_Exception
  * @throws CiviCRM_API3_Exception
  */
-function _civicrm_api3_contact_check_params(&$params, $dupeCheck = TRUE, $dupeErrorArray = FALSE, $obsoletevalue = TRUE, $dedupeRuleGroupID = NULL)
-{
+function _civicrm_api3_contact_check_params(&$params, $dupeCheck = TRUE, $dupeErrorArray = FALSE, $obsoletevalue = TRUE, $dedupeRuleGroupID = NULL) {
 
   switch (strtolower(CRM_Utils_Array::value('contact_type', $params))) {
     case 'household':

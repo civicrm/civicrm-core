@@ -46,7 +46,8 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
   public function tearDown() {
     $tablesToTruncate = array(
-      'civicrm_custom_group', 'civicrm_custom_field',
+      'civicrm_custom_group',
+      'civicrm_custom_field',
     );
     // true tells quickCleanup to drop any tables that might have been created in the test
     $this->quickCleanup($tablesToTruncate, TRUE);
@@ -101,9 +102,9 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
 
-    $customField  = $this->callAPIAndDocument('custom_field', 'create', $params, __FUNCTION__, __FILE__);
+    $customField = $this->callAPIAndDocument('custom_field', 'create', $params, __FUNCTION__, __FILE__);
     $params['id'] = $customField['id'];
-    $customField  = $this->callAPISuccess('custom_field', 'create', $params);
+    $customField = $this->callAPISuccess('custom_field', 'create', $params);
 
     $this->assertNotNull($customField['id'], 'in line ' . __LINE__);
   }
@@ -241,10 +242,12 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
     $this->assertTrue(is_numeric($optionGroupID) && ($optionGroupID > 0));
     $optionGroup = $this->callAPISuccess('option_group', 'getsingle', array(
-      'id' => $optionGroupID));
+      'id' => $optionGroupID
+    ));
     $this->assertEquals($optionGroup['title'], 'Country');
     $optionValueCount = $this->callAPISuccess('option_value', 'getcount', array(
-      'option_group_id' => $optionGroupID));
+      'option_group_id' => $optionGroupID
+    ));
     $this->assertEquals(0, $optionValueCount);
   }
 
@@ -301,7 +304,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
 
     $result = $this->callAPISuccess('custom_field', 'getsingle', array(
-           'id' => $customField['id'],
+      'id' => $customField['id'],
       'return' => array('data_type'),
     ));
     $this->assertTrue(array_key_exists('data_type', $result));
@@ -316,7 +319,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
 
     $result = $this->callAPISuccess('custom_field', 'getsingle', array(
-           'id' => $customField['id'],
+      'id' => $customField['id'],
       'return' => 'data_type, custom_group_id',
     ));
     $this->assertTrue(array_key_exists('data_type', $result));
@@ -329,7 +332,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
     $option_values = array(
       array(
-    'weight' => 1,
+        'weight' => 1,
         'label' => 'Label1',
         'value' => 1,
         'is_active' => 1,
@@ -361,16 +364,16 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $this->assertNotNull($customField['id']);
     $getFieldsParams = array(
       'options' => array('get_options' => 'custom_' . $customField['id']),
-           'action' => 'create',
+      'action' => 'create',
     );
-    $description  = "Demonstrate retrieving metadata with custom field options";
+    $description = "Demonstrate retrieving metadata with custom field options";
     $subfile = "GetFieldsOptions";
     $fields = $this->callAPIAndDocument('contact', 'getfields', $getFieldsParams, __FUNCTION__, 'ContactTest.php', $description, $subfile, 'GetFields');
     $this->assertArrayHasKey('options', $fields['values']['custom_' . $customField['id']]);
     $this->assertEquals('Label1', $fields['values']['custom_' . $customField['id']]['options'][1]);
     $getOptionsArray = array(
       'field' => 'custom_' . $customField['id'],
-         );
+    );
     $description = "Demonstrates retrieving options for a custom field";
     $subfile = "GetOptions";
     $result = $this->callAPIAndDocument('contact', 'getoptions', $getOptionsArray, __FUNCTION__, 'ContactTest.php', $description, '', 'getoptions');
@@ -446,11 +449,17 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
     // Add some fields
     $contactGroup = $this->customGroupCreate(array('extends' => 'Contact', 'title' => 'test_group_c'));
-    $contactField = $this->customFieldCreate(array('custom_group_id' => $contactGroup['id'], 'label' => 'For Contacts'));
+    $contactField = $this->customFieldCreate(array(
+        'custom_group_id' => $contactGroup['id'],
+        'label' => 'For Contacts'
+      ));
     $indivGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'test_group_i'));
     $indivField = $this->customFieldCreate(array('custom_group_id' => $indivGroup['id'], 'label' => 'For Individuals'));
     $activityGroup = $this->customGroupCreate(array('extends' => 'Activity', 'title' => 'test_group_a'));
-    $activityField = $this->customFieldCreate(array('custom_group_id' => $activityGroup['id'], 'label' => 'For Activities'));
+    $activityField = $this->customFieldCreate(array(
+        'custom_group_id' => $activityGroup['id'],
+        'label' => 'For Activities'
+      ));
 
     // Check getfields
     $this->assertEquals(
@@ -488,7 +497,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    * @return array
    */
   public function getCustomFieldKeys($getFieldsResult) {
-    $isCustom = function($key) {
+    $isCustom = function ($key) {
       return preg_match('/^custom_/', $key);
     };
     $r = array_values(array_filter(array_keys($getFieldsResult['values']), $isCustom));

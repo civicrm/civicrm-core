@@ -117,7 +117,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
           if (!empty($blockValues['is_primary'])) {
             $hasPrimary[] = $instance;
             if (!$primaryID && !empty($blockValues['im'])) {
-                $primaryID = $blockValues['im'];
+              $primaryID = $blockValues['im'];
             }
           }
         }

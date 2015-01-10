@@ -52,7 +52,7 @@ class CRM_Dashlet_Page_CaseDashboard extends CRM_Core_Page {
     }
 
     $session = &CRM_Core_Session::singleton();
-    $userID  = $session->get('userID');
+    $userID = $session->get('userID');
     $summary = CRM_Case_BAO_Case::getCasesSummary(TRUE, $userID);
 
     if (!empty($summary)) {

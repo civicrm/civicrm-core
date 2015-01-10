@@ -16,6 +16,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @var array
    */
   protected $_params = array();
+
   /**
    * Class constructor
    */
@@ -23,10 +24,14 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
     parent::__construct();
     $this->_mapperKeys = &$mapperKeys;
   }
+
   public function setFields() {
     $customGroupID = $this->_multipleCustomData;
     $importableFields = $this->getGroupFieldsForImport($customGroupID, $this);
-    $this->_fields = array_merge(array('do_not_import' => array('title' => ts('- do not import -')), 'contact_id' => array('title' => ts('Contact ID'))), $importableFields);
+    $this->_fields = array_merge(array(
+        'do_not_import' => array('title' => ts('- do not import -')),
+        'contact_id' => array('title' => ts('Contact ID'))
+      ), $importableFields);
   }
 
   /**
@@ -85,7 +90,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    */
   public function summary(&$values) {
     $erroneousField = NULL;
-    $response      = $this->setActiveFieldValues($values, $erroneousField);
+    $response = $this->setActiveFieldValues($values, $erroneousField);
     $errorRequired = FALSE;
     $missingField = '';
     $this->_params = &$this->getActiveFieldParams();
@@ -168,7 +173,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
     try {
       civicrm_api3('custom_value', 'create', $this->_params);
     }
-    catch(CiviCRM_API3_Exception $e) {
+    catch (CiviCRM_API3_Exception $e) {
       $error = $e->getMessage();
       array_unshift($values, $error);
       return CRM_Import_Parser::ERROR;

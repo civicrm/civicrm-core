@@ -80,8 +80,8 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
     $this->assign('id', $this->_id);
 
     $this->_BAOName = 'CRM_Core_BAO_OptionValue';
-    $this->_gName   = 'activity_type';
-    $this->_gid     = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $this->_gName, 'id', 'name');
+    $this->_gName = 'activity_type';
+    $this->_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $this->_gName, 'id', 'name');
 
     $session = CRM_Core_Session::singleton();
     $url = CRM_Utils_System::url('civicrm/admin/campaign/surveyType', 'reset=1');

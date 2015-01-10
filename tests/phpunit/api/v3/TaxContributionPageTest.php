@@ -336,6 +336,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 2, 'In line ' . __LINE__);
     $this->_checkFinancialRecords($contribution, 'payLater');
   }
+
   public function testCreateContributionPendingOnline() {
     $this->setUpContributionPage();
     $params = array(
@@ -372,7 +373,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
       'total_amount' => 100.00,
-      'financial_type_id'   => $this->financialtypeID,
+      'financial_type_id' => $this->financialtypeID,
       'source' => 'SSF',
       'contribution_status_id' => 1,
     );
@@ -388,7 +389,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals('120.00', $trxnAmount);
     $newParams = array(
       'id' => $contribution['id'],
-      'financial_type_id'   => 1, // without tax rate i.e Donation
+      'financial_type_id' => 1, // without tax rate i.e Donation
       'total_amount' => '300',
     );
     $contribution = $this->callAPISuccess('contribution', 'update', $newParams);
@@ -510,8 +511,8 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
 
     $searchParams = array(
-      'entity_table'         => 'civicrm_financial_type',
-      'entity_id'            => $financialTypeId,
+      'entity_table' => 'civicrm_financial_type',
+      'entity_id' => $financialTypeId,
       'account_relationship' => $accountRel,
     );
 

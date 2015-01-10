@@ -33,7 +33,6 @@
   */
 
 
-
 define('GOOGLE_DEBUG_PP', 0);
 
 /**
@@ -123,9 +122,9 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
 
     $ids['contributionRecur'] = $ids['contributionPage'] = NULL;
     if ($input['component'] == "event") {
-      $ids['event']       = self::retrieve('eventID', 'Integer', $privateData, TRUE);
+      $ids['event'] = self::retrieve('eventID', 'Integer', $privateData, TRUE);
       $ids['participant'] = self::retrieve('participantID', 'Integer', $privateData, TRUE);
-      $ids['membership']  = NULL;
+      $ids['membership'] = NULL;
     }
     else {
       $ids['membership'] = self::retrieve('membershipID', 'Integer', $privateData, FALSE);
@@ -175,7 +174,7 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
           // create a contribution and then get it processed
           $contribution = new CRM_Contribute_DAO_Contribution();
           $contribution->contact_id = $ids['contact'];
-          $contribution->financial_type_id  = $objects['contributionType']->id;
+          $contribution->financial_type_id = $objects['contributionType']->id;
           $contribution->contribution_page_id = $objects['contribution']->contribution_page_id;
           $contribution->contribution_recur_id = $ids['contributionRecur'];
           $contribution->receive_date = date('YmdHis');
@@ -299,11 +298,14 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
       $ids['onbehalf_dupe_alert'] = NULL;
       if ($contribution->trxn_id) {
         list($ids['membership'], $ids['related_contact'], $ids['onbehalf_dupe_alert']) = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-        $contribution->trxn_id
+          $contribution->trxn_id
         );
       }
       foreach (array(
-        'membership', 'related_contact', 'onbehalf_dupe_alert') as $fld) {
+                 'membership',
+                 'related_contact',
+                 'onbehalf_dupe_alert'
+               ) as $fld) {
         if (!is_numeric($ids[$fld])) {
           unset($ids[$fld]);
         }
@@ -328,11 +330,11 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
       return $this->failed($objects, $transaction);
     }
 
-    $input['amount']     = $contribution->total_amount;
+    $input['amount'] = $contribution->total_amount;
     $input['fee_amount'] = NULL;
     $input['net_amount'] = NULL;
-    $input['trxn_id']    = $ids['contributionRecur'] ? $serial : $dataRoot['google-order-number']['VALUE'];
-    $input['is_test']    = $contribution->is_test;
+    $input['trxn_id'] = $ids['contributionRecur'] ? $serial : $dataRoot['google-order-number']['VALUE'];
+    $input['is_test'] = $contribution->is_test;
 
     $recur = NULL;
     if ($ids['contributionRecur']) {
@@ -350,8 +352,8 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
    */
   public function completeRecur($input, $ids, $objects) {
     if ($ids['contributionRecur']) {
-      $recur               = &$objects['contributionRecur'];
-      $contributionCount   = CRM_Core_DAO::singleValueQuery("
+      $recur = &$objects['contributionRecur'];
+      $contributionCount = CRM_Core_DAO::singleValueQuery("
 SELECT count(*)
 FROM   civicrm_contribution
 WHERE  contribution_recur_id = {$ids['contributionRecur']}
@@ -548,12 +550,13 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
       $privateData = $data[$root]['shopping-cart']['merchant-private-data']['VALUE'];
     }
     if (empty($privateData) && array_key_exists('order-summary', $data[$root])
-        && array_key_exists('shopping-cart', $data[$root]['order-summary'])) {
+      && array_key_exists('shopping-cart', $data[$root]['order-summary'])
+    ) {
       $privateData = $data[$root]['order-summary']['shopping-cart']['merchant-private-data']['VALUE'];
     }
     $privateData = $privateData ? self::stringToArray($privateData) : '';
-    $orderNo     = $data[$root]['google-order-number']['VALUE'];
-    $serial      = $data[$root]['serial-number'];
+    $orderNo = $data[$root]['google-order-number']['VALUE'];
+    $serial = $data[$root]['serial-number'];
 
     // a dummy object to call get context and a parent function inside it.
     $ipn = new CRM_Core_Payment_GoogleIPN('live', $dummyProcessor);
@@ -585,13 +588,13 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
       case "merchant-calculation-callback":
         break;
 
-      case "new-order-notification":{
+      case "new-order-notification": {
         $response->SendAck($serial, FALSE);
         $ipn->newOrderNotify($data[$root], $privateData, $module);
         break;
-        }
+      }
 
-      case "order-state-change-notification":{
+      case "order-state-change-notification": {
         $response->SendAck($serial, FALSE);
         $new_financial_state = $data[$root]['new-financial-order-state']['VALUE'];
         $new_fulfillment_order = $data[$root]['new-fulfillment-order-state']['VALUE'];
@@ -615,9 +618,9 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
             break;
         }
         break;
-        }
+      }
 
-      case "authorization-amount-notification":{
+      case "authorization-amount-notification": {
         $response->SendAck($serial, FALSE);
         $new_financial_state = $data[$root]['order-summary']['financial-order-state']['VALUE'];
         $new_fulfillment_order = $data[$root]['order-summary']['fulfillment-order-state']['VALUE'];
@@ -644,7 +647,7 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
             break;
         }
         break;
-        }
+      }
 
       case "charge-amount-notification":
       case "chargeback-amount-notification":

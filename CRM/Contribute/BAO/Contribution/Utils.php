@@ -283,8 +283,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
       if ($component !== 'membership') {
         CRM_Core_Error::displaySessionError($result);
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact',
-            "_qf_Main_display=true&qfKey={$form->_params['qfKey']}"
-          ));
+          "_qf_Main_display=true&qfKey={$form->_params['qfKey']}"
+        ));
       }
       $membershipResult[1] = $result;
     }
@@ -354,7 +354,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
       $form->_values['contribution_id'] = $contribution->id;
       CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
         $form->_values, $contribution->is_test,
-      FALSE, $fieldTypes
+        FALSE, $fieldTypes
       );
     }
   }
@@ -374,6 +374,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
     return FALSE;
 
   }
+
   /**
    * Get the contribution details by month
    * of the year
@@ -511,9 +512,10 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     if (!CRM_Utils_System::isNull($params['email'])) {
       $params['email'] = array(
         1 => array(
-      'email' => $params['email'],
+          'email' => $params['email'],
           'location_type_id' => $billingLocTypeId,
-        ));
+        )
+      );
     }
 
     if (isset($transaction['trxn_id'])) {
@@ -567,7 +569,11 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     $type = strtolower($type);
 
     if (!in_array($type, array(
-      'paypal', 'google', 'csv'))) {
+      'paypal',
+      'google',
+      'csv'
+    ))
+    ) {
       // return the params as is
       return $apiParams;
     }

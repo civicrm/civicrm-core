@@ -328,19 +328,19 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   public function testUpdateOptionValueWithGroupId() {
     // create a option group
     $og = $this->callAPISuccess('option_group', 'create', array(
-        'name' => 'our test Option Group for with group id',
-        'is_active' => 1,
-      ));
+      'name' => 'our test Option Group for with group id',
+      'is_active' => 1,
+    ));
     // create a option value
     $ov = $this->callAPISuccess('option_value', 'create',
       array('option_group_id' => $og['id'], 'label' => 'test option value')
     );
     // update option value without 'option_group_id'
     $this->callAPISuccess('option_value', 'create', array(
-        'id' => $ov['id'],
-        'option_group_id' => $og['id'],
-        'is_active' => 0,
-      ));
+      'id' => $ov['id'],
+      'option_group_id' => $og['id'],
+      'is_active' => 0,
+    ));
     $val = $this->callAPISuccess('option_value', 'getvalue', array(
       'id' => $ov['id'],
       'return' => 'is_active',

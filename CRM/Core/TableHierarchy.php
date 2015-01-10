@@ -58,7 +58,7 @@ class CRM_Core_TableHierarchy {
     'civicrm_entity_tag' => '22',
     'civicrm_note' => '23',
     'civicrm_contribution' => '24',
-    'civicrm_financial_type'    => '25',
+    'civicrm_financial_type' => '25',
     'civicrm_participant' => '26',
     'civicrm_event' => '27',
     'civicrm_worldregion' => '28',

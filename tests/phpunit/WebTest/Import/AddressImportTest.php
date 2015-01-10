@@ -89,17 +89,17 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     }
 
     $rows = array(
-    0 =>
+      0 =>
 
-      array(
-        'first_name' => $firstName1,
-        'last_name' => 'Anderson',
-        'address_1' => 'Add 1',
-        'address_2' => 'Add 2',
-        'city' => 'Watson',
-        'state' => 'NY',
-        'country' => 'United States',
-      ),
+        array(
+          'first_name' => $firstName1,
+          'last_name' => 'Anderson',
+          'address_1' => 'Add 1',
+          'address_2' => 'Add 2',
+          'city' => 'Watson',
+          'state' => 'NY',
+          'country' => 'United States',
+        ),
     );
     foreach ($customDataParams['rows'][0] as $key => $values) {
       $rows[0][$key] = $values;
@@ -273,7 +273,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
         ),
       ),
       'customFields' => array(
-        $customField  => 'This is a test field',
+        $customField => 'This is a test field',
         $customField3 => 'label1',
         $customField4 => 'label1',
         $customField5 => 'label1',

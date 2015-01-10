@@ -34,6 +34,7 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
   // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
   // new test classes should be compliant.
   public $_eNoticeCompliant = FALSE;
+
   public function setUp() {
     parent::setUp();
     if (class_exists('test_extension_manager_paymenttest')) {
@@ -94,6 +95,7 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest" AND is_active = 1');
   }
+
   /**
    * Install an extension and create a payment processor which uses it.
    * Attempts to uninstall fail

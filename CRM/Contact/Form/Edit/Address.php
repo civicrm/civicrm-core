@@ -73,7 +73,10 @@ class CRM_Contact_Form_Edit_Address {
     }
 
     //make location type required for inline edit
-    $form->addSelect("address[$blockId][location_type_id]", array('entity' => 'address', 'class' => 'eight') + $js, $inlineEdit);
+    $form->addSelect("address[$blockId][location_type_id]", array(
+        'entity' => 'address',
+        'class' => 'eight'
+      ) + $js, $inlineEdit);
 
     if (!$inlineEdit) {
       $js = array('id' => 'Address_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );');
@@ -113,8 +116,16 @@ class CRM_Contact_Form_Edit_Address {
       'supplemental_address_1' => array(ts('Supplemental Address 1'), $attributes['supplemental_address_1'], NULL),
       'supplemental_address_2' => array(ts('Supplemental Address 2'), $attributes['supplemental_address_2'], NULL),
       'city' => array(ts('City'), $attributes['city'], NULL),
-      'postal_code' => array(ts('Zip / Postal Code'), array_merge($attributes['postal_code'], array('class' => 'crm_postal_code')), NULL),
-      'postal_code_suffix' => array(ts('Postal Code Suffix'), array('size' => 4, 'maxlength' => 12, 'class' => 'crm_postal_code_suffix'), NULL),
+      'postal_code' => array(
+        ts('Zip / Postal Code'),
+        array_merge($attributes['postal_code'], array('class' => 'crm_postal_code')),
+        NULL
+      ),
+      'postal_code_suffix' => array(
+        ts('Postal Code Suffix'),
+        array('size' => 4, 'maxlength' => 12, 'class' => 'crm_postal_code_suffix'),
+        NULL
+      ),
       'country_id' => array(ts('Country'), $attributes['country_id'], 'country'),
       'state_province_id' => array(ts('State/Province'), $attributes['state_province_id'], NULL),
       'county_id' => array(ts('County'), $attributes['county_id'], NULL),
@@ -132,7 +143,11 @@ class CRM_Contact_Form_Edit_Address {
       if (empty($addressOptions[$nameWithoutID])) {
         $continue = TRUE;
         if (in_array($nameWithoutID, array(
-          'street_number', 'street_name', 'street_unit')) && !empty($addressOptions['street_address_parsing'])) {
+            'street_number',
+            'street_name',
+            'street_unit'
+          )) && !empty($addressOptions['street_address_parsing'])
+        ) {
           $continue = FALSE;
         }
         if ($continue) {
@@ -233,7 +248,7 @@ class CRM_Contact_Form_Edit_Address {
         CRM_Contact_Form_Edit_Address::storeRequiredCustomDataInfo($form, $groupTree);
       }
 
-      $template     = CRM_Core_Smarty::singleton();
+      $template = CRM_Core_Smarty::singleton();
       $tplGroupTree = $template->get_template_vars('address_groupTree');
       $tplGroupTree = empty($tplGroupTree) ? array() : $tplGroupTree;
 
@@ -248,7 +263,11 @@ class CRM_Contact_Form_Edit_Address {
       $form->addElement('checkbox', "address[$blockId][use_shared_address]", NULL, ts('Use another contact\'s address'));
 
       // Override the default profile links to add address form
-      $profileLinks = CRM_Core_BAO_UFGroup::getCreateLinks(array('new_individual', 'new_organization', 'new_household'), 'shared_address');
+      $profileLinks = CRM_Core_BAO_UFGroup::getCreateLinks(array(
+          'new_individual',
+          'new_organization',
+          'new_household'
+        ), 'shared_address');
       $form->addEntityRef("address[$blockId][master_contact_id]", ts('Share With'), array('create' => $profileLinks));
     }
   }
@@ -340,7 +359,10 @@ class CRM_Contact_Form_Edit_Address {
           $sharedAddresses[$key]['shared_address_display'] = array(
             'address' => $addressValue['display'],
             'name' => $shareAddressContactNames[$addressValue['master_id']]['name'],
-            'options' => CRM_Core_BAO_Address::getValues(array('entity_id' => $master_cid, 'contact_id' => $master_cid)),
+            'options' => CRM_Core_BAO_Address::getValues(array(
+                'entity_id' => $master_cid,
+                'contact_id' => $master_cid
+              )),
             'master_id' => $addressValue['master_id'],
           );
           $defaults['address'][$key]['master_contact_id'] = $master_cid;
@@ -364,9 +386,15 @@ class CRM_Contact_Form_Edit_Address {
         foreach ($defaults['address'] as $cnt => & $address) {
           $streetAddress = NULL;
           foreach (array(
-            'street_number', 'street_number_suffix', 'street_name', 'street_unit') as $fld) {
+                     'street_number',
+                     'street_number_suffix',
+                     'street_name',
+                     'street_unit'
+                   ) as $fld) {
             if (in_array($fld, array(
-              'street_name', 'street_unit'))) {
+              'street_name',
+              'street_unit'
+            ))) {
               $streetAddress .= ' ';
             }
             $streetAddress .= CRM_Utils_Array::value($fld, $address);

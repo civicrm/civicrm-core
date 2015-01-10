@@ -51,8 +51,8 @@ class CRM_Campaign_Form_Search_Survey extends CRM_Core_Form {
    * @return void
    */
   function preProcess() {
-    $this->_search    = CRM_Utils_Array::value('search', $_GET);
-    $this->_force     = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE, FALSE);
+    $this->_search = CRM_Utils_Array::value('search', $_GET);
+    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE, FALSE);
     $this->_searchTab = CRM_Utils_Request::retrieve('type', 'String', $this, FALSE, 'survey');
 
     //when we do load tab, lets load the default objects.
@@ -86,7 +86,8 @@ class CRM_Campaign_Form_Search_Survey extends CRM_Core_Form {
     $surveyTypes = CRM_Campaign_BAO_Survey::getSurveyActivityType();
     $this->add('select', 'activity_type_id',
       ts('Activity Type'), array(
-        '' => ts('- select -')) + $surveyTypes
+        '' => ts('- select -')
+      ) + $surveyTypes
     );
     $this->set('surveyTypes', $surveyTypes);
     $this->assign('surveyTypes', json_encode($surveyTypes));

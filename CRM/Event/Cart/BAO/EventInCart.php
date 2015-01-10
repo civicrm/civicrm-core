@@ -52,8 +52,8 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
     $this->load_associations();
     $contacts_to_delete = array();
     foreach ($this->participants as $participant) {
-      $defaults          = array();
-      $params            = array('id' => $participant->contact_id);
+      $defaults = array();
+      $params = array('id' => $participant->contact_id);
       $temporary_contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
 
       if ($temporary_contact->is_deleted) {

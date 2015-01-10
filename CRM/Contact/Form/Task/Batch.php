@@ -130,8 +130,12 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
     // if below fields are missing we should not reset sort name / display name
     // CRM-6794
     $preserveDefaultsArray = array(
-      'first_name', 'last_name', 'middle_name',
-      'organization_name', 'prefix_id', 'suffix_id',
+      'first_name',
+      'last_name',
+      'middle_name',
+      'organization_name',
+      'prefix_id',
+      'suffix_id',
       'household_name',
     );
 
@@ -226,8 +230,8 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   public function postProcess() {
     $params = $this->exportValues();
 
-    $ufGroupId         = $this->get('ufGroupId');
-    $notify            = NULL;
+    $ufGroupId = $this->get('ufGroupId');
+    $notify = NULL;
     $inValidSubtypeCnt = 0;
     //send profile notification email if 'notify' field is set
     $notify = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $ufGroupId, 'notify');
@@ -254,7 +258,10 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
     CRM_Core_Session::setStatus('', ts("Updates Saved"), 'success');
     if ($inValidSubtypeCnt) {
-      CRM_Core_Session::setStatus(ts('Contact Subtype field of 1 contact has not been updated.', array('plural' => 'Contact Subtype field of %count contacts has not been updated.', 'count' => $inValidSubtypeCnt)), ts('Invalid Subtype'));
+      CRM_Core_Session::setStatus(ts('Contact Subtype field of 1 contact has not been updated.', array(
+            'plural' => 'Contact Subtype field of %count contacts has not been updated.',
+            'count' => $inValidSubtypeCnt
+          )), ts('Invalid Subtype'));
     }
   }
 

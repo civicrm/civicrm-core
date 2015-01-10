@@ -106,8 +106,8 @@ class CRM_Utils_System {
   public static function getLinksUrl($urlVar, $includeReset = FALSE, $includeForce = TRUE, $skipUFVar = TRUE) {
     // Sort out query string to prevent messy urls
     $querystring = array();
-    $qs          = array();
-    $arrays      = array();
+    $qs = array();
+    $arrays = array();
 
     if (!empty($_SERVER['QUERY_STRING'])) {
       $qs = explode('&', str_replace('&amp;', '&', $_SERVER['QUERY_STRING']));
@@ -508,7 +508,7 @@ class CRM_Utils_System {
     $config->userFrameworkResourceURL = str_replace('http://', 'https://', $config->userFrameworkResourceURL);
     $config->resourceBase = $config->userFrameworkResourceURL;
 
-    if (! empty($config->extensionsURL)) {
+    if (!empty($config->extensionsURL)) {
       $config->extensionsURL = str_replace('http://', 'https://', $config->extensionsURL);
     }
 
@@ -734,17 +734,17 @@ class CRM_Utils_System {
     $s = ob_get_contents();
     ob_end_clean();
 
-    $s        = strip_tags($s, '<h2><th><td>');
-    $s        = preg_replace('/<th[^>]*>([^<]+)<\/th>/', "<info>\\1</info>", $s);
-    $s        = preg_replace('/<td[^>]*>([^<]+)<\/td>/', "<info>\\1</info>", $s);
-    $vTmp     = preg_split('/(<h2>[^<]+<\/h2>)/', $s, -1, PREG_SPLIT_DELIM_CAPTURE);
+    $s = strip_tags($s, '<h2><th><td>');
+    $s = preg_replace('/<th[^>]*>([^<]+)<\/th>/', "<info>\\1</info>", $s);
+    $s = preg_replace('/<td[^>]*>([^<]+)<\/td>/', "<info>\\1</info>", $s);
+    $vTmp = preg_split('/(<h2>[^<]+<\/h2>)/', $s, -1, PREG_SPLIT_DELIM_CAPTURE);
     $vModules = array();
     for ($i = 1; $i < count($vTmp); $i++) {
       if (preg_match('/<h2>([^<]+)<\/h2>/', $vTmp[$i], $vMat)) {
         $vName = trim($vMat[1]);
         $vTmp2 = explode("\n", $vTmp[$i + 1]);
         foreach ($vTmp2 as $vOne) {
-          $vPat  = '<info>([^<]+)<\/info>';
+          $vPat = '<info>([^<]+)<\/info>';
           $vPat3 = "/$vPat\s*$vPat\s*$vPat/";
           $vPat2 = "/$vPat\s*$vPat/";
           // 3cols
@@ -981,8 +981,8 @@ class CRM_Utils_System {
 
     if ($abort) {
       CRM_Core_Error::fatal(ts('This feature requires PHP Version %1 or greater',
-          array(1 => $ver)
-        ));
+        array(1 => $ver)
+      ));
     }
     return FALSE;
   }
@@ -1068,8 +1068,8 @@ class CRM_Utils_System {
           array(dirname(__FILE__), '..', '..', 'xml', 'version.xml')
         );
         if (file_exists($verFile)) {
-          $str     = file_get_contents($verFile);
-          $xmlObj  = simplexml_load_string($str);
+          $str = file_get_contents($verFile);
+          $xmlObj = simplexml_load_string($str);
           $version = (string) $xmlObj->version_no;
         }
       }
@@ -1110,10 +1110,10 @@ class CRM_Utils_System {
         $headers[str_replace(' ',
           '-',
           ucwords(strtolower(str_replace('_',
-                ' ',
-                substr($name, 5)
-              )
-            ))
+              ' ',
+              substr($name, 5)
+            )
+          ))
         )] = $value;
       }
     }
@@ -1425,8 +1425,8 @@ class CRM_Utils_System {
       // if db.ver > code.ver, sth really wrong
       if (version_compare($dbVersion, $codeVersion) > 0) {
         $errorMessage = '<p>' . ts('Your database is marked with an unexpected version number: %1. The v%2 codebase may not be compatible with your database state. You will need to determine the correct version corresponding to your current database state. You may want to revert to the codebase you were using until you resolve this problem.',
-          array(1 => $dbVersion, 2 => $codeVersion)
-        ) . '</p>';
+            array(1 => $dbVersion, 2 => $codeVersion)
+          ) . '</p>';
         $errorMessage .= "<p>" . ts('OR if this is a manual install from git, you might want to fix civicrm-version.php file.') . "</p>";
         return FALSE;
       }
@@ -1468,14 +1468,14 @@ class CRM_Utils_System {
 
     // reset various static arrays used here
     CRM_Contact_BAO_Contact::$_importableFields =
-      CRM_Contact_BAO_Contact::$_exportableFields =
-      CRM_Contribute_BAO_Contribution::$_importableFields =
-      CRM_Contribute_BAO_Contribution::$_exportableFields =
-      CRM_Pledge_BAO_Pledge::$_exportableFields =
-      CRM_Contribute_BAO_Query::$_contributionFields =
-      CRM_Core_BAO_CustomField::$_importFields =
-      CRM_Core_BAO_Cache::$_cache =
-      CRM_Core_DAO::$_dbColumnValueCache = NULL;
+    CRM_Contact_BAO_Contact::$_exportableFields =
+    CRM_Contribute_BAO_Contribution::$_importableFields =
+    CRM_Contribute_BAO_Contribution::$_exportableFields =
+    CRM_Pledge_BAO_Pledge::$_exportableFields =
+    CRM_Contribute_BAO_Query::$_contributionFields =
+    CRM_Core_BAO_CustomField::$_importFields =
+    CRM_Core_BAO_Cache::$_cache =
+    CRM_Core_DAO::$_dbColumnValueCache = NULL;
 
     CRM_Core_OptionGroup::flushAll();
     CRM_Utils_PseudoConstant::flushAll();
@@ -1540,7 +1540,8 @@ class CRM_Utils_System {
             DIRECTORY_SEPARATOR . 'sites' .
             DIRECTORY_SEPARATOR . 'all' .
             DIRECTORY_SEPARATOR . 'modules'
-          ) === FALSE) {
+          ) === FALSE
+        ) {
           $startPos = strpos($civicrm_root,
             DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR
           );

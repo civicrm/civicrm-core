@@ -79,7 +79,10 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
     $element = $this->add('checkbox', 'is_active', ts('Enabled?'));
     if ($this->_action & CRM_Core_Action::UPDATE) {
       if (in_array($this->_values['name'], array(
-        'encounter_medium', 'case_type', 'case_status'))) {
+        'encounter_medium',
+        'case_type',
+        'case_status'
+      ))) {
         static $caseCount = NULL;
         if (!isset($caseCount)) {
           $caseCount = CRM_Case_BAO_Case::caseCount(NULL, FALSE);

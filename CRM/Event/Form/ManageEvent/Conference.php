@@ -54,8 +54,8 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
   public function setDefaultValues() {
     $parentDefaults = parent::setDefaultValues();
 
-    $eventId  = $this->_id;
-    $params   = array();
+    $eventId = $this->_id;
+    $params = array();
     $defaults = array();
     if (isset($eventId)) {
       $params = array('id' => $eventId);
@@ -81,7 +81,8 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
       'slot_label_id',
       ts('Conference Slot'),
       array(
-        '' => ts('- select -')) + $slots,
+        '' => ts('- select -')
+      ) + $slots,
       FALSE
     );
 

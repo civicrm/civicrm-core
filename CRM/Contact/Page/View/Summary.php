@@ -141,9 +141,9 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $url = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $this->_contactId);
     $session->pushUserContext($url);
 
-    $params   = array();
+    $params = array();
     $defaults = array();
-    $ids      = array();
+    $ids = array();
 
     $params['id'] = $params['contact_id'] = $this->_contactId;
     $params['noRelationships'] = $params['noNotes'] = $params['noGroups'] = TRUE;
@@ -360,14 +360,14 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     foreach ($rest as $k => $v) {
       if ($accessCiviCRM && !empty($this->_viewOptions[$k])) {
         $allTabs[] = $v + array(
-          'id' => $k,
-          'url' => CRM_Utils_System::url(
-            "civicrm/contact/view/$k",
-            "reset=1&cid={$this->_contactId}"
-          ),
-          'weight' => $weight,
-          'count' => CRM_Contact_BAO_Contact::getCountComponent($k, $this->_contactId),
-        );
+            'id' => $k,
+            'url' => CRM_Utils_System::url(
+              "civicrm/contact/view/$k",
+              "reset=1&cid={$this->_contactId}"
+            ),
+            'weight' => $weight,
+            'count' => CRM_Contact_BAO_Contact::getCountComponent($k, $this->_contactId),
+          );
         $weight += 10;
       }
     }

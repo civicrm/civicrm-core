@@ -230,7 +230,7 @@ class CRM_Core_ManagedEntities {
       $params = array_merge($defaults, $todo['params']);
       $result = civicrm_api($dao->entity_type, 'create', $params);
       if ($result['is_error']) {
-        $this->onApiError($dao->entity_type, 'create',$params, $result);
+        $this->onApiError($dao->entity_type, 'create', $params, $result);
       }
     }
 
@@ -257,7 +257,7 @@ class CRM_Core_ManagedEntities {
       );
       $result = civicrm_api($dao->entity_type, 'create', $params);
       if ($result['is_error']) {
-        $this->onApiError($dao->entity_type, 'create',$params, $result);
+        $this->onApiError($dao->entity_type, 'create', $params, $result);
       }
     }
   }
@@ -273,9 +273,11 @@ class CRM_Core_ManagedEntities {
       case 'always':
         $doDelete = TRUE;
         break;
+
       case 'never':
         $doDelete = FALSE;
         break;
+
       case 'unused':
         $getRefCount = civicrm_api3($dao->entity_type, 'getrefcount', array(
           'debug' => 1,
@@ -289,6 +291,7 @@ class CRM_Core_ManagedEntities {
 
         $doDelete = ($total == 0);
         break;
+
       default:
         throw new \Exception('Unrecognized cleanup policy: ' . $policy);
     }

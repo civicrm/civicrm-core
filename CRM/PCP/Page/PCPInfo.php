@@ -49,10 +49,10 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
    * @return void
    */
   public function run() {
-    $session         = CRM_Core_Session::singleton();
-    $config          = CRM_Core_Config::singleton();
+    $session = CRM_Core_Session::singleton();
+    $config = CRM_Core_Config::singleton();
     $permissionCheck = FALSE;
-    $statusMessage   = '';
+    $statusMessage = '';
     if ($config->userFramework != 'Joomla') {
       $permissionCheck = CRM_Core_Permission::check('administer CiviCRM');
     }
@@ -106,9 +106,9 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     if ($pcpInfo['status_id'] != $approvedId || !$pcpInfo['is_active']) {
       if ($pcpInfo['contact_id'] != $session->get('userID') && !$permissionCheck) {
         CRM_Core_Error::statusBounce($statusMessage, CRM_Utils_System::url($urlBase,
-            "reset=1&id=" . $pcpInfo['page_id'],
-            FALSE, NULL, FALSE, TRUE
-          ));
+          "reset=1&id=" . $pcpInfo['page_id'],
+          FALSE, NULL, FALSE, TRUE
+        ));
       }
     }
     else {
@@ -116,9 +116,9 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
       if (!$getStatus) {
         // PCP not enabled for this contribution page. Forward everyone to source page
         CRM_Core_Error::statusBounce($statusMessage, CRM_Utils_System::url($urlBase,
-            "reset=1&id=" . $pcpInfo['page_id'],
-            FALSE, NULL, FALSE, TRUE
-          ));
+          "reset=1&id=" . $pcpInfo['page_id'],
+          FALSE, NULL, FALSE, TRUE
+        ));
       }
     }
 
@@ -135,7 +135,12 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
       $page_class = 'CRM_Event_DAO_Event';
       $this->assign('pageName', CRM_Event_PseudoConstant::event($pcpInfo['page_id']));
       CRM_Core_DAO::commonRetrieveAll($page_class, 'id',
-        $pcpInfo['page_id'], $default, array('start_date', 'end_date', 'registration_start_date', 'registration_end_date')
+        $pcpInfo['page_id'], $default, array(
+          'start_date',
+          'end_date',
+          'registration_start_date',
+          'registration_end_date'
+        )
       );
     }
     elseif ($pcpBlock->entity_table == 'civicrm_contribution_page') {
@@ -198,8 +203,8 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
       $fileInfo = reset($entityFile);
       $fileId = $fileInfo['fileID'];
       $image = '<img src="' . CRM_Utils_System::url('civicrm/file',
-        "reset=1&id=$fileId&eid={$this->_id}"
-      ) . '" />';
+          "reset=1&id=$fileId&eid={$this->_id}"
+        ) . '" />';
       $this->assign('image', $image);
     }
 
@@ -296,14 +301,14 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     switch ($action) {
       case CRM_Core_Action::BROWSE:
         $subForm = 'PCPAccount';
-        $form    = "CRM_PCP_Form_$subForm";
-        $single  = TRUE;
+        $form = "CRM_PCP_Form_$subForm";
+        $single = TRUE;
         break;
 
       case CRM_Core_Action::UPDATE:
         $subForm = 'Campaign';
-        $form    = "CRM_PCP_Form_$subForm";
-        $single  = TRUE;
+        $form = "CRM_PCP_Form_$subForm";
+        $single = TRUE;
         break;
     }
 

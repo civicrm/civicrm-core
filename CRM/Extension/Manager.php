@@ -125,7 +125,7 @@ class CRM_Extension_Manager {
    * @throws CRM_Extension_Exception
    */
   public function replace($tmpCodeDir) {
-    if (! $this->defaultContainer) {
+    if (!$this->defaultContainer) {
       throw new CRM_Extension_Exception("Default extension container is not configured");
     }
 
@@ -140,7 +140,7 @@ class CRM_Extension_Manager {
         // There is an old copy of the extension. Try to install in the same place -- but it must go somewhere in the default-container
         list ($oldInfo, $typeManager) = $this->_getInfoTypeHandler($newInfo->key); // throws Exception
         $tgtPath = $this->fullContainer->getPath($newInfo->key);
-        if (! CRM_Utils_File::isChildPath($this->defaultContainer->getBaseDir(), $tgtPath)) {
+        if (!CRM_Utils_File::isChildPath($this->defaultContainer->getBaseDir(), $tgtPath)) {
           // force installation in the default-container
           $oldPath = $tgtPath;
           $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
@@ -352,7 +352,7 @@ class CRM_Extension_Manager {
         case self::STATUS_INSTALLED_MISSING:
           throw new CRM_Extension_Exception("Cannot uninstall extension; disable it first: $key");
 
-        break;
+          break;
         case self::STATUS_DISABLED:
           list ($info, $typeManager) = $this->_getInfoTypeHandler($key); // throws Exception
           $typeManager->onPreUninstall($info);

@@ -46,7 +46,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *   Name of the entity table usually 'civicrm_contact'.
    *
    * @return array(
-  ) reference $tag array of category id's the contact belongs to.
+   * ) reference $tag array of category id's the contact belongs to.
    *
    * @static
    */
@@ -146,15 +146,15 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @static
    */
   public static function addEntitiesToTag(&$entityIds, $tagId, $entityTable = 'civicrm_contact') {
-    $numEntitiesAdded    = 0;
+    $numEntitiesAdded = 0;
     $numEntitiesNotAdded = 0;
-    $entityIdsAdded      = array();
+    $entityIdsAdded = array();
 
     foreach ($entityIds as $entityId) {
       $tag = new CRM_Core_DAO_EntityTag();
 
-      $tag->entity_id    = $entityId;
-      $tag->tag_id       = $tagId;
+      $tag->entity_id = $entityId;
+      $tag->tag_id = $tagId;
       $tag->entity_table = $entityTable;
       if (!$tag->find()) {
         $tag->save();
@@ -199,8 +199,8 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
     foreach ($entityIds as $entityId) {
       $tag = new CRM_Core_DAO_EntityTag();
 
-      $tag->entity_id    = $entityId;
-      $tag->tag_id       = $tagId;
+      $tag->entity_id = $entityId;
+      $tag->tag_id = $tagId;
       $tag->entity_table = $entityTable;
       if ($tag->find()) {
         $tag->delete();
@@ -348,14 +348,14 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    */
   public function mergeTags($tagAId, $tagBId) {
     $queryParams = array(
-    1 => array($tagBId, 'Integer'),
+      1 => array($tagBId, 'Integer'),
       2 => array($tagAId, 'Integer'),
     );
 
     // re-compute used_for field
     $query = "SELECT id, name, used_for FROM civicrm_tag WHERE id IN (%1, %2)";
-    $dao   = CRM_Core_DAO::executeQuery($query, $queryParams);
-    $tags  = array();
+    $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
+    $tags = array();
     while ($dao->fetch()) {
       $label = ($dao->id == $tagAId) ? 'tagA' : 'tagB';
       $tags[$label] = $dao->name;

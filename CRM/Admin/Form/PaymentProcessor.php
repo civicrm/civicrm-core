@@ -181,7 +181,10 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       $attributes['name'], TRUE
     );
 
-    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array('CRM_Financial_DAO_PaymentProcessor', $this->_id));
+    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
+        'CRM_Financial_DAO_PaymentProcessor',
+        $this->_id
+      ));
 
     $this->add('text', 'description', ts('Description'),
       $attributes['description']
@@ -239,8 +242,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $errors = array();
 
     if (!(self::checkSection($fields, $errors) ||
-        self::checkSection($fields, $errors, 'test')
-      )) {
+      self::checkSection($fields, $errors, 'test')
+    )
+    ) {
       $errors['_qf_default'] = ts('You must have at least the test or live section filled');
     }
 
@@ -306,7 +310,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $domainID = CRM_Core_Config::domainID();
 
     $dao = new CRM_Financial_DAO_PaymentProcessor();
-    $dao->id        = $this->_id;
+    $dao->id = $this->_id;
     $dao->domain_id = $domainID;
     if (!$dao->find(TRUE)) {
       return $defaults;
@@ -316,8 +320,8 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
 
     // now get testID
     $testDAO = new CRM_Financial_DAO_PaymentProcessor();
-    $testDAO->name      = $dao->name;
-    $testDAO->is_test   = 1;
+    $testDAO->name = $dao->name;
+    $testDAO->is_test = 1;
     $testDAO->domain_id = $domainID;
     if ($testDAO->find(TRUE)) {
       $this->_testID = $testDAO->id;
@@ -372,9 +376,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   public function updatePaymentProcessor(&$values, $domainID, $test) {
     $dao = new CRM_Financial_DAO_PaymentProcessor();
 
-    $dao->id         = $test ? $this->_testID : $this->_id;
-    $dao->domain_id  = $domainID;
-    $dao->is_test    = $test;
+    $dao->id = $test ? $this->_testID : $this->_id;
+    $dao->domain_id = $domainID;
+    $dao->is_test = $test;
     $dao->is_default = CRM_Utils_Array::value('is_default', $values, 0);
 
     $dao->is_active = CRM_Utils_Array::value('is_active', $values, 0);
@@ -392,9 +396,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     }
 
     // also copy meta fields from the info DAO
-    $dao->is_recur     = $this->_ppDAO->is_recur;
+    $dao->is_recur = $this->_ppDAO->is_recur;
     $dao->billing_mode = $this->_ppDAO->billing_mode;
-    $dao->class_name   = $this->_ppDAO->class_name;
+    $dao->class_name = $this->_ppDAO->class_name;
     $dao->payment_type = $this->_ppDAO->payment_type;
 
     $dao->save();

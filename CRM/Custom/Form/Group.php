@@ -121,14 +121,14 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $errors = array();
 
     //validate group title as well as name.
-    $title  = $fields['title'];
-    $name   = CRM_Utils_String::munge($title, '_', 64);
-    $query  = 'select count(*) from civicrm_custom_group where ( name like %1 OR title like %2 ) and id != %3';
+    $title = $fields['title'];
+    $name = CRM_Utils_String::munge($title, '_', 64);
+    $query = 'select count(*) from civicrm_custom_group where ( name like %1 OR title like %2 ) and id != %3';
     $grpCnt = CRM_Core_DAO::singleValueQuery($query, array(
-    1 => array($name, 'String'),
-        2 => array($title, 'String'),
-        3 => array((int) $self->_id, 'Integer'),
-      ));
+      1 => array($name, 'String'),
+      2 => array($title, 'String'),
+      3 => array((int) $self->_id, 'Integer'),
+    ));
     if ($grpCnt) {
       $errors['title'] = ts('Custom group \'%1\' already exists in Database.', array(1 => $title));
     }
@@ -202,18 +202,18 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $contactTypes = array('Contact', 'Individual', 'Household', 'Organization');
     $this->assign('contactTypes', json_encode($contactTypes));
 
-    $sel1         = array("" => "- select -") + CRM_Core_SelectValues::customGroupExtends();
-    $sel2         = array();
+    $sel1 = array("" => "- select -") + CRM_Core_SelectValues::customGroupExtends();
+    $sel2 = array();
     $activityType = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
 
-    $eventType       = CRM_Core_OptionGroup::values('event_type');
-    $grantType       = CRM_Core_OptionGroup::values('grant_type');
-    $campaignTypes   = CRM_Campaign_PseudoConstant::campaignType();
-    $membershipType  = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
+    $eventType = CRM_Core_OptionGroup::values('event_type');
+    $grantType = CRM_Core_OptionGroup::values('grant_type');
+    $campaignTypes = CRM_Campaign_PseudoConstant::campaignType();
+    $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
     $participantRole = CRM_Core_OptionGroup::values('participant_role');
-    $relTypeInd      = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Individual');
-    $relTypeOrg      = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Organization');
-    $relTypeHou      = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Household');
+    $relTypeInd = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Individual');
+    $relTypeOrg = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Organization');
+    $relTypeHou = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Household');
 
     ksort($sel1);
     asort($activityType);
@@ -257,11 +257,13 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
         if ($main == 'Relationship') {
           $relName = self::getFormattedList($sel2[$main]);
           $sel2[$main] = array(
-            '' => ts("- Any -")) + $relName;
+              '' => ts("- Any -")
+            ) + $relName;
         }
         else {
           $sel2[$main] = array(
-            '' => ts("- Any -")) + $sel2[$main];
+              '' => ts("- Any -")
+            ) + $sel2[$main];
         }
       }
     }
@@ -274,7 +276,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
         $contactSubTypes[$key] = $key;
       }
       $sel2['Contact'] = array(
-        "" => "-- Any --") + $contactSubTypes;
+          "" => "-- Any --"
+        ) + $contactSubTypes;
     }
     else {
       if (!isset($this->_id)) {
@@ -493,8 +496,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $action = CRM_Core_Resources::singleton()->ajaxPopupsEnabled ? '' : '/add';
       $url = CRM_Utils_System::url("civicrm/admin/custom/group/field$action", 'reset=1&new=1&gid=' . $group->id . '&action=' . ($action ? 'add' : 'browse'));
       CRM_Core_Session::setStatus(ts("Your custom field set '%1' has been added. You can add custom fields now.",
-          array(1 => $group->title)
-        ), ts('Saved'), 'success');
+        array(1 => $group->title)
+      ), ts('Saved'), 'success');
       $session = CRM_Core_Session::singleton();
       $session->replaceUserContext($url);
     }
@@ -505,7 +508,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     if (is_array($db_prefix) && $config->userSystem->is_drupal && module_exists('views')) {
       // get table_name for each custom group
       $tables = array();
-      $sql    = "SELECT table_name FROM civicrm_custom_group WHERE is_active = 1";
+      $sql = "SELECT table_name FROM civicrm_custom_group WHERE is_active = 1";
       $result = CRM_Core_DAO::executeQuery($sql);
       while ($result->fetch()) {
         $tables[$result->table_name] = $result->table_name;
@@ -516,8 +519,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
 
       if (!empty($missingTableNames)) {
         CRM_Core_Session::setStatus(ts("To ensure that all of your custom data groups are available to Views, you may need to add the following key(s) to the db_prefix array in your settings.php file: '%1'.",
-            array(1 => implode(', ', $missingTableNames))
-          ), ts('Note'), 'info');
+          array(1 => implode(', ', $missingTableNames))
+        ), ts('Note'), 'info');
       }
     }
   }

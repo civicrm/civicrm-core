@@ -152,9 +152,9 @@ LEFT JOIN civicrm_state_province state_province ON state_province.id = address.s
     $params = array();
     $where = "contact_a.contact_type   = 'Household'";
 
-    $count  = 1;
+    $count = 1;
     $clause = array();
-    $name   = CRM_Utils_Array::value('household_name',
+    $name = CRM_Utils_Array::value('household_name',
       $this->_formValues
     );
     if ($name != NULL) {

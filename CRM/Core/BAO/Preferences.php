@@ -54,7 +54,7 @@ AND    v.is_active = 1
 
     $dirParams = array();
     $urlParams = array();
-    $dao       = CRM_Core_DAO::executeQuery($sql);
+    $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       if (!isset($params[$dao->valueName])) {
         continue;
@@ -102,7 +102,8 @@ AND    v.name = %3
       else {
         $value = CRM_Utils_System::relativeURL($value);
       }
-      $sqlParams = array(1 => array($value, 'String'),
+      $sqlParams = array(
+        1 => array($value, 'String'),
         2 => array($optionName, 'String'),
         3 => array($name, 'String'),
       );

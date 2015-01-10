@@ -61,9 +61,9 @@ class CRM_Upgrade_Headless {
 
     $postUpgradeMessageFile = CRM_Utils_File::tempnam('civicrm-post-upgrade');
     $queueRunner = new CRM_Queue_Runner(array(
-        'title' => ts('CiviCRM Upgrade Tasks'),
-        'queue' => CRM_Upgrade_Form::buildQueue($currentVer, $latestVer, $postUpgradeMessageFile),
-      ));
+      'title' => ts('CiviCRM Upgrade Tasks'),
+      'queue' => CRM_Upgrade_Form::buildQueue($currentVer, $latestVer, $postUpgradeMessageFile),
+    ));
     $queueResult = $queueRunner->runAll();
     if ($queueResult !== TRUE) {
       $errorMessage = CRM_Core_Error::formatTextException($queueResult['exception']);

@@ -107,10 +107,12 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext($url);
-      $breadCrumb = array(array(
-      'title' => ts('CiviCRM Profile Fields'),
+      $breadCrumb = array(
+        array(
+          'title' => ts('CiviCRM Profile Fields'),
           'url' => $url,
-        ));
+        )
+      );
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
     }
 
@@ -292,7 +294,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $defaultLocation = $this->_location_types[$defaultLocationType->id];
       unset($this->_location_types[$defaultLocationType->id]);
       $this->_location_types = array(
-        $defaultLocationType->id => $defaultLocation) + $this->_location_types;
+          $defaultLocationType->id => $defaultLocation
+        ) + $this->_location_types;
     }
 
     $this->_location_types = array('Primary') + $this->_location_types;
@@ -366,8 +369,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
 
     $this->_defaults = array();
-    $js              = "<script type='text/javascript'>\n";
-    $formName        = "document.{$this->_name}";
+    $js = "<script type='text/javascript'>\n";
+    $formName = "document.{$this->_name}";
 
     $alreadyMixProfile = FALSE;
     if (CRM_Core_BAO_UFField::checkProfileType($this->_gid)) {
@@ -505,7 +508,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::DELETE) {
       $fieldValues = array('uf_group_id' => $this->_gid);
       CRM_Utils_Weight::delWeight('CRM_Core_DAO_UFField', $this->_id, $fieldValues);
-      $deleted     = CRM_Core_BAO_UFField::del($this->_id);
+      $deleted = CRM_Core_BAO_UFField::del($this->_id);
 
       //update group_type every time. CRM-3608
       if ($this->_gid && $deleted) {
@@ -558,7 +561,10 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $config = CRM_Core_Config::singleton();
       $showBestResult = FALSE;
       if (in_array($ufField->field_name, array(
-        'country', 'state_province')) && count($config->countryLimit) > 1) {
+          'country',
+          'state_province'
+        )) && count($config->countryLimit) > 1
+      ) {
         // get state or country field weight if exists
         $field = 'state_province';
         if ($ufField->field_name == 'state_province') {
@@ -586,8 +592,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         CRM_Core_BAO_UFGroup::updateGroupTypes($this->_gid, $fieldsType);
       }
       CRM_Core_Session::setStatus(ts('Your CiviCRM Profile Field \'%1\' has been saved to \'%2\'.',
-          array(1 => $name, 2 => $this->_title)
-        ), ts('Profile Field Saved'), 'success');
+        array(1 => $name, 2 => $this->_title)
+      ), ts('Profile Field Saved'), 'success');
     }
     $buttonName = $this->controller->getButtonName();
 
@@ -595,13 +601,13 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     if ($buttonName == $this->getButtonName('next', 'new')) {
       CRM_Core_Session::setStatus(ts(' You can add another profile field.'), '', 'info');
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/uf/group/field/add',
-          "reset=1&action=add&gid={$this->_gid}&sbr={$showBestResult}"
-        ));
+        "reset=1&action=add&gid={$this->_gid}&sbr={$showBestResult}"
+      ));
     }
     else {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/uf/group/field',
-          "reset=1&action=browse&gid={$this->_gid}"
-        ));
+        "reset=1&action=browse&gid={$this->_gid}"
+      ));
       $session->set('showBestResult', $showBestResult);
     }
   }
@@ -623,14 +629,22 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    */
   public static function formRuleSubType($fieldType, $groupType, $errors) {
     if (in_array($fieldType, array(
-      'Participant', 'Contribution', 'Membership', 'Activity'))) {
+      'Participant',
+      'Contribution',
+      'Membership',
+      'Activity'
+    ))) {
       $individualSubTypes = CRM_Contact_BAO_ContactType::subTypes('Individual');
       foreach ($groupType as $value) {
         if (!in_array($value, $individualSubTypes) &&
           !in_array($value, array(
-            'Participant', 'Contribution', 'Membership',
-              'Individual', 'Contact', 'Activity',
-            ))
+            'Participant',
+            'Contribution',
+            'Membership',
+            'Individual',
+            'Contact',
+            'Activity',
+          ))
         ) {
           $errors['field_name'] = ts('Cannot add or update profile field "%1" with combination of Household or Organization or any subtypes of Household or Organisation.', array(1 => $fieldType));
           break;
@@ -671,7 +685,12 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   public static function formRuleCustomDataExtentColumnValue($customField, $gid, $fieldType, &$errors) {
     // fix me : check object $customField
     if (in_array($fieldType, array(
-          'Participant', 'Contribution', 'Membership', 'Activity', 'Case'))) {
+      'Participant',
+      'Contribution',
+      'Membership',
+      'Activity',
+      'Case'
+    ))) {
       $params = array('id' => $customField->custom_group_id);
       $customGroup = array();
       CRM_Core_BAO_CustomGroup::retrieve($params, $customGroup);
@@ -758,11 +777,11 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * @static
    */
   public static function formRule($fields, $files, $self) {
-    $is_required     = CRM_Utils_Array::value('is_required', $fields, FALSE);
+    $is_required = CRM_Utils_Array::value('is_required', $fields, FALSE);
     $is_registration = CRM_Utils_Array::value('is_registration', $fields, FALSE);
-    $is_view         = CRM_Utils_Array::value('is_view', $fields, FALSE);
-    $in_selector     = CRM_Utils_Array::value('in_selector', $fields, FALSE);
-    $is_active       = CRM_Utils_Array::value('is_active', $fields, FALSE);
+    $is_view = CRM_Utils_Array::value('is_view', $fields, FALSE);
+    $in_selector = CRM_Utils_Array::value('in_selector', $fields, FALSE);
+    $is_active = CRM_Utils_Array::value('is_active', $fields, FALSE);
 
     $errors = array();
     if ($is_view && $is_registration) {
@@ -778,7 +797,12 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
 
     if ($in_selector && in_array($entityName, array(
-      'Contribution', 'Participant', 'Membership', 'Activity'))) {
+        'Contribution',
+        'Participant',
+        'Membership',
+        'Activity'
+      ))
+    ) {
       $errors['in_selector'] = ts("'In Selector' cannot be checked for %1 fields.", array(1 => $entityName));
     }
 
@@ -966,7 +990,10 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         if (CRM_Contact_BAO_ContactType::isaSubType($fieldType)) {
           if (CRM_Contact_BAO_ContactType::isaSubType($profileType)) {
             if ($fieldType != $profileType) {
-              $errors['field_name'] = ts('Cannot add or update profile field type "%1" with combination of "%2".', array(1 => $fieldType, 2 => $profileType));
+              $errors['field_name'] = ts('Cannot add or update profile field type "%1" with combination of "%2".', array(
+                  1 => $fieldType,
+                  2 => $profileType
+                ));
             }
           }
           else {
@@ -975,7 +1002,10 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
               $profileType != $basicType &&
               $profileType != 'Contact'
             ) {
-              $errors['field_name'] = ts('Cannot add or update profile field type "%1" with combination of "%2".', array(1 => $fieldType, 2 => $profileType));
+              $errors['field_name'] = ts('Cannot add or update profile field type "%1" with combination of "%2".', array(
+                  1 => $fieldType,
+                  2 => $profileType
+                ));
             }
           }
         }

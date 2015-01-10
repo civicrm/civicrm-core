@@ -115,14 +115,16 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
 
   public function testUpdate() {
     $params = array(
-        'name' => 'test membership status',);
+      'name' => 'test membership status',
+    );
     $result = $this->callAPISuccess('membership_status', 'create', $params);
     $id = $result['id'];
     $result = $this->callAPISuccess('membership_status', 'get', $params);
     $this->assertEquals('test membership status', $result['values'][$id]['name']);
     $newParams = array(
       'id' => $id,
-      'name' => 'renamed',);
+      'name' => 'renamed',
+    );
     $result = $this->callAPISuccess('membership_status', 'create', $newParams);
     $result = $this->callAPISuccess('membership_status', 'get', array('id' => $id));
     $this->assertEquals('renamed', $result['values'][$id]['name']);

@@ -85,8 +85,8 @@ class CRM_Core_BAO_Block {
       $count = 1;
       foreach ($blockIds as $blockId) {
         $block = new $BAOString();
-        $block->id        = $blockId['id'];
-        $getBlocks        = self::retrieveBlock($block, $blockName);
+        $block->id = $blockId['id'];
+        $getBlocks = self::retrieveBlock($block, $blockName);
         $blocks[$count++] = array_pop($getBlocks);
       }
     }
@@ -233,9 +233,9 @@ class CRM_Core_BAO_Block {
       return NULL;
     }
 
-    $name           = ucfirst($blockName);
-    $contactId      = NULL;
-    $isPrimary      = $isBilling = TRUE;
+    $name = ucfirst($blockName);
+    $contactId = NULL;
+    $isPrimary = $isBilling = TRUE;
     $entityElements = $blocks = array();
 
     if ($entity) {

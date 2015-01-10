@@ -10,23 +10,23 @@
 */
 
 /**
- -----------------------------------------------------------------------------------------------
- The basic functionality of this processor is that variables from the $params object are transformed
- into xml. The xml is submitted to the processor's https site
- using curl and the response is translated back into an array using the processor's function.
-
- If an array ($params) is returned to the calling function the values from
- the array are merged into the calling functions array.
-
- If an result of class error is returned it is treated as a failure. No error denotes a success. Be
- WARY of this when coding
-
- -----------------------------------------------------------------------------------------------
+ * -----------------------------------------------------------------------------------------------
+ * The basic functionality of this processor is that variables from the $params object are transformed
+ * into xml. The xml is submitted to the processor's https site
+ * using curl and the response is translated back into an array using the processor's function.
+ *
+ * If an array ($params) is returned to the calling function the values from
+ * the array are merged into the calling functions array.
+ *
+ * If an result of class error is returned it is treated as a failure. No error denotes a success. Be
+ * WARY of this when coding
+ *
+ * -----------------------------------------------------------------------------------------------
  **/
 class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   // (not used, implicit in the API, might need to convert?)
   const
-  CHARSET = 'UFT-8';
+    CHARSET = 'UFT-8';
 
   /**
    * We only need one instance of this object. So we use the singleton
@@ -227,7 +227,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     }
 
     /**********************************************************
-     // If gateway returned no data - tell 'em and bail out
+     * // If gateway returned no data - tell 'em and bail out
      **********************************************************/
     if (empty($responseData)) {
       curl_close($ch);
@@ -235,7 +235,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     }
 
     /**********************************************************
-     // Success so far - close the curl and check the data
+     * // Success so far - close the curl and check the data
      **********************************************************/
     curl_close($ch);
 
@@ -254,11 +254,11 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     }
     if ($processorResponse['ssl_result_message'] == "APPROVED") {
       if ($this->_mode == 'test') {
-        $query             = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'test%'";
-        $p                 = array();
-        $trxn_id           = strval(CRM_Core_Dao::singleValueQuery($query, $p));
-        $trxn_id           = str_replace('test', '', $trxn_id);
-        $trxn_id           = intval($trxn_id) + 1;
+        $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'test%'";
+        $p = array();
+        $trxn_id = strval(CRM_Core_Dao::singleValueQuery($query, $p));
+        $trxn_id = str_replace('test', '', $trxn_id);
+        $trxn_id = intval($trxn_id) + 1;
         $params['trxn_id'] = sprintf('test%08d', $trxn_id);
         return $params;
       }
@@ -276,7 +276,8 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
              * Success !
              */
 
-      if ($this->_mode == 'test') {}
+      if ($this->_mode == 'test') {
+      }
       else {
         // 'trxn_id' is varchar(255) field. returned value is length 37
         $params['trxn_id'] = $processorResponse['ssl_txn_id'];

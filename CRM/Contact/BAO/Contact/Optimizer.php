@@ -62,14 +62,14 @@ class CRM_Contact_BAO_Contact_Optimizer {
     $old = $new = array();
 
     foreach ($oldWebsiteValues as $idx => $value) {
-      if (! empty($value['url'])) {
+      if (!empty($value['url'])) {
         $oldEmpty = FALSE;
         $old[] = array('website_type_id' => $value['website_type_id'], 'url' => $value['url']);
       }
     }
 
     foreach ($newWebsiteValues as $idx => $value) {
-      if (! empty($value['url'])) {
+      if (!empty($value['url'])) {
         $newEmpty = FALSE;
         $new[] = array('website_type_id' => $value['website_type_id'], 'url' => $value['url']);
       }
@@ -97,7 +97,7 @@ class CRM_Contact_BAO_Contact_Optimizer {
           unset($new[$newID]);
           break;
         }
-        if (! $found) {
+        if (!$found) {
           return;
         }
       }
@@ -125,31 +125,31 @@ class CRM_Contact_BAO_Contact_Optimizer {
     $old = $new = array();
 
     foreach ($oldEmailValues as $idx => $value) {
-      if (! empty($value['email'])) {
+      if (!empty($value['email'])) {
         $oldEmpty = FALSE;
         $old[] = array(
-          'email'            => $value['email'],
+          'email' => $value['email'],
           'location_type_id' => $value['location_type_id'],
-          'on_hold'          => $value['on_hold']     ? 1 : 0,
-          'is_primary'       => $value['is_primary']  ? 1 : 0,
-          'is_bulkmail'      => $value['is_bulkmail'] ? 1 : 0,
-          'signature_text'   => $value['signature_text'] ? $value['signature_text'] : '',
-          'signature_html'   => $value['signature_html'] ? $value['signature_html'] : '',
+          'on_hold' => $value['on_hold'] ? 1 : 0,
+          'is_primary' => $value['is_primary'] ? 1 : 0,
+          'is_bulkmail' => $value['is_bulkmail'] ? 1 : 0,
+          'signature_text' => $value['signature_text'] ? $value['signature_text'] : '',
+          'signature_html' => $value['signature_html'] ? $value['signature_html'] : '',
         );
       }
     }
 
     foreach ($newEmailValues as $idx => $value) {
-      if (! empty($value['email'])) {
+      if (!empty($value['email'])) {
         $newEmpty = FALSE;
         $new[] = array(
-          'email'            => $value['email'],
+          'email' => $value['email'],
           'location_type_id' => $value['location_type_id'],
-          'on_hold'          => $value['on_hold']     ? 1 : 0,
-          'is_primary'       => $value['is_primary']  ? 1 : 0,
-          'is_bulkmail'      => $value['is_bulkmail'] ? 1 : 0,
-          'signature_text'   => $value['signature_text'] ? $value['signature_text'] : '',
-          'signature_html'   => $value['signature_html'] ? $value['signature_html'] : '',
+          'on_hold' => $value['on_hold'] ? 1 : 0,
+          'is_primary' => $value['is_primary'] ? 1 : 0,
+          'is_bulkmail' => $value['is_bulkmail'] ? 1 : 0,
+          'signature_text' => $value['signature_text'] ? $value['signature_text'] : '',
+          'signature_html' => $value['signature_html'] ? $value['signature_html'] : '',
         );
       }
     }
@@ -176,7 +176,7 @@ class CRM_Contact_BAO_Contact_Optimizer {
           unset($new[$newID]);
           break;
         }
-        if (! $found) {
+        if (!$found) {
           return;
         }
       }

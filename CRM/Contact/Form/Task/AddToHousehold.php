@@ -65,7 +65,8 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
 
     $this->add('select', 'relationship_type_id', ts('Relationship Type'),
       array(
-        '' => ts('- select -')) +
+        '' => ts('- select -')
+      ) +
       CRM_Contact_BAO_Relationship::getRelationType("Household"), TRUE
     );
 
@@ -145,10 +146,11 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
         }
 
         if (CRM_Contact_BAO_Relationship::checkDuplicateRelationship($params,
-            CRM_Utils_Array::value('contact', $ids),
-            // step 2
-            $params['contact_check']
-          )) {
+          CRM_Utils_Array::value('contact', $ids),
+          // step 2
+          $params['contact_check']
+        )
+        ) {
           $duplicate++;
           continue;
         }
@@ -160,15 +162,33 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
       list($rtype, $a_b) = explode('_', $data['relationship_type_id'], 2);
       $relationship = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $rtype, "label_$a_b");
 
-      $status = array(ts('%count %2 %3 relationship created', array('count' => $valid, 'plural' => '%count %2 %3 relationships created', 2 => $relationship, 3 => $house)));
+      $status = array(
+        ts('%count %2 %3 relationship created', array(
+            'count' => $valid,
+            'plural' => '%count %2 %3 relationships created',
+            2 => $relationship,
+            3 => $house
+          ))
+      );
       if ($duplicate) {
-        $status[] = ts('%count was skipped because the contact is already %2 %3', array('count' => $duplicate, 'plural' => '%count were skipped because the contacts are already %2 %3', 2 => $relationship, 3 => $house));
+        $status[] = ts('%count was skipped because the contact is already %2 %3', array(
+            'count' => $duplicate,
+            'plural' => '%count were skipped because the contacts are already %2 %3',
+            2 => $relationship,
+            3 => $house
+          ));
       }
       if ($invalid) {
-        $status[] = ts('%count relationship was not created because the contact is not of the right type for this relationship', array('count' => $invalid, 'plural' => '%count relationships were not created because the contact is not of the right type for this relationship'));
+        $status[] = ts('%count relationship was not created because the contact is not of the right type for this relationship', array(
+            'count' => $invalid,
+            'plural' => '%count relationships were not created because the contact is not of the right type for this relationship'
+          ));
       }
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
-      CRM_Core_Session::setStatus($status, ts('Relationship created.', array('count' => $valid, 'plural' => 'Relationships created.')), 'success', array('expires' => 0));
+      CRM_Core_Session::setStatus($status, ts('Relationship created.', array(
+            'count' => $valid,
+            'plural' => 'Relationships created.'
+          )), 'success', array('expires' => 0));
     }
   }
 
@@ -235,8 +255,8 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
     }
 
     // get the count of contact
-    $contactBAO  = new CRM_Contact_BAO_Contact();
-    $query       = new CRM_Contact_BAO_Query($searchValues);
+    $contactBAO = new CRM_Contact_BAO_Contact();
+    $query = new CRM_Contact_BAO_Query($searchValues);
     $searchCount = $query->searchQuery(0, 0, NULL, TRUE);
     $form->set('searchCount', $searchCount);
     if ($searchCount <= 50) {
@@ -269,7 +289,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
         $contact_type = '<img src="' . $config->resourceBase . 'i/contact_';
 
         $searchRows[$contactID]['type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-          $result->contact_sub_type : $result->contact_type
+            $result->contact_sub_type : $result->contact_type
         );
       }
 

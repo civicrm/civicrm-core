@@ -53,8 +53,8 @@ class CRM_Dashlet_Page_MyCases extends CRM_Core_Page {
       CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
     }
 
-    $session  = CRM_Core_Session::singleton();
-    $userID   = $session->get('userID');
+    $session = CRM_Core_Session::singleton();
+    $userID = $session->get('userID');
     $upcoming = CRM_Case_BAO_Case::getCases(FALSE, $userID, 'upcoming', $context);
 
     if (!empty($upcoming)) {

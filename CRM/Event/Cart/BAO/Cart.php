@@ -104,10 +104,10 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
    * @return $this|bool|CRM_Event_Cart_BAO_Cart
    */
   public static function find_or_create_for_current_session() {
-    $session       = CRM_Core_Session::singleton();
+    $session = CRM_Core_Session::singleton();
     $event_cart_id = $session->get('event_cart_id');
-    $userID        = $session->get('userID');
-    $cart          = FALSE;
+    $userID = $session->get('userID');
+    $cart = FALSE;
     if (!is_null($event_cart_id)) {
       $cart = self::find_uncompleted_by_id($event_cart_id);
       if ($cart && $userID) {
@@ -308,7 +308,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
         $index++;
       }
     }
-    return - 1;
+    return -1;
   }
 
   /**

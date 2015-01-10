@@ -146,13 +146,13 @@ class CRM_Core_BAO_CustomQuery {
     $this->_ids = &$ids;
     $this->_locationSpecificCustomFields = $locationSpecificFields;
 
-    $this->_select      = array();
-    $this->_element     = array();
-    $this->_tables      = array();
+    $this->_select = array();
+    $this->_element = array();
+    $this->_tables = array();
     $this->_whereTables = array();
-    $this->_where       = array();
-    $this->_qill        = array();
-    $this->_options     = array();
+    $this->_where = array();
+    $this->_qill = array();
+    $this->_options = array();
 
     $this->_fields = array();
     $this->_contactSearch = $contactSearch;
@@ -164,7 +164,7 @@ class CRM_Core_BAO_CustomQuery {
     // initialize the field array
     $tmpArray = array_keys($this->_ids);
     $idString = implode(',', $tmpArray);
-    $query    = "
+    $query = "
 SELECT f.id, f.label, f.data_type,
        f.html_type, f.is_search_range,
        f.option_group_id, f.custom_group_id,
@@ -357,7 +357,10 @@ SELECT label, value
         if (is_array($value) && !$field['is_search_range']) {
           $isSerialized = CRM_Core_BAO_CustomField::isSerialized($field);
           $wildcard = $isSerialized ? $wildcard : TRUE;
-          $options = CRM_Utils_Array::value('values', civicrm_api3('contact', 'getoptions', array('field' => $name, 'context' => 'search'), array()));
+          $options = CRM_Utils_Array::value('values', civicrm_api3('contact', 'getoptions', array(
+                'field' => $name,
+                'context' => 'search'
+              ), array()));
           $qillValue = '';
           $sqlOP = $wildcard ? ' OR ' : ' AND ';
           $sqlValue = array();
@@ -406,7 +409,7 @@ SELECT label, value
               if ($wildcard) {
                 $val = $strtolower(CRM_Core_DAO::escapeString($val));
                 $val = "%$val%";
-                $op  = 'LIKE';
+                $op = 'LIKE';
               }
 
               //FIX for custom data query fired against no value(NULL/NOT NULL)
@@ -577,7 +580,8 @@ SELECT label, value
       }
     }
 
-    return array(implode(' , ', $this->_select),
+    return array(
+      implode(' , ', $this->_select),
       implode(' ', $this->_tables),
       $whereStr,
     );

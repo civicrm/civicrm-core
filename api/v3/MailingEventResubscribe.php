@@ -83,4 +83,3 @@ function _civicrm_api3_mailing_event_resubscribe_create_spec(&$params) {
   $params['hash']['api.required'] = 1;
   $params['hash']['title'] = 'Hash';
 }
-

@@ -66,7 +66,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     }
     $form->_options = $sel2;
     $form->assign('mincontribution', $min_amount);
-    $sel = & $form->addElement('hierselect', "product_name", ts('Premium'), 'onclick="showMinContrib();"');
+    $sel = &$form->addElement('hierselect', "product_name", ts('Premium'), 'onclick="showMinContrib();"');
     $js = "<script type='text/javascript'>\n";
     $formName = 'document.forms.' . $form->getName();
 
@@ -101,31 +101,31 @@ class CRM_Contribute_Form_AdditionalInfo {
     $form->addDateTime('thankyou_date', ts('Thank-you Sent'), FALSE, array('formatType' => 'activityDateTime'));
 
     // add various amounts
-    $nonDeductAmount = & $form->add('text', 'non_deductible_amount', ts('Non-deductible Amount'),
-               $attributes['non_deductible_amount']
+    $nonDeductAmount = &$form->add('text', 'non_deductible_amount', ts('Non-deductible Amount'),
+      $attributes['non_deductible_amount']
     );
     $form->addRule('non_deductible_amount', ts('Please enter a valid monetary value for Non-deductible Amount.'), 'money');
 
     if ($form->_online) {
       $nonDeductAmount->freeze();
     }
-    $feeAmount = & $form->add('text', 'fee_amount', ts('Fee Amount'),
-               $attributes['fee_amount']
+    $feeAmount = &$form->add('text', 'fee_amount', ts('Fee Amount'),
+      $attributes['fee_amount']
     );
     $form->addRule('fee_amount', ts('Please enter a valid monetary value for Fee Amount.'), 'money');
     if ($form->_online) {
       $feeAmount->freeze();
     }
 
-    $netAmount = & $form->add('text', 'net_amount', ts('Net Amount'),
-               $attributes['net_amount']
+    $netAmount = &$form->add('text', 'net_amount', ts('Net Amount'),
+      $attributes['net_amount']
     );
     $form->addRule('net_amount', ts('Please enter a valid monetary value for Net Amount.'), 'money');
     if ($form->_online) {
       $netAmount->freeze();
     }
-    $element = & $form->add('text', 'invoice_id', ts('Invoice ID'),
-               $attributes['invoice_id']
+    $element = &$form->add('text', 'invoice_id', ts('Invoice ID'),
+      $attributes['invoice_id']
     );
     if ($form->_online) {
       $element->freeze();
@@ -205,7 +205,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     $dao->contribution_id = $contributionID;
     $dao->product_id = $params['product_name'][0];
     $dao->fulfilled_date = CRM_Utils_Date::processDate($params['fulfilled_date'], NULL, TRUE);
-    $isDeleted = False;
+    $isDeleted = FALSE;
     //CRM-11106
     $premiumParams = array(
       'id' => $params['product_name'][0],
@@ -480,17 +480,17 @@ class CRM_Contribute_Form_AdditionalInfo {
       $form->assign('receive_date', CRM_Utils_Date::processDate($params['receive_date']));
     }
 
-     $template = CRM_Core_Smarty::singleton();
-     $taxAmt = $template->get_template_vars('dataArray');
-     $eventTaxAmt = $template->get_template_vars('totalTaxAmount');
-     $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
-     $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
-     if ((!empty($taxAmt) || isset($eventTaxAmt)) && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
-       $isEmailPdf = True;
-     }
-     else {
-       $isEmailPdf = False;
-     }
+    $template = CRM_Core_Smarty::singleton();
+    $taxAmt = $template->get_template_vars('dataArray');
+    $eventTaxAmt = $template->get_template_vars('totalTaxAmount');
+    $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
+    if ((!empty($taxAmt) || isset($eventTaxAmt)) && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
+      $isEmailPdf = TRUE;
+    }
+    else {
+      $isEmailPdf = FALSE;
+    }
 
     list($sendReceipt, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
       array(

@@ -85,7 +85,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
    */
   public function testRetrieveZeroPledeID() {
     $defaults = array();
-    $params   = array('pledge_id' => 0);
+    $params = array('pledge_id' => 0);
     $pledgeId = CRM_Pledge_BAO_Pledge::retrieve($params, $defaults);
 
     $this->assertEquals(count($pledgeId), 0, "Pledge Id must be greater than 0");
@@ -96,7 +96,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
    */
   public function testRetrieveStringPledgeID() {
     $defaults = array();
-    $params   = array('pledge_id' => 'random text');
+    $params = array('pledge_id' => 'random text');
     $pledgeId = CRM_Pledge_BAO_Pledge::retrieve($params, $defaults);
 
     $this->assertEquals(count($pledgeId), 0, "Pledge Id must be a string");

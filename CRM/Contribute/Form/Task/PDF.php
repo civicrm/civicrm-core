@@ -92,9 +92,10 @@ AND    {$this->_componentClause}";
     $url = CRM_Utils_System::url('civicrm/contribute/search', $urlParams);
     $breadCrumb = array(
       array(
-    'url' => $url,
+        'url' => $url,
         'title' => ts('Search Results'),
-      ));
+      )
+    );
 
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     CRM_Utils_System::setTitle(ts('Print Contribution Receipts'));
@@ -182,12 +183,12 @@ AND    {$this->_componentClause}";
       $contribution = &$objects['contribution'];
 
       // set some fake input values so we can reuse IPN code
-      $input['amount']     = $contribution->total_amount;
-      $input['is_test']    = $contribution->is_test;
+      $input['amount'] = $contribution->total_amount;
+      $input['is_test'] = $contribution->is_test;
       $input['fee_amount'] = $contribution->fee_amount;
       $input['net_amount'] = $contribution->net_amount;
-      $input['trxn_id']    = $contribution->trxn_id;
-      $input['trxn_date']  = isset($contribution->trxn_date) ? $contribution->trxn_date : NULL;
+      $input['trxn_id'] = $contribution->trxn_id;
+      $input['trxn_date'] = isset($contribution->trxn_date) ? $contribution->trxn_date : NULL;
 
       // CRM_Contribute_BAO_Contribution::composeMessageArray expects mysql formatted date
       $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);
@@ -262,18 +263,19 @@ AND    {$this->_componentClause}";
 
     $pdfElements['createPdf'] = FALSE;
     if (!empty($pdfElements['params']['output']) &&
-      ($pdfElements['params']['output'] == "pdf_invoice" || $pdfElements['params']['output'] == "pdf_receipt")) {
+      ($pdfElements['params']['output'] == "pdf_invoice" || $pdfElements['params']['output'] == "pdf_receipt")
+    ) {
       $pdfElements['createPdf'] = TRUE;
     }
 
     $excludeContactIds = array();
     if (!$pdfElements['createPdf']) {
       $returnProperties = array(
-                                'email' => 1,
-                                'do_not_email' => 1,
-                                'is_deceased' => 1,
-                                'on_hold' => 1,
-                                );
+        'email' => 1,
+        'do_not_email' => 1,
+        'is_deceased' => 1,
+        'on_hold' => 1,
+      );
 
       list($contactDetails) = CRM_Utils_Token::getTokenDetails($contactIds, $returnProperties, FALSE, FALSE);
       $pdfElements['suppressedEmails'] = 0;
@@ -282,7 +284,8 @@ AND    {$this->_componentClause}";
         if (empty($values['email']) ||
           (empty($params['override_privacy']) && !empty($values['do_not_email']))
           || CRM_Utils_Array::value('is_deceased', $values)
-          || !empty($values['on_hold'])) {
+          || !empty($values['on_hold'])
+        ) {
           $suppressedEmails++;
           $pdfElements['suppressedEmails'] = $suppressedEmails;
           $excludeContactIds[] = $values['contact_id'];

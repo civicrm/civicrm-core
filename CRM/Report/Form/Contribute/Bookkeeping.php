@@ -452,7 +452,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
     while ($dao->fetch()) {
       $amount[] = CRM_Utils_Money::format($dao->amount, $dao->currency);
       $avg[] = CRM_Utils_Money::format(round(($dao->amount /
-            $dao->count), 2), $dao->currency);
+        $dao->count), 2), $dao->currency);
     }
 
     $statistics['counts']['amount'] = array(

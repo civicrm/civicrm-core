@@ -114,7 +114,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
     $queue_id = $this->_queue_id;
     $hash = $this->_hash;
 
-    $confirmURL = CRM_Utils_System::url("civicrm/mailing/{$this->_type}","reset=1&jid={$job_id}&qid={$queue_id}&h={$hash}&confirm=1");
+    $confirmURL = CRM_Utils_System::url("civicrm/mailing/{$this->_type}", "reset=1&jid={$job_id}&qid={$queue_id}&h={$hash}&confirm=1");
     $this->assign('confirmURL', $confirmURL);
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext($confirmURL);
@@ -140,7 +140,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
         array(1 => $values['email_confirm'])
       );
 
-    CRM_Core_Session::setStatus($statusMsg, '', 'fail');
+      CRM_Core_Session::setStatus($statusMsg, '', 'fail');
 
     }
 

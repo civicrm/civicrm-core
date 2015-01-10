@@ -72,13 +72,13 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
   public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
-        CRM_Core_Action::UPDATE  => array(
+        CRM_Core_Action::UPDATE => array(
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/financial/financialType/accounts',
           'qs' => 'action=update&id=%%id%%&aid=%%aid%%&reset=1',
           'title' => ts('Edit Financial Type Account'),
         ),
-        CRM_Core_Action::DELETE  => array(
+        CRM_Core_Action::DELETE => array(
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/financial/financialType/accounts',
           'qs' => 'action=delete&id=%%id%%&aid=%%aid%%',

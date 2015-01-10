@@ -32,7 +32,6 @@
  * $Id$
  *
  */
-
 class CRM_Utils_Cache_NoCache implements CRM_Utils_Cache_Interface {
 
   /**

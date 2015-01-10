@@ -96,10 +96,10 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     // verify that all contacts have been created separately
     $this->assertEquals(count($contactIds), 7, 'Check for number of contacts.');
 
-    $dao               = new CRM_Dedupe_DAO_RuleGroup();
+    $dao = new CRM_Dedupe_DAO_RuleGroup();
     $dao->contact_type = 'Individual';
-    $dao->level        = 'Fuzzy';
-    $dao->is_default   = 1;
+    $dao->level = 'Fuzzy';
+    $dao->is_default = 1;
     $dao->find(TRUE);
 
     $foundDupes = CRM_Dedupe_Finder::dupesInGroup($dao->id, $groupId);
@@ -198,10 +198,10 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     // verify that all contacts have been created separately
     $this->assertEquals(count($contactIds), 7, 'Check for number of contacts.');
 
-    $dao               = new CRM_Dedupe_DAO_RuleGroup();
+    $dao = new CRM_Dedupe_DAO_RuleGroup();
     $dao->contact_type = 'Individual';
-    $dao->used        = 'General';
-    $dao->is_default   = 1;
+    $dao->used = 'General';
+    $dao->is_default = 1;
     $dao->find(TRUE);
 
     $fields = array(

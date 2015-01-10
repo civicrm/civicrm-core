@@ -66,9 +66,9 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts('Database Configuration Error: Insufficient permissions. Import requires that the CiviCRM database user has permission to create temporary tables. Contact your site administrator for assistance.'));
     }
 
-    $results    = array();
-    $config     = CRM_Core_Config::singleton();
-    $handler    = opendir($config->uploadDir);
+    $results = array();
+    $config = CRM_Core_Config::singleton();
+    $handler = opendir($config->uploadDir);
     $errorFiles = array('sqlImport.errors', 'sqlImport.conflicts', 'sqlImport.duplicates', 'sqlImport.mismatch');
 
     // check for post max size avoid when called twice
@@ -86,7 +86,10 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     }
     closedir($handler);
     if (!empty($results)) {
-      CRM_Core_Error::fatal(ts('<b>%1</b> file(s) in %2 directory are not writable. Listed file(s) might be used during the import to log the errors occurred during Import process. Contact your site administrator for assistance.', array(1 => implode(', ', $results), 2 => $config->uploadDir)));
+      CRM_Core_Error::fatal(ts('<b>%1</b> file(s) in %2 directory are not writable. Listed file(s) might be used during the import to log the errors occurred during Import process. Contact your site administrator for assistance.', array(
+            1 => implode(', ', $results),
+            2 => $config->uploadDir
+          )));
     }
 
     $this->_dataSourceIsValid = FALSE;
@@ -170,9 +173,9 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     );
 
     $mappingArray = CRM_Core_BAO_Mapping::getMappings(CRM_Core_OptionGroup::getValue('mapping_type',
-        'Import Contact',
-        'name'
-      ));
+      'Import Contact',
+      'name'
+    ));
 
     $this->assign('savedMapping', $mappingArray);
     $this->addElement('select', 'savedMapping', ts('Mapping Option'), array('' => ts('- select -')) + $mappingArray);
@@ -266,9 +269,9 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
    */
   private function _getDataSources() {
     // Open the data source dir and scan it for class files
-    $config        = CRM_Core_Config::singleton();
+    $config = CRM_Core_Config::singleton();
     $dataSourceDir = $config->importDataSourceDir;
-    $dataSources   = array();
+    $dataSources = array();
     if (!is_dir($dataSourceDir)) {
       CRM_Core_Error::fatal("Import DataSource directory $dataSourceDir does not exist");
     }
@@ -285,7 +288,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
         $dataSourceClass = "CRM_Import_DataSource_" . $matches[1];
         require_once $dataSourceDir . DIRECTORY_SEPARATOR . $dataSourceFile;
         $object = new $dataSourceClass;
-        $info   = $object->getInfo();
+        $info = $object->getInfo();
         $dataSources[$dataSourceClass] = $info['title'];
       }
     }
@@ -340,8 +343,8 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
       // We should have the data in the DB now, parse it
       $importTableName = $this->get('importTableName');
-      $fieldNames      = $this->_prepareImportTable($db, $importTableName);
-      $mapper          = array();
+      $fieldNames = $this->_prepareImportTable($db, $importTableName);
+      $mapper = array();
 
       $parser = new CRM_Contact_Import_Parser_Contact($mapper);
       $parser->setMaxLinesToProcess(100);

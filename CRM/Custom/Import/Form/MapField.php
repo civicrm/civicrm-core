@@ -12,6 +12,7 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
    * @var string
    */
   protected $_entity;
+
   /**
    * Set variables up before form is built
    *
@@ -31,7 +32,7 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
     $this->assign('dataValues', $dataValues);
 
     $this->_entity = $this->_multipleCustomData = $this->get('multipleCustomData');
-    $skipColumnHeader   = $this->controller->exportValue('DataSource', 'skipColumnHeader');
+    $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
     $this->_onDuplicate = $this->get('onDuplicate');
     if ($skipColumnHeader) {
       //showColNames needs to be true to show "Column Names" column
@@ -142,9 +143,9 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
     $config = CRM_Core_Config::singleton();
     $separator = $config->fieldSeparator;
 
-    $mapperKeys     = array();
-    $mapper         = array();
-    $mapperKeys     = $this->controller->exportValue($this->_name, 'mapper');
+    $mapperKeys = array();
+    $mapper = array();
+    $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
     $mapperKeysMain = array();
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
@@ -178,9 +179,9 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
         $updateMappingFields->column_number = $i;
 
         $explodedValues = explode('_', $mapperKeys[$i][0]);
-        $id             = CRM_Utils_Array::value(0, $explodedValues);
-        $first          = CRM_Utils_Array::value(1, $explodedValues);
-        $second         = CRM_Utils_Array::value(2, $explodedValues);
+        $id = CRM_Utils_Array::value(0, $explodedValues);
+        $first = CRM_Utils_Array::value(1, $explodedValues);
+        $second = CRM_Utils_Array::value(2, $explodedValues);
 
         $updateMappingFields->name = $mapper[$i];
         $updateMappingFields->save();
@@ -205,9 +206,9 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
         $saveMappingFields->column_number = $i;
 
         $explodedValues = explode('_', $mapperKeys[$i][0]);
-        $id             = CRM_Utils_Array::value(0, $explodedValues);
-        $first          = CRM_Utils_Array::value(1, $explodedValues);
-        $second         = CRM_Utils_Array::value(2, $explodedValues);
+        $id = CRM_Utils_Array::value(0, $explodedValues);
+        $first = CRM_Utils_Array::value(1, $explodedValues);
+        $second = CRM_Utils_Array::value(2, $explodedValues);
 
         $saveMappingFields->name = $mapper[$i];
         $saveMappingFields->save();

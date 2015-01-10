@@ -49,9 +49,9 @@ class CRM_Core_CodeGen_Main {
 
     CRM_Core_CodeGen_Util_Smarty::singleton()->setPluginDirs($smartyPluginDirs);
 
-    $versionFile        = "version.xml";
-    $versionXML         = CRM_Core_CodeGen_Util_Xml::parse($versionFile);
-    $this->db_version         = $versionXML->version_no;
+    $versionFile = "version.xml";
+    $versionXML = CRM_Core_CodeGen_Util_Xml::parse($versionFile);
+    $this->db_version = $versionXML->version_no;
     $this->buildVersion = preg_replace('/^(\d{1,2}\.\d{1,2})\.(\d{1,2}|\w{4,7})$/i', '$1', $this->db_version);
     if (isset($argVersion)) {
       // change the version to that explicitly passed, if any

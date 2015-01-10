@@ -68,8 +68,8 @@ class CRM_Pledge_Task {
   public static function &tasks() {
     if (!self::$_tasks) {
       self::$_tasks = array(
-      1 => array(
-        'title' => ts('Delete Pledges'),
+        1 => array(
+          'title' => ts('Delete Pledges'),
           'class' => 'CRM_Pledge_Form_Task_Delete',
           'result' => FALSE,
         ),

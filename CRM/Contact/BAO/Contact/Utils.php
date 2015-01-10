@@ -336,7 +336,7 @@ UNION
       );
       list($valid, $invalid, $duplicate,
         $saved, $relationshipIds
-      ) = CRM_Contact_BAO_Relationship::createMultiple($relationshipParams, $cid);
+        ) = CRM_Contact_BAO_Relationship::createMultiple($relationshipParams, $cid);
 
 
       // In case we change employer, clean previous employer related records.
@@ -512,7 +512,7 @@ WHERE id={$contactId}; ";
         break;
 
       case 'Household':
-        $form->add('text', 'household_name', ts('Household Name'),  $attributes['household_name']);
+        $form->add('text', 'household_name', ts('Household Name'), $attributes['household_name']);
         break;
 
       default:
@@ -613,7 +613,9 @@ UPDATE civicrm_contact
 
       // check permission on acl basis.
       if (in_array($task, array(
-        'view', 'edit'))) {
+        'view',
+        'edit'
+      ))) {
         $aclPermission = CRM_Core_Permission::VIEW;
         if ($task == 'edit') {
           $aclPermission = CRM_Core_Permission::EDIT;
@@ -663,9 +665,9 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
         }
       }
       if (!empty($originalId) && array_key_exists('merge', $hasPermissions)) {
-        $rgBao               = new CRM_Dedupe_BAO_RuleGroup();
+        $rgBao = new CRM_Dedupe_BAO_RuleGroup();
         $rgBao->contact_type = $dao->contact_type;
-        $rgBao->used         = 'Supervised';
+        $rgBao->used = 'Supervised';
         if ($rgBao->find(TRUE)) {
           $rgid = $rgBao->id;
         }
@@ -708,8 +710,8 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
         'contact_autocomplete_options'
       );
       $returnProperties = array_fill_keys(array_merge(array('sort_name'),
-          array_keys($autocompleteContactSearch)
-        ), 1);
+        array_keys($autocompleteContactSearch)
+      ), 1);
     }
 
     $compTable = NULL;
@@ -730,7 +732,9 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
     $select = $from = array();
     foreach ($returnProperties as $property => $ignore) {
       $value = (in_array($property, array(
-        'city', 'street_address'))) ? 'address' : $property;
+        'city',
+        'street_address'
+      ))) ? 'address' : $property;
       switch ($property) {
         case 'sort_name':
           if ($componentName == 'Activity') {
@@ -787,9 +791,9 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
 
     //finally retrieve contact details.
     if (!empty($select) && !empty($from)) {
-      $fromClause   = implode(' ', $from);
+      $fromClause = implode(' ', $from);
       $selectClause = implode(', ', $select);
-      $whereClause  = "{$compTable}.id IN (" . implode(',', $componentIds) . ')';
+      $whereClause = "{$compTable}.id IN (" . implode(',', $componentIds) . ')';
 
       $query = "
   SELECT  contact.id as contactId, $compTable.id as componentId, $selectClause
@@ -855,14 +859,14 @@ Group By  componentId";
       foreach ($values as $field => $submittedValue) {
         if (!in_array($field, $skipFields)) {
           if (isset($masterAddress->$field)) {
-          $values[$field] = $masterAddress->$field;
+            $values[$field] = $masterAddress->$field;
           }
           else {
             $values[$field] = '';
+          }
         }
       }
     }
-  }
   }
 
   /**
@@ -935,10 +939,10 @@ Group By  componentId";
    */
   public static function updateGreeting($params) {
     $contactType = $params['ct'];
-    $greeting    = $params['gt'];
-    $valueID     = $id = CRM_Utils_Array::value('id', $params);
-    $force       = CRM_Utils_Array::value('force', $params);
-    $limit       = CRM_Utils_Array::value('limit', $params);
+    $greeting = $params['gt'];
+    $valueID = $id = CRM_Utils_Array::value('id', $params);
+    $force = CRM_Utils_Array::value('force', $params);
+    $limit = CRM_Utils_Array::value('limit', $params);
 
     // if valueID is not passed use default value
     if (!$valueID) {

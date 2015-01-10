@@ -68,12 +68,12 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
     $this->add('hidden', 'hidden_find_mailings', 1);
 
     $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Search'),
-          'isDefault' => TRUE,
-        ),
-      ));
+      array(
+        'type' => 'refresh',
+        'name' => ts('Search'),
+        'isDefault' => TRUE,
+      ),
+    ));
   }
 
   /**
@@ -110,14 +110,27 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
 
     $parent = $this->controller->getParent();
     if (!empty($params)) {
-      $fields = array('mailing_name', 'mailing_from', 'mailing_to', 'sort_name',
-                'campaign_id', 'mailing_status', 'sms', 'status_unscheduled', 'is_archived', 'hidden_find_mailings');
+      $fields = array(
+        'mailing_name',
+        'mailing_from',
+        'mailing_to',
+        'sort_name',
+        'campaign_id',
+        'mailing_status',
+        'sms',
+        'status_unscheduled',
+        'is_archived',
+        'hidden_find_mailings'
+      );
       foreach ($fields as $field) {
         if (isset($params[$field]) &&
           !CRM_Utils_System::isNull($params[$field])
         ) {
           if (in_array($field, array(
-            'mailing_from', 'mailing_to')) && !$params["mailing_relative"]) {
+              'mailing_from',
+              'mailing_to'
+            )) && !$params["mailing_relative"]
+          ) {
             $time = ($field == 'mailing_to') ? '235959' : NULL;
             $parent->set($field, CRM_Utils_Date::processDate($params[$field], $time));
           }

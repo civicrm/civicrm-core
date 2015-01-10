@@ -72,7 +72,10 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
     if ($this->_interviewToRelease) {
       //user came from interview form.
       foreach (array(
-        'surveyId', 'contactIds', 'interviewerId') as $fld) {
+                 'surveyId',
+                 'contactIds',
+                 'interviewerId'
+               ) as $fld) {
         $this->{"_$fld"} = $this->get($fld);
       }
 
@@ -104,7 +107,8 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
     $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
     $statusIds = array();
     foreach (array(
-      'Scheduled') as $name) {
+               'Scheduled'
+             ) as $name) {
       if ($statusId = array_search($name, $activityStatus)) {
         $statusIds[] = $statusId;
       }

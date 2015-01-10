@@ -144,9 +144,9 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         ),
         'group_bys' => array(
           'activity_date_time' => array(
-              'title' => ts('Activity Date'),
-              'frequency' => TRUE,
-            ),
+            'title' => ts('Activity Date'),
+            'frequency' => TRUE,
+          ),
           'activity_type_id' => array(
             'title' => ts('Activity Type'),
             'default' => TRUE,

@@ -77,12 +77,12 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($this);
 
     $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Search'),
-          'isDefault' => TRUE,
-        ),
-      ));
+      array(
+        'type' => 'refresh',
+        'name' => ts('Search'),
+        'isDefault' => TRUE,
+      ),
+    ));
   }
 
   public function postProcess() {

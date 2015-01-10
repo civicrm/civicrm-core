@@ -112,8 +112,8 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           ),
         ),
       )
-    + $this->addAddressFields()
-    + array(
+      + $this->addAddressFields()
+      + array(
         'civicrm_contribution' => array(
           'dao' => 'CRM_Contribute_DAO_Contribution',
           'fields' => array(

@@ -70,9 +70,9 @@ class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Cu
   }
 
   public function buildTempTable() {
-    $randomNum        = md5(uniqid());
+    $randomNum = md5(uniqid());
     $this->_tableName = "civicrm_temp_custom_{$randomNum}";
-    $sql              = "
+    $sql = "
 CREATE TEMPORARY TABLE {$this->_tableName} (
   id int unsigned NOT NULL AUTO_INCREMENT,
   contact_id int unsigned NOT NULL,
@@ -82,9 +82,9 @@ CREATE TEMPORARY TABLE {$this->_tableName} (
     foreach ($this->_columns as $dontCare => $fieldName) {
       if (in_array($fieldName, array(
         'contact_id',
-            'participant_id',
-            'display_name',
-          ))) {
+        'participant_id',
+        'display_name',
+      ))) {
         continue;
       }
       $sql .= "{$fieldName} int default 0,\n";
@@ -290,9 +290,9 @@ contact_a.display_name   as display_name";
 
       foreach ($this->_columns as $dontCare => $fieldName) {
         if (in_array($fieldName, array(
-              'contact_id',
-              'display_name',
-            ))) {
+          'contact_id',
+          'display_name',
+        ))) {
           continue;
         }
         $selectClause .= ",\ntempTable.{$fieldName} as {$fieldName}";

@@ -31,13 +31,11 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * @package CiviCRM_APIv3
  * @subpackage API_ActionSchedule
  */
-
 class api_v3_ActionScheduleTest extends CiviUnitTestCase {
   protected $_params;
   protected $_params2;
   protected $_entity = 'action_schedule';
   protected $_apiversion = 3;
-
 
 
   /**
@@ -84,8 +82,8 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
    */
   public function testActionScheduleCreateWithoutRequired() {
     $params = array(
-        'subject' => 'this case should fail',
-        'scheduled_date_time' => date('Ymd'),
+      'subject' => 'this case should fail',
+      'scheduled_date_time' => date('Ymd'),
     );
     $result = $this->callAPIFailure('activity', 'create', $params);
   }

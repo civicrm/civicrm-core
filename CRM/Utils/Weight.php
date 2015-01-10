@@ -65,8 +65,8 @@ class CRM_Utils_Weight {
 
     if ($minDupeID->dupeId) {
       $additionalWhere = "id !=" . $minDupeID->dupeId . " AND $weightField >= " . $minDupeID->dupeWeight;
-      $update          = "$weightField = $weightField + 1";
-      $status          = CRM_Utils_Weight::query('UPDATE', $daoName, $fieldValues, $update, $additionalWhere);
+      $update = "$weightField = $weightField + 1";
+      $status = CRM_Utils_Weight::query('UPDATE', $daoName, $fieldValues, $update, $additionalWhere);
     }
 
     if ($minDupeID->dupeId && $status) {
@@ -112,8 +112,8 @@ class CRM_Utils_Weight {
 
     // fill the gap
     $additionalWhere = "$weightField > $weight";
-    $update          = "$weightField = $weightField - 1";
-    $status          = CRM_Utils_Weight::query('UPDATE', $daoName, $fieldValues, $update, $additionalWhere);
+    $update = "$weightField = $weightField - 1";
+    $status = CRM_Utils_Weight::query('UPDATE', $daoName, $fieldValues, $update, $additionalWhere);
 
     return $status;
   }
@@ -202,10 +202,10 @@ class CRM_Utils_Weight {
    * @return integer
    */
   public static function getNewWeight($daoName, $fieldValues = NULL, $weightField = 'weight') {
-    $selectField     = "id AS fieldID, $weightField AS weight";
-    $field           = CRM_Utils_Weight::query('SELECT', $daoName, $fieldValues, $selectField);
+    $selectField = "id AS fieldID, $weightField AS weight";
+    $field = CRM_Utils_Weight::query('SELECT', $daoName, $fieldValues, $selectField);
     $sameWeightCount = 0;
-    $weights         = array();
+    $weights = array();
     while ($field->fetch()) {
       if (in_array($field->weight, $weights)) {
         $sameWeightCount++;
@@ -292,19 +292,19 @@ class CRM_Utils_Weight {
    */
   static function &query(
     $queryType,
-      $daoName,
-      $fieldValues = NULL,
-      $queryData,
-      $additionalWhere = NULL,
-      $orderBy = NULL,
-      $groupBy = NULL
-    ) {
+    $daoName,
+    $fieldValues = NULL,
+    $queryData,
+    $additionalWhere = NULL,
+    $orderBy = NULL,
+    $groupBy = NULL
+  ) {
 
     require_once str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php";
 
-    $dao       = new $daoName;
-    $table     = $dao->getTablename();
-    $fields    = &$dao->fields();
+    $dao = new $daoName;
+    $table = $dao->getTablename();
+    $fields = &$dao->fields();
     $fieldlist = array_keys($fields);
 
     $whereConditions = array();
@@ -321,7 +321,7 @@ class CRM_Utils_Weight {
         }
         $fieldNum++;
         $whereConditions[] = "$fieldName = %$fieldNum";
-        $fieldType         = $fields[$fieldName]['type'];
+        $fieldType = $fields[$fieldName]['type'];
         $params[$fieldNum] = array($value, CRM_Utils_Type::typeToString($fieldType));
       }
     }
@@ -375,15 +375,15 @@ class CRM_Utils_Weight {
     $ids = array_keys($rows);
     $numIDs = count($ids);
     array_unshift($ids, 0);
-    $ids[]   = 0;
+    $ids[] = 0;
     $firstID = $ids[1];
-    $lastID  = $ids[$numIDs];
+    $lastID = $ids[$numIDs];
     if ($firstID == $lastID) {
       $rows[$firstID]['order'] = NULL;
       return;
     }
-    $config    = CRM_Core_Config::singleton();
-    $imageURL  = $config->userFrameworkResourceURL . 'i/arrow';
+    $config = CRM_Core_Config::singleton();
+    $imageURL = $config->userFrameworkResourceURL . 'i/arrow';
 
     $queryParams = array(
       'reset' => 1,
@@ -398,7 +398,7 @@ class CRM_Utils_Weight {
     $baseURL = CRM_Utils_System::url('civicrm/admin/weight', $queryParams);
 
     for ($i = 1; $i <= $numIDs; $i++) {
-      $id     = $ids[$i];
+      $id = $ids[$i];
       $prevID = $ids[$i - 1];
       $nextID = $ids[$i + 1];
 
@@ -437,20 +437,20 @@ class CRM_Utils_Weight {
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), self::$SIGNABLE_FIELDS);
 
     // Validate $_GET values b/c subsequent code reads $_GET (via CRM_Utils_Request::retrieve)
-    if (! $signer->validate($signature, $_GET)) {
+    if (!$signer->validate($signature, $_GET)) {
       CRM_Core_Error::fatal('Request signature is invalid');
     }
 
     // Note: Ensure this list matches self::$SIGNABLE_FIELDS
     $daoName = CRM_Utils_Request::retrieve('dao', 'String', CRM_Core_DAO::$_nullObject);
-    $id      = CRM_Utils_Request::retrieve('id', 'Integer', CRM_Core_DAO::$_nullObject);
-    $idName  = CRM_Utils_Request::retrieve('idName', 'String', CRM_Core_DAO::$_nullObject);
-    $url     = CRM_Utils_Request::retrieve('url', 'String', CRM_Core_DAO::$_nullObject);
-    $filter  = CRM_Utils_Request::retrieve('filter', 'String', CRM_Core_DAO::$_nullObject);
-    $src     = CRM_Utils_Request::retrieve('src', 'Integer', CRM_Core_DAO::$_nullObject);
-    $dst     = CRM_Utils_Request::retrieve('dst', 'Integer', CRM_Core_DAO::$_nullObject);
-    $dir     = CRM_Utils_Request::retrieve('dir', 'String', CRM_Core_DAO::$_nullObject);
-    $object   = new $daoName();
+    $id = CRM_Utils_Request::retrieve('id', 'Integer', CRM_Core_DAO::$_nullObject);
+    $idName = CRM_Utils_Request::retrieve('idName', 'String', CRM_Core_DAO::$_nullObject);
+    $url = CRM_Utils_Request::retrieve('url', 'String', CRM_Core_DAO::$_nullObject);
+    $filter = CRM_Utils_Request::retrieve('filter', 'String', CRM_Core_DAO::$_nullObject);
+    $src = CRM_Utils_Request::retrieve('src', 'Integer', CRM_Core_DAO::$_nullObject);
+    $dst = CRM_Utils_Request::retrieve('dst', 'Integer', CRM_Core_DAO::$_nullObject);
+    $dir = CRM_Utils_Request::retrieve('dir', 'String', CRM_Core_DAO::$_nullObject);
+    $object = new $daoName();
     $srcWeight = CRM_Core_DAO::getFieldValue($daoName, $src, 'weight', $idName);
     $dstWeight = CRM_Core_DAO::getFieldValue($daoName, $dst, 'weight', $idName);
     if ($srcWeight == $dstWeight) {
@@ -461,15 +461,15 @@ class CRM_Utils_Weight {
 
     $query = "UPDATE $tableName SET weight = %1 WHERE $idName = %2";
     $params = array(
-    1 => array($dstWeight, 'Integer'),
-              2 => array($src, 'Integer'),
+      1 => array($dstWeight, 'Integer'),
+      2 => array($src, 'Integer'),
     );
     CRM_Core_DAO::executeQuery($query, $params);
 
     if ($dir == 'swap') {
       $params = array(
-      1 => array($srcWeight, 'Integer'),
-                2 => array($dst, 'Integer'),
+        1 => array($srcWeight, 'Integer'),
+        2 => array($dst, 'Integer'),
       );
       CRM_Core_DAO::executeQuery($query, $params);
     }
@@ -480,8 +480,8 @@ class CRM_Utils_Weight {
         $query .= " AND $filter";
       }
       $params = array(
-      1 => array($src, 'Integer'),
-                2 => array($srcWeight, 'Integer'),
+        1 => array($src, 'Integer'),
+        2 => array($srcWeight, 'Integer'),
       );
       CRM_Core_DAO::executeQuery($query, $params);
     }
@@ -492,8 +492,8 @@ class CRM_Utils_Weight {
         $query .= " AND $filter";
       }
       $params = array(
-      1 => array($src, 'Integer'),
-                2 => array($srcWeight, 'Integer'),
+        1 => array($src, 'Integer'),
+        2 => array($srcWeight, 'Integer'),
       );
       CRM_Core_DAO::executeQuery($query, $params);
     }

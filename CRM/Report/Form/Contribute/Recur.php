@@ -164,7 +164,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options'  => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Contribute_PseudoConstant::financialType(),
             'type' => CRM_Utils_Type::T_INT,
           ),
           'frequency_unit' => array(
@@ -208,6 +208,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
     $this->_currencyColumn = 'civicrm_contribution_recur_currency';
     parent::__construct();
   }
+
   public function getTemplateName() {
     return 'CRM/Report/Form.tpl';
   }
@@ -258,7 +259,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
         $start_date_db_alias = $this->_columns['civicrm_contribution_recur']['filters']['start_date']['dbAlias'];
 
         // The end date clause is simple to construct
-        $end_date_clause   = $this->dateClause($end_date_db_alias, $relative, $from, $to, $end_date_type, NULL, NULL);
+        $end_date_clause = $this->dateClause($end_date_db_alias, $relative, $from, $to, $end_date_type, NULL, NULL);
 
         // NOTE: For the calculation based on installment, there doesn't
         // seem to be a way to include the interval unit (e.g. month,
@@ -267,22 +268,22 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
 
         $installment_clause = '(' .
           $this->dateClause("DATE_ADD($start_date_db_alias, INTERVAL $installments_db_alias * COALESCE($frequency_interval_db_alias,1) month)",
-          $relative, $from, $to, $start_date_type, NULL, NULL);
+            $relative, $from, $to, $start_date_type, NULL, NULL);
         $installment_clause .= " AND $frequency_unit_db_alias = 'month' ) OR \n";
 
         $installment_clause .= '(' .
           $this->dateClause("DATE_ADD($start_date_db_alias, INTERVAL $installments_db_alias * COALESCE($frequency_interval_db_alias,1) day)",
-          $relative, $from, $to, $start_date_type, NULL, NULL);
+            $relative, $from, $to, $start_date_type, NULL, NULL);
         $installment_clause .= " AND $frequency_unit_db_alias = 'day' ) OR \n";
 
         $installment_clause .= '(' .
           $this->dateClause("DATE_ADD($start_date_db_alias, INTERVAL $installments_db_alias * COALESCE($frequency_interval_db_alias, 1) week)",
-          $relative, $from, $to, $start_date_type, NULL, NULL);
+            $relative, $from, $to, $start_date_type, NULL, NULL);
         $installment_clause .= " AND $frequency_unit_db_alias = 'week' ) OR \n";
 
         $installment_clause .= '(' .
           $this->dateClause("DATE_ADD($start_date_db_alias, INTERVAL $installments_db_alias * COALESCE($frequency_interval_db_alias, 1) year)",
-          $relative, $from, $to, $start_date_type, NULL, NULL);
+            $relative, $from, $to, $start_date_type, NULL, NULL);
         $installment_clause .= " AND $frequency_unit_db_alias = 'year' )\n";
 
         $this->_where .= " AND ";

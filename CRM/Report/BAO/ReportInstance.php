@@ -95,7 +95,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       $instance->id = $instanceID;
     }
 
-    if (! $instanceID) {
+    if (!$instanceID) {
       if ($reportID = CRM_Utils_Array::value('report_id', $params)) {
         $instance->report_id = $reportID;
       }
@@ -133,10 +133,10 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    */
   public static function &create(&$params) {
     if (isset($params['report_header'])) {
-      $params['header']    = CRM_Utils_Array::value('report_header',$params);
+      $params['header'] = CRM_Utils_Array::value('report_header', $params);
     }
     if (isset($params['report_footer'])) {
-      $params['footer']    = CRM_Utils_Array::value('report_footer',$params);
+      $params['footer'] = CRM_Utils_Array::value('report_footer', $params);
     }
 
     // build navigation parameters
@@ -148,7 +148,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
 
       $navigationParams['permission'] = array();
       $navigationParams['label'] = $params['title'];
-      $navigationParams['name']  = $params['title'];
+      $navigationParams['name'] = $params['title'];
 
       $navigationParams['current_parent_id'] = CRM_Utils_Array::value('parent_id', $navigationParams);
       $navigationParams['parent_id'] = CRM_Utils_Array::value('parent_id', $params);
@@ -206,10 +206,10 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     // add to dashlet
     if (!empty($dashletParams)) {
       $section = 2;
-      $chart  = '';
+      $chart = '';
       if (!empty($params['charts'])) {
         $section = 1;
-        $chart   = "&charts=" . $params['charts'];
+        $chart = "&charts=" . $params['charts'];
       }
       $limitResult = NULL;
       if (CRM_Utils_Array::value('row_count', $params)) {

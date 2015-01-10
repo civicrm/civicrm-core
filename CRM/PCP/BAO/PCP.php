@@ -80,7 +80,7 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
 
     // set currency for CRM-1496
     if (!isset($dao->currency)) {
-      $config = & CRM_Core_Config::singleton();
+      $config = &CRM_Core_Config::singleton();
       $dao->currency = $config->defaultCurrency;
     }
 
@@ -466,8 +466,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
       );
       $extraOption = array('onclick' => "return pcpAnonymous( );");
       $elements = array();
-      $elements[] = & $page->createElement('radio', NULL, '', ts('Include my name and message'), 0, $extraOption);
-      $elements[] = & $page->createElement('radio', NULL, '', ts('List my support anonymously'), 1, $extraOption);
+      $elements[] = &$page->createElement('radio', NULL, '', ts('Include my name and message'), 0, $extraOption);
+      $elements[] = &$page->createElement('radio', NULL, '', ts('List my support anonymously'), 1, $extraOption);
       $page->addGroup($elements, 'pcp_is_anonymous', NULL, '&nbsp;&nbsp;&nbsp;');
       $page->_defaults['pcp_is_anonymous'] = 0;
 

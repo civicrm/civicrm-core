@@ -175,8 +175,8 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
   public function buildQuickForm() {
 
-    $this->line_items    = array();
-    $this->sub_total     = 0;
+    $this->line_items = array();
+    $this->sub_total = 0;
     $this->_price_values = $this->getValuesForPage('ParticipantsAndPrices');
 
     // iterate over each event in cart
@@ -239,7 +239,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @param null $class
    */
   public function process_event_line_item(&$event_in_cart, $class = NULL) {
-    $cost         = 0;
+    $cost = 0;
     $price_set_id = CRM_Price_BAO_PriceSet::getFor("civicrm_event", $event_in_cart->event_id);
     $amount_level = NULL;
     if ($price_set_id) {
@@ -249,12 +249,12 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
           $event_price_values[$matches[1]] = $value;
         }
       }
-      $price_sets       = CRM_Price_BAO_PriceSet::getSetDetail($price_set_id, TRUE);
-      $price_set        = $price_sets[$price_set_id];
+      $price_sets = CRM_Price_BAO_PriceSet::getSetDetail($price_set_id, TRUE);
+      $price_set = $price_sets[$price_set_id];
       $price_set_amount = array();
       CRM_Price_BAO_PriceSet::processAmount($price_set['fields'], $event_price_values, $price_set_amount);
-      $cost            = $event_price_values['amount'];
-      $amount_level    = $event_price_values['amount_level'];
+      $cost = $event_price_values['amount'];
+      $amount_level = $event_price_values['amount_level'];
       $price_details[$price_set_id] = $price_set_amount;
     }
 
@@ -316,8 +316,8 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @param array $params
    */
   public function emailReceipt($events_in_cart, $params) {
-    $contact_details    = CRM_Contact_BAO_Contact::getContactDetails($this->payer_contact_id);
-    $state_province     = new CRM_Core_DAO_StateProvince();
+    $contact_details = CRM_Contact_BAO_Contact::getContactDetails($this->payer_contact_id);
+    $state_province = new CRM_Core_DAO_StateProvince();
     $state_province->id = $params["billing_state_province_id-{$this->_bltID}"];
     $state_province->find();
     $state_province->fetch();
@@ -429,13 +429,13 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
     $transaction = new CRM_Core_Transaction();
     $trxnDetails = NULL;
-    $params      = $this->_submitValues;
+    $params = $this->_submitValues;
 
     $main_participants = $this->cart->get_main_event_participants();
     foreach ($main_participants as $participant) {
-      $defaults            = array();
-      $ids                 = array('contact_id' => $participant->contact_id);
-      $contact             = CRM_Contact_BAO_Contact::retrieve($ids, $defaults);
+      $defaults = array();
+      $ids = array('contact_id' => $participant->contact_id);
+      $contact = CRM_Contact_BAO_Contact::retrieve($ids, $defaults);
       $contact->is_deleted = 0;
       $contact->save();
     }
@@ -443,11 +443,11 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $trxn_prefix = 'VR';
     if (array_key_exists('billing_contact_email', $params)) {
       $this->payer_contact_id = self::find_or_create_contact($this->getContactID(), array(
-          'email' => $params['billing_contact_email'],
-          'first_name' => $params['billing_first_name'],
-          'last_name' => $params['billing_last_name'],
-          'is_deleted' => FALSE,
-        ));
+        'email' => $params['billing_contact_email'],
+        'first_name' => $params['billing_first_name'],
+        'last_name' => $params['billing_last_name'],
+        'is_deleted' => FALSE,
+      ));
 
       $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
         $this->payer_contact_id,
@@ -580,8 +580,8 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $payment = &CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
     CRM_Core_Payment_Form::mapParams($this->_bltID, $params, $params, TRUE);
     $params['month'] = $params['credit_card_exp_date']['M'];
-    $params['year']  = $params['credit_card_exp_date']['Y'];
-    $result          = &$payment->doDirectPayment($params);
+    $params['year'] = $params['credit_card_exp_date']['Y'];
+    $result = &$payment->doDirectPayment($params);
     if (is_a($result, 'CRM_Core_Error')) {
       CRM_Core_Error::displaySessionError($result);
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/cart_checkout', "_qf_Payment_display=1&qfKey={$this->controller->_key}", TRUE, NULL, FALSE));

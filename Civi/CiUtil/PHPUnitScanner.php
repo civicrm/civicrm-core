@@ -1,5 +1,6 @@
 <?php
 namespace Civi\CiUtil;
+
 use Symfony\Component\Finder\Finder;
 
 /**

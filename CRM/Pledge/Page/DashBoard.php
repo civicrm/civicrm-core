@@ -47,9 +47,9 @@ class CRM_Pledge_Page_DashBoard extends CRM_Core_Page {
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviPledge'));
 
-    $startToDate    = array();
-    $yearToDate     = array();
-    $monthToDate    = array();
+    $startToDate = array();
+    $yearToDate = array();
+    $monthToDate = array();
     $previousToDate = array();
 
     $prefixes = array('start', 'month', 'year', 'previous');
@@ -60,13 +60,13 @@ class CRM_Pledge_Page_DashBoard extends CRM_Core_Page {
     $startDateEnd = NULL;
 
     // current year - prefix = 'year'
-    $config   = CRM_Core_Config::singleton();
+    $config = CRM_Core_Config::singleton();
     $yearDate = $config->fiscalYearStart;
-    $year     = array('Y' => date('Y'));
+    $year = array('Y' => date('Y'));
     $this->assign('curYear', $year['Y']);
-    $yearDate    = array_merge($year, $yearDate);
-    $yearDate    = CRM_Utils_Date::format($yearDate);
-    $yearDate    = $yearDate . '000000';
+    $yearDate = array_merge($year, $yearDate);
+    $yearDate = CRM_Utils_Date::format($yearDate);
+    $yearDate = $yearDate . '000000';
     $yearDateEnd = $year['Y'] . '1231235959';
 
     // current month - prefix = 'month'
@@ -76,15 +76,15 @@ class CRM_Pledge_Page_DashBoard extends CRM_Core_Page {
     $monthDateEnd = CRM_Utils_Date::customFormat(date("Y-m-t", mktime(0, 0, 0, date("m"), 01, date("Y"))), '%Y%m%d') . '235959';
 
     // previous month - prefix = 'previous'
-    $previousDate    = CRM_Utils_Date::customFormat(date("Y-m-d", mktime(0, 0, 0, date("m") - 1, 01, date("Y"))), '%Y%m%d') . '000000';
+    $previousDate = CRM_Utils_Date::customFormat(date("Y-m-d", mktime(0, 0, 0, date("m") - 1, 01, date("Y"))), '%Y%m%d') . '000000';
     $previousDateEnd = CRM_Utils_Date::customFormat(date("Y-m-t", mktime(0, 0, 0, date("m") - 1, 01, date("Y"))), '%Y%m%d') . '235959';
-    $previousMonth   = date("F Y", mktime(0, 0, 0, date("m") - 1, 01, date("Y")));
+    $previousMonth = date("F Y", mktime(0, 0, 0, date("m") - 1, 01, date("Y")));
     $this->assign('previousMonthYear', $previousMonth);
 
     foreach ($prefixes as $prefix) {
-      $aName     = $prefix . 'ToDate';
+      $aName = $prefix . 'ToDate';
       $startName = $prefix . 'Date';
-      $endName   = $prefix . 'DateEnd';
+      $endName = $prefix . 'DateEnd';
       foreach ($status as $s) {
         ${$aName}[str_replace(" ", "", $s)] = CRM_Pledge_BAO_Pledge::getTotalAmountAndCount($s, $$startName, $$endName);
       }

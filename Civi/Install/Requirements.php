@@ -142,10 +142,13 @@ class Requirements {
     switch (strtolower(substr($memString, -1))) {
       case "k":
         return round(substr($memString, 0, -1) * 1024);
+
       case "m":
         return round(substr($memString, 0, -1) * 1024 * 1024);
+
       case "g":
         return round(substr($memString, 0, -1) * 1024 * 1024 * 1024);
+
       default:
         return round($memString);
     }
@@ -478,7 +481,7 @@ class Requirements {
     $conn = @mysql_connect($db_config['server'], $db_config['username'], $db_config['password']);
     if (!$conn) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
-      $results['details'] =  'Could not connect to database';
+      $results['details'] = 'Could not connect to database';
       return $results;
     }
 

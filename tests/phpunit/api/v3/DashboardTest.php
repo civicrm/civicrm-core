@@ -30,7 +30,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * @package CiviCRM_APIv3
  * @subpackage API_ActionSchedule
  */
-
 class api_v3_DashboardTest extends CiviUnitTestCase {
   protected $_params;
   protected $_params2;

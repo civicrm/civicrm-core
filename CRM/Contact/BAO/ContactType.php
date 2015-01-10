@@ -421,12 +421,12 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
         $dao = CRM_Core_DAO::executeQuery($sql);
         while ($dao->fetch()) {
           if (!empty($dao->parent_id)) {
-            $key   = $isSeparator ? $dao->parent_name . $separator . $dao->child_name : $dao->child_name;
+            $key = $isSeparator ? $dao->parent_name . $separator . $dao->child_name : $dao->child_name;
             $label = "- {$dao->child_label}";
             $pName = $dao->parent_name;
           }
           else {
-            $key   = $dao->child_name;
+            $key = $dao->child_name;
             $label = $dao->child_label;
             $pName = $dao->child_name;
           }
@@ -469,7 +469,7 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
   /**
    * Retrieve the basic contact type associated with given subType.
    *
-   * @param array/string $subType contact subType.
+   * @param array /string $subType contact subType.
    * @return array/string of basicTypes.
    * @static
    */
@@ -665,8 +665,8 @@ WHERE name = %1";
     $contactType->save();
     if ($contactType->find(TRUE)) {
       $contactName = $contactType->name;
-      $contact     = ucfirst($contactType->label);
-      $active      = $contactType->is_active;
+      $contact = ucfirst($contactType->label);
+      $active = $contactType->is_active;
     }
 
     if (!empty($params['id'])) {
@@ -819,8 +819,8 @@ WHERE name = %1";
   public static function hasRelationships($contactId, $contactType) {
     $subTypeClause = NULL;
     if (self::isaSubType($contactType)) {
-      $subType       = $contactType;
-      $contactType   = self::getBasicType($subType);
+      $subType = $contactType;
+      $contactType = self::getBasicType($subType);
       $subTypeClause = " AND ( ( crt.contact_type_a = '{$contactType}' AND crt.contact_sub_type_a = '{$subType}') OR
                                      ( crt.contact_type_b = '{$contactType}' AND crt.contact_sub_type_b = '{$subType}')  ) ";
     }
@@ -859,8 +859,8 @@ LIMIT 1";
 
     $customSet = $subTypeClause = array();
     foreach ($subtypeSet as $subtype) {
-      $subtype         = CRM_Utils_Type::escape($subtype, 'String');
-      $subType         = CRM_Core_DAO::VALUE_SEPARATOR . $subtype . CRM_Core_DAO::VALUE_SEPARATOR;
+      $subtype = CRM_Utils_Type::escape($subtype, 'String');
+      $subType = CRM_Core_DAO::VALUE_SEPARATOR . $subtype . CRM_Core_DAO::VALUE_SEPARATOR;
       $subTypeClause[] = "extends_entity_column_value LIKE '%{$subtype}%' ";
     }
     $query = "SELECT table_name

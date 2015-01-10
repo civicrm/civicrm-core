@@ -116,8 +116,8 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
     $controller->run();
 
     $this->assign('caseId', $this->_id);
-    $output     = CRM_Core_Selector_Controller::SESSION;
-    $selector   = new CRM_Activity_Selector_Activity($this->_contactId, $this->_permission, FALSE, 'case');
+    $output = CRM_Core_Selector_Controller::SESSION;
+    $selector = new CRM_Activity_Selector_Activity($this->_contactId, $this->_permission, FALSE, 'case');
     $controller =
       new CRM_Core_Selector_Controller(
         $selector,
@@ -292,7 +292,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
         break;
 
       case 'fulltext':
-        $action    = CRM_Utils_Request::retrieve('action', 'String', $this);
+        $action = CRM_Utils_Request::retrieve('action', 'String', $this);
         $urlParams = 'force=1';
         $urlString = 'civicrm/contact/search/custom';
         if ($action == CRM_Core_Action::RENEW) {

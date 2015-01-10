@@ -73,8 +73,8 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
       // also set the user context to send back to view page
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/participant',
-          "reset=1&action=view&id={$participantID}&cid={$contactID}"
-        ));
+        "reset=1&action=view&id={$participantID}&cid={$contactID}"
+      ));
     }
     else {
       parent::preProcess();
@@ -97,7 +97,8 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
       'badge_id',
       ts('Name Badge Format'),
       array(
-        '' => ts('- select -')) + $label, TRUE
+        '' => ts('- select -')
+      ) + $label, TRUE
     );
 
     $next = 'next';

@@ -33,7 +33,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * @package CiviCRM_APIv3
  * @subpackage API_ContributionSoft
  */
-
 class api_v3_ContributionSoftTest extends CiviUnitTestCase {
 
   /**
@@ -64,7 +63,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
       'total_amount' => 100.00,
-      'financial_type_id'   => $this->_financialTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'non_deductible_amount' => 10.00,
       'fee_amount' => 5.00,
       'net_amount' => 95.00,
@@ -135,7 +134,8 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
 
     //test get by contact id works
     $result = $this->callAPISuccess('contribution_soft', 'get', array(
-      'contact_id' => $this->_softIndividual2Id)
+        'contact_id' => $this->_softIndividual2Id
+      )
     );
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
 
@@ -151,7 +151,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
 
     $this->callAPISuccess('ContributionSoft', 'Delete', array(
       'id' => $this->_softcontribution2['id'],
-     ));
+    ));
   }
 
 

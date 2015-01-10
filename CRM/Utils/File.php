@@ -331,11 +331,12 @@ class CRM_Utils_File {
       // allow html/htm extension ONLY if the user is admin
       // and/or has access CiviMail
       if (!(CRM_Core_Permission::check('access CiviMail') ||
-          CRM_Core_Permission::check('administer CiviCRM') ||
-          (CRM_Mailing_Info::workflowEnabled() &&
-            CRM_Core_Permission::check('create mailings')
-          )
-        )) {
+        CRM_Core_Permission::check('administer CiviCRM') ||
+        (CRM_Mailing_Info::workflowEnabled() &&
+          CRM_Core_Permission::check('create mailings')
+        )
+      )
+      ) {
         unset($extensions['html']);
         unset($extensions['htm']);
       }
@@ -380,8 +381,8 @@ class CRM_Utils_File {
    * @return string
    */
   public static function makeFileName($name) {
-    $uniqID   = md5(uniqid(rand(), TRUE));
-    $info     = pathinfo($name);
+    $uniqID = md5(uniqid(rand(), TRUE));
+    $info = pathinfo($name);
     $basename = substr($info['basename'],
       0, -(strlen(CRM_Utils_Array::value('extension', $info)) + (CRM_Utils_Array::value('extension', $info) == '' ? 0 : 1))
     );
@@ -403,7 +404,7 @@ class CRM_Utils_File {
    * @return array
    */
   public static function getFilesByExtension($path, $ext) {
-    $path  = self::addTrailingSlash($path);
+    $path = self::addTrailingSlash($path);
     $files = array();
     if ($dh = opendir($path)) {
       while (FALSE !== ($elem = readdir($dh))) {

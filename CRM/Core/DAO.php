@@ -52,16 +52,16 @@ class CRM_Core_DAO extends DB_DataObject {
 
   static $_dbColumnValueCache = NULL;
   const NOT_NULL = 1, IS_NULL = 2,
-  DB_DAO_NOTNULL = 128,
-  VALUE_SEPARATOR = "",
-  BULK_INSERT_COUNT = 200,
-  BULK_INSERT_HIGH_COUNT = 200,
-  // special value for mail bulk inserts to avoid
-  // potential duplication, assuming a smaller number reduces number of queries
-  // by some factor, so some tradeoff. CRM-8678
-  BULK_MAIL_INSERT_COUNT = 10,
-  QUERY_FORMAT_WILDCARD = 1,
-  QUERY_FORMAT_NO_QUOTES = 2;
+    DB_DAO_NOTNULL = 128,
+    VALUE_SEPARATOR = "",
+    BULK_INSERT_COUNT = 200,
+    BULK_INSERT_HIGH_COUNT = 200,
+    // special value for mail bulk inserts to avoid
+    // potential duplication, assuming a smaller number reduces number of queries
+    // by some factor, so some tradeoff. CRM-8678
+    BULK_MAIL_INSERT_COUNT = 10,
+    QUERY_FORMAT_WILDCARD = 1,
+    QUERY_FORMAT_NO_QUOTES = 2;
 
   /*
    * Define entities that shouldn't be created or deleted when creating/ deleting
@@ -412,7 +412,7 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @return array
    */
-   static function &fields() {
+  static function &fields() {
     $result = NULL;
     return $result;
   }
@@ -492,10 +492,10 @@ class CRM_Core_DAO extends DB_DataObject {
       return;
     }
 
-    $dao                = new CRM_Core_DAO_Log();
-    $dao->entity_table  = $this->getTableName();
-    $dao->entity_id     = $this->id;
-    $dao->modified_id   = $cid;
+    $dao = new CRM_Core_DAO_Log();
+    $dao->entity_table = $this->getTableName();
+    $dao->entity_id = $this->id;
+    $dao->modified_id = $cid;
     $dao->modified_date = date("YmdHis");
     $dao->insert();
   }
@@ -602,7 +602,7 @@ class CRM_Core_DAO extends DB_DataObject {
           $cols = 80;
         }
 
-        $attributes         = array();
+        $attributes = array();
         $attributes['rows'] = $rows;
         $attributes['cols'] = $cols;
         return $attributes;
@@ -631,7 +631,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * @static
    */
   public static function getAttribute($class, $fieldName = NULL) {
-    $object = new $class( );
+    $object = new $class();
     $fields = &$object->fields();
     if ($fieldName != NULL) {
       $field = CRM_Utils_Array::value($fieldName, $fields);
@@ -680,7 +680,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * @static
    */
   public static function objectExists($value, $daoName, $daoID, $fieldName = 'name') {
-    $object = new $daoName( );
+    $object = new $daoName();
     $object->$fieldName = $value;
 
     $config = CRM_Core_Config::singleton();
@@ -712,7 +712,7 @@ FROM $tableName
 LIKE %1
 ";
     $params = array(1 => array($columnName, 'String'));
-    $dao    = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, $i18nRewrite);
+    $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, $i18nRewrite);
     $result = $dao->fetch() ? TRUE : FALSE;
     $dao->free();
     return $result;
@@ -872,7 +872,7 @@ LIKE %1
     }
     $constraint = "`FK_{$tableName}_{$columnName}`";
     $pattern = "/\bCONSTRAINT\b\s+%s\s+\bFOREIGN\s+KEY\b\s/i";
-    return preg_match(sprintf($pattern, $constraint),$show[$tableName]) ? TRUE : FALSE;
+    return preg_match(sprintf($pattern, $constraint), $show[$tableName]) ? TRUE : FALSE;
   }
 
   /**
@@ -887,8 +887,8 @@ LIKE %1
    * @static
    */
   public static function checkFieldHasAlwaysValue($tableName, $columnName, $columnValue) {
-    $query  = "SELECT * FROM $tableName WHERE $columnName != '$columnValue'";
-    $dao    = CRM_Core_DAO::executeQuery($query);
+    $query = "SELECT * FROM $tableName WHERE $columnName != '$columnValue'";
+    $dao = CRM_Core_DAO::executeQuery($query);
     $result = $dao->fetch() ? FALSE : TRUE;
     $dao->free();
     return $result;
@@ -905,8 +905,8 @@ LIKE %1
    * @static
    */
   public static function checkFieldIsAlwaysNull($tableName, $columnName) {
-    $query  = "SELECT * FROM $tableName WHERE $columnName IS NOT NULL";
-    $dao    = CRM_Core_DAO::executeQuery($query);
+    $query = "SELECT * FROM $tableName WHERE $columnName IS NOT NULL";
+    $dao = CRM_Core_DAO::executeQuery($query);
     $result = $dao->fetch() ? FALSE : TRUE;
     $dao->free();
     return $result;
@@ -1000,7 +1000,7 @@ FROM   civicrm_domain
     }
 
     if (!array_key_exists($cacheKey, self::$_dbColumnValueCache) || $force) {
-      $object   = new $daoName( );
+      $object = new $daoName();
       $object->$searchColumn = $searchValue;
       $object->selectAdd();
       $object->selectAdd($returnColumn);
@@ -1035,7 +1035,7 @@ FROM   civicrm_domain
    * @static
    */
   public static function setFieldValue($daoName, $searchValue, $setColumn, $setValue, $searchColumn = 'id') {
-    $object = new $daoName( );
+    $object = new $daoName();
     $object->selectAdd();
     $object->selectAdd("$searchColumn, $setColumn");
     $object->$searchColumn = $searchValue;
@@ -1094,7 +1094,7 @@ FROM   civicrm_domain
    * @static
    */
   public static function commonRetrieve($daoName, &$params, &$defaults, $returnProperities = NULL) {
-    $object = new $daoName( );
+    $object = new $daoName();
     $object->copyValues($params);
 
     // return only specific fields if returnproperties are sent
@@ -1122,7 +1122,7 @@ FROM   civicrm_domain
    * @static
    */
   public static function deleteEntityContact($daoName, $contactId) {
-    $object = new $daoName( );
+    $object = new $daoName();
 
     $object->entity_table = 'civicrm_contact';
     $object->entity_id = $contactId;
@@ -1147,11 +1147,11 @@ FROM   civicrm_domain
    */
   static function &executeQuery(
     $query,
-    $params        = array(),
-    $abort         = TRUE,
-    $daoName       = NULL,
-    $freeDAO       = FALSE,
-    $i18nRewrite   = TRUE,
+    $params = array(),
+    $abort = TRUE,
+    $daoName = NULL,
+    $freeDAO = FALSE,
+    $i18nRewrite = TRUE,
     $trapException = FALSE
   ) {
     $queryStr = self::composeQuery($query, $params, $abort);
@@ -1160,7 +1160,7 @@ FROM   civicrm_domain
       $dao = new CRM_Core_DAO();
     }
     else {
-      $dao = new $daoName( );
+      $dao = new $daoName();
     }
 
     if ($trapException) {
@@ -1197,8 +1197,8 @@ FROM   civicrm_domain
    */
   static function &singleValueQuery(
     $query,
-    $params      = array(),
-    $abort       = TRUE,
+    $params = array(),
+    $abort = TRUE,
     $i18nRewrite = TRUE
   ) {
     $queryStr = self::composeQuery($query, $params, $abort);
@@ -1326,7 +1326,7 @@ FROM   civicrm_domain
    * @return (reference )                   the newly created copy of the object
    */
   static function &copyGeneric($daoName, $criteria, $newData = NULL, $fieldsFix = NULL, $blockCopyOfDependencies = NULL) {
-    $object = new $daoName( );
+    $object = new $daoName();
     if (!$newData) {
       $object->id = $criteria['id'];
     }
@@ -1346,12 +1346,12 @@ FROM   civicrm_domain
         break;
       }
 
-      $newObject   = new $daoName( );
+      $newObject = new $daoName();
 
       $fields = &$object->fields();
       if (!is_array($fieldsFix)) {
-        $fieldsToPrefix  = array();
-        $fieldsToSuffix  = array();
+        $fieldsToPrefix = array();
+        $fieldsToSuffix = array();
         $fieldsToReplace = array();
       }
       if (!empty($fieldsFix['prefix'])) {
@@ -1399,11 +1399,11 @@ FROM   civicrm_domain
   }
 
   public static function cascadeUpdate($daoName, $fromId, $toId, $newData = array()) {
-    $object = new $daoName( );
+    $object = new $daoName();
     $object->id = $fromId;
 
     if ($object->find(TRUE)) {
-      $newObject = new $daoName( );
+      $newObject = new $daoName();
       $newObject->id = $toId;
 
       if ($newObject->find(TRUE)) {
@@ -1479,8 +1479,8 @@ SELECT contact_id
    * @static
    */
   public static function commonRetrieveAll($daoName, $fieldIdName = 'id', $fieldId, &$details, $returnProperities = NULL) {
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php");
-    $object = new $daoName( );
+    require_once(str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php");
+    $object = new $daoName();
     $object->$fieldIdName = $fieldId;
 
     // return only specific fields if returnproperties are sent
@@ -1582,7 +1582,8 @@ SELECT contact_id
     // note that mysql does not escape these characters
     if ($string && in_array($string,
         array('%', '_', '%%', '_%')
-      )) {
+      )
+    ) {
       return '\\' . $string;
     }
 
@@ -1618,7 +1619,8 @@ SELECT contact_id
       'CRM_Core_DAO_StateProvince',
       'CRM_Core_DAO_Country',
       'CRM_Core_DAO_Domain',
-      'CRM_Financial_DAO_FinancialType'//because valid ones exist & we use pick them due to pseudoconstant can't reliably create & delete these
+      'CRM_Financial_DAO_FinancialType'
+      //because valid ones exist & we use pick them due to pseudoconstant can't reliably create & delete these
     );
 
     // Prefer to instantiate BAO's instead of DAO's (when possible)
@@ -1634,7 +1636,7 @@ SELECT contact_id
       /** @var CRM_Core_DAO $object */
       $object = new $daoName();
 
-      $fields = & $object->fields();
+      $fields = &$object->fields();
       foreach ($fields as $fieldName => $fieldDef) {
         $dbName = $fieldDef['name'];
         $FKClassName = CRM_Utils_Array::value('FKClassName', $fieldDef);
@@ -1708,7 +1710,8 @@ SELECT contact_id
           && ($required || $dbName == 'contact_id')
           //I'm a bit stuck on this one - we might need to change the singleValueAlter so that the entities don't share a contact
           // to make this test process pass - line below makes pass for now
-          && $dbName != 'member_of_contact_id') {
+          && $dbName != 'member_of_contact_id'
+        ) {
           $deletions[] = array($FKClassName, array('id' => $object->$dbName)); // x
         }
       }
@@ -1718,7 +1721,7 @@ SELECT contact_id
 
     foreach ($deletions as $deletion) {
       CRM_Core_DAO::deleteTestObjects($deletion[0], $deletion[1]);
-  }
+    }
   }
 
   /**
@@ -1976,11 +1979,11 @@ SELECT contact_id
       }
       foreach ($tables as $eventName => $events) {
         foreach ($events as $whenName => $parts) {
-          $varString   = implode("\n", $parts['variables']);
-          $sqlString   = implode("\n", $parts['sql']);
-          $validName   = CRM_Core_DAO::shortenSQLName($tableName, 48, TRUE);
+          $varString = implode("\n", $parts['variables']);
+          $sqlString = implode("\n", $parts['sql']);
+          $validName = CRM_Core_DAO::shortenSQLName($tableName, 48, TRUE);
           $triggerName = "{$validName}_{$whenName}_{$eventName}";
-          $triggerSQL  = "CREATE TRIGGER $triggerName $whenName $eventName ON $tableName FOR EACH ROW BEGIN $varString $sqlString END";
+          $triggerSQL = "CREATE TRIGGER $triggerName $whenName $eventName ON $tableName FOR EACH ROW BEGIN $varString $sqlString END";
 
           CRM_Core_DAO::executeQuery("DROP TRIGGER IF EXISTS $triggerName");
           CRM_Core_DAO::executeQuery(
@@ -2295,7 +2298,7 @@ SELECT contact_id
 
           default:
             if (!$returnSanitisedArray) {
-              return(sprintf('%s %s "%s"', $fieldName, $operator, CRM_Core_DAO::escapeString($criteria)));
+              return (sprintf('%s %s "%s"', $fieldName, $operator, CRM_Core_DAO::escapeString($criteria)));
             }
             else {
               return NULL; // not yet implemented (tests required to implement)
@@ -2311,7 +2314,23 @@ SELECT contact_id
    * @return array
    */
   public static function acceptedSQLOperators() {
-    return array('=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=", "NOT LIKE", 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN', 'IS NOT NULL', 'IS NULL');
+    return array(
+      '=',
+      '<=',
+      '>=',
+      '>',
+      '<',
+      'LIKE',
+      "<>",
+      "!=",
+      "NOT LIKE",
+      'IN',
+      'NOT IN',
+      'BETWEEN',
+      'NOT BETWEEN',
+      'IS NOT NULL',
+      'IS NULL'
+    );
   }
 
   /**
@@ -2353,6 +2372,7 @@ SELECT contact_id
   /**
    * @param array $params
    */
-  public function setApiFilter(&$params) {}
+  public function setApiFilter(&$params) {
+  }
 
 }

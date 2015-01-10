@@ -122,10 +122,10 @@ AND    co.id IN ( $contribIDs )";
     );
 
     // build a row for each contribution id
-    $this->_rows   = array();
-    $attributes    = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
-    $defaults      = array();
-    $now           = date("m/d/Y");
+    $this->_rows = array();
+    $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
+    $defaults = array();
+    $now = date("m/d/Y");
     $paidByOptions = array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument();
 
     while ($dao->fetch()) {
@@ -228,8 +228,8 @@ AND    co.id IN ( $contribIDs )";
 
     // get the missing pieces for each contribution
     $contribIDs = implode(',', $this->_contributionIds);
-    $details    = self::getDetails($contribIDs);
-    $template   = CRM_Core_Smarty::singleton();
+    $details = self::getDetails($contribIDs);
+    $template = CRM_Core_Smarty::singleton();
 
     // for each contribution id, we just call the baseIPN stuff
     foreach ($this->_rows as $row) {
@@ -268,7 +268,8 @@ AND    co.id IN ( $contribIDs )";
       // status is not pending
       if ($contribution->contribution_status_id != array_search('Pending',
           $contributionStatuses
-        )) {
+        )
+      ) {
         $transaction->commit();
         continue;
       }

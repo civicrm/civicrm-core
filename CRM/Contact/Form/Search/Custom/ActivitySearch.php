@@ -138,9 +138,14 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
      * for the search form.
      */
     $form->assign('elements', array(
-      'contact_type', 'activity_subject', 'activity_type_id',
-        'activity_status_id', 'start_date', 'end_date', 'sort_name',
-      ));
+      'contact_type',
+      'activity_subject',
+      'activity_type_id',
+      'activity_status_id',
+      'start_date',
+      'end_date',
+      'sort_name',
+    ));
   }
 
   /**
@@ -289,9 +294,9 @@ ORDER BY contact_a.sort_name';
     // add contact name search; search on primary name, source contact, assignee
     $contactname = $this->_formValues['sort_name'];
     if (!empty($contactname)) {
-      $dao         = new CRM_Core_DAO();
+      $dao = new CRM_Core_DAO();
       $contactname = $dao->escape($contactname);
-      $clauses[]   = "(contact_a.sort_name LIKE '%{$contactname}%' OR
+      $clauses[] = "(contact_a.sort_name LIKE '%{$contactname}%' OR
                            contact_b.sort_name LIKE '%{$contactname}%' OR
                            contact_c.display_name LIKE '%{$contactname}%')";
     }
@@ -303,8 +308,8 @@ ORDER BY contact_a.sort_name';
     }
 
     if (!empty($subject)) {
-      $dao       = new CRM_Core_DAO();
-      $subject   = $dao->escape($subject);
+      $dao = new CRM_Core_DAO();
+      $subject = $dao->escape($subject);
       $clauses[] = "activity.subject LIKE '%{$subject}%'";
     }
 

@@ -44,10 +44,10 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
    * return null
    */
   public function listMemberships() {
-    $membership      = array();
-    $dao             = new CRM_Member_DAO_Membership();
+    $membership = array();
+    $dao = new CRM_Member_DAO_Membership();
     $dao->contact_id = $this->_contactId;
-    $dao->is_test    = 0;
+    $dao->is_test = 0;
     $dao->find();
 
     while ($dao->fetch()) {
@@ -57,7 +57,9 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
       //get the membership status and type values.
       $statusANDType = CRM_Member_BAO_Membership::getStatusANDTypeValues($dao->id);
       foreach (array(
-        'status', 'membership_type') as $fld) {
+                 'status',
+                 'membership_type'
+               ) as $fld) {
         $membership[$dao->id][$fld] = CRM_Utils_Array::value($fld, $statusANDType[$dao->id]);
       }
       if (!empty($statusANDType[$dao->id]['is_current_member'])) {

@@ -141,8 +141,8 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
 
     //fill first name, last name, email id
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
-    $lastName  = 'An' . substr(sha1(rand()), 0, 7);
-    $emailId   = substr(sha1(rand()), 0, 7) . '@web.com';
+    $lastName = 'An' . substr(sha1(rand()), 0, 7);
+    $emailId = substr(sha1(rand()), 0, 7) . '@web.com';
     $this->click("first_name");
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);
@@ -217,8 +217,8 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
 
     //fill first name, last name, email id
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
-    $lastName  = 'An' . substr(sha1(rand()), 0, 7);
-    $emailId   = substr(sha1(rand()), 0, 7) . '@web.com';
+    $lastName = 'An' . substr(sha1(rand()), 0, 7);
+    $emailId = substr(sha1(rand()), 0, 7) . '@web.com';
     $this->click("first_name");
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);

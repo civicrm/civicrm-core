@@ -85,8 +85,8 @@ class CRM_Core_Key {
    */
   public static function get($name, $addSequence = FALSE) {
     $privateKey = self::privateKey();
-    $sessionID  = self::sessionID();
-    $key        = md5($sessionID . $name . $privateKey);
+    $sessionID = self::sessionID();
+    $key = md5($sessionID . $name . $privateKey);
 
     if ($addSequence) {
       // now generate a random number between 1 and 100K and add it to the key

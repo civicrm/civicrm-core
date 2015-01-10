@@ -90,7 +90,14 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
      * If you are using the sample template, this array tells the template fields to render
      * for the search form.
      */
-    $form->assign('elements', array('paid_online', 'start_date', 'end_date', 'show_payees', 'event_type_id', 'event_id'));
+    $form->assign('elements', array(
+        'paid_online',
+        'start_date',
+        'end_date',
+        'show_payees',
+        'event_type_id',
+        'event_id'
+      ));
   }
 
   /**
@@ -206,7 +213,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
 
     $clauses[] = "civicrm_participant.status_id in ( 1 )";
     $clauses[] = "civicrm_contribution.is_test = 0";
-    $onLine    = CRM_Utils_Array::value('paid_online',
+    $onLine = CRM_Utils_Array::value('paid_online',
       $this->_formValues
     );
     if ($onLine) {

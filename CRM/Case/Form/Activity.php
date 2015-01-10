@@ -191,8 +191,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
             if ($activityInst[$this->_activityTypeName] == 1) {
               $atArray = array('activity_type_id' => $this->_activityTypeId);
               $activities = CRM_Case_BAO_Case::getCaseActivity($caseId,
-              $atArray,
-              $this->_currentUserId
+                $atArray,
+                $this->_currentUserId
               );
               $activities = array_keys($activities);
               $activities = $activities[0];
@@ -693,8 +693,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
         if ($followupActivity) {
           $caseParams = array(
-             'activity_id' => $followupActivity->id,
-             'case_id' => $vval['case_id'],
+            'activity_id' => $followupActivity->id,
+            'case_id' => $vval['case_id'],
           );
           CRM_Case_BAO_Case::processCaseActivity($caseParams);
           $followupStatus = ts("A followup activity has been scheduled.");

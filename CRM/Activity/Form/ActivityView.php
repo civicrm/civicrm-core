@@ -47,8 +47,8 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
   public function preProcess() {
     //get the activity values
     $activityId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $context    = CRM_Utils_Request::retrieve('context', 'String', $this);
-    $cid        = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
     //check for required permissions, CRM-6264
     if ($activityId &&
@@ -59,7 +59,11 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
     if (!in_array($context, array(
-      'home', 'dashlet', 'dashletFullscreen'))) {
+      'home',
+      'dashlet',
+      'dashletFullscreen'
+    ))
+    ) {
       $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$cid}&selectedChild=activity");
     }
     else {

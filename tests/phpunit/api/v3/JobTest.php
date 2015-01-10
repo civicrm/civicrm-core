@@ -169,9 +169,9 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testCallUpdateGreetingSuccess() {
     $result = $this->callAPISuccess($this->_entity, 'update_greeting', array(
-        'gt' => 'postal_greeting',
-        'ct' => 'Individual',
-      ));
+      'gt' => 'postal_greeting',
+      'ct' => 'Individual',
+    ));
   }
 
   public function testCallUpdateGreetingCommaSeparatedParamsSuccess() {
@@ -209,10 +209,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
         'limit_to' => FALSE,
       ));
       $this->callAPISuccess('group_contact', 'create', array(
-          'contact_id' => $contactID,
-          'status' => 'Added',
-          'group_id' => $groupID,
-        ));
+        'contact_id' => $contactID,
+        'status' => 'Added',
+        'group_id' => $groupID,
+      ));
     }
     $result = $this->callAPISuccess('job', 'send_reminder', array());
     $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
@@ -236,10 +236,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
       }
       if ($i < 3) {
         $this->callAPISuccess('group_contact', 'create', array(
-            'contact_id' => $contactID,
-            'status' => 'Added',
-            'group_id' => $groupID,
-          ));
+          'contact_id' => $contactID,
+          'status' => 'Added',
+          'group_id' => $groupID,
+        ));
       }
       if ($i > 1) {
         $this->callAPISuccess('membership', 'create', array(
@@ -274,9 +274,9 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $orgID = $this->organizationCreate();
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_pre', array($this, 'hookPreRelationship'));
     $relationshipTypeID = $this->callAPISuccess('relationship_type', 'getvalue', array(
-        'return' => 'id',
-        'name_a_b' => 'Employee of',
-      ));
+      'return' => 'id',
+      'name_a_b' => 'Employee of',
+    ));
     $result = $this->callAPISuccess('relationship', 'create', array(
       'relationship_type_id' => $relationshipTypeID,
       'contact_id_a' => $individualID,

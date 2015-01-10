@@ -59,12 +59,12 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     $this->db = $dsn['database'];
 
     $this->log_conn_id = CRM_Utils_Request::retrieve('log_conn_id', 'Integer', CRM_Core_DAO::$_nullObject);
-    $this->log_date    = CRM_Utils_Request::retrieve('log_date', 'String', CRM_Core_DAO::$_nullObject);
-    $this->cid         = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject);
-    $this->raw         = CRM_Utils_Request::retrieve('raw', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $this->log_date = CRM_Utils_Request::retrieve('log_date', 'String', CRM_Core_DAO::$_nullObject);
+    $this->cid = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject);
+    $this->raw = CRM_Utils_Request::retrieve('raw', 'Boolean', CRM_Core_DAO::$_nullObject);
 
-    $this->altered_name  = CRM_Utils_Request::retrieve('alteredName', 'String',  CRM_Core_DAO::$_nullObject);
-    $this->altered_by    = CRM_Utils_Request::retrieve('alteredBy',   'String',  CRM_Core_DAO::$_nullObject);
+    $this->altered_name = CRM_Utils_Request::retrieve('alteredName', 'String', CRM_Core_DAO::$_nullObject);
+    $this->altered_by = CRM_Utils_Request::retrieve('alteredBy', 'String', CRM_Core_DAO::$_nullObject);
     $this->altered_by_id = CRM_Utils_Request::retrieve('alteredById', 'Integer', CRM_Core_DAO::$_nullObject);
 
     parent::__construct();
@@ -72,15 +72,23 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     CRM_Utils_System::resetBreadCrumb();
     $breadcrumb =
       array(
-            array('title' => ts('Home'),
-                  'url' => CRM_Utils_System::url()),
-            array('title' => ts('CiviCRM'),
-                  'url' => CRM_Utils_System::url('civicrm', 'reset=1')),
-            array('title' => ts('View Contact'),
-                  'url' => CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->cid}")),
-            array('title' => ts('Search Results'),
-                  'url' => CRM_Utils_System::url('civicrm/contact/search', "force=1")),
-            );
+        array(
+          'title' => ts('Home'),
+          'url' => CRM_Utils_System::url()
+        ),
+        array(
+          'title' => ts('CiviCRM'),
+          'url' => CRM_Utils_System::url('civicrm', 'reset=1')
+        ),
+        array(
+          'title' => ts('View Contact'),
+          'url' => CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->cid}")
+        ),
+        array(
+          'title' => ts('Search Results'),
+          'url' => CRM_Utils_System::url('civicrm/contact/search', "force=1")
+        ),
+      );
     CRM_Utils_System::appendBreadCrumb($breadcrumb);
 
     if (CRM_Utils_Request::retrieve('revert', 'Boolean', CRM_Core_DAO::$_nullObject)) {
@@ -114,7 +122,8 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
   /**
    * @param bool $applyLimit
    */
-  public function buildQuery($applyLimit = TRUE) {}
+  public function buildQuery($applyLimit = TRUE) {
+  }
 
   /**
    * @param $sql
@@ -159,8 +168,8 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     $skipped = array('contact_id', 'entity_id', 'id');
     foreach ($diffs as $diff) {
       $field = $diff['field'];
-      $from  = $diff['from'];
-      $to    = $diff['to'];
+      $from = $diff['from'];
+      $to = $diff['to'];
 
       if ($this->raw) {
         $field = "$table.$field";
@@ -178,7 +187,8 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
         if ((substr($from, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR &&
             substr($from, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR) ||
           (substr($to, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR &&
-            substr($to, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR)) {
+            substr($to, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR)
+        ) {
           $froms = $tos = array();
           foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($from, CRM_Core_DAO::VALUE_SEPARATOR)) as $val) {
             $froms[] = CRM_Utils_Array::value($val, $values[$field]);
@@ -187,7 +197,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
             $tos[] = CRM_Utils_Array::value($val, $values[$field]);
           }
           $from = implode(', ', array_filter($froms));
-          $to   = implode(', ', array_filter($tos));
+          $to = implode(', ', array_filter($tos));
         }
 
         if (isset($values[$field][$from])) {
@@ -222,9 +232,9 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     );
 
     $this->assign('whom_url', CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->cid}"));
-    $this->assign('who_url',  CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->altered_by_id}"));
+    $this->assign('who_url', CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->altered_by_id}"));
     $this->assign('whom_name', $this->altered_name);
-    $this->assign('who_name',  $this->altered_by);
+    $this->assign('who_name', $this->altered_by);
 
     $this->assign('log_date', CRM_Utils_Date::mysqlToIso($this->log_date));
 

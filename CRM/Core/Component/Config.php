@@ -34,7 +34,6 @@
  * $Id$
  *
  */
-
 abstract class CRM_Core_Component_Config {
 
   /**

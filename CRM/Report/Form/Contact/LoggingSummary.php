@@ -82,7 +82,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
             'name' => 'id',
             'no_display' => TRUE,
             'required' => TRUE,
-            'alias'    => 'modified_contact_civireport',
+            'alias' => 'modified_contact_civireport',
           ),
           'log_conn_id' => array(
             'no_display' => TRUE,
@@ -119,7 +119,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
             'type' => CRM_Utils_Type::T_STRING,
           ),
           'log_type_table' => array(
-            'name'  => 'log_type',
+            'name' => 'log_type',
             'title' => ts('Log Type Table'),
             'type' => CRM_Utils_Type::T_STRING,
           ),
@@ -136,7 +136,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
         ),
       ),
       'altered_by_contact' => array(
-        'dao'   => 'CRM_Contact_DAO_Contact',
+        'dao' => 'CRM_Contact_DAO_Contact',
         'alias' => 'altered_by_contact',
         'fields' => array(
           'display_name' => array(
@@ -162,7 +162,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
   public function alterDisplay(&$rows) {
     // cache for id → is_deleted mapping
     $isDeleted = array();
-    $newRows   = array();
+    $newRows = array();
 
     foreach ($rows as $key => &$row) {
       if (!isset($isDeleted[$row['log_civicrm_entity_altered_contact_id']])) {
@@ -171,7 +171,8 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
       }
 
       if (!empty($row['log_civicrm_entity_altered_contact']) &&
-        !$isDeleted[$row['log_civicrm_entity_altered_contact_id']]) {
+        !$isDeleted[$row['log_civicrm_entity_altered_contact_id']]
+      ) {
         $row['log_civicrm_entity_altered_contact_link'] =
           CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $row['log_civicrm_entity_altered_contact_id']);
         $row['log_civicrm_entity_altered_contact_hover'] = ts("Go to contact summary");
@@ -188,14 +189,16 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
       }
 
       if ('Contact' == CRM_Utils_Array::value('log_type', $this->_logTables[$row['log_civicrm_entity_log_type']]) &&
-          CRM_Utils_Array::value('log_civicrm_entity_log_action', $row) == 'Insert') {
+        CRM_Utils_Array::value('log_civicrm_entity_log_action', $row) == 'Insert'
+      ) {
         $row['log_civicrm_entity_log_action'] = ts('Update');
       }
 
       if ($newAction = $this->getEntityAction($row['log_civicrm_entity_id'],
-                       $row['log_civicrm_entity_log_conn_id'],
-                       $row['log_civicrm_entity_log_type'],
-                       CRM_Utils_Array::value('log_civicrm_entity_log_action', $row))) {
+        $row['log_civicrm_entity_log_conn_id'],
+        $row['log_civicrm_entity_log_type'],
+        CRM_Utils_Array::value('log_civicrm_entity_log_action', $row))
+      ) {
         $row['log_civicrm_entity_log_action'] = $newAction;
       }
 
@@ -217,7 +220,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
         $row['log_civicrm_entity_log_action'] = "<a href='{$url1}' class='crm-summary-link'><div class='icon ui-icon-zoomin'></div></a>&nbsp;<a title='View details for this update' href='{$url2}'>" . ts('Update') . '</a>';
       }
 
-      $key  = $date . '_' .
+      $key = $date . '_' .
         $row['log_civicrm_entity_log_type'] . '_' .
         $row['log_civicrm_entity_log_conn_id'] . '_' .
         $row['log_civicrm_entity_log_user_id'] . '_' .
@@ -241,7 +244,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
       $entity = $logTable;
     }
 
-    $detail    = $this->_logTables[$entity];
+    $detail = $this->_logTables[$entity];
     $tableName = CRM_Utils_Array::value('table_name', $detail, $entity);
     $clause = CRM_Utils_Array::value('entity_table', $detail);
     $clause = $clause ? "AND entity_log_civireport.entity_table = 'civicrm_contact'" : NULL;

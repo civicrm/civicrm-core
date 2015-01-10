@@ -42,8 +42,8 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     );
 
     if ($this->cid) {
-      $params         = array('id' => $this->cid);
-      $contact        = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
+      $params = array('id' => $this->cid);
+      $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
       $contact_values = array();
       CRM_Core_DAO::storeValues($contact, $contact_values);
       $this->assign('contact', $contact_values);
@@ -76,8 +76,8 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     $price_set_id = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $event->id);
     if ($price_set_id) {
       $price_sets = CRM_Price_BAO_PriceSet::getSetDetail($price_set_id, TRUE, TRUE);
-      $price_set  = $price_sets[$price_set_id];
-      $index      = -1;
+      $price_set = $price_sets[$price_set_id];
+      $index = -1;
       foreach ($price_set['fields'] as $field) {
         $index++;
         $field_name = "event_{$event->id}_price_{$field['id']}";
@@ -143,7 +143,11 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
           while ($participant->fetch()) {
             if (array_key_exists($participant->status_id, $statusTypes)) {
               $form = $mer_participant->get_form();
-              $this->_errors[$form->html_field_name('email')] = ts("The participant %1 is already registered for %2 (%3).", array(1 => $participant_fields['email'], 2 => $event_in_cart->event->title, 3 => $event_in_cart->event->start_date));
+              $this->_errors[$form->html_field_name('email')] = ts("The participant %1 is already registered for %2 (%3).", array(
+                  1 => $participant_fields['email'],
+                  2 => $event_in_cart->event->title,
+                  3 => $event_in_cart->event->start_date
+                ));
             }
           }
         }
@@ -202,8 +206,8 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
 
         $participant = $this->cart->get_event_in_cart_by_event_id($event_id)->get_participant_by_id($participant_id);
         if ($participant->contact_id && $contact_id != $participant->contact_id) {
-          $defaults          = array();
-          $params            = array('id' => $participant->contact_id);
+          $defaults = array();
+          $params = array('id' => $participant->contact_id);
           $temporary_contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
 
           foreach ($this->cart->get_subparticipants($participant) as $subparticipant) {

@@ -50,7 +50,7 @@ function initialize() {
 function run() {
   initialize();
 
-  $fh   = fopen('php://output', 'w');
+  $fh = fopen('php://output', 'w');
   $rows = CRM_Upgrade_Incremental_php_FourTwo::deleteInvalidPairs();
 
   if (!empty($rows)) {

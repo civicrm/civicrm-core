@@ -465,7 +465,7 @@ class CRM_Utils_Migrate_Export {
    * @return array
    */
   public function exportDAO($objectName, $object, $mappedFields) {
-    $dbFields = & $object->fields();
+    $dbFields = &$object->fields();
 
     // Filter the list of keys and values so that we only export interesting stuff
     $keyValues = array();
@@ -477,7 +477,15 @@ class CRM_Utils_Migrate_Export {
       if (isset($object->$name) && $object->$name !== NULL) {
         // hack for extends_entity_column_value
         if ($name == 'extends_entity_column_value') {
-          if (in_array($object->extends, array('Event', 'Activity', 'Relationship', 'Individual', 'Organization', 'Household', 'Case'))) {
+          if (in_array($object->extends, array(
+              'Event',
+              'Activity',
+              'Relationship',
+              'Individual',
+              'Organization',
+              'Household',
+              'Case'
+            ))) {
             if ($object->extends == 'Event') {
               $key = 'event_type';
             }
@@ -487,7 +495,7 @@ class CRM_Utils_Migrate_Export {
             elseif ($object->extends == 'Relationship') {
               $key = 'relationship_type';
             }
-            elseif($object->extends == 'Case') {
+            elseif ($object->extends == 'Case') {
               $key = 'case_type';
             }
             $types = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($object->$name, 1, -1));

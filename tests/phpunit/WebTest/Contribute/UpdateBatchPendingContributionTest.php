@@ -123,7 +123,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->click("xpath=//div[@id='contributionSearch']/table[@class='selector row-highlight']/tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
     $expected = array(
-      'Received Into'        => "Deposit Bank Account",
+      'Received Into' => "Deposit Bank Account",
       'Contribution Status' => "Completed",
     );
 

@@ -62,10 +62,10 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   private static $financialAccount;
 
   /**
-     * Contribution pages
-     * @var array
-     * @static
-     */
+   * Contribution pages
+   * @var array
+   * @static
+   */
   private static $contributionPageActive = NULL;
 
   /**
@@ -196,7 +196,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   public static function flush($name = 'cache') {
     if (isset(self::$$name)) {
       self::$$name = NULL;
-   }
+    }
   }
 
   /**
@@ -279,8 +279,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @static
    */
   public static function products($pageID = NULL) {
-    $products       = array();
-    $dao            = new CRM_Contribute_DAO_Product();
+    $products = array();
+    $dao = new CRM_Contribute_DAO_Product();
     $dao->is_active = 1;
     $dao->orderBy('id');
     $dao->find();
@@ -289,9 +289,9 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
       $products[$dao->id] = $dao->name;
     }
     if ($pageID) {
-      $dao               = new CRM_Contribute_DAO_Premium();
+      $dao = new CRM_Contribute_DAO_Premium();
       $dao->entity_table = 'civicrm_contribution_page';
-      $dao->entity_id    = $pageID;
+      $dao->entity_id = $pageID;
       $dao->find(TRUE);
       $premiumID = $dao->id;
 

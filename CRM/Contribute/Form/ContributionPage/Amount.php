@@ -152,7 +152,8 @@ SELECT id
     }
     $this->add('select', 'price_set_id', ts('Price Set'),
       array(
-        '' => ts('- none -')) + $price,
+        '' => ts('- none -')
+      ) + $price,
       NULL, array('onchange' => "showHideAmountBlock( this.value, 'price_set_id' );")
     );
     //CiviPledge fields.
@@ -203,9 +204,14 @@ SELECT id
         if ($isQuick = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config')) {
           $this->assign('isQuick', $isQuick);
           //$priceField = CRM_Core_DAO::getFieldValue( 'CRM_Price_DAO_PriceField', $priceSetId, 'id', 'price_set_id' );
-          $options          = $pFIDs = array();
+          $options = $pFIDs = array();
           $priceFieldParams = array('price_set_id' => $priceSetId);
-          $priceFields      = CRM_Core_DAO::commonRetrieveAll('CRM_Price_DAO_PriceField', 'price_set_id', $priceSetId, $pFIDs, $return = array('html_type', 'name', 'is_active', 'label'));
+          $priceFields = CRM_Core_DAO::commonRetrieveAll('CRM_Price_DAO_PriceField', 'price_set_id', $priceSetId, $pFIDs, $return = array(
+              'html_type',
+              'name',
+              'is_active',
+              'label'
+            ));
           foreach ($priceFields as $priceField) {
             if ($priceField['id'] && $priceField['html_type'] == 'Radio' && $priceField['name'] == 'contribution_amount') {
               $defaults['price_field_id'] = $priceField['id'];
@@ -261,8 +267,8 @@ SELECT id
 
     if (!empty($defaults['payment_processor'])) {
       $defaults['payment_processor'] = array_fill_keys(explode(CRM_Core_DAO::VALUE_SEPARATOR,
-          $defaults['payment_processor']
-        ), '1');
+        $defaults['payment_processor']
+      ), '1');
     }
     return $defaults;
   }
@@ -416,10 +422,10 @@ SELECT id
 
     if (array_key_exists('payment_processor', $params)) {
       if (array_key_exists(CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor', 'AuthNet',
-            'id', 'payment_processor_type_id'
-          ),
-          CRM_Utils_Array::value('payment_processor', $params)
-        )) {
+          'id', 'payment_processor_type_id'
+        ),
+        CRM_Utils_Array::value('payment_processor', $params)
+      )) {
         CRM_Core_Session::setStatus(ts(' Please note that the Authorize.net payment processor only allows recurring contributions and auto-renew memberships with payment intervals from 7-365 days or 1-12 months (i.e. not greater than 1 year).'), '', 'alert');
       }
     }
@@ -459,7 +465,9 @@ SELECT id
       }
 
       if (in_array($field, array(
-        'min_amount', 'max_amount'))) {
+        'min_amount',
+        'max_amount'
+      ))) {
         $val = CRM_Utils_Rule::cleanMoney($val);
       }
 
@@ -517,8 +525,8 @@ SELECT id
           // process contribution amount block
           $deleteAmountBlk = FALSE;
 
-          $labels  = CRM_Utils_Array::value('label', $params);
-          $values  = CRM_Utils_Array::value('value', $params);
+          $labels = CRM_Utils_Array::value('label', $params);
+          $values = CRM_Utils_Array::value('value', $params);
           $default = CRM_Utils_Array::value('default', $params);
 
           $options = array();
@@ -527,7 +535,7 @@ SELECT id
               (strlen(trim($values[$i])) > 0)
             ) {
               $options[] = array(
-              'label' => trim($labels[$i]),
+                'label' => trim($labels[$i]),
                 'value' => CRM_Utils_Rule::cleanMoney(trim($values[$i])),
                 'weight' => $i,
                 'is_active' => 1,
@@ -623,8 +631,8 @@ SELECT id
             }
             if (!empty($params['is_allow_other_amount']) && empty($params['price_field_other'])) {
               $editedFieldParams = array(
-                 'price_set_id' => $priceSetId,
-                 'name' => 'other_amount',
+                'price_set_id' => $priceSetId,
+                'name' => 'other_amount',
               );
               $editedResults = array();
 
@@ -701,8 +709,10 @@ SELECT id
               $pledgeBlockParams['id'] = $this->_pledgeBlockID;
             }
             $pledgeBlock = array(
-              'pledge_frequency_unit', 'max_reminders',
-              'initial_reminder_day', 'additional_reminder_day',
+              'pledge_frequency_unit',
+              'max_reminders',
+              'initial_reminder_day',
+              'additional_reminder_day',
             );
             foreach ($pledgeBlock as $key) {
               $pledgeBlockParams[$key] = CRM_Utils_Array::value($key, $params);

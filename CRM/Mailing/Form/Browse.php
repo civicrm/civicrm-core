@@ -58,9 +58,9 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
 
-    $mailing     = new CRM_Mailing_BAO_Mailing();
+    $mailing = new CRM_Mailing_BAO_Mailing();
     $mailing->id = $this->_mailingId;
-    $subject     = '';
+    $subject = '';
     if ($mailing->find(TRUE)) {
       $subject = $mailing->subject;
     }

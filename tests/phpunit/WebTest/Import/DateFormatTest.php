@@ -173,7 +173,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
 
     $rows = array(
       array(
-    'first_name' => substr(sha1(rand()), 0, 7),
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -186,7 +186,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'birth_date' => '1998-12-25',
       ),
       array(
-    'first_name' => substr(sha1(rand()), 0, 7),
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -226,7 +226,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
 
     $rows = array(
       array(
-    'first_name' => substr(sha1(rand()), 0, 7),
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -239,7 +239,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'birth_date' => '12/23/98',
       ),
       array(
-    'first_name' => substr(sha1(rand()), 0, 7),
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -279,7 +279,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
 
     $rows = array(
       array(
-    'first_name' => substr(sha1(rand()), 0, 7),
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -292,7 +292,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'birth_date' => '11/12/1995',
       ),
       array(
-    'first_name' => substr(sha1(rand()), 0, 7),
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -332,7 +332,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
 
     $rows = array(
       array(
-    'first_name' => substr(sha1(rand()), 0, 7),
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -345,7 +345,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'birth_date' => 'December 12, 1998',
       ),
       array(
-    'first_name' => substr(sha1(rand()), 0, 7),
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -385,7 +385,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
 
     $rows = array(
       array(
-    'first_name' => substr(sha1(rand()), 0, 7),
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -398,7 +398,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'birth_date' => '25/12/98',
       ),
       array(
-    'first_name' => substr(sha1(rand()), 0, 7),
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -438,7 +438,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
 
     $rows = array(
       array(
-    'first_name' => substr(sha1(rand()), 0, 7),
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -451,7 +451,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'birth_date' => '25/12/1998',
       ),
       array(
-    'first_name' => substr(sha1(rand()), 0, 7),
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',

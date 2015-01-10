@@ -218,11 +218,11 @@ UPDATE civicrm_dedupe_rule_group
       $rgDao->id = $this->_rgid;
     }
 
-    $rgDao->title        = $values['title'];
-    $rgDao->is_reserved  = CRM_Utils_Array::value('is_reserved', $values, FALSE);
-    $rgDao->used         = $values['used'];
+    $rgDao->title = $values['title'];
+    $rgDao->is_reserved = CRM_Utils_Array::value('is_reserved', $values, FALSE);
+    $rgDao->used = $values['used'];
     $rgDao->contact_type = $this->_contactType;
-    $rgDao->threshold    = $values['threshold'];
+    $rgDao->threshold = $values['threshold'];
     $rgDao->save();
 
     // make sure name is set only during insert
@@ -285,7 +285,15 @@ UPDATE civicrm_dedupe_rule_group
 
         if ($dao->fetch()) {
           // set the length to null for all the fields where prefix length is not supported. eg. int,tinyint,date,enum etc dataTypes.
-          if ($dao->COLUMN_NAME == $field && !in_array($dao->DATA_TYPE, array('char', 'varchar', 'binary', 'varbinary', 'text', 'blob'))) {
+          if ($dao->COLUMN_NAME == $field && !in_array($dao->DATA_TYPE, array(
+                'char',
+                'varchar',
+                'binary',
+                'varbinary',
+                'text',
+                'blob'
+              ))
+          ) {
             $length = NULL;
           }
           elseif ($dao->COLUMN_NAME == $field && !empty($dao->CHARACTER_MAXIMUM_LENGTH) && ($length > $dao->CHARACTER_MAXIMUM_LENGTH)) {

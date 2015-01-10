@@ -162,8 +162,8 @@ DELETE FROM civicrm_contact_type
       'contact_sub_type_b' => $this->parent,
     );
     $relTypeIds = array();
-    $relType    = CRM_Contact_BAO_RelationshipType::add($relTypeParams, $relTypeIds);
-    $params     = array(
+    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams, $relTypeIds);
+    $params = array(
       'relationship_type_id' => $relType->id . '_a_b',
       'contact_check' => array($this->indivi_student => 1),
     );
@@ -189,8 +189,8 @@ DELETE FROM civicrm_contact_type
       'contact_type_b' => 'Individual',
     );
     $relTypeIds = array();
-    $relType    = CRM_Contact_BAO_RelationshipType::add($relTypeParams, $relTypeIds);
-    $params     = array(
+    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams, $relTypeIds);
+    $params = array(
       'relationship_type_id' => $relType->id . '_a_b',
       'contact_check' => array($this->individual => 1),
     );
@@ -214,8 +214,8 @@ DELETE FROM civicrm_contact_type
       'contact_sub_type_b' => 'Sponser',
     );
     $relTypeIds = array();
-    $relType    = CRM_Contact_BAO_RelationshipType::add($relTypeParams, $relTypeIds);
-    $params     = array(
+    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams, $relTypeIds);
+    $params = array(
       'relationship_type_id' => $relType->id . '_a_b',
       'contact_check' => array($this->individual => 1),
     );
@@ -242,8 +242,8 @@ DELETE FROM civicrm_contact_type
       'contact_sub_type_b' => $this->parent,
     );
     $relTypeIds = array();
-    $relType    = CRM_Contact_BAO_RelationshipType::add($relTypeParams, $relTypeIds);
-    $params     = array(
+    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams, $relTypeIds);
+    $params = array(
       'relationship_type_id' => $relType->id . '_a_b',
       'is_active' => 1,
       'contact_check' => array($this->indivi_parent => $this->indivi_parent),
@@ -270,8 +270,8 @@ DELETE FROM civicrm_contact_type
       'contact_type_b' => 'Individual',
     );
     $relTypeIds = array();
-    $relType    = CRM_Contact_BAO_RelationshipType::add($relTypeParams, $relTypeIds);
-    $params     = array(
+    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams, $relTypeIds);
+    $params = array(
       'relationship_type_id' => $relType->id . '_a_b',
       'is_active' => 1,
       'contact_check' => array($this->indivi_student => 1),
@@ -295,8 +295,8 @@ DELETE FROM civicrm_contact_type
       'contact_sub_type_b' => $this->sponsor,
     );
     $relTypeIds = array();
-    $relType    = CRM_Contact_BAO_RelationshipType::add($relTypeParams, $relTypeIds);
-    $params     = array(
+    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams, $relTypeIds);
+    $params = array(
       'relationship_type_id' => $relType->id . '_a_b',
       'is_active' => 1,
       'contact_check' => array($this->organization_sponsor => 1),

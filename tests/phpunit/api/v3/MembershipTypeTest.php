@@ -111,7 +111,8 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'duration_unit' => 'month',
       'duration_interval' => '10',
       'period_type' => 'rolling',
-      'visibility' => 'public',);
+      'visibility' => 'public',
+    );
     $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'],
       'Mandatory key(s) missing from params array: financial_type_id'
@@ -127,7 +128,8 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'domain_id' => '1',
       'minimum_fee' => '200',
       'duration_interval' => '10',
-      'visibility' => 'public',);
+      'visibility' => 'public',
+    );
 
     $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'],
@@ -144,7 +146,8 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'minimum_fee' => '200',
       'duration_unit' => 'month',
       'period_type' => 'rolling',
-      'visibility' => 'public',);
+      'visibility' => 'public',
+    );
     $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'],
       'Mandatory key(s) missing from params array: financial_type_id, duration_interval'
@@ -159,7 +162,8 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'minimum_fee' => '200',
       'duration_interval' => '10',
       'period_type' => 'rolling',
-      'visibility' => 'public',);
+      'visibility' => 'public',
+    );
 
     $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'],
@@ -177,7 +181,8 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'duration_unit' => 'month',
       'duration_interval' => '10',
       'period_type' => 'rolling',
-      'visibility' => 'public',);
+      'visibility' => 'public',
+    );
 
     $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'], 'Mandatory key(s) missing from params array: name');
@@ -221,7 +226,8 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'duration_unit' => 'month',
       'duration_interval' => '10',
       'period_type' => 'rolling',
-      'visibility' => 'public',);
+      'visibility' => 'public',
+    );
 
     $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'], 'Mandatory key(s) missing from params array: domain_id');
@@ -232,7 +238,8 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $newMembOrgParams = array(
       'organization_name' => 'New membership organisation',
       'contact_type' => 'Organization',
-      'visibility' => 1,);
+      'visibility' => 1,
+    );
 
     // create a new contact to update this membership type to
     $newMembOrgID = $this->organizationCreate($newMembOrgParams);
@@ -244,7 +251,8 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'duration_unit' => 'month',
       'duration_interval' => '10',
       'period_type' => 'fixed',
-      'domain_id' => 1,);
+      'domain_id' => 1,
+    );
 
     $this->callAPISuccess('membership_type', 'update', $params);
 

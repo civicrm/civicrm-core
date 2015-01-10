@@ -63,12 +63,12 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     }
 
     $rows = array();
-    $cid  = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-    $oid  = CRM_Utils_Request::retrieve('oid', 'Positive', $this, TRUE);
+    $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
+    $oid = CRM_Utils_Request::retrieve('oid', 'Positive', $this, TRUE);
     $flip = CRM_Utils_Request::retrieve('flip', 'Positive', $this, FALSE);
 
-    $this->_rgid    = $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this, FALSE);
-    $this->_gid     = $gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE);
+    $this->_rgid = $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this, FALSE);
+    $this->_gid = $gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE);
     $this->_mergeId = CRM_Utils_Request::retrieve('mergeId', 'Positive', $this, FALSE);
 
     // Sanity check
@@ -94,8 +94,9 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
     // Block access if user does not have EDIT permissions for both contacts.
     if (!(CRM_Contact_BAO_Contact_Permission::allow($cid, CRM_Core_Permission::EDIT) &&
-        CRM_Contact_BAO_Contact_Permission::allow($oid, CRM_Core_Permission::EDIT)
-      )) {
+      CRM_Contact_BAO_Contact_Permission::allow($oid, CRM_Core_Permission::EDIT)
+    )
+    ) {
       CRM_Utils_System::permissionDenied();
     }
 
@@ -129,7 +130,9 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
     $this->prev = $this->next = NULL;
     foreach (array(
-      'prev', 'next') as $position) {
+               'prev',
+               'next'
+             ) as $position) {
       if (!empty($pos[$position])) {
         if ($pos[$position]['id1'] && $pos[$position]['id2']) {
           $urlParam = "reset=1&cid={$pos[$position]['id1']}&oid={$pos[$position]['id2']}&mergeId={$pos[$position]['mergeId']}&action=update";
@@ -206,9 +209,9 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->assign('other_cid', $other['contact_id']);
     $this->assign('rgid', $rgid);
 
-    $this->_cid         = $cid;
-    $this->_oid         = $oid;
-    $this->_rgid        = $rgid;
+    $this->_cid = $cid;
+    $this->_oid = $oid;
+    $this->_rgid = $rgid;
     $this->_contactType = $main['contact_type'];
     $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('class' => 'select-rows'));
 
@@ -257,7 +260,8 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     return array('deleteOther' => 1);
   }
 
-  public function addRules() {}
+  public function addRules() {
+  }
 
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Merge %1s', array(1 => $this->_contactType)));
@@ -340,7 +344,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       );
       CRM_Utils_System::redirect($lisitingURL);
     }
-     if (!empty($formValues['_qf_Merge_done'])) {
+    if (!empty($formValues['_qf_Merge_done'])) {
       CRM_Utils_System::redirect($url);
     }
 

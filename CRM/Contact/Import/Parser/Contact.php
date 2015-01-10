@@ -1489,6 +1489,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
               }
             }
             break;
+
           //check for any error in email/postal greeting, addressee,
           //custom email/postal greeting, custom addressee, CRM-4575
 
@@ -1976,6 +1977,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
               }
             }
             break;
+
           case 'CheckBox':
           case 'AdvMulti-Select':
           case 'Multi-Select':

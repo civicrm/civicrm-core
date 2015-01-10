@@ -121,9 +121,9 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     $ids['contribution'] = self::retrieve('contributionID', 'Integer', $privateData, TRUE);
 
     if ($input['component'] == "event") {
-      $ids['event']       = self::retrieve('eventID', 'Integer', $privateData, TRUE);
+      $ids['event'] = self::retrieve('eventID', 'Integer', $privateData, TRUE);
       $ids['participant'] = self::retrieve('participantID', 'Integer', $privateData, TRUE);
-      $ids['membership']  = NULL;
+      $ids['membership'] = NULL;
     }
     else {
       $ids['membership'] = self::retrieve('membershipID', 'Integer', $privateData, FALSE);
@@ -139,10 +139,10 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     // make sure the invoice is valid and matches what we have in the contribution record
-    $input['invoice']    = $privateData['invoiceID'];
+    $input['invoice'] = $privateData['invoiceID'];
     $input['newInvoice'] = $transactionReference;
-    $contribution        = &$objects['contribution'];
-    $input['trxn_id']    = $transactionReference;
+    $contribution = &$objects['contribution'];
+    $input['trxn_id'] = $transactionReference;
 
     if ($contribution->invoice_id != $input['invoice']) {
       CRM_Core_Error::debug_log_message("Invoice values dont match between database and IPN request");
@@ -188,8 +188,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-
-  /**
+   *
+   * /**
    * The function returns the component(Event/Contribute..)and whether it is Test or not
    *
    * @param array $privateData
@@ -206,8 +206,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     $component = NULL;
     $isTest = NULL;
 
-    $contributionID   = $privateData['contributionID'];
-    $contribution     = new CRM_Contribute_DAO_Contribution();
+    $contributionID = $privateData['contributionID'];
+    $contribution = new CRM_Contribute_DAO_Contribution();
     $contribution->id = $contributionID;
 
     if (!$contribution->find(TRUE)) {
@@ -281,40 +281,40 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
 
     if ($dps_method == "pxpay") {
       $processResponse = CRM_Core_Payment_PaymentExpressUtils::_valueXml(array(
-          'PxPayUserId' => $dps_user,
-          'PxPayKey' => $dps_key,
-          'Response' => $_GET['result'],
-        ));
+        'PxPayUserId' => $dps_user,
+        'PxPayKey' => $dps_key,
+        'Response' => $_GET['result'],
+      ));
       $processResponse = CRM_Core_Payment_PaymentExpressUtils::_valueXml('ProcessResponse', $processResponse);
 
       fwrite($message_log, sprintf("\n\r%s:- %s\n", date("D M j G:i:s T Y"),
-          $processResponse
-        ));
+        $processResponse
+      ));
 
       // Send the XML-formatted validation request to DPS so that we can receive a decrypted XML response which contains the transaction results
       $curl = CRM_Core_Payment_PaymentExpressUtils::_initCURL($processResponse, $dps_url);
 
       fwrite($message_log, sprintf("\n\r%s:- %s\n", date("D M j G:i:s T Y"),
-          $curl
-        ));
+        $curl
+      ));
       $success = FALSE;
       if ($response = curl_exec($curl)) {
         fwrite($message_log, sprintf("\n\r%s:- %s\n", date("D M j G:i:s T Y"),
-            $response
-          ));
+          $response
+        ));
         curl_close($curl);
 
         // Assign the returned XML values to variables
-        $valid             = CRM_Core_Payment_PaymentExpressUtils::_xmlAttribute($response, 'valid');
-        $success           = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'Success');
-        $txnId             = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'TxnId');
-        $responseText      = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'ResponseText');
-        $authCode          = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'AuthCode');
-        $DPStxnRef         = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'DpsTxnRef');
-        $qfKey             = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData1");
-        $privateData       = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData2");
-        list($component, $paymentProcessorID,)  = explode(',', CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData3"));
-        $amount            = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "AmountSettlement");
+        $valid = CRM_Core_Payment_PaymentExpressUtils::_xmlAttribute($response, 'valid');
+        $success = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'Success');
+        $txnId = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'TxnId');
+        $responseText = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'ResponseText');
+        $authCode = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'AuthCode');
+        $DPStxnRef = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'DpsTxnRef');
+        $qfKey = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData1");
+        $privateData = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData2");
+        list($component, $paymentProcessorID,) = explode(',', CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData3"));
+        $amount = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "AmountSettlement");
         $merchantReference = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "MerchantReference");
       }
       else {
@@ -332,13 +332,13 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
       #which encapsulates all the response data
       $rsp = $pxaccess->getResponse($rawPostData);
 
-      $qfKey             = $rsp->getTxnData1();
-      $privateData       = $rsp->getTxnData2();
-      list($component, $paymentProcessorID)  = explode(',', $rsp->getTxnData3());
-      $success           = $rsp->getSuccess();
-      $authCode          = $rsp->getAuthCode();
-      $DPStxnRef         = $rsp->getDpsTxnRef();
-      $amount            = $rsp->getAmountSettlement();
+      $qfKey = $rsp->getTxnData1();
+      $privateData = $rsp->getTxnData2();
+      list($component, $paymentProcessorID) = explode(',', $rsp->getTxnData3());
+      $success = $rsp->getSuccess();
+      $authCode = $rsp->getAuthCode();
+      $DPStxnRef = $rsp->getDpsTxnRef();
+      $amount = $rsp->getAmountSettlement();
       $MerchantReference = $rsp->getMerchantReference();
     }
 
