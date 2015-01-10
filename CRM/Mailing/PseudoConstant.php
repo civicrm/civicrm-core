@@ -190,23 +190,23 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
       $options = array(
         'bounce' => array(
           'N' => ts('Successful '),
-      'Y' => ts('Bounced '),
+          'Y' => ts('Bounced '),
         ),
         'delivered' => array(
           'Y' => ts('Successful '),
-      'N' => ts('Bounced '),
+          'N' => ts('Bounced '),
         ),
         'open' => array(
           'Y' => ts('Opened '),
-      'N' => ts('Unopened/Hidden '),
+          'N' => ts('Unopened/Hidden '),
         ),
         'click' => array(
           'Y' => ts('Clicked '),
-      'N' => ts('Not Clicked '),
+          'N' => ts('Not Clicked '),
         ),
         'reply' => array(
           'Y' => ts('Replied '),
-      'N' => ts('No Reply '),
+          'N' => ts('No Reply '),
         ),
       );
     }

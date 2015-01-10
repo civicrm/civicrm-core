@@ -205,7 +205,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       // definitely different for different forms
       $name = $scope;
     }
-    $name         = $name . '_' . $this->key($name, $addSequence, $ignoreKey);
+    $name = $name . '_' . $this->key($name, $addSequence, $ignoreKey);
     $this->_title = $title;
     if ($scope) {
       $this->_scope = $scope;
@@ -220,8 +220,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     if (!empty($this->_key)) {
       CRM_Core_Session::registerAndRetrieveSessionObjects(array(
         "_{$name}_container",
-          array('CiviCRM', $this->_scope),
-        ));
+        array('CiviCRM', $this->_scope),
+      ));
     }
 
     $this->HTML_QuickForm_Controller($name, $modal);
@@ -280,7 +280,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
 
   public function fini() {
     CRM_Core_BAO_Cache::storeSessionToCache(array(
-      "_{$this->_name}_container",
+        "_{$this->_name}_container",
         array('CiviCRM', $this->_scope),
       ),
       TRUE
@@ -443,8 +443,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     $pages = $stateMachine->getPages();
     foreach ($pages as $name => $value) {
       $className = CRM_Utils_Array::value('className', $value, $name);
-      $title     = CRM_Utils_Array::value('title', $value);
-      $options   = CRM_Utils_Array::value('options', $value);
+      $title = CRM_Utils_Array::value('title', $value);
+      $options = CRM_Utils_Array::value('options', $value);
       $stateName = CRM_Utils_String::getClassName($className);
       if (!empty($value['className'])) {
         $formName = $name;
@@ -536,7 +536,6 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param string $name
    *   : name of the variable.
    *
-
    *
    * @return mixed
    */
@@ -554,9 +553,9 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @return array
    */
   public function wizardHeader($currentPageName) {
-    $wizard          = array();
+    $wizard = array();
     $wizard['steps'] = array();
-    $count           = 0;
+    $count = 0;
     foreach ($this->_pages as $name => $page) {
       $count++;
       $wizard['steps'][] = array(

@@ -50,7 +50,11 @@ class CRM_Upgrade_Incremental_php_ThreeTwo {
     $config = CRM_Core_Config::singleton();
     if ($config->userSystem->is_drupal) {
 
-      $config->userSystem->replacePermission('access CiviCase', array('access my cases and activities', 'access all cases and activities', 'administer CiviCase'));
+      $config->userSystem->replacePermission('access CiviCase', array(
+          'access my cases and activities',
+          'access all cases and activities',
+          'administer CiviCase'
+        ));
 
       //insert core acls.
       $casePermissions = array(
@@ -108,7 +112,10 @@ class CRM_Upgrade_Incremental_php_ThreeTwo {
       $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
       // optimal: an English locale
       foreach (array(
-        'en_US', 'en_GB', 'en_AU') as $loc) {
+                 'en_US',
+                 'en_GB',
+                 'en_AU'
+               ) as $loc) {
         if (in_array($loc, $locales)) {
           $seedLocale = $loc;
           break;

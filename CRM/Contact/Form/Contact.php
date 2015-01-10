@@ -149,8 +149,9 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $this, TRUE, NULL, 'REQUEST'
       );
       if (!in_array($this->_contactType,
-          array('Individual', 'Household', 'Organization')
-        )) {
+        array('Individual', 'Household', 'Organization')
+      )
+      ) {
         CRM_Core_Error::statusBounce(ts('Could not get a contact id and/or contact type'));
       }
 
@@ -161,7 +162,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
       if (
         $this->_contactSubType &&
-        !(CRM_Contact_BAO_ContactType::isExtendsContactType($this->_contactSubType, $this->_contactType, TRUE))) {
+        !(CRM_Contact_BAO_ContactType::isExtendsContactType($this->_contactSubType, $this->_contactType, TRUE))
+      ) {
         CRM_Core_Error::statusBounce(ts("Could not get a valid contact subtype for contact type '%1'", array(1 => $this->_contactType)));
       }
 
@@ -174,7 +176,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         FALSE, NULL, 'GET'
       );
       $typeLabel = CRM_Contact_BAO_ContactType::contactTypePairs(TRUE, $this->_contactSubType ?
-        $this->_contactSubType : $this->_contactType
+          $this->_contactSubType : $this->_contactType
       );
       $typeLabel = implode(' / ', $typeLabel);
 
@@ -189,8 +191,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       }
 
       if ($this->_contactId) {
-        $defaults          = array();
-        $params            = array('id' => $this->_contactId);
+        $defaults = array();
+        $params = array('id' => $this->_contactId);
         $returnProperities = array('id', 'contact_type', 'contact_sub_type', 'modified_date');
         CRM_Core_DAO::commonRetrieve('CRM_Contact_DAO_Contact', $params, $defaults, $returnProperities);
 
@@ -470,8 +472,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     // get default phone and im provider id.
     $defPhoneTypeId = key(CRM_Core_OptionGroup::values('phone_type', FALSE, FALSE, FALSE, ' AND is_default = 1'));
     $defIMProviderId = key(CRM_Core_OptionGroup::values('instant_messenger_service',
-        FALSE, FALSE, FALSE, ' AND is_default = 1'
-      ));
+      FALSE, FALSE, FALSE, ' AND is_default = 1'
+    ));
     $defWebsiteTypeId = key(CRM_Core_OptionGroup::values('website_type',
       FALSE, FALSE, FALSE, ' AND is_default = 1'
     ));
@@ -640,7 +642,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
               $hasPrimary[] = $instance;
               if (!$primaryID &&
                 in_array($name, array(
-                  'email', 'openid')) && !empty($blockValues[$name])) {
+                  'email',
+                  'openid'
+                )) && !empty($blockValues[$name])
+              ) {
                 $primaryID = $blockValues[$name];
               }
             }
@@ -651,9 +656,9 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           }
 
           if ($name == 'openid' && !empty($blockValues[$name])) {
-            $oid         = new CRM_Core_DAO_OpenID();
+            $oid = new CRM_Core_DAO_OpenID();
             $oid->openid = $openIds[$instance] = CRM_Utils_Array::value($name, $blockValues);
-            $cid         = isset($contactId) ? $contactId : 0;
+            $cid = isset($contactId) ? $contactId : 0;
             if ($oid->find(TRUE) && ($oid->contact_id != $cid)) {
               $errors["{$name}[$instance][openid]"] = ts('%1 already exist.', array(1 => $blocks['OpenID']));
             }
@@ -703,7 +708,9 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
         if (!empty($invalidStreetNumbers)) {
           $first = $invalidStreetNumbers[0];
-          foreach ($invalidStreetNumbers as & $num) $num = CRM_Contact_Form_Contact::ordinalNumber($num);
+          foreach ($invalidStreetNumbers as & $num) {
+            $num = CRM_Contact_Form_Contact::ordinalNumber($num);
+          }
           $errors["address[$first][street_number]"] = ts('The street number you entered for the %1 address block(s) is not in an expected format. Street numbers may include numeric digit(s) followed by other characters. You can still enter the complete street address (unparsed) by clicking "Edit Complete Street Address".', array(1 => implode(', ', $invalidStreetNumbers)));
         }
       }
@@ -728,13 +735,13 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $deleteExtra = ts('Are you sure you want to delete contact image.');
       $deleteURL = array(
         CRM_Core_Action::DELETE =>
-        array(
-          'name' => ts('Delete Contact Image'),
-          'url' => 'civicrm/contact/image',
-          'qs' => 'reset=1&cid=%%id%%&action=delete',
-          'extra' =>
-          'onclick = "if (confirm( \'' . $deleteExtra . '\' ) ) this.href+=\'&amp;confirmed=1\'; else return false;"',
-        ),
+          array(
+            'name' => ts('Delete Contact Image'),
+            'url' => 'civicrm/contact/image',
+            'qs' => 'reset=1&cid=%%id%%&action=delete',
+            'extra' =>
+              'onclick = "if (confirm( \'' . $deleteExtra . '\' ) ) this.href+=\'&amp;confirmed=1\'; else return false;"',
+          ),
       );
       $deleteURL = CRM_Core_Action::formLink($deleteURL,
         CRM_Core_Action::DELETE,
@@ -1071,7 +1078,15 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       return FALSE;
     }
 
-    static $skipFields = array('location_type_id', 'is_primary', 'phone_type_id', 'provider_id', 'country_id', 'website_type_id', 'master_id');
+    static $skipFields = array(
+      'location_type_id',
+      'is_primary',
+      'phone_type_id',
+      'provider_id',
+      'country_id',
+      'website_type_id',
+      'master_id'
+    );
     foreach ($fields as $name => $value) {
       $skipField = FALSE;
       foreach ($skipFields as $skip) {
@@ -1123,12 +1138,21 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $contactLinks = CRM_Contact_BAO_Contact_Utils::formatContactIDSToLinks($ids, TRUE, TRUE, $contactID);
 
         $duplicateContactsLinks = '<div class="matching-contacts-found">';
-        $duplicateContactsLinks .= ts('One matching contact was found. ', array('count' => count($contactLinks['rows']), 'plural' => '%count matching contacts were found.<br />'));
+        $duplicateContactsLinks .= ts('One matching contact was found. ', array(
+            'count' => count($contactLinks['rows']),
+            'plural' => '%count matching contacts were found.<br />'
+          ));
         if ($contactLinks['msg'] == 'view') {
-          $duplicateContactsLinks .= ts('You can View the existing contact', array('count' => count($contactLinks['rows']), 'plural' => 'You can View the existing contacts'));
+          $duplicateContactsLinks .= ts('You can View the existing contact', array(
+              'count' => count($contactLinks['rows']),
+              'plural' => 'You can View the existing contacts'
+            ));
         }
         else {
-          $duplicateContactsLinks .= ts('You can View or Edit the existing contact', array('count' => count($contactLinks['rows']), 'plural' => 'You can View or Edit the existing contacts'));
+          $duplicateContactsLinks .= ts('You can View or Edit the existing contact', array(
+              'count' => count($contactLinks['rows']),
+              'plural' => 'You can View or Edit the existing contacts'
+            ));
         }
         if ($contactLinks['msg'] == 'merge') {
           // We should also get a merge link if this is for an existing contact
@@ -1158,7 +1182,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $duplicateContactsLinks .= ts("If you're sure this record is not a duplicate, click the 'Save Matching Contact' button below.");
 
         $errors['_qf_default'] = $duplicateContactsLinks;
-
 
 
         // let smarty know that there are duplicates
@@ -1213,7 +1236,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $buildStreetAddress = FALSE;
       $parseFieldName = 'street_address';
       foreach (array(
-        'street_number', 'street_name', 'street_unit') as $fld) {
+                 'street_number',
+                 'street_name',
+                 'street_unit'
+               ) as $fld) {
         if (!empty($address[$fld])) {
           $parseFieldName = 'street_number';
           $buildStreetAddress = TRUE;
@@ -1242,9 +1268,15 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
         $streetAddress = NULL;
         foreach (array(
-          'street_number', 'street_number_suffix', 'street_name', 'street_unit') as $fld) {
+                   'street_number',
+                   'street_number_suffix',
+                   'street_name',
+                   'street_unit'
+                 ) as $fld) {
           if (in_array($fld, array(
-            'street_name', 'street_unit'))) {
+            'street_name',
+            'street_unit'
+          ))) {
             $streetAddress .= ' ';
           }
           $streetAddress .= CRM_Utils_Array::value($fld, $address);
@@ -1358,12 +1390,13 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    */
   public function updateMembershipStatus($deceasedParams) {
     $updateMembershipMsg = NULL;
-    $contactId           = CRM_Utils_Array::value('contact_id', $deceasedParams);
-    $deceasedDate        = CRM_Utils_Array::value('deceased_date', $deceasedParams);
+    $contactId = CRM_Utils_Array::value('contact_id', $deceasedParams);
+    $deceasedDate = CRM_Utils_Array::value('deceased_date', $deceasedParams);
 
     // process to set membership status to deceased for both active/inactive membership
     if ($contactId &&
-      $this->_contactType == 'Individual' && !empty($deceasedParams['is_deceased'])) {
+      $this->_contactType == 'Individual' && !empty($deceasedParams['is_deceased'])
+    ) {
 
       $session = CRM_Core_Session::singleton();
       $userId = $session->get('userID');
@@ -1390,7 +1423,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $dao->whereAdd("status_id != $deceasedStatusId");
       $dao->find();
       $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
-      $allStatus     = CRM_Member_PseudoConstant::membershipStatus();
+      $allStatus = CRM_Member_PseudoConstant::membershipStatus();
       $memCount = 0;
       while ($dao->fetch()) {
         // update status to deceased (for both active/inactive membership )

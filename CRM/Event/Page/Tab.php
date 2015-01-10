@@ -121,9 +121,9 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
   }
 
   public function preProcess() {
-    $context       = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
-    $this->_id     = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     if ($context == 'standalone') {
       $this->_action = CRM_Core_Action::ADD;
@@ -172,7 +172,8 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
     elseif ($this->_action & (CRM_Core_Action::UPDATE |
         CRM_Core_Action::ADD |
         CRM_Core_Action::DELETE
-      )) {
+      )
+    ) {
       $this->edit();
     }
     else {
@@ -247,7 +248,7 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
         break;
 
       case 'fulltext':
-        $keyName   = '&qfKey';
+        $keyName = '&qfKey';
         $urlParams = 'force=1';
         $urlString = 'civicrm/contact/search/custom';
         if ($this->_action == CRM_Core_Action::UPDATE) {

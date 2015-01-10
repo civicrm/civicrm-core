@@ -125,7 +125,10 @@ class CRM_Contact_Form_Task_LabelCommon {
     foreach ($contactIDs as $key => $contactID) {
       $params[] = array(
         CRM_Core_Form::CB_PREFIX . $contactID,
-        '=', 1, 0, 0,
+        '=',
+        1,
+        0,
+        0,
       );
     }
 
@@ -137,11 +140,11 @@ class CRM_Contact_Form_Task_LabelCommon {
     $params[] = array('is_deceased', '=', 0, 0, 0);
 
     if ($locationTypeID) {
-      $locType          = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-      $locName          = $locType[$locationTypeID];
-      $location         = array('location' => array("{$locName}" => $addressReturnProperties));
+      $locType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+      $locName = $locType[$locationTypeID];
+      $location = array('location' => array("{$locName}" => $addressReturnProperties));
       $returnProperties = array_merge($returnProperties, $location);
-      $params[]         = array('location_type', '=', array($locationTypeID => 1), 0, 0);
+      $params[] = array('location_type', '=', array($locationTypeID => 1), 0, 0);
     }
     else {
       $returnProperties = array_merge($returnProperties, $addressReturnProperties);
@@ -158,8 +161,8 @@ class CRM_Contact_Form_Task_LabelCommon {
     $numberofContacts = count($contactIDs);
     //this does the same as calling civicrm_api3('contact, get, array('id' => array('IN' => $this->_contactIds)
     // except it also handles multiple locations
-    $query            = new CRM_Contact_BAO_Query($params, $returnProperties);
-    $details          = $query->apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts);
+    $query = new CRM_Contact_BAO_Query($params, $returnProperties);
+    $details = $query->apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts);
 
     $messageToken = CRM_Utils_Token::getTokens($mailingFormat);
     $details = $details[0];
@@ -204,10 +207,15 @@ class CRM_Contact_Form_Task_LabelCommon {
         if ($locationTypeID) {
           foreach ($valuesothers as $vals) {
             if (CRM_Utils_Array::value('location_type_id', $vals) ==
-              $locationTypeID) {
+              $locationTypeID
+            ) {
               foreach ($vals as $k => $v) {
                 if (in_array($k, array(
-                  'email', 'phone', 'im', 'openid'))) {
+                  'email',
+                  'phone',
+                  'im',
+                  'openid'
+                ))) {
                   if ($k == 'im') {
                     $rows[$value][$k] = $v['1']['name'];
                   }
@@ -285,7 +293,7 @@ class CRM_Contact_Form_Task_LabelCommon {
       NULL,
       $messageToken,
       'CRM_Contact_Form_Task_LabelCommon'
-     );
+    );
 
     CRM_Utils_Hook::tokens($tokens);
 
@@ -318,19 +326,19 @@ class CRM_Contact_Form_Task_LabelCommon {
 
     # exclude individuals belonging to selected households
     foreach ($households as $household_id => $row) {
-    $dao = new CRM_Contact_DAO_Relationship();
-    $dao->contact_id_b = $household_id;
-    $dao->find();
-    while ($dao->fetch()) {
-    $individual_id = $dao->contact_id_a;
-    if (array_key_exists($individual_id, $individuals)) {
-    unset($individuals[$individual_id]);
-    }
-    }
+      $dao = new CRM_Contact_DAO_Relationship();
+      $dao->contact_id_b = $household_id;
+      $dao->find();
+      while ($dao->fetch()) {
+        $individual_id = $dao->contact_id_a;
+        if (array_key_exists($individual_id, $individuals)) {
+          unset($individuals[$individual_id]);
+        }
+      }
     }
 
     # merge back individuals and households
     $rows = array_merge($individuals, $households);
     return $rows;
-    }
+  }
 }

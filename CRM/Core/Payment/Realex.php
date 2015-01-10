@@ -142,9 +142,9 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     }
 
     // Create sha1 hash for request
-    $hashme   = "{$this->_getParam('timestamp')}.{$this->_getParam('merchant_ref')}.{$this->_getParam('order_id')}.{$this->_getParam('amount')}.{$this->_getParam('currency')}.{$this->_getParam('card_number')}";
+    $hashme = "{$this->_getParam('timestamp')}.{$this->_getParam('merchant_ref')}.{$this->_getParam('order_id')}.{$this->_getParam('amount')}.{$this->_getParam('currency')}.{$this->_getParam('card_number')}";
     $sha1hash = sha1($hashme);
-    $hashme   = "$sha1hash.{$this->_getParam('secret')}";
+    $hashme = "$sha1hash.{$this->_getParam('secret')}";
     $sha1hash = sha1($hashme);
 
     // Generate the request xml that is send to Realex Payments.
@@ -228,9 +228,9 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     }
 
     // Check the response hash
-    $hashme   = "{$this->_getParam('timestamp')}.{$this->_getParam('merchant_ref')}.{$this->_getParam('order_id')}.{$response['RESULT']}.{$response['MESSAGE']}.{$response['PASREF']}.{$response['AUTHCODE']}";
+    $hashme = "{$this->_getParam('timestamp')}.{$this->_getParam('merchant_ref')}.{$this->_getParam('order_id')}.{$response['RESULT']}.{$response['MESSAGE']}.{$response['PASREF']}.{$response['AUTHCODE']}";
     $sha1hash = sha1($hashme);
-    $hashme   = "$sha1hash.{$this->_getParam('secret')}";
+    $hashme = "$sha1hash.{$this->_getParam('secret')}";
     $sha1hash = sha1($hashme);
 
     if ($response['SHA1HASH'] != $sha1hash) {
@@ -409,7 +409,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     // Format the expiry date to MMYY
     $expmonth = (string) $params['month'];
     $expmonth = (strlen($expmonth) === 1) ? '0' . $expmonth : $expmonth;
-    $expyear  = substr((string) $params['year'], 2, 2);
+    $expyear = substr((string) $params['year'], 2, 2);
     $this->_setParam('exp_date', $expmonth . $expyear);
 
     if (isset($params['credit_card_start_date']) && (strlen($params['credit_card_start_date']['M']) !== 0) &&
@@ -417,7 +417,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     ) {
       $startmonth = (string) $params['credit_card_start_date']['M'];
       $startmonth = (strlen($startmonth) === 1) ? '0' . $startmonth : $startmonth;
-      $startyear  = substr((string) $params['credit_card_start_date']['Y'], 2, 2);
+      $startyear = substr((string) $params['credit_card_start_date']['Y'], 2, 2);
       $this->_setParam('start_date', $startmonth . $startyear);
     }
 

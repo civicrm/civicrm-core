@@ -88,7 +88,9 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
         }
       }
       elseif (in_array($key, array(
-        'birth_date', 'deceased_date'))) {
+        'birth_date',
+        'deceased_date'
+      ))) {
         list($value) = CRM_Utils_Date::setDateDefaults($value);
       }
 
@@ -113,12 +115,12 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
     }
 
     $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Search'),
-          'isDefault' => TRUE,
-        ),
-      ));
+      array(
+        'type' => 'refresh',
+        'name' => ts('Search'),
+        'isDefault' => TRUE,
+      ),
+    ));
 
     parent::buildQuickForm();
   }

@@ -98,7 +98,7 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    */
   public function getUserDashboardElement() {
     return array(
-    'name' => ts('Pledges'),
+      'name' => ts('Pledges'),
       'title' => ts('Your Pledge(s)'),
       // we need to check this permission since you can click on contribution page link for making payment
       'perm' => array('make online contributions'),
@@ -119,7 +119,7 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    */
   public function registerTab() {
     return array(
-    'title' => ts('Pledges'),
+      'title' => ts('Pledges'),
       'url' => 'pledge',
       'weight' => 25,
     );
@@ -138,7 +138,7 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    */
   public function registerAdvancedSearchPane() {
     return array(
-    'title' => ts('Pledges'),
+      'title' => ts('Pledges'),
       'weight' => 25,
     );
   }
@@ -169,11 +169,12 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
     ) {
       $shortCuts = array_merge($shortCuts, array(
         array(
-      'path' => 'civicrm/pledge/add',
-            'query' => 'reset=1&action=add&context=standalone',
-            'ref' => 'new-pledge',
-            'title' => ts('Pledge'),
-          )));
+          'path' => 'civicrm/pledge/add',
+          'query' => 'reset=1&action=add&context=standalone',
+          'ref' => 'new-pledge',
+          'title' => ts('Pledge'),
+        )
+      ));
     }
   }
 }

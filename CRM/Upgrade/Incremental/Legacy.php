@@ -81,7 +81,10 @@ SELECT  id
       version_compare($upgradeTo, '3.4.beta3') >= 0
     ) {
       $config = CRM_Core_Config::singleton();
-      $preUpgradeMessage .= '<br />' . ts("As per <a href='%1'>the related blog post</a>, we are making contact names, addresses and mailings monolingual; the values entered for the default locale (%2) will be preserved and values for other locales removed.", array(1 => 'http://civicrm.org/blogs/shot/multilingual-civicrm-3440-making-some-fields-monolingual', 2 => $config->lcMessages));
+      $preUpgradeMessage .= '<br />' . ts("As per <a href='%1'>the related blog post</a>, we are making contact names, addresses and mailings monolingual; the values entered for the default locale (%2) will be preserved and values for other locales removed.", array(
+            1 => 'http://civicrm.org/blogs/shot/multilingual-civicrm-3440-making-some-fields-monolingual',
+            2 => $config->lcMessages
+          ));
     }
 
     if (version_compare($currentVer, '3.4.6') == -1 &&
@@ -103,13 +106,13 @@ SELECT  id
     if (file_exists($ofcFile)) {
       if (@unlink($ofcFile)) {
         $preUpgradeMessage .= '<br />' . ts('This system included an outdated, insecure script (%1). The file was automatically deleted.', array(
-          1 => $ofcFile,
-        ));
+            1 => $ofcFile,
+          ));
       }
       else {
         $preUpgradeMessage .= '<br />' . ts('This system includes an outdated, insecure script (%1). Please delete it.', array(
-          1 => $ofcFile,
-        ));
+            1 => $ofcFile,
+          ));
       }
     }
 
@@ -158,9 +161,9 @@ SELECT  id
       return;
     }
 
-    $html     = NULL;
+    $html = NULL;
     $pathName = dirname(dirname(__FILE__));
-    $flag     = FALSE;
+    $flag = FALSE;
     foreach ($workflows as $workflow => $title) {
       $name = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue',
         $workflow,
@@ -198,7 +201,10 @@ SELECT  id
     if ($flag == TRUE) {
       $html = "<ul>" . $html . "<ul>";
 
-      $message .= '<br />' . ts("The default copies of the message templates listed below will be updated to handle new features or correct a problem. Your installation has customized versions of these message templates, and you will need to apply the updates manually after running this upgrade. <a href='%1' style='color:white; text-decoration:underline; font-weight:bold;' target='_blank'>Click here</a> for detailed instructions. %2", array(1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Message+Templates#MessageTemplates-UpgradesandCustomizedSystemWorkflowTemplates', 2 => $html));
+      $message .= '<br />' . ts("The default copies of the message templates listed below will be updated to handle new features or correct a problem. Your installation has customized versions of these message templates, and you will need to apply the updates manually after running this upgrade. <a href='%1' style='color:white; text-decoration:underline; font-weight:bold;' target='_blank'>Click here</a> for detailed instructions. %2", array(
+            1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Message+Templates#MessageTemplates-UpgradesandCustomizedSystemWorkflowTemplates',
+            2 => $html
+          ));
     }
   }
 
@@ -242,7 +248,10 @@ SELECT  id
 
         if (!empty($subTypeTemplates)) {
           $subTypeTemplates = implode(',', $subTypeTemplates);
-          $postUpgradeMessage .= '<br />' . ts('You are using custom template for contact subtypes: %1.', array(1 => $subTypeTemplates)) . '<br />' . ts('You need to move these subtype templates to the SubType directory in %1 and %2 respectively.', array(1 => 'CRM/Contact/Form/Edit', 2 => 'CRM/Contact/Page/View'));
+          $postUpgradeMessage .= '<br />' . ts('You are using custom template for contact subtypes: %1.', array(1 => $subTypeTemplates)) . '<br />' . ts('You need to move these subtype templates to the SubType directory in %1 and %2 respectively.', array(
+                1 => 'CRM/Contact/Form/Edit',
+                2 => 'CRM/Contact/Page/View'
+              ));
         }
       }
     }
@@ -295,9 +304,9 @@ SELECT  count( id ) as statusCount
       $template = CRM_Core_Smarty::singleton();
 
       $eventFees = array();
-      $query     = "SELECT og.id ogid FROM civicrm_option_group og WHERE og.name LIKE  %1";
-      $params    = array(1 => array('civicrm_event_page.amount%', 'String'));
-      $dao       = CRM_Core_DAO::executeQuery($query, $params);
+      $query = "SELECT og.id ogid FROM civicrm_option_group og WHERE og.name LIKE  %1";
+      $params = array(1 => array('civicrm_event_page.amount%', 'String'));
+      $dao = CRM_Core_DAO::executeQuery($query, $params);
       while ($dao->fetch()) {
         $eventFees[$dao->ogid] = $dao->ogid;
       }
@@ -379,13 +388,15 @@ SELECT  count( id ) as statusCount
   public static function upgrade_2_2_beta2($rev) {
     $template = CRM_Core_Smarty::singleton();
     if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue',
-        'CRM_Contact_Form_Search_Custom_ZipCodeRange', 'id', 'name'
-      )) {
+      'CRM_Contact_Form_Search_Custom_ZipCodeRange', 'id', 'name'
+    )
+    ) {
       $template->assign('customSearchAbsentAll', TRUE);
     }
     elseif (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue',
-        'CRM_Contact_Form_Search_Custom_MultipleValues', 'id', 'name'
-      )) {
+      'CRM_Contact_Form_Search_Custom_MultipleValues', 'id', 'name'
+    )
+    ) {
       $template->assign('customSearchAbsent', TRUE);
     }
     $upgrade = new CRM_Upgrade_Form();
@@ -538,7 +549,9 @@ SELECT  count( id ) as statusCount
     // newly added permission 'edit_all_events', CRM-5472
     $config = CRM_Core_Config::singleton();
     if (is_callable(array(
-      $config->userSystem, 'replacePermission'))) {
+      $config->userSystem,
+      'replacePermission'
+    ))) {
       $config->userSystem->replacePermission('access CiviEvent', array('access CiviEvent', 'edit all events'));
     }
 

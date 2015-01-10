@@ -42,7 +42,7 @@
  *   The Smarty object.
  *
  * @return string
-   *   HTML
+ *   HTML
  */
 function smarty_function_crmNavigationMenu($params, &$smarty) {
   $config = CRM_Core_Config::singleton();

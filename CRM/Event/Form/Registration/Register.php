@@ -246,8 +246,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           );
 
           $this->_defaults['amount'] = key(array_slice($this->_values['discount'][$discountId],
-              $discountKey - 1, $discountKey, TRUE
-            ));
+            $discountKey - 1, $discountKey, TRUE
+          ));
         }
       }
     }
@@ -372,7 +372,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $this->_priceSetId
       ) &&
       !$this->_allowConfirmation &&
-      is_numeric($this->_availableRegistrations) && !empty($this->_values['event']['has_waitlist'])) {
+      is_numeric($this->_availableRegistrations) && !empty($this->_values['event']['has_waitlist'])
+    ) {
       $bypassPayment = TRUE;
       //case might be group become as a part of waitlist.
       //If not waitlist then they require admin approve.
@@ -709,7 +710,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
     if (!$priceSetId ||
       !is_array($priceSet) ||
-      empty($priceSet) || empty($priceSet['optionsMaxValueTotal'])) {
+      empty($priceSet) || empty($priceSet['optionsMaxValueTotal'])
+    ) {
       return;
     }
 
@@ -744,10 +746,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         continue;
       }
       foreach ($field['options'] as & $option) {
-        $optId             = $option['id'];
-        $count             = CRM_Utils_Array::value('count', $option, 0);
-        $maxValue          = CRM_Utils_Array::value('max_value', $option, 0);
-        $dbTotalCount      = CRM_Utils_Array::value($optId, $recordedOptionsCount, 0);
+        $optId = $option['id'];
+        $count = CRM_Utils_Array::value('count', $option, 0);
+        $maxValue = CRM_Utils_Array::value('max_value', $option, 0);
+        $dbTotalCount = CRM_Utils_Array::value($optId, $recordedOptionsCount, 0);
         $currentTotalCount = CRM_Utils_Array::value($optId, $currentOptionsCount, 0);
 
 
@@ -979,7 +981,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $params['is_primary'] = 1;
 
     if ($this->_values['event']['is_pay_later']
-      && (!array_key_exists('hidden_processor', $params) || $params['payment_processor'] == 0)) {
+      && (!array_key_exists('hidden_processor', $params) || $params['payment_processor'] == 0)
+    ) {
       $params['is_pay_later'] = 1;
     }
     else {

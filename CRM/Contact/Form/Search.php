@@ -417,8 +417,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
     // add the go button for the action form, note it is of type 'next' rather than of type 'submit'
     if ($this->_context === 'amtg') {
-        // check if _groupID exists, it might not if
-        // we are displaying a hidden group
+      // check if _groupID exists, it might not if
+      // we are displaying a hidden group
       if (!isset($this->_group[$this->_amtgID])) {
         $this->assign('permissionedForGroup', FALSE);
         $this->_group[$this->_amtgID] =
@@ -603,11 +603,17 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         // FIXME: we should generalise in a way that components could inject url-filters
         // just like they build their own form elements
         foreach (array(
-          'mailing_id', 'mailing_delivery_status', 'mailing_open_status',
-          'mailing_click_status', 'mailing_reply_status', 'mailing_optout',
-          'mailing_forward', 'mailing_unsubscribe', 'mailing_date_low',
-          'mailing_date_high',
-          ) as $mailingFilter) {
+                   'mailing_id',
+                   'mailing_delivery_status',
+                   'mailing_open_status',
+                   'mailing_click_status',
+                   'mailing_reply_status',
+                   'mailing_optout',
+                   'mailing_forward',
+                   'mailing_unsubscribe',
+                   'mailing_date_low',
+                   'mailing_date_high',
+                 ) as $mailingFilter) {
           $type = 'String';
           if ($mailingFilter == 'mailing_id' &&
             $filterVal = CRM_Utils_Request::retrieve('mailing_id', 'Positive', $this)
@@ -740,7 +746,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
 
     if (array_key_exists($this->_searchButtonName, $_POST) ||
-      ($this->_force && !$crmPID)) {
+      ($this->_force && !$crmPID)
+    ) {
       //reset the cache table for new search
       $cacheKey = "civicrm search {$this->controller->_key}";
       CRM_Core_BAO_PrevNextCache::deleteItem(NULL, $cacheKey);

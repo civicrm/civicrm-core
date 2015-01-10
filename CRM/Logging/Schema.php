@@ -48,7 +48,7 @@ class CRM_Logging_Schema {
 
   //CRM-13028 / NYSS-6933 - table => array (cols) - to be excluded from the update statement
   private $exceptions = array(
-    'civicrm_job'   => array('last_run'),
+    'civicrm_job' => array('last_run'),
     'civicrm_group' => array('cache_date'),
   );
 
@@ -160,7 +160,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
       $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_before_update");
       $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_before_delete");
 
-     // after triggers
+      // after triggers
       $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_after_insert");
       $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_after_update");
       $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_after_delete");
@@ -194,7 +194,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
   /**
    * Sync log tables and rebuild triggers.
    *
-   * @param bool $enableLogging: Ensure logging is enabled
+   * @param bool $enableLogging : Ensure logging is enabled
    *
    * @return void
    */
@@ -348,10 +348,10 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     // add report instances
     $domain_id = CRM_Core_Config::domainID();
     foreach ($this->reports as $report) {
-      $dao             = new CRM_Report_DAO_ReportInstance;
-      $dao->domain_id  = $domain_id;
-      $dao->report_id  = $report;
-      $dao->title      = $titles[$report];
+      $dao = new CRM_Report_DAO_ReportInstance;
+      $dao->domain_id = $domain_id;
+      $dao->report_id = $report;
+      $dao->title = $titles[$report];
       $dao->permission = 'administer CiviCRM';
       if ($report == 'logging/contact/summary')
         $dao->is_reserved = 1;
@@ -410,11 +410,11 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
         }
         $columnSpecs[$dao->TABLE_NAME][$dao->COLUMN_NAME] =
           array(
-              'COLUMN_NAME' => $dao->COLUMN_NAME,
-              'DATA_TYPE'   => $dao->DATA_TYPE,
-              'IS_NULLABLE' => $dao->IS_NULLABLE,
-              'COLUMN_DEFAULT' => $dao->COLUMN_DEFAULT,
-            );
+            'COLUMN_NAME' => $dao->COLUMN_NAME,
+            'DATA_TYPE' => $dao->DATA_TYPE,
+            'IS_NULLABLE' => $dao->IS_NULLABLE,
+            'COLUMN_DEFAULT' => $dao->COLUMN_DEFAULT,
+          );
       }
     }
     return $columnSpecs[$table];
@@ -428,7 +428,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
    */
   public function columnsWithDiffSpecs($civiTable, $logTable) {
     $civiTableSpecs = $this->columnSpecsOf($civiTable);
-    $logTableSpecs  = $this->columnSpecsOf($logTable);
+    $logTableSpecs = $this->columnSpecsOf($logTable);
 
     $diff = array('ADD' => array(), 'MODIFY' => array(), 'OBSOLETE' => array());
 
@@ -451,12 +451,14 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
           $diff['MODIFY'][] = $col;
         }
         elseif ($civiTableSpecs[$col]['IS_NULLABLE'] != CRM_Utils_Array::value('IS_NULLABLE', $logTableSpecs[$col]) &&
-          $logTableSpecs[$col]['IS_NULLABLE'] == 'NO') {
+          $logTableSpecs[$col]['IS_NULLABLE'] == 'NO'
+        ) {
           // if is-null property is different, and log table's column is NOT-NULL, surely consider the column
           $diff['MODIFY'][] = $col;
         }
         elseif ($civiTableSpecs[$col]['COLUMN_DEFAULT'] != CRM_Utils_Array::value('COLUMN_DEFAULT', $logTableSpecs[$col]) &&
-          !strstr($civiTableSpecs[$col]['COLUMN_DEFAULT'], 'TIMESTAMP')) {
+          !strstr($civiTableSpecs[$col]['COLUMN_DEFAULT'], 'TIMESTAMP')
+        ) {
           // if default property is different, and its not about a timestamp column, consider it
           $diff['MODIFY'][] = $col;
         }
@@ -467,7 +469,8 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
     $oldCols = array_diff(array_keys($logTableSpecs), array_keys($civiTableSpecs));
     foreach ($oldCols as $col) {
       if (!in_array($col, array('log_date', 'log_conn_id', 'log_user_id', 'log_action')) &&
-        $logTableSpecs[$col]['IS_NULLABLE'] == 'NO') {
+        $logTableSpecs[$col]['IS_NULLABLE'] == 'NO'
+      ) {
         // if its a column present only in log table, not among those used by log tables for special purpose, and not-null
         $diff['OBSOLETE'][] = $col;
       }
@@ -528,7 +531,7 @@ COLS;
     // delete report instances
     $domain_id = CRM_Core_Config::domainID();
     foreach ($this->reports as $report) {
-      $dao            = new CRM_Report_DAO_ReportInstance;
+      $dao = new CRM_Report_DAO_ReportInstance;
       $dao->domain_id = $domain_id;
       $dao->report_id = $report;
       $dao->delete();
@@ -617,13 +620,13 @@ COLS;
 
       $sqlStmt = '';
       foreach ($columns as $column) {
-        $sqlStmt   .= "NEW.$column, ";
+        $sqlStmt .= "NEW.$column, ";
         $deleteSQL .= "OLD.$column, ";
       }
-      $sqlStmt   .= "CONNECTION_ID(), @civicrm_user_id, '{eventName}');";
+      $sqlStmt .= "CONNECTION_ID(), @civicrm_user_id, '{eventName}');";
       $deleteSQL .= "CONNECTION_ID(), @civicrm_user_id, '{eventName}');";
 
-      $sqlStmt   .= "END IF;";
+      $sqlStmt .= "END IF;";
       $deleteSQL .= "END IF;";
 
       $insertSQL .= $sqlStmt;

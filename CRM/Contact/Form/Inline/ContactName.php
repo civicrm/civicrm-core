@@ -61,7 +61,7 @@ class CRM_Contact_Form_Inline_ContactName extends CRM_Contact_Form_Inline {
 
     // Process / save contact info
     $params['contact_type'] = $this->_contactType;
-    $params['contact_id']   = $this->_contactId;
+    $params['contact_id'] = $this->_contactId;
 
     if (!empty($this->_contactSubType)) {
       $params['contact_sub_type'] = $this->_contactSubType;

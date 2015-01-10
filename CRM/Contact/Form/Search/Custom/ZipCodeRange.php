@@ -156,7 +156,7 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
 
     $where = "ROUND(address.postal_code) >= %1 AND ROUND(address.postal_code) <= %2";
     $params = array(
-    1 => array(trim($low), 'Integer'),
+      1 => array(trim($low), 'Integer'),
       2 => array(trim($high), 'Integer'),
     );
 

@@ -37,9 +37,9 @@ class CRM_Campaign_Page_Petition_ThankYou extends CRM_Core_Page {
    * @return string
    */
   public function run() {
-    $id             = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $petition_id    = CRM_Utils_Request::retrieve('pid', 'Positive', $this);
-    $params['id']   = $petition_id;
+    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $petition_id = CRM_Utils_Request::retrieve('pid', 'Positive', $this);
+    $params['id'] = $petition_id;
     $this->petition = array();
     CRM_Campaign_BAO_Survey::retrieve($params, $this->petition);
     $this->assign('petitionTitle', $this->petition['title']);

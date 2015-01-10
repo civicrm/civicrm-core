@@ -174,8 +174,8 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
           ),
         ),
       )
-    + $this->getAddressColumns(array('group_by' => FALSE))
-    + $this->getPhoneColumns();
+      + $this->getAddressColumns(array('group_by' => FALSE))
+      + $this->getPhoneColumns();
     // If we have a campaign, build out the relevant elements
     $this->_tagFilter = TRUE;
     if ($campaignEnabled && !empty($this->activeCampaigns)) {

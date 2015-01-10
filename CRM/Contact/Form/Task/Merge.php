@@ -63,7 +63,7 @@ class CRM_Contact_Form_Task_Merge extends CRM_Contact_Form_Task {
       while ($contact->fetch()) {
         $contactTypes[$contact->contact_type] = TRUE;
         if (count($contactTypes) > 1)
-        break;
+          break;
       }
       if (count($contactTypes) > 1) {
         $statusMsg = ts('Selected records must all be the same contact type (i.e. all Individuals).');

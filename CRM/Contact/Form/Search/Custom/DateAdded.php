@@ -213,8 +213,8 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     // CRM-6356
     if ($this->_groups) {
       //block for Group search
-      $smartGroup       = array();
-      $group            = new CRM_Contact_DAO_Group();
+      $smartGroup = array();
+      $group = new CRM_Contact_DAO_Group();
       $group->is_active = 1;
       $group->find();
       while ($group->fetch()) {

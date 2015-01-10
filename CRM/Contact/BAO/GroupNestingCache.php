@@ -82,11 +82,11 @@ SET    parents  = null,
 
     $values = array();
     foreach (array_keys($tree) as $id) {
-      $parents  = implode(',', $tree[$id]['parents']);
+      $parents = implode(',', $tree[$id]['parents']);
       $children = implode(',', $tree[$id]['children']);
-      $parents  = $parents == NULL ? 'null' : "'$parents'";
+      $parents = $parents == NULL ? 'null' : "'$parents'";
       $children = $children == NULL ? 'null' : "'$children'";
-      $sql      = "
+      $sql = "
 UPDATE civicrm_group
 SET    parents  = $parents ,
        children = $children

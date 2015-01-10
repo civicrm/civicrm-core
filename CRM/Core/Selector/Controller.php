@@ -48,7 +48,7 @@ class CRM_Core_Selector_Controller {
    */
   // move the values from the session to the template
   const SESSION = 1, TEMPLATE = 2,
-  TRANSFER = 4, EXPORT = 8, SCREEN = 16, PDF = 32;
+    TRANSFER = 4, EXPORT = 8, SCREEN = 16, PDF = 32;
 
   /**
    * A CRM Object that implements CRM_Core_Selector_API
@@ -201,10 +201,10 @@ class CRM_Core_Selector_Controller {
     $this->_pageID = $pageID ? $pageID : 1;
     $this->_sortID = $sortID ? $sortID : NULL;
     $this->_action = $action;
-    $this->_store  = $store;
+    $this->_store = $store;
     $this->_output = $output;
     $this->_prefix = $prefix;
-    $this->_case   = $case;
+    $this->_case = $case;
 
     // fix sortID
     if ($this->_sortID && strpos($this->_sortID, '_') === FALSE) {
@@ -342,8 +342,8 @@ class CRM_Core_Selector_Controller {
       $rows = self::getRows($this);
       CRM_Utils_Hook::searchColumns($contextName, $columnHeaders, $rows, $this);
       $rowsEmpty = count($rows) ? FALSE : TRUE;
-      $qill      = $this->getQill();
-      $summary   = $this->getSummary();
+      $qill = $this->getQill();
+      $summary = $this->getSummary();
       // if we need to store in session, lets update session
       if ($this->_output & self::SESSION) {
         $this->_store->set("{$this->_prefix}columnHeaders", $columnHeaders);

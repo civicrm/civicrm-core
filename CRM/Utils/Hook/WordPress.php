@@ -109,7 +109,7 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
      */
 
     // distinguish between types of hook
-    if (! in_array($fnSuffix, $this->hooksThatReturn)) {
+    if (!in_array($fnSuffix, $this->hooksThatReturn)) {
 
       // only pass the arguments that have values
       $args = array_slice(
@@ -169,7 +169,6 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
   }
 
 
-
   /**
    * Build the list of plugins ("modules" in CiviCRM terminology) to be processed for hooks.
    * We need to do this to preserve the CiviCRM hook signatures for hooks that require
@@ -219,7 +218,6 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
 
     }
   }
-
 
 
 }

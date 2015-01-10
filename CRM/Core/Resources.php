@@ -160,7 +160,7 @@ class CRM_Core_Resources {
    *   relative weight within a given region.
    * @param string $region
    *   location within the file; 'html-header', 'page-header', 'page-footer'.
-   * @param $translate, whether to parse this file for strings enclosed in ts()
+   * @param $translate , whether to parse this file for strings enclosed in ts()
    *
    * @return CRM_Core_Resources
    */
@@ -258,9 +258,9 @@ class CRM_Core_Resources {
       $region = self::isAjaxMode() ? 'ajax-snippet' : 'html-header';
       $resources = $this;
       CRM_Core_Region::instance($region)->add(array(
-      'callback' => function(&$snippet, &$html) use ($resources) {
-        $html .= "\n" . $resources->renderSetting();
-      },
+        'callback' => function (&$snippet, &$html) use ($resources) {
+          $html .= "\n" . $resources->renderSetting();
+        },
         'weight' => -100000,
       ));
       $this->addedSettings = TRUE;
@@ -530,10 +530,11 @@ class CRM_Core_Resources {
 
       // Add global settings
       $settings = array(
-      'config' => array(
-        'ajaxPopupsEnabled' => $this->ajaxPopupsEnabled,
-        'isFrontend' => $config->userFrameworkFrontend,
-      ));
+        'config' => array(
+          'ajaxPopupsEnabled' => $this->ajaxPopupsEnabled,
+          'isFrontend' => $config->userFrameworkFrontend,
+        )
+      );
       // Disable profile creation if user lacks permission
       if (!CRM_Core_Permission::check('edit all contacts') && !CRM_Core_Permission::check('add contacts')) {
         $settings['config']['entityRef']['contactCreate'] = FALSE;
@@ -650,30 +651,19 @@ class CRM_Core_Resources {
       "packages/jquery/jquery-1.11.1$min.js",
       "packages/jquery/jquery-ui/jquery-ui$min.js",
       "packages/jquery/jquery-ui/jquery-ui$min.css",
-
       "packages/backbone/lodash.compat$min.js",
-
       "packages/jquery/plugins/jquery.mousewheel$min.js",
-
       "packages/jquery/plugins/select2/select2$min.js",
       "packages/jquery/plugins/select2/select2.css",
-
       "packages/jquery/plugins/jquery.tableHeader.js",
-
       "packages/jquery/plugins/jquery.textarearesizer.js",
-
       "packages/jquery/plugins/jquery.form$min.js",
-
       "packages/jquery/plugins/jquery.timeentry$min.js",
-
       "packages/jquery/plugins/jquery.blockUI$min.js",
-
       "packages/jquery/plugins/DataTables/media/js/jquery.dataTables$min.js",
       "packages/jquery/plugins/DataTables/media/css/jquery.dataTables$min.css",
-
       "packages/jquery/plugins/jquery.validate$min.js",
       "packages/jquery/plugins/jquery.ui.datepicker.validation.pack.js",
-
       "js/Common.js",
       "js/crm.ajax.js",
     );
@@ -722,7 +712,11 @@ class CRM_Core_Resources {
    *   is this page request an ajax snippet?
    */
   public static function isAjaxMode() {
-    return in_array(CRM_Utils_Array::value('snippet', $_REQUEST), array(CRM_Core_Smarty::PRINT_SNIPPET, CRM_Core_Smarty::PRINT_NOFORM, CRM_Core_Smarty::PRINT_JSON));
+    return in_array(CRM_Utils_Array::value('snippet', $_REQUEST), array(
+        CRM_Core_Smarty::PRINT_SNIPPET,
+        CRM_Core_Smarty::PRINT_NOFORM,
+        CRM_Core_Smarty::PRINT_JSON
+      ));
   }
 
   /**
@@ -737,14 +731,15 @@ class CRM_Core_Resources {
     $filters['event'] = array(
       array('key' => 'event_type_id', 'value' => ts('Event Type')),
       array(
-    'key' => 'start_date',
-    'value' => ts('Start Date'),
-    'options' => array(
-        array('key' => '{">":"now"}', 'value' => ts('Upcoming')),
-        array('key' => '{"BETWEEN":["now - 3 month","now"]}', 'value' => ts('Past 3 Months')),
-        array('key' => '{"BETWEEN":["now - 6 month","now"]}', 'value' => ts('Past 6 Months')),
-        array('key' => '{"BETWEEN":["now - 1 year","now"]}', 'value' => ts('Past Year')),
-      )),
+        'key' => 'start_date',
+        'value' => ts('Start Date'),
+        'options' => array(
+          array('key' => '{">":"now"}', 'value' => ts('Upcoming')),
+          array('key' => '{"BETWEEN":["now - 3 month","now"]}', 'value' => ts('Past 3 Months')),
+          array('key' => '{"BETWEEN":["now - 6 month","now"]}', 'value' => ts('Past 6 Months')),
+          array('key' => '{"BETWEEN":["now - 1 year","now"]}', 'value' => ts('Past Year')),
+        )
+      ),
     );
 
     $filters['activity'] = array(

@@ -109,7 +109,8 @@ AND TABLE_SCHEMA = %1
     $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
     if ($dao->fetch()) {
       if ($dao->CONSTRAINT_NAME == 'FK_civicrm_msg_template_pdf_format_id' ||
-        $dao->CONSTRAINT_NAME == 'pdf_format_id') {
+        $dao->CONSTRAINT_NAME == 'pdf_format_id'
+      ) {
         $sqlDropFK = "ALTER TABLE `civicrm_msg_template`
 DROP FOREIGN KEY `{$dao->CONSTRAINT_NAME}`,
 DROP KEY `{$dao->CONSTRAINT_NAME}`";
@@ -139,7 +140,10 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
         FROM {$tableName}")->getDatabaseResult()->fetchRow();
       for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
         $endId = $startId + self::BATCH_SIZE - 1;
-        $title = ts("Upgrade DB to 4.5.beta9: Fix line items for {$label} (%1 => %2)", array(1 => $startId, 2 => $endId));
+        $title = ts("Upgrade DB to 4.5.beta9: Fix line items for {$label} (%1 => %2)", array(
+            1 => $startId,
+            2 => $endId
+          ));
         $this->addTask($title, 'task_4_5_0_fixLineItem', $startId, $endId, $label);
       }
     }

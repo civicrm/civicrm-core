@@ -182,7 +182,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
 
     list($displayName, $contactImage,
       $contactType, $contactSubtype, $contactImageUrl
-    ) = self::getContactDetails($this->_contactId);
+      ) = self::getContactDetails($this->_contactId);
     $this->assign('displayName', $displayName);
 
     $this->set('contactType', $contactType);
@@ -265,7 +265,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
       $contactType,
       $contactSubtype,
       $contactImageUrl
-    ) = CRM_Contact_BAO_Contact::getDisplayAndImage($contactId,
+      ) = CRM_Contact_BAO_Contact::getDisplayAndImage($contactId,
       TRUE,
       TRUE
     );

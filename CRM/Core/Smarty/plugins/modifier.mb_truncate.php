@@ -58,7 +58,7 @@
  * @return string
  */
 function smarty_modifier_mb_truncate($string, $length = 80, $etc = '...',
-  $break_words = FALSE
+                                     $break_words = FALSE
 ) {
   if (function_exists('mb_internal_encoding') and function_exists('mb_strlen') and function_exists('mb_substr')) {
     mb_internal_encoding('UTF-8');

@@ -52,8 +52,8 @@ class CRM_Dedupe_Finder {
    *   array of (cid1, cid2, weight) dupe triples
    */
   public static function dupes($rgid, $cids = array()) {
-    $rgBao             = new CRM_Dedupe_BAO_RuleGroup();
-    $rgBao->id         = $rgid;
+    $rgBao = new CRM_Dedupe_BAO_RuleGroup();
+    $rgBao->id = $rgid;
     $rgBao->contactIds = $cids;
     if (!$rgBao->find(TRUE)) {
       CRM_Core_Error::fatal("Dedupe rule not found for selected contacts");
@@ -109,8 +109,8 @@ class CRM_Dedupe_Finder {
 
     $foundByID = FALSE;
     if ($ruleGroupID) {
-      $rgBao               = new CRM_Dedupe_BAO_RuleGroup();
-      $rgBao->id           = $ruleGroupID;
+      $rgBao = new CRM_Dedupe_BAO_RuleGroup();
+      $rgBao->id = $ruleGroupID;
       $rgBao->contact_type = $ctype;
       if ($rgBao->find(TRUE)) {
         $foundByID = TRUE;
@@ -118,9 +118,9 @@ class CRM_Dedupe_Finder {
     }
 
     if (!$foundByID) {
-      $rgBao               = new CRM_Dedupe_BAO_RuleGroup();
+      $rgBao = new CRM_Dedupe_BAO_RuleGroup();
       $rgBao->contact_type = $ctype;
-      $rgBao->used         = $used;
+      $rgBao->used = $used;
       if (!$rgBao->find(TRUE)) {
         CRM_Core_Error::fatal("$used rule for $ctype does not exist");
       }
@@ -183,8 +183,8 @@ class CRM_Dedupe_Finder {
       }
       $ctype = $dao->contact_type;
     }
-    $rgBao               = new CRM_Dedupe_BAO_RuleGroup();
-    $rgBao->used         = $used;
+    $rgBao = new CRM_Dedupe_BAO_RuleGroup();
+    $rgBao->used = $used;
     $rgBao->contact_type = $ctype;
     if (!$rgBao->find(TRUE)) {
       CRM_Core_Error::fatal("$used rule for $ctype does not exist");
@@ -235,7 +235,9 @@ class CRM_Dedupe_Finder {
 
     // handle {birth,deceased}_date
     foreach (array(
-      'birth_date', 'deceased_date') as $date) {
+               'birth_date',
+               'deceased_date'
+             ) as $date) {
       if (!empty($fields[$date])) {
         $flat[$date] = $fields[$date];
         if (is_array($flat[$date])) {
@@ -306,9 +308,9 @@ class CRM_Dedupe_Finder {
           // FIXME: we also need to do some hacking for id and name fields, see CRM-3902’s comments
           $fixes = array(
             'address_name' => 'name',
-          'country' => 'country_id',
+            'country' => 'country_id',
             'state_province' => 'state_province_id',
-          'county' => 'county_id',
+            'county' => 'county_id',
           );
           foreach ($fixes as $orig => $target) {
             if (!empty($flat[$orig])) {

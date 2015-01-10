@@ -39,9 +39,9 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
     $this->_locales = array_keys($config->languageLimit);
 
     // get the part of the database we want to edit and validate it
-    $table            = CRM_Utils_Request::retrieve('table', 'String', $this);
-    $field            = CRM_Utils_Request::retrieve('field', 'String', $this);
-    $id               = CRM_Utils_Request::retrieve('id', 'Int', $this);
+    $table = CRM_Utils_Request::retrieve('table', 'String', $this);
+    $field = CRM_Utils_Request::retrieve('field', 'String', $this);
+    $id = CRM_Utils_Request::retrieve('id', 'Int', $this);
     $this->_structure = CRM_Core_I18n_SchemaStructure::columns();
     if (!isset($this->_structure[$table][$field])) {
       CRM_Core_Error::fatal("$table.$field is not internationalized.");
@@ -93,24 +93,24 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
 
   public function postProcess() {
     $values = $this->exportValues();
-    $table  = $values['table'];
-    $field  = $values['field'];
+    $table = $values['table'];
+    $field = $values['field'];
 
     // validate table and field
     if (!isset($this->_structure[$table][$field])) {
       CRM_Core_Error::fatal("$table.$field is not internationalized.");
     }
 
-    $cols   = array();
+    $cols = array();
     $params = array(array($values['id'], 'Int'));
-    $i      = 1;
+    $i = 1;
     foreach ($this->_locales as $locale) {
       $cols[] = "{$field}_{$locale} = %$i";
       $params[$i] = array($values["{$field}_{$locale}"], 'String');
       $i++;
     }
     $query = "UPDATE $table SET " . implode(', ', $cols) . " WHERE id = %0";
-    $dao   = new CRM_Core_DAO();
+    $dao = new CRM_Core_DAO();
     $query = CRM_Core_DAO::composeQuery($query, $params, TRUE);
     $dao->query($query, FALSE);
   }

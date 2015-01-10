@@ -87,9 +87,9 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
    * return null
    */
   public function browse() {
-    $note               = new CRM_Core_DAO_Note();
+    $note = new CRM_Core_DAO_Note();
     $note->entity_table = 'civicrm_contact';
-    $note->entity_id    = $this->_contactId;
+    $note->entity_id = $this->_contactId;
 
     $note->orderBy('modified_date desc');
 
@@ -103,7 +103,7 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
     $mask = CRM_Core_Action::mask($permissions);
 
     $values = array();
-    $links  = self::links();
+    $links = self::links();
     $action = array_sum(array_keys($links)) & $mask;
 
     $note->find();
@@ -177,8 +177,9 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
     $session->pushUserContext($url);
 
     if (CRM_Utils_Request::retrieve('confirmed', 'Boolean',
-        CRM_Core_DAO::$_nullObject
-      )) {
+      CRM_Core_DAO::$_nullObject
+    )
+    ) {
       CRM_Core_BAO_Note::del($this->_id);
       CRM_Utils_System::redirect($url);
     }

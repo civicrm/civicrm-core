@@ -49,6 +49,7 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
 
   static $_columnHeader = NULL;
   static $_returnvalues = NULL;
+
   /**
    * Get BAO Name
    *
@@ -68,14 +69,14 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
   public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
-        'view'  => array(
-          'name'  => ts('View'),
-          'url'   => 'civicrm/contact/view/contribution',
-          'qs'    => 'reset=1&id=%%contid%%&cid=%%cid%%&action=view&context=contribution&selectedChild=contribute',
+        'view' => array(
+          'name' => ts('View'),
+          'url' => 'civicrm/contact/view/contribution',
+          'qs' => 'reset=1&id=%%contid%%&cid=%%cid%%&action=view&context=contribution&selectedChild=contribute',
           'title' => ts('View Contribution'),
         ),
-        'remove'  => array(
-          'name'  => ts('Remove'),
+        'remove' => array(
+          'name' => ts('Remove'),
           'title' => ts('Remove Transaction'),
           'extra' => 'onclick = "assignRemove( %%id%%,\'' . 'remove' . '\' );"',
         ),

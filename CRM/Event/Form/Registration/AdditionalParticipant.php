@@ -130,9 +130,9 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     //CRM-4320, setdefault additional participant values.
     if ($this->_allowConfirmation && $this->_additionalParticipantId) {
       //hack to get set default from eventFees.php
-      $this->_discountId   = $discountId;
-      $this->_pId          = $this->_additionalParticipantId;
-      $this->_contactId    = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_additionalParticipantId, 'contact_id');
+      $this->_discountId = $discountId;
+      $this->_pId = $this->_additionalParticipantId;
+      $this->_contactId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_additionalParticipantId, 'contact_id');
       $participantDefaults = CRM_Event_Form_EventFees::setDefaultValues($this);
       $participantDefaults = array_merge($this->_defaults, $participantDefaults);
       // use primary email address if billing email address is empty
@@ -177,13 +177,17 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     $first_name = $last_name = NULL;
     $pre = $post = array();
     foreach (array(
-      'pre', 'post') as $keys) {
+               'pre',
+               'post'
+             ) as $keys) {
       if (isset($this->_values['additional_custom_' . $keys . '_id'])) {
         $this->buildCustom($this->_values['additional_custom_' . $keys . '_id'], 'additionalCustom' . ucfirst($keys), TRUE);
         $$keys = CRM_Core_BAO_UFGroup::getFields($this->_values['additional_custom_' . $keys . '_id']);
       }
       foreach (array(
-        'first_name', 'last_name') as $name) {
+                 'first_name',
+                 'last_name'
+               ) as $name) {
         if (array_key_exists($name, $$keys) &&
           CRM_Utils_Array::value('is_required', CRM_Utils_Array::value($name, $$keys))
         ) {
@@ -252,14 +256,23 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
           $this->_allowWaitlist = FALSE;
           $this->set('allowWaitlist', $this->_allowWaitlist);
           if ($this->_requireApproval) {
-            $statusMessage = ts("It looks like you are now registering a group of %1 participants. The event has %2 available spaces (you will not be wait listed). Registration for this event requires approval. You will receive an email once your registration has been reviewed.", array(1 => ++$processedCnt, 2 => $spaces));
+            $statusMessage = ts("It looks like you are now registering a group of %1 participants. The event has %2 available spaces (you will not be wait listed). Registration for this event requires approval. You will receive an email once your registration has been reviewed.", array(
+                1 => ++$processedCnt,
+                2 => $spaces
+              ));
           }
           else {
-            $statusMessage = ts("It looks like you are now registering a group of %1 participants. The event has %2 available spaces (you will not be wait listed).", array(1 => ++$processedCnt, 2 => $spaces));
+            $statusMessage = ts("It looks like you are now registering a group of %1 participants. The event has %2 available spaces (you will not be wait listed).", array(
+                1 => ++$processedCnt,
+                2 => $spaces
+              ));
           }
         }
         else {
-          $statusMessage = ts("It looks like you are now registering a group of %1 participants. The event has %2 available spaces (you will not be wait listed). Please go back to the main registration page and reduce the number of additional people. You will also need to complete payment information.", array(1 => ++$processedCnt, 2 => $spaces));
+          $statusMessage = ts("It looks like you are now registering a group of %1 participants. The event has %2 available spaces (you will not be wait listed). Please go back to the main registration page and reduce the number of additional people. You will also need to complete payment information.", array(
+              1 => ++$processedCnt,
+              2 => $spaces
+            ));
           $allowToProceed = FALSE;
         }
         CRM_Core_Session::setStatus($statusMessage, ts('Registration Error'), 'error');
@@ -336,7 +349,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     //CRM-4320
     if ($allowToProceed) {
       $buttons = array_merge($buttons, array(
-        array(
+          array(
             'type' => 'next',
             'name' => ts('Continue'),
             'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
@@ -347,12 +360,13 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       );
       if ($includeSkipButton) {
         $buttons = array_merge($buttons, array(
-          array(
-            'type' => 'next',
-            'name' => ts('Skip Participant'),
-            'subName' => 'skip',
-            'icon' => 'seek-next',
-          ))
+            array(
+              'type' => 'next',
+              'name' => ts('Skip Participant'),
+              'subName' => 'skip',
+              'icon' => 'seek-next',
+            )
+          )
         );
       }
     }
@@ -471,7 +485,10 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
           if (!$self->_allowConfirmation && empty($self->_values['event']['has_waitlist']) &&
             $totalParticipants > $self->_availableRegistrations
           ) {
-            $errors['_qf_default'] = ts('It looks like event has only %2 seats available and you are trying to register %1 participants, so could you please select price options accordingly.', array(1 => $totalParticipants, 2 => $self->_availableRegistrations));
+            $errors['_qf_default'] = ts('It looks like event has only %2 seats available and you are trying to register %1 participants, so could you please select price options accordingly.', array(
+                1 => $totalParticipants,
+                2 => $self->_availableRegistrations
+              ));
           }
         }
       }
@@ -828,7 +845,10 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       return;
     }
     foreach (array(
-      'constantValues', 'submitValues', 'defaultValues') as $val) {
+               'constantValues',
+               'submitValues',
+               'defaultValues'
+             ) as $val) {
       $values = &$this->{"_$val"};
       if (!is_array($values) || empty($values)) {
         continue;

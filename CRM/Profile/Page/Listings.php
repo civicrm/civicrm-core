@@ -147,8 +147,15 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     $this->_params = array();
 
     $resetArray = array(
-      'group', 'tag', 'preferred_communication_method', 'do_not_phone',
-      'do_not_email', 'do_not_mail', 'do_not_sms', 'do_not_trade', 'gender',
+      'group',
+      'tag',
+      'preferred_communication_method',
+      'do_not_phone',
+      'do_not_email',
+      'do_not_mail',
+      'do_not_sms',
+      'do_not_trade',
+      'gender',
     );
 
     foreach ($this->_fields as $name => $field) {
@@ -173,8 +180,8 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
           ) == 'TextArea')
       ) {
         $value = trim(CRM_Utils_Request::retrieve($name, 'String',
-            $this, FALSE, NULL, 'REQUEST'
-          ));
+          $this, FALSE, NULL, 'REQUEST'
+        ));
         if (!empty($value) &&
           !((substr($value, 0, 1) == '%') &&
             (substr($value, -1, 1) == '%')
@@ -222,8 +229,8 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
         if ($customField) {
           // reset checkbox/radio because a form does not send null checkbox values
           if (in_array($customField['html_type'],
-              array('Multi-Select', 'CheckBox', 'Multi-Select State/Province', 'Multi-Select Country', 'Radio')
-            )) {
+            array('Multi-Select', 'CheckBox', 'Multi-Select State/Province', 'Multi-Select Country', 'Radio')
+          )) {
             // only reset on a POST submission if we dont see any value
             $value = NULL;
             $this->set($name, $value);
@@ -250,8 +257,13 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     // set the prox params
     // need to ensure proximity searching is enabled
     $proximityVars = array(
-      'street_address', 'city', 'postal_code', 'state_province_id',
-      'country_id', 'distance', 'distance_unit',
+      'street_address',
+      'city',
+      'postal_code',
+      'state_province_id',
+      'country_id',
+      'distance',
+      'distance_unit',
     );
     foreach ($proximityVars as $var) {
       $value = CRM_Utils_Request::retrieve("prox_{$var}",
@@ -335,11 +347,11 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
         $gidString = implode(',', $this->_profileIds);
       }
 
-      $map      = 0;
+      $map = 0;
       $linkToUF = 0;
       $editLink = FALSE;
       if ($this->_gid) {
-        $map      = $ufgroupDAO->is_map;
+        $map = $ufgroupDAO->is_map;
         $linkToUF = $ufgroupDAO->is_uf_link;
         $editLink = $ufgroupDAO->is_edit_link;
       }

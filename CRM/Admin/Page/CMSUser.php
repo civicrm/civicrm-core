@@ -50,8 +50,9 @@ class CRM_Admin_Page_CMSUser extends CRM_Core_Page {
   public function run() {
     //if javascript is enabled
     if (CRM_Utils_Request::retrieve('confirmed', 'Boolean',
-        $this, '', '', 'GET'
-      )) {
+      $this, '', '', 'GET'
+    )
+    ) {
       CRM_Core_BAO_CMSUser::synchronize();
       return;
     }

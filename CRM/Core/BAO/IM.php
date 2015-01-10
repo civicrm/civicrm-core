@@ -103,8 +103,8 @@ ORDER BY
   civicrm_im.is_primary DESC, im_id ASC ";
     $params = array(1 => array($id, 'Integer'));
 
-    $ims   = $values = array();
-    $dao   = CRM_Core_DAO::executeQuery($query, $params);
+    $ims = $values = array();
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
     $count = 1;
     while ($dao->fetch()) {
       $values = array(

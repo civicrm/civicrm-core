@@ -90,7 +90,7 @@ class CRM_Campaign_BAO_Query {
     // CRM-13810 Translate campaign_id to label for search builder
     // CRM-14238 Only translate when we are in contact mode
     // Other modes need the untranslated data for export and other functions
-    if (is_array($query->_select)  && $query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
+    if (is_array($query->_select) && $query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
       foreach ($query->_select as $field => $queryString) {
         if (substr($field, -11) == 'campaign_id') {
           $query->_pseudoConstantsSelect[$field] = array(
@@ -241,8 +241,8 @@ class CRM_Campaign_BAO_Query {
 
       case self::CIVICRM_ACTIVITY:
         $surveyActivityTypes = CRM_Campaign_PseudoConstant::activityType();
-        $surveyKeys          = "(" . implode(',', array_keys($surveyActivityTypes)) . ")";
-        $from                = " INNER JOIN civicrm_activity ON ( civicrm_activity.id = civicrm_activity_target.activity_id
+        $surveyKeys = "(" . implode(',', array_keys($surveyActivityTypes)) . ")";
+        $from = " INNER JOIN civicrm_activity ON ( civicrm_activity.id = civicrm_activity_target.activity_id
                                  AND civicrm_activity.activity_type_id IN $surveyKeys ) ";
         break;
 
@@ -409,7 +409,9 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
     $customSearchFields = array();
     while ($dao->fetch()) {
       foreach (array(
-        'ward', 'precinct') as $name) {
+                 'ward',
+                 'precinct'
+               ) as $name) {
         if (stripos($name, $dao->label) !== FALSE) {
           $fieldId = $dao->id;
           $fieldName = 'custom_' . $dao->id;
@@ -467,7 +469,7 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
     if (!is_array($params) || empty($params)) {
       return $voterClause;
     }
-    $surveyId       = CRM_Utils_Array::value('campaign_survey_id', $params);
+    $surveyId = CRM_Utils_Array::value('campaign_survey_id', $params);
     $searchVoterFor = CRM_Utils_Array::value('campaign_search_voter_for', $params);
 
     //get the survey activities.
@@ -510,8 +512,8 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
               $values['status_id'] == $completedStatusId
             ) {
               $recontactIntSeconds = $numOfDays * 24 * 3600;
-              $actDateTimeSeconds  = CRM_Utils_Date::unixTime($values['activity_date_time']);
-              $totalSeconds        = $recontactIntSeconds + $actDateTimeSeconds;
+              $actDateTimeSeconds = CRM_Utils_Date::unixTime($values['activity_date_time']);
+              $totalSeconds = $recontactIntSeconds + $actDateTimeSeconds;
               //don't consider completed survey activity
               //unless it fulfill recontact interval criteria.
               if ($totalSeconds <= time()) {
@@ -576,10 +578,10 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
    *
    **/
   public static function componentSearchClause(&$params, &$query) {
-    $op        = CRM_Utils_Array::value('op', $params, '=');
-    $campaign  = CRM_Utils_Array::value('campaign', $params);
+    $op = CRM_Utils_Array::value('op', $params, '=');
+    $campaign = CRM_Utils_Array::value('campaign', $params);
     $tableName = CRM_Utils_Array::value('tableName', $params);
-    $grouping  = CRM_Utils_Array::value('grouping', $params);
+    $grouping = CRM_Utils_Array::value('grouping', $params);
     if (CRM_Utils_System::isNull($campaign) || empty($tableName)) {
       return;
     }
@@ -588,7 +590,9 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
     // an integer, not an array
     if (is_array($campaign)) {
       foreach (array(
-        'current_campaign', 'past_campaign') as $ignore) {
+                 'current_campaign',
+                 'past_campaign'
+               ) as $ignore) {
         $index = array_search($ignore, $campaign);
         if ($index !== FALSE) {
           unset($campaign[$index]);
@@ -619,8 +623,8 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
       }
     }
     $query->_qill[$grouping][] = ts('Campaigns %1',
-      array(1 => $op)
-    ) . ' ' . implode(' ' . ts('or') . ' ', $campaignTitles);
+        array(1 => $op)
+      ) . ' ' . implode(' ' . ts('or') . ' ', $campaignTitles);
     $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("{$tableName}.campaign_id",
       $op,
       $campaignIds,

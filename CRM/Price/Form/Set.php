@@ -70,10 +70,12 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     CRM_Utils_System::setTitle($title);
 
     $url = CRM_Utils_System::url('civicrm/admin/price', 'reset=1');
-    $breadCrumb = array(array(
-    'title' => ts('Price Sets'),
+    $breadCrumb = array(
+      array(
+        'title' => ts('Price Sets'),
         'url' => $url,
-      ));
+      )
+    );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
   }
 
@@ -132,7 +134,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
       $priceSetUsedTables = CRM_Price_BAO_PriceSet::getUsedBy($this->_sid, 'table');
     }
 
-    $config           = CRM_Core_Config::singleton();
+    $config = CRM_Core_Config::singleton();
     $showContribution = FALSE;
     $enabledComponents = CRM_Core_Component::getEnabledComponents();
 
@@ -195,7 +197,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
 
     $this->add('select', 'financial_type_id',
       ts('Default Financial Type'),
-          array('' => ts('- select -')) + $financialType, 'required'
+      array('' => ts('- select -')) + $financialType, 'required'
     );
 
     // help text
@@ -296,10 +298,15 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     else {
       // Jump directly to adding a field if popups are disabled
       $action = CRM_Core_Resources::singleton()->ajaxPopupsEnabled ? 'browse' : 'add';
-      $url = CRM_Utils_System::url('civicrm/admin/price/field', array('reset' => 1, 'action' => $action, 'sid' => $set->id, 'new' => 1));
+      $url = CRM_Utils_System::url('civicrm/admin/price/field', array(
+          'reset' => 1,
+          'action' => $action,
+          'sid' => $set->id,
+          'new' => 1
+        ));
       CRM_Core_Session::setStatus(ts("Your Set '%1' has been added. You can add fields to this set now.",
-          array(1 => $set->title)
-        ), ts('Saved'), 'success');
+        array(1 => $set->title)
+      ), ts('Saved'), 'success');
       $session = CRM_Core_Session::singleton();
       $session->replaceUserContext($url);
     }

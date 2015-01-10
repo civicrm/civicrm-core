@@ -38,7 +38,6 @@
  * Create a subclass for a specific format.
  * @see http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+Specifications+-++Batches#CiviAccountsSpecifications-Batches-%C2%A0Overviewofimplementation
  */
-
 class CRM_Financial_BAO_ExportFormat {
 
   /*

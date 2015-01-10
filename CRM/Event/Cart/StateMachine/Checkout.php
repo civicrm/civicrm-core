@@ -17,8 +17,8 @@ class CRM_Event_Cart_StateMachine_Checkout extends CRM_Core_StateMachine {
       CRM_Core_Error::statusBounce(ts("You don't have any events in you cart. Please add some events."), CRM_Utils_System::url('civicrm/event'));
     }
 
-    $pages         = array();
-    $is_monetary   = FALSE;
+    $pages = array();
+    $is_monetary = FALSE;
     $is_conference = FALSE;
     foreach ($cart->events_in_carts as $event_in_cart) {
       if ($event_in_cart->event->is_monetary) {

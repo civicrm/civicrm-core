@@ -282,9 +282,9 @@ class CRM_Core_CodeGen_Specification {
    * @param $fields
    */
   public function getField(&$fieldXML, &$fields) {
-    $name  = trim((string ) $fieldXML->name);
+    $name = trim((string ) $fieldXML->name);
     $field = array('name' => $name, 'localizable' => $fieldXML->localizable);
-    $type  = (string ) $fieldXML->type;
+    $type = (string ) $fieldXML->type;
     switch ($type) {
       case 'varchar':
       case 'char':
@@ -303,7 +303,7 @@ class CRM_Core_CodeGen_Specification {
         $field['cols'] = isset($fieldXML->html) ? $this->value('cols', $fieldXML->html) : NULL;
         break;
 
-      break;
+        break;
 
       case 'datetime':
         $field['sqlType'] = $field['phpType'] = $type;
@@ -344,10 +344,10 @@ class CRM_Core_CodeGen_Specification {
     }
 
     $field['required'] = $this->value('required', $fieldXML);
-    $field['collate']  = $this->value('collate', $fieldXML);
-    $field['comment']  = $this->value('comment', $fieldXML);
-    $field['default']  = $this->value('default', $fieldXML);
-    $field['import']   = $this->value('import', $fieldXML);
+    $field['collate'] = $this->value('collate', $fieldXML);
+    $field['comment'] = $this->value('comment', $fieldXML);
+    $field['default'] = $this->value('default', $fieldXML);
+    $field['import'] = $this->value('import', $fieldXML);
     if ($this->value('export', $fieldXML)) {
       $field['export'] = $this->value('export', $fieldXML);
     }
@@ -477,8 +477,8 @@ class CRM_Core_CodeGen_Specification {
 
     $index = array();
     // empty index name is fine
-    $indexName      = trim((string) $indexXML->name);
-    $index['name']  = $indexName;
+    $indexName = trim((string) $indexXML->name);
+    $index['name'] = $indexName;
     $index['field'] = array();
 
     // populate fields

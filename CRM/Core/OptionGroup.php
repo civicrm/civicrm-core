@@ -304,14 +304,14 @@ WHERE  v.option_group_id = g.id
           }
 
           if ($flip) {
-            $p        = array(1 => array($postValue, 'String'));
+            $p = array(1 => array($postValue, 'String'));
             $lookupBy = 'v.label= %1';
-            $select   = "v.value";
+            $select = "v.value";
           }
           else {
-            $p        = array(1 => array($postValue, 'Integer'));
+            $p = array(1 => array($postValue, 'Integer'));
             $lookupBy = 'v.value = %1';
-            $select   = "v.label";
+            $select = "v.label";
           }
 
           $p[2] = array($value['groupName'], 'String');
@@ -358,7 +358,7 @@ WHERE  v.option_group_id = g.id
       $query .= " AND  v.is_active = 1 ";
     }
     $p = array(
-    1 => array($groupName, 'String'),
+      1 => array($groupName, 'String'),
       2 => array($value, 'Integer'),
     );
     $dao = CRM_Core_DAO::executeQuery($query, $p);
@@ -400,7 +400,7 @@ WHERE  v.option_group_id = g.id
 ";
 
     $p = array(
-    1 => array($groupName, 'String'),
+      1 => array($groupName, 'String'),
       2 => array($label, $labelType),
     );
     $dao = CRM_Core_DAO::executeQuery($query, $p);
@@ -475,11 +475,11 @@ WHERE  v.option_group_id = g.id
   public static function createAssoc($groupName, &$values, &$defaultID, $groupTitle = NULL) {
     self::deleteAssoc($groupName);
     if (!empty($values)) {
-      $group              = new CRM_Core_DAO_OptionGroup();
-      $group->name        = $groupName;
-      $group->title       = empty($groupTitle) ? $groupName : $groupTitle;
+      $group = new CRM_Core_DAO_OptionGroup();
+      $group->name = $groupName;
+      $group->title = empty($groupTitle) ? $groupName : $groupTitle;
       $group->is_reserved = 1;
-      $group->is_active   = 1;
+      $group->is_active = 1;
       $group->save();
 
       foreach ($values as $v) {
@@ -584,7 +584,7 @@ SELECT v.label
    AND g.name  = %1
    AND v.value = %2";
     $params = array(
-    1 => array($groupName, 'String'),
+      1 => array($groupName, 'String'),
       2 => array($value, 'String'),
     );
     return CRM_Core_DAO::singleValueQuery($query, $params);
@@ -618,7 +618,7 @@ WHERE  v.option_group_id = g.id
     }
 
     $p = array(
-    1 => array($groupName, 'String'),
+      1 => array($groupName, 'String'),
       2 => array($fieldValue, $fieldType),
     );
     $dao = CRM_Core_DAO::executeQuery($query, $p);
@@ -626,7 +626,13 @@ WHERE  v.option_group_id = g.id
 
     if ($dao->fetch()) {
       foreach (array(
-        'id', 'name', 'value', 'label', 'weight', 'description') as $fld) {
+                 'id',
+                 'name',
+                 'value',
+                 'label',
+                 'weight',
+                 'description'
+               ) as $fld) {
         $row[$fld] = $dao->$fld;
       }
     }

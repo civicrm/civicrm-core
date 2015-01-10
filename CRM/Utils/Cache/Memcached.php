@@ -33,11 +33,11 @@
  *
  */
 class CRM_Utils_Cache_Memcached {
-  const DEFAULT_HOST    = 'localhost';
-  const DEFAULT_PORT    = 11211;
+  const DEFAULT_HOST = 'localhost';
+  const DEFAULT_PORT = 11211;
   const DEFAULT_TIMEOUT = 3600;
-  const DEFAULT_PREFIX  = '';
-  const MAX_KEY_LEN     = 62;
+  const DEFAULT_PREFIX = '';
+  const MAX_KEY_LEN = 62;
 
   /**
    * The host name of the memcached server

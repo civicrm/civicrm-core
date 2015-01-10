@@ -139,8 +139,8 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @static
    */
   public static function &getValues(&$params, &$values) {
-    $websites            = array();
-    $website             = new CRM_Core_DAO_Website();
+    $websites = array();
+    $website = new CRM_Core_DAO_Website();
     $website->contact_id = $params['contact_id'];
     $website->find();
 
@@ -180,8 +180,8 @@ SELECT  id, website_type_id
     $params = array(1 => array($id, 'Integer'));
 
     $websites = $values = array();
-    $dao      = CRM_Core_DAO::executeQuery($query, $params);
-    $count    = 1;
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    $count = 1;
     while ($dao->fetch()) {
       $values = array(
         'id' => $dao->id,

@@ -90,7 +90,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       }
       if (is_object($paymentProcessorObj) && $paymentProcessorObj->isSupported('updateSubscriptionBillingInfo')) {
         self::$_links[CRM_Core_Action::RENEW] = array(
-        'name' => ts('Change Billing Details'),
+          'name' => ts('Change Billing Details'),
           'title' => ts('Change Billing Details'),
           'url' => 'civicrm/contribute/updatebilling',
           'qs' => "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}",
@@ -113,7 +113,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     list($annual['count'],
       $annual['amount'],
       $annual['avg']
-    ) = CRM_Contribute_BAO_Contribution::annual($this->_contactId);
+      ) = CRM_Contribute_BAO_Contribution::annual($this->_contactId);
     $this->assign('annual', $annual);
 
     $controller = new CRM_Core_Controller_Simple(
@@ -184,7 +184,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       list($softCreditTotals['amount'],
         $softCreditTotals['avg'],
         $softCreditTotals['currency']
-      ) = CRM_Contribute_BAO_ContributionSoft::getSoftContributionTotals($this->_contactId, $isTest);
+        ) = CRM_Contribute_BAO_ContributionSoft::getSoftContributionTotals($this->_contactId, $isTest);
 
       $this->assign('softCredit', TRUE);
       $this->assign('softCreditRows', $softCreditList);
@@ -241,9 +241,9 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   }
 
   public function preProcess() {
-    $context       = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
-    $this->_id     = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     if ($context == 'standalone') {
       $this->_action = CRM_Core_Action::ADD;
@@ -251,7 +251,10 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     else {
       $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, empty($this->_id));
       if (empty($this->_contactId)) {
-        $this->_contactId = civicrm_api3('contribution', 'getvalue', array('id' => $this->_id, 'return' => 'contact_id'));
+        $this->_contactId = civicrm_api3('contribution', 'getvalue', array(
+            'id' => $this->_id,
+            'return' => 'contact_id'
+          ));
       }
       $this->assign('contactId', $this->_contactId);
 
@@ -431,7 +434,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         break;
 
       case 'fulltext':
-        $keyName   = '&qfKey';
+        $keyName = '&qfKey';
         $urlParams = 'force=1';
         $urlString = 'civicrm/contact/search/custom';
         if ($this->_action == CRM_Core_Action::UPDATE) {

@@ -133,11 +133,11 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
 
     $logData = "$tableName,$tableID";
     if (!$log->id) {
-      $log->entity_table  = 'civicrm_contact';
-      $log->entity_id     = $contactID;
-      $log->modified_id   = $userID;
+      $log->entity_table = 'civicrm_contact';
+      $log->entity_id = $contactID;
+      $log->modified_id = $userID;
       $log->modified_date = date("YmdHis");
-      $log->data          = $logData;
+      $log->data = $logData;
       $log->save();
     }
     else {

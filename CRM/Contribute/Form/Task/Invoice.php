@@ -280,7 +280,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         CRM_Core_Error::fatal();
       }
 
-      $contribution = & $objects['contribution'];
+      $contribution = &$objects['contribution'];
 
       $input['amount'] = $contribution->total_amount;
       $input['invoice_id'] = $contribution->invoice_id;

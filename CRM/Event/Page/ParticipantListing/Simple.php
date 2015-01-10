@@ -144,13 +144,13 @@ SELECT count( civicrm_contact.id )
     if (!$headers) {
       $headers = array();
       $headers[1] = array(
-      'name' => ts('Name'),
+        'name' => ts('Name'),
         'sort' => 'civicrm_contact.sort_name',
         'direction' => CRM_Utils_Sort::ASCENDING,
       );
       if ($this->_participantListingType == 'Name and Email') {
         $headers[2] = array(
-        'name' => ts('Email'),
+          'name' => ts('Email'),
           'sort' => 'civicrm_email.email',
           'direction' => CRM_Utils_Sort::DONTCARE,
         );

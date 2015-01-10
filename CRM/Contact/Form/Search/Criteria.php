@@ -66,7 +66,7 @@ class CRM_Contact_Form_Search_Criteria {
         $form->add('select', 'group_type', ts('Group Types'), $groupOptions, FALSE,
           array('id' => 'group_type', 'multiple' => 'multiple', 'class' => 'crm-select2')
         );
-        $form->add('hidden','group_search_selected','group');
+        $form->add('hidden', 'group_search_selected', 'group');
       }
     }
 
@@ -100,7 +100,7 @@ class CRM_Contact_Form_Search_Criteria {
       $tagTypesText = implode(" or ", $tagsTypes);
       if ($showAllTagTypes) {
         $form->add('checkbox', 'all_tag_types', ts('Include tags used for %1', array(1 => $tagTypesText)));
-        $form->add('hidden','tag_types_text', $tagTypesText);
+        $form->add('hidden', 'tag_types_text', $tagTypesText);
       }
     }
 
@@ -158,7 +158,8 @@ class CRM_Contact_Form_Search_Criteria {
       'uf_group_id',
       ts('Search Views'),
       array(
-        '0' => ts('- default view -')) + $searchProfiles
+        '0' => ts('- default view -')
+      ) + $searchProfiles
     );
 
     $componentModes = CRM_Contact_Form_Search::getModeSelect();
@@ -312,8 +313,8 @@ class CRM_Contact_Form_Search_Criteria {
       list($title, $attributes, $select, $multiSelect) = $v;
 
       if (in_array($name,
-          array('street_number', 'street_name', 'street_unit')
-        )) {
+        array('street_number', 'street_name', 'street_unit')
+      )) {
         if (!$parseStreetAddress) {
           continue;
         }

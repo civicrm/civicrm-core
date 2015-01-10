@@ -33,8 +33,8 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     //If this ID has parent, send parent id
     if ($checkParentExistsForThisId) {
       /**
-     * Get connected event information list
-     */
+       * Get connected event information list
+       */
       //Get all connected event ids
       $allEventIdsArray = CRM_Core_BAO_RecurringEntity::getEntitiesForParent($checkParentExistsForThisId, 'civicrm_event');
       $allEventIds = array();
@@ -114,36 +114,36 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
 
       $linkedEntities = array(
         array(
-          'table'         => 'civicrm_price_set_entity',
-          'findCriteria'  => array(
-            'entity_id'    => $this->_id,
+          'table' => 'civicrm_price_set_entity',
+          'findCriteria' => array(
+            'entity_id' => $this->_id,
             'entity_table' => 'civicrm_event',
           ),
           'linkedColumns' => array('entity_id'),
           'isRecurringEntityRecord' => FALSE,
         ),
         array(
-          'table'         => 'civicrm_uf_join',
-          'findCriteria'  => array(
-            'entity_id'    => $this->_id,
+          'table' => 'civicrm_uf_join',
+          'findCriteria' => array(
+            'entity_id' => $this->_id,
             'entity_table' => 'civicrm_event',
           ),
           'linkedColumns' => array('entity_id'),
           'isRecurringEntityRecord' => FALSE,
         ),
         array(
-          'table'         => 'civicrm_tell_friend',
-          'findCriteria'  => array(
-            'entity_id'    => $this->_id,
+          'table' => 'civicrm_tell_friend',
+          'findCriteria' => array(
+            'entity_id' => $this->_id,
             'entity_table' => 'civicrm_event',
           ),
           'linkedColumns' => array('entity_id'),
           'isRecurringEntityRecord' => TRUE,
         ),
         array(
-          'table'         => 'civicrm_pcp_block',
-          'findCriteria'  => array(
-            'entity_id'    => $this->_id,
+          'table' => 'civicrm_pcp_block',
+          'findCriteria' => array(
+            'entity_id' => $this->_id,
             'entity_table' => 'civicrm_event',
           ),
           'linkedColumns' => array('entity_id'),
@@ -171,7 +171,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
    */
   static public function getParticipantCountforEvent($listOfRelatedEntities = array()) {
     if (!empty($listOfRelatedEntities)) {
-      $implodeRelatedEntities = implode(',', array_map(function($entity) {
+      $implodeRelatedEntities = implode(',', array_map(function ($entity) {
         return $entity['id'];
       }, $listOfRelatedEntities));
       if ($implodeRelatedEntities) {

@@ -127,7 +127,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
     if (empty($id)) {
       CRM_Core_Error::fatal();
     }
-    CRM_Core_Transaction::create()->run(function() use ($id) {
+    CRM_Core_Transaction::create()->run(function () use ($id) {
       CRM_Utils_Hook::pre('delete', 'MailingAB', $id, CRM_Core_DAO::$_nullArray);
 
       $dao = new CRM_Mailing_DAO_MailingAB();

@@ -96,8 +96,8 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
 
     $eventTemplate = new CRM_Event_DAO_Event();
 
-    $eventTypes          = CRM_Event_PseudoConstant::eventType();
-    $participantRoles    = CRM_Event_PseudoConstant::participantRole();
+    $eventTypes = CRM_Event_PseudoConstant::eventType();
+    $participantRoles = CRM_Event_PseudoConstant::participantRole();
     $participantListings = CRM_Event_PseudoConstant::participantListing();
 
     //find all event templates.
@@ -138,8 +138,8 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
 
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath(),
-        'reset=1&action=browse'
-      ));
+      'reset=1&action=browse'
+    ));
   }
 
   /**

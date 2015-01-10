@@ -99,11 +99,11 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    * @access public
    */
   public function __construct($event, $distinct, $mailing, $job = NULL, $url = NULL) {
-    $this->_event_type  = $event;
+    $this->_event_type = $event;
     $this->_is_distinct = $distinct;
-    $this->_mailing_id  = $mailing;
-    $this->_job_id      = $job;
-    $this->_url_id      = $url;
+    $this->_mailing_id = $mailing;
+    $this->_job_id = $job;
+    $this->_url_id = $url;
   }
 
   /**
@@ -124,8 +124,8 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    */
   public function getPagerParams($action, &$params) {
     $params['csvString'] = NULL;
-    $params['rowCount']  = CRM_Utils_Pager::ROWCOUNT;
-    $params['status']    = ts('%1 %%StatusMessage%%', array(1 => $this->eventToTitle()));
+    $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
+    $params['status'] = ts('%1 %%StatusMessage%%', array(1 => $this->eventToTitle()));
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }
@@ -212,27 +212,27 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           $dateSort = CRM_Mailing_Event_BAO_Unsubscribe::getTableName() . '.time_stamp';
           $this->_columnHeaders = array_merge($this->_columnHeaders, array(
             array(
-                'name' => ts('Unsubscribe'),
-              ),
-            ));
+              'name' => ts('Unsubscribe'),
+            ),
+          ));
           break;
 
         case 'optout':
           $dateSort = CRM_Mailing_Event_BAO_Unsubscribe::getTableName() . '.time_stamp';
           $this->_columnHeaders = array_merge($this->_columnHeaders, array(
             array(
-                'name' => ts('Opt-Out'),
-              ),
-            ));
+              'name' => ts('Opt-Out'),
+            ),
+          ));
           break;
 
         case 'click':
           $dateSort = CRM_Mailing_Event_BAO_TrackableURLOpen::getTableName() . '.time_stamp';
           $this->_columnHeaders = array_merge($this->_columnHeaders, array(
             array(
-                'name' => ts('URL'),
-              ),
-            ));
+              'name' => ts('URL'),
+            ),
+          ));
           break;
 
         default:
@@ -354,7 +354,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
         return CRM_Mailing_Event_BAO_Queue::getRows($this->_mailing_id,
           $this->_job_id, $offset, $rowCount, $sort
         );
-      break;
+        break;
 
       case 'delivered':
         return CRM_Mailing_Event_BAO_Delivered::getRows($this->_mailing_id,
@@ -432,16 +432,16 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
         'bounce' => ts('Bounces'),
         'forward' => ts('Forwards'),
         'reply' => $this->_is_distinct
-         ? ts('Unique Replies')
-         : ts('Replies'),
+          ? ts('Unique Replies')
+          : ts('Replies'),
         'unsubscribe' => ts('Unsubscribe Requests'),
         'optout' => ts('Opt-out Requests'),
         'click' => $this->_is_distinct
-         ? ts('Unique Click-throughs')
-         : ts('Click-throughs'),
+          ? ts('Unique Click-throughs')
+          : ts('Click-throughs'),
         'opened' => $this->_is_distinct
-         ? ts('Unique Tracked Opens')
-         : ts('Tracked Opens'),
+          ? ts('Unique Tracked Opens')
+          : ts('Tracked Opens'),
       );
     }
     return $events[$this->_event_type];

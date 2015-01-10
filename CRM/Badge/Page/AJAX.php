@@ -31,7 +31,6 @@
  * @copyright CiviCRM LLC (c) 2004-2014
  *
  */
-
 class CRM_Badge_Page_AJAX {
   public static function getImageProp() {
     $img = $_GET['img'];

@@ -136,9 +136,9 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
     $pageID = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE, 0
     );
-    $dao               = new CRM_Contribute_DAO_Premium();
+    $dao = new CRM_Contribute_DAO_Premium();
     $dao->entity_table = 'civicrm_contribution_page';
-    $dao->entity_id    = $pageID;
+    $dao->entity_id = $pageID;
     $dao->find(TRUE);
     $premiumID = $dao->id;
     $this->assign('products', FALSE);

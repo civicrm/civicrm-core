@@ -124,18 +124,18 @@ class CRM_Admin_Form_PreferencesDate extends CRM_Admin_Form {
     $params = $this->controller->exportValues($this->_name);
 
     // action is taken depending upon the mode
-    $dao              = new CRM_Core_DAO_PreferencesDate();
-    $dao->id          = $this->_id;
+    $dao = new CRM_Core_DAO_PreferencesDate();
+    $dao->id = $this->_id;
     $dao->description = $params['description'];
-    $dao->start       = $params['start'];
-    $dao->end         = $params['end'];
+    $dao->start = $params['start'];
+    $dao->end = $params['end'];
     $dao->date_format = $params['date_format'];
     $dao->time_format = $params['time_format'];
 
     $dao->save();
 
     CRM_Core_Session::setStatus(ts("The date type '%1' has been saved.",
-        array(1 => $params['name'])
-      ), ts('Saved'), 'success');
+      array(1 => $params['name'])
+    ), ts('Saved'), 'success');
   }
 }

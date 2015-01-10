@@ -216,7 +216,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
       'join_date',
       'membership_start_date',
       'membership_end_date',
-     );
+    );
     if (isset($params['field'])) {
       $customFields = array();
       foreach ($params['field'] as $key => $value) {

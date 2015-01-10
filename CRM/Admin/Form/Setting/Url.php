@@ -42,6 +42,7 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
     'cvv_backoffice_required' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
     'disable_core_css' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
   );
+
   /**
    * Build the form object
    *

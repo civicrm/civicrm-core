@@ -118,9 +118,9 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
     // also update the ProfileModule tables
     $ufJoinParams = array(
       'is_active' => 1,
-      'module'    => 'CiviCampaign',
+      'module' => 'CiviCampaign',
       'entity_table' => 'civicrm_survey',
-      'entity_id'    => $this->_surveyId,
+      'entity_id' => $this->_surveyId,
     );
 
     // first delete all past entries

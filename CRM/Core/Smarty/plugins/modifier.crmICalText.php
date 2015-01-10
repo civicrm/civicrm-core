@@ -39,7 +39,7 @@
  * @param string $str
  *
  * @return string
-   *   formatted text
+ *   formatted text
  */
 function smarty_modifier_crmICalText($str) {
   return CRM_Utils_ICalendar::formatText($str);

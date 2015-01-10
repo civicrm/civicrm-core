@@ -58,12 +58,12 @@ class CRM_Report_BAO_Hook {
     return $singleton;
   }
 
- /**
-  * Get or build the list of search objects (via hook)
-  *
-  * @return array
+  /**
+   * Get or build the list of search objects (via hook)
+   *
+   * @return array
    *   of CRM_Report_BAO_Hook_Interface objects
-  */
+   */
   public function getSearchQueryObjects() {
     if ($this->_queryObjects === NULL) {
       $this->_queryObjects = array();

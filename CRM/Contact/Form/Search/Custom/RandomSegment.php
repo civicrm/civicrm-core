@@ -160,8 +160,8 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     $this->_tableName = "civicrm_temp_custom_{$randomNum}";
 
     //block for Group search
-    $smartGroup       = array();
-    $group            = new CRM_Contact_DAO_Group();
+    $smartGroup = array();
+    $group = new CRM_Contact_DAO_Group();
     $group->is_active = 1;
     $group->find();
     while ($group->fetch()) {
@@ -308,8 +308,8 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     if (substr($this->_segmentSize, -1) == '%') {
       $countSql = "SELECT DISTINCT contact_a.id $from $fromTail
                          WHERE " . $this->where();
-      $dao        = CRM_Core_DAO::executeQuery($countSql);
-      $totalSize  = $dao->N;
+      $dao = CRM_Core_DAO::executeQuery($countSql);
+      $totalSize = $dao->N;
       $multiplier = substr($this->_segmentSize, 0, strlen($this->_segmentSize) - 1);
       $multiplier /= 100;
       $this->_segmentSize = round($totalSize * $multiplier);

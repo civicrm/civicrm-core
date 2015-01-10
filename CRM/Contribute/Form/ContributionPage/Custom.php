@@ -56,13 +56,21 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
     $allowCoreTypes[] = 'Contribution';
     //CRM-15427
     $allowSubTypes['ContributionType'] = array($financialTypeId);
-    $entities[] = array('entity_name' => 'contribution_1', 'entity_type' => 'ContributionModel', 'entity_sub_type' => '*');
+    $entities[] = array(
+      'entity_name' => 'contribution_1',
+      'entity_type' => 'ContributionModel',
+      'entity_sub_type' => '*'
+    );
 
     // If applicable, register 'membership_1'
     $member = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
     if ($member && $member['is_active']) {
       //CRM-15427
-      $entities[] = array('entity_name' => 'membership_1', 'entity_type' => 'MembershipModel', 'entity_sub_type' => '*');
+      $entities[] = array(
+        'entity_name' => 'membership_1',
+        'entity_type' => 'MembershipModel',
+        'entity_sub_type' => '*'
+      );
       $allowCoreTypes[] = 'Membership';
       $allowSubTypes['MembershipType'] = explode(',', $member['membership_types']);
     }
@@ -172,9 +180,9 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
     $preProfileType = $postProfileType = NULL;
     // for membership profile make sure Membership section is enabled
     // get membership section for this contribution page
-    $dao               = new CRM_Member_DAO_MembershipBlock();
+    $dao = new CRM_Member_DAO_MembershipBlock();
     $dao->entity_table = 'civicrm_contribution_page';
-    $dao->entity_id    = $contributionPageId;
+    $dao->entity_id = $contributionPageId;
 
     $membershipEnable = FALSE;
 

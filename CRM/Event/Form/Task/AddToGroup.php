@@ -214,8 +214,8 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
       $groupParams['visibility'] = "User and User Admin Only";
       if (array_key_exists('group_type', $params) && is_array($params['group_type'])) {
         $groupParams['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-          array_keys($params['group_type'])
-        ) . CRM_Core_DAO::VALUE_SEPARATOR;
+            array_keys($params['group_type'])
+          ) . CRM_Core_DAO::VALUE_SEPARATOR;
       }
       else {
         $groupParams['group_type'] = '';
@@ -223,22 +223,34 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
       $groupParams['is_active'] = 1;
 
       $createdGroup = CRM_Contact_BAO_Group::create($groupParams);
-      $groupID      = $createdGroup->id;
-      $groupName    = $groupParams['title'];
+      $groupID = $createdGroup->id;
+      $groupName = $groupParams['title'];
     }
     else {
-      $groupID   = $params['group_id'];
-      $group     = CRM_Core_PseudoConstant::group();
+      $groupID = $params['group_id'];
+      $group = CRM_Core_PseudoConstant::group();
       $groupName = $group[$groupID];
     }
 
     list($total, $added, $notAdded) = CRM_Contact_BAO_GroupContact::addContactsToGroup($this->_contactIds, $groupID);
 
-    $status = array(ts('%count contact added to group', array('count' => $added, 'plural' => '%count contacts added to group')));
+    $status = array(
+      ts('%count contact added to group', array(
+          'count' => $added,
+          'plural' => '%count contacts added to group'
+        ))
+    );
     if ($notAdded) {
-      $status[] = ts('%count contact was already in group', array('count' => $notAdded, 'plural' => '%count contacts were already in group'));
+      $status[] = ts('%count contact was already in group', array(
+          'count' => $notAdded,
+          'plural' => '%count contacts were already in group'
+        ));
     }
     $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
-    CRM_Core_Session::setStatus($status, ts('Added Contact to %1', array(1 => $groupName, 'count' => $added, 'plural' => 'Added Contacts to %1')), 'success', array('expires' => 0));
+    CRM_Core_Session::setStatus($status, ts('Added Contact to %1', array(
+          1 => $groupName,
+          'count' => $added,
+          'plural' => 'Added Contacts to %1'
+        )), 'success', array('expires' => 0));
   }
 }

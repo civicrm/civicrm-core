@@ -150,15 +150,15 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
      */
     $form->assign('elements', array(
       'distance',
-        'prox_distance_unit',
-        'street_address',
-        'city',
-        'postal_code',
-        'country_id',
-        'state_province_id',
-        'group',
-        'tag',
-      ));
+      'prox_distance_unit',
+      'street_address',
+      'city',
+      'postal_code',
+      'country_id',
+      'state_province_id',
+      'group',
+      'tag',
+    ));
   }
 
   /**

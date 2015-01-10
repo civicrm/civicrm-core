@@ -189,7 +189,7 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
         case 'week':
           $scheduleType = 'WEEKLY';
           $scheduleDate = $date['wday'] + 1;
-          $endTime      = $startTime + ($paymentsRecur * 7 * 24 * 60 * 60);
+          $endTime = $startTime + ($paymentsRecur * 7 * 24 * 60 * 60);
           break;
 
         case 'month':
@@ -205,7 +205,7 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
 
         default:
           die('Invalid frequency unit!');
-        break;
+          break;
       }
       $endDate = date('Y-m-d', $endTime);
       $startDate = date('Y-m-d', $startTime);
@@ -227,9 +227,9 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
       // this just means we got some kind of answer, not necessarily approved
       $result = $iatslink1->getAuthorizationResult();
       //return self::error($result);
-      $result      = explode(':', $result, 2);
+      $result = explode(':', $result, 2);
       $trxn_result = trim($result[0]);
-      $trxn_id     = trim($result[1]);
+      $trxn_id = trim($result[1]);
       if ($trxn_result == 'OK') {
         $params['trxn_id'] = $trxn_id . ':' . time();
         $params['gross_amount'] = $amount;

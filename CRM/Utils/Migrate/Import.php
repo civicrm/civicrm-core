@@ -49,7 +49,7 @@ class CRM_Utils_Migrate_Import {
   public function run($file) {
     // read xml file
     $dom = new DomDocument();
-    if (! $dom->load($file)) {
+    if (!$dom->load($file)) {
       throw new CRM_Core_Exception("Failed to parse XML file \"$file\"");
     }
     $dom->xinclude();
@@ -117,7 +117,7 @@ class CRM_Utils_Migrate_Import {
       }
     }
 
-    $fields = & $dao->fields();
+    $fields = &$dao->fields();
     foreach ($fields as $name => $dontCare) {
       if (isset($xml->$name)) {
         $value = (string ) $xml->$name;
@@ -223,7 +223,8 @@ WHERE      v.option_group_id = %1
 
         // fix extends stuff if it exists
         if (isset($customGroupXML->extends_entity_column_value_option_group) &&
-          isset($customGroupXML->extends_entity_column_value)) {
+          isset($customGroupXML->extends_entity_column_value)
+        ) {
           $valueIDs = array();
           $optionValues = explode(",", $customGroupXML->extends_entity_column_value);
           $optValues = implode("','", $optionValues);
@@ -251,7 +252,7 @@ AND        v.name IN ('$optValues')
                   'String',
                 ),
               );
-              $dao = & CRM_Core_DAO::executeQuery($sql, $params);
+              $dao = &CRM_Core_DAO::executeQuery($sql, $params);
 
               while ($dao->fetch()) {
                 $valueIDs[] = $dao->value;
@@ -259,8 +260,8 @@ AND        v.name IN ('$optValues')
             }
             if (!empty($valueIDs)) {
               $customGroup->extends_entity_column_value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-                $valueIDs
-              ) . CRM_Core_DAO::VALUE_SEPARATOR;
+                  $valueIDs
+                ) . CRM_Core_DAO::VALUE_SEPARATOR;
 
               unset($valueIDs);
 
@@ -312,8 +313,8 @@ AND        v.name = %1
 
             if (is_array($optionIDs) && !empty($optionIDs)) {
               $customGroup->extends_entity_column_value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-                array_keys($optionIDs)
-              ) . CRM_Core_DAO::VALUE_SEPARATOR;
+                  array_keys($optionIDs)
+                ) . CRM_Core_DAO::VALUE_SEPARATOR;
 
               $saveAgain = TRUE;
             }
@@ -443,12 +444,12 @@ AND        f.column_name = %2
           $cfID = CRM_Core_DAO::singleValueQuery($sql, $params);
           if (!$cfID) {
             CRM_Core_Error::fatal(ts("Could not find custom field for %1, %2, %3",
-              array(
-                1 => $profileField->field_name,
-                2 => $tableName,
-                3 => $columnName,
-              )
-            ) . "<br />");
+                array(
+                  1 => $profileField->field_name,
+                  2 => $tableName,
+                  3 => $columnName,
+                )
+              ) . "<br />");
           }
           $profileField->field_name = "custom_{$cfID}";
         }

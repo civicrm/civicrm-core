@@ -573,8 +573,8 @@ class CRM_Case_BAO_Query {
 
       case 'case_relationship':
         $session = CRM_Core_Session::singleton();
-        $userID  = $session->get('userID');
-        $from   .= " $side JOIN civicrm_relationship case_relationship ON ( case_relationship.contact_id_a = civicrm_case_contact.contact_id AND case_relationship.contact_id_b = {$userID} AND case_relationship.case_id = civicrm_case.id )";
+        $userID = $session->get('userID');
+        $from .= " $side JOIN civicrm_relationship case_relationship ON ( case_relationship.contact_id_a = civicrm_case_contact.contact_id AND case_relationship.contact_id_b = {$userID} AND case_relationship.case_id = civicrm_case.id )";
         break;
 
       case 'case_relation_type':

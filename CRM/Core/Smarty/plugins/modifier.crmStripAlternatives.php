@@ -41,7 +41,7 @@
  *   All alternatives as a long string (or some other text).
  *
  * @return string
-   *   only the first alternative found (or the text without alternatives)
+ *   only the first alternative found (or the text without alternatives)
  */
 function smarty_modifier_crmStripAlternatives($full) {
   return CRM_Utils_String::stripAlternatives($full);

@@ -160,7 +160,10 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    */
   public static function initializeDashlets() {
     $dashlets = array();
-    $getDashlets = civicrm_api3("Dashboard", "get", array('domain_id' => CRM_Core_Config::domainID(), 'option.limit' => 0));
+    $getDashlets = civicrm_api3("Dashboard", "get", array(
+        'domain_id' => CRM_Core_Config::domainID(),
+        'option.limit' => 0
+      ));
     $contactID = CRM_Core_Session::singleton()->get('userID');
     $allDashlets = CRM_Utils_Array::index(array('name'), $getDashlets['values']);
     $defaultDashlets = array();
@@ -177,7 +180,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       foreach ($defaultDashlets as $id => $defaultDashlet) {
         $dashboard_id = $defaultDashlet['dashboard_id'];
         if (!self::checkPermission($getDashlets['values'][$dashboard_id]['permission'],
-                                   $getDashlets['values'][$dashboard_id]['permission_operator'])) {
+          $getDashlets['values'][$dashboard_id]['permission_operator'])
+        ) {
           continue;
         }
         else {
@@ -224,7 +228,10 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
 
         // hack to handle case permissions
         if (!$componentName && in_array($key, array(
-          'access my cases and activities', 'access all cases and activities'))) {
+            'access my cases and activities',
+            'access all cases and activities'
+          ))
+        ) {
           $componentName = 'CiviCase';
         }
 
@@ -287,8 +294,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     // build the content
     $dao = new CRM_Contact_DAO_DashboardContact();
 
-    $session           = CRM_Core_Session::singleton();
-    $dao->contact_id   = $session->get('userID');
+    $session = CRM_Core_Session::singleton();
+    $dao->contact_id = $session->get('userID');
     $dao->dashboard_id = $dashletID;
     $dao->find(TRUE);
 
@@ -474,10 +481,11 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     }
     return $url;
   }
+
   /**
    * Update contact dashboard with new dashlet
    *
-   * @param object: $dashlet
+   * @param object : $dashlet
    *
    * @return void
    * @static

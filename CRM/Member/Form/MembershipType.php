@@ -88,11 +88,11 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     $periods = array('fixed_period_start_day', 'fixed_period_rollover_day');
     foreach ($periods as $per) {
       if (isset($defaults[$per])) {
-        $date            = $defaults[$per];
+        $date = $defaults[$per];
 
         $defaults[$per] = array();
         if ($date > 31) {
-          $date                = ($date < 999) ? '0' . $date : $date;
+          $date = ($date < 999) ? '0' . $date : $date;
           $defaults[$per]['M'] = substr($date, 0, 2);
           $defaults[$per]['d'] = substr($date, 2, 3);
         }
@@ -150,9 +150,9 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     );
 
     //Auto-renew Option
-    $paymentProcessor  = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'is_recur = 1');
-    $isAuthorize       = FALSE;
-    $options           = array();
+    $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'is_recur = 1');
+    $isAuthorize = FALSE;
+    $options = array();
     if (is_array($paymentProcessor) && !empty($paymentProcessor)) {
       $isAuthorize = TRUE;
       $options = CRM_Core_SelectValues::memberAutoRenew();
@@ -201,7 +201,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     $this->assign('membershipRecordsExists', $membershipRecords);
 
     $this->add('text', 'max_related', ts('Max related'),
-        CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'max_related')
+      CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'max_related')
     );
 
     $this->addFormRule(array('CRM_Member_Form_MembershipType', 'formRule'));
@@ -234,7 +234,9 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     }
 
     if (in_array(CRM_Utils_Array::value('auto_renew', $params), array(
-      1, 2))) {
+      1,
+      2
+    ))) {
       if (($params['duration_interval'] > 1 && $params['duration_unit'] == 'year') ||
         ($params['duration_interval'] > 12 && $params['duration_unit'] == 'month')
       ) {
@@ -295,9 +297,9 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       try {
-      CRM_Member_BAO_MembershipType::del($this->_id);
+        CRM_Member_BAO_MembershipType::del($this->_id);
       }
-      catch(CRM_Core_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         CRM_Core_Error::statusBounce($e->getMessage(), NULL, ts('Membership Type Not Deleted'));
       }
       CRM_Core_Session::setStatus(ts('Selected membership type has been deleted.'), ts('Record Deleted'), 'success');
@@ -368,13 +370,13 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       $periods = array('fixed_period_start_day', 'fixed_period_rollover_day');
       foreach ($periods as $per) {
         if (!empty($params[$per]['M']) && !empty($params[$per]['d'])) {
-          $mon          = $params[$per]['M'];
-          $dat          = $params[$per]['d'];
-          $mon          = ($mon < 10) ? '0' . $mon : $mon;
-          $dat          = ($dat < 10) ? '0' . $dat : $dat;
+          $mon = $params[$per]['M'];
+          $dat = $params[$per]['d'];
+          $mon = ($mon < 10) ? '0' . $mon : $mon;
+          $dat = ($dat < 10) ? '0' . $dat : $dat;
           $params[$per] = $mon . $dat;
         }
-        elseif($per == 'fixed_period_rollover_day' && !empty($params['month_fixed_period_rollover_day'])) {
+        elseif ($per == 'fixed_period_rollover_day' && !empty($params['month_fixed_period_rollover_day'])) {
           $params['fixed_period_rollover_day'] = $params['month_fixed_period_rollover_day']['d'];
           unset($params['month_fixed_period_rollover_day']);
         }
@@ -400,8 +402,8 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
 
       CRM_Core_Session::setStatus(ts('The membership type \'%1\' has been saved.',
-          array(1 => $membershipType->name)
-        ), ts('Saved'), 'success');
+        array(1 => $membershipType->name)
+      ), ts('Saved'), 'success');
       $session = CRM_Core_Session::singleton();
       if ($buttonName == $this->getButtonName('upload', 'new')) {
         $session->replaceUserContext(

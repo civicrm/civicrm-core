@@ -47,10 +47,10 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
-    $values        = $ids = array();
+    $values = $ids = array();
     $participantID = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
-    $contactID     = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-    $params        = array('id' => $participantID);
+    $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
+    $params = array('id' => $participantID);
 
     CRM_Event_BAO_Participant::getValues($params,
       $values,
@@ -76,8 +76,9 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $this->assign('hasPayment', $paymentId);
 
     if ($parentParticipantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
-          $participantID, 'registered_by_id'
-      )) {
+      $participantID, 'registered_by_id'
+    )
+    ) {
       $parentHasPayment = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
         $parentParticipantId, 'id', 'participant_id'
       );
@@ -132,11 +133,11 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       $eventGroupTree = &CRM_Core_BAO_CustomGroup::getTree('Participant', $this, $participantID, NULL,
         $values[$participantID]['event_id'], $eventNameCustomDataTypeID
       );
-      $eventTypeID        = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $values[$participantID]['event_id'], 'event_type_id', 'id');
+      $eventTypeID = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $values[$participantID]['event_id'], 'event_type_id', 'id');
       $eventTypeGroupTree = CRM_Core_BAO_CustomGroup::getTree('Participant', $this, $participantID, NULL, $eventTypeID, $eventTypeCustomDataTypeID);
-      $groupTree          = CRM_Utils_Array::crmArrayMerge($roleGroupTree, $eventGroupTree);
-      $groupTree          = CRM_Utils_Array::crmArrayMerge($groupTree, $eventTypeGroupTree);
-      $groupTree          = CRM_Utils_Array::crmArrayMerge($groupTree, CRM_Core_BAO_CustomGroup::getTree('Participant', $this, $participantID));
+      $groupTree = CRM_Utils_Array::crmArrayMerge($roleGroupTree, $eventGroupTree);
+      $groupTree = CRM_Utils_Array::crmArrayMerge($groupTree, $eventTypeGroupTree);
+      $groupTree = CRM_Utils_Array::crmArrayMerge($groupTree, CRM_Core_BAO_CustomGroup::getTree('Participant', $this, $participantID));
       foreach ($groupTree as $treeId => $trees) {
         $finalTree[$treeId] = $trees;
       }

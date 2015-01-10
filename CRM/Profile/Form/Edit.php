@@ -87,8 +87,8 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
     if ($this->get('edit')) {
       // make sure we have right permission to edit this user
       $session = CRM_Core_Session::singleton();
-      $userID  = $session->get('userID');
-      $id      = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, $userID);
+      $userID = $session->get('userID');
+      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, $userID);
 
       if ($id) {
         // this is edit mode.

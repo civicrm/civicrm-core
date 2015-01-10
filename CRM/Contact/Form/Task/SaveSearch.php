@@ -164,9 +164,9 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
       if (!$this->_id) {
         //save record in mapping table
         $mappingParams = array('mapping_type' => 'Search Builder');
-        $temp          = array();
-        $mapping       = CRM_Core_BAO_Mapping::add($mappingParams, $temp);
-        $mappingId     = $mapping->id;
+        $temp = array();
+        $mapping = CRM_Core_BAO_Mapping::add($mappingParams, $temp);
+        $mappingId = $mapping->id;
       }
       else {
         //get the mapping id from saved search
@@ -199,8 +199,8 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
       is_array($formValues['group_type'])
     ) {
       $params['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-        array_keys($formValues['group_type'])
-      ) . CRM_Core_DAO::VALUE_SEPARATOR;
+          array_keys($formValues['group_type'])
+        ) . CRM_Core_DAO::VALUE_SEPARATOR;
     }
     else {
       $params['group_type'] = '';

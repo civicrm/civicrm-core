@@ -147,9 +147,9 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_tagFilter = FALSE;
 
   /**
-<<<<<<< HEAD
+   * <<<<<<< HEAD
    * Build groups filter
-=======
+   * =======
    * specify entity table for tags filter
    *
    */
@@ -158,7 +158,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * build groups filter
    *
->>>>>>> 098a61330d0fe12153370741ec98cb1172ece849
+   * >>>>>>> 098a61330d0fe12153370741ec98cb1172ece849
    */
   protected $_groupFilter = FALSE;
 

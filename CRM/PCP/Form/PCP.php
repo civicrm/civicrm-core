@@ -77,7 +77,7 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
     $context = $session->popUserContext();
-    $userID  = $session->get('userID');
+    $userID = $session->get('userID');
 
     //do not allow destructive actions without permissions
     $permission = FALSE;
@@ -167,7 +167,7 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
         'event' => ts('Event'),
       );
       $contribPages = array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::contributionPage();
-      $eventPages   = array('' => ts('- select -')) + CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
+      $eventPages = array('' => ts('- select -')) + CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
 
       $this->addElement('select', 'status_id', ts('Status'), $status);
       $this->addElement('select', 'page_type', ts('Source Type'), $types);

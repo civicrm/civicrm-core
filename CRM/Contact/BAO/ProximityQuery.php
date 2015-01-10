@@ -44,12 +44,10 @@ class CRM_Contact_BAO_ProximityQuery {
    * All function arguments and return values measure distances in metres
    * and angles in degrees.  The ellipsoid model is from the WGS-84 datum.
    * Ka-Ping Yee, 2003-08-11
-
    * earth_radius_semimajor = 6378137.0;
    * earth_flattening = 1/298.257223563;
    * earth_radius_semiminor = $earth_radius_semimajor * (1 - $earth_flattening);
    * earth_eccentricity_sq = 2*$earth_flattening - pow($earth_flattening, 2);
-
    * This library is an implementation of UCB CS graduate student, Ka-Ping Yee (http://www.zesty.ca).
    * This version has been taken from Drupal's location module: http://drupal.org/project/location
    **/
@@ -101,9 +99,9 @@ class CRM_Contact_BAO_ProximityQuery {
     $lat = deg2rad($latitude);
 
     $cosLong = cos($long);
-    $cosLat  = cos($lat);
+    $cosLat = cos($lat);
     $sinLong = sin($long);
-    $sinLat  = sin($lat);
+    $sinLat = sin($lat);
 
     $radius = self::$_earthRadiusSemiMajor / sqrt(1 - self::$_earthEccentricitySQ * $sinLat * $sinLat);
 
@@ -125,16 +123,16 @@ class CRM_Contact_BAO_ProximityQuery {
    * Estimate the min and max longitudes within $distance of a given location.
    */
   public static function earthLongitudeRange($longitude, $latitude, $distance) {
-    $long   = deg2rad($longitude);
-    $lat    = deg2rad($latitude);
+    $long = deg2rad($longitude);
+    $lat = deg2rad($latitude);
     $radius = self::earthRadius($latitude);
 
-    $angle   = $distance / $radius;
-    $diff    = asin(sin($angle) / cos($lat));
+    $angle = $distance / $radius;
+    $diff = asin(sin($angle) / cos($lat));
     $minLong = $long - $diff;
     $maxLong = $long + $diff;
 
-    if ($minLong < - pi()) {
+    if ($minLong < -pi()) {
       $minLong = $minLong + pi() * 2;
     }
 
@@ -142,7 +140,8 @@ class CRM_Contact_BAO_ProximityQuery {
       $maxLong = $maxLong - pi() * 2;
     }
 
-    return array(rad2deg($minLong),
+    return array(
+      rad2deg($minLong),
       rad2deg($maxLong),
     );
   }
@@ -151,17 +150,17 @@ class CRM_Contact_BAO_ProximityQuery {
    * Estimate the min and max latitudes within $distance of a given location.
    */
   public static function earthLatitudeRange($longitude, $latitude, $distance) {
-    $long   = deg2rad($longitude);
-    $lat    = deg2rad($latitude);
+    $long = deg2rad($longitude);
+    $lat = deg2rad($latitude);
     $radius = self::earthRadius($latitude);
 
-    $angle      = $distance / $radius;
-    $minLat     = $lat - $angle;
-    $maxLat     = $lat + $angle;
+    $angle = $distance / $radius;
+    $minLat = $lat - $angle;
+    $maxLat = $lat + $angle;
     $rightangle = pi() / 2.0;
 
     // wrapped around the south pole
-    if ($minLat < - $rightangle) {
+    if ($minLat < -$rightangle) {
       $overshoot = -$minLat - $rightangle;
       $minLat = -$rightangle + $overshoot;
       if ($minLat > $maxLat) {
@@ -180,7 +179,8 @@ class CRM_Contact_BAO_ProximityQuery {
       $maxLat = $rightangle;
     }
 
-    return array(rad2deg($minLat),
+    return array(
+      rad2deg($minLat),
       rad2deg($maxLat),
     );
   }

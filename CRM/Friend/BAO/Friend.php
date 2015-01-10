@@ -156,7 +156,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
       // attempt to save activity targets
       $targetParams = array(
         'activity_id' => $activity->id,
-        'contact_id'  => $contact,
+        'contact_id' => $contact,
         'record_type_id' => $targetID,
       );
 

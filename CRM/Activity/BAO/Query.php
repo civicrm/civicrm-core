@@ -202,7 +202,10 @@ class CRM_Activity_BAO_Query {
         $types = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
         //get the component activity types.
         $compActTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE, TRUE);
-        $activityTypeIds = self::buildWhereAndQill($query, $value, $types, $op, $grouping, array('Activity Type', 'civicrm_activity.activity_type_id'));
+        $activityTypeIds = self::buildWhereAndQill($query, $value, $types, $op, $grouping, array(
+            'Activity Type',
+            'civicrm_activity.activity_type_id'
+          ));
 
         foreach ($activityTypeIds as $activityTypeId) {
           if (array_key_exists($activityTypeId, $compActTypes)) {
@@ -258,7 +261,10 @@ class CRM_Activity_BAO_Query {
       case 'activity_status':
         $status = CRM_Core_PseudoConstant::activityStatus();
 
-        $activityTypeIds = self::buildWhereAndQill($query, $value, $status, $op, $grouping, array('Activity Status', 'civicrm_activity.status_id'));
+        $activityTypeIds = self::buildWhereAndQill($query, $value, $status, $op, $grouping, array(
+            'Activity Status',
+            'civicrm_activity.status_id'
+          ));
         break;
 
       case 'activity_subject':
@@ -285,7 +291,7 @@ class CRM_Activity_BAO_Query {
       case 'activity_test':
         // We dont want to include all tests for sql OR CRM-7827
         if (!$value || $query->getOperator() != 'OR') {
-            $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_activity.is_test", $op, $value, "Boolean");
+          $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_activity.is_test", $op, $value, "Boolean");
           if ($value) {
             $query->_qill[$grouping][] = ts('Activity is a Test');
           }
@@ -360,7 +366,7 @@ class CRM_Activity_BAO_Query {
       case 'activity_result':
         if (is_array($value)) {
           $safe = NULL;
-          while (list(,$k) = each($value)) {
+          while (list(, $k) = each($value)) {
             $safe[] = "'" . CRM_Utils_Type::escape($k, 'String') . "'";
           }
           $query->_where[$grouping][] = "civicrm_activity.result IN (" . implode(',', $safe) . ")";
@@ -386,7 +392,7 @@ class CRM_Activity_BAO_Query {
         }
         elseif ($value == 2) {
           $query->_where[$grouping][] = "civicrm_activity.parent_id IS NULL";
-         $query->_qill[$grouping][] = ts('Activities which are not Followup Activities');
+          $query->_qill[$grouping][] = ts('Activities which are not Followup Activities');
         }
         break;
     }
@@ -545,14 +551,14 @@ class CRM_Activity_BAO_Query {
       $form->addSelect('activity_engagement_level', array('entity' => 'activity', 'context' => 'search'));
 
       // Add survey result field.
-      $optionGroups  = CRM_Campaign_BAO_Survey::getResultSets('name');
+      $optionGroups = CRM_Campaign_BAO_Survey::getResultSets('name');
       $resultOptions = array();
       foreach ($optionGroups as $gid => $name) {
         if ($name) {
           $value = array();
           $value = CRM_Core_OptionGroup::values($name);
           if (!empty($value)) {
-            while (list($k,$v) = each($value)) {
+            while (list($k, $v) = each($value)) {
               $resultOptions[$v] = $v;
             }
           }

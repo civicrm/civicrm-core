@@ -180,9 +180,9 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     // submitted form values
     $this->_queryParams = &$queryParams;
 
-    $this->_single      = $single;
-    $this->_limit       = $limit;
-    $this->_context     = $context;
+    $this->_single = $single;
+    $this->_limit = $limit;
+    $this->_context = $context;
     $this->_compContext = $compContext;
 
     $this->_contributionClause = $contributionClause;
@@ -342,9 +342,9 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     $qfKey = $this->_key;
     $componentId = $componentContext = NULL;
     if ($this->_context != 'contribute') {
-      $qfKey            = CRM_Utils_Request::retrieve('key', 'String', CRM_Core_DAO::$_nullObject);
-      $componentId      = CRM_Utils_Request::retrieve('id', 'Positive', CRM_Core_DAO::$_nullObject);
-      $componentAction  = CRM_Utils_Request::retrieve('action', 'String', CRM_Core_DAO::$_nullObject);
+      $qfKey = CRM_Utils_Request::retrieve('key', 'String', CRM_Core_DAO::$_nullObject);
+      $componentId = CRM_Utils_Request::retrieve('id', 'Positive', CRM_Core_DAO::$_nullObject);
+      $componentAction = CRM_Utils_Request::retrieve('action', 'String', CRM_Core_DAO::$_nullObject);
       $componentContext = CRM_Utils_Request::retrieve('compContext', 'String', CRM_Core_DAO::$_nullObject);
 
       if (!$componentContext &&
@@ -477,7 +477,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
         array(
           array(
             'name' => ts('Type'),
-            'sort'      => 'financial_type',
+            'sort' => 'financial_type',
             'direction' => CRM_Utils_Sort::DONTCARE,
           ),
           array(

@@ -60,6 +60,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     }
     return CRM_Core_BAO_OptionValue::add($params, $ids);
   }
+
   /**
    * Set default Parameters
    * This functions sets default parameters if not set:
@@ -100,7 +101,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    */
   public static function getDefaultWeight($params) {
     return (int) CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
-          array('option_group_id' => $params['option_group_id']));
+      array('option_group_id' => $params['option_group_id']));
   }
 
   /**
@@ -111,17 +112,18 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param array $params
    */
   public static function getDefaultValue($params) {
-     $bao = new CRM_Core_BAO_OptionValue();
-     $bao->option_group_id = $params['option_group_id'];
-     if (isset($params['domain_id'])) {
-       $bao->domain_id = $params['domain_id'];
-     }
-     $bao->selectAdd();
-     $bao->whereAdd("value REGEXP '^[0-9]+$'");
-     $bao->selectAdd('(ROUND(COALESCE(MAX(CONVERT(value, UNSIGNED)),0)) +1) as nextvalue');
-     $bao->find(TRUE);
-     return $bao->nextvalue;
+    $bao = new CRM_Core_BAO_OptionValue();
+    $bao->option_group_id = $params['option_group_id'];
+    if (isset($params['domain_id'])) {
+      $bao->domain_id = $params['domain_id'];
+    }
+    $bao->selectAdd();
+    $bao->whereAdd("value REGEXP '^[0-9]+$'");
+    $bao->selectAdd('(ROUND(COALESCE(MAX(CONVERT(value, UNSIGNED)),0)) +1) as nextvalue');
+    $bao->find(TRUE);
+    return $bao->nextvalue;
   }
+
   /**
    * Fetch object based on array of properties
    *
@@ -316,13 +318,14 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       'gender' => 'gender_id',
       'individual_prefix' => 'prefix_id',
       'individual_suffix' => 'suffix_id',
-      'communication_style' => 'communication_style_id', // Not only Individuals -- but the code seems to be generic for all contact types, despite the naming...
+      'communication_style' => 'communication_style_id',
+      // Not only Individuals -- but the code seems to be generic for all contact types, despite the naming...
     );
     $contributions = array('payment_instrument' => 'payment_instrument_id');
-    $activities    = array('activity_type' => 'activity_type_id');
-    $participant   = array('participant_role' => 'role_id');
-    $eventType     = array('event_type' => 'event_type_id');
-    $aclRole       = array('acl_role' => 'acl_role_id');
+    $activities = array('activity_type' => 'activity_type_id');
+    $participant = array('participant_role' => 'role_id');
+    $eventType = array('event_type' => 'event_type_id');
+    $aclRole = array('acl_role' => 'acl_role_id');
 
     $all = array_merge($individuals, $contributions, $activities, $participant, $eventType, $aclRole);
     $fieldName = '';
@@ -457,8 +460,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    */
   public static function getOptionValuesArray($optionGroupID) {
     // check if we can get the field values from the system cache
-    $cacheKey     = "CRM_Core_BAO_OptionValue_OptionGroupID_{$optionGroupID}";
-    $cache        = CRM_Utils_Cache::singleton();
+    $cacheKey = "CRM_Core_BAO_OptionValue_OptionGroupID_{$optionGroupID}";
+    $cache = CRM_Utils_Cache::singleton();
     $optionValues = $cache->get($cacheKey);
     if (empty($optionValues)) {
       $dao = new CRM_Core_DAO_OptionValue();
@@ -498,6 +501,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     }
     return $options;
   }
+
   /**
    * Get the values of all option values given an option group Name as a key => value pair
    * Use above cached function to make it super efficient

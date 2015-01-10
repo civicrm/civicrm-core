@@ -103,8 +103,8 @@ class CRM_Utils_Verp {
   public static function &verpdecode($address) {
     preg_match('/^(.+)-([^=]+)=([^\@]+)\@(.+)/', $address, $match);
 
-    $slocal  = $match[1];
-    $rlocal  = $match[2];
+    $slocal = $match[1];
+    $rlocal = $match[2];
     $rdomain = $match[3];
     $sdomain = $match[4];
 

@@ -42,10 +42,10 @@ class CRM_Logging_Reverter {
    * @param $log_date
    */
   public function __construct($log_conn_id, $log_date) {
-    $dsn               = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
-    $this->db          = $dsn['database'];
+    $dsn = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
+    $this->db = $dsn['database'];
     $this->log_conn_id = $log_conn_id;
-    $this->log_date    = $log_date;
+    $this->log_date = $log_date;
   }
 
   /**
@@ -139,7 +139,7 @@ class CRM_Logging_Reverter {
           foreach ($row as $id => $changes) {
             $inserts = array('id' => '%1');
             $updates = array();
-            $params  = array(1 => array($id, 'Integer'));
+            $params = array(1 => array($id, 'Integer'));
             $counter = 2;
             foreach ($changes as $field => $value) {
               // don’t try reverting a field that’s no longer there
@@ -155,8 +155,8 @@ class CRM_Logging_Reverter {
                   $value = CRM_Utils_Date::isoToMysql($value);
                   break;
               }
-              $inserts[$field]  = "%$counter";
-              $updates[]        = "$field = %$counter";
+              $inserts[$field] = "%$counter";
+              $updates[] = "$field = %$counter";
               $params[$counter] = array($value, $ctypes[$table][$field]);
               $counter++;
             }

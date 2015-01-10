@@ -113,14 +113,14 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         CRM_Core_Error::fatal('Could not find mapping for scheduled reminders.');
       }
 
-      $sel = & $this->add(
+      $sel = &$this->add(
         'hierselect',
-          'entity',
-          ts('Entity'),
-          array(
-            'name' => 'entity[0]',
-            'style' => 'vertical-align: top;',
-          ),
+        'entity',
+        ts('Entity'),
+        array(
+          'name' => 'entity[0]',
+          'style' => 'vertical-align: top;',
+        ),
         TRUE
       );
       $sel->setOptions(array($sel1, $sel2, $sel3));
@@ -183,7 +183,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->add('select', 'start_action_unit', ts('Frequency'), $freqUnitsDisplay, TRUE);
 
     $condition = array(
-    'before' => ts('before'),
+      'before' => ts('before'),
       'after' => ts('after'),
     );
     //reminder_action
@@ -261,6 +261,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     $this->setPageTitle(ts('Scheduled Reminder'));
   }
+
   /**
    * Global form rule
    *
@@ -464,7 +465,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
 
     if (!empty($this->_mappingID) && !empty($this->_compId)) {
-      $params['mapping_id']   = $this->_mappingID;
+      $params['mapping_id'] = $this->_mappingID;
       $params['entity_value'] = $this->_compId;
       $params['entity_status'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $values['entity']);
     }
@@ -512,8 +513,10 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     //TODO: handle postprocessing of SMS and/or Email info based on $modePrefixes
 
     $composeFields = array(
-      'template', 'saveTemplate',
-      'updateTemplate', 'saveTemplateName',
+      'template',
+      'saveTemplate',
+      'updateTemplate',
+      'saveTemplateName',
     );
     $msgTemplate = NULL;
     //mail template is composed
@@ -597,7 +600,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     if ($this->_action) {
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $status = ts("Your Reminder titled %1 has been updated.",
-                  array(1 => "<strong>{$values['title']}</strong>")
+          array(1 => "<strong>{$values['title']}</strong>")
         );
       }
 

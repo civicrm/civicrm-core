@@ -269,9 +269,9 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    */
   static function getEvents(
     $all = 0,
-                            $id = FALSE,
-                            $isActive = TRUE,
-                            $checkPermission = TRUE
+    $id = FALSE,
+    $isActive = TRUE,
+    $checkPermission = TRUE
   ) {
     $query = "
 SELECT `id`, `title`, `start_date`
@@ -602,10 +602,10 @@ $event_summary_limit
    */
   public static function getParticipantCount(
     $eventId,
-                                             $considerStatus = TRUE,
-                                             $status = TRUE,
-                                             $considerRole = TRUE,
-                                             $role = TRUE
+    $considerStatus = TRUE,
+    $status = TRUE,
+    $considerRole = TRUE,
+    $role = TRUE
   ) {
 
     // consider both role and status for counted participants, CRM-4924.
@@ -702,9 +702,9 @@ WHERE civicrm_address.geo_code_1 IS NOT NULL
       $params = array('entity_id' => $id, 'entity_table' => 'civicrm_event');
       $addressValues = CRM_Core_BAO_Location::getValues($params, TRUE);
       $location['address'] = str_replace(array(
-          "\r",
-          "\n",
-        ), '', addslashes(nl2br($addressValues['address'][1]['display_text'])));
+        "\r",
+        "\n",
+      ), '', addslashes(nl2br($addressValues['address'][1]['display_text'])));
 
       $location['url'] = CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $dao->event_id);
       $location['location_type'] = $dao->location_type;
@@ -2232,7 +2232,7 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
         // Fixme - this is going to ignore context, better to get conditions, add params, and call PseudoConstant::get
         return CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
 
-      break;
+        break;
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }

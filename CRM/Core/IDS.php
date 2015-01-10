@@ -76,14 +76,14 @@ class CRM_Core_IDS {
     require_once 'IDS/Init.php';
     try {
       $init = IDS_Init::init($configFile);
-      $ids  = new IDS_Monitor($_REQUEST, $init);
+      $ids = new IDS_Monitor($_REQUEST, $init);
     }
     catch (Exception $e) {
       // might be an old stale copy of Config.IDS.ini
       // lets try to rebuild it again and see if it works
       $configFile = self::createConfigFile(TRUE);
       $init = IDS_Init::init($configFile);
-      $ids  = new IDS_Monitor($_REQUEST, $init);
+      $ids = new IDS_Monitor($_REQUEST, $init);
     }
 
     $result = $ids->run();
@@ -258,9 +258,9 @@ class CRM_Core_IDS {
 
     $path = implode('/', $args);
     if (in_array(
-        $path,
-        array("civicrm/ajax/rest", "civicrm/api/json")
-      )) {
+      $path,
+      array("civicrm/ajax/rest", "civicrm/api/json")
+    )) {
       require_once "api/v3/utils.php";
       $error = civicrm_api3_create_error(
         $msg,

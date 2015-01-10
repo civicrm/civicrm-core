@@ -52,7 +52,7 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
    *
    * @return string
    */
-  public function fileName ($key) {
+  public function fileName($key) {
     if (strlen($key) > 50) {
       return CIVICRM_TEMPLATE_COMPILEDIR . "CRM_" . md5($key) . ".php";
     }
@@ -64,7 +64,7 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
    *
    * @return mixed
    */
-  public function get ($key) {
+  public function get($key) {
     if (array_key_exists($key, $this->_cache)) {
       return $this->_cache[$key];
     }

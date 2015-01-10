@@ -63,7 +63,10 @@ class CRM_Queue_ErrorPolicy {
     $this->active = TRUE;
     $this->backup = array();
     foreach (array(
-      'display_errors', 'html_errors', 'xmlrpc_errors') as $key) {
+               'display_errors',
+               'html_errors',
+               'xmlrpc_errors'
+             ) as $key) {
       $this->backup[$key] = ini_get($key);
       ini_set($key, 0);
     }
@@ -79,7 +82,10 @@ class CRM_Queue_ErrorPolicy {
     $this->errorScope = NULL;
     restore_error_handler();
     foreach (array(
-      'display_errors', 'html_errors', 'xmlrpc_errors') as $key) {
+               'display_errors',
+               'html_errors',
+               'xmlrpc_errors'
+             ) as $key) {
       ini_set($key, $this->backup[$key]);
     }
     $this->active = FALSE;
@@ -99,7 +105,7 @@ class CRM_Queue_ErrorPolicy {
     try {
       $result = $callable();
     }
-    catch(Exception$e) {
+    catch (Exception$e) {
       $this->reportException($e);
     }
     $this->deactivate();

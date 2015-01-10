@@ -202,7 +202,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       }
 
       $contribution->contact_id = $ids['contact'];
-      $contribution->financial_type_id  = $objects['contributionType']->id;
+      $contribution->financial_type_id = $objects['contributionType']->id;
       $contribution->contribution_page_id = $ids['contributionPage'];
       $contribution->contribution_recur_id = $ids['contributionRecur'];
       $contribution->receive_date = $now;
@@ -369,9 +369,9 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       $input[$name] = $value ? $value : NULL;
     }
 
-    $input['is_test']    = self::retrieve('test_ipn', 'Integer', 'POST', FALSE);
+    $input['is_test'] = self::retrieve('test_ipn', 'Integer', 'POST', FALSE);
     $input['fee_amount'] = self::retrieve('mc_fee', 'Money', 'POST', FALSE);
     $input['net_amount'] = self::retrieve('settle_amount', 'Money', 'POST', FALSE);
-    $input['trxn_id']    = self::retrieve('txn_id', 'String', 'POST', FALSE);
+    $input['trxn_id'] = self::retrieve('txn_id', 'String', 'POST', FALSE);
   }
 }

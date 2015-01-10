@@ -60,10 +60,10 @@ class CRM_Utils_Mail {
    *   true if a mail was sent, else false
    */
   public static function send(&$params) {
-    $returnPath       = CRM_Core_BAO_MailSettings::defaultReturnPath();
+    $returnPath = CRM_Core_BAO_MailSettings::defaultReturnPath();
     $includeMessageId = CRM_Core_BAO_MailSettings::includeMessageId();
-    $emailDomain      = CRM_Core_BAO_MailSettings::defaultDomain();
-    $from             = CRM_Utils_Array::value('from', $params);
+    $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
+    $from = CRM_Utils_Array::value('from', $params);
     if (!$returnPath) {
       $returnPath = self::pluckEmailFromHeader($from);
     }
@@ -86,13 +86,13 @@ class CRM_Utils_Mail {
       $htmlMessage = FALSE;
     }
 
-    $headers         = array();
+    $headers = array();
     // CRM-10699 support custom email headers
     if (!empty($params['headers'])) {
       $headers = array_merge($headers, $params['headers']);
     }
     $headers['From'] = $params['from'];
-    $headers['To']   =
+    $headers['To'] =
       self::formatRFC822Email(
         CRM_Utils_Array::value('toName', $params),
         CRM_Utils_Array::value('toEmail', $params),
@@ -201,7 +201,8 @@ class CRM_Utils_Mail {
    */
   public static function errorMessage($mailer, $result) {
     $message = '<p>' . ts('An error occurred when CiviCRM attempted to send an email (via %1). If you received this error after submitting on online contribution or event registration - the transaction was completed, but we were unable to send the email receipt.', array(
-      1 => 'SMTP')) . '</p>' . '<p>' . ts('The mail library returned the following error message:') . '<br /><span class="font-red"><strong>' . $result->getMessage() . '</strong></span></p>' . '<p>' . ts('This is probably related to a problem in your Outbound Email Settings (Administer CiviCRM &raquo; System Settings &raquo; Outbound Email), OR the FROM email address specifically configured for your contribution page or event. Possible causes are:') . '</p>';
+        1 => 'SMTP'
+      )) . '</p>' . '<p>' . ts('The mail library returned the following error message:') . '<br /><span class="font-red"><strong>' . $result->getMessage() . '</strong></span></p>' . '<p>' . ts('This is probably related to a problem in your Outbound Email Settings (Administer CiviCRM &raquo; System Settings &raquo; Outbound Email), OR the FROM email address specifically configured for your contribution page or event. Possible causes are:') . '</p>';
 
     if (is_a($mailer, 'Mail_smtp')) {
       $message .= '<ul>' . '<li>' . ts('Your SMTP Username or Password are incorrect.') . '</li>' . '<li>' . ts('Your SMTP Server (machine) name is incorrect.') . '</li>' . '<li>' . ts('You need to use a Port other than the default port 25 in your environment.') . '</li>' . '<li>' . ts('Your SMTP server is just not responding right now (it is down for some reason).') . '</li>';
@@ -211,7 +212,8 @@ class CRM_Utils_Mail {
     }
 
     $message .= '<li>' . ts('The FROM Email Address configured for this feature may not be a valid sender based on your email service provider rules.') . '</li>' . '</ul>' . '<p>' . ts('Check <a href="%1">this page</a> for more information.', array(
-      1 => CRM_Utils_System::docURL2('user/advanced-configuration/email-system-configuration', TRUE))) . '</p>';
+        1 => CRM_Utils_System::docURL2('user/advanced-configuration/email-system-configuration', TRUE)
+      )) . '</p>';
 
     return $message;
   }
@@ -408,9 +410,9 @@ class CRM_Utils_Mail {
     $html = preg_replace('/(<html)(.+?xmlns=["\'].[^\s]+["\'])(.+)?(>)/', '\1\3\4', $html);
 
     file_put_contents($pdf_filename, CRM_Utils_PDF_Utils::html2pdf($html,
-      $fileName,
-      TRUE,
-      $format)
+        $fileName,
+        TRUE,
+        $format)
     );
     return array(
       'fullPath' => $pdf_filename,

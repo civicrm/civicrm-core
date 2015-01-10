@@ -109,8 +109,8 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults  = array();
-    $params    = array();
+    $defaults = array();
+    $params = array();
 
     if (isset($this->_id)) {
       $params['id'] = $this->_id;
@@ -167,17 +167,17 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
     CRM_Contact_Form_Location::buildQuickForm($this);
 
     $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Save'),
-          'subName' => 'view',
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      ));
+      array(
+        'type' => 'next',
+        'name' => ts('Save'),
+        'subName' => 'view',
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
@@ -267,9 +267,9 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
 
     $params += array('contact_id' => $this->_contactId);
     $contactParams = array(
-      'sort_name'    => $domain->name,
+      'sort_name' => $domain->name,
       'display_name' => $domain->name,
-      'legal_name'   => $domain->name,
+      'legal_name' => $domain->name,
       'organization_name' => $domain->name,
       'contact_id' => $this->_contactId,
       'contact_type' => 'Organization',

@@ -34,37 +34,37 @@
  */
 class CRM_Utils_Type {
   const
-    T_INT        = 1,
-    T_STRING     = 2,
-    T_ENUM       = 2,
-    T_DATE       = 4,
-    T_TIME       = 8,
-    T_BOOLEAN    = 16,
-    T_TEXT       = 32,
-    T_LONGTEXT   = 32,
-    T_BLOB       = 64,
-    T_TIMESTAMP  = 256,
-    T_FLOAT      = 512,
-    T_MONEY      = 1024,
-    T_EMAIL      = 2048,
-    T_URL        = 4096,
-    T_CCNUM      = 8192,
+    T_INT = 1,
+    T_STRING = 2,
+    T_ENUM = 2,
+    T_DATE = 4,
+    T_TIME = 8,
+    T_BOOLEAN = 16,
+    T_TEXT = 32,
+    T_LONGTEXT = 32,
+    T_BLOB = 64,
+    T_TIMESTAMP = 256,
+    T_FLOAT = 512,
+    T_MONEY = 1024,
+    T_EMAIL = 2048,
+    T_URL = 4096,
+    T_CCNUM = 8192,
     T_MEDIUMBLOB = 16384;
 
   // @todo What's the point of these constants? Backwards compatibility?
   const
-    TWO       = 2,
-    FOUR      = 4,
-    SIX       = 6,
-    EIGHT     = 8,
-    TWELVE    = 12,
-    SIXTEEN   = 16,
-    TWENTY    = 20,
-    MEDIUM    = 20,
-    THIRTY    = 30,
-    BIG       = 30,
+    TWO = 2,
+    FOUR = 4,
+    SIX = 6,
+    EIGHT = 8,
+    TWELVE = 12,
+    SIXTEEN = 16,
+    TWENTY = 20,
+    MEDIUM = 20,
+    THIRTY = 30,
+    BIG = 30,
     FORTYFIVE = 45,
-    HUGE      = 45;
+    HUGE = 45;
 
   /**
    * Gets the string representation for a data type.
@@ -185,7 +185,7 @@ class CRM_Utils_Type {
             return $data;
           }
         }
-        elseif (!is_numeric($data) &&  CRM_Core_DAO::escapeString($data)) {
+        elseif (!is_numeric($data) && CRM_Core_DAO::escapeString($data)) {
           return $data;
         }
         elseif (CRM_Utils_Rule::positiveInteger($data)) {

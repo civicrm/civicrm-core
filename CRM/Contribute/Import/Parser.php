@@ -32,7 +32,6 @@
  * $Id$
  *
  */
-
 abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
 
   /**
@@ -345,7 +344,8 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
       }
       if ($this->_invalidRowCount) {
         // removed view url for invlaid contacts
-        $headers = array_merge(array(ts('Line Number'),
+        $headers = array_merge(array(
+            ts('Line Number'),
             ts('Reason'),
           ),
           $customHeaders
@@ -356,7 +356,8 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
 
       if ($this->_invalidPledgePaymentRowCount) {
         // removed view url for invlaid contacts
-        $headers = array_merge(array(ts('Line Number'),
+        $headers = array_merge(array(
+            ts('Line Number'),
             ts('Reason'),
           ),
           $customHeaders
@@ -367,7 +368,8 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
 
       if ($this->_invalidSoftCreditRowCount) {
         // removed view url for invlaid contacts
-        $headers = array_merge(array(ts('Line Number'),
+        $headers = array_merge(array(
+            ts('Line Number'),
             ts('Reason'),
           ),
           $customHeaders
@@ -377,7 +379,8 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
       }
 
       if ($this->_conflictCount) {
-        $headers = array_merge(array(ts('Line Number'),
+        $headers = array_merge(array(
+            ts('Line Number'),
             ts('Reason'),
           ),
           $customHeaders
@@ -386,7 +389,8 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
         self::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
       }
       if ($this->_duplicateCount) {
-        $headers = array_merge(array(ts('Line Number'),
+        $headers = array_merge(array(
+            ts('Line Number'),
             ts('View Contribution URL'),
           ),
           $customHeaders

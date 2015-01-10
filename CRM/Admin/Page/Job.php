@@ -116,12 +116,14 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
   public function run() {
     // set title and breadcrumb
     CRM_Utils_System::setTitle(ts('Settings - Scheduled Jobs'));
-    $breadCrumb = array(array(
-    'title' => ts('Scheduled Jobs'),
+    $breadCrumb = array(
+      array(
+        'title' => ts('Scheduled Jobs'),
         'url' => CRM_Utils_System::url('civicrm/admin',
           'reset=1'
         ),
-      ));
+      )
+    );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'String',

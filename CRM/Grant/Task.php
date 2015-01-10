@@ -68,8 +68,8 @@ class CRM_Grant_Task {
   public static function &tasks() {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
-      1 => array(
-        'title' => ts('Delete Grants'),
+        1 => array(
+          'title' => ts('Delete Grants'),
           'class' => 'CRM_Grant_Form_Task_Delete',
           'result' => FALSE,
         ),

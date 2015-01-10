@@ -434,45 +434,45 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     if ($context == 'financialBatch') {
       $links = array(
         'transaction' => array(
-          'name'  => ts('Transactions'),
-          'url'   => 'civicrm/batchtransaction',
-          'qs'    => 'reset=1&bid=%%id%%',
+          'name' => ts('Transactions'),
+          'url' => 'civicrm/batchtransaction',
+          'qs' => 'reset=1&bid=%%id%%',
           'title' => ts('View/Add Transactions to Batch'),
         ),
         'edit' => array(
-          'name'  => ts('Edit'),
-          'url'   => 'civicrm/financial/batch',
-          'qs'    => 'reset=1&action=update&id=%%id%%&context=1',
+          'name' => ts('Edit'),
+          'url' => 'civicrm/financial/batch',
+          'qs' => 'reset=1&action=update&id=%%id%%&context=1',
           'title' => ts('Edit Batch'),
         ),
         'close' => array(
-          'name'  => ts('Close'),
+          'name' => ts('Close'),
           'title' => ts('Close Batch'),
-          'url'   => '#',
+          'url' => '#',
           'extra' => 'rel="close"',
         ),
         'export' => array(
-          'name'  => ts('Export'),
+          'name' => ts('Export'),
           'title' => ts('Export Batch'),
-          'url'   => '#',
+          'url' => '#',
           'extra' => 'rel="export"',
         ),
         'reopen' => array(
-          'name'  => ts('Re-open'),
+          'name' => ts('Re-open'),
           'title' => ts('Re-open Batch'),
-          'url'   => '#',
+          'url' => '#',
           'extra' => 'rel="reopen"',
         ),
         'delete' => array(
-          'name'  => ts('Delete'),
+          'name' => ts('Delete'),
           'title' => ts('Delete Batch'),
-          'url'   => '#',
+          'url' => '#',
           'extra' => 'rel="delete"',
         ),
         'download' => array(
-          'name'  => ts('Download'),
-          'url'   => 'civicrm/file',
-          'qs'    => 'reset=1&id=%%fid%%&eid=%%eid%%',
+          'name' => ts('Download'),
+          'url' => 'civicrm/file',
+          'qs' => 'reset=1&id=%%fid%%&eid=%%eid%%',
           'title' => ts('Download Batch'),
         ),
       );
@@ -526,7 +526,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
 
-
   /**
    * Calculate sum of all entries in a batch
    * Used to validate and update item_count and total when closing an accounting batch
@@ -554,8 +553,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Format markup for comparing two totals
    *
-   * @param $actual: calculated total
-   * @param $expected: user-entered total
+   * @param $actual : calculated total
+   * @param $expected : user-entered total
    * @return array
    */
   public static function displayTotals($actual, $expected) {

@@ -96,7 +96,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   public static function getSelection($id = NULL) {
     $mapping = self::getMapping();
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
-    $activityType   = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
+    $activityType = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
 
     $participantStatus = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     $event = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
@@ -431,13 +431,13 @@ AND   cas.entity_value = $id AND
     $schedule = new CRM_Core_DAO_ActionSchedule();
     $schedule->id = $scheduleID;
 
-    $domain     = CRM_Core_BAO_Domain::getDomain();
-    $result     = NULL;
+    $domain = CRM_Core_BAO_Domain::getDomain();
+    $result = NULL;
     $hookTokens = array();
 
     if ($schedule->find(TRUE)) {
-      $body_text    = $schedule->body_text;
-      $body_html    = $schedule->body_html;
+      $body_text = $schedule->body_text;
+      $body_html = $schedule->body_html;
       $sms_body_text = $schedule->sms_body_text;
       $body_subject = $schedule->subject;
       if (!$body_text) {
@@ -489,7 +489,10 @@ AND   cas.entity_value = $id AND
 
       $smarty = CRM_Core_Smarty::singleton();
       foreach (array(
-          'text', 'html', 'sms_text') as $elem) {
+                 'text',
+                 'html',
+                 'sms_text'
+               ) as $elem) {
         $$elem = $smarty->fetch("string:{$$elem}");
       }
 
@@ -525,7 +528,11 @@ AND   cas.entity_value = $id AND
       if ($schedule->mode == 'SMS' or $schedule->mode == 'User_Preference') {
         $session = CRM_Core_Session::singleton();
         $userID = $session->get('userID') ? $session->get('userID') : $contactId;
-        $smsParams = array('To' => $phoneNumber, 'provider_id' => $schedule->sms_provider_id, 'activity_subject' => $messageSubject);
+        $smsParams = array(
+          'To' => $phoneNumber,
+          'provider_id' => $schedule->sms_provider_id,
+          'activity_subject' => $messageSubject
+        );
         $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
           'SMS',
           'name'
@@ -716,12 +723,12 @@ AND   cas.entity_value = $id AND
         $tokenEntity = 'activity';
         $tokenFields = array('activity_id', 'activity_type', 'subject', 'details', 'activity_date_time');
         $extraSelect = ', ov.label as activity_type, e.id as activity_id';
-        $extraJoin   = "
+        $extraJoin = "
 INNER JOIN civicrm_option_group og ON og.name = 'activity_type'
 INNER JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
         $extraOn = ' AND e.is_current_revision = 1 AND e.is_deleted = 0 ';
         if ($actionSchedule->limit_to == 0) {
-          $extraJoin   = "
+          $extraJoin = "
 LEFT JOIN civicrm_option_group og ON og.name = 'activity_type'
 LEFT JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
         }
@@ -737,10 +744,25 @@ LEFT JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option
 
       if ($mapping->entity == 'civicrm_participant') {
         $tokenEntity = 'event';
-        $tokenFields = array('event_type', 'title', 'event_id', 'start_date', 'end_date', 'summary', 'description', 'location', 'info_url', 'registration_url', 'fee_amount', 'contact_email', 'contact_phone', 'balance');
+        $tokenFields = array(
+          'event_type',
+          'title',
+          'event_id',
+          'start_date',
+          'end_date',
+          'summary',
+          'description',
+          'location',
+          'info_url',
+          'registration_url',
+          'fee_amount',
+          'contact_email',
+          'contact_phone',
+          'balance'
+        );
         $extraSelect = ', ov.label as event_type, ev.title, ev.id as event_id, ev.start_date, ev.end_date, ev.summary, ev.description, address.street_address, address.city, address.state_province_id, address.postal_code, email.email as contact_email, phone.phone as contact_phone ';
 
-        $extraJoin   = "
+        $extraJoin = "
 INNER JOIN civicrm_event ev ON e.event_id = ev.id
 INNER JOIN civicrm_option_group og ON og.name = 'event_type'
 INNER JOIN civicrm_option_value ov ON ev.event_type_id = ov.value AND ov.option_group_id = og.id
@@ -750,7 +772,7 @@ LEFT  JOIN civicrm_email email ON email.id = lb.email_id
 LEFT  JOIN civicrm_phone phone ON phone.id = lb.phone_id
 ";
         if ($actionSchedule->limit_to == 0) {
-          $extraJoin   = "
+          $extraJoin = "
 LEFT JOIN civicrm_event ev ON e.event_id = ev.id
 LEFT JOIN civicrm_option_group og ON og.name = 'event_type'
 LEFT JOIN civicrm_option_value ov ON ev.event_type_id = ov.value AND ov.option_group_id = og.id
@@ -766,12 +788,12 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
         $tokenEntity = 'membership';
         $tokenFields = array('fee', 'id', 'join_date', 'start_date', 'end_date', 'status', 'type');
         $extraSelect = ', mt.minimum_fee as fee, e.id as id , e.join_date, e.start_date, e.end_date, ms.name as status, mt.name as type';
-        $extraJoin   = '
+        $extraJoin = '
  INNER JOIN civicrm_membership_type mt ON e.membership_type_id = mt.id
  INNER JOIN civicrm_membership_status ms ON e.status_id = ms.id';
 
         if ($actionSchedule->limit_to == 0) {
-          $extraJoin   = '
+          $extraJoin = '
  LEFT JOIN civicrm_membership_type mt ON e.membership_type_id = mt.id
  LEFT JOIN civicrm_membership_status ms ON e.status_id = ms.id';
         }
@@ -843,7 +865,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           }
         }
 
-        $isError  = 0;
+        $isError = 0;
         $errorMsg = $toEmail = $toPhoneNumber = '';
 
         if ($actionSchedule->mode == 'SMS' or $actionSchedule->mode == 'User_Preference') {
@@ -897,7 +919,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
             'subject' => $actionSchedule->title,
             'details' => $actionSchedule->body_html,
             'source_contact_id' =>
-            $session->get('userID') ? $session->get('userID') : $dao->contactID,
+              $session->get('userID') ? $session->get('userID') : $dao->contactID,
             'target_contact_id' => $dao->contactID,
             'activity_date_time' => date('YmdHis'),
             'status_id' => $activityStatusID,
@@ -1246,7 +1268,7 @@ LEFT JOIN {$reminderJoinClause}
       $isSendToAdditionalContacts = (!is_null($limitTo) && $limitTo == 0 && (!empty($addGroup) || !empty($addWhere))) ? TRUE : FALSE;
       if ($isSendToAdditionalContacts) {
         $contactTable = "civicrm_contact c";
-        $addSelect  = "SELECT c.id as contact_id, c.id as entity_id, 'civicrm_contact' as entity_table, {$actionSchedule->id} as action_schedule_id";
+        $addSelect = "SELECT c.id as contact_id, c.id as entity_id, 'civicrm_contact' as entity_table, {$actionSchedule->id} as action_schedule_id";
         $additionReminderClause = "civicrm_action_log reminder ON reminder.contact_id = c.id AND
           reminder.entity_id          = c.id AND
           reminder.entity_table       = 'civicrm_contact' AND
@@ -1313,7 +1335,12 @@ INNER JOIN {$reminderJoinClause}
 {$groupByClause}
 {$havingClause}";
 
-        $valsqlInsertValues = CRM_Core_DAO::executeQuery($sqlInsertValues, array(1 => array($actionSchedule->id, 'Integer')));
+        $valsqlInsertValues = CRM_Core_DAO::executeQuery($sqlInsertValues, array(
+            1 => array(
+              $actionSchedule->id,
+              'Integer'
+            )
+          ));
 
         $arrValues = array();
         while ($valsqlInsertValues->fetch()) {

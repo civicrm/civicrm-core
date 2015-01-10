@@ -78,12 +78,14 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
   public function run() {
     // set title and breadcrumb
     CRM_Utils_System::setTitle(ts('Settings - Scheduled Jobs Log'));
-    $breadCrumb = array(array(
-    'title' => ts('Administration'),
+    $breadCrumb = array(
+      array(
+        'title' => ts('Administration'),
         'url' => CRM_Utils_System::url('civicrm/admin',
           'reset=1'
         ),
-      ));
+      )
+    );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     return parent::run();
   }

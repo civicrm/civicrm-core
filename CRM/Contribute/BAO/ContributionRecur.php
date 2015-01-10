@@ -117,8 +117,8 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * static
    */
   public static function checkDuplicate($params, &$duplicates) {
-    $id         = CRM_Utils_Array::value('id', $params);
-    $trxn_id    = CRM_Utils_Array::value('trxn_id', $params);
+    $id = CRM_Utils_Array::value('id', $params);
+    $trxn_id = CRM_Utils_Array::value('trxn_id', $params);
     $invoice_id = CRM_Utils_Array::value('invoice_id', $params);
 
     $clause = array();
@@ -144,8 +144,8 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       $params[3] = array($id, 'Integer');
     }
 
-    $query  = "SELECT id FROM civicrm_contribution_recur WHERE $clause";
-    $dao    = CRM_Core_DAO::executeQuery($query, $params);
+    $query = "SELECT id FROM civicrm_contribution_recur WHERE $clause";
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
     $result = FALSE;
     while ($dao->fetch()) {
       $duplicates[] = $dao->id;
@@ -219,9 +219,9 @@ SELECT r.payment_processor_id
       return $result;
     }
 
-    $recur     = new CRM_Contribute_DAO_ContributionRecur();
+    $recur = new CRM_Contribute_DAO_ContributionRecur();
     $recur->id = $recurId;
-    $result    = $recur->delete();
+    $result = $recur->delete();
 
     return $result;
   }
@@ -246,9 +246,9 @@ SELECT r.payment_processor_id
     }
 
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $canceledId         = array_search('Cancelled', $contributionStatus);
-    $recur              = new CRM_Contribute_DAO_ContributionRecur();
-    $recur->id          = $recurId;
+    $canceledId = array_search('Cancelled', $contributionStatus);
+    $recur = new CRM_Contribute_DAO_ContributionRecur();
+    $recur->id = $recurId;
     $recur->whereAdd("contribution_status_id != $canceledId");
 
     if ($recur->find(TRUE)) {
@@ -266,15 +266,15 @@ SELECT r.payment_processor_id
         if ($dao->auto_renew && $dao->membership_id) {
           // its auto-renewal membership mode
           $membershipTypes = CRM_Member_PseudoConstant::membershipType();
-          $membershipType  = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $dao->membership_id, 'membership_type_id');
-          $membershipType  = CRM_Utils_Array::value($membershipType, $membershipTypes);
+          $membershipType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $dao->membership_id, 'membership_type_id');
+          $membershipType = CRM_Utils_Array::value($membershipType, $membershipTypes);
           $details .= '
 <br/>' . ts('Automatic renewal of %1 membership cancelled.', array(1 => $membershipType));
         }
         else {
           $details .= '
 <br/>' . ts('The recurring contribution of %1, every %2 %3 has been cancelled.', array(
-          1 => $dao->amount,
+              1 => $dao->amount,
               2 => $dao->frequency_interval,
               3 => $dao->frequency_unit,
             ));

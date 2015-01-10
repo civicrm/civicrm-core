@@ -157,8 +157,8 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    */
   public function browse() {
     $campaingCompId = CRM_Core_Component::getComponentID('CiviCampaign');
-    $groupParams    = array('name' => $this->_gName);
-    $optionValues   = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'component_id,weight');
+    $groupParams = array('name' => $this->_gName);
+    $optionValues = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'component_id,weight');
 
     foreach ($optionValues as $key => $optionValue) {
       if (CRM_Utils_Array::value('component_id', $optionValue) != $campaingCompId) {

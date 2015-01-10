@@ -34,7 +34,6 @@
  * $Id$
  *
  */
-
 abstract class CRM_Core_Component_Info {
 
   /**
@@ -105,10 +104,10 @@ abstract class CRM_Core_Component_Info {
    * @param int $componentID
    */
   public function __construct($name, $namespace, $componentID) {
-    $this->name        = $name;
-    $this->namespace   = $namespace;
+    $this->name = $name;
+    $this->namespace = $namespace;
     $this->componentID = $componentID;
-    $this->info        = $this->getInfo();
+    $this->info = $this->getInfo();
     $this->info['url'] = $this->getKeyword();
   }
 

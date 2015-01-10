@@ -133,9 +133,9 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   public static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     $config = CRM_Core_Config::singleton();
 
-    $dao    = new CRM_Core_DAO();
-    $name   = $dao->escape(CRM_Utils_Array::value('name', $params));
-    $email  = $dao->escape(CRM_Utils_Array::value('mail', $params));
+    $dao = new CRM_Core_DAO();
+    $name = $dao->escape(CRM_Utils_Array::value('name', $params));
+    $email = $dao->escape(CRM_Utils_Array::value('mail', $params));
     $errors = form_get_errors();
     if ($errors) {
       // unset drupal messages to avoid twice display of errors
@@ -320,7 +320,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   /**
    * Add a script file
    *
-   * @param $url: string, absolute path to file
+   * @param $url : string, absolute path to file
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -350,7 +350,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   /**
    * Add an inline script
    *
-   * @param $code: string, javascript code
+   * @param $code : string, javascript code
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -378,7 +378,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   /**
    * Add a css file
    *
-   * @param $url: string, absolute path to file
+   * @param $url : string, absolute path to file
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -402,7 +402,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   /**
    * Add an inline style
    *
-   * @param $code: string, css code
+   * @param $code : string, css code
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -503,8 +503,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
       require_once "$cmsPath/includes/password.inc";
 
       $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-      $name       = $dbDrupal->escapeSimple($strtolower($name));
-      $sql        = "
+      $name = $dbDrupal->escapeSimple($strtolower($name));
+      $sql = "
 SELECT u.*
 FROM   {$config->userFrameworkUsersTableName} u
 WHERE  LOWER(u.name) = '$name'
@@ -911,11 +911,11 @@ AND    u.status = 1
               //kinda hackish but not sure how to do it right
               //hope http_build_url() will help at some point.
               if (is_array($parseUrl) && !empty($parseUrl)) {
-                $urlParts           = explode('/', $url);
-                $hostKey            = array_search($parseUrl['host'], $urlParts);
-                $ufUrlParts         = parse_url(CIVICRM_UF_BASEURL);
+                $urlParts = explode('/', $url);
+                $hostKey = array_search($parseUrl['host'], $urlParts);
+                $ufUrlParts = parse_url(CIVICRM_UF_BASEURL);
                 $urlParts[$hostKey] = $ufUrlParts['host'];
-                $url                = implode('/', $urlParts);
+                $url = implode('/', $urlParts);
               }
             }
           }
@@ -1023,6 +1023,7 @@ AND    u.status = 1
     }
     return $timezone;
   }
+
   /**
    * Reset any system caches that may be required for proper CiviCRM
    * integration.

@@ -136,8 +136,8 @@ class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
 
     $this->assign('report', $report);
     CRM_Utils_System::setTitle(ts('CiviMail Report: %1',
-        array(1 => $report['mailing']['name'])
-      ));
+      array(1 => $report['mailing']['name'])
+    ));
 
     return CRM_Core_Page::run();
   }

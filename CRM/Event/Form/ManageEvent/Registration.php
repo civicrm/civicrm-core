@@ -116,7 +116,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
       list($defaults['custom_pre_id'],
         $defaults['custom_post']
-      ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+        ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
       // Get the id for the event registration profile
       $eventRegistrationIdParams = $eventRegistrationIdDefaults = array(
@@ -154,7 +154,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
         list($defaults['additional_custom_pre_id'],
           $defaults['additional_custom_post']
-        ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinAddParams);
+          ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinAddParams);
 
         if (isset($defaults['additional_custom_post']) && is_numeric($defaults['additional_custom_post'])) {
           $defaults['additional_custom_post_id'] = $defaults['additional_custom_post'];
@@ -185,7 +185,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     if (!empty($defaults['registration_start_date'])) {
       list($defaults['registration_start_date'],
         $defaults['registration_start_date_time']
-      ) = CRM_Utils_Date::setDateDefaults($defaults['registration_start_date'],
+        ) = CRM_Utils_Date::setDateDefaults($defaults['registration_start_date'],
         'activityDateTime'
       );
     }
@@ -193,7 +193,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     if (!empty($defaults['registration_end_date'])) {
       list($defaults['registration_end_date'],
         $defaults['registration_end_date_time']
-      ) = CRM_Utils_Date::setDateDefaults($defaults['registration_end_date'],
+        ) = CRM_Utils_Date::setDateDefaults($defaults['registration_end_date'],
         'activityDateTime'
       );
     }
@@ -265,7 +265,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     }
 
     $params = array(
-      'used'         => 'Supervised',
+      'used' => 'Supervised',
       'contact_type' => 'Individual',
     );
     $dedupeRuleFields = CRM_Dedupe_BAO_Rule::dedupeRuleFields($params);
@@ -375,19 +375,26 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       'profileEntities' => array(),
     );
 
-    $configs['allowCoreTypes'] = array_merge(array('Contact', 'Individual'), CRM_Contact_BAO_ContactType::subTypes('Individual'));
+    $configs['allowCoreTypes'] = array_merge(array(
+        'Contact',
+        'Individual'
+      ), CRM_Contact_BAO_ContactType::subTypes('Individual'));
     $configs['allowCoreTypes'][] = 'Participant';
     //CRM-15427
     $id = CRM_Utils_Request::retrieve('id', 'Integer');
     if ($id) {
       $participantEventType = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $id, 'event_type_id', 'id');
-      $participantRole  = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'default_role_id');
+      $participantRole = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'default_role_id');
       $configs['allowSubTypes']['ParticipantEventName'] = array($id);
       $configs['allowSubTypes']['ParticipantEventType'] = array($participantEventType);
       $configs['allowSubTypes']['ParticipantRole'] = array($participantRole);
     }
     $configs['profileEntities'][] = array('entity_name' => 'contact_1', 'entity_type' => 'IndividualModel');
-    $configs['profileEntities'][] = array('entity_name' => 'participant_1', 'entity_type' => 'ParticipantModel', 'entity_sub_type' => '*');
+    $configs['profileEntities'][] = array(
+      'entity_name' => 'participant_1',
+      'entity_type' => 'ParticipantModel',
+      'entity_sub_type' => '*'
+    );
 
     return $configs;
   }
@@ -507,7 +514,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         isset($values['registration_end_date'])
       ) {
         $start = CRM_Utils_Date::processDate($values['registration_start_date']);
-        $end   = CRM_Utils_Date::processDate($values['registration_end_date']);
+        $end = CRM_Utils_Date::processDate($values['registration_end_date']);
         if ($end < $start) {
           $errorMsg['registration_end_date'] = ts('Registration end date should be after Registration start date');
         }
@@ -903,7 +910,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
           $ufAdd[1] = $params['custom_pre_id'];
           $wtAdd = 1;
         }
-        elseif (CRM_Utils_Array::value('additional_custom_pre_id', $params) == 'none') {}
+        elseif (CRM_Utils_Array::value('additional_custom_pre_id', $params) == 'none') {
+        }
         else {
           $ufAdd[1] = $params['additional_custom_pre_id'];
           $wtAdd = 1;
@@ -914,7 +922,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         if (empty($params['additional_custom_post_id'])) {
           $ufAdd[2] = $params['custom_post_id'];
         }
-        elseif (CRM_Utils_Array::value('additional_custom_post_id', $params) == 'none') {}
+        elseif (CRM_Utils_Array::value('additional_custom_post_id', $params) == 'none') {
+        }
         else {
           $ufAdd[2] = $params['additional_custom_post_id'];
         }

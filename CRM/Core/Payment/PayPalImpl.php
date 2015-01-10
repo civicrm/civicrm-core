@@ -85,6 +85,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
     return FALSE;
   }
+
   /**
    * Express checkout code. Check PayPal documentation for more information
    *
@@ -282,12 +283,12 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param $method
    */
   public function initialize(&$args, $method) {
-    $args['user']      = $this->_paymentProcessor['user_name'];
-    $args['pwd']       = $this->_paymentProcessor['password'];
-    $args['version']   = 3.0;
+    $args['user'] = $this->_paymentProcessor['user_name'];
+    $args['pwd'] = $this->_paymentProcessor['password'];
+    $args['version'] = 3.0;
     $args['signature'] = $this->_paymentProcessor['signature'];
-    $args['subject']   = CRM_Utils_Array::value('subject', $this->_paymentProcessor);
-    $args['method']    = $method;
+    $args['subject'] = CRM_Utils_Array::value('subject', $this->_paymentProcessor);
+    $args['method'] = $method;
   }
 
   /**
@@ -449,8 +450,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $this->initialize($args, 'ManageRecurringPaymentsProfileStatus');
 
       $args['PROFILEID'] = CRM_Utils_Array::value('subscriptionId', $params);
-      $args['ACTION']    = 'Cancel';
-      $args['NOTE']      = CRM_Utils_Array::value('reason', $params);
+      $args['ACTION'] = 'Cancel';
+      $args['NOTE'] = CRM_Utils_Array::value('reason', $params);
 
       $result = $this->invokeAPI($args);
       if (is_a($result, 'CRM_Core_Error')) {
@@ -482,13 +483,13 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $args['EXPDATE'] = sprintf('%02d', $params['month']) . $params['year'];
       $args['CVV2'] = $params['cvv2'];
 
-      $args['FIRSTNAME']   = $params['first_name'];
-      $args['LASTNAME']    = $params['last_name'];
-      $args['STREET']      = $params['street_address'];
-      $args['CITY']        = $params['city'];
-      $args['STATE']       = $params['state_province'];
+      $args['FIRSTNAME'] = $params['first_name'];
+      $args['LASTNAME'] = $params['last_name'];
+      $args['STREET'] = $params['street_address'];
+      $args['CITY'] = $params['city'];
+      $args['STATE'] = $params['state_province'];
       $args['COUNTRYCODE'] = $params['postal_code'];
-      $args['ZIP']         = $params['country'];
+      $args['ZIP'] = $params['country'];
 
       $result = $this->invokeAPI($args);
       if (is_a($result, 'CRM_Core_Error')) {
@@ -562,8 +563,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       }
     }
 
-    $url       = ($component == 'event') ? 'civicrm/event/register' : 'civicrm/contribute/transact';
-    $cancel    = ($component == 'event') ? '_qf_Register_display' : '_qf_Main_display';
+    $url = ($component == 'event') ? 'civicrm/event/register' : 'civicrm/contribute/transact';
+    $cancel = ($component == 'event') ? '_qf_Register_display' : '_qf_Main_display';
     $returnURL = CRM_Utils_System::url($url,
       "_qf_ThankYou_display=1&qfKey={$params['qfKey']}",
       TRUE, NULL, FALSE
@@ -655,9 +656,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
       $paypalParams += array(
         'cmd' => '_xclick-subscriptions',
-        'a3'  => $params['amount'],
-        'p3'  => $params['frequency_interval'],
-        't3'  => ucfirst(substr($params['frequency_unit'], 0, 1)),
+        'a3' => $params['amount'],
+        'p3' => $params['frequency_interval'],
+        't3' => ucfirst(substr($params['frequency_unit'], 0, 1)),
         'src' => 1,
         'sra' => 1,
         'srt' => CRM_Utils_Array::value('installments', $params),
@@ -691,9 +692,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $uri .= "&{$key}={$value}";
     }
 
-    $uri       = substr($uri, 1);
-    $url       = $this->_paymentProcessor['url_site'];
-    $sub       = empty($params['is_recur']) ? 'cgi-bin/webscr' : 'subscriptions';
+    $uri = substr($uri, 1);
+    $url = $this->_paymentProcessor['url_site'];
+    $sub = empty($params['is_recur']) ? 'cgi-bin/webscr' : 'subscriptions';
     $paypalURL = "{$url}{$sub}?$uri";
 
     CRM_Utils_System::redirect($paypalURL);

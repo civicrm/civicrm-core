@@ -69,8 +69,8 @@ class CRM_Upgrade_Incremental_php_FourFour {
       }
       if ($oversizedEntries > 0) {
         $preUpgradeMessage .= '<br/>' . ts("WARNING: There are %1 word-replacement entries which will not be valid in v4.4+ (eg with over 255 characters). They will be dropped during upgrade. For details, consult the CiviCRM log.", array(
-          1 => $oversizedEntries,
-        ));
+            1 => $oversizedEntries,
+          ));
       }
     }
   }
@@ -102,7 +102,10 @@ LEFT JOIN civicrm_contribution cc ON ceft.entity_id = cc.id
 WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id IS NULL;";
       $dao = CRM_Core_DAO::executeQuery($query);
       if ($dao->N) {
-        $postUpgradeMessage .= '<br /><br /><strong>' . ts('Your database contains %1 financial transaction records with no payment instrument (Paid By is empty). If you use the Accounting Batches feature this may result in unbalanced transactions. If you do not use this feature, you can ignore the condition (although you will be required to select a Paid By value for new transactions). <a href="%2" target="_blank">You can review steps to correct transactions with missing payment instruments on the wiki.</a>', array(1 => $dao->N, 2 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Fixing+Transactions+Missing+a+Payment+Instrument+-+4.4.3+Upgrades')) . '</strong>';
+        $postUpgradeMessage .= '<br /><br /><strong>' . ts('Your database contains %1 financial transaction records with no payment instrument (Paid By is empty). If you use the Accounting Batches feature this may result in unbalanced transactions. If you do not use this feature, you can ignore the condition (although you will be required to select a Paid By value for new transactions). <a href="%2" target="_blank">You can review steps to correct transactions with missing payment instruments on the wiki.</a>', array(
+              1 => $dao->N,
+              2 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Fixing+Transactions+Missing+a+Payment+Instrument+-+4.4.3+Upgrades'
+            )) . '</strong>';
       }
     }
     if ($rev == '4.4.6') {
@@ -391,7 +394,7 @@ ALTER TABLE civicrm_dashboard
           // For anyone who upgraded 4.4.6 release (eg 4.4.0=>4.4.6), the $newImageUrl incorrectly used backend URLs.
           // For anyone who skipped 4.4.6 (eg 4.4.0=>4.4.7), the $newImageUrl correctly uses frontend URLs
           self::setContactImageUrl($dao->id,
-              CRM_Utils_System::url('civicrm/contact/imagefile', 'photo=' . $photo, TRUE, NULL, TRUE, TRUE));
+            CRM_Utils_System::url('civicrm/contact/imagefile', 'photo=' . $photo, TRUE, NULL, TRUE, TRUE));
         }
         else {
           $failures[$dao->id] = $dao->image_url;
@@ -792,7 +795,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
     // add civicrm_report_instance.name
 
     $sql = "SELECT count(*) FROM information_schema.columns "
-     . "WHERE table_schema = database() AND table_name = 'civicrm_report_instance' AND COLUMN_NAME = 'name' ";
+      . "WHERE table_schema = database() AND table_name = 'civicrm_report_instance' AND COLUMN_NAME = 'name' ";
 
     $res = CRM_Core_DAO::singleValueQuery($sql);
 

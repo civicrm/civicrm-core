@@ -41,9 +41,9 @@ class CRM_Case_Page_CaseDetails extends CRM_Core_Page {
    * return null
    */
   public function run() {
-    $this->_action  = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
-    $type           = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject);
+    $type = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject);
 
     $this->assign('action', $this->_action);
     $this->assign('context', $this->_context);

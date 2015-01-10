@@ -69,7 +69,10 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
     $this->add('text', 'name', ts('Name'),
       CRM_Core_DAO::getAttribute('CRM_Mailing_DAO_Component', 'name'), TRUE
     );
-    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array('CRM_Mailing_DAO_Component', $this->_id));
+    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
+        'CRM_Mailing_DAO_Component',
+        $this->_id
+      ));
 
     $this->add('select', 'component_type', ts('Component Type'), CRM_Core_SelectValues::mailingComponents());
 
@@ -167,20 +170,24 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
     }
     $errors = array();
     foreach (array(
-      'text', 'html') as $type) {
+               'text',
+               'html'
+             ) as $type) {
       $dataErrors = array();
       foreach ($InvalidTokens as $token => $desc) {
         if ($params['body_' . $type]) {
           if (preg_match('/' . preg_quote('{' . $token . '}') . '/', $params['body_' . $type])) {
             $dataErrors[] = '<li>' . ts('This message is having a invalid token - %1: %2', array(
-              1 => $token,
-            2 => $desc)) . '</li>';
+                1 => $token,
+                2 => $desc
+              )) . '</li>';
           }
         }
       }
       if (!empty($dataErrors)) {
         $errors['body_' . $type] = ts('The following errors were detected in %1 message:', array(
-          1 => $type)) . '<ul>' . implode('', $dataErrors) . '</ul><br /><a href="' . CRM_Utils_System::docURL2('Tokens', TRUE, NULL, NULL, NULL, "wiki") . '">' . ts('More information on tokens...') . '</a>';
+            1 => $type
+          )) . '<ul>' . implode('', $dataErrors) . '</ul><br /><a href="' . CRM_Utils_System::docURL2('Tokens', TRUE, NULL, NULL, NULL, "wiki") . '">' . ts('More information on tokens...') . '</a>';
       }
     }
 

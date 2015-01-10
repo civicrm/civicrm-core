@@ -154,14 +154,14 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         'qs' => 'sid=%%id%%&reset=1',
         'title' => ts('Sign Petition'),
         'fe' => TRUE,
-      //CRM_Core_Action::PROFILE is used because there isn't a specific action for sign
+        //CRM_Core_Action::PROFILE is used because there isn't a specific action for sign
       );
       self::$_petitionActionLinks[CRM_Core_Action::BROWSE] = array(
         'name' => ts('Signatures'),
         'url' => 'civicrm/activity/search',
         'qs' => 'survey=%%id%%&force=1',
         'title' => ts('List the signatures'),
-      //CRM_Core_Action::PROFILE is used because there isn't a specific action for sign
+        //CRM_Core_Action::PROFILE is used because there isn't a specific action for sign
       );
     }
 
@@ -205,12 +205,19 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     //get the campaigns.
     $campaigns = CRM_Campaign_BAO_Campaign::getCampaignSummary($params);
     if (!empty($campaigns)) {
-      $config         = CRM_Core_Config::singleton();
-      $campaignType   = CRM_Campaign_PseudoConstant::campaignType();
+      $config = CRM_Core_Config::singleton();
+      $campaignType = CRM_Campaign_PseudoConstant::campaignType();
       $campaignStatus = CRM_Campaign_PseudoConstant::campaignStatus();
-      $properties     = array(
-        'id', 'name', 'title', 'status_id', 'description',
-        'campaign_type_id', 'is_active', 'start_date', 'end_date',
+      $properties = array(
+        'id',
+        'name',
+        'title',
+        'status_id',
+        'description',
+        'campaign_type_id',
+        'is_active',
+        'start_date',
+        'end_date',
       );
       foreach ($campaigns as $cmpid => $campaign) {
         foreach ($properties as $prop) {
@@ -466,9 +473,10 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
       ->addSetting(array(
-    'tabSettings' => array(
-        'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'campaign')),
-      )));
+        'tabSettings' => array(
+          'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'campaign')),
+        )
+      ));
   }
 
   /**

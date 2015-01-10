@@ -176,7 +176,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
     if ($activity->subject == 'null') {
       $activity->subject = ts('Case type changed from %1 to %2',
         array(
-      1 => CRM_Utils_Array::value($form->_defaults['case_type_id'], $allCaseTypes),
+          1 => CRM_Utils_Array::value($form->_defaults['case_type_id'], $allCaseTypes),
           2 => CRM_Utils_Array::value($params['case_type_id'], $allCaseTypes),
         )
       );

@@ -114,10 +114,11 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
     return isset(self::$_cache[$cacheKey]) ? $cacheKey : NULL;
   }
+
   /**
-  * Allow key o be cleared
-  * @param string $cacheKey
-  */
+   * Allow key o be cleared
+   * @param string $cacheKey
+   */
   public static function flushCache($cacheKey) {
     unset(self::$_cache[$cacheKey]);
     $globalCache = CRM_Utils_Cache::singleton();
@@ -183,7 +184,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $dao->name = $name;
     $dao->component_id = $componentID;
     if (empty($domainID)) {
-      $dao->domain_id  = CRM_Core_Config::domainID();
+      $dao->domain_id = CRM_Core_Config::domainID();
     }
     else {
       $dao->domain_id = $domainID;
@@ -293,12 +294,13 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       foreach ($fieldsToGet as $name => $value) {
         if (!empty($fields['values'][$name]['prefetch'])) {
           if (isset($params['filters']) && isset($params['filters']['prefetch'])
-            && $params['filters']['prefetch'] == 0) {
+            && $params['filters']['prefetch'] == 0
+          ) {
             // we are filtering out the prefetches from the return array
             // so we will skip
             continue;
           }
-          $configKey = CRM_Utils_Array::value('config_key', $fields['values'][$name],  $name);
+          $configKey = CRM_Utils_Array::value('config_key', $fields['values'][$name], $name);
           if (isset($config->$configKey)) {
             $setting = $config->$configKey;
           }
@@ -306,13 +308,13 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
         else {
           $setting =
             CRM_Core_BAO_Setting::getItem(
-            $fields['values'][$name]['group_name'],
-            $name,
-            CRM_Utils_Array::value('component_id', $params),
-            NULL,
-            CRM_Utils_Array::value('contact_id', $params),
-            $domainID
-          );
+              $fields['values'][$name]['group_name'],
+              $name,
+              CRM_Utils_Array::value('component_id', $params),
+              NULL,
+              CRM_Utils_Array::value('contact_id', $params),
+              $domainID
+            );
         }
         if (!is_null($setting)) {
           // we won't return if not set - helps in return all scenario - otherwise we can't indentify the missing ones
@@ -562,7 +564,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       list($name) = array_keys($settingParams);
       $getFieldsParams['name'] = $name;
     }
-    $fields = civicrm_api3('setting','getfields', $getFieldsParams);
+    $fields = civicrm_api3('setting', 'getfields', $getFieldsParams);
     $invalidParams = (array_diff_key($settingParams, $fields['values']));
     if (!empty($invalidParams)) {
       throw new api_Exception(implode(',', array_keys($invalidParams)) . " not valid settings");
@@ -585,14 +587,14 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    */
   public static function validateSetting(&$value, $fieldSpec) {
     if ($fieldSpec['type'] == 'String' && is_array($value)) {
-      $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,$value) . CRM_Core_DAO::VALUE_SEPARATOR;
+      $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $value) . CRM_Core_DAO::VALUE_SEPARATOR;
     }
     if (empty($fieldSpec['validate_callback'])) {
       return TRUE;
     }
     else {
-      list($class,$fn) = explode('::',$fieldSpec['validate_callback']);
-      if (!$class::$fn($value,$fieldSpec)) {
+      list($class, $fn) = explode('::', $fieldSpec['validate_callback']);
+      if (!$class::$fn($value, $fieldSpec)) {
         throw new api_Exception("validation failed for {$fieldSpec['name']} = $value  based on callback {$fieldSpec['validate_callback']}");
       }
     }
@@ -669,7 +671,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
         $metaDataFolders = array($civicrm_root . '/settings');
         CRM_Utils_Hook::alterSettingsFolders($metaDataFolders);
         $settingsMetadata = self::loadSettingsMetaDataFolders($metaDataFolders);
-        CRM_Core_BAO_Cache::setItem($settingsMetadata,'CiviCRM setting Spec', 'All', $componentID);
+        CRM_Core_BAO_Cache::setItem($settingsMetadata, 'CiviCRM setting Spec', 'All', $componentID);
       }
       $cached = 0;
     }
@@ -721,7 +723,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       $settings = include $file;
       $settingMetaData = array_merge($settingMetaData, $settings);
     }
-    CRM_Core_BAO_Cache::setItem($settingMetaData,'CiviCRM setting Spec', 'All');
+    CRM_Core_BAO_Cache::setItem($settingMetaData, 'CiviCRM setting Spec', 'All');
     return $settingMetaData;
   }
 
@@ -916,8 +918,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
       if (!empty($cbValues)) {
         $optionValue = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-          array_keys($cbValues)
-        ) . CRM_Core_DAO::VALUE_SEPARATOR;
+            array_keys($cbValues)
+          ) . CRM_Core_DAO::VALUE_SEPARATOR;
       }
       else {
         $optionValue = NULL;

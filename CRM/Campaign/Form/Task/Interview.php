@@ -79,7 +79,10 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
     if ($this->_reserveToInterview || $this->_votingTab) {
       //user came from voting tab / reserve form.
       foreach (array(
-                 'surveyId', 'contactIds', 'interviewerId') as $fld) {
+                 'surveyId',
+                 'contactIds',
+                 'interviewerId'
+               ) as $fld) {
         $this->{"_$fld"} = $this->get($fld);
       }
       //get the target voter ids.
@@ -100,7 +103,7 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
     }
 
     $orderClause = FALSE;
-    $buttonName  = $this->controller->getButtonName();
+    $buttonName = $this->controller->getButtonName();
     if ($buttonName == '_qf_Interview_submit_orderBy' && !empty($_POST['order_bys'])) {
       $orderByParams = CRM_Utils_Array::value('order_bys', $_POST);
     }
@@ -109,7 +112,7 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
         array(
           1 => array(
             'column' => 'civicrm_address.street_name',
-            'order'  => 'ASC',
+            'order' => 'ASC',
           ),
           2 => array(
             'column' => 'civicrm_address.street_number%2',
@@ -141,7 +144,7 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
     $this->_contactIds = array_unique($this->_contactIds);
     if (!empty($this->_contactIds) && $orderClause) {
       $clause = 'contact_a.id IN ( ' . implode(',', $this->_contactIds) . ' ) ';
-      $sql    = "
+      $sql = "
 SELECT contact_a.id
 FROM civicrm_contact contact_a
 LEFT JOIN civicrm_address ON contact_a.id = civicrm_address.contact_id
@@ -176,8 +179,8 @@ WHERE {$clause}
 
     $activityIds = array();
     foreach ($this->_contactIds as $key => $voterId) {
-      $actVals    = CRM_Utils_Array::value($voterId, $this->_surveyActivityIds);
-      $statusId   = CRM_Utils_Array::value('status_id', $actVals);
+      $actVals = CRM_Utils_Array::value($voterId, $this->_surveyActivityIds);
+      $statusId = CRM_Utils_Array::value('status_id', $actVals);
       $activityId = CRM_Utils_Array::value('activity_id', $actVals);
       if ($activityId &&
         $statusId &&
@@ -256,7 +259,7 @@ WHERE {$clause}
 
   public function validateIds() {
     $required = array(
-    'surveyId' => ts('Could not find Survey.'),
+      'surveyId' => ts('Could not find Survey.'),
       'interviewerId' => ts('Could not find Interviewer.'),
       'contactIds' => ts('No respondents are currently reserved for you to interview.'),
       'resultOptions' => ts('Oops. It looks like there is no response option configured.'),
@@ -287,15 +290,18 @@ WHERE {$clause}
 
     $options =
       array(
-    '' => ' - none - ',
-        'civicrm_address.street_name'     => 'Street Name',
+        '' => ' - none - ',
+        'civicrm_address.street_name' => 'Street Name',
         'civicrm_address.street_number%2' => 'Odd / Even Street Number',
-        'civicrm_address.street_number'   => 'Street Number',
-        'contact_a.sort_name'             => 'Respondent Name',
+        'civicrm_address.street_number' => 'Street Number',
+        'contact_a.sort_name' => 'Respondent Name',
       );
     for ($i = 1; $i < count($options); $i++) {
       $this->addElement('select', "order_bys[{$i}][column]", ts('Order by Column'), $options);
-      $this->addElement('select', "order_bys[{$i}][order]", ts('Order by Order'), array('ASC' => 'Ascending', 'DESC' => 'Descending'));
+      $this->addElement('select', "order_bys[{$i}][order]", ts('Order by Order'), array(
+          'ASC' => 'Ascending',
+          'DESC' => 'Descending'
+        ));
     }
 
     //pickup the uf fields.
@@ -315,8 +321,9 @@ WHERE {$clause}
       if (!empty($this->_resultOptions)) {
         $this->add('select', "field[$contactId][result]", ts('Result'),
           array(
-            '' => ts('- select -')) +
-            array_combine($this->_resultOptions, $this->_resultOptions)
+            '' => ts('- select -')
+          ) +
+          array_combine($this->_resultOptions, $this->_resultOptions)
         );
       }
 
@@ -339,11 +346,12 @@ WHERE {$clause}
 
     $buttons = array(
       array(
-    'type' => 'cancel',
+        'type' => 'cancel',
         'name' => ts('Done'),
         'subName' => 'interview',
         'isDefault' => TRUE,
-      ));
+      )
+    );
 
     $buttons[] = array(
       'type' => 'submit',
@@ -404,7 +412,7 @@ WHERE {$clause}
         array(
           1 => array(
             'column' => 'civicrm_address.street_name',
-            'order'  => 'ASC',
+            'order' => 'ASC',
           ),
           2 => array(
             'column' => 'civicrm_address.street_number%2',
@@ -424,10 +432,10 @@ WHERE {$clause}
       $defaults['order_bys'] =
         array(
           1 =>
-          array(
-            'column' => 'contact_a.sort_name',
-            'order' => 'ASC',
-          ),
+            array(
+              'column' => 'contact_a.sort_name',
+              'order' => 'ASC',
+            ),
         );
     }
     return $defaults;
@@ -448,7 +456,10 @@ WHERE {$clause}
     elseif ($buttonName == '_qf_Interview_next_interviewToRelease') {
       //get ready to jump to release form.
       foreach (array(
-                 'surveyId', 'contactIds', 'interviewerId') as $fld) {
+                 'surveyId',
+                 'contactIds',
+                 'interviewerId'
+               ) as $fld) {
         $this->controller->set($fld, $this->{"_$fld"});
       }
       $this->controller->set('interviewToRelease', TRUE);
@@ -576,8 +587,8 @@ WHERE {$clause}
     }
     if (!$this->_surveyId) {
       // use default survey id
-      $dao             = new CRM_Campaign_DAO_Survey();
-      $dao->is_active  = 1;
+      $dao = new CRM_Campaign_DAO_Survey();
+      $dao->is_active = 1;
       $dao->is_default = 1;
       $dao->find(TRUE);
       $this->_surveyId = $dao->id;

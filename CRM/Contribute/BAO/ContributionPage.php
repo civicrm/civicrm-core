@@ -633,60 +633,60 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       ),
     );
     $copy = &CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_ContributionPage', array(
-        'id' => $id,
-      ), NULL, $fieldsFix);
+      'id' => $id,
+    ), NULL, $fieldsFix);
 
     //copying all the blocks pertaining to the contribution page
     $copyPledgeBlock = &CRM_Core_DAO::copyGeneric('CRM_Pledge_DAO_PledgeBlock', array(
-        'entity_id' => $id,
-        'entity_table' => 'civicrm_contribution_page',
-      ), array(
-        'entity_id' => $copy->id,
-      ));
+      'entity_id' => $id,
+      'entity_table' => 'civicrm_contribution_page',
+    ), array(
+      'entity_id' => $copy->id,
+    ));
 
     $copyMembershipBlock = &CRM_Core_DAO::copyGeneric('CRM_Member_DAO_MembershipBlock', array(
-        'entity_id' => $id,
-        'entity_table' => 'civicrm_contribution_page',
-      ), array(
-        'entity_id' => $copy->id,
-      ));
+      'entity_id' => $id,
+      'entity_table' => 'civicrm_contribution_page',
+    ), array(
+      'entity_id' => $copy->id,
+    ));
 
     $copyUFJoin = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFJoin', array(
-        'entity_id' => $id,
-        'entity_table' => 'civicrm_contribution_page',
-      ), array(
-        'entity_id' => $copy->id,
-      ));
+      'entity_id' => $id,
+      'entity_table' => 'civicrm_contribution_page',
+    ), array(
+      'entity_id' => $copy->id,
+    ));
 
     $copyWidget = &CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_Widget', array(
-        'contribution_page_id' => $id,
-      ), array(
-        'contribution_page_id' => $copy->id,
-      ));
+      'contribution_page_id' => $id,
+    ), array(
+      'contribution_page_id' => $copy->id,
+    ));
 
     //copy price sets
     CRM_Price_BAO_PriceSet::copyPriceSet('civicrm_contribution_page', $id, $copy->id);
 
     $copyTellFriend = &CRM_Core_DAO::copyGeneric('CRM_Friend_DAO_Friend', array(
-        'entity_id' => $id,
-        'entity_table' => 'civicrm_contribution_page',
-      ), array(
-        'entity_id' => $copy->id,
-      ));
+      'entity_id' => $id,
+      'entity_table' => 'civicrm_contribution_page',
+    ), array(
+      'entity_id' => $copy->id,
+    ));
 
     $copyPersonalCampaignPages = &CRM_Core_DAO::copyGeneric('CRM_PCP_DAO_PCPBlock', array(
-        'entity_id' => $id,
-        'entity_table' => 'civicrm_contribution_page',
-      ), array(
-        'entity_id' => $copy->id,
-      ));
+      'entity_id' => $id,
+      'entity_table' => 'civicrm_contribution_page',
+    ), array(
+      'entity_id' => $copy->id,
+    ));
 
     $copyPremium = &CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_Premium', array(
-        'entity_id' => $id,
-        'entity_table' => 'civicrm_contribution_page',
-      ), array(
-        'entity_id' => $copy->id,
-      ));
+      'entity_id' => $id,
+      'entity_table' => 'civicrm_contribution_page',
+    ), array(
+      'entity_id' => $copy->id,
+    ));
     $premiumQuery = "
 SELECT id
 FROM civicrm_premiums
@@ -696,7 +696,7 @@ WHERE entity_table = 'civicrm_contribution_page'
     $premiumDao = CRM_Core_DAO::executeQuery($premiumQuery, CRM_Core_DAO::$_nullArray);
     while ($premiumDao->fetch()) {
       if ($premiumDao->id) {
-        $copyPremiumProduct = & CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_PremiumsProduct', array(
+        $copyPremiumProduct = &CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_PremiumsProduct', array(
           'premiums_id' => $premiumDao->id,
         ), array(
           'premiums_id' => $copyPremium->id,
@@ -818,8 +818,8 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
    * @see CRM_Core_DAO::buildOptions
    *
    * @param string $fieldName
-   * @param string $context: @see CRM_Core_DAO::buildOptionsContext
-   * @param array $props: whatever is known about this dao object
+   * @param string $context : @see CRM_Core_DAO::buildOptionsContext
+   * @param array $props : whatever is known about this dao object
    *
    * @return array|bool
    */
@@ -831,7 +831,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
         // Fixme - this is going to ignore context, better to get conditions, add params, and call PseudoConstant::get
         return CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
 
-      break;
+        break;
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
@@ -839,8 +839,8 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
   /**
    * Get or Set multilingually affected honor params for processing module_data or setting default values.
    *
-   * @param string $params:
-   * @param bool $setDefault: If yes then returns array to used for setting default value afterward
+   * @param string $params :
+   * @param bool $setDefault : If yes then returns array to used for setting default value afterward
    *
    * @return array|string
    */
@@ -938,7 +938,11 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
    *   isSeparateMembershipPayment
    */
   public static function getIsMembershipPayment($id) {
-    $membershipBlocks = civicrm_api3('membership_block', 'get', array('entity_table' => 'civicrm_contribution_page', 'entity_id' => $id, 'sequential' => TRUE));
+    $membershipBlocks = civicrm_api3('membership_block', 'get', array(
+        'entity_table' => 'civicrm_contribution_page',
+        'entity_id' => $id,
+        'sequential' => TRUE
+      ));
     if (!$membershipBlocks['count']) {
       return FALSE;
     }

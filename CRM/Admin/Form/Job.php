@@ -81,7 +81,10 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       $attributes['name'], TRUE
     );
 
-    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array('CRM_Core_DAO_Job', $this->_id));
+    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
+        'CRM_Core_DAO_Job',
+        $this->_id
+      ));
 
     $this->add('text', 'description', ts('Description'),
       $attributes['description']
@@ -148,8 +151,8 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     }
     $domainID = CRM_Core_Config::domainID();
 
-    $dao            = new CRM_Core_DAO_Job();
-    $dao->id        = $this->_id;
+    $dao = new CRM_Core_DAO_Job();
+    $dao->id = $this->_id;
     $dao->domain_id = $domainID;
     if (!$dao->find(TRUE)) {
       return $defaults;
@@ -188,15 +191,15 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
 
     $dao = new CRM_Core_DAO_Job();
 
-    $dao->id            = $this->_id;
-    $dao->domain_id     = $domainID;
+    $dao->id = $this->_id;
+    $dao->domain_id = $domainID;
     $dao->run_frequency = $values['run_frequency'];
-    $dao->parameters    = $values['parameters'];
-    $dao->name          = $values['name'];
-    $dao->api_entity    = $values['api_entity'];
-    $dao->api_action    = $values['api_action'];
-    $dao->description   = $values['description'];
-    $dao->is_active     = CRM_Utils_Array::value('is_active', $values, 0);
+    $dao->parameters = $values['parameters'];
+    $dao->name = $values['name'];
+    $dao->api_entity = $values['api_entity'];
+    $dao->api_action = $values['api_action'];
+    $dao->description = $values['description'];
+    $dao->is_active = CRM_Utils_Array::value('is_active', $values, 0);
 
     $dao->save();
 

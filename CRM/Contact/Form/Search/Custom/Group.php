@@ -65,9 +65,9 @@ class CRM_Contact_Form_Search_Custom_Group
 
     //define variables
     $this->_allSearch = FALSE;
-    $this->_groups    = FALSE;
-    $this->_tags      = FALSE;
-    $this->_andOr     = CRM_Utils_Array::value('andOr', $this->_formValues);
+    $this->_groups = FALSE;
+    $this->_tags = FALSE;
+    $this->_andOr = CRM_Utils_Array::value('andOr', $this->_formValues);
 
 
     //make easy to check conditions for groups and tags are

@@ -136,11 +136,11 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
       return;
     }
 
-    $protos  = '(https?|ftp)';
+    $protos = '(https?|ftp)';
     $letters = '\w';
-    $gunk    = '/#~:.?+=&%@!\-';
-    $punc    = '.:?\-';
-    $any     = "{$letters}{$gunk}{$punc}";
+    $gunk = '/#~:.?+=&%@!\-';
+    $punc = '.:?\-';
+    $any = "{$letters}{$gunk}{$punc}";
     if ($onlyHrefs) {
       $pattern = "{\\b(href=([\"'])?($protos:[$any]+?(?=[$punc]*[^$any]|$))([\"'])?)}im";
     }

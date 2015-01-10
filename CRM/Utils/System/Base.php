@@ -372,6 +372,7 @@ abstract class CRM_Utils_System_Base {
   public function getUserRecordUrl($contactID) {
     return NULL;
   }
+
   /**
    * Is the current user permitted to add a user
    * @return bool

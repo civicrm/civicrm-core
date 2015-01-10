@@ -196,7 +196,7 @@ class CRM_Core_ShowHideBlocks {
     $hideCode = "cj('#id_{$prefix}').hide(); cj('#id_{$prefix}_show').show(); return false;";
 
     self::setIcons();
-    $values         = array();
+    $values = array();
     $values['show'] = self::linkHtml("${prefix}_show", "#${prefix}_hide", self::$_showIcon . $showLinkText, "onclick=\"$showCode\"");
     $values['hide'] = self::linkHtml("${prefix}_hide", "#${prefix}", self::$_hideIcon . $hideLinkText, "onclick=\"$hideCode\"");
 

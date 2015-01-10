@@ -105,14 +105,19 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
     // set title and breadcrumb
     CRM_Utils_System::setTitle(ts('Settings - Payment Processor'));
     //CRM-15546
-    $paymentProcessorTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_PaymentProcessor', 'payment_processor_type_id', array('labelColumn' => 'name', 'flip' => 1));
-    $this->assign('defaultPaymentProcessorType', $paymentProcessorTypes['PayPal']);
-    $breadCrumb = array(array(
-    'title' => ts('Administration'),
-        'url' => CRM_Utils_System::url('civicrm/admin',
-        'reset=1'
-        ),
+    $paymentProcessorTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_PaymentProcessor', 'payment_processor_type_id', array(
+        'labelColumn' => 'name',
+        'flip' => 1
       ));
+    $this->assign('defaultPaymentProcessorType', $paymentProcessorTypes['PayPal']);
+    $breadCrumb = array(
+      array(
+        'title' => ts('Administration'),
+        'url' => CRM_Utils_System::url('civicrm/admin',
+          'reset=1'
+        ),
+      )
+    );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     return parent::run();
   }
@@ -129,8 +134,8 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
     // get all custom groups sorted by weight
     $paymentProcessor = array();
     $dao = new CRM_Financial_DAO_PaymentProcessor();
-    $dao->is_test     = 0;
-    $dao->domain_id   = CRM_Core_Config::domainID();
+    $dao->is_test = 0;
+    $dao->domain_id = CRM_Core_Config::domainID();
     $dao->orderBy('name');
     $dao->find();
 

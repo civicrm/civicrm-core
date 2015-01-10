@@ -118,8 +118,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     CRM_Core_DAO::executeQuery($query, $params);
 
     if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
-        'is_enabled'
-      )) {
+      'is_enabled'
+    )
+    ) {
       // clear any descendant groups cache if exists
       CRM_Core_BAO_Cache::deleteGroup('descendant groups for an org');
     }
@@ -372,8 +373,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     if (isset($params['group_type'])) {
       if (is_array($params['group_type'])) {
         $params['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-          array_keys($params['group_type'])
-        ) . CRM_Core_DAO::VALUE_SEPARATOR;
+            array_keys($params['group_type'])
+          ) . CRM_Core_DAO::VALUE_SEPARATOR;
       }
     }
     else {
@@ -400,8 +401,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     // we need the $params one to be in it's original form & we are not sure what test coverage we have on that
     if (isset($group->parents) && is_array($group->parents)) {
       $group->parents = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-        array_keys($group->parents)
-      ) . CRM_Core_DAO::VALUE_SEPARATOR;
+          array_keys($group->parents)
+        ) . CRM_Core_DAO::VALUE_SEPARATOR;
     }
     if (empty($params['id']) &&
       !$nameParam
@@ -663,10 +664,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       //save the mapping for search builder
       if (!$ssId) {
         //save record in mapping table
-        $temp          = array();
+        $temp = array();
         $mappingParams = array('mapping_type' => 'Search Builder');
-        $mapping       = CRM_Core_BAO_Mapping::add($mappingParams, $temp);
-        $mappingId     = $mapping->id;
+        $mapping = CRM_Core_BAO_Mapping::add($mappingParams, $temp);
+        $mappingId = $mapping->id;
       }
       else {
         //get the mapping id from saved search
@@ -730,9 +731,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    */
   static public function getGroupListSelector(&$params) {
     // format the params
-    $params['offset']   = ($params['page'] - 1) * $params['rp'];
+    $params['offset'] = ($params['page'] - 1) * $params['rp'];
     $params['rowCount'] = $params['rp'];
-    $params['sort']     = CRM_Utils_Array::value('sortBy', $params);
+    $params['sort'] = CRM_Utils_Array::value('sortBy', $params);
 
     // get groups
     $groups = CRM_Contact_BAO_Group::getGroupList($params);
@@ -1167,9 +1168,9 @@ WHERE {$whereClause}";
     if ($groupType) {
       $types = explode(',', $groupType);
       if (!empty($types)) {
-        $clauses[]  = 'groups.group_type LIKE %2';
+        $clauses[] = 'groups.group_type LIKE %2';
         $typeString = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $types) . CRM_Core_DAO::VALUE_SEPARATOR;
-        $params[2]  = array($typeString, 'String', TRUE);
+        $params[2] = array($typeString, 'String', TRUE);
       }
     }
 

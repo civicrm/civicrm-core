@@ -206,18 +206,22 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
         $this->_doneUrl = CRM_Utils_System::url('civicrm/event/manage',
           'reset=1'
         );
-        $breadCrumb = array(array(
-        'title' => ts('Manage Events'),
+        $breadCrumb = array(
+          array(
+            'title' => ts('Manage Events'),
             'url' => $this->_doneUrl,
-          ));
+          )
+        );
       }
     }
     else {
       $this->_doneUrl = CRM_Utils_System::url('civicrm/admin/eventTemplate', 'reset=1');
-      $breadCrumb = array(array(
-      'title' => ts('Manage Event Templates'),
+      $breadCrumb = array(
+        array(
+          'title' => ts('Manage Event Templates'),
           'url' => $this->_doneUrl,
-        ));
+        )
+      );
     }
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
   }
@@ -351,8 +355,8 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       }
 
       CRM_Core_Session::setStatus(ts("'%1' information has been saved.",
-          array(1 => CRM_Utils_Array::value('title', CRM_Utils_Array::value($subPage, $this->get('tabHeader')), $className))
-        ), ts('Saved'), 'success');
+        array(1 => CRM_Utils_Array::value('title', CRM_Utils_Array::value($subPage, $this->get('tabHeader')), $className))
+      ), ts('Saved'), 'success');
 
       $config = CRM_Core_Config::singleton();
       if (in_array('CiviCampaign', $config->enableComponents)) {
@@ -366,7 +370,8 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       $this->postProcessHook();
       if ($this->controller->getButtonName('submit') == "_qf_{$className}_upload_done") {
         if ($this->_isTemplate) {
-          CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/eventTemplate', 'reset=1'));
+          CRM_Core_Session::singleton()
+            ->pushUserContext(CRM_Utils_System::url('civicrm/admin/eventTemplate', 'reset=1'));
         }
         else {
           CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/event/manage', 'reset=1'));
@@ -374,8 +379,8 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       }
       else {
         CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url("civicrm/event/manage/{$subPage}",
-            "action=update&reset=1&id={$this->_id}"
-          ));
+          "action=update&reset=1&id={$this->_id}"
+        ));
       }
     }
   }

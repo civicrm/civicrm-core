@@ -280,22 +280,22 @@ class CRM_Utils_Mail_Incoming {
       !trim(file_get_contents($file))
     ) {
       return CRM_Core_Error::createAPIError(ts('%1 does not exists or is empty',
-          array(1 => $file)
-        ));
+        array(1 => $file)
+      ));
     }
 
     require_once 'ezc/Base/src/ezc_bootstrap.php';
     require_once 'ezc/autoload/mail_autoload.php';
 
     // explode email to digestable format
-    $set    = new ezcMailFileSet(array($file));
+    $set = new ezcMailFileSet(array($file));
     $parser = new ezcMailParser();
-    $mail   = $parser->parseMail($set);
+    $mail = $parser->parseMail($set);
 
     if (!$mail) {
       return CRM_Core_Error::createAPIError(ts('%1 could not be parsed',
-          array(1 => $file)
-        ));
+        array(1 => $file)
+      ));
     }
 
     // since we only have one fileset
@@ -347,9 +347,9 @@ class CRM_Utils_Mail_Incoming {
       $config = CRM_Core_Config::singleton();
       for ($i = 0; $i < count($attachments); $i++) {
         $attachNum = $i + 1;
-        $fileName  = basename($attachments[$i]['fullName']);
-        $newName   = CRM_Utils_File::makeFileName($fileName);
-        $location  = $config->uploadDir . $newName;
+        $fileName = basename($attachments[$i]['fullName']);
+        $newName = CRM_Utils_File::makeFileName($fileName);
+        $location = $config->uploadDir . $newName;
 
         // move file to the civicrm upload directory
         rename($attachments[$i]['fullName'], $location);

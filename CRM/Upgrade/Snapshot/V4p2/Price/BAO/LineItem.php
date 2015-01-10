@@ -183,7 +183,7 @@ WHERE     %2.id = %1";
    *                          to the price set used for particular event
    * @param array $values
    *   Reference to the values array(.
-  this is
+   * this is
    *                          lineItem array)
    *
    * @return void

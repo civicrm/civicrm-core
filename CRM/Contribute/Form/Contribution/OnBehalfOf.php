@@ -154,9 +154,9 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
       NULL, FALSE, NULL, FALSE, NULL,
       CRM_Core_Permission::CREATE, NULL
     );
-    $fieldTypes     = array('Contact', 'Organization');
+    $fieldTypes = array('Contact', 'Organization');
     $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');
-    $fieldTypes     = array_merge($fieldTypes, $contactSubType);
+    $fieldTypes = array_merge($fieldTypes, $contactSubType);
 
     if (is_array($form->_membershipBlock) && !empty($form->_membershipBlock)) {
       $fieldTypes = array_merge($fieldTypes, array('Membership'));

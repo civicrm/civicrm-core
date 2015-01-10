@@ -146,8 +146,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    */
   public static function del($membershipTypeId) {
     //check dependencies
-    $check      = FALSE;
-    $status     = array();
+    $check = FALSE;
+    $status = array();
     $dependancy = array(
       'Membership' => 'membership_type_id',
       'MembershipBlock' => 'membership_type_default',
@@ -168,13 +168,20 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       if (in_array('Membership', $status)) {
         $findMembersURL = CRM_Utils_System::url('civicrm/member/search', 'reset=1');
         $deleteURL = CRM_Utils_System::url('civicrm/contact/search/advanced', 'reset=1');
-        $message .= '<br/>' . ts('%3. There are some contacts who have this membership type assigned to them. Search for contacts with this membership type from <a href=\'%1\'>Find Members</a>. If you are still getting this message after deleting these memberships, there may be contacts in the Trash (deleted) with this membership type. Try using <a href="%2">Advanced Search</a> and checking "Search in Trash".', array(1 => $findMembersURL, 2 => $deleteURL, 3 => $cnt));
+        $message .= '<br/>' . ts('%3. There are some contacts who have this membership type assigned to them. Search for contacts with this membership type from <a href=\'%1\'>Find Members</a>. If you are still getting this message after deleting these memberships, there may be contacts in the Trash (deleted) with this membership type. Try using <a href="%2">Advanced Search</a> and checking "Search in Trash".', array(
+              1 => $findMembersURL,
+              2 => $deleteURL,
+              3 => $cnt
+            ));
         $cnt++;
       }
 
       if (in_array('MembershipBlock', $status)) {
         $deleteURL = CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1');
-        $message .= ts('%2. This Membership Type is used in an <a href=\'%1\'>Online Contribution page</a>. Uncheck this membership type in the Memberships tab.', array(1 => $deleteURL, 2 => $cnt));
+        $message .= ts('%2. This Membership Type is used in an <a href=\'%1\'>Online Contribution page</a>. Uncheck this membership type in the Memberships tab.', array(
+            1 => $deleteURL,
+            2 => $cnt
+          ));
         throw new CRM_Core_Exception($message);
       }
     }
@@ -208,8 +215,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       foreach ($periodDays as $pDay) {
         if (!empty($details[$pDay])) {
           if ($details[$pDay] > 31) {
-            $month    = substr($details[$pDay], 0, strlen($details[$pDay]) - 2);
-            $day      = substr($details[$pDay], -2);
+            $month = substr($details[$pDay], 0, strlen($details[$pDay]) - 2);
+            $day = substr($details[$pDay], -2);
             $monthMap = array(
               '1' => 'Jan',
               '2' => 'Feb',
@@ -304,7 +311,10 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
     // convert all dates to 'Y-m-d' format.
     foreach (array(
-      'joinDate', 'startDate', 'endDate') as $dateParam) {
+               'joinDate',
+               'startDate',
+               'endDate'
+             ) as $dateParam) {
       if (!empty($$dateParam)) {
         $$dateParam = CRM_Utils_Date::processDate($$dateParam, NULL, FALSE, 'Y-m-d');
       }
@@ -368,10 +378,10 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         //get the fixed end date here.
         $dateParts = explode('-', $actualStartDate);
         $fixedEndDate = date('Y-m-d', mktime(0, 0, 0,
-            $dateParts[1],
-            $dateParts[2] - 1,
-            $dateParts[0] + ($numRenewTerms * $membershipTypeDetails['duration_interval'])
-          ));
+          $dateParts[1],
+          $dateParts[2] - 1,
+          $dateParts[0] + ($numRenewTerms * $membershipTypeDetails['duration_interval'])
+        ));
 
         //make sure rollover window should be
         //subset of membership period window.
@@ -409,10 +419,10 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     //calculate end date if it is not passed by user
     if (!$endDate) {
       //end date calculation
-      $date  = explode('-', $actualStartDate);
-      $year  = $date[0];
+      $date = explode('-', $actualStartDate);
+      $year = $date[0];
       $month = $date[1];
-      $day   = $date[2];
+      $day = $date[2];
 
       switch ($membershipTypeDetails['duration_unit']) {
         case 'year':
@@ -481,15 +491,15 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @static
    */
   public static function getRenewalDatesForMembershipType($membershipId, $changeToday = NULL, $membershipTypeID = NULL, $numRenewTerms = 1) {
-    $params            = array('id' => $membershipId);
+    $params = array('id' => $membershipId);
     $membershipDetails = CRM_Member_BAO_Membership::getValues($params, $values);
-    $statusID          = $membershipDetails[$membershipId]->status_id;
+    $statusID = $membershipDetails[$membershipId]->status_id;
     $membershipDates = array(
       'join_date' => CRM_Utils_Date::customFormat($membershipDetails[$membershipId]->join_date, '%Y%m%d'),
     );
 
     $oldPeriodType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-        CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $membershipId, 'membership_type_id'), 'period_type');
+      CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $membershipId, 'membership_type_id'), 'period_type');
 
     // CRM-7297 Membership Upsell
     if (is_null($membershipTypeID)) {
@@ -510,17 +520,17 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       else {
         $date = $membershipDetails[$membershipId]->end_date;
       }
-      $date  = explode('-', $date);
+      $date = explode('-', $date);
       $logStartDate = date('Y-m-d', mktime(0, 0, 0,
-          (double) $date[1],
-          (double) ($date[2] + 1),
-          (double) $date[0]
-        ));
+        (double) $date[1],
+        (double) ($date[2] + 1),
+        (double) $date[0]
+      ));
 
-      $date  = explode('-', $logStartDate);
-      $year  = $date[0];
+      $date = explode('-', $logStartDate);
+      $year = $date[0];
       $month = $date[1];
-      $day   = $date[2];
+      $day = $date[2];
 
       switch ($membershipTypeDetails['duration_unit']) {
         case 'year':
@@ -548,10 +558,10 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       }
       else {
         $endDate = date('Y-m-d', mktime(0, 0, 0,
-            $month,
-            $day - 1,
-            $year
-          ));
+          $month,
+          $day - 1,
+          $year
+        ));
       }
       $today = date('Y-m-d');
       $membershipDates['today'] = CRM_Utils_Date::customFormat($today, '%Y%m%d');
@@ -689,8 +699,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     else {
       $fieldName = $previousID;
     }
-    $fieldLabel  = 'Membership Amount';
-    $optionsIds  = NULL;
+    $fieldLabel = 'Membership Amount';
+    $optionsIds = NULL;
     $fieldParams = array(
       'price_set_id ' => $priceSetId,
       'name' => $fieldName,
@@ -727,9 +737,9 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       $results = array();
       CRM_Price_BAO_PriceFieldValue::retrieve($fieldValueParams, $results);
       if (!empty($results)) {
-        $results['label']  = $results['name'] = $params['name'];
+        $results['label'] = $results['name'] = $params['name'];
         $results['amount'] = empty($params['minimum_fee']) ? 0 : $params['minimum_fee'];
-        $optionsIds['id']  = $results['id'];
+        $optionsIds['id'] = $results['id'];
       }
       else {
         $results = array(

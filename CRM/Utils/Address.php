@@ -255,8 +255,8 @@ class CRM_Utils_Address {
     else {
       // remove \n from each line and only add at the end
       // this hack solves formatting issue, when we convert nl2br
-      $lines          = array();
-      $count          = 1;
+      $lines = array();
+      $count = 1;
       $finalFormatted = NULL;
       $formattedArray = explode("\n", $formatted);
       $formattedArray = array_filter($formattedArray);

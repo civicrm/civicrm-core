@@ -21,7 +21,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     if (!empty($formValues['email_options'])) {
       $returnProperties['email'] = $returnProperties['on_hold'] = $returnProperties['is_deceased'] = $returnProperties['do_not_email'] = 1;
       $emailParams = array(
-        'subject'   => $formValues['subject'],
+        'subject' => $formValues['subject'],
       );
       // We need display_name for emailLetter() so add to returnProperties here
       $returnProperties['display_name'] = 1;
@@ -30,11 +30,11 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       }
     }
     // update dates ?
-    $receipt_update  = isset($formValues['receipt_update']) ? $formValues['receipt_update'] : FALSE;
+    $receipt_update = isset($formValues['receipt_update']) ? $formValues['receipt_update'] : FALSE;
     $thankyou_update = isset($formValues['thankyou_update']) ? $formValues['thankyou_update'] : FALSE;
-    $nowDate         = date('YmdHis');
+    $nowDate = date('YmdHis');
     $receipts = $thanks = $emailed = 0;
-    $updateStatus    = '';
+    $updateStatus = '';
     $task = 'CRM_Contribution_Form_Task_PDFLetterCommon';
     $realSeparator = ', ';
     //the original thinking was mutliple options - but we are going with only 2 (comma & td) for now in case
@@ -143,7 +143,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     foreach ($relevantEntities as $entity) {
       if (isset($tokens[$entity]) && is_array($tokens[$entity])) {
         foreach ($tokens[$entity] as $token) {
-          if (!self::isHtmlTokenInTableCell($token, $entity, $html)) {;
+          if (!self::isHtmlTokenInTableCell($token, $entity, $html)) {
+            ;
             return FALSE;
           }
         }
@@ -285,7 +286,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
   public static function combineContributions($existing, $contribution, $separator) {
     foreach ($contribution as $field => $value) {
       $existing[$field] = isset($existing[$field]) ? $existing[$field] . $separator : '';
-      $existing[$field]  .= $value;
+      $existing[$field] .= $value;
     }
     return $existing;
   }
@@ -304,7 +305,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       return;
     }
     CRM_Core_Smarty::singleton()->assign('contact_aggregate', $contact['contact_aggregate']);
-    CRM_Core_Smarty::singleton()->assign('contributions', array_intersect_key($contributions, $contact['contribution_ids'][$groupBy][$groupByID]));
+    CRM_Core_Smarty::singleton()
+      ->assign('contributions', array_intersect_key($contributions, $contact['contribution_ids'][$groupBy][$groupByID]));
     CRM_Core_Smarty::singleton()->assign('contribution_aggregate', $contact['aggregates'][$groupBy][$groupByID]);
 
   }

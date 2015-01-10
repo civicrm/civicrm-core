@@ -357,7 +357,7 @@ class CRM_Core_SelectValues {
    */
   public static function mailingComponents() {
     return array(
-    'Header' => ts('Header'),
+      'Header' => ts('Header'),
       'Footer' => ts('Footer'),
       'Reply' => ts('Reply Auto-responder'),
       'OptOut' => ts('Opt-out Message'),
@@ -571,7 +571,7 @@ class CRM_Core_SelectValues {
     static $tokens = NULL;
     if (!$tokens) {
       $additionalFields = array(
-      'checksum' => array('title' => ts('Checksum')),
+        'checksum' => array('title' => ts('Checksum')),
         'contact_id' => array('title' => ts('Internal Contact ID')),
       );
       $exportFields = array_merge(CRM_Contact_BAO_Contact::exportableFields(), $additionalFields);
@@ -581,8 +581,16 @@ class CRM_Core_SelectValues {
 
       //FIXME:skipping some tokens for time being.
       $skipTokens = array(
-        'is_bulkmail', 'group', 'tag', 'contact_sub_type', 'note',
-        'is_deceased', 'deceased_date', 'legal_identifier', 'contact_sub_type', 'user_unique_id',
+        'is_bulkmail',
+        'group',
+        'tag',
+        'contact_sub_type',
+        'note',
+        'is_deceased',
+        'deceased_date',
+        'legal_identifier',
+        'contact_sub_type',
+        'user_unique_id',
       );
 
       $customFields = CRM_Core_BAO_CustomField::getFields(array('Individual', 'Address'));
@@ -645,8 +653,14 @@ class CRM_Core_SelectValues {
 
       // skipping some tokens for time being.
       $skipTokens = array(
-        'event_id', 'participant_is_pay_later', 'participant_is_test', 'participant_contact_id',
-        'participant_fee_currency', 'participant_campaign_id', 'participant_status', 'participant_discount_name',
+        'event_id',
+        'participant_is_pay_later',
+        'participant_is_test',
+        'participant_contact_id',
+        'participant_fee_currency',
+        'participant_campaign_id',
+        'participant_status',
+        'participant_discount_name',
       );
 
       $customFields = CRM_Core_BAO_CustomField::getFields('Participant');
@@ -879,9 +893,9 @@ class CRM_Core_SelectValues {
    */
   public static function getWordReplacementMatchType() {
     return array(
-        'exactMatch' => ts('Exact Match'),
-        'wildcardMatch' => ts('Wildcard Match'),
-      );
+      'exactMatch' => ts('Exact Match'),
+      'wildcardMatch' => ts('Wildcard Match'),
+    );
   }
 
   /**
@@ -924,7 +938,8 @@ class CRM_Core_SelectValues {
     static $scheduleReminderFrequencyUnits = NULL;
     if (!$scheduleReminderFrequencyUnits) {
       $scheduleReminderFrequencyUnits = array(
-          'hour' => ts('hour')) + CRM_Core_OptionGroup::values('recur_frequency_units');
+          'hour' => ts('hour')
+        ) + CRM_Core_OptionGroup::values('recur_frequency_units');
     }
 
     return $scheduleReminderFrequencyUnits;

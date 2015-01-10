@@ -32,7 +32,6 @@
  * $Id$
  *
  */
-
 abstract class CRM_SMS_Provider {
 
   /**
@@ -55,8 +54,8 @@ abstract class CRM_SMS_Provider {
    * @static
    */
   public static function &singleton($providerParams = array(), $force = FALSE) {
-    $mailingID    = CRM_Utils_Array::value('mailing_id', $providerParams);
-    $providerID   = CRM_Utils_Array::value('provider_id', $providerParams);
+    $mailingID = CRM_Utils_Array::value('mailing_id', $providerParams);
+    $providerID = CRM_Utils_Array::value('provider_id', $providerParams);
     $providerName = CRM_Utils_Array::value('provider', $providerParams);
 
     if (!$providerID && $mailingID) {
@@ -72,7 +71,7 @@ abstract class CRM_SMS_Provider {
     }
 
     $providerName = CRM_Utils_Type::escape($providerName, 'String');
-    $cacheKey     = "{$providerName}_" . (int) $providerID . "_" . (int) $mailingID;
+    $cacheKey = "{$providerName}_" . (int) $providerID . "_" . (int) $mailingID;
 
     if (!isset(self::$_singleton[$cacheKey]) || $force) {
       $ext = CRM_Extension_System::singleton()->getMapper();
@@ -133,7 +132,7 @@ SELECT scheduled_id FROM civicrm_mailing m
 INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       $sourceContactID = CRM_Core_DAO::singleValueQuery($sql, array(1 => array($jobID, 'Integer')));
     }
-    elseif($userID) {
+    elseif ($userID) {
       $sourceContactID = $userID;
     }
     else {
@@ -193,11 +192,11 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
    * @throws CRM_Core_Exception
    */
   public function processInbound($from, $body, $to = NULL, $trackID = NULL) {
-    $formatFrom   = $this->formatPhone($this->stripPhone($from), $like, "like");
-    $escapedFrom  = CRM_Utils_Type::escape($formatFrom, 'String');
+    $formatFrom = $this->formatPhone($this->stripPhone($from), $like, "like");
+    $escapedFrom = CRM_Utils_Type::escape($formatFrom, 'String');
     $fromContactID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE "%' . $escapedFrom . '"');
 
-    if (! $fromContactID) {
+    if (!$fromContactID) {
       // unknown mobile sender -- create new contact
       // use fake @mobile.sms email address for new contact since civi
       // requires email or name for all contacts
@@ -209,16 +208,18 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       $contactparams = array(
         'contact_type' => 'Individual',
         'email' => array(
-      1 => array(
-          'location_type_id' => $phoneloc,
-          'email' => $stripFrom . '@mobile.sms',
-        )),
+          1 => array(
+            'location_type_id' => $phoneloc,
+            'email' => $stripFrom . '@mobile.sms',
+          )
+        ),
         'phone' => array(
-      1 => array(
-          'phone_type_id' => $phonetype,
-          'location_type_id' => $phoneloc,
-          'phone' => $stripFrom,
-        )),
+          1 => array(
+            'phone_type_id' => $phonetype,
+            'location_type_id' => $phoneloc,
+            'phone' => $stripFrom,
+          )
+        ),
       );
       $fromContact = CRM_Contact_BAO_Contact::create($contactparams, FALSE, TRUE, FALSE);
       $fromContactID = $fromContact->id;
@@ -291,7 +292,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
         $area = "";
         $exch = "";
         $uniq = "";
-        $ext  = $phoneA[1];
+        $ext = $phoneA[1];
         break;
 
       case 7:
@@ -299,7 +300,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
         $area = "";
         $exch = substr($phone, 0, 3);
         $uniq = substr($phone, 3, 4);
-        $ext  = $phoneA[1];
+        $ext = $phoneA[1];
         break;
 
       case 10:
@@ -307,7 +308,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
         $area = substr($phone, 0, 3);
         $exch = substr($phone, 3, 3);
         $uniq = substr($phone, 6, 4);
-        $ext  = $phoneA[1];
+        $ext = $phoneA[1];
         break;
 
       default:

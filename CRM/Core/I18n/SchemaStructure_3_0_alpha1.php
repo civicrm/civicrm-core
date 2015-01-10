@@ -240,7 +240,7 @@ class CRM_Core_I18n_SchemaStructure_3_0_alpha1 {
   /**
    * @return array
    */
-  static  function &tables() {
+  static function &tables() {
     static $result = NULL;
     if (!$result) {
       $result = array_keys(self::columns());

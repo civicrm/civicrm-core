@@ -1,4 +1,5 @@
 <?php
+
 interface CRM_Core_FileSearchInterface {
   const DEFAULT_SEARCH_LIMIT = 20;
   const DEFAULT_SEARCH_OFFSET = 0;

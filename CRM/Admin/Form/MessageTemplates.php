@@ -75,8 +75,8 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       //set the context for redirection after form submit or cancel
       $session = CRM_Core_Session::singleton();
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/messageTemplates',
-          'selectedChild=user&reset=1'
-        ));
+        'selectedChild=user&reset=1'
+      ));
     }
 
     // FIXME: we need to fix the Cancel button here as we don’t know whether it’s a workflow template in buildQuickForm()
@@ -138,12 +138,14 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       return;
     }
 
-    $breadCrumb = array(array(
-    'title' => ts('Message Templates'),
+    $breadCrumb = array(
+      array(
+        'title' => ts('Message Templates'),
         'url' => CRM_Utils_System::url('civicrm/admin/messageTemplates',
           'action=browse&reset=1'
         ),
-      ));
+      )
+    );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
     $this->applyFilter('__ALL__', 'trim');
@@ -174,7 +176,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       $this->addWysiwyg('msg_html', ts('HTML Message'),
         array(
           'cols' => '80',
-      'rows' => '8',
+          'rows' => '8',
           'onkeyup' => "return verify(this)",
         )
       );
@@ -186,7 +188,8 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
     $this->add('select', 'pdf_format_id', ts('PDF Page Format'),
       array(
-        'null' => ts('- default -')) + CRM_Core_BAO_PdfFormat::getList(TRUE), FALSE
+        'null' => ts('- default -')
+      ) + CRM_Core_BAO_PdfFormat::getList(TRUE), FALSE
     );
 
     $this->add('checkbox', 'is_active', ts('Enabled?'));

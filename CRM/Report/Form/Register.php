@@ -198,7 +198,10 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
 
       $groupParams = array('name' => ('report_template'));
       $optionValue = CRM_Core_OptionValue::addOptionValue($params, $groupParams, $this->_action, $this->_id);
-      CRM_Core_Session::setStatus(ts('The %1 \'%2\' has been saved.', array(1 => 'Report Template', 2 => $optionValue->label)), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts('The %1 \'%2\' has been saved.', array(
+            1 => 'Report Template',
+            2 => $optionValue->label
+          )), ts('Saved'), 'success');
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/report/options/report_template', "reset=1"));
     }
   }

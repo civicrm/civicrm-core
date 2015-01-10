@@ -812,11 +812,12 @@ SELECT  id
 
     $profileFields = civicrm_api3('uf_field', 'get', array_merge($profileFilter,
       array(
-    'is_active' => 1,
-    'return' => 'field_name, is_required',
-    'options' => array(
-        'limit' => 0,
-      ))
+        'is_active' => 1,
+        'return' => 'field_name, is_required',
+        'options' => array(
+          'limit' => 0,
+        )
+      )
     ));
     //check for valid fields ( fields that are present in billing block )
     $validBillingFields = array(
@@ -848,30 +849,31 @@ SELECT  id
     }
 
     if (!empty($index) && (
-      // it's empty so we set it OR
-      !CRM_Utils_array::value($prefixName, $profileAddressFields)
+        // it's empty so we set it OR
+        !CRM_Utils_array::value($prefixName, $profileAddressFields)
         //we are dealing with billing id (precedence)
         || $index == $billing_id
         // we are dealing with primary & billing not set
         || ($index == 'Primary' && $profileAddressFields[$prefixName] != $billing_id)
         || ($index == CRM_Core_BAO_LocationType::getDefault()->id
-        && $profileAddressFields[$prefixName] != $billing_id
-        && $profileAddressFields[$prefixName] != 'Primary'
+          && $profileAddressFields[$prefixName] != $billing_id
+          && $profileAddressFields[$prefixName] != 'Primary'
+        )
       )
-    )
     ) {
       $profileAddressFields[$prefixName] = $index;
     }
 
     $potentiallyMissingRequiredFields = array_diff($requiredBillingFields, $requiredProfileFields);
-    CRM_Core_Resources::singleton()->addSetting(array('billing' => array('billingProfileIsHideable' => empty($potentiallyMissingRequiredFields))));
+    CRM_Core_Resources::singleton()
+      ->addSetting(array('billing' => array('billingProfileIsHideable' => empty($potentiallyMissingRequiredFields))));
   }
 
   /**
    * Get a list of fields which can be added to profiles
    *
-   * @param int $gid: UF group ID
-   * @param array $defaults: Form defaults
+   * @param int $gid : UF group ID
+   * @param array $defaults : Form defaults
    * @return array, multidimensional; e.g. $result['FieldGroup']['field_name']['label']
    * @static
    */

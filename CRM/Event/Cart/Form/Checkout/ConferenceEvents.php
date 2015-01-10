@@ -64,10 +64,10 @@ EOS;
       $slot_buttons = array();
       $group_name = "slot_$slot_index";
       foreach ($events as $event) {
-        $seats_available   = $this->checkEventCapacity($event->id);
-        $event_is_full     = ($seats_available === NULL) ? FALSE : ($seats_available < 1);
-        $radio             = $this->createElement('radio', NULL, NULL, $event->title, $event->id);
-        $slot_buttons[]    = $radio;
+        $seats_available = $this->checkEventCapacity($event->id);
+        $event_is_full = ($seats_available === NULL) ? FALSE : ($seats_available < 1);
+        $radio = $this->createElement('radio', NULL, NULL, $event->title, $event->id);
+        $slot_buttons[] = $radio;
         $event_description = ($event_is_full ? $event->event_full_text . "<p>" : '') . $event->description;
 
         $session_options[$radio->getAttribute('id')] = array(
@@ -136,9 +136,9 @@ EOS;
 
       $values = array();
       CRM_Core_DAO::storeValues($this->main_participant, $values);
-      $values['id']       = NULL;
+      $values['id'] = NULL;
       $values['event_id'] = $event_in_cart->event_id;
-      $participant        = CRM_Event_Cart_BAO_MerParticipant::create($values);
+      $participant = CRM_Event_Cart_BAO_MerParticipant::create($values);
       $participant->save();
       $event_in_cart->add_participant($participant);
     }

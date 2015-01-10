@@ -86,8 +86,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   public static function runJobs($testParams = NULL, $mode = NULL) {
     $job = new CRM_Mailing_BAO_MailingJob();
 
-    $config       = CRM_Core_Config::singleton();
-    $jobTable     = CRM_Mailing_DAO_MailingJob::getTableName();
+    $config = CRM_Core_Config::singleton();
+    $jobTable = CRM_Mailing_DAO_MailingJob::getTableName();
     $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
 
     if (!empty($testParams)) {
@@ -99,8 +99,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     }
     else {
       $currentTime = date('YmdHis');
-      $mailingACL  = CRM_Mailing_BAO_Mailing::mailingACL('m');
-      $domainID    = CRM_Core_Config::domainID();
+      $mailingACL = CRM_Mailing_BAO_Mailing::mailingACL('m');
+      $domainID = CRM_Core_Config::domainID();
 
       $modeClause = 'AND m.sms_provider_id IS NULL';
       if ($mode == 'sms') {
@@ -172,10 +172,10 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
         $job->queue($testParams);
 
         // Mark up the starting time
-        $saveJob             = new CRM_Mailing_DAO_MailingJob();
-        $saveJob->id         = $job->id;
+        $saveJob = new CRM_Mailing_DAO_MailingJob();
+        $saveJob->id = $job->id;
         $saveJob->start_date = date('YmdHis');
-        $saveJob->status     = 'Running';
+        $saveJob->status = 'Running';
         $saveJob->save();
 
         $transaction->commit();
@@ -201,10 +201,10 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
         $transaction = new CRM_Core_Transaction();
 
-        $saveJob           = new CRM_Mailing_DAO_MailingJob();
-        $saveJob->id       = $job->id;
+        $saveJob = new CRM_Mailing_DAO_MailingJob();
+        $saveJob->id = $job->id;
         $saveJob->end_date = date('YmdHis');
-        $saveJob->status   = 'Complete';
+        $saveJob->status = 'Complete';
         $saveJob->save();
 
         $transaction->commit();
@@ -232,13 +232,13 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
     $mailing = new CRM_Mailing_BAO_Mailing();
 
-    $config       = CRM_Core_Config::singleton();
-    $jobTable     = CRM_Mailing_DAO_MailingJob::getTableName();
+    $config = CRM_Core_Config::singleton();
+    $jobTable = CRM_Mailing_DAO_MailingJob::getTableName();
     $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
 
     $currentTime = date('YmdHis');
-    $mailingACL  = CRM_Mailing_BAO_Mailing::mailingACL('m');
-    $domainID    = CRM_Core_Config::domainID();
+    $mailingACL = CRM_Mailing_BAO_Mailing::mailingACL('m');
+    $domainID = CRM_Core_Config::domainID();
 
     $query = "
                 SELECT   j.*
@@ -277,10 +277,10 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
         $transaction = new CRM_Core_Transaction();
 
-        $saveJob           = new CRM_Mailing_DAO_MailingJob();
-        $saveJob->id       = $job->id;
+        $saveJob = new CRM_Mailing_DAO_MailingJob();
+        $saveJob->id = $job->id;
         $saveJob->end_date = date('YmdHis');
-        $saveJob->status   = 'Complete';
+        $saveJob->status = 'Complete';
         $saveJob->save();
 
         $mailing->reset();
@@ -301,7 +301,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   public static function runJobs_pre($offset = 200, $mode = NULL) {
     $job = new CRM_Mailing_BAO_MailingJob();
 
-    $jobTable     = CRM_Mailing_DAO_MailingJob::getTableName();
+    $jobTable = CRM_Mailing_DAO_MailingJob::getTableName();
     $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
 
     $currentTime = date('YmdHis');
@@ -367,10 +367,10 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       // update the status of the parent job
       $transaction = new CRM_Core_Transaction();
 
-      $saveJob             = new CRM_Mailing_DAO_MailingJob();
-      $saveJob->id         = $job->id;
+      $saveJob = new CRM_Mailing_DAO_MailingJob();
+      $saveJob->id = $job->id;
       $saveJob->start_date = date('YmdHis');
-      $saveJob->status     = 'Running';
+      $saveJob->status = 'Running';
       $saveJob->save();
 
       $transaction->commit();
@@ -398,7 +398,7 @@ INSERT INTO civicrm_mailing_job
 VALUES (%1, %2, %3, %4, %5, %6, %7)
 ";
     $params = array(
-    1 => array($this->mailing_id, 'Integer'),
+      1 => array($this->mailing_id, 'Integer'),
       2 => array($this->scheduled_date, 'String'),
       3 => array('Scheduled', 'String'),
       4 => array('child', 'String'),
@@ -441,9 +441,9 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       // FIXME: this is not very smart, we should move this to one DB call
       // INSERT INTO ... SELECT FROM ..
       // the thing we need to figure out is how to generate the hash automatically
-      $now    = time();
+      $now = time();
       $params = array();
-      $count  = 0;
+      $count = 0;
       while ($recipients->fetch()) {
         if ($recipients->phone_id) {
           $recipients->email_id = "null";
@@ -488,13 +488,13 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $mailing->find(TRUE);
     $mailing->free();
 
-    $eq           = new CRM_Mailing_Event_BAO_Queue();
-    $eqTable      = CRM_Mailing_Event_BAO_Queue::getTableName();
-    $emailTable   = CRM_Core_BAO_Email::getTableName();
-    $phoneTable   = CRM_Core_DAO_Phone::getTableName();
+    $eq = new CRM_Mailing_Event_BAO_Queue();
+    $eqTable = CRM_Mailing_Event_BAO_Queue::getTableName();
+    $emailTable = CRM_Core_BAO_Email::getTableName();
+    $phoneTable = CRM_Core_DAO_Phone::getTableName();
     $contactTable = CRM_Contact_BAO_Contact::getTableName();
-    $edTable      = CRM_Mailing_Event_BAO_Delivered::getTableName();
-    $ebTable      = CRM_Mailing_Event_BAO_Bounce::getTableName();
+    $edTable = CRM_Mailing_Event_BAO_Delivered::getTableName();
+    $ebTable = CRM_Mailing_Event_BAO_Bounce::getTableName();
 
     $query = "  SELECT      $eqTable.id,
                                 $emailTable.email as email,
@@ -628,8 +628,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
 
     // get the return properties
     $returnProperties = $mailing->getReturnProperties();
-    $params           = $targetParams = $deliveredParams = array();
-    $count            = 0;
+    $params = $targetParams = $deliveredParams = array();
+    $count = 0;
 
     /**
      * CRM-15702: Sending bulk sms to contacts without e-mail addres fails.
@@ -687,8 +687,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
 
       if ($mailing->sms_provider_id) {
         $provider = CRM_SMS_Provider::singleton(array('mailing_id' => $mailing->id));
-        $body     = $provider->getMessage($message, $field['contact_id'], $details[0][$contactID]);
-        $headers  = $provider->getRecipientDetails($field, $details[0][$contactID]);
+        $body = $provider->getMessage($message, $field['contact_id'], $details[0][$contactID]);
+        $headers = $provider->getRecipientDetails($field, $details[0][$contactID]);
       }
 
       // make $recipient actually be the *encoded* header, so as not to baffle Mail_RFC822, CRM-5743
@@ -834,10 +834,10 @@ AND    ( ( job_type IS NULL ) OR
       in_array($job->status, array('Scheduled', 'Running', 'Paused'))
     ) {
 
-      $newJob           = new CRM_Mailing_BAO_MailingJob();
-      $newJob->id       = $job->id;
+      $newJob = new CRM_Mailing_BAO_MailingJob();
+      $newJob->id = $job->id;
       $newJob->end_date = date('YmdHis');
-      $newJob->status   = 'Canceled';
+      $newJob->status = 'Canceled';
       $newJob->save();
 
       // also cancel all child jobs
@@ -851,7 +851,7 @@ AND    job_type = 'child'
 AND    status IN ( 'Scheduled', 'Running', 'Paused' )
 ";
       $params = array(
-      1 => array($job->id, 'Integer'),
+        1 => array($job->id, 'Integer'),
         2 => array(date('YmdHis'), 'Timestamp'),
       );
       CRM_Core_DAO::executeQuery($sql, $params);

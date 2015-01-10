@@ -78,8 +78,8 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
 
     $eventID = implode(',', $eventIDs);
 
-    $participantStatus  = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1");
-    $participantRole    = CRM_Event_PseudoConstant::participantRole();
+    $participantStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1");
+    $participantRole = CRM_Event_PseudoConstant::participantRole();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
 
     $rows = $eventSummary = $roleRows = $statusRows = $instrumentRows = $count = array();
@@ -344,8 +344,8 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
       $this->setPager();
 
       $showEvents = array();
-      $count      = 0;
-      $numRows    = $this->_limit;
+      $count = 0;
+      $numRows = $this->_limit;
 
       if (CRM_Utils_Array::value('id_op', $this->_params, 'in') == 'in' || $noSelection) {
         while ($count < self::ROW_COUNT_LIMIT) {

@@ -175,13 +175,13 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
     $merchant_key = $this->_paymentProcessor['password'];
     $server_type = ($this->_mode == 'test') ? 'sandbox' : '';
 
-    $itemName     = CRM_Utils_Array::value('item_name', $params);
-    $description  = CRM_Utils_Array::value('description', $params);
-    $amount       = CRM_Utils_Array::value('amount', $params);
+    $itemName = CRM_Utils_Array::value('item_name', $params);
+    $description = CRM_Utils_Array::value('description', $params);
+    $amount = CRM_Utils_Array::value('amount', $params);
     $installments = CRM_Utils_Array::value('installments', $params);
 
-    $cart              = new GoogleCart($merchant_id, $merchant_key, $server_type, $params['currencyID']);
-    $item              = new GoogleItem($itemName, $description, 1, $amount);
+    $cart = new GoogleCart($merchant_id, $merchant_key, $server_type, $params['currencyID']);
+    $item = new GoogleItem($itemName, $description, 1, $amount);
     $subscription_item = new GoogleSubscription("merchant", $intervalUnit, $amount, $installments);
 
     $item->SetSubscription($subscription_item);
@@ -277,8 +277,8 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
 
     if ($request->getResponseCode() != 302) {
       CRM_Core_Error::fatal(ts('Invalid response code received from Google Checkout: %1',
-          array(1 => $request->getResponseCode())
-        ));
+        array(1 => $request->getResponseCode())
+      ));
     }
     CRM_Utils_System::redirect($request->getResponseHeader('location'));
     CRM_Utils_System::civiExit();
@@ -291,9 +291,9 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    * returns an associtive array containing the response from the server.
    */
   public function invokeAPI($paymentProcessor, $searchParams) {
-    $merchantID  = $paymentProcessor['user_name'];
+    $merchantID = $paymentProcessor['user_name'];
     $merchantKey = $paymentProcessor['password'];
-    $siteURL     = rtrim(str_replace('https://', '', $paymentProcessor['url_site']), '/');
+    $siteURL = rtrim(str_replace('https://', '', $paymentProcessor['url_site']), '/');
 
     $url = "https://{$merchantID}:{$merchantKey}@{$siteURL}/api/checkout/v2/reports/Merchant/{$merchantID}";
     $xml = self::buildXMLQuery($searchParams);
@@ -385,8 +385,8 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
   public static function getArrayFromXML($xmlData) {
     require_once 'Google/library/xml-processing/gc_xmlparser.php';
     $xmlParser = new gc_XmlParser($xmlData);
-    $root      = $xmlParser->GetRoot();
-    $data      = $xmlParser->GetData();
+    $root = $xmlParser->GetRoot();
+    $data = $xmlParser->GetData();
 
     return array($root, $data);
   }
@@ -424,13 +424,13 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
   public function cancelSubscription(&$message = '', $params = array()) {
     $orderNo = CRM_Utils_Array::value('subscriptionId', $params);
 
-    $merchant_id  = $this->_paymentProcessor['user_name'];
+    $merchant_id = $this->_paymentProcessor['user_name'];
     $merchant_key = $this->_paymentProcessor['password'];
-    $server_type  = ($this->_mode == 'test') ? 'sandbox' : '';
+    $server_type = ($this->_mode == 'test') ? 'sandbox' : '';
 
     $googleRequest = new GoogleRequest($merchant_id, $merchant_key, $server_type);
-    $result        = $googleRequest->SendCancelItems($orderNo, array(), 'Cancelled by admin', '');
-    $message       = "{$result[0]}: {$result[1]}";
+    $result = $googleRequest->SendCancelItems($orderNo, array(), 'Cancelled by admin', '');
+    $message = "{$result[0]}: {$result[1]}";
 
     if ($result[0] != 200) {
       return self::error($result[0], $result[1]);

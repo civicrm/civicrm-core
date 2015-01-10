@@ -343,7 +343,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function preProcess($formName, &$form) {
     return self::singleton()
-      ->invoke(2, $formName, $form, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,  'civicrm_preProcess');
+      ->invoke(2, $formName, $form, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_preProcess');
   }
 
   /**

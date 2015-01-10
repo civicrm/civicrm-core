@@ -120,7 +120,8 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
       if (!empty($greetingTokens)) {
         $form->addElement('select', $fields['field'], $fields['label'],
           array(
-            '' => ts('- select -')) + $greetingTokens
+            '' => ts('- select -')
+          ) + $greetingTokens
         );
         //custom addressee
         $form->addElement('text', $fields['customField'], $fields['customLabel'],

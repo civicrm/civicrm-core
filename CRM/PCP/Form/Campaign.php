@@ -176,7 +176,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
    * @return void
    */
   public function postProcess() {
-    $params  = $this->controller->exportValues($this->_name);
+    $params = $this->controller->exportValues($this->_name);
     $checkBoxes = array('is_thermometer', 'is_honor_roll', 'is_active');
 
     foreach ($checkBoxes as $key) {
@@ -199,7 +199,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     // we also need to purify it, so lets clean it up
     $htmlFields = array('intro_text', 'page_text', 'title');
     foreach ($htmlFields as $field) {
-      if (! empty($params[$field])) {
+      if (!empty($params[$field])) {
         $params[$field] = CRM_Utils_String::purifyHTML($params[$field]);
       }
     }
@@ -238,7 +238,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     $statusId = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $pcp->id, 'status_id');
 
     //send notification of PCP create/update.
-    $pcpParams    = array('entity_table' => $entity_table, 'entity_id' => $pcp->page_id);
+    $pcpParams = array('entity_table' => $entity_table, 'entity_id' => $pcp->page_id);
     $notifyParams = array();
     $notifyStatus = "";
     CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCPBlock', $pcpParams, $notifyParams, array('notify_email'));
@@ -343,8 +343,8 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     }
 
     CRM_Core_Session::setStatus(ts("Your Personal Campaign Page has been %1 %2 %3",
-        array(1 => $pageStatus, 2 => $approvalMessage, 3 => $notifyStatus)
-      ), '', 'info');
+      array(1 => $pageStatus, 2 => $approvalMessage, 3 => $notifyStatus)
+    ), '', 'info');
     if (!$this->_pageId) {
       $session->pushUserContext(CRM_Utils_System::url('civicrm/pcp/info', "reset=1&id={$pcp->id}&ap={$anonymousPCP}"));
     }

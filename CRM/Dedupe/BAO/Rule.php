@@ -71,7 +71,7 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
     // $using are arrays of required field matchings (for substring and
     // full matches, respectively)
     $where = array();
-    $on    = array("SUBSTR(t1.{$this->rule_field}, 1, {$this->rule_length}) = SUBSTR(t2.{$this->rule_field}, 1, {$this->rule_length})");
+    $on = array("SUBSTR(t1.{$this->rule_field}, 1, {$this->rule_length}) = SUBSTR(t2.{$this->rule_field}, 1, {$this->rule_length})");
     $using = array($this->rule_field);
 
     switch ($this->rule_table) {
@@ -90,8 +90,8 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
         break;
 
       case 'civicrm_address':
-        $id      = 'contact_id';
-        $on[]    = 't1.location_type_id = t2.location_type_id';
+        $id = 'contact_id';
+        $on[] = 't1.location_type_id = t2.location_type_id';
         $using[] = 'location_type_id';
         if ($this->params['civicrm_address']['location_type_id']) {
           $locTypeId = CRM_Utils_Type::escape($this->params['civicrm_address']['location_type_id'], 'Integer', FALSE);
@@ -193,8 +193,8 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
    * @return rule fields array associated to rule group
    */
   public static function dedupeRuleFields($params) {
-    $rgBao               = new CRM_Dedupe_BAO_RuleGroup();
-    $rgBao->used         = $params['used'];
+    $rgBao = new CRM_Dedupe_BAO_RuleGroup();
+    $rgBao->used = $params['used'];
     $rgBao->contact_type = $params['contact_type'];
     $rgBao->find(TRUE);
 

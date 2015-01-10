@@ -434,15 +434,15 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
       }
 
       // Find related households.
-      $relationSelect      = "SELECT contact_household.id as household_id, {$contactA} as refContact ";
+      $relationSelect = "SELECT contact_household.id as household_id, {$contactA} as refContact ";
       $relationFrom = " FROM civicrm_contact contact_household
               INNER JOIN civicrm_relationship crel ON crel.{$contactB} = contact_household.id AND crel.relationship_type_id = {$id} ";
 
       // Check for active relationship status only.
-      $today               = date('Ymd');
-      $relationActive      = " AND (crel.is_active = 1 AND ( crel.end_date is NULL OR crel.end_date >= {$today} ) )";
-      $relationWhere       = " WHERE contact_household.is_deleted = 0  AND crel.{$contactA} IN ( {$relID} ) {$relationActive}";
-      $relationGroupBy     = " GROUP BY crel.{$contactA}";
+      $today = date('Ymd');
+      $relationActive = " AND (crel.is_active = 1 AND ( crel.end_date is NULL OR crel.end_date >= {$today} ) )";
+      $relationWhere = " WHERE contact_household.is_deleted = 0  AND crel.{$contactA} IN ( {$relID} ) {$relationActive}";
+      $relationGroupBy = " GROUP BY crel.{$contactA}";
       $relationQueryString = "$relationSelect $relationFrom $relationWhere $relationGroupBy";
 
       $householdsDAO = CRM_Core_DAO::executeQuery($relationQueryString);

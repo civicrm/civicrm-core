@@ -191,7 +191,7 @@ WHERE  inst.report_id = %1";
 
     list($domainEmailName,
       $domainEmailAddress
-    ) = CRM_Core_BAO_Domain::getNameAndEmail();
+      ) = CRM_Core_BAO_Domain::getNameAndEmail();
 
     $params = array('id' => $instanceID);
     $instanceInfo = array();
@@ -200,13 +200,13 @@ WHERE  inst.report_id = %1";
       $instanceInfo
     );
 
-    $params              = array();
+    $params = array();
     $params['groupName'] = 'Report Email Sender';
-    $params['from']      = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
+    $params['from'] = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
     //$domainEmailName;
-    $params['toName']  = "";
+    $params['toName'] = "";
     $params['toEmail'] = CRM_Utils_Array::value('email_to', $instanceInfo);
-    $params['cc']      = CRM_Utils_Array::value('email_cc', $instanceInfo);
+    $params['cc'] = CRM_Utils_Array::value('email_cc', $instanceInfo);
     $params['subject'] = CRM_Utils_Array::value('email_subject', $instanceInfo);
     if (empty($instanceInfo['attachments'])) {
       $instanceInfo['attachments'] = array();
@@ -252,8 +252,8 @@ WHERE  inst.report_id = %1";
     }
     // Add the headers.
     $csv .= implode($config->fieldSeparator,
-      $headers
-    ) . "\r\n";
+        $headers
+      ) . "\r\n";
 
     $displayRows = array();
     $value = NULL;
@@ -288,8 +288,8 @@ WHERE  inst.report_id = %1";
       }
       // Add the data row.
       $csv .= implode($config->fieldSeparator,
-        $displayRows
-      ) . "\r\n";
+          $displayRows
+        ) . "\r\n";
     }
 
     return $csv;
@@ -347,8 +347,8 @@ WHERE  inst.report_id = %1";
 
     if (!empty($instanceValues['permission']) &&
       (!(CRM_Core_Permission::check($instanceValues['permission']) ||
-          CRM_Core_Permission::check('administer Reports')
-        ))
+        CRM_Core_Permission::check('administer Reports')
+      ))
     ) {
       return FALSE;
     }
@@ -412,8 +412,8 @@ WHERE  inst.report_id = %1";
     $messages = array("Report Mail Triggered...");
 
     $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', $optionVal, 'value');
-    $obj          = new CRM_Report_Page_Instance();
-    $is_error     = 0;
+    $obj = new CRM_Report_Page_Instance();
+    $is_error = 0;
     if (strstr(CRM_Utils_Array::value('name', $templateInfo), '_Form')) {
       $instanceInfo = array();
       CRM_Report_BAO_ReportInstance::retrieve(array('id' => $instanceId), $instanceInfo);
@@ -489,8 +489,8 @@ WHERE  inst.report_id = %1";
         // (in other words, there's no point in propagating blank filters).
         foreach ($process_params as $field_name => $field_value) {
           $suffix_position = strrpos($field_name, '_');
-          $suffix          = substr($field_name, $suffix_position);
-          $basename        = substr($field_name, 0, $suffix_position);
+          $suffix = substr($field_name, $suffix_position);
+          $basename = substr($field_name, 0, $suffix_position);
           if ($suffix == '_min' || $suffix == '_max' ||
             $suffix == '_from' || $suffix == '_to' ||
             $suffix == '_relative'

@@ -49,7 +49,7 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
       $this->_customSearchID,
       $this->_customSearchClass,
       $formValues
-    ) = CRM_Contact_BAO_SearchCustom::details($csID, $ssID, $gID);
+      ) = CRM_Contact_BAO_SearchCustom::details($csID, $ssID, $gID);
 
     if (!$this->_customSearchID) {
       CRM_Core_Error::fatal('Could not get details for custom search.');
@@ -64,12 +64,14 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     }
 
     // set breadcrumb to return to Custom Search listings page
-    $breadCrumb = array(array(
+    $breadCrumb = array(
+      array(
         'title' => ts('Custom Searches'),
         'url' => CRM_Utils_System::url('civicrm/contact/search/custom/list',
           'reset=1'
         ),
-      ));
+      )
+    );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
     // use the custom selector
@@ -85,7 +87,8 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
 
     // CRM-12747
     if (isset($this->_customClass->_permissionedComponent) &&
-      !self::isPermissioned($this->_customClass->_permissionedComponent)) {
+      !self::isPermissioned($this->_customClass->_permissionedComponent)
+    ) {
       CRM_Utils_System::permissionDenied();
     }
   }

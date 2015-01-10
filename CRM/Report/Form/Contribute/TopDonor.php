@@ -78,8 +78,8 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
           ),
         ),
       )
-    + $this->getAddressColumns()
-    + array(
+      + $this->getAddressColumns()
+      + array(
         'civicrm_contribution' => array(
           'dao' => 'CRM_Contribute_DAO_Contribution',
           'fields' => array(

@@ -75,7 +75,7 @@ class CRM_Utils_ReCAPTCHA {
    * Add element to form
    */
   public static function add(&$form) {
-    $error  = NULL;
+    $error = NULL;
     $config = CRM_Core_Config::singleton();
     $useSSL = FALSE;
     if (!function_exists('recaptcha_get_html')) {

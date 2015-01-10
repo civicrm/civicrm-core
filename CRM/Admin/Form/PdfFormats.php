@@ -66,7 +66,8 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
 
     $this->add('select', 'paper_size', ts('Paper Size'),
       array(
-        0 => ts('- default -')) + CRM_Core_BAO_PaperSize::getList(TRUE), FALSE,
+        0 => ts('- default -')
+      ) + CRM_Core_BAO_PaperSize::getList(TRUE), FALSE,
       array('onChange' => "selectPaper( this.value );")
     );
 
@@ -83,7 +84,10 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
     $this->add('text', 'margin_bottom', ts('Bottom Margin'), array('size' => 8, 'maxlength' => 8), TRUE);
     $this->add('text', 'weight', ts('Order'), CRM_Core_DAO::getAttribute('CRM_Core_BAO_PdfFormat', 'weight'), TRUE);
 
-    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array('CRM_Core_BAO_PdfFormat', $this->_id));
+    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
+        'CRM_Core_BAO_PdfFormat',
+        $this->_id
+      ));
     $this->addRule('margin_left', ts('Margin must be numeric'), 'numeric');
     $this->addRule('margin_right', ts('Margin must be numeric'), 'numeric');
     $this->addRule('margin_top', ts('Margin must be numeric'), 'numeric');
