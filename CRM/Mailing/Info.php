@@ -69,7 +69,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     );
     $result['crmD3'] = array(
       'ext' => 'civicrm',
-      'js' => array('js/angular-crmD3.js', 'js/d3.min.js'),
+      'js' => array('js/angular-crmD3.js', 'bower_components/d3/d3.min.js'),
     );
 
     $config = CRM_Core_Config::singleton();
