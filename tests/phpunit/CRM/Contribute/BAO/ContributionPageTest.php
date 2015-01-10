@@ -88,9 +88,9 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     );
 
     $contributionpage = CRM_Contribute_BAO_ContributionPage::create($params);
-    $id               = $contributionpage->id;
-    $is_active        = 1;
-    $pageActive       = CRM_Contribute_BAO_ContributionPage::setIsActive($id, $is_active);
+    $id = $contributionpage->id;
+    $is_active = 1;
+    $pageActive = CRM_Contribute_BAO_ContributionPage::setIsActive($id, $is_active);
     $this->assertEquals($pageActive, TRUE, 'Verify financial types record deletion.');
     ContributionPage::delete($contributionpage->id);
   }
@@ -108,8 +108,8 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
 
     $contributionpage = CRM_Contribute_BAO_ContributionPage::create($params);
 
-    $id        = $contributionpage->id;
-    $values    = array();
+    $id = $contributionpage->id;
+    $values = array();
     $setValues = CRM_Contribute_BAO_ContributionPage::setValues($id, $values);
 
     $this->assertEquals($params['title'], $values['title'], 'Verify contribution title.');
@@ -164,8 +164,8 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     );
 
     $contributionpage = CRM_Contribute_BAO_ContributionPage::create($params);
-    $id               = $contributionpage->id;
-    $checkRecurring   = CRM_Contribute_BAO_ContributionPage::checkRecurPaymentProcessor($id);
+    $id = $contributionpage->id;
+    $checkRecurring = CRM_Contribute_BAO_ContributionPage::checkRecurPaymentProcessor($id);
     $this->assertEquals($checkRecurring, FALSE, 'Check for false return.');
     ContributionPage::delete($contributionpage->id);
   }

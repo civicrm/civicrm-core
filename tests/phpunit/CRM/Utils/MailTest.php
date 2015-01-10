@@ -18,7 +18,7 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
 
     $values = array(
       array(
-    'name' => "Test User",
+        'name' => "Test User",
         'email' => "foo@bar.com",
         'result' => "Test User <foo@bar.com>",
       ),

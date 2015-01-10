@@ -43,7 +43,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
    */
   public function testOverride() {
     CRM_Core_Region::instance('testOverride')->update('default', array(
-       'disabled' => TRUE,
+      'disabled' => TRUE,
     ));
     CRM_Core_Region::instance('testOverride')->add(array(
       'markup' => 'override<br/>',

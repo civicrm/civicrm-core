@@ -42,8 +42,8 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
    */
   public function testAdd() {
     $firstName = 'Shane';
-    $lastName  = 'Whatson';
-    $params    = array(
+    $lastName = 'Whatson';
+    $params = array(
       'first_name' => $firstName,
       'last_name' => $lastName,
       'contact_type' => 'Individual',
@@ -56,8 +56,8 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'contact_id' => $contact->id,
       'total_amount' => $price,
       'financial_type_id' => 1,
-      'is_active'     => 1,
-      'skipLineItem'  => 1,
+      'is_active' => 1,
+      'skipLineItem' => 1,
     );
 
     $defaults = array();
@@ -91,8 +91,8 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
    */
   public function testRetrieve() {
     $firstName = 'Shane';
-    $lastName  = 'Whatson';
-    $params    = array(
+    $lastName = 'Whatson';
+    $params = array(
       'first_name' => $firstName,
       'last_name' => $lastName,
       'contact_type' => 'Individual',
@@ -104,8 +104,8 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'contact_id' => $contact->id,
       'total_amount' => $price,
       'financial_type_id' => 1,
-      'is_active'     => 1,
-      'skipLineItem'  => 1,
+      'is_active' => 1,
+      'skipLineItem' => 1,
     );
 
     $defaults = array();
@@ -138,8 +138,8 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
    */
   public function testCreate() {
     $firstName = 'Shane';
-    $lastName  = 'Whatson';
-    $params    = array(
+    $lastName = 'Whatson';
+    $params = array(
       'first_name' => $firstName,
       'last_name' => $lastName,
       'contact_type' => 'Individual',
@@ -151,8 +151,8 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'contact_id' => $contact->id,
       'total_amount' => $price,
       'financial_type_id' => 1,
-      'is_active'     => 1,
-      'skipLineItem'  => 1,
+      'is_active' => 1,
+      'skipLineItem' => 1,
     );
 
     $defaults = array();

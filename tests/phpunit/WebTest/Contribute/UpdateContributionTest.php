@@ -114,9 +114,9 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $from = 'Premiums';
     $to = 'Premiums inventory';
     $financialType = array(
-     'name' => 'Test Financial' . substr(sha1(rand()), 0, 7),
-     'is_reserved' => 1,
-     'is_deductible' => 1,
+      'name' => 'Test Financial' . substr(sha1(rand()), 0, 7),
+      'is_reserved' => 1,
+      'is_deductible' => 1,
     );
     $this->addeditFinancialType($financialType);
     $this->waitForElementPresent("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='" . $financialType['name'] . "']/../td[7]/span/a[text()='Accounts']");
@@ -185,9 +185,9 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $from = 'Premiums';
     $to = 'Premiums inventory';
     $financialType = array(
-     'name' => 'Test Financial' . substr(sha1(rand()), 0, 7),
-     'is_reserved' => 1,
-     'is_deductible' => 1,
+      'name' => 'Test Financial' . substr(sha1(rand()), 0, 7),
+      'is_reserved' => 1,
+      'is_deductible' => 1,
     );
     $this->addeditFinancialType($financialType);
     $this->waitForElementPresent("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='" . $financialType['name'] . "']/../td[7]/span/a[text()='Accounts']");
@@ -284,8 +284,8 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
     $search = array('entity_id' => $lineItem);
     $compare = array(
-     'amount' => '100.00',
-     'status_id' => 1,
+      'amount' => '100.00',
+      'status_id' => 1,
     );
     $this->assertDBCompareValues("CRM_Financial_DAO_FinancialItem", $search, $compare);
     $amount = $this->_getPremiumActualCost($contId, NULL, 'Payment Processor Account', -100.00, "'civicrm_contribution'");
@@ -312,8 +312,8 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $this->assertDBCompareValues('CRM_Contribute_DAO_Contribution', $search, $compare);
     $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
     $itemParams = array(
-     'amount' => '-100.00',
-     'entity_id' => $lineItem,
+      'amount' => '-100.00',
+      'entity_id' => $lineItem,
     );
     $defaults = array();
     $items = CRM_Financial_BAO_FinancialItem::retrieve($itemParams, $defaults);
@@ -345,8 +345,8 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
     $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
     $itemParams = array(
-     'amount' => '-100.00',
-     'entity_id' => $lineItem,
+      'amount' => '-100.00',
+      'entity_id' => $lineItem,
     );
     $item1 = $item2 = array();
     CRM_Financial_BAO_FinancialItem::retrieve($itemParams, $item1);
@@ -489,9 +489,9 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
 
     $expected = array(
-     'Financial Type' => 'Donation',
-     'Total Amount' => '100.00',
-     'Contribution Status' => $status,
+      'Financial Type' => 'Donation',
+      'Total Amount' => '100.00',
+      'Contribution Status' => $status,
     );
     $this->webtestVerifyTabularData($expected);
     $this->click("_qf_ContributionView_cancel-bottom");

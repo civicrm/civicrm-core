@@ -65,24 +65,24 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    * Test works but not both due to some form of caching going on in the SmartySingleton
    */
   public function testCreateSingleNowDated() {
-    $firstName  = 'John_' . substr(sha1(rand()), 0, 7);
-    $lastName   = 'Smith_' . substr(sha1(rand()), 0, 7);
+    $firstName = 'John_' . substr(sha1(rand()), 0, 7);
+    $lastName = 'Smith_' . substr(sha1(rand()), 0, 7);
     $nameParams = array('first_name' => $firstName, 'last_name' => $lastName);
-    $contactId  = $this->individualCreate($nameParams);
+    $contactId = $this->individualCreate($nameParams);
 
     $invoiceID = sha1(rand());
-    $amount    = rand(100, 1000) . '.00';
+    $amount = rand(100, 1000) . '.00';
 
     $contributionRecurParams = array(
       'contact_id' => $contactId,
-      'amount'     => $amount,
-      'currency'   => 'USD',
+      'amount' => $amount,
+      'currency' => 'USD',
       'frequency_unit' => 'week',
       'frequency_interval' => 1,
       'installments' => 2,
-      'start_date'   => date('Ymd'),
-      'create_date'  => date('Ymd'),
-      'invoice_id'   => $invoiceID,
+      'start_date' => date('Ymd'),
+      'create_date' => date('Ymd'),
+      'invoice_id' => $invoiceID,
       'contribution_status_id' => 2,
       'is_test' => 1,
       'payment_processor_id' => $this->processorParams->id,
@@ -90,14 +90,14 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $recur = CRM_Contribute_BAO_ContributionRecur::add($contributionRecurParams);
 
     $contributionParams = array(
-      'contact_id'   => $contactId,
-      'financial_type_id'   => $this->_financialTypeId,
+      'contact_id' => $contactId,
+      'financial_type_id' => $this->_financialTypeId,
       'receive_date' => date('Ymd'),
       'total_amount' => $amount,
-      'invoice_id'   => $invoiceID,
-      'currency'     => 'USD',
+      'invoice_id' => $invoiceID,
+      'currency' => 'USD',
       'contribution_recur_id' => $recur->id,
-      'is_test'      => 1,
+      'is_test' => 1,
       'contribution_status_id' => 2,
     );
     $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
@@ -198,25 +198,25 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   public function testCreateSinglePostDated() {
     $start_date = date('Ymd', strtotime("+ 1 week"));
 
-    $firstName  = 'John_' . substr(sha1(rand()), 0, 7);
-    $lastName   = 'Smith_' . substr(sha1(rand()), 0, 7);
+    $firstName = 'John_' . substr(sha1(rand()), 0, 7);
+    $lastName = 'Smith_' . substr(sha1(rand()), 0, 7);
     $nameParams = array('first_name' => $firstName, 'last_name' => $lastName);
-    $contactId  = $this->individualCreate($nameParams);
+    $contactId = $this->individualCreate($nameParams);
 
     $ids = array('contribution' => NULL);
     $invoiceID = sha1(rand());
-    $amount    = rand(100, 1000) . '.00';
+    $amount = rand(100, 1000) . '.00';
 
     $contributionRecurParams = array(
       'contact_id' => $contactId,
-      'amount'     => $amount,
-      'currency'   => 'USD',
+      'amount' => $amount,
+      'currency' => 'USD',
       'frequency_unit' => 'month',
       'frequency_interval' => 1,
       'installments' => 3,
-      'start_date'   => $start_date,
-      'create_date'  => date('Ymd'),
-      'invoice_id'   => $invoiceID,
+      'start_date' => $start_date,
+      'create_date' => date('Ymd'),
+      'invoice_id' => $invoiceID,
       'contribution_status_id' => 2,
       'is_test' => 1,
       'payment_processor_id' => $this->processorParams->id,
@@ -224,12 +224,12 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $recur = CRM_Contribute_BAO_ContributionRecur::add($contributionRecurParams, $ids);
 
     $contributionParams = array(
-      'contact_id'   => $contactId,
-      'financial_type_id'   => $this->_financialTypeId,
+      'contact_id' => $contactId,
+      'financial_type_id' => $this->_financialTypeId,
       'receive_date' => $start_date,
       'total_amount' => $amount,
-      'invoice_id'   => $invoiceID,
-      'currency'     => 'USD',
+      'invoice_id' => $invoiceID,
+      'currency' => 'USD',
       'contribution_recur_id' => $recur->id,
       'is_test' => 1,
       'contribution_status_id' => 2,

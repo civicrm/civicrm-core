@@ -73,10 +73,10 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
     $this->clickLink("xpath=//table/tbody//tr/td[1]/div[text()='{$financialAccountTitle}']/../../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom', FALSE);
     //Varify Data after Adding new Financial Account
     $verifyData = array(
-    'name' => $financialAccountTitle,
+      'name' => $financialAccountTitle,
       'description' => $financialAccountDescription,
       'accounting_code' => $accountingCode,
-      'tax_rate'   => $taxRate,
+      'tax_rate' => $taxRate,
       'is_tax' => 'on',
       'is_deductible' => 'off',
       'is_default' => 'off',
@@ -121,10 +121,10 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
     $this->clickLink("xpath=//table/tbody//tr/td[1]/div[text()='{$financialAccountTitle}']/../../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom', FALSE);
 
     $verifyData = array(
-    'name' => $financialAccountTitle,
+      'name' => $financialAccountTitle,
       'description' => $financialAccountDescription,
       'accounting_code' => $accountingCode,
-      'tax_rate'   => $taxRate,
+      'tax_rate' => $taxRate,
       'is_tax' => 'on',
       'is_deductible' => 'off',
       'is_default' => 'off',

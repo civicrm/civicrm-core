@@ -354,6 +354,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->membershipDelete($membershipId);
     Contact::delete($contactId);
   }
+
   /**
    * Get membership joins/renewals
    * for a specified membership
@@ -488,8 +489,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    */
   public function testRenewMembership() {
     $contactId = Contact::createIndividual();
-    $joinDate  = $startDate = date("Ymd", strtotime(date("Ymd") . " -6 month"));
-    $endDate   = date("Ymd", strtotime($joinDate . " +1 year -1 day"));
+    $joinDate = $startDate = date("Ymd", strtotime(date("Ymd") . " -6 month"));
+    $endDate = date("Ymd", strtotime($joinDate . " +1 year -1 day"));
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
@@ -500,8 +501,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
     );
-    $ids          = array();
-    $membership   = CRM_Member_BAO_Membership::create($params, $ids);
+    $ids = array();
+    $membership = CRM_Member_BAO_Membership::create($params, $ids);
     $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for created membership.'
     );
@@ -549,11 +550,11 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Renew stale membership
    */
   public function testStaleMembership() {
-    $statusId  = 3;
+    $statusId = 3;
     $contactId = Contact::createIndividual();
-    $joinDate  = $startDate = date("Ymd", strtotime(date("Ymd") . " -1 year -15 days"));
-    $endDate   = date("Ymd", strtotime($joinDate . " +1 year -1 day"));
-    $params    = array(
+    $joinDate = $startDate = date("Ymd", strtotime(date("Ymd") . " -1 year -15 days"));
+    $endDate = date("Ymd", strtotime($joinDate . " +1 year -1 day"));
+    $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => $joinDate,

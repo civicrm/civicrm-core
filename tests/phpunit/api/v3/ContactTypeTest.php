@@ -26,9 +26,6 @@
 */
 
 
-
-
-
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
@@ -230,7 +227,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     $updateContact = $this->callAPIFailure('contact', 'create', $updateParams);
     $params = array(
       'contact_id' => $contact['id'],
-     );
+    );
     $this->callAPISuccess('contact', 'delete', $params);
 
     // check for Type:Organization

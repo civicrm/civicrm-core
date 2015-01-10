@@ -34,6 +34,7 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
   // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
   // new test classes should be compliant.
   public $_eNoticeCompliant = FALSE;
+
   public function setUp() {
     parent::setUp();
   }
@@ -49,7 +50,13 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
 
   public function testGetKeys() {
     $c = $this->_createContainer();
-    $this->assertEquals(array('test.conflict', 'test.whiz', 'test.whizbang', 'test.foo', 'test.foo.bar'), $c->getKeys());
+    $this->assertEquals(array(
+        'test.conflict',
+        'test.whiz',
+        'test.whizbang',
+        'test.foo',
+        'test.foo.bar'
+      ), $c->getKeys());
   }
 
   public function testGetPath() {
@@ -136,7 +143,7 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
         'resUrl' => 'http://conflict-c',
       ),
     ));
-    $c  = new CRM_Extension_Container_Collection($containers, $cache, $cacheKey);
+    $c = new CRM_Extension_Container_Collection($containers, $cache, $cacheKey);
     return $c;
   }
 }

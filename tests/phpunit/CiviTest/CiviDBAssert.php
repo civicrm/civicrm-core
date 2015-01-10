@@ -51,7 +51,7 @@ class CiviDBAssert {
       $testCase->fail('ID not populated. Please fix your assertDBState usage!!!');
     }
 
-    $object   = new $daoName();
+    $object = new $daoName();
     $object->id = $id;
     $verifiedCount = 0;
 

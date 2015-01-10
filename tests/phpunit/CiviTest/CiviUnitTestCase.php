@@ -2038,9 +2038,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     //have a crack @ deleting it first in the hope this will prevent derailing our tests
     $this->callAPISuccess('custom_group', 'get', array(
-        'title' => $params['title'],
-        array('api.custom_group.delete' => 1),
-      ));
+      'title' => $params['title'],
+      array('api.custom_group.delete' => 1),
+    ));
 
     return $this->callAPISuccess('custom_group', 'create', $params);
   }
@@ -2083,24 +2083,24 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $ids['custom_group_id'] = $customGroup['id'];
 
     $customField = $this->customFieldCreate(array(
-        'custom_group_id' => $ids['custom_group_id'],
-        'label' => 'field_1' . $ids['custom_group_id'],
-      ));
+      'custom_group_id' => $ids['custom_group_id'],
+      'label' => 'field_1' . $ids['custom_group_id'],
+    ));
 
     $ids['custom_field_id'][] = $customField['id'];
 
     $customField = $this->customFieldCreate(array(
-        'custom_group_id' => $ids['custom_group_id'],
-        'default_value' => '',
-        'label' => 'field_2' . $ids['custom_group_id'],
-      ));
+      'custom_group_id' => $ids['custom_group_id'],
+      'default_value' => '',
+      'label' => 'field_2' . $ids['custom_group_id'],
+    ));
     $ids['custom_field_id'][] = $customField['id'];
 
     $customField = $this->customFieldCreate(array(
-        'custom_group_id' => $ids['custom_group_id'],
-        'default_value' => '',
-        'label' => 'field_3' . $ids['custom_group_id'],
-      ));
+      'custom_group_id' => $ids['custom_group_id'],
+      'default_value' => '',
+      'label' => 'field_3' . $ids['custom_group_id'],
+    ));
     $ids['custom_field_id'][] = $customField['id'];
 
     return $ids;
@@ -3037,24 +3037,24 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $contributionPriceSet = $this->callAPISuccess('price_set', 'getsingle', array('name' => 'default_contribution_amount'));
     $firstID = $contributionPriceSet['id'];
     $this->callAPISuccess('price_set', 'create', array(
-        'id' => $contributionPriceSet['id'],
-        'is_active' => 0,
-        'name' => 'old',
-      ));
+      'id' => $contributionPriceSet['id'],
+      'is_active' => 0,
+      'name' => 'old',
+    ));
     unset($contributionPriceSet['id']);
     $newPriceSet = $this->callAPISuccess('price_set', 'create', $contributionPriceSet);
     $priceField = $this->callAPISuccess('price_field', 'getsingle', array(
-        'price_set_id' => $firstID,
-        'options' => array('limit' => 1),
-      ));
+      'price_set_id' => $firstID,
+      'options' => array('limit' => 1),
+    ));
     unset($priceField['id']);
     $priceField['price_set_id'] = $newPriceSet['id'];
     $newPriceField = $this->callAPISuccess('price_field', 'create', $priceField);
     $priceFieldValue = $this->callAPISuccess('price_field_value', 'getsingle', array(
-        'price_set_id' => $firstID,
-        'sequential' => 1,
-        'options' => array('limit' => 1),
-      ));
+      'price_set_id' => $firstID,
+      'sequential' => 1,
+      'options' => array('limit' => 1),
+    ));
 
     unset($priceFieldValue['id']);
     //create some padding to use up ids
@@ -3157,18 +3157,18 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'line_total' => 200,
       'financial_type_id' => 1,
       'price_field_id' => $this->callAPISuccess('price_field', 'getvalue', array(
-          'return' => 'id',
-          'label' => 'Membership Amount',
-        )),
+        'return' => 'id',
+        'label' => 'Membership Amount',
+      )),
       'price_field_value_id' => $this->callAPISuccess('price_field_value', 'getvalue', array(
-          'return' => 'id',
-          'label' => 'General',
-        )),
+        'return' => 'id',
+        'label' => 'General',
+      )),
     ));
     $this->callAPISuccess('membership_payment', 'create', array(
-        'contribution_id' => $this->_contributionID,
-        'membership_id' => $this->ids['membership'],
-      ));
+      'contribution_id' => $this->_contributionID,
+      'membership_id' => $this->ids['membership'],
+    ));
   }
 
   /**

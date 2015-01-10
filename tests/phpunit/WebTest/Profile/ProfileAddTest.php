@@ -156,8 +156,8 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     //Add fields to profile
     $fields = array(
       'first_name' => 'Individual',
-      'last_name'  => 'Individual',
-      'email'      => 'Contact',
+      'last_name' => 'Individual',
+      'email' => 'Contact',
     );
     $this->waitForElementPresent("field_name_0");
     foreach ($fields as $field => $type) {
@@ -174,7 +174,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $gid = $this->urlArg('gid');
     $this->openCiviPage('profile/create', "gid=$gid&reset=1", NULL);
     $firstName1 = "John_" . substr(sha1(rand()), 0, 7);
-    $lastName1  = "Smiths_x" . substr(sha1(rand()), 0, 7);
+    $lastName1 = "Smiths_x" . substr(sha1(rand()), 0, 7);
     $this->type('first_name', $firstName1);
     $this->type('last_name', $lastName1);
     $this->type('email-Primary', "$firstName1.$lastName1@example.com");
@@ -184,7 +184,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->webtestLogout();
     $this->openCiviPage('profile/create', "gid=$gid&reset=1", NULL);
     $firstName2 = "John12_" . substr(sha1(rand()), 0, 7);
-    $lastName2  = "Smiths34_x" . substr(sha1(rand()), 0, 7);
+    $lastName2 = "Smiths34_x" . substr(sha1(rand()), 0, 7);
     $this->type('first_name', $firstName2);
     $this->type('last_name', $lastName2);
     $this->type('email-Primary', "$firstName2.$lastName2@example.com");

@@ -253,7 +253,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     );
     $cases[] = array(
       array('check_permissions' => 1),
-        "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table'/",
+      "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table'/",
     );
     $cases[] = array(
       array('entity_table' => 'civicrm_activity', 'name' => 'example_456.csv'),

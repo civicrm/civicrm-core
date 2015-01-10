@@ -26,7 +26,6 @@
 */
 
 
-
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/Event.php';
@@ -148,7 +147,10 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $participant = $this->callAPISuccessGetSingle('participant', array('id' => $participant['id']));
 
     // add participant payment entry
-    $this->callAPISuccess('participant_payment', 'create', array('participant_id' => $participant['id'], 'contribution_id' => $contributionId));
+    $this->callAPISuccess('participant_payment', 'create', array(
+        'participant_id' => $participant['id'],
+        'contribution_id' => $contributionId
+      ));
 
     // -- processing priceSet using the BAO
     $lineItem = array();

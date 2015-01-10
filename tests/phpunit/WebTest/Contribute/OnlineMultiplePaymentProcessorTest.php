@@ -194,8 +194,8 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
     $this->click("xpath=//div[@id='contributionSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
     $expected = array(
-      'From'            => "{$firstName} {$lastName}",
-      'Financial Type'  => 'Donation',
+      'From' => "{$firstName} {$lastName}",
+      'Financial Type' => 'Donation',
       'Contribution Status' => 'Pending : Pay Later',
     );
     $this->webtestVerifyTabularData($expected);

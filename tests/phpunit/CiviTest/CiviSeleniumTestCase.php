@@ -1820,16 +1820,16 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    */
   function _testEditFinancialAccount(
     $editfinancialAccount,
-                                     $financialAccountTitle = FALSE,
-                                     $financialAccountDescription = FALSE,
-                                     $accountingCode = FALSE,
-                                     $firstName = FALSE,
-                                     $financialAccountType = FALSE,
-                                     $taxDeductible = FALSE,
-                                     $isActive = TRUE,
-                                     $isTax = FALSE,
-                                     $taxRate = FALSE,
-                                     $isDefault = FALSE
+    $financialAccountTitle = FALSE,
+    $financialAccountDescription = FALSE,
+    $accountingCode = FALSE,
+    $firstName = FALSE,
+    $financialAccountType = FALSE,
+    $taxDeductible = FALSE,
+    $isActive = TRUE,
+    $isTax = FALSE,
+    $taxRate = FALSE,
+    $isDefault = FALSE
   ) {
     if ($firstName) {
       $this->openCiviPage("admin/financial/financialAccount", "reset=1");

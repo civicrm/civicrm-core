@@ -41,9 +41,9 @@ class WebTest_Pledge_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->enableDisablePopups(FALSE);
 
     // create unique name
-    $name      = substr(sha1(rand()), 0, 7);
+    $name = substr(sha1(rand()), 0, 7);
     $firstName = 'Adam' . $name;
-    $lastName  = 'Jones' . $name;
+    $lastName = 'Jones' . $name;
 
     // create new contact
     $this->webtestAddContact($firstName, $lastName, $firstName . "@example.com");

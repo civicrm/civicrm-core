@@ -222,8 +222,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => array(),
     );
     $files = array();
-    $obj   = new CRM_Member_Form_Membership;
-    $rc    = $obj->formRule($params, $files, $obj);
+    $obj = new CRM_Member_Form_Membership;
+    $rc = $obj->formRule($params, $files, $obj);
     $this->assertType('array', $rc,
       'In line ' . __LINE__
     );
@@ -247,19 +247,19 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  membership type
    */
   public function testFormRuleRollingEarlyStart() {
-    $unixNow       = time();
-    $ymdNow        = date('m/d/Y', $unixNow);
+    $unixNow = time();
+    $ymdNow = date('m/d/Y', $unixNow);
     $unixYesterday = $unixNow - (24 * 60 * 60);
-    $ymdYesterday  = date('m/d/Y', $unixYesterday);
-    $params        = array(
+    $ymdYesterday = date('m/d/Y', $unixYesterday);
+    $params = array(
       'join_date' => $ymdNow,
       'start_date' => $ymdYesterday,
       'end_date' => '',
       'membership_type_id' => array('23', '3'),
     );
     $files = array();
-    $obj   = new CRM_Member_Form_Membership;
-    $rc    = call_user_func(array('CRM_Member_Form_Membership', 'formRule'),
+    $obj = new CRM_Member_Form_Membership;
+    $rc = call_user_func(array('CRM_Member_Form_Membership', 'formRule'),
       $params, $files, $obj
     );
     $this->assertType('array', $rc,
@@ -276,19 +276,19 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  membership type
    */
   public function testFormRuleRollingEarlyEnd() {
-    $unixNow       = time();
-    $ymdNow        = date('m/d/Y', $unixNow);
+    $unixNow = time();
+    $ymdNow = date('m/d/Y', $unixNow);
     $unixYesterday = $unixNow - (24 * 60 * 60);
-    $ymdYesterday  = date('m/d/Y', $unixYesterday);
-    $params        = array(
+    $ymdYesterday = date('m/d/Y', $unixYesterday);
+    $params = array(
       'join_date' => $ymdNow,
       'start_date' => $ymdNow,
       'end_date' => $ymdYesterday,
       'membership_type_id' => array('23', '3'),
     );
     $files = array();
-    $obj   = new CRM_Member_Form_Membership;
-    $rc    = $obj->formRule($params, $files, $obj);
+    $obj = new CRM_Member_Form_Membership;
+    $rc = $obj->formRule($params, $files, $obj);
     $this->assertType('array', $rc,
       'In line ' . __LINE__
     );
@@ -303,19 +303,19 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  membership type
    */
   public function testFormRuleRollingEndNoStart() {
-    $unixNow         = time();
-    $ymdNow          = date('m/d/Y', $unixNow);
+    $unixNow = time();
+    $ymdNow = date('m/d/Y', $unixNow);
     $unixYearFromNow = $unixNow + (365 * 24 * 60 * 60);
-    $ymdYearFromNow  = date('m/d/Y', $unixYearFromNow);
-    $params          = array(
+    $ymdYearFromNow = date('m/d/Y', $unixYearFromNow);
+    $params = array(
       'join_date' => $ymdNow,
       'start_date' => '',
       'end_date' => $ymdYearFromNow,
       'membership_type_id' => array('23', '3'),
     );
     $files = array();
-    $obj   = new CRM_Member_Form_Membership;
-    $rc    = $obj->formRule($params, $files, $obj);
+    $obj = new CRM_Member_Form_Membership;
+    $rc = $obj->formRule($params, $files, $obj);
     $this->assertType('array', $rc,
       'In line ' . __LINE__
     );
@@ -329,9 +329,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  that has an end date and a lifetime membership type
    */
   public function testFormRuleRollingLifetimeEnd() {
-    $unixNow         = time();
+    $unixNow = time();
     $unixYearFromNow = $unixNow + (365 * 24 * 60 * 60);
-    $params          = array(
+    $params = array(
       'join_date' => date('m/d/Y', $unixNow),
       'start_date' => date('m/d/Y', $unixNow),
       'end_date' => date('m/d/Y',
@@ -340,8 +340,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => array('23', '13'),
     );
     $files = array();
-    $obj   = new CRM_Member_Form_Membership;
-    $rc    = $obj->formRule($params, $files, $obj);
+    $obj = new CRM_Member_Form_Membership;
+    $rc = $obj->formRule($params, $files, $obj);
     $this->assertType('array', $rc);
     $this->assertTrue(array_key_exists('status_id', $rc));
   }
@@ -351,16 +351,16 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  that has an override and no status
    */
   public function testFormRuleOverrideNoStatus() {
-    $unixNow         = time();
+    $unixNow = time();
     $unixYearFromNow = $unixNow + (365 * 24 * 60 * 60);
-    $params          = array(
-    'join_date' => date('m/d/Y', $unixNow),
+    $params = array(
+      'join_date' => date('m/d/Y', $unixNow),
       'membership_type_id' => array('23', '13'),
       'is_override' => TRUE,
     );
     $files = array();
-    $obj   = new CRM_Member_Form_Membership;
-    $rc    = $obj->formRule($params, $files, $obj);
+    $obj = new CRM_Member_Form_Membership;
+    $rc = $obj->formRule($params, $files, $obj);
     $this->assertType('array', $rc,
       'In line ' . __LINE__
     );
@@ -374,17 +374,17 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  of one month from now and a rolling membership type
    */
   public function testFormRuleRollingJoin1MonthFromNow() {
-    $unixNow     = time();
+    $unixNow = time();
     $unix1MFmNow = $unixNow + (31 * 24 * 60 * 60);
-    $params      = array(
-    'join_date' => date('m/d/Y', $unix1MFmNow),
+    $params = array(
+      'join_date' => date('m/d/Y', $unix1MFmNow),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '3'),
     );
     $files = array();
-    $obj   = new CRM_Member_Form_Membership;
-    $rc    = $obj->formRule($params, $files, $obj);
+    $obj = new CRM_Member_Form_Membership;
+    $rc = $obj->formRule($params, $files, $obj);
 
     //  Should have found no valid membership status
     $this->assertType('array', $rc,
@@ -402,14 +402,14 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   public function testFormRuleRollingJoinToday() {
     $unixNow = time();
     $params = array(
-    'join_date' => date('m/d/Y', $unixNow),
+      'join_date' => date('m/d/Y', $unixNow),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '3'),
     );
     $files = array();
-    $obj   = new CRM_Member_Form_Membership;
-    $rc    = $obj->formRule($params, $files, $obj);
+    $obj = new CRM_Member_Form_Membership;
+    $rc = $obj->formRule($params, $files, $obj);
 
     //  Should have found New membership status
     $this->assertTrue($rc, 'In line ' . __LINE__);
@@ -420,17 +420,17 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  of one month ago and a rolling membership type
    */
   public function testFormRuleRollingJoin1MonthAgo() {
-    $unixNow   = time();
+    $unixNow = time();
     $unix1MAgo = $unixNow - (31 * 24 * 60 * 60);
-    $params    = array(
-    'join_date' => date('m/d/Y', $unix1MAgo),
+    $params = array(
+      'join_date' => date('m/d/Y', $unix1MAgo),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '3'),
     );
     $files = array();
-    $obj   = new CRM_Member_Form_Membership;
-    $rc    = $obj->formRule($params, $files, $obj);
+    $obj = new CRM_Member_Form_Membership;
+    $rc = $obj->formRule($params, $files, $obj);
 
     //  Should have found New membership status
     $this->assertTrue($rc, 'In line ' . __LINE__);
@@ -441,17 +441,17 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  of six months ago and a rolling membership type
    */
   public function testFormRuleRollingJoin6MonthsAgo() {
-    $unixNow   = time();
+    $unixNow = time();
     $unix6MAgo = $unixNow - (180 * 24 * 60 * 60);
-    $params    = array(
-    'join_date' => date('m/d/Y', $unix6MAgo),
+    $params = array(
+      'join_date' => date('m/d/Y', $unix6MAgo),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '3'),
     );
     $files = array();
-    $obj   = new CRM_Member_Form_Membership;
-    $rc    = $obj->formRule($params, $files, $obj);
+    $obj = new CRM_Member_Form_Membership;
+    $rc = $obj->formRule($params, $files, $obj);
 
     //  Should have found Current membership status
     $this->assertTrue($rc, 'In line ' . __LINE__);
@@ -462,17 +462,17 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  of one year+ ago and a rolling membership type
    */
   public function testFormRuleRollingJoin1YearAgo() {
-    $unixNow   = time();
+    $unixNow = time();
     $unix1YAgo = $unixNow - (370 * 24 * 60 * 60);
-    $params    = array(
-    'join_date' => date('m/d/Y', $unix1YAgo),
+    $params = array(
+      'join_date' => date('m/d/Y', $unix1YAgo),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '3'),
     );
     $files = array();
-    $obj   = new CRM_Member_Form_Membership;
-    $rc    = $obj->formRule($params, $files, $obj);
+    $obj = new CRM_Member_Form_Membership;
+    $rc = $obj->formRule($params, $files, $obj);
 
     //  Should have found Grace membership status
     $this->assertTrue($rc, 'In line ' . __LINE__);
@@ -483,17 +483,17 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  of two years ago and a rolling membership type
    */
   public function testFormRuleRollingJoin2YearsAgo() {
-    $unixNow   = time();
+    $unixNow = time();
     $unix2YAgo = $unixNow - (2 * 365 * 24 * 60 * 60);
-    $params    = array(
-    'join_date' => date('m/d/Y', $unix2YAgo),
+    $params = array(
+      'join_date' => date('m/d/Y', $unix2YAgo),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '3'),
     );
     $files = array();
-    $obj   = new CRM_Member_Form_Membership;
-    $rc    = $obj->formRule($params, $files, $obj);
+    $obj = new CRM_Member_Form_Membership;
+    $rc = $obj->formRule($params, $files, $obj);
 
     //  Should have found Expired membership status
     $this->assertTrue($rc, 'In line ' . __LINE__);
@@ -504,17 +504,17 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  of six months ago and a fixed membership type
    */
   public function testFormRuleFixedJoin6MonthsAgo() {
-    $unixNow   = time();
+    $unixNow = time();
     $unix6MAgo = $unixNow - (180 * 24 * 60 * 60);
-    $params    = array(
-    'join_date' => date('m/d/Y', $unix6MAgo),
+    $params = array(
+      'join_date' => date('m/d/Y', $unix6MAgo),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '7'),
     );
     $files = array();
-    $obj   = new CRM_Member_Form_Membership;
-    $rc    = $obj->formRule($params, $files, $obj);
+    $obj = new CRM_Member_Form_Membership;
+    $rc = $obj->formRule($params, $files, $obj);
 
     //  Should have found Current membership status
     $this->assertTrue($rc, 'In line ' . __LINE__);

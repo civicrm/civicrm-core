@@ -113,9 +113,9 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     );
     $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
 
-    $params  = array('name' => 'General');
+    $params = array('name' => 'General');
     $default = array();
-    $result  = CRM_Member_BAO_MembershipType::retrieve($params, $default);
+    $result = CRM_Member_BAO_MembershipType::retrieve($params, $default);
     $this->assertEquals($result->name, 'General', 'Verify membership type name.');
     $this->membershipTypeDelete(array('id' => $membershipType->id));
   }

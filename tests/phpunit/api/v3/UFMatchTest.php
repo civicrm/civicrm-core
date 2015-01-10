@@ -26,8 +26,6 @@
 */
 
 
-
-
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
@@ -43,7 +41,6 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
   protected $_contactId;
   protected $_apiversion;
   protected $_params = array();
-
 
 
   protected function setUp() {
@@ -70,7 +67,7 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
       'uf_id' => '2',
       'uf_name' => 'blahdyblah@gmail.com',
       'domain_id' => 1,
-      );
+    );
   }
 
   public function tearDown() {
@@ -136,13 +133,13 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
   public function testDelete() {
     $result = $this->callAPISuccess('uf_match', 'create', $this->_params);
     $this->assertEquals(1, $this->callAPISuccess('uf_match', 'getcount', array(
-    'id' => $result['id'],
-      )));
+      'id' => $result['id'],
+    )));
     $this->callAPISuccess('uf_match', 'delete', array(
-    'id' => $result['id'],
+      'id' => $result['id'],
     ));
     $this->assertEquals(0, $this->callAPISuccess('uf_match', 'getcount', array(
-    'id' => $result['id'],
-      )));
+      'id' => $result['id'],
+    )));
   }
 }

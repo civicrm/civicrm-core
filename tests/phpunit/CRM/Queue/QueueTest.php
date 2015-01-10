@@ -46,12 +46,14 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
       array(
         'type' => 'Sql',
         'name' => 'test-queue',
-      ));
+      )
+    );
     $queueSpecs[] = array(
       array(
         'type' => 'Memory',
         'name' => 'test-queue',
-      ));
+      )
+    );
     return $queueSpecs;
   }
 
@@ -78,14 +80,14 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->assertTrue($this->queue instanceof CRM_Queue_Queue);
 
     $this->queue->createItem(array(
-        'test-key' => 'a',
-      ));
+      'test-key' => 'a',
+    ));
     $this->queue->createItem(array(
-        'test-key' => 'b',
-      ));
+      'test-key' => 'b',
+    ));
     $this->queue->createItem(array(
-        'test-key' => 'c',
-      ));
+      'test-key' => 'c',
+    ));
 
     $this->assertEquals(3, $this->queue->numberOfItems());
     $item = $this->queue->claimItem();
@@ -98,8 +100,8 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->queue->deleteItem($item);
 
     $this->queue->createItem(array(
-        'test-key' => 'd',
-      ));
+      'test-key' => 'd',
+    ));
 
     $this->assertEquals(2, $this->queue->numberOfItems());
     $item = $this->queue->claimItem();
@@ -124,8 +126,8 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->assertTrue($this->queue instanceof CRM_Queue_Queue);
 
     $this->queue->createItem(array(
-        'test-key' => 'a',
-      ));
+      'test-key' => 'a',
+    ));
 
     $item = $this->queue->claimItem();
     $this->assertEquals('a', $item->data['test-key']);
@@ -151,8 +153,8 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
 
     CRM_Utils_Time::setTime('2012-04-01 1:00:00');
     $this->queue->createItem(array(
-        'test-key' => 'a',
-      ));
+      'test-key' => 'a',
+    ));
 
     $item = $this->queue->claimItem();
     $this->assertEquals('a', $item->data['test-key']);
@@ -186,8 +188,8 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     require_once 'CRM/Utils/Time.php';
     CRM_Utils_Time::setTime('2012-04-01 1:00:00');
     $this->queue->createItem(array(
-        'test-key' => 'a',
-      ));
+      'test-key' => 'a',
+    ));
 
     $item = $this->queue->claimItem();
     $this->assertEquals('a', $item->data['test-key']);
@@ -216,11 +218,11 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
   public function testCreateResetTrue($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
     $this->queue->createItem(array(
-        'test-key' => 'a',
-      ));
+      'test-key' => 'a',
+    ));
     $this->queue->createItem(array(
-        'test-key' => 'b',
-      ));
+      'test-key' => 'b',
+    ));
     $this->assertEquals(2, $this->queue->numberOfItems());
     unset($this->queue);
 
@@ -238,11 +240,11 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
   public function testCreateResetFalse($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
     $this->queue->createItem(array(
-        'test-key' => 'a',
-      ));
+      'test-key' => 'a',
+    ));
     $this->queue->createItem(array(
-        'test-key' => 'b',
-      ));
+      'test-key' => 'b',
+    ));
     $this->assertEquals(2, $this->queue->numberOfItems());
     unset($this->queue);
 
@@ -262,11 +264,11 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
   public function testLoad($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
     $this->queue->createItem(array(
-        'test-key' => 'a',
-      ));
+      'test-key' => 'a',
+    ));
     $this->queue->createItem(array(
-        'test-key' => 'b',
-      ));
+      'test-key' => 'b',
+    ));
     $this->assertEquals(2, $this->queue->numberOfItems());
     unset($this->queue);
 

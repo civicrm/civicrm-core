@@ -111,12 +111,15 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_MembershipView_cancel-bottom');
 
-    $joinDate   = date('Y-m-d');
-    $startDate  = date('Y-m-d');
-    $endDate    = date('Y-m-d', mktime(0, 0, 0, date('m'), date('d') - 1, date('Y') + 1));
+    $joinDate = date('Y-m-d');
+    $startDate = date('Y-m-d');
+    $endDate = date('Y-m-d', mktime(0, 0, 0, date('m'), date('d') - 1, date('Y') + 1));
     $configVars = new CRM_Core_Config_Variables();
     foreach (array(
-      'joinDate', 'startDate', 'endDate') as $date) {
+               'joinDate',
+               'startDate',
+               'endDate'
+             ) as $date) {
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }
 

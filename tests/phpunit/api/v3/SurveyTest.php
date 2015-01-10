@@ -31,8 +31,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_survey_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Campaign
+ * @package CiviCRM_APIv3
+ * @subpackage API_Campaign
  */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -55,7 +55,10 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
 
 
   public function setUp() {
-    $phoneBankActivityTypeID = $this->callAPISuccessGetValue('Option_value', array('label' => 'PhoneBank', 'return' => 'value'), 'integer');
+    $phoneBankActivityTypeID = $this->callAPISuccessGetValue('Option_value', array(
+        'label' => 'PhoneBank',
+        'return' => 'value'
+      ), 'integer');
     $this->useTransaction();
     $this->enableCiviCampaign();
     $this->params = array(
@@ -104,8 +107,8 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
    */
   public function testGetSurveyChainDelete() {
     $description = "demonstrates get + delete in the same call";
-    $subfile     = 'ChainedGetDelete';
-    $params      = array(
+    $subfile = 'ChainedGetDelete';
+    $params = array(
       'title' => "survey title",
       'api.survey.delete' => 1,
     );

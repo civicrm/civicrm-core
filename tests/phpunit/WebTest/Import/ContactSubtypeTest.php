@@ -314,7 +314,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
 
     $rows = array(
       array(
-    'first_name' => substr(sha1(rand()), 0, 7),
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -326,7 +326,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
         'country' => 'United States',
       ),
       array(
-    'first_name' => substr(sha1(rand()), 0, 7),
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -362,7 +362,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
 
     $rows = array(
       array(
-    'organization_name' => 'org_' . substr(sha1(rand()), 0, 7),
+        'organization_name' => 'org_' . substr(sha1(rand()), 0, 7),
         'email' => substr(sha1(rand()), 0, 7) . '@example.org',
         'phone' => '9949912154',
         'address_1' => 'Add 1',
@@ -372,7 +372,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
         'country' => 'United States',
       ),
       array(
-    'organization_name' => 'org_' . substr(sha1(rand()), 0, 7),
+        'organization_name' => 'org_' . substr(sha1(rand()), 0, 7),
         'email' => substr(sha1(rand()), 0, 7) . '@example.org',
         'phone' => '6949412154',
         'address_1' => 'Add 1',
@@ -406,7 +406,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
 
     $rows = array(
       array(
-    'household_name' => 'household_' . substr(sha1(rand()), 0, 7),
+        'household_name' => 'household_' . substr(sha1(rand()), 0, 7),
         'email' => substr(sha1(rand()), 0, 7) . '@example.org',
         'phone' => '3949912154',
         'address_1' => 'Add 1',
@@ -416,7 +416,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
         'country' => 'United States',
       ),
       array(
-    'household_name' => 'household_' . substr(sha1(rand()), 0, 7),
+        'household_name' => 'household_' . substr(sha1(rand()), 0, 7),
         'email' => substr(sha1(rand()), 0, 7) . '@example.org',
         'phone' => '5949412154',
         'address_1' => 'Add 1',

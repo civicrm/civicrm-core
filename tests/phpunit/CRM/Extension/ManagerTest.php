@@ -275,10 +275,10 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $this->download = $this->_createDownload('test.newextension', 'newextension');
 
     $testingTypeManager
-      ->expects($this->never()) // no data to replace
+      ->expects($this->never())// no data to replace
       ->method('onPreReplace');
     $testingTypeManager
-      ->expects($this->never()) // no data to replace
+      ->expects($this->never())// no data to replace
       ->method('onPostReplace');
     $manager->replace($this->download);
     $this->assertEquals('uninstalled', $manager->getStatus('test.newextension'));
@@ -302,10 +302,10 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $this->download = $this->_createDownload('test.whiz.bang', 'newextension');
 
     $testingTypeManager
-      ->expects($this->never()) // no data to replace
+      ->expects($this->never())// no data to replace
       ->method('onPreReplace');
     $testingTypeManager
-      ->expects($this->never()) // no data to replace
+      ->expects($this->never())// no data to replace
       ->method('onPostReplace');
     $manager->replace($this->download);
     $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));

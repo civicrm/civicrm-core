@@ -43,7 +43,7 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
     parent::setUp();
     // put stuff here that should happen before all tests in this unit
     $priceSetparams = array(
-           #     [domain_id] =>
+      #     [domain_id] =>
       'name' => 'default_goat_priceset',
       'title' => 'Goat accomodation',
       'is_active' => 1,
@@ -59,7 +59,7 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
     $this->priceSetID = $price_set['id'];
 
     $this->_params = array(
-    'price_set_id' => $this->priceSetID,
+      'price_set_id' => $this->priceSetID,
       'name' => 'grassvariety',
       'label' => 'Grass Variety',
       'html_type' => 'Text',
@@ -70,13 +70,13 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
 
   public function tearDown() {
     $tablesToTruncate = array(
-        'civicrm_contact',
-        'civicrm_contribution',
+      'civicrm_contact',
+      'civicrm_contribution',
     );
     $this->quickCleanup($tablesToTruncate);
 
     $delete = $this->callAPISuccess('PriceSet', 'delete', array(
-           'id' => $this->priceSetID,
+      'id' => $this->priceSetID,
     ));
 
     $this->assertAPISuccess($delete);

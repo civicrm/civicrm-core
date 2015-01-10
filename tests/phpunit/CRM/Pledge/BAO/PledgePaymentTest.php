@@ -94,9 +94,9 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    *  Retrieve a payment based on a pledge id = 0
    */
   public function testRetrieveZeroPledeID() {
-    $payment   = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
-    $params    = array('pledge_id' => 0);
-    $defaults  = array();
+    $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
+    $params = array('pledge_id' => 0);
+    $defaults = array();
     $paymentid = CRM_Pledge_BAO_PledgePayment::retrieve($params, $defaults);
 
     $this->assertEquals(count($paymentid), 0, "Pledge Id must be greater than 0");
@@ -107,9 +107,9 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    *  Retrieve a payment based on a Null pledge id
    */
   public function testRetrieveStringPledgeID() {
-    $payment   = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
-    $params    = array('pledge_id' => 'Test');
-    $defaults  = array();
+    $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
+    $params = array('pledge_id' => 'Test');
+    $defaults = array();
     $paymentid = CRM_Pledge_BAO_PledgePayment::retrieve($params, $defaults);
 
     $this->assertEquals(count($paymentid), 0, "Pledge Id cannot be a string");
@@ -120,10 +120,10 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    *  Test that payment retrieve wrks based on known pledge id
    */
   public function testRetrieveKnownPledgeID() {
-    $payment   = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
-    $pledgeId  = $payment->pledge_id;
-    $params    = array('pledge_id' => $pledgeId);
-    $defaults  = array();
+    $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
+    $pledgeId = $payment->pledge_id;
+    $params = array('pledge_id' => $pledgeId);
+    $defaults = array();
     $paymentid = CRM_Pledge_BAO_PledgePayment::retrieve($params, $defaults);
 
     $this->assertEquals(count($paymentid), 1, "Pledge was retrieved");
@@ -154,9 +154,9 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    *  Pass Zero Id for a payment deletion for one pledge
    */
   public function testDeletePaymentsZeroId() {
-    $payment   = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
+    $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
     $paymentid = CRM_Pledge_BAO_PledgePayment::deletePayments(0);
-    $result    = CRM_Pledge_BAO_Pledge::deletePledge($payment->pledge_id);
+    $result = CRM_Pledge_BAO_Pledge::deletePledge($payment->pledge_id);
   }
 
   /**

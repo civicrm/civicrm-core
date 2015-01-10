@@ -1,5 +1,6 @@
 <?php
 namespace Civi\API;
+
 use \Symfony\Component\EventDispatcher\EventDispatcher;
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -53,7 +54,7 @@ class KernelTest extends \CiviUnitTestCase {
     $this->dispatcher->addListener(Events::RESOLVE, function () {
       throw new \API_Exception('Oh My God', 'omg', array('the' => 'badzes'));
     }, Events::W_EARLY);
-    $this->dispatcher->addListener(Events::EXCEPTION, function(\Civi\API\Event\ExceptionEvent $event) use ($test) {
+    $this->dispatcher->addListener(Events::EXCEPTION, function (\Civi\API\Event\ExceptionEvent $event) use ($test) {
       $test->assertEquals('Oh My God', $event->getException()->getMessage());
     });
 

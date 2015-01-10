@@ -120,9 +120,9 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
 
   public function testDeletePCP() {
 
-    $pcp   = CRM_Core_DAO::createTestObject('CRM_PCP_DAO_PCP');
+    $pcp = CRM_Core_DAO::createTestObject('CRM_PCP_DAO_PCP');
     $pcpId = $pcp->id;
-    $del   = CRM_PCP_BAO_PCP::deleteById($pcpId);
+    $del = CRM_PCP_BAO_PCP::deleteById($pcpId);
     $this->assertDBRowNotExist('CRM_PCP_DAO_PCP', $pcpId,
       'Database check PCP deleted successfully.'
     );
@@ -132,9 +132,9 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
    * Build params
    */
   private function pcpBlockParams() {
-    $contribPage        = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');
-    $contribPageId      = $contribPage->id;
-    $supporterProfile   = CRM_Core_DAO::createTestObject('CRM_Core_DAO_UFGroup');
+    $contribPage = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');
+    $contribPageId = $contribPage->id;
+    $supporterProfile = CRM_Core_DAO::createTestObject('CRM_Core_DAO_UFGroup');
     $supporterProfileId = $supporterProfile->id;
 
     $params = array(
@@ -156,9 +156,9 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
    * Build params
    */
   private function pcpParams() {
-    $contact       = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
-    $contactId     = $contact->id;
-    $contribPage   = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');
+    $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
+    $contactId = $contact->id;
+    $contribPage = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');
     $contribPageId = $contribPage->id;
 
     $params = array(

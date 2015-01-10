@@ -96,9 +96,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    */
   public function testProfileGet() {
     $pofileFieldValues = $this->_createIndividualContact();
-    $expected          = current($pofileFieldValues);
-    $contactId         = key($pofileFieldValues);
-    $params            = array(
+    $expected = current($pofileFieldValues);
+    $contactId = key($pofileFieldValues);
+    $params = array(
       'profile_id' => $this->_profileID,
       'contact_id' => $contactId,
     );
@@ -110,9 +110,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
 
   public function testProfileGetMultiple() {
     $pofileFieldValues = $this->_createIndividualContact();
-    $expected          = current($pofileFieldValues);
-    $contactId         = key($pofileFieldValues);
-    $params            = array(
+    $expected = current($pofileFieldValues);
+    $contactId = key($pofileFieldValues);
+    $params = array(
       'profile_id' => array($this->_profileID, 1, 'Billing'),
       'contact_id' => $contactId,
     );
@@ -139,7 +139,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
 
   public function testProfileGetBillingUseIsBillingLocation() {
     $individual = $this->_createIndividualContact();
-    $contactId  = key($individual);
+    $contactId = key($individual);
     $this->callAPISuccess('address', 'create', array(
       'is_billing' => 1,
       'street_address' => 'is billing st',
@@ -172,9 +172,19 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
 
   public function testProfileGetMultipleHasBillingLocation() {
     $individual = $this->_createIndividualContact();
-    $contactId  = key($individual);
-    $this->callAPISuccess('address', 'create', array('contact_id' => $contactId, 'street_address' => '25 Big Street', 'city' => 'big city', 'location_type_id' => 5));
-    $this->callAPISuccess('email', 'create', array('contact_id' => $contactId, 'email' => 'big@once.com', 'location_type_id' => 2, 'is_billing' => 1));
+    $contactId = key($individual);
+    $this->callAPISuccess('address', 'create', array(
+        'contact_id' => $contactId,
+        'street_address' => '25 Big Street',
+        'city' => 'big city',
+        'location_type_id' => 5
+      ));
+    $this->callAPISuccess('email', 'create', array(
+        'contact_id' => $contactId,
+        'email' => 'big@once.com',
+        'location_type_id' => 2,
+        'is_billing' => 1
+      ));
 
     $expected = current($individual);
 
@@ -298,7 +308,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   public function testGetFields() {
     $this->_createIndividualProfile();
     $this->_addCustomFieldToProfile($this->_profileID);
-    $result = $this->callAPIAndDocument('profile', 'getfields', array('action' => 'submit', 'profile_id' => $this->_profileID), __FUNCTION__, __FILE__,
+    $result = $this->callAPIAndDocument('profile', 'getfields', array(
+        'action' => 'submit',
+        'profile_id' => $this->_profileID
+      ), __FUNCTION__, __FILE__,
       'demonstrates retrieving profile fields passing in an id');
     $this->assertArrayKeyExists('first_name', $result['values']);
     $this->assertEquals('2', $result['values']['first_name']['type']);
@@ -313,9 +326,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    */
   public function testGetFieldsParticipantProfile() {
     $result = $this->callAPISuccess('profile', 'getfields', array(
-      'action' => 'submit',
-      'profile_id' => 'participant_status',
-      'get_options' => 'all')
+        'action' => 'submit',
+        'profile_id' => 'participant_status',
+        'get_options' => 'all'
+      )
     );
     $this->assertTrue(array_key_exists('participant_status_id', $result['values']));
     $this->assertEquals('Attended', $result['values']['participant_status_id']['options'][2]);
@@ -328,13 +342,18 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    */
   public function testGetFieldsMembershipBatchProfile() {
     $result = $this->callAPISuccess('profile', 'getfields', array(
-      'action' => 'submit',
-      'profile_id' => 'membership_batch_entry',
-      'get_options' => 'all')
+        'action' => 'submit',
+        'profile_id' => 'membership_batch_entry',
+        'get_options' => 'all'
+      )
     );
     $this->assertTrue(array_key_exists('total_amount', $result['values']));
     $this->assertTrue(array_key_exists('financial_type_id', $result['values']));
-    $this->assertEquals(array('contribution_type_id', 'contribution_type', 'financial_type'), $result['values']['financial_type_id']['api.aliases']);
+    $this->assertEquals(array(
+        'contribution_type_id',
+        'contribution_type',
+        'financial_type'
+      ), $result['values']['financial_type_id']['api.aliases']);
     $this->assertTrue(!array_key_exists('financial_type', $result['values']));
     $this->assertEquals(12, $result['values']['receive_date']['type']);
   }
@@ -348,9 +367,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $profileIDs = array_keys($result['values']);
     foreach ($profileIDs as $profileID) {
       $result = $this->callAPISuccess('profile', 'getfields', array(
-        'action' => 'submit',
-        'profile_id' => $profileID,
-        'get_options' => 'all')
+          'action' => 'submit',
+          'profile_id' => $profileID,
+          'get_options' => 'all'
+        )
       );
     }
   }
@@ -453,8 +473,15 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->_membershipTypeID = $this->membershipTypeCreate();
 
     $membershipTypes = $this->callAPISuccess('membership_type', 'get', array());
-    $profileFields = $this->callAPISuccess('profile', 'getfields', array('get_options' => 'all', 'action' => 'submit', 'profile_id' => 'membership_batch_entry'));
-    $getoptions = $this->callAPISuccess('membership', 'getoptions', array('field' => 'membership_type', 'context' => 'validate'));
+    $profileFields = $this->callAPISuccess('profile', 'getfields', array(
+        'get_options' => 'all',
+        'action' => 'submit',
+        'profile_id' => 'membership_batch_entry'
+      ));
+    $getoptions = $this->callAPISuccess('membership', 'getoptions', array(
+        'field' => 'membership_type',
+        'context' => 'validate'
+      ));
     $this->assertEquals(array_keys($membershipTypes['values']), array_keys($getoptions['values']));
     $this->assertEquals(array_keys($membershipTypes['values']), array_keys($profileFields['values']['membership_type_id']['options']));
 
@@ -464,7 +491,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Test that the fields are returned in the right order despite the faffing around that goes on
    */
   public function testMembershipGetFieldsOrder() {
-    $result = $this->callAPISuccess('profile', 'getfields', array('action' => 'submit', 'profile_id' => 'membership_batch_entry'));
+    $result = $this->callAPISuccess('profile', 'getfields', array(
+        'action' => 'submit',
+        'profile_id' => 'membership_batch_entry'
+      ));
     $weight = 1;
     foreach ($result['values'] as $fieldName => $field) {
       if ($fieldName == 'profile_id') {
@@ -474,22 +504,24 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       $weight++;
     }
   }
+
   /**
    * Check we can submit membership batch profiles (create mode)
    */
   public function testProfileSubmitMembershipBatch() {
     $this->_contactID = $this->individualCreate();
     $this->callAPISuccess('profile', 'submit', array(
-     'profile_id' => 'membership_batch_entry',
-     'financial_type_id' => 1,
-     'membership_type' => $this->_membershipTypeID,
-     'join_date' => 'now',
-     'total_amount' => 10,
-     'contribution_status_id' => 1,
-     'receive_date' => 'now',
-     'contact_id' => $this->_contactID,
+      'profile_id' => 'membership_batch_entry',
+      'financial_type_id' => 1,
+      'membership_type' => $this->_membershipTypeID,
+      'join_date' => 'now',
+      'total_amount' => 10,
+      'contribution_status_id' => 1,
+      'receive_date' => 'now',
+      'contact_id' => $this->_contactID,
     ));
   }
+
   /**
    * Set is deprecated but we need to ensure it still works
    */
@@ -683,7 +715,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     }
 
     foreach (array(
-      'email', 'phone', 'address') as $fieldType) {
+               'email',
+               'phone',
+               'address'
+             ) as $fieldType) {
       $typeValues = array_pop($result['values'][$fieldType]);
       foreach ($expected[$fieldType] as $field => $value) {
         $this->assertEquals($value, CRM_Utils_Array::value($field, $typeValues), "In line " . __LINE__ . " error message: " . "missing/mismatching value for {$field} ({$fieldType})"
@@ -700,29 +735,29 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    */
   public function _createIndividualContact($params = array()) {
     $contactParams = array_merge(array(
-      'first_name' => 'abc1',
-      'last_name' => 'xyz1',
-      'email' => 'abc1.xyz1@yahoo.com',
-      'api.address.create' => array(
-        'location_type_id' => 1,
-        'is_primary' => 1,
-        'street_address' => '5 Saint Helier St',
-        'county' => 'Marin',
-        'country' => 'United States',
-        'state_province' => 'Michigan',
-        'supplemental_address_1' => 'Hallmark Ct',
-        'supplemental_address_2' => 'Jersey Village',
-        'postal_code' => '90210',
-        'city' => 'Gotham City',
-        'is_billing' => 0,
-      ),
-      'api.phone.create' => array(
-        'location_type_id' => '1',
-        'phone' => '021 512 755',
-        'phone_type_id' => '1',
-        'is_primary' => '1',
-      ),
-     ), $params
+        'first_name' => 'abc1',
+        'last_name' => 'xyz1',
+        'email' => 'abc1.xyz1@yahoo.com',
+        'api.address.create' => array(
+          'location_type_id' => 1,
+          'is_primary' => 1,
+          'street_address' => '5 Saint Helier St',
+          'county' => 'Marin',
+          'country' => 'United States',
+          'state_province' => 'Michigan',
+          'supplemental_address_1' => 'Hallmark Ct',
+          'supplemental_address_2' => 'Jersey Village',
+          'postal_code' => '90210',
+          'city' => 'Gotham City',
+          'is_billing' => 0,
+        ),
+        'api.phone.create' => array(
+          'location_type_id' => '1',
+          'phone' => '021 512 755',
+          'phone_type_id' => '1',
+          'is_primary' => '1',
+        ),
+      ), $params
     );
 
     $this->_contactID = $this->individualCreate($contactParams);
@@ -818,6 +853,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
 
     return array($profileParams, $expected);
   }
+
   /**
    * Create a profile
    */
@@ -883,7 +919,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
           'field_type' => 'Contact',
           'location_type_id' => 1,
           'label' => 'State Province',
-         ),
+        ),
       ),
     );
     $profile = $this->callAPISuccess('uf_group', 'create', $ufGroupParams);
@@ -895,6 +931,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    */
   public function _addCustomFieldToProfile($profileID) {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, '');
-    $this->uFFieldCreate(array('uf_group_id' => $profileID, 'field_name' => 'custom_' . $ids['custom_field_id'], 'contact_type' => 'Contact'));
+    $this->uFFieldCreate(array(
+        'uf_group_id' => $profileID,
+        'field_name' => 'custom_' . $ids['custom_field_id'],
+        'contact_type' => 'Contact'
+      ));
   }
 }

@@ -49,7 +49,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
     $ufGroup = $this->callAPISuccess('uf_group', 'create', array(
       'group_type' => 'Contact',
-      'help_pre'   => 'Profile to Test API',
+      'help_pre' => 'Profile to Test API',
       'title' => 'Test Profile',
     ));
     $this->_ufGroupId = $ufGroup['id'];
@@ -105,7 +105,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       'help_post' => 'Profile Pro help text.',
       'is_active' => 1,
       'id' => $this->_ufGroupId,
-     );
+    );
 
     $result = $this->callAPISuccess('uf_group', 'create', $params);
     foreach ($params as $key => $value) {
@@ -160,7 +160,8 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       'name' => 'test_group',
       'notify' => 'admin@example.org',
       'post_URL' => 'http://example.org/post',
-      'title' => 'Test Group',);
+      'title' => 'Test Group',
+    );
     $result = $this->callAPISuccess('uf_group', 'create', $params);
     $params['created_date'] = date('YmdHis', strtotime($params['created_date']));
     foreach ($params as $key => $value) {

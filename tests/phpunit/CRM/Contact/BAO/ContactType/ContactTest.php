@@ -72,7 +72,8 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch(Exception$expected) {}
+    catch (Exception$expected) {
+    }
     $this->assertEquals($contact->first_name, 'Anne', 'In line ' . __LINE__);
     $this->assertEquals($contact->contact_type, 'Individual', 'In line ' . __LINE__);
     CRM_Contact_BAO_Contact::deleteContact($contact->id);
@@ -85,7 +86,8 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch(Exception$expected) {}
+    catch (Exception$expected) {
+    }
     $this->assertEquals($contact->organization_name, 'Compumentor', 'In line ' . __LINE__);
     $this->assertEquals($contact->contact_type, 'Organization', 'In line ' . __LINE__);
     CRM_Contact_BAO_Contact::deleteContact($contact->id);
@@ -98,7 +100,8 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch(Exception$expected) {}
+    catch (Exception$expected) {
+    }
     $this->assertEquals($contact->household_name, 'John Does home', 'In line ' . __LINE__);
     $this->assertEquals($contact->contact_type, 'Household', 'In line ' . __LINE__);
     CRM_Contact_BAO_Contact::deleteContact($contact->id);
@@ -113,7 +116,8 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch(Exception$expected) {}
+    catch (Exception$expected) {
+    }
     $this->assertEquals($contact->first_name, 'Bill', 'In line ' . __LINE__);
     $this->assertEquals($contact->contact_type, 'Individual', 'In line ' . __LINE__);
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $contact->contact_sub_type), $this->student, 'In line ' . __LINE__);
@@ -128,7 +132,8 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch(Exception$expected) {}
+    catch (Exception$expected) {
+    }
     $this->assertEquals($contact->organization_name, 'Conservation Corp', 'In line ' . __LINE__);
     $this->assertEquals($contact->contact_type, 'Organization', 'In line ' . __LINE__);
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $contact->contact_sub_type), $this->sponsor, 'In line ' . __LINE__);
@@ -148,7 +153,8 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch(Exception$expected) {}
+    catch (Exception$expected) {
+    }
     $updateParams = array(
       'contact_sub_type' => $this->student,
       'contact_type' => 'Individual',
@@ -157,7 +163,8 @@ DELETE FROM civicrm_contact_type
     try {
       $updatedContact = CRM_Contact_BAO_Contact::add($updateParams);
     }
-    catch(Exception$expected) {}
+    catch (Exception$expected) {
+    }
     $this->assertEquals($updatedContact->id, $contact->id, 'In line ' . __LINE__);
     $this->assertEquals($updatedContact->contact_type, 'Individual', 'In line ' . __LINE__);
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $updatedContact->contact_sub_type), $this->student, 'In line ' . __LINE__);
@@ -170,7 +177,8 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch(Exception$expected) {}
+    catch (Exception$expected) {
+    }
 
     $updateParams = array(
       'contact_sub_type' => $this->sponsor,
@@ -180,7 +188,8 @@ DELETE FROM civicrm_contact_type
     try {
       $updatedContact = CRM_Contact_BAO_Contact::add($updateParams);
     }
-    catch(Exception$expected) {}
+    catch (Exception$expected) {
+    }
     $this->assertEquals($updatedContact->id, $contact->id, 'In line ' . __LINE__);
     $this->assertEquals($updatedContact->contact_type, 'Organization', 'In line ' . __LINE__);
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $updatedContact->contact_sub_type), $this->sponsor, 'In line ' . __LINE__);
@@ -201,7 +210,8 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch(Exception$expected) {}
+    catch (Exception$expected) {
+    }
 
     $updateParams = array(
       'contact_sub_type' => $this->parent,
@@ -211,7 +221,8 @@ DELETE FROM civicrm_contact_type
     try {
       $updatedContact = CRM_Contact_BAO_Contact::add($updateParams);
     }
-    catch(Exception$expected) {}
+    catch (Exception$expected) {
+    }
     $this->assertEquals($updatedContact->id, $contact->id, 'In line ' . __LINE__);
     $this->assertEquals($updatedContact->contact_type, 'Individual', 'In line ' . __LINE__);
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $updatedContact->contact_sub_type), $this->parent, 'In line ' . __LINE__);
@@ -225,7 +236,8 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch(Exception$expected) {}
+    catch (Exception$expected) {
+    }
 
     $updateParams = array(
       'contact_sub_type' => $this->team,
@@ -235,7 +247,8 @@ DELETE FROM civicrm_contact_type
     try {
       $updatedContact = CRM_Contact_BAO_Contact::add($updateParams);
     }
-    catch(Exception$expected) {}
+    catch (Exception$expected) {
+    }
 
     $this->assertEquals($updatedContact->id, $contact->id, 'In line ' . __LINE__);
     $this->assertEquals($updatedContact->contact_type, 'Organization', 'In line ' . __LINE__);
@@ -251,7 +264,8 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch(Exception$expected) {}
+    catch (Exception$expected) {
+    }
 
     $updateParams = array(
       'contact_sub_type' => NULL,
@@ -261,7 +275,8 @@ DELETE FROM civicrm_contact_type
     try {
       $updatedContact = CRM_Contact_BAO_Contact::add($updateParams);
     }
-    catch(Exception$expected) {}
+    catch (Exception$expected) {
+    }
 
     $this->assertEquals($updatedContact->id, $contact->id, 'In line ' . __LINE__);
     $this->assertEquals($updatedContact->contact_type, 'Individual', 'In line ' . __LINE__);

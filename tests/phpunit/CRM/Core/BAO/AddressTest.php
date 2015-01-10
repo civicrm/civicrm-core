@@ -290,8 +290,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($parsedStreetAddress['street_number_suffix'], 'A');
 
     // valid Street address to be parsed ( $locale = 'en_US' )
-    $street_address      = "54A Excelsior Ave. Apt 1C";
-    $locale              = 'en_US';
+    $street_address = "54A Excelsior Ave. Apt 1C";
+    $locale = 'en_US';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address, $locale);
     $this->assertEquals($parsedStreetAddress['street_name'], 'Excelsior Ave.');
     $this->assertEquals($parsedStreetAddress['street_unit'], 'Apt 1C');
@@ -299,8 +299,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($parsedStreetAddress['street_number_suffix'], 'A');
 
     // invalid Street address ( $locale = 'en_US' )
-    $street_address      = "West St. Apt 1";
-    $locale              = 'en_US';
+    $street_address = "West St. Apt 1";
+    $locale = 'en_US';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address, $locale);
     $this->assertEquals($parsedStreetAddress['street_name'], 'West St.');
     $this->assertEquals($parsedStreetAddress['street_unit'], 'Apt 1');
@@ -308,8 +308,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertNotContains('street_number_suffix', $parsedStreetAddress);
 
     // valid Street address to be parsed ( $locale = 'fr_CA' )
-    $street_address      = "2-123CA Main St";
-    $locale              = 'fr_CA';
+    $street_address = "2-123CA Main St";
+    $locale = 'fr_CA';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address, $locale);
     $this->assertEquals($parsedStreetAddress['street_name'], 'Main St');
     $this->assertEquals($parsedStreetAddress['street_unit'], '2');
@@ -317,8 +317,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($parsedStreetAddress['street_number_suffix'], 'CA');
 
     // invalid Street address ( $locale = 'fr_CA' )
-    $street_address      = "123 Main St";
-    $locale              = 'fr_CA';
+    $street_address = "123 Main St";
+    $locale = 'fr_CA';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address, $locale);
     $this->assertEquals($parsedStreetAddress['street_name'], 'Main St');
     $this->assertEquals($parsedStreetAddress['street_number'], '123');

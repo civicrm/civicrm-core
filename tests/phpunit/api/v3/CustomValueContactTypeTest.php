@@ -33,7 +33,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * @package CiviCRM_APIv3
  * @subpackage API_Contact
  */
-
 class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   protected $_contactID;
   protected $_apiversion = 3;
@@ -112,15 +111,22 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
     $tablesToTruncate = array('civicrm_contact', 'civicrm_cache');
     $this->quickCleanup($tablesToTruncate, TRUE);
   }
+
   /*
    * Test that custom fields is returned for correct contact type only
    */
   public function testGetFields() {
     $result = $this->callAPISuccess('Contact', 'getfields', array());
     $this->assertArrayHasKey("custom_{$this->IndividualField['id']}", $result['values'], 'If This fails there is probably a caching issue - failure in line' . __LINE__ . print_r(array_keys($result['values']), TRUE));
-    $result = $this->callAPISuccess('Contact', 'getfields', array('action' => 'create', 'contact_type' => 'Individual'), 'in line' . __LINE__);
+    $result = $this->callAPISuccess('Contact', 'getfields', array(
+        'action' => 'create',
+        'contact_type' => 'Individual'
+      ), 'in line' . __LINE__);
     $this->assertArrayHasKey("custom_{$this->IndividualField['id']}", $result['values']);
-    $result = $this->callAPISuccess('Contact', 'getfields', array('action' => 'create', 'contact_type' => 'Organization'));
+    $result = $this->callAPISuccess('Contact', 'getfields', array(
+        'action' => 'create',
+        'contact_type' => 'Organization'
+      ));
     $this->assertArrayNotHasKey("custom_{$this->IndividualField['id']}", $result['values'], 'in line' . __LINE__ . print_r(array_keys($result['values']), TRUE));
     $result = $this->callAPISuccess('Relationship', 'getfields', array('action' => 'create'), 'in line' . __LINE__);
     $this->assertArrayNotHasKey("custom_{$this->IndividualField['id']}", $result['values']);
@@ -135,7 +141,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
       'id' => $this->organization,
       'contact_type' => 'Organization',
       "custom_{$this->IndividualField['id']}" => 'Test String',
-    'debug' => 1, // so that undefined_fields is returned
+      'debug' => 1, // so that undefined_fields is returned
     );
 
     $contact = $this->callAPISuccess('contact', 'create', $params);
@@ -149,7 +155,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
    */
   public function testAddCustomDataEmptyToIndividual() {
     $contact = $this->callAPIFailure('contact', 'create', array(),
-    'Mandatory key(s) missing from params array: contact_type'
+      'Mandatory key(s) missing from params array: contact_type'
     );
   }
 
@@ -198,7 +204,8 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $this->individualStudent,
       'contact_type' => 'Individual',
-      "custom_{$this->IndiStudentField['id']}" => 'Test String',);
+      "custom_{$this->IndiStudentField['id']}" => 'Test String',
+    );
 
     $result = $this->callAPISuccess('contact', 'create', $params);
 
@@ -219,7 +226,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
       'contact_id' => $this->individualParent,
       'contact_type' => 'Individual',
       "custom_{$this->IndiStudentField['id']}" => 'Test String',
-    'debug' => 1, // so that undefined_fields is returned
+      'debug' => 1, // so that undefined_fields is returned
     );
     $contact = $this->callAPISuccess('contact', 'create', $params);
     $this->assertTrue(is_array($contact['undefined_fields']), __LINE__);
@@ -238,7 +245,8 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $this->individual,
       'contact_type' => 'Individual',
-      "custom_" . $this->IndividualField['id'] => 'Test String',);
+      "custom_" . $this->IndividualField['id'] => 'Test String',
+    );
 
     $contact = $this->callAPISuccess('contact', 'create', $params);
 
@@ -263,7 +271,8 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
       'contact_id' => $this->individualStudent,
       'contact_type' => 'Individual',
       'contact_sub_type' => 'Student',
-      "custom_{$this->IndiStudentField['id']}" => 'Test String',);
+      "custom_{$this->IndiStudentField['id']}" => 'Test String',
+    );
 
     $contact = $this->callAPISuccess('contact', 'create', $params);
     $this->assertAPISuccess($contact);
@@ -271,7 +280,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
       'contact_id' => $this->individualStudent,
       'contact_type' => 'Individual',
       'contact_sub_type' => 'Student',
-    "return.custom_{$this->IndiStudentField['id']}" => 1,
+      "return.custom_{$this->IndiStudentField['id']}" => 1,
     );
 
     $getContact = $this->callAPISuccess('contact', 'get', $params);

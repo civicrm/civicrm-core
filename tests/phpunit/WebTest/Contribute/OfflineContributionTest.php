@@ -395,7 +395,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       "xpath=//form[@id='Basic']/div[3]/div[1]/div[2]/table/tbody/tr[1]/td[11]/span/a[text()='View']");
 
     $this->clickLink("xpath=//form[@id='Basic']/div[3]/div[1]/div[2]/table/tbody/tr[1]/td[11]/span/a[text()='View']",
-    'crm-contact-actions-link', FALSE);
+      'crm-contact-actions-link', FALSE);
   }
 
   public function testOnlineContributionWithZeroAmount() {
