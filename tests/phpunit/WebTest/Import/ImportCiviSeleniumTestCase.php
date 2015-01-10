@@ -50,7 +50,6 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    * @param array $other
    *   Other parameters.
    *                             useMappingName     : to reuse mapping
-
    *                             dateFormat         : date format of data
    *                             checkMapperHeaders : to override default check mapper headers
    *                             saveMapping        : save current mapping?
@@ -181,7 +180,6 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    * @param array $other
    *   Other parameters.
    *                             contactSubtype     : import for selected Contact Subtype
-
    *                             useMappingName     : to reuse mapping
    *                             dateFormat         : date format of data
    *                             checkMapperHeaders : to override default check mapper headers
@@ -418,7 +416,10 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     }
 
     if (!empty($other['callbackImportSummary']) && is_callable(array(
-      $this, $other['callbackImportSummary']))) {
+        $this,
+        $other['callbackImportSummary']
+      ))
+    ) {
       $callbackImportSummary = $other['callbackImportSummary'];
       $this->$callbackImportSummary($originalHeaders, $originalRows, $checkSummary);
     }

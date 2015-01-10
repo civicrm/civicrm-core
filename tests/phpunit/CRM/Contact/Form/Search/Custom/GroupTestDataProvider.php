@@ -50,82 +50,146 @@ class CRM_Contact_Form_Search_Custom_GroupTestDataProvider implements Iterator {
   private $dataset = array(
     //  Exclude static group 3
     array(
-  'fv' => array('excludeGroups' => array('3')),
+      'fv' => array('excludeGroups' => array('3')),
       'id' => array(
-        '9', '10', '11', '12', '13', '14',
-        '15', '16', '26',
+        '9',
+        '10',
+        '11',
+        '12',
+        '13',
+        '14',
+        '15',
+        '16',
+        '26',
       ),
     ),
     //  Include static group 3
     array(
-  'fv' => array('includeGroups' => array('3')),
+      'fv' => array('includeGroups' => array('3')),
       'id' => array(
-        '17', '18', '19', '20', '21',
-        '22', '23', '24', '27', '28',
+        '17',
+        '18',
+        '19',
+        '20',
+        '21',
+        '22',
+        '23',
+        '24',
+        '27',
+        '28',
       ),
     ),
     //  Include static group 5
     array(
-  'fv' => array('includeGroups' => array('5')),
+      'fv' => array('includeGroups' => array('5')),
       'id' => array(
-        '13', '14', '15', '16', '21',
-        '22', '23', '24',
+        '13',
+        '14',
+        '15',
+        '16',
+        '21',
+        '22',
+        '23',
+        '24',
       ),
     ),
     //  Include static groups 3 and 5
     array(
-  'fv' => array('includeGroups' => array('3', '5')),
+      'fv' => array('includeGroups' => array('3', '5')),
       'id' => array(
-        '13', '14', '15', '16', '17', '18',
-        '19', '20', '21', '22', '23', '24',
-        '27', '28',
+        '13',
+        '14',
+        '15',
+        '16',
+        '17',
+        '18',
+        '19',
+        '20',
+        '21',
+        '22',
+        '23',
+        '24',
+        '27',
+        '28',
       ),
     ),
     //  Include static group 3, exclude static group 5
     array(
-  'fv' => array(
-  'includeGroups' => array('3'),
+      'fv' => array(
+        'includeGroups' => array('3'),
         'excludeGroups' => array('5'),
       ),
       'id' => array('17', '18', '19', '20', '27', '28'),
     ),
     //  Exclude tag 7
     array(
-  'fv' => array('excludeTags' => array('7')),
+      'fv' => array('excludeTags' => array('7')),
       'id' => array(
-        '9', '10', '13', '14', '17', '18',
-        '21', '22', '27',
+        '9',
+        '10',
+        '13',
+        '14',
+        '17',
+        '18',
+        '21',
+        '22',
+        '27',
       ),
     ),
     //  Include tag 7
     array(
-  'fv' => array('includeTags' => array('7')),
+      'fv' => array('includeTags' => array('7')),
       'id' => array(
-        '11', '12', '15', '16', '19',
-        '20', '23', '24', '26', '28',
+        '11',
+        '12',
+        '15',
+        '16',
+        '19',
+        '20',
+        '23',
+        '24',
+        '26',
+        '28',
       ),
     ),
     //  Include tag 9
     array(
-  'fv' => array('includeTags' => array('9')),
+      'fv' => array('includeTags' => array('9')),
       'id' => array(
-        '10', '12', '14', '16', '18',
-        '20', '22', '24',
+        '10',
+        '12',
+        '14',
+        '16',
+        '18',
+        '20',
+        '22',
+        '24',
       ),
     ),
     //  Include tags 7 and 9
     array(
-  'fv' => array('includeTags' => array('7', '9')),
+      'fv' => array('includeTags' => array('7', '9')),
       'id' => array(
-        '10', '11', '12', '14', '15', '16',
-        '18', '19', '20', '22', '23', '24',
-        '26', '28',
+        '10',
+        '11',
+        '12',
+        '14',
+        '15',
+        '16',
+        '18',
+        '19',
+        '20',
+        '22',
+        '23',
+        '24',
+        '26',
+        '28',
       ),
     ),
     //  Include tag 7, exclude tag 9
     array(
-  'fv' => array(
-  'includeTags' => array('7'),
+      'fv' => array(
+        'includeTags' => array('7'),
         'excludeTags' => array('9'),
       ),
       'id' => array('11', '15', '19', '23', '26', '28'),
@@ -138,9 +202,21 @@ class CRM_Contact_Form_Search_Custom_GroupTestDataProvider implements Iterator {
         'andOr' => 0,
       ),
       'id' => array(
-        '11', '12', '15', '16', '17', '18',
-        '19', '20', '21', '22', '23', '24',
-        '26', '27', '28',
+        '11',
+        '12',
+        '15',
+        '16',
+        '17',
+        '18',
+        '19',
+        '20',
+        '21',
+        '22',
+        '23',
+        '24',
+        '26',
+        '27',
+        '28',
       ),
     ),
     //  Include static group 3, include tag 7 (both)
@@ -154,54 +230,85 @@ class CRM_Contact_Form_Search_Custom_GroupTestDataProvider implements Iterator {
     ),
     //  Include static group 3, exclude tag 7
     array(
-  'fv' => array(
-  'includeGroups' => array('3'),
+      'fv' => array(
+        'includeGroups' => array('3'),
         'excludeTags' => array('7'),
       ),
       'id' => array('17', '18', '21', '22', '27'),
     ),
     //  Include tag 9, exclude static group 5
     array(
-  'fv' => array(
-  'includeTags' => array('9'),
+      'fv' => array(
+        'includeTags' => array('9'),
         'excludeGroups' => array('5'),
       ),
       'id' => array('10', '12', '18', '20'),
     ),
     //  Exclude tag 9, exclude static group 5
     array(
-  'fv' => array(
-  'excludeTags' => array('9'),
+      'fv' => array(
+        'excludeTags' => array('9'),
         'excludeGroups' => array('5'),
       ),
       'id' => array(
-        '9', '11', '17', '19',
-        '26', '27', '28',
+        '9',
+        '11',
+        '17',
+        '19',
+        '26',
+        '27',
+        '28',
       ),
     ),
     //  Include smart group 6
     array(
-  'fv' => array('includeGroups' => array('6')),
+      'fv' => array('includeGroups' => array('6')),
       'id' => array(
-        '9', '10', '11', '12', '13', '14',
-        '15', '16', '26',
+        '9',
+        '10',
+        '11',
+        '12',
+        '13',
+        '14',
+        '15',
+        '16',
+        '26',
       ),
     ),
     //  Include smart group 4
     array(
-  'fv' => array('includeGroups' => array('4')),
+      'fv' => array('includeGroups' => array('4')),
       'id' => array(
-        '17', '18', '19', '20', '21',
-        '22', '23', '24', '27', '28',
+        '17',
+        '18',
+        '19',
+        '20',
+        '21',
+        '22',
+        '23',
+        '24',
+        '27',
+        '28',
       ),
     ),
     //  Include smart group 4 and static group 5
     array(
-  'fv' => array('includeGroups' => array('4', '5')),
+      'fv' => array('includeGroups' => array('4', '5')),
       'id' => array(
-        '13', '14', '15', '16', '17', '18',
-        '19', '20', '21', '22', '23', '24',
-        '27', '28',
+        '13',
+        '14',
+        '15',
+        '16',
+        '17',
+        '18',
+        '19',
+        '20',
+        '21',
+        '22',
+        '23',
+        '24',
+        '27',
+        '28',
       ),
     ),
   );
@@ -219,8 +326,8 @@ class CRM_Contact_Form_Search_Custom_GroupTestDataProvider implements Iterator {
    */
   public function current() {
     $count = count($this->dataset[$this->i]['id']);
-    $ids   = $this->dataset[$this->i]['id'];
-    $full  = array();
+    $ids = $this->dataset[$this->i]['id'];
+    $full = array();
     foreach ($this->dataset[$this->i]['id'] as $key => $value) {
       $full[] = array(
         'contact_id' => $value,

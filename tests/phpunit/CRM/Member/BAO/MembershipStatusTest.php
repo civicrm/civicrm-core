@@ -63,8 +63,8 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     );
 
     $membershipStatus = CRM_Member_BAO_MembershipStatus::add($params);
-    $defaults         = array();
-    $result           = CRM_Member_BAO_MembershipStatus::retrieve($params, $defaults);
+    $defaults = array();
+    $result = CRM_Member_BAO_MembershipStatus::retrieve($params, $defaults);
     $this->assertEquals($result->name, 'testStatus', 'Verify membership status name.');
     CRM_Member_BAO_MembershipStatus::del($membershipStatus->id);
   }

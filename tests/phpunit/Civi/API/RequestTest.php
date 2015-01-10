@@ -31,13 +31,25 @@ class RequestTest extends \CiviUnitTestCase {
       array(), // expectedChains
     );
     $cases[] = array(
-      array('version' => 4, 'option.limit' => 15, 'option.foo' => array('bar'), 'options' => array('whiz' => 'bang'), 'optionnotreally' => 'data'), // requestParams
+      array(
+        'version' => 4,
+        'option.limit' => 15,
+        'option.foo' => array('bar'),
+        'options' => array('whiz' => 'bang'),
+        'optionnotreally' => 'data'
+      ), // requestParams
       array('limit' => 15, 'foo' => array('bar'), 'whiz' => 'bang'), // expectedOptions
       array('optionnotreally' => 'data'), // expectedData
       array(), // expectedChains
     );
     $cases[] = array(
-      array('version' => 4, 'return' => array('field1', 'field2'), 'return.field3' => 1, 'return.field4' => 0, 'returnontreally' => 'data'), // requestParams
+      array(
+        'version' => 4,
+        'return' => array('field1', 'field2'),
+        'return.field3' => 1,
+        'return.field4' => 0,
+        'returnontreally' => 'data'
+      ), // requestParams
       array('return' => array('field1', 'field2', 'field3')), // expectedOptions
       array('returnontreally' => 'data'), // expectedData
       array(), // expectedChains

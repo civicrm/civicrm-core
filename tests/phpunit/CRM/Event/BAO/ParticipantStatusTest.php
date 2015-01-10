@@ -134,8 +134,8 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
     $statusType = CRM_Event_BAO_ParticipantStatusType::create($params);
 
     // retrieve status type
-    $retrieveParams     = array('id' => $statusType->id);
-    $default            = array();
+    $retrieveParams = array('id' => $statusType->id);
+    $default = array();
     $retrieveStatusType = CRM_Event_BAO_ParticipantStatusType::retrieve($retrieveParams, $default);
 
     // check on retrieve values

@@ -146,8 +146,18 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
       '/Authorization failed/',
     );
 
-    $cases[] = array('FakeFile', 'create', array(), "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table/");
-    $cases[] = array('FakeFile', 'get', array(), "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table/");
+    $cases[] = array(
+      'FakeFile',
+      'create',
+      array(),
+      "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table/"
+    );
+    $cases[] = array(
+      'FakeFile',
+      'get',
+      array(),
+      "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table/"
+    );
 
     $cases[] = array('FakeFile', 'create', array('entity_table' => 'unknown'), '/Unrecognized target entity/');
     $cases[] = array('FakeFile', 'get', array('entity_table' => 'unknown'), '/Unrecognized target entity/');

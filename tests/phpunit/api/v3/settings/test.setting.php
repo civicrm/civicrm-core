@@ -59,4 +59,4 @@ return array(
     'html_type' => 'Text',
     'quick_form_type' => 'Element',
   ),
- );
+);

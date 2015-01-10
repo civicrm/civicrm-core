@@ -183,12 +183,13 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $this->assertEquals(2, $result['count']);
     foreach ($result['values'] as $contribution) {
       $this->assertEquals($this->callAPISuccess('line_item', 'getvalue', array(
-       'contribution_id' => $contribution['id'],
-       'return' => 'line_total',
+        'contribution_id' => $contribution['id'],
+        'return' => 'line_total',
 
       )), $contribution['total_amount']);
     }
   }
+
   /**
    * Data provider for test process membership
    * @return array
@@ -202,7 +203,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
         1 => $this->_contactID,
         2 => $this->_contactID2,
         3 => $this->_contactID3,
-        ),
+      ),
       'field' => array(
         1 => array(
           'membership_type' => array(0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
@@ -218,35 +219,35 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
           'check_number' => NULL,
           'contribution_status_id' => 1,
         ),
-      2 => array(
-        'membership_type' => array(0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
-        'join_date' => '07/03/2013',
-        'membership_start_date' => '02/03/2013',
-        'membership_end_date' => NULL,
-        'membership_source' => NULL,
-        'financial_type' => 2,
-        'total_amount' => 1,
-        'receive_date' => '07/17/2013',
-        'receive_date_time' => NULL,
-        'payment_instrument' => NULL,
-        'check_number' => NULL,
-        'contribution_status_id' => 1,
-       ),
+        2 => array(
+          'membership_type' => array(0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
+          'join_date' => '07/03/2013',
+          'membership_start_date' => '02/03/2013',
+          'membership_end_date' => NULL,
+          'membership_source' => NULL,
+          'financial_type' => 2,
+          'total_amount' => 1,
+          'receive_date' => '07/17/2013',
+          'receive_date_time' => NULL,
+          'payment_instrument' => NULL,
+          'check_number' => NULL,
+          'contribution_status_id' => 1,
+        ),
         // no join date, coded end date
-       3 => array(
-         'membership_type' => array(0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
-         'join_date' => NULL,
-         'membership_start_date' => NULL,
-         'membership_end_date' => '2013-12-01',
-         'membership_source' => NULL,
-         'financial_type' => 2,
-         'total_amount' => 1,
-         'receive_date' => '07/17/2013',
-         'receive_date_time' => NULL,
-         'payment_instrument' => NULL,
-         'check_number' => NULL,
-         'contribution_status_id' => 1,
-       ),
+        3 => array(
+          'membership_type' => array(0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
+          'join_date' => NULL,
+          'membership_start_date' => NULL,
+          'membership_end_date' => '2013-12-01',
+          'membership_source' => NULL,
+          'financial_type' => 2,
+          'total_amount' => 1,
+          'receive_date' => '07/17/2013',
+          'receive_date_time' => NULL,
+          'payment_instrument' => NULL,
+          'check_number' => NULL,
+          'contribution_status_id' => 1,
+        ),
 
       ),
       'actualBatchTotal' => 0,

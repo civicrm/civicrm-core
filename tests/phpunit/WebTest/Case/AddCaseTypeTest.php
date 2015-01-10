@@ -46,7 +46,12 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     $this->enableComponents("CiviCase");
 
     // let's give full CiviCase permissions to demo user (registered user).
-    $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
+    $permission = array(
+      'edit-2-access-all-cases-and-activities',
+      'edit-2-access-my-cases-and-activities',
+      'edit-2-administer-civicase',
+      'edit-2-delete-in-civicase'
+    );
     $this->changePermissions($permission);
 
     // Log in as normal user
@@ -127,7 +132,7 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('title');
     $this->type('title', $editCaseTypeLabel);
 
-    $this->select2("xpath=//div[@id='crm-main-content-wrapper']/div/div/form/div/div[4]/table/tfoot/tr/td/span/div/a",'Sibling of', FALSE, TRUE);
+    $this->select2("xpath=//div[@id='crm-main-content-wrapper']/div/div/form/div/div[4]/table/tfoot/tr/td/span/div/a", 'Sibling of', FALSE, TRUE);
     $this->click("xpath=//*[@id='crm-main-content-wrapper']/div/div/form/div/div[4]/table/tbody/tr[4]/td[2]/input[@type='checkbox']");
 
     $this->click("xpath=//a[text()='Standard Timeline']");

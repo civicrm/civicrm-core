@@ -67,8 +67,8 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   public function setUp() {
 
     parent::setUp();
-    $this->_cId_a      = $this->individualCreate();
-    $this->_cId_b      = $this->organizationCreate();
+    $this->_cId_a = $this->individualCreate();
+    $this->_cId_b = $this->organizationCreate();
   }
 
   public function tearDown() {

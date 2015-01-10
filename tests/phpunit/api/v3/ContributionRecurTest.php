@@ -34,8 +34,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * @package CiviCRM_APIv3
  * @subpackage API_Contribution
  */
-
-
 class api_v3_ContributionRecurTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $params;

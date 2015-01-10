@@ -101,10 +101,10 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     /**
-    echo "Count: $count, OBJ: ", $obj->count( ) . "\n";
-    while ( $dao->fetch( ) ) {
-    echo "{$dao->contact_id}, {$dao->contact_type}, {$dao->sort_name}, {$dao->group_names}\n";
-    }
+     * echo "Count: $count, OBJ: ", $obj->count( ) . "\n";
+     * while ( $dao->fetch( ) ) {
+     * echo "{$dao->contact_id}, {$dao->contact_type}, {$dao->sort_name}, {$dao->group_names}\n";
+     * }
      **/
     $this->assertEquals($count, $obj->count(),
       'In line ' . __LINE__
@@ -176,8 +176,8 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
    */
   public function testColumns() {
     $formValues = array();
-    $obj        = new CRM_Contact_Form_Search_Custom_Group($formValues);
-    $columns    = $obj->columns();
+    $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
+    $columns = $obj->columns();
     $this->assertTrue(is_array($columns), 'In line ' . __LINE__);
     foreach ($columns as $key => $value) {
       $this->assertTrue(is_string($key), 'In line ' . __LINE__);
@@ -208,8 +208,8 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
    */
   public function testTemplateFile() {
     $formValues = array();
-    $obj        = new CRM_Contact_Form_Search_Custom_Group($formValues);
-    $fileName   = $obj->templateFile();
+    $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
+    $fileName = $obj->templateFile();
     $this->assertTrue(is_string($fileName), 'In line ' . __LINE__);
     //FIXME: we would need to search the include path to do the following
     //$this->assertTrue( file_exists( $fileName ), 'In line ' . __LINE__ );

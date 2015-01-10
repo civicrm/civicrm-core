@@ -131,7 +131,10 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
       'CiviEvent' => array('participant_fee_amount_high', 'addParticipantSearchDetail'),
       'CiviMember' => array('member_end_date_high', 'addMemberSearchDetail'),
       'CiviPledge' => array('pledge_frequency_interval', 'addPledgeSearchDetail'),
-      'relationship' => array("xpath=//div[@id='relationship']/table/tbody/tr//td/label[text()='Relationship Status']/../label[text()='All']", ''),
+      'relationship' => array(
+        "xpath=//div[@id='relationship']/table/tbody/tr//td/label[text()='Relationship Status']/../label[text()='All']",
+        ''
+      ),
     );
 
     foreach ($searchBlockValues as $block => $blockValues) {
@@ -238,7 +241,15 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->clickAjaxLink("location", 'country');
     $this->select2("country", "United States", FALSE);
     $this->waitForElementPresent('state_province');
-    $this->multiselect2("state_province", array("Ohio", "New York", "New Mexico", "Connecticut", "Georgia", "New Jersey", "Texas"));
+    $this->multiselect2("state_province", array(
+        "Ohio",
+        "New York",
+        "New Mexico",
+        "Connecticut",
+        "Georgia",
+        "New Jersey",
+        "Texas"
+      ));
     $this->clickLink("_qf_Advanced_refresh", "xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[6]");
 
     $stateBeforeSort = $this->getText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[6]");

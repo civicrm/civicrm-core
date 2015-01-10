@@ -48,7 +48,8 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
       array(
         'type' => 'Sql',
         'name' => 'test-queue',
-      ));
+      )
+    );
     return $queueSpecs;
   }
 
@@ -75,14 +76,14 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
     $this->assertTrue($this->queue instanceof CRM_Queue_Queue);
 
     $this->queue->createItem(array(
-        'test-key' => 'a',
-      ));
+      'test-key' => 'a',
+    ));
     $this->queue->createItem(array(
-        'test-key' => 'b',
-      ));
+      'test-key' => 'b',
+    ));
     $this->queue->createItem(array(
-        'test-key' => 'c',
-      ));
+      'test-key' => 'c',
+    ));
 
     $this->assertEquals(3, $this->queue->numberOfItems());
     $item = $this->queue->claimItem();
@@ -111,8 +112,8 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
       )
     );
     $this->queue->createItem(array(
-        'test-key' => 'd',
-      ));
+      'test-key' => 'd',
+    ));
 
     $this->assertEquals(4, $this->queue->numberOfItems());
     $item = $this->queue->claimItem();

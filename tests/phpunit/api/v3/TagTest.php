@@ -34,7 +34,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * @package CiviCRM_APIv3
  * @subpackage API_Core
  */
-
 class api_v3_TagTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   /**
@@ -84,7 +83,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
    */
   public function testGetReturnArray() {
     $description = "demonstrates use of Return as an array";
-    $subfile     = "getReturnArray";
+    $subfile = "getReturnArray";
 
     $params = array(
       'id' => $this->tagID,
@@ -184,8 +183,8 @@ class api_v3_TagTest extends CiviUnitTestCase {
 
   public function testTagGetfields() {
     $description = "demonstrate use of getfields to interrogate api";
-    $params      = array('action' => 'create');
-    $result      = $this->callAPIAndDocument('tag', 'getfields', $params, __FUNCTION__, __FILE__, $description, NULL, 'getfields');
+    $params = array('action' => 'create');
+    $result = $this->callAPIAndDocument('tag', 'getfields', $params, __FUNCTION__, __FILE__, $description, NULL, 'getfields');
     $this->assertEquals('civicrm_contact', $result['values']['used_for']['api.default']);
   }
 

@@ -38,9 +38,9 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
     require_once 'CRM/Queue/Service.php';
     $this->queueService = CRM_Queue_Service::singleton(TRUE);
     $this->queue = $this->queueService->create(array(
-        'type' => 'Sql',
-        'name' => 'test-queue',
-      ));
+      'type' => 'Sql',
+      'name' => 'test-queue',
+    ));
     self::$_recordedValues = array();
   }
 
@@ -57,26 +57,26 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
   public function testRunAllNormal() {
     // prepare a list of tasks with an error in the middle
     $this->queue->createItem(new CRM_Queue_Task(
-        array('CRM_Queue_RunnerTest', '_recordValue'),
-        array('a'),
-        'Add "a"'
-      ));
+      array('CRM_Queue_RunnerTest', '_recordValue'),
+      array('a'),
+      'Add "a"'
+    ));
     $this->queue->createItem(new CRM_Queue_Task(
-        array('CRM_Queue_RunnerTest', '_recordValue'),
-        array('b'),
-        'Add "b"'
-      ));
+      array('CRM_Queue_RunnerTest', '_recordValue'),
+      array('b'),
+      'Add "b"'
+    ));
     $this->queue->createItem(new CRM_Queue_Task(
-        array('CRM_Queue_RunnerTest', '_recordValue'),
-        array('c'),
-        'Add "c"'
-      ));
+      array('CRM_Queue_RunnerTest', '_recordValue'),
+      array('c'),
+      'Add "c"'
+    ));
 
     // run the list of tasks
     $runner = new CRM_Queue_Runner(array(
-        'queue' => $this->queue,
-        'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
-      ));
+      'queue' => $this->queue,
+      'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
+    ));
     $this->assertEquals(self::$_recordedValues, array());
     $this->assertEquals(3, $this->queue->numberOfItems());
     $result = $runner->runAll();
@@ -92,26 +92,26 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
   public function testRunAll_AddMore() {
     // prepare a list of tasks with an error in the middle
     $this->queue->createItem(new CRM_Queue_Task(
-        array('CRM_Queue_RunnerTest', '_recordValue'),
-        array('a'),
-        'Add "a"'
-      ));
+      array('CRM_Queue_RunnerTest', '_recordValue'),
+      array('a'),
+      'Add "a"'
+    ));
     $this->queue->createItem(new CRM_Queue_Task(
-        array('CRM_Queue_RunnerTest', '_enqueueNumbers'),
-        array(1, 3),
-        'Add more'
-      ));
+      array('CRM_Queue_RunnerTest', '_enqueueNumbers'),
+      array(1, 3),
+      'Add more'
+    ));
     $this->queue->createItem(new CRM_Queue_Task(
-        array('CRM_Queue_RunnerTest', '_recordValue'),
-        array('b'),
-        'Add "b"'
-      ));
+      array('CRM_Queue_RunnerTest', '_recordValue'),
+      array('b'),
+      'Add "b"'
+    ));
 
     // run the list of tasks
     $runner = new CRM_Queue_Runner(array(
-        'queue' => $this->queue,
-        'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
-      ));
+      'queue' => $this->queue,
+      'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
+    ));
     $this->assertEquals(self::$_recordedValues, array());
     $this->assertEquals(3, $this->queue->numberOfItems());
     $result = $runner->runAll();
@@ -127,26 +127,26 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
   public function testRunAll_Continue_Exception() {
     // prepare a list of tasks with an error in the middle
     $this->queue->createItem(new CRM_Queue_Task(
-        array('CRM_Queue_RunnerTest', '_recordValue'),
-        array('a'),
-        'Add "a"'
-      ));
+      array('CRM_Queue_RunnerTest', '_recordValue'),
+      array('a'),
+      'Add "a"'
+    ));
     $this->queue->createItem(new CRM_Queue_Task(
-        array('CRM_Queue_RunnerTest', '_throwException'),
-        array('b'),
-        'Throw exception'
-      ));
+      array('CRM_Queue_RunnerTest', '_throwException'),
+      array('b'),
+      'Throw exception'
+    ));
     $this->queue->createItem(new CRM_Queue_Task(
-        array('CRM_Queue_RunnerTest', '_recordValue'),
-        array('c'),
-        'Add "c"'
-      ));
+      array('CRM_Queue_RunnerTest', '_recordValue'),
+      array('c'),
+      'Add "c"'
+    ));
 
     // run the list of tasks
     $runner = new CRM_Queue_Runner(array(
-        'queue' => $this->queue,
-        'errorMode' => CRM_Queue_Runner::ERROR_CONTINUE,
-      ));
+      'queue' => $this->queue,
+      'errorMode' => CRM_Queue_Runner::ERROR_CONTINUE,
+    ));
     $this->assertEquals(self::$_recordedValues, array());
     $this->assertEquals(3, $this->queue->numberOfItems());
     $result = $runner->runAll();
@@ -163,26 +163,26 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
   public function testRunAll_Abort_Exception() {
     // prepare a list of tasks with an error in the middle
     $this->queue->createItem(new CRM_Queue_Task(
-        array('CRM_Queue_RunnerTest', '_recordValue'),
-        array('a'),
-        'Add "a"'
-      ));
+      array('CRM_Queue_RunnerTest', '_recordValue'),
+      array('a'),
+      'Add "a"'
+    ));
     $this->queue->createItem(new CRM_Queue_Task(
-        array('CRM_Queue_RunnerTest', '_throwException'),
-        array('b'),
-        'Throw exception'
-      ));
+      array('CRM_Queue_RunnerTest', '_throwException'),
+      array('b'),
+      'Throw exception'
+    ));
     $this->queue->createItem(new CRM_Queue_Task(
-        array('CRM_Queue_RunnerTest', '_recordValue'),
-        array('c'),
-        'Add "c"'
-      ));
+      array('CRM_Queue_RunnerTest', '_recordValue'),
+      array('c'),
+      'Add "c"'
+    ));
 
     // run the list of tasks
     $runner = new CRM_Queue_Runner(array(
-        'queue' => $this->queue,
-        'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
-      ));
+      'queue' => $this->queue,
+      'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
+    ));
     $this->assertEquals(self::$_recordedValues, array());
     $this->assertEquals(3, $this->queue->numberOfItems());
     $result = $runner->runAll();
@@ -200,26 +200,26 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
   public function testRunAll_Abort_False() {
     // prepare a list of tasks with an error in the middle
     $this->queue->createItem(new CRM_Queue_Task(
-        array('CRM_Queue_RunnerTest', '_recordValue'),
-        array('a'),
-        'Add "a"'
-      ));
+      array('CRM_Queue_RunnerTest', '_recordValue'),
+      array('a'),
+      'Add "a"'
+    ));
     $this->queue->createItem(new CRM_Queue_Task(
-        array('CRM_Queue_RunnerTest', '_returnFalse'),
-        array(),
-        'Return false'
-      ));
+      array('CRM_Queue_RunnerTest', '_returnFalse'),
+      array(),
+      'Return false'
+    ));
     $this->queue->createItem(new CRM_Queue_Task(
-        array('CRM_Queue_RunnerTest', '_recordValue'),
-        array('c'),
-        'Add "c"'
-      ));
+      array('CRM_Queue_RunnerTest', '_recordValue'),
+      array('c'),
+      'Add "c"'
+    ));
 
     // run the list of tasks
     $runner = new CRM_Queue_Runner(array(
-        'queue' => $this->queue,
-        'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
-      ));
+      'queue' => $this->queue,
+      'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
+    ));
     $this->assertEquals(self::$_recordedValues, array());
     $this->assertEquals(3, $this->queue->numberOfItems());
     $result = $runner->runAll();

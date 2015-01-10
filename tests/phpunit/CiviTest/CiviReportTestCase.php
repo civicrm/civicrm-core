@@ -140,7 +140,7 @@ class CiviReportTestCase extends CiviUnitTestCase {
     foreach ($actualCsvArray as $intKey => $strVal) {
       $rowData = var_export(array(
         'expected' => $expectedCsvArray[$intKey],
-        'actual'  => $actualCsvArray[$intKey],
+        'actual' => $actualCsvArray[$intKey],
       ), TRUE);
       $this->assertNotNull($expectedCsvArray[$intKey], 'In line ' . __LINE__);
       $this->assertEquals(

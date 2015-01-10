@@ -42,7 +42,7 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
 
     $firstName = substr(sha1(rand()), 0, 7);
     $lastName1 = substr(sha1(rand()), 0, 7);
-    $email     = "{$firstName}@example.com";
+    $email = "{$firstName}@example.com";
     $lastName2 = substr(sha1(rand()), 0, 7);
 
     //contact details section

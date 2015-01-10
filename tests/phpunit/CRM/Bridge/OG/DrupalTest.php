@@ -45,9 +45,9 @@ class CRM_Bridge_OG_DrupalTest extends CiviUnitTestCase {
    */
   public function testACLRoleDeleteFunctionality() {
     $optionGroup = civicrm_api('OptionGroup', 'Get', array(
-        'version' => 3,
-        'name' => 'acl_role',
-        'api.OptionValue.Create' =>
+      'version' => 3,
+      'name' => 'acl_role',
+      'api.OptionValue.Create' =>
         array(
           array(
             'label' => 'OG',
@@ -60,7 +60,7 @@ class CRM_Bridge_OG_DrupalTest extends CiviUnitTestCase {
             'description' => 'OG Sync Group ACL :1969:',
           ),
         ),
-      ));
+    ));
     $getOptionGroupParams = array('version' => 3, 'option_group_id' => $optionGroup['id']);
     $originalCount = civicrm_api('OptionValue', 'GetCount', $getOptionGroupParams);
     $params = array('source' => 'OG Sync Group ACL :1969:');

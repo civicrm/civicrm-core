@@ -123,7 +123,6 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    *
    *  SET @groupID = x;
    *  SELECT mapping_id FROM civicrm_group g LEFT JOIN civicrm_saved_search s ON saved_search_id = s.id WHERE g.id = @groupID INTO @mappingID;
-
    * SELECT * FROM civicrm_mapping WHERE id = @mappingID;
    * SELECT * FROM civicrm_mapping_field WHERE mapping_id = @mappingID;
    * SELECT * FROM civicrm_saved_search WHERE mapping_id = @mappingID;

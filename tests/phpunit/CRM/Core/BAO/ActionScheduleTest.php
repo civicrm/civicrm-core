@@ -512,7 +512,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'contact_id' => $membership->contact_id,
       'email' => 'test-member@example.com',
       'location_type_id' => 1,
-     ));
+    ));
     $this->assertAPISuccess($result);
 
     $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
@@ -639,7 +639,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->callAPISuccess('Email', 'create', array(
       'contact_id' => $membership->contact_id,
       'email' => 'test-member@example.com',
-     ));
+    ));
     $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
 
     $actionSchedule = $this->fixtures['sched_membership_end_2week'];
@@ -768,6 +768,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     ));
     $this->callAPISuccess('custom_group', 'delete', array('id' => $createGroup['id']));
   }
+
   /**
    * Check that limit_to + an empty recipients doesn't sent to multiple contacts
    */
@@ -799,7 +800,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       ),
     ));
   }
-
 
 
   public function testContactCustomDate_Anniv() {

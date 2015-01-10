@@ -204,7 +204,7 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
 
     $rows = array(
       array(
-    'first_name' => 'A' . substr(sha1(rand()), 0, 7),
+        'first_name' => 'A' . substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => substr(sha1(rand()), 0, 7) . 'and',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -217,7 +217,7 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
         'country' => 'United States',
       ),
       array(
-    'first_name' => 'S' . substr(sha1(rand()), 0, 7),
+        'first_name' => 'S' . substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => substr(sha1(rand()), 0, 7) . 'sum',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',

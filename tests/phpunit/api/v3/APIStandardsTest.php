@@ -49,7 +49,6 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
   /* This test case doesn't require DB reset */
 
 
-
   public $DBResetRequired = FALSE;
 
   /**

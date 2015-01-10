@@ -40,7 +40,7 @@ class WebTest_Contact_EditContactTest extends CiviSeleniumTestCase {
 
     // create contact
     $firstName = 'WebTest' . substr(sha1(rand()), 0, 7);
-    $lastName  = 'ContactEdit' . substr(sha1(rand()), 0, 7);
+    $lastName = 'ContactEdit' . substr(sha1(rand()), 0, 7);
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);

@@ -205,9 +205,9 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent('_qf_MembershipView_cancel-bottom');
 
-    $joinDate  = date('F jS, Y');
+    $joinDate = date('F jS, Y');
     $startDate = date('F jS, Y', strtotime("+1 month"));
-    $endDate   = date('F jS, Y', strtotime("+4 year 1 month -1 day"));
+    $endDate = date('F jS, Y', strtotime("+4 year 1 month -1 day"));
 
     // verify membership renew override
     $verifyMembershipRenewOverrideData = array(
@@ -302,9 +302,9 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent('_qf_MembershipView_cancel-bottom');
 
-    $joinDate  = date('F jS, Y', strtotime("-2 year"));
+    $joinDate = date('F jS, Y', strtotime("-2 year"));
     $startDate = date('F jS, Y');
-    $endDate   = date('F jS, Y', strtotime("+1 year -1 day"));
+    $endDate = date('F jS, Y', strtotime("+1 year -1 day"));
 
     // verify membership renewed and the membership type is changed
     $verifyMembershipData = array(

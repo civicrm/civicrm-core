@@ -74,7 +74,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'name' => 'ryegrass',
       'label' => 'juicy and healthy',
       'amount' => 1,
-     );
+    );
 
     $membershipOrgId = $this->organizationCreate(NULL);
     $this->_membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $membershipOrgId));
@@ -103,19 +103,19 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
 
   public function tearDown() {
     $tablesToTruncate = array(
-        'civicrm_contact',
-        'civicrm_contribution',
+      'civicrm_contact',
+      'civicrm_contribution',
     );
     $this->quickCleanup($tablesToTruncate);
     $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
     $this->callAPISuccess('PriceField', 'delete', array(
-        'id' => $this->priceFieldID1,
+      'id' => $this->priceFieldID1,
     ));
     $this->callAPISuccess('PriceSet', 'delete', array(
       'id' => $this->priceSetID1,
     ));
     $this->callAPISuccess('PriceField', 'delete', array(
-        'id' => $this->priceFieldID,
+      'id' => $this->priceFieldID,
     ));
     $delete = $this->callAPISuccess('PriceSet', 'delete', array(
       'id' => $this->priceSetID,
@@ -169,12 +169,13 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'membership_num_terms' => 2,
       'is_active' => 1,
       'financial_type_id' => 2,
-     );
+    );
     $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['values'][$result['id']]['membership_num_terms'], 2);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $result['id']));
   }
+
   public function testGetPriceFieldValuewithMultipleTerms() {
     $params1 = array(
       'price_field_id' => $this->priceFieldID1,
@@ -185,7 +186,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'membership_num_terms' => 2,
       'is_active' => 1,
       'financial_type_id' => 2,
-     );
+    );
     $params2 = array(
       'price_field_id' => $this->priceFieldID1,
       'membership_type_id' => $this->_membershipTypeID,
@@ -195,7 +196,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'membership_num_terms' => 3,
       'is_active' => 1,
       'financial_type_id' => 2,
-     );
+    );
     $result1 = $this->callAPISuccess($this->_entity, 'create', $params1);
     $result2 = $this->callAPISuccess($this->_entity, 'create', $params2);
     $result = $this->callAPISuccess($this->_entity, 'get', array('price_field_id' => $this->priceFieldID1));

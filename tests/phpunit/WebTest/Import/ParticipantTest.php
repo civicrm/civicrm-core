@@ -259,8 +259,8 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
         'event_type_id' => 4,
         'payment_processor' => $processorName,
         'fee_level' => array(
-        'Member' => "250.00",
-        'Non-Member' => "325.00",
+          'Member' => "250.00",
+          'Non-Member' => "325.00",
         ),
       );
     }

@@ -81,14 +81,14 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
    * @return array
    */
   public function _contributionIndividualCSVData() {
-    $firstName1  = substr(sha1(rand()), 0, 7);
-    $lastName1   = substr(sha1(rand()), 0, 7);
+    $firstName1 = substr(sha1(rand()), 0, 7);
+    $lastName1 = substr(sha1(rand()), 0, 7);
     $externalId1 = substr(sha1(rand()), 0, 4);
 
     $this->_addContact($firstName1, $lastName1, $externalId1);
 
-    $firstName2  = substr(sha1(rand()), 0, 7);
-    $lastName2   = substr(sha1(rand()), 0, 7);
+    $firstName2 = substr(sha1(rand()), 0, 7);
+    $lastName2 = substr(sha1(rand()), 0, 7);
     $externalId2 = substr(sha1(rand()), 0, 4);
 
     $this->_addContact($firstName2, $lastName2, $externalId2);
@@ -96,7 +96,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     $headers = array(
       'external_identifier' => 'External Identifier',
       'fee_amount' => 'Fee Amount',
-                          'financial_type'         => 'Financial Type',
+      'financial_type' => 'Financial Type',
       'contribution_status_id' => 'Contribution Status',
       'total_amount' => 'Total Amount',
     );
@@ -105,21 +105,21 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
       array(
         'external_identifier' => $externalId1,
         'fee_amount' => '200',
-                             'financial_type'         => 'Donation',
+        'financial_type' => 'Donation',
         'contribution_status_id' => 'Completed',
         'total_amount' => '200',
       ),
       array(
         'external_identifier' => $externalId2,
         'fee_amount' => '400',
-                             'financial_type'         => 'Donation',
+        'financial_type' => 'Donation',
         'contribution_status_id' => 'Completed',
         'total_amount' => '400',
       ),
     );
     $fieldMapper = array(
       'mapper[0][0]' => 'external_identifier',
-                              'mapper[2][0]' => 'financial_type',
+      'mapper[2][0]' => 'financial_type',
       'mapper[4][0]' => 'total_amount',
     );
     return array($headers, $rows, $fieldMapper);
@@ -133,16 +133,16 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
   public function _memberIndividualCSVData() {
     $memTypeParams = $this->webtestAddMembershipType();
 
-    $firstName1  = substr(sha1(rand()), 0, 7);
-    $lastName1   = substr(sha1(rand()), 0, 7);
+    $firstName1 = substr(sha1(rand()), 0, 7);
+    $lastName1 = substr(sha1(rand()), 0, 7);
     $externalId1 = substr(sha1(rand()), 0, 4);
 
     $this->_addContact($firstName1, $lastName1, $externalId1);
     $startDate1 = date('Y-m-d');
     $year = date('Y') - 1;
 
-    $firstName2  = substr(sha1(rand()), 0, 7);
-    $lastName2   = substr(sha1(rand()), 0, 7);
+    $firstName2 = substr(sha1(rand()), 0, 7);
+    $lastName2 = substr(sha1(rand()), 0, 7);
     $externalId2 = substr(sha1(rand()), 0, 4);
 
     $this->_addContact($firstName2, $lastName2, $externalId2);
@@ -182,14 +182,14 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
   public function _participantIndividualCSVData() {
     $eventInfo = $this->_addNewEvent();
 
-    $firstName1  = substr(sha1(rand()), 0, 7);
-    $lastName1   = substr(sha1(rand()), 0, 7);
+    $firstName1 = substr(sha1(rand()), 0, 7);
+    $lastName1 = substr(sha1(rand()), 0, 7);
     $externalId1 = substr(sha1(rand()), 0, 4);
 
     $this->_addContact($firstName1, $lastName1, $externalId1);
 
-    $firstName2  = substr(sha1(rand()), 0, 7);
-    $lastName2   = substr(sha1(rand()), 0, 7);
+    $firstName2 = substr(sha1(rand()), 0, 7);
+    $lastName2 = substr(sha1(rand()), 0, 7);
     $externalId2 = substr(sha1(rand()), 0, 4);
 
     $this->_addContact($firstName2, $lastName2, $externalId2);

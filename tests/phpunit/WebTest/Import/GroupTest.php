@@ -112,7 +112,7 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
 
     $rows = array(
       array(
-    'first_name' => substr(sha1(rand()), 0, 7),
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -124,7 +124,7 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
         'country' => 'United States',
       ),
       array(
-    'first_name' => substr(sha1(rand()), 0, 7),
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',

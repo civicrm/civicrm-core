@@ -47,6 +47,7 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
   public function testCRM11793Household() {
     $this->_testCRM11793ContactType('Household');
   }
+
   public function testCRM11793Individual() {
     $this->_testCRM11793ContactType('Individual');
   }

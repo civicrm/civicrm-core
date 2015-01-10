@@ -34,6 +34,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
   protected function setUp() {
     parent::setUp();
   }
+
   public function testAdminAddNewProfile() {
     $this->webtestLogin();
     list($id, $profileTitle) = $this->_addNewProfile();
@@ -116,7 +117,11 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
 
     $gid = $this->urlArg('gid');
 
-    $this->openCiviPage('admin/uf/group/field/add', array('action' => 'add', 'reset' => 1, 'gid' => $gid), 'field_name[0]');
+    $this->openCiviPage('admin/uf/group/field/add', array(
+        'action' => 'add',
+        'reset' => 1,
+        'gid' => $gid
+      ), 'field_name[0]');
 
     //Add field to profile
     $this->click('field_name[0]');
