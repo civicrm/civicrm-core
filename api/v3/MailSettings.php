@@ -97,4 +97,3 @@ function civicrm_api3_mail_settings_get($params) {
 function civicrm_api3_mail_settings_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-
