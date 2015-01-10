@@ -51,7 +51,10 @@ global $installType;
 $installType = strtolower($_SESSION['civicrm_install_type']);
 
 if (!in_array($installType, array(
-  'drupal', 'wordpress'))) {
+  'drupal',
+  'wordpress'
+))
+) {
   $errorTitle = "Oops! Unsupported installation mode";
   $errorMsg = "";
   errorDisplayPage($errorTitle, $errorMsg);
@@ -83,11 +86,15 @@ if ($installType == 'drupal') {
   $pattern = '/' . preg_quote(CIVICRM_DIRECTORY_SEPARATOR . 'modules', CIVICRM_DIRECTORY_SEPARATOR) . '/';
 
   if (!preg_match($pattern,
-      str_replace("\\", "/", $_SERVER['SCRIPT_FILENAME'])
-    )) {
+    str_replace("\\", "/", $_SERVER['SCRIPT_FILENAME'])
+  )
+  ) {
     $errorTitle = "Oops! Please Correct Your Install Location";
     $errorMsg = "Please untar (uncompress) your downloaded copy of CiviCRM in the <strong>" . implode(CIVICRM_DIRECTORY_SEPARATOR, array(
-      'sites', 'all', 'modules')) . "</strong> directory below your Drupal root directory. Refer to the online " . $docLink . " for more information.";
+        'sites',
+        'all',
+        'modules'
+      )) . "</strong> directory below your Drupal root directory. Refer to the online " . $docLink . " for more information.";
     errorDisplayPage($errorTitle, $errorMsg);
   }
 }
@@ -166,7 +173,10 @@ if ($alreadyInstalled) {
   if ($installType == 'drupal') {
 
     $errorMsg = "CiviCRM has already been installed in this Drupal site. <ul><li>To <strong>start over</strong>, you must delete or rename the existing CiviCRM settings file - <strong>civicrm.settings.php</strong> - from <strong>" . implode(CIVICRM_DIRECTORY_SEPARATOR, array(
-      '[your Drupal root directory]', 'sites', $siteDir)) . "</strong>.</li><li>To <strong>upgrade an existing installation</strong>, refer to the online " . $docLink . ".</li></ul>";
+        '[your Drupal root directory]',
+        'sites',
+        $siteDir
+      )) . "</strong>.</li><li>To <strong>upgrade an existing installation</strong>, refer to the online " . $docLink . ".</li></ul>";
   }
   elseif ($installType == 'wordpress') {
     $errorMsg = "CiviCRM has already been installed in this WordPress site. <ul><li>To <strong>start over</strong>, you must delete or rename the existing CiviCRM settings file - <strong>civicrm.settings.php</strong> - from <strong>" . $cmsPath . "</strong>.</li><li>To <strong>upgrade an existing installation</strong>, refer to the online " . $docLink . ".</li></ul>";
@@ -276,12 +286,13 @@ class InstallRequirements {
    */
   function checkdatabase($databaseConfig, $dbName) {
     if ($this->requireFunction('mysql_connect',
-        array(
-          "PHP Configuration",
-          "MySQL support",
-          "MySQL support not included in PHP.",
-        )
-      )) {
+      array(
+        "PHP Configuration",
+        "MySQL support",
+        "MySQL support not included in PHP.",
+      )
+    )
+    ) {
       $this->requireMySQLServer($databaseConfig['server'],
         array(
           "MySQL $dbName Configuration",
@@ -291,14 +302,15 @@ class InstallRequirements {
         )
       );
       if ($this->requireMysqlConnection($databaseConfig['server'],
-          $databaseConfig['username'],
-          $databaseConfig['password'],
-          array(
-            "MySQL $dbName Configuration",
-            "Are the access credentials correct",
-            "That username/password doesn't work",
-          )
-        )) {
+        $databaseConfig['username'],
+        $databaseConfig['password'],
+        array(
+          "MySQL $dbName Configuration",
+          "Are the access credentials correct",
+          "That username/password doesn't work",
+        )
+      )
+      ) {
         @$this->requireMySQLVersion("5.1",
           array(
             "MySQL $dbName Configuration",
@@ -324,7 +336,8 @@ class InstallRequirements {
           array(
             "MySQL $dbName Configuration",
             "Does MySQL thread_stack meet minimum (" . self::MINIMUM_THREAD_STACK . "k)",
-            "", // "The MySQL thread_stack does not meet minimum " . CRM_Upgrade_Form::MINIMUM_THREAD_STACK . "k. Please update thread_stack in my.cnf.",
+            "",
+            // "The MySQL thread_stack does not meet minimum " . CRM_Upgrade_Form::MINIMUM_THREAD_STACK . "k. Please update thread_stack in my.cnf.",
           )
         );
       }
@@ -394,7 +407,12 @@ class InstallRequirements {
 
     $this->errors = NULL;
 
-    $this->requirePHPVersion('5.3.3', array("PHP Configuration", "PHP5 installed", NULL, "PHP version " . phpversion()));
+    $this->requirePHPVersion('5.3.3', array(
+      "PHP Configuration",
+      "PHP5 installed",
+      NULL,
+      "PHP version " . phpversion()
+    ));
 
     // Check that we can identify the root folder successfully
     $this->requireFile($crmPath . CIVICRM_DIRECTORY_SEPARATOR . 'README.txt',
@@ -421,7 +439,10 @@ class InstallRequirements {
     foreach ($requiredDirectories as $dir) {
       $this->requireFile($crmPath . CIVICRM_DIRECTORY_SEPARATOR . $dir,
         array(
-          "File permissions", "$dir folder exists", "There is no $dir folder"), TRUE
+          "File permissions",
+          "$dir folder exists",
+          "There is no $dir folder"
+        ), TRUE
       );
     }
 
@@ -477,7 +498,11 @@ class InstallRequirements {
     }
 
     // Check for $_SERVER configuration
-    $this->requireServerVariables(array('SCRIPT_NAME', 'HTTP_HOST', 'SCRIPT_FILENAME'), array("Webserver config", "Recognised webserver", "You seem to be using an unsupported webserver.  The server variables SCRIPT_NAME, HTTP_HOST, SCRIPT_FILENAME need to be set."));
+    $this->requireServerVariables(array('SCRIPT_NAME', 'HTTP_HOST', 'SCRIPT_FILENAME'), array(
+      "Webserver config",
+      "Recognised webserver",
+      "You seem to be using an unsupported webserver.  The server variables SCRIPT_NAME, HTTP_HOST, SCRIPT_FILENAME need to be set."
+    ));
 
     // Check for MySQL support
     $this->requireFunction('mysql_connect',
@@ -492,9 +517,9 @@ class InstallRequirements {
     // Check for xcache_isset and emit warning if exists
     $this->checkXCache(array(
       "PHP Configuration",
-        "XCache compatibility",
-        "XCache is installed and there are known compatibility issues between XCache and CiviCRM. Consider using an alternative PHP caching mechanism or disable PHP caching altogether.",
-      ));
+      "XCache compatibility",
+      "XCache is installed and there are known compatibility issues between XCache and CiviCRM. Consider using an alternative PHP caching mechanism or disable PHP caching altogether.",
+    ));
 
     // Check memory allocation
     $this->requireMemory(32 * 1024 * 1024,
@@ -627,7 +652,7 @@ class InstallRequirements {
 
     $this->testing($testDetails);
 
-    $phpVersion      = phpversion();
+    $phpVersion = phpversion();
     $aboveMinVersion = version_compare($phpVersion, $minVersion) >= 0;
     $belowMaxVersion = $maxVersion ? version_compare($phpVersion, $maxVersion) < 0 : TRUE;
 
@@ -1033,7 +1058,8 @@ class InstallRequirements {
    * @param $testDetails
    * @param bool $onlyRequire
    */
-  function requireDatabaseOrCreatePermissions($server,
+  function requireDatabaseOrCreatePermissions(
+    $server,
     $username,
     $password,
     $database,
@@ -1185,7 +1211,8 @@ class Installer extends InstallRequirements {
       return;
     }
 
-    if (@mysql_query("CREATE DATABASE $database")) {}
+    if (@mysql_query("CREATE DATABASE $database")) {
+    }
     else {
       $errorTitle = "Oops! Could not create Database $database";
       $errorMsg = "We encountered an error when attempting to create the database. Please check your mysql server permissions and the database name and try again.";
@@ -1403,7 +1430,8 @@ function civicrm_install_set_drupal_perms() {
       watchdog('civicrm',
         'Cannot grant the %perm permission because it does not yet exist.',
         array(
-          '%perm' => $perm), WATCHDOG_ERROR
+          '%perm' => $perm
+        ), WATCHDOG_ERROR
       );
     }
     $perms = array_intersect($perms, $allPerms);
@@ -1442,8 +1470,8 @@ function getSiteDir($cmsPath, $str) {
       for ($j = count($server); $j > 0; $j--) {
         $dir = implode('.', array_slice($server, -$j)) . implode('.', array_slice($uri, 0, $i));
         if (file_exists($cmsPath . CIVICRM_DIRECTORY_SEPARATOR .
-            'sites' . CIVICRM_DIRECTORY_SEPARATOR . $dir
-          )) {
+          'sites' . CIVICRM_DIRECTORY_SEPARATOR . $dir
+        )) {
           $siteDir = $dir;
           return $siteDir;
         }
