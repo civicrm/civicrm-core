@@ -51,7 +51,7 @@ class CRM_Activity_BAO_ICalendar {
    *   Reference to an activity object.
    *
    * @return \CRM_Activity_BAO_ICalendar
-  @access public
+   * @access public
    */
   public function __construct(&$act) {
     $this->activity = $act;
@@ -65,8 +65,8 @@ class CRM_Activity_BAO_ICalendar {
    * @param array $contacts
    *   Array of contacts (attendees).
    *
-   * @return string
-   *   Array index of the added attachment in the $attachments array, or else NULL.
+   * @return string|null
+   *   Array index of the added attachment in the $attachments array, else NULL.
    */
   public function addAttachment(&$attachments, $contacts) {
     // Check preferences setting
@@ -105,14 +105,17 @@ class CRM_Activity_BAO_ICalendar {
     return NULL;
   }
 
+  /**
+   * Remove temp file
+   */
   public function cleanup() {
     if (!empty ($this->icsfile)) {
       @unlink($this->icsfile);
     }
   }
 
-  // TODO: Is there a better way to do this?
   /**
+   * TODO: Is there a better way to do this?
    * @return string
    */
   private function getPrimaryEmail() {

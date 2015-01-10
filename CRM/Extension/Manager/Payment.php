@@ -36,7 +36,7 @@
 class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
 
   /**
-  @var CRM_Extension_Mapper
+   * @var CRM_Extension_Mapper
    */
   protected $mapper;
 

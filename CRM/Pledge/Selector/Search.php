@@ -148,7 +148,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
    * @param string $context
    *
    * @return \CRM_Pledge_Selector_Search
-  @access public
+   * @access public
    */
   function __construct(
     &$queryParams,
