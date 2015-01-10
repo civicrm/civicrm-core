@@ -54,7 +54,7 @@ AND    v.is_active = 1
 
     $dirParams = array();
     $urlParams = array();
-    $dao       = CRM_Core_DAO::executeQuery($sql);
+    $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       if (!isset($params[$dao->valueName])) {
         continue;

@@ -66,9 +66,9 @@ class CRM_Upgrade_Incremental_php_FourThree {
 
       if ($count > 0) {
         $error = ts("There is a data integrity issue with this CiviCRM database. It contains %1 contribution records which are linked to contact records that have been deleted. You will need to correct this manually before you can run the upgrade. Use the following MySQL query to identify the problem records: %2 These records will need to be deleted or linked to an existing contact record.", array(
-            1 => $count,
-            2 => '<em>SELECT ct.* FROM civicrm_contribution ct LEFT JOIN civicrm_contact c ON ct.contact_id = c.id WHERE c.id IS NULL;</em>',
-          ));
+          1 => $count,
+          2 => '<em>SELECT ct.* FROM civicrm_contribution ct LEFT JOIN civicrm_contact c ON ct.contact_id = c.id WHERE c.id IS NULL;</em>',
+        ));
         CRM_Core_Error::fatal($error);
         return FALSE;
       }

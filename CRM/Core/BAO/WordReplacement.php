@@ -48,6 +48,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   public function __construct() {
     parent::__construct();
   }
+
   /**
    * Takes a bunch of params that are needed to match certain criteria and
    * retrieves the relevant objects.
@@ -235,8 +236,8 @@ WHERE  domain_id = %1
     $wordReplacementCreateParams = array();
     // get all domains
     $result = civicrm_api3('domain', 'get', array(
-                                                  'return' => array('locale_custom_strings'),
-                                                  ));
+      'return' => array('locale_custom_strings'),
+    ));
     if (!empty($result["values"])) {
       foreach ($result["values"] as $value) {
         $params = array();

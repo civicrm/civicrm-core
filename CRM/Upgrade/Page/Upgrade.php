@@ -161,7 +161,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
       'pathPrefix' => 'civicrm/upgrade/queue',
       'onEndUrl' => CRM_Utils_System::url('civicrm/upgrade', 'action=finish', FALSE, NULL, FALSE),
       'buttons' => array('retry' => $config->debug, 'skip' => $config->debug),
-      ));
+    ));
     $queueRunner->runAllViaWeb();
     CRM_Core_Error::fatal(ts('Upgrade failed to redirect'));
   }

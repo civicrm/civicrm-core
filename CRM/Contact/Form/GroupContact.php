@@ -101,7 +101,10 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
         $msg = ts('Add to a group');
       }
 
-      $this->add('select', 'group_id', '', $groupSelect, TRUE, array('class' => 'crm-select2 crm-action-menu action-icon-plus', 'placeholder' => $msg));
+      $this->add('select', 'group_id', '', $groupSelect, TRUE, array(
+          'class' => 'crm-select2 crm-action-menu action-icon-plus',
+          'placeholder' => $msg
+        ));
 
       $this->addButtons(array(
           array(
@@ -120,8 +123,8 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
    */
   public function postProcess() {
     $contactID = array($this->_contactId);
-    $groupId   = $this->controller->exportValue('GroupContact', 'group_id');
-    $method    = ($this->_context == 'user') ? 'Web' : 'Admin';
+    $groupId = $this->controller->exportValue('GroupContact', 'group_id');
+    $method = ($this->_context == 'user') ? 'Web' : 'Admin';
 
     $session = CRM_Core_Session::singleton();
     $userID = $session->get('userID');

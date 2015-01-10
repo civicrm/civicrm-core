@@ -277,8 +277,8 @@ class CRM_Core_Menu {
     $config = CRM_Core_Config::singleton();
 
     foreach ($menuArray as $path => $item) {
-      $menu            = new CRM_Core_DAO_Menu();
-      $menu->path      = $path;
+      $menu = new CRM_Core_DAO_Menu();
+      $menu->path = $path;
       $menu->domain_id = CRM_Core_Config::domainID();
 
       $menu->find(TRUE);
@@ -317,19 +317,19 @@ class CRM_Core_Menu {
         'title' => $item['title'],
         'desc' => CRM_Utils_Array::value('desc', $item),
         'id' => strtr($item['title'], array(
-          '(' => '_',
-      ')' => '',
-      ' ' => '',
+            '(' => '_',
+            ')' => '',
+            ' ' => '',
             ',' => '_',
-      '/' => '_',
+            '/' => '_',
           )
         ),
         'url' => CRM_Utils_System::url($path, $query,
-            FALSE, // absolute
-            NULL, // fragment
-            TRUE, // htmlize
-            FALSE, // frontend
-            TRUE // forceBackend; CRM-14439 work-around; acceptable for now because we don't display breadcrumbs on frontend
+          FALSE, // absolute
+          NULL, // fragment
+          TRUE, // htmlize
+          FALSE, // frontend
+          TRUE // forceBackend; CRM-14439 work-around; acceptable for now because we don't display breadcrumbs on frontend
         ),
         'icon' => CRM_Utils_Array::value('icon', $item),
         'extra' => CRM_Utils_Array::value('extra', $item),
@@ -392,7 +392,8 @@ class CRM_Core_Menu {
     foreach ($values as $index => $item) {
       if (strpos(CRM_Utils_Array::value($config->userFrameworkURLVar, $_REQUEST),
           $item['path']
-        ) === 0) {
+        ) === 0
+      ) {
         $values[$index]['active'] = 'class="active"';
       }
       else {
@@ -622,14 +623,14 @@ class CRM_Core_Menu {
 
     $elements = array();
     while (!empty($args)) {
-      $string     = implode('/', $args);
-      $string     = CRM_Core_DAO::escapeString($string);
+      $string = implode('/', $args);
+      $string = CRM_Core_DAO::escapeString($string);
       $elements[] = "'{$string}'";
       array_pop($args);
     }
 
-    $queryString       = implode(', ', $elements);
-    $domainID          = CRM_Core_Config::domainID();
+    $queryString = implode(', ', $elements);
+    $domainID = CRM_Core_Config::domainID();
     $domainWhereClause = " AND domain_id = $domainID ";
     if ($config->isUpgradeMode() &&
       !CRM_Core_DAO::checkFieldExists('civicrm_menu', 'domain_id')
@@ -741,7 +742,7 @@ UNION (
           $urlToSession[$count]['sessionVar'],
           $urlToSession[$count]['type'],
           $urlToSession[$count]['default']
-        ) = explode(':', $keyVal);
+          ) = explode(':', $keyVal);
         $count++;
       }
       $arr['urlToSession'] = $urlToSession;

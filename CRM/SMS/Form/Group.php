@@ -190,7 +190,10 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     $groups = array();
 
     foreach (array(
-      'name', 'group_id', 'is_sms') as $n) {
+               'name',
+               'group_id',
+               'is_sms'
+             ) as $n) {
       if (!empty($values[$n])) {
         $params[$n] = $values[$n];
       }
@@ -199,9 +202,9 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     $qf_Group_submit = $this->controller->exportValue($this->_name, '_qf_Group_submit');
     $this->set('name', $params['name']);
 
-    $inGroups    = $values['includeGroups'];
-    $outGroups   = $values['excludeGroups'];
-    $inMailings  = $values['includeMailings'];
+    $inGroups = $values['includeGroups'];
+    $outGroups = $values['excludeGroups'];
+    $inMailings = $values['includeMailings'];
     $outMailings = $values['excludeMailings'];
 
     if (is_array($inGroups)) {
@@ -235,10 +238,10 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
       }
     }
 
-    $session            = CRM_Core_Session::singleton();
-    $params['groups']   = $groups;
+    $session = CRM_Core_Session::singleton();
+    $params['groups'] = $groups;
     $params['mailings'] = $mailings;
-    $ids                = array();
+    $ids = array();
     if ($this->get('mailing_id')) {
 
       // don't create a new mass sms if already exists
@@ -249,9 +252,11 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
       // delete previous includes/excludes, if mailing already existed
       foreach (array(
-        'groups', 'mailings') as $entity) {
-        $mg               = new CRM_Mailing_DAO_MailingGroup();
-        $mg->mailing_id   = $ids['mailing_id'];
+                 'groups',
+                 'mailings'
+               ) as $entity) {
+        $mg = new CRM_Mailing_DAO_MailingGroup();
+        $mg->mailing_id = $ids['mailing_id'];
         $mg->entity_table = ($entity == 'groups') ? $groupTableName : $mailingTableName;
         $mg->find();
         while ($mg->fetch()) {

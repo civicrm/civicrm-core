@@ -51,8 +51,8 @@ class CRM_Utils_Mail_EmailProcessor {
    *                 fix this to return true on success / false on failure etc
    */
   public static function processBounces() {
-    $dao             = new CRM_Core_DAO_MailSettings;
-    $dao->domain_id  = CRM_Core_Config::domainID();
+    $dao = new CRM_Core_DAO_MailSettings;
+    $dao->domain_id = CRM_Core_Config::domainID();
     $dao->is_default = TRUE;
     $dao->find();
 
@@ -101,8 +101,8 @@ class CRM_Utils_Mail_EmailProcessor {
    * @return void
    */
   public static function processActivities() {
-    $dao             = new CRM_Core_DAO_MailSettings;
-    $dao->domain_id  = CRM_Core_Config::domainID();
+    $dao = new CRM_Core_DAO_MailSettings;
+    $dao->domain_id = CRM_Core_Config::domainID();
     $dao->is_default = FALSE;
     $dao->find();
     $found = FALSE;
@@ -146,19 +146,19 @@ class CRM_Utils_Mail_EmailProcessor {
     $emailActivityTypeId =
       (defined('EMAIL_ACTIVITY_TYPE_ID') && EMAIL_ACTIVITY_TYPE_ID) ? EMAIL_ACTIVITY_TYPE_ID : CRM_Core_OptionGroup::getValue(
         'activity_type',
-      'Inbound Email',
-      'name'
-    );
+        'Inbound Email',
+        'name'
+      );
 
     if (!$emailActivityTypeId) {
       CRM_Core_Error::fatal(ts('Could not find a valid Activity Type ID for Inbound Email'));
     }
 
-    $config            = CRM_Core_Config::singleton();
-    $verpSeperator     = preg_quote($config->verpSeparator);
+    $config = CRM_Core_Config::singleton();
+    $verpSeperator = preg_quote($config->verpSeparator);
     $twoDigitStringMin = $verpSeperator . '(\d+)' . $verpSeperator . '(\d+)';
-    $twoDigitString    = $twoDigitStringMin . $verpSeperator;
-    $threeDigitString  = $twoDigitString . '(\d+)' . $verpSeperator;
+    $twoDigitString = $twoDigitStringMin . $verpSeperator;
+    $threeDigitString = $twoDigitString . '(\d+)' . $verpSeperator;
 
     // FIXME: legacy regexen to handle CiviCRM 2.1 address patterns, with domain id and possible VERP part
     $commonRegex = '/^' . preg_quote($dao->localpart) . '(b|bounce|c|confirm|o|optOut|r|reply|re|e|resubscribe|u|unsubscribe)' . $threeDigitString . '([0-9a-f]{16})(-.*)?@' . preg_quote($dao->domain) . '$/';
@@ -177,7 +177,7 @@ class CRM_Utils_Mail_EmailProcessor {
     try {
       $store = CRM_Mailing_MailStore::getStore($dao->name);
     }
-    catch(Exception$e) {
+    catch (Exception$e) {
       $message = ts('Could not connect to MailStore for ') . $dao->username . '@' . $dao->server . '<p>';
       $message .= ts('Error message: ');
       $message .= '<pre>' . $e->getMessage() . '</pre><p>';

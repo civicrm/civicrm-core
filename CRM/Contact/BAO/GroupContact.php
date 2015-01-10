@@ -146,7 +146,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
 
     list($numContactsAdded,
       $numContactsNotAdded
-    ) = self::bulkAddContactsToGroup($contactIds,
+      ) = self::bulkAddContactsToGroup($contactIds,
       $groupId,
       $method,
       $status,

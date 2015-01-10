@@ -104,9 +104,9 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
    * @return void
    */
   public function preProcess() {
-    $context       = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
-    $this->_id     = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     if ($context == 'standalone') {
       $this->_action = CRM_Core_Action::ADD;
@@ -153,9 +153,9 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
   }
 
   public function setContext() {
-    $context   = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->_id = CRM_Utils_Request::retrieve('id', 'Integer', $this);
-    $session   = CRM_Core_Session::singleton();
+    $session = CRM_Core_Session::singleton();
 
     $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
     //validate the qfKey
@@ -201,8 +201,9 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
     $session->pushUserContext($url);
 
     if (CRM_Utils_Request::retrieve('confirmed', 'Boolean',
-        CRM_Core_DAO::$_nullObject
-      )) {
+      CRM_Core_DAO::$_nullObject
+    )
+    ) {
       CRM_Grant_BAO_Grant::del($this->_id);
       CRM_Utils_System::redirect($url);
     }

@@ -158,8 +158,8 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
     // submitted form values
     $this->_queryParams = &$queryParams;
 
-    $this->_single  = $single;
-    $this->_limit   = $limit;
+    $this->_single = $single;
+    $this->_limit = $limit;
     $this->_context = $context;
 
     $this->_memberClause = $memberClause;
@@ -435,7 +435,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
       //does membership have auto renew CRM-7137.
       $autoRenew = FALSE;
       if (isset($result->membership_recur_id) && $result->membership_recur_id &&
-          !CRM_Member_BAO_Membership::isSubscriptionCancelled($row['membership_id'])
+        !CRM_Member_BAO_Membership::isSubscriptionCancelled($row['membership_id'])
       ) {
         $autoRenew = TRUE;
       }
@@ -482,7 +482,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array(
-      'name' => ts('Member Since'),
+          'name' => ts('Member Since'),
           'sort' => 'join_date',
           'direction' => CRM_Utils_Sort::DESCENDING,
         ),

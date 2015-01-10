@@ -59,8 +59,8 @@ class CRM_Utils_Crypt {
     ) {
       $td = mcrypt_module_open(MCRYPT_RIJNDAEL_256, '', MCRYPT_MODE_ECB, '');
       // ECB mode - iv not needed - CRM-8198
-      $iv  = '00000000000000000000000000000000';
-      $ks  = mcrypt_enc_get_key_size($td);
+      $iv = '00000000000000000000000000000000';
+      $ks = mcrypt_enc_get_key_size($td);
       $key = substr(sha1(CIVICRM_SITE_KEY), 0, $ks);
 
       mcrypt_generic_init($td, $key, $iv);
@@ -98,8 +98,8 @@ class CRM_Utils_Crypt {
     ) {
       $td = mcrypt_module_open(MCRYPT_RIJNDAEL_256, '', MCRYPT_MODE_ECB, '');
       // ECB mode - iv not needed - CRM-8198
-      $iv  = '00000000000000000000000000000000';
-      $ks  = mcrypt_enc_get_key_size($td);
+      $iv = '00000000000000000000000000000000';
+      $ks = mcrypt_enc_get_key_size($td);
       $key = substr(sha1(CIVICRM_SITE_KEY), 0, $ks);
 
       mcrypt_generic_init($td, $key, $iv);

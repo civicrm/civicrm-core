@@ -125,8 +125,14 @@ class CRM_Utils_Pager extends Pager_Sliding {
      * page variable, but a different form element for one at the bottom
      *
      */
-    $this->_response['titleTop'] = ts('Page %1 of %2', array(1 => '<input size="2" maxlength="3" name="' . self::PAGE_ID . '" type="text" value="' . $this->_response['currentPage'] . '" />', 2 => $this->_response['numPages']));
-    $this->_response['titleBottom'] = ts('Page %1 of %2', array(1 => '<input size="2" maxlength="3" name="' . self::PAGE_ID_BOTTOM . '" type="text" value="' . $this->_response['currentPage'] . '" />', 2 => $this->_response['numPages']));
+    $this->_response['titleTop'] = ts('Page %1 of %2', array(
+        1 => '<input size="2" maxlength="3" name="' . self::PAGE_ID . '" type="text" value="' . $this->_response['currentPage'] . '" />',
+        2 => $this->_response['numPages']
+      ));
+    $this->_response['titleBottom'] = ts('Page %1 of %2', array(
+        1 => '<input size="2" maxlength="3" name="' . self::PAGE_ID_BOTTOM . '" type="text" value="' . $this->_response['currentPage'] . '" />',
+        2 => $this->_response['numPages']
+      ));
   }
 
   /**
@@ -281,7 +287,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
     }
     $href = $this->makeURL(self::PAGE_ID, 1);
     return $this->formatLink($href, str_replace('%d', 1, $this->_altFirst), $this->_firstPagePre . $this->_firstPageText . $this->_firstPagePost) .
-      $this->_spacesBefore . $this->_spacesAfter;
+    $this->_spacesBefore . $this->_spacesAfter;
   }
 
   /**
@@ -313,8 +319,8 @@ class CRM_Utils_Pager extends Pager_Sliding {
     if ($this->_currentPage < $this->_totalPages) {
       $href = $this->makeURL(self::PAGE_ID, $this->getNextPageID());
       return $this->_spacesAfter .
-        $this->formatLink($href, $this->_altNext, $this->_nextImg) .
-        $this->_spacesBefore . $this->_spacesAfter;
+      $this->formatLink($href, $this->_altNext, $this->_nextImg) .
+      $this->_spacesBefore . $this->_spacesAfter;
     }
     return '';
   }

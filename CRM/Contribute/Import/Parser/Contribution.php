@@ -273,16 +273,16 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     foreach ($params as $key => $val) {
       if ($val) {
         switch ($key) {
-        case 'receive_date':
-        case 'cancel_date':
-        case 'receipt_date':
-        case 'thankyou_date':
-          $params[$key] = CRM_Utils_Date::formatDate($params[$key], $dateType);
-          break;
+          case 'receive_date':
+          case 'cancel_date':
+          case 'receipt_date':
+          case 'thankyou_date':
+            $params[$key] = CRM_Utils_Date::formatDate($params[$key], $dateType);
+            break;
 
-        case 'pledge_payment':
-          $params[$key] = CRM_Utils_String::strtobool($val);
-          break;
+          case 'pledge_payment':
+            $params[$key] = CRM_Utils_String::strtobool($val);
+            break;
 
         }
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
@@ -501,7 +501,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
         // Using new Dedupe rule.
         $ruleParams = array(
           'contact_type' => $this->_contactType,
-          'used'         => 'Unsupervised',
+          'used' => 'Unsupervised',
         );
         $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
         $disp = NULL;

@@ -68,7 +68,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
         break;
 
       case CRM_Core_Action::UPDATE:
-        if (! CRM_Extension_System::singleton()->getBrowser()->isEnabled()) {
+        if (!CRM_Extension_System::singleton()->getBrowser()->isEnabled()) {
           CRM_Core_Error::fatal(ts('The system administrator has disabled this feature.'));
         }
         $info = CRM_Extension_System::singleton()->getBrowser()->getExtension($this->_key);
@@ -206,7 +206,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
         'version' => 3,
         'key' => $this->_key,
       ));
-      if (! CRM_Utils_Array::value('is_error', $result, FALSE)) {
+      if (!CRM_Utils_Array::value('is_error', $result, FALSE)) {
         CRM_Core_Session::setStatus("", ts('Extension Upgraded'), "success");
       }
       else {

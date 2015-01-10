@@ -15,7 +15,7 @@ class CRM_Core_Region {
    * @return CRM_Core_Region
    */
   public static function &instance($name, $autocreate = TRUE) {
-    if ($autocreate && ! isset(self::$_instances[$name])) {
+    if ($autocreate && !isset(self::$_instances[$name])) {
       self::$_instances[$name] = new CRM_Core_Region($name);
     }
     return self::$_instances[$name];
@@ -198,7 +198,7 @@ class CRM_Core_Region {
 
         case 'jquery':
           $snippet['script'] = sprintf("CRM.\$(function(\$) {\n%s\n});", $snippet['jquery']);
-          // no break - continue processing as script
+        // no break - continue processing as script
         case 'script':
           if (!$allowCmsOverride || !$cms->addScript($snippet['script'], $this->_name)) {
             $html .= sprintf("<script type=\"text/javascript\">\n%s\n</script>\n", $snippet['script']);
@@ -220,7 +220,7 @@ class CRM_Core_Region {
         default:
           require_once 'CRM/Core/Error.php';
           CRM_Core_Error::fatal(ts('Snippet type %1 is unrecognized',
-                     array(1 => $snippet['type'])));
+            array(1 => $snippet['type'])));
       }
     }
     return $html;
@@ -255,14 +255,14 @@ class CRM_Core_Region {
    * @param string $markup
    *   HTML.
    *
-  public function addMarkup($markup) {
-  return $this->add(array(
-  'type' => 'markup',
-  'markup' => $markup,
-  ));
-  }
-
-  /**
+   * public function addMarkup($markup) {
+   * return $this->add(array(
+   * 'type' => 'markup',
+   * 'markup' => $markup,
+   * ));
+   * }
+   *
+   * /**
    * Add a Smarty template file to a region
    *
    * Note: File is not evaluated until the page is rendered
@@ -270,26 +270,26 @@ class CRM_Core_Region {
    * @param string $template
    *   Path to the Smarty template file.
    *
-  public function addTemplate($template) {
-  return $this->add(array(
-  'type' => 'template',
-  'template' => $template,
-  ));
-  }
-
-  /**
+   * public function addTemplate($template) {
+   * return $this->add(array(
+   * 'type' => 'template',
+   * 'template' => $template,
+   * ));
+   * }
+   *
+   * /**
    * Use a callback function to extend a region
    *
    * @param mixed $callback
    * @param array $arguments
    *   Optional, array of parameters for callback; if omitted, the default arguments are ($snippetSpec, $html).
    *
-  public function addCallback($callback, $arguments = FALSE) {
-  return $this->add(array(
-  'type' => 'callback',
-  'callback' => $callback,
-  'arguments' => $arguments,
-  ));
-  }
-  */
+   * public function addCallback($callback, $arguments = FALSE) {
+   * return $this->add(array(
+   * 'type' => 'callback',
+   * 'callback' => $callback,
+   * 'arguments' => $arguments,
+   * ));
+   * }
+   */
 }

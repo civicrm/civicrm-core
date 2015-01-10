@@ -84,8 +84,8 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    */
   public function preProcess() {
     $this->_unscheduled = $this->_archived = $archiveLinks = FALSE;
-    $this->_mailingId   = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
-    $this->_sms         = CRM_Utils_Request::retrieve('sms', 'Positive', $this);
+    $this->_mailingId = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
+    $this->_sms = CRM_Utils_Request::retrieve('sms', 'Positive', $this);
     $this->assign('sms', $this->_sms);
     // check that the user has permission to access mailing id
     CRM_Mailing_BAO_Mailing::checkPermission($this->_mailingId);

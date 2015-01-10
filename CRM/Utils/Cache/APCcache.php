@@ -34,7 +34,7 @@
  */
 class CRM_Utils_Cache_APCcache {
   const DEFAULT_TIMEOUT = 3600;
-  const DEFAULT_PREFIX  = '';
+  const DEFAULT_PREFIX = '';
 
   /**
    * The default timeout to use

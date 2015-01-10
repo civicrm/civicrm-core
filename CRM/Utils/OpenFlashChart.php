@@ -46,9 +46,18 @@ class CRM_Utils_OpenFlashChart {
    * @static
    */
   private static $_colours = array(
-    "#C3CC38", "#C8B935", "#CEA632", "#D3932F",
-    "#D9802C", "#FA6900", "#DC9B57", "#F78F01",
-    "#5AB56E", "#6F8069", "#C92200", "#EB6C5C",
+    "#C3CC38",
+    "#C8B935",
+    "#CEA632",
+    "#D3932F",
+    "#D9802C",
+    "#FA6900",
+    "#DC9B57",
+    "#F78F01",
+    "#5AB56E",
+    "#6F8069",
+    "#C92200",
+    "#EB6C5C",
   );
 
   /**
@@ -127,7 +136,7 @@ class CRM_Utils_OpenFlashChart {
     $xLabels = new x_axis_labels();
     // set_labels function requires xValues array of string or x_axis_label
     // so type casting array values to string values
-    array_walk($xValues, function(&$value, $index) {
+    array_walk($xValues, function (&$value, $index) {
       $value = (string) $value;
     });
     $xLabels->set_labels($xValues);
@@ -468,7 +477,10 @@ class CRM_Utils_OpenFlashChart {
 
     // carry some chart params if pass.
     foreach (array(
-      'xSize', 'ySize', 'divName') as $f) {
+               'xSize',
+               'ySize',
+               'divName'
+             ) as $f) {
       if (!empty($rows[$f])) {
         $chartData[$f] = $rows[$f];
       }
@@ -505,7 +517,10 @@ class CRM_Utils_OpenFlashChart {
 
     // carry some chart params if pass.
     foreach (array(
-      'xSize', 'ySize', 'divName') as $f) {
+               'xSize',
+               'ySize',
+               'divName'
+             ) as $f) {
       if (!empty($rows[$f])) {
         $chartData[$f] = $rows[$f];
       }

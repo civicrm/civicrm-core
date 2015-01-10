@@ -65,7 +65,7 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
       CRM_Utils_System::permissionDenied();
     }
 
-    $this->_action   = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add', 'REQUEST');
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add', 'REQUEST');
     $this->_surveyId = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
 
     if ($this->_surveyId) {
@@ -130,9 +130,9 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
     }
     $buttons[] =
       array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-            );
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      );
     $this->addButtons($buttons);
 
     $url = CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey');
@@ -146,14 +146,14 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
       if ($tabTitle == 'Main') {
         $tabTitle = 'Main settings';
       }
-      $subPage   = strtolower($className);
+      $subPage = strtolower($className);
       CRM_Core_Session::setStatus(ts("'%1' have been saved.", array(1 => $tabTitle)), ts('Saved'), 'success');
 
       $this->postProcessHook();
 
       if ($this->_action & CRM_Core_Action::ADD)
         CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/survey/configure/questions",
-                                                         "action=update&reset=1&id={$this->_surveyId}"));
+          "action=update&reset=1&id={$this->_surveyId}"));
 
       if ($this->controller->getButtonName('submit') == "_qf_{$className}_upload_done") {
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey'));
@@ -161,11 +161,11 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
       elseif ($this->controller->getButtonName('submit') == "_qf_{$className}_upload_next") {
         $subPage = CRM_Campaign_Form_Survey_TabHeader::getNextTab($this);
         CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/survey/configure/{$subPage}",
-                                                         "action=update&reset=1&id={$this->_surveyId}"));
+          "action=update&reset=1&id={$this->_surveyId}"));
       }
       else {
         CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/survey/configure/{$subPage}",
-                                                         "action=update&reset=1&id={$this->_surveyId}"));
+          "action=update&reset=1&id={$this->_surveyId}"));
       }
     }
   }

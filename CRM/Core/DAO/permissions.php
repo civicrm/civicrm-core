@@ -30,12 +30,12 @@
  * Decide what permissions to check for an api call
  * The contact must have all of the returned permissions for the api call to be allowed
  *
- * @param $entity: (str) api entity
- * @param $action: (str) api action
- * @param $params: (array) api params
+ * @param $entity : (str) api entity
+ * @param $action : (str) api action
+ * @param $params : (array) api params
  *
  * @return array
-   *   of permissions to check for this entity-action combo
+ *   of permissions to check for this entity-action combo
  */
 function _civicrm_api3_permissions($entity, $action, &$params) {
   $entity = _civicrm_api_get_entity_name_from_camel($entity);

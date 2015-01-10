@@ -44,9 +44,9 @@
 class CRM_Profile_Form extends CRM_Core_Form {
   const
     MODE_REGISTER = 1,
-    MODE_SEARCH   = 2,
-    MODE_CREATE   = 4,
-    MODE_EDIT     = 8;
+    MODE_SEARCH = 2,
+    MODE_CREATE = 4,
+    MODE_EDIT = 8;
 
   protected $_mode;
 
@@ -174,7 +174,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_customGroupId = NULL;
 
   protected $_currentUserID = NULL;
-  protected $_session       = NULL;
+  protected $_session = NULL;
 
   /**
    * Pre processing work done here.
@@ -186,10 +186,10 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
-    $this->_id         = $this->get('id');
+    $this->_id = $this->get('id');
     $this->_profileIds = $this->get('profileIds');
-    $this->_grid       = CRM_Utils_Request::retrieve('grid', 'Integer', $this);
-    $this->_context    = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_grid = CRM_Utils_Request::retrieve('grid', 'Integer', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
     //unset from session when $_GET doesn't have it
     //except when the form is submitted
@@ -214,7 +214,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
 
       if ($this->_multiRecord &&
-          !in_array($this->_multiRecord, array(CRM_Core_Action::UPDATE, CRM_Core_Action::ADD, CRM_Core_Action::DELETE))) {
+        !in_array($this->_multiRecord, array(CRM_Core_Action::UPDATE, CRM_Core_Action::ADD, CRM_Core_Action::DELETE))
+      ) {
         CRM_Core_Error::fatal(ts('Proper action not specified for this custom value record profile'));
       }
     }
@@ -315,7 +316,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
           }
           //record id is neccessary for _multiRecord view and update/edit action
           if (!$this->_recordId
-              && ($this->_multiRecord == CRM_Core_Action::UPDATE || $this->_multiRecord == CRM_Core_Action::DELETE)) {
+            && ($this->_multiRecord == CRM_Core_Action::UPDATE || $this->_multiRecord == CRM_Core_Action::DELETE)
+          ) {
             CRM_Core_Error::fatal(ts('The requested Profile (gid=%1) requires record id while performing this action',
               array(1 => $this->_gid)
             ));
@@ -357,7 +359,11 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
         }
         elseif (!empty($this->_multiRecordFields)
-           && (!$this->_multiRecord || !in_array($this->_multiRecord, array(CRM_Core_Action::DELETE, CRM_Core_Action::UPDATE)))) {
+          && (!$this->_multiRecord || !in_array($this->_multiRecord, array(
+                CRM_Core_Action::DELETE,
+                CRM_Core_Action::UPDATE
+              )))
+        ) {
           CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header');
           //multirecord listing page
           $multiRecordFieldListing = TRUE;
@@ -486,8 +492,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
           if ($htmlType == 'File') {
             $entityId = $this->_id;
             if (CRM_Utils_Array::value('field_type', $field) == 'Activity' &&
-                $this->_activityId
-                ) {
+              $this->_activityId
+            ) {
               $entityId = $this->_activityId;
             }
             $url = CRM_Core_BAO_CustomField::getFileURL($entityId, $key);
@@ -496,10 +502,10 @@ class CRM_Profile_Form extends CRM_Core_Form {
               $customFiles[$name]['displayURL'] = ts("Attached File") . ": {$url['file_url']}";
 
               $deleteExtra = ts("Are you sure you want to delete attached file?");
-              $fileId      = $url['file_id'];
-              $deleteURL   = CRM_Utils_System::url('civicrm/file',
-                             "reset=1&id={$fileId}&eid=$entityId&fid={$key}&action=delete"
-                           );
+              $fileId = $url['file_id'];
+              $deleteURL = CRM_Utils_System::url('civicrm/file',
+                "reset=1&id={$fileId}&eid=$entityId&fid={$key}&action=delete"
+              );
               $text = ts("Delete Attached File");
               $customFiles[$field['name']]['deleteURL'] = "<a href=\"{$deleteURL}\" onclick = \"if (confirm( ' $deleteExtra ' )) this.href+='&amp;confirmed=1'; else return false;\">$text</a>";
 
@@ -515,8 +521,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
           $htmlType = $field['html_type'];
           if ((!isset($this->_defaults[$name]) || $htmlType == 'File') &&
-              (CRM_Utils_Array::value('field_type', $field) != 'Activity')
-              ) {
+            (CRM_Utils_Array::value('field_type', $field) != 'Activity')
+          ) {
             CRM_Core_BAO_CustomField::setProfileDefaults($customFieldID,
               $name,
               $this->_defaults,
@@ -536,9 +542,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
               $customFiles[$field['name']]['displayURL'] = ts("Attached File") . ": {$url['file_url']}";
 
               $deleteExtra = ts("Are you sure you want to delete attached file?");
-              $fileId      = $url['file_id'];
-              $deleteURL   = CRM_Utils_System::url('civicrm/file',
-                 "reset=1&id={$fileId}&eid=$entityId&fid={$customFieldID}&action=delete"
+              $fileId = $url['file_id'];
+              $deleteURL = CRM_Utils_System::url('civicrm/file',
+                "reset=1&id={$fileId}&eid=$entityId&fid={$customFieldID}&action=delete"
               );
               $text = ts("Delete Attached File");
               $customFiles[$field['name']]['deleteURL'] = "<a href=\"{$deleteURL}\" onclick = \"if (confirm( ' $deleteExtra ' )) this.href+='&amp;confirmed=1'; else return false;\">$text</a>";
@@ -643,7 +649,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
       if ($this->_id) {
         $contactTypes = CRM_Contact_BAO_Contact::getContactTypes($this->_id);
-        $contactType  = $contactTypes[0];
+        $contactType = $contactTypes[0];
 
         array_shift($contactTypes);
         $contactSubtypes = $contactTypes;
@@ -669,10 +675,10 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
 
       if (
-        in_array(
-          $profileType,
-          array("Membership", "Participant", "Contribution")
-        )
+      in_array(
+        $profileType,
+        array("Membership", "Participant", "Contribution")
+      )
       ) {
         $return = TRUE;
         if (!$statusMessage) {
@@ -723,7 +729,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     if (!$this->_currentUserID) {
       $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
       $primaryLocationType = $defaultLocationType->id;
-      $anonUser            = TRUE;
+      $anonUser = TRUE;
     }
     $this->assign('anonUser', $anonUser);
 
@@ -957,12 +963,21 @@ class CRM_Profile_Form extends CRM_Core_Form {
             $contactLinks = CRM_Contact_BAO_Contact_Utils::formatContactIDSToLinks($ids, TRUE, TRUE);
 
             $duplicateContactsLinks = '<div class="matching-contacts-found">';
-            $duplicateContactsLinks .= ts('One matching contact was found. ', array('count' => count($contactLinks['rows']), 'plural' => '%count matching contacts were found.<br />'));
+            $duplicateContactsLinks .= ts('One matching contact was found. ', array(
+                'count' => count($contactLinks['rows']),
+                'plural' => '%count matching contacts were found.<br />'
+              ));
             if ($contactLinks['msg'] == 'view') {
-              $duplicateContactsLinks .= ts('You can View the existing contact.', array('count' => count($contactLinks['rows']), 'plural' => 'You can View the existing contacts.'));
+              $duplicateContactsLinks .= ts('You can View the existing contact.', array(
+                  'count' => count($contactLinks['rows']),
+                  'plural' => 'You can View the existing contacts.'
+                ));
             }
             else {
-              $duplicateContactsLinks .= ts('You can View or Edit the existing contact.', array('count' => count($contactLinks['rows']), 'plural' => 'You can View or Edit the existing contacts.'));
+              $duplicateContactsLinks .= ts('You can View or Edit the existing contact.', array(
+                  'count' => count($contactLinks['rows']),
+                  'plural' => 'You can View or Edit the existing contacts.'
+                ));
             }
             $duplicateContactsLinks .= '</div>';
             $duplicateContactsLinks .= '<table class="matching-contacts-actions">';
@@ -1013,8 +1028,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
           if ($stateProvinceDAO->country_id != $countryId) {
             // country mismatch hence display error
             $stateProvinces = CRM_Core_PseudoConstant::stateProvince();
-            $countries      = CRM_Core_PseudoConstant::country();
-            $errors[$key]   = "State/Province " . $stateProvinces[$stateProvinceId] . " is not part of " . $countries[$countryId] . ". It belongs to " . $countries[$stateProvinceDAO->country_id] . ".";
+            $countries = CRM_Core_PseudoConstant::country();
+            $errors[$key] = "State/Province " . $stateProvinces[$stateProvinceId] . " is not part of " . $countries[$countryId] . ". It belongs to " . $countries[$stateProvinceDAO->country_id] . ".";
           }
         }
       }
@@ -1032,8 +1047,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
           if ($countyDAO->state_province_id != $stateProvinceId) {
             // state province mismatch hence display error
             $stateProvinces = CRM_Core_PseudoConstant::stateProvince();
-            $counties       = CRM_Core_PseudoConstant::county();
-            $errors[$key]   = "County " . $counties[$countyId] . " is not part of " . $stateProvinces[$stateProvinceId] . ". It belongs to " . $stateProvinces[$countyDAO->state_province_id] . ".";
+            $counties = CRM_Core_PseudoConstant::county();
+            $errors[$key] = "County " . $counties[$countyId] . " is not part of " . $stateProvinces[$stateProvinceId] . ". It belongs to " . $stateProvinces[$countyDAO->state_province_id] . ".";
           }
         }
       }
@@ -1071,9 +1086,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
           if ($tableName = CRM_Utils_Array::value('table_name', $returnValues)) {
             $sql = "DELETE FROM {$tableName} WHERE id = %1 AND entity_id = %2";
             $sqlParams = array(
-                          1 => array($this->_recordId, 'Integer'),
-                          2 => array($this->_id, 'Integer'),
-                         );
+              1 => array($this->_recordId, 'Integer'),
+              2 => array($this->_id, 'Integer'),
+            );
             CRM_Core_DAO::executeQuery($sql, $sqlParams);
             CRM_Core_Session::setStatus(ts('Your record has been deleted.'), ts('Deleted'), 'success');
           }
@@ -1100,8 +1115,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
       $details = $contactDetails[0][$this->_id];
     }
     if (!(!empty($details['addressee_id']) || !empty($details['email_greeting_id']) ||
-        CRM_Utils_Array::value('postal_greeting_id', $details)
-      )) {
+      CRM_Utils_Array::value('postal_greeting_id', $details)
+    )
+    ) {
 
       $profileType = CRM_Core_BAO_UFField::getProfileType($this->_gid);
       //Though Profile type is contact we need
@@ -1305,8 +1321,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
         CRM_Core_Error::debug_log_message("Rolling back transaction as CMSUser Create failed in Profile_Form for contact " . $params['contactID']);
         $transaction->rollback();
         return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/profile/create',
-            'reset=1&gid=' . $this->_gid
-          ));
+          'reset=1&gid=' . $this->_gid
+        ));
       }
     }
 

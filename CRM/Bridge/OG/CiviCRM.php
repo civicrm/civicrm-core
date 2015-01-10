@@ -61,9 +61,9 @@ class CRM_Bridge_OG_CiviCRM {
     }
 
     global $user;
-    $node->uid    = $user->uid;
-    $node->title  = $group->title;
-    $node->type   = 'og';
+    $node->uid = $user->uid;
+    $node->title = $group->title;
+    $node->type = 'og';
     $node->status = 1;
 
     // set the og values

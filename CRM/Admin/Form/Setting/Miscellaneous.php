@@ -60,7 +60,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
    */
 
   public function preProcess() {
-    $config     = CRM_Core_Config::singleton();
+    $config = CRM_Core_Config::singleton();
     $this->_uploadMaxSize = (int) ini_get('upload_max_filesize');
     // check for post max size
     CRM_Core_Config_Defaults::formatUnitSize(ini_get('post_max_size'), TRUE);

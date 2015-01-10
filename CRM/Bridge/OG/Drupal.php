@@ -75,9 +75,9 @@ class CRM_Bridge_OG_Drupal {
    * @param null $groupType
    */
   public static function updateCiviGroup(&$params, $op, $groupType = NULL) {
-    $abort             = FALSE;
+    $abort = FALSE;
     $params['version'] = 3;
-    $params['id']      = CRM_Bridge_OG_Utils::groupID($params['source'], $params['title'], $abort);
+    $params['id'] = CRM_Bridge_OG_Utils::groupID($params['source'], $params['title'], $abort);
 
     if ($op == 'add') {
       if ($groupType) {
@@ -156,7 +156,7 @@ SELECT v.id
    AND v.description     = %2
 ";
     $queryParams = array(
-    1 => array($optionGroupID, 'Integer'),
+      1 => array($optionGroupID, 'Integer'),
       2 => array($params['source'], 'String'),
     );
     $dao->id = CRM_Core_DAO::singleValueQuery($query, $queryParams);
@@ -204,8 +204,8 @@ SELECT v.id
     $dao->find(TRUE);
 
     $dao->entity_table = 'civicrm_acl_role';
-    $dao->entity_id    = $params['acl_role_id'];
-    $dao->operation    = 'Edit';
+    $dao->entity_id = $params['acl_role_id'];
+    $dao->operation = 'Edit';
 
     $dao->is_active = TRUE;
     $dao->save();

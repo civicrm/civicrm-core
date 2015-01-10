@@ -173,9 +173,9 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     // submitted form values
     $this->_queryParams = &$queryParams;
 
-    $this->_single      = $single;
-    $this->_limit       = $limit;
-    $this->_context     = $context;
+    $this->_single = $single;
+    $this->_limit = $limit;
+    $this->_context = $context;
     $this->_compContext = $compContext;
 
     $this->_eventClause = $eventClause;
@@ -329,10 +329,10 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     }
     $mask = CRM_Core_Action::mask($permissions);
 
-    $statusTypes      = CRM_Event_PseudoConstant::participantStatus();
-    $statusClasses    = CRM_Event_PseudoConstant::participantStatusClass();
+    $statusTypes = CRM_Event_PseudoConstant::participantStatus();
+    $statusClasses = CRM_Event_PseudoConstant::participantStatusClass();
     $participantRoles = CRM_Event_PseudoConstant::participantRole();
-    $sep              = CRM_Core_DAO::VALUE_SEPARATOR;
+    $sep = CRM_Core_DAO::VALUE_SEPARATOR;
 
     //get all campaigns.
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
@@ -454,7 +454,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     if (!isset(self::$_columnHeaders)) {
       self::$_columnHeaders = array(
         array(
-      'name' => ts('Event'),
+          'name' => ts('Event'),
           'sort' => 'event_title',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),

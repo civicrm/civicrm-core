@@ -86,10 +86,10 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
         $mulValues = explode(',', $value);
         foreach ($mulValues as $key => $state) {
           $valid = array_key_exists(strtolower(trim($state)),
-            array_change_key_case(array_flip(CRM_Core_PseudoConstant::stateProvinceAbbreviation()), CASE_LOWER)
-          ) || array_key_exists(strtolower(trim($state)),
-            array_change_key_case(array_flip(CRM_Core_PseudoConstant::stateProvince()), CASE_LOWER)
-          );
+              array_change_key_case(array_flip(CRM_Core_PseudoConstant::stateProvinceAbbreviation()), CASE_LOWER)
+            ) || array_key_exists(strtolower(trim($state)),
+              array_change_key_case(array_flip(CRM_Core_PseudoConstant::stateProvince()), CASE_LOWER)
+            );
           if (!$valid) {
             break;
           }
@@ -103,10 +103,10 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
         $mulValues = explode(',', $value);
         foreach ($mulValues as $key => $country) {
           $valid = array_key_exists(strtolower(trim($country)),
-            array_change_key_case(array_flip(CRM_Core_PseudoConstant::countryIsoCode()), CASE_LOWER)
-          ) || array_key_exists(strtolower(trim($country)),
-            array_change_key_case(array_flip(CRM_Core_PseudoConstant::country()), CASE_LOWER)
-          );
+              array_change_key_case(array_flip(CRM_Core_PseudoConstant::countryIsoCode()), CASE_LOWER)
+            ) || array_key_exists(strtolower(trim($country)),
+              array_change_key_case(array_flip(CRM_Core_PseudoConstant::country()), CASE_LOWER)
+            );
           if (!$valid) {
             break;
           }

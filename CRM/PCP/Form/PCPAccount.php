@@ -63,12 +63,12 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
 
   public function preProcess() {
-    $session          = CRM_Core_Session::singleton();
-    $config           = CRM_Core_Config::singleton();
-    $this->_action    = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
-    $this->_pageId    = CRM_Utils_Request::retrieve('pageId', 'Positive', $this);
+    $session = CRM_Core_Session::singleton();
+    $config = CRM_Core_Config::singleton();
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
+    $this->_pageId = CRM_Utils_Request::retrieve('pageId', 'Positive', $this);
     $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this);
-    $this->_id        = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     if (!$this->_pageId && $config->userFramework == 'Joomla' && $config->userFrameworkFrontend) {
       $this->_pageId = $this->_id;
@@ -195,7 +195,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     if ($this->_single) {
       $button = array(
         array(
-      'type' => 'next',
+          'type' => 'next',
           'name' => ts('Save'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,

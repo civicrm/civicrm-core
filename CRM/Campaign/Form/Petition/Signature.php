@@ -59,7 +59,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   /**
    * The contact type
    *
-     * @var string ("Individual"/"Household"/"Organization"). Never been tested for something else than Individual
+   * @var string ("Individual"/"Household"/"Organization"). Never been tested for something else than Individual
    */
   protected $_ctype = 'Individual';
 
@@ -400,9 +400,9 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
       $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $params['contact_type']);
     }
 
-        $petition_params['id'] = $this->_surveyId;
-        $petition = array();
-        CRM_Campaign_BAO_Survey::retrieve($petition_params, $petition);
+    $petition_params['id'] = $this->_surveyId;
+    $petition = array();
+    CRM_Campaign_BAO_Survey::retrieve($petition_params, $petition);
 
     switch (count($ids)) {
       case 0:
@@ -417,10 +417,10 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
           $params['statusId'] = 2;
         }
         else {
-        $this->_sendEmailMode = self::EMAIL_CONFIRM;
+          $this->_sendEmailMode = self::EMAIL_CONFIRM;
 
-        // Set status for signature activity to scheduled until email is verified
-        $params['statusId'] = 1;
+          // Set status for signature activity to scheduled until email is verified
+          $params['statusId'] = 1;
         }
         break;
 
@@ -440,9 +440,9 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
 
         // dedupe matched single contact, check for 'unconfirmed' tag
         if ($tag_name) {
-          $tag            = new CRM_Core_DAO_EntityTag();
+          $tag = new CRM_Core_DAO_EntityTag();
           $tag->entity_id = $this->_contactId;
-          $tag->tag_id    = $this->_tagId;
+          $tag->tag_id = $this->_tagId;
 
           if (!($tag->find())) {
             // send thank you email directly, the user is known and validated
@@ -476,9 +476,9 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
         }
 
         if ($tag_name) {
-          $tag            = new CRM_Core_DAO_EntityTag();
+          $tag = new CRM_Core_DAO_EntityTag();
           $tag->entity_id = $this->_contactId;
-          $tag->tag_id    = $this->_tagId;
+          $tag->tag_id = $this->_tagId;
 
           if (!($tag->find())) {
             // send thank you email
@@ -495,7 +495,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
         }
         break;
     }
-
 
 
     $transaction = new CRM_Core_Transaction();
@@ -658,7 +657,8 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     if (isset($this->thankyou)) {
       return ('CRM/Campaign/Page/Petition/ThankYou.tpl');
     }
-    else {}
+    else {
+    }
     return parent::getTemplateFileName();
   }
 

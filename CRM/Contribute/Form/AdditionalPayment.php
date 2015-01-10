@@ -184,7 +184,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if (empty($defaults['trxn_date']) && empty($defaults['trxn_date_time'])) {
       list($defaults['trxn_date'],
         $defaults['trxn_date_time']
-      ) = CRM_Utils_Date::setDateDefaults(
+        ) = CRM_Utils_Date::setDateDefaults(
         CRM_Utils_Array::value('register_date', $defaults), 'activityDateTime'
       );
     }
@@ -401,8 +401,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
       $session = CRM_Core_Session::singleton();
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
-          "reset=1&cid={$this->_contactId}&selectedChild=participant"
-        ));
+        "reset=1&cid={$this->_contactId}&selectedChild=participant"
+      ));
     }
   }
 
@@ -430,7 +430,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     //get the payment processor id as per mode.
     //@todo unclear relevance of mode - seems like a lot of duplicated params here!
     $this->_params['payment_processor'] = $params['payment_processor_id'] =
-    $this->_params['payment_processor_id'] = $submittedValues['payment_processor_id'] = $this->_paymentProcessor['id'];
+      $this->_params['payment_processor_id'] = $submittedValues['payment_processor_id'] = $this->_paymentProcessor['id'];
 
     $now = date('YmdHis');
     $fields = array();
@@ -439,7 +439,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if ($this->_context == 'standalone' && !empty($submittedValues['is_email_receipt'])) {
       list($this->userDisplayName,
         $this->userEmail
-      ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
+        ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
       $this->assign('displayName', $this->userDisplayName);
     }
 
@@ -621,8 +621,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
       CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
-          "reset=1&cid={$this->_contactId}&selectedChild=participant"
-        ));
+        "reset=1&cid={$this->_contactId}&selectedChild=participant"
+      ));
     }
   }
 

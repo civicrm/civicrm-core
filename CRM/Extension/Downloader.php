@@ -87,7 +87,7 @@ class CRM_Extension_Downloader {
       );
     }
 
-    if (empty($errors) && ! CRM_Utils_HttpClient::singleton()->isRedirectSupported()) {
+    if (empty($errors) && !CRM_Utils_HttpClient::singleton()->isRedirectSupported()) {
       CRM_Core_Session::setStatus(ts('WARNING: The downloader may be unable to download files which require HTTP redirection. This may be a configuration issue with PHP\'s open_basedir or safe_mode.'));
       CRM_Core_Error::debug_log_message('WARNING: The downloader may be unable to download files which require HTTP redirection. This may be a configuration issue with PHP\'s open_basedir or safe_mode.');
     }
@@ -114,16 +114,16 @@ class CRM_Extension_Downloader {
       CRM_Core_Error::fatal('Cannot install this extension - downloadUrl is not set!');
     }
 
-    if (! $this->fetch($downloadUrl, $filename)) {
+    if (!$this->fetch($downloadUrl, $filename)) {
       return FALSE;
     }
 
     $extractedZipPath = $this->extractFiles($key, $filename);
-    if (! $extractedZipPath) {
+    if (!$extractedZipPath) {
       return FALSE;
     }
 
-    if (! $this->validateFiles($key, $extractedZipPath)) {
+    if (!$this->validateFiles($key, $extractedZipPath)) {
       return FALSE;
     }
 

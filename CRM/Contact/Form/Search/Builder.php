@@ -160,7 +160,8 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
         $v[2] = self::checkArrayKeyEmpty($v[2]);
 
         if (in_array($v[1], array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY')) &&
-          !empty($v[2])) {
+          !empty($v[2])
+        ) {
           $errorMsg["value[$v[3]][$v[4]]"] = ts('Please clear your value if you want to use %1 operator.', array(1 => $v[1]));
         }
         elseif (($v[0] == 'group' || $v[0] == 'tag') && !empty($v[2])) {
@@ -212,7 +213,9 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
             // hack to handle custom data of type state and country
             if (in_array($type, array(
-              'Country', 'StateProvince'))) {
+              'Country',
+              'StateProvince'
+            ))) {
               $type = "Integer";
             }
           }
@@ -229,7 +232,8 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
             $type = CRM_Utils_Type::typeToString($fldType);
             // Check Empty values for Integer Or Boolean Or Date type For operators other than IS NULL and IS NOT NULL.
             if (!in_array($v[1],
-                array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
+              array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))
+            ) {
               if ((($type == 'Int' || $type == 'Boolean') && !is_array($v[2]) && !trim($v[2])) && $v[2] != '0') {
                 $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter a value.");
               }
@@ -339,7 +343,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       $addMore = CRM_Utils_Array::value('addMore', $params);
       for ($x = 1; $x <= $this->_blockCount; $x++) {
         if (!empty($addMore[$x])) {
-          $this->set('newBlock',  $x);
+          $this->set('newBlock', $x);
           $this->_columnCount[$x] = $this->_columnCount[$x] + 5;
           $this->set('columnCount', $this->_columnCount);
           $this->set('showSearchForm', TRUE);
@@ -438,7 +442,17 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       'member_is_pay_later' => 'yesno',
       'is_override' => 'yesno',
     );
-    $entities = array('contact', 'address', 'activity', 'participant', 'pledge', 'member', 'contribution', 'case', 'grant');
+    $entities = array(
+      'contact',
+      'address',
+      'activity',
+      'participant',
+      'pledge',
+      'member',
+      'contribution',
+      'case',
+      'grant'
+    );
     CRM_Contact_BAO_Query_Hook::singleton()->alterSearchBuilderOptions($entities, $options);
     foreach ($entities as $entity) {
       $fields = civicrm_api3($entity, 'getfields');
@@ -453,7 +467,11 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
         elseif (!empty($info['data_type']) && in_array($info['data_type'], array('StateProvince', 'Country'))) {
           $options[$field] = $entity;
         }
-        elseif (in_array(substr($field, 0, 3), array('is_', 'do_')) || CRM_Utils_Array::value('data_type', $info) == 'Boolean') {
+        elseif (in_array(substr($field, 0, 3), array(
+              'is_',
+              'do_'
+            )) || CRM_Utils_Array::value('data_type', $info) == 'Boolean'
+        ) {
           $options[$field] = 'yesno';
           if ($entity != 'contact') {
             $options[$entity . '_' . $field] = 'yesno';

@@ -46,7 +46,7 @@ class CRM_Utils_Check_Case {
 
   /**
    * @param CRM_Case_XMLRepository $xmlRepo
-   * @param array<string> $caseTypeNames
+   * @param array <string> $caseTypeNames
    */
   public function __construct($xmlRepo, $caseTypeNames) {
     $this->caseTypeNames = $caseTypeNames;

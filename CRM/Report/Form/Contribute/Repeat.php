@@ -500,9 +500,9 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
           if (!$found) {
             $erorrGrps = implode(',', $invlidGroups);
             $tempErrors[] = ts("Do not select field %1 with Group by %2.", array(
-                1 => $idMapping[$fld_id],
-                2 => $erorrGrps,
-              ));
+              1 => $idMapping[$fld_id],
+              2 => $erorrGrps,
+            ));
           }
         }
       }

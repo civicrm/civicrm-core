@@ -51,9 +51,9 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
   public function run() {
     $this->preProcess();
 
-    $params   = array();
+    $params = array();
     $defaults = array();
-    $ids      = array();
+    $ids = array();
 
     $params['id'] = $params['contact_id'] = $this->_contactId;
     $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults, $ids);
@@ -111,9 +111,9 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
         if (!empty($location['supplemental_address_2'])) {
           $extend .= ', ' . $location['supplemental_address_2'];
         }
-        $street   = CRM_Utils_Array::value('street_address', $location);
+        $street = CRM_Utils_Array::value('street_address', $location);
         $locality = CRM_Utils_Array::value('city', $location);
-        $region   = NULL;
+        $region = NULL;
         if (!empty($location['state_province_id'])) {
           $region = $stateProvices[CRM_Utils_Array::value('state_province_id', $location)];
         }

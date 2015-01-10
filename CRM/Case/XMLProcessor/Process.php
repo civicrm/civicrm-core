@@ -45,8 +45,8 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     if ($xml === FALSE) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/setup");
       CRM_Core_Error::fatal(ts("Configuration file could not be retrieved for case type = '%1' %2.",
-          array(1 => $caseType, 2 => $docLink)
-        ));
+        array(1 => $caseType, 2 => $docLink)
+      ));
       return FALSE;
     }
 
@@ -70,8 +70,8 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     if ($xml === FALSE) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/setup");
       CRM_Core_Error::fatal(ts("Unable to load configuration file for the referenced case type: '%1' %2.",
-          array(1 => $caseType, 2 => $docLink)
-        ));
+        array(1 => $caseType, 2 => $docLink)
+      ));
       return FALSE;
     }
 
@@ -95,7 +95,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    */
   public function process($xml, &$params) {
     $standardTimeline = CRM_Utils_Array::value('standardTimeline', $params);
-    $activitySetName  = CRM_Utils_Array::value('activitySetName', $params);
+    $activitySetName = CRM_Utils_Array::value('activitySetName', $params);
     $activityTypeName = CRM_Utils_Array::value('activityTypeName', $params);
 
     if ('Open Case' == CRM_Utils_Array::value('activityTypeName', $params)) {
@@ -104,8 +104,9 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
         foreach ($caseRoleXML->RelationshipType as $relationshipTypeXML) {
           if ((int ) $relationshipTypeXML->creator == 1) {
             if (!$this->createRelationships((string ) $relationshipTypeXML->name,
-                $params
-              )) {
+              $params
+            )
+            ) {
               CRM_Core_Error::fatal();
               return FALSE;
             }
@@ -146,7 +147,8 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    */
   public function processStandardTimeline($activitySetXML, &$params) {
     if ('Change Case Type' == CRM_Utils_Array::value('activityTypeName', $params)
-      && CRM_Utils_Array::value('resetTimeline', $params, TRUE)) {
+      && CRM_Utils_Array::value('resetTimeline', $params, TRUE)
+    ) {
       // delete all existing activities which are non-empty
       $this->deleteEmptyActivity($params);
     }
@@ -216,8 +218,8 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     if ($relationshipTypeID === FALSE) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/setup");
       CRM_Core_Error::fatal(ts('Relationship type %1, found in case configuration file, is not present in the database %2',
-          array(1 => $relationshipTypeName, 2 => $docLink)
-        ));
+        array(1 => $relationshipTypeName, 2 => $docLink)
+      ));
       return FALSE;
     }
 
@@ -273,7 +275,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     foreach ($activityTypesXML as $activityTypeXML) {
       foreach ($activityTypeXML as $recordXML) {
         $activityTypeName = (string ) $recordXML->name;
-        $maxInstances     = (string ) $recordXML->max_instances;
+        $maxInstances = (string ) $recordXML->max_instances;
         $activityTypeInfo = CRM_Utils_Array::value($activityTypeName, $activityTypes);
 
         if ($activityTypeInfo['id']) {
@@ -390,7 +392,7 @@ AND        a.is_deleted = 0
 ";
 
     $sqlParams = array(
-    1 => array($params['activityTypeID'], 'Integer'),
+      1 => array($params['activityTypeID'], 'Integer'),
       2 => array($params['caseID'], 'Integer'),
     );
     $count = CRM_Core_DAO::singleValueQuery($query, $sqlParams);
@@ -412,14 +414,14 @@ AND        a.is_deleted = 0
    */
   public function createActivity($activityTypeXML, &$params) {
     $activityTypeName = (string) $activityTypeXML->name;
-    $activityTypes    = &$this->allActivityTypes(TRUE, TRUE);
+    $activityTypes = &$this->allActivityTypes(TRUE, TRUE);
     $activityTypeInfo = CRM_Utils_Array::value($activityTypeName, $activityTypes);
 
     if (!$activityTypeInfo) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/setup");
       CRM_Core_Error::fatal(ts('Activity type %1, found in case configuration file, is not present in the database %2',
-          array(1 => $activityTypeName, 2 => $docLink)
-        ));
+        array(1 => $activityTypeName, 2 => $docLink)
+      ));
       return FALSE;
     }
 

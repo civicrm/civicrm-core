@@ -53,7 +53,9 @@ class CRM_Contact_Form_Task_Result extends CRM_Contact_Form_Task {
 
     $context = $this->get('context');
     if (in_array($context, array(
-      'smog', 'amtg'))) {
+      'smog',
+      'amtg'
+    ))) {
       $urlParams = 'reset=1&force=1&context=smog&gid=';
       $urlParams .= ($context == 'smog') ? $this->get('gid') : $this->get('amtgID');
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/group/search', $urlParams));

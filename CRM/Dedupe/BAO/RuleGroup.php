@@ -80,8 +80,13 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
       );
       // the table names we support in dedupe rules - a filter for importableFields()
       $supportedTables = array(
-        'civicrm_address', 'civicrm_contact', 'civicrm_email',
-        'civicrm_im', 'civicrm_note', 'civicrm_openid', 'civicrm_phone',
+        'civicrm_address',
+        'civicrm_contact',
+        'civicrm_email',
+        'civicrm_im',
+        'civicrm_note',
+        'civicrm_openid',
+        'civicrm_phone',
       );
 
       foreach (array('Individual', 'Organization', 'Household') as $ctype) {
@@ -137,7 +142,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
       CRM_Utils_File::isIncludable("CRM/Dedupe/BAO/QueryBuilder/{$this->name}.php")
     ) {
       include_once "CRM/Dedupe/BAO/QueryBuilder/{$this->name}.php";
-      $class   = "CRM_Dedupe_BAO_QueryBuilder_{$this->name}";
+      $class = "CRM_Dedupe_BAO_QueryBuilder_{$this->name}";
       $command = empty($this->params) ? 'internal' : 'record';
       $queries = call_user_func(array($class, $command), $this);
     }
@@ -182,15 +187,15 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
 
     if ($this->params && !$this->noRules) {
       $tempTableQuery = "CREATE TEMPORARY TABLE dedupe (id1 int, weight int, UNIQUE UI_id1 (id1)) ENGINE=MyISAM";
-      $insertClause   = "INSERT INTO dedupe (id1, weight)";
-      $groupByClause  = "GROUP BY id1";
-      $dupeCopyJoin   = " JOIN dedupe_copy ON dedupe_copy.id1 = t1.column WHERE ";
+      $insertClause = "INSERT INTO dedupe (id1, weight)";
+      $groupByClause = "GROUP BY id1";
+      $dupeCopyJoin = " JOIN dedupe_copy ON dedupe_copy.id1 = t1.column WHERE ";
     }
     else {
       $tempTableQuery = "CREATE TEMPORARY TABLE dedupe (id1 int, id2 int, weight int, UNIQUE UI_id1_id2 (id1, id2)) ENGINE=MyISAM";
-      $insertClause   = "INSERT INTO dedupe (id1, id2, weight)";
-      $groupByClause  = "GROUP BY id1, id2";
-      $dupeCopyJoin   = " JOIN dedupe_copy ON dedupe_copy.id1 = t1.column AND dedupe_copy.id2 = t2.column WHERE ";
+      $insertClause = "INSERT INTO dedupe (id1, id2, weight)";
+      $groupByClause = "GROUP BY id1, id2";
+      $dupeCopyJoin = " JOIN dedupe_copy ON dedupe_copy.id1 = t1.column AND dedupe_copy.id2 = t2.column WHERE ";
     }
     $patternColumn = '/t1.(\w+)/';
     $exclWeightSum = array();
@@ -215,7 +220,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
           // extract the next query ( and weight ) to be executed
           $fieldWeight = array_keys($tableQueries);
           $fieldWeight = $fieldWeight[0];
-          $query       = array_shift($tableQueries);
+          $query = array_shift($tableQueries);
 
           if ($searchWithinDupes) {
             // get prepared to search within already found dupes if $searchWithinDupes flag is set
@@ -251,8 +256,8 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
         // since queries are already sorted by weights, we can continue as is
         $fieldWeight = array_keys($tableQueries);
         $fieldWeight = $fieldWeight[0];
-        $query       = array_shift($tableQueries);
-        $query       = "{$insertClause} {$query} {$groupByClause} ON DUPLICATE KEY UPDATE weight = weight + VALUES(weight)";
+        $query = array_shift($tableQueries);
+        $query = "{$insertClause} {$query} {$groupByClause} ON DUPLICATE KEY UPDATE weight = weight + VALUES(weight)";
         $dao->query($query);
         if ($dao->affectedRows() >= 1) {
           $exclWeightSum[] = substr($fieldWeight, strrpos($fieldWeight, '.') + 1);
@@ -384,7 +389,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    * @access public
    */
   public static function dedupeRuleFieldsWeight($params) {
-    $rgBao               = new CRM_Dedupe_BAO_RuleGroup();
+    $rgBao = new CRM_Dedupe_BAO_RuleGroup();
     $rgBao->contact_type = $params['contact_type'];
     if (CRM_Utils_Array::value('id', $params)) {
       // accept an ID if provided

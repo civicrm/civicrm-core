@@ -188,8 +188,8 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
   public static function climbtree($form, $tree, &$elements) {
     foreach ($tree as $tagID => $varValue) {
       $tagAttribute = array(
-      'onclick' => "return changeRowColor(\"rowidtag_$tagID\")",
-      'id' => "tag_{$tagID}",
+        'onclick' => "return changeRowColor(\"rowidtag_$tagID\")",
+        'id' => "tag_{$tagID}",
       );
 
       $elements[$tagID] = $form->createElement('checkbox', $tagID, '', '', $tagAttribute);

@@ -125,7 +125,7 @@ class CRM_Core_Session {
         // FIXME: This belongs in CRM_Utils_System_*
         if ($config->userSystem->is_drupal && function_exists('drupal_session_start')) {
           // https://issues.civicrm.org/jira/browse/CRM-14356
-          if (! (isset($GLOBALS['lazy_session']) && $GLOBALS['lazy_session'] == TRUE)) {
+          if (!(isset($GLOBALS['lazy_session']) && $GLOBALS['lazy_session'] == TRUE)) {
             drupal_session_start();
           }
           $_SESSION = array();

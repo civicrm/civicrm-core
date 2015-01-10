@@ -106,8 +106,8 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
     if (!$this->_paymentProcessor['object']->isSupported('updateSubscriptionBillingInfo')) {
       CRM_Core_Error::fatal(ts("%1 processor doesn't support updating subscription billing details.",
-          array(1 => $this->_paymentProcessor['object']->_processorName)
-        ));
+        array(1 => $this->_paymentProcessor['object']->_processorName)
+      ));
     }
     $this->assign('paymentProcessor', $this->_paymentProcessor);
 
@@ -145,10 +145,16 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     $this->_defaults = array();
 
     if ($this->_subscriptionDetails->contact_id) {
-      $fields  = array();
-      $names   = array(
-        'first_name', 'middle_name', 'last_name', "street_address-{$this->_bltID}", "city-{$this->_bltID}",
-        "postal_code-{$this->_bltID}", "country_id-{$this->_bltID}", "state_province_id-{$this->_bltID}",
+      $fields = array();
+      $names = array(
+        'first_name',
+        'middle_name',
+        'last_name',
+        "street_address-{$this->_bltID}",
+        "city-{$this->_bltID}",
+        "postal_code-{$this->_bltID}",
+        "country_id-{$this->_bltID}",
+        "state_province_id-{$this->_bltID}",
       );
       foreach ($names as $name) {
         $fields[$name] = 1;
@@ -419,7 +425,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     }
 
     $session = CRM_Core_Session::singleton();
-    $userID  = $session->get('userID');
+    $userID = $session->get('userID');
     if ($userID && $status) {
       $session->setStatus($status, $msgTitle, $msgType);
     }
@@ -430,7 +436,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
       if (isset($tplParams))
         $session->set('resultParams', $tplParams);
       return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/subscriptionstatus',
-                                                              "reset=1&task=billing&result={$result}"));
+        "reset=1&task=billing&result={$result}"));
     }
   }
 }

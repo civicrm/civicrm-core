@@ -83,7 +83,8 @@ class CRM_Core_Payment_ProcessorForm {
 
     // make sure we have a valid payment class, else abort
     if (!empty($form->_values['is_monetary']) &&
-      !$form->_paymentProcessor['class_name'] && empty($form->_values['is_pay_later'])) {
+      !$form->_paymentProcessor['class_name'] && empty($form->_values['is_pay_later'])
+    ) {
       CRM_Core_Error::fatal(ts('Payment processor is not set for this page'));
     }
 

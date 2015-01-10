@@ -133,27 +133,27 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     if (self::$_dataToLabels == NULL) {
       self::$_dataToLabels = array(
         array(
-      'Text' => ts('Text'),
-      'Select' => ts('Select'),
+          'Text' => ts('Text'),
+          'Select' => ts('Select'),
           'Radio' => ts('Radio'),
-      'CheckBox' => ts('CheckBox'),
-      'Multi-Select' => ts('Multi-Select'),
+          'CheckBox' => ts('CheckBox'),
+          'Multi-Select' => ts('Multi-Select'),
           'AdvMulti-Select' => ts('Adv Multi-Select (obsolete)'),
           'Autocomplete-Select' => ts('Autocomplete-Select'),
         ),
         array(
-      'Text' => ts('Text'),
-      'Select' => ts('Select'),
+          'Text' => ts('Text'),
+          'Select' => ts('Select'),
           'Radio' => ts('Radio'),
         ),
         array(
-      'Text' => ts('Text'),
-      'Select' => ts('Select'),
+          'Text' => ts('Text'),
+          'Select' => ts('Select'),
           'Radio' => ts('Radio'),
         ),
         array(
-      'Text' => ts('Text'),
-      'Select' => ts('Select'),
+          'Text' => ts('Text'),
+          'Select' => ts('Select'),
           'Radio' => ts('Radio'),
         ),
         array('TextArea' => ts('TextArea'), 'RichTextEditor' => ts('Rich Text Editor')),
@@ -268,7 +268,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $this->assign('dontShowLink', $dontShowLink);
     }
     if ($this->_action & CRM_Core_Action::ADD &&
-      CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_multiple', 'id')) {
+      CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_multiple', 'id')
+    ) {
       $defaults['in_selector'] = 1;
     }
 
@@ -334,7 +335,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     }
     else {
       $optionTypes = array(
-      '1' => ts('Create a new set of options'),
+        '1' => ts('Create a new set of options'),
         '2' => ts('Reuse an existing set'),
       );
 
@@ -342,7 +343,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         'option_group_id',
         ts('Multiple Choice Option Sets'),
         array(
-          '' => ts('- select -')) + $optionGroups
+          '' => ts('- select -')
+        ) + $optionGroups
       );
     }
 
@@ -350,7 +352,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       ts('Option Type'),
       $optionTypes,
       array(
-        'onclick' => "showOptionSelect();"), '<br/>'
+        'onclick' => "showOptionSelect();"
+      ), '<br/>'
     );
 
     $contactGroups = CRM_Core_PseudoConstant::group();
@@ -523,7 +526,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     );
 
     // is searchable by range?
-    $searchRange   = array();
+    $searchRange = array();
     $searchRange[] = $this->createElement('radio', NULL, NULL, ts('Yes'), '1');
     $searchRange[] = $this->createElement('radio', NULL, NULL, ts('No'), '0');
 
@@ -583,16 +586,16 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $errors = array();
 
     //validate field label as well as name.
-    $title  = $fields['label'];
-    $name   = CRM_Utils_String::munge($title, '_', 64);
-    $gId    = $self->_gid;  // CRM-7564
-    $query  = 'select count(*) from civicrm_custom_field where ( name like %1 OR label like %2 ) and id != %3 and custom_group_id = %4';
+    $title = $fields['label'];
+    $name = CRM_Utils_String::munge($title, '_', 64);
+    $gId = $self->_gid;  // CRM-7564
+    $query = 'select count(*) from civicrm_custom_field where ( name like %1 OR label like %2 ) and id != %3 and custom_group_id = %4';
     $fldCnt = CRM_Core_DAO::singleValueQuery($query, array(
-    1 => array($name, 'String'),
-        2 => array($title, 'String'),
-        3 => array((int) $self->_id, 'Integer'),
-        4 => array($gId, 'Integer'),
-      ));
+      1 => array($name, 'String'),
+      2 => array($title, 'String'),
+      3 => array((int) $self->_id, 'Integer'),
+      4 => array($gId, 'Integer'),
+    ));
     if ($fldCnt) {
       $errors['label'] = ts('Custom field \'%1\' already exists in Database.', array(1 => $title));
     }
@@ -704,8 +707,8 @@ SELECT count(*)
      *  Incomplete row checking is also required.
      */
     $_flagOption = $_rowError = 0;
-    $_showHide   = new CRM_Core_ShowHideBlocks('', '');
-    $dataType    = self::$_dataTypeKeys[$fields['data_type'][0]];
+    $_showHide = new CRM_Core_ShowHideBlocks('', '');
+    $dataType = self::$_dataTypeKeys[$fields['data_type'][0]];
     if (isset($fields['data_type'][1])) {
       $dataField = $fields['data_type'][1];
     }
@@ -835,7 +838,8 @@ FROM   civicrm_custom_field
 WHERE  data_type != %1
 AND    option_group_id = %2";
         $params = array(
-          1 => array(self::$_dataTypeKeys[$fields['data_type'][0]],
+          1 => array(
+            self::$_dataTypeKeys[$fields['data_type'][0]],
             'String',
           ),
           2 => array($fields['option_group_id'], 'Integer'),
@@ -907,19 +911,23 @@ AND    option_group_id = %2";
     // store the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
     if ($this->_action == CRM_Core_Action::UPDATE) {
-      $dataTypeKey         = $this->_defaultDataType[0];
+      $dataTypeKey = $this->_defaultDataType[0];
       $params['data_type'] = self::$_dataTypeKeys[$this->_defaultDataType[0]];
       $params['html_type'] = self::$_dataToHTML[$this->_defaultDataType[0]][$this->_defaultDataType[1]];
     }
     else {
-      $dataTypeKey         = $params['data_type'][0];
+      $dataTypeKey = $params['data_type'][0];
       $params['html_type'] = self::$_dataToHTML[$params['data_type'][0]][$params['data_type'][1]];
       $params['data_type'] = self::$_dataTypeKeys[$params['data_type'][0]];
     }
 
     //fix for 'is_search_range' field.
     if (in_array($dataTypeKey, array(
-      1, 2, 3, 5))) {
+      1,
+      2,
+      3,
+      5
+    ))) {
       if (empty($params['is_searchable'])) {
         $params['is_search_range'] = 0;
       }
@@ -1008,13 +1016,13 @@ SELECT id
     if ($buttonName == $this->getButtonName('next', 'new')) {
       $msg .= '<p>' . ts("Ready to add another.") . '</p>';
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field/add',
-          'reset=1&action=add&gid=' . $this->_gid
-        ));
+        'reset=1&action=add&gid=' . $this->_gid
+      ));
     }
     else {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field',
-          'reset=1&action=browse&gid=' . $this->_gid
-        ));
+        'reset=1&action=browse&gid=' . $this->_gid
+      ));
     }
     $session->setStatus($msg, ts('Saved'), 'success');
 

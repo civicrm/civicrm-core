@@ -162,9 +162,9 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
    * @return void
    */
   public function run() {
-    $context   = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    $action    = CRM_Utils_Request::retrieve('action', 'String', $this);
+    $action = CRM_Utils_Request::retrieve('action', 'String', $this);
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     //do check for view/edit operation.
@@ -203,7 +203,9 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
       );
 
       if (in_array($activityTypeId, array(
-        $emailTypeValue, $letterTypeValue))) {
+        $emailTypeValue,
+        $letterTypeValue
+      ))) {
         return;
       }
     }

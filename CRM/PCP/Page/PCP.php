@@ -94,13 +94,13 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
           'title' => ts('Delete Personal Campaign Page'),
         ),
         CRM_Core_Action::ENABLE => array(
-      'name' => ts('Enable'),
+          'name' => ts('Enable'),
           'url' => 'civicrm/admin/pcp',
           'qs' => 'action=enable&id=%%id%%',
           'title' => ts('Enable'),
         ),
         CRM_Core_Action::DISABLE => array(
-      'name' => ts('Disable'),
+          'name' => ts('Disable'),
           'url' => 'civicrm/admin/pcp',
           'qs' => 'action=disable&id=%%id%%',
           'title' => ts('Disable'),

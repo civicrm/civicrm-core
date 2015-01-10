@@ -223,17 +223,17 @@ class CRM_Core_I18n_Schema {
 
     if (!empty($triggers)) {
       if (CRM_Core_Config::isUpgradeMode()) {
-      foreach ($triggers as $triggerInfo) {
-        $when = $triggerInfo['when'];
-        $event = $triggerInfo['event'];
-        $triggerName = "{$table}_{$when}_{$event}";
-        CRM_Core_DAO::executeQuery("DROP TRIGGER IF EXISTS {$triggerName}");
+        foreach ($triggers as $triggerInfo) {
+          $when = $triggerInfo['when'];
+          $event = $triggerInfo['event'];
+          $triggerName = "{$table}_{$when}_{$event}";
+          CRM_Core_DAO::executeQuery("DROP TRIGGER IF EXISTS {$triggerName}");
+        }
       }
-    }
 
-    // invoke the meta trigger creation call
-    CRM_Core_DAO::triggerRebuild($table);
-  }
+      // invoke the meta trigger creation call
+      CRM_Core_DAO::triggerRebuild($table);
+    }
   }
 
   /**
@@ -316,7 +316,7 @@ class CRM_Core_I18n_Schema {
       $class = 'CRM_Core_I18n_SchemaStructure';
     }
     $indices =& $class::indices();
-    $tables  =& $class::tables();
+    $tables =& $class::tables();
     $queries = array();
     $dao = new CRM_Core_DAO;
 
@@ -397,7 +397,7 @@ class CRM_Core_I18n_Schema {
         // class loader look for file like - CRM/Core/I18n/SchemaStructure/4/1/0.php which is not what we want to be loaded
         require_once "CRM/Core/I18n/SchemaStructure_{$latest}.php";
         $class = "CRM_Core_I18n_SchemaStructure_{$latest}";
-        $tables  =& $class::tables();
+        $tables =& $class::tables();
       }
       else {
         $tables = CRM_Core_I18n_SchemaStructure::tables();
@@ -562,7 +562,8 @@ class CRM_Core_I18n_Schema {
         foreach ($locales as $old) {
           $trigger[] = "ELSEIF NEW.{$column}_{$old} IS NOT NULL THEN";
           foreach (array_merge($locales, array(
-            $locale)) as $loc) {
+            $locale
+          )) as $loc) {
             if ($loc == $old) {
               continue;
             }
@@ -592,7 +593,8 @@ class CRM_Core_I18n_Schema {
         foreach ($locales as $old) {
           $trigger[] = "ELSEIF NEW.{$column}_{$old} IS NOT NULL THEN";
           foreach (array_merge($locales, array(
-            $locale)) as $loc) {
+            $locale
+          )) as $loc) {
             if ($loc == $old) {
               continue;
             }

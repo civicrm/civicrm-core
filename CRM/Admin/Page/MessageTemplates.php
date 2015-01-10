@@ -165,7 +165,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
 
       // rebuild the action links HTML, as we need to handle %%orig_id%% for revertible templates
       $values['action'] = CRM_Core_Action::formLink($links, $action, array(
-        'id' => $object->id,
+          'id' => $object->id,
           'orig_id' => CRM_Utils_Array::value($object->id, $this->_revertible),
         ),
         ts('more'),

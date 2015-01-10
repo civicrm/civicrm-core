@@ -46,6 +46,7 @@ class CRM_Core_Payment_BaseIPN {
   protected $_isRecurring = FALSE;
 
   protected $_isFirstOrLastRecurringPayment = FALSE;
+
   /**
    * Constructor
    */
@@ -66,6 +67,7 @@ class CRM_Core_Payment_BaseIPN {
     }
     $this->_inputParameters = $parameters;
   }
+
   /**
    * Validate incoming data. This function is intended to ensure that incoming data matches
    * It provides a form of pseudo-authentication - by checking the calling fn already knows
@@ -159,13 +161,13 @@ class CRM_Core_Payment_BaseIPN {
     try {
       $success = $contribution->loadRelatedObjects($input, $ids, $required);
     }
-    catch(Exception $e) {
+    catch (Exception $e) {
       $success = FALSE;
       if (!empty($error_handling['log_error'])) {
         CRM_Core_Error::debug_log_message($e->getMessage());
       }
       if (!empty($error_handling['echo_error'])) {
-        echo ($e->getMessage());
+        echo($e->getMessage());
       }
       if (!empty($error_handling['return_error'])) {
         return array(
@@ -202,7 +204,10 @@ class CRM_Core_Payment_BaseIPN {
     $participant = &$objects['participant'];
 
     //CRM-15546
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array('labelColumn' => 'name', 'flip' => 1));
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+        'labelColumn' => 'name',
+        'flip' => 1
+      ));
     $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
     $contribution->thankyou_date = CRM_Utils_Date::isoToMysql($contribution->thankyou_date);
@@ -224,7 +229,10 @@ class CRM_Core_Payment_BaseIPN {
     if (empty($input['skipComponentSync'])) {
       if (!empty($memberships)) {
         // if transaction is failed then set "Cancelled" as membership status
-        $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', array('labelColumn' => 'name', 'flip' => 1));
+        $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', array(
+            'labelColumn' => 'name',
+            'flip' => 1
+          ));
         foreach ($memberships as $membership) {
           if ($membership) {
             $membership->status_id = $membershipStatuses['Cancelled'];
@@ -238,7 +246,10 @@ class CRM_Core_Payment_BaseIPN {
       }
 
       if ($participant) {
-        $participantStatuses = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', 'status_id', array('labelColumn' => 'name', 'flip' => 1));
+        $participantStatuses = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', 'status_id', array(
+            'labelColumn' => 'name',
+            'flip' => 1
+          ));
         $participant->status_id = $participantStatuses['Cancelled'];
         $participant->save();
       }
@@ -282,7 +293,10 @@ class CRM_Core_Payment_BaseIPN {
     if (empty($contribution->id)) {
       $addLineItems = TRUE;
     }
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array('labelColumn' => 'name', 'flip' => 1));
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+        'labelColumn' => 'name',
+        'flip' => 1
+      ));
     $contribution->contribution_status_id = $contributionStatuses['Cancelled'];
     $contribution->cancel_date = self::$_now;
     $contribution->cancel_reason = CRM_Utils_Array::value('reasonCode', $input);
@@ -305,7 +319,10 @@ class CRM_Core_Payment_BaseIPN {
 
     if (empty($input['skipComponentSync'])) {
       if (!empty($memberships)) {
-        $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', array('labelColumn' => 'name', 'flip' => 1));
+        $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', array(
+            'labelColumn' => 'name',
+            'flip' => 1
+          ));
         foreach ($memberships as $membership) {
           if ($membership) {
             $membership->status_id = $membershipStatuses['Cancelled'];
@@ -319,7 +336,10 @@ class CRM_Core_Payment_BaseIPN {
       }
 
       if ($participant) {
-        $participantStatuses = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', 'status_id', array('labelColumn' => 'name', 'flip' => 1));
+        $participantStatuses = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', 'status_id', array(
+            'labelColumn' => 'name',
+            'flip' => 1
+          ));
         $participant->status_id = $participantStatuses['Cancelled'];
         $participant->save();
       }
@@ -359,9 +379,9 @@ class CRM_Core_Payment_BaseIPN {
     if (is_numeric($memberships)) {
       $memberships = array($objects['membership']);
     }
-    $participant  = &$objects['participant'];
-    $event        = &$objects['event'];
-    $changeToday  = CRM_Utils_Array::value('trxn_date', $input, self::$_now);
+    $participant = &$objects['participant'];
+    $event = &$objects['event'];
+    $changeToday = CRM_Utils_Array::value('trxn_date', $input, self::$_now);
     $recurContrib = &$objects['contributionRecur'];
 
     $values = array();
@@ -453,7 +473,7 @@ LIMIT 1;";
             );
 
             $formatedParams = array(
-            'status_id' => CRM_Utils_Array::value('id', $calcStatus, 2),
+              'status_id' => CRM_Utils_Array::value('id', $calcStatus, 2),
               'join_date' => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('join_date', $dates), $format),
               'start_date' => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('start_date', $dates), $format),
               'end_date' => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('end_date', $dates), $format),
@@ -515,13 +535,13 @@ LIMIT 1;";
 
       $ufJoinParams = array(
         'entity_table' => 'civicrm_event',
-        'entity_id'    => $ids['event'],
-        'module'       => 'CiviEvent',
+        'entity_id' => $ids['event'],
+        'module' => 'CiviEvent',
       );
 
       list($custom_pre_id,
-           $custom_post_ids
-           ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+        $custom_post_ids
+        ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
       $values['custom_pre_id'] = $custom_pre_id;
       $values['custom_post_id'] = $custom_post_ids;
@@ -536,7 +556,10 @@ LIMIT 1;";
         $values['is_email_receipt'] = 1;
       }
       if (empty($input['skipComponentSync'])) {
-        $participantStatuses = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', 'status_id', array('labelColumn' => 'name', 'flip' => 1));
+        $participantStatuses = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', 'status_id', array(
+            'labelColumn' => 'name',
+            'flip' => 1
+          ));
         $participant->status_id = $participantStatuses['Registered'];
       }
       $participant->save();
@@ -551,7 +574,10 @@ LIMIT 1;";
     if (empty($contribution->id)) {
       $addLineItems = TRUE;
     }
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array('labelColumn' => 'name', 'flip' => 1));
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+        'labelColumn' => 'name',
+        'flip' => 1
+      ));
     $contribution->contribution_status_id = $contributionStatuses['Completed'];
     $contribution->is_test = $input['is_test'];
     $contribution->fee_amount = CRM_Utils_Array::value('fee_amount', $input, 0);
@@ -614,8 +640,11 @@ LIMIT 1;";
     // From a lot of code reading /debugging I'm still not sure the intent WRT first & subsequent payments in this code
     // it would be good if someone added some comments or refactored this
     if ($contribution->id) {
-      $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array('labelColumn' => 'name', 'flip' => 1));
-      if ((empty($input['prevContribution']) && $paymentProcessorId) || (!$input['prevContribution']->is_pay_later && - $input['prevContribution']->contribution_status_id == $contributionStatuses['Pending'])) {
+      $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+          'labelColumn' => 'name',
+          'flip' => 1
+        ));
+      if ((empty($input['prevContribution']) && $paymentProcessorId) || (!$input['prevContribution']->is_pay_later && -$input['prevContribution']->contribution_status_id == $contributionStatuses['Pending'])) {
         $input['payment_processor'] = $paymentProcessorId;
       }
       $input['contribution_status_id'] = $contributionStatuses['Completed'];
@@ -767,9 +796,9 @@ LIMIT 1;";
    */
   public function updateContributionStatus(&$params) {
     // get minimum required values.
-    $statusId       = CRM_Utils_Array::value('contribution_status_id', $params);
-    $componentId    = CRM_Utils_Array::value('component_id', $params);
-    $componentName  = CRM_Utils_Array::value('componentName', $params);
+    $statusId = CRM_Utils_Array::value('contribution_status_id', $params);
+    $componentId = CRM_Utils_Array::value('component_id', $params);
+    $componentName = CRM_Utils_Array::value('componentName', $params);
     $contributionId = CRM_Utils_Array::value('contribution_id', $params);
 
     if (!$contributionId || !$componentId || !$componentName || !$statusId) {
@@ -821,7 +850,10 @@ LIMIT 1;";
 
     $contribution = &$objects['contribution'];
 
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array('labelColumn' => 'name', 'flip' => 1));
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+        'labelColumn' => 'name',
+        'flip' => 1
+      ));
     $input['skipComponentSync'] = CRM_Utils_Array::value('skipComponentSync', $params);
     if ($statusId == $contributionStatuses['Cancelled']) {
       $baseIPN->cancelled($objects, $transaction, $input);
@@ -842,7 +874,10 @@ LIMIT 1;";
 
     //set values for ipn code.
     foreach (array(
-      'fee_amount', 'check_number', 'payment_instrument_id') as $field) {
+               'fee_amount',
+               'check_number',
+               'payment_instrument_id'
+             ) as $field) {
       if (!$input[$field] = CRM_Utils_Array::value($field, $params)) {
         $input[$field] = $contribution->$field;
       }
@@ -886,11 +921,12 @@ LIMIT 1;";
    */
   public function updateRecurLinkedPledge(&$contribution) {
     $returnProperties = array('id', 'pledge_id');
-    $paymentDetails   = $paymentIDs = array();
+    $paymentDetails = $paymentIDs = array();
 
     if (CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'contribution_id', $contribution->id,
-        $paymentDetails, $returnProperties
-      )) {
+      $paymentDetails, $returnProperties
+    )
+    ) {
       foreach ($paymentDetails as $key => $value) {
         $paymentIDs[] = $value['id'];
         $pledgeId = $value['pledge_id'];
@@ -963,7 +999,10 @@ LIMIT 1;";
         $lineSets[$priceField->price_set_id][] = $value;
         if ($value['entity_table'] == 'civicrm_membership') {
           try {
-            civicrm_api3('membership_payment', 'create', array('membership_id' => $value['entity_id'], 'contribution_id' => $contribution->id));
+            civicrm_api3('membership_payment', 'create', array(
+                'membership_id' => $value['entity_id'],
+                'contribution_id' => $contribution->id
+              ));
           }
           catch (CiviCRM_API3_Exception $e) {
             // we are catching & ignoring errors as an extra precaution since lost IPNs may be more serious that lost membership_payment data
@@ -1011,13 +1050,13 @@ LIMIT 1;";
         }
 
         foreach ($table as $tableName => $tableColumns) {
-          $insert          = 'INSERT INTO ' . $tableName . ' (' . implode(', ', $tableColumns) . ') ';
+          $insert = 'INSERT INTO ' . $tableName . ' (' . implode(', ', $tableColumns) . ') ';
           $tableColumns[0] = $targetContributionId;
-          $select          = 'SELECT ' . implode(', ', $tableColumns);
-          $from            = ' FROM ' . $tableName;
-          $where           = " WHERE {$tableName}.entity_id = {$sourceContributionId}";
-          $query           = $insert . $select . $from . $where;
-          $dao             = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+          $select = 'SELECT ' . implode(', ', $tableColumns);
+          $from = ' FROM ' . $tableName;
+          $where = " WHERE {$tableName}.entity_id = {$sourceContributionId}";
+          $query = $insert . $select . $from . $where;
+          $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
         }
       }
     }

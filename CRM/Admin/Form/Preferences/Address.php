@@ -43,7 +43,8 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
 
     // Address Standardization
     $addrProviders = array(
-      '' => '- select -') + CRM_Core_SelectValues::addressProvider();
+        '' => '- select -'
+      ) + CRM_Core_SelectValues::addressProvider();
 
     $this->_varNames = array(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(

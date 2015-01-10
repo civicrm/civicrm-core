@@ -69,7 +69,7 @@ class CRM_Core_Payment_Form {
     // @todo - replace this section with one similar to above per discussion - probably use a manual processor shell class to stand in for that capability
     //return without adding billing fields if billing_mode = 4 (@todo - more the ability to set that to the payment processor)
     // or payment processor is NULL (pay later)
-    if (($processor == NULL && !$forceBillingFieldsForPayLater) ||  CRM_Utils_Array::value('billing_mode', $processor) == 4) {
+    if (($processor == NULL && !$forceBillingFieldsForPayLater) || CRM_Utils_Array::value('billing_mode', $processor) == 4) {
       return;
     }
     //@todo setPaymentFields defines the billing fields - this should be moved to the processor class & renamed getBillingFields
@@ -159,8 +159,9 @@ class CRM_Core_Payment_Form {
       'title' => ts('Country'),
       'cc_field' => TRUE,
       'attributes' => array(
-        '' => ts('- select -')) +
-      CRM_Core_PseudoConstant::country(),
+          '' => ts('- select -')
+        ) +
+        CRM_Core_PseudoConstant::country(),
       'is_required' => TRUE,
     );
     //CRM-15509 working towards giving control over billing fields to payment processors. For now removing tpl hard-coding
@@ -278,7 +279,6 @@ class CRM_Core_Payment_Form {
    * @param CRM_Core_Form $form
    * @param array $paymentFields
    *   Array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors.
-
    * @param $paymentFields
    */
   protected static function addRules(&$form, $paymentFields) {

@@ -55,8 +55,8 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
       return $success;
     }
 
-    $transaction        = new CRM_Core_Transaction();
-    $bounce             = new CRM_Mailing_Event_BAO_Bounce();
+    $transaction = new CRM_Core_Transaction();
+    $bounce = new CRM_Mailing_Event_BAO_Bounce();
     $bounce->time_stamp = date('YmdHis');
 
     // if we dont have a valid bounce type, we should set it
@@ -80,9 +80,9 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
     $success = TRUE;
 
     $bounceTable = CRM_Mailing_Event_BAO_Bounce::getTableName();
-    $bounceType  = CRM_Mailing_DAO_BounceType::getTableName();
-    $emailTable  = CRM_Core_BAO_Email::getTableName();
-    $queueTable  = CRM_Mailing_Event_BAO_Queue::getTableName();
+    $bounceType = CRM_Mailing_DAO_BounceType::getTableName();
+    $emailTable = CRM_Core_BAO_Email::getTableName();
+    $queueTable = CRM_Mailing_Event_BAO_Queue::getTableName();
 
     $bounce->reset();
     // might want to put distinct inside the count
@@ -105,9 +105,9 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
 
     while ($bounce->fetch()) {
       if ($bounce->bounces >= $bounce->threshold) {
-        $email            = new CRM_Core_BAO_Email();
-        $email->id        = $q->email_id;
-        $email->on_hold   = TRUE;
+        $email = new CRM_Core_BAO_Email();
+        $email->id = $q->email_id;
+        $email->on_hold = TRUE;
         $email->hold_date = date('YmdHis');
         $email->save();
         break;
@@ -135,10 +135,10 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
   public static function getTotalCount($mailing_id, $job_id = NULL, $is_distinct = FALSE, $toDate = NULL) {
     $dao = new CRM_Core_DAO();
 
-    $bounce  = self::getTableName();
-    $queue   = CRM_Mailing_Event_BAO_Queue::getTableName();
+    $bounce = self::getTableName();
+    $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
 
     $query = "
             SELECT      COUNT($bounce.id) as bounce
@@ -200,13 +200,13 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
 
     $dao = new CRM_Core_Dao();
 
-    $bounce     = self::getTableName();
+    $bounce = self::getTableName();
     $bounceType = CRM_Mailing_DAO_BounceType::getTableName();
-    $queue      = CRM_Mailing_Event_BAO_Queue::getTableName();
-    $mailing    = CRM_Mailing_BAO_Mailing::getTableName();
-    $job        = CRM_Mailing_BAO_MailingJob::getTableName();
-    $contact    = CRM_Contact_BAO_Contact::getTableName();
-    $email      = CRM_Core_BAO_Email::getTableName();
+    $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
+    $mailing = CRM_Mailing_BAO_Mailing::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
+    $contact = CRM_Contact_BAO_Contact::getTableName();
+    $email = CRM_Core_BAO_Email::getTableName();
 
     $query = "
             SELECT      $contact.display_name as display_name,
@@ -269,7 +269,7 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
         'email' => $dao->email,
         // FIXME: translate this
         'type' => (empty($dao->bounce_type)
-      ? ts('Unknown') : $dao->bounce_type
+          ? ts('Unknown') : $dao->bounce_type
         ),
         'reason' => $dao->reason,
         'date' => CRM_Utils_Date::customFormat($dao->date),

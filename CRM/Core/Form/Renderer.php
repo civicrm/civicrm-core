@@ -290,7 +290,10 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
             $view[] = $contact[$fld];
           }
         }
-        $field->setAttribute('data-entity-value', json_encode(array('id' => $contact['id'], 'text' => implode(' :: ', $view))));
+        $field->setAttribute('data-entity-value', json_encode(array(
+              'id' => $contact['id'],
+              'text' => implode(' :: ', $view)
+            )));
       }
     }
   }

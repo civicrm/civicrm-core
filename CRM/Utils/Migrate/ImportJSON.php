@@ -208,7 +208,7 @@ class CRM_Utils_Migrate_ImportJSON {
    * @param null $dateFields
    */
   public function restore(&$chunk, $daoName, $lookUpMapping = NULL, $dateFields = NULL) {
-    $object   = new $daoName();
+    $object = new $daoName();
     $tableName = $object->__table;
 
     if (is_array($lookUpMapping)) {
@@ -226,7 +226,7 @@ class CRM_Utils_Migrate_ImportJSON {
     $columns = $chunk[0];
     foreach ($chunk as $key => $value) {
       if ($key) {
-        $object   = new $daoName();
+        $object = new $daoName();
         foreach ($columns as $k => $column) {
           if ($column == 'id') {
             $childID = $value[$k];

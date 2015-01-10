@@ -96,6 +96,7 @@ class CRM_Core_Permission_Base {
   public function whereClause($type, &$tables, &$whereTables) {
     return '( 1 )';
   }
+
   /**
    * Get the permissioned where clause for the user when trying to see groups
    *

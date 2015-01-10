@@ -174,8 +174,8 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
           $group->id = $id;
           if ($group->find(TRUE) && $group->saved_search_id) {
             $clause = CRM_Contact_BAO_SavedSearch::whereClause($group->saved_search_id,
-                $tables,
-                $whereTables
+              $tables,
+              $whereTables
             );
             if (trim($clause)) {
               $clauses[] = $clause;

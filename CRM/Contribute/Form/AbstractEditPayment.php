@@ -329,11 +329,11 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
           $endDate = CRM_Utils_Array::value('membership_end_date', $updateResult);
           if ($endDate) {
             $statusMsg .= "<br />" . ts("Membership for %1 has been updated. The membership End Date is %2.",
-              array(
-                1 => $userDisplayName,
-                2 => $endDate,
-              )
-            );
+                array(
+                  1 => $userDisplayName,
+                  2 => $endDate,
+                )
+              );
           }
         }
       }
@@ -418,7 +418,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       if (empty($this->_paymentProcessors)) {
         throw new CRM_Core_Exception(ts('You will need to configure the %1 settings for your Payment Processor before you can submit a credit card transactions.', array(1 => $this->_mode)));
       }
-      $this->_processors  = array();
+      $this->_processors = array();
       foreach ($this->_paymentProcessors as $id => $processor) {
         $this->_processors[$id] = ts($processor['name']);
       }

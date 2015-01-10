@@ -102,8 +102,8 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
 
     $this->addButtons($buttons);
 
-    $preview            = array();
-    $preview['type']    = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $this->_mailingID, 'body_html') ? 'html' : 'text';
+    $preview = array();
+    $preview['type'] = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $this->_mailingID, 'body_html') ? 'html' : 'text';
     $preview['viewURL'] = CRM_Utils_System::url('civicrm/mailing/view', "reset=1&id={$this->_mailingID}");
     $this->assign_by_ref('preview', $preview);
   }
@@ -138,8 +138,9 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
     }
 
     if (CRM_Utils_Date::format(CRM_Utils_Date::processDate($params['start_date'],
-          $params['start_date_time']
-        )) < CRM_Utils_Date::format(date('YmdHi00'))) {
+        $params['start_date_time']
+      )) < CRM_Utils_Date::format(date('YmdHi00'))
+    ) {
       return array(
         'start_date' => ts('Start date cannot be earlier than the current time.'),
       );
@@ -198,8 +199,8 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/mailing/browse/scheduled',
-        'reset=1&scheduled=true&sms=1'
-      ));
+      'reset=1&scheduled=true&sms=1'
+    ));
   }
 
   /**

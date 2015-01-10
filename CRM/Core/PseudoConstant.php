@@ -228,7 +228,7 @@ class CRM_Core_PseudoConstant {
    * - orderColumn string the column to use for sorting, defaults to 'weight' column if one exists, else defaults to labelColumn
    * - onlyActive boolean return only the action option values
    * - fresh      boolean ignore cache entries and go back to DB
-   * @param string $context: Context string
+   * @param string $context : Context string
    *
    * @return Array|bool - array on success, FALSE on error.
    *
@@ -380,9 +380,9 @@ class CRM_Core_PseudoConstant {
             $wheres[] = 'domain_id = ' . CRM_Core_Config::domainID();
           }
           $queryParams = array(
-             1 => array($params['keyColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
-             2 => array($params['labelColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
-             3 => array($pseudoconstant['table'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
+            1 => array($params['keyColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
+            2 => array($params['labelColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
+            3 => array($pseudoconstant['table'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
           );
           // Add orderColumn param
           if (!empty($params['orderColumn'])) {
@@ -570,8 +570,8 @@ class CRM_Core_PseudoConstant {
     $force = NULL
   ) {
     $cacheKey = "CRM_PC_{$name}_{$all}_{$key}_{$retrieve}_{$filter}_{$condition}_{$orderby}";
-    $cache    = CRM_Utils_Cache::singleton();
-    $var      = $cache->get($cacheKey);
+    $cache = CRM_Utils_Cache::singleton();
+    $var = $cache->get($cacheKey);
     if ($var && empty($force)) {
       return $var;
     }
@@ -718,8 +718,8 @@ class CRM_Core_PseudoConstant {
       $config = CRM_Core_Config::singleton();
       if ($limit) {
         $countryIsoCodes = self::countryIsoCode();
-        $limitCodes      = $config->provinceLimit();
-        $limitIds        = array();
+        $limitCodes = $config->provinceLimit();
+        $limitIds = array();
         foreach ($limitCodes as $code) {
           $limitIds = array_merge($limitIds, array_keys($countryIsoCodes, $code));
         }
@@ -737,8 +737,8 @@ class CRM_Core_PseudoConstant {
       if ($tsLocale != '' and $tsLocale != 'en_US') {
         $i18n = CRM_Core_I18n::singleton();
         $i18n->localizeArray(self::$stateProvince, array(
-            'context' => 'province',
-          ));
+          'context' => 'province',
+        ));
         self::$stateProvince = CRM_Utils_Array::asort(self::$stateProvince);
       }
     }
@@ -788,10 +788,10 @@ WHERE  id = %1";
       $whereClause = FALSE;
 
       if ($limit) {
-        $config          = CRM_Core_Config::singleton();
+        $config = CRM_Core_Config::singleton();
         $countryIsoCodes = self::countryIsoCode();
-        $limitCodes      = $config->provinceLimit();
-        $limitIds        = array();
+        $limitCodes = $config->provinceLimit();
+        $limitIds = array();
         foreach ($limitCodes as $code) {
           $tmpArray = array_keys($countryIsoCodes, $code);
 
@@ -880,8 +880,8 @@ WHERE  id = %1";
       if ($tsLocale != '' and $tsLocale != 'en_US') {
         $i18n = CRM_Core_I18n::singleton();
         $i18n->localizeArray(self::$country, array(
-            'context' => 'country',
-          ));
+          'context' => 'country',
+        ));
         self::$country = CRM_Utils_Array::asort(self::$country);
       }
     }
@@ -1779,7 +1779,10 @@ WHERE  id = %1
   public static function &greetingDefaults() {
     if (!self::$greetingDefaults) {
       $defaultGreetings = array();
-      $contactTypes = self::get('CRM_Contact_DAO_Contact', 'contact_type', array('keyColumn' => 'id', 'labelColumn' => 'name'));
+      $contactTypes = self::get('CRM_Contact_DAO_Contact', 'contact_type', array(
+          'keyColumn' => 'id',
+          'labelColumn' => 'name'
+        ));
 
       foreach ($contactTypes as $filter => $contactType) {
         $filterCondition = " AND (v.filter = 0 OR v.filter = $filter) AND v.is_default = 1 ";

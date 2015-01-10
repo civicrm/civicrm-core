@@ -244,14 +244,15 @@ class CRM_Utils_Token {
   ) {
     $key = 'domain';
     if (
-      !$knownTokens || empty($knownTokens[$key])) {
+      !$knownTokens || empty($knownTokens[$key])
+    ) {
       return $str;
     }
 
     $str = preg_replace_callback(
       self::tokenRegex($key),
-      function ($matches) use(&$domain, $html, $escapeSmarty) {
-      return CRM_Utils_Token::getDomainTokenReplacement($matches[1], $domain, $html, $escapeSmarty);
+      function ($matches) use (&$domain, $html, $escapeSmarty) {
+        return CRM_Utils_Token::getDomainTokenReplacement($matches[1], $domain, $html, $escapeSmarty);
       },
       $str
     );
@@ -434,8 +435,8 @@ class CRM_Utils_Token {
 
     $str = preg_replace_callback(
       self::tokenRegex($key),
-      function ($matches) use(&$mailing, $escapeSmarty) {
-      return CRM_Utils_Token::getMailingTokenReplacement($matches[1], $mailing, $escapeSmarty);
+      function ($matches) use (&$mailing, $escapeSmarty) {
+        return CRM_Utils_Token::getMailingTokenReplacement($matches[1], $mailing, $escapeSmarty);
       },
       $str
     );
@@ -574,8 +575,8 @@ class CRM_Utils_Token {
 
     $str = preg_replace_callback(
       self::tokenRegex($key),
-      function ($matches) use(&$addresses, &$urls, $html, $escapeSmarty) {
-      return CRM_Utils_Token::getActionTokenReplacement($matches[1], $addresses, $urls, $html, $escapeSmarty);
+      function ($matches) use (&$addresses, &$urls, $html, $escapeSmarty) {
+        return CRM_Utils_Token::getActionTokenReplacement($matches[1], $addresses, $urls, $html, $escapeSmarty);
       },
       $str
     );
@@ -678,8 +679,8 @@ class CRM_Utils_Token {
 
     $str = preg_replace_callback(
       self::tokenRegex($key),
-      function ($matches) use(&$contact, $html, $returnBlankToken, $escapeSmarty) {
-      return CRM_Utils_Token::getContactTokenReplacement($matches[1], $contact, $html, $returnBlankToken, $escapeSmarty);
+      function ($matches) use (&$contact, $html, $returnBlankToken, $escapeSmarty) {
+        return CRM_Utils_Token::getContactTokenReplacement($matches[1], $contact, $html, $returnBlankToken, $escapeSmarty);
       },
       $str
     );
@@ -769,7 +770,8 @@ class CRM_Utils_Token {
     }
 
     if ($escapeSmarty
-        && !($returnBlankToken && $noReplace)) { // $returnBlankToken means the caller wants to do further attempts at processing unreplaced tokens -- so don't escape them yet in this case.
+      && !($returnBlankToken && $noReplace)
+    ) { // $returnBlankToken means the caller wants to do further attempts at processing unreplaced tokens -- so don't escape them yet in this case.
       $value = self::tokenEscapeSmarty($value);
     }
 
@@ -804,8 +806,8 @@ class CRM_Utils_Token {
     foreach ($categories as $key) {
       $str = preg_replace_callback(
         self::tokenRegex($key),
-        function ($matches) use(&$contact, $key, $html, $escapeSmarty) {
-        return CRM_Utils_Token::getHookTokenReplacement($matches[1], $contact, $key, $html, $escapeSmarty);
+        function ($matches) use (&$contact, $key, $html, $escapeSmarty) {
+          return CRM_Utils_Token::getHookTokenReplacement($matches[1], $contact, $key, $html, $escapeSmarty);
         },
         $str
       );
@@ -1013,9 +1015,9 @@ class CRM_Utils_Token {
 
     if (preg_match('/\{action\.subscribe.\d+\}/', $str, $matches)) {
       foreach ($matches as $key => $value) {
-        $gid       = substr($value, 18, -1);
-        $config    = CRM_Core_Config::singleton();
-        $domain    = CRM_Core_BAO_MailSettings::defaultDomain();
+        $gid = substr($value, 18, -1);
+        $config = CRM_Core_Config::singleton();
+        $domain = CRM_Core_BAO_MailSettings::defaultDomain();
         $localpart = CRM_Core_BAO_MailSettings::defaultLocalpart();
         // we add the 0.0000000000000000 part to make this match the other email patterns (with action, two ids and a hash)
         $str = preg_replace('/' . preg_quote($value) . '/', "mailto:{$localpart}s.{$gid}.0.0000000000000000@$domain", $str);
@@ -1146,10 +1148,10 @@ class CRM_Utils_Token {
     $returnProperties = array();
     $matches = array();
     preg_match_all('/(?<!\{|\\\\)\{(\w+\.\w+)\}(?!\})/',
-        $string,
-        $matches,
-        PREG_PATTERN_ORDER
-      );
+      $string,
+      $matches,
+      PREG_PATTERN_ORDER
+    );
     if ($matches[1]) {
       foreach ($matches[1] as $token) {
         list($type, $name) = preg_split('/\./', $token, 2);
@@ -1169,9 +1171,9 @@ class CRM_Utils_Token {
    * @param $contactIDs
    * @param array $returnProperties
    *   Of required properties.
-   * @param bool $skipOnHoldDon't return on_hold contact info also.
+   * @param bool $skipOnHoldDon 't return on_hold contact info also.
    *   Don't return on_hold contact info also.
-   * @param bool $skipDeceasedDon't return deceased contact info.
+   * @param bool $skipDeceasedDon 't return deceased contact info.
    *   Don't return deceased contact info.
    * @param array $extraParams
    *   Extra params.
@@ -1203,7 +1205,10 @@ class CRM_Utils_Token {
     foreach ($contactIDs as $key => $contactID) {
       $params[] = array(
         CRM_Core_Form::CB_PREFIX . $contactID,
-        '=', 1, 0, 0,
+        '=',
+        1,
+        0,
+        0,
       );
     }
 
@@ -1277,7 +1282,10 @@ class CRM_Utils_Token {
 
         //special case for greeting replacement
         foreach (array(
-          'email_greeting', 'postal_greeting', 'addressee') as $val) {
+                   'email_greeting',
+                   'postal_greeting',
+                   'addressee'
+                 ) as $val) {
           if (!empty($contactDetails[$contactID][$val])) {
             $contactDetails[$contactID][$val] = $contactDetails[$contactID]["{$val}_display"];
           }
@@ -1314,14 +1322,15 @@ class CRM_Utils_Token {
    *   contactDetails with hooks swapped out
    */
   public function getAnonymousTokenDetails($contactIDs = array(
-    0),
-    $returnProperties = NULL,
-    $skipOnHold = TRUE,
-    $skipDeceased = TRUE,
-    $extraParams = NULL,
-    $tokens = array(),
-    $className = NULL,
-    $jobID = NULL) {
+      0
+    ),
+                                           $returnProperties = NULL,
+                                           $skipOnHold = TRUE,
+                                           $skipDeceased = TRUE,
+                                           $extraParams = NULL,
+                                           $tokens = array(),
+                                           $className = NULL,
+                                           $jobID = NULL) {
     $details = array(0 => array());
     // also call a hook and get token details
     CRM_Utils_Hook::tokenValues($details[0],
@@ -1406,9 +1415,13 @@ class CRM_Utils_Token {
    *   Array of membership IDS.
    */
   public static function getMembershipTokenDetails($membershipIDs) {
-    $memberships = civicrm_api3('membership', 'get', array('options' => array('limit' => 200000), 'membership_id' => array('IN' => (array) $membershipIDs)));
+    $memberships = civicrm_api3('membership', 'get', array(
+        'options' => array('limit' => 200000),
+        'membership_id' => array('IN' => (array) $membershipIDs)
+      ));
     return $memberships['values'];
   }
+
   /**
    * Replace greeting tokens exists in message/subject
    */
@@ -1493,7 +1506,10 @@ class CRM_Utils_Token {
     $flattenTokens = array();
 
     foreach (array(
-      'html', 'text', 'subject') as $prop) {
+               'html',
+               'text',
+               'subject'
+             ) as $prop) {
       if (!isset($tokens[$prop])) {
         continue;
       }
@@ -1533,8 +1549,8 @@ class CRM_Utils_Token {
 
     $str = preg_replace_callback(
       self::tokenRegex($key),
-      function ($matches) use($escapeSmarty) {
-      return CRM_Utils_Token::getUserTokenReplacement($matches[1], $escapeSmarty);
+      function ($matches) use ($escapeSmarty) {
+        return CRM_Utils_Token::getUserTokenReplacement($matches[1], $escapeSmarty);
       },
       $str
     );
@@ -1575,8 +1591,8 @@ class CRM_Utils_Token {
     $key = 'contribution';
     if (self::$_tokens[$key] == NULL) {
       self::$_tokens[$key] = array_keys(array_merge(CRM_Contribute_BAO_Contribution::exportableFields('All'),
-          array('campaign', 'financial_type')
-        ));
+        array('campaign', 'financial_type')
+      ));
     }
   }
 
@@ -1648,8 +1664,8 @@ class CRM_Utils_Token {
 
     $str = preg_replace_callback(
       self::tokenRegex($key),
-      function ($matches) use(&$contribution, $html, $escapeSmarty) {
-      return CRM_Utils_Token::getContributionTokenReplacement($matches[1], $contribution, $html, $escapeSmarty);
+      function ($matches) use (&$contribution, $html, $escapeSmarty) {
+        return CRM_Utils_Token::getContributionTokenReplacement($matches[1], $contribution, $html, $escapeSmarty);
       },
       $str
     );
@@ -1719,7 +1735,10 @@ class CRM_Utils_Token {
 
       case 'fee':
         try {
-          $value = civicrm_api3('membership_type', 'getvalue', array('id' => $membership['membership_type_id'], 'return' => 'minimum_fee'));
+          $value = civicrm_api3('membership_type', 'getvalue', array(
+              'id' => $membership['membership_type_id'],
+              'return' => 'minimum_fee'
+            ));
         }
         catch (CiviCRM_API3_Exception $e) {
           // we can anticipate we will get an error if the minimum fee is set to 'NULL' because of the way the

@@ -275,8 +275,8 @@ class CRM_Core_Component {
     $fields = array();
     foreach ($info as $name => $comp) {
       if ($comp->usesSearch()) {
-        $bqr    = $comp->getBAOQueryObject();
-        $flds   = $bqr->getFields();
+        $bqr = $comp->getBAOQueryObject();
+        $flds = $bqr->getFields();
         $fields = array_merge($fields, $flds);
       }
     }

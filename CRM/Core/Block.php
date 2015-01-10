@@ -240,7 +240,9 @@ class CRM_Core_Block {
     foreach (self::properties() as $id => $value) {
       if ($value['active']) {
         if (in_array($id, array(
-          self::ADD, self::CREATE_NEW))) {
+          self::ADD,
+          self::CREATE_NEW
+        ))) {
           $hasAccess = TRUE;
           if (!CRM_Core_Permission::check('add contacts') &&
             !CRM_Core_Permission::check('edit groups')
@@ -304,7 +306,7 @@ class CRM_Core_Block {
         $defaultLocation = CRM_Core_BAO_LocationType::getDefault();
         $defaultPrimaryLocationId = $defaultLocation->id;
         $values = array(
-        'postURL' => CRM_Utils_System::url('civicrm/contact/add', 'reset=1&ct=Individual'),
+          'postURL' => CRM_Utils_System::url('civicrm/contact/add', 'reset=1&ct=Individual'),
           'primaryLocationType' => $defaultPrimaryLocationId,
         );
 
@@ -328,7 +330,8 @@ class CRM_Core_Block {
         $urlArray = array(
           'fullTextSearchID' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue',
             'CRM_Contact_Form_Search_Custom_FullText', 'value', 'name'
-          ));
+          )
+        );
         self::setProperty(self::FULLTEXT_SEARCH, 'templateValues', $urlArray);
         break;
 
@@ -367,7 +370,8 @@ class CRM_Core_Block {
           'query' => 'action=add&reset=1&context=standalone',
           'ref' => 'new-activity',
           'title' => ts('Activity'),
-        )));
+        )
+      ));
 
       $components = CRM_Core_Component::getEnabledComponents();
 
@@ -385,30 +389,33 @@ class CRM_Core_Block {
       // new email (select recipients)
       $shortCuts = array_merge($shortCuts, array(
         array(
-      'path' => 'civicrm/activity/email/add',
-            'query' => 'atype=3&action=add&reset=1&context=standalone',
-            'ref' => 'new-email',
-            'title' => ts('Email'),
-          )));
+          'path' => 'civicrm/activity/email/add',
+          'query' => 'atype=3&action=add&reset=1&context=standalone',
+          'ref' => 'new-email',
+          'title' => ts('Email'),
+        )
+      ));
 
       if (CRM_Core_Permission::check('edit groups')) {
         $shortCuts = array_merge($shortCuts, array(
           array(
-        'path' => 'civicrm/group/add',
-              'query' => 'reset=1',
-              'ref' => 'new-group',
-              'title' => ts('Group'),
-            )));
+            'path' => 'civicrm/group/add',
+            'query' => 'reset=1',
+            'ref' => 'new-group',
+            'title' => ts('Group'),
+          )
+        ));
       }
 
       if (CRM_Core_Permission::check('administer CiviCRM')) {
         $shortCuts = array_merge($shortCuts, array(
           array(
-        'path' => 'civicrm/admin/tag',
-              'query' => 'reset=1&action=add',
-              'ref' => 'new-tag',
-              'title' => ts('Tag'),
-            )));
+            'path' => 'civicrm/admin/tag',
+            'query' => 'reset=1&action=add',
+            'ref' => 'new-tag',
+            'title' => ts('Tag'),
+          )
+        ));
       }
 
       if (empty($shortCuts)) {
@@ -453,7 +460,7 @@ class CRM_Core_Block {
       $value['url'] = CRM_Utils_System::url($short['path'], $short['query'], FALSE);
     }
     $value['title'] = $short['title'];
-    $value['ref']   = $short['ref'];
+    $value['ref'] = $short['ref'];
     if (!empty($short['shortCuts'])) {
       foreach ($short['shortCuts'] as $shortCut) {
         $value['shortCuts'][] = self::setShortcutValues($shortCut);
@@ -472,10 +479,11 @@ class CRM_Core_Block {
     if (CRM_Core_Permission::check('access Contact Dashboard')) {
       $dashboardLinks = array(
         array(
-      'path' => 'civicrm/user',
+          'path' => 'civicrm/user',
           'query' => 'reset=1',
           'title' => ts('My Contact Dashboard'),
-        ));
+        )
+      );
     }
 
     if (empty($dashboardLinks)) {
@@ -492,8 +500,8 @@ class CRM_Core_Block {
         $value['url'] = CRM_Utils_System::url($dash['path'], $dash['query'], FALSE);
       }
       $value['title'] = $dash['title'];
-      $value['key']   = CRM_Utils_Array::value('key', $dash);
-      $values[]       = $value;
+      $value['key'] = CRM_Utils_Array::value('key', $dash);
+      $values[] = $value;
     }
     self::setProperty(self::DASHBOARD, 'templateValues', array('dashboardLinks' => $values));
   }
@@ -509,7 +517,7 @@ class CRM_Core_Block {
     if (!($shortCuts)) {
       $shortCuts = array(
         array(
-      'path' => 'civicrm/mailing/send',
+          'path' => 'civicrm/mailing/send',
           'query' => 'reset=1',
           'title' => ts('Send Mailing'),
         ),
@@ -523,10 +531,10 @@ class CRM_Core_Block {
 
     $values = array();
     foreach ($shortCuts as $short) {
-      $value          = array();
-      $value['url']   = CRM_Utils_System::url($short['path'], $short['query']);
+      $value = array();
+      $value['url'] = CRM_Utils_System::url($short['path'], $short['query']);
       $value['title'] = $short['title'];
-      $values[]       = $value;
+      $values[] = $value;
     }
     self::setProperty(self::MAIL, 'templateValues', array('shortCuts' => $values));
   }
@@ -635,9 +643,9 @@ class CRM_Core_Block {
       return NULL;
     }
 
-    $block            = array();
-    $block['name']    = 'block-civicrm';
-    $block['id']      = $block['name'] . '_' . $id;
+    $block = array();
+    $block['name'] = 'block-civicrm';
+    $block['id'] = $block['name'] . '_' . $id;
     $block['subject'] = self::fetch($id, 'Subject.tpl',
       array('subject' => self::getProperty($id, 'subject'))
     );

@@ -84,6 +84,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @var array
    */
   public $_fields = array();
+
   /**
    * Build all the data structures needed to build the form
    *
@@ -105,10 +106,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $this->_profileId = CRM_Batch_BAO_Batch::getProfileId($this->_batchInfo['type_id']);
     }
     CRM_Core_Resources::singleton()
-    ->addScriptFile('civicrm', 'templates/CRM/Batch/Form/Entry.js', 1, 'html-header')
-    ->addSetting(array('batch' => array('type_id' => $this->_batchInfo['type_id'])))
-    ->addSetting(array('setting' => array('monetaryThousandSeparator' => CRM_Core_Config::singleton()->monetaryThousandSeparator)))
-    ->addSetting(array('setting' => array('monetaryDecimalPoint' => CRM_Core_Config::singleton()->monetaryDecimalPoint)));
+      ->addScriptFile('civicrm', 'templates/CRM/Batch/Form/Entry.js', 1, 'html-header')
+      ->addSetting(array('batch' => array('type_id' => $this->_batchInfo['type_id'])))
+      ->addSetting(array('setting' => array('monetaryThousandSeparator' => CRM_Core_Config::singleton()->monetaryThousandSeparator)))
+      ->addSetting(array('setting' => array('monetaryDecimalPoint' => CRM_Core_Config::singleton()->monetaryDecimalPoint)));
 
   }
 
@@ -187,7 +188,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     $fileFieldExists = FALSE;
     $preserveDefaultsArray = array(
-      'first_name', 'last_name', 'middle_name',
+      'first_name',
+      'last_name',
+      'middle_name',
       'organization_name',
       'household_name',
     );
@@ -197,7 +200,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $config = CRM_Core_Config::singleton();
 
     for ($rowNumber = 1; $rowNumber <= $this->_batchInfo['item_count']; $rowNumber++) {
-      $this->addEntityRef("primary_contact_id[{$rowNumber}]", '', array('create' => TRUE, 'placeholder' => ts('- select -')));
+      $this->addEntityRef("primary_contact_id[{$rowNumber}]", '', array(
+          'create' => TRUE,
+          'placeholder' => ts('- select -')
+        ));
 
       // special field specific to membership batch udpate
       if ($this->_batchInfo['type_id'] == 2) {
@@ -243,11 +249,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     $this->assign('fields', $this->_fields);
     CRM_Core_Resources::singleton()
-    ->addSetting(array(
-    'contact' => array(
-      'return' => implode(',', $contactReturnProperties),
-      'fieldmap' => array_flip($contactReturnProperties),
-    )));
+      ->addSetting(array(
+        'contact' => array(
+          'return' => implode(',', $contactReturnProperties),
+          'fieldmap' => array_flip($contactReturnProperties),
+        )
+      ));
 
     // don't set the status message when form is submitted.
     $buttonName = $this->controller->getButtonName('submit');
@@ -810,7 +817,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $domainEmail = "$domainEmail[0] <$domainEmail[1]>";
 
           $value['from_email_address'] = $domainEmail;
-          $value['membership_id']      = $membership->id;
+          $value['membership_id'] = $membership->id;
           $value['contribution_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $membership->id, 'contribution_id', 'membership_id');
           CRM_Member_Form_Membership::emailReceipt($this, $value, $membership);
         }

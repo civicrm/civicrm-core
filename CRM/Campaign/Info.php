@@ -127,18 +127,18 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
     ) {
       $shortCuts = array_merge($shortCuts, array(
         array(
-      'path' => 'civicrm/campaign/add',
-            'query' => "reset=1&action=add",
-            'ref' => 'new-campaign',
-            'title' => ts('Campaign'),
-          ),
-          array(
-            'path' => 'civicrm/survey/add',
-            'query' => "reset=1&action=add",
-            'ref' => 'new-survey',
-            'title' => ts('Survey'),
-          ),
-        ));
+          'path' => 'civicrm/campaign/add',
+          'query' => "reset=1&action=add",
+          'ref' => 'new-campaign',
+          'title' => ts('Campaign'),
+        ),
+        array(
+          'path' => 'civicrm/survey/add',
+          'query' => "reset=1&action=add",
+          'ref' => 'new-survey',
+          'title' => ts('Survey'),
+        ),
+      ));
     }
   }
 }

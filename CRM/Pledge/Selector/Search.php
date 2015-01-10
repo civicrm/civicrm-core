@@ -161,8 +161,8 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
     // submitted form values
     $this->_queryParams = &$queryParams;
 
-    $this->_single  = $single;
-    $this->_limit   = $limit;
+    $this->_single = $single;
+    $this->_limit = $limit;
     $this->_context = $context;
 
     $this->_additionalClause = $additionalClause;

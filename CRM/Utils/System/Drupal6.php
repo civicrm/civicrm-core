@@ -157,8 +157,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     $config = CRM_Core_Config::singleton();
 
-    $dao   = new CRM_Core_DAO();
-    $name  = $dao->escape(CRM_Utils_Array::value('name', $params));
+    $dao = new CRM_Core_DAO();
+    $name = $dao->escape(CRM_Utils_Array::value('name', $params));
     $email = $dao->escape(CRM_Utils_Array::value('mail', $params));
     _user_edit_validate(NULL, $params);
     $errors = form_get_errors();
@@ -332,7 +332,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Add a script file
    *
-   * @param $url: string, absolute path to file
+   * @param $url : string, absolute path to file
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -350,7 +350,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Add an inline script
    *
-   * @param $code: string, javascript code
+   * @param $code : string, javascript code
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -368,7 +368,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Add a css file
    *
-   * @param $url: string, absolute path to file
+   * @param $url : string, absolute path to file
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -389,7 +389,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Add an inline style
    *
-   * @param $code: string, css code
+   * @param $code : string, css code
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -465,10 +465,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     }
 
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-    $dbpassword   = md5($password);
-    $name       = $dbDrupal->escapeSimple($strtolower($name));
-    $sql        = 'SELECT u.* FROM ' . $config->userFrameworkUsersTableName . " u WHERE LOWER(u.name) = '$name' AND u.pass = '$dbpassword' AND u.status = 1";
-    $query      = $dbDrupal->query($sql);
+    $dbpassword = md5($password);
+    $name = $dbDrupal->escapeSimple($strtolower($name));
+    $sql = 'SELECT u.* FROM ' . $config->userFrameworkUsersTableName . " u WHERE LOWER(u.name) = '$name' AND u.pass = '$dbpassword' AND u.status = 1";
+    $query = $dbDrupal->query($sql);
 
     $user = NULL;
     // need to change this to make sure we matched only one row
@@ -483,8 +483,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
           $bootStrapParams = array();
           if ($name && $password) {
             $bootStrapParams = array(
-                'name' => $name,
-                'pass' => $password,
+              'name' => $name,
+              'pass' => $password,
             );
           }
           CRM_Utils_System::loadBootStrap($bootStrapParams, TRUE, TRUE, $realPath);
@@ -829,8 +829,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
         $language->prefix &&
         in_array($mode, array(
           LANGUAGE_NEGOTIATION_PATH,
-            LANGUAGE_NEGOTIATION_PATH_DEFAULT,
-          ))
+          LANGUAGE_NEGOTIATION_PATH_DEFAULT,
+        ))
       ) {
 
         if ($addLanguagePart) {
@@ -855,11 +855,11 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
           //kinda hackish but not sure how to do it right
           //hope http_build_url() will help at some point.
           if (is_array($parseUrl) && !empty($parseUrl)) {
-            $urlParts           = explode('/', $url);
-            $hostKey            = array_search($parseUrl['host'], $urlParts);
-            $ufUrlParts         = parse_url(CIVICRM_UF_BASEURL);
+            $urlParts = explode('/', $url);
+            $hostKey = array_search($parseUrl['host'], $urlParts);
+            $ufUrlParts = parse_url(CIVICRM_UF_BASEURL);
             $urlParts[$hostKey] = $ufUrlParts['host'];
-            $url                = implode('/', $urlParts);
+            $url = implode('/', $urlParts);
           }
         }
       }

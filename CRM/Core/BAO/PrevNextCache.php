@@ -86,9 +86,9 @@ WHERE  cacheKey     = %3 AND
         1 => array($mergeId, 'Integer'),
         2 => array($cacheKey, 'String'),
       );
-      $sql       = "SELECT pn.id, pn.entity_id1, pn.entity_id2, pn.data FROM civicrm_prevnext_cache pn {$join} ";
+      $sql = "SELECT pn.id, pn.entity_id1, pn.entity_id2, pn.data FROM civicrm_prevnext_cache pn {$join} ";
       $wherePrev = " WHERE pn.id < %1 AND pn.cacheKey = %2 {$where} ORDER BY ID DESC LIMIT 1";
-      $sqlPrev   = $sql . $wherePrev;
+      $sqlPrev = $sql . $wherePrev;
 
 
       $dao = CRM_Core_DAO::executeQuery($sqlPrev, $p);
@@ -148,9 +148,9 @@ WHERE  cacheKey     = %3 AND
     $params = array(1 => array($entityTable, 'String'));
 
     $pair =
-      ! $isViceVersa ?
-      "entity_id1 = %2 AND entity_id2 = %3" :
-      "(entity_id1 = %2 AND entity_id2 = %3) OR (entity_id1 = %3 AND entity_id2 = %2)";
+      !$isViceVersa ?
+        "entity_id1 = %2 AND entity_id2 = %3" :
+        "(entity_id1 = %2 AND entity_id2 = %3) OR (entity_id1 = %3 AND entity_id2 = %2)";
     $sql .= " AND ( {$pair} )";
     $params[2] = array($id1, 'Integer');
     $params[3] = array($id2, 'Integer');
@@ -289,8 +289,8 @@ WHERE cacheKey $op %1
         $cids[$dupe[1]] = 1;
       }
       $cidString = implode(', ', array_keys($cids));
-      $sql       = "SELECT id, display_name FROM civicrm_contact WHERE id IN ($cidString) ORDER BY sort_name";
-      $dao       = new CRM_Core_DAO();
+      $sql = "SELECT id, display_name FROM civicrm_contact WHERE id IN ($cidString) ORDER BY sort_name";
+      $dao = new CRM_Core_DAO();
       $dao->query($sql);
       while ($dao->fetch()) {
         $displayNames[$dao->id] = $dao->display_name;
@@ -480,7 +480,7 @@ WHERE  cacheKey LIKE %1
       $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
     }
 
-    $qfKey = CRM_Utils_Request::retrieve('qfKey','String', $form);
+    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
     $cacheKey = "civicrm search {$qfKey}";
 
     $query = "

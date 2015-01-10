@@ -211,9 +211,9 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     $fromEmailAddress = CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1');
     if (!empty($fromEmailAddress)) {
       foreach ($fromEmailAddress as $key => $value) {
-        $email     = CRM_Utils_Mail::pluckEmailFromHeader($value);
+        $email = CRM_Utils_Mail::pluckEmailFromHeader($value);
         $fromArray = explode('"', $value);
-        $fromName  = CRM_Utils_Array::value(1, $fromArray);
+        $fromName = CRM_Utils_Array::value(1, $fromArray);
         break;
       }
       return array($fromName, $email);

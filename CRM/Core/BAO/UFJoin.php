@@ -70,9 +70,9 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
    * @param array $params
    */
   public static function deleteAll(&$params) {
-    $module      = CRM_Utils_Array::value('module', $params);
+    $module = CRM_Utils_Array::value('module', $params);
     $entityTable = CRM_Utils_Array::value('entity_table', $params);
-    $entityID    = CRM_Utils_Array::value('entity_id', $params);
+    $entityID = CRM_Utils_Array::value('entity_id', $params);
 
     if (empty($entityTable) ||
       empty($entityID) ||
@@ -81,10 +81,10 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
       return;
     }
 
-    $dao               = new CRM_Core_DAO_UFJoin();
-    $dao->module       = $module;
+    $dao = new CRM_Core_DAO_UFJoin();
+    $dao->module = $module;
     $dao->entity_table = $entityTable;
-    $dao->entity_id    = $entityID;
+    $dao->entity_id = $entityID;
     $dao->delete();
   }
 
@@ -142,8 +142,8 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
     $dao = new CRM_Core_DAO_UFJoin();
 
     $dao->entity_table = CRM_Utils_Array::value('entity_table', $params);
-    $dao->entity_id    = CRM_Utils_Array::value('entity_id', $params);
-    $dao->weight       = CRM_Utils_Array::value('weight', $params);
+    $dao->entity_id = CRM_Utils_Array::value('entity_id', $params);
+    $dao->weight = CRM_Utils_Array::value('weight', $params);
     if ($dao->find(TRUE)) {
       return $dao->uf_group_id;
     }

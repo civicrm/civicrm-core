@@ -80,12 +80,12 @@ class CRM_Group_Form_Search extends CRM_Core_Form {
     );
 
     $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Search'),
-          'isDefault' => TRUE,
-        ),
-      ));
+      array(
+        'type' => 'refresh',
+        'name' => ts('Search'),
+        'isDefault' => TRUE,
+      ),
+    ));
 
     parent::buildQuickForm();
     $this->assign('suppressForm', TRUE);

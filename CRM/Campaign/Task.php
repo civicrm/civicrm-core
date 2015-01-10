@@ -69,8 +69,8 @@ class CRM_Campaign_Task {
   public static function &tasks() {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
-      1 => array(
-        'title' => ts('Record Respondents Interview'),
+        1 => array(
+          'title' => ts('Record Respondents Interview'),
           'class' => array(
             'CRM_Campaign_Form_Task_Interview',
             'CRM_Campaign_Form_Task_Release',

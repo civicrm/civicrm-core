@@ -86,41 +86,41 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
   static $_tableDAOMapper =
     array(
-      'civicrm_event'       => 'CRM_Event_DAO_Event',
+      'civicrm_event' => 'CRM_Event_DAO_Event',
       'civicrm_price_set_entity' => 'CRM_Price_DAO_PriceSetEntity',
-      'civicrm_uf_join'     => 'CRM_Core_DAO_UFJoin',
+      'civicrm_uf_join' => 'CRM_Core_DAO_UFJoin',
       'civicrm_tell_friend' => 'CRM_Friend_DAO_Friend',
-      'civicrm_pcp_block'   => 'CRM_PCP_DAO_PCPBlock',
-      'civicrm_activity'    => 'CRM_Activity_DAO_Activity',
-      'civicrm_activity_contact'  => 'CRM_Activity_DAO_ActivityContact',
+      'civicrm_pcp_block' => 'CRM_PCP_DAO_PCPBlock',
+      'civicrm_activity' => 'CRM_Activity_DAO_Activity',
+      'civicrm_activity_contact' => 'CRM_Activity_DAO_ActivityContact',
     );
 
   static $_updateSkipFields =
     array(
-      'civicrm_event'       => array('start_date', 'end_date'),
+      'civicrm_event' => array('start_date', 'end_date'),
       'civicrm_tell_friend' => array('entity_id'),
-      'civicrm_pcp_block'   => array('entity_id'),
-      'civicrm_activity'    => array('activity_date_time'),
+      'civicrm_pcp_block' => array('entity_id'),
+      'civicrm_activity' => array('activity_date_time'),
     );
 
   static $_linkedEntitiesInfo =
     array(
       'civicrm_tell_friend' => array(
-        'entity_id_col'    => 'entity_id',
+        'entity_id_col' => 'entity_id',
         'entity_table_col' => 'entity_table'
       ),
       'civicrm_price_set_entity' => array(
-        'entity_id_col'    => 'entity_id',
+        'entity_id_col' => 'entity_id',
         'entity_table_col' => 'entity_table',
-        'is_multirecord'   => TRUE,
+        'is_multirecord' => TRUE,
       ),
       'civicrm_uf_join' => array(
-        'entity_id_col'    => 'entity_id',
+        'entity_id_col' => 'entity_id',
         'entity_table_col' => 'entity_table',
-        'is_multirecord'   => TRUE,
+        'is_multirecord' => TRUE,
       ),
       'civicrm_pcp_block' => array(
-        'entity_id_col'    => 'entity_id',
+        'entity_id_col' => 'entity_id',
         'entity_table_col' => 'entity_table'
       ),
     );
@@ -132,6 +132,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   public static function setStatus($status) {
     self::$status = $status;
   }
+
   /**
    * Save records in civicrm_recujrring_entity table
    *
@@ -181,8 +182,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   public static function quickAdd($parentId, $entityId, $entityTable) {
     $params =
       array(
-        'parent_id'    => $parentId,
-        'entity_id'    => $entityId,
+        'parent_id' => $parentId,
+        'entity_id' => $entityId,
         'entity_table' => $entityTable
       );
     return self::add($params);
@@ -255,7 +256,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   public function generateEntities() {
     self::setStatus(self::RUNNING);
 
-    $newEntities  = array();
+    $newEntities = array();
     $findCriteria = array();
     if (!empty($this->recursionDates)) {
       if ($this->entity_id) {
@@ -329,7 +330,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       $exRangeStart = $exRangeEnd = NULL;
       if (!empty($this->excludeDateRangeColumns)) {
         $exRangeStart = $this->excludeDateRangeColumns[0];
-        $exRangeEnd   = $this->excludeDateRangeColumns[1];
+        $exRangeEnd = $this->excludeDateRangeColumns[1];
       }
 
       $count = 1;
@@ -351,7 +352,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         }
         if ($exRangeStart) {
           $exRangeStartDate = CRM_Utils_Date::processDate($recursionDates[$count][$exRangeStart], NULL, FALSE, 'Ymd');
-          $exRangeEndDate   = CRM_Utils_Date::processDate($recursionDates[$count][$exRangeEnd], NULL, FALSE, 'Ymd');
+          $exRangeEndDate = CRM_Utils_Date::processDate($recursionDates[$count][$exRangeEnd], NULL, FALSE, 'Ymd');
         }
 
         foreach ($this->excludeDates as $exDate) {
@@ -419,7 +420,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
 
     $queryParams = array(
-      1 => array($parentId,    'Integer'),
+      1 => array($parentId, 'Integer'),
       2 => array($entityTable, 'String'),
       3 => array($initiatorId, 'Integer'),
     );
@@ -546,7 +547,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     $newObject = CRM_Core_DAO::copyGeneric($daoName, $fromCriteria, $newParams);
 
     if (is_a($newObject, 'CRM_Core_DAO') && $newObject->id && $createRecurringEntity) {
-      $object = new $daoName( );
+      $object = new $daoName();
       foreach ($fromCriteria as $key => $value) {
         $object->$key = $value;
       }
@@ -609,7 +610,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       $processedEntities[$key] = 1;
 
       if (array_key_exists($entityTable, self::$_tableDAOMapper)) {
-        $daoName  = self::$_tableDAOMapper[$entityTable];
+        $daoName = self::$_tableDAOMapper[$entityTable];
 
         $skipData = array();
         if (array_key_exists($entityTable, self::$_updateSkipFields)) {
@@ -681,14 +682,15 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     if (empty($hasaRecurringRecord)) {
       // check if its a linked entity
       if (array_key_exists($obj->__table, self::$_linkedEntitiesInfo) &&
-        !CRM_Utils_Array::value('is_multirecord', self::$_linkedEntitiesInfo[$obj->__table])) {
+        !CRM_Utils_Array::value('is_multirecord', self::$_linkedEntitiesInfo[$obj->__table])
+      ) {
         $linkedDAO = new self::$_tableDAOMapper[$obj->__table]();
         $linkedDAO->id = $obj->id;
         if ($linkedDAO->find(TRUE)) {
           $idCol = self::$_linkedEntitiesInfo[$obj->__table]['entity_id_col'];
           $tableCol = self::$_linkedEntitiesInfo[$obj->__table]['entity_table_col'];
 
-          $pEntityID    = $linkedDAO->$idCol;
+          $pEntityID = $linkedDAO->$idCol;
           $pEntityTable = $linkedDAO->$tableCol;
 
           // find all parent recurring entity set
@@ -719,7 +721,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
               else {
                 // linked entity doesn't exist. lets create them
                 $newCriteria = array(
-                  $idCol    => $val['id'],
+                  $idCol => $val['id'],
                   $tableCol => $val['table']
                 );
                 $linkedObj = CRM_Core_BAO_RecurringEntity::copyCreateEntity($obj->__table,
@@ -884,7 +886,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       }
       if ($formParams['repeats_by'] == 2) {
         if (CRM_Utils_Array::value('entity_status_1', $formParams) && CRM_Utils_Array::value('entity_status_2', $formParams)) {
-          $dbParams['entity_status'] = $formParams['entity_status_1']." ".$formParams['entity_status_2'];
+          $dbParams['entity_status'] = $formParams['entity_status_1'] . " " . $formParams['entity_status_2'];
         }
       }
     }
@@ -976,7 +978,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         if ($repetition_frequency_unit == "day") {
           $repetition_frequency_unit = "dai";
         }
-        $repetition_frequency_unit = $repetition_frequency_unit.'ly';
+        $repetition_frequency_unit = $repetition_frequency_unit . 'ly';
         $r->recur($start, $repetition_frequency_unit);
       }
 
@@ -1005,27 +1007,27 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         if ($scheduleReminderDetails['entity_status']) {
           $startActionDate = explode(" ", $scheduleReminderDetails['entity_status']);
           switch ($startActionDate[0]) {
-          case 'first':
-            $startActionDate1 = 1;
-            break;
+            case 'first':
+              $startActionDate1 = 1;
+              break;
 
-          case 'second':
-            $startActionDate1 = 2;
-            break;
+            case 'second':
+              $startActionDate1 = 2;
+              break;
 
-          case 'third':
-            $startActionDate1 = 3;
-            break;
+            case 'third':
+              $startActionDate1 = 3;
+              break;
 
-          case 'fourth':
-            $startActionDate1 = 4;
-            break;
+            case 'fourth':
+              $startActionDate1 = 4;
+              break;
 
-          case 'last':
-            $startActionDate1 = -1;
-            break;
+            case 'last':
+              $startActionDate1 = -1;
+              break;
           }
-          $concatStartActionDateBits = $startActionDate1.strtoupper(substr($startActionDate[1], 0, 2));
+          $concatStartActionDateBits = $startActionDate1 . strtoupper(substr($startActionDate[1], 0, 2));
           $r->byday(array($concatStartActionDateBits));
         }
         elseif ($scheduleReminderDetails['limit_to']) {
@@ -1043,7 +1045,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
       if (CRM_Utils_Array::value('absolute_date', $scheduleReminderDetails)) {
         $absoluteDate = CRM_Utils_Date::setDateDefaults($scheduleReminderDetails['absolute_date']);
-        $endDate = new DateTime($absoluteDate[0].' '.$absoluteDate[1]);
+        $endDate = new DateTime($absoluteDate[0] . ' ' . $absoluteDate[1]);
         $endDate->modify('+1 day');
         $r->until($endDate);
       }
@@ -1075,7 +1077,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   static public function getInterval($startDate, $endDate) {
     if ($startDate && $endDate) {
       $startDate = new DateTime($startDate);
-      $endDate   = new DateTime($endDate);
+      $endDate = new DateTime($endDate);
       return $startDate->diff($endDate);
     }
   }
@@ -1122,7 +1124,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    */
   public static function updateModeLinkedEntity($entityId, $linkedEntityTable, $mainEntityTable) {
     $result = array();
-    if ( $entityId && $linkedEntityTable && $mainEntityTable ) {
+    if ($entityId && $linkedEntityTable && $mainEntityTable) {
       if (CRM_Utils_Array::value($linkedEntityTable, self::$_tableDAOMapper)) {
         $dao = self::$_tableDAOMapper[$linkedEntityTable];
       }
@@ -1132,9 +1134,9 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       }
       $entityTable = $linkedEntityTable;
       $params = array(
-                      'entity_id' => $entityId,
-                      'entity_table' => $mainEntityTable
-                    );
+        'entity_id' => $entityId,
+        'entity_table' => $mainEntityTable
+      );
       $defaults = array();
       CRM_Core_DAO::commonRetrieve($dao, $params, $defaults);
       if (CRM_Utils_Array::value('id', $defaults)) {

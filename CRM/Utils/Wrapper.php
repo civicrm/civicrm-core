@@ -62,15 +62,15 @@ class CRM_Utils_Wrapper {
    */
   public function run($formName, $formLabel = NULL, $arguments = NULL) {
     if (is_array($arguments)) {
-      $mode         = CRM_Utils_Array::value('mode', $arguments);
-      $imageUpload  = (bool) CRM_Utils_Array::value('imageUpload', $arguments, FALSE);
-      $addSequence  = (bool) CRM_Utils_Array::value('addSequence', $arguments, FALSE);
+      $mode = CRM_Utils_Array::value('mode', $arguments);
+      $imageUpload = (bool) CRM_Utils_Array::value('imageUpload', $arguments, FALSE);
+      $addSequence = (bool) CRM_Utils_Array::value('addSequence', $arguments, FALSE);
       $attachUpload = (bool) CRM_Utils_Array::value('attachUpload', $arguments, FALSE);
-      $ignoreKey    = (bool) CRM_Utils_Array::value('ignoreKey', $arguments, FALSE);
+      $ignoreKey = (bool) CRM_Utils_Array::value('ignoreKey', $arguments, FALSE);
     }
     else {
-      $arguments   = array();
-      $mode        = NULL;
+      $arguments = array();
+      $mode = NULL;
       $addSequence = $ignoreKey = $imageUpload = $attachUpload = FALSE;
     }
 
@@ -87,11 +87,11 @@ class CRM_Utils_Wrapper {
     if (array_key_exists('urlToSession', $arguments)) {
       if (is_array($arguments['urlToSession'])) {
         foreach ($arguments['urlToSession'] as $params) {
-          $urlVar     = CRM_Utils_Array::value('urlVar', $params);
+          $urlVar = CRM_Utils_Array::value('urlVar', $params);
           $sessionVar = CRM_Utils_Array::value('sessionVar', $params);
-          $type       = CRM_Utils_Array::value('type', $params);
-          $default    = CRM_Utils_Array::value('default', $params);
-          $abort      = CRM_Utils_Array::value('abort', $params, FALSE);
+          $type = CRM_Utils_Array::value('type', $params);
+          $default = CRM_Utils_Array::value('default', $params);
+          $abort = CRM_Utils_Array::value('abort', $params, FALSE);
 
           $value = NULL;
           $value = CRM_Utils_Request::retrieve(

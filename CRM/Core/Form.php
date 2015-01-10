@@ -221,14 +221,31 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function registerRules() {
     static $rules = array(
-      'title', 'longTitle', 'variable', 'qfVariable',
-      'phone', 'integer', 'query',
-      'url', 'wikiURL',
-      'domain', 'numberOfDigit',
-      'date', 'currentDate',
-      'asciiFile', 'htmlFile', 'utf8File',
-      'objectExists', 'optionExists', 'postalCode', 'money', 'positiveInteger',
-      'xssString', 'fileExists', 'autocomplete', 'validContact',
+      'title',
+      'longTitle',
+      'variable',
+      'qfVariable',
+      'phone',
+      'integer',
+      'query',
+      'url',
+      'wikiURL',
+      'domain',
+      'numberOfDigit',
+      'date',
+      'currentDate',
+      'asciiFile',
+      'htmlFile',
+      'utf8File',
+      'objectExists',
+      'optionExists',
+      'postalCode',
+      'money',
+      'positiveInteger',
+      'xssString',
+      'fileExists',
+      'autocomplete',
+      'validContact',
     );
 
     foreach ($rules as $rule) {
@@ -329,7 +346,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->postProcessHook();
 
     // Respond with JSON if in AJAX context (also support legacy value '6')
-    if ($allowAjax && !empty($_REQUEST['snippet']) && in_array($_REQUEST['snippet'], array(CRM_Core_Smarty::PRINT_JSON, 6))) {
+    if ($allowAjax && !empty($_REQUEST['snippet']) && in_array($_REQUEST['snippet'], array(
+          CRM_Core_Smarty::PRINT_JSON,
+          6
+        ))
+    ) {
       $this->ajaxResponse['buttonName'] = str_replace('_qf_' . $this->getAttribute('id') . '_', '', $this->controller->getButtonName());
       $this->ajaxResponse['action'] = $this->_action;
       if (isset($this->_id) || isset($this->id)) {
@@ -469,10 +490,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     //Set html data-attribute to enable warning user of unsaved changes
     if ($this->unsavedChangesWarn === TRUE
-        || (!isset($this->unsavedChangesWarn)
-           && ($this->_action & CRM_Core_Action::ADD || $this->_action & CRM_Core_Action::UPDATE)
-           )
-        ) {
+      || (!isset($this->unsavedChangesWarn)
+        && ($this->_action & CRM_Core_Action::ADD || $this->_action & CRM_Core_Action::UPDATE)
+      )
+    ) {
       $this->setAttribute('data-warn-changes', 'true');
     }
   }
@@ -689,9 +710,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
     else {
       $tplname = str_replace('_',
-        DIRECTORY_SEPARATOR,
-        CRM_Utils_System::getClassName($this)
-      ) . '.tpl';
+          DIRECTORY_SEPARATOR,
+          CRM_Utils_System::getClassName($this)
+        ) . '.tpl';
     }
     return $tplname;
   }
@@ -873,7 +894,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function addYesNo($id, $title, $allowClear = FALSE, $required = NULL, $attributes = array()) {
     $attributes += array('id_suffix' => $id);
-    $choice   = array();
+    $choice = array();
     $choice[] = $this->createElement('radio', NULL, '11', ts('Yes'), '1', $attributes);
     $choice[] = $this->createElement('radio', NULL, '11', ts('No'), '0', $attributes);
 
@@ -1112,8 +1133,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'editor_id'
     );
     $editor = strtolower(CRM_Utils_Array::value($editorID,
-        CRM_Core_OptionGroup::values('wysiwyg_editor')
-      ));
+      CRM_Core_OptionGroup::values('wysiwyg_editor')
+    ));
     if (!$editor || $forceTextarea) {
       $editor = 'textarea';
     }
@@ -1152,7 +1173,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public function addCountry($id, $title, $required = NULL, $extra = NULL) {
     $this->addElement('select', $id, $title,
       array(
-        '' => ts('- select -')) + CRM_Core_PseudoConstant::country(), $extra
+        '' => ts('- select -')
+      ) + CRM_Core_PseudoConstant::country(), $extra
     );
     if ($required) {
       $this->addRule($id, ts('Please select %1', array(1 => $title)), 'required');
@@ -1487,8 +1509,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       if (!empty($params[$fieldName])) {
         $params[$fieldName] = CRM_Utils_Date::isoToMysql(
           CRM_Utils_Date::processDate(
-          $params[$fieldName],
-          CRM_Utils_Array::value("{$fieldName}_time", $params), TRUE)
+            $params[$fieldName],
+            CRM_Utils_Array::value("{$fieldName}_time", $params), TRUE)
         );
       }
       else {
@@ -1623,21 +1645,24 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function addAutoSelector($profiles = array(), $autoCompleteField = array()) {
     $autoCompleteField = array_merge(array(
-        'id_field' => 'select_contact_id',
-        'placeholder' => ts('Select someone else ...'),
-        'show_hide' => TRUE,
-        'api' => array('params' => array('contact_type' => 'Individual')),
-      ), $autoCompleteField);
+      'id_field' => 'select_contact_id',
+      'placeholder' => ts('Select someone else ...'),
+      'show_hide' => TRUE,
+      'api' => array('params' => array('contact_type' => 'Individual')),
+    ), $autoCompleteField);
 
     if ($this->canUseAjaxContactLookups()) {
       $this->assign('selectable', $autoCompleteField['id_field']);
-      $this->addEntityRef($autoCompleteField['id_field'], NULL, array('placeholder' => $autoCompleteField['placeholder'], 'api' => $autoCompleteField['api']));
+      $this->addEntityRef($autoCompleteField['id_field'], NULL, array(
+          'placeholder' => $autoCompleteField['placeholder'],
+          'api' => $autoCompleteField['api']
+        ));
 
       CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AlternateContactSelector.js', 1, 'html-header')
-      ->addSetting(array(
-      'form' => array('autocompletes' => $autoCompleteField),
-      'ids' => array('profile' => $profiles),
-      ));
+        ->addSetting(array(
+          'form' => array('autocompletes' => $autoCompleteField),
+          'ids' => array('profile' => $profiles),
+        ));
     }
   }
 
@@ -1645,7 +1670,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function canUseAjaxContactLookups() {
     if (0 < (civicrm_api3('contact', 'getcount', array('check_permissions' => 1))) &&
-      CRM_Core_Permission::check(array(array('access AJAX API', 'access CiviCRM')))) {
+      CRM_Core_Permission::check(array(array('access AJAX API', 'access CiviCRM')))
+    ) {
       return TRUE;
     }
   }
@@ -1750,7 +1776,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function addChainSelect($elementName, $settings = array()) {
     $props = $settings += array(
-      'control_field' => str_replace(array('state_province', 'StateProvince', 'county', 'County'), array('country', 'Country', 'state_province', 'StateProvince'), $elementName),
+      'control_field' => str_replace(array('state_province', 'StateProvince', 'county', 'County'), array(
+          'country',
+          'Country',
+          'state_province',
+          'StateProvince'
+        ), $elementName),
       'data-callback' => strpos($elementName, 'rovince') ? 'civicrm/ajax/jqState' : 'civicrm/ajax/jqCounty',
       'label' => strpos($elementName, 'rovince') ? ts('State/Province') : ts('County'),
       'data-empty-prompt' => strpos($elementName, 'rovince') ? ts('Choose country first') : ts('Choose state first'),

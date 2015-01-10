@@ -108,11 +108,11 @@ ORDER BY title";
       $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
       $rows = array();
       while ($dao->fetch()) {
-        $row                = array();
-        $row['id']          = $dao->id;
-        $row['title']       = $dao->title;
+        $row = array();
+        $row['id'] = $dao->id;
+        $row['title'] = $dao->title;
         $row['description'] = $dao->description;
-        $row['checkbox']    = CRM_Core_Form::CB_PREFIX . $row['id'];
+        $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $row['id'];
         $this->addElement('checkbox',
           $row['checkbox'],
           NULL, NULL
@@ -131,12 +131,13 @@ ORDER BY title";
     // if recaptcha is not configured, then dont add it
     // CRM-11316 Only enable ReCAPTCHA for anonymous visitors
     $config = CRM_Core_Config::singleton();
-    $session   = CRM_Core_Session::singleton();
+    $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
 
     if (empty($config->recaptchaPublicKey) ||
       empty($config->recaptchaPrivateKey) ||
-      $contactID) {
+      $contactID
+    ) {
       $addCaptcha = FALSE;
     }
     else {

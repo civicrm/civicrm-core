@@ -273,7 +273,7 @@ AND li.entity_id = {$entityId}
    *                          to the price set used for particular event
    * @param array $values
    *   Reference to the values array(.
-  this is
+   * this is
    *                          lineItem array)
    *
    * @return void
@@ -523,7 +523,8 @@ AND li.entity_id = {$entityId}
             $params['is_quick_config'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $setID, 'is_quick_config');
           }
           if (!empty($params['is_quick_config']) && array_key_exists('total_amount', $params)
-            && $totalEntityId == 1) {
+            && $totalEntityId == 1
+          ) {
             $values['line_total'] = $values['unit_price'] = $params['total_amount'];
           }
           $values['id'] = $key;

@@ -73,7 +73,10 @@ class CRM_Contribute_Form_Task_PickProfile extends CRM_Contribute_Form_Task {
     $validate = FALSE;
     //validations
     if (count($this->_contributionIds) > $this->_maxContributions) {
-      CRM_Core_Session::setStatus(ts("The maximum number of contributions you can select for Batch Update is %1. You have selected %2. Please select fewer contributions from your search results and try again.", array(1 => $this->_maxContributions, 2 => count($this->_contributionIds))), ts('Batch Update Error'), 'error');
+      CRM_Core_Session::setStatus(ts("The maximum number of contributions you can select for Batch Update is %1. You have selected %2. Please select fewer contributions from your search results and try again.", array(
+            1 => $this->_maxContributions,
+            2 => count($this->_contributionIds)
+          )), ts('Batch Update Error'), 'error');
       $validate = TRUE;
     }
 
@@ -101,7 +104,8 @@ class CRM_Contribute_Form_Task_PickProfile extends CRM_Contribute_Form_Task {
 
     $ufGroupElement = $this->add('select', 'uf_group_id', ts('Select Profile'),
       array(
-        '' => ts('- select profile -')) + $profiles, TRUE
+        '' => ts('- select profile -')
+      ) + $profiles, TRUE
     );
     $this->addDefaultButtons(ts('Continue'));
   }

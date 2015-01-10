@@ -139,7 +139,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
       'email' => ts('Send emails where possible. Generate printable PDFs for contacts who cannot receive email.'),
       'both' => ts('Send emails where possible. Generate printable PDFs for all contacts.'),
     );
-    if (CRM_Core_Config::singleton()->doNotAttachPDFReceipt)  {
+    if (CRM_Core_Config::singleton()->doNotAttachPDFReceipt) {
       $emailOptions['pdfemail'] = ts('Send emails with an attached PDF where possible. Generate printable PDFs for contacts who cannot receive email.');
       $emailOptions['pdfemail_both'] = ts('Send emails with an attached PDF where possible. Generate printable PDFs for all contacts.');
     }

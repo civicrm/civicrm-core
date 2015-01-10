@@ -154,7 +154,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
         $query = 'UPDATE civicrm_relationship SET end_date=%2 WHERE id=%1';
         foreach ($rels as $relId => $relData) {
           $relParams = array(
-          1 => array($relId, 'Integer'),
+            1 => array($relId, 'Integer'),
             2 => array($params['end_date'], 'Timestamp'),
           );
           CRM_Core_DAO::executeQuery($query, $relParams);

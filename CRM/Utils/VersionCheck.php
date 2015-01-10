@@ -183,7 +183,8 @@ class CRM_Utils_VersionCheck {
     foreach ($this->versionInfo as $majorVersion) {
       foreach ($majorVersion['releases'] as $release) {
         if (!empty($release['security']) && $release['date'] > $localVersionDate
-          && version_compare($this->localVersion, $release['version']) < 0) {
+          && version_compare($this->localVersion, $release['version']) < 0
+        ) {
           if (!$this->ignoreDate || $this->ignoreDate < $release['date']) {
             return TRUE;
           }
@@ -255,7 +256,8 @@ class CRM_Utils_VersionCheck {
             <li><a class="crm-setVersionCheckIgnoreDate" href="' . $settingsUrl . '">' . ts('Suppress this message') . '</a></li>
           </ul>';
         $session->setStatus($msg, ts('Security Alert'), 'alert');
-        CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Admin/Form/Setting/versionCheckOptions.js');
+        CRM_Core_Resources::singleton()
+          ->addScriptFile('civicrm', 'templates/CRM/Admin/Form/Setting/versionCheckOptions.js');
       }
     }
     elseif (CRM_Core_Permission::check('administer CiviCRM') && $versionAlertSetting > 1) {
@@ -269,7 +271,8 @@ class CRM_Utils_VersionCheck {
               <li><a class="crm-setVersionCheckIgnoreDate" href="' . $settingsUrl . '">' . ts('Suppress this message') . '</a></li>
             </ul>';
           $session->setStatus($msg, ts('Update Available'), 'info');
-          CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Admin/Form/Setting/versionCheckOptions.js');
+          CRM_Core_Resources::singleton()
+            ->addScriptFile('civicrm', 'templates/CRM/Admin/Form/Setting/versionCheckOptions.js');
         }
       }
     }

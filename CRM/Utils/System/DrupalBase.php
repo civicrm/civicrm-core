@@ -44,6 +44,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @var bool
    */
   var $supports_UF_Logging = TRUE;
+
   /**
    */
   public function __construct() {
@@ -272,7 +273,12 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    */
   public function getUserRecordUrl($contactID) {
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
-    if (CRM_Core_Session::singleton()->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm(array('cms:administer users', 'cms:view user account'))) {
+    if (CRM_Core_Session::singleton()
+        ->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm(array(
+          'cms:administer users',
+          'cms:view user account'
+        ))
+    ) {
       return CRM_Utils_System::url('user/' . $uid);
     };
   }
@@ -353,6 +359,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       }
     }
   }
+
   /**
    * Format the url as per language Negotiation.
    *
@@ -404,11 +411,11 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
               //kinda hackish but not sure how to do it right
               //hope http_build_url() will help at some point.
               if (is_array($parseUrl) && !empty($parseUrl)) {
-                $urlParts           = explode('/', $url);
-                $hostKey            = array_search($parseUrl['host'], $urlParts);
-                $ufUrlParts         = parse_url(CIVICRM_UF_BASEURL);
+                $urlParts = explode('/', $url);
+                $hostKey = array_search($parseUrl['host'], $urlParts);
+                $ufUrlParts = parse_url(CIVICRM_UF_BASEURL);
                 $urlParts[$hostKey] = $ufUrlParts['host'];
-                $url                = implode('/', $urlParts);
+                $url = implode('/', $urlParts);
               }
             }
           }
@@ -465,6 +472,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
     return CRM_Core_I18n_PseudoConstant::longForShort(substr($language->language, 0, 2));
   }
+
   /**
    * Perform any post login activities required by the UF -
    * e.g. for drupal: records a watchdog message about the new session, saves the login timestamp,

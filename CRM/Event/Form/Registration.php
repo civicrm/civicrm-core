@@ -346,7 +346,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       );
       list($this->_values['custom_pre_id'],
         $this->_values['custom_post_id']
-      ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+        ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
       // set profiles for additional participants
       if ($this->_values['event']['is_multiple_registrations']) {
@@ -355,7 +355,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
         list($this->_values['additional_custom_pre_id'],
           $this->_values['additional_custom_post_id'], $preActive, $postActive
-        ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+          ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
         // CRM-4377: we need to maintain backward compatibility, hence if there is profile for main contact
         // set same profile for additional contacts.
@@ -429,8 +429,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     // Handle PCP
     $pcpId = CRM_Utils_Request::retrieve('pcpId', 'Positive', $this);
     if ($pcpId) {
-      $pcp             = CRM_PCP_BAO_PCP::handlePcp($pcpId, 'event', $this->_values['event']);
-      $this->_pcpId    = $pcp['pcpId'];
+      $pcp = CRM_PCP_BAO_PCP::handlePcp($pcpId, 'event', $this->_values['event']);
+      $this->_pcpId = $pcp['pcpId'];
       $this->_values['event']['intro_text'] = CRM_Utils_Array::value('intro_text', $pcp['pcpInfo']);
     }
 
@@ -485,8 +485,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->set('name', $name);
 
     $vars = array(
-      'amount', 'currencyID', 'credit_card_type',
-      'trxn_id', 'amount_level', 'receive_date',
+      'amount',
+      'currencyID',
+      'credit_card_type',
+      'trxn_id',
+      'amount_level',
+      'receive_date',
     );
 
     foreach ($vars as $v) {
@@ -564,9 +568,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public function buildCustom($id, $name, $viewOnly = FALSE) {
     if ($id) {
-      $button    = substr($this->controller->getButtonName(), -4);
-      $cid       = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-      $session   = CRM_Core_Session::singleton();
+      $button = substr($this->controller->getButtonName(), -4);
+      $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+      $session = CRM_Core_Session::singleton();
       $contactID = $session->get('userID');
 
       // we don't allow conflicting fields to be
@@ -637,7 +641,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
             $field['is_required'] = FALSE;
           }
           // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
-          elseif ($field['add_captcha']  && !$contactID) {
+          elseif ($field['add_captcha'] && !$contactID) {
             // only add captcha for first page
             $addCaptcha = TRUE;
           }
@@ -679,7 +683,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
 
     if (property_exists($form, '_context') && ($form->_context == 'standalone'
-      || $form->_context == 'participant')) {
+        || $form->_context == 'participant')
+    ) {
       $discountedEvent = CRM_Core_BAO_Discount::getOptionGroup($eventID, 'civicrm_event');
       if (is_array($discountedEvent)) {
         foreach ($discountedEvent as $key => $priceSetId) {
@@ -790,7 +795,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $this->_params['contactID'] = $contactID;
 
       if (array_key_exists('email-5', $this->_params)) {
-      $mail = 'email-5';
+        $mail = 'email-5';
       }
       else {
         foreach ($this->_params as $name => $dontCare) {
@@ -807,7 +812,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       // 3. waiting list participant.
       // 4. require approval participant.
       if (!empty($this->_params['is_pay_later']) ||
-        $this->_allowWaitlist || $this->_requireApproval || empty($this->_values['event']['is_monetary'])) {
+        $this->_allowWaitlist || $this->_requireApproval || empty($this->_values['event']['is_monetary'])
+      ) {
         $mail = 'email-Primary';
       }
 
@@ -944,9 +950,9 @@ WHERE  v.option_group_id = g.id
       return $totalCount;
     }
 
-    $priceSetId          = $form->get('priceSetId');
-    $addParticipantNum   = substr($form->_name, 12);
-    $priceSetFields      = $priceSetDetails = array();
+    $priceSetId = $form->get('priceSetId');
+    $addParticipantNum = substr($form->_name, 12);
+    $priceSetFields = $priceSetDetails = array();
     $hasPriceFieldsCount = FALSE;
     if ($priceSetId) {
       $priceSetDetails = $form->get('priceSet');
@@ -1088,8 +1094,8 @@ WHERE  v.option_group_id = g.id
    * @return array
    */
   public static function getPriceSetOptionCount(&$form) {
-    $params     = $form->get('params');
-    $priceSet   = $form->get('priceSet');
+    $params = $form->get('params');
+    $priceSet = $form->get('priceSet');
     $priceSetId = $form->get('priceSetId');
 
     $optionsCount = array();
@@ -1345,9 +1351,9 @@ WHERE  v.option_group_id = g.id
 
     // also set the allow confirmation stuff
     if (array_key_exists(
-        $this->_values['participant']['status_id'],
-        CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Pending'")
-      )) {
+      $this->_values['participant']['status_id'],
+      CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Pending'")
+    )) {
       $this->_allowConfirmation = TRUE;
       $this->set('allowConfirmation', TRUE);
     }
@@ -1379,8 +1385,8 @@ WHERE  v.option_group_id = g.id
 
     $now = date('YmdHis');
     $startDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('registration_start_date',
-        $this->_values['event']
-      ));
+      $this->_values['event']
+    ));
 
     if (
       $startDate &&
@@ -1390,8 +1396,8 @@ WHERE  v.option_group_id = g.id
     }
 
     $endDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('registration_end_date',
-        $this->_values['event']
-      ));
+      $this->_values['event']
+    ));
     $eventEndDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('event_end_date', $this->_values['event']));
     if (
       $endDate &&

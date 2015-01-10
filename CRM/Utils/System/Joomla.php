@@ -64,8 +64,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     require_once $baseDir . '/components/com_users/models/registration.php';
 
     $userParams = JComponentHelper::getParams('com_users');
-    $model      = new UsersModelRegistration();
-    $ufID       = NULL;
+    $model = new UsersModelRegistration();
+    $ufID = NULL;
 
     // get the default usertype
     $userType = $userParams->get('new_usertype');
@@ -84,11 +84,11 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
 
     // Prepare the values for a new Joomla user.
-    $values              = array();
-    $values['name']      = $fullname;
-    $values['username']  = trim($params['cms_name']);
+    $values = array();
+    $values['name'] = $fullname;
+    $values['username'] = trim($params['cms_name']);
     $values['password1'] = $values['password2'] = $params['cms_pass'];
-    $values['email1']    = $values['email2'] = trim($params[$mail]);
+    $values['email1'] = $values['email2'] = trim($params[$mail]);
 
     $lang = JFactory::getLanguage();
     $lang->load('com_users', $baseDir);
@@ -133,8 +133,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     $config = CRM_Core_Config::singleton();
 
-    $dao   = new CRM_Core_DAO();
-    $name  = $dao->escape(CRM_Utils_Array::value('name', $params));
+    $dao = new CRM_Core_DAO();
+    $name = $dao->escape(CRM_Utils_Array::value('name', $params));
     $email = $dao->escape(CRM_Utils_Array::value('mail', $params));
     //don't allow the special characters and min. username length is two
     //regex \\ to match a single backslash would become '/\\\\/'
@@ -262,7 +262,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Add a script file
    *
-   * @param $url: string, absolute path to file
+   * @param $url : string, absolute path to file
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -279,7 +279,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Add an inline script
    *
-   * @param $code: string, javascript code
+   * @param $code : string, javascript code
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -296,7 +296,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Add a css file
    *
-   * @param $url: string, absolute path to file
+   * @param $url : string, absolute path to file
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -318,7 +318,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Add an inline style
    *
-   * @param $code: string, css code
+   * @param $code : string, css code
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -365,11 +365,11 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $fragment = NULL, $htmlize = TRUE,
     $frontend = FALSE, $forceBackend = FALSE
   ) {
-    $config    = CRM_Core_Config::singleton();
+    $config = CRM_Core_Config::singleton();
     $separator = $htmlize ? '&amp;' : '&';
-    $Itemid    = '';
-    $script    = '';
-    $path      = CRM_Utils_String::stripPathChars($path);
+    $Itemid = '';
+    $script = '';
+    $path = CRM_Utils_String::stripPathChars($path);
 
     if ($config->userFrameworkFrontend) {
       $script = 'index.php';
@@ -477,7 +477,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *
    * @return mixed false if no auth
    *               array(
-  contactID, ufID, unique string ) if success
+   * contactID, ufID, unique string ) if success
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE) {
     require_once 'DB.php';
@@ -658,7 +658,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     // load BootStrap here if needed
     // We are a valid Joomla entry point.
-    if (! defined('_JEXEC') && $loadDefines) {
+    if (!defined('_JEXEC') && $loadDefines) {
       define('_JEXEC', 1);
       define('DS', DIRECTORY_SEPARATOR);
       define('JPATH_BASE', $joomlaBase . '/administrator');
@@ -729,6 +729,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $user = JFactory::getUser();
     return $this->getUniqueIdentifierFromUserObject($user);
   }
+
   /**
    * Get User ID from UserFramework system (Joomla)
    * @param object $user

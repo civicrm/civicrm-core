@@ -37,9 +37,9 @@ class CRM_Report_Form_Contribute_LoggingDetail extends CRM_Logging_ReportDetail 
   /**
    */
   public function __construct() {
-    $logging        = new CRM_Logging_Schema;
+    $logging = new CRM_Logging_Schema;
     $this->tables[] = 'civicrm_contribution';
-    $this->tables   = array_merge($this->tables, array_keys($logging->customDataLogTables()));
+    $this->tables = array_merge($this->tables, array_keys($logging->customDataLogTables()));
 
     $this->detail = 'logging/contribute/detail';
     $this->summary = 'logging/contribute/summary';

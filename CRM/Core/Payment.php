@@ -26,6 +26,7 @@
 */
 
 use Civi\Payment\System;
+
 /**
  *
  * @package CRM
@@ -33,7 +34,6 @@ use Civi\Payment\System;
  * $Id$
  *
  */
-
 abstract class CRM_Core_Payment {
 
   /**
@@ -67,7 +67,7 @@ abstract class CRM_Core_Payment {
     RECURRING_PAYMENT_START = 'START',
     RECURRING_PAYMENT_END = 'END';
 
-   protected $_paymentProcessor;
+  protected $_paymentProcessor;
 
   /**
    * Singleton function used to manage this object
@@ -96,7 +96,7 @@ abstract class CRM_Core_Payment {
     }
     //we use two lines because we can't remove the '&singleton' without risking breakage
     //of extension classes that extend this one
-    $object =  Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
+    $object = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
     return $object;
   }
 
@@ -303,7 +303,8 @@ abstract class CRM_Core_Payment {
             'rule_message' => ts('Please enter a valid value for your card security code. This is usually the last 3-4 digits on the card\'s signature panel.'),
             'rule_name' => 'integer',
             'rule_parameters' => NULL,
-        )),
+          )
+        ),
       ),
       'credit_card_exp_date' => array(
         'htmlType' => 'date',
@@ -317,7 +318,8 @@ abstract class CRM_Core_Payment {
             'rule_message' => ts('Card expiration date cannot be a past date.'),
             'rule_name' => 'currentDate',
             'rule_parameters' => TRUE,
-          )),
+          )
+        ),
       ),
       'credit_card_type' => array(
         'htmlType' => 'select',
@@ -355,7 +357,8 @@ abstract class CRM_Core_Payment {
             'rule_message' => ts('Please enter a valid Bank Identification Number (value must not contain punctuation characters).'),
             'rule_name' => 'nopunctuation',
             'rule_parameters' => NULL,
-        )),
+          )
+        ),
         'is_required' => TRUE,
       ),
       //e.g. SWIFT-BIC can have maxlength of 11 digits
@@ -375,7 +378,8 @@ abstract class CRM_Core_Payment {
             'rule_message' => ts('Please enter a valid Bank Identification Number (value must not contain punctuation characters).'),
             'rule_name' => 'nopunctuation',
             'rule_parameters' => NULL,
-        )),
+          )
+        ),
       ),
       'bank_name' => array(
         'htmlType' => 'text',
@@ -618,11 +622,11 @@ abstract class CRM_Core_Payment {
         break;
     }
 
-    $session       = CRM_Core_Session::singleton();
-    $userId        = $session->get('userID');
-    $contactID     = 0;
+    $session = CRM_Core_Session::singleton();
+    $userId = $session->get('userID');
+    $contactID = 0;
     $checksumValue = '';
-    $entityArg     = '';
+    $entityArg = '';
 
     // Find related Contact
     if ($entityID) {

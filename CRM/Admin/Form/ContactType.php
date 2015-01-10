@@ -150,8 +150,8 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
     }
     $contactType = CRM_Contact_BAO_ContactType::add($params);
     CRM_Core_Session::setStatus(ts("The Contact Type '%1' has been saved.",
-        array(1 => $contactType->label)
-      ), ts('Saved'), 'success');
+      array(1 => $contactType->label)
+    ), ts('Saved'), 'success');
   }
 
 }

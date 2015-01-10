@@ -119,8 +119,9 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
         );
       }
       if (CRM_Core_Permission::ufGroupValid($this->_gid,
-          CRM_Core_Permission::SEARCH
-        )) {
+        CRM_Core_Permission::SEARCH
+      )
+      ) {
         $this->assign('listingURL',
           CRM_Utils_System::url("civicrm/profile",
             "force=1&gid={$gidString}"

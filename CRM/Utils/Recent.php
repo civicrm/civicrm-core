@@ -166,8 +166,9 @@ class CRM_Utils_Recent {
     // make sure item is not already present in list
     for ($i = 0; $i < count($tempRecent); $i++) {
       if (!($tempRecent[$i]['id'] == $recentItem['id'] &&
-          $tempRecent[$i]['type'] == $recentItem['type']
-        )) {
+        $tempRecent[$i]['type'] == $recentItem['type']
+      )
+      ) {
         self::$_recent[] = $tempRecent[$i];
       }
     }

@@ -120,8 +120,8 @@ LEFT JOIN civicrm_state_province state_province ON  state_province.id = address.
   public function where($includeContactIDs = FALSE) {
     $params = array();
 
-    $count   = 1;
-    $clause  = array();
+    $count = 1;
+    $clause = array();
     $groupID = CRM_Utils_Array::value('group_id',
       $this->_formValues
     );

@@ -175,11 +175,11 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     // hence treat that also as test mode transaction
     // fix for CRM-2566
     if (($this->_mode == 'test') || $response_fields[6] == 0) {
-      $query             = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id RLIKE 'test[0-9]+'";
-      $p                 = array();
-      $trxn_id           = strval(CRM_Core_DAO::singleValueQuery($query, $p));
-      $trxn_id           = str_replace('test', '', $trxn_id);
-      $trxn_id           = intval($trxn_id) + 1;
+      $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id RLIKE 'test[0-9]+'";
+      $p = array();
+      $trxn_id = strval(CRM_Core_DAO::singleValueQuery($query, $p));
+      $trxn_id = str_replace('test', '', $trxn_id);
+      $trxn_id = intval($trxn_id) + 1;
       $params['trxn_id'] = sprintf('test%08d', $trxn_id);
     }
     else {
@@ -332,7 +332,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    */
   public function _getAuthorizeNetFields() {
     $amount = $this->_getParam('total_amount');//Total amount is from the form contribution field
-    if (empty($amount)){//CRM-9894 would this ever be the case??
+    if (empty($amount)) {//CRM-9894 would this ever be the case??
       $amount = $this->_getParam('amount');
     }
     $fields = array();
@@ -349,7 +349,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $fields['x_customer_ip'] = $this->_getParam('ip_address');
     $fields['x_email'] = $this->_getParam('email');
     $fields['x_invoice_num'] = substr($this->_getParam('invoiceID'), 0, 20);
-    $fields['x_amount']         = $amount;
+    $fields['x_amount'] = $amount;
     $fields['x_currency_code'] = $this->_getParam('currencyID');
     $fields['x_description'] = $this->_getParam('description');
     $fields['x_cust_id'] = $this->_getParam('contactID');
@@ -413,9 +413,9 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
       if (strlen($key) > $b) {
         $key = pack("H*", md5($key));
       }
-      $key    = str_pad($key, $b, chr(0x00));
-      $ipad   = str_pad('', $b, chr(0x36));
-      $opad   = str_pad('', $b, chr(0x5c));
+      $key = str_pad($key, $b, chr(0x00));
+      $ipad = str_pad('', $b, chr(0x36));
+      $opad = str_pad('', $b, chr(0x5c));
       $k_ipad = $key ^ $ipad;
       $k_opad = $key ^ $opad;
       return md5($k_opad . pack("H*", md5($k_ipad . $data)));
@@ -443,9 +443,9 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     if (empty($md5Hash)) {
       return TRUE;
     }
-    $loginid    = $this->_getParam('apiLogin');
+    $loginid = $this->_getParam('apiLogin');
     $hashString = $ipn ? ($md5Hash . $transaction_id . $amount) : ($md5Hash . $loginid . $transaction_id . $amount);
-    $result     = strtoupper(md5($hashString));
+    $result = strtoupper(md5($hashString));
 
     if ($result == $responseMD5) {
       return TRUE;
@@ -462,12 +462,12 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    *   fingerprint
    **/
   public function CalculateFP() {
-    $x_tran_key  = $this->_getParam('paymentKey');
-    $loginid     = $this->_getParam('apiLogin');
-    $sequence    = $this->_getParam('sequence');
-    $timestamp   = $this->_getParam('timestamp');
-    $amount      = $this->_getParam('amount');
-    $currency    = $this->_getParam('currencyID');
+    $x_tran_key = $this->_getParam('paymentKey');
+    $loginid = $this->_getParam('apiLogin');
+    $sequence = $this->_getParam('sequence');
+    $timestamp = $this->_getParam('timestamp');
+    $amount = $this->_getParam('amount');
+    $currency = $this->_getParam('currencyID');
     $transaction = "$loginid^$sequence^$timestamp^$amount^$currency";
     return $this->hmac($x_tran_key, $transaction);
   }
@@ -520,10 +520,10 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    *   refId, resultCode, code, text, subscriptionId
    */
   public function _parseArbReturn($content) {
-    $refId          = $this->_substring_between($content, '<refId>', '</refId>');
-    $resultCode     = $this->_substring_between($content, '<resultCode>', '</resultCode>');
-    $code           = $this->_substring_between($content, '<code>', '</code>');
-    $text           = $this->_substring_between($content, '<text>', '</text>');
+    $refId = $this->_substring_between($content, '<refId>', '</refId>');
+    $resultCode = $this->_substring_between($content, '<resultCode>', '</resultCode>');
+    $code = $this->_substring_between($content, '<code>', '</code>');
+    $text = $this->_substring_between($content, '<text>', '</text>');
     $subscriptionId = $this->_substring_between($content, '<subscriptionId>', '</subscriptionId>');
     return array(
       'refId' => $refId,

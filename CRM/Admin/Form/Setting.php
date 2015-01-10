@@ -52,8 +52,8 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
   public function setDefaultValues() {
     if (!$this->_defaults) {
       $this->_defaults = array();
-      $formArray       = array('Component', 'Localization');
-      $formMode        = FALSE;
+      $formArray = array('Component', 'Localization');
+      $formMode = FALSE;
       if (in_array($this->_name, $formArray)) {
         $formMode = TRUE;
       }
@@ -63,12 +63,12 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
       CRM_Core_Config_Defaults::setValues($this->_defaults, $formMode);
 
       $list = array_flip(CRM_Core_OptionGroup::values('contact_autocomplete_options',
-          FALSE, FALSE, TRUE, NULL, 'name'
-        ));
+        FALSE, FALSE, TRUE, NULL, 'name'
+      ));
 
       $cRlist = array_flip(CRM_Core_OptionGroup::values('contact_reference_options',
-          FALSE, FALSE, TRUE, NULL, 'name'
-        ));
+        FALSE, FALSE, TRUE, NULL, 'name'
+      ));
 
       $listEnabled = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'contact_autocomplete_options'
@@ -89,18 +89,20 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
       //Set defaults for autocomplete and contact reference options
       $this->_defaults['autocompleteContactSearch'] = array(
-        '1' => 1) + $autoSearchFields;
+          '1' => 1
+        ) + $autoSearchFields;
       $this->_defaults['autocompleteContactReference'] = array(
-        '1' => 1) + $cRSearchFields;
+          '1' => 1
+        ) + $cRSearchFields;
 
       // we can handle all the ones defined in the metadata here. Others to be converted
       foreach ($this->_settings as $setting => $group) {
         $settingMetaData = civicrm_api('setting', 'getfields', array('version' => 3, 'name' => $setting));
         $this->_defaults[$setting] = civicrm_api('setting', 'getvalue', array(
-          'version' => 3,
-          'name' => $setting,
-          'group' => $group,
-          'default_value' => CRM_Utils_Array::value('default', $settingMetaData['values'][$setting]),
+            'version' => 3,
+            'name' => $setting,
+            'group' => $group,
+            'default_value' => CRM_Utils_Array::value('default', $settingMetaData['values'][$setting]),
           )
         );
       }
@@ -187,8 +189,8 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     // save autocomplete search options
     if (!empty($params['autocompleteContactSearch'])) {
       $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-        array_keys($params['autocompleteContactSearch'])
-      ) . CRM_Core_DAO::VALUE_SEPARATOR;
+          array_keys($params['autocompleteContactSearch'])
+        ) . CRM_Core_DAO::VALUE_SEPARATOR;
 
       CRM_Core_BAO_Setting::setItem($value,
         CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
@@ -201,8 +203,8 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     // save autocomplete contact reference options
     if (!empty($params['autocompleteContactReference'])) {
       $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-        array_keys($params['autocompleteContactReference'])
-      ) . CRM_Core_DAO::VALUE_SEPARATOR;
+          array_keys($params['autocompleteContactReference'])
+        ) . CRM_Core_DAO::VALUE_SEPARATOR;
 
       CRM_Core_BAO_Setting::setItem($value,
         CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,

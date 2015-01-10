@@ -211,7 +211,10 @@ class CRM_Grant_BAO_Query {
 
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_grant.grant_type_id', $op, $value, "Integer");
 
-        $query->_qill[$grouping][] = ts('Grant Type %2 %1', array(1 => implode(' ' . ts('or') . ' ', $names), 2 => $op));
+        $query->_qill[$grouping][] = ts('Grant Type %2 %1', array(
+            1 => implode(' ' . ts('or') . ' ', $names),
+            2 => $op
+          ));
         $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
 
         return;
@@ -244,7 +247,10 @@ class CRM_Grant_BAO_Query {
 
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_grant.status_id', $op, $value, "Integer");
 
-        $query->_qill[$grouping][] = ts('Grant Status %2 %1', array(1 => implode(' ' . ts('or') . ' ', $names), 2 => $op));
+        $query->_qill[$grouping][] = ts('Grant Status %2 %1', array(
+            1 => implode(' ' . ts('or') . ' ', $names),
+            2 => $op
+          ));
         $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
 
         return;

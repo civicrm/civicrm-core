@@ -194,8 +194,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       CRM_Core_Error::fatal(ts('Invalid value passed to getPayment function'));
     }
 
-    $dao            = new CRM_Financial_DAO_PaymentProcessor();
-    $dao->id        = $paymentProcessorID;
+    $dao = new CRM_Financial_DAO_PaymentProcessor();
+    $dao->id = $paymentProcessorID;
     $dao->is_active = 1;
     if (!$dao->find(TRUE)) {
       return NULL;
@@ -203,9 +203,9 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
 
     if ($mode == 'test') {
       $testDAO = new CRM_Financial_DAO_PaymentProcessor();
-      $testDAO->name      = $dao->name;
+      $testDAO->name = $dao->name;
       $testDAO->is_active = 1;
-      $testDAO->is_test   = 1;
+      $testDAO->is_test = 1;
       if (!$testDAO->find(TRUE)) {
         CRM_Core_Error::fatal(ts('Could not retrieve payment processor details'));
       }
@@ -268,10 +268,23 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    */
   public static function buildPayment($dao, $mode) {
     $fields = array(
-      'id', 'name', 'payment_processor_type_id', 'user_name', 'password',
-      'signature', 'url_site', 'url_api', 'url_recur', 'url_button',
-      'subject', 'class_name', 'is_recur', 'billing_mode', 'is_test',
-      'payment_type', 'is_default',
+      'id',
+      'name',
+      'payment_processor_type_id',
+      'user_name',
+      'password',
+      'signature',
+      'url_site',
+      'url_api',
+      'url_recur',
+      'url_button',
+      'subject',
+      'class_name',
+      'is_recur',
+      'billing_mode',
+      'is_test',
+      'payment_type',
+      'is_default',
     );
     $result = array();
     foreach ($fields as $name) {
@@ -295,16 +308,20 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return array
    */
   public static function getAllPaymentProcessors($mode, $reset = FALSE) {
-   /**
-   * $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . ($mode ? 'test' : 'all');
-   if (!$reset) {
-     $processors = CRM_Utils_Cache::singleton()->get($cacheKey);
-     if (!empty($processors)) {
-       return $processors;
-     }
-   }
+    /**
+     * $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . ($mode ? 'test' : 'all');
+     * if (!$reset) {
+     * $processors = CRM_Utils_Cache::singleton()->get($cacheKey);
+     * if (!empty($processors)) {
+     * return $processors;
+     * }
+     * }
      * */
-    $retrievalParameters = array('is_active' => TRUE, 'options' => array('sort' => 'is_default DESC, name'), 'api.payment_processor_type.getsingle' => 1);
+    $retrievalParameters = array(
+      'is_active' => TRUE,
+      'options' => array('sort' => 'is_default DESC, name'),
+      'api.payment_processor_type.getsingle' => 1
+    );
     if ($mode == 'test') {
       $retrievalParameters['is_test'] = 1;
     }
@@ -407,7 +424,11 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   public static function getProcessorForEntity($entityID, $component = 'contribute', $type = 'id') {
     $result = NULL;
     if (!in_array($component, array(
-      'membership', 'contribute', 'recur'))) {
+      'membership',
+      'contribute',
+      'recur'
+    ))
+    ) {
       return $result;
     }
     //FIXME:

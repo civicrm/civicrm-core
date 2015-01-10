@@ -64,7 +64,7 @@ class CRM_Core_BAO_CMSUser {
     // Build an array of rows from UF users table.
     $rows = array();
     if ($config->userSystem->is_drupal == '1') {
-      $id   = 'uid';
+      $id = 'uid';
       $mail = 'mail';
       $name = 'name';
 
@@ -82,7 +82,7 @@ class CRM_Core_BAO_CMSUser {
       }
     }
     elseif ($config->userFramework == 'Joomla') {
-      $id   = 'id';
+      $id = 'id';
       $mail = 'email';
       $name = 'name';
       // TODO: Insert code here to populate $rows for Joomla;
@@ -98,13 +98,13 @@ class CRM_Core_BAO_CMSUser {
     set_time_limit(300);
 
     if ($config->userSystem->is_drupal == '1') {
-      $user            = new StdClass();
-      $uf              = $config->userFramework;
-      $contactCount    = 0;
-      $contactCreated  = 0;
+      $user = new StdClass();
+      $uf = $config->userFramework;
+      $contactCount = 0;
+      $contactCreated = 0;
       $contactMatching = 0;
       foreach ($rows as $row) {
-        $user->$id   = $row[$id];
+        $user->$id = $row[$id];
         $user->$mail = $row[$mail];
         $user->$name = $row[$name];
         $contactCount++;
@@ -132,24 +132,25 @@ class CRM_Core_BAO_CMSUser {
       $db->setQuery($query, 0, $limit);
       $users = $db->loadObjectList();
 
-      $user            = new StdClass();
-      $uf              = $config->userFramework;
-      $contactCount    = 0;
-      $contactCreated  = 0;
+      $user = new StdClass();
+      $uf = $config->userFramework;
+      $contactCount = 0;
+      $contactCreated = 0;
       $contactMatching = 0;
       for ($i = 0; $i < count($users); $i++) {
-        $user->$id   = $users[$i]->$id;
+        $user->$id = $users[$i]->$id;
         $user->$mail = $users[$i]->$mail;
         $user->$name = $users[$i]->$name;
         $contactCount++;
         if ($match = CRM_Core_BAO_UFMatch::synchronizeUFMatch($user,
-            $users[$i]->$id,
-            $users[$i]->$mail,
-            $uf,
-            1,
-            'Individual',
-            TRUE
-          )) {
+          $users[$i]->$id,
+          $users[$i]->$mail,
+          $uf,
+          1,
+          'Individual',
+          TRUE
+        )
+        ) {
           $contactCreated++;
         }
         else {
@@ -161,9 +162,9 @@ class CRM_Core_BAO_CMSUser {
       }
     }
     elseif ($config->userFramework == 'WordPress') {
-      $uf              = $config->userFramework;
-      $contactCount    = 0;
-      $contactCreated  = 0;
+      $uf = $config->userFramework;
+      $contactCount = 0;
+      $contactCreated = 0;
       $contactMatching = 0;
 
       global $wpdb;
@@ -173,13 +174,14 @@ class CRM_Core_BAO_CMSUser {
         $wpUserData = get_userdata($wpUserId);
         $contactCount++;
         if ($match = CRM_Core_BAO_UFMatch::synchronizeUFMatch($wpUserData,
-            $wpUserData->$id,
-            $wpUserData->$mail,
-            $uf,
-            1,
-            'Individual',
-            TRUE
-          )) {
+          $wpUserData->$id,
+          $wpUserData->$mail,
+          $uf,
+          1,
+          'Individual',
+          TRUE
+        )
+        ) {
           $contactCreated++;
         }
         else {
@@ -195,26 +197,26 @@ class CRM_Core_BAO_CMSUser {
     if ($is_interactive) {
       $status = ts('Synchronize Users to Contacts completed.');
       $status .= ' ' . ts('Checked one user record.',
-        array(
-          'count' => $contactCount,
-          'plural' => 'Checked %count user records.',
-        )
-      );
-      if ($contactMatching) {
-        $status .= ' ' . ts('Found one matching contact record.',
           array(
-            'count' => $contactMatching,
-            'plural' => 'Found %count matching contact records.',
+            'count' => $contactCount,
+            'plural' => 'Checked %count user records.',
           )
         );
+      if ($contactMatching) {
+        $status .= ' ' . ts('Found one matching contact record.',
+            array(
+              'count' => $contactMatching,
+              'plural' => 'Found %count matching contact records.',
+            )
+          );
       }
 
       $status .= ' ' . ts('Created one new contact record.',
-        array(
-          'count' => $contactCreated,
-          'plural' => 'Created %count new contact records.',
-        )
-      );
+          array(
+            'count' => $contactCreated,
+            'plural' => 'Created %count new contact records.',
+          )
+        );
       CRM_Core_Session::setStatus($status, ts('Saved'), 'success');
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
     }
@@ -242,9 +244,9 @@ class CRM_Core_BAO_CMSUser {
       isset($params['contactID'])
     ) {
       // create the UF Match record
-      $ufmatch['uf_id']      = $ufID;
+      $ufmatch['uf_id'] = $ufID;
       $ufmatch['contact_id'] = $params['contactID'];
-      $ufmatch['uf_name']    = $params[$mail];
+      $ufmatch['uf_name'] = $params[$mail];
       CRM_Core_BAO_UFMatch::create($ufmatch);
     }
 
@@ -269,8 +271,8 @@ class CRM_Core_BAO_CMSUser {
     $config = CRM_Core_Config::singleton();
     $showCMS = FALSE;
 
-    $isDrupal    = $config->userSystem->is_drupal;
-    $isJoomla    = ucfirst($config->userFramework) == 'Joomla' ? TRUE : FALSE;
+    $isDrupal = $config->userSystem->is_drupal;
+    $isJoomla = ucfirst($config->userFramework) == 'Joomla' ? TRUE : FALSE;
     $isWordPress = $config->userFramework == 'WordPress' ? TRUE : FALSE;
 
     //if CMS is configured for not to allow creating new CMS user,
@@ -356,8 +358,8 @@ class CRM_Core_BAO_CMSUser {
 
     $config = CRM_Core_Config::singleton();
 
-    $isDrupal    = $config->userSystem->is_drupal;
-    $isJoomla    = ucfirst($config->userFramework) == 'Joomla' ? TRUE : FALSE;
+    $isDrupal = $config->userSystem->is_drupal;
+    $isJoomla = ucfirst($config->userFramework) == 'Joomla' ? TRUE : FALSE;
     $isWordPress = $config->userFramework == 'WordPress' ? TRUE : FALSE;
 
     $errors = array();
@@ -431,8 +433,8 @@ class CRM_Core_BAO_CMSUser {
   public static function userExists(&$contact) {
     $config = CRM_Core_Config::singleton();
 
-    $isDrupal    = $config->userSystem->is_drupal;
-    $isJoomla    = ucfirst($config->userFramework) == 'Joomla' ? TRUE : FALSE;
+    $isDrupal = $config->userSystem->is_drupal;
+    $isJoomla = ucfirst($config->userFramework) == 'Joomla' ? TRUE : FALSE;
     $isWordPress = $config->userFramework == 'WordPress' ? TRUE : FALSE;
 
     if (!$isDrupal && !$isJoomla && !$isWordPress) {
@@ -501,8 +503,8 @@ class CRM_Core_BAO_CMSUser {
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
       CRM_Core_Error::statusBounce(ts("Cannot connect to UF db via %1. Please check the CIVICRM_UF_DSN value in your civicrm.settings.php file",
-          array(1 => $db_uf->getMessage())
-        ));
+        array(1 => $db_uf->getMessage())
+      ));
     }
     $db_uf->query('/*!40101 SET NAMES utf8 */');
     return $db_uf;

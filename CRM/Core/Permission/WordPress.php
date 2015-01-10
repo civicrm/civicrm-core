@@ -90,6 +90,7 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
     }
     return FALSE;
   }
+
   /**
    * {@inheritDoc}
    */

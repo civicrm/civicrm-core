@@ -39,11 +39,11 @@ function smarty_function_simpleActivityContacts($params, &$smarty) {
   require_once 'api/api.php';
   require_once 'api/v3/utils.php';
   $activity = civicrm_api('activity', 'getsingle', array(
-      'version' => 3,
-      'id' => $params['activity_id'],
-      'return.target_contact_id' => 1,
-      'return.assignee_contact_id' => 1,
-    ));
+    'version' => 3,
+    'id' => $params['activity_id'],
+    'return.target_contact_id' => 1,
+    'return.assignee_contact_id' => 1,
+  ));
 
   $baseContactParams = array('version' => 3);
   foreach (explode(',', $params['return']) as $field) {
@@ -51,7 +51,9 @@ function smarty_function_simpleActivityContacts($params, &$smarty) {
   }
 
   foreach (array(
-    'target', 'assignee') as $role) {
+             'target',
+             'assignee'
+           ) as $role) {
     $contact = array();
     if (!empty($activity[$role . '_contact_id'])) {
       $contact_id = array_shift($activity[$role . '_contact_id']);

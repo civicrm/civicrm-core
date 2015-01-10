@@ -80,7 +80,8 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
       $defaults['link_text'] = ts('Promote this event with a personal campaign page');
 
       if ($this->_id &&
-          $ccReceipt = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'cc_receipt')) {
+        $ccReceipt = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'cc_receipt')
+      ) {
         $defaults['notify_email'] = $ccReceipt;
       }
     }
@@ -105,7 +106,8 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
     $this->add('select', 'target_entity_id',
       ts('Online Contribution Page'),
       array(
-        '' => ts('- select -')) +
+        '' => ts('- select -')
+      ) +
       CRM_Contribute_PseudoConstant::contributionPage()
     );
 
@@ -119,7 +121,9 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
 
     if (!empty($pcpBlock->id) && CRM_PCP_BAO_PCP::getPcpBlockInUse($pcpBlock->id)) {
       foreach (array(
-        'target_entity_type', 'target_entity_id') as $element_name) {
+                 'target_entity_type',
+                 'target_entity_id'
+               ) as $element_name) {
         $element = $this->getElement($element_name);
         $element->freeze();
       }
@@ -192,9 +196,9 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
       $params['target_entity_id'] = CRM_Utils_Array::value('target_entity_id', $params, $this->_id);
     }
 
-    $dao               = new CRM_PCP_DAO_PCPBlock();
+    $dao = new CRM_PCP_DAO_PCPBlock();
     $dao->entity_table = $params['entity_table'];
-    $dao->entity_id    = $this->_id;
+    $dao->entity_id = $this->_id;
     $dao->find(TRUE);
     $params['id'] = $dao->id;
     $params['is_active'] = CRM_Utils_Array::value('pcp_active', $params, FALSE);

@@ -168,8 +168,8 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
   public function browse() {
     $groupParams = array('name' => self::$_gName);
     $optionValue = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'weight');
-    $gName       = self::$_gName;
-    $returnURL   = CRM_Utils_System::url("civicrm/admin/report/options/$gName",
+    $gName = self::$_gName;
+    $returnURL = CRM_Utils_System::url("civicrm/admin/report/options/$gName",
       "reset=1"
     );
     $filter = "option_group_id = " . self::$_gId;

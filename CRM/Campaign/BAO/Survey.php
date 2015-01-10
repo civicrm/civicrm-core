@@ -217,8 +217,16 @@ SELECT  survey.id                         as id,
 
     $surveys = array();
     $properties = array(
-      'id', 'title', 'campaign_id', 'is_active', 'is_default', 'result_id', 'activity_type_id',
-      'release_frequency', 'max_number_of_contacts', 'default_number_of_contacts',
+      'id',
+      'title',
+      'campaign_id',
+      'is_active',
+      'is_default',
+      'result_id',
+      'activity_type_id',
+      'release_frequency',
+      'max_number_of_contacts',
+      'default_number_of_contacts',
     );
 
     $survey = CRM_Core_DAO::executeQuery($query, $queryParams);
@@ -438,18 +446,20 @@ SELECT  survey.id    as id,
         'contact_autocomplete_options'
       );
       $returnProperties = array_fill_keys(array_merge(array(
-        'contact_type',
-            'contact_sub_type',
-            'sort_name',
-          ),
-          array_keys($autocompleteContactSearch)
-        ), 1);
+          'contact_type',
+          'contact_sub_type',
+          'sort_name',
+        ),
+        array_keys($autocompleteContactSearch)
+      ), 1);
     }
 
     $select = $from = array();
     foreach ($returnProperties as $property => $ignore) {
       $value = (in_array($property, array(
-        'city', 'street_address'))) ? 'address' : $property;
+        'city',
+        'street_address'
+      ))) ? 'address' : $property;
       switch ($property) {
         case 'sort_name':
         case 'contact_type':
@@ -479,9 +489,9 @@ SELECT  survey.id    as id,
 
     //finally retrieve contact details.
     if (!empty($select) && !empty($from)) {
-      $fromClause   = implode(' ', $from);
+      $fromClause = implode(' ', $from);
       $selectClause = implode(', ', $select);
-      $whereClause  = "contact.id IN (" . implode(',', $voterIds) . ')';
+      $whereClause = "contact.id IN (" . implode(',', $voterIds) . ')';
 
       $query = "
   SELECT  contact.id as contactId, $selectClause
@@ -524,7 +534,7 @@ Group By  contact.id";
    */
   static function voterActivityDetails(
     $surveyId, $voterIds, $interviewerId = NULL,
-                                       $statusIds = array()) {
+    $statusIds = array()) {
     $activityDetails = array();
     if (!$surveyId ||
       !is_array($voterIds) || empty($voterIds)
@@ -653,7 +663,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
             $whereClause";
 
     $params = array(
-    1 => array($surveyId, 'Integer'),
+      1 => array($surveyId, 'Integer'),
       2 => array($actTypeId, 'Integer'),
     );
 
@@ -731,8 +741,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
     $resultSets = array();
     $valueColumnName = CRM_Utils_Type::escape($valueColumnName, 'String');
 
-    $query      = "SELECT id, {$valueColumnName} FROM civicrm_option_group WHERE name LIKE 'civicrm_survey_%' AND is_active=1";
-    $dao        = CRM_Core_DAO::executeQuery($query);
+    $query = "SELECT id, {$valueColumnName} FROM civicrm_option_group WHERE name LIKE 'civicrm_survey_%' AND is_active=1";
+    $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $resultSets[$dao->id] = $dao->$valueColumnName;
     }
@@ -847,11 +857,11 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
       if ($reportID) {
         $voterLinks['report'] =
           array(
-                'name' => 'report',
-                'url'  => "civicrm/report/instance/{$reportID}",
-                'qs'   => 'reset=1',
-                'title' => ts('View Survey Report'),
-                );
+            'name' => 'report',
+            'url' => "civicrm/report/instance/{$reportID}",
+            'qs' => 'reset=1',
+            'title' => ts('View Survey Report'),
+          );
       }
     }
 
@@ -1140,8 +1150,8 @@ UPDATE  civicrm_activity
    * @see CRM_Core_DAO::buildOptions
    *
    * @param string $fieldName
-   * @param string $context: @see CRM_Core_DAO::buildOptionsContext
-   * @param array $props: whatever is known about this dao object
+   * @param string $context : @see CRM_Core_DAO::buildOptionsContext
+   * @param array $props : whatever is known about this dao object
    *
    * @return array|bool
    */

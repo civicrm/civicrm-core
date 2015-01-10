@@ -167,7 +167,10 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   WHERE m.owner_membership_id = {$dao->id} AND m.is_test = 0 AND ms.is_current_member = 1 AND ct.is_deleted = 0";
         $num_related = CRM_Core_DAO::singleValueQuery($query);
         $max_related = CRM_Utils_Array::value('max_related', $membership[$dao->id]);
-        $membership[$dao->id]['related_count'] = ($max_related == '' ? ts('%1 created', array(1 => $num_related)) : ts('%1 out of %2', array(1 => $num_related, 2 => $max_related))
+        $membership[$dao->id]['related_count'] = ($max_related == '' ? ts('%1 created', array(1 => $num_related)) : ts('%1 out of %2', array(
+            1 => $num_related,
+            2 => $max_related
+          ))
         );
       }
       else {
@@ -466,10 +469,10 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    */
   static function &links(
     $status = 'all',
-                         $isPaymentProcessor = NULL,
-                         $accessContribution = NULL,
-                         $isCancelSupported = FALSE,
-                         $isUpdateBilling = FALSE
+    $isPaymentProcessor = NULL,
+    $accessContribution = NULL,
+    $isCancelSupported = FALSE,
+    $isUpdateBilling = FALSE
   ) {
     if (!CRM_Utils_Array::value('view', self::$_links)) {
       self::$_links['view'] = array(

@@ -346,9 +346,9 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     //insert payment record for this membership
     if (!empty($params['relate_contribution_id'])) {
       CRM_Member_BAO_MembershipPayment::create(array(
-          'membership_id' => $membership->id,
-          'contribution_id' => $params['relate_contribution_id'],
-        ));
+        'membership_id' => $membership->id,
+        'contribution_id' => $params['relate_contribution_id'],
+      ));
     }
 
     // add activity record only during create mode and renew mode
@@ -761,12 +761,12 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    */
   static function buildMembershipBlock(
     &$form,
-                                       $pageID,
-                                       $cid,
-                                       $formItems = FALSE,
-                                       $selectedMembershipTypeID = NULL,
-                                       $thankPage = FALSE,
-                                       $isTest = NULL
+    $pageID,
+    $cid,
+    $formItems = FALSE,
+    $selectedMembershipTypeID = NULL,
+    $thankPage = FALSE,
+    $isTest = NULL
   ) {
 
     $separateMembershipPayment = FALSE;
@@ -1326,8 +1326,8 @@ AND civicrm_membership.is_test = %2";
    */
   public static function postProcessMembership(
     $membershipParams, $contactID, &$form, $premiumParams,
-                                               $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeIDs, $isPaidMembership, $membershipID,
-                                               $isProcessSeparateMembershipTransaction, $defaultContributionTypeID, $membershipLineItems, $isPayLater) {
+    $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeIDs, $isPaidMembership, $membershipID,
+    $isProcessSeparateMembershipTransaction, $defaultContributionTypeID, $membershipLineItems, $isPayLater) {
     $result = $membershipContribution = NULL;
     $isTest = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $createdMemberships = array();
@@ -1458,9 +1458,9 @@ AND civicrm_membership.is_test = %2";
       if (!empty($membershipContribution->trxn_id)) {
         try {
           civicrm_api3('contribution', 'completetransaction', array(
-              'id' => $membershipContribution->id,
-              'trxn_id' => $membershipContribution->trxn_id,
-            ));
+            'id' => $membershipContribution->id,
+            'trxn_id' => $membershipContribution->trxn_id,
+          ));
         }
         catch (CiviCRM_API3_Exception $e) {
           // if for any reason it is already completed this will fail - e.g extensions hacking around core not completing transactions prior to CRM-15296
@@ -2296,9 +2296,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    */
   public static function linkMembershipPayment($membership, $membershipContribution) {
     CRM_Member_BAO_MembershipPayment::create(array(
-        'membership_id' => $membership->id,
-        'contribution_id' => $membershipContribution->id,
-      ));
+      'membership_id' => $membership->id,
+      'contribution_id' => $membershipContribution->id,
+    ));
   }
 
   /**
@@ -2872,9 +2872,9 @@ WHERE      civicrm_membership.is_test = 0";
     }
     $result['is_error'] = 0;
     $result['messages'] = ts('Processed %1 membership records. Updated %2 records.', array(
-        1 => $processCount,
-        2 => $updateCount,
-      ));
+      1 => $processCount,
+      2 => $updateCount,
+    ));
     return $result;
   }
 
@@ -3002,9 +3002,9 @@ WHERE      civicrm_membership.is_test = 0";
     //insert payment record for this membership
     if (empty($ids['contribution']) || !empty($params['is_recur'])) {
       CRM_Member_BAO_MembershipPayment::create(array(
-          'membership_id' => $membershipId,
-          'contribution_id' => $contribution->id,
-        ));
+        'membership_id' => $membershipId,
+        'contribution_id' => $contribution->id,
+      ));
     }
     return $contribution;
   }

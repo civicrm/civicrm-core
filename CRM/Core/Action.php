@@ -63,9 +63,9 @@ class CRM_Core_Action {
     RENEW = 32768,
     DETACH = 65536,
     REVERT = 131072,
-    CLOSE        = 262144,
-    REOPEN       = 524288,
-    MAX_ACTION   = 1048575;
+    CLOSE = 262144,
+    REOPEN = 524288,
+    MAX_ACTION = 1048575;
 
   //make sure MAX_ACTION = 2^n - 1 ( n = total number of actions )
 
@@ -74,7 +74,7 @@ class CRM_Core_Action {
    * bit manipulation operations so we can perform multiple
    * actions on the same object if needed
    *
-   * @var array $_names  type of variable name to action constant
+   * @var array $_names type of variable name to action constant
    *
    * @static
    */
@@ -94,8 +94,8 @@ class CRM_Core_Action {
     'renew' => self::RENEW,
     'detach' => self::DETACH,
     'revert' => self::REVERT,
-                           'close'         => self::CLOSE,
-                           'reopen'        => self::REOPEN,
+    'close' => self::CLOSE,
+    'reopen' => self::REOPEN,
   );
 
   /**

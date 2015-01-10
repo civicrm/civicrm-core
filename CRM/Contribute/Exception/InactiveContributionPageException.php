@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: eileen
@@ -7,6 +8,7 @@
  */
 class CRM_Contribute_Exception_InactiveContributionPageException extends Exception {
   private $id;
+
   public function __construct($message, $id) {
     parent::__construct(ts($message));
     $this->id = $id;

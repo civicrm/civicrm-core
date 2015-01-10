@@ -15,7 +15,7 @@
 class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
   // (not used, implicit in the API, might need to convert?)
   const
-  CHARSET = 'UFT-8';
+    CHARSET = 'UFT-8';
 
   /**
    * We only need one instance of this object. So we use the singleton
@@ -310,7 +310,6 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
          * the cvv check, the avs check. This is stored in
          * CiviCRM as part of the transact
          * but not further processing is done. Business rules would need to be defined
-
          *******************************************************/
         $params['trxn_id'] = $nvpArray['PNREF'] . $nvpArray['TRXPNREF'];
         //'trxn_id' is varchar(255) field. returned value is length 12

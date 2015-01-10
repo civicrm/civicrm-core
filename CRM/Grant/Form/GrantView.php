@@ -46,8 +46,8 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
    */
   public function preProcess() {
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    $this->_id        = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $context          = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->assign('context', $context);
 
     $values = array();
@@ -58,9 +58,15 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
     $this->assign('grantType', $grantType[$values['grant_type_id']]);
     $this->assign('grantStatus', $grantStatus[$values['status_id']]);
     $grantTokens = array(
-      'amount_total', 'amount_requested', 'amount_granted',
-      'rationale', 'grant_report_received', 'application_received_date',
-      'decision_date', 'money_transfer_date', 'grant_due_date',
+      'amount_total',
+      'amount_requested',
+      'amount_granted',
+      'rationale',
+      'grant_report_received',
+      'application_received_date',
+      'decision_date',
+      'money_transfer_date',
+      'grant_due_date',
     );
 
     foreach ($grantTokens as $token) {

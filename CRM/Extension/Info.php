@@ -88,11 +88,11 @@ class CRM_Extension_Info {
    * @param null $file
    */
   public function __construct($key = NULL, $type = NULL, $name = NULL, $label = NULL, $file = NULL) {
-    $this->key       = $key;
-    $this->type      = $type;
-    $this->name      = $name;
-    $this->label     = $label;
-    $this->file      = $file;
+    $this->key = $key;
+    $this->type = $type;
+    $this->name = $name;
+    $this->label = $label;
+    $this->file = $file;
   }
 
   /**
@@ -102,9 +102,9 @@ class CRM_Extension_Info {
    * @return void
    */
   public function parse($info) {
-    $this->key   = (string) $info->attributes()->key;
-    $this->type  = (string) $info->attributes()->type;
-    $this->file  = (string) $info->file;
+    $this->key = (string) $info->attributes()->key;
+    $this->type = (string) $info->attributes()->type;
+    $this->file = (string) $info->file;
     $this->label = (string) $info->name;
 
     // Convert first level variables to CRM_Core_Extension properties

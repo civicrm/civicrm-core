@@ -66,7 +66,10 @@ class CRM_Contribute_Import_Form_DataSource extends CRM_Core_Form {
 
     $this->add('File', 'uploadFile', ts('Import Data File'), 'size=30 maxlength=255', TRUE);
     $this->setMaxFileSize($uploadFileSize);
-    $this->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', array(1 => $uploadSize, 2 => $uploadFileSize)), 'maxfilesize', $uploadFileSize);
+    $this->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', array(
+          1 => $uploadSize,
+          2 => $uploadFileSize
+        )), 'maxfilesize', $uploadFileSize);
     $this->addRule('uploadFile', ts('A valid file must be uploaded.'), 'uploadedfile');
     $this->addRule('uploadFile', ts('Input file must be in CSV format'), 'utf8File');
 
@@ -85,9 +88,9 @@ class CRM_Contribute_Import_Form_DataSource extends CRM_Core_Form {
 
     //get the saved mapping details
     $mappingArray = CRM_Core_BAO_Mapping::getMappings(CRM_Core_OptionGroup::getValue('mapping_type',
-        'Import Contribution',
-        'name'
-      ));
+      'Import Contribution',
+      'name'
+    ));
     $this->assign('savedMapping', $mappingArray);
     $this->add('select', 'savedMapping', ts('Mapping Option'), array('' => ts('- select -')) + $mappingArray);
     $this->addElement('submit', 'loadMapping', ts('Load Mapping'), NULL, array('onclick' => 'checkSelect()'));
@@ -100,7 +103,7 @@ class CRM_Contribute_Import_Form_DataSource extends CRM_Core_Form {
     $this->setDefaults(array(
       'onDuplicate' =>
         CRM_Import_Parser::DUPLICATE_SKIP,
-      ));
+    ));
 
     //contact types option
     $contactOptions = array();
@@ -127,7 +130,7 @@ class CRM_Contribute_Import_Form_DataSource extends CRM_Core_Form {
     $this->setDefaults(array(
       'contactType' =>
         CRM_Import_Parser::CONTACT_INDIVIDUAL,
-      ));
+    ));
 
     //build date formats
     CRM_Core_Form_Date::buildAllowedDateFormats($this);
@@ -155,12 +158,12 @@ class CRM_Contribute_Import_Form_DataSource extends CRM_Core_Form {
   public function postProcess() {
     $this->controller->resetPage('MapField');
 
-    $fileName         = $this->controller->exportValue($this->_name, 'uploadFile');
+    $fileName = $this->controller->exportValue($this->_name, 'uploadFile');
     $skipColumnHeader = $this->controller->exportValue($this->_name, 'skipColumnHeader');
-    $onDuplicate      = $this->controller->exportValue($this->_name, 'onDuplicate');
-    $contactType      = $this->controller->exportValue($this->_name, 'contactType');
-    $dateFormats      = $this->controller->exportValue($this->_name, 'dateFormats');
-    $savedMapping     = $this->controller->exportValue($this->_name, 'savedMapping');
+    $onDuplicate = $this->controller->exportValue($this->_name, 'onDuplicate');
+    $contactType = $this->controller->exportValue($this->_name, 'contactType');
+    $dateFormats = $this->controller->exportValue($this->_name, 'dateFormats');
+    $savedMapping = $this->controller->exportValue($this->_name, 'savedMapping');
 
     $this->set('onDuplicate', $onDuplicate);
     $this->set('contactType', $contactType);

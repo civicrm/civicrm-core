@@ -95,9 +95,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       $extendsChildType = implode(CRM_Core_DAO::VALUE_SEPARATOR, $extendsChildType);
       if (CRM_Utils_Array::value(0, $params['extends']) == 'Relationship') {
         $extendsChildType = str_replace(array('_a_b', '_b_a'), array(
-            '',
-            '',
-          ), $extendsChildType);
+          '',
+          '',
+        ), $extendsChildType);
       }
       if (substr($extendsChildType, 0, 1) != CRM_Core_DAO::VALUE_SEPARATOR) {
         $extendsChildType = CRM_Core_DAO::VALUE_SEPARATOR . $extendsChildType .
@@ -2086,8 +2086,8 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
           $retValue = $value;
           break;
         }
-        // note that if its not text / textarea, the code falls thru and executes
-        // the below case also
+      // note that if its not text / textarea, the code falls thru and executes
+      // the below case also
       case 'StateProvince':
       case 'Country':
         $options = array();

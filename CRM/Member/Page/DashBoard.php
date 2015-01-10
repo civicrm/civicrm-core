@@ -102,52 +102,52 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     foreach ($membershipTypes as $key => $value) {
 
       $membershipSummary[$key]['premonth']['new'] = array(
-      'count' => CRM_Member_BAO_Membership::getMembershipJoins($key, $preMonth, $preMonthEnd),
+        'count' => CRM_Member_BAO_Membership::getMembershipJoins($key, $preMonth, $preMonthEnd),
         'name' => $value,
       );
 
       $membershipSummary[$key]['premonth']['renew'] = array(
-      'count' => CRM_Member_BAO_Membership::getMembershipRenewals($key, $preMonth, $preMonthEnd),
+        'count' => CRM_Member_BAO_Membership::getMembershipRenewals($key, $preMonth, $preMonthEnd),
         'name' => $value,
       );
 
       $membershipSummary[$key]['premonth']['total'] = array(
-      'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $preMonth, $preMonthEnd),
+        'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $preMonth, $preMonthEnd),
         'name' => $value,
       );
 
       $membershipSummary[$key]['month']['new'] = array(
-      'count' => CRM_Member_BAO_Membership::getMembershipJoins($key, $monthStart, $ymd),
+        'count' => CRM_Member_BAO_Membership::getMembershipJoins($key, $monthStart, $ymd),
         'name' => $value,
       );
 
       $membershipSummary[$key]['month']['renew'] = array(
-      'count' => CRM_Member_BAO_Membership::getMembershipRenewals($key, $monthStart, $ymd),
+        'count' => CRM_Member_BAO_Membership::getMembershipRenewals($key, $monthStart, $ymd),
         'name' => $value,
       );
 
       $membershipSummary[$key]['month']['total'] = array(
-      'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $monthStart, $ymd),
+        'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $monthStart, $ymd),
         'name' => $value,
       );
 
       $membershipSummary[$key]['year']['new'] = array(
-      'count' => CRM_Member_BAO_Membership::getMembershipJoins($key, $yearStart, $ymd),
+        'count' => CRM_Member_BAO_Membership::getMembershipJoins($key, $yearStart, $ymd),
         'name' => $value,
       );
 
       $membershipSummary[$key]['year']['renew'] = array(
-      'count' => CRM_Member_BAO_Membership::getMembershipRenewals($key, $yearStart, $ymd),
+        'count' => CRM_Member_BAO_Membership::getMembershipRenewals($key, $yearStart, $ymd),
         'name' => $value,
       );
 
       $membershipSummary[$key]['year']['total'] = array(
-      'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $yearStart, $ymd),
+        'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $yearStart, $ymd),
         'name' => $value,
       );
 
       $membershipSummary[$key]['current']['total'] = array(
-      'count' => CRM_Member_BAO_Membership::getMembershipCount($key, $current),
+        'count' => CRM_Member_BAO_Membership::getMembershipCount($key, $current),
         'name' => $value,
       );
 
@@ -155,22 +155,22 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
 
       //LCD also get summary stats for membership owners
       $membershipSummary[$key]['premonth_owner']['premonth_owner'] = array(
-      'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $preMonth, $preMonthEnd, 0, 1),
+        'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $preMonth, $preMonthEnd, 0, 1),
         'name' => $value,
       );
 
       $membershipSummary[$key]['month_owner']['month_owner'] = array(
-      'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $monthStart, $ymd, 0, 1),
+        'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $monthStart, $ymd, 0, 1),
         'name' => $value,
       );
 
       $membershipSummary[$key]['year_owner']['year_owner'] = array(
-      'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $yearStart, $ymd, 0, 1),
+        'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $yearStart, $ymd, 0, 1),
         'name' => $value,
       );
 
       $membershipSummary[$key]['current_owner']['current_owner'] = array(
-      'count' => CRM_Member_BAO_Membership::getMembershipCount($key, $current, 0, 1),
+        'count' => CRM_Member_BAO_Membership::getMembershipCount($key, $current, 0, 1),
         'name' => $value,
       );
 
@@ -283,17 +283,17 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     $totalCountPreMonth = $totalCountMonth = $totalCountYear = $totalCountCurrent = $totalCountTotal = 0;
     $totalCountPreMonth_owner = $totalCountMonth_owner = $totalCountYear_owner = $totalCountCurrent_owner = $totalCountTotal_owner = 0;
     foreach ($membershipSummary as $key => $value) {
-      $newCountPreMonth   = $newCountPreMonth + $value['premonth']['new']['count'];
+      $newCountPreMonth = $newCountPreMonth + $value['premonth']['new']['count'];
       $renewCountPreMonth = $renewCountPreMonth + $value['premonth']['renew']['count'];
       $totalCountPreMonth = $totalCountPreMonth + $value['premonth']['total']['count'];
-      $newCountMonth      = $newCountMonth + $value['month']['new']['count'];
-      $renewCountMonth    = $renewCountMonth + $value['month']['renew']['count'];
-      $totalCountMonth    = $totalCountMonth + $value['month']['total']['count'];
-      $newCountYear       = $newCountYear + $value['year']['new']['count'];
-      $renewCountYear     = $renewCountYear + $value['year']['renew']['count'];
-      $totalCountYear     = $totalCountYear + $value['year']['total']['count'];
-      $totalCountCurrent  = $totalCountCurrent + $value['current']['total']['count'];
-      $totalCountTotal    = $totalCountTotal + $value['total']['total']['count'];
+      $newCountMonth = $newCountMonth + $value['month']['new']['count'];
+      $renewCountMonth = $renewCountMonth + $value['month']['renew']['count'];
+      $totalCountMonth = $totalCountMonth + $value['month']['total']['count'];
+      $newCountYear = $newCountYear + $value['year']['new']['count'];
+      $renewCountYear = $renewCountYear + $value['year']['renew']['count'];
+      $totalCountYear = $totalCountYear + $value['year']['total']['count'];
+      $totalCountCurrent = $totalCountCurrent + $value['current']['total']['count'];
+      $totalCountTotal = $totalCountTotal + $value['total']['total']['count'];
 
       //LCD add owner values
       $totalCountPreMonth_owner = $totalCountPreMonth_owner + $value['premonth_owner']['premonth_owner']['count'];
@@ -394,33 +394,33 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     //LCD add owner values
     $totalCount['premonth_owner']['premonth_owner'] = array(
       'count' => $totalCountPreMonth_owner,
-    //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=$preMonth&end=$preMonthEnd&owner=1"),
+      //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=$preMonth&end=$preMonthEnd&owner=1"),
     );
 
     $totalCount['month_owner']['month_owner'] = array(
       'count' => $totalCountMonth_owner,
-    //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=$monthStart&end=$ymd&owner=1"),
+      //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=$monthStart&end=$ymd&owner=1"),
     );
 
     $totalCount['year_owner']['year_owner'] = array(
       'count' => $totalCountYear_owner,
-    //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=$yearStart&end=$ymd&owner=1"),
+      //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=$yearStart&end=$ymd&owner=1"),
     );
 
     $totalCount['current_owner']['current_owner'] = array(
       'count' => $totalCountCurrent_owner,
-    //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&owner=1"),
+      //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&owner=1"),
     );
 
     $totalCount['total_owner']['total_owner'] = array(
       'count' => $totalCountTotal_owner,
-    //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&owner=1"),
+      //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&owner=1"),
     );
 
     if (!$isCurrentMonth) {
       $totalCount['total_owner']['total_owner'] = array(
         'count' => $totalCountTotal_owner,
-      //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=&end=$ymd&owner=1"),
+        //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=&end=$ymd&owner=1"),
       );
     }
     //LCD end

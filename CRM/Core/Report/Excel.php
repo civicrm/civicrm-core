@@ -59,10 +59,10 @@ class CRM_Core_Report_Excel {
 
     $result = '';
 
-    $config        = CRM_Core_Config::singleton();
-    $seperator     = $config->fieldSeparator;
-    $enclosed      = '"';
-    $escaped       = $enclosed;
+    $config = CRM_Core_Config::singleton();
+    $seperator = $config->fieldSeparator;
+    $enclosed = '"';
+    $escaped = $enclosed;
     $add_character = "\015\012";
 
     $schema_insert = '';

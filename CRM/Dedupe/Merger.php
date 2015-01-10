@@ -621,7 +621,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @static
    */
   public static function merge($dupePairs = array(), $cacheParams = array(), $mode = 'safe',
-    $autoFlip = TRUE, $redirectForPerformance = FALSE
+                               $autoFlip = TRUE, $redirectForPerformance = FALSE
   ) {
     $cacheKeyString = CRM_Utils_Array::value('cache_key_string', $cacheParams);
     $resultStats = array('merged' => array(), 'skipped' => array());
@@ -726,7 +726,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
       elseif ((in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) or
           substr($key, 0, 12) == 'move_custom_'
-        ) and $val != NULL) {
+        ) and $val != NULL
+      ) {
         // Rule: if both main-contact has other-contact, let $mode decide if to merge a
         // particular field or not
         if (!empty($migrationInfo['rows'][$key]['main'])) {
@@ -751,7 +752,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         if ($fieldName == 'address') {
           $mainNewLocTypeId = $migrationInfo['location'][$fieldName][$fieldCount]['locTypeId'];
           if (!empty($migrationInfo['main_loc_address']) &&
-              array_key_exists("main_{$mainNewLocTypeId}", $migrationInfo['main_loc_address'])) {
+            array_key_exists("main_{$mainNewLocTypeId}", $migrationInfo['main_loc_address'])
+          ) {
             // main loc already has some address for the loc-type. Its a overwrite situation.
 
             // look for next available loc-type
@@ -824,7 +826,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     // Fetch contacts
     foreach (array('main' => $mainId, 'other' => $otherId) as $moniker => $cid) {
-      $params = array('contact_id' => $cid, 'version' => 3, 'return' => array_merge(array('display_name'), self::getContactFields()));
+      $params = array(
+        'contact_id' => $cid,
+        'version' => 3,
+        'return' => array_merge(array('display_name'), self::getContactFields())
+      );
       $result = civicrm_api('contact', 'get', $params);
 
       if (empty($result['values'][$cid]['contact_type'])) {
@@ -856,10 +862,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
       $names = array(
         'preferred_communication_method' =>
-        array(
-          'newName' => 'preferred_communication_method_display',
-          'groupName' => 'preferred_communication_method',
-        ),
+          array(
+            'newName' => 'preferred_communication_method_display',
+            'groupName' => 'preferred_communication_method',
+          ),
       );
       CRM_Core_OptionGroup::lookupValues($specialValues[$moniker], $names);
 
@@ -1058,8 +1064,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $js = array('onChange' => "mergeBlock('$name', this, $count );");
           }
           $elements[] = array(
-            'select', "location[{$name}][$count][locTypeId]", NULL,
-            $defaultLocType + $locTypeValues, $js,
+            'select',
+            "location[{$name}][$count][locTypeId]",
+            NULL,
+            $defaultLocType + $locTypeValues,
+            $js,
           );
           // keep location-type-id same as that of other-contact
           $migrationInfo['location'][$name][$count]['locTypeId'] = $locTypeId;
@@ -1229,7 +1238,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $value = '0';
       }
       if ((in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) ||
-        substr($key, 0, 12) == 'move_custom_') &&
+          substr($key, 0, 12) == 'move_custom_') &&
         $value != NULL
       ) {
         $submitted[substr($key, 5)] = $value;
@@ -1426,10 +1435,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
                 //keep state and country as array format.
                 //for checkbox and m-select format w/ VALUE_SEPARATOR
                 if (in_array($htmlType, array(
-                  'CheckBox', 'Multi-Select', 'AdvMulti-Select'))) {
+                  'CheckBox',
+                  'Multi-Select',
+                  'AdvMulti-Select'
+                ))) {
                   $submitted[$key] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-                    $mergeValue
-                  ) . CRM_Core_DAO::VALUE_SEPARATOR;
+                      $mergeValue
+                    ) . CRM_Core_DAO::VALUE_SEPARATOR;
                 }
                 else {
                   $submitted[$key] = $mergeValue;
@@ -1437,7 +1449,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
               }
             }
             elseif (in_array($htmlType, array(
-              'Multi-Select Country', 'Multi-Select State/Province'))) {
+              'Multi-Select Country',
+              'Multi-Select State/Province'
+            ))) {
               //we require submitted values should be in array format
               if ($value) {
                 $mergeValueArray = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
@@ -1497,7 +1511,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       if (CRM_Core_DAO::singleValueQuery("
         SELECT id
         FROM civicrm_entity_file
-        WHERE entity_table = '{$tableName}' AND file_id = {$fileIds[$otherId]}")) {
+        WHERE entity_table = '{$tableName}' AND file_id = {$fileIds[$otherId]}")
+      ) {
         $sql = "
           UPDATE civicrm_entity_file
           SET entity_id = {$mainId}
@@ -1599,8 +1614,18 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   public static function getContactFields() {
     $contactFields = CRM_Contact_DAO_Contact::fields();
-    $invalidFields = array('api_key', 'contact_is_deleted', 'created_date', 'display_name', 'hash', 'id', 'modified_date',
-      'primary_contact_id', 'sort_name', 'user_unique_id');
+    $invalidFields = array(
+      'api_key',
+      'contact_is_deleted',
+      'created_date',
+      'display_name',
+      'hash',
+      'id',
+      'modified_date',
+      'primary_contact_id',
+      'sort_name',
+      'user_unique_id'
+    );
     foreach ($contactFields as $field => $value) {
       if (in_array($field, $invalidFields)) {
         unset($contactFields[$field]);

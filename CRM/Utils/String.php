@@ -599,10 +599,23 @@ class CRM_Utils_String {
 
     if ($_searchChars == NULL) {
       $_searchChars = array(
-        '&', ';', ',', '=', '$',
-        '"', "'", '\\',
-        '<', '>', '(', ')',
-        ' ', "\r", "\r\n", "\n", "\t",
+        '&',
+        ';',
+        ',',
+        '=',
+        '$',
+        '"',
+        "'",
+        '\\',
+        '<',
+        '>',
+        '(',
+        ')',
+        ' ',
+        "\r",
+        "\r\n",
+        "\n",
+        "\t",
       );
       $_replaceChar = '_';
     }
@@ -723,8 +736,8 @@ class CRM_Utils_String {
     $offset = floor(($len - $maskCount) / 2);
 
     $masked = substr($user, 0, $offset)
-       . str_repeat($maskChar, $maskCount)
-       . substr($user, $maskCount + $offset);
+      . str_repeat($maskChar, $maskCount)
+      . substr($user, $maskCount + $offset);
 
     return ($masked . '@' . $domain);
   }

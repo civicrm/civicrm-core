@@ -47,15 +47,18 @@ class CRM_Contribute_Page_DashBoard extends CRM_Core_Page {
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviContribute'));
 
-    $status      = array('Valid', 'Cancelled');
-    $prefixes    = array('start', 'month', 'year');
-    $startDate   = NULL;
+    $status = array('Valid', 'Cancelled');
+    $prefixes = array('start', 'month', 'year');
+    $startDate = NULL;
     $startToDate = $monthToDate = $yearToDate = array();
 
     //get contribution dates.
     $dates = CRM_Contribute_BAO_Contribution::getContributionDates();
     foreach (array(
-      'now', 'yearDate', 'monthDate') as $date) {
+               'now',
+               'yearDate',
+               'monthDate'
+             ) as $date) {
       $$date = $dates[$date];
     }
     // fiscal years end date
@@ -124,7 +127,8 @@ class CRM_Contribute_Page_DashBoard extends CRM_Core_Page {
     $chartForm->setEmbedded(TRUE);
     $chartForm->process();
     $chartForm->run();
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Contribute/Page/DashBoard.js', 1, 'html-header');
+    CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'templates/CRM/Contribute/Page/DashBoard.js', 1, 'html-header');
 
     return parent::run();
   }

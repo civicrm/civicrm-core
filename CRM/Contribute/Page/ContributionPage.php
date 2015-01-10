@@ -288,19 +288,21 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
     );
 
     // set breadcrumb to append to 2nd layer pages
-    $breadCrumb = array(array(
-    'title' => ts('Manage Contribution Pages'),
+    $breadCrumb = array(
+      array(
+        'title' => ts('Manage Contribution Pages'),
         'url' => CRM_Utils_System::url(CRM_Utils_System::currentPath(),
           'reset=1'
         ),
-      ));
+      )
+    );
 
     // what action to take ?
     if ($action & CRM_Core_Action::ADD) {
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath(),
-          'action=browse&reset=1'
-        ));
+        'action=browse&reset=1'
+      ));
 
       $controller = new CRM_Contribute_Controller_ContributionPage(NULL, $action);
       CRM_Utils_System::setTitle(ts('Manage Contribution Page'));
@@ -331,8 +333,8 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
 
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath(),
-          'reset=1&action=browse'
-        ));
+        'reset=1&action=browse'
+      ));
 
       $id = CRM_Utils_Request::retrieve('id', 'Positive',
         $this, FALSE, 0
@@ -564,8 +566,8 @@ ORDER BY title asc
    */
   public function whereClause(&$params, $sortBy = TRUE) {
     // @todo Unused local variable can be safely removed.
-    $values    = $clauses = array();
-    $title     = $this->get('title');
+    $values = $clauses = array();
+    $title = $this->get('title');
     $createdId = $this->get('cid');
 
     if ($createdId) {

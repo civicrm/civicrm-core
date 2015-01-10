@@ -72,7 +72,10 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     $form->assign('uploadSize', $uploadSize);
     $form->add('File', 'uploadFile', ts('Import Data File'), 'size=30 maxlength=255', TRUE);
     $form->setMaxFileSize($uploadFileSize);
-    $form->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', array(1 => $uploadSize, 2 => $uploadFileSize)), 'maxfilesize', $uploadFileSize);
+    $form->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', array(
+          1 => $uploadSize,
+          2 => $uploadFileSize
+        )), 'maxfilesize', $uploadFileSize);
     $form->addRule('uploadFile', ts('Input file must be in CSV format'), 'utf8File');
     $form->addRule('uploadFile', ts('A valid file must be uploaded.'), 'uploadedfile');
 
@@ -144,9 +147,9 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       $result['original_col_header'] = $firstrow;
 
       $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-      $columns    = array_map($strtolower, $firstrow);
-      $columns    = str_replace(' ', '_', $columns);
-      $columns    = preg_replace('/[^a-z_]/', '', $columns);
+      $columns = array_map($strtolower, $firstrow);
+      $columns = str_replace(' ', '_', $columns);
+      $columns = preg_replace('/[^a-z_]/', '', $columns);
 
       // need to take care of null as well as duplicate col names.
       $duplicateColName = FALSE;
@@ -207,7 +210,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       rewind($fd);
     }
 
-    $sql   = NULL;
+    $sql = NULL;
     $first = TRUE;
     $count = 0;
     while ($row = fgetcsv($fd, 0, $fieldSeparator)) {
@@ -229,7 +232,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
         $sql = "INSERT IGNORE INTO $table VALUES $sql";
         $db->query($sql);
 
-        $sql   = NULL;
+        $sql = NULL;
         $first = TRUE;
         $count = 0;
       }

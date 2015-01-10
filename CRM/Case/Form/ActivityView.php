@@ -46,10 +46,10 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
-    $contactID       = CRM_Utils_Request::retrieve('cid', 'Integer', $this, TRUE);
-    $activityID      = CRM_Utils_Request::retrieve('aid', 'Integer', $this, TRUE);
-    $revs            = CRM_Utils_Request::retrieve('revs', 'Boolean', CRM_Core_DAO::$_nullObject);
-    $caseID          = CRM_Utils_Request::retrieve('caseID', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $contactID = CRM_Utils_Request::retrieve('cid', 'Integer', $this, TRUE);
+    $activityID = CRM_Utils_Request::retrieve('aid', 'Integer', $this, TRUE);
+    $revs = CRM_Utils_Request::retrieve('revs', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $caseID = CRM_Utils_Request::retrieve('caseID', 'Boolean', CRM_Core_DAO::$_nullObject);
     $activitySubject = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity',
       $activityID,
       'subject'

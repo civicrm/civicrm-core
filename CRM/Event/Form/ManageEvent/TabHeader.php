@@ -53,9 +53,10 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
       ->addSetting(array(
-    'tabSettings' => array(
-        'active' => self::getCurrentTab($tabs),
-      )));
+        'tabSettings' => array(
+          'active' => self::getCurrentTab($tabs),
+        )
+      ));
     CRM_Event_Form_ManageEvent::addProfileEditScripts();
     return $tabs;
   }
@@ -148,9 +149,9 @@ WHERE      e.id = %1
     CRM_Utils_Hook::tabset('civicrm/event/manage', $tabs,
       array('event_id' => $eventID));
 
-    $fullName  = $form->getVar('_name');
+    $fullName = $form->getVar('_name');
     $className = CRM_Utils_String::getClassName($fullName);
-    $new       = '';
+    $new = '';
 
     // hack for special cases.
     switch ($className) {

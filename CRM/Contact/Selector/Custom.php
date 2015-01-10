@@ -209,9 +209,9 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * @param array $params
    */
   public function getPagerParams($action, &$params) {
-    $params['status']    = ts('Contact %%StatusMessage%%');
+    $params['status'] = ts('Contact %%StatusMessage%%');
     $params['csvString'] = NULL;
-    $params['rowCount']  = CRM_Utils_Pager::ROWCOUNT;
+    $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
 
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
@@ -296,15 +296,16 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     // contact query object used for creating $sql
     $contactQueryObj = NULL;
     if (method_exists($this->_search, 'getQueryObj') &&
-      is_a($this->_search->getQueryObj(), 'CRM_Contact_BAO_Query')) {
+      is_a($this->_search->getQueryObj(), 'CRM_Contact_BAO_Query')
+    ) {
       $contactQueryObj = $this->_search->getQueryObj();
     }
 
     $dao = CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
 
-    $columns     = $this->_search->columns();
+    $columns = $this->_search->columns();
     $columnNames = array_values($columns);
-    $links       = self::links($this->_key);
+    $links = self::links($this->_key);
 
     $permissions = array(CRM_Core_Permission::getPermission());
     if (CRM_Core_Permission::check('delete contacts')) {
@@ -314,8 +315,8 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
 
     $alterRow = FALSE;
     if (method_exists($this->_customSearchClass,
-        'alterRow'
-      )) {
+      'alterRow'
+    )) {
       $alterRow = TRUE;
     }
     $image = FALSE;
@@ -377,8 +378,8 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * Given the current formValues, gets the query in local
    * language
    *
-   * @param array(
-  reference)   $formValues   submitted formValues
+   * @param array (
+   * reference)   $formValues   submitted formValues
    *
    * @return array
    *   which contains an array of strings

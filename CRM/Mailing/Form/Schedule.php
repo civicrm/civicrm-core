@@ -67,6 +67,7 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
       $this->_scheduleFormOnly = TRUE;
     }
   }
+
   /**
    * Set default values for the form.
    *
@@ -102,13 +103,13 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
 
     if ($this->_scheduleFormOnly) {
       $title = ts('Schedule Mailing') . ' - ' . CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing',
-        $this->_mailingID,
-        'name'
-      );
+          $this->_mailingID,
+          'name'
+        );
       CRM_Utils_System::setTitle($title);
       $buttons = array(
         array(
-      'type' => 'next',
+          'type' => 'next',
           'name' => ts('Submit Mailing'),
           'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
           'isDefault' => TRUE,
@@ -162,8 +163,8 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
       $this->_scheduleFormOnly
     ) {
       // add the preview elements
-      $preview            = array();
-      $preview['type']    = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $this->_mailingID, 'body_html') ? 'html' : 'text';
+      $preview = array();
+      $preview['type'] = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $this->_mailingID, 'body_html') ? 'html' : 'text';
       $preview['subject'] = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing',
         $this->_mailingID,
         'subject'
@@ -248,8 +249,9 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
     }
 
     if (CRM_Utils_Date::format(CRM_Utils_Date::processDate($params['start_date'],
-          $params['start_date_time']
-        )) < CRM_Utils_Date::format(date('YmdHi00'))) {
+        $params['start_date_time']
+      )) < CRM_Utils_Date::format(date('YmdHi00'))
+    ) {
       return array(
         'start_date' => ts('Start date cannot be earlier than the current time.'),
       );
@@ -342,8 +344,8 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/mailing/browse/scheduled',
-        'reset=1&scheduled=true'
-      ));
+      'reset=1&scheduled=true'
+    ));
   }
 
   /**

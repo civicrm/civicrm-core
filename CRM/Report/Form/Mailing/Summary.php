@@ -371,8 +371,8 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
           $clause = NULL;
           if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
             $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from     = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to       = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
+            $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
+            $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
 
             $clause = $this->dateClause($this->_aliases[$tableName] . '.' . $field['name'], $relative, $from, $to, $field['type']);
           }
@@ -445,15 +445,15 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
    */
   public static function getChartCriteria() {
     return array(
-    'count' => array(
-    'civicrm_mailing_event_delivered_delivered_count' => ts('Delivered'),
+      'count' => array(
+        'civicrm_mailing_event_delivered_delivered_count' => ts('Delivered'),
         'civicrm_mailing_event_bounce_bounce_count' => ts('Bounce'),
         'civicrm_mailing_event_opened_open_count' => ts('Opened'),
         'civicrm_mailing_event_trackable_url_open_click_count' => ts('Clicks'),
         'civicrm_mailing_event_unsubscribe_unsubscribe_count' => ts('Unsubscribe'),
       ),
       'rate' => array(
-    'civicrm_mailing_event_delivered_accepted_rate' => ts('Accepted Rate'),
+        'civicrm_mailing_event_delivered_accepted_rate' => ts('Accepted Rate'),
         'civicrm_mailing_event_bounce_bounce_rate' => ts('Bounce Rate'),
         'civicrm_mailing_event_opened_open_rate' => ts('Confirmed Open Rate'),
         'civicrm_mailing_event_trackable_url_open_CTR' => ts('Click through Rate'),
@@ -480,13 +480,26 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     $isError = TRUE;
     foreach ($fields['fields'] as $fld => $isActive) {
       if (in_array($fld, array(
-        'delivered_count', 'bounce_count', 'open_count', 'click_count', 'unsubscribe_count', 'accepted_rate', 'bounce_rate', 'open_rate', 'CTR', 'CTO'))) {
+        'delivered_count',
+        'bounce_count',
+        'open_count',
+        'click_count',
+        'unsubscribe_count',
+        'accepted_rate',
+        'bounce_rate',
+        'open_rate',
+        'CTR',
+        'CTO'
+      ))) {
         $isError = FALSE;
       }
     }
 
     if ($isError) {
-      $errors['_qf_default'] = ts('For Chart view, please select at least one field from %1 OR %2.', array(1 => implode(', ', $criterias['count']), 2 => implode(', ', $criterias['rate'])));
+      $errors['_qf_default'] = ts('For Chart view, please select at least one field from %1 OR %2.', array(
+          1 => implode(', ', $criterias['count']),
+          2 => implode(', ', $criterias['rate'])
+        ));
     }
 
     return $errors;
@@ -503,7 +516,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     $criterias = self::getChartCriteria();
 
     $chartInfo = array(
-    'legend' => ts('Mail Summary'),
+      'legend' => ts('Mail Summary'),
       'xname' => ts('Mailing'),
       'yname' => ts('Statistics'),
       'xLabelAngle' => 20,

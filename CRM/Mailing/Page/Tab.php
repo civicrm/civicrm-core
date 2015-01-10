@@ -63,7 +63,7 @@ class CRM_Mailing_Page_Tab extends CRM_Contact_Page_View {
    */
   public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
-    $this->_id     = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);

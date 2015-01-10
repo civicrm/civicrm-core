@@ -94,10 +94,10 @@ class CRM_Campaign_Form_Survey_TabHeader {
       ),
     );
 
-    $surveyID  = $form->getVar('_surveyId');
-    $class     = $form->getVar('_name');
-    $class     = CRM_Utils_String::getClassName($class);
-    $class     = strtolower($class);
+    $surveyID = $form->getVar('_surveyId');
+    $class = $form->getVar('_name');
+    $class = CRM_Utils_String::getClassName($class);
+    $class = strtolower($class);
 
     if (array_key_exists($class, $tabs)) {
       $tabs[$class]['current'] = TRUE;

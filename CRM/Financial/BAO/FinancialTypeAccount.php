@@ -32,7 +32,6 @@
  * $Id$
  *
  */
-
 class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFinancialAccount {
 
   /**

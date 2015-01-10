@@ -29,10 +29,16 @@ WHERE on_hold = 1 AND hold_date is not null AND contact_id in (" . implode(",", 
       $sql = "SELECT ROW_COUNT( )";
       $result = CRM_Core_DAO::singleValueQuery($sql);
       if ($result) {
-        CRM_Core_Session::setStatus(ts('%count email was found on hold and updated.', array('count' => $result, 'plural' => '%count emails were found on hold and updated.')), ts('Emails Restored'), 'success');
+        CRM_Core_Session::setStatus(ts('%count email was found on hold and updated.', array(
+              'count' => $result,
+              'plural' => '%count emails were found on hold and updated.'
+            )), ts('Emails Restored'), 'success');
       }
       else {
-        CRM_Core_Session::setStatus(ts('The selected contact does not have an email on hold.', array('count' => $result, 'plural' => 'None of the selected contacts have an email on hold.')), ts('No Emails to Restore'), 'info');
+        CRM_Core_Session::setStatus(ts('The selected contact does not have an email on hold.', array(
+              'count' => $result,
+              'plural' => 'None of the selected contacts have an email on hold.'
+            )), ts('No Emails to Restore'), 'info');
       }
     }
     else {

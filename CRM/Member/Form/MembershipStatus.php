@@ -115,7 +115,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form_MembershipConfig 
       try {
         CRM_Member_BAO_MembershipStatus::del($this->_id);
       }
-      catch(CRM_Core_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         CRM_Core_Error::statusBounce($e->getMessage(), NULL, ts('Delete Failed'));
       }
       CRM_Core_Session::setStatus(ts('Selected membership status has been deleted.'), ts('Record Deleted'), 'success');
@@ -141,8 +141,8 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form_MembershipConfig 
 
       $membershipStatus = CRM_Member_BAO_MembershipStatus::add($params, $ids);
       CRM_Core_Session::setStatus(ts('The membership status \'%1\' has been saved.',
-          array(1 => $membershipStatus->label)
-        ), ts('Saved'), 'success');
+        array(1 => $membershipStatus->label)
+      ), ts('Saved'), 'success');
     }
   }
 }

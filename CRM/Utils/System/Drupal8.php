@@ -155,7 +155,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       // This checks for both username uniqueness and validity.
       $violations = iterator_to_array($user->validate());
       // We only care about violations on the username field; discard the rest.
-      $violations = array_filter($violations, function ($v) { return $v->getPropertyPath() == 'name.0.value';
+      $violations = array_filter($violations, function ($v) {
+        return $v->getPropertyPath() == 'name.0.value';
       });
       if (count($violations) > 0) {
         $errors['cms_name'] = $violations[0]->getMessage();
@@ -172,7 +173,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       // This checks for both email uniqueness.
       $violations = iterator_to_array($user->validate());
       // We only care about violations on the email field; discard the rest.
-      $violations = array_filter($violations, function ($v) { return $v->getPropertyPath() == 'mail.0.value';
+      $violations = array_filter($violations, function ($v) {
+        return $v->getPropertyPath() == 'mail.0.value';
       });
       if (count($violations) > 0) {
         $errors[$emailName] = $violations[0]->getMessage();
@@ -292,7 +294,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * Add a script file
    *
-   * @param $url: string, absolute path to file
+   * @param $url : string, absolute path to file
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -322,7 +324,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * Add an inline script
    *
-   * @param $code: string, javascript code
+   * @param $code : string, javascript code
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -350,7 +352,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * Add a css file
    *
-   * @param $url: string, absolute path to file
+   * @param $url : string, absolute path to file
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -374,7 +376,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * Add an inline style
    *
-   * @param $code: string, css code
+   * @param $code : string, css code
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *

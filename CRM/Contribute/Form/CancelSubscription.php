@@ -58,7 +58,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
-    $this->_mid  = CRM_Utils_Request::retrieve('mid',  'Integer', $this, FALSE);
+    $this->_mid = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE);
 
     $this->_crid = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
     if ($this->_crid) {
@@ -139,7 +139,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
     // Determine if we can cancel recurring contribution via API with this processor
     $cancelSupported = $this->_paymentProcessorObj->isSupported('cancelSubscription');
     if ($cancelSupported) {
-      $searchRange   = array();
+      $searchRange = array();
       $searchRange[] = $this->createElement('radio', NULL, NULL, ts('Yes'), '1');
       $searchRange[] = $this->createElement('radio', NULL, NULL, ts('No'), '0');
 
@@ -203,9 +203,9 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
    * @return void
    */
   public function postProcess() {
-    $status             = $message = NULL;
+    $status = $message = NULL;
     $cancelSubscription = TRUE;
-    $params             = $this->controller->exportValues($this->_name);
+    $params = $this->controller->exportValues($this->_name);
 
     if ($this->_selfService) {
       // for self service force sending-request & notify
@@ -292,16 +292,16 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
           // send notification
           $sendTemplateParams =
             array(
-                  'groupName' => $this->_mode == 'auto_renew' ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
-                  'valueName' => $this->_mode == 'auto_renew' ? 'membership_autorenew_cancelled' : 'contribution_recurring_cancelled',
-                  'contactId' => $this->_subscriptionDetails->contact_id,
-                  'tplParams' => $tplParams,
-                  //'isTest'    => $isTest, set this from _objects
-                  'PDFFilename' => 'receipt.pdf',
-                  'from' => $receiptFrom,
-                  'toName' => $this->_donorDisplayName,
-                  'toEmail' => $this->_donorEmail,
-                  );
+              'groupName' => $this->_mode == 'auto_renew' ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
+              'valueName' => $this->_mode == 'auto_renew' ? 'membership_autorenew_cancelled' : 'contribution_recurring_cancelled',
+              'contactId' => $this->_subscriptionDetails->contact_id,
+              'tplParams' => $tplParams,
+              //'isTest'    => $isTest, set this from _objects
+              'PDFFilename' => 'receipt.pdf',
+              'from' => $receiptFrom,
+              'toName' => $this->_donorDisplayName,
+              'toEmail' => $this->_donorEmail,
+            );
           list($sent) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         }
       }
@@ -323,7 +323,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
     }
 
     $session = CRM_Core_Session::singleton();
-    $userID  = $session->get('userID');
+    $userID = $session->get('userID');
     if ($userID && $status) {
       $session->setStatus($status, $msgTitle, $msgType);
     }
@@ -332,7 +332,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
         CRM_Utils_System::setUFMessage($status);
       // keep result as 1, since we not displaying anything on the redirected page anyway
       return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/subscriptionstatus',
-                                                              "reset=1&task=cancel&result=1"));
+        "reset=1&task=cancel&result=1"));
     }
   }
 }

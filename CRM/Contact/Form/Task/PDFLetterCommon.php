@@ -47,9 +47,9 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @return void
    */
   public static function preProcess(&$form) {
-    $messageText    = array();
+    $messageText = array();
     $messageSubject = array();
-    $dao            = new CRM_Core_BAO_MessageTemplate();
+    $dao = new CRM_Core_BAO_MessageTemplate();
     $dao->is_active = 1;
     $dao->find();
     while ($dao->fetch()) {
@@ -370,10 +370,10 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    */
   public static function createActivities($form, $html_message, $contactIds) {
     //Added for CRM-12682: Add activity subject and campaign fields
-    $formValues     = $form->controller->exportValues($form->getName());
+    $formValues = $form->controller->exportValues($form->getName());
 
-    $session        = CRM_Core_Session::singleton();
-    $userID         = $session->get('userID');
+    $session = CRM_Core_Session::singleton();
+    $userID = $session->get('userID');
     $activityTypeID = CRM_Core_OptionGroup::getValue(
       'activity_type',
       'Print PDF Letter',
@@ -439,8 +439,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
         $matches = array();
         if (preg_match('/^(&nbsp;)+/', $msg, $matches)) {
           $spaceLen = strlen($matches[0]) / 6;
-          $trimMsg  = ltrim($msg, '&nbsp; ');
-          $charLen  = strlen($trimMsg);
+          $trimMsg = ltrim($msg, '&nbsp; ');
+          $charLen = strlen($trimMsg);
           $totalLen = $charLen + $spaceLen;
           if ($totalLen > 100) {
             $spacesCount = 10;

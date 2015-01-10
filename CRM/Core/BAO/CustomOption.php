@@ -155,7 +155,10 @@ WHERE  id = %1
       case 'Radio':
       case 'Autocomplete-Select':
         if (!in_array($dataType, array(
-          'Boolean', 'ContactReference'))) {
+          'Boolean',
+          'ContactReference'
+        ))
+        ) {
           $options = self::valuesByID($fieldId);
         }
     }
@@ -188,8 +191,8 @@ AND    g.id    = v.option_group_id";
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     if ($dao->fetch()) {
       if (in_array($dao->dataType,
-          array('Int', 'Float', 'Money', 'Boolean')
-        )) {
+        array('Int', 'Float', 'Money', 'Boolean')
+      )) {
         $value = 0;
       }
       else {
@@ -255,7 +258,8 @@ WHERE  id = %2";
             $dataType = $dao->dataType;
           }
           $queryParams = array(
-            1 => array($params['value'],
+            1 => array(
+              $params['value'],
               $dataType,
             ),
             2 => array(
@@ -270,11 +274,11 @@ WHERE  id = %2";
         case 'CheckBox':
           $oldString = CRM_Core_DAO::VALUE_SEPARATOR . $oldValue . CRM_Core_DAO::VALUE_SEPARATOR;
           $newString = CRM_Core_DAO::VALUE_SEPARATOR . $params['value'] . CRM_Core_DAO::VALUE_SEPARATOR;
-          $query     = "
+          $query = "
 UPDATE {$dao->tableName}
 SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
           $queryParams = array(
-          1 => array($oldString, 'String'),
+            1 => array($oldString, 'String'),
             2 => array($newString, 'String'),
           );
           break;

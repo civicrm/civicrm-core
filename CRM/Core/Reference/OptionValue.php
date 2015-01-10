@@ -33,7 +33,7 @@ class CRM_Core_Reference_OptionValue extends CRM_Core_Reference_Basic {
    * @throws CRM_Core_Exception
    */
   public function findReferences($targetDao) {
-    if (! ($targetDao instanceof CRM_Core_DAO_OptionValue)) {
+    if (!($targetDao instanceof CRM_Core_DAO_OptionValue)) {
       throw new CRM_Core_Exception("Mismatched reference: expected OptionValue but received " . get_class($targetDao));
     }
     if ($targetDao->option_group_id == $this->getTargetOptionGroupId()) {
@@ -51,7 +51,7 @@ class CRM_Core_Reference_OptionValue extends CRM_Core_Reference_Basic {
    * @throws CRM_Core_Exception
    */
   public function getReferenceCount($targetDao) {
-    if (! ($targetDao instanceof CRM_Core_DAO_OptionValue)) {
+    if (!($targetDao instanceof CRM_Core_DAO_OptionValue)) {
       throw new CRM_Core_Exception("Mismatched reference: expected OptionValue but received " . get_class($targetDao));
     }
     if ($targetDao->option_group_id == $this->getTargetOptionGroupId()) {

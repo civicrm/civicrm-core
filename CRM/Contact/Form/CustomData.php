@@ -102,6 +102,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   public $_multiRecordDisplay;
 
   public $_copyValueId;
+
   /**
    * Pre processing work done here.
    *
@@ -306,7 +307,8 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     $cgcount += 1;
     $buttonName = $this->controller->getButtonName();
     if ($buttonName == $this->getButtonName('upload', 'new')) {
-      CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/cd/edit', "reset=1&type={$this->_contactType}&groupID={$this->_groupID}&entityID={$this->_tableID}&cgcount={$cgcount}&multiRecordDisplay=single&mode=add"));
+      CRM_Core_Session::singleton()
+        ->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/cd/edit', "reset=1&type={$this->_contactType}&groupID={$this->_groupID}&entityID={$this->_tableID}&cgcount={$cgcount}&multiRecordDisplay=single&mode=add"));
     }
     // reset the group contact cache for this group
     CRM_Contact_BAO_GroupContactCache::remove();

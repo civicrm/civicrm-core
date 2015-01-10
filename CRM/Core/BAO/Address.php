@@ -380,7 +380,11 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
       if ($parseStreetAddress && !empty($params['street_address'])) {
         foreach (array(
-          'street_number', 'street_name', 'street_unit', 'street_number_suffix') as $fld) {
+                   'street_number',
+                   'street_name',
+                   'street_unit',
+                   'street_number_suffix'
+                 ) as $fld) {
           unset($params[$fld]);
         }
         // main parse string.
@@ -418,7 +422,14 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
     $config = CRM_Core_Config::singleton();
     foreach ($params as $name => $value) {
       if (in_array($name, array(
-        'is_primary', 'location_type_id', 'id', 'contact_id', 'is_billing', 'display', 'master_id'))) {
+        'is_primary',
+        'location_type_id',
+        'id',
+        'contact_id',
+        'is_billing',
+        'display',
+        'master_id'
+      ))) {
         continue;
       }
       elseif (!CRM_Utils_System::isNull($value)) {
@@ -500,7 +511,11 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       // deprecate reference.
       if ($count > 1) {
         foreach (array(
-          'state', 'state_name', 'country', 'world_region') as $fld) {
+                   'state',
+                   'state_name',
+                   'country',
+                   'world_region'
+                 ) as $fld) {
           if (isset($address->$fld)) {
             unset($address->$fld);
           }
@@ -688,7 +703,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
         $addressSequence[$key] = 'city_postal_code';
       }
       elseif (
-        in_array($field, array('country', 'state_province', 'city', 'postal_code'))
+      in_array($field, array('country', 'state_province', 'city', 'postal_code'))
       ) {
         unset($addressSequence[$key]);
       }
@@ -747,7 +762,10 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
 
     $matches = array();
     if (in_array($locale, array(
-      'en_CA', 'fr_CA')) && preg_match('/^([A-Za-z0-9]+)[ ]*\-[ ]*/', $streetAddress, $matches)) {
+        'en_CA',
+        'fr_CA'
+      )) && preg_match('/^([A-Za-z0-9]+)[ ]*\-[ ]*/', $streetAddress, $matches)
+    ) {
       $parseFields['street_unit'] = $matches[1];
       // unset from rest of street address
       $streetAddress = preg_replace('/^([A-Za-z0-9]+)[ ]*\-[ ]*/', '', $streetAddress);
@@ -794,18 +812,53 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
     // now get the street unit.
     // supportable street unit formats.
     $streetUnitFormats = array(
-      'APT', 'APARTMENT', 'BSMT', 'BASEMENT', 'BLDG', 'BUILDING',
-      'DEPT', 'DEPARTMENT', 'FL', 'FLOOR', 'FRNT', 'FRONT',
-      'HNGR', 'HANGER', 'LBBY', 'LOBBY', 'LOWR', 'LOWER',
-      'OFC', 'OFFICE', 'PH', 'PENTHOUSE', 'TRLR', 'TRAILER',
-      'UPPR', 'RM', 'ROOM', 'SIDE', 'SLIP', 'KEY',
-      'LOT', 'PIER', 'REAR', 'SPC', 'SPACE',
-      'STOP', 'STE', 'SUITE', 'UNIT', '#',
+      'APT',
+      'APARTMENT',
+      'BSMT',
+      'BASEMENT',
+      'BLDG',
+      'BUILDING',
+      'DEPT',
+      'DEPARTMENT',
+      'FL',
+      'FLOOR',
+      'FRNT',
+      'FRONT',
+      'HNGR',
+      'HANGER',
+      'LBBY',
+      'LOBBY',
+      'LOWR',
+      'LOWER',
+      'OFC',
+      'OFFICE',
+      'PH',
+      'PENTHOUSE',
+      'TRLR',
+      'TRAILER',
+      'UPPR',
+      'RM',
+      'ROOM',
+      'SIDE',
+      'SLIP',
+      'KEY',
+      'LOT',
+      'PIER',
+      'REAR',
+      'SPC',
+      'SPACE',
+      'STOP',
+      'STE',
+      'SUITE',
+      'UNIT',
+      '#',
     );
 
     // overwriting $streetUnitFormats for 'en_CA' and 'fr_CA' locale
     if (in_array($locale, array(
-      'en_CA', 'fr_CA'))) {
+      'en_CA',
+      'fr_CA'
+    ))) {
       $streetUnitFormats = array('APT', 'APP', 'SUITE', 'BUREAU', 'UNIT');
     }
     //@todo per CRM-14459 this regex picks up words with the string in them - e.g APT picks up
@@ -994,7 +1047,7 @@ SELECT is_primary,
     foreach (array_keys($rows) as $rowID) {
       // load complete address as array key
       $address =
-      trim($rows[$rowID]['street_address']) . trim($rows[$rowID]['city']) . trim($rows[$rowID]['state_province']) . trim($rows[$rowID]['postal_code']) . trim($rows[$rowID]['country']);
+        trim($rows[$rowID]['street_address']) . trim($rows[$rowID]['city']) . trim($rows[$rowID]['state_province']) . trim($rows[$rowID]['postal_code']) . trim($rows[$rowID]['country']);
       if (isset($rows[$rowID]['last_name'])) {
         $name = $rows[$rowID]['last_name'];
       }
@@ -1126,7 +1179,7 @@ SELECT is_primary,
 
     list($valid, $invalid, $duplicate,
       $saved, $relationshipIds
-    ) = CRM_Contact_BAO_Relationship::createMultiple($relationshipParams, $cid);
+      ) = CRM_Contact_BAO_Relationship::createMultiple($relationshipParams, $cid);
   }
 
   /**
@@ -1255,7 +1308,7 @@ SELECT is_primary,
       case 'world_region':
         return CRM_Core_PseudoConstant::worldRegion();
 
-      break;
+        break;
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }

@@ -265,8 +265,8 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
               is_array($this->_params[$settingName])
             ) {
               $this->_config->$settingName = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-                array_keys($this->_params[$settingName])
-              ) . CRM_Core_DAO::VALUE_SEPARATOR;
+                  array_keys($this->_params[$settingName])
+                ) . CRM_Core_DAO::VALUE_SEPARATOR;
             }
             else {
               $this->_config->$settingName = NULL;

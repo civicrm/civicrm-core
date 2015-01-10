@@ -135,8 +135,8 @@ class CRM_Contact_Page_AJAX {
     }
 
     $list = array_keys(CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'contact_reference_options'
-      ), '1');
+      'contact_reference_options'
+    ), '1');
 
     $return = array_unique(array_merge(array('sort_name'), $list));
 
@@ -148,7 +148,21 @@ class CRM_Contact_Page_AJAX {
     }
 
     if (!empty($action)) {
-      $excludeGet = array('reset', 'key', 'className', 'fnName', 'json', 'reset', 'context', 'timestamp', 'limit', 'id', 's', 'q', 'action');
+      $excludeGet = array(
+        'reset',
+        'key',
+        'className',
+        'fnName',
+        'json',
+        'reset',
+        'context',
+        'timestamp',
+        'limit',
+        'id',
+        's',
+        'q',
+        'action'
+      );
       foreach ($_GET as $param => $val) {
         if (empty($val) ||
           in_array($param, $excludeGet) ||
@@ -199,8 +213,8 @@ class CRM_Contact_Page_AJAX {
    * Fetch PCP ID by PCP Supporter sort_name, also displays PCP title and associated Contribution Page title
    */
   public static function getPCPList() {
-    $name  = CRM_Utils_Array::value('s', $_GET);
-    $name  = CRM_Utils_Type::escape($name, 'String');
+    $name = CRM_Utils_Array::value('s', $_GET);
+    $name = CRM_Utils_Type::escape($name, 'String');
     $limit = '10';
 
     $where = ' AND pcp.page_id = cp.id AND pcp.contact_id = cc.id';
@@ -320,10 +334,10 @@ class CRM_Contact_Page_AJAX {
    * Fetch the custom field help
    */
   public static function customField() {
-    $fieldId          = CRM_Utils_Type::escape($_REQUEST['id'], 'Integer');
-    $params           = array('id' => $fieldId);
+    $fieldId = CRM_Utils_Type::escape($_REQUEST['id'], 'Integer');
+    $params = array('id' => $fieldId);
     $returnProperties = array('help_pre', 'help_post');
-    $values           = array();
+    $values = array();
 
     CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $values, $returnProperties);
     CRM_Utils_JSON::output($values);
@@ -368,8 +382,8 @@ class CRM_Contact_Page_AJAX {
       $relType = NULL;
       if (isset($_GET['rel'])) {
         $relation = explode('_', $_GET['rel']);
-        $relType  = CRM_Utils_Type::escape($relation[0], 'Integer');
-        $rel      = CRM_Utils_Type::escape($relation[2], 'String');
+        $relType = CRM_Utils_Type::escape($relation[0], 'Integer');
+        $rel = CRM_Utils_Type::escape($relation[2], 'String');
       }
 
       //shared household info
@@ -403,8 +417,8 @@ class CRM_Contact_Page_AJAX {
         $splitName = explode(' :: ', $name);
         if ($splitName) {
           $contactName = trim(CRM_Utils_Array::value('0', $splitName));
-          $street      = trim(CRM_Utils_Array::value('1', $splitName));
-          $city        = trim(CRM_Utils_Array::value('2', $splitName));
+          $street = trim(CRM_Utils_Array::value('1', $splitName));
+          $city = trim(CRM_Utils_Array::value('2', $splitName));
         }
         else {
           $contactName = $name;
@@ -484,7 +498,7 @@ ORDER BY sort_name ";
         while ($dao->fetch()) {
           if ($json) {
             $elements[] = array(
-            'name' => addslashes($dao->sort_name),
+              'name' => addslashes($dao->sort_name),
               'id' => $dao->id,
             );
           }
@@ -540,8 +554,8 @@ ORDER BY sort_name ";
    * Perform enable / disable actions on record.
    */
   public static function enableDisable() {
-    $op        = CRM_Utils_Type::escape($_REQUEST['op'], 'String');
-    $recordID  = CRM_Utils_Type::escape($_REQUEST['recordID'], 'Positive');
+    $op = CRM_Utils_Type::escape($_REQUEST['op'], 'String');
+    $recordID = CRM_Utils_Type::escape($_REQUEST['recordID'], 'Positive');
     $recordBAO = CRM_Utils_Type::escape($_REQUEST['recordBAO'], 'String');
 
     $isActive = NULL;
@@ -626,7 +640,7 @@ ORDER BY sort_name ";
       }
       list($displayName,
         $userEmail
-      ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
+        ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
       if ($userEmail) {
         echo $userEmail;
       }
@@ -878,8 +892,8 @@ LIMIT {$offset}, {$rowCount}
    */
   public static function getSignature() {
     $emailID = CRM_Utils_Type::escape($_REQUEST['emailID'], 'Positive');
-    $query   = "SELECT signature_text, signature_html FROM civicrm_email WHERE id = {$emailID}";
-    $dao     = CRM_Core_DAO::executeQuery($query);
+    $query = "SELECT signature_text, signature_html FROM civicrm_email WHERE id = {$emailID}";
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     $signatures = array();
     while ($dao->fetch()) {
@@ -897,8 +911,8 @@ LIMIT {$offset}, {$rowCount}
    */
   public static function processDupes() {
     $oper = CRM_Utils_Type::escape($_REQUEST['op'], 'String');
-    $cid  = CRM_Utils_Type::escape($_REQUEST['cid'], 'Positive');
-    $oid  = CRM_Utils_Type::escape($_REQUEST['oid'], 'Positive');
+    $cid = CRM_Utils_Type::escape($_REQUEST['cid'], 'Positive');
+    $oid = CRM_Utils_Type::escape($_REQUEST['oid'], 'Positive');
 
     if (!$oper || !$cid || !$oid) {
       return;
@@ -926,21 +940,21 @@ LIMIT {$offset}, {$rowCount}
 
   public static function getDedupes() {
 
-    $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
-    $offset    = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
-    $rowCount  = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
-    $sort      = 'sort_name';
+    $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
+    $offset = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
+    $rowCount = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
+    $sort = 'sort_name';
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
 
-    $gid         = isset($_REQUEST['gid']) ? CRM_Utils_Type::escape($_REQUEST['gid'], 'Integer') : 0;
-    $rgid        = isset($_REQUEST['rgid']) ? CRM_Utils_Type::escape($_REQUEST['rgid'], 'Integer') : 0;
+    $gid = isset($_REQUEST['gid']) ? CRM_Utils_Type::escape($_REQUEST['gid'], 'Integer') : 0;
+    $rgid = isset($_REQUEST['rgid']) ? CRM_Utils_Type::escape($_REQUEST['rgid'], 'Integer') : 0;
     $contactType = '';
     if ($rgid) {
       $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $rgid, 'contact_type');
     }
 
-    $cacheKeyString   = "merge {$contactType}_{$rgid}_{$gid}";
-    $searchRows       = array();
+    $cacheKeyString = "merge {$contactType}_{$rgid}_{$gid}";
+    $searchRows = array();
     $selectorElements = array('src', 'dst', 'weight', 'actions');
 
     $join = "LEFT JOIN civicrm_dedupe_exception de ON ( pn.entity_id1 = de.contact_id1 AND
@@ -997,9 +1011,9 @@ LIMIT {$offset}, {$rowCount}
   }
 
   public static function selectUnselectContacts() {
-    $name         = CRM_Utils_Array::value('name', $_REQUEST);
-    $cacheKey     = CRM_Utils_Array::value('qfKey', $_REQUEST);
-    $state        = CRM_Utils_Array::value('state', $_REQUEST, 'checked');
+    $name = CRM_Utils_Array::value('name', $_REQUEST);
+    $cacheKey = CRM_Utils_Array::value('qfKey', $_REQUEST);
+    $state = CRM_Utils_Array::value('state', $_REQUEST, 'checked');
     $variableType = CRM_Utils_Array::value('variableType', $_REQUEST, 'single');
 
     $actionToPerform = CRM_Utils_Array::value('action', $_REQUEST, 'select');
@@ -1080,10 +1094,10 @@ LIMIT {$offset}, {$rowCount}
       10 => '',
     );
 
-    $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
-    $offset    = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
-    $rowCount  = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
-    $sort      = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
+    $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
+    $offset = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
+    $rowCount = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
+    $sort = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
 
     $params = $_POST;

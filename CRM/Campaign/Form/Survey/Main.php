@@ -224,11 +224,13 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     if (!empty($this->_values['result_id'])) {
       $query = "SELECT COUNT(*) FROM civicrm_survey WHERE result_id = %1";
-      $countSurvey = (int)CRM_Core_DAO::singleValueQuery($query,
+      $countSurvey = (int) CRM_Core_DAO::singleValueQuery($query,
         array(
-          1 => array($this->_values['result_id'],
+          1 => array(
+            $this->_values['result_id'],
             'Positive',
-          ))
+          )
+        )
       );
       // delete option group if no any survey is using it.
       if (!$countSurvey) {

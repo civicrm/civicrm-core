@@ -40,7 +40,7 @@
  */
 class CRM_Contact_Form_Edit_Organization {
 
- /**
+  /**
    * This function provides the HTML form elements that are specific
    * to the Organization Contact Type
    *

@@ -70,8 +70,8 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
   public static function getProviders($selectArr = NULL, $filter = NULL, $getActive = TRUE, $orderBy = 'id') {
 
     $providers = array();
-    $temp      = array();
-    $dao       = new CRM_SMS_DAO_Provider();
+    $temp = array();
+    $dao = new CRM_SMS_DAO_Provider();
     if ($filter && !array_key_exists('is_active', $filter) && $getActive) {
       $dao->is_active = 1;
     }
