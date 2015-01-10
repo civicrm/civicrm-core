@@ -80,4 +80,3 @@ function _civicrm_api3_membership_payment_create_spec(&$params) {
 function civicrm_api3_membership_payment_get($params) {
   return _civicrm_api3_basic_get('CRM_Member_DAO_MembershipPayment', $params);
 }
-

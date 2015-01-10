@@ -118,4 +118,3 @@ function civicrm_api3_group_delete($params) {
   CRM_Contact_BAO_Group::discard($params['id']);
   return civicrm_api3_create_success(TRUE);
 }
-

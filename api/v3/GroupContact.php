@@ -256,4 +256,3 @@ function _civicrm_api3_group_contact_deprecation() {
     'update_status' => 'GroupContact "update_status" action is deprecated in favor of "create".',
   );
 }
-
