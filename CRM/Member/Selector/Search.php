@@ -145,7 +145,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    * @param string $context
    *
    * @return \CRM_Member_Selector_Search
-  @access public
+   * @access public
    */
   function __construct(
     &$queryParams,

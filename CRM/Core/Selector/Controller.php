@@ -193,7 +193,7 @@ class CRM_Core_Selector_Controller {
    * @param null $case
    *
    * @return \CRM_Core_Selector_Controller
-  @access public
+   * @access public
    */
   public function __construct($object, $pageID, $sortID, $action, $store = NULL, $output = self::TEMPLATE, $prefix = NULL, $case = NULL) {
 

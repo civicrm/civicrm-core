@@ -149,7 +149,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    * @param null $compContext
    *
    * @return \CRM_Mailing_Selector_Search
-  @access public
+   * @access public
    */
   function __construct(
     &$queryParams,
