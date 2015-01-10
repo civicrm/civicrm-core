@@ -80,7 +80,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * Class constructor
    *
    * @return \CRM_Core_DAO
-  @access public
+   * @access public
    */
   public function __construct() {
     $this->initialize();

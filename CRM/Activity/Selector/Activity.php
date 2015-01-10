@@ -75,7 +75,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    * @param null $activityTypeIDs
    *
    * @return \CRM_Activity_Selector_Activity
-  @access public
+   * @access public
    */
   function __construct(
     $contactId,

@@ -37,17 +37,6 @@
  */
 
 /**
- * Most API functions take in associative arrays ( name => value pairs
- * as parameters. Some of the most commonly used parameters are
- * described below
- *
- * @param array $params
- *   An associative array used in construction.
- * retrieval of the object
- *
- */
-
-/**
  * Create a 'custom field' within a custom field group.
  * We also empty the static var in the getfields
  * function after deletion so that the field is available for us (getfields manages date conversion
@@ -56,7 +45,8 @@
  * @param $params
  *   Array Associative array of property name/value pairs to create new custom field.
  *
- * @return Newly API success object
+ * @return array
+ *   API success array
  *
  * @access public
  *
@@ -90,6 +80,7 @@ function _civicrm_api3_custom_field_flush_static_caches() {
   civicrm_api('custom_field', 'getfields', array('version' => 3, 'cache_clear' => 1));
   CRM_Core_BAO_UFField::getAvailableFieldsFlat(TRUE);
 }
+
 /**
  * Adjust Metadata for Create action
  *
@@ -123,7 +114,6 @@ function _civicrm_api3_custom_field_create_spec(&$params) {
  * @access public
  **/
 function civicrm_api3_custom_field_delete($params) {
-
   $field = new CRM_Core_BAO_CustomField();
   $field->id = $params['id'];
   $field->find(TRUE);
@@ -137,10 +127,9 @@ function civicrm_api3_custom_field_delete($params) {
  *
  * @param array $params
  *   Array to search on.
- * {*
  *
  * @return array
-@getfields CustomField_get}
+ * @getfields CustomField_get
  * @access public
  *
  **/
@@ -162,7 +151,7 @@ function civicrm_api3_custom_field_get($params) {
  *   Collect validation errors.
  *
  * @return array
-   *   Validation errors
+ *   Validation errors
  * @todo remove this function - not in use but need to review functionality before
  * removing as it might be useful in wrapper layer
  */

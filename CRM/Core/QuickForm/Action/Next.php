@@ -42,7 +42,7 @@ class CRM_Core_QuickForm_Action_Next extends CRM_Core_QuickForm_Action {
    *   Reference to state machine object.
    *
    * @return \CRM_Core_QuickForm_Action_Next
-  @access public
+   * @access public
    */
   public function __construct(&$stateMachine) {
     parent::__construct($stateMachine);
