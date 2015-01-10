@@ -252,6 +252,48 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           'dao' => 'CRM_Core_DAO_OptionValue',
           'fields' => array(// so we have $this->_alias populated
           ),
+          'status_id' =>
+          array('title' => ts('Activity Status'),
+            'default' => TRUE,
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+          'duration' =>
+          array('title' => ts('Duration'),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
+          'location' =>
+          array('title' => ts('Location'),
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+          'details' => array(
+            'title' => ts('Activity Details'),
+          )
+        ),
+        'filters' => array(
+          'activity_date_time' => array(
+            'default' => 'this.month',
+            'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+          'activity_subject' =>
+          array('title' => ts('Activity Subject')),
+          'location' =>
+            array('title' => ts('Location'),
+            'type' => CRM_Utils_Type::T_TEXT,
+          ),
+          'activity_type_id' =>
+          array('title' => ts('Activity Type'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => $this->activityTypes,
+          ),
+          'status_id' =>
+          array('title' => ts('Activity Status'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::activityStatus(),
+          ),
+          'details' => array(
+            'title' => ts('Activity Details'),
+            'type' => CRM_Utils_Type::T_TEXT,
+          )
         ),
       ) + $this->addressFields(TRUE);
 
@@ -292,6 +334,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     }
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
+    $this->_tagFilterTable = 'civicrm_activity';
     parent::__construct();
   }
 
