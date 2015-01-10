@@ -108,7 +108,7 @@ class Frame {
   }
 
   public function setRollbackOnly() {
-    $this->doCommit = false;
+    $this->doCommit = FALSE;
   }
 
   public function begin() {
@@ -163,7 +163,7 @@ class Frame {
    * @param array|NULL $params Optional values to pass to callback.
    *          See php manual call_user_func_array for details.
    */
-  public function addCallback($phase, $callback, $params = null, $id = NULL) {
+  public function addCallback($phase, $callback, $params = NULL, $id = NULL) {
     if ($id) {
       $this->callbacks[$phase][$id] = array(
         'callback' => $callback,

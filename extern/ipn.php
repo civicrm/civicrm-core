@@ -51,7 +51,7 @@ else {
 try {
   $paypalIPN->main();
 }
-catch(CRM_Core_Exception $e) {
+catch (CRM_Core_Exception $e) {
   CRM_Core_Error::debug_log_message($e->getMessage());
   CRM_Core_Error::debug_var('error data', $e->getErrorData(), TRUE, TRUE);
   CRM_Core_Error::debug_var('REQUEST', $_REQUEST, TRUE, TRUE);

@@ -257,7 +257,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
    * @param int $id
    * @todo - this function is a long way, non standard of saying $dao = new CRM_Contribute_DAO_ContributionProduct(); $dao->id = $id; $dao->find();
    */
-  public function assignPremiumProduct($id) { //to get Premium id
+  public function assignPremiumProduct($id) {
     $sql = "
 SELECT *
 FROM   civicrm_contribution_product
@@ -329,11 +329,11 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
           $endDate = CRM_Utils_Array::value('membership_end_date', $updateResult);
           if ($endDate) {
             $statusMsg .= "<br />" . ts("Membership for %1 has been updated. The membership End Date is %2.",
-              array(
-                1 => $userDisplayName,
-                2 => $endDate,
-              )
-            );
+                array(
+                  1 => $userDisplayName,
+                  2 => $endDate,
+                )
+              );
           }
         }
       }
@@ -418,7 +418,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       if (empty($this->_paymentProcessors)) {
         throw new CRM_Core_Exception(ts('You will need to configure the %1 settings for your Payment Processor before you can submit a credit card transactions.', array(1 => $this->_mode)));
       }
-      $this->_processors  = array();
+      $this->_processors = array();
       foreach ($this->_paymentProcessors as $id => $processor) {
         $this->_processors[$id] = ts($processor['name']);
       }
@@ -436,11 +436,13 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
+   * Get current currency from DB or use default currency.
+   *
    * @param $submittedValues
    *
    * @return mixed
    */
-  public function getCurrency($submittedValues) { // get current currency from DB or use default currency
+  public function getCurrency($submittedValues) {
     $config = CRM_Core_Config::singleton();
 
     $currentCurrency = CRM_Utils_Array::value('currency',

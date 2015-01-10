@@ -74,14 +74,16 @@ class CRM_Friend_Form extends CRM_Core_Form {
     $pcomponent = CRM_Utils_Request::retrieve('pcomponent', 'String', $this, TRUE);
 
     if (in_array($pcomponent, array(
-      'contribute', 'event'))) {
+      'contribute',
+      'event'
+    ))) {
       $values = array();
       $params = array('id' => $this->_entityId);
       CRM_Core_DAO::commonRetrieve('CRM_Contribute_DAO_ContributionPage',
         $params, $values, array('title', 'campaign_id', 'is_share')
       );
-      $this->_title       = CRM_Utils_Array::value('title', $values);
-      $this->_campaignId  = CRM_Utils_Array::value('campaign_id', $values);
+      $this->_title = CRM_Utils_Array::value('title', $values);
+      $this->_campaignId = CRM_Utils_Array::value('campaign_id', $values);
       $this->_entityTable = 'civicrm_contribution_page';
       if ($pcomponent == 'event') {
         $this->_entityTable = 'civicrm_event';
@@ -310,9 +312,9 @@ class CRM_Friend_Form extends CRM_Core_Form {
       require_once 'CRM/PCP/BAO/PCP.php';
       if ($linkText = CRM_PCP_BAO_PCP::getPcpBlockStatus($defaults['entity_id'], $defaults['entity_table'])) {
         $linkTextUrl = CRM_Utils_System::url('civicrm/contribute/campaign',
-                                                      "action=add&reset=1&pageId={$defaults['entity_id']}&component=event",
-                                                      FALSE, NULL, TRUE,
-                                                      TRUE);
+          "action=add&reset=1&pageId={$defaults['entity_id']}&component=event",
+          FALSE, NULL, TRUE,
+          TRUE);
         $this->assign('linkTextUrl', $linkTextUrl);
         $this->assign('linkText', $linkText);
       }

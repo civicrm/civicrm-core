@@ -56,8 +56,8 @@ class CRM_Utils_Sunlight {
     }
     if ($request->getResponseCode() != 200) {
       CRM_Core_Error::fatal(ts('Invalid response code received from Sunlight servers: %1',
-          array(1 => $request->getResponseCode())
-        ));
+        array(1 => $request->getResponseCode())
+      ));
     }
     $string = $request->getResponseBody();
     return simplexml_load_string($string);
@@ -137,9 +137,9 @@ class CRM_Utils_Sunlight {
     ) {
       return NULL;
     }
-    $key  = self::$_apiKey;
+    $key = self::$_apiKey;
     $city = urlencode($city);
-    $uri  = "people.reps.getRepsFromCityState.php?city={$city}&state={$state}&apikey={$key}&output=xml";
+    $uri = "people.reps.getRepsFromCityState.php?city={$city}&state={$state}&apikey={$key}&output=xml";
     return self::getPeopleInfo($uri);
   }
 

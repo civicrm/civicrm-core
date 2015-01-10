@@ -83,8 +83,8 @@ class CRM_Campaign_Page_Survey extends CRM_Core_Page {
 
     if (!empty($surveys)) {
 
-      $surveyType    = CRM_Campaign_BAO_Survey::getSurveyActivityType();
-      $campaigns     = CRM_Campaign_BAO_Campaign::getAllCampaign();
+      $surveyType = CRM_Campaign_BAO_Survey::getSurveyActivityType();
+      $campaigns = CRM_Campaign_BAO_Campaign::getAllCampaign();
       $activityTypes = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, FALSE, 'name');
       foreach ($surveys as $sid => $survey) {
         $surveys[$sid]['campaign_id'] = $campaigns[$survey['campaign_id']];

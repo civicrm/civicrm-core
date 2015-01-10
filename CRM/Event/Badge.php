@@ -46,11 +46,17 @@ class CRM_Event_Badge {
   /**
    */
   public function __construct() {
-    $this->style        = array('width' => 0.1, 'cap' => 'round', 'join' => 'round', 'dash' => '2,2', 'color' => array(0, 0, 200));
-    $this->format       = '5160';
+    $this->style = array(
+      'width' => 0.1,
+      'cap' => 'round',
+      'join' => 'round',
+      'dash' => '2,2',
+      'color' => array(0, 0, 200)
+    );
+    $this->format = '5160';
     $this->imgExtension = 'png';
-    $this->imgRes       = 300;
-    $this->event        = NULL;
+    $this->imgRes = 300;
+    $this->event = NULL;
     $this->setDebug(FALSE);
   }
 
@@ -79,7 +85,7 @@ class CRM_Event_Badge {
   public function run(&$participants) {
     // fetch the 1st participant, and take her event to retrieve its attributes
     $participant = reset($participants);
-    $eventID     = $participant['event_id'];
+    $eventID = $participant['event_id'];
     $this->event = self::retrieveEvent($eventID);
     //call function to create labels
     self::createLabels($participants);
@@ -142,7 +148,15 @@ class CRM_Event_Badge {
     $x = $this->pdf->GetAbsX();
     $y = $this->pdf->GetY();
     if ($this->debug) {
-      $this->pdf->Rect($x, $y, $this->pdf->width, $this->pdf->height, 'D', array('all' => array('width' => 1, 'cap' => 'round', 'join' => 'round', 'dash' => '2,10', 'color' => array(255, 0, 0))));
+      $this->pdf->Rect($x, $y, $this->pdf->width, $this->pdf->height, 'D', array(
+          'all' => array(
+            'width' => 1,
+            'cap' => 'round',
+            'join' => 'round',
+            'dash' => '2,10',
+            'color' => array(255, 0, 0)
+          )
+        ));
     }
     $img = $this->getImageFileName($this->event->id, $img);
     if ($img) {

@@ -37,7 +37,6 @@
  * This class generates form components for adding a petition
  *
  */
-
 class CRM_Campaign_Form_Petition extends CRM_Core_Form {
 
   /**
@@ -200,7 +199,8 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     // custom group id
     $this->add('select', 'contact_profile_id', ts('Contact Profile'),
       array(
-        '' => ts('- select -')) + $customContactProfiles, TRUE
+        '' => ts('- select -')
+      ) + $customContactProfiles, TRUE
     );
 
     $customProfiles = CRM_Core_BAO_UFGroup::getProfiles(array('Activity'));

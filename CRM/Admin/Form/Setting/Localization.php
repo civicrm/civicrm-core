@@ -251,8 +251,9 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
       $values['currencyLimit'] = array($values['defaultCurrency']);
     }
     elseif (!in_array($values['defaultCurrency'],
-        $values['currencyLimit']
-      )) {
+      $values['currencyLimit']
+    )
+    ) {
       $values['currencyLimit'][] = $values['defaultCurrency'];
     }
 

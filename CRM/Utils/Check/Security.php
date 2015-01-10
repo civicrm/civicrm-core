@@ -150,8 +150,8 @@ class CRM_Utils_Check_Security {
         $messages[] = new CRM_Utils_Check_Message(
           'checkUploadsAreNotAccessible',
           ts('Files in the data directory (<a href="%3">%2</a>) should not be downloadable.'
-              . '<br />'
-              . '<a href="%1">Read more about this warning</a>',
+            . '<br />'
+            . '<a href="%1">Read more about this warning</a>',
             array(
               1 => $this->createDocUrl('checkUploadsAreNotAccessible'),
               2 => $privateDir,

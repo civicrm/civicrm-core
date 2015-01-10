@@ -95,7 +95,8 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
     $statusIds = array();
     foreach (array(
-      'Scheduled') as $name) {
+               'Scheduled'
+             ) as $name) {
       if ($statusId = array_search($name, $activityStatus)) {
         $statusIds[] = $statusId;
       }
@@ -174,11 +175,12 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
 
     $buttons = array(
       array(
-    'type' => 'done',
+        'type' => 'done',
         'name' => ts('Reserve'),
         'subName' => 'reserve',
         'isDefault' => TRUE,
-      ));
+      )
+    );
 
     if (CRM_Core_Permission::check('manage campaign') ||
       CRM_Core_Permission::check('administer CiviCampaign') ||
@@ -216,13 +218,13 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     $errors = array();
     $invalidGroupName = FALSE;
     if (!empty($fields['newGroupName'])) {
-      $title  = trim($fields['newGroupName']);
-      $name   = CRM_Utils_String::titleToVar($title);
-      $query  = 'select count(*) from civicrm_group where name like %1 OR title like %2';
+      $title = trim($fields['newGroupName']);
+      $name = CRM_Utils_String::titleToVar($title);
+      $query = 'select count(*) from civicrm_group where name like %1 OR title like %2';
       $grpCnt = CRM_Core_DAO::singleValueQuery($query, array(
-      1 => array($name, 'String'),
-          2 => array($title, 'String'),
-        ));
+        1 => array($name, 'String'),
+        2 => array($title, 'String'),
+      ));
       if ($grpCnt) {
         $invalidGroupName = TRUE;
         $errors['newGroupName'] = ts('Group \'%1\' already exists.', array(1 => $fields['newGroupName']));
@@ -241,17 +243,17 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
    */
   public function postProcess() {
     //add reservation.
-    $countVoters    = 0;
-    $maxVoters      = CRM_Utils_Array::value('max_number_of_contacts', $this->_surveyDetails);
+    $countVoters = 0;
+    $maxVoters = CRM_Utils_Array::value('max_number_of_contacts', $this->_surveyDetails);
     $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
-    $statusHeld     = array_search('Scheduled', $activityStatus);
+    $statusHeld = array_search('Scheduled', $activityStatus);
 
     $reservedVoterIds = array();
     foreach ($this->_contactIds as $cid) {
-      $subject        = ts('%1', array(1 => $this->_surveyDetails['title'])) . ' - ' . ts('Respondent Reservation');
-      $session        = CRM_Core_Session::singleton();
+      $subject = ts('%1', array(1 => $this->_surveyDetails['title'])) . ' - ' . ts('Respondent Reservation');
+      $session = CRM_Core_Session::singleton();
       $activityParams = array(
-      'source_contact_id' => $session->get('userID'),
+        'source_contact_id' => $session->get('userID'),
         'assignee_contact_id' => array($this->_interviewerId),
         'target_contact_id' => array($cid),
         'source_record_id' => $this->_surveyId,
@@ -280,8 +282,8 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
       $status = '<p>' . ts("%1 Contact(s) have been reserved.", array(1 => $countVoters)) . '</p>';
       if ($groupAdditions) {
         $status .= '<p>' . ts('Respondent(s) has been added to %1 group(s).',
-          array(1 => implode(', ', $groupAdditions))
-        ) . '</p>';
+            array(1 => implode(', ', $groupAdditions))
+          ) . '</p>';
       }
       CRM_Core_Session::setStatus($status, ts('Reservation Added'), 'success');
     }
@@ -315,8 +317,8 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
       return $groupAdditions;
     }
 
-    $params       = $this->controller->exportValues($this->_name);
-    $groups       = CRM_Utils_Array::value('groups', $params, array());
+    $params = $this->controller->exportValues($this->_name);
+    $groups = CRM_Utils_Array::value('groups', $params, array());
     $newGroupName = CRM_Utils_Array::value('newGroupName', $params);
     $newGroupDesc = CRM_Utils_Array::value('newGroupDesc', $params);
 

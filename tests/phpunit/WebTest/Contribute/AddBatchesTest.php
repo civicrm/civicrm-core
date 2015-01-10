@@ -206,7 +206,8 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
       if (!empty($data['contact'])) {
         $pledgeID = CRM_Pledge_BAO_Pledge::getContactPledges($data['contact']['id']);
         $this->select("open_pledges_{$row}", "value={$pledgeID[0]}");
-        $this->click("css=span#{$row}.pledge-adjust-option a");sleep(5);
+        $this->click("css=span#{$row}.pledge-adjust-option a");
+        sleep(5);
         $this->select("option_type_{$row}", "value=1");
         $this->click("css=span#{$row}.pledge-adjust-option a");
         $this->type("field_{$row}_total_amount", $data['amount']);

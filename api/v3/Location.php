@@ -24,4 +24,3 @@ function civicrm_api3_location_get($params) {
 function civicrm_api3_location_delete($params) {
   return civicrm_api3_create_error("API (Location, Delete) does not exist, use the Address/Phone/Email/Website API instead", array('obsoleted' => TRUE));
 }
-

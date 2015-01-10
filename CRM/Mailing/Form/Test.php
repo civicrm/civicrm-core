@@ -113,8 +113,8 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
     $this->addButtons($buttons);
 
     $mailingID = $this->get('mailing_id');
-    $textFile  = $this->get('textFile');
-    $htmlFile  = $this->get('htmlFile');
+    $textFile = $this->get('textFile');
+    $htmlFile = $this->get('htmlFile');
 
     $this->addFormRule(array('CRM_Mailing_Form_Test', 'testMail'), $this);
     $preview = array();
@@ -146,8 +146,8 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
     );
 
     $returnProperties = $mailing->getReturnProperties();
-    $userID           = $session->get('userID');
-    $params           = array('contact_id' => $userID);
+    $userID = $session->get('userID');
+    $params = array('contact_id' => $userID);
 
     $details = CRM_Utils_Token::getTokenDetails($params,
       $returnProperties,
@@ -262,10 +262,11 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
     }
 
     if (!empty($testParams['_qf_Test_next']) &&
-      $self->get('count') <= 0) {
+      $self->get('count') <= 0
+    ) {
       return array(
         '_qf_default' =>
-        ts("You can not schedule or send this mailing because there are currently no recipients selected. Click 'Previous' to return to the Select Recipients step, OR click 'Save & Continue Later'."),
+          ts("You can not schedule or send this mailing because there are currently no recipients selected. Click 'Previous' to return to the Select Recipients step, OR click 'Save & Continue Later'."),
       );
     }
 
@@ -274,9 +275,9 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
       return $error;
     }
 
-    $job             = new CRM_Mailing_BAO_MailingJob();
+    $job = new CRM_Mailing_BAO_MailingJob();
     $job->mailing_id = $self->get('mailing_id');
-    $job->is_test    = TRUE;
+    $job->is_test = TRUE;
     $job->save();
     $newEmails = NULL;
     $session = CRM_Core_Session::singleton();
@@ -322,13 +323,14 @@ ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
             'contact_type' => 'Individual',
             'email' => array(
               1 => array(
-          'email' => $email,
+                'email' => $email,
                 'is_primary' => 1,
                 'location_type_id' => 1,
-              )),
+              )
+            ),
           );
-          $contact   = CRM_Contact_BAO_Contact::create($params);
-          $emailId   = $contact->email[0]->id;
+          $contact = CRM_Contact_BAO_Contact::create($params);
+          $emailId = $contact->email[0]->id;
           $contactId = $contact->id;
           $contact->free();
         }

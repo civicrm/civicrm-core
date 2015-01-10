@@ -175,12 +175,20 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       'assignee_contact_id' => array(
         'type' => 'entityRef',
         'label' => ts('Assigned to'),
-        'attributes' => array('multiple' => TRUE, 'create' => TRUE, 'api' => array('params' => array('is_deceased' => 0))),
+        'attributes' => array(
+          'multiple' => TRUE,
+          'create' => TRUE,
+          'api' => array('params' => array('is_deceased' => 0))
+        ),
       ),
       'followup_assignee_contact_id' => array(
         'type' => 'entityRef',
         'label' => ts('Assigned to'),
-        'attributes' => array('multiple' => TRUE, 'create' => TRUE, 'api' => array('params' => array('is_deceased' => 0))),
+        'attributes' => array(
+          'multiple' => TRUE,
+          'create' => TRUE,
+          'api' => array('params' => array('is_deceased' => 0))
+        ),
       ),
       'followup_activity_type_id' => array(
         'type' => 'select',
@@ -432,10 +440,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $urlString = 'civicrm/contact/search/advanced';
       }
       elseif ($path == 'civicrm/group/search'
-    || $path == 'civicrm/contact/search'
+        || $path == 'civicrm/contact/search'
         || $path == 'civicrm/contact/search/advanced'
         || $path == 'civicrm/contact/search/custom'
-        || $path == 'civicrm/group/search') {
+        || $path == 'civicrm/group/search'
+      ) {
         $urlString = $path;
       }
       else {
@@ -629,7 +638,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     //enable form element (ActivityLinks sets this true)
     $this->assign('suppressForm', FALSE);
 
-    $element = & $this->add('select', 'activity_type_id', ts('Activity Type'),
+    $element = &$this->add('select', 'activity_type_id', ts('Activity Type'),
       $this->_fields['followup_activity_type_id']['attributes'],
       FALSE, array(
         'onchange' => "CRM.buildCustomData( 'Activity', this.value );",
@@ -980,8 +989,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     unset($params['id']);
     $linkedEntities = array(
       array(
-        'table'         => 'civicrm_activity_contact',
-        'findCriteria'  => array(
+        'table' => 'civicrm_activity_contact',
+        'findCriteria' => array(
           'activity_id' => $this->_activityId,
         ),
         'linkedColumns' => array('activity_id'),
@@ -1062,7 +1071,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $mailStatus = '';
 
     if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'activity_assignee_notification')) {
+      'activity_assignee_notification')
+    ) {
       $activityIDs = array($activity->id);
       if ($followupActivity) {
         $activityIDs = array_merge($activityIDs, array($followupActivity->id));

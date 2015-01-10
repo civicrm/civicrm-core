@@ -81,7 +81,7 @@ SET    on_hold = 2,
 WHERE  email = %2
 ";
         $sqlParams = array(
-        1 => array($now, 'Timestamp'),
+          1 => array($now, 'Timestamp'),
           2 => array($email->email, 'String'),
         );
         CRM_Core_DAO::executeQuery($sql, $sqlParams);

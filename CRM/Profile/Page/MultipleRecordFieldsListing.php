@@ -221,7 +221,14 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
     }
     if ($fieldIDs && !empty($fieldIDs) && $this->_contactId) {
       $options = array();
-      $returnProperities = array('html_type', 'data_type', 'date_format', 'time_format', 'default_value', 'is_required');
+      $returnProperities = array(
+        'html_type',
+        'data_type',
+        'date_format',
+        'time_format',
+        'default_value',
+        'is_required'
+      );
       foreach ($fieldIDs as $key => $fieldID) {
         $fieldIDs[$key] = !is_numeric($fieldID) ? CRM_Core_BAO_CustomField::getKeyID($fieldID) : $fieldID;
         $param = array('id' => $fieldIDs[$key]);
@@ -244,7 +251,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         $options[$fieldIDs[$key]]['attributes']['default_value'] = CRM_Utils_Array::value('default_value', $returnValues);
 
         $options[$fieldIDs[$key]]['attributes']['format'] =
-          $options[$fieldIDs[$key]]['attributes']['date_format'] = CRM_Utils_Array::value('date_format', $returnValues);
+        $options[$fieldIDs[$key]]['attributes']['date_format'] = CRM_Utils_Array::value('date_format', $returnValues);
         $options[$fieldIDs[$key]]['attributes']['time_format'] = CRM_Utils_Array::value('time_format', $returnValues);
       }
 
@@ -263,7 +270,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
           $singleField = CRM_Core_BAO_CustomField::getKeyID($nonListingFieldIds[0]);
           $fieldIdInput = $singleField;
           $singleField = array($singleField);
-          $fieldInput  = $singleField;
+          $fieldInput = $singleField;
         }
         $customGroupInfo = CRM_Core_BAO_CustomGroup::getGroupTitles($fieldInput);
         $this->_customGroupTitle = $customGroupInfo[$fieldIdInput]['groupTitle'];
@@ -344,9 +351,10 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
               $op = NULL;
               if ($this->_pageViewType == 'profileDataView') {
                 $actionParams = array(
-                'recordId' => $recId,
-                'gid' => $this->_profileId,
-                  'id' => $this->_contactId);
+                  'recordId' => $recId,
+                  'gid' => $this->_profileId,
+                  'id' => $this->_contactId
+                );
                 $op = 'profile.multiValue.row';
               }
               else {

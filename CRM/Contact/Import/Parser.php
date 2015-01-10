@@ -32,8 +32,6 @@
  * $Id$
  *
  */
-
-
 abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
 
   protected $_tableName;
@@ -347,7 +345,8 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
 
       if ($this->_invalidRowCount) {
         // removed view url for invlaid contacts
-        $headers = array_merge(array(ts('Line Number'),
+        $headers = array_merge(array(
+            ts('Line Number'),
             ts('Reason'),
           ),
           $customHeaders
@@ -356,7 +355,8 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
         self::exportCSV($this->_errorFileName, $headers, $this->_errors);
       }
       if ($this->_conflictCount) {
-        $headers = array_merge(array(ts('Line Number'),
+        $headers = array_merge(array(
+            ts('Line Number'),
             ts('Reason'),
           ),
           $customHeaders
@@ -365,7 +365,8 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
         self::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
       }
       if ($this->_duplicateCount) {
-        $headers = array_merge(array(ts('Line Number'),
+        $headers = array_merge(array(
+            ts('Line Number'),
             ts('View Contact URL'),
           ),
           $customHeaders
@@ -375,7 +376,8 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
         self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
       }
       if ($this->_unMatchCount) {
-        $headers = array_merge(array(ts('Line Number'),
+        $headers = array_merge(array(
+            ts('Line Number'),
             ts('Reason'),
           ),
           $customHeaders
@@ -385,7 +387,8 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
         self::exportCSV($this->_misMatchFilemName, $headers, $this->_unMatch);
       }
       if ($this->_unparsedAddressCount) {
-        $headers = array_merge(array(ts('Line Number'),
+        $headers = array_merge(array(
+            ts('Line Number'),
             ts('Contact Edit URL'),
           ),
           $customHeaders
@@ -552,9 +555,9 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
 
           $value = array(
             $this->_activeFields[$i]->_name =>
-            $this->_activeFields[$i]->_value,
+              $this->_activeFields[$i]->_value,
             'location_type_id' =>
-            $this->_activeFields[$i]->_hasLocationType,
+              $this->_activeFields[$i]->_hasLocationType,
           );
 
           if (isset($this->_activeFields[$i]->_phoneType)) {
@@ -595,7 +598,8 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
 
           if (isset($this->_activeFields[$i]->_relatedContactLocType) && !empty($this->_activeFields[$i]->_value)) {
             if (!empty($params[$this->_activeFields[$i]->_related][$this->_activeFields[$i]->_relatedContactDetails]) &&
-              !is_array($params[$this->_activeFields[$i]->_related][$this->_activeFields[$i]->_relatedContactDetails])) {
+              !is_array($params[$this->_activeFields[$i]->_related][$this->_activeFields[$i]->_relatedContactDetails])
+            ) {
               $params[$this->_activeFields[$i]->_related][$this->_activeFields[$i]->_relatedContactDetails] = array();
             }
             $value = array(

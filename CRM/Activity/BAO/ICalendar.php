@@ -97,7 +97,7 @@ class CRM_Activity_BAO_ICalendar {
             'fileName' => $icsFileName,
             'cleanName' => $icsFileName,
             'fullPath' => $this->icsfile,
-           );
+          );
           return 'activity_ics';
         }
       }

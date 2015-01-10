@@ -51,10 +51,12 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     $breadCrumbUrl = CRM_Utils_System::url('civicrm/admin/options/wordreplacements',
       "reset=1"
     );
-    $breadCrumb = array(array(
-    'title' => ts('Word Replacements'),
+    $breadCrumb = array(
+      array(
+        'title' => ts('Word Replacements'),
         'url' => $breadCrumbUrl,
-      ));
+      )
+    );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
   }
 
@@ -117,8 +119,8 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
-    $config    = CRM_Core_Config::singleton();
-    $values    = $config->localeCustomStrings[$config->lcMessages];
+    $config = CRM_Core_Config::singleton();
+    $values = $config->localeCustomStrings[$config->lcMessages];
 
     //CRM-14179
     $instances = 0;
@@ -187,9 +189,9 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
   public static function formRule($values) {
     $errors = array();
 
-    $oldValues  = CRM_Utils_Array::value('old', $values);
-    $newValues  = CRM_Utils_Array::value('new', $values);
-    $enabled    = CRM_Utils_Array::value('enabled', $values);
+    $oldValues = CRM_Utils_Array::value('old', $values);
+    $newValues = CRM_Utils_Array::value('new', $values);
+    $enabled = CRM_Utils_Array::value('enabled', $values);
     $exactMatch = CRM_Utils_Array::value('cb', $values);
 
     foreach ($oldValues as $k => $v) {
@@ -276,8 +278,8 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
 
       CRM_Core_Session::setStatus("", ts("Settings Saved"), "success");
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/options/wordreplacements',
-          "reset=1"
-        ));
+        "reset=1"
+      ));
     }
   }
 }

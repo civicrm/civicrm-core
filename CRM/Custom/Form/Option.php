@@ -250,9 +250,9 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
    * @static
    */
   public static function formRule($fields, $files, $form) {
-    $optionLabel   = $fields['label'];
-    $optionValue   = $fields['value'];
-    $fieldId       = $form->_fid;
+    $optionLabel = $fields['label'];
+    $optionValue = $fields['value'];
+    $fieldId = $form->_fid;
     $optionGroupId = $form->_optionGroupID;
 
     $temp = array();

@@ -76,7 +76,7 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
    */
   public static function getNames($activityID, $recordTypeID, $alsoIDs = FALSE) {
     $names = array();
-    $ids   = array();
+    $ids = array();
 
     if (empty($activityID)) {
       return $alsoIDs ? array($names, $ids) : $names;
@@ -115,7 +115,8 @@ AND        contact_a.is_deleted = 0
   public static function retrieveContactIdsByActivityId($activityID, $recordTypeID) {
     $activityContact = array();
     if (!CRM_Utils_Rule::positiveInteger($activityID) ||
-        !CRM_Utils_Rule::positiveInteger($recordTypeID)) {
+      !CRM_Utils_Rule::positiveInteger($recordTypeID)
+    ) {
       return $activityContact;
     }
 

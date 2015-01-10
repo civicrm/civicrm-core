@@ -36,7 +36,6 @@
  * base class for doing all command line operations via civicrm
  * used by cli.php
  **/
-
 class civicrm_cli {
   // required values that must be passed
   // via the command line
@@ -138,7 +137,7 @@ class civicrm_cli {
       // find the value of this arg
       if (preg_match('/=/', $arg)) {
         $parts = explode('=', $arg);
-        $arg   = $parts[0];
+        $arg = $parts[0];
         $value = $parts[1];
       }
       else {
@@ -199,7 +198,7 @@ class civicrm_cli {
     $_SERVER['HTTP_HOST'] = $this->_site;
     $_SERVER['REMOTE_ADDR'] = "127.0.0.1";
     $_SERVER['SERVER_SOFTWARE'] = NULL;
-    $_SERVER['REQUEST_METHOD']  = 'GET';
+    $_SERVER['REQUEST_METHOD'] = 'GET';
 
     // SCRIPT_FILENAME needed by CRM_Utils_System::cmsRootPath
     $_SERVER['SCRIPT_FILENAME'] = __FILE__;
@@ -224,9 +223,9 @@ class civicrm_cli {
     // Now we have a Config object, we can set it from the Base URL.
     if ($_SERVER['HTTP_HOST'] == 'localhost') {
       $_SERVER['HTTP_HOST'] = preg_replace(
-                '!^https?://([^/]+)/$!i',
-                '$1',
-                $this->_config->userFrameworkBaseURL);
+        '!^https?://([^/]+)/$!i',
+        '$1',
+        $this->_config->userFrameworkBaseURL);
     }
 
     $class = 'CRM_Utils_System_' . $this->_config->userFramework;
@@ -314,7 +313,6 @@ class civicrm_cli {
  * class used by csv/export.php to export records from
  * the database in a csv file format.
  **/
-
 class civicrm_cli_csv_exporter extends civicrm_cli {
   var $separator = ',';
 
@@ -358,7 +356,6 @@ class civicrm_cli_csv_exporter extends civicrm_cli {
  * records based on those found in a csv file
  * passed to the script.
  **/
-
 class civicrm_cli_csv_file extends civicrm_cli {
   var $header;
   var $separator = ',';
@@ -432,7 +429,6 @@ class civicrm_cli_csv_file extends civicrm_cli {
  * used by csv/import.php
  *
  **/
-
 class civicrm_cli_csv_importer extends civicrm_cli_csv_file {
   /**
    * @param array $params
@@ -453,7 +449,6 @@ class civicrm_cli_csv_importer extends civicrm_cli_csv_file {
  * used by csv/delete.php
  *
  **/
-
 class civicrm_cli_csv_deleter extends civicrm_cli_csv_file {
   /**
    * @param array $params

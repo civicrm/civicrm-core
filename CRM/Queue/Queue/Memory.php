@@ -135,8 +135,8 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
       if (empty($this->releaseTimes[$id]) || $this->releaseTimes[$id] < $nowEpoch) {
         $this->releaseTimes[$id] = $nowEpoch + $leaseTime;
 
-        $item       = new stdClass();
-        $item->id   = $id;
+        $item = new stdClass();
+        $item->id = $id;
         $item->data = unserialize($data);
         return $item;
       }
@@ -164,8 +164,8 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
       $this->releaseTimes[$id] = $nowEpoch + $leaseTime;
 
-      $item       = new stdClass();
-      $item->id   = $id;
+      $item = new stdClass();
+      $item->id = $id;
       $item->data = unserialize($data);
       return $item;
     }

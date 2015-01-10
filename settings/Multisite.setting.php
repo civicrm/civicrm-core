@@ -89,4 +89,4 @@ return array(
     'description' => '',
     'help_text' => NULL,
   ),
- );
+);

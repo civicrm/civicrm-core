@@ -39,10 +39,11 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
   protected $_entity = 'price_set';
 
   public $DBResetRequired = TRUE;
+
   public function setUp() {
     parent::setUp();
     $this->_params = array(
-    #     [domain_id] =>
+      #     [domain_id] =>
       'name' => 'default_goat_priceset',
       'title' => 'Goat accessories',
       'is_active' => 1,

@@ -199,9 +199,9 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
     }
 
     $this->addFormRule(array(
-        'CRM_Campaign_Form_Survey_Results',
-        'formRule',
-      ), $this);
+      'CRM_Campaign_Form_Survey_Results',
+      'formRule',
+    ), $this);
 
     parent::buildQuickForm();
   }
@@ -486,11 +486,11 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
 
       $query = "SELECT MAX(id) FROM civicrm_report_instance WHERE name = %1";
       $reportID = CRM_Core_DAO::singleValueQuery($query, array(
-          1 => array(
-            "survey_{$survey->id}",
-            'String',
-          ),
-        ));
+        1 => array(
+          "survey_{$survey->id}",
+          'String',
+        ),
+      ));
       if ($reportID) {
         $url = CRM_Utils_System::url("civicrm/report/instance/{$reportID}", 'reset=1');
         $status = ts("A Survey Detail Report <a href='%1'>%2</a> has been created.",

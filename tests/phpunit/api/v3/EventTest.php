@@ -40,8 +40,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->_apiversion = 3;
-    $this->_entity     = 'event';
-    $this->_params     = array(
+    $this->_entity = 'event';
+    $this->_params = array(
       array(
         'title' => 'Annual CiviCRM meet',
         'summary' => 'If you have any CiviCRM realted issues or want to track where CiviCRM is heading, Sign up now',
@@ -82,18 +82,20 @@ class api_v3_EventTest extends CiviUnitTestCase {
       array(
         'title' => 'Annual CiviCRM meet',
         'event_type_id' => 1,
-        'start_date' => 20081021,),
+        'start_date' => 20081021,
+      ),
       array(
         'title' => 'Annual CiviCRM meet 2',
         'event_type_id' => 1,
-        'start_date' => 20101021,),
+        'start_date' => 20101021,
+      ),
     );
 
     $this->events = array();
     $this->eventIds = array();
     foreach ($params as $event) {
-      $result            = $this->callAPISuccess('Event', 'Create', $event);
-      $this->_events[]   = $result;
+      $result = $this->callAPISuccess('Event', 'Create', $event);
+      $this->_events[] = $result;
       $this->_eventIds[] = $result['id'];
     }
   }
@@ -113,7 +115,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   public function testGetEventById() {
     $params = array(
-      'id' => $this->_events[1]['id'],);
+      'id' => $this->_events[1]['id'],
+    );
     $result = $this->callAPISuccess('event', 'get', $params);
     $this->assertEquals($result['values'][$this->_eventIds[1]]['event_title'], 'Annual CiviCRM meet 2');
   }
@@ -132,21 +135,25 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   public function testGetEventByWrongTitle() {
     $params = array(
-      'title' => 'No event with that title',);
+      'title' => 'No event with that title',
+    );
     $result = $this->callAPISuccess('Event', 'Get', $params);
     $this->assertEquals(0, $result['count']);
   }
+
   public function testGetEventByIdSort() {
     $params = array(
       'return.sort' => 'id ASC',
-      'return.max_results' => 1,);
+      'return.max_results' => 1,
+    );
     $result = $this->callAPISuccess('Event', 'Get', $params);
     $this->assertEquals(1, $result['id'], ' in line ' . __LINE__);
     $params = array(
       'options' => array(
         'sort' => 'id DESC',
         'limit' => 1,
-      ),);
+      ),
+    );
 
     $result = $this->callAPISuccess('Event', 'Get', $params);
     $this->assertAPISuccess($result, ' in line ' . __LINE__);
@@ -155,7 +162,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'options' => array(
         'sort' => 'id ASC',
         'limit' => 1,
-      ),);
+      ),
+    );
     $result = $this->callAPISuccess('Event', 'Get', $params);
     $this->assertEquals(1, $result['id'], ' in line ' . __LINE__);
 
@@ -184,14 +192,14 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'isCurrent' => 1,
     );
     $currentEventParams = array(
-    'start_date' => date('Y-m-d', strtotime('+ 1 day')),
+      'start_date' => date('Y-m-d', strtotime('+ 1 day')),
       'end_date' => date('Y-m-d', strtotime('+ 1 week')),
     );
     $currentEventParams = array_merge($this->_params[1], $currentEventParams);
-    $currentEvent       = $this->callAPISuccess('Event', 'Create', $currentEventParams);
-    $description        = "demonstrates use of is.Current option";
-    $subfile            = "IsCurrentOption";
-    $result             = $this->callAPIAndDocument('Event', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $currentEvent = $this->callAPISuccess('Event', 'Create', $currentEventParams);
+    $description = "demonstrates use of is.Current option";
+    $subfile = "IsCurrentOption";
+    $result = $this->callAPIAndDocument('Event', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $allEvents = $this->callAPISuccess('Event', 'Get', array());
     $this->callAPISuccess('Event', 'Delete', array('id' => $currentEvent['id']));
     $this->assertEquals(1, $result['count'], 'confirm only one event found in line ' . __LINE__);
@@ -227,27 +235,33 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate();
     $params = array(
       'id' => $this->_eventIds[0],
-    'max_participants' => 1,
+      'max_participants' => 1,
     );
     $result = $this->callAPISuccess('Event', 'Create', $params);
 
     $getEventParams = array(
       'id' => $this->_eventIds[0],
-    'return.is_full' => 1,
+      'return.is_full' => 1,
     );
 
     $currentEvent = $this->callAPISuccess('Event', 'getsingle', $getEventParams);
-    $description  = "demonstrates use of return is_full ";
-    $subfile      = "IsFullOption";
+    $description = "demonstrates use of return is_full ";
+    $subfile = "IsFullOption";
     $this->assertEquals(0, $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
     $this->assertEquals(1, $currentEvent['available_places'], 'available places is set in line ' . __LINE__);
-    $participant = $this->callAPISuccess('Participant', 'create', array('participant_status' => 1, 'role_id' => 1, 'contact_id' => $contactID, 'event_id' => $this->_eventIds[0]));
+    $participant = $this->callAPISuccess('Participant', 'create', array(
+        'participant_status' => 1,
+        'role_id' => 1,
+        'contact_id' => $contactID,
+        'event_id' => $this->_eventIds[0]
+      ));
     $currentEvent = $this->callAPIAndDocument('Event', 'getsingle', $getEventParams, __FUNCTION__, __FILE__, $description, $subfile, 'getsingle');
     $this->assertEquals(1, $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
     $this->assertEquals(0, $currentEvent['available_places'], 'available places is set in line ' . __LINE__);
 
     $this->contactDelete($contactID);
   }
+
   /*
    * Legacy support for Contribution Type ID. We need to ensure this is supported
    * as an alias for financial_type_id
@@ -280,7 +294,10 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
     $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
 
-    $check = $this->callAPISuccess($this->_entity, 'get', array('return.custom_' . $ids['custom_field_id'] => 1, 'id' => $result['id']));
+    $check = $this->callAPISuccess($this->_entity, 'get', array(
+        'return.custom_' . $ids['custom_field_id'] => 1,
+        'id' => $result['id']
+      ));
     $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
 
     $this->customFieldDelete($ids['custom_field_id']);
@@ -362,7 +379,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
     $params = array(
       'id' => $result['id'],
-    'max_participants' => 150,
+      'max_participants' => 150,
     );
     $this->callAPISuccess('Event', 'Create', $params);
     $updated = $this->callAPISuccess('Event', 'Get', $params, __FUNCTION__, __FILE__);
@@ -388,7 +405,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
    */
   public function testDeleteWithEventId() {
     $params = array(
-      'event_id' => $this->_eventIds[0],);
+      'event_id' => $this->_eventIds[0],
+    );
     $result = $this->callAPISuccess('Event', 'Delete', $params);
     $this->assertAPISuccess($result, 'in line ' . __LINE__);
   }
@@ -431,7 +449,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
   public function testSearchEmptyParams() {
     $event = $this->callAPISuccess('event', 'create', $this->_params[1]);
 
-    $getparams = array(     'sequential' => 1,
+    $getparams = array(
+      'sequential' => 1,
     );
     $result = $this->callAPISuccess('event', 'get', $getparams);
     $this->assertEquals($result['count'], 3, 'In line ' . __LINE__);
@@ -448,7 +467,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'event_type_id' => 1,
       'return.title' => 1,
       'return.id' => 1,
-      'return.start_date' => 1,);
+      'return.start_date' => 1,
+    );
     $result = $this->callAPISuccess('event', 'get', $params);
 
     $this->assertEquals($result['values'][$this->_eventIds[0]]['id'], $this->_eventIds[0], 'In line ' . __LINE__);
@@ -464,7 +484,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $events = array();
     while ($maxEvents > 0) {
       $params = array(
-      'title' => 'Test Event' . $maxEvents,
+        'title' => 'Test Event' . $maxEvents,
         'event_type_id' => 2,
         'start_date' => 20081021,
       );
@@ -473,7 +493,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       $maxEvents--;
     }
     $params = array(
-    'event_type_id' => 2,
+      'event_type_id' => 2,
       'return.id' => 1,
       'return.title' => 1,
       'return.offset' => 2,
@@ -487,9 +507,10 @@ class api_v3_EventTest extends CiviUnitTestCase {
   public function testEventCreationPermissions() {
     $params = array(
       'event_type_id' => 1,
-    'start_date' => '2010-10-03',
-    'title' => 'le cake is a tie',
-    'check_permissions' => TRUE,);
+      'start_date' => '2010-10-03',
+      'title' => 'le cake is a tie',
+      'check_permissions' => TRUE,
+    );
     $config = &CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array('access CiviCRM');
     $result = $this->callAPIFailure('event', 'create', $params);
@@ -515,12 +536,14 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals(1, $result['values']['title']['api.required'], 'in line ' . __LINE__);
   }
+
   public function testgetfieldsGet() {
     $description = "demonstrate use of getfields to interrogate api";
     $params = array('action' => 'get');
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals('title', $result['values']['event_title']['name'], 'in line ' . __LINE__);
   }
+
   public function testgetfieldsDelete() {
     $description = "demonstrate use of getfields to interrogate api";
     $params = array('action' => 'delete');

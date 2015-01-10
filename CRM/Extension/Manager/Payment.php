@@ -65,10 +65,10 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
 
     $dao = new CRM_Financial_DAO_PaymentProcessorType();
 
-    $dao->is_active   = 1;
-    $dao->class_name  = trim($info->key);
-    $dao->title       = trim($info->name) . ' (' . trim($info->key) . ')';
-    $dao->name        = trim($info->name);
+    $dao->is_active = 1;
+    $dao->class_name = trim($info->key);
+    $dao->title = trim($info->name) . ' (' . trim($info->key) . ')';
+    $dao->name = trim($info->name);
     $dao->description = trim($info->description);
 
     $dao->user_name_label = trim($info->typeInfo['userNameLabel']);
@@ -193,8 +193,12 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
     try {
       $paymentClass = $this->mapper->keyToClass($info->key, 'payment');
       $file = $this->mapper->classToPath($paymentClass);
-      if (! file_exists($file)) {
-        CRM_Core_Session::setStatus(ts('Failed to load file (%3) for payment processor (%1) while running "%2"', array(1 => $info->key, 2 => $method, 3 => $file)), '', 'error');
+      if (!file_exists($file)) {
+        CRM_Core_Session::setStatus(ts('Failed to load file (%3) for payment processor (%1) while running "%2"', array(
+              1 => $info->key,
+              2 => $method,
+              3 => $file
+            )), '', 'error');
         return;
       }
       else {
@@ -202,7 +206,10 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
       }
     }
     catch (CRM_Extension_Exception $e) {
-      CRM_Core_Session::setStatus(ts('Failed to determine file path for payment processor (%1) while running "%2"', array(1 => $info->key, 2 => $method)), '', 'error');
+      CRM_Core_Session::setStatus(ts('Failed to determine file path for payment processor (%1) while running "%2"', array(
+            1 => $info->key,
+            2 => $method
+          )), '', 'error');
       return;
     }
 
@@ -217,10 +224,11 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
                  WHERE ext.type = 'payment'
                    AND ext.full_name = %1
         ",
-        array(
-          1 => array($info->key, 'String'),
-        )
-      )) {
+      array(
+        1 => array($info->key, 'String'),
+      )
+    )
+    ) {
       // If so, load params in the usual way ..
       $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($processor_id, NULL);
     }
@@ -279,7 +287,10 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
 
         // Does PP implement this method, and can we call it?
         if (method_exists($processorInstance, $method) && is_callable(array(
-          $processorInstance, $method))) {
+            $processorInstance,
+            $method
+          ))
+        ) {
           // If so, call it ...
           $processorInstance->$method();
         }
@@ -287,8 +298,8 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
 
       default:
         CRM_Core_Session::setStatus(ts("Unrecognized payment hook (%1) in %2::%3",
-                        array(1 => $method, 2 => __CLASS__ , 3 => __METHOD__)),
-                        '', 'error');
+            array(1 => $method, 2 => __CLASS__, 3 => __METHOD__)),
+          '', 'error');
     }
   }
 }

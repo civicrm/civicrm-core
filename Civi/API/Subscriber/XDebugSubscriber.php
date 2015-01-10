@@ -26,6 +26,7 @@
 */
 
 namespace Civi\API\Subscriber;
+
 use Civi\API\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

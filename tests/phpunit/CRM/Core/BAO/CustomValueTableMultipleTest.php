@@ -14,10 +14,10 @@ class CRM_Core_BAO_CustomValueTableMultipleTest extends CiviUnitTestCase {
   }
 
   public function testCustomGroupMultipleSingle() {
-    $params      = array();
-    $contactID   = Contact::createIndividual();
+    $params = array();
+    $contactID = Contact::createIndividual();
     $customGroup = Custom::createGroup($params, 'Individual', TRUE);
-    $fields      = array(
+    $fields = array(
       'groupId' => $customGroup->id,
       'dataType' => 'String',
       'htmlType' => 'Text',
@@ -45,10 +45,10 @@ class CRM_Core_BAO_CustomValueTableMultipleTest extends CiviUnitTestCase {
   }
 
   public function testCustomGroupMultipleDouble() {
-    $params      = array();
-    $contactID   = Contact::createIndividual();
+    $params = array();
+    $contactID = Contact::createIndividual();
     $customGroup = Custom::createGroup($params, 'Individual', TRUE);
-    $fields      = array(
+    $fields = array(
       'groupId' => $customGroup->id,
       'dataType' => 'String',
       'htmlType' => 'Text',
@@ -78,10 +78,10 @@ class CRM_Core_BAO_CustomValueTableMultipleTest extends CiviUnitTestCase {
   }
 
   public function testCustomGroupMultipleUpdate() {
-    $params      = array();
-    $contactID   = Contact::createIndividual();
+    $params = array();
+    $contactID = Contact::createIndividual();
     $customGroup = Custom::createGroup($params, 'Individual', TRUE);
-    $fields      = array(
+    $fields = array(
       'groupId' => $customGroup->id,
       'dataType' => 'String',
       'htmlType' => 'Text',
@@ -120,10 +120,10 @@ class CRM_Core_BAO_CustomValueTableMultipleTest extends CiviUnitTestCase {
   }
 
   public function testCustomGroupMultipleOldFormate() {
-    $params      = array();
-    $contactID   = Contact::createIndividual();
+    $params = array();
+    $contactID = Contact::createIndividual();
     $customGroup = Custom::createGroup($params, 'Individual', TRUE);
-    $fields      = array(
+    $fields = array(
       'groupId' => $customGroup->id,
       'dataType' => 'String',
       'htmlType' => 'Text',

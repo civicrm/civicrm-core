@@ -256,14 +256,17 @@ class CRM_Utils_Address_BatchUpdate {
     }
 
     $this->returnMessages[] = ts("Addresses Evaluated: %1", array(
-      1 => $totalAddresses)) . "\n";
+        1 => $totalAddresses
+      )) . "\n";
     if ($processGeocode) {
       $this->returnMessages[] = ts("Addresses Geocoded: %1", array(
-        1 => $totalGeocoded)) . "\n";
+          1 => $totalGeocoded
+        )) . "\n";
     }
     if ($parseStreetAddress) {
       $this->returnMessages[] = ts("Street Addresses Parsed: %1", array(
-        1 => $totalAddressParsed)) . "\n";
+          1 => $totalAddressParsed
+        )) . "\n";
       if ($unparseableContactAddress) {
         $this->returnMessages[] = "<br />\n" . ts("Following is the list of contacts whose address is not parsed:") . "<br />\n";
         foreach ($unparseableContactAddress as $contactLink) {
@@ -279,7 +282,7 @@ class CRM_Utils_Address_BatchUpdate {
    * @return array
    */
   public function returnResult() {
-    $result             = array();
+    $result = array();
     $result['is_error'] = $this->returnError;
     $result['messages'] = implode("", $this->returnMessages);
     return $result;

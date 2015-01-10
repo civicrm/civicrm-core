@@ -118,26 +118,26 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->type('label', $fields[0]);
     $this->select('html_type', "value={$fields[1]}");
     $options = array(
-            1 => array(
-    'label' => $memTypeTitle1 . "_1",
-              'membership_type_id' => $memTypeId1,
-              'amount' => 50.00,
-              'membership_num_terms' => 1,
-            ),
-            2 => array(
-              'label' => $memTypeTitle1 . "_2",
-              'membership_type_id' => $memTypeId1,
-              'amount' => 90.00,
-              'membership_num_terms' => 2,
-            ),
-            3 => array(
-              'label' => $memTypeTitle1 . "_3",
-              'membership_type_id' => $memTypeId1,
-              'amount' => 120.00,
-              'membership_num_terms' => 3,
-            ),
+      1 => array(
+        'label' => $memTypeTitle1 . "_1",
+        'membership_type_id' => $memTypeId1,
+        'amount' => 50.00,
+        'membership_num_terms' => 1,
+      ),
+      2 => array(
+        'label' => $memTypeTitle1 . "_2",
+        'membership_type_id' => $memTypeId1,
+        'amount' => 90.00,
+        'membership_num_terms' => 2,
+      ),
+      3 => array(
+        'label' => $memTypeTitle1 . "_3",
+        'membership_type_id' => $memTypeId1,
+        'amount' => 120.00,
+        'membership_num_terms' => 3,
+      ),
 
-          );
+    );
     $i = 2;
     foreach ($options as $index => $values) {
       $this->select("membership_type_id_{$index}", "value={$values['membership_type_id']}");
@@ -246,7 +246,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
         case 'Radio':
           $options = array(
             1 => array(
-          'label' => "$memTypeTitle1",
+              'label' => "$memTypeTitle1",
               'membership_type_id' => $memTypeId1,
               'amount' => 100.00,
             ),
@@ -262,7 +262,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
         case 'CheckBox':
           $options = array(
             1 => array(
-          'label' => "$memTypeTitle1",
+              'label' => "$memTypeTitle1",
               'membership_type_id' => $memTypeId1,
               'amount' => 100.00,
             ),
@@ -323,7 +323,10 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $endDate = date('Y-m-d', mktime(0, 0, 0, $currentMonth, $previousDay, $endYear));
     $configVars = new CRM_Core_Config_Variables();
     foreach (array(
-      'joinDate', 'startDate', 'endDate') as $date) {
+               'joinDate',
+               'startDate',
+               'endDate'
+             ) as $date) {
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }
 
@@ -445,7 +448,10 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $endDate = date('Y-m-d', mktime(0, 0, 0, $currentMonth, $previousDay, $endYear));
     $configVars = new CRM_Core_Config_Variables();
     foreach (array(
-      'joinDate', 'startDate', 'endDate') as $date) {
+               'joinDate',
+               'startDate',
+               'endDate'
+             ) as $date) {
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }
     $i = ($term == 3) ? 3 : (($term == 2) ? 2 : 1);

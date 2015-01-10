@@ -32,7 +32,6 @@
  * $Id$
  *
  */
-
 class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   /**
    * Class constructor
@@ -79,10 +78,10 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
 
     if (!empty($trxnEntityTable)) {
       $entityFinancialTrxnParams['entity_table'] = $trxnEntityTable['entity_table'];
-      $entityFinancialTrxnParams['entity_id']    = $trxnEntityTable['entity_id'];
+      $entityFinancialTrxnParams['entity_id'] = $trxnEntityTable['entity_id'];
     }
     else {
-      $entityFinancialTrxnParams['entity_id'] =  $params['contribution_id'];
+      $entityFinancialTrxnParams['entity_id'] = $params['contribution_id'];
     }
 
     $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
@@ -283,7 +282,7 @@ LEFT JOIN civicrm_line_item AS lt ON lt.id = fi.entity_id AND lt.entity_table = 
 WHERE lt.entity_id = %1 ";
 
     $sqlParams = array(1 => array($entity_id, 'Integer'), 2 => array($entity_table, 'String'));
-    $dao =  CRM_Core_DAO::executeQuery($query, $sqlParams);
+    $dao = CRM_Core_DAO::executeQuery($query, $sqlParams);
     while ($dao->fetch()) {
       $result[$dao->financial_trxn_id][$dao->id] = $dao->amount;
     }
@@ -395,8 +394,8 @@ WHERE ceft.entity_id = %1";
     $params['trxnParams']['to_financial_account_id'] = $financialAccount;
     $params['trxnParams']['total_amount'] = $amount;
     $params['trxnParams']['fee_amount'] =
-      $params['trxnParams']['net_amount'] = 0;
-    $params['trxnParams']['status_id'] = CRM_Core_OptionGroup::getValue('contribution_status','Completed','name');
+    $params['trxnParams']['net_amount'] = 0;
+    $params['trxnParams']['status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     $params['trxnParams']['contribution_id'] = $contributionId;
     $trxn = self::create($params['trxnParams']);
     if (empty($params['entity_id'])) {
@@ -411,7 +410,7 @@ WHERE ceft.entity_id = %1";
         'transaction_date' => date('YmdHis'),
         'amount' => $amount,
         'description' => 'Fee',
-        'status_id' => CRM_Core_OptionGroup::getValue('financial_item_status','Paid','name'),
+        'status_id' => CRM_Core_OptionGroup::getValue('financial_item_status', 'Paid', 'name'),
         'entity_table' => 'civicrm_financial_trxn',
         'entity_id' => $params['entity_id'],
         'currency' => $params['trxnParams']['currency'],
@@ -482,7 +481,7 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
         if ($returnType) {
           $value = array();
           if ($paymentVal < 0) {
-            $value['refund_due']  = $paymentVal;
+            $value['refund_due'] = $paymentVal;
           }
           elseif ($paymentVal > 0) {
             $value['amount_owed'] = $paymentVal;

@@ -33,7 +33,6 @@
  * $Id$
  *
  */
-
 class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAccount {
 
   /**
@@ -134,7 +133,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
     $dependancy = array(
       array('Core', 'FinancialTrxn', 'to_financial_account_id'),
       array('Financial', 'FinancialTypeAccount', 'financial_account_id'),
-      );
+    );
     foreach ($dependancy as $name) {
       require_once str_replace('_', DIRECTORY_SEPARATOR, "CRM_" . $name[0] . "_BAO_" . $name[1]) . ".php";
       $className = "CRM_{$name[0]}_BAO_{$name[1]}";

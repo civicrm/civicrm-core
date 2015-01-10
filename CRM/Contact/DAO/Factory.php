@@ -40,7 +40,7 @@ class CRM_Contact_DAO_Factory {
     $file = self::$_prefix[$type] . $className;
     $class = str_replace('/', '_', $file);
 
-    require_once ($file . self::$_suffix);
+    require_once($file . self::$_suffix);
 
     if ($type == 'singleton') {
       $newObj = $class::singleton();

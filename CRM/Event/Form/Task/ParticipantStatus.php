@@ -45,7 +45,8 @@ class CRM_Event_Form_Task_ParticipantStatus extends CRM_Event_Form_Task_Batch {
     asort($statuses, SORT_STRING);
     $this->add('select', 'status_change', ts('Change All Statuses'),
       array(
-        '' => ts('- select status -')) + $statuses
+        '' => ts('- select status -')
+      ) + $statuses
     );
 
     $this->assign('context', 'statusChange');

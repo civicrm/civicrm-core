@@ -272,9 +272,9 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         $params['join_date'] = $params['membership_start_date'];
       }
 
-      $session      = CRM_Core_Session::singleton();
-      $dateType     = $session->get('dateTypes');
-      $formatted    = array();
+      $session = CRM_Core_Session::singleton();
+      $dateType = $session->get('dateTypes');
+      $formatted = array();
       $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $params));
 
       // don't add to recent items, CRM-4399
@@ -366,9 +366,9 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         }
 
         if (!empty($formatValues['membership_id'])) {
-          $dao     = new CRM_Member_BAO_Membership();
+          $dao = new CRM_Member_BAO_Membership();
           $dao->id = $formatValues['membership_id'];
-          $dates   = array('join_date', 'start_date', 'end_date');
+          $dates = array('join_date', 'start_date', 'end_date');
           foreach ($dates as $v) {
             if (empty($formatted[$v])) {
               $formatted[$v] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $formatValues['membership_id'], $v);
@@ -409,8 +409,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
 
       //Format dates
       $startDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('start_date', $formatted), '%Y-%m-%d');
-      $endDate   = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('end_date', $formatted), '%Y-%m-%d');
-      $joinDate  = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('join_date', $formatted), '%Y-%m-%d');
+      $endDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('end_date', $formatted), '%Y-%m-%d');
+      $joinDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('join_date', $formatted), '%Y-%m-%d');
 
       if ($this->_contactIdIndex < 0) {
 
@@ -478,7 +478,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
           // Using new Dedupe rule.
           $ruleParams = array(
             'contact_type' => $this->_contactType,
-            'used'         => 'Unsupervised',
+            'used' => 'Unsupervised',
           );
           $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
           $disp = '';
@@ -659,7 +659,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             foreach ($customOption as $customValueID => $customLabel) {
               $customValue = $customLabel['value'];
               if ((strtolower($customLabel['label']) == strtolower(trim($v1))) ||
-                (strtolower($customValue) == strtolower(trim($v1)))) {
+                (strtolower($customValue) == strtolower(trim($v1)))
+              ) {
                 if ($type == 'CheckBox') {
                   $values[$key][$customValue] = 1;
                 }
@@ -677,9 +678,9 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
           if (!CRM_Utils_Rule::integer($value)) {
             throw new Exception("contact_id not valid: $value");
           }
-          $dao     = new CRM_Core_DAO();
+          $dao = new CRM_Core_DAO();
           $qParams = array();
-          $svq     = $dao->singleValueQuery("SELECT id FROM civicrm_contact WHERE id = $value",
+          $svq = $dao->singleValueQuery("SELECT id FROM civicrm_contact WHERE id = $value",
             $qParams
           );
           if (!$svq) {
@@ -698,7 +699,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
 
         case 'membership_type':
           $membershipTypeId = CRM_Utils_Array::key(ucfirst($value),
-          CRM_Member_PseudoConstant::membershipType()
+            CRM_Member_PseudoConstant::membershipType()
           );
           if ($membershipTypeId) {
             if (!empty($values['membership_type_id']) &&
@@ -722,7 +723,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
 
         case 'membership_status':
           $membershipStatusId = CRM_Utils_Array::key(ucfirst($value),
-          CRM_Member_PseudoConstant::membershipStatus()
+            CRM_Member_PseudoConstant::membershipStatus()
           );
           if ($membershipStatusId) {
             if (!empty($values['status_id']) &&

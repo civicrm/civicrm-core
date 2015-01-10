@@ -1,6 +1,7 @@
 <?php
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
 /**
  * Test that the API accepts the 'match' and 'match-mandatory' options.
  */
@@ -20,7 +21,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
       'email' => 'ignore1@example.com',
       // 'street_address-1' => 'Irrelevant'
       'api.Address.create' => array(
-       'location_type_id' => 1,
+        'location_type_id' => 1,
         'street_address' => '123 Irrelevant Str',
         'supplemental_address_1' => 'Room 987',
       ),
@@ -185,7 +186,11 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
         'options' => array('match' => 'location_type_id'),
         'values' => array(
           array('location_type_id' => 1, 'email' => 'j1-a@example.com', 'signature_text' => 'The Dude abides.'),
-          array('location_type_id' => 2, 'email' => 'j2@example.com', 'signature_text' => 'You know, a lotta ins, a lotta outs, a lotta what-have-yous.'),
+          array(
+            'location_type_id' => 2,
+            'email' => 'j2@example.com',
+            'signature_text' => 'You know, a lotta ins, a lotta outs, a lotta what-have-yous.'
+          ),
         ),
       ),
     ));
@@ -261,8 +266,16 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
       'api.Address.replace' => array(
         'options' => array('match' => 'location_type_id'),
         'values' => array(
-          array('location_type_id' => 1, 'street_address' => 'j1-a Example Ave', 'supplemental_address_1' => 'The Dude abides.'),
-          array('location_type_id' => 2, 'street_address' => 'j2 Example Ave', 'supplemental_address_1' => 'You know, a lotta ins, a lotta outs, a lotta what-have-yous.'),
+          array(
+            'location_type_id' => 1,
+            'street_address' => 'j1-a Example Ave',
+            'supplemental_address_1' => 'The Dude abides.'
+          ),
+          array(
+            'location_type_id' => 2,
+            'street_address' => 'j2 Example Ave',
+            'supplemental_address_1' => 'You know, a lotta ins, a lotta outs, a lotta what-have-yous.'
+          ),
         ),
       ),
     ));

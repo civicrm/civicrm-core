@@ -137,8 +137,8 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
       'group' => array($parentGroup->id => 1),
       'version' => 3,
     );
-    $result           = civicrm_api('contact', 'get', $searchParams);
-    $validContactIds  = array($parentContact, $childContact);
+    $result = civicrm_api('contact', 'get', $searchParams);
+    $validContactIds = array($parentContact, $childContact);
     $resultContactIds = array();
     foreach ($result['values'] as $k => $v) {
       $resultContactIds[] = $v['contact_id'];

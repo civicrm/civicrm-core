@@ -227,10 +227,10 @@ contact_a.sort_name    as sort_name,
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
-    $count  = 1;
+    $count = 1;
     $clause = array();
     $params = array();
-    $name   = CRM_Utils_Array::value('sort_name',
+    $name = CRM_Utils_Array::value('sort_name',
       $this->_formValues
     );
     if ($name != NULL) {
@@ -292,10 +292,10 @@ contact_a.sort_name    as sort_name,
     foreach ($this->_options as $fieldID => $values) {
       $customVal = $valueSeparatedArray = array();
       if (in_array($values['attributes']['html_type'],
-          array('Radio', 'Select', 'Autocomplete-Select')
-        )) {
+        array('Radio', 'Select', 'Autocomplete-Select')
+      )) {
         if ($values['attributes']['data_type'] == 'ContactReference' && $row["custom_{$fieldID}"]) {
-          $row["custom_{$fieldID}"] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', (int)$row["custom_{$fieldID}"], 'display_name');
+          $row["custom_{$fieldID}"] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', (int) $row["custom_{$fieldID}"], 'display_name');
         }
         elseif ($row["custom_{$fieldID}"] &&
           array_key_exists($row["custom_{$fieldID}"],
@@ -306,8 +306,8 @@ contact_a.sort_name    as sort_name,
         }
       }
       elseif (in_array($values['attributes']['html_type'],
-          array('CheckBox', 'Multi-Select', 'AdvMulti-Select')
-        )) {
+        array('CheckBox', 'Multi-Select', 'AdvMulti-Select')
+      )) {
         $valueSeparatedArray = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $row["custom_{$fieldID}"]));
         foreach ($valueSeparatedArray as $val) {
           $customVal[] = $values[$val];
@@ -315,8 +315,8 @@ contact_a.sort_name    as sort_name,
         $row["custom_{$fieldID}"] = implode(', ', $customVal);
       }
       elseif (in_array($values['attributes']['html_type'],
-          array('Multi-Select State/Province', 'Select State/Province')
-        )) {
+        array('Multi-Select State/Province', 'Select State/Province')
+      )) {
         $valueSeparatedArray = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $row["custom_{$fieldID}"]));
         $stateName = CRM_Core_PseudoConstant::stateProvince();
         foreach ($valueSeparatedArray as $val) {
@@ -325,8 +325,8 @@ contact_a.sort_name    as sort_name,
         $row["custom_{$fieldID}"] = implode(', ', $customVal);
       }
       elseif (in_array($values['attributes']['html_type'],
-          array('Multi-Select Country', 'Select Country')
-        )) {
+        array('Multi-Select Country', 'Select Country')
+      )) {
         $valueSeparatedArray = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $row["custom_{$fieldID}"]));
         CRM_Core_PseudoConstant::populate($countryNames, 'CRM_Core_DAO_Country',
           TRUE, 'name', 'is_active'

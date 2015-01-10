@@ -89,16 +89,16 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
     );
 
     $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Forward'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      ));
+      array(
+        'type' => 'next',
+        'name' => ts('Forward'),
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
   }
 
   /**
@@ -108,15 +108,15 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
    * @return void
    */
   public function postProcess() {
-    $queue_id  = $this->get('queue_id');
-    $job_id    = $this->get('job_id');
-    $hash      = $this->get('hash');
+    $queue_id = $this->get('queue_id');
+    $job_id = $this->get('job_id');
+    $hash = $this->get('hash');
     $timeStamp = date('YmdHis');
 
-    $formValues          = $this->controller->exportValues($this->_name);
-    $params              = array();
+    $formValues = $this->controller->exportValues($this->_name);
+    $params = array();
     $params['body_text'] = $formValues['forward_comment'];
-    $html_comment        = $formValues['html_comment'];
+    $html_comment = $formValues['html_comment'];
     $params['body_html'] = str_replace('%7B', '{', str_replace('%7D', '}', $html_comment));
 
     $emails = array();
@@ -145,9 +145,15 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
       }
     }
 
-    $status = ts('Mailing is not forwarded to the given email address.', array('count' => count($emails), 'plural' => 'Mailing is not forwarded to the given email addresses.'));
+    $status = ts('Mailing is not forwarded to the given email address.', array(
+        'count' => count($emails),
+        'plural' => 'Mailing is not forwarded to the given email addresses.'
+      ));
     if ($forwarded) {
-      $status = ts('Mailing is forwarded successfully to %count email address.', array('count' => $forwarded, 'plural' => 'Mailing is forwarded successfully to %count email addresses.'));
+      $status = ts('Mailing is forwarded successfully to %count email address.', array(
+          'count' => $forwarded,
+          'plural' => 'Mailing is forwarded successfully to %count email addresses.'
+        ));
     }
 
     CRM_Utils_System::setUFMessage($status);

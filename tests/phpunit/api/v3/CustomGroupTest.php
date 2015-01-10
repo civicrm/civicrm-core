@@ -34,7 +34,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * @package CiviCRM_APIv3
  * @subpackage API_CustomGroup
  */
-
 class api_v3_CustomGroupTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_entity;
@@ -43,8 +42,8 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   public $DBResetRequired = TRUE;
 
   public function setUp() {
-    $this->_entity     = 'CustomGroup';
-    $this->_params     = array(
+    $this->_entity = 'CustomGroup';
+    $this->_params = array(
       'title' => 'Test_Group_1',
       'name' => 'test_group_1',
       'extends' => 'Individual',
@@ -195,7 +194,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPIFailure('custom_group', 'create', $params,
-    'implode(): Invalid arguments passed');
+      'implode(): Invalid arguments passed');
   }
 
   /**
@@ -232,7 +231,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
    */
   public function testCustomGroupCreateNoTitle() {
     $params = array(
-    'extends' => array('Contact'),
+      'extends' => array('Contact'),
       'weight' => 5,
       'collapse_display' => 1,
       'style' => 'Tab',

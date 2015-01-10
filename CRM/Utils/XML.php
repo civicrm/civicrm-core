@@ -30,7 +30,6 @@
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  */
-
 class CRM_Utils_XML {
 
   /**
@@ -45,7 +44,7 @@ class CRM_Utils_XML {
     $xml = FALSE; // SimpleXMLElement
     $error = FALSE; // string
 
-    if (! file_exists($file)) {
+    if (!file_exists($file)) {
       $error = 'File ' . $file . ' does not exist.';
     }
     else {

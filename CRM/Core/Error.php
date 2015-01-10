@@ -62,7 +62,7 @@ class CRM_Exception extends PEAR_Exception {
    * @param int $code
    * @param Exception $previous
    */
-  public function __construct($message = NULL, $code = 0, Exception$previous = NULL) {
+  public function __construct($message = NULL, $code = 0, Exception $previous = NULL) {
     parent::__construct($message, $code, $previous);
   }
 }
@@ -188,15 +188,15 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
 
     // create the error array
-    $error               = array();
-    $error['callback']   = $pearError->getCallback();
-    $error['code']       = $pearError->getCode();
-    $error['message']    = $pearError->getMessage();
-    $error['mode']       = $pearError->getMode();
+    $error = array();
+    $error['callback'] = $pearError->getCallback();
+    $error['code'] = $pearError->getCode();
+    $error['message'] = $pearError->getMessage();
+    $error['mode'] = $pearError->getMode();
     $error['debug_info'] = $pearError->getDebugInfo();
-    $error['type']       = $pearError->getType();
-    $error['user_info']  = $pearError->getUserInfo();
-    $error['to_string']  = $pearError->toString();
+    $error['type'] = $pearError->getType();
+    $error['user_info'] = $pearError->getUserInfo();
+    $error['to_string'] = $pearError->toString();
     if (function_exists('mysql_error') &&
       mysql_error()
     ) {
@@ -259,15 +259,15 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   public static function simpleHandler($pearError) {
 
     // create the error array
-    $error               = array();
-    $error['callback']   = $pearError->getCallback();
-    $error['code']       = $pearError->getCode();
-    $error['message']    = $pearError->getMessage();
-    $error['mode']       = $pearError->getMode();
+    $error = array();
+    $error['callback'] = $pearError->getCallback();
+    $error['code'] = $pearError->getCode();
+    $error['message'] = $pearError->getMessage();
+    $error['mode'] = $pearError->getMode();
     $error['debug_info'] = $pearError->getDebugInfo();
-    $error['type']       = $pearError->getType();
-    $error['user_info']  = $pearError->getUserInfo();
-    $error['to_string']  = $pearError->toString();
+    $error['type'] = $pearError->getType();
+    $error['user_info'] = $pearError->getUserInfo();
+    $error['to_string'] = $pearError->toString();
 
     // ensure that debug does not check permissions since we are in bootstrap
     // mode and need to print a decent message to help the user
@@ -727,7 +727,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
       if (!empty($trace['args'])) {
         foreach ($trace['args'] as $arg) {
-          if (! $showArgs || $skipArgs) {
+          if (!$showArgs || $skipArgs) {
             $args[] = '(' . gettype($arg) . ')';
             continue;
           }

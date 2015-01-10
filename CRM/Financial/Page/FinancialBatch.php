@@ -90,7 +90,8 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
         CRM_Core_Action::ADD |
         CRM_Core_Action::CLOSE |
         CRM_Core_Action::REOPEN |
-        CRM_Core_Action::EXPORT)) {
+        CRM_Core_Action::EXPORT)
+    ) {
       $this->edit($action, $id);
     }
     // parent run

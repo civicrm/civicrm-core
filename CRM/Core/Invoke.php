@@ -99,6 +99,7 @@ class CRM_Core_Invoke {
       }
     }
   }
+
   /**
    * Hackish support /civicrm/menu/rebuild
    *
@@ -213,9 +214,9 @@ class CRM_Core_Invoke {
     if ($item) {
       // CRM-7656 - make sure we send a clean sanitized path to create printer friendly url
       $printerFriendly = CRM_Utils_System::makeURL(
-        'snippet', FALSE, FALSE,
-        CRM_Utils_Array::value('path', $item)
-      ) . '2';
+          'snippet', FALSE, FALSE,
+          CRM_Utils_Array::value('path', $item)
+        ) . '2';
       $template->assign('printerFriendly', $printerFriendly);
 
       if (!array_key_exists('page_callback', $item)) {

@@ -16,7 +16,11 @@ class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
 
   public function setupCms() {
     if (!in_array($this->config->cms, array(
-      'drupal', 'joomla', 'wordpress'))) {
+      'drupal',
+      'joomla',
+      'wordpress'
+    ))
+    ) {
       echo "Config file for '{$this->config->cms}' not known.";
       exit();
     }

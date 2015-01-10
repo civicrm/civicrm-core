@@ -96,8 +96,8 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
    */
 
   public function postProcess() {
-    $formparams      = $this->exportValues();
-    $caseId          = $formparams['unclosed_case_id'];
+    $formparams = $this->exportValues();
+    $caseId = $formparams['unclosed_case_id'];
     $filedActivities = 0;
     foreach ($this->_activityHolderIds as $key => $id) {
       $targetContactValues = $defaults = array();
@@ -130,8 +130,9 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
       }
       else {
         CRM_Core_Session::setStatus(ts('Not permitted to file activity %1 %2.', array(
-          1 => empty($defaults['subject']) ? '' : $defaults['subject'],
-          2 => $defaults['activity_date_time'])),
+            1 => empty($defaults['subject']) ? '' : $defaults['subject'],
+            2 => $defaults['activity_date_time']
+          )),
           ts("Error"), "error");
       }
     }

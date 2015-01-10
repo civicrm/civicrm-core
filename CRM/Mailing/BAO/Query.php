@@ -71,13 +71,13 @@ class CRM_Mailing_BAO_Query {
 
       // get mailing name
       if (!empty($query->_returnProperties['mailing_name'])) {
-        $query->_select['mailing_name']  = "civicrm_mailing.name as mailing_name";
+        $query->_select['mailing_name'] = "civicrm_mailing.name as mailing_name";
         $query->_element['mailing_name'] = 1;
       }
 
       // get mailing subject
       if (!empty($query->_returnProperties['mailing_subject'])) {
-        $query->_select['mailing_subject']  = "civicrm_mailing.subject as mailing_subject";
+        $query->_select['mailing_subject'] = "civicrm_mailing.subject as mailing_subject";
         $query->_element['mailing_subject'] = 1;
       }
 
@@ -85,7 +85,7 @@ class CRM_Mailing_BAO_Query {
       if (!empty($query->_returnProperties['mailing_job_status'])) {
         $query->_tables['civicrm_mailing_job'] = $query->_whereTables['civicrm_mailing_job'] =
           " LEFT JOIN civicrm_mailing_job ON civicrm_mailing_job.mailing_id = civicrm_mailing.id AND civicrm_mailing_job.parent_id IS NULL AND civicrm_mailing_job.is_test != 1 ";
-        $query->_select['mailing_job_status']  = "civicrm_mailing_job.status as mailing_job_status";
+        $query->_select['mailing_job_status'] = "civicrm_mailing_job.status as mailing_job_status";
         $query->_element['mailing_job_status'] = 1;
       }
 
@@ -113,7 +113,7 @@ class CRM_Mailing_BAO_Query {
       if (!empty($query->_returnProperties['mailing_job_end_date'])) {
         $query->_tables['civicrm_mailing_job'] = $query->_whereTables['civicrm_mailing_job'] =
           " LEFT JOIN civicrm_mailing_job ON civicrm_mailing_job.mailing_id = civicrm_mailing.id AND civicrm_mailing_job.parent_id IS NULL AND civicrm_mailing_job.is_test != 1 ";
-        $query->_select['mailing_job_end_date']  = "civicrm_mailing_job.end_date as mailing_job_end_date";
+        $query->_select['mailing_job_end_date'] = "civicrm_mailing_job.end_date as mailing_job_end_date";
         $query->_element['mailing_job_end_date'] = 1;
       }
 
@@ -254,10 +254,10 @@ class CRM_Mailing_BAO_Query {
         $value = strtolower(addslashes($value));
         if ($wildcard) {
           $value = "%$value%";
-          $op    = 'LIKE';
+          $op = 'LIKE';
         }
         $query->_where[$grouping][] = "LOWER(civicrm_mailing.name) $op '$value'";
-        $query->_qill[$grouping][]  = "Mailing Namename $op \"$value\"";
+        $query->_qill[$grouping][] = "Mailing Namename $op \"$value\"";
         $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
         $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
         return;
@@ -306,7 +306,10 @@ class CRM_Mailing_BAO_Query {
           'civicrm_mailing_event_bounce',
           'bounce_type_id',
           ts('Bounce type(s)'),
-          CRM_Core_PseudoConstant::get('CRM_Mailing_Event_DAO_Bounce', 'bounce_type_id', array('keyColumn' => 'id', 'labelColumn' => 'name'))
+          CRM_Core_PseudoConstant::get('CRM_Mailing_Event_DAO_Bounce', 'bounce_type_id', array(
+              'keyColumn' => 'id',
+              'labelColumn' => 'name'
+            ))
         );
         return;
 
@@ -368,7 +371,7 @@ class CRM_Mailing_BAO_Query {
           $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
 
           $query->_where[$grouping][] = " civicrm_mailing_job.status = '{$value}' ";
-          $query->_qill[$grouping][]  = "Mailing Job Status IS \"$value\"";
+          $query->_qill[$grouping][] = "Mailing Job Status IS \"$value\"";
         }
         return;
     }

@@ -59,7 +59,7 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
     list($headers, $rows) = $this->_contributionOrganizationCSVData();
     $fieldMapper = array(
       'mapper[0][0]' => 'organization_name',
-                              'mapper[2][0]' => 'financial_type',
+      'mapper[2][0]' => 'financial_type',
       'mapper[4][0]' => 'total_amount',
     );
     $this->importCSVComponent('Contribution', $headers, $rows, 'Organization', 'Insert new contributions', $fieldMapper);
@@ -73,7 +73,7 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
     list($headers, $rows) = $this->_contributionHouseholdCSVData();
     $fieldMapper = array(
       'mapper[0][0]' => 'household_name',
-                              'mapper[2][0]' => 'financial_type',
+      'mapper[2][0]' => 'financial_type',
       'mapper[4][0]' => 'total_amount',
     );
     $this->importCSVComponent('Contribution', $headers, $rows, 'Household', 'Insert new contributions', $fieldMapper);
@@ -103,14 +103,14 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
       array(
         'email' => $email1,
         'fee_amount' => '200',
-        'financial_type'         => 'Donation',
+        'financial_type' => 'Donation',
         'contribution_status_id' => 'Completed',
         'total_amount' => '200',
       ),
       array(
         'email' => $email2,
         'fee_amount' => '400',
-        'financial_type'         => 'Donation',
+        'financial_type' => 'Donation',
         'contribution_status_id' => 'Completed',
         'total_amount' => '400',
       ),
@@ -141,14 +141,14 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
       array(
         'household' => $household1,
         'fee_amount' => '200',
-                         'financial_type'         => 'Donation',
+        'financial_type' => 'Donation',
         'contribution_status_id' => 'Completed',
         'total_amount' => '200',
       ),
       array(
         'household' => $household2,
         'fee_amount' => '400',
-                         'financial_type'         => 'Donation',
+        'financial_type' => 'Donation',
         'contribution_status_id' => 'Completed',
         'total_amount' => '400',
       ),
@@ -179,14 +179,14 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
       array(
         'organization' => $organization1,
         'fee_amount' => '200',
-                         'financial_type'         => 'Donation',
+        'financial_type' => 'Donation',
         'contribution_status_id' => 'Completed',
         'total_amount' => '200',
       ),
       array(
         'organization' => $organization2,
         'fee_amount' => '400',
-                         'financial_type'         => 'Donation',
+        'financial_type' => 'Donation',
         'contribution_status_id' => 'Completed',
         'total_amount' => '400',
       ),

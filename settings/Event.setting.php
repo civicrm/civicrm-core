@@ -50,5 +50,5 @@ return array(
       'is_contact' => 1,
       'description' => "WRITE ME",
       'help_text' => 'WRITE ME',
-  ),
+    ),
 );

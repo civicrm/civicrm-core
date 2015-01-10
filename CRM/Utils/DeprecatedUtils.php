@@ -985,7 +985,12 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
   }
 
   foreach (array(
-    'Phone', 'Email', 'IM', 'OpenID', 'Phone_Ext') as $block) {
+             'Phone',
+             'Email',
+             'IM',
+             'OpenID',
+             'Phone_Ext'
+           ) as $block) {
     $name = strtolower($block);
     if (!array_key_exists($name, $values)) {
       continue;
@@ -1073,7 +1078,8 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
               foreach ($mulValues as $v1) {
                 foreach ($customOption as $v2) {
                   if ((strtolower($v2['label']) == strtolower(trim($v1))) ||
-                     (strtolower($v2['value']) == strtolower(trim($v1)))) {
+                    (strtolower($v2['value']) == strtolower(trim($v1)))
+                  ) {
                     if ($htmlType == 'CheckBox') {
                       $newValues[$key][$v2['value']] = 1;
                     }
@@ -1095,8 +1101,11 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
   _civicrm_api3_store_values($fields['Address'], $values, $params['address'][$addressCnt]);
 
   $addressFields = array(
-    'county', 'country', 'state_province',
-    'supplemental_address_1', 'supplemental_address_2',
+    'county',
+    'country',
+    'state_province',
+    'supplemental_address_1',
+    'supplemental_address_2',
     'StateProvince.name',
   );
 
@@ -1122,7 +1131,7 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
  * @param <type> $params
  *
  * @return array
-   *   <type>
+ *   <type>
  */
 function _civicrm_api3_deprecated_duplicate_formatted_contact($params) {
   $id = CRM_Utils_Array::value('id', $params);
@@ -1305,7 +1314,7 @@ function _civicrm_api3_deprecated_participant_check_params($params, $checkDuplic
  *   Contact subtype if exists/passed.
  *
  * @return null
-   *   on success, error message otherwise
+ *   on success, error message otherwise
  */
 function _civicrm_api3_deprecated_contact_check_custom_params($params, $csType = NULL) {
   empty($csType) ? $onlyParent = TRUE : $onlyParent = FALSE;
@@ -1477,7 +1486,7 @@ function _civicrm_api3_deprecated_contact_check_params(
  * @param int $activityTypeID
  *
  * @return array
-   *   <type> $params
+ *   <type> $params
  */
 function _civicrm_api3_deprecated_activity_buildmailparams($result, $activityTypeID) {
   // get ready for collecting data about activity to be created

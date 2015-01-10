@@ -98,8 +98,8 @@ SELECT   civicrm_contact.id                as contact_id    ,
 ORDER BY $orderBy
 LIMIT    $offset, $rowCount";
 
-    $rows         = array();
-    $object       = CRM_Core_DAO::executeQuery($query, $params);
+    $rows = array();
+    $object = CRM_Core_DAO::executeQuery($query, $params);
     $statusLookup = CRM_Event_PseudoConstant::participantStatus();
     while ($object->fetch()) {
       $status = CRM_Utils_Array::value($object->status_id, $statusLookup);
@@ -156,17 +156,17 @@ SELECT count( civicrm_contact.id )
     if (!$headers) {
       $headers = array();
       $headers[1] = array(
-      'name' => ts('Name'),
+        'name' => ts('Name'),
         'sort' => 'civicrm_contact.sort_name',
         'direction' => CRM_Utils_Sort::ASCENDING,
       );
       $headers[2] = array(
-      'name' => ts('Status'),
+        'name' => ts('Status'),
         'sort' => 'civicrm_participant.status_id',
         'direction' => CRM_Utils_Sort::DONTCARE,
       );
       $headers[3] = array(
-      'name' => ts('Register Date'),
+        'name' => ts('Register Date'),
         'sort' => 'civicrm_participant.register_date',
         'direction' => CRM_Utils_Sort::DONTCARE,
       );

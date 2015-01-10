@@ -45,7 +45,7 @@ class CRM_Contact_Form_Task_AlterPreferences extends CRM_Contact_Form_Task {
    *
    * @return void
    */
-   public function buildQuickForm() {
+  public function buildQuickForm() {
     // add select for preferences
 
     $options = array(ts('Add Selected Options'), ts('Remove selected options'));

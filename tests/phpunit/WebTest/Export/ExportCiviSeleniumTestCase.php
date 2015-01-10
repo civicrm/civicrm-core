@@ -78,13 +78,13 @@ class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    *   Array of header and rows according to row index.
    *                              eg: array(
    *                                    1 => array(
-  // Row index 1
-  // column name 'First Name', value 'Jones'
+   * // Row index 1
+   * // column name 'First Name', value 'Jones'
    *                                      'First Name' => 'Jones',
    *                                      'Last Name'  => 'Franklin'
    *                                    ),
    *                                    2 => array(
-  // Row index 2
+   * // Row index 2
    *                                      'First Name' => 'Rajan',
    *                                      'Last Name'  => 'mayekar'
    *                                    ),

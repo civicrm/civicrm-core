@@ -32,10 +32,6 @@
  * $Id$
  *
  */
-
-
-
-
 abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
 
   protected $_action;
@@ -146,10 +142,10 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     // CRM-9034
     // dont see args or pageArgs being used, so we should
     // consider eliminating them in a future version
-    $n        = func_num_args();
-    $args     = ($n > 0) ? func_get_arg(0) : NULL;
+    $n = func_num_args();
+    $args = ($n > 0) ? func_get_arg(0) : NULL;
     $pageArgs = ($n > 1) ? func_get_arg(1) : NULL;
-    $sort     = ($n > 2) ? func_get_arg(2) : NULL;
+    $sort = ($n > 2) ? func_get_arg(2) : NULL;
     // what action do we want to perform ? (store it for smarty too.. :)
 
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
@@ -199,10 +195,10 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * @return void
    */
   public function browse() {
-    $n      = func_num_args();
+    $n = func_num_args();
     $action = ($n > 0) ? func_get_arg(0) : NULL;
-    $sort   = ($n > 0) ? func_get_arg(1) : NULL;
-    $links  = &$this->links();
+    $sort = ($n > 0) ? func_get_arg(1) : NULL;
+    $links = &$this->links();
     if ($action == NULL) {
       if (!empty($links)) {
         $action = array_sum(array_keys($links));
@@ -301,11 +297,15 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    */
   public function action(&$object, $action, &$values, &$links, $permission, $forceAction = FALSE) {
     $values['class'] = '';
-    $newAction       = $action;
-    $hasDelete       = $hasDisable = TRUE;
+    $newAction = $action;
+    $hasDelete = $hasDisable = TRUE;
 
     if (!empty($values['name']) && in_array($values['name'], array(
-      'encounter_medium', 'case_type', 'case_status'))) {
+        'encounter_medium',
+        'case_type',
+        'case_status'
+      ))
+    ) {
       static $caseCount = NULL;
       if (!isset($caseCount)) {
         $caseCount = CRM_Case_BAO_Case::caseCount(NULL, FALSE);

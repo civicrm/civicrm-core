@@ -39,6 +39,7 @@ class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
   public function __construct() {
     parent::__construct();
   }
+
   /**
    * Add the membership Blocks
    *

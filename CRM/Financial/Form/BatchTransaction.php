@@ -72,6 +72,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
       $this->assign('columnHeaders', $columnHeaders);
     }
   }
+
   /**
    * Build the form object
    *
@@ -134,7 +135,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     $this->addButtons(
       array(
         array(
-    'type' => 'submit',
+          'type' => 'submit',
           'name' => ts('Search'),
           'isDefault' => TRUE,
         ),
@@ -178,15 +179,15 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
   public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
-        'view'  => array(
-          'name'  => ts('View'),
-          'url'   => 'civicrm/contact/view/contribution',
-          'qs'    => 'reset=1&id=%%contid%%&cid=%%cid%%&action=view&context=contribution&selectedChild=contribute',
+        'view' => array(
+          'name' => ts('View'),
+          'url' => 'civicrm/contact/view/contribution',
+          'qs' => 'reset=1&id=%%contid%%&cid=%%cid%%&action=view&context=contribution&selectedChild=contribute',
           'title' => ts('View Contribution'),
         ),
         'assign' => array(
-          'name'  => ts('Assign'),
-          'ref'   => 'disable-action',
+          'name' => ts('Assign'),
+          'ref' => 'disable-action',
           'title' => ts('Assign Transaction'),
           'extra' => 'onclick = "assignRemove( %%id%%,\'' . 'assign' . '\' );"',
         ),

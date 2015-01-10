@@ -53,7 +53,10 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
    */
   public function preProcess() {
     if (CRM_Core_BAO_MailSettings::defaultDomain() == "EXAMPLE.ORG") {
-      CRM_Core_Error::fatal(ts('The <a href="%1">default mailbox</a> has not been configured. You will find <a href="%2">more info in our online user and administrator guide.</a>', array(1 => CRM_Utils_System::url('civicrm/admin/mailSettings', 'reset=1'), 2 => "http://book.civicrm.org/user/advanced-configuration/email-system-configuration/")));
+      CRM_Core_Error::fatal(ts('The <a href="%1">default mailbox</a> has not been configured. You will find <a href="%2">more info in our online user and administrator guide.</a>', array(
+            1 => CRM_Utils_System::url('civicrm/admin/mailSettings', 'reset=1'),
+            2 => "http://book.civicrm.org/user/advanced-configuration/email-system-configuration/"
+          )));
     }
 
     $this->_mailingID = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE, NULL);
@@ -156,8 +159,8 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
     $showGroupSelector = TRUE;
     if ($this->_searchBasedMailing) {
       $showGroupSelector = FALSE;
-      $formElements      = array('includeGroups', 'excludeGroups', 'includeMailings', 'excludeMailings');
-      $formValues        = $this->controller->exportValues($this->_name);
+      $formElements = array('includeGroups', 'excludeGroups', 'includeMailings', 'excludeMailings');
+      $formValues = $this->controller->exportValues($this->_name);
       foreach ($formElements as $element) {
         if (!empty($formValues[$element])) {
           $showGroupSelector = TRUE;
@@ -240,7 +243,8 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
       $this->add('select', 'baseGroup',
         ts('Unsubscription Group'),
         array(
-          '' => ts('- select -')) + CRM_Contact_BAO_Group::getGroupsHierarchy($staticGroups, NULL, '&nbsp;&nbsp;', TRUE),
+          '' => ts('- select -')
+        ) + CRM_Contact_BAO_Group::getGroupsHierarchy($staticGroups, NULL, '&nbsp;&nbsp;', TRUE),
         TRUE,
         array('class' => 'crm-select2 huge')
       );
@@ -320,9 +324,9 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
       if ($this->_resultSelectOption == 'ts_sel') {
         // create a static grp if only a subset of result set was selected:
 
-        $randID   = md5(time());
+        $randID = md5(time());
         $grpTitle = "Hidden Group {$randID}";
-        $grpID    = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $grpTitle, 'id', 'title');
+        $grpID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $grpTitle, 'id', 'title');
 
         if (!$grpID) {
           $groupParams = array(
@@ -339,8 +343,8 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
 
           $newGroupTitle = "Hidden Group {$grpID}";
           $groupParams = array(
-            'id'    => $grpID,
-            'name'  => CRM_Utils_String::titleToVar($newGroupTitle),
+            'id' => $grpID,
+            'name' => CRM_Utils_String::titleToVar($newGroupTitle),
             'title' => $newGroupTitle,
             'group_type' => array('2' => 1),
           );
@@ -354,7 +358,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
         //get the hidden smart group id.
         $ssId = $this->get('ssID');
         $hiddenSmartParams = array(
-        'group_type' => array('2' => 1),
+          'group_type' => array('2' => 1),
           'form_values' => $this->get('formValues'),
           'saved_search_id' => $ssId,
           'search_custom_id' => $this->get('customSearchID'),
@@ -380,7 +384,16 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
     }
 
     foreach (
-      array('name', 'group_id', 'search_id', 'search_args', 'campaign_id', 'dedupe_email', 'location_type_id', 'email_selection_method') as $n
+      array(
+        'name',
+        'group_id',
+        'search_id',
+        'search_args',
+        'campaign_id',
+        'dedupe_email',
+        'location_type_id',
+        'email_selection_method'
+      ) as $n
     ) {
       if (!empty($values[$n])) {
         $params[$n] = $values[$n];
@@ -390,9 +403,9 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
     $qf_Group_submit = $this->controller->exportValue($this->_name, '_qf_Group_submit');
     $this->set('name', $params['name']);
 
-    $inGroups    = $values['includeGroups'];
-    $outGroups   = $values['excludeGroups'];
-    $inMailings  = $values['includeMailings'];
+    $inGroups = $values['includeGroups'];
+    $outGroups = $values['excludeGroups'];
+    $inMailings = $values['includeMailings'];
     $outMailings = $values['excludeMailings'];
 
     if (is_array($inGroups)) {
@@ -426,8 +439,8 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
       }
     }
 
-    $session            = CRM_Core_Session::singleton();
-    $params['groups']   = $groups;
+    $session = CRM_Core_Session::singleton();
+    $params['groups'] = $groups;
     $params['mailings'] = $mailings;
     $ids = array();
     if ($this->get('mailing_id')) {
@@ -440,8 +453,8 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
 
       // delete previous includes/excludes, if mailing already existed
       foreach (array('groups', 'mailings') as $entity) {
-        $mg               = new CRM_Mailing_DAO_MailingGroup();
-        $mg->mailing_id   = $ids['mailing_id'];
+        $mg = new CRM_Mailing_DAO_MailingGroup();
+        $mg->mailing_id = $ids['mailing_id'];
         $mg->entity_table = ($entity == 'groups') ? $groupTableName : $mailingTableName;
         $mg->find();
         while ($mg->fetch()) {

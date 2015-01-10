@@ -103,7 +103,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    * @return mixed
    */
   public function get($key) {
-    if (! array_key_exists($key, $this->frontCache)) {
+    if (!array_key_exists($key, $this->frontCache)) {
       $this->frontCache[$key] = CRM_Core_BAO_Cache::getItem($this->group, $key, $this->componentID);
     }
     return $this->frontCache[$key];

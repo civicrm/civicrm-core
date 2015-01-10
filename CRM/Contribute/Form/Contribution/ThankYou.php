@@ -51,9 +51,9 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
   public function preProcess() {
     parent::preProcess();
 
-    $this->_params   = $this->get('params');
+    $this->_params = $this->get('params');
     $this->_lineItem = $this->get('lineItem');
-    $is_deductible   = $this->get('is_deductible');
+    $is_deductible = $this->get('is_deductible');
     $this->assign('is_deductible', $is_deductible);
     $this->assign('thankyou_title', CRM_Utils_Array::value('thankyou_title', $this->_values));
     $this->assign('thankyou_text', CRM_Utils_Array::value('thankyou_text', $this->_values));
@@ -94,8 +94,8 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
    */
   public function buildQuickForm() {
     $this->assignToTemplate();
-    $productID        = $this->get('productID');
-    $option           = $this->get('option');
+    $productID = $this->get('productID');
+    $option = $this->get('option');
     $membershipTypeID = $this->get('membershipTypeID');
     $this->assign('receiptFromEmail', CRM_Utils_Array::value('receipt_from_email', $this->_values));
 
@@ -143,7 +143,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields($this, $params['honor'], $params['honoree_profile_id']);
 
       $fieldTypes = array('Contact');
-      $fieldTypes[]  = CRM_Core_BAO_UFGroup::getContactType($params['honoree_profile_id']);
+      $fieldTypes[] = CRM_Core_BAO_UFGroup::getContactType($params['honoree_profile_id']);
       $this->buildCustom($params['honoree_profile_id'], 'honoreeProfileFields', TRUE, 'honor', $fieldTypes);
     }
 
@@ -153,7 +153,11 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       $qParams .= "&amp;pcpId={$this->_pcpId}";
       $this->assign('pcpBlock', TRUE);
       foreach (array(
-        'pcp_display_in_roll', 'pcp_is_anonymous', 'pcp_roll_nickname', 'pcp_personal_note') as $val) {
+                 'pcp_display_in_roll',
+                 'pcp_is_anonymous',
+                 'pcp_roll_nickname',
+                 'pcp_personal_note'
+               ) as $val) {
         if (!empty($this->_params[$val])) {
           $this->assign($val, $this->_params[$val]);
         }
@@ -163,9 +167,9 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('qParams', $qParams);
 
     if ($membershipTypeID) {
-      $transactionID    = $this->get('membership_trx_id');
+      $transactionID = $this->get('membership_trx_id');
       $membershipAmount = $this->get('membership_amount');
-      $renewalMode      = $this->get('renewal_mode');
+      $renewalMode = $this->get('renewal_mode');
       $this->assign('membership_trx_id', $transactionID);
       $this->assign('membership_amount', $membershipAmount);
       $this->assign('renewal_mode', $renewalMode);
@@ -194,9 +198,9 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       $OnBehalfProfile = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
       $profileId = $OnBehalfProfile[0];
 
-      $fieldTypes     = array('Contact', 'Organization');
+      $fieldTypes = array('Contact', 'Organization');
       $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');
-      $fieldTypes     = array_merge($fieldTypes, $contactSubType);
+      $fieldTypes = array_merge($fieldTypes, $contactSubType);
       if (is_array($this->_membershipBlock) && !empty($this->_membershipBlock)) {
         $fieldTypes = array_merge($fieldTypes, array('Membership'));
       }
@@ -235,7 +239,12 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
             $defaults[$timeField] = $contact[$timeField];
           }
         }
-        elseif (in_array($name, array('addressee', 'email_greeting', 'postal_greeting')) && !empty($contact[$name . '_custom'])) {
+        elseif (in_array($name, array(
+              'addressee',
+              'email_greeting',
+              'postal_greeting'
+            )) && !empty($contact[$name . '_custom'])
+        ) {
           $defaults[$name . '_custom'] = $contact[$name . '_custom'];
         }
       }

@@ -124,27 +124,34 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     if (self::$_gName == 'acl_role') {
       CRM_Utils_System::setTitle(ts('Manage ACL Roles'));
       // set breadcrumb to append to admin/access
-      $breadCrumb = array(array(
-      'title' => ts('Access Control'),
+      $breadCrumb = array(
+        array(
+          'title' => ts('Access Control'),
           'url' => CRM_Utils_System::url('civicrm/admin/access',
             'reset=1'
           ),
-        ));
+        )
+      );
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
     }
     else {
       CRM_Utils_System::setTitle(ts("%1 Options", array(1 => self::$_gLabel)));
     }
     if (in_array(self::$_gName,
-        array(
-          'from_email_address', 'email_greeting',
-          'postal_greeting', 'addressee',
-          'communication_style',
-          'case_status', 'encounter_medium',
-          'case_type', 'payment_instrument',
-          'soft_credit_type', 'website_type',
-        )
-      )) {
+      array(
+        'from_email_address',
+        'email_greeting',
+        'postal_greeting',
+        'addressee',
+        'communication_style',
+        'case_status',
+        'encounter_medium',
+        'case_type',
+        'payment_instrument',
+        'soft_credit_type',
+        'website_type',
+      )
+    )) {
       $this->assign('showIsDefault', TRUE);
     }
 
@@ -208,7 +215,8 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
             'url' => 'civicrm/contact/search/custom',
             'qs' => 'reset=1&csid=%%value%%',
             'title' => ts('Run %1', array(1 => self::$_gName)),
-          ));
+          )
+        );
         self::$_links = $runLink + self::$_links;
       }
     }
@@ -238,8 +246,8 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     }
     $groupParams = array('name' => self::$_gName);
     $optionValue = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'component_id,weight');
-    $gName       = self::$_gName;
-    $returnURL   = CRM_Utils_System::url("civicrm/admin/options/$gName",
+    $gName = self::$_gName;
+    $returnURL = CRM_Utils_System::url("civicrm/admin/options/$gName",
       "reset=1&group=$gName"
     );
     $filter = "option_group_id = " . self::$_gId;

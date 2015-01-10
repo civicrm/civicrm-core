@@ -52,7 +52,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id'   => 1,
+      'financial_type_id' => 1,
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -110,7 +110,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id'   => 1,
+      'financial_type_id' => 1,
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -169,7 +169,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id'   => 1,
+      'financial_type_id' => 1,
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -203,8 +203,8 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
    */
   public function testcreateAndGetHonorContact() {
     $firstName = 'John_' . substr(sha1(rand()), 0, 7);
-    $lastName  = 'Smith_' . substr(sha1(rand()), 0, 7);
-    $email     = "{$firstName}.{$lastName}@example.com";
+    $lastName = 'Smith_' . substr(sha1(rand()), 0, 7);
+    $email = "{$firstName}.{$lastName}@example.com";
 
     //Get profile id of name honoree_individual used to create profileContact
     $honoreeProfileId = NULL;
@@ -223,8 +223,8 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $softParam = array('soft_credit_type_id' => 1);
 
     $honoreeContactId = CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray,
-        NULL, NULL, $honoreeProfileId
-      );
+      NULL, NULL, $honoreeProfileId
+    );
 
     $this->assertDBCompareValue('CRM_Contact_DAO_Contact', $honoreeContactId, 'first_name', 'id', $firstName,
       'Database check for created honor contact record.'
@@ -238,7 +238,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $param = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id'   => 4,
+      'financial_type_id' => 4,
       'contribution_status_id' => 1,
       'receive_date' => date('Ymd'),
       'total_amount' => 66,
@@ -306,7 +306,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $param = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id'   => 1,
+      'financial_type_id' => 1,
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -369,7 +369,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $param = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id'   => 1,
+      'financial_type_id' => 1,
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -425,7 +425,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $param = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id'   => 1,
+      'financial_type_id' => 1,
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',

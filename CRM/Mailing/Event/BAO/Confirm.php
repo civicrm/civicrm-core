@@ -132,10 +132,10 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
       $text = CRM_Utils_String::htmlToText($component->body_html);
     }
 
-    $bao            = new CRM_Mailing_BAO_Mailing();
+    $bao = new CRM_Mailing_BAO_Mailing();
     $bao->body_text = $text;
     $bao->body_html = $html;
-    $tokens         = $bao->getTokens();
+    $tokens = $bao->getTokens();
 
     $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html']);
     $html = CRM_Utils_Token::replaceWelcomeTokens($html, $group->title, TRUE);
@@ -145,7 +145,7 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
 
     $mailParams = array(
       'groupName' => 'Mailing Event ' . $component->component_type,
-    'subject' => $component->subject,
+      'subject' => $component->subject,
       'from' => "\"$domainEmailName\" <do-not-reply@$emailDomain>",
       'toEmail' => $email,
       'toName' => $display_name,

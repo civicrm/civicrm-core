@@ -158,8 +158,8 @@ ORDER BY civicrm_phone.is_primary DESC,  phone_id ASC ";
     );
 
     $numbers = $values = array();
-    $dao     = CRM_Core_DAO::executeQuery($query, $params);
-    $count   = 1;
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    $count = 1;
     while ($dao->fetch()) {
       $values = array(
         'locationType' => $dao->locationType,

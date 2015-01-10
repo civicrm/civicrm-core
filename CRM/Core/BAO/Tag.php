@@ -128,10 +128,11 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @return array
    */
   public static function getTagsUsedFor($usedFor = array(
-    'civicrm_contact'),
-    $buildSelect = TRUE,
-    $all = FALSE,
-    $parentId = NULL
+      'civicrm_contact'
+    ),
+                                        $buildSelect = TRUE,
+                                        $all = FALSE,
+                                        $parentId = NULL
   ) {
     $tags = array();
 
@@ -247,7 +248,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
           'prefix' => '',
           'name' => $dao->name,
           'idPrefix' => $idPrefix,
-          );
+        );
       }
       else {
         $rows[] = array(
@@ -256,7 +257,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
           'name' => $dao->name,
           'parent_id' => $dao->parent_id,
           'idPrefix' => $idPrefix,
-         );
+        );
       }
     }
 
@@ -267,14 +268,14 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     // iterate through because we must modify the unplaced nodes list
     // during the loop.
     while (count($roots)) {
-      $new_roots         = array();
-      $current_rows      = $rows;
-      $root              = array_shift($roots);
+      $new_roots = array();
+      $current_rows = $rows;
+      $root = array_shift($roots);
       $tags[$root['id']] = array(
         $root['prefix'],
         $root['name'],
         $root['idPrefix'],
-        );
+      );
 
       // As you find the children, append them to the end of the new set
       // of roots (maintain alphabetical ordering). Also remove the node
@@ -287,7 +288,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
               'prefix' => $tags[$root['id']][0] . $separator,
               'name' => $row['name'],
               'idPrefix' => $row['idPrefix'],
-              );
+            );
             unset($rows[$key]);
           }
         }
@@ -384,8 +385,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
 
     // save creator id and time
     if (!$tag->id) {
-      $session           = CRM_Core_Session::singleton();
-      $tag->created_id   = $session->get('userID');
+      $session = CRM_Core_Session::singleton();
+      $tag->created_id = $session->get('userID');
       $tag->created_date = date('YmdHis');
     }
 
@@ -396,7 +397,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     if ($tag->parent_id === 'null') {
       CRM_Core_DAO::executeQuery("UPDATE civicrm_tag SET used_for=%1 WHERE parent_id = %2",
         array(
-      1 => array($params['used_for'], 'String'),
+          1 => array($params['used_for'], 'String'),
           2 => array($tag->id, 'Integer'),
         )
       );
@@ -438,7 +439,12 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     $tagSets = array();
     $query = "SELECT name, id FROM civicrm_tag
               WHERE is_tagset=1 AND parent_id IS NULL and used_for LIKE %1";
-    $dao = CRM_Core_DAO::executeQuery($query, array(1 => array('%' . $entityTable . '%', 'String')), TRUE, NULL, FALSE, FALSE);
+    $dao = CRM_Core_DAO::executeQuery($query, array(
+        1 => array(
+          '%' . $entityTable . '%',
+          'String'
+        )
+      ), TRUE, NULL, FALSE, FALSE);
     while ($dao->fetch()) {
       $tagSets[$dao->id] = $dao->name;
     }

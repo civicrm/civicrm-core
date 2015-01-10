@@ -67,13 +67,18 @@ class CRM_Contact_Form_Edit_Email {
     $form->addRule("email[$blockId][email]", ts('Email is not valid.'), 'email');
     if (isset($form->_contactType) || $blockEdit) {
       //Block type
-      $form->addSelect("email[$blockId][location_type_id]", array('entity' => 'email', 'class' => 'eight', 'placeholder' => NULL));
+      $form->addSelect("email[$blockId][location_type_id]", array(
+          'entity' => 'email',
+          'class' => 'eight',
+          'placeholder' => NULL
+        ));
 
       $multipleBulk = CRM_Core_BAO_Email::isMultipleBulkMail();
 
       //On-hold select
       if ($multipleBulk) {
-        $holdOptions = array(0 => ts('- select -'),
+        $holdOptions = array(
+          0 => ts('- select -'),
           1 => ts('On Hold Bounce'),
           2 => ts('On Hold Opt Out'),
         );

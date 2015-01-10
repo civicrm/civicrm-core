@@ -160,8 +160,8 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
     // submitted form values
     $this->_queryParams = &$queryParams;
 
-    $this->_single  = $single;
-    $this->_limit   = $limit;
+    $this->_single = $single;
+    $this->_limit = $limit;
     $this->_context = $context;
 
     $this->_campaignClause = $surveyClause;
@@ -334,29 +334,29 @@ FROM {$from}
     if (!$this->_single) {
       $contactDetails = array(
         array(
-      'name' => ts('Contact Name'),
+          'name' => ts('Contact Name'),
           'sort' => 'sort_name',
           'direction' => CRM_Utils_Sort::ASCENDING,
         ),
         array(
-      'name' => ts('Street Number'),
+          'name' => ts('Street Number'),
           'sort' => 'street_number',
         ),
         array(
-      'name' => ts('Street Name'),
+          'name' => ts('Street Name'),
           'sort' => 'street_name',
         ),
         array('name' => ts('Street Address')),
         array(
-      'name' => ts('City'),
+          'name' => ts('City'),
           'sort' => 'city',
         ),
         array(
-      'name' => ts('Postal Code'),
+          'name' => ts('Postal Code'),
           'sort' => 'postal_code',
         ),
         array(
-      'name' => ts('State'),
+          'name' => ts('State'),
           'sort' => 'state_province_name',
         ),
         array('name' => ts('Country')),

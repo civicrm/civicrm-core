@@ -57,7 +57,8 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
    */
   public function testPaymentProcessorTypeCreateWithoutName() {
     $payProcParams = array(
-      'is_active' => 1,);
+      'is_active' => 1,
+    );
     $result = $this->callAPIFailure('payment_processor_type', 'create', $payProcParams);
     $this->assertEquals($result['error_message'],
       'Mandatory key(s) missing from params array: name, title, class_name, billing_mode'
@@ -69,7 +70,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
    */
   public function testPaymentProcessorTypeCreate() {
     $params = array(
-    'sequential' => 1,
+      'sequential' => 1,
       'name' => 'API_Test_PP',
       'title' => 'API Test Payment Processor',
       'class_name' => 'CRM_Core_Payment_APITest',
@@ -178,7 +179,8 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'title' => 'API Test Payment Processor 2',
       'class_name' => 'CRM_Core_Payment_APITest 2',
       'billing_mode' => 2,
-      'is_recur' => 0,);
+      'is_recur' => 0,
+    );
 
     $result = $this->callAPISuccess('payment_processor_type', 'create', $params);
     $this->assertNotNull($result['id']);
@@ -200,7 +202,8 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'title' => 'API Test Payment Processor',
       'class_name' => 'CRM_Core_Payment_APITest',
       'billing_mode' => 1,
-      'is_recur' => 0,);
+      'is_recur' => 0,
+    );
 
     $first = $this->callAPISuccess('PaymentProcessorType', 'Create', $firstRelTypeParams);
 
@@ -209,7 +212,8 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'title' => 'API Test Payment Processor 2',
       'class_name' => 'CRM_Core_Payment_APITest 2',
       'billing_mode' => 2,
-      'is_recur' => 0,);
+      'is_recur' => 0,
+    );
     $second = $this->callAPISuccess('PaymentProcessorType', 'Create', $secondRelTypeParams);
     $result = $this->callAPISuccess('payment_processor_type', 'get', array());
 
@@ -226,7 +230,8 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'title' => 'API Test Payment Processor 11',
       'class_name' => 'CRM_Core_Payment_APITest_11',
       'billing_mode' => 1,
-      'is_recur' => 0,);
+      'is_recur' => 0,
+    );
 
     $first = $this->callAPISuccess('PaymentProcessorType', 'Create', $firstRelTypeParams);
 
@@ -235,11 +240,13 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'title' => 'API Test Payment Processor 12',
       'class_name' => 'CRM_Core_Payment_APITest_12',
       'billing_mode' => 2,
-      'is_recur' => 0,);
+      'is_recur' => 0,
+    );
     $second = $this->callAPISuccess('PaymentProcessorType', 'Create', $secondRelTypeParams);
 
     $params = array(
-      'name' => 'API_Test_PP_12',);
+      'name' => 'API_Test_PP_12',
+    );
     $result = $this->callAPISuccess('payment_processor_type', 'get', $params);
 
     $this->assertAPISuccess($result);

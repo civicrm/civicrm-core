@@ -69,7 +69,7 @@ class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@id='memberships']//table/tbody/tr[1]/td[9]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
     $expected = array(
-      'Membership Type'  => $membershipTypes['membership_type'],
+      'Membership Type' => $membershipTypes['membership_type'],
       'Status' => 'New',
       'Source' => 'Membership StandaloneAddTest Webtest',
     );

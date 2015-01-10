@@ -171,7 +171,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
         $dao->id
       );
       //Financial Type
-      if (!empty($dao->financial_type_id) ) {
+      if (!empty($dao->financial_type_id)) {
         require_once 'CRM/Core/DAO.php';
         $premiums[$dao->id]['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $dao->financial_type_id, 'name');
       }

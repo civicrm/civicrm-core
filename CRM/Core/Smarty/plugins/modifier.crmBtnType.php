@@ -39,7 +39,7 @@
  * @param string $btnName
  *
  * @return string
-   *   button type, one of: 'upload', 'next', 'back', 'cancel', 'refresh'
+ *   button type, one of: 'upload', 'next', 'back', 'cancel', 'refresh'
  *                                      'submit', 'done', 'display', 'jump' 'process'
  */
 function smarty_modifier_crmBtnType($btnName) {

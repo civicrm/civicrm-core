@@ -119,7 +119,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
         case 'Select':
           $options = array(
             1 => array(
-          'label' => 'Chicken',
+              'label' => 'Chicken',
               'amount' => '30.00',
               'financial_type_id' => 'Donation',
             ),
@@ -138,11 +138,11 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
         case 'Radio':
           $options = array(
             1 => array(
-          'label' => 'Yes',
+              'label' => 'Yes',
               'amount' => '50.00',
               'financial_type_id' => 'Donation',
 
-             ),
+            ),
             2 => array(
               'label' => 'No',
               'amount' => '0',
@@ -159,7 +159,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
         case 'CheckBox':
           $options = array(
             1 => array(
-          'label' => 'First Night',
+              'label' => 'First Night',
               'amount' => '15.00',
               'financial_type_id' => 'Donation',
             ),
@@ -501,7 +501,6 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
   /**
    * Test to regiter participant for event with
-
    * multiple price fields in price-set
    * CRM-11986
 

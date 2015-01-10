@@ -34,7 +34,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * @package CiviCRM_APIv3
  * @subpackage API_Contact
  */
-
 class api_v3_WebsiteTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $params;
@@ -47,9 +46,9 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction();
 
-    $this->_entity     = 'website';
-    $this->_contactID  = $this->organizationCreate();
-    $this->params  = array(
+    $this->_entity = 'website';
+    $this->_contactID = $this->organizationCreate();
+    $this->params = array(
       'contact_id' => $this->_contactID,
       'url' => 'website.com',
       'website_type_id' => 1,
@@ -78,6 +77,7 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
+
   public function testDeleteWebsiteInvalid() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $deleteParams = array('id' => 600);
@@ -85,16 +85,19 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(1, $checkDeleted['count'], 'In line ' . __LINE__);
   }
+
   /**
    * Test retrieval of metadata
    */
   public function testGetMetadata() {
     $result = $this->callAPIAndDocument($this->_entity, 'get', array(
       'options' => array(
-    'metadata' => array('fields'),
-    )), __FUNCTION__, __FILE__, 'Demonostrates returning field metadata', 'GetWithMetadata');
+        'metadata' => array('fields'),
+      )
+    ), __FUNCTION__, __FILE__, 'Demonostrates returning field metadata', 'GetWithMetadata');
     $this->assertEquals('Website', $result['metadata']['fields']['url']['title']);
   }
+
   /**
    * Test retrieval of label metadata
    */

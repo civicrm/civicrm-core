@@ -38,7 +38,6 @@
  * @param array $data
  *   Extra params to return. eg an extra array of ids. It is not mandatory, but can help the computer using the api. Keep in mind the api consumer isn't to be trusted. eg. the database password is NOT a good extra data.
  */
-
 class CRM_Core_Exception extends PEAR_Exception {
   private $errorData = array();
 

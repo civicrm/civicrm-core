@@ -88,7 +88,7 @@ class CRM_Report_Form_Instance {
       'row_count',
       ts('Limit Dashboard Results'),
       array(
-    'maxlength' => 64,
+        'maxlength' => 64,
         'size' => 5,
       )
     );
@@ -299,8 +299,17 @@ class CRM_Report_Form_Instance {
 
     // unset params from $formValues that doesn't match with DB columns of instance tables, and also not required in form-values for sure
     $unsetFields = array(
-      'title', 'to_emails', 'cc_emails', 'header', 'footer',
-      'qfKey', 'id', '_qf_default', 'report_header', 'report_footer', 'grouprole',
+      'title',
+      'to_emails',
+      'cc_emails',
+      'header',
+      'footer',
+      'qfKey',
+      'id',
+      '_qf_default',
+      'report_header',
+      'report_footer',
+      'grouprole',
     );
     foreach ($unsetFields as $field) {
       unset($formValues[$field]);

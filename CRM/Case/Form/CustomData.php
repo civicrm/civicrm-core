@@ -74,8 +74,8 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
-    $this->_groupID   = CRM_Utils_Request::retrieve('groupID', 'Positive', $this, TRUE);
-    $this->_entityID  = CRM_Utils_Request::retrieve('entityID', 'Positive', $this, TRUE);
+    $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this, TRUE);
+    $this->_entityID = CRM_Utils_Request::retrieve('entityID', 'Positive', $this, TRUE);
     $this->_subTypeID = CRM_Utils_Request::retrieve('subType', 'Positive', $this, TRUE);
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
 
@@ -150,7 +150,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/case', "reset=1&id={$this->_entityID}&cid={$this->_contactID}&action=view"));
 
-    $session        = CRM_Core_Session::singleton();
+    $session = CRM_Core_Session::singleton();
     $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type', 'Change Custom Data', 'name');
     $activityParams = array(
       'activity_type_id' => $activityTypeID,

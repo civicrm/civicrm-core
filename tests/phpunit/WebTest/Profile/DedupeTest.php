@@ -37,7 +37,12 @@ class WebTest_Profile_DedupeTest extends CiviSeleniumTestCase {
 
   public function testProfileCreateDupeStrictDefault() {
     // lets give profile related permision to anonymous user.
-    $permission = array('edit-1-profile-create', 'edit-1-profile-edit', 'edit-1-profile-listings', 'edit-1-profile-view');
+    $permission = array(
+      'edit-1-profile-create',
+      'edit-1-profile-edit',
+      'edit-1-profile-listings',
+      'edit-1-profile-view'
+    );
     $this->changePermissions($permission);
 
     // Log in as normal user

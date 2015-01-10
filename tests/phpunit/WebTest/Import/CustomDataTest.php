@@ -38,8 +38,8 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
   public function testCustomDataImport() {
     $this->webtestLogin();
 
-    $firstName1       = 'Ma_' . substr(sha1(rand()), 0, 7);
-    $firstName2       = 'An_' . substr(sha1(rand()), 0, 7);
+    $firstName1 = 'Ma_' . substr(sha1(rand()), 0, 7);
+    $firstName2 = 'An_' . substr(sha1(rand()), 0, 7);
     $customGroupTitle = 'Custom ' . substr(sha1(rand()), 0, 7);
 
     $firstName3 = 'Ma' . substr(sha1(rand()), 0, 4);

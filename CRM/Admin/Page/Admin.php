@@ -58,7 +58,7 @@ class CRM_Admin_Page_Admin extends CRM_Core_Page {
     }
 
     $groups = array(
-    'Customize Data and Screens' => ts('Customize Data and Screens'),
+      'Customize Data and Screens' => ts('Customize Data and Screens'),
       'Communications' => ts('Communications'),
       'Localization' => ts('Localization'),
       'Users and Permissions' => ts('Users and Permissions'),

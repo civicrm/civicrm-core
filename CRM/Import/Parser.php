@@ -32,8 +32,6 @@
  * $Id$
  *
  */
-
-
 abstract class CRM_Import_Parser {
   /**
    * Settings

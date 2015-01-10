@@ -49,7 +49,7 @@
  *   The Smarty object.
  *
  * @return string
-   *   the string, translated by gettext
+ *   the string, translated by gettext
  */
 function smarty_block_edit($params, $text, &$smarty) {
   $action = $smarty->_tpl_vars['action'];

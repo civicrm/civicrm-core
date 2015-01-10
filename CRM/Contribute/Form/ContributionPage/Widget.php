@@ -64,17 +64,20 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
     );
 
     $this->_fields = array(
-    'title' => array(ts('Title'),
+      'title' => array(
+        ts('Title'),
         'text',
         FALSE,
         $title,
       ),
-      'url_logo' => array(ts('URL to Logo Image'),
+      'url_logo' => array(
+        ts('URL to Logo Image'),
         'text',
         FALSE,
         NULL,
       ),
-      'button_title' => array(ts('Button Title'),
+      'button_title' => array(
+        ts('Button Title'),
         'text',
         FALSE,
         ts('Contribute!'),
@@ -82,47 +85,56 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
     );
 
     $this->_colorFields = array(
-    'color_title' => array(ts('Title Text Color'),
+      'color_title' => array(
+        ts('Title Text Color'),
         'text',
         FALSE,
         '#2786C2',
       ),
-      'color_bar' => array(ts('Progress Bar Color'),
+      'color_bar' => array(
+        ts('Progress Bar Color'),
         'text',
         FALSE,
         '#FFFFFF',
       ),
-      'color_main_text' => array(ts('Additional Text Color'),
+      'color_main_text' => array(
+        ts('Additional Text Color'),
         'text',
         FALSE,
         '#FFFFFF',
       ),
-      'color_main' => array(ts('Background Color'),
+      'color_main' => array(
+        ts('Background Color'),
         'text',
         FALSE,
         '#96C0E7',
       ),
-      'color_main_bg' => array(ts('Background Color Top Area'),
+      'color_main_bg' => array(
+        ts('Background Color Top Area'),
         'text',
         FALSE,
         '#B7E2FF',
       ),
-      'color_bg' => array(ts('Border Color'),
+      'color_bg' => array(
+        ts('Border Color'),
         'text',
         FALSE,
         '#96C0E7',
       ),
-      'color_about_link' => array(ts('Button Link Color'),
+      'color_about_link' => array(
+        ts('Button Link Color'),
         'text',
         FALSE,
         '#556C82',
       ),
-      'color_button' => array(ts('Button Background Color'),
+      'color_button' => array(
+        ts('Button Background Color'),
         'text',
         FALSE,
         '#FFFFFF',
       ),
-      'color_homepage_link' => array(ts('Homepage Link Color'),
+      'color_homepage_link' => array(
+        ts('Homepage Link Color'),
         'text',
         FALSE,
         '#FFFFFF',

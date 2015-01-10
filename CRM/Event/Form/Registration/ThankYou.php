@@ -47,13 +47,13 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
    */
   public function preProcess() {
     parent::preProcess();
-    $this->_params      = $this->get('params');
-    $this->_lineItem    = $this->get('lineItem');
-    $this->_part        = $this->get('part');
+    $this->_params = $this->get('params');
+    $this->_lineItem = $this->get('lineItem');
+    $this->_part = $this->get('part');
     $this->_totalAmount = $this->get('totalAmount');
     $this->_receiveDate = $this->get('receiveDate');
-    $this->_trxnId      = $this->get('trxnId');
-    $finalAmount        = $this->get('finalAmount');
+    $this->_trxnId = $this->get('trxnId');
+    $finalAmount = $this->get('finalAmount');
     $this->assign('finalAmount', $finalAmount);
     $participantInfo = $this->get('participantInfo');
     $this->assign('part', $this->_part);
@@ -95,7 +95,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     }
     $this->assignToTemplate();
 
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
     $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $getTaxDetails = FALSE;
@@ -217,10 +217,10 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $this->assign('isRequireApproval', $isRequireApproval);
 
     // find pcp info
-    $dao               = new CRM_PCP_DAO_PCPBlock();
+    $dao = new CRM_PCP_DAO_PCPBlock();
     $dao->entity_table = 'civicrm_event';
-    $dao->entity_id    = $this->_eventId;
-    $dao->is_active    = 1;
+    $dao->entity_id = $this->_eventId;
+    $dao->is_active = 1;
     $dao->find(TRUE);
 
     if ($dao->id) {
@@ -241,7 +241,8 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
    *
    * @return void
    */
-  public function postProcess() {}
+  public function postProcess() {
+  }
 
   /**
    * Return a descriptive name for the page, used in wizard header

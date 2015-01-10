@@ -1695,7 +1695,7 @@ WHERE  id IN ( $deleteIDString )
    */
   static function _trimNonTokens(
     &$parsedString, $defaultGreeting,
-                                 $addressMergeGreetings, $greetingType = 'postal_greeting'
+    $addressMergeGreetings, $greetingType = 'postal_greeting'
   ) {
     if (!empty($addressMergeGreetings[$greetingType])) {
       $greetingLabel = $addressMergeGreetings[$greetingType];

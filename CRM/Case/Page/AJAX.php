@@ -130,16 +130,16 @@ class CRM_Case_Page_AJAX {
       CRM_Utils_System::permissionDenied();
     }
 
-    $sql       = "SELECT civicrm_case.*, civicrm_case_type.title as case_type
+    $sql = "SELECT civicrm_case.*, civicrm_case_type.title as case_type
         FROM civicrm_case
         INNER JOIN civicrm_case_type ON civicrm_case.case_type_id = civicrm_case_type.id
         WHERE civicrm_case.id = %1";
-    $dao       = CRM_Core_DAO::executeQuery($sql, array(1 => array($caseId, 'Integer')));
+    $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($caseId, 'Integer')));
 
     if ($dao->fetch()) {
       $caseStatuses = CRM_Case_PseudoConstant::caseStatus();
-      $cs           = $caseStatuses[$dao->status_id];
-      $caseDetails  = "<table><tr><td>" . ts('Case Subject') . "</td><td>{$dao->subject}</td></tr>
+      $cs = $caseStatuses[$dao->status_id];
+      $caseDetails = "<table><tr><td>" . ts('Case Subject') . "</td><td>{$dao->subject}</td></tr>
                                     <tr><td>" . ts('Case Type') . "</td><td>{$dao->case_type}</td></tr>
                                     <tr><td>" . ts('Case Status') . "</td><td>{$cs}</td></tr>
                                     <tr><td>" . ts('Case Start Date') . "</td><td>" . CRM_Utils_Date::customFormat($dao->start_date) . "</td></tr>
@@ -201,7 +201,7 @@ class CRM_Case_Page_AJAX {
    * Delete relationships specific to case and relationship type
    */
   public static function deleteCaseRoles() {
-    $caseId  = CRM_Utils_Type::escape($_POST['case_id'], 'Positive');
+    $caseId = CRM_Utils_Type::escape($_POST['case_id'], 'Positive');
     $relType = CRM_Utils_Type::escape($_POST['rel_type'], 'Positive');
 
     if (!$relType || !CRM_Case_BAO_Case::accessCase($caseId)) {

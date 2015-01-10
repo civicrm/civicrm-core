@@ -8,8 +8,8 @@ define('CIVICRM_TEST', 1);
 
 //--- you shouldn't have to modify anything under this line, but might want to put the compiled templates CIVICRM_TEMPLATE_COMPILEDIR in a different folder than our default location ----------
 
-if (! defined('CIVICRM_DSN') && ! empty($GLOBALS['mysql_user'])) {
-  $dbName = ! empty($GLOBALS['mysql_db']) ? $GLOBALS['mysql_db'] : 'civicrm_tests_dev';
+if (!defined('CIVICRM_DSN') && !empty($GLOBALS['mysql_user'])) {
+  $dbName = !empty($GLOBALS['mysql_db']) ? $GLOBALS['mysql_db'] : 'civicrm_tests_dev';
   if (empty($GLOBALS['mysql_pass']) && $GLOBALS['mysql_pass_need_password']) {
     $GLOBALS['mysql_pass'] = PHPUnit_TextUI_Command::getPassword('Password');
   }
@@ -55,7 +55,7 @@ $GLOBALS['mysql_db'] = $dsninfo['database'];
  * Content Management System (CMS) Host:
  *
  * CiviCRM can be hosted in either Drupal, Joomla or WordPress.
-*/
+ */
 define('CIVICRM_UF', 'UnitTests');
 
 
@@ -122,10 +122,10 @@ define('CIVICRM_MYSQL_STRICT', TRUE);
  *
  */
 
-$include_path = '.'        . PATH_SEPARATOR .
-                $civicrm_root . PATH_SEPARATOR .
-                $civicrm_root . DIRECTORY_SEPARATOR . 'packages' . PATH_SEPARATOR .
-                get_include_path();
+$include_path = '.' . PATH_SEPARATOR .
+  $civicrm_root . PATH_SEPARATOR .
+  $civicrm_root . DIRECTORY_SEPARATOR . 'packages' . PATH_SEPARATOR .
+  get_include_path();
 set_include_path($include_path);
 
 if (function_exists('variable_get') && variable_get('clean_url', '0') != '0') {
@@ -140,12 +140,15 @@ ini_set('auto_detect_line_endings', '1');
 
 // make sure the memory_limit is at least 64 MB
 $memLimitString = trim(ini_get('memory_limit'));
-$memLimitUnit   = strtolower(substr($memLimitString, -1));
-$memLimit       = (int) $memLimitString;
+$memLimitUnit = strtolower(substr($memLimitString, -1));
+$memLimit = (int) $memLimitString;
 switch ($memLimitUnit) {
-  case 'g': $memLimit *= 1024;
-  case 'm': $memLimit *= 1024;
-  case 'k': $memLimit *= 1024;
+  case 'g':
+    $memLimit *= 1024;
+  case 'm':
+    $memLimit *= 1024;
+  case 'k':
+    $memLimit *= 1024;
 }
 if ($memLimit >= 0 and $memLimit < 67108864) {
   ini_set('memory_limit', '64M');

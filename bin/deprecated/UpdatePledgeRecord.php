@@ -70,7 +70,10 @@ class CRM_UpdatePledgeRecord {
 
     //unset statues that we never use for pledges
     foreach (array(
-      'Completed', 'Cancelled', 'Failed') as $statusKey) {
+               'Completed',
+               'Cancelled',
+               'Failed'
+             ) as $statusKey) {
       if ($key = CRM_Utils_Array::key($statusKey, $allStatus)) {
         unset($allStatus[$key]);
       }
@@ -143,7 +146,8 @@ SELECT  pledge.contact_id              as contact_id,
 
       if (CRM_Utils_Date::overdue(CRM_Utils_Date::customFormat($dao->scheduled_date, '%Y%m%d'),
           $now
-        ) && $dao->payment_status != array_search('Overdue', $allStatus)) {
+        ) && $dao->payment_status != array_search('Overdue', $allStatus)
+      ) {
         $pledgePayments[$dao->pledge_id][$dao->payment_id] = $dao->payment_id;
       }
     }
@@ -170,7 +174,7 @@ SELECT  pledge.contact_id              as contact_id,
       require_once 'CRM/Core/SelectValues.php';
       $domain = CRM_Core_BAO_Domain::getDomain();
       $tokens = array(
-      'domain' => array('name', 'phone', 'address', 'email'),
+        'domain' => array('name', 'phone', 'address', 'email'),
         'contact' => CRM_Core_SelectValues::contactTokens(),
       );
 

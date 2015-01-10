@@ -61,7 +61,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $eventId = $Id[1];
 
     $params = array(
-    'label_a_b' => 'Owner of ' . rand(),
+      'label_a_b' => 'Owner of ' . rand(),
       'label_b_a' => 'Belongs to ' . rand(),
       'contact_type_a' => 'Individual',
       'contact_type_b' => 'Individual',
@@ -307,12 +307,12 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
   public function testAdvanceSearchForLog() {
     $this->webtestLogin();
 
-    $Pdate     = date('F jS, Y h:i:s A', mktime(0, 0, 0, date('m'), date('d') - 1, date('Y')));
-    $Ndate     = date('F jS, Y h:i:s A', mktime(0, 0, 0, date('m'), date('d') + 1, date('Y')));
+    $Pdate = date('F jS, Y h:i:s A', mktime(0, 0, 0, date('m'), date('d') - 1, date('Y')));
+    $Ndate = date('F jS, Y h:i:s A', mktime(0, 0, 0, date('m'), date('d') + 1, date('Y')));
 
     //create a contact and return the contact id
     $firstNameSoft = "John_" . substr(sha1(rand()), 0, 5);
-    $lastNameSoft  = "Doe_" . substr(sha1(rand()), 0, 5);
+    $lastNameSoft = "Doe_" . substr(sha1(rand()), 0, 5);
     $this->webtestAddContact($firstNameSoft, $lastNameSoft);
     $cid = $this->urlArg('cid');
 

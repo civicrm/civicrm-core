@@ -66,26 +66,26 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
   public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
-        CRM_Core_Action::UPDATE  => array(
-          'name'  => ts('Edit'),
-          'url'   => 'civicrm/admin/financial/financialAccount',
-          'qs'    => 'action=update&id=%%id%%&reset=1',
+        CRM_Core_Action::UPDATE => array(
+          'name' => ts('Edit'),
+          'url' => 'civicrm/admin/financial/financialAccount',
+          'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Financial Type'),
         ),
         CRM_Core_Action::DISABLE => array(
-          'name'  => ts('Disable'),
+          'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Financial Type'),
         ),
-        CRM_Core_Action::ENABLE  => array(
-          'name'  => ts('Enable'),
+        CRM_Core_Action::ENABLE => array(
+          'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Financial Type'),
         ),
-        CRM_Core_Action::DELETE  => array(
-          'name'  => ts('Delete'),
-          'url'   => 'civicrm/admin/financial/financialAccount',
-          'qs'    => 'action=delete&id=%%id%%',
+        CRM_Core_Action::DELETE => array(
+          'name' => ts('Delete'),
+          'url' => 'civicrm/admin/financial/financialAccount',
+          'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Financial Type'),
         ),
       );

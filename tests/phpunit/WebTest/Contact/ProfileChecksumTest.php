@@ -103,7 +103,12 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     $profileId = $this->_testCreateContactProfile($fields, $profileName);
 
     // Check for profile create/edit permissions.
-    $permission = array('edit-1-profile-edit', 'edit-1-profile-create', 'edit-1-access-all-custom-data', 'edit-1-edit-all-contacts');
+    $permission = array(
+      'edit-1-profile-edit',
+      'edit-1-profile-create',
+      'edit-1-access-all-custom-data',
+      'edit-1-edit-all-contacts'
+    );
     $this->changePermissions($permission);
 
     // Get checksum of the newly created contact.

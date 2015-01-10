@@ -1,28 +1,28 @@
 <?php
 /**
- +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
- |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +--------------------------------------------------------------------+
+ * +--------------------------------------------------------------------+
+ * | CiviCRM version 4.6                                                |
+ * +--------------------------------------------------------------------+
+ * | Copyright CiviCRM LLC (c) 2004-2014                                |
+ * +--------------------------------------------------------------------+
+ * | This file is a part of CiviCRM.                                    |
+ * |                                                                    |
+ * | CiviCRM is free software; you can copy, modify, and distribute it  |
+ * | under the terms of the GNU Affero General Public License           |
+ * | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ * |                                                                    |
+ * | CiviCRM is distributed in the hope that it will be useful, but     |
+ * | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ * | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ * | See the GNU Affero General Public License for more details.        |
+ * |                                                                    |
+ * | You should have received a copy of the GNU Affero General Public   |
+ * | License and the CiviCRM Licensing Exception along                  |
+ * | with this program; if not, contact CiviCRM LLC                     |
+ * | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ * | GNU Affero General Public License or the licensing of CiviCRM,     |
+ * | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ * +--------------------------------------------------------------------+
  */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -34,7 +34,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * @package CiviCRM_APIv3
  * @subpackage API_Event
  */
-
 class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
 
   protected $_apiversion = 3;
@@ -54,13 +53,25 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $this->_createdParticipants = array();
     $this->_individualId = $this->individualCreate();
 
-    $this->_participantID = $this->participantCreate(array('contactID' => $this->_contactID, 'eventID' => $this->_eventID));
+    $this->_participantID = $this->participantCreate(array(
+        'contactID' => $this->_contactID,
+        'eventID' => $this->_eventID
+      ));
     $this->_contactID2 = $this->individualCreate();
-    $this->_participantID2 = $this->participantCreate(array('contactID' => $this->_contactID2, 'eventID' => $this->_eventID));
-    $this->_participantID3 = $this->participantCreate(array('contactID' => $this->_contactID2, 'eventID' => $this->_eventID));
+    $this->_participantID2 = $this->participantCreate(array(
+        'contactID' => $this->_contactID2,
+        'eventID' => $this->_eventID
+      ));
+    $this->_participantID3 = $this->participantCreate(array(
+        'contactID' => $this->_contactID2,
+        'eventID' => $this->_eventID
+      ));
 
     $this->_contactID3 = $this->individualCreate();
-    $this->_participantID4 = $this->participantCreate(array('contactID' => $this->_contactID3, 'eventID' => $this->_eventID));
+    $this->_participantID4 = $this->participantCreate(array(
+        'contactID' => $this->_contactID3,
+        'eventID' => $this->_eventID
+      ));
   }
 
   ///////////////// civicrm_participant_payment_create methods
@@ -87,7 +98,8 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   public function testPaymentCreateMissingContributionId() {
     //Without Payment EntityID
     $params = array(
-      'participant_id' => $this->_participantID,);
+      'participant_id' => $this->_participantID,
+    );
 
     $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
   }
@@ -138,7 +150,8 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   public function testPaymentUpdateMissingParticipantId() {
     //WithoutParticipantId
     $params = array(
-      'contribution_id' => '3',);
+      'contribution_id' => '3',
+    );
 
     $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
   }
@@ -148,7 +161,8 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   public function testPaymentUpdateMissingContributionId() {
     $params = array(
-      'participant_id' => $this->_participantID,);
+      'participant_id' => $this->_participantID,
+    );
     $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
   }
 
@@ -164,7 +178,8 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'id' => $this->_participantPaymentID,
       'participant_id' => $this->_participantID,
-      'contribution_id' => $contributionID,);
+      'contribution_id' => $contributionID,
+    );
 
     // Update Payment
     $participantPayment = $this->callAPISuccess('participant_payment', 'create', $params);
@@ -187,9 +202,9 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $pageParams['processor_id'] = $paymentProcessor->id;
     $contributionPage = $this->contributionPageCreate($pageParams);
     $contributionParams = array(
-       'contact_id' => $this->_contactID,
-       'contribution_page_id' => $contributionPage['id'],
-       'payment_processor' => $paymentProcessor->id,
+      'contact_id' => $this->_contactID,
+      'contribution_page_id' => $contributionPage['id'],
+      'payment_processor' => $paymentProcessor->id,
     );
     $contributionID = $this->onlineContributionCreate($contributionParams, 1);
 
@@ -197,7 +212,8 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'id' => $this->_participantPaymentID,
       'participant_id' => $this->_participantID,
-      'contribution_id' => $contributionID,);
+      'contribution_id' => $contributionID,
+    );
 
     // Update Payment
     $participantPayment = $this->callAPISuccess('participant_payment', 'create', $params);
@@ -232,7 +248,8 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'id' => $this->_participantPaymentID,
       'participant_id' => $this->_participantID,
-      'contribution_id' => $contributionID,);
+      'contribution_id' => $contributionID,
+    );
 
     // Update Payment
     $participantPayment = $this->callAPISuccess('participant_payment', 'create', $params);
@@ -270,7 +287,8 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   public function testPaymentDeleteWithWrongID() {
     $params = array(
-      'id' => 0,);
+      'id' => 0,
+    );
     $deletePayment = $this->callAPIFailure('participant_payment', 'delete', $params);
     $this->assertEquals($deletePayment['error_message'], 'Error while deleting participantPayment');
   }

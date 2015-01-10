@@ -173,8 +173,8 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
         cj("#crm-preferences-display-form-block-wysiwyg_input_format").hide()
       }';
 
-      $formats           = filter_formats();
-      $format_options    = array();
+      $formats = filter_formats();
+      $format_options = array();
       foreach ($formats as $id => $format) {
         $format_options[$id] = $format->name;
       }

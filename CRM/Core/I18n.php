@@ -95,7 +95,7 @@ class CRM_Core_I18n {
 
       $mo_file = $config->gettextResourceDir . $locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . 'civicrm.mo';
 
-      if (! file_exists($mo_file)) {
+      if (!file_exists($mo_file)) {
         // fallback to pre-4.5 mode
         $mo_file = $config->gettextResourceDir . $locale . DIRECTORY_SEPARATOR . 'civicrm.mo';
       }
@@ -152,7 +152,7 @@ class CRM_Core_I18n {
         if ($code == 'en_US') {
           continue;
         }
-        if (!in_array($code, $codes))unset($all[$code]);
+        if (!in_array($code, $codes)) unset($all[$code]);
       }
     }
 
@@ -259,7 +259,7 @@ class CRM_Core_I18n {
 
     // gettext domain for extensions
     $domain_changed = FALSE;
-    if (! empty($params['domain']) && $this->_phpgettext) {
+    if (!empty($params['domain']) && $this->_phpgettext) {
       if ($this->setGettextDomain($params['domain'])) {
         $domain_changed = TRUE;
       }
@@ -287,9 +287,9 @@ class CRM_Core_I18n {
       !$exactMatch &&
       isset($stringTable['enabled']['wildcardMatch'])
     ) {
-      $search  = array_keys($stringTable['enabled']['wildcardMatch']);
+      $search = array_keys($stringTable['enabled']['wildcardMatch']);
       $replace = array_values($stringTable['enabled']['wildcardMatch']);
-      $text    = str_replace($search, $replace, $text);
+      $text = str_replace($search, $replace, $text);
     }
 
     // dont translate if we've done exactMatch already
@@ -416,12 +416,12 @@ class CRM_Core_I18n {
    */
   public function setGettextDomain($key) {
     /* No domain changes for en_US */
-    if (! $this->_phpgettext) {
+    if (!$this->_phpgettext) {
       return FALSE;
     }
 
     // It's only necessary to find/bind once
-    if (! isset($this->_extensioncache[$key])) {
+    if (!isset($this->_extensioncache[$key])) {
       $config = CRM_Core_Config::singleton();
 
       try {
@@ -507,7 +507,7 @@ class CRM_Core_I18n {
  *   Array an array of additional parameters.
  *
  * @return string
-   *   the translated string
+ *   the translated string
  */
 function ts($text, $params = array()) {
   static $config = NULL;

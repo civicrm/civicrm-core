@@ -53,8 +53,9 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $config = CRM_Core_Config::singleton();
     // ensure that the user has permission to see this page
     if (!CRM_Core_Permission::event(CRM_Core_Permission::VIEW,
-        $this->_id, 'view event info'
-      )) {
+      $this->_id, 'view event info'
+    )
+    ) {
       CRM_Utils_System::setUFMessage(ts('You do not have permission to view this event'));
       return CRM_Utils_System::permissionDenied();
     }
@@ -167,7 +168,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
         $this->assign('isPriceSet', 1);
         $this->assign('isQuickConfig', $setDetails[$priceSetId]['is_quick_config']);
       }
-        }
+    }
 
     $params = array('entity_id' => $this->_id, 'entity_table' => 'civicrm_event');
     $values['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
@@ -194,7 +195,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       $this->assign('mapKey', $config->mapAPIKey);
       $sumLat = $sumLng = 0;
       $maxLat = $maxLng = -400;
-      $minLat = $minLng = + 400;
+      $minLat = $minLng = +400;
       foreach ($locations as $location) {
         $sumLat += $location['lat'];
         $sumLng += $location['lng'];
@@ -214,11 +215,13 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
         }
       }
 
-      $center = array('lat' => (float ) $sumLat / count($locations),
+      $center = array(
+        'lat' => (float ) $sumLat / count($locations),
         'lng' => (float ) $sumLng / count($locations),
       );
-      $span = array('lat' => (float )($maxLat - $minLat),
-        'lng' => (float )($maxLng - $minLng),
+      $span = array(
+        'lat' => (float ) ($maxLat - $minLat),
+        'lng' => (float ) ($maxLng - $minLng),
       );
       $this->assign_by_ref('center', $center);
       $this->assign_by_ref('span', $span);
@@ -310,7 +313,8 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $this->assign('allowRegistration', $allowRegistration);
 
     $session = CRM_Core_Session::singleton();
-    $params = array('contact_id' => $session->get('userID'),
+    $params = array(
+      'contact_id' => $session->get('userID'),
       'event_id' => CRM_Utils_Array::value('id', $values['event']),
       'role_id' => CRM_Utils_Array::value('default_role_id', $values['event']),
     );

@@ -40,6 +40,7 @@
 class CRM_Badge_Form_Layout extends CRM_Admin_Form {
 
   const FIELD_ROWCOUNT = 6;
+
   /**
    * Build the form object
    *

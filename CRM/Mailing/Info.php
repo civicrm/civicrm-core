@@ -59,12 +59,20 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $result = array();
     $result['crmMailing'] = array(
       'ext' => 'civicrm',
-      'js' => array('js/angular-crmMailing.js', 'js/angular-crmMailing/services.js', 'js/angular-crmMailing/directives.js'),
+      'js' => array(
+        'js/angular-crmMailing.js',
+        'js/angular-crmMailing/services.js',
+        'js/angular-crmMailing/directives.js'
+      ),
       'css' => array('css/angular-crmMailing.css'),
     );
     $result['crmMailingAB'] = array(
       'ext' => 'civicrm',
-      'js' => array('js/angular-crmMailingAB.js', 'js/angular-crmMailingAB/services.js', 'js/angular-crmMailingAB/directives.js'),
+      'js' => array(
+        'js/angular-crmMailingAB.js',
+        'js/angular-crmMailingAB/services.js',
+        'js/angular-crmMailingAB/directives.js'
+      ),
       'css' => array('css/angular-crmMailingAB.css'),
     );
     $result['crmD3'] = array(
@@ -100,7 +108,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'contact_id' => $contactID,
       ));
       $mesTemplate = civicrm_api3('MessageTemplate', 'get', array(
-      'sequential' => 1,
+        'sequential' => 1,
         'return' => array("msg_html", "id", "msg_title", "msg_subject", "msg_text"),
         'workflow_id' => array('IS NULL' => ""),
       ));
@@ -127,10 +135,13 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'contactid' => $contactID,
         'enableReplyTo' => isset($config->replyTo) ? $config->replyTo : 0,
         'fromAddress' => array_values($fromAddress['values'][0]['api.OptionValue.get']['values']),
-        'defaultTestEmail' => civicrm_api3('Contact', 'getvalue', array('id' => 'user_contact_id', 'return' => 'email')),
+        'defaultTestEmail' => civicrm_api3('Contact', 'getvalue', array(
+            'id' => 'user_contact_id',
+            'return' => 'email'
+          )),
         'visibility' => array(
-            array('value' => 'Public Pages', 'label' => ts('Public Pages')),
-            array('value' => 'User and User Admin Only', 'label' => ts('User and User Admin Only')),
+          array('value' => 'Public Pages', 'label' => ts('Public Pages')),
+          array('value' => 'User and User Admin Only', 'label' => ts('User and User Admin Only')),
         ),
       ),
     ));
@@ -226,7 +237,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
    */
   public function registerAdvancedSearchPane() {
     return array(
-    'title' => ts('Mailings'),
+      'title' => ts('Mailings'),
       'weight' => 20,
     );
   }

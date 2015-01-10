@@ -97,7 +97,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   public static function create($params) {
     $ids = array();
     if (!empty($params['id'])) {
-      $ids['membershipStatus']  = $params['id'];
+      $ids['membershipStatus'] = $params['id'];
     }
     else {
       //don't allow duplicate names - if id not set
@@ -110,6 +110,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     $membershipStatusBAO = CRM_Member_BAO_MembershipStatus::add($params, $ids);
     return $membershipStatusBAO;
   }
+
   /**
    * Add the membership types
    *
@@ -305,25 +306,25 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
               // add in months
               if ($membershipStatus->{$eve . '_event_adjust_unit'} == 'month') {
                 ${$eve . 'Event'} = date('Ymd', mktime($hour, $minute, $second,
-                    ${$dat . 'Month'} + $membershipStatus->{$eve . '_event_adjust_interval'},
-                    ${$dat . 'Day'},
-                    ${$dat . 'Year'}
+                  ${$dat . 'Month'} + $membershipStatus->{$eve . '_event_adjust_interval'},
+                  ${$dat . 'Day'},
+                  ${$dat . 'Year'}
                 ));
               }
               // add in days
               if ($membershipStatus->{$eve . '_event_adjust_unit'} == 'day') {
                 ${$eve . 'Event'} = date('Ymd', mktime($hour, $minute, $second,
-                    ${$dat . 'Month'},
-                    ${$dat . 'Day'} + $membershipStatus->{$eve . '_event_adjust_interval'},
-                    ${$dat . 'Year'}
+                  ${$dat . 'Month'},
+                  ${$dat . 'Day'} + $membershipStatus->{$eve . '_event_adjust_interval'},
+                  ${$dat . 'Year'}
                 ));
               }
               // add in years
               if ($membershipStatus->{$eve . '_event_adjust_unit'} == 'year') {
                 ${$eve . 'Event'} = date('Ymd', mktime($hour, $minute, $second,
-                    ${$dat . 'Month'},
-                    ${$dat . 'Day'},
-                    ${$dat . 'Year'} + $membershipStatus->{$eve . '_event_adjust_interval'}
+                  ${$dat . 'Month'},
+                  ${$dat . 'Day'},
+                  ${$dat . 'Year'} + $membershipStatus->{$eve . '_event_adjust_interval'}
                 ));
               }
               // if no interval and unit, present

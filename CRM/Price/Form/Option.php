@@ -135,7 +135,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       return;
     }
     else {
-      $attributes        = CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceFieldValue');
+      $attributes = CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceFieldValue');
       // lets trim all the whitespace
       $this->applyFilter('__ALL__', 'trim');
 
@@ -166,7 +166,8 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
         $this->assign('showMember', TRUE);
         $membershipTypes = CRM_Member_PseudoConstant::membershipType();
         $this->add('select', 'membership_type_id', ts('Membership Type'), array(
-          '' => ' ') + $membershipTypes, FALSE,
+            '' => ' '
+          ) + $membershipTypes, FALSE,
           array('onClick' => "calculateRowValues( );")
         );
         $this->add('text', 'membership_num_terms', ts('Number of Terms'), $attributes['membership_num_terms']);
@@ -301,8 +302,8 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   public function postProcess() {
     if ($this->_action == CRM_Core_Action::DELETE) {
       $fieldValues = array('price_field_id' => $this->_fid);
-      $wt          = CRM_Utils_Weight::delWeight('CRM_Price_DAO_PriceFieldValue', $this->_oid, $fieldValues);
-      $label       = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue',
+      $wt = CRM_Utils_Weight::delWeight('CRM_Price_DAO_PriceFieldValue', $this->_oid, $fieldValues);
+      $label = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue',
         $this->_oid,
         'label', 'id'
       );
@@ -313,8 +314,8 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       return;
     }
     else {
-      $params     = $ids = array();
-      $params     = $this->controller->exportValues('Option');
+      $params = $ids = array();
+      $params = $this->controller->exportValues('Option');
       $fieldLabel = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $this->_fid, 'label');
 
       $params['amount'] = CRM_Utils_Rule::cleanMoney(trim($params['amount']));

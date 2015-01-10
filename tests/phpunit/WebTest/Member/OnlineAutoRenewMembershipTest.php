@@ -167,7 +167,8 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
       $onBehalf = FALSE;
       $pledges = FALSE;
       $recurring = TRUE;
-      $membershipTypes = array(array('id' => 1, 'auto_renew' => 1),
+      $membershipTypes = array(
+        array('id' => 1, 'auto_renew' => 1),
         array('id' => 2, 'auto_renew' => 1),
       );
       $memPriceSetId = NULL;

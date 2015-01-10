@@ -72,9 +72,9 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
   }
 
   public function preProcess() {
-    $context          = CRM_Utils_Request::retrieve('context', 'String', $this);
-    $this->_action    = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'view');
-    $this->_id        = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'view');
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->assign('contactId', $this->_contactId);
 

@@ -104,7 +104,10 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
     $this->applyFilter('__ALL__', 'trim');
     $this->add('text', 'name', ts('Name'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'name'), TRUE);
-    $this->addRule('name', ts('A product with this name already exists. Please select another name.'), 'objectExists', array('CRM_Contribute_DAO_Product', $this->_id));
+    $this->addRule('name', ts('A product with this name already exists. Please select another name.'), 'objectExists', array(
+        'CRM_Contribute_DAO_Product',
+        $this->_id
+      ));
     $this->add('text', 'sku', ts('SKU'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'sku'));
 
     $this->add('textarea', 'description', ts('Description'), 'rows=3, cols=60');
@@ -133,7 +136,11 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
     $this->add('textarea', 'options', ts('Options'), 'rows=3, cols=60');
 
-    $this->add('select', 'period_type', ts('Period Type'), array('' => '- select -', 'rolling' => 'Rolling', 'fixed' => 'Fixed'));
+    $this->add('select', 'period_type', ts('Period Type'), array(
+        '' => '- select -',
+        'rolling' => 'Rolling',
+        'fixed' => 'Fixed'
+      ));
 
     $this->add('text', 'fixed_period_start_day', ts('Fixed Period Start Day'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'fixed_period_start_day'));
 
@@ -284,7 +291,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       CRM_Core_Session::setStatus(ts('Selected Premium Product type has been deleted.'), ts('Deleted'), 'info');
     }
     else {
-      $params    = $this->controller->exportValues($this->_name);
+      $params = $this->controller->exportValues($this->_name);
       $imageFile = CRM_Utils_Array::value('uploadFile', $params);
       $imageFile = $imageFile['name'];
 
@@ -335,7 +342,10 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
       // fix the money fields
       foreach (array(
-        'cost', 'price', 'min_contribution') as $f) {
+                 'cost',
+                 'price',
+                 'min_contribution'
+               ) as $f) {
         $params[$f] = CRM_Utils_Rule::cleanMoney($params[$f]);
       }
 
@@ -373,7 +383,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     if ($imageInfo['mime'] == 'image/gif') {
       $source = imagecreatefromgif($filename);
     }
-    elseif($imageInfo['mime'] == 'image/png') {
+    elseif ($imageInfo['mime'] == 'image/png') {
       $source = imagecreatefrompng($filename);
     }
     else {

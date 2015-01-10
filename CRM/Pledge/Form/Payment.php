@@ -106,7 +106,7 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
     );
 
     $optionTypes = array(
-    '1' => ts('Adjust Pledge Payment Schedule?'),
+      '1' => ts('Adjust Pledge Payment Schedule?'),
       '2' => ts('Adjust Total Pledge Amount?'),
     );
     $element = $this->addRadio('option_type',

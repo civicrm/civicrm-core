@@ -153,8 +153,8 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
     $this->ajaxResponse = array_merge(
       array(
         'changeLog' => array(
-         'count' => CRM_Contact_BAO_Contact::getCountComponent('log', $this->_contactId),
-         'markup' => $smarty->fetch('CRM/common/contactFooter.tpl'),
+          'count' => CRM_Contact_BAO_Contact::getCountComponent('log', $this->_contactId),
+          'markup' => $smarty->fetch('CRM/common/contactFooter.tpl'),
         ),
       ),
       $this->ajaxResponse,

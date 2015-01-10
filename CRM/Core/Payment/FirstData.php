@@ -15,20 +15,20 @@
 */
 
 /**
- Note that in order to use FirstData / LinkPoint you need a certificate (.pem) file issued by them
- and a store number. You can configure the path to the certificate and the store number
- through the front end of civiCRM. The path is as seen by the server not the url
- -----------------------------------------------------------------------------------------------
- The basic functionality of this processor is that variables from the $params object are transformed
- into xml using a function provided by the processor. The xml is submitted to the processor's https site
- using curl and the response is translated back into an array using the processor's function.
-
- If an array ($params) is returned to the calling function it is treated as a success and the values from
- the array are merged into the calling functions array.
-
- If an result of class error is returned it is treated as a failure
-
- -----------------------------------------------------------------------------------------------
+ * Note that in order to use FirstData / LinkPoint you need a certificate (.pem) file issued by them
+ * and a store number. You can configure the path to the certificate and the store number
+ * through the front end of civiCRM. The path is as seen by the server not the url
+ * -----------------------------------------------------------------------------------------------
+ * The basic functionality of this processor is that variables from the $params object are transformed
+ * into xml using a function provided by the processor. The xml is submitted to the processor's https site
+ * using curl and the response is translated back into an array using the processor's function.
+ *
+ * If an array ($params) is returned to the calling function it is treated as a success and the values from
+ * the array are merged into the calling functions array.
+ *
+ * If an result of class error is returned it is treated as a failure
+ *
+ * -----------------------------------------------------------------------------------------------
  **/
 
 /**

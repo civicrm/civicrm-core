@@ -131,6 +131,7 @@ class api_v3_APITest extends CiviUnitTestCase {
       $this->assertEquals($expected, $actual, sprintf('input=%s expected=%s actual=%s', $input, $expected, $actual));
     }
   }
+
   /**
    * Test that calling via wrapper works
    */

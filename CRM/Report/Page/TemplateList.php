@@ -85,8 +85,8 @@ LEFT  JOIN civicrm_component comp
     }
     $sql .= " ORDER BY  v.weight ";
 
-    $dao    = CRM_Core_DAO::executeQuery($sql);
-    $rows   = array();
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $rows = array();
     $config = CRM_Core_Config::singleton();
     while ($dao->fetch()) {
       if ($dao->component_name != 'Contact' && $dao->component_name != $dao->grouping &&

@@ -185,10 +185,10 @@ class CRM_Utils_REST {
    * @return string
    */
   public static function jsonFormated($json) {
-    $tabcount   = 0;
-    $result     = '';
-    $inquote    = FALSE;
-    $inarray    = FALSE;
+    $tabcount = 0;
+    $result = '';
+    $inquote = FALSE;
+    $inarray = FALSE;
     $ignorenext = FALSE;
 
     $tab = "\t";
@@ -417,7 +417,7 @@ class CRM_Utils_REST {
       'action' => 1,
     );
 
-    if (array_key_exists('json', $requestParams) &&  $requestParams['json'][0] == "{") {
+    if (array_key_exists('json', $requestParams) && $requestParams['json'][0] == "{") {
       $params = json_decode($requestParams['json'], TRUE);
       if ($params === NULL) {
         CRM_Utils_JSON::output(array('is_error' => 1, 'error_message', 'Unable to decode supplied JSON.'));
@@ -470,7 +470,7 @@ class CRM_Utils_REST {
   }
 
   /** used to load a template "inline", eg. for ajax, without having to build a menu for each template */
-  static  function loadTemplate () {
+  static function loadTemplate() {
     $request = CRM_Utils_Request::retrieve('q', 'String');
     if (FALSE !== strpos($request, '..')) {
       die ("SECURITY FATAL: the url can't contain '..'. Please report the issue on the forum at civicrm.org");
@@ -499,12 +499,13 @@ class CRM_Utils_REST {
     unset($param['q']);
     $smarty->assign_by_ref("request", $param);
 
-    if  (! array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
-      $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest" ) {
+    if (!array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
+      $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest"
+    ) {
 
       $smarty->assign('tplFile', $tpl);
       $config = CRM_Core_Config::singleton();
-      $content = $smarty->fetch('CRM/common/'. strtolower($config->userFramework) .'.tpl');
+      $content = $smarty->fetch('CRM/common/' . strtolower($config->userFramework) . '.tpl');
 
       if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
         CRM_Utils_System::addHTMLHead($region->render(''));
@@ -533,7 +534,8 @@ class CRM_Utils_REST {
     // Why is $config undefined -- $config = CRM_Core_Config::singleton();
     if (!$config->debug && (!array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
         $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest"
-      )) {
+      )
+    ) {
       $error = civicrm_api3_create_error("SECURITY ALERT: Ajax requests can only be issued by javascript clients, eg. CRM.api3().",
         array(
           'IP' => $_SERVER['REMOTE_ADDR'],
@@ -556,7 +558,11 @@ class CRM_Utils_REST {
     $entity = CRM_Utils_String::munge(CRM_Utils_Array::value('entity', $requestParams));
     $action = CRM_Utils_String::munge(CRM_Utils_Array::value('action', $requestParams));
     if (!is_array($params)) {
-      CRM_Utils_JSON::output(array('is_error' => 1, 'error_message', 'invalid json format: ?{"param_with_double_quote":"value"}'));
+      CRM_Utils_JSON::output(array(
+          'is_error' => 1,
+          'error_message',
+          'invalid json format: ?{"param_with_double_quote":"value"}'
+        ));
     }
 
     $params['check_permissions'] = TRUE;
@@ -685,8 +691,8 @@ class CRM_Utils_REST {
 
     $uid = NULL;
     if (!$uid) {
-      $store      = NULL;
-      $api_key    = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
+      $store = NULL;
+      $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
       if (empty($api_key)) {
         return self::error("FATAL: mandatory param 'api_key' (user key) missing");
       }

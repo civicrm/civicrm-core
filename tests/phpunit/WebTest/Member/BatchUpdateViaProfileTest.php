@@ -46,8 +46,8 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
 
     // Add new individual using Quick Add block on the main page
     $firstName1 = "John_" . substr(sha1(rand()), 0, 7);
-    $lastName   = "Smith_" . substr(sha1(rand()), 0, 7);
-    $Name1      = $lastName . ', ' . $firstName1;
+    $lastName = "Smith_" . substr(sha1(rand()), 0, 7);
+    $Name1 = $lastName . ', ' . $firstName1;
     $this->webtestAddContact($firstName1, $lastName, "$firstName1.$lastName@example.com");
 
     // Add membership for this individual
@@ -203,7 +203,11 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
     $gid = $this->urlArg('gid');
 
-    $this->openCiviPage('admin/uf/group/field/add', array('action' => 'add', 'reset' => 1, 'gid' => $gid), 'field_name[0]');
+    $this->openCiviPage('admin/uf/group/field/add', array(
+        'action' => 'add',
+        'reset' => 1,
+        'gid' => $gid
+      ), 'field_name[0]');
 
     $this->select('field_name[0]', "value=Membership");
     $this->select('field_name[1]', "label={$customDataParams[0]} :: {$customDataParams[1]}");

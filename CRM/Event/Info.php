@@ -86,7 +86,8 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getUserDashboardElement() {
-    return array('name' => ts('Events'),
+    return array(
+      'name' => ts('Events'),
       'title' => ts('Your Event(s)'),
       'perm' => array('register for events'),
       'weight' => 20,
@@ -98,7 +99,8 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function registerTab() {
-    return array('title' => ts('Events'),
+    return array(
+      'title' => ts('Events'),
       'id' => 'participant',
       'url' => 'participant',
       'weight' => 40,
@@ -110,7 +112,8 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function registerAdvancedSearchPane() {
-    return array('title' => ts('Events'),
+    return array(
+      'title' => ts('Events'),
       'weight' => 40,
     );
   }
@@ -121,7 +124,8 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
    */
   public function getActivityTypes() {
     $types = array();
-    $types['Event'] = array('title' => ts('Event'),
+    $types['Event'] = array(
+      'title' => ts('Event'),
       'callback' => 'CRM_Event_Page_EventInfo::run()',
     );
     return $types;

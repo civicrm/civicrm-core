@@ -26,7 +26,6 @@
 */
 
 
-
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/Event.php';
@@ -71,10 +70,10 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     );
 
     $params = array_merge($params, array(
-        'id' => $participant->id,
-        'role_id' => 2,
-        'status_id' => 3,
-      ));
+      'id' => $participant->id,
+      'role_id' => 2,
+      'status_id' => 3,
+    ));
 
     // Participant Edited
     $updatedParticipant = CRM_Event_BAO_Participant::add($params);
@@ -138,8 +137,8 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
    * GetValues() method (checking for behavior when params are empty )
    */
   public function testgetValuesWithoutValidParams() {
-    $params           = $values = $ids = array();
-    $participantId    = Participant::create($this->_contactId, $this->_eventId);
+    $params = $values = $ids = array();
+    $participantId = Participant::create($this->_contactId, $this->_eventId);
     $fetchParticipant = CRM_Event_BAO_Participant::getValues($params, $values, $ids);
     $this->assertNull($fetchParticipant, 'In line ' . __LINE__);
 
@@ -290,10 +289,10 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
 
     $params = array_merge($params, array(
       'id' => $participant->id,
-        'role_id' => 2,
-        'status_id' => 3,
-        'note' => 'Test Event in edit mode is running successfully ....',
-      ));
+      'role_id' => 2,
+      'status_id' => 3,
+      'note' => 'Test Event in edit mode is running successfully ....',
+    ));
 
     $participant = CRM_Event_BAO_Participant::create($params);
 
@@ -404,7 +403,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     );
 
     $values = array();
-    $ids    = array();
+    $ids = array();
     $params = array('id' => $participant->id);
 
     CRM_Event_BAO_Participant::getValues($params, $values, $ids);

@@ -57,38 +57,38 @@
 */
 
 /**
- -----------------------------------------------------------------------------------------------
- From the eWAY supplied 'Web.config' dated 25-Sep-2006 - check date and update links if required
- -----------------------------------------------------------------------------------------------
-
- LIVE gateway with CVN
- https://www.eway.com.au/gateway_cvn/xmlpayment.asp
-
- LIVE gateway without CVN
- https://www.eway.com.au/gateway/xmlpayment.asp
-
-
- Test gateway with CVN
- https://www.eway.com.au/gateway_cvn/xmltest/TestPage.asp
-
- Test gateway without CVN
- https://www.eway.com.au/gateway/xmltest/TestPage.asp
-
-
- LIVE gateway for Stored Transactions
- https://www.eway.com.au/gateway/xmlstored.asp
-
-
- -----------------------------------------------------------------------------------------------
- From the eWAY web-site - http://www.eway.com.au/Support/Developer/PaymentsRealTime.aspx
- -----------------------------------------------------------------------------------------------
- The test Customer ID is 87654321 - this is the only ID that will work on the test gateway.
- The test Credit Card number is 4444333322221111
- - this is the only credit card number that will work on the test gateway.
- The test Total Amount should end in 00 or 08 to get a successful response (e.g. $10.00 or $10.08)
- ie - all other amounts will return a failed response.
-
- -----------------------------------------------------------------------------------------------
+ * -----------------------------------------------------------------------------------------------
+ * From the eWAY supplied 'Web.config' dated 25-Sep-2006 - check date and update links if required
+ * -----------------------------------------------------------------------------------------------
+ *
+ * LIVE gateway with CVN
+ * https://www.eway.com.au/gateway_cvn/xmlpayment.asp
+ *
+ * LIVE gateway without CVN
+ * https://www.eway.com.au/gateway/xmlpayment.asp
+ *
+ *
+ * Test gateway with CVN
+ * https://www.eway.com.au/gateway_cvn/xmltest/TestPage.asp
+ *
+ * Test gateway without CVN
+ * https://www.eway.com.au/gateway/xmltest/TestPage.asp
+ *
+ *
+ * LIVE gateway for Stored Transactions
+ * https://www.eway.com.au/gateway/xmlstored.asp
+ *
+ *
+ * -----------------------------------------------------------------------------------------------
+ * From the eWAY web-site - http://www.eway.com.au/Support/Developer/PaymentsRealTime.aspx
+ * -----------------------------------------------------------------------------------------------
+ * The test Customer ID is 87654321 - this is the only ID that will work on the test gateway.
+ * The test Credit Card number is 4444333322221111
+ * - this is the only credit card number that will work on the test gateway.
+ * The test Total Amount should end in 00 or 08 to get a successful response (e.g. $10.00 or $10.08)
+ * ie - all other amounts will return a failed response.
+ *
+ * -----------------------------------------------------------------------------------------------
  **/
 class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   # (not used, implicit in the API, might need to convert?)
@@ -170,7 +170,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     // Prepare some composite data from _paymentProcessor fields
     //-------------------------------------------------------------
     $fullAddress = $params['street_address'] . ", " . $params['city'] . ", " . $params['state_province'] . ".";
-    $expireYear  = substr($params['year'], 2, 2);
+    $expireYear = substr($params['year'], 2, 2);
     $expireMonth = sprintf('%02d', (int) $params['month']);
     // CiviCRM V1.9 - Picks up reasonable description
     //$description = $params['amount_level'];
@@ -539,12 +539,12 @@ The CiviCRM eWAY Payment Processor Module
     $params = array();
 
     $params['groupName'] = 'eWay Email Sender';
-    $params['from']      = $from;
-    $params['toName']    = $toName;
-    $params['toEmail']   = $toEmail;
-    $params['subject']   = $subject;
-    $params['cc']        = $cc;
-    $params['text']      = $message;
+    $params['from'] = $from;
+    $params['toName'] = $toName;
+    $params['toEmail'] = $toEmail;
+    $params['subject'] = $subject;
+    $params['cc'] = $cc;
+    $params['text'] = $message;
 
     CRM_Utils_Mail::send($params);
   }

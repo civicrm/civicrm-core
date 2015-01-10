@@ -41,7 +41,8 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
   /**
    * This is a contructor of the class.
    */
-  public function __construct() {}
+  public function __construct() {
+  }
 
   /**
    * Function is used to format the individual contact values
@@ -67,13 +68,13 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       }
     }
 
-    $sortName   = $displayName = '';
-    $firstName  = CRM_Utils_Array::value('first_name', $params, '');
+    $sortName = $displayName = '';
+    $firstName = CRM_Utils_Array::value('first_name', $params, '');
     $middleName = CRM_Utils_Array::value('middle_name', $params, '');
-    $lastName   = CRM_Utils_Array::value('last_name', $params, '');
-    $nickName   = CRM_Utils_Array::value('nick_name', $params, '');
-    $prefix_id  = CRM_Utils_Array::value('prefix_id', $params, '');
-    $suffix_id  = CRM_Utils_Array::value('suffix_id', $params, '');
+    $lastName = CRM_Utils_Array::value('last_name', $params, '');
+    $nickName = CRM_Utils_Array::value('nick_name', $params, '');
+    $prefix_id = CRM_Utils_Array::value('prefix_id', $params, '');
+    $suffix_id = CRM_Utils_Array::value('suffix_id', $params, '');
     $formalTitle = CRM_Utils_Array::value('formal_title', $params, '');
 
     // get prefix and suffix names
@@ -126,12 +127,12 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
 
         foreach (array('last', 'middle', 'first', 'nick') as $name) {
           $phpName = "{$name}Name";
-          $dbName  = "{$name}_name";
-          $value   = $individual->$dbName;
+          $dbName = "{$name}_name";
+          $value = $individual->$dbName;
           if (in_array($name, $useDBNames)) {
-            $params[$dbName]  = $value;
+            $params[$dbName] = $value;
             $contact->$dbName = $value;
-            $$phpName         = $value;
+            $$phpName = $value;
           }
           elseif (array_key_exists($dbName, $params)) {
             $$phpName = $params[$dbName];
@@ -142,7 +143,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         }
 
         foreach (array('prefix', 'suffix') as $name) {
-          $dbName  = "{$name}_id";
+          $dbName = "{$name}_id";
 
           $value = $individual->$dbName;
           if (in_array($name, $useDBNames)) {
@@ -168,8 +169,8 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
 
         if (in_array('formal_title', $useDBNames)) {
           $params['formal_title'] = $individual->formal_title;
-          $contact->formal_title  = $individual->formal_title;
-          $formalTitle            = $individual->formal_title;
+          $contact->formal_title = $individual->formal_title;
+          $formalTitle = $individual->formal_title;
         }
         elseif (array_key_exists('formal_title', $params)) {
           $formalTitle = $params['formal_title'];
@@ -273,7 +274,9 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     $format = CRM_Utils_Date::getDateFormat('birth');
     if ($date = CRM_Utils_Array::value('birth_date', $params)) {
       if (in_array($format, array(
-        'dd-mm', 'mm/dd'))) {
+        'dd-mm',
+        'mm/dd'
+      ))) {
         $separator = '/';
         if ($format == 'dd-mm') {
           $separator = '-';
@@ -281,15 +284,18 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         $date = $date . $separator . '1902';
       }
       elseif (in_array($format, array(
-        'yy-mm'))) {
+        'yy-mm'
+      ))) {
         $date = $date . '-01';
       }
       elseif (in_array($format, array(
-        'M yy'))) {
+        'M yy'
+      ))) {
         $date = $date . '-01';
       }
       elseif (in_array($format, array(
-        'yy'))) {
+        'yy'
+      ))) {
         $date = $date . '-01-01';
       }
       $contact->birth_date = CRM_Utils_Date::processDate($date);
@@ -300,7 +306,9 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
 
     if ($date = CRM_Utils_Array::value('deceased_date', $params)) {
       if (in_array($format, array(
-        'dd-mm', 'mm/dd'))) {
+        'dd-mm',
+        'mm/dd'
+      ))) {
         $separator = '/';
         if ($format == 'dd-mm') {
           $separator = '-';
@@ -308,15 +316,18 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         $date = $date . $separator . '1902';
       }
       elseif (in_array($format, array(
-        'yy-mm'))) {
+        'yy-mm'
+      ))) {
         $date = $date . '-01';
       }
       elseif (in_array($format, array(
-        'M yy'))) {
+        'M yy'
+      ))) {
         $date = $date . '-01';
       }
       elseif (in_array($format, array(
-        'yy'))) {
+        'yy'
+      ))) {
         $date = $date . '-01-01';
       }
 
@@ -364,8 +375,8 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     }
 
     // query for the affected individuals
-    $fieldValue          = CRM_Utils_Type::escape($fieldValue, 'Integer');
-    $contact             = new CRM_Contact_BAO_Contact();
+    $fieldValue = CRM_Utils_Type::escape($fieldValue, 'Integer');
+    $contact = new CRM_Contact_BAO_Contact();
     $contact->$fieldName = $fieldValue;
     $contact->find();
 

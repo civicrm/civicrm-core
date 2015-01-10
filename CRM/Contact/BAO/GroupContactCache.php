@@ -119,7 +119,7 @@ AND     ( g.cache_date IS NULL OR
    * Check to see if we have cache entries for this group
    * if not, regenerate, else return
    *
-   * @param int/array $groupID groupID of group that we are checking against
+   * @param int /array $groupID groupID of group that we are checking against
    *                           if empty, all groups are checked
    * @param int $limit
    *   Limits the number of groups we evaluate.
@@ -177,7 +177,7 @@ AND     ( g.cache_date IS NULL OR
 
     if (!empty($refreshGroupIDs)) {
       $refreshGroupIDString = CRM_Core_DAO::escapeString(implode(', ', $refreshGroupIDs));
-      $time  = CRM_Utils_Date::getUTCTime(self::smartGroupCacheTimeout() * 60);
+      $time = CRM_Utils_Date::getUTCTime(self::smartGroupCacheTimeout() * 60);
       $query = "
 UPDATE civicrm_group g
 SET    g.refresh_date = $time
@@ -237,9 +237,9 @@ AND    g.refresh_date IS NULL
     // to avoid long strings, lets do BULK_INSERT_COUNT values at a time
     while (!empty($values)) {
       $processed = TRUE;
-      $input     = array_splice($values, 0, CRM_Core_DAO::BULK_INSERT_COUNT);
-      $str       = implode(',', $input);
-      $sql       = "INSERT IGNORE INTO civicrm_group_contact_cache (group_id,contact_id) VALUES $str;";
+      $input = array_splice($values, 0, CRM_Core_DAO::BULK_INSERT_COUNT);
+      $str = implode(',', $input);
+      $sql = "INSERT IGNORE INTO civicrm_group_contact_cache (group_id,contact_id) VALUES $str;";
       CRM_Core_DAO::executeQuery($sql);
     }
     self::updateCacheTime($groupID, $processed);
@@ -257,11 +257,11 @@ AND    g.refresh_date IS NULL
     if ($processed) {
       // also update the group with cache date information
       //make sure to give original timezone settings again.
-      $now     = CRM_Utils_Date::getUTCTime();
+      $now = CRM_Utils_Date::getUTCTime();
       $refresh = 'null';
     }
     else {
-      $now     = 'null';
+      $now = 'null';
       $refresh = 'null';
     }
 
@@ -319,10 +319,10 @@ WHERE  id IN ( $groupIDs )
     }
 
     $refresh = NULL;
-    $params  = array();
+    $params = array();
     $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
 
-    $now         = CRM_Utils_Date::getUTCTime();
+    $now = CRM_Utils_Date::getUTCTime();
     $refreshTime = CRM_Utils_Date::getUTCTime($smartGroupCacheTimeout * 60);
 
     if (!isset($groupID)) {
@@ -459,8 +459,8 @@ WHERE  id = %1
       return;
     }
 
-    $sql         = NULL;
-    $idName      = 'id';
+    $sql = NULL;
+    $idName = 'id';
     $customClass = NULL;
     if ($savedSearchID) {
       $ssParams = CRM_Contact_BAO_SavedSearch::getSearchParams($savedSearchID);
@@ -501,18 +501,18 @@ WHERE  id = %1
             FALSE,
             CRM_Utils_Array::value('display_relationship_type', $formValues),
             CRM_Utils_Array::value('operator', $formValues, 'AND')
-        );
+          );
         $query->_useDistinct = FALSE;
-        $query->_useGroupBy  = FALSE;
-        $searchSQL           =
+        $query->_useGroupBy = FALSE;
+        $searchSQL =
           $query->searchQuery(
             0, 0, NULL,
-          FALSE, FALSE,
-          FALSE, TRUE,
-          TRUE,
-          NULL, NULL, NULL,
-          TRUE
-        );
+            FALSE, FALSE,
+            FALSE, TRUE,
+            TRUE,
+            NULL, NULL, NULL,
+            TRUE
+          );
       }
       $groupID = CRM_Utils_Type::escape($groupID, 'Integer');
       $sql = $searchSQL . " AND contact_a.id NOT IN (
@@ -536,7 +536,7 @@ WHERE  civicrm_group_contact.status = 'Added'
     $groupIDs = array($groupID);
     self::remove($groupIDs);
     $processed = FALSE;
-    $tempTable = 'civicrm_temp_group_contact_cache' . rand(0,2000);
+    $tempTable = 'civicrm_temp_group_contact_cache' . rand(0, 2000);
     foreach (array($sql, $sqlB) as $selectSql) {
       if (!$selectSql) {
         continue;
@@ -595,7 +595,8 @@ AND  civicrm_group_contact.group_id = $groupID ";
     if (
       isset($config->smartGroupCacheTimeout) &&
       is_numeric($config->smartGroupCacheTimeout) &&
-      $config->smartGroupCacheTimeout > 0) {
+      $config->smartGroupCacheTimeout > 0
+    ) {
       return $config->smartGroupCacheTimeout;
     }
 

@@ -122,7 +122,7 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
 
     $rows = array(
       array(
-    'first_name' => $firstName1,
+        'first_name' => $firstName1,
         'last_name' => 'Anderson',
         "custom_{$customDataParams[0]}" => 'This is a test field',
       ),

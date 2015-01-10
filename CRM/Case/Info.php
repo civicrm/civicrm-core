@@ -153,7 +153,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    */
   public function registerTab() {
     return array(
-    'title' => ts('Cases'),
+      'title' => ts('Cases'),
       'url' => 'case',
       'weight' => 50,
     );
@@ -165,7 +165,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    */
   public function registerAdvancedSearchPane() {
     return array(
-    'title' => ts('Cases'),
+      'title' => ts('Cases'),
       'weight' => 50,
     );
   }
@@ -193,11 +193,12 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       if ($atype) {
         $shortCuts = array_merge($shortCuts, array(
           array(
-        'path' => 'civicrm/case/add',
-              'query' => "reset=1&action=add&atype=$atype&context=standalone",
-              'ref' => 'new-case',
-              'title' => ts('Case'),
-            )));
+            'path' => 'civicrm/case/add',
+            'query' => "reset=1&action=add&atype=$atype&context=standalone",
+            'ref' => 'new-case',
+            'title' => ts('Case'),
+          )
+        ));
       }
     }
   }

@@ -327,9 +327,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description);
 
     $check = $this->callAPISuccess($this->_entity, 'get', array(
-        'return.custom_' . $ids['custom_field_id'] => 1,
-        'id' => $result['id'],
-      ));
+      'return.custom_' . $ids['custom_field_id'] => 1,
+      'id' => $result['id'],
+    ));
     $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']]);
 
     $this->customFieldDelete($ids['custom_field_id']);
@@ -426,11 +426,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testGetDeceasedRetrieved() {
     $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $c2 = $this->callAPISuccess($this->_entity, 'create', array(
-        'first_name' => 'bb',
-        'last_name' => 'ccc',
-        'contact_type' => 'Individual',
-        'is_deceased' => 1,
-      ));
+      'first_name' => 'bb',
+      'last_name' => 'ccc',
+      'contact_type' => 'Individual',
+      'is_deceased' => 1,
+    ));
     $result = $this->callAPISuccess($this->_entity, 'get', array('is_deceased' => 0));
     $this->assertFalse(array_key_exists($c2['id'], $result['values']));
   }
@@ -441,10 +441,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testGetSort() {
     $c1 = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $c2 = $this->callAPISuccess($this->_entity, 'create', array(
-        'first_name' => 'bb',
-        'last_name' => 'ccc',
-        'contact_type' => 'Individual',
-      ));
+      'first_name' => 'bb',
+      'last_name' => 'ccc',
+      'contact_type' => 'Individual',
+    ));
     $result = $this->callAPISuccess($this->_entity, 'get', array(
       'sort' => 'first_name ASC',
       'return.first_name' => 1,
@@ -472,15 +472,15 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testGetINIDArray() {
     $c1 = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $c2 = $this->callAPISuccess($this->_entity, 'create', array(
-        'first_name' => 'bb',
-        'last_name' => 'ccc',
-        'contact_type' => 'Individual',
-      ));
+      'first_name' => 'bb',
+      'last_name' => 'ccc',
+      'contact_type' => 'Individual',
+    ));
     $c3 = $this->callAPISuccess($this->_entity, 'create', array(
-        'first_name' => 'hh',
-        'last_name' => 'll',
-        'contact_type' => 'Individual',
-      ));
+      'first_name' => 'hh',
+      'last_name' => 'll',
+      'contact_type' => 'Individual',
+    ));
     $result = $this->callAPISuccess($this->_entity, 'get', array('id' => array('IN' => array($c1['id'], $c3['id']))));
     $this->assertEquals(2, $result['count']);
     $this->assertEquals(array($c1['id'], $c3['id']), array_keys($result['values']));
@@ -524,10 +524,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testGetSortNewSYntax() {
     $c1 = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $c2 = $this->callAPISuccess($this->_entity, 'create', array(
-        'first_name' => 'bb',
-        'last_name' => 'ccc',
-        'contact_type' => 'Individual',
-      ));
+      'first_name' => 'bb',
+      'last_name' => 'ccc',
+      'contact_type' => 'Individual',
+    ));
     $result = $this->callAPISuccess($this->_entity, 'getvalue', array(
       'return' => 'first_name',
       'options' => array(
@@ -579,9 +579,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'create', $params);
 
     $check = $this->callAPIAndDocument($this->_entity, 'get', array(
-        'return.custom_' . $ids['custom_field_id'] => 1,
-        'id' => $result['id'],
-      ), __FUNCTION__, __FILE__, $description, $subfile);
+      'return.custom_' . $ids['custom_field_id'] => 1,
+      'id' => $result['id'],
+    ), __FUNCTION__, __FILE__, $description, $subfile);
 
     $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']]);
     $fields = ($this->callAPISuccess('contact', 'getfields', $params));
@@ -618,15 +618,15 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testGetReturnAddressName() {
     $contactID = $this->individualCreate();
     $this->callAPISuccess('address', 'create', array(
-        'contact_id' => $contactID,
-        'address_name' => 'My house',
-        'location_type_id' => 'Home',
-        'street_address' => '1 my road',
-      ));
+      'contact_id' => $contactID,
+      'address_name' => 'My house',
+      'location_type_id' => 'Home',
+      'street_address' => '1 my road',
+    ));
     $result = $this->callAPISuccessGetSingle('contact', array(
-        'return' => 'address_name, street_address',
-        'id' => $contactID,
-      ));
+      'return' => 'address_name, street_address',
+      'id' => $contactID,
+    ));
     $this->assertEquals('1 my road', $result['street_address']);
     $this->assertEquals('My house', $result['address_name']);
 
@@ -1257,15 +1257,15 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(date('Y-m-d', strtotime('first day of next month -20 years')), $result['values'][$contact3['id']]['birth_date']);
     $result = $this->callAPISuccess('contact', 'get', array(
-        'birth_date_low' => date('Y-m-d', strtotime('-6 years')),
-        'birth_date_high' => date('Y-m-d', strtotime('- 3 years')),
-      ));
+      'birth_date_low' => date('Y-m-d', strtotime('-6 years')),
+      'birth_date_high' => date('Y-m-d', strtotime('- 3 years')),
+    ));
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(date('Y-m-d', strtotime('first day of next month -5 years')), $result['values'][$contact2['id']]['birth_date']);
     $result = $this->callAPISuccess('contact', 'get', array(
-        'birth_date_low' => '-6 years',
-        'birth_date_high' => '- 3 years',
-      ));
+      'birth_date_low' => '-6 years',
+      'birth_date_high' => '- 3 years',
+    ));
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(date('Y-m-d', strtotime('first day of next month -5 years')), $result['values'][$contact2['id']]['birth_date']);
   }
@@ -1288,9 +1288,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(date('Y-m-d', strtotime('first day of next month -20 years')), $result['values'][$contact3['id']]['deceased_date']);
     $result = $this->callAPISuccess('contact', 'get', array(
-        'deceased_date_low' => '-6 years',
-        'deceased_date_high' => date('Y-m-d', strtotime('- 3 years')),
-      ));
+      'deceased_date_low' => '-6 years',
+      'deceased_date_high' => date('Y-m-d', strtotime('- 3 years')),
+    ));
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(date('Y-m-d', strtotime('first day of next month -5 years')), $result['values'][$contact2['id']]['deceased_date']);
   }
@@ -1344,9 +1344,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     }
     //now we check they are still returned with 'return' key
     $result = $this->callAPISuccess('contact', 'getsingle', array(
-        'id' => $contactID,
-        'return' => array_keys($extraParams),
-      ));
+      'id' => $contactID,
+      'return' => array_keys($extraParams),
+    ));
     foreach ($extraParams as $key => $value) {
       $this->assertEquals($result[$key], $value);
     }
@@ -1531,9 +1531,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $params['custom_' . $ids['custom_field_id']] = "custom string";
     $moreids = $this->CustomGroupMultipleCreateWithFields();
     $andmoreids = $this->CustomGroupMultipleCreateWithFields(array(
-        'title' => "another group",
-        'name' => 'another name',
-      ));
+      'title' => "another group",
+      'name' => 'another name',
+    ));
     $description = "/*this demonstrates the usage of chained api functions. A variety of techniques are used";
     $subfile = "APIChainedArrayMultipleCustom";
     $params = array(
@@ -1933,10 +1933,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate();
     CRM_Core_Config::singleton()->defaultSearchProfileID = 1;
     $this->callAPISuccess('address', 'create', array(
-        'contact_id' => $contactID,
-        'city' => 'Cool City',
-        'location_type_id' => 1,
-      ));
+      'contact_id' => $contactID,
+      'city' => 'Cool City',
+      'location_type_id' => 1,
+    ));
     $result = $this->callAPISuccess('contact', 'get', array('city' => 'Cool City', 'return' => 'contact_type'));
     $this->assertEquals(1, $result['count']);
   }
@@ -1954,9 +1954,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(2, $result['count'], 'In line ' . __LINE__);
     // Force-exclude the deceased contact
     $result = $this->callAPISuccess('contact', 'getlist', array(
-        'input' => $name,
-        'params' => array('is_deceased' => 0),
-      ));
+      'input' => $name,
+      'params' => array('is_deceased' => 0),
+    ));
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertEquals($contact, $result['values'][0]['id'], 'In line ' . __LINE__);
   }

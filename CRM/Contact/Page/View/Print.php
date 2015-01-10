@@ -61,9 +61,9 @@ class CRM_Contact_Page_View_Print extends CRM_Contact_Page_View_Summary {
    * @return void
    */
   public function view() {
-    $params   = array();
+    $params = array();
     $defaults = array();
-    $ids      = array();
+    $ids = array();
 
     $params['id'] = $params['contact_id'] = $this->_contactId;
     $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults, $ids);

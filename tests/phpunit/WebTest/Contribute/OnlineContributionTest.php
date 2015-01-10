@@ -178,7 +178,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
 
   }
 
-  public function testOnlineContributionWithZeroAmount () {
+  public function testOnlineContributionWithZeroAmount() {
     $this->webtestLogin();
 
     // Use default payment processor

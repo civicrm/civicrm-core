@@ -19,7 +19,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
     $loaded = TRUE;
 
     CRM_Core_Resources::singleton()
-      ->addSettingsFactory(function() {
+      ->addSettingsFactory(function () {
         return array(
           'PseudoConstant' => array(
             'locationType' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'),
@@ -210,7 +210,8 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
         case 'Household':
           if ($field['field_type'] != $extends && $field['field_type'] != 'Contact'
             //CRM-15595 check if subtype
-            && !in_array($field['field_type'], CRM_Contact_BAO_ContactType::subTypes($extends))) {
+            && !in_array($field['field_type'], CRM_Contact_BAO_ContactType::subTypes($extends))
+          ) {
             continue 2;
           }
           break;

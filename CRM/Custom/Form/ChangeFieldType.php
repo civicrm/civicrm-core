@@ -85,8 +85,8 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
     $session->pushUserContext($url);
 
     CRM_Utils_System::setTitle(ts('Change Field Type: %1',
-        array(1 => $this->_values['label'])
-      ));
+      array(1 => $this->_values['label'])
+    ));
   }
 
   /**
@@ -112,7 +112,8 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
       'dst_html_type',
       ts('New HTML Type'),
       array(
-        '' => ts('- select -')) + $this->_htmlTypeTransitions,
+        '' => ts('- select -')
+      ) + $this->_htmlTypeTransitions,
       TRUE
     );
 
@@ -165,7 +166,11 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
     $customField->find(TRUE);
 
     if ($dstHtmlType == 'Text' && in_array($srcHtmlType, array(
-      'Select', 'Radio', 'Autocomplete-Select'))) {
+        'Select',
+        'Radio',
+        'Autocomplete-Select'
+      ))
+    ) {
       $customField->option_group_id = "NULL";
       CRM_Core_BAO_CustomField::checkOptionGroup($this->_values['option_group_id']);
     }
@@ -188,8 +193,8 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
     CRM_Core_BAO_Cache::deleteGroup('contact fields');
 
     CRM_Core_Session::setStatus(ts('Input type of custom field \'%1\' has been successfully changed to \'%2\'.',
-        array(1 => $this->_values['label'], 2 => $dstHtmlType)
-      ), ts('Field Type Changed'), 'success');
+      array(1 => $this->_values['label'], 2 => $dstHtmlType)
+    ), ts('Field Type Changed'), 'success');
   }
 
   /**
@@ -266,14 +271,14 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
   public function firstValueToFlatten($table, $column) {
     $selectSql = "SELECT id, $column FROM $table WHERE $column IS NOT NULL";
     $updateSql = "UPDATE $table SET $column = %1 WHERE id = %2";
-    $dao       = CRM_Core_DAO::executeQuery($selectSql);
+    $dao = CRM_Core_DAO::executeQuery($selectSql);
     while ($dao->fetch()) {
       if (!$dao->{$column}) {
         continue;
       }
       $value = CRM_Core_DAO::VALUE_SEPARATOR . $dao->{$column} . CRM_Core_DAO::VALUE_SEPARATOR;
       $params = array(
-      1 => array((string) $value, 'String'),
+        1 => array((string) $value, 'String'),
         2 => array($dao->id, 'Integer'),
       );
       CRM_Core_DAO::executeQuery($updateSql, $params);
@@ -287,11 +292,11 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
   public function flattenToFirstValue($table, $column) {
     $selectSql = "SELECT id, $column FROM $table WHERE $column IS NOT NULL";
     $updateSql = "UPDATE $table SET $column = %1 WHERE id = %2";
-    $dao       = CRM_Core_DAO::executeQuery($selectSql);
+    $dao = CRM_Core_DAO::executeQuery($selectSql);
     while ($dao->fetch()) {
       $values = self::explode($dao->{$column});
       $params = array(
-      1 => array((string) array_shift($values), 'String'),
+        1 => array((string) array_shift($values), 'String'),
         2 => array($dao->id, 'Integer'),
       );
       CRM_Core_DAO::executeQuery($updateSql, $params);

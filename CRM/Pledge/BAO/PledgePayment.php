@@ -638,11 +638,11 @@ WHERE  civicrm_pledge.id = %2
    */
   static function updatePledgePayments(
     $pledgeId,
-                                       $paymentStatusId,
-                                       $paymentIds = NULL,
-                                       $actualAmount = 0,
-                                       $contributionId = NULL,
-                                       $isScriptUpdate = FALSE
+    $paymentStatusId,
+    $paymentIds = NULL,
+    $actualAmount = 0,
+    $contributionId = NULL,
+    $isScriptUpdate = FALSE
   ) {
     $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $paymentClause = NULL;

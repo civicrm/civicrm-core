@@ -34,7 +34,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * @package CiviCRM_APIv3
  * @subpackage API_Contact
  */
-
 class api_v3_ImTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $params;
@@ -47,9 +46,9 @@ class api_v3_ImTest extends CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction(TRUE);
 
-    $this->_entity     = 'im';
-    $this->_contactID  = $this->organizationCreate();
-    $this->params  = array(
+    $this->_entity = 'im';
+    $this->_contactID = $this->organizationCreate();
+    $this->params = array(
       'contact_id' => $this->_contactID,
       'name' => 'My Yahoo IM Handle',
       'location_type_id' => 1,
@@ -79,6 +78,7 @@ class api_v3_ImTest extends CiviUnitTestCase {
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
+
   public function testDeleteImInvalid() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $deleteParams = array('id' => 600);

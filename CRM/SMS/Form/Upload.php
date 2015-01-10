@@ -125,7 +125,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
-    $config  = CRM_Core_Config::singleton();
+    $config = CRM_Core_Config::singleton();
     $options = array();
     $tempVar = FALSE;
 
@@ -170,7 +170,8 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     $this->addFormRule(array('CRM_SMS_Form_Upload', 'formRule'), $this);
 
     $buttons = array(
-      array('type' => 'back',
+      array(
+        'type' => 'back',
         'name' => ts('Previous'),
       ),
       array(
@@ -228,8 +229,10 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $params['contact_id'] = $session->get('userID');
     $composeFields = array(
-      'SMStemplate', 'SMSsaveTemplate',
-      'SMSupdateTemplate', 'SMSsaveTemplateName',
+      'SMStemplate',
+      'SMSsaveTemplate',
+      'SMSupdateTemplate',
+      'SMSsaveTemplateName',
     );
     $msgTemplate = NULL;
     //mail template is composed
@@ -314,7 +317,8 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     $mailing->find(TRUE);
 
     $session = CRM_Core_Session::singleton();
-    $values = array('contact_id' => $session->get('userID'),
+    $values = array(
+      'contact_id' => $session->get('userID'),
       'version' => 3,
     );
     require_once 'api/api.php';
@@ -386,10 +390,10 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       // be a suggestion from someone on how to
       // make it a bit more elegant
 
-      $dummy_mail        = new CRM_Mailing_BAO_Mailing();
-      $mess              = "body_text";
+      $dummy_mail = new CRM_Mailing_BAO_Mailing();
+      $mess = "body_text";
       $dummy_mail->$mess = $str;
-      $tokens            = $dummy_mail->getTokens();
+      $tokens = $dummy_mail->getTokens();
 
       $str = CRM_Utils_Token::replaceSubscribeInviteTokens($str);
       $str = CRM_Utils_Token::replaceDomainTokens($str, $domain, NULL, $tokens['text']);
@@ -411,7 +415,8 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       }
       if (!empty($dataErrors)) {
         $errors['textFile'] = ts('The following errors were detected in %1:', array(
-          1 => $name)) . ' <ul>' . implode('', $dataErrors) . '</ul>';
+            1 => $name
+          )) . ' <ul>' . implode('', $dataErrors) . '</ul>';
       }
     }
 

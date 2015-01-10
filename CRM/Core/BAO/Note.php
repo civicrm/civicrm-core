@@ -257,8 +257,8 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
     if (empty($params)) {
       return NULL;
     }
-    $note               = new CRM_Core_BAO_Note();
-    $note->entity_id    = $params['contact_id'];
+    $note = new CRM_Core_BAO_Note();
+    $note->entity_id = $params['contact_id'];
     $note->entity_table = 'civicrm_contact';
 
     // get the total count of notes
@@ -299,9 +299,9 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @static
    */
   public static function del($id, $showStatus = TRUE) {
-    $return   = NULL;
-    $recent   = array($id);
-    $note     = new CRM_Core_DAO_Note();
+    $return = NULL;
+    $recent = array($id);
+    $note = new CRM_Core_DAO_Note();
     $note->id = $id;
     $note->find();
     $note->fetch();
@@ -350,9 +350,9 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    */
   public static function deleteContact($id) {
     // need to delete for both entity_id
-    $dao               = new CRM_Core_DAO_Note();
+    $dao = new CRM_Core_DAO_Note();
     $dao->entity_table = 'civicrm_contact';
-    $dao->entity_id    = $id;
+    $dao->entity_id = $id;
     $dao->delete();
 
     // and the creator contact id
@@ -407,8 +407,8 @@ ORDER BY  modified_date desc";
    * @static
    */
   public static function getContactNoteCount($contactID) {
-    $note               = new CRM_Core_DAO_Note();
-    $note->entity_id    = $contactID;
+    $note = new CRM_Core_DAO_Note();
+    $note->entity_id = $contactID;
     $note->entity_table = 'civicrm_contact';
     $note->find();
     $count = 0;
@@ -451,9 +451,9 @@ ORDER BY  modified_date desc";
    * @static
    */
   public static function getChildCount($id) {
-    $note               = new CRM_Core_DAO_Note();
+    $note = new CRM_Core_DAO_Note();
     $note->entity_table = 'civicrm_note';
-    $note->entity_id    = $id;
+    $note->entity_id = $id;
     $note->find();
     $count = 0;
     while ($note->fetch()) {
@@ -488,9 +488,9 @@ ORDER BY  modified_date desc";
     }
 
     // get direct children of given parentId note
-    $note               = new CRM_Core_DAO_Note();
+    $note = new CRM_Core_DAO_Note();
     $note->entity_table = 'civicrm_note';
-    $note->entity_id    = $parentId;
+    $note->entity_id = $parentId;
     $note->orderBy('modified_date asc');
     $note->find();
     while ($note->fetch()) {
@@ -499,7 +499,7 @@ ORDER BY  modified_date desc";
         CRM_Core_DAO::storeValues($note, $tree[$note->id]);
 
         // get name of user that created this note
-        $contact     = new CRM_Contact_DAO_Contact();
+        $contact = new CRM_Contact_DAO_Contact();
         $createdById = $note->contact_id;
         $contact->id = $createdById;
         $contact->find();
@@ -548,9 +548,9 @@ ORDER BY  modified_date desc";
    */
   public static function getDescendentIds($parentId, &$ids = array()) {
     // get direct children of given parentId note
-    $note               = new CRM_Core_DAO_Note();
+    $note = new CRM_Core_DAO_Note();
     $note->entity_table = 'civicrm_note';
-    $note->entity_id    = $parentId;
+    $note->entity_id = $parentId;
     $note->find();
     while ($note->fetch()) {
       // foreach child, add to ids list, and recurse

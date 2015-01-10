@@ -29,7 +29,6 @@ class CRM_Core_Reference_Dynamic extends CRM_Core_Reference_Basic {
 
     $params = array(
       1 => array($targetDao->$targetColumn, 'String'),
-
       // If anyone complains about $targetDao::getTableName(), then could use
       // "{get_class($targetDao)}::getTableName();"
       2 => array($targetDao::getTableName(), 'String'),
@@ -56,7 +55,6 @@ EOS;
     $targetColumn = $this->getTargetKey();
     $params = array(
       1 => array($targetDao->$targetColumn, 'String'),
-
       // If anyone complains about $targetDao::getTableName(), then could use
       // "{get_class($targetDao)}::getTableName();"
       2 => array($targetDao::getTableName(), 'String'),

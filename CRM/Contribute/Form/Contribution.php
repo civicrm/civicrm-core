@@ -189,7 +189,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *
    * @var array
    */
-   public $_paymentFields = array();
+  public $_paymentFields = array();
   /**
    * Logged in user's email
    * @var string
@@ -222,6 +222,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @var string
    */
   public $userDisplayName;
+
   /**
    * Set variables up before form is built
    *
@@ -497,7 +498,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // build price set form.
     $buildPriceSet = FALSE;
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $this->assign('invoicing', $invoicing);
 
@@ -660,7 +661,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('entityID', $this->_id);
 
     if ($this->_context == 'standalone') {
-      $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE, 'api' => array('extra' => array('email'))), TRUE);
+      $this->addEntityRef('contact_id', ts('Contact'), array(
+          'create' => TRUE,
+          'api' => array('extra' => array('email'))
+        ), TRUE);
     }
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
@@ -732,10 +736,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           unset($status[CRM_Utils_Array::key('Pending', $statusName)]);
           unset($status[CRM_Utils_Array::key('Failed', $statusName)]);
           break;
+
         case 'Pending':
         case 'In Progress':
           unset($status[CRM_Utils_Array::key('Refunded', $statusName)]);
           break;
+
         case 'Failed':
           foreach (array(
                      'Pending',
@@ -970,7 +976,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     //FIXME FOR NEW DATA FLOW http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+4.3+Data+Flow
-     if (!empty($fields['fee_amount']) && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($fields['financial_type_id'])) {
+    if (!empty($fields['fee_amount']) && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($fields['financial_type_id'])) {
       $errors['financial_type_id'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for Financial Type : ") . $financialType;
     }
 
@@ -979,7 +985,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $queryParams = array(1 => array($fields['trxn_id'], 'String'));
       $query = 'select count(*) from civicrm_contribution where trxn_id = %1';
       if ($self->_id) {
-        $queryParams[2] = array((int)$self->_id, 'Integer');
+        $queryParams[2] = array((int) $self->_id, 'Integer');
         $query .= ' and id !=%2';
       }
       $tCnt = CRM_Core_DAO::singleValueQuery($query, $queryParams);
@@ -1348,7 +1354,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // assign tax calculation for contribution receipts
       $taxRate = array();
       $getTaxDetails = FALSE;
-      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       if ($invoicing) {
         if ($this->_action & CRM_Core_Action::ADD) {
@@ -1447,7 +1453,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $updatePledgePaymentStatus = TRUE;
         }
         elseif ($this->_action & CRM_Core_Action::UPDATE && (($this->_defaults['contribution_status_id'] != $formValues['contribution_status_id']) ||
-          ($this->_defaults['total_amount'] != $formValues['total_amount']))
+            ($this->_defaults['total_amount'] != $formValues['total_amount']))
         ) {
           $updatePledgePaymentStatus = TRUE;
         }

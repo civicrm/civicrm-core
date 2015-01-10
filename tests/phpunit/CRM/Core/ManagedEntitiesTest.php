@@ -218,7 +218,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
     // Override 'getrefcount' ==> The refcount is 1
-    $this->adhocProvider->addAction('getrefcount', 'access CiviCRM', function($apiRequest) {
+    $this->adhocProvider->addAction('getrefcount', 'access CiviCRM', function ($apiRequest) {
       return civicrm_api3_create_success(array(
         array(
           'name' => 'mock',
@@ -238,7 +238,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $this->assertEquals($foo['id'], $foo2['id']);
 
     // Override 'getrefcount' ==> The refcount is 0
-    $this->adhocProvider->addAction('getrefcount', 'access CiviCRM', function($apiRequest) {
+    $this->adhocProvider->addAction('getrefcount', 'access CiviCRM', function ($apiRequest) {
       return civicrm_api3_create_success(array());
     });
 

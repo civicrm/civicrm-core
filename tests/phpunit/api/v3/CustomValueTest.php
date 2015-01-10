@@ -1,28 +1,28 @@
 <?php
 /**
- +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
-+--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2014                                |
-+--------------------------------------------------------------------+
-| This file is a part of CiviCRM.                                    |
-|                                                                    |
-| CiviCRM is free software; you can copy, modify, and distribute it  |
-| under the terms of the GNU Affero General Public License           |
-| Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-|                                                                    |
-| CiviCRM is distributed in the hope that it will be useful, but     |
-| WITHOUT ANY WARRANTY; without even the implied warranty of         |
-| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-| See the GNU Affero General Public License for more details.        |
-|                                                                    |
-| You should have received a copy of the GNU Affero General Public   |
-| License and the CiviCRM Licensing Exception along                  |
-| with this program; if not, contact CiviCRM LLC                     |
-| at info[AT]civicrm[DOT]org. If you have questions about the        |
-| GNU Affero General Public License or the licensing of CiviCRM,     |
-| see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-+--------------------------------------------------------------------+
+ * +--------------------------------------------------------------------+
+ * | CiviCRM version 4.6                                                |
+ * +--------------------------------------------------------------------+
+ * | Copyright CiviCRM LLC (c) 2004-2014                                |
+ * +--------------------------------------------------------------------+
+ * | This file is a part of CiviCRM.                                    |
+ * |                                                                    |
+ * | CiviCRM is free software; you can copy, modify, and distribute it  |
+ * | under the terms of the GNU Affero General Public License           |
+ * | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ * |                                                                    |
+ * | CiviCRM is distributed in the hope that it will be useful, but     |
+ * | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ * | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ * | See the GNU Affero General Public License for more details.        |
+ * |                                                                    |
+ * | You should have received a copy of the GNU Affero General Public   |
+ * | License and the CiviCRM Licensing Exception along                  |
+ * | with this program; if not, contact CiviCRM LLC                     |
+ * | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ * | GNU Affero General Public License or the licensing of CiviCRM,     |
+ * | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ * +--------------------------------------------------------------------+
  */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -40,12 +40,12 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    $this->individual  = $this->individualCreate();
-    $this->params      = array(
+    $this->individual = $this->individualCreate();
+    $this->params = array(
       'entity_id' => $this->individual,
     );
     $this->ids['single'] = $this->entityCustomGroupWithSingleFieldCreate('mySingleField', 'Contacts');
-    $this->ids['multi']  = $this->CustomGroupMultipleCreateWithFields();
+    $this->ids['multi'] = $this->CustomGroupMultipleCreateWithFields();
     $this->ids['multi2'] = $this->CustomGroupMultipleCreateWithFields(array('title' => 'group2'));
   }
 
@@ -63,7 +63,8 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
   public function testCreateCustomValue() {
     $params = array(
-      'custom_' . $this->ids['single']['custom_field_id'] => 'customString') + $this->params;
+        'custom_' . $this->ids['single']['custom_field_id'] => 'customString'
+      ) + $this->params;
 
     $result = $this->callAPIAndDocument('custom_value', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
@@ -94,9 +95,9 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $createParams = array(
       'contact_type' => 'Individual',
       'id' => $contact_id,
-       'custom_' . $firstCustomField => "value 3",
-       'custom_' . $secondCustomField => "coffee",
-       'custom_' . $thirdCustomField => "value 4",
+      'custom_' . $firstCustomField => "value 3",
+      'custom_' . $secondCustomField => "coffee",
+      'custom_' . $thirdCustomField => "value 4",
     );
     $result = $this->callAPISuccess('Contact', 'create', $createParams);
 
@@ -143,8 +144,8 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $createParams = array(
       'contact_type' => 'Individual',
       'id' => $contact_id,
-       'custom_' . $firstCustomField . '-1' => "second multi value 2",
-       'custom_' . $firstCustomField . '-2' => "second multi value 3",
+      'custom_' . $firstCustomField . '-1' => "second multi value 2",
+      'custom_' . $firstCustomField . '-2' => "second multi value 3",
     );
     $result = $this->callAPISuccess('Contact', 'create', $createParams);
 

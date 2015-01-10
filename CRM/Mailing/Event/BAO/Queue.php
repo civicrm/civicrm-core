@@ -70,8 +70,8 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    * @static
    */
   public static function hash($params) {
-    $jobId     = $params['job_id'];
-    $emailId   = CRM_Utils_Array::value('email_id', $params, '');
+    $jobId = $params['job_id'];
+    $emailId = CRM_Utils_Array::value('email_id', $params, '');
     $contactId = $params['contact_id'];
 
     return substr(sha1("{$jobId}:{$emailId}:{$contactId}:" . time()),
@@ -96,9 +96,9 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
     $success = NULL;
     $q = new CRM_Mailing_Event_BAO_Queue();
     if (!empty($job_id) && !empty($queue_id) && !empty($hash)) {
-      $q->id     = $queue_id;
+      $q->id = $queue_id;
       $q->job_id = $job_id;
-      $q->hash   = $hash;
+      $q->hash = $hash;
       if ($q->find(TRUE)) {
         $success = $q;
       }
@@ -118,7 +118,7 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    */
   public static function getEmailAddress($queue_id) {
     $email = CRM_Core_BAO_Email::getTableName();
-    $eq    = self::getTableName();
+    $eq = self::getTableName();
     $query = "  SELECT      $email.email as email
                     FROM        $email
                     INNER JOIN  $eq
@@ -149,9 +149,9 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   public static function getTotalCount($mailing_id, $job_id = NULL) {
     $dao = new CRM_Core_DAO();
 
-    $queue   = self::getTableName();
+    $queue = self::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
 
     $dao->query("
             SELECT      COUNT(*) as queued
@@ -194,11 +194,11 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   ) {
     $dao = new CRM_Core_Dao();
 
-    $queue   = self::getTableName();
+    $queue = self::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
     $contact = CRM_Contact_BAO_Contact::getTableName();
-    $email   = CRM_Core_BAO_Email::getTableName();
+    $email = CRM_Core_BAO_Email::getTableName();
 
     $orderBy = "sort_name ASC, {$job}.start_date DESC";
     if ($sort) {
@@ -265,10 +265,10 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    *   Mailing BAO
    */
   public function &getMailing() {
-    $mailing  = new CRM_Mailing_BAO_Mailing();
-    $jobs     = CRM_Mailing_BAO_MailingJob::getTableName();
+    $mailing = new CRM_Mailing_BAO_Mailing();
+    $jobs = CRM_Mailing_BAO_MailingJob::getTableName();
     $mailings = CRM_Mailing_BAO_Mailing::getTableName();
-    $queue    = self::getTableName();
+    $queue = self::getTableName();
 
     $mailing->query("
                 SELECT      $mailings.*
@@ -324,14 +324,14 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
     $values = array();
     foreach ($params as $param) {
       $values[] = "( {$param[0]}, {$param[1]}, {$param[2]}, {$param[3]}, '" . substr(sha1("{$param[0]}:{$param[1]}:{$param[2]}:{$param[3]}:{$now}"),
-        0, 16
-      ) . "' )";
+          0, 16
+        ) . "' )";
     }
 
     while (!empty($values)) {
       $input = array_splice($values, 0, CRM_Core_DAO::BULK_INSERT_COUNT);
-      $str   = implode(',', $input);
-      $sql   = "INSERT INTO civicrm_mailing_event_queue ( job_id, email_id, contact_id, phone_id, hash ) VALUES $str;";
+      $str = implode(',', $input);
+      $sql = "INSERT INTO civicrm_mailing_event_queue ( job_id, email_id, contact_id, phone_id, hash ) VALUES $str;";
       CRM_Core_DAO::executeQuery($sql);
     }
   }

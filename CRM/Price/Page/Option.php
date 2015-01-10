@@ -219,8 +219,8 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     $session = CRM_Core_Session::singleton();
 
     $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/price/field/option',
-        "reset=1&action=browse&fid={$this->_fid}&sid={$this->_sid}"
-      ));
+      "reset=1&action=browse&fid={$this->_fid}&sid={$this->_sid}"
+    ));
     $controller = new CRM_Core_Controller_Simple('CRM_Price_Form_Option', ts('Price Field Option'), $action);
     $controller->set('fid', $this->_fid);
     $controller->setEmbedded(TRUE);
@@ -276,10 +276,12 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
       $this->assign('isReserved', $this->_isSetReserved);
     }
     //as url contain $sid so append breadcrumb dynamically.
-    $breadcrumb = array(array(
-    'title' => ts('Price Fields'),
+    $breadcrumb = array(
+      array(
+        'title' => ts('Price Fields'),
         'url' => CRM_Utils_System::url('civicrm/admin/price/field', 'reset=1&sid=' . $this->_sid),
-      ));
+      )
+    );
     CRM_Utils_System::appendBreadCrumb($breadcrumb);
 
     if ($this->_fid) {
@@ -311,7 +313,8 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     // what action to take ?
     if ($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD |
         CRM_Core_Action::VIEW | CRM_Core_Action::DELETE
-      ) && !$this->_isSetReserved) {
+      ) && !$this->_isSetReserved
+    ) {
       // no browse for edit/update/view
       $this->edit($action);
     }

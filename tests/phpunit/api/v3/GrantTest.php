@@ -34,7 +34,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * @package CiviCRM_APIv3
  * @subpackage API_Grant
  */
-
 class api_v3_GrantTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $params;
@@ -47,7 +46,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     parent::setUp();
     $this->ids['contact'][0] = $this->individualCreate();
     $this->params = array(
-           'contact_id' => $this->ids['contact'][0],
+      'contact_id' => $this->ids['contact'][0],
       'application_received_date' => 'now',
       'decision_date' => 'next Monday',
       'amount_total' => '500',
@@ -91,9 +90,10 @@ class api_v3_GrantTest extends CiviUnitTestCase {
         array('label' => 'my goat', 'value' => 'goat', 'is_active' => TRUE, 'weight' => 2),
         array('label' => 'mohair', 'value' => 'wool', 'is_active' => TRUE, 'weight' => 3),
         array('label' => 'hungry', 'value' => '', 'is_active' => TRUE, 'weight' => 3),
-    )));
+      )
+    ));
     $columnName = $result['values'][$result['id']]['column_name'];
-    $ids['custom_field_id']  = $result['id'];
+    $ids['custom_field_id'] = $result['id'];
     $customFieldLabel = 'custom_' . $ids['custom_field_id'];
     $expectedValue = CRM_Core_DAO::VALUE_SEPARATOR . 'valley' . CRM_Core_DAO::VALUE_SEPARATOR;
     //first we pass in the core separators ourselves
@@ -156,6 +156,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
+
   /*
   * This is a test to check if setting fields one at a time alters other fields
   * Issues Hit so far =
@@ -166,9 +167,9 @@ class api_v3_GrantTest extends CiviUnitTestCase {
 
   public function testCreateAutoGrant() {
     $entityName = $this->_entity;
-    $baoString  = 'CRM_Grant_BAO_Grant';
-    $fields     = $this->callAPISuccess($entityName, 'getfields', array(
-               'action' => 'create',
+    $baoString = 'CRM_Grant_BAO_Grant';
+    $fields = $this->callAPISuccess($entityName, 'getfields', array(
+        'action' => 'create',
       )
     );
 
@@ -177,9 +178,9 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $baoObj = new CRM_Core_DAO();
     $baoObj->createTestObject($baoString, array('currency' => 'USD'), 2, 0);
     $getentities = $this->callAPISuccess($entityName, 'get', array(
-               'sequential' => 1,
-        'return' => $return,
-      ));
+      'sequential' => 1,
+      'return' => $return,
+    ));
 
     // lets use first rather than assume only one exists
     $entity = $getentities['values'][0];
@@ -225,8 +226,8 @@ class api_v3_GrantTest extends CiviUnitTestCase {
           $entity[$field] = 'warm.beer.com';
       }
       $updateParams = array(
-               'id' => $entity['id'],
-         $field => $entity[$field],
+        'id' => $entity['id'],
+        $field => $entity[$field],
         'debug' => 1,
       );
       $update = $this->callAPISuccess($entityName, 'create', $updateParams);

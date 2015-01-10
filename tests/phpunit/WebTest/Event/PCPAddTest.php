@@ -37,7 +37,12 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
 
   public function testPCPAdd() {
     //give permissions to anonymous user
-    $permission = array('edit-1-profile-listings-and-forms', 'edit-1-access-all-custom-data', 'edit-1-register-for-events', 'edit-1-make-online-contributions');
+    $permission = array(
+      'edit-1-profile-listings-and-forms',
+      'edit-1-access-all-custom-data',
+      'edit-1-register-for-events',
+      'edit-1-make-online-contributions'
+    );
     $this->changePermissions($permission);
 
     // Log in as normal user

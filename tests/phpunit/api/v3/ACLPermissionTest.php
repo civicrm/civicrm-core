@@ -232,15 +232,15 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   public function setupCoreACL() {
     $this->createLoggedInUser();
     $this->_permissionedDisabledGroup = $this->groupCreate(array(
-        'title' => 'pick-me-disabled',
-        'is_active' => 0,
-        'name' => 'pick-me-disabled',
-      ));
+      'title' => 'pick-me-disabled',
+      'is_active' => 0,
+      'name' => 'pick-me-disabled',
+    ));
     $this->_permissionedGroup = $this->groupCreate(array(
-        'title' => 'pick-me-active',
-        'is_active' => 1,
-        'name' => 'pick-me-active',
-      ));
+      'title' => 'pick-me-active',
+      'is_active' => 1,
+      'name' => 'pick-me-active',
+    ));
     $this->setupACL();
   }
 

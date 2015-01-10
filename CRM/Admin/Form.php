@@ -63,9 +63,9 @@ class CRM_Admin_Form extends CRM_Core_Form {
    * Basic setup
    */
   public function preProcess() {
-    $this->_id      = $this->get('id');
+    $this->_id = $this->get('id');
     $this->_BAOName = $this->get('BAOName');
-    $this->_values  = array();
+    $this->_values = array();
     if (isset($this->_id)) {
       $params = array('id' => $this->_id);
       // this is needed if the form is outside the CRM name space

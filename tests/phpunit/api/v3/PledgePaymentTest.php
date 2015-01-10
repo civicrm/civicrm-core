@@ -32,7 +32,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  *
  * @package CiviCRM_APIv3
  */
-
 class api_v3_PledgePaymentTest extends CiviUnitTestCase {
 
   /**
@@ -189,8 +188,8 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $params['scheduled_date'] = '20131212';
     $resultcreatenew = $this->callAPISuccess('pledge_payment', 'create', $params);
     $result = $this->callAPISuccess('PledgePayment', 'Get', array(
-        'pledge_id' => $this->_pledgeID,
-      ));
+      'pledge_id' => $this->_pledgeID,
+    ));
 
     $this->assertEquals(6, $result['count']);
   }
@@ -232,7 +231,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     //check existing updated not new one created - 'create' means add contribution_id in this context
     $afterAdd = $this->callAPISuccess('pledge_payment', 'get', array(
       'contribution_id' => $contributionID,
-      ));
+    ));
     $this->assertEquals(1, $afterAdd['count'], " in line " . __LINE__);
   }
 

@@ -89,17 +89,19 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
   public function preProcess() {
     $this->_id = $this->get('id');
     if ($this->_id) {
-      $breadCrumb = array(array(
-      'title' => ts('Manage Groups'),
+      $breadCrumb = array(
+        array(
+          'title' => ts('Manage Groups'),
           'url' => CRM_Utils_System::url('civicrm/group',
             'reset=1'
           ),
-        ));
+        )
+      );
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
       $this->_groupValues = array();
-      $params             = array('id' => $this->_id);
-      $this->_group       = CRM_Contact_BAO_Group::retrieve($params, $this->_groupValues);
+      $params = array('id' => $this->_id);
+      $this->_group = CRM_Contact_BAO_Group::retrieve($params, $this->_groupValues);
       $this->_title = $this->_groupValues['title'];
     }
 
@@ -125,7 +127,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
           'id' => $this->_id,
           'title' => $this->_title,
           'saved_search_id' =>
-          isset($this->_groupValues['saved_search_id']) ? $this->_groupValues['saved_search_id'] : '',
+            isset($this->_groupValues['saved_search_id']) ? $this->_groupValues['saved_search_id'] : '',
         );
         if (isset($this->_groupValues['saved_search_id'])) {
           $groupValues['mapping_id'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch',
@@ -186,10 +188,11 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
     }
 
     if (!((CRM_Core_Permission::check('access CiviMail')) ||
-        (CRM_Mailing_Info::workflowEnabled() &&
-          CRM_Core_Permission::check('create mailings')
-        )
-      )) {
+      (CRM_Mailing_Info::workflowEnabled() &&
+        CRM_Core_Permission::check('create mailings')
+      )
+    )
+    ) {
       $groupTypes = CRM_Core_OptionGroup::values('group_type', TRUE);
       if ($defaults['group_type'][$groupTypes['Mailing List']] == 1) {
         $this->assign('freezeMailignList', $groupTypes['Mailing List']);
@@ -282,7 +285,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
         array(
           'type' => 'upload',
           'name' =>
-          ($this->_action == CRM_Core_Action::ADD) ? ts('Continue') : ts('Save'),
+            ($this->_action == CRM_Core_Action::ADD) ? ts('Continue') : ts('Save'),
           'isDefault' => TRUE,
         ),
         array(

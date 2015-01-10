@@ -43,10 +43,10 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
     $this->webtestAddPaymentProcessor($processorName, 'AuthNet');
 
     // Create a membership type to use for this test
-    $periodType        = 'rolling';
+    $periodType = 'rolling';
     $duration_interval = 1;
-    $duration_unit     = 'year';
-    $auto_renew        = "optional";
+    $duration_unit = 'year';
+    $auto_renew = "optional";
 
     $memTypeParams = $this->webtestAddMembershipType($periodType, $duration_interval, $duration_unit, $auto_renew);
 

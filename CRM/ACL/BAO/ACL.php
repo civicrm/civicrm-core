@@ -258,8 +258,8 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
 
     $dao->query($union);
 
-    $allow    = array(0);
-    $deny     = array(0);
+    $allow = array(0);
+    $deny = array(0);
     $override = array();
 
     while ($dao->fetch()) {
@@ -333,8 +333,8 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    * @static
    */
   public static function getClause($table, $id, &$tables) {
-    $table       = CRM_Utils_Type::escape($table, 'String');
-    $id          = CRM_Utils_Type::escape($id, 'Integer');
+    $table = CRM_Utils_Type::escape($table, 'String');
+    $id = CRM_Utils_Type::escape($id, 'Integer');
     $whereTables = array();
 
     $ssTable = CRM_Contact_BAO_SavedSearch::getTableName();
@@ -408,10 +408,10 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
 
     $rule = new CRM_ACL_BAO_ACL();
 
-    $acl     = self::getTableName();
+    $acl = self::getTableName();
     $contact = CRM_Contact_BAO_Contact::getTableName();
-    $c2g     = CRM_Contact_BAO_GroupContact::getTableName();
-    $group   = CRM_Contact_BAO_Group::getTableName();
+    $c2g = CRM_Contact_BAO_GroupContact::getTableName();
+    $group = CRM_Contact_BAO_Group::getTableName();
 
     $query = " SELECT      $acl.*
                         FROM        $acl ";
@@ -468,12 +468,12 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
 
     $rule = new CRM_ACL_BAO_ACL();
 
-    $acl         = self::getTableName();
-    $aclRole     = 'civicrm_acl_role';
+    $acl = self::getTableName();
+    $aclRole = 'civicrm_acl_role';
     $aclRoleJoin = CRM_ACL_DAO_EntityRole::getTableName();
-    $contact     = CRM_Contact_BAO_Contact::getTableName();
-    $c2g         = CRM_Contact_BAO_GroupContact::getTableName();
-    $group       = CRM_Contact_BAO_Group::getTableName();
+    $contact = CRM_Contact_BAO_Contact::getTableName();
+    $c2g = CRM_Contact_BAO_GroupContact::getTableName();
+    $group = CRM_Contact_BAO_Group::getTableName();
 
     $query = "   SELECT          $acl.*
                         FROM            $acl
@@ -532,9 +532,9 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
 
     $rule = new CRM_ACL_BAO_ACL();
 
-    $acl     = self::getTableName();
-    $c2g     = CRM_Contact_BAO_GroupContact::getTableName();
-    $group   = CRM_Contact_BAO_Group::getTableName();
+    $acl = self::getTableName();
+    $c2g = CRM_Contact_BAO_GroupContact::getTableName();
+    $group = CRM_Contact_BAO_Group::getTableName();
     $results = array();
 
     if ($contact_id) {
@@ -581,7 +581,7 @@ SELECT      $acl.*
     $aclRole = 'civicrm_acl_role';
 
     $aclER = CRM_ACL_DAO_EntityRole::getTableName();
-    $c2g   = CRM_Contact_BAO_GroupContact::getTableName();
+    $c2g = CRM_Contact_BAO_GroupContact::getTableName();
     $group = CRM_Contact_BAO_Group::getTableName();
 
     $query = "   SELECT          $acl.*
@@ -779,7 +779,7 @@ SELECT g.*
  WHERE g.id IN ( $ids )
  AND   g.is_active = 1
 ";
-        $dao            = CRM_Core_DAO::executeQuery($query);
+        $dao = CRM_Core_DAO::executeQuery($query);
         $staticGroupIDs = array();
         $cachedGroupIDs = array();
         while ($dao->fetch()) {
@@ -806,13 +806,13 @@ SELECT g.*
               $tmpTables = array();
               foreach (unserialize($dao->where_tables) as $tmpName => $tmpInfo) {
                 if ($tmpName == '`civicrm_group_contact-' . $dao->id . '`') {
-                  $tmpName          = '`civicrm_group_contact-ACL`';
-                  $tmpInfo          = str_replace('civicrm_group_contact-' . $dao->id, 'civicrm_group_contact-ACL', $tmpInfo);
+                  $tmpName = '`civicrm_group_contact-ACL`';
+                  $tmpInfo = str_replace('civicrm_group_contact-' . $dao->id, 'civicrm_group_contact-ACL', $tmpInfo);
                   $staticGroupIDs[] = $dao->id;
                 }
                 elseif ($tmpName == '`civicrm_group_contact_cache_' . $dao->id . '`') {
-                  $tmpName          = '`civicrm_group_contact_cache-ACL`';
-                  $tmpInfo          = str_replace('civicrm_group_contact_cache_' . $dao->id, 'civicrm_group_contact_cache-ACL', $tmpInfo);
+                  $tmpName = '`civicrm_group_contact_cache-ACL`';
+                  $tmpInfo = str_replace('civicrm_group_contact_cache_' . $dao->id, 'civicrm_group_contact_cache-ACL', $tmpInfo);
                   $cachedGroupIDs[] = $dao->id;
                 }
                 $tmpTables[$tmpName] = $tmpInfo;
@@ -822,7 +822,8 @@ SELECT g.*
           }
 
           if (($dao->saved_search_id || $dao->children || $dao->parents) &&
-            $dao->cache_date == NULL) {
+            $dao->cache_date == NULL
+          ) {
             CRM_Contact_BAO_GroupContactCache::load($dao);
           }
         }

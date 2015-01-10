@@ -473,7 +473,7 @@ class Givi {
    * @return bool
    */
   function doReview($baseBranch = NULL) {
-    if (! $this->doCheckoutAll($baseBranch)) {
+    if (!$this->doCheckoutAll($baseBranch)) {
       return FALSE;
     }
 
@@ -485,7 +485,8 @@ class Givi {
       $pullRequest = PullRequest::get($prUrl, $this->repos);
       if ($pullRequest) {
         $pullRequests[] = $pullRequest;
-      } else {
+      }
+      else {
         return $this->returnError("Invalid pull-request URL: $prUrl");
       }
     }
@@ -551,14 +552,15 @@ class Givi {
       return $this->returnError("Missing <branch>[:<branch>]\n");
     }
     if (FALSE !== strpos($newBranchNames, ':')) {
-      list ($newBranchFromName,$newBranchToName) = explode(':', $newBranchNames);
+      list ($newBranchFromName, $newBranchToName) = explode(':', $newBranchNames);
       foreach ($this->repos as $repo => $relPath) {
         $filteredFromName = $this->filterBranchName($repo, $newBranchFromName);
         $filteredToName = $this->filterBranchName($repo, $newBranchToName);
 
         $this->run($repo, $relPath, 'git', 'push', $newBranchRepo, $filteredFromName . ':' . $filteredToName);
       }
-    } else {
+    }
+    else {
       foreach ($this->repos as $repo => $relPath) {
         $filteredName = $this->filterBranchName($repo, $newBranchNames);
         $this->run($repo, $relPath, 'git', 'push', $newBranchRepo, $filteredName);
@@ -630,7 +632,8 @@ class Givi {
     printf("\n\n\nRUN [%s]: %s\n", $repoName, $command);
     if ($this->dryRun) {
       $r = NULL;
-    } else {
+    }
+    else {
       $r = system($command);
     }
 
@@ -729,7 +732,8 @@ class HttpClient {
     // PHP native client is unreliable PITA for HTTPS
     if (exec("which wget")) {
       self::run('wget', '-q', '-O', $file, $url);
-    } elseif (exec("which curl")) {
+    }
+    elseif (exec("which curl")) {
       self::run('curl', '-o', $file, $url);
     }
 

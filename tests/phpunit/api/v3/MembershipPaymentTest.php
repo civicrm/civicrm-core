@@ -34,7 +34,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * @package CiviCRM_APIv3
  * @subpackage API_Member
  */
-
 class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_contactID;
@@ -42,6 +41,7 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
   protected $_membershipTypeID;
   protected $_membershipStatusID;
   protected $_contribution = array();
+
   public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);

@@ -10,6 +10,7 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
   // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
   // new test classes should be compliant.
   public $_eNoticeCompliant = FALSE;
+
   public function setUp() {
     parent::setUp();
     // $query = "INSERT INTO civicrm_domain ( name, version ) VALUES ( 'domain', 3 )";
@@ -227,7 +228,7 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
     foreach ($counts as $key => $expected) {
       $actual = @$_test_extension_manager_moduletest_counts[$module][$key];
       $this->assertEquals($expected, $actual,
-         sprintf('Expected %d call(s) to hook_civicrm_%s -- found %d', $expected, $key, $actual)
+        sprintf('Expected %d call(s) to hook_civicrm_%s -- found %d', $expected, $key, $actual)
       );
     }
   }

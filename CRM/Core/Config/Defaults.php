@@ -162,14 +162,15 @@ class CRM_Core_Config_Defaults {
         global $civicrm_root;
         $cmsPath = $config->userSystem->cmsRootPath();
         $defaults['userFrameworkResourceURL'] = $baseURL . str_replace("$cmsPath/", '',
-          str_replace('\\', '/', $civicrm_root)
-        );
+            str_replace('\\', '/', $civicrm_root)
+          );
 
         if (strpos($civicrm_root,
             DIRECTORY_SEPARATOR . 'sites' .
             DIRECTORY_SEPARATOR . 'all' .
             DIRECTORY_SEPARATOR . 'modules'
-          ) === FALSE) {
+          ) === FALSE
+        ) {
           $startPos = strpos($civicrm_root,
             DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR
           );

@@ -98,11 +98,11 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
 
     // verify tabular data for grant view
     $this->webtestVerifyTabularData(array(
-      'Name' => $contact['display_name'],
-      'Grant Status' => 'Approved',
-      'Grant Type' => $grantType,
-      $grantField => '$ 99.99',
-     )
+        'Name' => $contact['display_name'],
+        'Grant Status' => 'Approved',
+        'Grant Type' => $grantType,
+        $grantField => '$ 99.99',
+      )
     );
   }
 

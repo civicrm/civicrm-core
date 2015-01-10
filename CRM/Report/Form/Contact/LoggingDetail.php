@@ -37,9 +37,9 @@ class CRM_Report_Form_Contact_LoggingDetail extends CRM_Logging_ReportDetail {
   /**
    */
   public function __construct() {
-    $logging        = new CRM_Logging_Schema;
+    $logging = new CRM_Logging_Schema;
     $this->tables[] = 'civicrm_contact';
-    $this->tables   = array_merge($this->tables, array_keys($logging->customDataLogTables()));
+    $this->tables = array_merge($this->tables, array_keys($logging->customDataLogTables()));
     $this->tables[] = 'civicrm_email';
     $this->tables[] = 'civicrm_phone';
     $this->tables[] = 'civicrm_im';

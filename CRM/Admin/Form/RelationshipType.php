@@ -78,11 +78,13 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
     // add select for contact type
     $contactTypeA = &$this->add('select', 'contact_types_a', ts('Contact Type A') . ' ',
       array(
-        '' => ts('All Contacts')) + $contactTypes
+        '' => ts('All Contacts')
+      ) + $contactTypes
     );
     $contactTypeB = &$this->add('select', 'contact_types_b', ts('Contact Type B') . ' ',
       array(
-        '' => ts('All Contacts')) + $contactTypes
+        '' => ts('All Contacts')
+      ) + $contactTypes
     );
 
     $isActive = &$this->add('checkbox', 'is_active', ts('Enabled?'));

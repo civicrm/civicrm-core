@@ -88,7 +88,12 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    */
   public function tearDown() {
-    $tablesToTruncate = array('civicrm_membership', 'civicrm_membership_log', 'civicrm_contribution', 'civicrm_membership_payment');
+    $tablesToTruncate = array(
+      'civicrm_membership',
+      'civicrm_membership_log',
+      'civicrm_contribution',
+      'civicrm_membership_payment'
+    );
     $this->quickCleanup($tablesToTruncate);
     $this->relationshipTypeDelete($this->_relationshipTypeId);
     $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
@@ -116,8 +121,8 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $params = array(
       array(
         'anthony_anderson@civicrm.org',
-         $this->_membershipTypeID,
-         date('Y-m-d'),
+        $this->_membershipTypeID,
+        date('Y-m-d'),
       ),
       array(
         $contact2Params['email'],

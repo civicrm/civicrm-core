@@ -77,7 +77,10 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
     $validate = FALSE;
     //validations
     if (count($this->_contactIds) > $this->_maxContacts) {
-      CRM_Core_Session::setStatus(ts("The maximum number of contacts you can select for Batch Update is %1. You have selected %2. Please select fewer contacts from your search results and try again.", array(1 => $this->_maxContacts, 2 => count($this->_contactIds))), ts('Maximum Exceeded'), 'error');
+      CRM_Core_Session::setStatus(ts("The maximum number of contacts you can select for Batch Update is %1. You have selected %2. Please select fewer contacts from your search results and try again.", array(
+            1 => $this->_maxContacts,
+            2 => count($this->_contactIds)
+          )), ts('Maximum Exceeded'), 'error');
       $validate = TRUE;
     }
 

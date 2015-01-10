@@ -46,7 +46,7 @@
  *   The Smarty object.
  *
  * @return string
-   *   multilingualized query
+ *   multilingualized query
  */
 function smarty_block_localize($params, $text, &$smarty) {
   if (!$smarty->_tpl_vars['multilingual']) {

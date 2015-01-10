@@ -63,12 +63,25 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @static
    */
   static $_properties = array(
-    'contact_id', 'contact_type', 'contact_sub_type',
-    'sort_name', 'street_address',
-    'city', 'state_province', 'postal_code', 'country',
-    'geo_code_1', 'geo_code_2', 'is_deceased',
-    'email', 'on_hold', 'phone', 'status',
-    'do_not_email', 'do_not_phone', 'do_not_mail',
+    'contact_id',
+    'contact_type',
+    'contact_sub_type',
+    'sort_name',
+    'street_address',
+    'city',
+    'state_province',
+    'postal_code',
+    'country',
+    'geo_code_1',
+    'geo_code_2',
+    'is_deceased',
+    'email',
+    'on_hold',
+    'phone',
+    'status',
+    'do_not_email',
+    'do_not_phone',
+    'do_not_mail',
   );
 
   /**
@@ -299,9 +312,9 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param array $params
    */
   public function getPagerParams($action, &$params) {
-    $params['status']    = ts('Contact %%StatusMessage%%');
+    $params['status'] = ts('Contact %%StatusMessage%%');
     $params['csvString'] = NULL;
-    $params['rowCount']  = CRM_Utils_Pager::ROWCOUNT;
+    $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
 
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
@@ -374,7 +387,8 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       $direction = CRM_Utils_Sort::ASCENDING;
       $empty = TRUE;
       if (!self::$_columnHeaders) {
-        self::$_columnHeaders = array(array('name' => ''),
+        self::$_columnHeaders = array(
+          array('name' => ''),
           array(
             'name' => ts('Name'),
             'sort' => 'sort_name',
@@ -399,7 +413,10 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
               }
 
               if (in_array($fieldName, array(
-                'phone', 'im', 'email'))) {
+                'phone',
+                'im',
+                'email'
+              ))) {
                 if ($type) {
                   $name = "`$locationTypeName-$fieldName-$type`";
                 }
@@ -438,7 +455,8 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       $headers = self::$_columnHeaders;
     }
     elseif (!empty($this->_returnProperties)) {
-      self::$_columnHeaders = array(array('name' => ''),
+      self::$_columnHeaders = array(
+        array('name' => ''),
         array(
           'name' => ts('Name'),
           'sort' => 'sort_name',
@@ -576,7 +594,10 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
             $locationTypeName = str_replace(' ', '_', $locationTypeName);
             if (in_array($fieldName, array(
-              'phone', 'im', 'email'))) {
+              'phone',
+              'im',
+              'email'
+            ))) {
               if ($type) {
                 $names[] = "{$locationTypeName}-{$fieldName}-{$type}";
               }
@@ -651,14 +672,17 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         elseif (strpos($property, '-im')) {
           $row[$property] = $result->$property;
           if (!empty($result->$property)) {
-            $imProviders    = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
-            $providerId     = $property . "-provider_id";
-            $providerName   = $imProviders[$result->$providerId];
+            $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+            $providerId = $property . "-provider_id";
+            $providerName = $imProviders[$result->$providerId];
             $row[$property] = $result->$property . " ({$providerName})";
           }
         }
         elseif (in_array($property, array(
-          'addressee', 'email_greeting', 'postal_greeting'))) {
+          'addressee',
+          'email_greeting',
+          'postal_greeting'
+        ))) {
           $greeting = $property . '_display';
           $row[$property] = $result->$greeting;
         }
@@ -675,9 +699,9 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           $websiteFld = $websiteKey . '-' . array_pop($propertyArray);
           if (!empty($result->$websiteFld)) {
             $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
-            $websiteType  = $websiteTypes[$result->{"$websiteKey-website_type_id"}];
+            $websiteType = $websiteTypes[$result->{"$websiteKey-website_type_id"}];
             $websiteValue = $result->$websiteFld;
-            $websiteUrl   = "<a href=\"{$websiteValue}\">{$websiteValue}  ({$websiteType})</a>";
+            $websiteUrl = "<a href=\"{$websiteValue}\">{$websiteValue}  ({$websiteType})</a>";
           }
           $row[$property] = $websiteUrl;
         }
@@ -799,7 +823,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         );
 
         $row['contact_type_orig'] = $result->contact_sub_type ? $result->contact_sub_type : $result->contact_type;
-        $row['contact_sub_type']  = $result->contact_sub_type ? CRM_Contact_BAO_ContactType::contactTypePairs(FALSE, $result->contact_sub_type, ', ') : $result->contact_sub_type;
+        $row['contact_sub_type'] = $result->contact_sub_type ? CRM_Contact_BAO_ContactType::contactTypePairs(FALSE, $result->contact_sub_type, ', ') : $result->contact_sub_type;
         $row['contact_id'] = $result->contact_id;
         $row['sort_name'] = $result->sort_name;
         if (array_key_exists('id', $row)) {
@@ -1077,8 +1101,8 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
    * Given the current formValues, gets the query in local
    * language
    *
-   * @param array(
-  reference)   $formValues   submitted formValues
+   * @param array (
+   * reference)   $formValues   submitted formValues
    *
    * @return array
    *   which contains an array of strings

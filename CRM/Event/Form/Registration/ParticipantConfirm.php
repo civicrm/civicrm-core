@@ -106,12 +106,12 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
 
     $statusMsg = NULL;
     if (array_key_exists($this->_participantStatusId,
-        CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Pending'")
-      )) {
+      CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Pending'")
+    )) {
 
       //need to confirm that though participant confirming
       //registration - but is there enough space to confirm.
-      $emptySeats   = CRM_Event_BAO_Participant::pendingToConfirmSpaces($this->_eventId);
+      $emptySeats = CRM_Event_BAO_Participant::pendingToConfirmSpaces($this->_eventId);
       $additonalIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_participantId);
       $requireSpace = 1 + count($additonalIds);
       if ($emptySeats !== NULL && ($requireSpace > $emptySeats)) {
@@ -120,34 +120,38 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
       else {
         if ($this->_cc == 'fail') {
           $statusMsg = '<div class="bold">' . ts('Your Credit Card transaction was not successful. No money has yet been charged to your card.') . '</div><div><br />' . ts('Click the "Confirm Registration" button to complete your registration in %1, or click "Cancel Registration" if you are no longer interested in attending this event.', array(
-            1 => $values['title'])) . '</div>';
+              1 => $values['title']
+            )) . '</div>';
         }
         else {
           $statusMsg = '<div class="bold">' . ts('Confirm your registration for %1.', array(
-            1 => $values['title'])) . '</div><div><br />' . ts('Click the "Confirm Registration" button to begin, or click "Cancel Registration" if you are no longer interested in attending this event.') . '</div>';
+              1 => $values['title']
+            )) . '</div><div><br />' . ts('Click the "Confirm Registration" button to begin, or click "Cancel Registration" if you are no longer interested in attending this event.') . '</div>';
         }
         $buttons = array_merge($buttons, array(
           array(
-        'type' => 'next',
-              'name' => ts('Confirm Registration'),
-              'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-              'isDefault' => TRUE,
-            )));
+            'type' => 'next',
+            'name' => ts('Confirm Registration'),
+            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+            'isDefault' => TRUE,
+          )
+        ));
       }
     }
 
     // status class other than Negative should be able to cancel registration.
     if (array_key_exists($this->_participantStatusId,
-        CRM_Event_PseudoConstant::participantStatus(NULL, "class != 'Negative'")
-      )) {
+      CRM_Event_PseudoConstant::participantStatus(NULL, "class != 'Negative'")
+    )) {
       $cancelConfirm = ts('Are you sure you want to cancel your registration for this event?');
       $buttons = array_merge($buttons, array(
         array(
-      'type' => 'submit',
-            'name' => ts('Cancel Registration'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'js' => array('onclick' => 'return confirm(\'' . $cancelConfirm . '\');'),
-          )));
+          'type' => 'submit',
+          'name' => ts('Cancel Registration'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'js' => array('onclick' => 'return confirm(\'' . $cancelConfirm . '\');'),
+        )
+      ));
       if (!$statusMsg) {
         $statusMsg = ts('You can cancel your registration for %1 by clicking "Cancel Registration".', array(1 => $values['title']));
       }
@@ -170,7 +174,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
    */
   public function postProcess() {
     //get the button.
-    $buttonName    = $this->controller->getButtonName();
+    $buttonName = $this->controller->getButtonName();
     $participantId = $this->_participantId;
 
     if ($buttonName == '_qf_ParticipantConfirm_next') {

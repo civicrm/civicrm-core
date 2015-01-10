@@ -99,8 +99,8 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
     //        }
 
     $customReports = $this->getCustomReportsByName();
-    $cr          = $this->getCustomReportsById();
-    $id          = $cr[$customReports[$info->key]];
+    $cr = $this->getCustomReportsById();
+    $id = $cr[$customReports[$info->key]];
     $optionValue = CRM_Core_BAO_OptionValue::del($id);
 
     return $optionValue ? TRUE : FALSE;
@@ -111,8 +111,8 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
    */
   public function onPreDisable(CRM_Extension_Info $info) {
     $customReports = $this->getCustomReportsByName();
-    $cr          = $this->getCustomReportsById();
-    $id          = $cr[$customReports[$info->key]];
+    $cr = $this->getCustomReportsById();
+    $id = $cr[$customReports[$info->key]];
     $optionValue = CRM_Core_BAO_OptionValue::setIsActive($id, 0);
   }
 
@@ -121,8 +121,8 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
    */
   public function onPreEnable(CRM_Extension_Info $info) {
     $customReports = $this->getCustomReportsByName();
-    $cr          = $this->getCustomReportsById();
-    $id          = $cr[$customReports[$info->key]];
+    $cr = $this->getCustomReportsById();
+    $id = $cr[$customReports[$info->key]];
     $optionValue = CRM_Core_BAO_OptionValue::setIsActive($id, 1);
   }
 

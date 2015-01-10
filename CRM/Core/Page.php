@@ -128,9 +128,9 @@ class CRM_Core_Page {
    * @return CRM_Core_Page
    */
   public function __construct($title = NULL, $mode = NULL) {
-    $this->_name  = CRM_Utils_System::getClassName($this);
+    $this->_name = CRM_Utils_System::getClassName($this);
     $this->_title = $title;
-    $this->_mode  = $mode;
+    $this->_mode = $mode;
 
     // let the constructor initialize this, should happen only once
     if (!isset(self::$_template)) {
@@ -184,8 +184,12 @@ class CRM_Core_Page {
     CRM_Utils_Hook::pageRun($this);
 
     if ($this->_print) {
-      if (in_array($this->_print, array(CRM_Core_Smarty::PRINT_SNIPPET,
-        CRM_Core_Smarty::PRINT_PDF, CRM_Core_Smarty::PRINT_NOFORM, CRM_Core_Smarty::PRINT_JSON))) {
+      if (in_array($this->_print, array(
+        CRM_Core_Smarty::PRINT_SNIPPET,
+        CRM_Core_Smarty::PRINT_PDF,
+        CRM_Core_Smarty::PRINT_NOFORM,
+        CRM_Core_Smarty::PRINT_JSON
+      ))) {
         $content = self::$_template->fetch('CRM/common/snippet.tpl');
       }
       else {
@@ -222,8 +226,8 @@ class CRM_Core_Page {
     CRM_Utils_Check::singleton()->showPeriodicAlerts();
 
     if ($this->useLivePageJS &&
-      CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajaxPopupsEnabled', NULL, TRUE))
-    {
+      CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajaxPopupsEnabled', NULL, TRUE)
+    ) {
       CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header');
       $this->assign('includeWysiwygEditor', TRUE);
     }

@@ -147,7 +147,7 @@ SELECT     civicrm_email.id as email_id
      WHERE civicrm_email.email = %1
        AND civicrm_email.contact_id = %2";
     $params = array(
-    1 => array($email, 'String'),
+      1 => array($email, 'String'),
       2 => array($contact_id, 'Integer'),
     );
     $dao = CRM_Core_DAO::executeQuery($query, $params);
@@ -220,13 +220,13 @@ SELECT     civicrm_email.id as email_id
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
 
     $confirm = implode($config->verpSeparator,
-      array(
-        $localpart . 'c',
-        $this->contact_id,
-        $this->id,
-        $this->hash,
-      )
-    ) . "@$emailDomain";
+        array(
+          $localpart . 'c',
+          $this->contact_id,
+          $this->id,
+          $this->hash,
+        )
+      ) . "@$emailDomain";
 
     $group = new CRM_Contact_BAO_Group();
     $group->id = $this->group_id;
@@ -391,7 +391,10 @@ SELECT     civicrm_email.id as email_id
         $group[$groupID]['title'] = $contactGroups[$groupID]['title'];
 
         $group[$groupID]['status'] = $contactGroups[$groupID]['status'];
-        $status = ts('You are already subscribed in %1, your subscription is %2.', array(1 => $group[$groupID]['title'], 2 => $group[$groupID]['status']));
+        $status = ts('You are already subscribed in %1, your subscription is %2.', array(
+            1 => $group[$groupID]['title'],
+            2 => $group[$groupID]['status']
+          ));
         CRM_Utils_System::setUFMessage($status);
         continue;
       }

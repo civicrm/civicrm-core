@@ -65,7 +65,7 @@ class CRM_Case_XMLRepository {
   }
 
   /**
-   * @param array<String,SimpleXMLElement> $xml
+   * @param array <String,SimpleXMLElement> $xml
    */
   public function __construct($allCaseTypes = NULL, $xml = array()) {
     $this->allCaseTypes = $allCaseTypes;

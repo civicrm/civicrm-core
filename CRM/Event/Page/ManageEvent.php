@@ -138,12 +138,12 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'field' => 'is_online_registration',
         );
       if (CRM_Core_Permission::check('administer CiviCRM')) {
-      self::$_tabLinks[$cacheKey]['reminder'] =
-        array(
-          'title' => ts('Schedule Reminders'),
-          'url' => 'civicrm/event/manage/reminder',
-          'field' => 'reminder',
-        );
+        self::$_tabLinks[$cacheKey]['reminder'] =
+          array(
+            'title' => ts('Schedule Reminders'),
+            'url' => 'civicrm/event/manage/reminder',
+            'field' => 'reminder',
+          );
       }
       self::$_tabLinks[$cacheKey]['conference'] =
         array(
@@ -211,9 +211,12 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
     }
 
     if (!$this->_isTemplate && $id) {
-      $breadCrumb = array(array('title' => ts('Manage Events'),
+      $breadCrumb = array(
+        array(
+          'title' => ts('Manage Events'),
           'url' => CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1'),
-        ));
+        )
+      );
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
     }
 
@@ -440,9 +443,9 @@ ORDER BY start_date desc
    * @return string
    */
   public function whereClause(&$params, $sortBy = TRUE, $force) {
-    $values    = array();
-    $clauses   = array();
-    $title     = $this->get('title');
+    $values = array();
+    $clauses = array();
+    $title = $this->get('title');
     $createdId = $this->get('cid');
 
     if ($createdId) {

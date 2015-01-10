@@ -124,9 +124,9 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    * @return string
    */
   public function defaultFromData(&$patterns, $index) {
-    $best     = '';
+    $best = '';
     $bestHits = 0;
-    $n        = count($this->_dataValues);
+    $n = count($this->_dataValues);
 
     foreach ($patterns as $key => $re) {
       // Skip empty key/patterns

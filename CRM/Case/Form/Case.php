@@ -122,7 +122,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     if (!$this->_caseId) {
       $caseAttributes = array(
-      'case_type' => CRM_Case_PseudoConstant::caseType(),
+        'case_type' => CRM_Case_PseudoConstant::caseType(),
         'case_status' => CRM_Case_PseudoConstant::caseStatus(),
         'encounter_medium' => CRM_Case_PseudoConstant::encounterMedium(),
       );
@@ -130,8 +130,8 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       foreach ($caseAttributes as $key => $values) {
         if (empty($values)) {
           CRM_Core_Error::fatal(ts('You do not have any active %1',
-              array(1 => str_replace('_', ' ', $key))
-            ));
+            array(1 => str_replace('_', ' ', $key))
+          ));
           break;
         }
       }
@@ -261,7 +261,8 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     }
     $this->add('text', 'activity_subject', ts('Subject'),
       array_merge($s, array(
-        'maxlength' => '128')), TRUE
+        'maxlength' => '128'
+      )), TRUE
     );
 
     CRM_Core_BAO_Tag::getTags('civicrm_case', $tags, NULL,

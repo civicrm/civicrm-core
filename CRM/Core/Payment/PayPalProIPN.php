@@ -225,8 +225,12 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     $contributionStatuses = $contributionStatuses['values'];
     switch ($txnType) {
       case 'recurring_payment_profile_created':
-        if (in_array($recur->contribution_status_id, array(array_search('Pending', $contributionStatuses), array_search('In Progress', $contributionStatuses)))
-        && !empty($recur->processor_id)) {
+        if (in_array($recur->contribution_status_id, array(
+              array_search('Pending', $contributionStatuses),
+              array_search('In Progress', $contributionStatuses)
+            ))
+          && !empty($recur->processor_id)
+        ) {
           echo "already handled";
           return;
         }
@@ -300,7 +304,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       }
 
       $contribution->contact_id = $recur->contact_id;
-      $contribution->financial_type_id  = $objects['contributionType']->id;
+      $contribution->financial_type_id = $objects['contributionType']->id;
       $contribution->contribution_page_id = $ids['contributionPage'];
       $contribution->contribution_recur_id = $ids['contributionRecur'];
       $contribution->currency = $objects['contribution']->currency;
@@ -395,7 +399,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       return;
     }
     $objects = $ids = $input = array();
-    $this->_component  = $input['component'] = self::getValue('m');
+    $this->_component = $input['component'] = self::getValue('m');
     $input['invoice'] = self::getValue('i', TRUE);
     // get the contribution and contact ids from the GET params
     $ids['contact'] = self::getValue('c', TRUE);
@@ -427,7 +431,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
      WHERE m.contribution_recur_id = %2
      LIMIT 1";
       $sqlParams = array(
-      1 => array($ids['contribution'], 'Integer'),
+        1 => array($ids['contribution'], 'Integer'),
         2 => array($ids['contributionRecur'], 'Integer'),
       );
       if ($membershipId = CRM_Core_DAO::singleValueQuery($sql, $sqlParams)) {
@@ -498,10 +502,10 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
       $input[$name] = $value ? $value : NULL;
     }
 
-    $input['is_test']    = self::retrieve('test_ipn', 'Integer', 'POST', FALSE);
+    $input['is_test'] = self::retrieve('test_ipn', 'Integer', 'POST', FALSE);
     $input['fee_amount'] = self::retrieve('mc_fee', 'Money', 'POST', FALSE);
     $input['net_amount'] = self::retrieve('settle_amount', 'Money', 'POST', FALSE);
-    $input['trxn_id']    = self::retrieve('txn_id', 'String', 'POST', FALSE);
+    $input['trxn_id'] = self::retrieve('txn_id', 'String', 'POST', FALSE);
     $input['payment_date'] = self::retrieve('payment_date', 'String', 'POST', FALSE);
   }
 
@@ -525,7 +529,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     // as membership id etc can be derived by the load objects fn
     $objects = $ids = $input = array();
     $isFirst = FALSE;
-    $input['txnType']  = $this->retrieve('txn_type', 'String');
+    $input['txnType'] = $this->retrieve('txn_type', 'String');
     if ($input['txnType'] != 'recurring_payment') {
       throw new CRM_Core_Exception('Paypal IPNS not handled other than recurring_payments');
     }
@@ -535,7 +539,10 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
       throw new CRM_Core_Exception('This transaction has already been processed');
     }
 
-    $contributionRecur = civicrm_api3('contribution_recur', 'getsingle', array('return' => 'contact_id, id', 'invoice_id' => $input['invoice']));
+    $contributionRecur = civicrm_api3('contribution_recur', 'getsingle', array(
+        'return' => 'contact_id, id',
+        'invoice_id' => $input['invoice']
+      ));
     $ids['contact'] = $contributionRecur['contact_id'];
     $ids['contributionRecur'] = $contributionRecur['id'];
     $result = civicrm_api3('contribution', 'getsingle', array('invoice_id' => $input['invoice']));
@@ -546,11 +553,16 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
       $isFirst = TRUE;
     }
     // arg api won't get this - fix it
-    $ids['contributionPage'] = CRM_Core_DAO::singleValueQuery("SELECT contribution_page_id FROM civicrm_contribution WHERE invoice_id = %1", array(1 => array($ids['contribution'], 'Integer')));
+    $ids['contributionPage'] = CRM_Core_DAO::singleValueQuery("SELECT contribution_page_id FROM civicrm_contribution WHERE invoice_id = %1", array(
+        1 => array(
+          $ids['contribution'],
+          'Integer'
+        )
+      ));
     // only handle component at this stage - not terribly sure how a recurring event payment would arise
     // & suspec main function may be a victom of copy & paste
     // membership would be an easy add - but not relevant to my customer...
-    $this->_component  = $input['component'] = 'contribute';
+    $this->_component = $input['component'] = 'contribute';
     $input['trxn_date'] = date('Y-m-d-H-i-s', strtotime(self::retrieve('time_created', 'String')));
     $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
       'PayPal', 'id', 'name'
@@ -570,7 +582,8 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     if (CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_contribution WHERE trxn_id = %1",
       array(
         1 => array($trxn_id, 'String'),
-      ))) {
+      ))
+    ) {
       return TRUE;
     }
   }

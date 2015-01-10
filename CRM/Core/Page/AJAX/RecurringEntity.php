@@ -11,7 +11,6 @@
  *
  * @author Priyanka
  */
-
 class CRM_Core_Page_AJAX_RecurringEntity {
 
   public static function updateMode() {
@@ -54,13 +53,14 @@ class CRM_Core_Page_AJAX_RecurringEntity {
     $params = $formValues = $genericResult = array();
     $formValues = $_REQUEST;
     if (!empty($formValues) &&
-        CRM_Utils_Array::value('entity_table', $formValues)) {
+      CRM_Utils_Array::value('entity_table', $formValues)
+    ) {
       $startDateColumnName = CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['dateColumns'][0];
       $endDateColumnName = CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['intervalDateColumns'][0];
 
       $recursion = new CRM_Core_BAO_RecurringEntity();
       if (CRM_Utils_Array::value('dateColumns', CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']])) {
-        $recursion->dateColumns  = CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['dateColumns'];
+        $recursion->dateColumns = CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['dateColumns'];
       }
       $recursion->scheduleFormValues = $formValues;
       if (!empty($formValues['exclude_date_list'])) {
@@ -82,7 +82,7 @@ class CRM_Core_Page_AJAX_RecurringEntity {
           $endDate = CRM_Core_DAO::getFieldValue($daoName, $parentEventId, $endDateColumnName);
         }
         if ($endDate) {
-          $interval  = $recursion->getInterval($startDate, $endDate);
+          $interval = $recursion->getInterval($startDate, $endDate);
           $recursion->intervalDateColumns = array($endDateColumnName => $interval);
         }
       }

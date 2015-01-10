@@ -130,7 +130,11 @@ class CRM_Contribute_Form_SoftCredit {
 
       $form->addMoney("soft_credit_amount[{$rowNumber}]", ts('Amount'), FALSE, NULL, FALSE);
 
-      $form->addSelect("soft_credit_type[{$rowNumber}]", array('entity' => 'contribution_soft', 'field' => 'soft_credit_type_id', 'label' => ts('Type')));
+      $form->addSelect("soft_credit_type[{$rowNumber}]", array(
+          'entity' => 'contribution_soft',
+          'field' => 'soft_credit_type_id',
+          'label' => ts('Type')
+        ));
       if (!empty($form->_softCreditInfo['soft_credit'][$rowNumber]['soft_credit_id'])) {
         $form->add('hidden', "soft_credit_id[{$rowNumber}]",
           $form->_softCreditInfo['soft_credit'][$rowNumber]['soft_credit_id']);
@@ -222,7 +226,8 @@ class CRM_Contribute_Form_SoftCredit {
             $errors["soft_credit_contact[$key]"] = ts('You cannot enter multiple soft credits for the same contact.');
           }
           if ($self->_action == CRM_Core_Action::ADD && $fields['soft_credit_amount'][$key]
-            && (CRM_Utils_Rule::cleanMoney($fields['soft_credit_amount'][$key]) > CRM_Utils_Rule::cleanMoney($fields['total_amount']))) {
+            && (CRM_Utils_Rule::cleanMoney($fields['soft_credit_amount'][$key]) > CRM_Utils_Rule::cleanMoney($fields['total_amount']))
+          ) {
             $errors["soft_credit_amount[$key]"] = ts('Soft credit amount cannot be more than the total amount.');
           }
           if (empty($fields['soft_credit_amount'][$key])) {

@@ -39,8 +39,6 @@
 class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
 
-
-
   /**
    * Set variables up before form is built
    *
@@ -79,14 +77,23 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       //modify field title only for update mode. CRM-3245
       foreach (array(
-        'contribution_id', 'invoice_id', 'trxn_id') as $key) {
+                 'contribution_id',
+                 'invoice_id',
+                 'trxn_id'
+               ) as $key) {
         $this->_mapperFields[$key] .= ' (match to contribution record)';
         $highlightedFields[] = $key;
       }
     }
     elseif ($this->_onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
       unset($this->_mapperFields['contribution_id']);
-      $highlightedFieldsArray = array('contribution_contact_id', 'email', 'first_name', 'last_name', 'external_identifier');
+      $highlightedFieldsArray = array(
+        'contribution_contact_id',
+        'email',
+        'first_name',
+        'last_name',
+        'external_identifier'
+      );
       foreach ($highlightedFieldsArray as $name) {
         $highlightedFields[] = $name;
       }
@@ -214,7 +221,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     $warning = 0;
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
-      $sel = & $this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', array(1 => $i)), NULL);
+      $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', array(1 => $i)), NULL);
       $jsSet = FALSE;
       if ($this->get('savedMapping')) {
         if (isset($mappingName[$i])) {

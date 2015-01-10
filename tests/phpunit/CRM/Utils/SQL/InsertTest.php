@@ -1,9 +1,9 @@
 <?php
-  require_once 'CiviTest/CiviUnitTestCase.php';
+require_once 'CiviTest/CiviUnitTestCase.php';
 
-  /**
-   * Class CRM_Utils_SQL_SelectTest
-   */
+/**
+ * Class CRM_Utils_SQL_SelectTest
+ */
 class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
   public function testRow_twice() {
     $insert = CRM_Utils_SQL_Insert::into('foo')
@@ -21,8 +21,8 @@ class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
     $insert = CRM_Utils_SQL_Insert::into('foo')
       ->row(array('first' => '1', 'second' => '2'))
       ->rows(array(
-      array('second' => '2b', 'first' => '1b'),
-      array('first' => '1c', 'second' => '2c'),
+        array('second' => '2b', 'first' => '1b'),
+        array('first' => '1c', 'second' => '2c'),
       ))
       ->row(array('second' => '2d', 'first' => '1d'));
     $expected = '

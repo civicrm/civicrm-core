@@ -92,13 +92,13 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
       ->limit(100, 300);
     $this->assertLike(
       "SELECT foo.id FROM foo"
-        . " INNER JOIN rel1_table rel1 ON foo.id = rel1.foo_id"
-        . " LEFT JOIN rel2_table rel2 ON foo.id = rel2.foo_id "
-        . " WHERE (foo.type = \"mytype\")"
-        . " GROUP BY foo.id"
-        . " HAVING (sum(rel1.stat) > 10)"
-        . " ORDER BY rel2.whiz"
-        . " LIMIT 100 OFFSET 300",
+      . " INNER JOIN rel1_table rel1 ON foo.id = rel1.foo_id"
+      . " LEFT JOIN rel2_table rel2 ON foo.id = rel2.foo_id "
+      . " WHERE (foo.type = \"mytype\")"
+      . " GROUP BY foo.id"
+      . " HAVING (sum(rel1.stat) > 10)"
+      . " ORDER BY rel2.whiz"
+      . " LIMIT 100 OFFSET 300",
       $select->toSQL()
     );
   }

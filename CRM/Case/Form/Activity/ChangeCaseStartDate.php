@@ -171,10 +171,10 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
 
     // 1. save activity subject with new start date
     $currentStartDate = CRM_Utils_Date::customFormat(CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case',
-        $caseId, 'start_date'
-      ), $config->dateformatFull);
-    $newStartDate      = CRM_Utils_Date::customFormat(CRM_Utils_Date::mysqlToIso($params['start_date']), $config->dateformatFull);
-    $subject           = 'Change Case Start Date from ' . $currentStartDate . ' to ' . $newStartDate;
+      $caseId, 'start_date'
+    ), $config->dateformatFull);
+    $newStartDate = CRM_Utils_Date::customFormat(CRM_Utils_Date::mysqlToIso($params['start_date']), $config->dateformatFull);
+    $subject = 'Change Case Start Date from ' . $currentStartDate . ' to ' . $newStartDate;
     $activity->subject = $subject;
     $activity->save();
     // 2. initiate xml processor
@@ -197,10 +197,10 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
     // Multiple steps since revisioned
     if ($form->openCaseActivityId) {
 
-      $abao                = new CRM_Activity_BAO_Activity();
-      $oldParams           = array('id' => $form->openCaseActivityId);
+      $abao = new CRM_Activity_BAO_Activity();
+      $oldParams = array('id' => $form->openCaseActivityId);
       $oldActivityDefaults = array();
-      $oldActivity         = $abao->retrieve($oldParams, $oldActivityDefaults);
+      $oldActivity = $abao->retrieve($oldParams, $oldActivityDefaults);
 
       // save the old values
       require_once 'api/v3/utils.php';

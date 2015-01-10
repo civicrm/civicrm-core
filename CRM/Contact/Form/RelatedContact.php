@@ -76,8 +76,8 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
     );
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
 
-    $rcid    = CRM_Utils_Request::retrieve('rcid', 'Positive', $this);
-    $rcid    = $rcid ? "&id={$rcid}" : '';
+    $rcid = CRM_Utils_Request::retrieve('rcid', 'Positive', $this);
+    $rcid = $rcid ? "&id={$rcid}" : '';
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/user', "reset=1{$rcid}"));
 
@@ -119,9 +119,9 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
-    $params       = array();
+    $params = array();
     $params['id'] = $params['contact_id'] = $this->_contactId;
-    $contact      = CRM_Contact_BAO_Contact::retrieve($params, $this->_defaults);
+    $contact = CRM_Contact_BAO_Contact::retrieve($params, $this->_defaults);
 
     $countryID = '';
     $stateID = '';
@@ -141,16 +141,16 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
     );
 
     $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      ));
+      array(
+        'type' => 'next',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
   }
 
   /**
@@ -165,7 +165,10 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
 
     $locType = CRM_Core_BAO_LocationType::getDefault();
     foreach (array(
-      'phone', 'email', 'address') as $locFld) {
+               'phone',
+               'email',
+               'address'
+             ) as $locFld) {
       if (!empty($this->_defaults[$locFld]) && $this->_defaults[$locFld][1]['location_type_id']) {
         $params[$locFld][1]['is_primary'] = $this->_defaults[$locFld][1]['is_primary'];
         $params[$locFld][1]['location_type_id'] = $this->_defaults[$locFld][1]['location_type_id'];

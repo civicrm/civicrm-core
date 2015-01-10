@@ -32,7 +32,6 @@
  * $Id$
  *
  */
-
 class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
 
   /**
@@ -80,25 +79,27 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
     $itemStatus = NULL;
     if ($contribution->contribution_status_id == array_search('Completed', $contributionStatuses)
-      || $contribution->contribution_status_id == array_search('Pending refund', $contributionStatuses)) {
+      || $contribution->contribution_status_id == array_search('Pending refund', $contributionStatuses)
+    ) {
       $itemStatus = array_search('Paid', $financialItemStatus);
     }
     elseif ($contribution->contribution_status_id == array_search('Pending', $contributionStatuses)
-      || $contribution->contribution_status_id == array_search('In Progress', $contributionStatuses)) {
+      || $contribution->contribution_status_id == array_search('In Progress', $contributionStatuses)
+    ) {
       $itemStatus = array_search('Unpaid', $financialItemStatus);
     }
     elseif ($contribution->contribution_status_id == array_search('Partially paid', $contributionStatuses)) {
       $itemStatus = array_search('Partially paid', $financialItemStatus);
     }
     $params = array(
-      'transaction_date'  => CRM_Utils_Date::isoToMysql($contribution->receive_date),
-      'contact_id'        => $contribution->contact_id,
-      'amount'            => $lineItem->line_total,
-      'currency'          => $contribution->currency,
-      'entity_table'      => 'civicrm_line_item',
-      'entity_id'         => $lineItem->id,
-      'description'       => ($lineItem->qty != 1 ? $lineItem->qty . ' of ' : ''). ' ' . $lineItem->label,
-      'status_id'         => $itemStatus,
+      'transaction_date' => CRM_Utils_Date::isoToMysql($contribution->receive_date),
+      'contact_id' => $contribution->contact_id,
+      'amount' => $lineItem->line_total,
+      'currency' => $contribution->currency,
+      'entity_table' => 'civicrm_line_item',
+      'entity_id' => $lineItem->id,
+      'description' => ($lineItem->qty != 1 ? $lineItem->qty . ' of ' : '') . ' ' . $lineItem->label,
+      'status_id' => $itemStatus,
     );
 
     if ($taxTrxnID) {
@@ -113,8 +114,8 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     }
     if ($lineItem->financial_type_id) {
       $searchParams = array(
-        'entity_table'         => 'civicrm_financial_type',
-        'entity_id'            => $lineItem->financial_type_id,
+        'entity_table' => 'civicrm_financial_type',
+        'entity_id' => $lineItem->financial_type_id,
         'account_relationship' => $accountRel,
       );
 
@@ -159,10 +160,10 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     $financialItem->save();
     if (!empty($trxnIds['id'])) {
       $entity_financial_trxn_params = array(
-        'entity_table'      => "civicrm_financial_item",
-        'entity_id'         => $financialItem->id,
+        'entity_table' => "civicrm_financial_item",
+        'entity_id' => $financialItem->id,
         'financial_trxn_id' => $trxnIds['id'],
-        'amount'            => $params['amount'],
+        'amount' => $params['amount'],
       );
 
       $entity_trxn = new CRM_Financial_DAO_EntityFinancialTrxn();
@@ -219,11 +220,11 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     $financialItem->find();
     while ($financialItem->fetch()) {
       $financialItems[$financialItem->id] = array(
-        'id'                => $financialItem->id,
-        'entity_table'      => $financialItem->entity_table,
-        'entity_id'         => $financialItem->entity_id,
+        'id' => $financialItem->id,
+        'entity_table' => $financialItem->entity_table,
+        'entity_id' => $financialItem->entity_id,
         'financial_trxn_id' => $financialItem->financial_trxn_id,
-        'amount'            => $financialItem->amount,
+        'amount' => $financialItem->amount,
       );
     }
     if (!empty($financialItems)) {

@@ -129,16 +129,16 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     }
 
     //make sure we have session w/ consistent ids.
-    $ufID     = $ufmatch->uf_id;
-    $userID   = $ufmatch->contact_id;
+    $ufID = $ufmatch->uf_id;
+    $userID = $ufmatch->contact_id;
     $ufUniqID = '';
     if ($isUserLoggedIn) {
       $loggedInUserUfID = CRM_Utils_System::getLoggedInUfID();
       //are we processing logged in user.
       if ($loggedInUserUfID && $loggedInUserUfID != $ufID) {
-        $userIds  = self::getUFValues($loggedInUserUfID);
-        $ufID     = CRM_Utils_Array::value('uf_id', $userIds, '');
-        $userID   = CRM_Utils_Array::value('contact_id', $userIds, '');
+        $userIds = self::getUFValues($loggedInUserUfID);
+        $ufID = CRM_Utils_Array::value('uf_id', $userIds, '');
+        $userID = CRM_Utils_Array::value('contact_id', $userIds, '');
         $ufUniqID = CRM_Utils_Array::value('uf_name', $userIds, '');
       }
     }
@@ -202,9 +202,9 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     $newContact = FALSE;
 
     // make sure that a contact id exists for this user id
-    $ufmatch            = new CRM_Core_DAO_UFMatch();
+    $ufmatch = new CRM_Core_DAO_UFMatch();
     $ufmatch->domain_id = CRM_Core_Config::domainID();
-    $ufmatch->uf_id     = $userKey;
+    $ufmatch->uf_id = $userKey;
 
     if (!$ufmatch->find(TRUE)) {
       $transaction = new CRM_Core_Transaction();
@@ -261,9 +261,9 @@ AND    domain_id = %2
         $conflict = CRM_Core_DAO::singleValueQuery($sql, $params);
 
         if (!$conflict) {
-          $found               = TRUE;
+          $found = TRUE;
           $ufmatch->contact_id = $dao->contact_id;
-          $ufmatch->uf_name    = $uniqId;
+          $ufmatch->uf_name = $uniqId;
         }
       }
 
@@ -310,9 +310,9 @@ AND    domain_id = %2
           }
         }
 
-        $contactId           = CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray);
+        $contactId = CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray);
         $ufmatch->contact_id = $contactId;
-        $ufmatch->uf_name    = $uniqId;
+        $ufmatch->uf_name = $uniqId;
       }
 
       // check that there are not two CMS IDs matching the same CiviCRM contact - this happens when a civicrm
@@ -385,9 +385,9 @@ AND    domain_id    = %4
     $update = FALSE;
 
     // 1.do check for contact Id.
-    $ufmatch             = new CRM_Core_DAO_UFMatch();
+    $ufmatch = new CRM_Core_DAO_UFMatch();
     $ufmatch->contact_id = $contactId;
-    $ufmatch->domain_id  = CRM_Core_Config::domainID();
+    $ufmatch->domain_id = CRM_Core_Config::domainID();
     if (!$ufmatch->find(TRUE)) {
       return;
     }
@@ -431,9 +431,9 @@ AND    domain_id    = %4
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     $emailAddress = $strtolower($emailAddress);
 
-    $ufmatch             = new CRM_Core_DAO_UFMatch();
+    $ufmatch = new CRM_Core_DAO_UFMatch();
     $ufmatch->contact_id = $contactId;
-    $ufmatch->domain_id  = CRM_Core_Config::domainID();
+    $ufmatch->domain_id = CRM_Core_Config::domainID();
     if ($ufmatch->find(TRUE)) {
       // Save the email in UF Match table
       $ufmatch->uf_name = $emailAddress;
@@ -458,10 +458,10 @@ AND    domain_id    = %4
       }
       else {
         //else insert a new email record
-        $email             = new CRM_Core_DAO_Email();
+        $email = new CRM_Core_DAO_Email();
         $email->contact_id = $contactId;
         $email->is_primary = 1;
-        $email->email      = $emailAddress;
+        $email->email = $emailAddress;
         $email->save();
         $emailID = $email->id;
       }
@@ -648,8 +648,8 @@ AND    domain_id    = %4
 
     static $ufValues;
     if ($ufID && !isset($ufValues[$ufID])) {
-      $ufmatch            = new CRM_Core_DAO_UFMatch();
-      $ufmatch->uf_id     = $ufID;
+      $ufmatch = new CRM_Core_DAO_UFMatch();
+      $ufmatch->uf_id = $ufID;
       $ufmatch->domain_id = CRM_Core_Config::domainID();
       if ($ufmatch->find(TRUE)) {
         $ufValues[$ufID] = array(

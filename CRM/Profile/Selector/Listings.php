@@ -161,7 +161,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
       $this->_gid = $ufGroupIds;
     }
 
-    $this->_map      = $map;
+    $this->_map = $map;
     $this->_editLink = $editLink;
     $this->_linkToUF = $linkToUF;
 
@@ -195,8 +195,8 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     $returnProperties['contact_sub_type'] = 1;
     $returnProperties['sort_name'] = 1;
 
-    $queryParams    = CRM_Contact_BAO_Query::convertFormValues($this->_params, 1);
-    $this->_query   = new CRM_Contact_BAO_Query($queryParams, $returnProperties, $this->_fields);
+    $queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_params, 1);
+    $this->_query = new CRM_Contact_BAO_Query($queryParams, $returnProperties, $this->_fields);
 
     //the below is done for query building for multirecord custom field listing
     //to show all the custom field multi valued records of a particular contact
@@ -279,9 +279,9 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   public function getPagerParams($action, &$params) {
     $status =
       CRM_Utils_System::isNull($this->_multiRecordTableName) ? ts('Contact %%StatusMessage%%') : ts('Contact Multi Records %%StatusMessage%%');
-    $params['status']    = $status;
+    $params['status'] = $status;
     $params['csvString'] = NULL;
-    $params['rowCount']  = CRM_Utils_Pager::ROWCOUNT;
+    $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
 
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
@@ -302,10 +302,11 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     static $skipFields = array('group', 'tag');
     $multipleFields = array('url');
-    $direction      = CRM_Utils_Sort::ASCENDING;
-    $empty          = TRUE;
+    $direction = CRM_Utils_Sort::ASCENDING;
+    $empty = TRUE;
     if (!isset(self::$_columnHeaders)) {
-      self::$_columnHeaders = array(array('name' => ''),
+      self::$_columnHeaders = array(
+        array('name' => ''),
         array(
           'name' => ts('Name'),
           'sort' => 'sort_name',
@@ -327,10 +328,10 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         ) {
 
           if (strpos($name, '-') !== FALSE) {
-            $value     = explode('-', $name);
+            $value = explode('-', $name);
             $fieldName = CRM_Utils_Array::value(0, $value);
-            $lType     = CRM_Utils_Array::value(1, $value);
-            $type      = CRM_Utils_Array::value(2, $value);
+            $lType = CRM_Utils_Array::value(1, $value);
+            $type = CRM_Utils_Array::value(2, $value);
 
             if (!in_array($fieldName, $multipleFields)) {
               if ($lType == 'Primary') {
@@ -341,7 +342,10 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
               }
 
               if (in_array($fieldName, array(
-                'phone', 'im', 'email'))) {
+                'phone',
+                'im',
+                'email'
+              ))) {
                 if ($type) {
                   $name = "`$locationTypeName-$fieldName-$type`";
                 }
@@ -396,7 +400,8 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     $returnQuery = NULL;
 
     if ($this->_multiRecordTableName &&
-        !array_key_exists($this->_multiRecordTableName, $this->_query->_whereTables)) {
+      !array_key_exists($this->_multiRecordTableName, $this->_query->_whereTables)
+    ) {
       $additionalFromClause = CRM_Utils_Array::value($this->_multiRecordTableName, $this->_query->_tables);
       $returnQuery = TRUE;
     }
@@ -449,9 +454,9 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
       $vars = $sort->_vars;
       $varArray = array();
       foreach ($vars as $key => $field) {
-        $field      = $vars[$key];
+        $field = $vars[$key];
         $fieldArray = explode('-', $field['name']);
-        $fieldType  = CRM_Utils_Array::value('2', $fieldArray);
+        $fieldType = CRM_Utils_Array::value('2', $fieldArray);
         if (is_numeric(CRM_Utils_Array::value('1', $fieldArray))) {
           if (!in_array($fieldType, $multipleFields)) {
             $locationType = new CRM_Core_DAO_LocationType();
@@ -490,7 +495,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
 
     if ($returnQuery) {
       $resQuery = preg_replace('/GROUP BY contact_a.id[\s]+ORDER BY/', ' ORDER BY', $result);
-      $result   = CRM_Core_DAO::executeQuery($resQuery);
+      $result = CRM_Core_DAO::executeQuery($resQuery);
     }
 
     // process the result of the query
@@ -527,10 +532,10 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         !in_array($key, $skipFields)
       ) {
         if (strpos($key, '-') !== FALSE) {
-          $value     = explode('-', $key);
+          $value = explode('-', $key);
           $fieldName = CRM_Utils_Array::value(0, $value);
-          $id        = CRM_Utils_Array::value(1, $value);
-          $type      = CRM_Utils_Array::value(2, $value);
+          $id = CRM_Utils_Array::value(1, $value);
+          $type = CRM_Utils_Array::value(2, $value);
 
           if (!in_array($fieldName, $multipleFields)) {
             $locationTypeName = NULL;
@@ -548,7 +553,10 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
             }
             $locationTypeName = str_replace(' ', '_', $locationTypeName);
             if (in_array($fieldName, array(
-              'phone', 'im', 'email'))) {
+              'phone',
+              'im',
+              'email'
+            ))) {
               if ($type) {
                 $names[] = "{$locationTypeName}-{$fieldName}-{$type}";
               }
@@ -590,7 +598,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         $i18n = CRM_Core_I18n::singleton();
         $result->country = $i18n->translate($result->country);
       }
-      $row   = array();
+      $row = array();
       $empty = TRUE;
       $row[] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type,
         FALSE,
@@ -616,8 +624,8 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         elseif (substr($name, -4) == '-url' &&
           !empty($result->$name)
         ) {
-          $url      = CRM_Utils_System::fixURL($result->$name);
-          $typeId   = substr($name, 0, -4) . "-website_type_id";
+          $url = CRM_Utils_System::fixURL($result->$name);
+          $typeId = substr($name, 0, -4) . "-website_type_id";
           $typeName = CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_Website', 'website_type_id', $result->$typeId);
           if ($typeName) {
             $row[] = "<a href=\"$url\">{$result->$name} (${typeName})</a>";
@@ -640,9 +648,9 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         }
         elseif (strpos($name, '-im')) {
           if (!empty($result->$name)) {
-            $providerId   = $name . "-provider_id";
+            $providerId = $name . "-provider_id";
             $providerName = CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_IM', 'provider_id', $result->$providerId);
-            $row[]        = $result->$name . " ({$providerName})";
+            $row[] = $result->$name . " ({$providerName})";
           }
           else {
             $row[] = '';
@@ -658,12 +666,17 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
           }
         }
         elseif (in_array($name, array(
-          'addressee', 'email_greeting', 'postal_greeting'))) {
+          'addressee',
+          'email_greeting',
+          'postal_greeting'
+        ))) {
           $dname = $name . '_display';
           $row[] = $result->$dname;
         }
         elseif (in_array($name, array(
-          'birth_date', 'deceased_date'))) {
+          'birth_date',
+          'deceased_date'
+        ))) {
           $row[] = CRM_Utils_Date::customFormat($result->$name);
         }
         elseif (isset($result->$name)) {

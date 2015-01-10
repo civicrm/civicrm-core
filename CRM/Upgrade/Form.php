@@ -417,8 +417,10 @@ SET    version = '$version'
   public function processSQL($rev) {
     $sqlFile = implode(DIRECTORY_SEPARATOR,
       array(
-        dirname(__FILE__), 'Incremental',
-        'sql', $rev . '.mysql',
+        dirname(__FILE__),
+        'Incremental',
+        'sql',
+        $rev . '.mysql',
       )
     );
     $tplFile = "$sqlFile.tpl";
@@ -498,17 +500,17 @@ SET    version = '$version'
     $minPhpVersion = '5.3.3';
     if (version_compare($phpVersion, $minPhpVersion) < 0) {
       $error = ts('CiviCRM %3 requires PHP version %1 (or newer), but the current system uses %2 ',
-               array(
-                 1 => $minPhpVersion,
-                 2 => $phpVersion,
-                 3 => $latestVer,
-               ));
+        array(
+          1 => $minPhpVersion,
+          2 => $phpVersion,
+          3 => $latestVer,
+        ));
     }
 
     // check for mysql trigger privileges
     if (!CRM_Core_DAO::checkTriggerViewPermission(FALSE, TRUE)) {
       $error = ts('CiviCRM %1 requires MySQL trigger privileges.',
-               array(1 => $latestVer));
+        array(1 => $latestVer));
     }
 
     if (CRM_Core_DAO::getGlobalSetting('thread_stack', 0) < (1024 * self::MINIMUM_THREAD_STACK)) {
@@ -571,17 +573,17 @@ SET    version = '$version'
       CRM_Core_Error::fatal(ts('Failed to find or create queueing table'));
     }
     $queue = CRM_Queue_Service::singleton()->create(array(
-        'name' => self::QUEUE_NAME,
-        'type' => 'Sql',
-        'reset' => TRUE,
-      ));
+      'name' => self::QUEUE_NAME,
+      'type' => 'Sql',
+      'reset' => TRUE,
+    ));
 
     $revisions = $upgrade->getRevisionSequence();
     foreach ($revisions as $rev) {
       // proceed only if $currentVer < $rev
       if (version_compare($currentVer, $rev) < 0) {
         $beginTask = new CRM_Queue_Task(
-          // callback
+        // callback
           array('CRM_Upgrade_Form', 'doIncrementalUpgradeStart'),
           // arguments
           array($rev),
@@ -590,7 +592,7 @@ SET    version = '$version'
         $queue->createItem($beginTask);
 
         $task = new CRM_Queue_Task(
-          // callback
+        // callback
           array('CRM_Upgrade_Form', 'doIncrementalUpgradeStep'),
           // arguments
           array($rev, $currentVer, $latestVer, $postUpgradeMessageFile),
@@ -599,7 +601,7 @@ SET    version = '$version'
         $queue->createItem($task);
 
         $task = new CRM_Queue_Task(
-          // callback
+        // callback
           array('CRM_Upgrade_Form', 'doIncrementalUpgradeFinish'),
           // arguments
           array($rev, $currentVer, $latestVer, $postUpgradeMessageFile),
@@ -656,7 +658,10 @@ SET    version = '$version'
     // pre-db check for major release.
     if ($upgrade->checkVersionRelease($rev, 'alpha1')) {
       if (!(is_callable(array(
-        $versionObject, 'verifyPreDBstate')))) {
+        $versionObject,
+        'verifyPreDBstate'
+      )))
+      ) {
         CRM_Core_Error::fatal("verifyPreDBstate method was not found for $rev");
       }
 
@@ -673,7 +678,9 @@ SET    version = '$version'
     $upgrade->setSchemaStructureTables($rev);
 
     if (is_callable(array(
-      $versionObject, $phpFunctionName))) {
+      $versionObject,
+      $phpFunctionName
+    ))) {
       $versionObject->$phpFunctionName($rev, $originalVer, $latestVer);
     }
     else {
@@ -682,7 +689,9 @@ SET    version = '$version'
 
     // set post-upgrade-message if any
     if (is_callable(array(
-      $versionObject, 'setPostUpgradeMessage'))) {
+      $versionObject,
+      'setPostUpgradeMessage'
+    ))) {
       $postUpgradeMessage = file_get_contents($postUpgradeMessageFile);
       $versionObject->setPostUpgradeMessage($postUpgradeMessage, $rev);
       file_put_contents($postUpgradeMessageFile, $postUpgradeMessage);
@@ -769,7 +778,9 @@ SET    version = '$version'
       ) {
         $versionObject = $this->incrementalPhpObject($rev);
         if (is_callable(array(
-          $versionObject, 'setPreUpgradeMessage'))) {
+          $versionObject,
+          'setPreUpgradeMessage'
+        ))) {
           $versionObject->setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
         }
       }

@@ -54,7 +54,7 @@ class WebTest_Admin_Form_Setting_LocalizationTest extends CiviSeleniumTestCase {
     try {
       $this->assertFalse($this->isTextPresent("Your changes have been saved."));
     }
-    catch(PHPUnit_Framework_AssertionFailedError$e) {
+    catch (PHPUnit_Framework_AssertionFailedError$e) {
       array_push($this->verificationErrors, $e->toString());
     }
   }

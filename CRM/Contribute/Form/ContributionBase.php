@@ -177,10 +177,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_action;
 
   /**
-  * Is honor block is enabled for this contribution?
-  *
-  * @var boolean
-  */
+   * Is honor block is enabled for this contribution?
+   *
+   * @var boolean
+   */
   public $_honor_block_is_active = FALSE;
 
   /**
@@ -196,6 +196,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_useForMember;
 
   public $_isBillingAddressRequiredForPayLater;
+
   /**
    * Set variables up before form is built
    *
@@ -433,10 +434,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // Handle PCP
     $pcpId = CRM_Utils_Request::retrieve('pcpId', 'Positive', $this);
     if ($pcpId) {
-      $pcp             = CRM_PCP_BAO_PCP::handlePcp($pcpId, 'contribute', $this->_values);
-      $this->_pcpId    = $pcp['pcpId'];
+      $pcp = CRM_PCP_BAO_PCP::handlePcp($pcpId, 'contribute', $this->_values);
+      $this->_pcpId = $pcp['pcpId'];
       $this->_pcpBlock = $pcp['pcpBlock'];
-      $this->_pcpInfo  = $pcp['pcpInfo'];
+      $this->_pcpInfo = $pcp['pcpInfo'];
     }
 
     // Link (button) for users to create their own Personal Campaign page
@@ -545,17 +546,22 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     $this->assign('paymentProcessor', $this->_paymentProcessor);
     $vars = array(
-      'amount', 'currencyID',
-      'credit_card_type', 'trxn_id', 'amount_level',
+      'amount',
+      'currencyID',
+      'credit_card_type',
+      'trxn_id',
+      'amount_level',
     );
 
     $config = CRM_Core_Config::singleton();
     if (isset($this->_values['is_recur']) && !empty($this->_paymentProcessor['is_recur'])) {
       $this->assign('is_recur_enabled', 1);
       $vars = array_merge($vars, array(
-        'is_recur', 'frequency_interval', 'frequency_unit',
-          'installments',
-        ));
+        'is_recur',
+        'frequency_interval',
+        'frequency_unit',
+        'installments',
+      ));
     }
 
     if (in_array('CiviPledge', $config->enableComponents) &&
@@ -565,10 +571,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
       $vars = array_merge($vars, array(
         'is_pledge',
-          'pledge_frequency_interval',
-          'pledge_frequency_unit',
-          'pledge_installments',
-        ));
+        'pledge_frequency_interval',
+        'pledge_frequency_unit',
+        'pledge_installments',
+      ));
     }
 
     if (isset($this->_params['amount_other']) || isset($this->_params['selectMembership'])) {
@@ -639,7 +645,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         $date = CRM_Utils_Date::mysqlToIso($date);
         $this->assign('credit_card_exp_date', $date);
         $this->assign('credit_card_number',
-                      CRM_Utils_System::mungeCreditCard(CRM_Utils_array::value('credit_card_number', $this->_params))
+          CRM_Utils_System::mungeCreditCard(CRM_Utils_array::value('credit_card_number', $this->_params))
         );
       }
     }
@@ -726,7 +732,14 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
           if ($profileContactType) {
             //Since we are showing honoree name separately so we are removing it from honoree profile just for display
-            $honoreeNamefields = array('prefix_id', 'first_name', 'last_name', 'suffix_id', 'organization_name', 'household_name');
+            $honoreeNamefields = array(
+              'prefix_id',
+              'first_name',
+              'last_name',
+              'suffix_id',
+              'organization_name',
+              'household_name'
+            );
             if ($profileContactType == 'honor' && in_array($field['name'], $honoreeNamefields)) {
               unset($fields[$field['name']]);
               continue;
@@ -829,14 +842,15 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
     //get pledge status and contact id
-    $pledgeValues     = array();
-    $pledgeParams     = array('id' => $this->_values['pledge_id']);
+    $pledgeValues = array();
+    $pledgeParams = array('id' => $this->_values['pledge_id']);
     $returnProperties = array('contact_id', 'status_id');
     CRM_Core_DAO::commonRetrieve('CRM_Pledge_DAO_Pledge', $pledgeParams, $pledgeValues, $returnProperties);
 
     //get all status
     $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $validStatus = array(array_search('Pending', $allStatus),
+    $validStatus = array(
+      array_search('Pending', $allStatus),
       array_search('In Progress', $allStatus),
       array_search('Overdue', $allStatus),
     );

@@ -107,7 +107,11 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
     }
 
     foreach (array(
-      'phone', 'email', 'im', 'address') as $loc) {
+               'phone',
+               'email',
+               'im',
+               'address'
+             ) as $loc) {
       $locBlock["{$loc}_id"] = !empty($location["$loc"][0]) ? $location["$loc"][0]->id : NULL;
       $locBlock["{$loc}_2_id"] = !empty($location["$loc"][1]) ? $location["$loc"][1]->id : NULL;
     }
@@ -134,9 +138,9 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
    * @static
    */
   public static function findExisting($entityElements) {
-    $eid    = $entityElements['entity_id'];
+    $eid = $entityElements['entity_id'];
     $etable = $entityElements['entity_table'];
-    $query  = "
+    $query = "
 SELECT e.loc_block_id as locId
 FROM {$etable} e
 WHERE e.id = %1";
@@ -330,8 +334,8 @@ WHERE e.id = %1";
     //copy all location blocks (email, phone, address, etc)
     foreach ($defaults as $key => $value) {
       if ($key != 'id') {
-        $tbl          = explode("_", $key);
-        $name         = ucfirst($tbl[0]);
+        $tbl = explode("_", $key);
+        $name = ucfirst($tbl[0]);
         $updateParams = NULL;
         if ($updateId = CRM_Utils_Array::value($key, $updateValues)) {
           $updateParams = array('id' => $updateId);
@@ -368,7 +372,12 @@ WHERE e.id = %1";
     $nonPrimaryBlockIds = CRM_Contact_BAO_Contact::getLocBlockIds($contactId, array('is_primary' => 0));
 
     foreach (array(
-      'Email', 'IM', 'Phone', 'Address', 'OpenID') as $block) {
+               'Email',
+               'IM',
+               'Phone',
+               'Address',
+               'OpenID'
+             ) as $block) {
       $name = strtolower($block);
       if (array_key_exists($name, $primaryLocBlockIds) &&
         !CRM_Utils_System::isNull($primaryLocBlockIds[$name])
@@ -421,13 +430,13 @@ WHERE e.id = %1";
 
       // Format for js
       else {
-       // Option-groups for multiple categories
+        // Option-groups for multiple categories
         if ($result && count($values) > 1) {
           $elements[] = array(
             'value' => CRM_Core_PseudoConstant::$valueType($val, FALSE),
             'children' => array(),
           );
-          $list = & $elements[count($elements) - 1]['children'];
+          $list = &$elements[count($elements) - 1]['children'];
         }
         foreach ($result as $id => $name) {
           $list[] = array(

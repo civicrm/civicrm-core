@@ -206,15 +206,15 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     }
 
     list($this->_memberDisplayName,
-         $this->_memberEmail
-    ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
+      $this->_memberEmail
+      ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
 
     //CRM-10375 Where the payer differs to the member the payer should get the email.
     // here we store details in order to do that
     if (!empty($formValues['soft_credit_contact_id'])) {
       $this->_receiptContactId = $this->_contributorContactID = $formValues['soft_credit_contact_id'];
       list($this->_contributorDisplayName,
-         $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contributorContactID);
+        $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contributorContactID);
     }
     else {
       $this->_receiptContactId = $this->_contributorContactID = $this->_contactID;

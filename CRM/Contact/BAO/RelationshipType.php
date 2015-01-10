@@ -165,7 +165,12 @@ UPDATE civicrm_membership_type
   SET  relationship_type_id = NULL
  WHERE relationship_type_id = %1
 ";
-    $params = array(1 => array(CRM_Core_DAO::VALUE_SEPARATOR . $relationshipTypeId . CRM_Core_DAO::VALUE_SEPARATOR, 'String'));
+    $params = array(
+      1 => array(
+        CRM_Core_DAO::VALUE_SEPARATOR . $relationshipTypeId . CRM_Core_DAO::VALUE_SEPARATOR,
+        'String'
+      )
+    );
     CRM_Core_DAO::executeQuery($query, $params);
 
     //fixed for CRM-3323

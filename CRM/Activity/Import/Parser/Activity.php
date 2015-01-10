@@ -162,9 +162,9 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    */
   public function summary(&$values) {
     $erroneousField = NULL;
-    $response       = $this->setActiveFieldValues($values, $erroneousField);
-    $index          = -1;
-    $errorRequired  = FALSE;
+    $response = $this->setActiveFieldValues($values, $erroneousField);
+    $index = -1;
+    $errorRequired = FALSE;
 
     if ($this->_activityTypeIndex > -1 && $this->_activityLabelIndex > -1) {
       array_unshift($values, ts('Please select either Activity Type ID OR Activity Type Label.'));
@@ -332,7 +332,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
         // Using new Dedupe rule.
         $ruleParams = array(
           'contact_type' => 'Individual',
-          'used'         => 'Unsupervised',
+          'used' => 'Unsupervised',
         );
         $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
 

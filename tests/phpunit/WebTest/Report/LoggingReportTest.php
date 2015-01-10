@@ -50,7 +50,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
 
     //add new contact
     $orginalFirstName = $firstName = 'Anthony' . substr(sha1(rand()), 0, 7);
-    $lastName  = 'Anderson' . substr(sha1(rand()), 0, 7);
+    $lastName = 'Anderson' . substr(sha1(rand()), 0, 7);
 
     $this->webtestAddContact($firstName, $lastName);
     $cid = $this->urlArg('cid');
@@ -186,34 +186,82 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
       array("log_type" => "Contact", "altered_contact" => "{$firstName} {$lastName}", "action" => "Update"),
       array("log_type" => "Contact", "altered_contact" => "{$firstName} {$lastName}", "action" => "Insert"),
       //relationship data check
-      array("log_type" => "Relationship", "altered_contact" => "{$firstName} {$lastName} [Employee of]", "action" => "Update"),
-      array("log_type" => "Relationship", "altered_contact" => "{$firstName} {$lastName} [Employee of]", "action" => "Insert"),
-      array("log_type" => "Relationship", "altered_contact" => "{$firstName} {$lastName} [Employee of]", "action" => "Delete"),
+      array(
+        "log_type" => "Relationship",
+        "altered_contact" => "{$firstName} {$lastName} [Employee of]",
+        "action" => "Update"
+      ),
+      array(
+        "log_type" => "Relationship",
+        "altered_contact" => "{$firstName} {$lastName} [Employee of]",
+        "action" => "Insert"
+      ),
+      array(
+        "log_type" => "Relationship",
+        "altered_contact" => "{$firstName} {$lastName} [Employee of]",
+        "action" => "Delete"
+      ),
       //group data check
-      array("log_type" => "Group", "altered_contact" => "{$firstName} {$lastName} [Case Resources]", "action" => "Added"),
-      array("log_type" => "Group", "altered_contact" => "{$firstName} {$lastName} [Case Resources]", "action" => "Removed"),
+      array(
+        "log_type" => "Group",
+        "altered_contact" => "{$firstName} {$lastName} [Case Resources]",
+        "action" => "Added"
+      ),
+      array(
+        "log_type" => "Group",
+        "altered_contact" => "{$firstName} {$lastName} [Case Resources]",
+        "action" => "Removed"
+      ),
       //note data check
       array("log_type" => "Note", "altered_contact" => "{$firstName} {$lastName}", "action" => "Update"),
       array("log_type" => "Note", "altered_contact" => "{$firstName} {$lastName}", "action" => "Insert"),
       array("log_type" => "Note", "altered_contact" => "{$firstName} {$lastName}", "action" => "Delete"),
       //tags data check
       array("log_type" => "Tag", "altered_contact" => "{$firstName} {$lastName} [Company]", "action" => "Insert"),
-      array("log_type" => "Tag", "altered_contact" => "{$firstName} {$lastName} [Government Entity]", "action" => "Insert"),
+      array(
+        "log_type" => "Tag",
+        "altered_contact" => "{$firstName} {$lastName} [Government Entity]",
+        "action" => "Insert"
+      ),
       array("log_type" => "Tag", "altered_contact" => "{$firstName} {$lastName} [Company]", "action" => "Delete"),
       //case data check
-      array("log_type" => "Case", "altered_contact" => "{$firstName} {$lastName} [Housing Support]", "action" => "Update"),
-      array("log_type" => "Case", "altered_contact" => "{$firstName} {$lastName} [Housing Support]", "action" => "Insert"),
+      array(
+        "log_type" => "Case",
+        "altered_contact" => "{$firstName} {$lastName} [Housing Support]",
+        "action" => "Update"
+      ),
+      array(
+        "log_type" => "Case",
+        "altered_contact" => "{$firstName} {$lastName} [Housing Support]",
+        "action" => "Insert"
+      ),
       //case activity check
-      array("log_type" => "Activity", "altered_contact" => "{$firstName} {$lastName} [Interview]", "action" => "Update"),
-      array("log_type" => "Activity", "altered_contact" => "{$firstName} {$lastName} [Interview]", "action" => "Insert"),
+      array(
+        "log_type" => "Activity",
+        "altered_contact" => "{$firstName} {$lastName} [Interview]",
+        "action" => "Update"
+      ),
+      array(
+        "log_type" => "Activity",
+        "altered_contact" => "{$firstName} {$lastName} [Interview]",
+        "action" => "Insert"
+      ),
     );
     $this->verifyReportData($data);
 
     //update link (logging details report check)
     $contactInfo = array();
     $contactInfo['data'] = array(
-      array('field' => 'Sort Name', 'changed_from' => "{$lastName}, {$orginalFirstName}", 'changed_to' => "{$lastName}, {$firstName}"),
-      array('field' => 'Display Name', 'changed_from' => "{$orginalFirstName} {$lastName}", 'changed_to' => "{$firstName} {$lastName}"),
+      array(
+        'field' => 'Sort Name',
+        'changed_from' => "{$lastName}, {$orginalFirstName}",
+        'changed_to' => "{$lastName}, {$firstName}"
+      ),
+      array(
+        'field' => 'Display Name',
+        'changed_from' => "{$orginalFirstName} {$lastName}",
+        'changed_to' => "{$firstName} {$lastName}"
+      ),
       array('field' => 'First Name', 'changed_from' => $orginalFirstName, 'changed_to' => $firstName),
       // array('field' => 'Email Greeting', 'changed_from' => "Dear {$orginalFirstName}", 'changed_to' => "Dear {$firstName}"),
       // array('field' => 'Postal Greeting', 'changed_from' => "Dear {$orginalFirstName}", 'changed_to' => "Dear {$firstName}"),
@@ -223,7 +271,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
 
     $relationshipInfo = array();
     $relationshipInfo['data'] = array(
-       array('field' => 'Relationship Is Active', 'changed_from' => 'true', 'changed_to' => 'false'),
+      array('field' => 'Relationship Is Active', 'changed_from' => 'true', 'changed_to' => 'false'),
     );
     $relationshipInfo = array_merge($relationshipInfo, $data[2]);
 
@@ -242,8 +290,8 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
 
     $activityInfo = array();
     $activityInfo['data'] = array(
-       array('field' => 'Activity Status Id', 'changed_from' => 'Scheduled', 'changed_to' => 'Completed'),
-     );
+      array('field' => 'Activity Status Id', 'changed_from' => 'Scheduled', 'changed_to' => 'Completed'),
+    );
     $activityInfo = array_merge($activityInfo, $data[15]);
 
     $dataForReportDetail = array($contactInfo, $relationshipInfo, $noteInfo, $caseInfo, $activityInfo);
@@ -261,7 +309,13 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->click("_qf_LoggingSummary_submit");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $contactDataDelete = array(array("log_type" => "Contact", "altered_contact" => "{$firstName} {$lastName}", "action" => "Delete (to trash)"));
+    $contactDataDelete = array(
+      array(
+        "log_type" => "Contact",
+        "altered_contact" => "{$firstName} {$lastName}",
+        "action" => "Delete (to trash)"
+      )
+    );
     $this->verifyReportData($contactDataDelete);
 
     //disable the logging

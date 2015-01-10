@@ -22,4 +22,6 @@ class CRM_Dedupe_BAO_QueryBuilder {
       return "($strID1 < $strID2)";
     }
   }
-};
+}
+
+;

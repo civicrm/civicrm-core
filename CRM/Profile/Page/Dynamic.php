@@ -141,7 +141,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     }
 
     if ($this->_multiRecord & CRM_Core_Action::VIEW) {
-      $this->_recordId  = CRM_Utils_Request::retrieve('recordId', 'Positive', $this);
+      $this->_recordId = CRM_Utils_Request::retrieve('recordId', 'Positive', $this);
       $this->_allFields = CRM_Utils_Request::retrieve('allFields', 'Integer', $this);
     }
 
@@ -192,8 +192,9 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       if ($limitListingsGroupsID) {
 
         if (!CRM_Contact_BAO_GroupContact::isContactInGroup($this->_id,
-            $limitListingsGroupsID
-          )) {
+          $limitListingsGroupsID
+        )
+        ) {
           CRM_Utils_System::setTitle(ts('Profile View - Permission Denied'));
           return CRM_Core_Session::setStatus(ts('You do not have permission to view this contact record. Contact the site administrator if you need assistance.'), ts('Permission Denied'), 'error');
         }

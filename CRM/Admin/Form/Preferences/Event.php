@@ -54,7 +54,7 @@ class CRM_Admin_Form_Preferences_Event extends CRM_Admin_Form_Preferences {
           'title' => ts('Use Shopping Cart Style Event Registration'),
           'weight' => 1,
           'description' => ts('This feature allows users to register for more than one event at a time. When enabled, users will add event(s) to a "cart" and then pay for them all at once. Enabling this setting will affect online registration for all active events. The code is an alpha state, and you will potentially need to have developer resources to debug and fix sections of the codebase while testing and deploying it. %1',
-                              array(1 => $docLink)),
+            array(1 => $docLink)),
         ),
         'show_events' => array(
           'html_type' => 'select',

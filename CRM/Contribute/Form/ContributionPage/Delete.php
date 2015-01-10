@@ -121,15 +121,15 @@ class CRM_Contribute_Form_ContributionPage_Delete extends CRM_Contribute_Form_Co
     $dao->delete();
 
     //next delete the membership block fields
-    $dao               = new CRM_Member_DAO_MembershipBlock();
+    $dao = new CRM_Member_DAO_MembershipBlock();
     $dao->entity_table = 'civicrm_contribution_page';
-    $dao->entity_id    = $this->_id;
+    $dao->entity_id = $this->_id;
     $dao->delete();
 
     //next delete the pcp block fields
-    $dao               = new CRM_PCP_DAO_PCPBlock();
+    $dao = new CRM_PCP_DAO_PCPBlock();
     $dao->entity_table = 'civicrm_contribution_page';
-    $dao->entity_id    = $this->_id;
+    $dao->entity_id = $this->_id;
     $dao->delete();
 
     // need to delete premiums. CRM-4586

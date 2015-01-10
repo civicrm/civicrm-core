@@ -120,10 +120,10 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
     require_once 'CRM/Core/Config.php';
     require_once 'CRM/Utils/Array.php';
     require_once 'CRM/Utils/Date.php';
-    $currentYear  = date('Y');
+    $currentYear = date('Y');
     $currentMonth = date('m');
     $previousYear = $currentYear - 1;
-    $nextYear     = $currentYear + 1;
+    $nextYear = $currentYear + 1;
 
     $todayDate = date('Y-m-d');
 
@@ -138,7 +138,10 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
 
     $configVars = new CRM_Core_Config_Variables();
     foreach (array(
-      'joinDate', 'startDate', 'endDate') as $date) {
+               'joinDate',
+               'startDate',
+               'endDate'
+             ) as $date) {
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }
 
@@ -278,7 +281,7 @@ SELECT end_event_adjust_interval
     require_once 'CRM/Core/Config.php';
     require_once 'CRM/Utils/Array.php';
     require_once 'CRM/Utils/Date.php';
-    $currentYear  = date('Y');
+    $currentYear = date('Y');
     $currentMonth = date('m');
     $previousYear = $currentYear - 1;
 
@@ -294,7 +297,10 @@ SELECT end_event_adjust_interval
     $endDate = date('Y-m-d', mktime(0, 0, 0, 8, 31, $currentYear + 2));
     $configVars = new CRM_Core_Config_Variables();
     foreach (array(
-      'joinDate', 'startDate', 'endDate') as $date) {
+               'joinDate',
+               'startDate',
+               'endDate'
+             ) as $date) {
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }
 
@@ -433,17 +439,20 @@ SELECT end_event_adjust_interval
     require_once 'CRM/Core/Config.php';
     require_once 'CRM/Utils/Array.php';
     require_once 'CRM/Utils/Date.php';
-    $currentYear  = date('Y');
+    $currentYear = date('Y');
     $currentMonth = date('m');
     $previousYear = $currentYear - 1;
-    $nextYear     = $currentYear + 1;
-    $todayDate    = date('Y-m-d');
-    $joinDate     = date('Y-m-d', mktime(0, 0, 0, 11, 15, $currentYear));
-    $startDate    = date('Y-m-d', mktime(0, 0, 0, 1, 1, $currentYear));
-    $endDate      = date('Y-m-d', mktime(0, 0, 0, 12, 31, $nextYear));
-    $configVars   = new CRM_Core_Config_Variables();
+    $nextYear = $currentYear + 1;
+    $todayDate = date('Y-m-d');
+    $joinDate = date('Y-m-d', mktime(0, 0, 0, 11, 15, $currentYear));
+    $startDate = date('Y-m-d', mktime(0, 0, 0, 1, 1, $currentYear));
+    $endDate = date('Y-m-d', mktime(0, 0, 0, 12, 31, $nextYear));
+    $configVars = new CRM_Core_Config_Variables();
     foreach (array(
-      'joinDate', 'startDate', 'endDate') as $date) {
+               'joinDate',
+               'startDate',
+               'endDate'
+             ) as $date) {
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }
 
@@ -581,20 +590,23 @@ SELECT end_event_adjust_interval
     require_once 'CRM/Core/Config.php';
     require_once 'CRM/Utils/Array.php';
     require_once 'CRM/Utils/Date.php';
-    $currentYear  = date('Y');
+    $currentYear = date('Y');
     $currentMonth = date('m');
-    $nextYear     = $currentYear + 1;
-    $todayDate    = date('Y-m-d');
+    $nextYear = $currentYear + 1;
+    $todayDate = date('Y-m-d');
 
     // the member-since date we will type in to membership form
     $joinDate = date('Y-m-d', mktime(0, 0, 0, 1, 15, $currentYear));
 
     // expected calc'd start and end dates
-    $startDate  = date('Y-m-d', mktime(0, 0, 0, 1, 1, $currentYear));
-    $endDate    = date('Y-m-d', mktime(0, 0, 0, 12, 31, $currentYear));
+    $startDate = date('Y-m-d', mktime(0, 0, 0, 1, 1, $currentYear));
+    $endDate = date('Y-m-d', mktime(0, 0, 0, 12, 31, $currentYear));
     $configVars = new CRM_Core_Config_Variables();
     foreach (array(
-      'joinDate', 'startDate', 'endDate') as $date) {
+               'joinDate',
+               'startDate',
+               'endDate'
+             ) as $date) {
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }
 

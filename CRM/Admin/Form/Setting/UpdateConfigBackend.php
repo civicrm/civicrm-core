@@ -54,7 +54,7 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
       $this->_oldBaseURL,
       $this->_oldBaseDir,
       $this->_oldSiteName
-    ) = CRM_Core_BAO_ConfigSetting::getConfigSettings();
+      ) = CRM_Core_BAO_ConfigSetting::getConfigSettings();
 
     $this->assign('oldBaseURL', $this->_oldBaseURL);
     $this->assign('oldBaseDir', $this->_oldBaseDir);
@@ -84,7 +84,7 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
         $this->_defaults['newBaseURL'],
         $this->_defaults['newBaseDir'],
         $this->_defaults['newSiteName']
-      ) = CRM_Core_BAO_ConfigSetting::getBestGuessSettings();
+        ) = CRM_Core_BAO_ConfigSetting::getBestGuessSettings();
     }
 
     return $this->_defaults;
@@ -146,7 +146,8 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
     }
 
     $from = array($this->_oldBaseURL, $this->_oldBaseDir);
-    $to = array(trim($params['newBaseURL']),
+    $to = array(
+      trim($params['newBaseURL']),
       trim($params['newBaseDir']),
     );
     if ($this->_oldSiteName &&

@@ -233,8 +233,8 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
   }
 
   /**
-    * Webtest for add contact to group (CRM-15108)
-    */
+   * Webtest for add contact to group (CRM-15108)
+   */
   public function testAddContactToGroup() {
     $this->webtestLogin();
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");

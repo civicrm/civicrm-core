@@ -114,6 +114,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     $this->callAPIFailure('uf_field', 'create', array('field_name' => 'test field'));
     $this->callAPIFailure('uf_field', 'create', array('label' => 'name-less field'));
   }
+
   /**
    * Create a field with 'weight=1' and then a second with 'weight=1'. The second field
    * winds up with weight=1, and the first field gets bumped to 'weight=2'.

@@ -58,9 +58,9 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
     $q = new CRM_Mailing_Event_BAO_Queue();
     $q->id = $queue_id;
     if ($q->find(TRUE)) {
-      $oe                 = new CRM_Mailing_Event_BAO_Opened();
+      $oe = new CRM_Mailing_Event_BAO_Opened();
       $oe->event_queue_id = $queue_id;
-      $oe->time_stamp     = date('YmdHis');
+      $oe->time_stamp = date('YmdHis');
       $oe->save();
       $success = TRUE;
     }
@@ -90,10 +90,10 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
   ) {
     $dao = new CRM_Core_DAO();
 
-    $open    = self::getTableName();
-    $queue   = CRM_Mailing_Event_BAO_Queue::getTableName();
+    $open = self::getTableName();
+    $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
 
     $query = "
             SELECT      COUNT($open.id) as opened
@@ -143,9 +143,9 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
     $dao = new CRM_Core_DAO();
     $openedCount = array();
 
-    $open    = self::getTableName();
-    $queue   = CRM_Mailing_Event_BAO_Queue::getTableName();
-    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
+    $open = self::getTableName();
+    $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
     $mailingIDs = implode(',', $mailingIDs);
 
     $query = "
@@ -239,12 +239,12 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
   ) {
     $dao = new CRM_Core_Dao();
 
-    $open    = self::getTableName();
-    $queue   = CRM_Mailing_Event_BAO_Queue::getTableName();
+    $open = self::getTableName();
+    $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
     $contact = CRM_Contact_BAO_Contact::getTableName();
-    $email   = CRM_Core_BAO_Email::getTableName();
+    $email = CRM_Core_BAO_Email::getTableName();
 
     $query = "
             SELECT      $contact.display_name as display_name,

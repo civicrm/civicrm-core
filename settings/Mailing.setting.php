@@ -48,7 +48,7 @@ return array(
     'title' => 'Enable Double Opt-in for Profile Group(s) field',
     'is_domain' => 1,
     'is_contact' => 0,
-     'description' => 'When CiviMail is enabled, users who "subscribe" to a group from a profile Group(s) checkbox will receive a confirmation email. They must respond (opt-in) before they are added to the group.',
+    'description' => 'When CiviMail is enabled, users who "subscribe" to a group from a profile Group(s) checkbox will receive a confirmation email. They must respond (opt-in) before they are added to the group.',
     'help_text' => NULL,
   ),
   'track_civimail_replies' => array(
@@ -119,7 +119,7 @@ return array(
     'title' => 'Enable Double Opt-in for Profile Group(s) field',
     'is_domain' => 1,
     'is_contact' => 0,
-     'description' => 'When CiviMail is enabled, users who "subscribe" to a group from a profile Group(s) checkbox will receive a confirmation email. They must respond (opt-in) before they are added to the group.',
+    'description' => 'When CiviMail is enabled, users who "subscribe" to a group from a profile Group(s) checkbox will receive a confirmation email. They must respond (opt-in) before they are added to the group.',
     'help_text' => NULL,
   ),
   'profile_add_to_group_double_optin' => array(

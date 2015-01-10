@@ -161,9 +161,9 @@ $sqlStatement
           }
 
           $query = $tableValues + array(
-            'text' => CRM_Utils_QueryFormatter::singleton()
-              ->format($queryText, CRM_Utils_QueryFormatter::LANG_SOLR),
-          );
+              'text' => CRM_Utils_QueryFormatter::singleton()
+                ->format($queryText, CRM_Utils_QueryFormatter::LANG_SOLR),
+            );
           list($intLimit, $intOffset) = $this->parseLimitOffset($limit);
           $files = $searcher->search($query, $intLimit, $intOffset);
           $matches = array();

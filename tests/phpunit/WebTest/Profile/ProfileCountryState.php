@@ -59,7 +59,11 @@ class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
     $gid = $this->urlArg('gid');
 
     //Add Country field to profile
-    $this->openCiviPage('admin/uf/group/field/add', array('action' => 'add', 'reset' => 1, 'gid' => $gid), 'field_name[0]');
+    $this->openCiviPage('admin/uf/group/field/add', array(
+        'action' => 'add',
+        'reset' => 1,
+        'gid' => $gid
+      ), 'field_name[0]');
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Contact');
     $this->click("//option[@value='Contact']");

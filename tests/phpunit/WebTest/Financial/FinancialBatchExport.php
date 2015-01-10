@@ -41,7 +41,7 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
     $this->webtestLogin('admin');
     $this->openCiviPage("financial/batch", "reset=1&action=add", '_qf_FinancialBatch_next-botttom');
     $setTitle = 'Batch ' . substr(sha1(rand()), 0, 7) . date('Y-m-d');
-    $setDescription  = 'Test Batch Creation';
+    $setDescription = 'Test Batch Creation';
     $setPaymentInstrument = 'Credit Card';
     $numberOfTrxn = '10'; // can be 10, 25, 50, 100
     $totalAmt = '1000';

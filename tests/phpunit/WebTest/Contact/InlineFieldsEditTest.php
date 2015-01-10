@@ -40,7 +40,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
 
     // Add a contact
     $firstName = 'WebTest' . substr(sha1(rand()), 0, 7);
-    $lastName  = 'InlineFieldsEdit' . substr(sha1(rand()), 0, 7);
+    $lastName = 'InlineFieldsEdit' . substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, $lastName);
     $contactId = $this->urlArg('cid');
     $this->waitForElementPresent('css=.crm-inline-edit-container.crm-edit-ready');

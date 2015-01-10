@@ -32,7 +32,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * @package CiviCRM_APIv3
  * @subpackage API_Activity
  */
-
 class api_v3_ActivityTypeTest extends CiviUnitTestCase {
   protected $_apiversion;
 
