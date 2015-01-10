@@ -96,7 +96,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    *   If the event type is a click-through, do we want only those from a specific url?.
    *
    * @return \CRM_Mailing_Selector_Event
-  @access public
+   * @access public
    */
   public function __construct($event, $distinct, $mailing, $job = NULL, $url = NULL) {
     $this->_event_type  = $event;
