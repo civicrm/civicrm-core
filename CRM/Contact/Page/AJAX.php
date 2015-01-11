@@ -199,7 +199,7 @@ class CRM_Contact_Page_AJAX {
    * Function to fetch PCP ID by PCP Supporter sort_name, also displays PCP title and associated Contribution Page title
    */
   static function getPCPList() {
-    $name  = CRM_Utils_Array::value('s', $_GET);
+    $name  = CRM_Utils_Array::value('term', $_GET);
     $name  = CRM_Utils_Type::escape($name, 'String');
     $limit = '10';
 
