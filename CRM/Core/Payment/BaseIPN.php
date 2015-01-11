@@ -743,7 +743,7 @@ LIMIT 1;";
    *   Is it part of a recurring contribution.
    * @param bool $returnMessageText
    *   Should text be returned instead of sent. This.
-   *  is because the function is also used to generate pdfs
+   *   is because the function is also used to generate pdfs
    *
    * @return array
    */

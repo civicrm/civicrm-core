@@ -223,7 +223,8 @@ class CRM_Core_StateMachine {
    * @param string $name
    *   Name of page.
    *
-   * @return CRM_Core_State state object matching the name
+   * @return CRM_Core_State
+   *   state object matching the name
    */
   public function &getState($name) {
     if (isset($this->_states[$name])) {

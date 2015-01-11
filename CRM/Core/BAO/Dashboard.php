@@ -99,11 +99,11 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *
    * @param bool $flatFormat
    *   This is true if you want simple associated.
-   * array of all the contact's dashlets whether or not they are enabled.
+   *   array of all the contact's dashlets whether or not they are enabled.
    *
    * @param int $contactID
    *   Provide the dashlets for the contact id.
-   * passed rather than the current user.
+   *   passed rather than the current user.
    *
    * @return array
    *   array of dashlets
@@ -156,7 +156,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * the default dashlets.
    *
    * @return array
-   *   of dashboard_id's
+   *   Array of dashboard_id's
    */
   public static function initializeDashlets() {
     $dashlets = array();

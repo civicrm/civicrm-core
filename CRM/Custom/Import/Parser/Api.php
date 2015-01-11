@@ -84,8 +84,8 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    *
    * @return boolean
    *   the result of this processing
-   * It is called from both the preview & the import actions
-   * (non-PHPdoc)
+   *   It is called from both the preview & the import actions
+   *
    * @see CRM_Custom_Import_Parser_BaseClass::summary()
    */
   public function summary(&$values) {

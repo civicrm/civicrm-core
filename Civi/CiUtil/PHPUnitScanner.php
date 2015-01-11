@@ -67,7 +67,8 @@ class PHPUnitScanner {
   }
 
   /**
-   * @param array $testClasses
+   * @param array $paths
+   *
    * @return array
    *   each element is an array with keys:
    *   - file: string

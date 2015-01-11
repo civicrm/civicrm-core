@@ -1835,15 +1835,15 @@ class CRM_Utils_System {
    *
    * @param array $crudLinkSpec
    *   With keys:.
-   *  - action: int, CRM_Core_Action::UPDATE or CRM_Core_Action::VIEW [default: VIEW]
-   *  - entity_table: string, eg "civicrm_contact"
-   *  - entity_id: int
+   *   - action: int, CRM_Core_Action::UPDATE or CRM_Core_Action::VIEW [default: VIEW]
+   *   - entity_table: string, eg "civicrm_contact"
+   *   - entity_id: int
    * @return array|NULL
    *   NULL if unavailable, or an array. array has keys:
-   *  - path: string
-   *  - query: array
-   *  - title: string
-   *  - url: string
+   *   - path: string
+   *   - query: array
+   *   - title: string
+   *   - url: string
    */
   public static function createDefaultCrudLink($crudLinkSpec) {
     $crudLinkSpec['action'] = CRM_Utils_Array::value('action', $crudLinkSpec, CRM_Core_Action::VIEW);

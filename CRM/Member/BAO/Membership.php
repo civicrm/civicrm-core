@@ -69,7 +69,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @param array $ids
    *   The array that holds all the db ids.
    *
-   * @return CRM_Member_BAO_Membership object
+   * @return CRM_Member_BAO_Membership
    * @static
    */
   public static function add(&$params, $ids = array()) {
@@ -238,7 +238,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *
    * @throws CRM_Core_Exception
    *
-   * @return CRM_Member_BAO_Membership object
+   * @return CRM_Member_BAO_Membership
    * @static
    */
   public static function create(&$params, &$ids, $skipRedirect = FALSE, $activityType = 'Membership Signup') {
@@ -519,7 +519,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *   (reference ) an assoc array to hold the name / value pairs.
    *                        in a hierarchical manner
    *
-   * @return CRM_Member_BAO_Membership object
+   * @return CRM_Member_BAO_Membership
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -558,7 +558,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *   Membership id of values to return.
    *
    * @return array
-   *   of key value pairs
+   *   Array of key value pairs
    */
   public static function getStatusANDTypeValues($membershipId) {
     $values = array();
@@ -3073,7 +3073,7 @@ WHERE      civicrm_membership.is_test = 0";
    *   Mode of payment.
    *
    * @return array
-   *   of membership type
+   *   Array of membership type
    * @static
    */
   public static function getContactsCancelledMembership($contactID, $isTest = FALSE) {

@@ -400,7 +400,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * @static
    *
    * @return array
-   *   of CRM_Core_Reference_Interface
+   *   Array of CRM_Core_Reference_Interface
    */
   public static function getReferenceColumns() {
     return array();
@@ -1144,7 +1144,8 @@ FROM   civicrm_domain
    * @param bool $i18nRewrite
    * @param bool $trapException
    *
-   * @return CRM_Core_DAO object that holds the results of the query
+   * @return CRM_Core_DAO
+   *   object that holds the results of the query
    * @static
    */
   static function &executeQuery(
@@ -2031,7 +2032,7 @@ SELECT contact_id
    * Find all records which refer to this entity.
    *
    * @return array
-   *   of objects referencing this
+   *   Array of objects referencing this
    */
   public function findReferences() {
     $links = self::getReferencesToTable(static::getTableName());
@@ -2056,11 +2057,11 @@ SELECT contact_id
   /**
    * @return array
    *   each item has keys:
-   *  - name: string
-   *  - type: string
-   *  - count: int
-   *  - table: string|null SQL table name
-   *  - key: string|null SQL column name
+   *   - name: string
+   *   - type: string
+   *   - count: int
+   *   - table: string|null SQL table name
+   *   - key: string|null SQL column name
    */
   public function getReferenceCounts() {
     $links = self::getReferencesToTable(static::getTableName());
@@ -2097,7 +2098,7 @@ SELECT contact_id
    *
    * @return array
    *   structure of table and column, listing every table with a
-   * foreign key reference to $tableName, and the column where the key appears.
+   *   foreign key reference to $tableName, and the column where the key appears.
    */
   public static function getReferencesToTable($tableName) {
     $refsFound = array();
@@ -2143,9 +2144,9 @@ SELECT contact_id
    *
    * @param string $fieldName
    * @param string $context
-   *   : @see CRM_Core_DAO::buildOptionsContext.
+   *   @see CRM_Core_DAO::buildOptionsContext.
    * @param array $props
-   *   : whatever is known about this bao object.
+   *   whatever is known about this bao object.
    *
    * @return Array|bool
    */
@@ -2237,7 +2238,7 @@ SELECT contact_id
    *   alternative field name ('as') @todo- not actually used.
    * @param bool $returnSanitisedArray
    *   Return a sanitised array instead of a clause.
-   *  this is primarily so we can add filters @ the api level to the Query object based fields
+   *   this is primarily so we can add filters @ the api level to the Query object based fields
    *
    * @throws Exception
    *

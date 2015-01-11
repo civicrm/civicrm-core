@@ -37,10 +37,6 @@
  *
  */
 
-/**
- * Files required for this package
- */
-
 
 /**
  * Returns array of Mailing Recipients

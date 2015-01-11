@@ -49,7 +49,7 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contact_BAO_RelationshipType object
+   * @return CRM_Contact_BAO_RelationshipType
    * @static
    */
   public static function retrieve(&$params, &$defaults) {

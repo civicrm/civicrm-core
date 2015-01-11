@@ -560,7 +560,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    * @param bool $xmlSafe
    * @return mixed
    *   value of the field, or empty string if the field is
-   * not set
+   *   not set
    */
   public function _getParam($field, $xmlSafe = FALSE) {
     $value = CRM_Utils_Array::value($field, $this->_params, '');

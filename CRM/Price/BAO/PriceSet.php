@@ -60,7 +60,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Price_DAO_PriceSet object
+   * @return CRM_Price_DAO_PriceSet
    * @static
    */
   public static function create(&$params) {
@@ -86,7 +86,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Price_DAO_PriceSet object
+   * @return CRM_Price_DAO_PriceSet
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -287,7 +287,7 @@ WHERE     ct.id = cp.financial_type_id AND
    *
    * @return boolean
    *   false if fields exist for this set, true if the
-   * set could be deleted
+   *   set could be deleted
    *
    * @static
    */
@@ -1092,7 +1092,7 @@ WHERE  id = %1";
    *   Price Set id.
    *
    * @return array
-   *   of the field ids
+   *   Array of the field ids
    *
    * @static
    */

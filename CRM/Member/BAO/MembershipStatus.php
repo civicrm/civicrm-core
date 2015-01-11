@@ -54,7 +54,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Member_BAO_MembershipStatus object
+   * @return CRM_Member_BAO_MembershipStatus
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -91,7 +91,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @throws Exception
-   * @return CRM_Member_BAO_MembershipStatus object
+   * @return CRM_Member_BAO_MembershipStatus
    * @static
    */
   public static function create($params) {

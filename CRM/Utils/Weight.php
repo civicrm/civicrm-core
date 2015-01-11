@@ -47,7 +47,7 @@ class CRM_Utils_Weight {
    *   Field => value to be used in the WHERE.
    * @param string $weightField
    *   Field which contains the weight value,.
-   * defaults to 'weight'
+   *   defaults to 'weight'
    *
    * @return bool
    */
@@ -94,7 +94,7 @@ class CRM_Utils_Weight {
    *   Field => value to be used in the WHERE.
    * @param string $weightField
    *   Field which contains the weight value,.
-   * defaults to 'weight'
+   *   defaults to 'weight'
    *
    * @return bool
    */
@@ -131,7 +131,7 @@ class CRM_Utils_Weight {
    *   Field => value to be used in the WHERE.
    * @param string $weightField
    *   Field which contains the weight value,.
-   * defaults to 'weight'
+   *   defaults to 'weight'
    *
    * @return int
    */
@@ -239,7 +239,7 @@ class CRM_Utils_Weight {
    *   Field => value to be used in the WHERE.
    * @param string $weightField
    *   Field which contains the weight value,.
-   * defaults to 'weight'
+   *   defaults to 'weight'
    *
    * @return integer
    */
@@ -262,7 +262,7 @@ class CRM_Utils_Weight {
    *   Field => value to be used in the WHERE.
    * @param string $weightField
    *   Field which contains the weight value,.
-   * defaults to 'weight'
+   *   defaults to 'weight'
    *
    * @return integer
    */
@@ -288,7 +288,8 @@ class CRM_Utils_Weight {
    *
    * @param null $groupBy
    *
-   * @return CRM_Core_DAO objet that holds the results of the query
+   * @return CRM_Core_DAO
+   *   objet that holds the results of the query
    */
   static function &query(
     $queryType,

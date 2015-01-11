@@ -1310,7 +1310,7 @@ class CRM_Utils_Token {
    *
    * @param array $contactIDs
    *   This should always be array(0) or its not anonymous - left to keep signature same.
-   * as main fn
+   *   as main fn
    * @param string $returnProperties
    * @param bool $skipOnHold
    * @param bool $skipDeceased

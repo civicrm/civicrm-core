@@ -60,7 +60,7 @@ function civicrm_api3_group_organization_get($params) {
  * @example GroupOrganizationCreate.php
  * {@getfields GroupOrganization_create}
  *
- * @param $params
+ * @param array $params
  *   Array.
  *
  * @return array

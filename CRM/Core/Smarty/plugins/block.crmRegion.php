@@ -9,7 +9,7 @@
  *   Must define 'name'.
  * @param string $content
  *   Default content.
- * @param object $smarty
+ * @param CRM_Core_Smarty $smarty
  *   The Smarty object.
  *
  * @param $repeat

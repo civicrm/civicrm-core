@@ -69,7 +69,7 @@ class CRM_Core_OptionValue {
    *   Has links like edit, delete, disable ..etc.
    *
    * @return array
-   *   of option-values
+   *   Array of option-values
    *
    * @static
    */
@@ -392,7 +392,7 @@ class CRM_Core_OptionValue {
    *   Do you want only active option values?.
    *
    * @return array
-   *   of option-values
+   *   Array of option-values
    *
    * @static
    */

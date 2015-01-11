@@ -38,7 +38,7 @@ function civicrm_api3_option_value_get($params) {
  *
  * @throws API_Exception
  * @return array
- *   of newly created option_value property values.
+ *   Array of newly created option_value property values.
  * {@getfields OptionValue_create}
  * @access public
  */

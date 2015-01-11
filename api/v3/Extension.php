@@ -307,7 +307,7 @@ function civicrm_api3_extension_get($params) {
  * @param array $params
  *   API request params with 'key' or 'keys'.
  * @return array
- *   of extension keys
+ *   Array of extension keys
  * @throws API_Exception
  */
 function _civicrm_api3_getKeys($params) {

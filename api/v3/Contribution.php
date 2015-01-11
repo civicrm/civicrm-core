@@ -209,7 +209,7 @@ function _civicrm_api3_contribution_delete_spec(&$params) {
  *   (reference ) input parameters.
  *
  * @return array
- *   of contributions, if error an array with an error id and error message
+ *   Array of contributions, if error an array with an error id and error message
  * @static void
  * @access public
  * {@getfields Contribution_get}
@@ -270,7 +270,7 @@ function _civicrm_api3_contribution_get_spec(&$params) {
  *
  * @param array $params
  *   Associative array of property name/value.
- * pairs to insert in new contact.
+ *   pairs to insert in new contact.
  * @param array $values
  *   The reformatted properties that we can use internally.
  * '

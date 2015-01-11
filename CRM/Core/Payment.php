@@ -184,7 +184,8 @@ abstract class CRM_Core_Payment {
   /**
    * Getter for payment form that is using the processor
    * @deprecated
-   * @return CRM_Core_Form  A form object
+   * @return CRM_Core_Form
+   *   A form object
    */
   public function getForm() {
     return $this->_paymentForm;

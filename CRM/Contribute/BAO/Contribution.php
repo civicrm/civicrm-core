@@ -92,7 +92,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param array $ids
    *   The array that holds all the db ids.
    *
-   * @return CRM_Contribute_BAO_Contribution object
+   * @return CRM_Contribute_BAO_Contribution
    * @static
    */
   public static function add(&$params, $ids = array()) {
@@ -297,7 +297,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param array $ids
    *   The array that holds all the db ids.
    *
-   * @return CRM_Contribute_BAO_Contribution object
+   * @return CRM_Contribute_BAO_Contribution
    * @static
    */
   public static function create(&$params, $ids = array()) {
@@ -540,7 +540,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param array $ids
    *   (reference) the array that holds all the db ids.
    *
-   * @return CRM_Contribute_BAO_Contribution object
+   * @return CRM_Contribute_BAO_Contribution
    * @static
    */
   public static function retrieve(&$params, &$defaults, &$ids) {
@@ -846,13 +846,12 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    * @param array $input
    *   An assoc array of name/value pairs.
    * @param array $duplicates
-   *   (reference ) store ids of duplicate contribs.
-   *
+   *   (reference) store ids of duplicate contribs.
    * @param int $id
    *
    * @return boolean
    *   true if duplicate, false otherwise
-   * static
+   * @static
    */
   public static function checkDuplicate($input, &$duplicates, $id = NULL) {
     if (!$id) {
@@ -902,9 +901,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    * pairs
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Contribute_BAO_ContributionProduct object
+   * @return CRM_Contribute_DAO_ContributionProduct
    * @static
    */
   public static function addPremium(&$params) {
@@ -1161,7 +1160,7 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
    *
    * @return array
    *   contribution id if success else NULL
-   * static
+   * @static
    */
   public static function checkDuplicateIds($params) {
     $dao = new CRM_Contribute_DAO_Contribution();
@@ -1254,7 +1253,6 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
    * Create address associated with contribution record.
    *
    * @param array $params
-   *   An associated array.
    * @param int $billingLocationTypeID
    *
    * @return int
@@ -1340,7 +1338,8 @@ WHERE      $condition
    * @param string $componentName
    *   Event/Membership.
    *
-   * @return $contributionId pending contribution id.
+   * @return int
+   *   pending contribution id.
    * @static
    */
   public static function checkOnlinePendingContribution($componentId, $componentName) {
@@ -1395,7 +1394,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
   }
 
   /**
-   * This function update contribution as well as related objects.
+   * Update contribution as well as related objects.
    */
   public static function transitionComponents($params, $processContributionObject = FALSE) {
     // get minimum required values.
@@ -1751,7 +1750,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
   }
 
   /**
-   * This function returns all contribution related object ids.
+   * Returns all contribution related object ids.
    */
   public static function getComponentDetails($contributionId) {
     $componentDetails = $pledgePayment = array();
@@ -1949,11 +1948,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     );
   }
 
-  /*
+  /**
    * Load objects relations to contribution object
    * Objects are stored in the $_relatedObjects property
    * In the first instance we are just moving functionality from BASEIpn -
-   * see http://issues.civicrm.org/jira/browse/CRM-9996
+   * @see http://issues.civicrm.org/jira/browse/CRM-9996
+   *
+   * Note that the unit test for the BaseIPN class tests this function
    *
    * @param array $input
    *   Input as delivered from Payment Processor.
@@ -1963,13 +1964,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   Is Payment processor / contribution page required.
    * @param bool $loadAll
    *   Load all related objects - even where id not passed in? (allows API to call this).
-   * Note that the unit test for the BaseIPN class tests this function
-   */
-  /**
-   * @param $input
-   * @param $ids
-   * @param bool $required
-   * @param bool $loadAll
    *
    * @return bool
    * @throws Exception
@@ -2129,12 +2123,12 @@ WHERE  contribution_id = %1 ";
     return TRUE;
   }
 
-  /*
+  /**
    * Create array of message information - ie. return html version, txt version, to field
    *
    * @param array $input
    *   Incoming information.
-   *  - is_recur - should this be treated as recurring (not sure why you wouldn't
+   *   - is_recur - should this be treated as recurring (not sure why you wouldn't
    *    just check presence of recur object but maintaining legacy approach
    *    to be careful)
    * @param array $ids
@@ -2142,20 +2136,14 @@ WHERE  contribution_id = %1 ";
    * @param array $values
    *   Any values that may have already been compiled by calling process.
    *   This is augmented by values 'gathered' by gatherMessageValues
+   * @param bool $recur
    * @param bool $returnMessageText
    *   Distinguishes between whether to send message or return.
    *   message text. We are working towards this function ALWAYS returning message text & calling
    *   function doing emails / pdfs with it
+   *
    * @return array
    *   messages
-   */
-  /**
-   * @param $input
-   * @param $ids
-   * @param $values
-   * @param bool $recur
-   * @param bool $returnMessageText
-   *
    * @throws Exception
    */
   public function composeMessageArray(&$input, &$ids, &$values, $recur = FALSE, $returnMessageText = TRUE) {
@@ -2279,26 +2267,18 @@ WHERE  contribution_id = %1 ";
     }
   }
 
-  /*
+  /**
    * Gather values for contribution mail - this function has been created
    * as part of CRM-9996 refactoring as a step towards simplifying the composeMessage function
    * Values related to the contribution in question are gathered
    *
    * @param array $input
    *   Input into function (probably from payment processor).
+   * @param array $values
    * @param array $ids
-   *   The set of ids related to the inpurt.
+   *   The set of ids related to the input.
    *
    * @return array
-   *
-   * NB don't add direct calls to the function as we intend to change the signature
-   */
-  /**
-   * @param $input
-   * @param $values
-   * @param array $ids
-   *
-   * @return mixed
    */
   public function _gatherMessageValues($input, &$values, $ids = array()) {
     // set display address of contributor
@@ -3195,9 +3175,9 @@ WHERE  contribution_id = %1 ";
    *
    * @param string $fieldName
    * @param string $context
-   *   : @see CRM_Core_DAO::buildOptionsContext.
+   *   @see CRM_Core_DAO::buildOptionsContext.
    * @param array $props
-   *   : whatever is known about this dao object.
+   *   whatever is known about this dao object.
    *
    * @return Array|bool
    */
@@ -3257,9 +3237,9 @@ WHERE  contribution_id = %1 ";
    * Function to record additional payment for partial and refund contributions
    *
    * @param int $contributionId
-   *   : is the invoice contribution id (got created after processing participant payment).
+   *   is the invoice contribution id (got created after processing participant payment).
    * @param array $trxnData
-   *   : to take user provided input of transaction details.
+   *   to take user provided input of transaction details.
    * @param string $paymentType
    *   'owed' for purpose of recording partial payments, 'refund' for purpose of recording refund payments.
    */

@@ -61,7 +61,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Pledge_BAO_Pledge object
+   * @return CRM_Pledge_BAO_Pledge
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -148,7 +148,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Pledge_BAO_Pledge object
+   * @return CRM_Pledge_BAO_Pledge
    * @static
    */
   public static function &create(&$params) {
@@ -1093,7 +1093,7 @@ SELECT  pledge.contact_id              as contact_id,
    *
    * @param int $pledgeID
    * @return array
-   *   of int (civicrm_pledge_payment.id)
+   *   Array of int (civicrm_pledge_payment.id)
    */
   public static function findCancelablePayments($pledgeID) {
     $statuses = array_flip(CRM_Contribute_PseudoConstant::contributionStatus());

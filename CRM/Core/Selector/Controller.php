@@ -392,7 +392,7 @@ class CRM_Core_Selector_Controller {
    * @param CRM_Core_Form $form
    *
    * @return array
-   *   of rows
+   *   Array of rows
    */
   public function getRows($form) {
     if ($form->_output == self::EXPORT || $form->_output == self::SCREEN) {

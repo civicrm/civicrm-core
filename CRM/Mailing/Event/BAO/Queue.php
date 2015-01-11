@@ -47,7 +47,8 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    * @param array $params
    *   Values of the new EventQueue.
    *
-   * @return CRM_Mailing_Event_BAO_Queue   The new EventQueue
+   * @return CRM_Mailing_Event_BAO_Queue
+   *   The new EventQueue
    * @static
    */
   public static function create($params) {

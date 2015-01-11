@@ -12,11 +12,11 @@
  *
  * @param array $apiRequest
  *   Api request as an array. Keys are.
- *  - entity: string
- *  - action: string
- *  - version: string
- *  - function: callback (mixed)
- *  - params: array, varies
+ *   - entity: string
+ *   - action: string
+ *   - version: string
+ *   - function: callback (mixed)
+ *   - params: array, varies
  * @return array
  *   API success object
  */
@@ -278,7 +278,7 @@ function civicrm_api3_generic_replace($apiRequest) {
  *   Api request as an array.
  *
  * @return array
- *   of results
+ *   Array of results
  */
 function civicrm_api3_generic_getoptions($apiRequest) {
   // Resolve aliases

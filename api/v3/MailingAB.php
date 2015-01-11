@@ -38,10 +38,6 @@
  */
 
 /**
- * Files required for this package
- */
-
-/**
  * Handle a create mailing ab testing
  *
  * @param array $params

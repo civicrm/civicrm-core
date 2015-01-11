@@ -79,7 +79,7 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
    *
    * @param array $params
    *
-   * @return CRM_Survey_DAO_Survey object
+   * @return CRM_Survey_DAO_Survey
    * @static
    */
   public static function create(&$params) {

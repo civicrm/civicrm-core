@@ -55,7 +55,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contribute_BAO_ContributionType object
+   * @return CRM_Contribute_BAO_ContributionType
    * @static
    */
   public static function retrieve(&$params, &$defaults) {

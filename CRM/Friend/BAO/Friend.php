@@ -54,7 +54,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Friend_BAO_Friend object
+   * @return CRM_Friend_BAO_Friend
    * @static
    */
   public static function add(&$params) {
@@ -93,7 +93,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Contact_BAO_Contact object
+   * @return CRM_Contact_BAO_Contact
    * @static
    */
   public static function create(&$params) {
@@ -343,7 +343,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Friend_BAO_Friend object
+   * @return CRM_Friend_BAO_Friend
    * @static
    */
   public static function addTellAFriend(&$params) {

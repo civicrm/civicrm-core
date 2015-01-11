@@ -120,13 +120,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    * @param array $cookies
-   *   Each item is an array with keys:.
-   *  - name: string
-   *  - value: string; note that RFC's don't define particular encoding scheme, so
+   *   Each item is an Array with keys:
+   *   - name: string
+   *   - value: string; note that RFC's don't define particular encoding scheme, so
    *    you must pick one yourself and pre-encode; does not allow values with
    *    commas, semicolons, or whitespace
-   *  - path: string; default: '/'
-   *  - max_age: int; default: 1 week (7*24*60*60)
+   *   - path: string; default: '/'
+   *   - max_age: int; default: 1 week (7*24*60*60)
    */
   protected function setCookies($cookies) {
     foreach ($cookies as $cookie) {
@@ -652,7 +652,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *   Selector.
    * @param string $contactType
    * @return array
-   *   of contact attributes (id, names, email)
+   *   Array of contact attributes (id, names, email)
    */
   public function createDialogContact($field = 'contact_id', $contactType = 'Individual') {
     $selectId = 's2id_' . $this->getAttribute($field . '@id');
@@ -2105,7 +2105,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @param array $customSets
    *   Custom sets i.e entity wise sets want to be created and checked.
-   * e.g    $customSets = array(array('entity' => 'Contribution', 'subEntity' => 'Donation',
+   *   e.g    $customSets = array(array('entity' => 'Contribution', 'subEntity' => 'Donation',
    * 'triggerElement' => $triggerElement))
    * array  $triggerElement:   the element which is responsible for custom group to load
    *

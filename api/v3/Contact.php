@@ -413,7 +413,7 @@ function _civicrm_api3_contact_check_params(&$params, $dupeCheck = TRUE, $dupeEr
  * @param int $contactID
  *   If present the contact with that ID is updated.
  *
- * @return CRM_Contact_BAO_Contact object
+ * @return CRM_Contact_BAO_Contact
  * @access public
  * @static
  */
@@ -857,7 +857,7 @@ LIMIT    0, {$limit}
 /**
  * @deprecated api notice
  * @return array
- *   of deprecated actions
+ *   Array of deprecated actions
  */
 function _civicrm_api3_contact_deprecation() {
   return array('getquick' => 'The "getquick" action is deprecated in favor of "getlist".');

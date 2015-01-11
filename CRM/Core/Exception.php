@@ -34,7 +34,7 @@
  *   The human friendly error message.
  * @param string $error_code
  *   A computer friendly error code. By convention, no space (but underscore allowed).
- *  ex: mandatory_missing, duplicate, invalid_format
+ *   ex: mandatory_missing, duplicate, invalid_format
  * @param array $data
  *   Extra params to return. eg an extra array of ids. It is not mandatory, but can help the computer using the api. Keep in mind the api consumer isn't to be trusted. eg. the database password is NOT a good extra data.
  */

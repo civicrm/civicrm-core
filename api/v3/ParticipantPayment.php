@@ -38,10 +38,6 @@
  */
 
 /**
- * Files required for this package
- */
-
-/**
  * Create a Event Participant Payment
  *
  * This API is used for creating a Participant Payment of Event.
@@ -53,7 +49,7 @@
  * {@example ParticipantPaymentCreate.php 0}
  *
  * @return array
- *   of newly created payment property values.
+ *   Array of newly created payment property values.
  * {@getfields ParticipantPayment_create}
  * @access public
  */

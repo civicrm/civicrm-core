@@ -47,7 +47,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * and this is new in 4.6
    * All existing calls have been changed to createMultiple except the api call - however, it is recommended
    * that you call that as the end to end testing here is based on the api & refactoring may still be done
-   * @param $params
+   * @param array $params
    * @return \CRM_Contact_BAO_Relationship
    * @throws \CRM_Core_Exception
    */
@@ -78,10 +78,10 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *   (reference ) an assoc array of name/value pairs.
    * @param array $ids
    *   The array that holds all the db ids.
-   * per http://wiki.civicrm.org/confluence/display/CRM/Database+layer
+   *   per http://wiki.civicrm.org/confluence/display/CRM/Database+layer
    *  "we are moving away from the $ids param "
    *
-   * @return CRM_Contact_BAO_Relationship object
+   * @return CRM_Contact_BAO_Relationship
    * @static
    */
   public static function createMultiple(&$params, $ids = array()) {
@@ -304,7 +304,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
   /**
    * Resolve passed in contact IDs to contact_id_a & contact_id_b
-   * @param $params
+   * @param array $params
    * @param array $ids
    * @param null $contactID
    * @throws \CRM_Core_Exception
@@ -1584,7 +1584,7 @@ WHERE id IN ( {$contacts} )
    *
    * @param int $contactID
    *   contact id whose employers.
-   * are to be found.
+   *   are to be found.
    * @param string $name
    *   employers sort name.
    *
@@ -1615,7 +1615,7 @@ WHERE id IN ( {$contacts} )
    * @static
    *
    * @return array
-   *   of contacts
+   *   Array of contacts
    */
   public static function getPermissionedContacts($contactID, $relTypeId, $name = NULL) {
     $contacts = array();

@@ -85,7 +85,7 @@ class CRM_Core_Permission {
    * Given a permission string or array, check for access requirements
    * @param mixed $permissions
    *   The permission to check as an array or string -see examples.
-   *  arrays
+   *   arrays
    *
    *  Ex 1
    *

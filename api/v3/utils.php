@@ -286,8 +286,8 @@ function _civicrm_api3_load_DAO($entity) {
  * return the DAO of the function or Entity
  * @param string $name
  *   Either a function of the api (civicrm_{entity}_create or the entity name.
- * return the DAO name to manipulate this function
- * eg. "civicrm_api3_contact_create" or "Contact" will return "CRM_Contact_BAO_Contact"
+ *   return the DAO name to manipulate this function
+ *   eg. "civicrm_api3_contact_create" or "Contact" will return "CRM_Contact_BAO_Contact"
  * @return mixed|string
  */
 function _civicrm_api3_get_DAO($name) {
@@ -354,8 +354,8 @@ function _civicrm_api3_get_DAO($name) {
  * return the DAO of the function or Entity
  * @param string $name
  *   Is either a function of the api (civicrm_{entity}_create or the entity name.
- * return the DAO name to manipulate this function
- * eg. "civicrm_contact_create" or "Contact" will return "CRM_Contact_BAO_Contact"
+ *   return the DAO name to manipulate this function
+ *   eg. "civicrm_contact_create" or "Contact" will return "CRM_Contact_BAO_Contact"
  * @return mixed
  */
 function _civicrm_api3_get_BAO($name) {
@@ -542,7 +542,8 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
  * @param array $params
  * @param string $mode
  * @param string $entity
- * @return CRM_Core_DAO query object
+ * @return CRM_Core_DAO
+ *   query object
  */
 function _civicrm_api3_get_query_object($params, $mode, $entity) {
   $options          = _civicrm_api3_get_options_from_params($params, TRUE, $entity, 'get');
@@ -700,7 +701,7 @@ function _civicrm_api3_apply_filters_to_dao($filterField, $filterValue, &$dao) {
  *   Params array as passed into civicrm_api.
  * @param bool $queryObject
  *   Is this supporting a queryobject api (e.g contact) - if so we support more options.
- * for legacy report & return a unique fields array
+ *   for legacy report & return a unique fields array
  *
  * @param string $entity
  * @param string $action
@@ -1996,9 +1997,9 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
  * Returns the canonical name of a field
  *
  * @param $entity
- *   : api entity name (string should already be standardized - no camelCase).
+ *   api entity name (string should already be standardized - no camelCase).
  * @param $fieldName
- *   : any variation of a field's name (name, unique_name, api.alias).
+ *   any variation of a field's name (name, unique_name, api.alias).
  *
  * @return bool|string
  *   fieldName or FALSE if the field does not exist

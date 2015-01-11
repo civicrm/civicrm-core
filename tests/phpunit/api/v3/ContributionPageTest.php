@@ -51,10 +51,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * @var array
-   *  - contribution_page
-   *  - price_set
-   *  - price_field
-   *  - price_field_value
+   *   - contribution_page
+   *   - price_set
+   *   - price_field
+   *   - price_field_value
    */
   protected $_ids = array();
 

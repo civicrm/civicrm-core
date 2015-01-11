@@ -38,7 +38,7 @@
  *
  * @param string $params
  *   Params of the {crmKey} call, with the ‘name’ key holding the name of the key.
- * @param object $smarty
+ * @param CRM_Core_Smarty $smarty
  *   The Smarty object.
  *
  * @return string

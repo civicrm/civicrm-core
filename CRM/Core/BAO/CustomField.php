@@ -131,7 +131,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Core_DAO_CustomField object
+   * @return CRM_Core_DAO_CustomField
    * @static
    */
   public static function create(&$params) {
@@ -327,7 +327,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_DAO_CustomField object
+   * @return CRM_Core_DAO_CustomField
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -710,7 +710,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param int $fieldID
    *   The custom field ID.
    *
-   * @return CRM_Core_DAO_CustomField $field  the field object
+   * @return CRM_Core_DAO_CustomField
+   *   $field  the field object
    * @static
    * public
    */
@@ -2107,7 +2108,7 @@ AND    cf.id = %1";
    *
    * @param array $includeFieldIds
    *   Ids of custom fields for which.
-   * option groups must be included.
+   *   option groups must be included.
    *
    * Currently this is required in the cases where option groups are to be included
    * for inactive fields : CRM-5369
@@ -2416,7 +2417,7 @@ WHERE      f.id IN ($ids)";
    *
    * @param array $params
    *   Custom data submitted.
-   * ie array( 'custom_1' => 'validate me' );
+   *   ie array( 'custom_1' => 'validate me' );
    *
    * @return array
    *   validation errors.

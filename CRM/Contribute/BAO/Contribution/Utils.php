@@ -41,10 +41,10 @@ class CRM_Contribute_BAO_Contribution_Utils {
    *   Form object.
    * @param array $paymentParams
    *   Array with payment related key.
-   * value pairs
+   *   value pairs
    * @param array $premiumParams
    *   Array with premium related key.
-   * value pairs
+   *   value pairs
    * @param int $contactID
    *   Contact id.
    * @param int $contributionTypeId

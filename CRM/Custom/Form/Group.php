@@ -533,7 +533,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    *   Array of relationship name.
    *
    * @return array
-   *   of relationship name.
+   *   Array of relationship name.
    */
   public static function getFormattedList(&$list) {
     $relName = array();
