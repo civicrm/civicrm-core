@@ -153,7 +153,8 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    * @param bool $appendDatesToTitle
    * @param bool $forceAll
    *
-   * @return mixed $campaigns a set of campaigns.
+   * @return mixed
+   *   $campaigns a set of campaigns.
    * @access public
    */
   public static function getCampaigns(

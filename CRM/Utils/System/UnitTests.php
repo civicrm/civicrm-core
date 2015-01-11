@@ -73,9 +73,8 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    *   Load cms bootstrap?.
    * @param NULL|string $realPath filename of script
    *
-   * @return mixed false if no auth
-   *               array(
-   *  contactID, ufID, unique string ) if success
+   * @return array|bool
+   *   [contactID, ufID, uniqueString] if success else false if no auth
    */
   /**
    * @param string $name

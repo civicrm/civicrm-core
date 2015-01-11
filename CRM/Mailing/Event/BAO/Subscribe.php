@@ -62,7 +62,8 @@ class CRM_Mailing_Event_BAO_Subscribe extends CRM_Mailing_Event_DAO_Subscribe {
    *   during event registration.
    * @param string $context
    *
-   * @return int|null $se_id      The id of the subscription event, null on failure
+   * @return int|null
+   *   $se_id      The id of the subscription event, null on failure
    * @static
    */
   public static function &subscribe($group_id, $email, $contactId = NULL, $context = NULL) {
@@ -185,7 +186,8 @@ SELECT     civicrm_email.id as email_id
    * @param string $hash
    *   Hash to verify.
    *
-   * @return object|null          The subscribe event object, or null on failure
+   * @return object|null
+   *   The subscribe event object, or null on failure
    * @static
    */
   public static function &verify($contact_id, $subscribe_id, $hash) {

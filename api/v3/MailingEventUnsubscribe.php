@@ -45,7 +45,7 @@
  *                       name/value pairs to insert in new 'survey'
  *
  * @return array
-   *   api result array
+ *   api result array
  * {@getfields mailing_event_unsubscribe_create}
  * @access public
  */

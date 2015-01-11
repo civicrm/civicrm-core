@@ -241,12 +241,12 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    * retrieve subtype pairs with name as 'subtype-name' and 'label' as value
    *
    * @param array $contactType
-   *   ..
    * @param bool $all
    * @param string $labelPrefix
    * @param bool $ignoreCache
    *
-   * @return list of subtypes with name as 'subtype-name' and 'label' as value
+   * @return array
+   *   list of subtypes with name as 'subtype-name' and 'label' as value
    * @static
    */
   public static function subTypePairs($contactType = NULL, $all = FALSE, $labelPrefix = '- ', $ignoreCache = FALSE) {

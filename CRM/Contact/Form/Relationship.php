@@ -559,7 +559,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return mixed true or array of errors
+   * @return bool|array
+   *   mixed true or array of errors
    * @static
    */
   public static function dateRule($params) {

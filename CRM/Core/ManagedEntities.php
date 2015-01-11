@@ -72,7 +72,8 @@ class CRM_Core_ManagedEntities {
   /**
    * Read the managed entity
    *
-   * @return array|NULL API representation, or NULL if the entity does not exist
+   * @return array|NULL
+   *   API representation, or NULL if the entity does not exist
    */
   public function get($moduleName, $name) {
     $dao = new CRM_Core_DAO_Managed();
@@ -366,7 +367,8 @@ class CRM_Core_ManagedEntities {
   /**
    * @param $declarations
    *
-   * @return mixed string on error, or FALSE
+   * @return string|bool
+   *   string on error, or FALSE
    */
   protected static function validate($declarations) {
     foreach ($declarations as $declare) {
@@ -382,9 +384,9 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * @param $declarations
+   * @param array $declarations
    *
-   * @return mixed
+   * @return array
    */
   protected static function cleanDeclarations($declarations) {
     foreach ($declarations as $name => &$declare) {

@@ -44,7 +44,7 @@
  * @param array $params
  *
  * @return array
-   *   of newly created print_label property values.
+ *   of newly created print_label property values.
  * @access public
  */
 function civicrm_api3_print_label_create($params) {
@@ -61,7 +61,7 @@ function civicrm_api3_print_label_create($params) {
  * @param array $params
  *
  * @return array
-   *   of retrieved print_label property values.
+ *   of retrieved print_label property values.
  * @access public
  */
 function civicrm_api3_print_label_get($params) {
@@ -78,7 +78,7 @@ function civicrm_api3_print_label_get($params) {
  * @param array $params
  *
  * @return array
-   *   of deleted values.
+ *   of deleted values.
  * @access public
  */
 function civicrm_api3_print_label_delete($params) {

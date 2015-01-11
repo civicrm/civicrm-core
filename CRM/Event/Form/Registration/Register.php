@@ -809,7 +809,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @param $self
    *
    *
-   * @return TRUE if no errors, else array of errors
+   * @return bool|array
+   *   true if no errors, else array of errors
    * @static
    */
   public static function formRule($fields, $files, $self) {

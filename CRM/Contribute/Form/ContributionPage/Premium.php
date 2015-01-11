@@ -114,7 +114,8 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.
    *
-   * @return mixed true or array of errors
+   * @return bool|array
+   *   mixed true or array of errors
    * @static
    */
   public static function formRule($params) {

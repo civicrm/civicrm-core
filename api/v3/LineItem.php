@@ -44,7 +44,7 @@
  * @example LineItemCreate.php Std Create example
  *
  * @return array
-   *   api result array
+ *   api result array
  * {@getfields line_item_create}
  * @access public
  */
@@ -76,7 +76,7 @@ function _civicrm_api3_line_item_create_spec(&$params) {
  *  as null, all line_items will be returned (default limit is 25)
  *
  * @return array
-   *   Array of matching line_items
+ *   Array of matching line_items
  * {@getfields line_item_get}
  * @access public
  */
@@ -95,7 +95,7 @@ function civicrm_api3_line_item_get($params) {
  *  to be deleted
  *
  * @return array
-   *   API result array
+ *   API result array
  * {@getfields line_item_delete}
  * @access public
  */

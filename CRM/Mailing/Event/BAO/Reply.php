@@ -62,7 +62,8 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
    *
    * @param null $replyto
    *
-   * @return object|null      The mailing object, or null on failure
+   * @return object|null
+   *   The mailing object, or null on failure
    * @static
    */
   public static function &reply($job_id, $queue_id, $hash, $replyto = NULL) {

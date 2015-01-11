@@ -231,7 +231,8 @@ class CRM_Friend_Form extends CRM_Core_Form {
    *
    * @param array $fields
    *
-   * @return mixed true or array of errors
+   * @return bool|array
+   *   mixed true or array of errors
    * @static
    */
   public static function formRule($fields) {

@@ -557,7 +557,8 @@ class CRM_Core_Session {
 
   /**
    * Retrieve contact id of the logged in user
-   * @return integer|NULL contact ID of logged in user
+   * @return integer|NULL
+   *   contact ID of logged in user
    */
   public static function getLoggedInContactID() {
     $session = CRM_Core_Session::singleton();

@@ -43,7 +43,7 @@
  * @example mail_settingsCreate.php Std Create example
  *
  * @return array
-   *   api result array
+ *   api result array
  * {@getfields mail_settings_create}
  * @access public
  */
@@ -71,7 +71,7 @@ function _civicrm_api3_mail_settings_create_spec(&$params) {
  *                       as null, all mail_settings will be returned
  *
  * @return array
-   *   Array of matching mail_settings
+ *   Array of matching mail_settings
  * {@getfields mail_settings_get}
  * @access public
  */
@@ -90,7 +90,7 @@ function civicrm_api3_mail_settings_get($params) {
  *                       to be deleted
  *
  * @return array
-   *   api result array
+ *   api result array
  * {@getfields mail_settings_delete}
  * @access public
  */

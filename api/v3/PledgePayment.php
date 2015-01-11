@@ -51,7 +51,7 @@
  * @example PledgePaymentCreate.php
  *
  * @return array
-   *   API Result
+ *   API Result
  * @static void
  * @access public
  */
@@ -101,7 +101,7 @@ function _civicrm_api3_pledge_payment_create_spec(&$params) {
  * @example PledgePaymentDelete.php
  *
  * @return array
-   *   API result
+ *   API result
  * @static void
  * @access public
  */
@@ -124,7 +124,7 @@ function civicrm_api3_pledge_payment_delete($params) {
  * @example PledgePaymentGet.php *
  *
  * @return array
-   *   (reference )        array of pledges, if error an array with an error id and error message
+ *   (reference )        array of pledges, if error an array with an error id and error message
  * @static void
  * @access public
  */
@@ -152,7 +152,7 @@ function updatePledgePayments($pledgeId, $paymentStatusId, $paymentIds) {
  * @param array $params
  *
  * @return array
-   *   fields valid for other functions
+ *   fields valid for other functions
  */
 function civicrm_api3_pledge_payment_get_spec(&$params) {
   $params['option.create_new'] = array('title' => "Create new field rather than update an unpaid payment");

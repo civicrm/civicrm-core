@@ -45,7 +45,8 @@ class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
   /**
    * @param string $cms
    *   "drupal"|"wordpress".
-   * @return null|string path to config template
+   * @return null|string
+   *   path to config template
    */
   public function findConfigTemplate($cms) {
     $candidates = array();

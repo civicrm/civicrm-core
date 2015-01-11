@@ -295,7 +295,8 @@ abstract class CRM_Utils_Hook {
    * @param object $objectRef
    *   The reference to the object if available.
    *
-   * @return mixed             based on op. pre-hooks return a boolean or
+   * @return mixed
+   *   based on op. pre-hooks return a boolean or
    *                           an error message which aborts the operation
    */
   public static function post($op, $objectName, $objectId, &$objectRef) {
@@ -394,7 +395,8 @@ abstract class CRM_Utils_Hook {
    * @param array &$files the FILES parameters as sent in by POST
    * @param array &$form the form object
    *
-   * @return mixed             formRule hooks return a boolean or
+   * @return mixed
+   *   formRule hooks return a boolean or
    *                           an array of error messages which display a QF Error
    */
   public static function validate($formName, &$fields, &$files, &$form) {
@@ -413,7 +415,8 @@ abstract class CRM_Utils_Hook {
    * @param array &$form the form object
    * @param array &$errors the array of errors.
    *
-   * @return mixed             formRule hooks return a boolean or
+   * @return mixed
+   *   formRule hooks return a boolean or
    *                           an array of error messages which display a QF Error
    */
   public static function validateForm($formName, &$fields, &$files, &$form, &$errors) {

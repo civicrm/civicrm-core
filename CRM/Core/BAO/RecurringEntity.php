@@ -789,13 +789,13 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * This function deletes main entity and related linked entities from recurring-entity table
    *
    * @param int $entityId
-   *   Entity id .
+   *   Entity id
    * @param string $entityTable
-   *   Name of the entity table .
+   *   Name of the entity table
    *
    * @static
    *
-   * @return boolean|object Returns either boolean value or CRM_Core_DAO_RecurringEntity object
+   * @return boolean|CRM_Core_DAO_RecurringEntity
    */
   static public function delEntity($entityId, $entityTable, $isDelLinkedEntities = FALSE) {
     if (empty($entityId) || empty($entityTable)) {

@@ -100,7 +100,8 @@ class CRM_Utils_PseudoConstant {
    * @param string $constant
    *   Constant-name.
    *
-   * @return string|NULL class-name
+   * @return string|NULL
+   *   class-name
    */
   public static function findConstantClass($constant) {
     if (self::$constants !== NULL && isset(self::$constants[$constant])) {

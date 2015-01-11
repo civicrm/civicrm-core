@@ -226,7 +226,8 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
    * @param $files
    * @param $self
    *
-   * @return mixed true or array of errors
+   * @return bool|array
+   *   mixed true or array of errors
    * @static
    */
   public static function formRule($params, $files, $self) {

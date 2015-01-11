@@ -763,7 +763,8 @@ class CRM_Utils_Date {
    * @param date $endDate
    *   End date for the range.
    *
-   * @return true              todays date is in the given date range
+   * @return bool
+   *   true if today's date is in the given date range
    * @static
    */
   public static function getRange($startDate, $endDate) {
@@ -1805,7 +1806,8 @@ class CRM_Utils_Date {
    * @param int $offset
    *   the offset from the current time in seconds.
    *
-   * @return the time in UTC
+   * @return string
+   *   the time in UTC
    * @static
    */
   public static function getUTCTime($offset = 0) {

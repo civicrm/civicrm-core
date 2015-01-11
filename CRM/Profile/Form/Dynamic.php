@@ -100,7 +100,8 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
    * @param CRM_Core_Form $form
    *
    *
-   * @return true if no errors, else array of errors
+   * @return bool|array
+   *   true if no errors, else array of errors
    * @static
    */
   public static function formRule($fields, $files, $form) {

@@ -47,7 +47,7 @@
  * @example RelationshipCreate.php Std Create example
  *
  * @return array
-   *   API Result Array
+ *   API Result Array
  * {@getfields relationship_create}
  * @static void
  * @access public
@@ -76,7 +76,7 @@ function _civicrm_api3_relationship_create_spec(&$params) {
  * @param array $params
  *
  * @return array
-   *   API Result Array
+ *   API Result Array
  * {@getfields relationship_delete}
  * @example RelationshipDelete.php Delete Example
  *
@@ -110,7 +110,7 @@ function civicrm_api3_relationship_delete($params) {
  * -  if you don't pass in contact_id then it does a filter on the relationship table (DAO based search)
  *
  * @return Array
-   *   API Result Array
+ *   API Result Array
  * {@getfields relationship_get}
  * @example RelationshipGet.php
  * @access  public

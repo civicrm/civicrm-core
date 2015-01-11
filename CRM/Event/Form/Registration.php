@@ -1198,9 +1198,11 @@ WHERE  v.option_group_id = g.id
   /**
    * Validate price set submitted params for price option limit,
    * as well as user should select at least one price field option.
-   * @param unknown_type $form
-   * @param unknown_type $params
-   * @return multitype:|Ambigous <multitype:, string, string>
+   *
+   * @param CRM_Core_Form $form
+   * @param array $params
+   *
+   * @return array
    */
   public static function validatePriceSet(&$form, $params) {
     $errors = array();
@@ -1335,8 +1337,9 @@ WHERE  v.option_group_id = g.id
     return $errors;
   }
 
-  // set the first participant ID if not set, CRM-10032
   /**
+   * set the first participant ID if not set, CRM-10032
+   *
    * @param int $participantID
    */
   public function processFirstParticipant($participantID) {

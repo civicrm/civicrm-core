@@ -27,7 +27,7 @@
 */
 
 /**
- * @param $apiRequest
+ * @param array $apiRequest
  *
  * @return array
  * @throws API_Exception

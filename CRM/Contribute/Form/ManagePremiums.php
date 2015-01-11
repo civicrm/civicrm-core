@@ -216,7 +216,8 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    *
    * @param $files
    *
-   * @return mixed true or array of errors
+   * @return bool|array
+   *   mixed true or array of errors
    * @static
    */
   public static function formRule($params, $files) {
@@ -368,7 +369,8 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    * @param $width
    * @param $height
    *
-   * @return Path to image
+   * @return string
+   *   Path to image
    */
   private function _resizeImage($filename, $resizedName, $width, $height) {
     // figure out the new filename

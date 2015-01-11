@@ -144,7 +144,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * Delete the activity
    *
    * @param array $params
-   *   Associated array.
    * @param bool $moveToTrash
    *
    * @return void
@@ -1513,7 +1512,8 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    *   The activity ID that tracks the message.
    * @param int $userID
    *
-   * @return mixed                    true on success or PEAR_Error object
+   * @return bool|PEAR_Error
+   *   true on success or PEAR_Error object
    * @static
    */
   static function sendSMSMessage(
@@ -2108,7 +2108,8 @@ AND cl.modified_id  = c.id
    *   Activity id.
    * @param string $crmDir
    *
-   * @return string|bool if file exists returns $activityTypeFile activity filename otherwise false.
+   * @return string|bool
+   *   if file exists returns $activityTypeFile activity filename otherwise false.
    *
    * @static
    */
@@ -2140,7 +2141,6 @@ AND cl.modified_id  = c.id
    * Restore the activity
    *
    * @param array $params
-   *   Associated array.
    *
    * @return void
    */

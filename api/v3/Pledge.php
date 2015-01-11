@@ -50,7 +50,7 @@
  * {@getfields pledge_create}
  *
  * @return array
-   *   Array containing 'is_error' to denote success or failure and details of the created pledge
+ *   Array containing 'is_error' to denote success or failure and details of the created pledge
  *
  * @example PledgeCreate.php Standard create example
  *
@@ -70,7 +70,7 @@ function civicrm_api3_pledge_create($params) {
  *   Array included 'pledge_id' of pledge to delete.
  *
  * @return boolean
-   *   true if success, else false
+ *   true if success, else false
  * @static void
  * {@getfields pledge_delete}
  * @example PledgeDelete.php
@@ -132,7 +132,7 @@ function _civicrm_api3_pledge_create_spec(&$params) {
  *   Input parameters. Use interrogate for possible fields.
  *
  * @return array
-   *   array of pledges, if error an array with an error id and error message
+ *   array of pledges, if error an array with an error id and error message
  * {@getfields pledge_get}
  * @example PledgeGet.php
  * @access public

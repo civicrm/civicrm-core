@@ -42,11 +42,11 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * Create a user in Drupal.
    *
    * @param array $params
-   *   Associated array.
    * @param string $mail
    *   Email id for cms user.
    *
-   * @return uid if user exists, false otherwise
+   * @return int|bool
+   *   uid if user exists, false otherwise
    */
   public function createUser(&$params, $mail) {
     $form_state = form_state_defaults();
@@ -462,7 +462,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    *   Load cms bootstrap?.
    * @param NULL|string $realPath filename of script
    *
-   * @return mixed false if no auth
+   * @return mixed
+   *   false if no auth
    *               array(
    *  contactID, ufID, unique string ) if success
    */

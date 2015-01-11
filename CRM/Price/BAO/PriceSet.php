@@ -375,7 +375,8 @@ WHERE     ct.id = cp.financial_type_id AND
    * @param null $isQuickConfig
    * @param null $setName
    *
-   * @return integer|false price_set_id, or false if none found
+   * @return integer|false
+   *   price_set_id, or false if none found
    */
   public static function getFor($entityTable, $entityId, $usedFor = NULL, $isQuickConfig = NULL, &$setName = NULL) {
     if (!$entityTable || !$entityId) {
@@ -412,7 +413,8 @@ WHERE     ct.id = cp.financial_type_id AND
    *                      array may contain either option id or
    *                      price field id
    *
-   * @return integer|NULL price set id on success, null  otherwise
+   * @return integer|NULL
+   *   price set id on success, null  otherwise
    * @static
    */
   public static function getSetId(&$params) {
@@ -1105,13 +1107,12 @@ WHERE  id = %1";
   }
 
   /**
-   * make a copy of a price set, including
-   * all the fields
+   * Copy a price set, including all the fields
    *
    * @param int $id
    *   The price set id to copy.
    *
-   * @return the copy object
+   * @return CRM_Price_DAO_PriceSet
    * @static
    */
   public static function copy($id) {

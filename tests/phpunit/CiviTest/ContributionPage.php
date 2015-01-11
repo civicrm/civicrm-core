@@ -10,7 +10,8 @@ class ContributionPage extends PHPUnit_Framework_Testcase {
    *
    * @param int $id
    *
-   * @return mixed $contributionPage id of created Contribution Page
+   * @return int
+   *   id of created Contribution Page
    */
   public static function create($id = NULL) {
     require_once "CRM/Contribute/BAO/ContributionPage.php";

@@ -99,7 +99,8 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
    * @param array $options
    *   Additional user data.
    *
-   * @return true if no errors, else array of errors
+   * @return bool|array
+   *   true if no errors, else array of errors
    * @static
    */
   public static function formRule($fields, $files, $options) {

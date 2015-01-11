@@ -46,7 +46,7 @@
  *   An associative array of name/value property values of civicrm_membership_status.
  *
  * @return array
-   *   of newly created membership status property values.
+ *   of newly created membership status property values.
  * {@getfields MembershipStatus_create}
  * @access public
  */
@@ -63,7 +63,7 @@ function civicrm_api3_membership_status_create($params) {
  *   An associative array of name/value property values of civicrm_membership_status.
  *
  * @return Array
-   *   of all found membership status property values.
+ *   of all found membership status property values.
  * {@getfields MembershipStatus_get}
  * @access public
  */
@@ -82,7 +82,7 @@ function civicrm_api3_membership_status_get($params) {
  * @deprecated - should just use create
  *
  * @return array
-   *   of updated membership status property values
+ *   of updated membership status property values
  * @access public
  */
 function &civicrm_api3_membership_status_update($params) {
@@ -124,7 +124,7 @@ function &civicrm_api3_membership_status_update($params) {
  * {@getfields MembershipStatus_delete}
  *
  * @return array
-   *   i
+ *   i
  * @access public
  */
 function civicrm_api3_membership_status_delete($params) {
@@ -144,7 +144,7 @@ function civicrm_api3_membership_status_delete($params) {
  * @throws API_Exception
  *
  * @return Array
-   *   Array of status id and status name
+ *   Array of status id and status name
  * @public
  */
 function civicrm_api3_membership_status_calc($membershipParams) {

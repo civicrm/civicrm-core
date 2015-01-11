@@ -351,7 +351,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $params
    *   Associative array of parameters.
    *
-   * @return object|NULL      The new group BAO (if created)
+   * @return CRM_Contact_BAO_Group|NULL
+   *   The new group BAO (if created)
    * @static
    */
   public static function &create(&$params) {
@@ -533,7 +534,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $params
    *   Associative array of parameters.
    *
-   * @return object|NULL      The new group BAO (if created)
+   * @return CRM_Contact_BAO_Group|NULL
+   *   The new group BAO (if created)
    * @static
    */
   public static function createSmartGroup(&$params) {
@@ -563,7 +565,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param bool $isActive
    *   Value we want to set the is_active field.
    *
-   * @return Object
+   * @return CRM_Core_DAO
    *   DAO object on sucess, NULL otherwise
    * @static
    */

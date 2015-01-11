@@ -1566,7 +1566,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *  - cid from the url if the caller has ACL permission to view
    *  - fallback is logged in user (or ? NULL if no logged in user) (@todo wouldn't 0 be more intuitive?)
    *
-   * @return mixed NULL|integer
+   * @return NULL|integer
    */
   public function getContactID() {
     $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);

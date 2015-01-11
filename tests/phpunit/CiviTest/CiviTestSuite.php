@@ -101,12 +101,12 @@ class CiviTestSuite extends PHPUnit_Framework_TestSuite {
    *  Add all test classes *Test and all test suites *Tests in subdirectories
    *
    * @param PHPUnit_Framework_TestSuite $suite
+   *   Test suite object to add tests to
    * @param $myfile
    * @param SplFileInfo $dirInfo
+   *   object to scan
    *
-   * @internal param $ &object Test suite object to add tests to
-   * @internal param \Directory $object to scan
-   * @return Test suite has been updated
+   * @return void
    */
   protected function addAllTests(
     PHPUnit_Framework_TestSuite &$suite,

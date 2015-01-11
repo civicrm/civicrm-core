@@ -158,7 +158,8 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
    * @param $files
    * @param $options
    *
-   * @return mixed true or array of errors
+   * @return bool|array
+   *   mixed true or array of errors
    * @static
    */
   public static function dataRule($params, $files, $options) {

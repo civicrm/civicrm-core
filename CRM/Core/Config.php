@@ -618,7 +618,8 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * @param string $driver
    *   'CRM_Mailing_BAO_Spool' or a name suitable for Mail::factory().
    * @param array $params
-   * @return Mail (More specifically, a class which implements the "send()" function)
+   * @return object
+   *   More specifically, a class which implements the "send()" function
    */
   public static function _createMailer($driver, $params) {
     if ($driver == 'CRM_Mailing_BAO_Spool') {

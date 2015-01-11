@@ -129,7 +129,8 @@ class CRM_Core_CommunityMessages {
   /**
    * Download document from URL and parse as JSON
    *
-   * @return NULL|array parsed JSON
+   * @return NULL|array
+   *   parsed JSON
    */
   public function fetchDocument() {
     list($status, $json) = $this->client->get($this->getRenderedUrl());

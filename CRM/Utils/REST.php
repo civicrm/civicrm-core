@@ -660,7 +660,8 @@ class CRM_Utils_REST {
   }
 
   /**
-   * @return array|NULL NULL if execution should proceed; array if the response is already known
+   * @return array|NULL
+   *   NULL if execution should proceed; array if the response is already known
    */
   public function loadCMSBootstrap() {
     $requestParams = CRM_Utils_Request::exportValues();

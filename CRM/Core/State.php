@@ -110,7 +110,8 @@ class CRM_Core_State {
    *
    * @param object the CRM_Core_Form element under consideration
    *
-   * @return mixed does a jump to the back state
+   * @return mixed
+   *   does a jump to the back state
    */
   public function handleBackState(&$page) {
     if ($this->_type & self::START) {
@@ -127,7 +128,8 @@ class CRM_Core_State {
    *
    * @param object the CRM_Core_Form element under consideration
    *
-   * @return mixed does a jump to the nextstate
+   * @return mixed
+   *   does a jump to the nextstate
    */
   public function handleNextState(&$page) {
     if ($this->_type & self::FINISH) {

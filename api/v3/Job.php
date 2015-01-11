@@ -62,7 +62,7 @@ function _civicrm_api3_job_create_spec(&$params) {
  * @param array $params
  *   Associative array of property name/value pairs to insert in new job.
  *
- * @return success or error
+ * @return array
  * {@getfields Job_create}
  * @access public
  * {@schema Core/Job.xml}
@@ -75,7 +75,7 @@ function civicrm_api3_job_create($params) {
  * Retrieve one or more job
  * @param array input parameters
  * @return array
-   *   api result array
+ *   api result array
  * {@getfields email_get}
  * @access public
  */
@@ -89,7 +89,7 @@ function civicrm_api3_job_get($params) {
  * @param array $params
  *
  * @return array
-   *   API Result Array
+ *   API Result Array
  * {@getfields Job_delete}
  * @static void
  * @access public
@@ -106,7 +106,7 @@ function civicrm_api3_job_delete($params) {
  *   (reference ) input parameters.
  *
  * @return array
-   *   API Result Array
+ *   API Result Array
  *
  * @static void
  * @access public
@@ -136,7 +136,7 @@ function _civicrm_api3_job_execute_spec(&$params) {
  *   (reference ) input parameters.
  *
  * @return array
-   *   API Result Array
+ *   API Result Array
  * {@getfields contact_geocode}
  *
  * @static void
@@ -180,7 +180,7 @@ function _civicrm_api3_job_geocode_spec(&$params) {
  *                            - makes testing a bit simpler since we can simulate past/future time
  *
  * @return boolean
-   *   true if success, else false
+ *   true if success, else false
  * @static void
  * @access public
  *
@@ -231,7 +231,7 @@ function _civicrm_api3_job_send_reminder(&$params) {
  *                        resetVal - Integer - should we reset form state (always true)?
  *
  * @return boolean
-   *   true if success, else false
+ *   true if success, else false
  * @static void
  * @access public
  *
@@ -259,7 +259,7 @@ function civicrm_api3_job_mail_report($params) {
  * @param array $params
  *
  * @return boolean
-   *   true if success, else false
+ *   true if success, else false
  * @static
  * @access public
  */
@@ -294,11 +294,11 @@ function civicrm_api3_job_update_greeting($params) {
 
 /**
  * Adjust Metadata for Get action
-*
-* The metadata is used for setting defaults, documentation & validation
-* @param array $params
-*   Array or parameters determined by getfields.
-*/
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params
+ *   Array or parameters determined by getfields.
+ */
 function _civicrm_api3_job_update_greeting_spec(&$params) {
   $params['ct'] = array(
     'api.required' => 1,
@@ -319,7 +319,7 @@ function _civicrm_api3_job_update_greeting_spec(&$params) {
  *   (reference ) input parameters.
  *
  * @return boolean
-   *   true if success, else false
+ *   true if success, else false
  * @static
  * @access public
  *
@@ -428,7 +428,7 @@ function civicrm_api3_job_fetch_activities($params) {
  *   (reference ) input parameters.
  *
  * @return array
-   *   (reference )        array of properties, if error an array with an error id and error message
+ *   array of properties, if error an array with an error id and error message
  * @access public
  */
 function civicrm_api3_job_process_participant($params) {
@@ -454,7 +454,7 @@ function civicrm_api3_job_process_participant($params) {
  *   Input parameters NOT USED.
  *
  * @return boolean
-   *   true if success, else false
+ *   true if success, else false
  * @static void
  * @access public
  */
@@ -482,7 +482,7 @@ function civicrm_api3_job_process_membership($params) {
  *   (reference ) input parameters.
  *
  * @return boolean
-   *   true if success, else false
+ *   true if success, else false
  * @static void
  * @access public
  */
@@ -511,7 +511,7 @@ function civicrm_api3_job_process_respondent($params) {
  * {boolean auto_flip   wether to let api decide which contact to retain and which to delete.}
  *
  * @return array
-   *   API Result Array
+ *   API Result Array
  *
  * @static void
  * @access public
@@ -576,7 +576,7 @@ function civicrm_api3_job_run_payment_cron($params) {
  *   (reference ) - sends in various config parameters to decide what needs to be cleaned.
  *
  * @return boolean
-   *   true if success, else false
+ *   true if success, else false
  * @static void
  * @access public
  */

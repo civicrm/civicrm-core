@@ -36,7 +36,7 @@
 /**
  * @deprecated api notice
  * @return string
-   *   to indicate this entire api entity is deprecated
+ *   to indicate this entire api entity is deprecated
  */
 function _civicrm_api3_survey_respondant_deprecation() {
   return 'The survey_respondant api is not currently supported.';
@@ -49,7 +49,7 @@ function _civicrm_api3_survey_respondant_deprecation() {
  *   (reference ) input parameters.
  *
  * @return array
-   *   (reference )        contribution_id of created or updated record
+ *   (reference )        contribution_id of created or updated record
  * @static void
  * @access public
  * @deprecated - api currently not supported

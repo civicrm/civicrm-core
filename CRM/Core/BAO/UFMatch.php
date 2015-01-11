@@ -184,11 +184,11 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    *   The name of the user framework.
    * @param int $status
    *   Returns the status if user created or already exits (used for CMS sync).
-   *
-   * @param null $ctype
+   * @param string $ctype
+   *   contact type
    * @param bool $isLogin
    *
-   * @return the ufmatch object that was found or created
+   * @return CRM_Core_DAO_UFMatch|bool
    * @static
    */
   public static function &synchronizeUFMatch(&$user, $userKey, $uniqId, $uf, $status = NULL, $ctype = NULL, $isLogin = FALSE) {

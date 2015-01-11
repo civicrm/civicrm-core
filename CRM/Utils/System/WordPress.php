@@ -406,9 +406,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @param bool $loadCMSBootstrap
    * @param null $realPath
    *
-   * @return mixed false if no auth
-   *               array(
-   * contactID, ufID, unique string ) if success
+   * @return array|bool
+   *   [contactID, ufID, uniqueString] if success else false if no auth
    * @static
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
@@ -544,10 +543,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Determine the location of the CMS root.
    *
-   * @return string|NULL local file system path to CMS root, or NULL if it cannot be determined
-   */
-  /**
-   * @return NULL|string
+   * @return string|NULL
+   *   local file system path to CMS root, or NULL if it cannot be determined
    */
   public function cmsRootPath() {
     $cmsRoot = $valid = NULL;
@@ -727,7 +724,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Get User ID from UserFramework system (Joomla)
    * @param object $user
    *   Object as described by the CMS.
-   * @return mixed <NULL, number>
+   *
+   * @return int|null
    */
   public function getUserIDFromUserObject($user) {
     return !empty($user->ID) ? $user->ID : NULL;
@@ -737,7 +735,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Get Unique Identifier from UserFramework system (CMS)
    * @param object $user
    *   Object as described by the User Framework.
-   * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
+   * @return int|null
+   *   Unique identifier from the user Framework system
    */
   public function getUniqueIdentifierFromUserObject($user) {
     return empty($user->user_email) ? NULL : $user->user_email;

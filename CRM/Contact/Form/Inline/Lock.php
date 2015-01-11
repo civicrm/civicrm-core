@@ -71,7 +71,8 @@ class CRM_Contact_Form_Inline_Lock {
    *   The uploaded files if any.
    * @param int $contactID
    *
-   * @return true if no errors, else array of errors
+   * @return bool|array
+   *   true if no errors, else array of errors
    * @static
    */
   public static function formRule($fields, $files, $contactID = NULL) {

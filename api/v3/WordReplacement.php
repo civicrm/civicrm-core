@@ -84,7 +84,7 @@ function _civicrm_api3_word_replacement_create_spec(&$params) {
  *  to be deleted
  *
  * @return array
-   *   api result array
+ *   api result array
  *
  * @access public
  */
