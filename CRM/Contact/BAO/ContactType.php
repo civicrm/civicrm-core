@@ -313,7 +313,7 @@ WHERE  type.name IS NOT NULL
         }
 
         $dao = CRM_Core_DAO::executeQuery($sql,
-          CRM_Core_DAO::$_nullArray,
+          array(),
           FALSE,
           'CRM_Contact_DAO_ContactType'
         );
