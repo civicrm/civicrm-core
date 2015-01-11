@@ -44,7 +44,7 @@
  *   Assoc array of name/value pairs.
  *
  * @return array
-   *   CRM_Core_DAO_UFJoin Array
+ *   CRM_Core_DAO_UFJoin Array
  * @access public
  * @example UFJoinCreate.php
  *  {@getfields UFJoin_create}
@@ -77,7 +77,7 @@ function _civicrm_api3_uf_join_create_spec(&$params) {
  *   (reference) an assoc array of name/value pairs.
  *
  * @return array
-   *   CiviCRM Result Array or null
+ *   CiviCRM Result Array or null
  * @todo Delete function missing
  * @access public
  * {getfields UFJoin_get}

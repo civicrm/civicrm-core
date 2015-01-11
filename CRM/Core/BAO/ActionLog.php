@@ -44,7 +44,7 @@ class CRM_Core_BAO_ActionLog extends CRM_Core_DAO_ActionLog {
    *
    * @param array $params
    *
-   * @return actionLog array
+   * @return array
    */
   public static function create($params) {
     $actionLog = new CRM_Core_DAO_ActionLog();

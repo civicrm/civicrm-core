@@ -6,17 +6,19 @@
 interface API_Wrapper {
 
   /**
-   * @param $apiRequest
+   * @param array $apiRequest
    *
-   * @return modified $apiRequest
+   * @return array
+   *   modified $apiRequest
    */
   function fromApiInput($apiRequest);
 
   /**
-   * @param $apiRequest
-   * @param $result
+   * @param array $apiRequest
+   * @param array $result
    *
-   * @return modified $result
+   * @return array
+   *   modified $result
    */
   function toApiOutput($apiRequest, $result);
 }

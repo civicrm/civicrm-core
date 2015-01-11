@@ -191,7 +191,7 @@ class CRM_Utils_Sort {
    * @param string $defaultSortOrder
    *   The sort order to use by default.
    *
-   * @return returns null if $url- (sort url) is not found
+   * @return void
    */
   public function initSortID($defaultSortOrder) {
     $url = CRM_Utils_Array::value(self::SORT_ID, $_GET, $defaultSortOrder);

@@ -1128,7 +1128,7 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
 
 /**
  *
- * @param <type> $params
+ * @param array $params
  *
  * @return array
  *   <type>
@@ -1232,7 +1232,8 @@ function _civicrm_api3_deprecated_validate_formatted_contact(&$params) {
  * @param array $params
  * @param $onDuplicate
  *
- * @return array|bool <type>
+ * @return array|bool
+ *   <type>
  */
 function _civicrm_api3_deprecated_create_participant_formatted($params, $onDuplicate) {
   require_once 'CRM/Event/Import/Parser.php';
@@ -1249,11 +1250,12 @@ function _civicrm_api3_deprecated_create_participant_formatted($params, $onDupli
 
 /**
  *
- * @param <type> $params
+ * @param array $params
  *
  * @param bool $checkDuplicate
  *
- * @return array|bool <type>
+ * @return array|bool
+ *   <type>
  */
 function _civicrm_api3_deprecated_participant_check_params($params, $checkDuplicate = FALSE) {
 

@@ -46,7 +46,7 @@
  *                    - Future extensions will include: Opened, Clicked, Forwarded
  *
  * @return array
-   *   API result
+ *   API result
  * @static void
  * @access public
  * @example CRM/Mailing/BAO/Mailing.php
@@ -295,7 +295,7 @@ INNER JOIN civicrm_mailing_event_bounce meb ON meb.event_queue_id = meq.id
  *                    - Future extensions will include: Opened, Clicked, Forwarded
  *
  * @return array
-   *   API result
+ *   API result
  * @static void
  * @access public
  * @example CRM/Mailing/BAO/Mailing.php

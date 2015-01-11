@@ -299,7 +299,8 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
    * @param $files
    * @param $self
    *
-   * @return mixed true or array of errors
+   * @return bool|array
+   *   mixed true or array of errors
    * @static
    */
   public static function formRule($params, $files, $self) {

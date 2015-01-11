@@ -168,7 +168,8 @@ WHERE     pledge_id = %1
    * @param array $params
    *   Associate array of field.
    *
-   * @return pledge payment id
+   * @return int
+   *   pledge payment id
    * @static
    */
   public static function add($params) {
@@ -557,13 +558,17 @@ WHERE  civicrm_pledge.id = %2
   /**
    * Calculate next scheduled pledge payment date. Function calculates next pledge payment date.
    *
-   * @param array params - must include frequency unit & frequency interval
-   * @param int paymentNo number of payment in sequence (e.g. 1 for first calculated payment (treat initial payment as 0)
-   * @param datestring basePaymentDate - date to calculate payments from. This would normally be the
-   * first day of the pledge (default) & is calculated off the 'scheduled date' param. Returned date will
-   * be equal to basePaymentDate normalised to fit the 'pledge pattern' + number of installments
+   * @param array $params
+   *   must include frequency unit & frequency interval
+   * @param int $paymentNo
+   *   number of payment in sequence (e.g. 1 for first calculated payment (treat initial payment as 0)
+   * @param string $basePaymentDate
+   *   date to calculate payments from. This would normally be the
+   *   first day of the pledge (default) & is calculated off the 'scheduled date' param. Returned date will
+   *   be equal to basePaymentDate normalised to fit the 'pledge pattern' + number of installments
    *
-   * @return formatted date
+   * @return string
+   *   formatted date
    */
   public static function calculateNextScheduledDate(&$params, $paymentNo, $basePaymentDate = NULL) {
     if (!$basePaymentDate) {

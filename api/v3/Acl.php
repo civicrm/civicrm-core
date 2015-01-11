@@ -44,7 +44,7 @@
  * @param array $params
  *
  * @return array
-   *   of newly created acl property values.
+ *   of newly created acl property values.
  * @access public
  */
 function civicrm_api3_acl_create($params) {
@@ -61,7 +61,7 @@ function civicrm_api3_acl_create($params) {
  * @param array $params
  *
  * @return array
-   *   of retrieved acl property values.
+ *   of retrieved acl property values.
  * @access public
  */
 function civicrm_api3_acl_get($params) {
@@ -78,7 +78,7 @@ function civicrm_api3_acl_get($params) {
  * @param array $params
  *
  * @return array
-   *   of deleted values.
+ *   of deleted values.
  * @access public
  */
 function civicrm_api3_acl_delete($params) {

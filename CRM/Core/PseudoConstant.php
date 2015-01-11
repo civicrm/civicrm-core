@@ -230,7 +230,8 @@ class CRM_Core_PseudoConstant {
    * - fresh      boolean ignore cache entries and go back to DB
    * @param string $context : Context string
    *
-   * @return Array|bool - array on success, FALSE on error.
+   * @return Array|bool
+   *   array on success, FALSE on error.
    *
    * @static
    */
@@ -976,7 +977,7 @@ WHERE  id = %1";
    *
    * @param bool $styledLabels
    *
-   * @return mixed - instance of CRM_Contact_BAO_GroupNesting
+   * @return CRM_Contact_BAO_GroupNesting
    */
   public static function &groupIterator($styledLabels = FALSE) {
     if (!self::$groupIterator) {

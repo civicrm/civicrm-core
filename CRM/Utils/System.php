@@ -1838,7 +1838,8 @@ class CRM_Utils_System {
    *  - action: int, CRM_Core_Action::UPDATE or CRM_Core_Action::VIEW [default: VIEW]
    *  - entity_table: string, eg "civicrm_contact"
    *  - entity_id: int
-   * @return array|NULL NULL if unavailable, or an array. array has keys:
+   * @return array|NULL
+   *   NULL if unavailable, or an array. array has keys:
    *  - path: string
    *  - query: array
    *  - title: string

@@ -55,7 +55,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contribute_BAO_FinancialAccount object
+   * @return CRM_Financial_BAO_FinancialAccount
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -76,8 +76,8 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object
-   *   DAO object on sucess, null otherwise
+   * @return CRM_Core_DAO|null
+   *   DAO object on success, null otherwise
    * @static
    */
   public static function setIsActive($id, $is_active) {
@@ -93,7 +93,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    *   Reference array contains the id.
    *
    * @static
-   * @return object
+   * @return CRM_Financial_DAO_FinancialAccount
    */
   public static function add(&$params, &$ids = array()) {
     if (empty($params['id'])) {
@@ -158,11 +158,10 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
   /**
    * Get accounting code for a financial type with account relation Income Account is
    *
-   * @financialTypeId int      Financial Type Id
-   *
    * @param int $financialTypeId
    *
-   * @return accounting code
+   * @return int
+   *   accounting code
    * @static
    */
   public static function getAccountingCode($financialTypeId) {
@@ -189,7 +188,8 @@ WHERE cft.id = %1
    * @param $financialAccountTypeId
    *   Financial account type id.
    *
-   * @param \account|string $accountTypeCode account type code
+   * @param string $accountTypeCode
+   *   account type code
    *
    * @return integer
    *   count

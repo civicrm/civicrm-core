@@ -126,7 +126,6 @@ class CRM_Core_Form_Tag {
    * Save entity tags when it is not save used AJAX
    *
    * @param array $params
-   *   Associated array.
    * @param int $entityId
    *   Entity id, eg: contact id, activity id, case id, file id.
    * @param string $entityTable

@@ -74,7 +74,8 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
    * @param array $options
    *   Additional user data.
    *
-   * @return true if no errors, else array of errors
+   * @return bool|array
+   *   true if no errors, else array of errors
    * @static
    */
   public static function formRule($fields, $files, $options) {

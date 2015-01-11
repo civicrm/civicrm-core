@@ -1251,8 +1251,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @param bool|int $isTest if true, membership is for a test site
    * @param bool|int $isOwner if true, only retrieve membership records for owners //LCD
    *
-   * @return returns the number of members of type $membershipTypeId as of
-   *         $date.
+   * @return int
+   *   the number of members of type $membershipTypeId as of $date.
    */
   public static function getMembershipCount($membershipTypeId, $date = NULL, $isTest = 0, $isOwner = 0) {
     if (!CRM_Utils_Rule::date($date)) {
@@ -1751,7 +1751,8 @@ SELECT c.contribution_page_id as pageID
    * @param int $id
    *   Id of the membership.
    *
-   * @return null|string     sort name of the contact if found
+   * @return null|string
+   *   sort name of the contact if found
    * @static
    */
   public static function sortName($id) {
@@ -1775,7 +1776,8 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * @param CRM_Core_DAO $dao
    *   Membership object.
    *
-   * @return null|array     array of memberships if created
+   * @return null|array
+   *   array of memberships if created
    * @static
    */
   public static function createRelatedMemberships(&$params, &$dao, $reset = FALSE) {
@@ -2119,9 +2121,10 @@ LEFT JOIN civicrm_membership mem ON ( cr.id = mem.contribution_recur_id )
    *   Date on which to end counting.
    * @param bool|int $isTest if true, membership is for a test site
    *
-   * @return returns the number of members of type $membershipTypeId
-   *         whose join_date is between $startDate and $endDate and
-   *         whose start_date is between $startDate and $endDate
+   * @return int
+   *   the number of members of type $membershipTypeId
+   *   whose join_date is between $startDate and $endDate and
+   *   whose start_date is between $startDate and $endDate
    */
   public static function getMembershipJoins($membershipTypeId, $startDate, $endDate, $isTest = 0) {
     $testClause = 'membership.is_test = 1';

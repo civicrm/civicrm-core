@@ -44,7 +44,7 @@
  * @example PriceFieldValueCreate.php Std Create example
  *
  * @return array
-   *   api result array
+ *   api result array
  * {@getfields price_field_value_create}
  * @access public
  */
@@ -84,7 +84,7 @@ function _civicrm_api3_price_field_value_create_spec(&$params) {
  *  as null, all price_field_values will be returned (default limit is 25)
  *
  * @return array
-   *   Array of matching price_field_values
+ *   Array of matching price_field_values
  * {@getfields price_field_value_get}
  * @access public
  */
@@ -103,7 +103,7 @@ function civicrm_api3_price_field_value_get($params) {
  *  to be deleted
  *
  * @return array
-   *   API result array
+ *   API result array
  * {@getfields price_field_value_delete}
  * @access public
  */

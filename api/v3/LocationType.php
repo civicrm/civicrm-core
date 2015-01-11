@@ -46,7 +46,7 @@
  * @param array $params
  *
  * @return array
-   *   API result array
+ *   API result array
  * {@getfields email_create}
  * @access public
  */
@@ -79,7 +79,7 @@ function _civicrm_api3_location_type_create_spec(&$params) {
  * @example LocationTypeDelete.php Standard Delete Example
  *
  * @return array
-   *   API result array
+ *   API result array
  * {@getfields LocationType_delete}
  * @access public
  */
@@ -99,7 +99,7 @@ function civicrm_api3_location_type_delete($params) {
  *   An associative array of name/value pairs.
  *
  * @return array
-   *   api result
+ *   api result
  * {@getfields LocationType_get}
  * @access public
  */

@@ -50,7 +50,8 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
   /**
    * Add context information at the end of a link
    *
-   * @return text extra query parameters
+   * @return string
+   *   extra query parameters
    */
   public function addContext() {
     $extra = '';

@@ -351,7 +351,8 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    * @param bool $returnWaitingCount
    * @param bool $considerTestParticipant
    *
-   * @return bool|int|null|string 1. false                 => If event having some empty spaces.
+   * @return bool|int|null|string
+   *   1. false                 => If event having some empty spaces.
    * @static
    */
   static function eventFull(
@@ -1693,7 +1694,8 @@ UPDATE  civicrm_participant
    *
    * @param int $participantId
    *
-   * @return true if participant is primary
+   * @return bool
+   *   true if participant is primary
    */
   public static function isPrimaryParticipant($participantId) {
 
@@ -1716,7 +1718,8 @@ UPDATE  civicrm_participant
    * @param int $newStatusId
    *   New status.
    *
-   * @return true if allowed
+   * @return bool
+   *   true if allowed
    */
   public static function getValidAdditionalIds($participantId, $oldStatusId, $newStatusId) {
 

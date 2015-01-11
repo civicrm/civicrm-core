@@ -334,7 +334,8 @@ ORDER BY parent_id, weight";
    * @param bool $navigationMenu
    *   True when called for building top navigation menu.
    *
-   * @return returns html or json object
+   * @return string
+   *   html or json string
    * @static
    */
   public static function buildNavigation($json = FALSE, $navigationMenu = TRUE) {

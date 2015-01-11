@@ -28,7 +28,7 @@
 /**
  * Generic api wrapper used for quicksearch and autocomplete
  *
- * @param $apiRequest
+ * @param array $apiRequest
  *   Array.
  * @return mixed
  */

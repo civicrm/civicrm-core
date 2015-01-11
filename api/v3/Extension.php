@@ -49,7 +49,7 @@ define('API_V3_EXTENSION_DELIMITER', ',');
  *                            using 'keys' should be more performant than making multiple API calls with 'key'
  *
  * @return array
-   *   API result
+ *   API result
  * @static void
  * @access public
  * @example ExtensionInstall.php
@@ -75,7 +75,7 @@ function civicrm_api3_extension_install($params) {
  * Upgrade an extension - runs upgrade_N hooks and system.flush
  *
  * @return array
-   *   API result
+ *   API result
  * @static void
  * @access public
  *
@@ -114,7 +114,7 @@ function civicrm_api3_extension_upgrade() {
  *                            using 'keys' should be more performant than making multiple API calls with 'key'
  *
  * @return array
-   *   API result
+ *   API result
  * @static void
  * @access public
  * @example ExtensionEnable.php
@@ -140,7 +140,7 @@ function civicrm_api3_extension_enable($params) {
  *                            using 'keys' should be more performant than making multiple API calls with 'key'
  *
  * @return array
-   *   API result
+ *   API result
  * @static void
  * @access public
  * @example ExtensionDisable.php
@@ -167,7 +167,7 @@ function civicrm_api3_extension_disable($params) {
  *                          - removeFiles: bool, whether to remove source tree; default: FALSE
  *
  * @return array
-   *   API result
+ *   API result
  * @static void
  * @access public
  * @example ExtensionUninstall.php
@@ -194,7 +194,7 @@ function civicrm_api3_extension_uninstall($params) {
  *
  * @throws API_Exception
  * @return array
-   *   API result
+ *   API result
  * @static void
  * @access public
  * @example ExtensionDownload.php
@@ -246,7 +246,7 @@ function civicrm_api3_extension_download($params) {
  *                          - remote: bool, whether to rescan remote repository (default: TRUE)
  *
  * @return array
-   *   API result
+ *   API result
  * @static void
  * @access public
  * @example ExtensionRefresh.php
@@ -279,7 +279,7 @@ function civicrm_api3_extension_refresh($params) {
  * @param array $params
  *
  * @return array
-   *   API result
+ *   API result
  * @static void
  * @access public
  * @example ExtensionGet.php
@@ -307,7 +307,7 @@ function civicrm_api3_extension_get($params) {
  * @param array $params
  *   API request params with 'key' or 'keys'.
  * @return array
-   *   of extension keys
+ *   of extension keys
  * @throws API_Exception
  */
 function _civicrm_api3_getKeys($params) {

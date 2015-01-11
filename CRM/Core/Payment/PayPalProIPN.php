@@ -143,7 +143,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    *   Abort if empty.
    *
    * @throws CRM_Core_Exception
-   * @return Ambigous <mixed, NULL, value, unknown, array, number>
+   * @return mixed
    */
   public function retrieve($name, $type, $location = 'POST', $abort = TRUE) {
     $value = CRM_Utils_Type::validate(
@@ -389,7 +389,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * (with the input parameters) & call this & all will be done
    *
    * @todo the references to POST throughout this class need to be removed
-   * @return void|boolean|Ambigous <void, boolean>
+   * @return void|boolean
    */
   public function main() {
     CRM_Core_Error::debug_var('GET', $_GET, TRUE, TRUE);
@@ -473,6 +473,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
    * @param $input
    * @param $ids
    *
+   * @return bool
    * @throws CRM_Core_Exception
    */
   public function getInput(&$input, &$ids) {
@@ -577,6 +578,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
   /**
    * Function check if transaction already exists
    * @param string $trxn_id
+   * @return bool|void
    */
   public function transactionExists($trxn_id) {
     if (CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_contribution WHERE trxn_id = %1",

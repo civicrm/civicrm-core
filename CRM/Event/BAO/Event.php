@@ -655,7 +655,8 @@ $event_summary_limit
    * @param int $id
    *   For which we want map info.
    *
-   * @return null|string     title of the event
+   * @return null|string
+   *   title of the event
    * @static
    */
   public static function &getMapInfo(&$id) {

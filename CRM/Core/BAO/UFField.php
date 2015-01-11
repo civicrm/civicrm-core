@@ -508,7 +508,8 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * @param int $ufGroupId
    *
-   * @return true for mix profile else false
+   * @return bool
+   *   true for mix profile else false
    * @static
    */
   public static function checkProfileType($ufGroupId) {
@@ -707,7 +708,8 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * @param $ctype
    *
-   * @return true for mix profile group else false
+   * @return bool
+   *   true for mix profile group else false
    * @static
    */
   public static function checkProfileGroupType($ctype) {

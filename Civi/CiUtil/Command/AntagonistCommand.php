@@ -30,13 +30,14 @@ class AntagonistCommand {
    *   E.g. "MyTest::testFoo".
    * @param array $candidateTests
    *   List of strings (e.g. "MyTest::testFoo").
-   * @return array|null array contains keys:
-   *  - antagonist: array
-   *    - file: string
-   *    - class: string
-   *    - method: string
-   *  - expectedResults: array
-   *  - actualResults: array
+   * @return array|null
+   *   array contains keys:
+   *    - antagonist: array
+   *      - file: string
+   *      - class: string
+   *      - method: string
+   *    - expectedResults: array
+   *    - actualResults: array
    */
   public static function findAntagonist($target, $candidateTests) {
     //$phpUnit = new \Civi\CiUtil\EnvTestRunner('./scripts/phpunit', 'EnvTests');

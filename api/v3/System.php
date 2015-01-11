@@ -46,7 +46,7 @@
  *                          - session:  bool, whether to reset the CiviCRM session data; defaul: FALSE
  *
  * @return boolean
-   *   true if success, else false
+ *   true if success, else false
  * @static void
  * @access public
  * @example SystemFlush.php
@@ -90,7 +90,7 @@ function _civicrm_api3_system_check_spec(&$spec) {
  *
  * @param array $params
  * @return array
-   *   API result descriptor; return items are alert codes/messages
+ *   API result descriptor; return items are alert codes/messages
  * @see civicrm_api3_create_success
  * @see civicrm_api3_create_error
  * @throws API_Exception

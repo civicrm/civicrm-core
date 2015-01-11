@@ -5470,8 +5470,9 @@ AND   displayRelType.is_active = 1
    * @param string $dataType
    *   The dataType we should check for the values, default integer.
    *
-   * @return bool|array if string does not match the patter
-   *         array of numeric values if string does match the pattern
+   * @return bool|array
+   *   false if string does not match the pattern
+   *   array of numeric values if string does match the pattern
    * @static
    */
   public static function parseSearchBuilderString($string, $dataType = 'Integer') {

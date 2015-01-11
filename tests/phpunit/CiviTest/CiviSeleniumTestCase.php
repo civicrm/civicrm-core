@@ -421,10 +421,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *   Contact’s last name.
    * @param mixed $email
    *   Contact’s email (when string) or random email (when true) or no email (when null).
+   * @param string $contactSubtype
    *
-   * @param null $contactSubtype
-   *
-   * @return mixed either a string with the (either generated or provided) email or null (if no email)
+   * @return string|null
+   *   either a string with the (either generated or provided) email or null (if no email)
    */
   public function webtestAddContact($fname = 'Anthony', $lname = 'Anderson', $email = NULL, $contactSubtype = NULL) {
     $args = 'reset=1&ct=Individual';
@@ -956,9 +956,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * Create new relationship type w/ user specified params or default.
    *
    * @param array $params
-   *   of required params.
+   *   array of required params.
    *
-   * @return an array of saved params values.
+   * @return array
+   *   array of saved params values.
    */
   public function webtestAddRelationshipType($params = array()) {
     $this->openCiviPage("admin/reltype", "reset=1&action=add");

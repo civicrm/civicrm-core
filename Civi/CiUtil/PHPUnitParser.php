@@ -8,7 +8,8 @@ class PHPUnitParser {
   /**
    * @param string $content
    *   Phpunit streaming JSON.
-   * @return array(string "$class::$func" => $status)
+   * @return array
+   *   ["$class::$func" => $status]
    */
   protected static function parseJsonStream($content) {
     $content = '['

@@ -43,7 +43,7 @@
  * @param array $params
  *
  * @return array
-   *   of newly created IM property values.
+ *   of newly created IM property values.
  * @access public
  */
 function civicrm_api3_im_create($params) {
@@ -68,7 +68,7 @@ function _civicrm_api3_im_create_spec(&$params) {
  * {@getfields im_delete}
  *
  * @return array
-   *   API result Array
+ *   API result Array
  * @access public
  * @todo convert to using Basic delete - BAO function non standard
  */
@@ -85,7 +85,7 @@ function civicrm_api3_im_delete($params) {
  *   An associative array of name/value pairs.
  *
  * @return array
-   *   details of found IM
+ *   details of found IM
  *
  * @access public
  */

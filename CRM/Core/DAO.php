@@ -573,7 +573,8 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param array $field
    *   The field under task.
    *
-   * @return array|null the attributes for the object
+   * @return array|null
+   *   the attributes for the object
    * @static
    */
   public static function makeAttribute($field) {
@@ -980,7 +981,8 @@ FROM   civicrm_domain
    * @param bool $force
    *   Skip use of the cache.
    *
-   * @return string|null          Value of $returnColumn in the retrieved record
+   * @return string|null
+   *   Value of $returnColumn in the retrieved record
    * @static
    */
   public static function getFieldValue($daoName, $searchValue, $returnColumn = 'name', $searchColumn = 'id', $force = FALSE) {
@@ -1191,7 +1193,8 @@ FROM   civicrm_domain
    * @param array $params
    * @param bool $abort
    * @param bool $i18nRewrite
-   * @return string|null the result of the query if any
+   * @return string|null
+   *   the result of the query if any
    *
    * @static
    */
@@ -1323,7 +1326,8 @@ FROM   civicrm_domain
    *                                        getting copied
    *
    *
-   * @return (reference )                   the newly created copy of the object
+   * @return CRM_Core_DAO
+   *   the newly created copy of the object
    */
   static function &copyGeneric($daoName, $criteria, $newData = NULL, $fieldsFix = NULL, $blockCopyOfDependencies = NULL) {
     $object = new $daoName();
@@ -2244,7 +2248,8 @@ SELECT contact_id
    *  preferable to not double-banger the return context next refactor of this - but keeping the attention
    *  in one place has some advantages as we try to extend this format
    *
-   * @return NULL|string|array a string is returned if $returnSanitisedArray is not set, otherwise and Array or NULL
+   * @return NULL|string|array
+   *   a string is returned if $returnSanitisedArray is not set, otherwise and Array or NULL
    *   depending on whether it is supported as yet
    */
   public static function createSQLFilter($fieldName, $filter, $type, $alias = NULL, $returnSanitisedArray = FALSE) {

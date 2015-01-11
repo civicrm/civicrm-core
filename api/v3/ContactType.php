@@ -46,7 +46,7 @@
  *                       name/value pairs to insert in new 'contact_type'
  *
  * @return array
-   *   contact_type array
+ *   contact_type array
  *
  * @access public
  */
@@ -75,7 +75,7 @@ function civicrm_api3_contact_type_create($params) {
  *                       as null, all contact_types will be returned
  *
  * @return array
-   *   Array of matching contact_types
+ *   Array of matching contact_types
  * @access public
  */
 function civicrm_api3_contact_type_get($params) {
@@ -94,7 +94,7 @@ function civicrm_api3_contact_type_get($params) {
  *                       to be deleted
  *
  * @return array
-   *   API Result Array
+ *   API Result Array
  *
  * @access public
  */

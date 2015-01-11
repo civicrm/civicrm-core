@@ -47,7 +47,8 @@ class Contact extends CiviUnitTestCase {
    * a contact of type Household
    *
    * @param array $params
-   * @return mixed $contactID id of created Household
+   * @return int
+   *   id of created Household
    */
   public static function createHousehold($params = NULL) {
     //compose the params, when not passed
@@ -68,7 +69,8 @@ class Contact extends CiviUnitTestCase {
    * a contact of type Organisation
    *
    * @param array $params
-   * @return mixed $contactID id of created Organisation
+   * @return int
+   *   id of created Organisation
    */
   public static function createOrganisation($params = NULL) {
     //compose the params, when not passed

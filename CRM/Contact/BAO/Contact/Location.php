@@ -125,7 +125,8 @@ LEFT JOIN civicrm_phone ON ( civicrm_phone.contact_id = civicrm_contact.id )
    * @param int $locationTypeID
    * @param bool $imageUrlOnly
    *
-   * @return null|string     display name of the contact if found
+   * @return null|string
+   *   display name of the contact if found
    * @static
    */
   public static function &getMapInfo($ids, $locationTypeID = NULL, $imageUrlOnly = FALSE) {

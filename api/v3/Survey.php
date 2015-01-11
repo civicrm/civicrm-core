@@ -44,7 +44,7 @@
  * @example SurveyCreate.php Std Create example
  *
  * @return array
-   *   api result array
+ *   api result array
  * {@getfields survey_create}
  * @access public
  */
@@ -72,7 +72,7 @@ function _civicrm_api3_survey_create_spec(&$params) {
  *                       as null, all surveys will be returned
  *
  * @return array
-   *   API result Array of matching surveys
+ *   API result Array of matching surveys
  * {@getfields survey_get}
  * @access public
  */
@@ -91,7 +91,7 @@ function civicrm_api3_survey_get($params) {
  *                       to be deleted
  *
  * @return array
-   *   api result array
+ *   api result array
  * {@getfields survey_delete}
  * @access public
  */

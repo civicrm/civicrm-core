@@ -59,12 +59,12 @@ class Utils {
   }
 
   /**
-   *  Prepare and execute a query
+   * Prepare and execute a query
    *
-   *  If the query fails, output a diagnostic message
-   * @param  string  Query to run
-   * @return mixed   PDOStatement => Results of the query
-   *                  false        => Query failed
+   * If the query fails, output a diagnostic message
+   * @param string $query
+   *   Query to run
+   * @return bool
    */
   public function do_query($query) {
     // echo "do_query($query)\n";

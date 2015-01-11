@@ -273,7 +273,8 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @param array $defaults
    *   (reference) the default values.
    *
-   * @return booelan  whether anything was found
+   * @return booelan
+   *   whether anything was found
    */
   public static function getValues(&$defaults) {
     if (empty($defaults)) {

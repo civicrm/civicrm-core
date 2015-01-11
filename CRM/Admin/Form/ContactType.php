@@ -90,7 +90,8 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
    * @param $files
    * @param $self
    *
-   * @return true if no errors, else array of errors
+   * @return bool|array
+   *   true if no errors, else array of errors
    * @static
    */
   public static function formRule($fields, $files, $self) {

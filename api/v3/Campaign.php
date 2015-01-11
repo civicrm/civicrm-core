@@ -46,7 +46,7 @@
  *                       name/value pairs to insert in new 'campaign'
  *
  * @return array
-   *   campaign array
+ *   campaign array
  * {@getfields campaign_create}
  * @access public
  */
@@ -74,7 +74,7 @@ function _civicrm_api3_campaign_create_spec(&$params) {
  *                       as null, all campaigns will be returned
  *
  * @return array
-   *   Array of matching campaigns
+ *   Array of matching campaigns
  * @access public
  * {@getfields campaign_get}
  */
@@ -93,7 +93,7 @@ function civicrm_api3_campaign_get($params) {
  *                       to be deleted
  *
  * @return array
-   *   (reference) returns flag true if successful, error
+ *   (reference) returns flag true if successful, error
  *                message otherwise
  * {@getfields campaign_delete}
  * @access public

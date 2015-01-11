@@ -1738,7 +1738,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * This is used by contribution and also event pcps
    *
    * @param array $params
-   *   Associated array.
    * @param object $contribution
    *   Contribution object.
    *
@@ -1778,7 +1777,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param CRM_Core_Form $page
    *   Form object.
    * @param array $params
-   *   Associated array.
    *
    * @return array
    * @static

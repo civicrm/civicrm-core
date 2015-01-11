@@ -47,7 +47,8 @@ interface CRM_Utils_Cache_Interface {
    * Get a value from the cache
    *
    * @param string $key
-   * @return mixed NULL if $key has not been previously set
+   * @return mixed
+   *   NULL if $key has not been previously set
    */
   public function get($key);
 

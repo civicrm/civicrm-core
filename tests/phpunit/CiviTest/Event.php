@@ -10,7 +10,8 @@ class Event extends PHPUnit_Framework_Testcase {
    *
    * @param int $contactId
    *
-   * @return mixed $event id of created Event
+   * @return int
+   *   id of created Event
    */
   public static function create($contactId) {
     require_once "CRM/Event/BAO/Event.php";

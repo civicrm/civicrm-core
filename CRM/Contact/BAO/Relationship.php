@@ -1699,7 +1699,8 @@ AND cc.sort_name LIKE '%$name%'";
   /**
    * Set 'is_valid' field to false for all relationships whose end date is in the past, ie. are expired.
    *
-   * @return True on success, false if error is encountered.
+   * @return bool
+   *   True on success, false if error is encountered.
    */
   public static function disableExpiredRelationships() {
     $query = "SELECT id FROM civicrm_relationship WHERE is_active = 1 AND end_date < CURDATE()";

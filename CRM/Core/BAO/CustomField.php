@@ -684,7 +684,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *   The key to parse.
    *
    * @param bool $all
-   * @return int|null         The id (if exists)
+   * @return int|null
+   *   The id (if exists)
    * @static
    */
   public static function getKeyID($key, $all = FALSE) {
@@ -2112,7 +2113,7 @@ AND    cf.id = %1";
    * for inactive fields : CRM-5369
    *
    *
-   * @return mixed $customOptionGroup
+   * @return mixed
    * @static
    */
   public static function &customOptionGroup($includeFieldIds = NULL) {

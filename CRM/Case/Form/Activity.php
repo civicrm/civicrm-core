@@ -361,7 +361,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
    *   The uploaded files if any.
    * @param $self
    *
-   * @return true if no errors, else array of errors
+   * @return bool|array
+   *   true if no errors, else array of errors
    * @static
    */
   public static function formRule($fields, $files, $self) {

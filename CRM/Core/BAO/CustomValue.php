@@ -125,7 +125,8 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
    * @param string $type
    *   The civicrm type string.
    *
-   * @return the mysql data store placeholder
+   * @return string|null
+   *   the mysql data store placeholder
    * @static
    */
   public static function typeToField($type) {
@@ -163,7 +164,8 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
 
 
   /**
-   * @param $formValues
+   * @param array $formValues
+   * @return null
    */
   public static function fixFieldValueOfTypeMemo(&$formValues) {
     if (empty($formValues)) {
@@ -192,7 +194,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
   }
 
   /**
-   * Delet option value give an option value and custom group id
+   * Delete option value give an option value and custom group id
    *
    * @param int $customValueID
    *   Custom value ID.
