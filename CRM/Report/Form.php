@@ -3888,8 +3888,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * Get phone columns to add to array
    *
    * @param array $options
-   *  - prefix Prefix to add to table (in case of more than one instance of the table)
-   *  - prefix_label Label to give columns from this phone table instance
+   *   - prefix Prefix to add to table (in case of more than one instance of the table)
+   *   - prefix_label Label to give columns from this phone table instance
    *
    * @return array
    *   phone columns definition
@@ -3920,8 +3920,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * Get address columns to add to array
    *
    * @param array $options
-   *  - prefix Prefix to add to table (in case of more than one instance of the table)
-   *  - prefix_label Label to give columns from this address table instance
+   *   - prefix Prefix to add to table (in case of more than one instance of the table)
+   *   - prefix_label Label to give columns from this address table instance
    *
    * @return array
    *   address columns definition

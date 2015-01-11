@@ -850,11 +850,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Run a series of cron jobs and make an assertion about email deliveries
    *
-   * @param $cronRuns
-   *
-   * @internal param array $jobSchedule specifying when to run cron and what messages to expect; each item is an array with keys:
-   *  - time: string, e.g. '2012-06-15 21:00:01'
-   *  - recipients: array(array(string)), list of email addresses which should receive messages
+   * @param array $cronRuns
+   *   array specifying when to run cron and what messages to expect; each item is an array with keys:
+   *   - time: string, e.g. '2012-06-15 21:00:01'
+   *   - recipients: array(array(string)), list of email addresses which should receive messages
    */
   public function assertCronRuns($cronRuns) {
     foreach ($cronRuns as $cronRun) {
@@ -864,11 +863,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       $this->mut->clearMessages();
     }
   }
-
-  ////////////////////////////////
-  ////////////////////////////////
-  ////////////////////////////////
-  ////////////////////////////////
 
   /**
    * @var array(DAO_Name => array(int)) List of items to garbage-collect during tearDown

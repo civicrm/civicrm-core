@@ -3057,7 +3057,7 @@ AND        m.id = %1
    * @param array $params
    *
    * @return array
-   *   of mailings for a contact
+   *   Array of mailings for a contact
    *
    * @static
    */

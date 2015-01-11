@@ -70,7 +70,8 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_DAO_Job object on success, null otherwise
+   * @return CRM_Core_DAO_Job|null
+   *   object on success, null otherwise
    * @static
    */
   public static function retrieve(&$params, &$defaults) {

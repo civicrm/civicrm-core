@@ -44,7 +44,7 @@
  * @param array $params
  *
  * @return array
- *   of newly created acl_role property values.
+ *   Array of newly created acl_role property values.
  * @access public
  */
 function civicrm_api3_acl_role_create($params) {
@@ -61,7 +61,7 @@ function civicrm_api3_acl_role_create($params) {
  * @param array $params
  *
  * @return array
- *   of retrieved acl_role property values.
+ *   Array of retrieved acl_role property values.
  * @access public
  */
 function civicrm_api3_acl_role_get($params) {
@@ -78,7 +78,7 @@ function civicrm_api3_acl_role_get($params) {
  * @param array $params
  *
  * @return array
- *   of deleted values.
+ *   Array of deleted values.
  * @access public
  */
 function civicrm_api3_acl_role_delete($params) {

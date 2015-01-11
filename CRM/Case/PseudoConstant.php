@@ -191,13 +191,13 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all Activty types for the CiviCase component
+   * Get all Activity types for the CiviCase component
    *
    * The static array activityType is returned
    *
    * @param bool $indexName
    *   True return activity name in array.
-   * key else activity id as array key.
+   *   key else activity id as array key.
    *
    * @param bool $all
    *

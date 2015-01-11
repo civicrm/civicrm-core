@@ -49,7 +49,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contribute_BAO_FinancialItem object
+   * @return CRM_Contribute_BAO_FinancialItem
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -188,7 +188,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Core_BAO_FinancialTrxn object
+   * @return CRM_Core_BAO_FinancialTrxn
    * @static
    */
   public static function createEntityTrxn($params) {

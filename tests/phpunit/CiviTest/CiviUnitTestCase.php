@@ -884,7 +884,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * This function exists to wrap api functions
+   * wrap api functions
    * so we can ensure they succeed & throw exceptions without litterering the test with checks
    *
    * @param string $entity
@@ -929,12 +929,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $params
    * @param string $type
    *   Per http://php.net/manual/en/function.gettype.php possible types.
-   * - boolean
-   * - integer
-   * - double
-   * - string
-   * - array
-   * - object
+   *   - boolean
+   *   - integer
+   *   - double
+   *   - string
+   *   - array
+   *   - object
    *
    * @return array|int
    */
@@ -964,12 +964,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $params
    * @param array $checkAgainst
    *   Array to compare result against.
-   * - boolean
-   * - integer
-   * - double
-   * - string
-   * - array
-   * - object
+   *   - boolean
+   *   - integer
+   *   - double
+   *   - string
+   *   - array
+   *   - object
    *
    * @throws Exception
    * @return array|int
@@ -1076,8 +1076,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Generic function to create Organisation, to be used in test cases
    *
-   * @param array parameters for civicrm_contact_add api function call
-   * @param int sequence number if creating multiple organizations
+   * @param array $params
+   *   parameters for civicrm_contact_add api function call
+   * @param int $seq
+   *   sequence number if creating multiple organizations
    *
    * @return int
    *   id of Organisation created
@@ -1093,8 +1095,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Generic function to create Individual, to be used in test cases
    *
-   * @param array parameters for civicrm_contact_add api function call
-   * @param int sequence number if creating multiple individuals
+   * @param array $params
+   *   parameters for civicrm_contact_add api function call
+   * @param int $seq
+   *   sequence number if creating multiple individuals
    *
    * @return int
    *   id of Individual created
@@ -1107,8 +1111,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Generic function to create Household, to be used in test cases
    *
-   * @param array parameters for civicrm_contact_add api function call
-   * @param int sequence number if creating multiple households
+   * @param array $params
+   *   parameters for civicrm_contact_add api function call
+   * @param int $seq
+   *   sequence number if creating multiple households
    *
    * @return int
    *   id of Household created
@@ -1121,8 +1127,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Helper function for getting sample contact properties
    *
-   * @param enum contact type: Individual, Organization
-   * @param int sequence number for the values of this type
+   * @param string $contact_type
+   *   enum contact type: Individual, Organization
+   * @param int $seq
+   *   sequence number for the values of this type
    *
    * @return array
    *   properties of sample contact (ie. $params for API call)
@@ -1406,8 +1414,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Create Payment Processor
    *
-   * @return object
-   *   of Payment Processsor
+   * @return CRM_Financial_DAO_PaymentProcessor
+   *   instance of Payment Processsor
    */
   public function processorCreate() {
     $processorParams = array(
@@ -1429,8 +1437,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Create contribution page
    *
    * @param array $params
-   * @return object
-   *   of contribution page
+   * @return array
+   *   Array of contribution page
    */
   public function contributionPageCreate($params) {
     $this->_pageParams = array(
@@ -1471,6 +1479,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param int $tagId
    *   Id of the tag to be deleted.
+   *
+   * @return int
    */
   public function tagDelete($tagId) {
     require_once 'api/api.php';
@@ -1541,11 +1551,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *   Contact_id.
    * @param int $cTypeID
    *   Id of financial type.
-   *
    * @param int $invoiceID
    * @param int $trxnID
    * @param int $paymentInstrumentID
    * @param bool $isFee
+   *
    * @return int
    *   id of created contribution
    */
@@ -1580,9 +1590,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $params
    * @param int $financialType
    *   Id of financial type.
-   *
    * @param int $invoiceID
    * @param int $trxnID
+   *
    * @return int
    *   id of created contribution
    */
@@ -1764,7 +1774,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Add a Location Type
    *
    * @param array $params
-   * @return CRM_Core_DAO_LocationType location id of created location
+   * @return CRM_Core_DAO_LocationType
+   *   location id of created location
    */
   public function locationTypeCreate($params = NULL) {
     if ($params === NULL) {

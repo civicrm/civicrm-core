@@ -9,9 +9,9 @@ class PCPBlock extends PHPUnit_Framework_Testcase {
    *
    * @param int $contributionPageId
    *   Id of the Contribution Page.
-   * to be deleted
+   *   to be deleted
    * @return array
-   *   of created pcp block
+   *   Array of created pcp block
    */
   public function create($contributionPageId) {
     $profileParams = array(

@@ -202,7 +202,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
    * Process the form after the input has been submitted and validated
    *
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues();

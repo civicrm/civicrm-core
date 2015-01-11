@@ -441,7 +441,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @param string $groupName
    *
-   * @return CRM_Core_DAO_OptionValue object
+   * @return CRM_Core_DAO_OptionValue
    * @static
    */
   public static function retrieve(&$params, &$values, $groupName = 'label_format') {

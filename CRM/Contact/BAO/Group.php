@@ -53,7 +53,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contact_BAO_Group object
+   * @return CRM_Contact_BAO_Group
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -236,7 +236,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param NULL $rowCount
    *
    * @return array
-   *   of group objects.
+   *   Array of group objects.
    *
    *
    * @todo other BAO functions that use returnProperties (e.g. Query Objects) receive the array flipped & filled with 1s and
@@ -565,7 +565,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param bool $isActive
    *   Value we want to set the is_active field.
    *
-   * @return CRM_Core_DAO
+   * @return CRM_Core_DAO|null
    *   DAO object on sucess, NULL otherwise
    * @static
    */
@@ -726,8 +726,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @return array
    *   associated array of group list
-   *  -rp = rowcount
-   *  -page= offset
+   *   -rp = rowcount
+   *   -page= offset
    * @todo there seems little reason for the small number of functions that call this to pass in
    * params that then need to be translated in this function since they are coding them when calling
    */

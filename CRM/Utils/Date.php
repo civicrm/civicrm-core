@@ -944,7 +944,7 @@ class CRM_Utils_Date {
    *
    * @param $format
    *   Given format ( eg 'M Y', 'Y M' ).
-   * return array of qfMapping and date parts for date format.
+   *   return array of qfMapping and date parts for date format.
    *
    * @return array|null|string
    */

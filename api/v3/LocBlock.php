@@ -93,7 +93,7 @@ function civicrm_api3_loc_block_create($params) {
  *
  * @param array $params
  *   Array of one or more valid property_name=>value pairs. If $params is set.
- *  as null, all loc_blocks will be returned (default limit is 25)
+ *   as null, all loc_blocks will be returned (default limit is 25)
  *
  * @return array
  *   Array of matching loc_blocks

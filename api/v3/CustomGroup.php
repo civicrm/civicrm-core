@@ -43,7 +43,7 @@
  *
  * @param array $params
  *   An associative array used in construction.
- * retrieval of the object
+ *   retrieval of the object
  * @todo missing get function
  *
  *
@@ -56,7 +56,7 @@
  * See the CRM Data Model for custom_group property definitions
  * $params['class_name'] is a required field, class being extended.
  *
- * @param $params
+ * @param array $params
  *   Array Associative array of property name/value pairs to insert in group.
  * {@getfields CustomGroup_create}
  *

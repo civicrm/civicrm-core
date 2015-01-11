@@ -36,11 +36,11 @@
 /**
  * Determine the URL of a resource file
  *
- * @param $params
- *   Array with keys:.
- *  - ext: string, extension name. see CRM_Core_Resources::getUrl
- *  - file: string, relative file path. see CRM_Core_Resources::getUrl
- * @param $smarty
+ * @param array $params
+ *   Array with keys:
+ *   - ext: string, extension name. see CRM_Core_Resources::getUrl
+ *   - file: string, relative file path. see CRM_Core_Resources::getUrl
+ * @param CRM_Core_Smarty $smarty
  *
  * @return string
  */

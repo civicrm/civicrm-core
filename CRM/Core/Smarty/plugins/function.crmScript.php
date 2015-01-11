@@ -36,14 +36,14 @@
 /**
  * Add a Javascript file to a specific part of the page
  *
- * @param $params
- *   Array with keys:.
- *  - ext: string, extension name. see CRM_Core_Resources::addScriptFile
- *  - file: string, relative file path. see CRM_Core_Resources::addScriptFile
- *  - url: string. see CRM_Core_Resources::addScriptURL
- *  - weight: int; default: CRM_Core_Resources::DEFAULT_WEIGHT (0)
- *  - region: string; default: CRM_Core_Resources::DEFAULT_REGION ('html-header')
- * @param $smarty
+ * @param array $params
+ *   Array with keys:
+ *   - ext: string, extension name. see CRM_Core_Resources::addScriptFile
+ *   - file: string, relative file path. see CRM_Core_Resources::addScriptFile
+ *   - url: string. see CRM_Core_Resources::addScriptURL
+ *   - weight: int; default: CRM_Core_Resources::DEFAULT_WEIGHT (0)
+ *   - region: string; default: CRM_Core_Resources::DEFAULT_REGION ('html-header')
+ * @param CRM_Core_Smarty $smarty
  *
  * @throws Exception
  */

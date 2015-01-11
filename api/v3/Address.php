@@ -46,7 +46,7 @@
  * @param array $params
  *
  * @return array
- *   of newly created tag property values.
+ *   Array of newly created tag property values.
  * @access public
  */
 function civicrm_api3_address_create(&$params) {

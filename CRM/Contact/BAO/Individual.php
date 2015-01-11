@@ -52,7 +52,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    * @param array $contact
    *   Contact object.
    *
-   * @return CRM_Contact_BAO_Contact object
+   * @return CRM_Contact_BAO_Contact
    * @static
    */
   public static function format(&$params, &$contact) {

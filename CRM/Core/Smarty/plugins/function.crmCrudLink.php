@@ -36,13 +36,13 @@
 /**
  * Dynamically construct a link based on an entity-type and entity-id.
  *
- * @param $params
- *   Array with keys:.
- *  - table: string
- *  - id: int
- *  - action: string, 'VIEW' or 'UPDATE' [default: VIEW]
- *  - title: string [optionally override default title]
- * @param $smarty
+ * @param array $params
+ *   Array with keys:
+ *   - table: string
+ *   - id: int
+ *   - action: string, 'VIEW' or 'UPDATE' [default: VIEW]
+ *   - title: string [optionally override default title]
+ * @param CRM_Core_Smarty $smarty
  *
  * @return string
  */

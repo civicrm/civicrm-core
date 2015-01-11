@@ -45,7 +45,7 @@
  * @param array $params
  *
  * @return array
- *   of newly created tag property values.
+ *   Array of newly created tag property values.
  * {@getfields tag_create}
  * @access public
  */

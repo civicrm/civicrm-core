@@ -46,7 +46,7 @@
  * @param array $params
  *
  * @return array
- *   of newly created phone property values.
+ *   Array of newly created phone property values.
  * @access public
  */
 function civicrm_api3_phone_create($params) {

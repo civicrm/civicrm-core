@@ -573,7 +573,7 @@ abstract class CRM_Utils_Hook {
    * @param CRM_Core_DAO $dao
    *   The item for which we want a reference count.
    * @param array $refCounts
-   *   Each item in the array is an array with keys:.
+   *   Each item in the array is an Array with keys:
    *   - name: string, eg "sql:civicrm_email:contact_id"
    *   - type: string, eg "sql"
    *   - count: int, eg "5" if there are 5 email addresses that refer to $dao
@@ -943,7 +943,7 @@ abstract class CRM_Utils_Hook {
    *
    * @param array $params
    *   Array fields include: groupName, from, toName, toEmail, subject, cc, bcc, text, html,
-   * returnPath, replyTo, headers, attachments (array)
+   *   returnPath, replyTo, headers, attachments (array)
    * @param string $context
    *   The context in which the hook is being invoked, eg 'civimail'.
    *
@@ -988,8 +988,8 @@ abstract class CRM_Utils_Hook {
    *   The case ID.
    *
    * @return array
-   *   of data to be displayed, where the key is a unique id to be used for styling (div id's)
-   * and the value is an array with keys 'label' and 'value' specifying label/value pairs
+   *   Array of data to be displayed, where the key is a unique id to be used for styling (div id's)
+   *   and the value is an array with keys 'label' and 'value' specifying label/value pairs
    */
   public static function caseSummary($caseID) {
     return self::singleton()->invoke(1, $caseID,
@@ -1259,9 +1259,8 @@ abstract class CRM_Utils_Hook {
    *                           activity, campaign, case, contact, contribution, event, grant, membership, and pledge
    * @param array &$headers the list of column headers, an associative array with keys: ( name, sort, order )
    * @param array &$rows the list of values, an associate array with fields that are displayed for that component
-   * @param $selector
-   *
-   * @internal param array $seletor the selector object. Allows you access to the context of the search
+   * @param array $selector
+   *   the selector object. Allows you access to the context of the search
    *
    * @return void
    *   modify the header and values object to pass the data u need
@@ -1892,10 +1891,10 @@ abstract class CRM_Utils_Hook {
    * @param CRM_Core_DAO $bao
    * @param array $link
    *   To define the link, add these keys to $link:.
-   *  - title: string
-   *  - path: string
-   *  - query: array
-   *  - url: string (used in lieu of "path"/"query")
+   *   - title: string
+   *   - path: string
+   *   - query: array
+   *   - url: string (used in lieu of "path"/"query")
    *      Note: if making "url" CRM_Utils_System::url(), set $htmlize=false
    * @return mixed
    */

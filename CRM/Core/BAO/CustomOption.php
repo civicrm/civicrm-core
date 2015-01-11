@@ -47,7 +47,7 @@ class CRM_Core_BAO_CustomOption {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_BAO_CustomOption object
+   * @return CRM_Core_BAO_CustomOption
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -173,7 +173,8 @@ WHERE  id = %1
   /**
    * Delete Option
    *
-   * param $optionId integer option id
+   * @param $optionId integer
+   *   option id
    *
    * @static
    */

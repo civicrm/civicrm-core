@@ -58,7 +58,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    *
    * @param array $allValues
    *
-   * @return CRM_Contribute_BAO_ContributionType object
+   * @return CRM_Contribute_BAO_ContributionType
    * @static
    */
   public static function retrieve(&$params, &$defaults, &$allValues = array()) {

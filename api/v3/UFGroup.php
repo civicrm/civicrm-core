@@ -38,7 +38,7 @@
  */
 
 /**
- * Files required for this package
+ * @param array $params
  */
 function _civicrm_api3_uf_group_create_spec(&$params) {
   $session = CRM_Core_Session::singleton();
@@ -51,7 +51,7 @@ function _civicrm_api3_uf_group_create_spec(&$params) {
 /**
  * Use this API to create a new group. See the CRM Data Model for uf_group property definitions
  *
- * @param $params
+ * @param array $params
  *   Array Associative array of property name/value pairs to insert in group.
  *
  * @return array

@@ -51,7 +51,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
    * @params array $params
    *   Form values.
    *
-   * @param $params
+   * @param array $params
    * @param array $ids
    *
    * @return object

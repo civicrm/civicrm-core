@@ -486,10 +486,10 @@ class CRM_Core_BAO_ConfigSetting {
    * Return likely default settings
    * @return array
    *   site settings
-   *  -$url,
-   * - $dir Base Directory
-   * - $siteName
-   * - $siteRoot
+   *   - $url
+   *   - $dir Base Directory
+   *   - $siteName
+   *   - $siteRoot
    */
   public static function getBestGuessSettings() {
     $config = CRM_Core_Config::singleton();

@@ -46,7 +46,7 @@
  * @param array $params
  *
  * @return array
- *   of newly created activity contact records.
+ *   Array of newly created activity contact records.
  * @access public
  */
 function civicrm_api3_activity_contact_create($params) {

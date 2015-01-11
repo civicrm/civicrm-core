@@ -39,17 +39,13 @@
  */
 
 /**
- * Files required for this package
- */
-
-/**
  * Create a Event
  *
  * This API is used for creating a Event
  *
  * @param array $params
  *   Input parameters.
- * Allowed @params array keys are:
+ *   Allowed @params array keys are:
  * {@getfields event_create}
  *
  * @return array
@@ -105,8 +101,8 @@ function _civicrm_api3_event_create_legacy_support_42(&$params) {
  *   An associative array of name/value property values of civicrm_event.
  * {@getfields event_get}
  *
- * @return Array
- *   of all found event property values.
+ * @return array
+ *   Array of all found event property values.
  * @access public
  *
  */

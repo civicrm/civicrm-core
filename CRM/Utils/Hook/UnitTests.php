@@ -66,7 +66,7 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
    *   Hook name, e.g civicrm_pre.
    * @param array $callable
    *   Function to call ie array(class, method).
-   *  eg. array($this, mymethod)
+   *   eg. array($this, mymethod)
    */
   public function setHook($hook, $callable) {
     $this->adhocHooks[$hook] = $callable;

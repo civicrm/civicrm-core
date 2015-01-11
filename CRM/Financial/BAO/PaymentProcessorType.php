@@ -54,7 +54,8 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_BAO_LocaationType object on success, null otherwise
+   * @return CRM_Core_BAO_LocaationType|null
+   *   object on success, null otherwise
    * @static
    */
   public static function retrieve(&$params, &$defaults) {

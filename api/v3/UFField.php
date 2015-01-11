@@ -40,7 +40,7 @@
 /**
  * Defines 'uf field' within a group.
  *
- * @param $params
+ * @param array $params
  *   Array Associative array of property name/value pairs to create new uf field.
  *
  * @throws API_Exception

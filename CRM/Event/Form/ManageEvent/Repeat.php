@@ -77,7 +77,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
    * the default values are retrieved from the database
    *
    *
-   * @return None
+   * @return void
    */
   public function setDefaultValues() {
     $defaults = array();

@@ -36,14 +36,14 @@
 /**
  * Add a stylesheet <LINK> to a specific part of the page
  *
- * @param $params
- *   Array with keys:.
- *  - ext: string, extension name. see CRM_Core_Resources::addStyleFile
- *  - file: string, relative file path. see CRM_Core_Resources::addStyleFile
- *  - url: string. see CRM_Core_Resources::addStyleURL
- *  - weight: int; default: CRM_Core_Resources::DEFAULT_WEIGHT (0)
- *  - region: string; default: CRM_Core_Resources::DEFAULT_REGION ('html-header')
- * @param $smarty
+ * @param array $params
+ *   Array with keys:
+ *   - ext: string, extension name. see CRM_Core_Resources::addStyleFile
+ *   - file: string, relative file path. see CRM_Core_Resources::addStyleFile
+ *   - url: string. see CRM_Core_Resources::addStyleURL
+ *   - weight: int; default: CRM_Core_Resources::DEFAULT_WEIGHT (0)
+ *   - region: string; default: CRM_Core_Resources::DEFAULT_REGION ('html-header')
+ * @param CRM_Core_Smarty $smarty
  *
  * @throws Exception
  */

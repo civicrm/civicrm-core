@@ -740,7 +740,7 @@ function _civicrm_api3_profile_appendaliases($values, $entity) {
 /**
  * @deprecated api notice
  * @return array
- *   of deprecated actions
+ *   Array of deprecated actions
  */
 function _civicrm_api3_profile_deprecation() {
   return array(

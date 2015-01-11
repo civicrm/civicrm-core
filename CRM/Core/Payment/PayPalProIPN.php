@@ -75,15 +75,15 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * Function exists to get the values from the rp_invoice_id string
+   * get the values from the rp_invoice_id string
    *
    * @param string $name
    *   E.g. i, values are stored in the string with letter codes.
    * @param bool $abort
-   *   Fatal if not found?.
+   *   Throw exception if not found
    *
    * @throws CRM_Core_Exception
-   * @return unknown
+   * @return mixed
    */
   public function getValue($name, $abort = TRUE) {
     if ($abort && empty($this->_invoiceData[$name])) {

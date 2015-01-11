@@ -1695,7 +1695,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    *
    * @param array $params
    *   reference to an array containing all the.
-   * values for import
+   *   values for import
    * @param int $onDuplicate
    * @param int $cid
    *   contact id.

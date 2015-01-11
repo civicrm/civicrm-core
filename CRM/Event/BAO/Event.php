@@ -49,7 +49,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Event_BAO_ManageEvent object
+   * @return CRM_Event_BAO_ManageEvent
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -2159,7 +2159,7 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
    *   Event template id.
    *
    * @return array
-   *   of custom data defaults.
+   *   Array of custom data defaults.
    */
   public static function getTemplateDefaultValues($templateId) {
     $defaults = array();

@@ -33,7 +33,7 @@ function civicrm_api3_custom_search_get($params) {
  * @param array $params
  *
  * @return array
- *   of newly created option_value property values.
+ *   Array of newly created option_value property values.
  * {@getfields OptionValue_create}
  * @access public
  */
