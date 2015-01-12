@@ -1190,25 +1190,20 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * @param int $contactID
+   * Delete contact, ensuring it is not the domain contact
    *
-   * @return array|int
+   * @param int $contactID
+   *   Contact ID to delete
    */
   public function contactDelete($contactID) {
-    $params = array(
-      'id' => $contactID,
-      'skip_undelete' => 1,
-      'debug' => 1,
-    );
     $domain = new CRM_Core_BAO_Domain;
     $domain->contact_id = $contactID;
-    if ($domain->find(TRUE)) {
-      // we are finding tests trying to delete the domain contact in cleanup
-      //since this is mainly for cleanup lets put a safeguard here
-      return;
+    if (!$domain->find(TRUE)) {
+      $this->callAPISuccess('contact', 'delete', array(
+        'id' => $contactID,
+        'skip_undelete' => 1,
+      ));
     }
-    $result = $this->callAPISuccess('contact', 'delete', $params);
-    return $result;
   }
 
   /**
@@ -2157,7 +2152,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param array $params
    *   (custom_group_id) is required.
-   * @return array|int
+   * @return array
    */
   public function customFieldCreate($params) {
     $params = array_merge(array(
@@ -2170,13 +2165,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     ), $params);
 
     $result = $this->callAPISuccess('custom_field', 'create', $params);
-
-    if ($result['is_error'] == 0 && isset($result['id'])) {
-      CRM_Core_BAO_CustomField::getTableColumnGroup($result['id'], 1);
-      // force reset of enabled components to help grab custom fields
-      CRM_Core_Component::getEnabledComponents(1);
-      return $result;
-    }
+    // these 2 functions are called with force to flush static caches
+    CRM_Core_BAO_CustomField::getTableColumnGroup($result['id'], 1);
+    CRM_Core_Component::getEnabledComponents(1);
+    return $result;
   }
 
   /**
@@ -2494,6 +2486,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * @param $tablesToTruncate
    * @param bool $dropCustomValueTables
+   * @throws \Exception
    */
   public function quickCleanup($tablesToTruncate, $dropCustomValueTables = FALSE) {
     if ($this->tx) {

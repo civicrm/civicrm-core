@@ -30,7 +30,7 @@ class System {
 
   /**
    * @param array $processor
-   * @throws \Civi\Payment\CRM_Core_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getByProcessor($processor) {
     $id = $processor['id'];
@@ -47,7 +47,7 @@ class System {
         else {
           $paymentClass = 'CRM_Core_' . $processor['class_name'];
           if (empty($paymentClass)) {
-            throw new CRM_Core_Exception('no class provided');
+            throw new \CRM_Core_Exception('no class provided');
           }
           require_once str_replace('_', DIRECTORY_SEPARATOR, $paymentClass) . '.php';
         }
