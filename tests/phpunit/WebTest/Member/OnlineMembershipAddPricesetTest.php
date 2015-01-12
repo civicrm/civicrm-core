@@ -102,7 +102,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $setHelp = 'Select your membership options.';
     $memTypeParams1 = $this->webtestAddMembershipType();
     $memTypeTitle1 = $memTypeParams1['membership_type'];
-    $memTypeId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[1][text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
+    $memTypeId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[1]/div[text()='{$memTypeTitle1}']/../../td[12]/span/a[3]@href"));
     $memTypeId1 = $memTypeId1[1];
     $this->_testAddSet($setTitle, $usedFor, $contributionType, $setHelp);
 

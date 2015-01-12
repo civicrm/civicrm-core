@@ -109,8 +109,8 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
 
     $this->checkCRMAlert("Campaign $title");
 
-    $this->waitForElementPresent("//td[text()='$campaignTitle']");
-    $campaignId = $this->urlArg('id', $this->getAttribute("//td[text()='$campaignTitle']/../td[13]/span/a[text()='Edit']@href"));
+    $this->waitForElementPresent("//td[3]/div[text()='$campaignTitle']");
+    $campaignId = $this->urlArg('id', $this->getAttribute("//td[3]/div[text()='$campaignTitle']/../../td[13]/span/a[text()='Edit']@href"));
 
     $this->offlineContributionTest($campaignTitle, $campaignId);
 
@@ -264,8 +264,8 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("link=Campaigns");
     $this->click("search_form_campaign");
     $this->type("campaign_title", $pastCampaignTitle);
-    $this->clickAjaxLink("//a[text()='Search']", "//td[text()='$pastCampaignTitle']");
-    $campaignId = $this->urlArg('id', $this->getAttribute("//td[text()='$pastCampaignTitle']/../td[13]/span/a[text()='Edit']@href"));
+    $this->clickAjaxLink("//a[text()='Search']", "//td[3]/div[text()='$pastCampaignTitle']");
+    $campaignId = $this->urlArg('id', $this->getAttribute("//td[3]/div[text()='$pastCampaignTitle']/../../td[13]/span/a[text()='Edit']@href"));
 
     $this->offlineContributionTest($pastCampaignTitle, $campaignId, TRUE);
   }
