@@ -237,12 +237,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'Unsupervised',
         ),
       ),
-      'CRM_Mailing_Event_DAO_Subscribe' => array(
-        array(
-          'fieldName' => 'group_id',
-          'sample' => $group_name,
-        ),
-      ),
       'CRM_Activity_DAO_Activity' => array(
         array(
           'fieldName' => 'activity_type_id',

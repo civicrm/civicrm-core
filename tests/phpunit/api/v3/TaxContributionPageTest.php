@@ -164,7 +164,6 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'financial_account_id' => 12,
       'is_active' => 1,
       'is_default' => 1,
-      'is_default' => 1,
       'user_name' => 'dummy',
       'url_site' => 'http://dummy.com',
       'url_recur' => 'http://dummyrecur.com',
@@ -503,8 +502,8 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param array $params
    * @param int $financialTypeId
+   * @return int
    */
   public function _getFinancialAccountId($financialTypeId) {
     $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
@@ -520,7 +519,9 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     return CRM_Utils_Array::value('financial_account_id', $result);
   }
 
-  ///////////////// civicrm_contribution_delete methods
+  /**
+   *
+   */
   public function testDeleteContribution() {
     $contributionID = $this->contributionCreate($this->_individualId, $this->financialtypeID, 'dfsdf', 12389);
     $params = array(

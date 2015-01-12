@@ -70,7 +70,7 @@ class CRM_Touchstone_Task {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
         1 => ts('Perform First Task'),
-        1 => ts('Perform Second Task'),
+        2 => ts('Perform Second Task'),
         5 => ts('Perform Third Task'),
       );
     }
