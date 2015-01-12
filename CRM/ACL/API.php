@@ -87,7 +87,7 @@ class CRM_ACL_API {
    *   Whether to include only deleted contacts.
    * @param bool $skipDeleteClause
    *   Don't add delete clause if this is true,.
-   *               this means it is handled by generating query
+   *   this means it is handled by generating query
    *
    * @return string
    *   the group where clause for this user
@@ -186,7 +186,6 @@ class CRM_ACL_API {
    * @param int $groupID
    * @param int $contactID
    *   The contactID for whom the check is made.
-   *
    * @param string $tableName
    * @param null $allGroups
    * @param null $includedGroups
