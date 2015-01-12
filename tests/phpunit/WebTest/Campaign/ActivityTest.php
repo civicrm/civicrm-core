@@ -106,8 +106,8 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
 
     $this->waitForText('crm-notification-container', "Campaign $title");
 
-    $this->waitForElementPresent("xpath=//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[3][text()='{$campaignTitle}']/../td[1]");
-    $id = (int) $this->getText("xpath=//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[3][text()='{$campaignTitle}']/../td[1]");
+    $this->waitForElementPresent("xpath=//div[@id='campaignList']/div/table/tbody//tr/td[3]/div[text()='{$campaignTitle}']/../../td[1]");
+    $id = (int) $this->getText("xpath=//div[@id='campaignList']/div/table/tbody//tr/td[3]/div[text()='{$campaignTitle}']/../../td[1]");
     $this->activityAddTest($campaignTitle, $id);
   }
 
@@ -195,7 +195,7 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText('crm-notification-container', $subject);
 
-    $this->waitForElementPresent("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[1]/td[8]/span/a[1][text()='View']");
 
     // click through to the Activity view screen
     $this->click("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody//tr[2]/td[8]/span/a[text()='View']");
