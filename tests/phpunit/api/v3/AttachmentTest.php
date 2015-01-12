@@ -40,6 +40,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_AttachmentTest extends CiviUnitTestCase {
   protected static $filePrefix = NULL;
 
+  /**
+   * @return string
+   */
   public static function getFilePrefix() {
     if (!self::$filePrefix) {
       self::$filePrefix = "test_" . CRM_Utils_String::createRandom(5, CRM_Utils_String::ALPHANUMERIC) . '_';
@@ -62,6 +65,9 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     \Civi\Core\Container::singleton(TRUE);
   }
 
+  /**
+   * @return array
+   */
   public function okCreateProvider() {
     $cases = array(); // array($entityClass, $createParams, $expectedContent)
 
@@ -103,6 +109,9 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     return $cases;
   }
 
+  /**
+   * @return array
+   */
   public function badCreateProvider() {
     $cases = array(); // array($entityClass, $createParams, $expectedError)
 
@@ -163,6 +172,9 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     return $cases;
   }
 
+  /**
+   * @return array
+   */
   public function badUpdateProvider() {
     $cases = array(); // array($entityClass, $createParams, $updateParams, $expectedError)
 
@@ -192,6 +204,9 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     return $cases;
   }
 
+  /**
+   * @return array
+   */
   public function okGetProvider() {
     $cases = array(); // array($getParams, $expectedNames)
 
@@ -236,6 +251,9 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     return $cases;
   }
 
+  /**
+   * @return array
+   */
   public function badGetProvider() {
     $cases = array(); // array($getParams, $expectedNames)
 
@@ -534,6 +552,10 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->assertAttachmentExistence(FALSE, $createResults['delme']['second']);
   }
 
+  /**
+   * @param $exists
+   * @param array $apiResult
+   */
   protected function assertAttachmentExistence($exists, $apiResult) {
     $fileId = $apiResult['id'];
     $this->assertTrue(is_numeric($fileId));
@@ -546,6 +568,10 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     ));
   }
 
+  /**
+   * @param $name
+   * @return string
+   */
   protected function tmpFile($name) {
     $tmpDir = sys_get_temp_dir();
     $this->assertTrue($tmpDir && is_dir($tmpDir), 'Tmp dir must exist: ' . $tmpDir);

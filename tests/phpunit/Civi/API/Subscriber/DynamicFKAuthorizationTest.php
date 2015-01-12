@@ -188,6 +188,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
    * @param $entity
    * @param $action
    * @param array $params
+   * @param $expectedError
    * @dataProvider badDataProvider
    */
   public function testBad($entity, $action, $params, $expectedError) {
