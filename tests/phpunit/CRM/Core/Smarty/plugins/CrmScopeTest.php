@@ -41,6 +41,8 @@ class CRM_Core_Smarty_plugins_CrmScopeTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider scopeCases
+   * @param $expected
+   * @param $input
    */
   public function testBlank($expected, $input) {
     $smarty = CRM_Core_Smarty::singleton();

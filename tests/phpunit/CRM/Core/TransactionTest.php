@@ -58,6 +58,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider dataCreateStyle
+   * @param $createStyle
    */
   public function testBasicRollback($createStyle) {
     $this->createContactWithTransaction('reuse-tx', $createStyle, 'rollback');

@@ -562,6 +562,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @match    array    Associative array of field name => expected value. Empty if asserting
    *                      that a DELETE occurred
    * @delete   boolean  True if we're checking that a DELETE action occurred.
+   * @param $daoName
+   * @param $id
+   * @param $match
+   * @param bool $delete
+   * @throws \PHPUnit_Framework_AssertionFailedError
    */
   public function assertDBState($daoName, $id, $match, $delete = FALSE) {
     if (empty($id)) {
@@ -705,6 +710,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * Example: $this->assertSql(2, 'select count(*) from foo where foo.bar like "%1"',
    * array(1 => array("Whiz", "String")));
+   * @param $expected
+   * @param $query
+   * @param array $params
+   * @param string $message
    */
   public function assertDBQuery($expected, $query, $params = array(), $message = '') {
     if ($message) {
@@ -850,6 +859,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
   /**
    * Check that a deleted item has been deleted
+   * @param $entity
+   * @param $id
    */
   public function assertAPIDeleted($entity, $id) {
     $this->callAPISuccess($entity, 'getcount', array('id' => $id), 0);
@@ -2060,6 +2071,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Existing function doesn't allow params to be over-ridden so need a new one
    * this one allows you to only pass in the params you want to change
+   * @param array $params
+   * @return array|int
    */
   public function CustomGroupCreateByParams($params = array()) {
     $defaults = array(
@@ -2075,6 +2088,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
   /**
    * Create custom group with multi fields
+   * @param array $params
+   * @return array|int
    */
   public function CustomGroupMultipleCreateByParams($params = array()) {
     $defaults = array(
@@ -2087,6 +2102,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
   /**
    * Create custom group with multi fields
+   * @param array $params
+   * @return array
    */
   public function CustomGroupMultipleCreateWithFields($params = array()) {
     // also need to pass on $params['custom_field'] if not set but not in place yet
@@ -2752,6 +2769,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
   /**
    * Temporarily replace the singleton extension with a different one
+   * @param \CRM_Extension_System $system
    */
   public function setExtensionSystem(CRM_Extension_System $system) {
     if ($this->origExtensionSystem == NULL) {
@@ -3080,6 +3098,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * this parent class & we don't have a structure for that yet
    * There is another function to this effect on the PaypalPro test but it appears to be silently failing
    * & the best protection agains that is the functions this class affords
+   * @param array $params
+   * @return
    */
   public function paymentProcessorCreate($params = array()) {
     $params = array_merge(array(

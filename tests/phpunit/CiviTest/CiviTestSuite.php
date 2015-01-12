@@ -40,6 +40,8 @@ class CiviTestSuite extends PHPUnit_Framework_TestSuite {
 
   /**
    * Simple name based constructor
+   * @param string $theClass
+   * @param string $name
    */
   public function __construct($theClass = '', $name = '') {
     if (empty($name)) {
@@ -80,6 +82,8 @@ class CiviTestSuite extends PHPUnit_Framework_TestSuite {
   }
 
   /**
+   * @param $myfile
+   * @return \PHPUnit_Framework_TestSuite
    */
   protected function implSuite($myfile) {
     $name = str_replace('_',

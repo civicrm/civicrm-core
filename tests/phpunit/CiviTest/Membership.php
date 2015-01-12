@@ -40,6 +40,9 @@ class Membership extends PHPUnit_Framework_Testcase {
 
   /**
    * Helper function to create membership block for contribution page
+   * @param $membershipType
+   * @param $contributionPageId
+   * @return $this
    */
   public function createMembershipBlock($membershipType, $contributionPageId) {
     $param = array(
@@ -67,6 +70,7 @@ class Membership extends PHPUnit_Framework_Testcase {
 
   /**
    * Helper function to delete the membership block
+   * @param $blcokId
    */
   public function deleteMembershipBlock($blcokId) {
     $dao = new CRM_Member_DAO_MembershipBlock();

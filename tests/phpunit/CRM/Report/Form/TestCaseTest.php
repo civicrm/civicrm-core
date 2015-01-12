@@ -144,6 +144,11 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
 
   /**
    * @dataProvider dataProvider
+   * @param $reportClass
+   * @param $inputParams
+   * @param $dataSet
+   * @param $expectedOutputCsvFile
+   * @throws \Exception
    */
   public function testReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
     $config = CRM_Core_Config::singleton();
@@ -159,6 +164,11 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
   /**
    * @expectedException PHPUnit_Framework_AssertionFailedError
    * @dataProvider badDataProvider
+   * @param $reportClass
+   * @param $inputParams
+   * @param $dataSet
+   * @param $expectedOutputCsvFile
+   * @throws \Exception
    */
   public function testBadReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
     $config = CRM_Core_Config::singleton();
