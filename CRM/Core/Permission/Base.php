@@ -122,7 +122,8 @@ class CRM_Core_Permission_Base {
    *
    * @param string $groupType
    *   Type of group(Access/Mailing).
-   * @param bool|\boolen $excludeHidden exclude hidden groups.
+   * @param bool $excludeHidden
+   *   exclude hidden groups.
    *
    *
    * @return array

@@ -260,7 +260,7 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   /**
    * Returns all the rows in the given offset and rowCount     *
    *
-   * @param enum $action
+   * @param string $action
    *   The action being performed.
    * @param int $offset
    *   The row number to start from.
@@ -268,7 +268,7 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    *   The number of rows to return.
    * @param string $sort
    *   The sql string that describes the sort order.
-   * @param enum $output
+   * @param string $output
    *   What should the result set include (web/email/csv).
    *
    * @return int
@@ -348,7 +348,7 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    *
    * @param string $action
    *   The action being performed.
-   * @param enum $output
+   * @param string $output
    *   What should the result set include (web/email/csv).
    *
    * @return array
