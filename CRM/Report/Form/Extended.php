@@ -43,23 +43,28 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   protected $_baseTable = 'civicrm_contact';
 
   /**
-   */
-  /**
+   *
    */
   public function __construct() {
     parent::__construct();
   }
 
+  /**
+   *
+   */
   public function preProcess() {
     parent::preProcess();
   }
 
+  /**
+   *
+   */
   public function select() {
     parent::select();
   }
 
 
-  /*
+  /**
    * From clause build where baseTable & fromClauses are defined
    */
   public function from() {
@@ -77,10 +82,9 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     }
   }
 
-  /*
-   * Define any from clauses in use (child classes to override)
-   */
   /**
+   * Define any from clauses in use (child classes to override)
+   *
    * @return array
    */
   public function fromClauses() {
@@ -108,7 +112,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */
@@ -124,7 +128,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    */
   public function alterDisplay(&$rows) {
     parent::alterDisplay($rows);
@@ -694,33 +698,20 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     );
   }
 
-  /*
-   * adding address fields to construct function in reports
-   * @param array $options
-   *   Options for the report.
-   * - prefix prefix to add (e.g. 'honor' when getting address details for honor contact
-   * - prefix_label optional prefix lable eg. "Honoree " for front end
-   * - group_by enable these fields for group by - default false
-   * - order_by enable these fields for order by
-   * - filters enable these fields for filtering
-   * - defaults - (is this working?) values to pre-populate
-   * @return array
-   *   address fields for construct clause
-   */
   /**
    * Get address columns to add to array
    *
    * @param array $options
-   *   - prefix Prefix to add to table (in case of more than one instance of the table)
-   *   - prefix_label Label to give columns from this address table instance
+   *   Options for the report.
+   *   - prefix prefix to add (e.g. 'honor' when getting address details for honor contact
+   *   - prefix_label optional prefix lable eg. "Honoree " for front end
+   *   - group_by enable these fields for group by - default false
+   *   - order_by enable these fields for order by
+   *   - filters enable these fields for filtering
+   *   - defaults - (is this working?) values to pre-populate
    *
    * @return array
    *   address columns definition
-   */
-  /**
-   * @param array $options
-   *
-   * @return array
    */
   public function getAddressColumns($options = array()) {
     $defaultOptions = array(
@@ -921,10 +912,9 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     return $addressFields;
   }
 
-  /*
-   * Get Information about advertised Joins
-   */
   /**
+   * Get Information about advertised Joins
+   *
    * @return array
    */
   public function getAvailableJoins() {
@@ -1012,11 +1002,10 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     );
   }
 
-  /*
+  /**
    * Add join from contact table to address. Prefix will be added to both tables
    * as it's assumed you are using it to get address of a secondary contact
-   */
-  /**
+   *
    * @param string $prefix
    */
   public function joinAddressFromContact($prefix = '') {
@@ -1039,7 +1028,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
      ";
   }
 
-  /*
+  /**
    * Define join from line item table to participant table
    */
   public function joinParticipantFromLineItem() {
@@ -1049,7 +1038,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     ";
   }
 
-  /*
+  /**
    * Define join from line item table to Membership table. Seems to be still via contribution
    * as the entity. Have made 'inner' to restrict does that make sense?
    */
@@ -1064,7 +1053,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     ";
   }
 
-  /*
+  /**
    * Define join from Participant to Contribution table
    */
   public function joinContributionFromParticipant() {
@@ -1075,7 +1064,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
       ";
   }
 
-  /*
+  /**
    * Define join from Membership to Contribution table
    */
   public function joinContributionFromMembership() {
@@ -1226,12 +1215,11 @@ WHERE   line_item_civireport.id IS NOT NULL
                         {$this->_aliases['civicrm_event']}.is_template = 0)";
   }
 
-  /*
-    * Retrieve text for financial type from pseudoconstant
-    */
   /**
+   * Retrieve text for financial type from pseudoconstant
+   *
    * @param $value
-   * @param $row
+   * @param array $row
    *
    * @return string
    */
@@ -1245,12 +1233,11 @@ WHERE   line_item_civireport.id IS NOT NULL
            " . $value . "</span></div>";
   }
 
-  /*
-   * Retrieve text for contribution type from pseudoconstant
-   */
   /**
+   * Retrieve text for contribution type from pseudoconstant
+   *
    * @param $value
-   * @param $row
+   * @param array $row
    *
    * @return array|string
    */
@@ -1258,12 +1245,11 @@ WHERE   line_item_civireport.id IS NOT NULL
     return is_string(CRM_Contribute_PseudoConstant::financialType($value, FALSE)) ? CRM_Contribute_PseudoConstant::financialType($value, FALSE) : '';
   }
 
-  /*
-   * Retrieve text for contribution status from pseudoconstant
-   */
   /**
+   * Retrieve text for contribution status from pseudoconstant
+   *
    * @param $value
-   * @param $row
+   * @param array $row
    *
    * @return array
    */
@@ -1271,12 +1257,11 @@ WHERE   line_item_civireport.id IS NOT NULL
     return CRM_Contribute_PseudoConstant::contributionStatus($value);
   }
 
-  /*
-   * Retrieve text for payment instrument from pseudoconstant
-   */
   /**
+   * Retrieve text for payment instrument from pseudoconstant
+   *
    * @param $value
-   * @param $row
+   * @param array $row
    *
    * @return array
    */
@@ -1286,7 +1271,7 @@ WHERE   line_item_civireport.id IS NOT NULL
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    *
    * @return array|string
    */
@@ -1296,7 +1281,7 @@ WHERE   line_item_civireport.id IS NOT NULL
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    *
    * @return array|string
    */
@@ -1306,7 +1291,7 @@ WHERE   line_item_civireport.id IS NOT NULL
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    *
    * @return array|string
    */
@@ -1316,7 +1301,7 @@ WHERE   line_item_civireport.id IS NOT NULL
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    * @param $selectedfield
    * @param string $criteriaFieldName
    *
@@ -1335,7 +1320,7 @@ WHERE   line_item_civireport.id IS NOT NULL
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    * @param $selectedfield
    * @param string $criteriaFieldName
    *
@@ -1354,7 +1339,7 @@ WHERE   line_item_civireport.id IS NOT NULL
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    * @param $selectedfield
    * @param string $criteriaFieldName
    *
@@ -1374,7 +1359,7 @@ WHERE   line_item_civireport.id IS NOT NULL
 
   /**
    * @param $value
-   * @param $row
+   * @param array $row
    * @param string $fieldname
    *
    * @return mixed
@@ -1400,7 +1385,7 @@ WHERE   line_item_civireport.id IS NOT NULL
   /**
    * @param $value
    *
-   * @return string
+   * @return string|void
    */
   public function alterParticipantRole($value) {
     if (empty($value)) {
