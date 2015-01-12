@@ -90,23 +90,14 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
     $location->preProcess($this);
   }
 
-  /*
-   * Set default values for the form.
-   * the default values are retrieved from the database
-   *
-   * @return void
-   */
   /**
    * This virtual function is used to set the default values of
    * various form elements
    *
-   * access        public
-   *
    * @return array
    *   reference to the array of default values
-   */
-  /**
-   * @return array
+   *
+   * @access public
    */
   public function setDefaultValues() {
     $defaults = array();

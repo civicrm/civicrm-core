@@ -25,13 +25,13 @@
 
 
 /*
-   * PxPay Functionality Copyright (C) 2008 Lucas Baker, Logistic Information Systems Limited (Logis)
-   * PxAccess Functionality Copyright (C) 2008 Eileen McNaughton
-   * Licensed to CiviCRM under the Academic Free License version 3.0.
-   *
-   * Grateful acknowledgements go to Donald Lobo for invaluable assistance
-   * in creating this payment processor module
-   */
+ * PxPay Functionality Copyright (C) 2008 Lucas Baker, Logistic Information Systems Limited (Logis)
+ * PxAccess Functionality Copyright (C) 2008 Eileen McNaughton
+ * Licensed to CiviCRM under the Academic Free License version 3.0.
+ *
+ * Grateful acknowledgements go to Donald Lobo for invaluable assistance
+ * in creating this payment processor module
+ */
 
 /**
  * Class CRM_Core_Payment_PaymentExpressIPN

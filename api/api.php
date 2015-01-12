@@ -117,7 +117,7 @@ function _civicrm_api_get_camel_name($entity) {
  * 'activity_type_id' => '$value.testfield',
  * 'tag_id'  => '$value.api.tag.create.id',
  * 'tag1_id' => '$value.api.entity.create.0.id'
- * 
+ *
  * @param array $params
  * @param array $parentResult
  * @param string $separator

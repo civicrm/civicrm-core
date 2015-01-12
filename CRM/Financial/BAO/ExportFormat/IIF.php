@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
@@ -331,13 +330,11 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
     return 'CRM/Financial/ExportFormat/IIF.tpl';
   }
 
-  /*
-   * $s the input string
-   * $type can be string, date, or notepad
-   */
   /**
-   * @param $s
+   * @param string $s
+   *   the input string
    * @param string $type
+   *   type can be string, date, or notepad
    *
    * @return bool|mixed|string
    */

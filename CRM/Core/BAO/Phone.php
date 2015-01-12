@@ -38,14 +38,10 @@
  */
 class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
 
-  /*
+  /**
    * Create phone object - note that the create function calls 'add' but
    * has more business logic
    *
-   * @param array $params
-   *   Input parameters.
-   */
-  /**
    * @param array $params
    *
    * @return object

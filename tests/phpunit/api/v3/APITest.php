@@ -68,9 +68,9 @@ class api_v3_APITest extends CiviUnitTestCase {
     $this->assertEquals('krypton', $params['big_rock']);
   }
 
-  /*
-    * test that error doesn't occur for non-existant file
-    */
+  /**
+   * test that error doesn't occur for non-existant file
+   */
   public function testAPIWrapperIncludeNoFile() {
 
     $result = $this->callAPIFailure('RandomFile', 'get', array(), 'API (RandomFile,get) does not exist (join the API team and implement it!)');

@@ -51,12 +51,10 @@ class CRM_Core_JobManager {
   var $_source = NULL;
 
 
-  /*
+  /**
    * Class constructor
    *
    * @param void
-   */
-  /**
    */
   public function __construct() {
     $config = CRM_Core_Config::singleton();
@@ -65,10 +63,6 @@ class CRM_Core_JobManager {
     $this->jobs = $this->_getJobs();
   }
 
-  /*
-   *
-   * @param void
-   */
   /**
    * @param bool $auth
    */
@@ -93,10 +87,8 @@ class CRM_Core_JobManager {
     $this->logEntry('Finishing scheduled jobs execution.');
   }
 
-  /*
+  /**
    * Class destructor
-   *
-   * @param void
    */
   public function __destruct() {
   }
@@ -145,16 +137,12 @@ class CRM_Core_JobManager {
     $this->currentJob = FALSE;
   }
 
-  /*
+  /**
    * Retrieves the list of jobs from the database,
    * populates class param.
    *
-   * @param void
    * @return array
    *   ($id => CRM_Core_ScheduledJob)
-   */
-  /**
-   * @return array
    */
   private function _getJobs() {
     $jobs = array();
@@ -170,13 +158,10 @@ class CRM_Core_JobManager {
     return $jobs;
   }
 
-  /*
+  /**
    * Retrieves specific job from the database by id
    * and creates ScheduledJob object.
    *
-   * @param void
-   */
-  /**
    * @param int $id
    * @param null $entity
    * @param null $action
@@ -213,13 +198,11 @@ class CRM_Core_JobManager {
     $this->singleRunParams[$key]['version'] = 3;
   }
 
-  /*
+  /**
+   * @param string $message
    *
    * @return array|null
    *   collection of permissions, null if none
-   */
-  /**
-   * @param $message
    */
   public function logEntry($message) {
     $domainID = CRM_Core_Config::domainID();

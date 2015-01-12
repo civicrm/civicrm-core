@@ -1421,8 +1421,14 @@ WHERE       ps.id = %1
     }
   }
 
-  /*
+  /**
    * Function to set tax_amount and tax_rate in LineItem
+   *
+   * @param array $field
+   * @param array $lineItem
+   * @param int $optionValueId
+   *
+   * @return array
    */
   public static function setLineItem($field, $lineItem, $optionValueId) {
     if ($field['html_type'] == 'Text') {

@@ -586,11 +586,10 @@ AND       CEF.entity_id    = %2";
     return $names;
   }
 
-  /*
+  /**
    * copy/attach an existing file to a different entity
    * table and id.
-   */
-  /**
+   *
    * @param $oldEntityTable
    * @param int $oldEntityId
    * @param $newEntityTable

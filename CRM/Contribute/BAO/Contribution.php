@@ -66,9 +66,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    */
   public $_component = NULL;
 
-  /*
-   * construct method
-   */
   /**
    * Class constructor
    *
@@ -3241,20 +3238,15 @@ WHERE  contribution_id = %1 ";
   }
 
 
-  /*
+  /**
    * Function to record additional payment for partial and refund contributions
    *
    * @param int $contributionId
    *   is the invoice contribution id (got created after processing participant payment).
-   * @param array $trxnData
+   * @param array $trxnsData
    *   to take user provided input of transaction details.
    * @param string $paymentType
    *   'owed' for purpose of recording partial payments, 'refund' for purpose of recording refund payments.
-   */
-  /**
-   * @param int $contributionId
-   * @param $trxnsData
-   * @param string $paymentType
    * @param int $participantId
    *
    * @return null|object

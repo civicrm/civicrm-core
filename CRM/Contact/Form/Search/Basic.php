@@ -43,7 +43,7 @@
  */
 class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
 
-  /*
+  /**
    * csv - common search values
    *
    * @var array

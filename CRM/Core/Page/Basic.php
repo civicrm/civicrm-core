@@ -215,10 +215,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
 
     $values = array();
 
-    /*
-         * lets make sure we get the stuff sorted by name if it exists
-         */
-
+    // lets make sure we get the stuff sorted by name if it exists
     $fields = &$object->fields();
     $key = '';
     if (!empty($fields['title'])) {
