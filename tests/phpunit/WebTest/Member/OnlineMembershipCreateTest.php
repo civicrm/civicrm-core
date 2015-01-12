@@ -53,7 +53,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     // create contribution page with randomized title and default params
     $amountSection = TRUE;
     $payLater = TRUE;
-    $allowOtherAmmount = FALSE;
+    $allowOtherAmount = FALSE;
     $onBehalf = FALSE;
     $pledges = FALSE;
     $recurring = FALSE;
@@ -262,7 +262,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $processorName = 'Test Processor';
     $amountSection = TRUE;
     $payLater = TRUE;
-    $allowOtherAmmount = TRUE;
+    $allowOtherAmount = TRUE;
     $onBehalf = FALSE;
     $pledges = FALSE;
     $recurring = FALSE;
@@ -299,7 +299,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
       FALSE,
       $isSeparatePayment,
       TRUE,
-      $allowOtherAmmount,
+      $allowOtherAmount,
       TRUE,
       'Donation',
       $fixedAmount,
