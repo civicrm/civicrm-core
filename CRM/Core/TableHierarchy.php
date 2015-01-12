@@ -38,7 +38,6 @@ class CRM_Core_TableHierarchy {
   /**
    * This array defines weights for table, which are used to sort array of table in from clause
    * @var array
-   * @static
    */
   static $info = array(
     'civicrm_contact' => '01',

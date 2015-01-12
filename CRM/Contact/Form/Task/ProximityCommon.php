@@ -114,7 +114,6 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
    *
    * @return bool|array
    *   true if no errors, else array of errors
-   * @static
    */
   public static function formRule($fields, $files, $form) {
     $errors = array();

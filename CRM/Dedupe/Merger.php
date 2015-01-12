@@ -415,7 +415,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * Based on the provided two contact_ids and a set of tables, move the
    * belongings of the other contact to the main one.
    *
-   * @static
    */
   public static function moveContactBelongings($mainId, $otherId, $tables = FALSE, $tableOperations = array()) {
     $cidRefs = self::cidRefs();
@@ -524,7 +523,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Contact details.
    *
    * @return array
-   * @static
    */
   public static function findDifferences($main, $other) {
     $result = array(
@@ -570,7 +568,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param bool $redirectForPerformance
    *
    * @return array|bool
-   * @static
    */
   public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $redirectForPerformance = FALSE) {
     $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $rgid, 'contact_type');
@@ -618,7 +615,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param bool $redirectForPerformance
    *
    * @return array|bool
-   * @static
    */
   public static function merge($dupePairs = array(), $cacheParams = array(), $mode = 'safe',
                                $autoFlip = TRUE, $redirectForPerformance = FALSE
@@ -708,7 +704,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *                                 Does a force merge otherwise (aggressive mode).
    *
    * @return bool
-   * @static
    */
   public static function skipMerge($mainId, $otherId, &$migrationInfo, $mode = 'safe') {
     $conflicts = array();
@@ -819,7 +814,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Duplicate contact which would be deleted after merge operation.
    *
    * @return array|bool|int
-   * @static
    */
   public static function getRowsElementsAndInfo($mainId, $otherId) {
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
@@ -1223,7 +1217,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param $migrationInfo
    *
    * @return bool
-   * @static
    */
   public static function moveAllBelongings($mainId, $otherId, $migrationInfo) {
     if (empty($migrationInfo)) {

@@ -42,7 +42,6 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
@@ -105,7 +104,6 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    *
    *
    * @return void
-   * @static
    */
   public function browse() {
     // get all membership types sorted by weight

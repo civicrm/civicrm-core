@@ -85,7 +85,6 @@ class CRM_Core_Page {
    * Cache the smarty template for efficiency reasons
    *
    * @var CRM_Core_Smarty
-   * @static
    */
   static protected $_template;
 
@@ -93,7 +92,6 @@ class CRM_Core_Page {
    * Cache the session for efficiency reasons
    *
    * @var CRM_Core_Session
-   * @static
    */
   static protected $_session;
 

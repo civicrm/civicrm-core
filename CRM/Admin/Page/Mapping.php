@@ -44,7 +44,6 @@ class CRM_Admin_Page_Mapping extends CRM_Core_Page_Basic {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 

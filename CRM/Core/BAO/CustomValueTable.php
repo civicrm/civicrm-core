@@ -258,7 +258,6 @@ class CRM_Core_BAO_CustomValueTable {
    *
    * @return string
    *   the mysql data store placeholder
-   * @static
    */
   public static function fieldToSQLType($type, $maxLength = 255) {
     if (!isset($maxLength) ||
@@ -392,7 +391,6 @@ class CRM_Core_BAO_CustomValueTable {
    *   Array of custom values for the entity with key=>value
    *                                   pairs specified as civicrm_custom_field.id => custom value.
    *                                   Empty array if no custom values found.
-   * @static
    */
   public static function &getEntityValues($entityID, $entityType = NULL, $fieldIDs = NULL, $formatMultiRecordField = FALSE) {
     if (!$entityID) {
@@ -498,7 +496,6 @@ AND    $cond
    *
    * @throws Exception
    * @return array
-   * @static
    */
   public static function setValues(&$params) {
 
@@ -643,7 +640,6 @@ AND    cf.id IN ( $fieldIDList )
    *
    * @throws Exception
    * @return array
-   * @static
    */
   public static function &getValues(&$params) {
     if (empty($params)) {

@@ -43,7 +43,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * @param array $params
    *   Values.
    *
-   * @static
    *
    * @return object
    */
@@ -65,7 +64,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *
    * @return array
    *   array of dashlets
-   * @static
    */
   public static function getDashlets($all = TRUE, $checkPermission = TRUE) {
     $dashlets = array();
@@ -107,7 +105,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *
    * @return array
    *   array of dashlets
-   * @static
    */
   public static function getContactDashlets($flatFormat = FALSE, $contactID = NULL) {
     $dashlets = array();
@@ -281,7 +278,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *
    * @return array
    *   associted array title and content
-   * @static
    */
   public static function getDashletInfo($dashletID) {
     $dashletInfo = array();
@@ -352,7 +348,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *
    * @throws RuntimeException
    * @return void
-   * @static
    */
   public static function saveDashletChanges($columns, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();
@@ -418,7 +413,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *
    * @return object
    *   $dashlet returns dashlet object
-   * @static
    */
   public static function addDashlet(&$params) {
 
@@ -486,7 +480,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * @param object : $dashlet
    *
    * @return void
-   * @static
    */
   public static function addContactDashlet($dashlet) {
     $admin = CRM_Core_Permission::check('administer CiviCRM');
@@ -555,7 +548,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *   Reset cache only for specific contact.
    *
    * @return void
-   * @static
    */
   public static function resetDashletCache($contactID = NULL) {
     $whereClause = NULL;
@@ -574,7 +566,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * @param int $dashletID
    *
    * @return void
-   * @static
    */
   public static function deleteDashlet($dashletID) {
     $dashlet = new CRM_Core_DAO_Dashboard();

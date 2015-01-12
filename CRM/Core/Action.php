@@ -76,7 +76,6 @@ class CRM_Core_Action {
    *
    * @var array $_names type of variable name to action constant
    *
-   * @static
    */
   static $_names = array(
     'add' => self::ADD,
@@ -102,7 +101,6 @@ class CRM_Core_Action {
    * The flipped version of the names array, initialized when used
    *
    * @var array
-   * @static
    */
   static $_description;
 
@@ -114,7 +112,6 @@ class CRM_Core_Action {
    *
    * @return int
    *   the action mask corresponding to the input string
-   * @static
    */
   public static function resolve($str) {
     $action = 0;
@@ -134,7 +131,6 @@ class CRM_Core_Action {
    *
    * @return int
    *   the action mask corresponding to the input args
-   * @static
    */
   public static function map($item) {
     $mask = 0;
@@ -158,7 +154,6 @@ class CRM_Core_Action {
    *
    * @return int
    *   the action mask corresponding to the input string
-   * @static
    */
   public static function mapItem($item) {
     $mask = CRM_Utils_Array::value(trim($item), self::$_names);
@@ -174,7 +169,6 @@ class CRM_Core_Action {
    *
    * @return string
    *   the corresponding action description
-   * @static
    */
   public static function description($mask) {
     if (!isset($_description)) {
@@ -205,7 +199,6 @@ class CRM_Core_Action {
    *
    * @return string
    *   the html string
-   * @static
    */
   static function formLink(
     $links,
@@ -317,7 +310,6 @@ class CRM_Core_Action {
    *
    * @return string
    *   the substituted string
-   * @static
    */
   public static function &replace(&$str, &$values) {
     foreach ($values as $n => $v) {
@@ -333,7 +325,6 @@ class CRM_Core_Action {
    *
    * @return int
    *   the mask for the above permission
-   * @static
    */
   public static function mask($permissions) {
     $mask = NULL;

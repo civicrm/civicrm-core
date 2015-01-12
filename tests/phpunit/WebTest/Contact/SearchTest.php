@@ -154,7 +154,6 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
   /**
    * This code is reused with advanced search, hence the reference to $self
    *
-   * @static
    * @param string $tagName
    * @param $self
    */

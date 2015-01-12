@@ -392,7 +392,6 @@ AND         cp.page_type = 'contribute'
    *
    * @param mixed $action
    *   Unused parameter.
-   * @static
    */
   public function browse($action = NULL) {
     $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter',

@@ -64,7 +64,6 @@ class CRM_Core_Session {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
@@ -93,7 +92,6 @@ class CRM_Core_Session {
    * Singleton function used to manage this object
    *
    * @return CRM_Core_Session
-   * @static
    */
   public static function &singleton() {
     if (self::$_singleton === NULL) {
@@ -489,7 +487,6 @@ class CRM_Core_Session {
    *                 defaults to 10 seconds for most messages, 5 if it has a title but no body,
    *                 or 0 for errors or messages containing links
    *
-   * @static
    *
    * @return void
    */

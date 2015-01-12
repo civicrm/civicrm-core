@@ -61,7 +61,6 @@ class CRM_Contact_BAO_Query {
    * The default set of return properties
    *
    * @var array
-   * @static
    */
   static $_defaultReturnProperties = NULL;
 
@@ -69,7 +68,6 @@ class CRM_Contact_BAO_Query {
    * The default set of hier return properties
    *
    * @var array
-   * @static
    */
   static $_defaultHierReturnProperties;
 
@@ -282,7 +280,6 @@ class CRM_Contact_BAO_Query {
    * The relationship type direction
    *
    * @var array
-   * @static
    */
   static $_relType;
 
@@ -290,7 +287,6 @@ class CRM_Contact_BAO_Query {
    * The activity role
    *
    * @var array
-   * @static
    */
   static $_activityRole;
 
@@ -299,7 +295,6 @@ class CRM_Contact_BAO_Query {
    * during activity search.
    *
    * @var array
-   * @static
    */
   static $_considerCompActivities;
 
@@ -308,7 +303,6 @@ class CRM_Contact_BAO_Query {
    * during activity search.
    *
    * @var array
-   * @static
    */
   static $_withContactActivitiesOnly;
 
@@ -332,7 +326,6 @@ class CRM_Contact_BAO_Query {
    * Track open panes, useful in advance search
    *
    * @var array
-   * @static
    */
   public static $_openedPanes = array();
 
@@ -346,7 +339,6 @@ class CRM_Contact_BAO_Query {
    * The tables which have a dependency on location and/or address
    *
    * @var array
-   * @static
    */
   static $_dependencies = array(
     'civicrm_state_province' => 1,
@@ -2386,7 +2378,6 @@ class CRM_Contact_BAO_Query {
    * @param bool $strict
    *
    * @return string
-   * @static
    */
   public static function getWhereClause($params, $fields, &$tables, &$whereTables, $strict = FALSE) {
     $query = new CRM_Contact_BAO_Query($params, NULL, $fields,
@@ -2415,7 +2406,6 @@ class CRM_Contact_BAO_Query {
    *
    * @return string
    *   the from clause
-   * @static
    */
   public static function fromClause(&$tables, $inner = NULL, $right = NULL, $primaryLocation = TRUE, $mode = 1) {
 
@@ -5485,7 +5475,6 @@ AND   displayRelType.is_active = 1
    * @return bool|array
    *   false if string does not match the pattern
    *   array of numeric values if string does match the pattern
-   * @static
    */
   public static function parseSearchBuilderString($string, $dataType = 'Integer') {
     $string = trim($string);

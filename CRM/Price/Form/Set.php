@@ -91,7 +91,6 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
    *
    * @return bool|array
    *   true if no errors, else array of errors
-   * @static
    */
   public static function formRule($fields, $files, $options) {
     $errors = array();

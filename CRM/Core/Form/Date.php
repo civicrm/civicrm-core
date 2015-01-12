@@ -45,7 +45,6 @@ class CRM_Core_Form_Date {
    * @param CRM_Core_Form $form
    *   The form object that we are operating on.
    *
-   * @static
    */
   public static function buildAllowedDateFormats(&$form) {
 
@@ -88,7 +87,6 @@ class CRM_Core_Form_Date {
    * @param bool|string $displayTime
    *
    *
-   * @static
    */
 
   static function buildDateRange(

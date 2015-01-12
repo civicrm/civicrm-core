@@ -43,7 +43,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * Static field for all the case information that we can potentially export
    *
    * @var array
-   * @static
    */
   static $_exportableFields = NULL;
 
@@ -60,7 +59,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @throws CRM_Core_Exception
    *
    * @return CRM_Case_BAO_CaseType
-   * @static
    */
   public static function add(&$params) {
     $caseTypeDAO = new CRM_Case_DAO_CaseType();
@@ -106,7 +104,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    *   The case-type defintion expressed as an array-tree.
    * @return string
    *   XML
-   * @static
    */
   public static function convertDefinitionToXML($name, $definition) {
     $xmlFile = '<?xml version="1.0" encoding="utf-8" ?>' . "\n\n<CaseType>\n";
@@ -190,7 +187,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    *
    * @return array
    *   the definition of the case-type, expressed as PHP array-tree
-   * @static
    */
   public static function convertXmlToDefinition($xml) {
     // build PHP array based on definition
@@ -254,7 +250,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    *   Output values of the object.
    *
    * @return CRM_Case_BAO_CaseType|null the found object or null
-   * @static
    */
   public static function &getValues(&$params, &$values) {
     $caseType = new CRM_Case_BAO_CaseType();
@@ -275,7 +270,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Case_BAO_CaseType
-   * @static
    */
   public static function &create(&$params) {
     $transaction = new CRM_Core_Transaction();
@@ -319,7 +313,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    *                        in a hierarchical manner
    *
    * @return CRM_Case_BAO_CaseType
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $caseType = CRM_Case_BAO_CaseType::getValues($params, $defaults);

@@ -106,7 +106,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    *
    * @return string
    *   The WHERE clause, or 0 on failure
-   * @static
    */
   public static function permissionClause(
     &$tables, $operation,
@@ -330,7 +329,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    * @return string|null
    *   WHERE-style clause to filter results,
    *   or null if $table or $id is null
-   * @static
    */
   public static function getClause($table, $id, &$tables) {
     $table = CRM_Utils_Type::escape($table, 'String');
@@ -392,7 +390,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    *
    * @return array
    *   Array of assoc. arrays of ACL rules
-   * @static
    */
   public static function &getACLs($contact_id = NULL, $group_id = NULL, $aclRoles = FALSE) {
     $results = array();
@@ -458,7 +455,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    *
    * @return array
    *   Array of assoc. arrays of ACL rules
-   * @static
    */
   public static function &getACLRoles($contact_id = NULL, $group_id = NULL) {
     $contact_id = CRM_Utils_Type::escape($contact_id, 'Integer');
@@ -525,7 +521,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    *
    * @return array
    *   Assoc array of ACL rules
-   * @static
    */
   public static function &getGroupACLs($contact_id, $aclRoles = FALSE) {
     $contact_id = CRM_Utils_Type::escape($contact_id, 'Integer');
@@ -570,7 +565,6 @@ SELECT      $acl.*
    *
    * @return array
    *   Array of assoc. arrays of ACL rules
-   * @static
    */
   public static function &getGroupACLRoles($contact_id) {
     $contact_id = CRM_Utils_Type::escape($contact_id, 'Integer');
@@ -643,7 +637,6 @@ SELECT $acl.*
    *
    * @return array
    *   Assoc array of ACL rules
-   * @static
    */
   public static function &getAllByContact($contact_id) {
     $result = array();
@@ -687,7 +680,6 @@ SELECT $acl.*
    *
    * @return Object
    *   DAO object on sucess, null otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     // note this also resets any ACL cache
@@ -976,7 +968,6 @@ ORDER BY a.object_id
    * @param int $aclId
    *   ID of the ACL record to be deleted.
    *
-   * @static
    */
   public static function del($aclId) {
     // delete all entries from the acl cache

@@ -69,7 +69,6 @@ class CRM_Core_BAO_SchemaHandler {
    * @return bool
    *   TRUE if successfully created, FALSE otherwise
    *
-   * @static
    */
   public static function createTable(&$params) {
     $sql = self::buildTableSQL($params);
@@ -370,7 +369,6 @@ ALTER TABLE {$tableName}
    * @return bool
    *   TRUE if successfully deleted, FALSE otherwise.
    *
-   * @static
    */
   public static function dropTable($tableName) {
     $sql = "DROP TABLE $tableName";

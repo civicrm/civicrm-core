@@ -142,7 +142,6 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
    *
    * @return bool|array
    *   mixed true or array of errors
-   * @static
    */
   public static function formRule($params, $files, $self) {
     $errors = array();

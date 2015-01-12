@@ -94,7 +94,6 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    *
    * @return array
    *   (reference)   List of Paper Sizes
-   * @static
    */
   public static function &addOrder(&$list, $returnURL) {
     $filter = "option_group_id = " . self::_getGid();
@@ -109,7 +108,6 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    *
    * @return array
    *   (reference)   Paper Size list
-   * @static
    */
   public static function &getList($namesOnly = FALSE) {
     static $list = array();
@@ -139,7 +137,6 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    *
    * @return array
    *   Name/value pairs containing the default Paper Size values.
-   * @static
    */
   public static function &getDefaultValues() {
     $params = array('is_active' => 1, 'is_default' => 1);
@@ -213,7 +210,6 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    * @param null $default
    *
    * @return value
-   * @static
    */
   public static function getValue($field, &$values, $default = NULL) {
     if (array_key_exists($field, self::$optionValueFields)) {
@@ -245,7 +241,6 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_DAO_OptionValue
-   * @static
    */
   public static function retrieve(&$params, &$values) {
     $optionValue = new CRM_Core_DAO_OptionValue();
@@ -339,7 +334,6 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    * @param int $id
    *   ID of the Paper Size to be deleted.
    *
-   * @static
    */
   public static function del($id) {
     if ($id) {

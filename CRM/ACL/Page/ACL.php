@@ -48,7 +48,6 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
@@ -157,7 +156,6 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
    * Browse all acls
    *
    * @return void
-   * @static
    */
   public function browse() {
     // get all acl's sorted by weight

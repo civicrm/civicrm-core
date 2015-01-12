@@ -53,7 +53,6 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    *   Contact object.
    *
    * @return CRM_Contact_BAO_Contact
-   * @static
    */
   public static function format(&$params, &$contact) {
     if (!self::dataExists($params)) {
@@ -412,7 +411,6 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return boolean
-   * @static
    */
   public static function dataExists(&$params) {
     if ($params['contact_type'] == 'Individual') {

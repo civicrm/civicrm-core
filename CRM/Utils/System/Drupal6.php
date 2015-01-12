@@ -802,7 +802,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * @return string
    *   , formatted url.
-   * @static
    */
   public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
     if (empty($url)) {
@@ -914,7 +913,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * @return string
    *   loginURL for the current CMS
-   * @static
    */
   public function getLoginURL($destination = '') {
     $config = CRM_Core_Config::singleton();

@@ -50,7 +50,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Event_BAO_ManageEvent
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $event = new CRM_Event_DAO_Event();
@@ -72,7 +71,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *
    * @return Object
    *   DAO object on sucess, null otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Event', $id, 'is_active', $is_active);
@@ -84,7 +82,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @param array $params
    *   Reference array contains the values submitted by the form.
    *
-   * @static
    *
    * @return object
    */
@@ -125,7 +122,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *   Reference array contains the values submitted by the form.
    *
    * @return object
-   * @static
    */
   public static function create(&$params) {
     $transaction = new CRM_Core_Transaction();
@@ -183,7 +179,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *   Event id.
    *
    * @return mixed|null
-   * @static
    */
   public static function del($id) {
     if (!$id) {
@@ -235,7 +230,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @param int $eventId
    *   Event with which loc block is associated.
    *
-   * @static
    */
   public static function deleteEventLocBlock($locBlockId, $eventId = NULL) {
     $query = "SELECT count(ce.id) FROM civicrm_event ce WHERE ce.loc_block_id = $locBlockId";
@@ -265,7 +259,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *   true if you need to check permission else false.
    *
    * @return array
-   * @static
    */
   static function getEvents(
     $all = 0,
@@ -320,7 +313,6 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
   /**
    * Get events Summary
    *
-   * @static
    *
    * @return array
    *   Array of event summary values
@@ -657,7 +649,6 @@ $event_summary_limit
    *
    * @return null|string
    *   title of the event
-   * @static
    */
   public static function &getMapInfo(&$id) {
 
@@ -733,7 +724,6 @@ WHERE civicrm_address.geo_code_1 IS NOT NULL
    *
    * @return array
    *   array of all the events that are searched
-   * @static
    */
   static function &getCompleteInfo(
     $start = NULL,
@@ -1455,7 +1445,6 @@ WHERE civicrm_event.is_active = 1
    * @param array $profileFields
    *
    * @return void
-   * @static
    */
   public static function displayProfile(&$params, $gid, &$groupTitle, &$values, &$profileFields = array()) {
     if ($gid) {
@@ -2010,7 +1999,6 @@ WHERE  ce.loc_block_id = $locBlockId";
    *
    * @return string
    *   the permission that the user has (or null)
-   * @static
    */
   public static function checkPermission($eventId = NULL, $type = CRM_Core_Permission::VIEW) {
     static $permissions = NULL;
@@ -2075,7 +2063,6 @@ WHERE  ce.loc_block_id = $locBlockId";
    *
    * @return array
    *   an array of email ids
-   * @static
    */
   public static function getFromEmailIds($eventId = NULL) {
     $fromEmailValues['from_email_id'] = CRM_Core_BAO_Email::getFromEmail();
@@ -2112,7 +2099,6 @@ WHERE  ce.loc_block_id = $locBlockId";
    *
    * @return int
    *   event total seats w/ given criteria.
-   * @static
    */
   public static function eventTotalSeats($eventId, $extraWhereClause = NULL) {
     if (empty($eventId)) {

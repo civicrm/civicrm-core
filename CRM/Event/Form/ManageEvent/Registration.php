@@ -318,7 +318,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @param CRM_Core_Form $form
    *
-   * @static
    */
   public function buildRegistrationBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
@@ -405,7 +404,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @param CRM_Core_Form $form
    *
-   * @static
    */
   public function buildConfirmationBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
@@ -433,7 +431,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @param CRM_Core_Form $form
    *
-   * @static
    */
   public function buildMailBlock(&$form) {
     $form->registerRule('emailList', 'callback', 'emailList', 'CRM_Utils_Rule');
@@ -489,7 +486,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @return array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRule($values, $files, $form) {
     if (!empty($values['is_online_registration'])) {

@@ -55,7 +55,6 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Contribute_BAO_ManagePremium
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $premium = new CRM_Contribute_DAO_Product();
@@ -78,7 +77,6 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
    *
    * @return Object
    *   DAO object on sucess, null otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     if (!$is_active) {
@@ -97,7 +95,6 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
    * @param array $ids
    *   Reference array contains the id.
    *
-   * @static
    *
    * @return object
    */
@@ -135,7 +132,6 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
    * Delete premium Types
    *
    * @param int $productID
-   * @static
    */
 
   public static function del($productID) {

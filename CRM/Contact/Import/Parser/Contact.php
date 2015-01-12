@@ -1619,7 +1619,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param string $errorMessage
    *   A string containing all the error-fields, where the new errorName is concatenated.
    *
-   * @static
    */
   public static function addToErrorMsg($errorName, &$errorMessage) {
     if ($errorMessage) {
@@ -1811,7 +1810,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    *   Type of date.
    * @param string $dateParam
    *   Index of params.
-   * @static
    */
   public function formatCustomDate(&$params, &$formatted, $dateType, $dateParam) {
     //fix for CRM-2687
@@ -1828,7 +1826,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    *   Array of formatted data.
    * @param array $contactFields
    *   Contact DAO fields.
-   * @static
    */
   public function formatCommonData($params, &$formatted, &$contactFields) {
     $csType = array(

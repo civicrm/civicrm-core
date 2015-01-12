@@ -44,7 +44,6 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   /**
    * Financial account
    * @var array
-   * @static
    */
   private static $financialAccount;
 
@@ -59,7 +58,6 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    * @param array $allValues
    *
    * @return CRM_Contribute_BAO_ContributionType
-   * @static
    */
   public static function retrieve(&$params, &$defaults, &$allValues = array()) {
     $financialTypeAccount = new CRM_Financial_DAO_EntityFinancialAccount();
@@ -80,7 +78,6 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    * @param array $ids
    *   Reference array contains the id.
    *
-   * @static
    * @return object
    */
   public static function add(&$params, &$ids = NULL) {
@@ -108,7 +105,6 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    * @param int $financialTypeAccountId
    * @param int $accountId
    *
-   * @static
    */
   public static function del($financialTypeAccountId, $accountId = NULL) {
     //checking if financial type is present
@@ -169,7 +165,6 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    *   Column to fetch.
    *
    * @return null|string
-   * @static
    */
   public static function getFinancialAccount($entityId, $entityTable, $columnName = 'name') {
     $join = $columnName == 'name' ? 'LEFT JOIN civicrm_financial_account ON civicrm_entity_financial_account.financial_account_id = civicrm_financial_account.id' : NULL;
@@ -194,7 +189,6 @@ AND entity_id = %2";
    *   Payment instrument value.
    *
    * @return array|null|string
-   * @static
    */
   public static function getInstrumentFinancialAccount($paymentInstrumentValue = NULL) {
     if (!self::$financialAccount) {
@@ -228,7 +222,6 @@ WHERE cog.name = 'payment_instrument' ";
    * @param $financialType
    *
    * @return array
-   * @static
    */
   public static function createDefaultFinancialAccounts($financialType) {
     $titles = array();

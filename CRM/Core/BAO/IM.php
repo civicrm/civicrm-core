@@ -46,7 +46,6 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
    *
    * @return object
    *   CRM_Core_BAO_IM object on success, null otherwise
-   * @static
    */
   public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
@@ -67,7 +66,6 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
    * @param array entityBlock input parameters to find object
    *
    * @return boolean
-   * @static
    */
   public static function &getValues($entityBlock) {
     return CRM_Core_BAO_Block::getValues('im', $entityBlock);
@@ -83,7 +81,6 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
    *
    * @return array
    *   the array of im details
-   * @static
    */
   public static function allIMs($id, $updateBlankLocInfo = FALSE) {
     if (!$id) {
@@ -135,7 +132,6 @@ ORDER BY
    *
    * @return array
    *   the array of im details
-   * @static
    */
   public static function allEntityIMs(&$entityElements) {
     if (empty($entityElements)) {

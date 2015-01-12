@@ -103,7 +103,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *
    * @return CRM_Financial_DAO_PaymentProcessor|null
    *   object on success, null otherwise
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $paymentProcessor = new CRM_Financial_DAO_PaymentProcessor();
@@ -126,7 +125,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return CRM_Financial_DAO_PaymentProcessor|null
    *   DAO object on success, null otherwise
    *
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_PaymentProcessor', $id, 'is_active', $is_active);
@@ -140,7 +138,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return CRM_Financial_DAO_PaymentProcessor|null
    *   The default payment processor object on success,
    *   null otherwise
-   * @static
    */
   public static function &getDefault() {
     if (self::$_defaultPaymentProcessor == NULL) {
@@ -157,7 +154,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param int $paymentProcessorID
    *
    * @return null
-   * @static
    */
   public static function del($paymentProcessorID) {
     if (!$paymentProcessorID) {
@@ -188,7 +184,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *
    * @return array
    *   associated array with payment processor related fields
-   * @static
    */
   public static function getPayment($paymentProcessorID, $mode) {
     if (!$paymentProcessorID) {
@@ -265,7 +260,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *
    * @return array
    *   associated array with payment processor related fields
-   * @static
    */
   public static function buildPayment($dao, $mode) {
     $fields = array(
@@ -418,7 +412,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *   Type of payment information to be retrieved.
    *
    * @return int|array|object
-   * @static
    */
   public static function getProcessorForEntity($entityID, $component = 'contribute', $type = 'id') {
     $result = NULL;

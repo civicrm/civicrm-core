@@ -59,7 +59,6 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
    *
    * @return boolean
    *   True on success
-   * @static
    */
   public static function confirm($contact_id, $subscribe_id, $hash) {
     $se = &CRM_Mailing_Event_BAO_Subscribe::verify(

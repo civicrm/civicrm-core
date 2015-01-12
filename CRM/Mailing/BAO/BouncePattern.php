@@ -50,7 +50,6 @@ class CRM_Mailing_BAO_BouncePattern extends CRM_Mailing_DAO_BouncePattern {
    * Build the static pattern array
    *
    * @return void
-   * @static
    */
   public static function buildPatterns() {
     self::$_patterns = array();
@@ -79,7 +78,6 @@ class CRM_Mailing_BAO_BouncePattern extends CRM_Mailing_DAO_BouncePattern {
    *
    * @return array
    *   Tuple (bounce_type, bounce_reason)
-   * @static
    */
   public static function &match(&$message) {
     // clean up $message and replace all white space by a single space, CRM-4767

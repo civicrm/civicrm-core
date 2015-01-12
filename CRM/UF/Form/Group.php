@@ -296,7 +296,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    *
    * @return bool|array
    *   true if no errors, else array of errors
-   * @static
    */
   public static function formRule($fields, $files, $self) {
     $errors = array();

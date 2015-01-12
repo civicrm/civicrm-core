@@ -1741,7 +1741,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param object $contribution
    *   Contribution object.
    *
-   * @static
    */
   public static function processPcpSoft(&$params, &$contribution) {
     //add soft contribution due to pcp or Submit Credit / Debit Card Contribution by admin.
@@ -1779,7 +1778,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $params
    *
    * @return array
-   * @static
    */
   public static function processPcp(&$page, $params) {
     $params['pcp_made_through_id'] = $page->_pcpId;

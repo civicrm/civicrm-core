@@ -99,7 +99,6 @@ class CRM_Utils_Token {
    * @return bool|array
    *    true if all required tokens are found,
    *    else an array of the missing tokens
-   * @static
    */
   public static function requiredTokens(&$str) {
     if (self::$_requiredTokens == NULL) {
@@ -154,7 +153,6 @@ class CRM_Utils_Token {
    *
    * @return boolean
    *   Was there a match
-   * @static
    */
   public static function token_match($type, $var, &$str) {
     $token = preg_quote('{' . "$type.$var") . '(\|.+?)?' . preg_quote('}');
@@ -176,7 +174,6 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
-   * @static
    */
   public static function &token_replace($type, $var, $value, &$str, $escapeSmarty = FALSE) {
     $token = preg_quote('{' . "$type.$var") . '(\|([^\}]+?))?' . preg_quote('}');
@@ -198,7 +195,6 @@ class CRM_Utils_Token {
    *
    * @return string
    *   regular expression sutiable for using in preg_replace
-   * @static
    */
   private static function tokenRegex($token_type) {
     return '/(?<!\{|\\\\)\{' . $token_type . '\.([\w]+(\-[\w\s]+)?)\}(?!\})/';
@@ -212,7 +208,6 @@ class CRM_Utils_Token {
    *
    * @return string
    *   the escaped string
-   * @static
    */
   private static function tokenEscapeSmarty($string) {
     // need to use negative look-behind, as both str_replace() and preg_replace() are sequential
@@ -234,7 +229,6 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
-   * @static
    */
   public static function &replaceDomainTokens(
     $str,
@@ -336,7 +330,6 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
-   * @static
    */
   public static function &replaceOrgTokens($str, &$org, $html = FALSE, $escapeSmarty = FALSE) {
     self::$_tokens['org'] =
@@ -420,7 +413,6 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed sstring
-   * @static
    */
   public static function &replaceMailingTokens(
     $str,
@@ -555,7 +547,6 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
-   * @static
    */
   public static function &replaceActionTokens(
     $str,
@@ -649,7 +640,6 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
-   * @static
    */
   public static function &replaceContactTokens(
     $str,
@@ -795,7 +785,6 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
-   * @static
    */
   public static function &replaceHookTokens(
     $str,
@@ -873,7 +862,6 @@ class CRM_Utils_Token {
    * @return void
    *   this function works directly on the string that is passed
    * @access public
-   * @static
    */
   public static function unescapeTokens(&$str) {
     $str = preg_replace('/\\\\|\{(\{\w+\.\w+\})\}/', '\\1', $str);
@@ -896,7 +884,6 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
-   * @static
    */
   public static function &replaceUnsubscribeTokens(
     $str,
@@ -943,7 +930,6 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
-   * @static
    */
   public static function &replaceResubscribeTokens(
     $str, &$domain, &$groups, $html,
@@ -971,7 +957,6 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
-   * @static
    */
   public static function &replaceSubscribeTokens($str, $group, $url, $html) {
     if (self::token_match('subscribe', 'group', $str)) {
@@ -991,7 +976,6 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
-   * @static
    */
   public static function &replaceSubscribeInviteTokens($str) {
     if (preg_match('/\{action\.subscribeUrl\}/', $str)) {
@@ -1039,7 +1023,6 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
-   * @static
    */
   public static function &replaceWelcomeTokens($str, $group, $html) {
     if (self::token_match('welcome', 'group', $str)) {
@@ -1056,7 +1039,6 @@ class CRM_Utils_Token {
    *
    * @return array
    *   Array of tokens that weren't replaced
-   * @static
    */
   public static function &unmatchedTokens(&$str) {
     //preg_match_all('/[^\{\\\\]\{(\w+\.\w+)\}[^\}]/', $str, $match);
@@ -1079,7 +1061,6 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
-   * @static
    */
   public static function &replaceComponentTokens(&$str, $contact, $components, $escapeSmarty = FALSE, $returnEmptyToken = TRUE) {
     if (!is_array($components) || empty($contact)) {
@@ -1113,7 +1094,6 @@ class CRM_Utils_Token {
    * @return array
    *   array of tokens mentioned in field
    * @access public
-   * @static
    */
   public static function getTokens($string) {
     $matches = array();
@@ -1185,7 +1165,6 @@ class CRM_Utils_Token {
    *   The mailing list jobID - this is a legacy param.
    *
    * @return array
-   * @static
    */
   static function getTokenDetails(
     $contactIDs,
@@ -1357,7 +1336,6 @@ class CRM_Utils_Token {
    * @param string $className
    *
    * @return array
-   * @static
    */
   static function getContributionTokenDetails(
     $contributionIDs,
@@ -1538,7 +1516,6 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
-   * @static
    */
   public static function &replaceUserTokens($str, $knownTokens = NULL, $escapeSmarty = FALSE) {
     $key = 'user';

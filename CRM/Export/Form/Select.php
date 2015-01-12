@@ -348,7 +348,6 @@ FROM   {$this->_componentTable}
    *
    * @return bool|array
    *   mixed true or array of errors
-   * @static
    */
   static public function formRule($params, $files, $self) {
     $errors = array();

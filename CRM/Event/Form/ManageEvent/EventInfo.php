@@ -242,7 +242,6 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
    *
    * @return array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRule($values) {
     $errors = array();

@@ -51,7 +51,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *
    * @return array
    *   array of created address
-   * @static
    */
   public static function create(&$params, $fixAddress = TRUE, $entity = NULL) {
     if (!isset($params['address']) || !is_array($params['address'])) {
@@ -144,7 +143,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *
    * @return object
    *   CRM_Core_BAO_Address object on success, null otherwise
-   * @static
    */
   public static function add(&$params, $fixAddress) {
     static $customFields = NULL;
@@ -206,7 +204,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return void
-   * @static
    */
   public static function fixAddress(&$params) {
     if (!empty($params['billing_street_address'])) {
@@ -411,7 +408,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *
    * @return boolean
    *
-   * @static
    */
   public static function dataExists(&$params) {
     //check if location type is set if not return false
@@ -478,7 +474,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *
    * @return array
    *   array with address fields
-   * @static
    */
   public static function &getValues($entityBlock, $microformat = FALSE, $fieldName = 'contact_id') {
     if (empty($entityBlock)) {
@@ -609,7 +604,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *
    * @return array
    *   the array of adrress data
-   * @static
    */
   public static function allAddress($id, $updateBlankLocInfo = FALSE) {
     if (!$id) {
@@ -646,7 +640,6 @@ ORDER BY civicrm_address.is_primary DESC, address_id ASC";
    *
    * @return array
    *   the array of adrress data
-   * @static
    */
   public static function allEntityAddress(&$entityElements) {
     $addresses = array();
@@ -725,7 +718,6 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    *
    * @return array
    *   parsed fields values.
-   * @static
    */
   public static function parseStreetAddress($streetAddress, $locale = NULL) {
     $config = CRM_Core_Config::singleton();
@@ -899,7 +891,6 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    *
    * @return array
    *   an array of contact fields and only the enabled address options
-   * @static
    */
   public static function validateAddressOptions($fields) {
     static $addressOptions = NULL;
@@ -929,7 +920,6 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    *
    * @return int
    *   count of contacts that use this shared address
-   * @static
    */
   public static function checkContactSharedAddress($addressId) {
     $query = 'SELECT count(id) FROM civicrm_address WHERE master_id = %1';
@@ -944,7 +934,6 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    * @param int $contactId
    *   Contact id.
    *
-   * @static
    */
   public static function checkContactSharedAddressFields(&$fields, $contactId) {
     if (!$contactId || !is_array($fields) || empty($fields)) {
@@ -1017,7 +1006,6 @@ SELECT is_primary,
    *   Associated array of address params.
    *
    * @return void
-   * @static
    */
   public static function processSharedAddress($addressId, $params) {
     $query = 'SELECT id FROM civicrm_address WHERE master_id = %1';
@@ -1120,7 +1108,6 @@ SELECT is_primary,
    *   Associated array of submitted values.
    *
    * @return void
-   * @static
    */
   public static function processSharedAddressRelationship($masterAddressId, $params) {
     if (!$masterAddressId) {
@@ -1194,7 +1181,6 @@ SELECT is_primary,
    *   By default false.
    *
    * @return string
-   * @static
    */
   public static function setSharedAddressDeleteStatus($addressId = NULL, $contactId = NULL, $returnStatus = FALSE) {
     // check if address that is being deleted has any shared

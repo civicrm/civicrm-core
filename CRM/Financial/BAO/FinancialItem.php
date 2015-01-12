@@ -50,7 +50,6 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Contribute_BAO_FinancialItem
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $financialItem = new CRM_Financial_DAO_FinancialItem();
@@ -71,7 +70,6 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    *   Contribution object.
    * @param bool $taxTrxnID
    *
-   * @static
    * @return void
    */
   public static function add($lineItem, $contribution, $taxTrxnID = FALSE) {
@@ -139,7 +137,6 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param array $trxnIds
    *   Financial item ids.
    *
-   * @static
    * @return object
    */
   public static function create(&$params, $ids = NULL, $trxnIds = NULL) {
@@ -189,7 +186,6 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Core_BAO_FinancialTrxn
-   * @static
    */
   public static function createEntityTrxn($params) {
     $entity_trxn = new CRM_Financial_DAO_EntityFinancialTrxn();
@@ -207,7 +203,6 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    *   To retrive max id.
    *
    * @return array
-   * @static
    */
   public static function retrieveEntityFinancialTrxn($params, $maxId = FALSE) {
     $financialItem = new CRM_Financial_DAO_EntityFinancialTrxn();
@@ -247,7 +242,6 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    *   Error to display.
    *
    * @return array
-   * @static
    */
   public static function checkContactPresent($contactIds, &$error) {
     if (empty($contactIds)) {

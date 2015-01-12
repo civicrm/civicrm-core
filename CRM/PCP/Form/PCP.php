@@ -197,7 +197,6 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
    *
    * @return array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRule($fields, $files, $form) {
   }

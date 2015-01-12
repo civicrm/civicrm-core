@@ -43,7 +43,6 @@ class CRM_Utils_Geocode_Yahoo {
    * Server to retrieve the lat/long
    *
    * @var string
-   * @static
    */
   static protected $_server = 'query.yahooapis.com';
 
@@ -51,7 +50,6 @@ class CRM_Utils_Geocode_Yahoo {
    * Uri of service
    *
    * @var string
-   * @static
    */
   static protected $_uri = '/v1/public/yql';
 
@@ -67,7 +65,6 @@ class CRM_Utils_Geocode_Yahoo {
    *
    * @return boolean
    *   true if we modified the address, false otherwise
-   * @static
    */
   public static function format(&$values, $stateName = FALSE) {
     CRM_Utils_System::checkPHPVersion(5, TRUE);

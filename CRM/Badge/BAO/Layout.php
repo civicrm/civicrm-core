@@ -53,7 +53,6 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    *
    * @return CRM_Core_DAO_PrintLabel|null
    *   object on success, null otherwise
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $printLabel = new CRM_Core_DAO_PrintLabel();
@@ -76,7 +75,6 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @return Object
    *   DAO object on success, null otherwise
    *
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_PrintLabel', $id, 'is_active', $is_active);
@@ -88,7 +86,6 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @param array $params
    *   Reference array contains the values submitted by the form.
    *
-   * @static
    *
    * @return object
    */
@@ -130,7 +127,6 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @param int $printLabelId
    *   ID of the name label to be deleted.
    *
-   * @static
    */
   public static function del($printLabelId) {
     $printLabel = new CRM_Core_DAO_PrintLabel();
@@ -143,7 +139,6 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    *
    * @return array
    *   list of labels
-   * @static
    */
   public static function getList() {
     $printLabel = new CRM_Core_DAO_PrintLabel();
@@ -183,7 +178,6 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    *
    * @return array
    *   associated array of decoded elements
-   * @static
    */
   static public function getDecodedData($jsonData) {
     return json_decode($jsonData, TRUE);

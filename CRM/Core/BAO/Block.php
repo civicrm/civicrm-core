@@ -58,7 +58,6 @@ class CRM_Core_BAO_Block {
    *
    * @return array
    *   Array of $block objects.
-   * @static
    */
   public static function &getValues($blockName, $params) {
     if (empty($params)) {
@@ -105,7 +104,6 @@ class CRM_Core_BAO_Block {
    *
    * @return array
    *   Array of $block objects.
-   * @static
    */
   public static function retrieveBlock(&$block, $blockName) {
     // we first get the primary location due to the order by clause
@@ -137,7 +135,6 @@ class CRM_Core_BAO_Block {
    *
    * @return boolean
    *   true if the block has data, otherwise false
-   * @static
    */
   public static function dataExists($blockFields, &$params) {
     foreach ($blockFields as $field) {
@@ -158,7 +155,6 @@ class CRM_Core_BAO_Block {
    *
    * @return boolean
    *   true if the block exits, otherwise false
-   * @static
    */
   public static function blockExists($blockName, &$params) {
     // return if no data present
@@ -183,7 +179,6 @@ class CRM_Core_BAO_Block {
    * @return array
    *   formatted array of block ids
    *
-   * @static
    */
   public static function getBlockIds($blockName, $contactId = NULL, $entityElements = NULL, $updateBlankLocInfo = FALSE) {
     $allBlocks = array();
@@ -226,7 +221,6 @@ class CRM_Core_BAO_Block {
    *
    * @return object
    *   CRM_Core_BAO_Block object on success, null otherwise
-   * @static
    */
   public static function create($blockName, &$params, $entity = NULL, $contactId = NULL) {
     if (!self::blockExists($blockName, $params)) {
@@ -406,7 +400,6 @@ class CRM_Core_BAO_Block {
    *   Associates array.
    *
    * @return void
-   * @static
    */
   public static function blockDelete($blockName, $params) {
     $name = ucfirst($blockName);
@@ -446,7 +439,6 @@ class CRM_Core_BAO_Block {
    * @param $class
    *
    * @throws API_Exception
-   * @static
    */
   public static function handlePrimary(&$params, $class) {
     $table = CRM_Core_DAO_AllCoreTables::getTableForClass($class);

@@ -557,7 +557,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *   Discount id for the event.
    *
    * @return void
-   * @static
    */
   static public function buildAmount(&$form, $required = TRUE, $discountId = NULL) {
     // build amount only when needed, skip incase of event full and waitlisting is enabled
@@ -811,7 +810,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *
    * @return bool|array
    *   true if no errors, else array of errors
-   * @static
    */
   public static function formRule($fields, $files, $self) {
     $errors = array();

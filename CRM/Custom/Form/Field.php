@@ -73,7 +73,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    * Array for valid combinations of data_type & html_type
    *
    * @var array
-   * @static
    */
   private static $_dataTypeValues = NULL;
   private static $_dataTypeKeys = NULL;
@@ -578,7 +577,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    * @return array
    *   if errors then list of errors to be posted back to the form,
    *                  true otherwise
-   * @static
    */
   public static function formRule($fields, $files, $self) {
     $default = CRM_Utils_Array::value('default_value', $fields);

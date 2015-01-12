@@ -160,7 +160,6 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
    *
    * @return bool|array
    *   mixed true or array of errors
-   * @static
    */
   public static function dataRule($params, $files, $options) {
     if ($params['component_type'] == 'Header' || $params['component_type'] == 'Footer') {

@@ -78,7 +78,6 @@ class CRM_Contact_Form_ProfileContact {
    *
    * @param CRM_Core_Form $form
    *
-   * @static
    */
   public static function buildQuickForm(&$form) {
     $ufGroup = new CRM_Core_DAO_UFGroup();

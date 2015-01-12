@@ -56,7 +56,6 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
    *
    * @return object
    *   $mailingab      The new mailingab object
-   * @static
    */
   public static function create(&$params, $ids = array()) {
     $transaction = new CRM_Core_Transaction();
@@ -79,7 +78,6 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
    * @param array $ids
    *   Reference array contains the id.
    *
-   * @static
    *
    * @return object
    */
@@ -121,7 +119,6 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
    *   Id of the mail to delete.
    *
    * @return void
-   * @static
    */
   public static function del($id) {
     if (empty($id)) {

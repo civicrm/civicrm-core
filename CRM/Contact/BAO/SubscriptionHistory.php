@@ -56,7 +56,6 @@ class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHi
    *
    * @return object
    *   $history  The new history object
-   * @static
    */
   public static function &create(&$params) {
     $history = new CRM_Contact_BAO_SubscriptionHistory();
@@ -73,7 +72,6 @@ class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHi
    *   The contact id.
    *
    * @return void
-   * @static
    */
   public static function deleteContact($id) {
     $history = new CRM_Contact_BAO_SubscriptionHistory();

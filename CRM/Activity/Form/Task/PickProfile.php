@@ -153,7 +153,6 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
    *
    * @return array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRule($fields) {
     return TRUE;

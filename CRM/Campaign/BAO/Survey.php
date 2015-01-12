@@ -80,7 +80,6 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
    * @param array $params
    *
    * @return CRM_Survey_DAO_Survey
-   * @static
    */
   public static function create(&$params) {
     if (empty($params)) {
@@ -118,7 +117,6 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
   /**
    * Retrieve surveys for dashboard.
    *
-   * @static
    */
   public static function getSurveySummary($params = array(), $onlyCount = FALSE) {
     //build the limit and order clause.
@@ -242,7 +240,6 @@ SELECT  survey.id                         as id,
   /**
    * Get the survey count.
    *
-   * @static
    */
   public static function getSurveyCount() {
     return (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_survey');
@@ -260,7 +257,6 @@ SELECT  survey.id                         as id,
    * @param bool $includePetition
    *   Include or exclude petitions.
    *
-   * @static
    */
   public static function getSurveys($onlyActive = TRUE, $onlyDefault = FALSE, $forceAll = FALSE, $includePetition = FALSE) {
     $cacheKey = 0;
@@ -313,7 +309,6 @@ SELECT  survey.id    as id,
    * Get Surveys activity types
    *
    *
-   * @static
    */
   static function getSurveyActivityType(
     $returnColumn = 'label',
@@ -352,7 +347,6 @@ SELECT  survey.id    as id,
    *   an array of survey type id.
    *
    * @return array
-   * @static
    */
   public static function getSurveyCustomGroups($surveyTypes = array()) {
     $customGroups = array();
@@ -396,7 +390,6 @@ SELECT  survey.id    as id,
    *
    * @return Object
    *   DAO object on sucess, null otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Campaign_DAO_Survey', $id, 'is_active', $is_active);
@@ -409,7 +402,6 @@ SELECT  survey.id    as id,
    *   Survey id.
    *
    * @return mixed|null
-   * @static
    */
   public static function del($id) {
     if (!$id) {
@@ -433,7 +425,6 @@ SELECT  survey.id    as id,
    *
    * @return array
    *   array of contact info.
-   * @static
    */
   public static function voterDetails($voterIds, $returnProperties = array()) {
     $voterDetails = array();
@@ -530,7 +521,6 @@ Group By  contact.id";
    *
    * @return array
    *   array of survey activity.
-   * @static
    */
   static function voterActivityDetails(
     $surveyId, $voterIds, $interviewerId = NULL,
@@ -594,7 +584,6 @@ INNER JOIN  civicrm_activity_contact activityAssignment
    *
    * @return array
    *   An array of survey activity.
-   * @static
    */
   static function getSurveyActivities(
     $surveyId,
@@ -701,7 +690,6 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    *
    * @return array
    *   Survey related contact ids.
-   * @static
    */
   public static function getSurveyVoterInfo($surveyId, $interviewerId = NULL, $statusIds = array()) {
     $voterIds = array();
@@ -735,7 +723,6 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    * @param string $valueColumnName
    * @return array
    *   an array of option groups.
-   * @static
    */
   public static function getResultSets($valueColumnName = 'title') {
     $resultSets = array();
@@ -756,7 +743,6 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    * @param int $activityId
    *   Activity id.
    * @return boolean
-   * @static
    */
   public static function isSurveyActivity($activityId) {
     $isSurveyActivity = FALSE;
@@ -786,7 +772,6 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    *   Survey id.
    * @return array
    *   an array of option values
-   * @static
    */
   public static function getResponsesOptions($surveyId) {
     $responseOptions = array();
@@ -810,7 +795,6 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    * @param string $extraULName
    * @return array|string
    *   $url array of permissioned links
-   * @static
    */
   public static function buildPermissionLinks($surveyId, $enclosedInUL = FALSE, $extraULName = 'more') {
     $menuLinks = array();

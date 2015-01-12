@@ -52,7 +52,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Contact_BAO_Group
-   * @static
    */
   public static function add(&$params) {
 
@@ -75,7 +74,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return boolean
-   * @static
    */
   public static function dataExists(&$params) {
     // return if no data present
@@ -97,7 +95,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *
    * @return array
    *   (reference)   the values that could be potentially assigned to smarty
-   * @static
    */
   public static function getValues(&$params, &$values) {
     if (empty($params)) {
@@ -131,7 +128,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *
    * @return array
    *   (total, added, notAdded) count of contacts added to group
-   * @static
    */
   static function addContactsToGroup(
     $contactIds,
@@ -182,7 +178,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *
    * @return array
    *   (total, removed, notRemoved) count of contacts removed to group
-   * @static
    */
   static function removeContactsFromGroup(
     &$contactIds,
@@ -282,7 +277,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *
    * @return array
    *   this array has key-> group id and value group title
-   * @static
    */
   public static function getGroupList($contactId = 0, $visibility = FALSE) {
     $group = new CRM_Contact_DAO_Group();
@@ -465,7 +459,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *
    * @return object
    *   of group contact
-   * @static
    */
   public static function getMembershipDetail($contactId, $groupID, $method = 'Email') {
     $leftJoin = $where = $orderBy = NULL;
@@ -506,7 +499,6 @@ SELECT    *
    *
    *
    * @return groupID
-   * @static
    */
   public static function getGroupId($groupContactID) {
     $dao = new CRM_Contact_DAO_GroupContact();
@@ -529,7 +521,6 @@ SELECT    *
    * @param string $method
    *
    * @return void
-   * @static
    */
   public static function create(&$params, $contactId, $visibility = FALSE, $method = 'Admin') {
     $contactIds = array();
@@ -619,7 +610,6 @@ SELECT    *
    *
    * @return void
    *
-   * @static
    */
   public static function mergeGroupContact($mainContactId, $otherContactId) {
     $params = array(
@@ -729,7 +719,6 @@ AND       group_id IN ( $groupIDString )
    *
    * @return array
    *   (total, added, notAdded) count of contacts added to group
-   * @static
    */
   static function bulkAddContactsToGroup(
     $contactIDs,

@@ -37,7 +37,6 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   /**
    * Product information
    * @var array
-   * @static
    */
   private static $productInfo;
 
@@ -57,7 +56,6 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Contribute_BAO_ManagePremium
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $premium = new CRM_Contribute_DAO_Product();
@@ -79,7 +77,6 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    *
    * @return Object
    *   DAO object on sucess, null otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Premium', $id, 'premiums_active ', $is_active);
@@ -90,7 +87,6 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    *
    * @param int $premiumID
    *
-   * @static
    */
   public static function del($premiumID) {
     //check dependencies
@@ -110,7 +106,6 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * @param int $selectedProductID
    * @param null $selectedOption
    *
-   * @static
    */
   public static function buildPremiumBlock(&$form, $pageID, $formItems = FALSE, $selectedProductID = NULL, $selectedOption = NULL) {
     $form->add('hidden', "selectProduct", $selectedProductID, array('id' => 'selectProduct'));
@@ -177,7 +172,6 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * @param int $productID
    * @param int $premiumProductID
    *
-   * @static
    */
   public function buildPremiumPreviewBlock($form, $productID, $premiumProductID = NULL) {
     if ($premiumProductID) {
@@ -216,7 +210,6 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    *
    * @param int $contributionPageID
    *
-   * @static
    */
   public static function deletePremium($contributionPageID) {
     if (!$contributionPageID) {
@@ -250,7 +243,6 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    *
    * @return array
    *   product and option arrays
-   * @static
    */
   public static function getPremiumProductInfo() {
     if (!self::$productInfo) {

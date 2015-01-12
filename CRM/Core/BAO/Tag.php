@@ -51,7 +51,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *
    * @return object
    *   CRM_Core_DAO_Tag object on success, otherwise null
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $tag = new CRM_Core_DAO_Tag();
@@ -322,7 +321,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *   Tag id.
    *
    * @return boolean
-   * @static
    */
   public static function del($id) {
     // since this is a destructive operation, lets make sure
@@ -362,7 +360,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *
    * @return object
    *   CRM_Core_DAO_Tag object on success, otherwise null
-   * @static
    */
   public static function add(&$params, $ids = array()) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('tag', $ids));
@@ -413,7 +410,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return boolean
-   * @static
    */
   public static function dataExists(&$params) {
     // Disallow empty values except for the number zero.
@@ -433,7 +429,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *
    * @return array
    *   array of tag sets
-   * @static
    */
   public static function getTagSet($entityTable) {
     $tagSets = array();
@@ -458,7 +453,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @return array
    *   associated array of tag name and id
    * @access public
-   * @static
    */
   public static function getTagsNotInTagset() {
     $tags = $tagSets = array();

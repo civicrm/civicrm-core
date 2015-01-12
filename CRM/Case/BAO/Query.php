@@ -699,7 +699,6 @@ case_relation_type.id = case_relationship.relationship_type_id )";
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @static
    */
   public static function buildSearchForm(&$form) {
     $config = CRM_Core_Config::singleton();

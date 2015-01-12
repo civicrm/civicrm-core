@@ -36,7 +36,6 @@ class CRM_Utils_REST {
 
   /**
    * Number of seconds we should let a REST process idle
-   * @static
    */
   static $rest_timeout = 0;
 

@@ -132,7 +132,6 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
   /**
    * Validation Rule
    *
-   * @static
    */
   public static function usernameRule($params) {
     $config = CRM_Core_Config::singleton();

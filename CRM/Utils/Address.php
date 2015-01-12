@@ -54,7 +54,6 @@ class CRM_Utils_Address {
    * @return string
    *   formatted address string
    *
-   * @static
    */
   static function format(
     $fields,

@@ -44,7 +44,6 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
@@ -52,7 +51,6 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    * The option group name
    *
    * @var array
-   * @static
    */
   protected $_gName;
 
@@ -60,7 +58,6 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    * The option group name in display format (capitalized, without underscores...etc)
    *
    * @var array
-   * @static
    */
   protected $_GName;
 
@@ -68,7 +65,6 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    * The option group id
    *
    * @var array
-   * @static
    */
   protected $_gid = NULL;
 
@@ -153,7 +149,6 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    *
    *
    * @return void
-   * @static
    */
   public function browse() {
     $campaingCompId = CRM_Core_Component::getComponentID('CiviCampaign');

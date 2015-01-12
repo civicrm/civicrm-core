@@ -42,14 +42,12 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Membership types
    * @var array
-   * @static
    */
   private static $membershipType;
 
   /**
    * Membership types
    * @var array
-   * @static
    */
   private static $membershipStatus;
 
@@ -62,7 +60,6 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return array
    *   array reference of all membership types if any
-   * @static
    */
   public static function &membershipType($id = NULL, $force = FALSE) {
     if (!self::$membershipType || $force) {
@@ -94,7 +91,6 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return array
    *   array reference of all membership statuss if any
-   * @static
    */
   public static function &membershipStatus($id = NULL, $cond = NULL, $column = 'name', $force = FALSE, $allStatus = FALSE) {
     if (self::$membershipStatus === NULL) {
@@ -127,7 +123,6 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db
    * next time it's requested.
    *
-   * @static
    *
    * @param bool|string $name pseudoconstant to be flushed
    */

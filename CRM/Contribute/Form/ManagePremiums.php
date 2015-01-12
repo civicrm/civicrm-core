@@ -218,7 +218,6 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    *
    * @return bool|array
    *   mixed true or array of errors
-   * @static
    */
   public static function formRule($params, $files) {
     if (isset($params['imageOption'])) {

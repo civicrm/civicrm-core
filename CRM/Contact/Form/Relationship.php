@@ -561,7 +561,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    *
    * @return bool|array
    *   mixed true or array of errors
-   * @static
    */
   public static function dateRule($params) {
     $errors = array();

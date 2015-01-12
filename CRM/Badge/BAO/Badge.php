@@ -412,7 +412,6 @@ class CRM_Badge_BAO_Badge {
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @static
    */
   public static function buildBadges(&$params, &$form) {
     // get name badge layout info

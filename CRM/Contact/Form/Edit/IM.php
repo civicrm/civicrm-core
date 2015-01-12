@@ -49,7 +49,6 @@ class CRM_Contact_Form_Edit_IM {
    *   Is it block edit.
    *
    * @return void
-   * @static
    */
   public static function buildQuickForm(&$form, $blockCount = NULL, $blockEdit = FALSE) {
     if (!$blockCount) {

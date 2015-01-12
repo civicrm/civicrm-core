@@ -43,7 +43,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * Event
    *
    * @var array
-   * @static
    */
   private static $event;
 
@@ -51,7 +50,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * Participant Status
    *
    * @var array
-   * @static
    */
   private static $participantStatus;
 
@@ -59,7 +57,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * Participant Role
    *
    * @var array
-   * @static
    */
   private static $participantRole;
 
@@ -67,7 +64,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * Participant Listing
    *
    * @var array
-   * @static
    */
   private static $participantListing;
 
@@ -75,7 +71,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * Event Type.
    *
    * @var array
-   * @static
    */
   private static $eventType;
 
@@ -88,7 +83,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Personal campaign pages
    * @var array
-   * @static
    */
   private static $pcPage;
 
@@ -102,7 +96,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return array
    *   array of all events if any
-   * @static
    */
   public static function event($id = NULL, $all = FALSE, $condition = NULL) {
     $key = "{$id}_{$all}_{$condition}";
@@ -140,7 +133,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return array
    *   array reference of all participant statuses if any
-   * @static
    */
   public static function &participantStatus($id = NULL, $cond = NULL, $retColumn = 'name') {
     if (self::$participantStatus === NULL) {
@@ -198,7 +190,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return array
    *   array reference of all participant roles if any
-   * @static
    */
   public static function &participantRole($id = NULL, $cond = NULL) {
     $index = $cond ? $cond : 'No Condition';
@@ -230,7 +221,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return array
    *   array reference of all participant listings if any
-   * @static
    */
   public static function &participantListing($id = NULL) {
     if (!self::$participantListing) {
@@ -252,7 +242,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param int $id
    * @return array
    *   array reference of all event types.
-   * @static
    */
   public static function &eventType($id = NULL) {
     if (!self::$eventType) {
@@ -295,7 +284,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db
    * nex time it's requested.
    *
-   * @static
    *
    * @param bool|string $name pseudoconstant to be flushed
    */
@@ -312,7 +300,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param int $id
    * @return array
    *   array reference of all pcp if any
-   * @static
    */
   public static function &pcPage($id = NULL) {
     if (!self::$pcPage) {

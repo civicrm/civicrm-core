@@ -47,7 +47,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * list of valid contexts
    *
    * @var array
-   * @static
    */
   static $_validContext = NULL;
 
@@ -55,7 +54,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * List of values used when we want to display other objects
    *
    * @var array
-   * @static
    */
   static $_modeValues = NULL;
 
@@ -137,7 +135,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * Csv - common search values
    *
    * @var array
-   * @static
    */
   static $csv = array('contact_type', 'group', 'tag');
 
@@ -168,7 +165,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    *
    * @return array
    *   the valid context set and the titles
-   * @static
    */
   public static function &validContext() {
     if (!(self::$_validContext)) {

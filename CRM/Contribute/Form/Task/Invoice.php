@@ -209,7 +209,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    *
    * @return array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRule($values) {
     $errors = array();
@@ -245,7 +244,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    *   Contact Id.
    * @param CRM_Core_Form $form
    *   Form object.
-   * @static
    */
   public static function printPDF($contribIDs, &$params, $contactIds, &$form) {
     // get all the details needed to generate a invoice
@@ -588,7 +586,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @param array $params
    *   For invoices.
    *
-   * @static
    */
   static public function addActivities($subject, $contactIds, $fileName, $params) {
     $session = CRM_Core_Session::singleton();

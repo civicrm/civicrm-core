@@ -51,7 +51,6 @@ class CRM_Contact_Form_Edit_Address {
    *
    * @return void
    *
-   * @static
    */
   public static function buildQuickForm(&$form, $addressBlockCount = NULL, $sharing = TRUE, $inlineEdit = FALSE) {
     // passing this via the session is AWFUL. we need to fix this
@@ -282,7 +281,6 @@ class CRM_Contact_Form_Edit_Address {
    * @return array|bool
    *   if no errors
    *
-   * @static
    */
   public static function formRule($fields, $files, $self) {
     $errors = array();
@@ -339,7 +337,6 @@ class CRM_Contact_Form_Edit_Address {
    * @param CRM_Core_Form $form
    *   Form object.
    *
-   * @static
    */
   public static function setDefaultValues(&$defaults, &$form) {
     $addressValues = array();

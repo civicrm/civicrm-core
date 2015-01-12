@@ -52,7 +52,6 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Price_DAO_LineItem
-   * @static
    */
   public static function create(&$params) {
     $id = CRM_Utils_Array::value('id', $params);
@@ -96,7 +95,6 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Price_BAO_LineItem
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $lineItem = new CRM_Price_BAO_LineItem();
@@ -340,7 +338,6 @@ AND li.entity_id = {$entityId}
    * @param int $entityTable
    *
    * @return bool
-   * @static
    */
   public static function deleteLineItems($entityId, $entityTable) {
     if (!$entityId || !$entityTable) {
@@ -369,7 +366,6 @@ AND li.entity_id = {$entityId}
    * @param bool $update
    *
    * @return void
-   * @static
    */
   public static function processPriceSet($entityId, $lineItem, $contributionDetails = NULL, $entityTable = 'civicrm_contribution', $update = FALSE) {
     if (!$entityId || !is_array($lineItem)
@@ -481,7 +477,6 @@ AND li.entity_id = {$entityId}
    *   Entity Table.
    *
    * @return void
-   * @static
    */
   public static function getLineItemArray(&$params, $entityId = NULL, $entityTable = 'contribution', $isRelatedID = FALSE) {
 
@@ -543,7 +538,6 @@ AND li.entity_id = {$entityId}
    * @return number|void
    *   tax rate
    *
-   * @static
    */
   public static function calculateTaxRate($lineItemId) {
     if ($lineItemId['unit_price'] == 0) {

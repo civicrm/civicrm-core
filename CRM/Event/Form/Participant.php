@@ -803,7 +803,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @return array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRule($values, $files, $self) {
     // If $values['_qf_Participant_next'] is Delete or

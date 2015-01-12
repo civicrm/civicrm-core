@@ -70,7 +70,6 @@ class CRM_Contact_Task {
    * The task array
    *
    * @var array
-   * @static
    */
   static $_tasks = NULL;
 
@@ -78,7 +77,6 @@ class CRM_Contact_Task {
    * The optional task array
    *
    * @var array
-   * @static
    */
   static $_optionalTasks = NULL;
 
@@ -281,7 +279,6 @@ class CRM_Contact_Task {
    *
    * @return array
    *   the set of tasks for a group of contacts
-   * @static
    */
   public static function &taskTitles() {
     self::initTasks();
@@ -361,7 +358,6 @@ class CRM_Contact_Task {
    *
    * @return array
    *   the set of optional tasks for a group of contacts
-   * @static
    */
   public static function &optionalTaskTitle() {
     $tasks = array(

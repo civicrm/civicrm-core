@@ -139,7 +139,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param array $params
    *   Reference array contains the values submitted by the form .
    *
-   * @static
    *
    * @return object
    */
@@ -175,7 +174,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param string $entityTable
    *   Name of the entity table .
    *
-   * @static
    *
    * @return object
    */
@@ -404,7 +402,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param int $initiatorId
    *   The instance where this function is invoked from .
    *
-   * @static
    *
    * @return array
    *   an array of child ids
@@ -473,7 +470,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param int $mode
    *   1. retrieve only one entity. 2. retrieve all future entities in the repeating set. 3. all entities in the repeating set. .
    *
-   * @static
    *
    * @return array
    *   array of connected ids
@@ -496,7 +492,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param bool $includeParent
    *   Include parent in result set .
    *
-   * @static
    *
    * @return int
    *   unsigned $parentId Parent ID
@@ -535,7 +530,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param bool $createRecurringEntity
    *   If to create a record in recurring_entity table .
    *
-   * @static
    *
    * @return object
    */
@@ -565,7 +559,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param object $event
    *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just updated .
    *
-   * @static
    *
    * @return void
    */
@@ -638,7 +631,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param object $event
    *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just inserted .
    *
-   * @static
    *
    * @return void
    */
@@ -749,7 +741,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param object $event
    *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just deleted .
    *
-   * @static
    *
    * @return void
    */
@@ -793,7 +784,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param string $entityTable
    *   Name of the entity table
    *
-   * @static
    *
    * @return boolean|CRM_Core_DAO_RecurringEntity
    */
@@ -913,7 +903,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param int $scheduleReminderId
    *   Primary key of civicrm_action_schedule table .
    *
-   * @static
    *
    * @return object
    */
@@ -1069,7 +1058,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param DateTime $endDate
    *   End Date .
    *
-   * @static
    *
    * @return object
    *   DateTime object which contain time difference
@@ -1090,7 +1078,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param string $used_for
    *   Specifies for which entity type it's used for .
    *
-   * @static
    *
    * @return object
    */

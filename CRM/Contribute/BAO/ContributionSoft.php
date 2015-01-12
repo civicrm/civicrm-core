@@ -71,7 +71,6 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Contribute_BAO_ContributionSoft
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();
@@ -88,7 +87,6 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    *
    * @param array $params
    *
-   * @static
    */
   public static function del($params) {
     //delete from contribution soft table
@@ -151,7 +149,6 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    *
    * @return array
    *   Array of soft contribution ids, amounts, and associated contact ids
-   * @static
    */
   public static function getSoftContribution($contributionID, $all = FALSE) {
     $pcpFields = array(
@@ -245,7 +242,6 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    *   Additional filter criteria, later used in where clause.
    *
    * @return array
-   * @static
    */
   public static function getSoftContributionList($contact_id, $filter = NULL, $isTest = 0) {
     $query = '

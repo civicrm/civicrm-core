@@ -86,7 +86,6 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
    *
    *
    * @return void
-   * @static
    */
   public function run() {
     $this->preProcess();

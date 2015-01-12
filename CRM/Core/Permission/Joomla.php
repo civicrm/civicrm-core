@@ -106,7 +106,6 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    *
    * @return boolean
    *   true if yes, else false
-   * @static
    */
   public function checkGroupRole($array) {
     return FALSE;

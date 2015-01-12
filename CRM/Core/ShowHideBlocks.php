@@ -86,7 +86,6 @@ class CRM_Core_ShowHideBlocks {
    * Load icon vars used in hide and show links
    *
    * @return void
-   * @static
    */
   public static function setIcons() {
     if (!isset(self::$_showIcon)) {
@@ -187,7 +186,6 @@ class CRM_Core_ShowHideBlocks {
    *
    * @param bool $assign
    *
-   * @static
    *
    * @return void
    */

@@ -38,7 +38,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * Static field for all the contribution information that we can potentially import
    *
    * @var array
-   * @static
    */
   static $_importableFields = NULL;
 
@@ -46,7 +45,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * Static field for all the contribution information that we can potentially export
    *
    * @var array
-   * @static
    */
   static $_exportableFields = NULL;
 
@@ -90,7 +88,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *   The array that holds all the db ids.
    *
    * @return CRM_Contribute_BAO_Contribution
-   * @static
    */
   public static function add(&$params, $ids = array()) {
     if (empty($params)) {
@@ -223,7 +220,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *   The array that holds all the db ids.
    *
    * @return CRM_Contribute_BAO_Contribution|null the found object or null
-   * @static
    */
   public static function &getValues($params, &$values, &$ids) {
     if (empty($params)) {
@@ -295,7 +291,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *   The array that holds all the db ids.
    *
    * @return CRM_Contribute_BAO_Contribution
-   * @static
    */
   public static function create(&$params, $ids = array()) {
     $dateFields = array('receive_date', 'cancel_date', 'receipt_date', 'thankyou_date');
@@ -485,7 +480,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *   True if we want to resolve the values in the reverse direction (value -> name).
    *
    * @return void
-   * @static
    */
   public static function resolveDefaults(&$defaults, $reverse = FALSE) {
     self::lookupValue($defaults, 'financial_type', CRM_Contribute_PseudoConstant::financialType(), $reverse);
@@ -538,7 +532,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *   (reference) the array that holds all the db ids.
    *
    * @return CRM_Contribute_BAO_Contribution
-   * @static
    */
   public static function retrieve(&$params, &$defaults, &$ids) {
     $contribution = CRM_Contribute_BAO_Contribution::getValues($params, $defaults, $ids);
@@ -557,7 +550,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *
    * @return array
    *   array of importable Fields
-   * @static
    */
   public static function &importableFields($contactType = 'Individual', $status = TRUE) {
     if (!self::$_importableFields) {
@@ -779,7 +771,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    * @return mixed|null
    *   $results no of deleted Contribution on success, false otherwise
    * @access public
-   * @static
    */
   public static function deleteContribution($id) {
     CRM_Utils_Hook::pre('delete', 'Contribution', $id, CRM_Core_DAO::$_nullArray);
@@ -856,7 +847,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    *
    * @return boolean
    *   true if duplicate, false otherwise
-   * @static
    */
   public static function checkDuplicate($input, &$duplicates, $id = NULL) {
     if (!$id) {
@@ -909,7 +899,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Contribute_DAO_ContributionProduct
-   * @static
    */
   public static function addPremium(&$params) {
     $contributionProduct = new CRM_Contribute_DAO_ContributionProduct();
@@ -927,7 +916,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    *
    * @return array
    *   the list of contribution fields
-   * @static
    */
   public static function getContributionFields($addExtraFields = TRUE) {
     $contributionFields = CRM_Contribute_DAO_Contribution::export();
@@ -956,7 +944,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   /**
    * Add extra fields specific to contribtion
    *
-   * @static
    */
   public static function getSpecialContributionFields() {
     $extraFields = array(
@@ -1026,7 +1013,6 @@ GROUP BY p.id
    * @return array
    *   list of contribution fields
    *
-   * @static
    */
   public static function getHonorContacts($honorId) {
     $params = array();
@@ -1064,7 +1050,6 @@ GROUP BY p.id
    *
    * @return null|string
    *   sort name of the contact if found
-   * @static
    */
   public static function sortName($id) {
     $id = CRM_Utils_Type::escape($id, 'Integer');
@@ -1165,7 +1150,6 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
    *
    * @return array
    *   contribution id if success else NULL
-   * @static
    */
   public static function checkDuplicateIds($params) {
     $dao = new CRM_Contribute_DAO_Contribution();
@@ -1199,7 +1183,6 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
    * @return array
    *   associated array
    *
-   * @static
    */
   public static function getContributionDetails($exportMode, $componentIds) {
     $paymentDetails = array();
@@ -1262,7 +1245,6 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
    *
    * @return int
    *   address id
-   * @static
    */
   public static function createAddress(&$params, $billingLocationTypeID) {
     $billingFields = array(
@@ -1298,7 +1280,6 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
    * @param int $contributionId
    * @param int $contactId
    *
-   * @static
    */
   public static function deleteAddress($contributionId = NULL, $contactId = NULL) {
     $clauses = array();
@@ -1345,7 +1326,6 @@ WHERE      $condition
    *
    * @return int
    *   pending contribution id.
-   * @static
    */
   public static function checkOnlinePendingContribution($componentId, $componentName) {
     $contributionId = NULL;
@@ -1921,7 +1901,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
   /**
    * @return array
-   * @static
    */
   public static function getContributionDates() {
     $config = CRM_Core_Config::singleton();
@@ -2593,7 +2572,6 @@ WHERE  contribution_id = %1 ";
    * @param bool $isNotCancelled
    *
    * @return boolean
-   * @static
    */
   public static function isCancelSubscriptionSupported($contributionId, $isNotCancelled = TRUE) {
     $cacheKeyString = "$contributionId";
@@ -2625,7 +2603,6 @@ WHERE  contribution_id = %1 ";
    *
    * @return string
    *   contribution status
-   * @static
    */
   public static function isSubscriptionCancelled($contributionId) {
     $sql = "
@@ -2652,7 +2629,6 @@ WHERE  contribution_id = %1 ";
    * @param array $financialTrxnValues
    *
    * @return null|object
-   * @static
    */
   public static function recordFinancialAccounts(&$params, $financialTrxnValues = NULL) {
     $skipRecords = $update = $return = $isRelatedId = FALSE;
@@ -2954,7 +2930,6 @@ WHERE  contribution_id = %1 ";
    *
    * @param null $skipTrxn
    *
-   * @static
    */
   public static function updateFinancialAccounts(&$params, $context = NULL, $skipTrxn = NULL) {
     $itemAmount = $trxnID = NULL;
@@ -3129,7 +3104,6 @@ WHERE  contribution_id = %1 ";
    *   List of errors.
    *
    * @return bool
-   * @static
    */
   public static function checkStatusValidation($values, &$fields, &$errors) {
     if (CRM_Utils_System::isNull($values) && !empty($fields['id'])) {
@@ -3163,7 +3137,6 @@ WHERE  contribution_id = %1 ";
    * @param int $contactId
    *   Contact id.
    *
-   * @static
    */
   public static function deleteContactContribution($contactId) {
     $contribution = new CRM_Contribute_DAO_Contribution();
@@ -3225,7 +3198,6 @@ WHERE  contribution_id = %1 ";
    * @param string $relationName
    *
    * @return array|bool
-   * @static
    */
   public static function validateFinancialType($financialTypeId, $relationName = 'Expense Account is') {
     $expenseTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE '{$relationName}' "));

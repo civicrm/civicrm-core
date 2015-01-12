@@ -221,7 +221,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    *
    * @return string
    *   loginURL for the current CMS
-   * @static
    */
   public function getLoginURL($destination = '') {
     $query = $destination ? array('destination' => $destination) : array();
@@ -855,7 +854,6 @@ AND    u.status = 1
    *
    * @return string
    *   , formatted url.
-   * @static
    */
   public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
     if (empty($url)) {

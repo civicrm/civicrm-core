@@ -113,7 +113,6 @@ function civicrm_api3_relationship_type_get($params) {
  * @return array
  *   API Result Array
  * {@getfields RelationshipType_delete}
- * @static
  * @access public
  */
 function civicrm_api3_relationship_type_delete($params) {
