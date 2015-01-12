@@ -58,7 +58,7 @@ class api_v3_APITest extends CiviUnitTestCase {
       'big_rock' => '$value.api.tag.create.api.tag.create.values.0.display',
       'villain' => '$value.api.tag.create.values.0.api_tag_get.display',
     );
-    _civicrm_api_replace_variables('Activity', 'Get', $params, $result);
+    _civicrm_api_replace_variables($params, $result);
     $this->assertEquals(999, $params['number']);
     $this->assertEquals(8, $params['tag_id']);
     $this->assertEquals(6, $params['activity_type_id']);

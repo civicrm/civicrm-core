@@ -158,7 +158,7 @@ class ChainSubscriber implements EventSubscriberInterface {
             // it is a numerically indexed array - ie. multiple creates
             foreach ($newparams as $entityparams) {
               $subParams = array_merge($genericParams, $entityparams);
-              _civicrm_api_replace_variables($subAPI[1], $subaction, $subParams, $result['values'][$idIndex], $separator);
+              _civicrm_api_replace_variables($subParams, $result['values'][$idIndex], $separator);
               $result['values'][$result['id']][$field][] = civicrm_api($subEntity, $subaction, $subParams);
               if ($result['is_error'] === 1) {
                 throw new \Exception($subEntity . ' ' . $subaction . 'call failed with' . $result['error_message']);
@@ -168,7 +168,7 @@ class ChainSubscriber implements EventSubscriberInterface {
           else {
 
             $subParams = array_merge($subParams, $newparams);
-            _civicrm_api_replace_variables($subAPI[1], $subaction, $subParams, $result['values'][$idIndex], $separator);
+            _civicrm_api_replace_variables($subParams, $result['values'][$idIndex], $separator);
             $result['values'][$idIndex][$field] = civicrm_api($subEntity, $subaction, $subParams);
             if (!empty($result['is_error'])) {
               throw new \Exception($subEntity . ' ' . $subaction . 'call failed with' . $result['error_message']);
