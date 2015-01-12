@@ -97,8 +97,8 @@ class CRM_Contribute_Form_SoftCredit {
       return $form;
     }
 
-    // by default generate 5 blocks
-    $item_count = 6;
+    // by default generate 10 blocks
+    $item_count = 11;
 
     $showSoftCreditRow = 2;
     if ($form->getAction() & CRM_Core_Action::UPDATE) {
