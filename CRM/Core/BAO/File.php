@@ -472,7 +472,6 @@ AND       CEF.entity_id    = %2";
    *
    * @return array
    *   An array with 2 elements. The string and the number of attachments
-   * @static
    */
   public static function attachmentInfo($entityTable, $entityID, $separator = '<br />') {
     if (!$entityID) {
@@ -630,7 +629,6 @@ AND       CEF.entity_id    = %2";
   /**
    * Delete a file attachment from an entity table / entity ID
    *
-   * @static
    */
   public static function deleteAttachment() {
     $params = array();
@@ -661,7 +659,6 @@ AND       CEF.entity_id    = %2";
    * @return array|NULL
    *   list of HTML snippets; one HTML snippet for each attachment. If none found, then NULL
    *
-   * @static
    */
   public static function paperIconAttachment($entityTable, $entityID) {
     if (empty($entityTable) || !$entityID) {

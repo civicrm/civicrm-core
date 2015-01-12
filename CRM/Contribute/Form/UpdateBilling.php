@@ -229,7 +229,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
    *
    * @return bool|array
    *   true if no errors, else array of errors
-   * @static
    */
   public static function formRule($fields, $files, $self) {
     $errors = array();

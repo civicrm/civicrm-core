@@ -38,7 +38,6 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * Static field for all the pledge information that we can potentially export
    *
    * @var array
-   * @static
    */
   static $_exportableFields = NULL;
 
@@ -62,7 +61,6 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Pledge_BAO_Pledge
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $pledge = new CRM_Pledge_DAO_Pledge();
@@ -80,7 +78,6 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @param array $params
    *   Reference array contains the values submitted by the form.
    *
-   * @static
    *
    * @return object
    */
@@ -132,7 +129,6 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    *
    * @return array
    *   associated array of field values
-   * @static
    */
   public static function &getValues(&$params, &$values, $returnProperties = NULL) {
     if (empty($params)) {
@@ -149,7 +145,6 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Pledge_BAO_Pledge
-   * @static
    */
   public static function &create(&$params) {
     //FIXME: a cludgy hack to fix the dates to MySQL format
@@ -270,7 +265,6 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    *   Pledge id.
    *
    * @return mixed
-   * @static
    */
   public static function deletePledge($id) {
     CRM_Utils_Hook::pre('delete', 'Pledge', $id, CRM_Core_DAO::$_nullArray);
@@ -462,7 +456,6 @@ GROUP BY  currency
    * @return array
    *   return the list of pledge fields
    *
-   * @static
    */
   public static function getHonorContacts($honorId) {
     $params = array();
@@ -709,7 +702,6 @@ GROUP BY  currency
    *
    * @return array
    *   array of exportable Fields
-   * @static
    */
   public static function &exportableFields() {
     if (!self::$_exportableFields) {
@@ -777,7 +769,6 @@ GROUP BY  currency
    *
    * @return array
    *   associated array of pledge id(s)
-   * @static
    */
   public static function getContactPledges($contactID) {
     $pledgeDetails = array();
@@ -825,7 +816,6 @@ GROUP BY  currency
    *
    * @return int
    *   count of pledge records
-   * @static
    */
   public static function getContactPledgeCount($contactID) {
     $query = "SELECT count(*) FROM civicrm_pledge WHERE civicrm_pledge.contact_id = {$contactID} AND civicrm_pledge.is_test = 0";

@@ -49,7 +49,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_BAO_MessageTemplate
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $messageTemplates = new CRM_Core_DAO_MessageTemplate();
@@ -71,7 +70,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    *
    * @return Object
    *   DAO object on sucess, NULL otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_MessageTemplate', $id, 'is_active', $is_active);
@@ -83,7 +81,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @param array $params
    *   Reference array contains the values submitted by the form.
    *
-   * @static
    *
    * @return object
    */
@@ -102,7 +99,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   /**
    * Delete the Message Templates
    *
-   * @static
    *
    * @param int $messageTemplatesID
    *
@@ -131,7 +127,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   /**
    * Get the Message Templates
    *
-   * @static
    *
    * @param bool $all
    *

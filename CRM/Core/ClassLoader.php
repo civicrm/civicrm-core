@@ -39,7 +39,6 @@ class CRM_Core_ClassLoader {
    * We only need one instance of this object. So we use the singleton
    * pattern and cache the instance in this variable
    * @var object
-   * @static
    */
   private static $_singleton = NULL;
 

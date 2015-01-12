@@ -91,7 +91,6 @@ function civicrm_api3_job_get($params) {
  * @return array
  *   API Result Array
  * {@getfields Job_delete}
- * @static
  * @access public
  */
 function civicrm_api3_job_delete($params) {
@@ -108,7 +107,6 @@ function civicrm_api3_job_delete($params) {
  * @return array
  *   API Result Array
  *
- * @static
  * @access public
  *
  */
@@ -139,7 +137,6 @@ function _civicrm_api3_job_execute_spec(&$params) {
  *   API Result Array
  * {@getfields contact_geocode}
  *
- * @static
  * @access public
  *
  *
@@ -181,7 +178,6 @@ function _civicrm_api3_job_geocode_spec(&$params) {
  *
  * @return boolean
  *   true if success, else false
- * @static
  * @access public
  *
  */
@@ -232,7 +228,6 @@ function _civicrm_api3_job_send_reminder(&$params) {
  *
  * @return boolean
  *   true if success, else false
- * @static
  * @access public
  *
  */
@@ -260,7 +255,6 @@ function civicrm_api3_job_mail_report($params) {
  *
  * @return boolean
  *   true if success, else false
- * @static
  * @access public
  */
 function civicrm_api3_job_update_greeting($params) {
@@ -320,7 +314,6 @@ function _civicrm_api3_job_update_greeting_spec(&$params) {
  *
  * @return boolean
  *   true if success, else false
- * @static
  * @access public
  *
  */
@@ -455,7 +448,6 @@ function civicrm_api3_job_process_participant($params) {
  *
  * @return boolean
  *   true if success, else false
- * @static
  * @access public
  */
 function civicrm_api3_job_process_membership($params) {
@@ -483,7 +475,6 @@ function civicrm_api3_job_process_membership($params) {
  *
  * @return boolean
  *   true if success, else false
- * @static
  * @access public
  */
 function civicrm_api3_job_process_respondent($params) {
@@ -513,7 +504,6 @@ function civicrm_api3_job_process_respondent($params) {
  * @return array
  *   API Result Array
  *
- * @static
  * @access public
  */
 function civicrm_api3_job_process_batch_merge($params) {
@@ -577,7 +567,6 @@ function civicrm_api3_job_run_payment_cron($params) {
  *
  * @return boolean
  *   true if success, else false
- * @static
  * @access public
  */
 function civicrm_api3_job_cleanup($params) {

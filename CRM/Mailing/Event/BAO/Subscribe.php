@@ -64,7 +64,6 @@ class CRM_Mailing_Event_BAO_Subscribe extends CRM_Mailing_Event_DAO_Subscribe {
    *
    * @return int|null
    *   $se_id      The id of the subscription event, null on failure
-   * @static
    */
   public static function &subscribe($group_id, $email, $contactId = NULL, $context = NULL) {
     // CRM-1797 - allow subscription only to public groups
@@ -188,7 +187,6 @@ SELECT     civicrm_email.id as email_id
    *
    * @return object|null
    *   The subscribe event object, or null on failure
-   * @static
    */
   public static function &verify($contact_id, $subscribe_id, $hash) {
     $success = NULL;
@@ -310,7 +308,6 @@ SELECT     civicrm_email.id as email_id
    *
    * @return object
    *   $domain       The domain owning the event
-   * @static
    */
   public static function &getDomain($subscribe_id) {
     return CRM_Core_BAO_Domain::getDomain();
@@ -381,7 +378,6 @@ SELECT     civicrm_email.id as email_id
    * @param string $context
    *
    * @return void
-   * @static
    */
   public static function commonSubscribe(&$groups, &$params, $contactId = NULL, $context = NULL) {
     $contactGroups = CRM_Mailing_Event_BAO_Subscribe::getContactGroups($params['email'], $contactId);

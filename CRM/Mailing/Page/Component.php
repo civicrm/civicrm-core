@@ -43,7 +43,6 @@ class CRM_Mailing_Page_Component extends CRM_Core_Page_Basic {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 

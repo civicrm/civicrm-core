@@ -53,7 +53,6 @@
  * @return array
  *   API Result Array
  *
- * @static
  * @access public
  */
 function civicrm_api3_contact_create($params) {
@@ -148,7 +147,6 @@ function _civicrm_api3_contact_create_spec(&$params) {
  * @return array
  *   API Result Array
  * (@getfields contact_get}
- * @static
  * @access public
  *
  * @example ContactGet.php Standard GET example
@@ -415,7 +413,6 @@ function _civicrm_api3_contact_check_params(&$params, $dupeCheck = TRUE, $dupeEr
  *
  * @return CRM_Contact_BAO_Contact
  * @access public
- * @static
  */
 function _civicrm_api3_contact_update($params, $contactID = NULL) {
   //@todo - doesn't contact create support 'id' which is already set- check & remove
@@ -881,7 +878,6 @@ function _civicrm_api3_contact_deprecation() {
  * @return array
  *   API Result Array
  *
- * @static
  * @access public
  */
 function civicrm_api3_contact_merge($params) {

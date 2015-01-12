@@ -57,7 +57,6 @@ class CRM_Utils_String {
    *
    * @return string
    *   An equivalent variable name.
-   * @static
    */
   public static function titleToVar($title, $maxLength = 31) {
     $variable = self::munge($title, '_', $maxLength);
@@ -85,7 +84,6 @@ class CRM_Utils_String {
    *
    * @return string
    *   returns the manipulated string
-   * @static
    */
   public static function munge($name, $char = '_', $len = 63) {
     // replace all white space and non-alpha numeric with $char
@@ -134,7 +132,6 @@ class CRM_Utils_String {
    *
    * @return string
    *   Randomized Variable Name
-   * @static
    */
   public static function rename($name, $len = 4) {
     $rand = substr(uniqid(), 0, $len);
@@ -152,7 +149,6 @@ class CRM_Utils_String {
    *
    * @return string
    *   the last component
-   * @static
    */
   public static function getClassName($string, $char = '_') {
     $names = array();
@@ -176,7 +172,6 @@ class CRM_Utils_String {
    *   The string (or array of strings) to append.
    *
    * @return void
-   * @static
    */
   public static function append(&$str, $delim, $name) {
     if (empty($name)) {
@@ -216,7 +211,6 @@ class CRM_Utils_String {
    *
    * @return boolean
    *   true if string is ascii
-   * @static
    */
   public static function isAscii($str, $utf8 = TRUE) {
     if (!function_exists('mb_detect_encoding')) {
@@ -261,7 +255,6 @@ class CRM_Utils_String {
    *
    * @return array
    *   array of strings w/ corresponding redacted outputs
-   * @static
    */
   public static function regex($str, $regexRules) {
     //redact the regular expressions
@@ -318,7 +311,6 @@ class CRM_Utils_String {
    *
    * @param string $str
    *   Input string.
-   * @static
    *
    * @return boolean
    */
@@ -352,7 +344,6 @@ class CRM_Utils_String {
    *
    * @return boolean
    *   true if the urls match, else false
-   * @static
    */
   public static function match($url1, $url2) {
     $url1 = strtolower($url1);
@@ -377,7 +368,6 @@ class CRM_Utils_String {
    *
    * @return mix
    *   $v  returns civicrm url (eg: civicrm/contact/search/...)
-   * @static
    */
   public static function extractURLVarValue($query) {
     $config = CRM_Core_Config::singleton();
@@ -402,7 +392,6 @@ class CRM_Utils_String {
    *   The string to be translated.
    *
    * @return boolean
-   * @static
    */
   public static function strtobool($str) {
     if (!is_scalar($str)) {
@@ -422,7 +411,6 @@ class CRM_Utils_String {
    *   The string to be translated.
    *
    * @return boolean
-   * @static
    */
   public static function strtoboolstr($str) {
     if (!is_scalar($str)) {
@@ -448,7 +436,6 @@ class CRM_Utils_String {
    *
    * @return string
    *   the converted string
-   * @static
    */
   public static function htmlToText($html) {
     require_once 'packages/html2text/rcube_html2text.php';
@@ -565,7 +552,6 @@ class CRM_Utils_String {
    *
    * @return string
    *   the cleaned string
-   * @static
    */
   public static function stripSpaces($string) {
     return (empty($string)) ? $string : preg_replace("/\s{2,}/", " ", trim($string));
@@ -584,7 +570,6 @@ class CRM_Utils_String {
    *
    * @return string
    *   the sanitized string
-   * @static
    */
   static function stripPathChars(
     $string,
@@ -643,7 +628,6 @@ class CRM_Utils_String {
    *
    * @return string
    *   the cleaned up string
-   * @static
    */
   public static function purifyHTML($string) {
     static $_filter = NULL;

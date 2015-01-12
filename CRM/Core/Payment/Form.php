@@ -365,7 +365,6 @@ class CRM_Core_Payment_Form {
    * @param bool $reverse
    *
    * @return void
-   * @static
    */
   public static function mapParams($id, &$src, &$dst, $reverse = FALSE) {
     static $map = NULL;
@@ -406,7 +405,6 @@ class CRM_Core_Payment_Form {
    * @param $src
    *
    * @return int
-   * @static
    */
   public static function getCreditCardExpirationMonth($src) {
     if ($month = CRM_Utils_Array::value('M', $src['credit_card_exp_date'])) {
@@ -424,7 +422,6 @@ class CRM_Core_Payment_Form {
    * @param $src
    *
    * @return int
-   * @static
    */
   public static function getCreditCardExpirationYear($src) {
     return CRM_Utils_Array::value('Y', $src['credit_card_exp_date']);

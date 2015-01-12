@@ -339,7 +339,6 @@ abstract class CRM_Import_Parser {
    * @param string $enclosure
    *
    * @return void
-   * @static
    */
   public static function encloseScrub(&$values, $enclosure = "'") {
     if (empty($values)) {
@@ -367,7 +366,6 @@ abstract class CRM_Import_Parser {
    *
    * @var $type error code constant
    * @return string
-   * @static
    */
   public static function errorFileName($type) {
     $fileName = NULL;
@@ -407,7 +405,6 @@ abstract class CRM_Import_Parser {
    *
    * @var $type error code constant
    * @return string
-   * @static
    */
   public static function saveFileName($type) {
     $fileName = NULL;

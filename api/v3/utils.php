@@ -873,7 +873,6 @@ function _civicrm_api3_get_unique_name_array(&$bao) {
  *
  * @return array
  *
- * @static
  * @access public
  */
 function _civicrm_api3_dao_to_array($dao, $params = NULL, $uniqueFields = TRUE, $entity = "", $autoFind = TRUE) {
@@ -946,7 +945,6 @@ function _civicrm_api3_custom_fields_are_required($entity, $params) {
  * @param array|bool $uniqueFields
  *
  * @return array
- * @static
  * @access public
  */
 function _civicrm_api3_object_to_array(&$dao, &$values, $uniqueFields = FALSE) {

@@ -67,7 +67,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    *
    * @return boolean
    *   true if yes, else false
-   * @static
    */
   public function checkPermission($str) {
     return TRUE;
@@ -202,7 +201,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @throws Exception
    * @return string
    *   loginURL for the current CMS
-   * @static
    */
   public function getLoginURL($destination = '') {
     throw new Exception("Method not implemented: getLoginURL");

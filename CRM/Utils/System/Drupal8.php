@@ -229,7 +229,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *
    * @return string
    *   loginURL for the current CMS
-   * @static
    */
   public function getLoginURL($destination = '') {
     $query = $destination ? array('destination' => $destination) : array();

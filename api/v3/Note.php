@@ -99,7 +99,6 @@ function civicrm_api3_note_delete($params) {
  *   array of properties,
  *   if error an array with an error id and error message
  * {@getfields note_get}
- * @static
  * @access public
  */
 function civicrm_api3_note_get($params) {

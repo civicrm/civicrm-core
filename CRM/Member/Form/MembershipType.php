@@ -217,7 +217,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    *
    * @return bool|array
    *   mixed true or array of errors
-   * @static
    */
   public static function formRule($params) {
     $errors = array();

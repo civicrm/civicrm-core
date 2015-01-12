@@ -45,7 +45,6 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
@@ -410,7 +409,6 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
    * @param $paymentProcessor
    *
    * @return object
-   * @static
    */
   public static function &singleton($mode, $component, &$paymentProcessor) {
     if (self::$_singleton === NULL) {
@@ -453,7 +451,6 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
    * @internal param \xml $xml_response response send by google in xml format
    * @return array
    *   context of this call (test, module, payment processor id)
-   * @static
    */
   public function getContext($privateData, $orderNo, $root, $response, $serial) {
     $contributionID = CRM_Utils_Array::value('contributionID', $privateData);

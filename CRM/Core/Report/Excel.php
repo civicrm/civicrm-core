@@ -51,7 +51,6 @@ class CRM_Core_Report_Excel {
    * @return mixed
    *   empty if output is printed, else output
    *
-   * @static
    */
   public static function makeCSVTable(&$header, &$rows, $titleHeader = NULL, $print = TRUE, $outputHeader = TRUE) {
     if ($titleHeader) {
@@ -207,7 +206,6 @@ class CRM_Core_Report_Excel {
    *   -.
    *
    * @return void
-   * @static
    */
   public static function writeCSVFile($fileName, &$header, &$rows, $titleHeader = NULL, $outputHeader = TRUE, $saveFile = NULL) {
     if ($outputHeader && !$saveFile) {

@@ -116,7 +116,6 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
    *
    * @return bool|array
    *   mixed true or array of errors
-   * @static
    */
   public static function formRule($params) {
     $errors = array();

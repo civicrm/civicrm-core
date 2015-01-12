@@ -38,7 +38,6 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_pcpLinks = NULL;
 
@@ -56,7 +55,6 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
    * @param bool $pcpBlock
    *   If true, create or update PCPBlock, else PCP.
    *
-   * @static
    *
    * @return object
    */
@@ -96,7 +94,6 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
    *
    * @return null|string
    *   Dispaly name of the contact if found
-   * @static
    */
   public static function displayName($id) {
     $id = CRM_Utils_Type::escape($id, 'Integer');
@@ -117,7 +114,6 @@ WHERE  civicrm_pcp.contact_id = civicrm_contact.id
    *
    * @return array
    *   array of Pcp if found
-   * @static
    */
   public static function getPcpDashboardInfo($contactId) {
     $links = self::pcpLinks();
@@ -235,7 +231,6 @@ ORDER BY target_entity_type, target_entity_id
    * @param array $pcpId
    *   Contains the pcp ID.
    *
-   * @static
    *
    * @return total
    *   amount
@@ -258,7 +253,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * @param array $pcpId
    *   Contains the pcp ID.
    *
-   * @static
    *
    * @return array
    */
@@ -287,7 +281,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *
    * @return array
    *   (reference) of action links
-   * @static
    */
   public static function &pcpLinks() {
     if (!(self::$_pcpLinks)) {
@@ -358,7 +351,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *   Campaign page id.
    *
    * @return null
-   * @static
    */
   public static function deleteById($id) {
     CRM_Utils_Hook::pre('delete', 'Campaign', $id, CRM_Core_DAO::$_nullArray);
@@ -591,7 +583,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * @param $is_active
    *
    * @return null
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     switch ($is_active) {
@@ -640,7 +631,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *
    * @throws Exception
    * @return null
-   * @static
    */
   public static function sendStatusUpdate($pcpId, $newStatus, $isInitial = FALSE, $component = 'contribute') {
     $pcpStatusName = CRM_Core_OptionGroup::values("pcp_status", FALSE, FALSE, FALSE, NULL, 'name');
@@ -733,7 +723,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *
    * @param $is_active
    * @return null
-   * @static
    */
   public static function setDisable($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_PCP_DAO_PCP', $id, 'is_active', $is_active);
@@ -746,7 +735,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * @param $component
    *
    * @return int
-   * @static
    */
   public static function getStatus($pcpId, $component) {
     $query = "
@@ -769,7 +757,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * @param $component
    *
    * @return string
-   * @static
    */
   public static function getPcpBlockStatus($pageId, $component) {
     $query = "
@@ -792,7 +779,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *   Pcp block id.
    *
    * @return Boolean
-   * @static
    */
   public static function getPcpBlockInUse($id) {
     $query = "
@@ -812,7 +798,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *   Supporter's profile id.
    *
    * @return boolean
-   * @static
    */
   public static function checkEmailProfile($profileId) {
     $query = "
@@ -835,7 +820,6 @@ WHERE field_name like 'email%' And is_active = 1 And uf_group_id = %1";
    * @param $component
    *
    * @return int
-   * @static
    */
   public static function getPcpPageTitle($pcpId, $component) {
     if ($component == 'contribute') {
@@ -864,7 +848,6 @@ WHERE field_name like 'email%' And is_active = 1 And uf_group_id = %1";
    * @param $component
    *
    * @return String
-   * @static
    */
   public static function getPcpBlockEntityId($pcpId, $component) {
     $entity_table = self::getPcpEntityTable($component);
@@ -890,7 +873,6 @@ WHERE pcp.id = %1";
    * @param $component
    *
    * @return String
-   * @static
    */
   public static function getPcpEntityTable($component) {
     $entity_table_map = array(
@@ -909,7 +891,6 @@ WHERE pcp.id = %1";
    * @param string $component
    *
    * @return int
-   * @static
    */
   public static function getSupporterProfileId($component_id, $component = 'contribute') {
     $entity_table = self::getPcpEntityTable($component);

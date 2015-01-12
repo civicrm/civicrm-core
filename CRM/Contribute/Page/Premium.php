@@ -42,7 +42,6 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
@@ -128,7 +127,6 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
 
   /**
    * @return void
-   * @static
    */
   public function browse() {
     // get all custom groups sorted by weight

@@ -49,7 +49,6 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    *
    * @return CRM_Mailing_Event_BAO_Queue
    *   The new EventQueue
-   * @static
    */
   public static function create($params) {
     $eq = new CRM_Mailing_Event_BAO_Queue();
@@ -68,7 +67,6 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    *
    * @return int
    *   The hash
-   * @static
    */
   public static function hash($params) {
     $jobId = $params['job_id'];
@@ -92,7 +90,6 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    *
    * @return object|null
    *   The queue event if verified, or null
-   * @static
    */
   public static function &verify($job_id, $queue_id, $hash) {
     $success = NULL;
@@ -116,7 +113,6 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    *
    * @return string
    *   The email address
-   * @static
    */
   public static function getEmailAddress($queue_id) {
     $email = CRM_Core_BAO_Email::getTableName();
@@ -146,7 +142,6 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    *
    * @return int
    *   Number of matching events
-   * @static
    */
   public static function getTotalCount($mailing_id, $job_id = NULL) {
     $dao = new CRM_Core_DAO();
@@ -188,7 +183,6 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    *
    * @return array
    *   Result set
-   * @static
    */
   public static function &getRows(
     $mailing_id, $job_id = NULL, $offset = NULL,

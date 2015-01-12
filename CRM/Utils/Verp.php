@@ -71,7 +71,6 @@ class CRM_Utils_Verp {
    *
    * @return string
    *   The VERP encoded address
-   * @static
    */
   public static function encode($sender, $recipient) {
     preg_match('/(.+)\@([^\@]+)$/', $sender, $match);
@@ -98,7 +97,6 @@ class CRM_Utils_Verp {
    *
    * @return array
    *   The tuple ($sender, $recipient)
-   * @static
    */
   public static function &verpdecode($address) {
     preg_match('/^(.+)-([^=]+)=([^\@]+)\@(.+)/', $address, $match);

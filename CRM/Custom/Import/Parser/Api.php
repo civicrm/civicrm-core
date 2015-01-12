@@ -222,7 +222,6 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    *
    * @return array
    *
-   * @static
    */
   public function getGroupFieldsForImport($id) {
     $importableFields = array();

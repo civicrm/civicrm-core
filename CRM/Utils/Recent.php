@@ -49,7 +49,6 @@ class CRM_Utils_Recent {
    * The list of recently viewed items
    *
    * @var array
-   * @static
    */
   static private $_recent = NULL;
 
@@ -57,7 +56,6 @@ class CRM_Utils_Recent {
    * Initialize this class and set the static variables
    *
    * @return void
-   * @static
    */
   public static function initialize() {
     if (!self::$_recent) {
@@ -74,7 +72,6 @@ class CRM_Utils_Recent {
    *
    * @return array
    *   the recently viewed array
-   * @static
    */
   public static function &get() {
     self::initialize();
@@ -96,7 +93,6 @@ class CRM_Utils_Recent {
    * @param array $others
    *
    * @return void
-   * @static
    */
   static function add(
     $title,
@@ -154,7 +150,6 @@ class CRM_Utils_Recent {
    *   Array of the recent Item to be removed.
    *
    * @return void
-   * @static
    */
   public static function del($recentItem) {
     self::initialize();
@@ -183,7 +178,6 @@ class CRM_Utils_Recent {
    *   Contact id that had to be removed.
    *
    * @return void
-   * @static
    */
   public static function delContact($id) {
     self::initialize();

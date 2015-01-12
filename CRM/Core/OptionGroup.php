@@ -113,7 +113,6 @@ class CRM_Core_OptionGroup {
    *
    * @return array
    *   the values as specified by the above params
-   * @static
    * @void
    */
   static function &values(
@@ -220,7 +219,6 @@ WHERE  v.option_group_id = g.id
    *
    * @return array
    *   Array of values as specified by the above params
-   * @static
    * @void
    */
   public static function &valuesByID($id, $flip = FALSE, $grouping = FALSE, $localize = FALSE, $labelColumnName = 'label', $onlyActive = TRUE, $fresh = FALSE) {
@@ -277,7 +275,6 @@ WHERE  v.option_group_id = g.id
    *
    * @return void
    *
-   * @static
    */
   public static function lookupValues(&$params, &$names, $flip = FALSE) {
     foreach ($names as $postName => $value) {
@@ -418,7 +415,6 @@ WHERE  v.option_group_id = g.id
    * @param string $groupName
    *   The name of the option group.
    *
-   * @static
    *
    * @return string
    *   the value from the row where is_default = true
@@ -467,7 +463,6 @@ WHERE  v.option_group_id = g.id
    * @param null $groupTitle
    *   The optional label of the option group else set to group name.
    *
-   * @static
    *
    * @return int
    *   the option group ID

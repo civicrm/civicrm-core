@@ -38,7 +38,6 @@ class CRM_Contribute_BAO_Query {
    * Static field for all the export/import contribution fields
    *
    * @var array
-   * @static
    */
   static $_contributionFields = NULL;
 
@@ -49,7 +48,6 @@ class CRM_Contribute_BAO_Query {
    *
    * @return array
    *   self::$_contributionFields  associative array of contribution fields
-   * @static
    */
   public static function &getFields() {
     if (!self::$_contributionFields) {
@@ -860,7 +858,6 @@ class CRM_Contribute_BAO_Query {
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @static
    */
   public static function buildSearchForm(&$form) {
 

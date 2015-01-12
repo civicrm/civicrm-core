@@ -43,7 +43,6 @@ class CRM_Core_Joomla {
    * to the smarty instance
    *
    * @return void
-   * @static
    */
   public static function sidebarLeft() {
     $config = CRM_Core_Config::singleton();

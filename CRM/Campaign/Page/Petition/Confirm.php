@@ -105,7 +105,6 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
    *
    * @return boolean
    *   True on success
-   * @static
    */
   public static function confirm($contact_id, $subscribe_id, $hash, $activity_id, $petition_id) {
     $se = CRM_Mailing_Event_BAO_Subscribe::verify($contact_id, $subscribe_id, $hash);

@@ -70,7 +70,6 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    *
    * @return object
    *   CRM_Core_BAO_Phone object on success, null otherwise
-   * @static
    */
   public static function add(&$params) {
     // Ensure mysql phone function exists
@@ -95,7 +94,6 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    *
    * @return array
    *   array of phone objects
-   * @static
    */
   public static function &getValues($entityBlock) {
     $getValues = CRM_Core_BAO_Block::getValues('phone', $entityBlock);
@@ -114,7 +112,6 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    *
    * @return array
    *   the array of phone ids which are potential numbers
-   * @static
    */
   public static function allPhones($id, $updateBlankLocInfo = FALSE, $type = NULL, $filters = array()) {
     if (!$id) {
@@ -187,7 +184,6 @@ ORDER BY civicrm_phone.is_primary DESC,  phone_id ASC ";
    *
    * @return array
    *   the array of phone ids which are potential numbers
-   * @static
    */
   public static function allEntityPhones($entityElements, $type = NULL) {
     if (empty($entityElements)) {
@@ -241,7 +237,6 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
    *   Value of option to be deleted.
    *
    * return void
-   * @static
    */
   public static function setOptionToNull($optionId) {
     if (!$optionId) {

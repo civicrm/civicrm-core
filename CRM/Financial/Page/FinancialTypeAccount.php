@@ -41,7 +41,6 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
@@ -49,7 +48,6 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    * The account id that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   protected $_aid = NULL;
 
@@ -123,7 +121,6 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    * Browse all Financial Type Account data
    *
    * @return void
-   * @static
    */
   public function browse() {
     // get all Financial Type Account data sorted by weight

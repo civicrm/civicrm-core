@@ -43,7 +43,6 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
@@ -199,7 +198,6 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @return array
    *   context of this call (test, component, payment processor id)
-   * @static
    */
   public static function getContext($privateData, $orderNo) {
 

@@ -77,7 +77,6 @@ class CRM_Core_Config_Defaults {
   /**
    * Format size
    *
-   * @static
    */
 
   public static function formatUnitSize($size, $checkForPostMax = FALSE) {
@@ -120,7 +119,6 @@ class CRM_Core_Config_Defaults {
    *   this variable is set true for GUI
    *   mode (eg: Global setting >> Components)
    *
-   * @static
    */
   public static function setValues(&$defaults, $formMode = FALSE) {
     $config = CRM_Core_Config::singleton();

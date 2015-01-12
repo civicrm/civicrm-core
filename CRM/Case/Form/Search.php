@@ -327,7 +327,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    *   Posted values of the form.
    *
    * @return void
-   * @static
    */
   public static function formRule($fields) {
     $errors = array();

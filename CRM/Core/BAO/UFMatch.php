@@ -72,7 +72,6 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    * @param bool $isLogin
    *
    * @return void
-   * @static
    */
   public static function synchronize(&$user, $update, $uf, $ctype, $isLogin = FALSE) {
     $userSystem = CRM_Core_Config::singleton()->userSystem;
@@ -182,7 +181,6 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    * @param bool $isLogin
    *
    * @return CRM_Core_DAO_UFMatch|bool
-   * @static
    */
   public static function &synchronizeUFMatch(&$user, $userKey, $uniqId, $uf, $status = NULL, $ctype = NULL, $isLogin = FALSE) {
     $config = CRM_Core_Config::singleton();
@@ -362,7 +360,6 @@ AND    domain_id    = %4
    *   Id of the contact to update.
    *
    * @return void
-   * @static
    */
   public static function updateUFName($contactId) {
     if (!$contactId) {
@@ -418,7 +415,6 @@ AND    domain_id    = %4
    *   Email to be modified for the user.
    *
    * @return void
-   * @static
    */
   public static function updateContactEmail($contactId, $emailAddress) {
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
@@ -473,7 +469,6 @@ AND    domain_id    = %4
    *   Id of the user to delete.
    *
    * @return void
-   * @static
    */
   public static function deleteUser($ufID) {
     $ufmatch = new CRM_Core_DAO_UFMatch();
@@ -491,7 +486,6 @@ AND    domain_id    = %4
    *
    * @return int
    *   contact_id on success, null otherwise
-   * @static
    */
   public static function getContactId($ufID) {
     if (!isset($ufID)) {
@@ -516,7 +510,6 @@ AND    domain_id    = %4
    *
    * @return int
    *   uf_id of the given contact_id on success, null otherwise
-   * @static
    */
   public static function getUFId($contactID) {
     if (!isset($contactID)) {
@@ -547,7 +540,6 @@ AND    domain_id    = %4
    *
    * @return int
    *   contact_id on success, null otherwise
-   * @static
    */
   public static function getContactIDs() {
     $id = array();
@@ -567,7 +559,6 @@ AND    domain_id    = %4
    *
    * @return bool
    *   true if allowed to login, false otherwise
-   * @static
    */
   public static function getAllowedToLogin($openId) {
     $ufmatch = new CRM_Core_DAO_UFMatch();
@@ -586,7 +577,6 @@ AND    domain_id    = %4
    *
    * @return int
    *   next highest unused value for uf_id
-   * @static
    */
   public static function getNextUfIdValue() {
     $query = "SELECT MAX(uf_id)+1 AS next_uf_id FROM civicrm_uf_match";

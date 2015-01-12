@@ -54,7 +54,6 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Pledge_BAO_PledgeBlock
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $pledgeBlock = new CRM_Pledge_DAO_PledgeBlock();
@@ -73,7 +72,6 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Pledge_BAO_PledgeBlock
-   * @static
    */
   public static function &create(&$params) {
     $transaction = new CRM_Core_Transaction();
@@ -97,7 +95,6 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * @param array $params
    *   Reference array contains the values submitted by the form.
    *
-   * @static
    *
    * @return object
    */
@@ -154,7 +151,6 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    *   PledgeBlock id.
    *
    * @return mixed|null
-   * @static
    */
   public static function deletePledgeBlock($id) {
     CRM_Utils_Hook::pre('delete', 'PledgeBlock', $id, CRM_Core_DAO::$_nullArray);
@@ -181,7 +177,6 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    *   Contribution page id.
    *
    * @return array
-   * @static
    */
   public static function getPledgeBlock($pageID) {
     $pledgeBlock = array();
@@ -200,7 +195,6 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * Build Pledge Block in Contribution Pages
    *
    * @param CRM_Core_Form $form
-   * @static
    */
   public static function buildPledgeBlock($form) {
     //build pledge payment fields.

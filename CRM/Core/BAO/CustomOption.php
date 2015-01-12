@@ -48,7 +48,6 @@ class CRM_Core_BAO_CustomOption {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_BAO_CustomOption
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $customOption = new CRM_Core_DAO_OptionValue();
@@ -70,7 +69,6 @@ class CRM_Core_BAO_CustomOption {
    *
    * @return array
    *   all active options for fieldId
-   * @static
    */
   static function getCustomOption(
     $fieldID,
@@ -122,7 +120,6 @@ class CRM_Core_BAO_CustomOption {
    *
    * @return string
    *   the label to display for this custom field
-   * @static
    */
   public static function getOptionLabel($fieldId, $value, $htmlType = NULL, $dataType = NULL) {
     if (!$fieldId) {
@@ -176,7 +173,6 @@ WHERE  id = %1
    * @param $optionId integer
    *   option id
    *
-   * @static
    */
   public static function del($optionId) {
     // get the customFieldID

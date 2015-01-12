@@ -383,7 +383,6 @@ class CRM_Mailing_BAO_Query {
    *
    * @param CRM_Core_Form $form
    * @return void
-   * @static
    */
   public static function buildSearchForm(&$form) {
     // mailing selectors

@@ -43,7 +43,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
    * The action links for notes that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
@@ -51,7 +50,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
    * The action links for comments that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_commentLinks = NULL;
 
@@ -251,7 +249,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
    *
    * @return array
    *   (reference) of action links
-   * @static
    */
   public static function &links() {
     if (!(self::$_links)) {
@@ -292,7 +289,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
    *
    * @return array
    *   (reference) of action links
-   * @static
    */
   public static function &commentLinks() {
     if (!(self::$_commentLinks)) {

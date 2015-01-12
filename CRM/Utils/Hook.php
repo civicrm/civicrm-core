@@ -56,7 +56,6 @@ abstract class CRM_Utils_Hook {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 

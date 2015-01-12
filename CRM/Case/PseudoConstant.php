@@ -42,35 +42,30 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Case statues
    * @var array
-   * @static
    */
   static $caseStatus = array();
 
   /**
    * Redaction rules
    * @var array
-   * @static
    */
   static $redactionRule;
 
   /**
    * Case type
    * @var array
-   * @static
    */
   static $caseType = array();
 
   /**
    * Encounter Medium
    * @var array
-   * @static
    */
   static $encounterMedium = array();
 
   /**
    * Activity type
    * @var array
-   * @static
    */
   static $activityTypeList = array();
 
@@ -85,7 +80,6 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return array
    *   array reference of all case statues
-   * @static
    */
   public static function caseStatus($column = 'label', $onlyActive = TRUE, $condition = NULL, $fresh = FALSE) {
     $cacheKey = "{$column}_" . (int) $onlyActive;
@@ -111,7 +105,6 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return array
    *   array reference of all redaction rules
-   * @static
    */
 
   public static function redactionRule($filter = NULL) {
@@ -142,7 +135,6 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return array
    *   array reference of all case type
-   * @static
    */
   public static function caseType($column = 'title', $onlyActive = TRUE) {
     if ($onlyActive) {
@@ -176,7 +168,6 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return array
    *   array reference of all Encounter Medium.
-   * @static
    */
   public static function encounterMedium($column = 'label', $onlyActive = TRUE) {
     $cacheKey = "{$column}_" . (int) $onlyActive;
@@ -201,7 +192,6 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param bool $all
    *
-   * @static
    *
    * @return array
    *   array reference of all activity types.
@@ -256,7 +246,6 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db
    * next time it's requested.
    *
-   * @static
    *
    * @param bool|string $name pseudoconstant to be flushed
    */

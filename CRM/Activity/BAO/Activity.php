@@ -43,7 +43,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * Static field for all the activity information that we can potentially export
    *
    * @var array
-   * @static
    */
   static $_exportableFields = NULL;
 
@@ -51,7 +50,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * Static field for all the activity information that we can potentially import
    *
    * @var array
-   * @static
    */
   static $_importableFields = NULL;
 
@@ -659,7 +657,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @return array
    *   (reference)      $values the relevant data object values of open activities
    *
-   * @static
    */
   public static function &getActivities($input) {
     //step 1: Get the basic activity data
@@ -908,7 +905,6 @@ ORDER BY    fixed_sort_order
    *
    * @return array
    *   Array of component id and name.
-   * @static
    **/
   public static function activityComponents() {
     $components = array();
@@ -950,7 +946,6 @@ ORDER BY    fixed_sort_order
    * @return int
    *   count of activities
    *
-   * @static
    */
   public static function &getActivitiesCount($input) {
     $input['count'] = TRUE;
@@ -988,7 +983,6 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
    * @return int
    *   count of activities
    *
-   * @static
    */
   public static function getActivitySQLClause($input) {
     $params = array();
@@ -1181,7 +1175,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    *
    * @return array
    *   ( sent, activityId) if any email is sent and activityId
-   * @static
    */
   static function sendEmail(
     &$contactDetails,
@@ -1514,7 +1507,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    *
    * @return bool|PEAR_Error
    *   true on success or PEAR_Error object
-   * @static
    */
   static function sendSMSMessage(
     $toID,
@@ -1598,7 +1590,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    *
    * @return boolean
    *   true if successfull else false.
-   * @static
    */
   static function sendMessage(
     $from,
@@ -1671,7 +1662,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    *
    * @return array
    *   array of importable Fields
-   * @static
    */
   public static function &importableFields($status = FALSE) {
     if (!self::$_importableFields) {
@@ -1802,7 +1792,6 @@ WHERE      activity.id IN ($activityIds)";
    * @param int $targetContactID
    *
    * @return bool
-   * @static
    */
   static function addActivity(
     &$activity,
@@ -2111,7 +2100,6 @@ AND cl.modified_id  = c.id
    * @return string|bool
    *   if file exists returns $activityTypeFile activity filename otherwise false.
    *
-   * @static
    */
   public static function getFileForActivityTypeId($activityTypeId, $crmDir = 'Activity') {
     $activityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
@@ -2162,7 +2150,6 @@ AND cl.modified_id  = c.id
    *
    * @return array
    *   array of exportable Fields
-   * @static
    */
   public static function &exportableFields($name = 'Activity') {
     if (!isset(self::$_exportableFields[$name])) {

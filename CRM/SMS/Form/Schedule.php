@@ -124,7 +124,6 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
    * @return boolean
    *   True if either we deliver immediately, or the
    *                          date is properly set.
-   * @static
    */
   public static function formRule($params, $files, $self) {
     if (!empty($params['_qf_Schedule_submit'])) {

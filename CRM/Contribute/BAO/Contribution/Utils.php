@@ -60,7 +60,6 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * @return array
    *   associated array
    *
-   * @static
    */
   static function processConfirm(
     &$form,
@@ -385,7 +384,6 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * @return array
    *   associated array
    *
-   * @static
    */
   public static function contributionChartMonthly($param) {
     if ($param) {
@@ -426,7 +424,6 @@ INNER JOIN   civicrm_contact AS contact ON ( contact.id = contrib.contact_id )
    * @return array
    *   associated array
    *
-   * @static
    */
   public static function contributionChartYearly() {
     $config = CRM_Core_Config::singleton();
@@ -905,7 +902,6 @@ LIMIT 1
    * @return array
    *   array of tax amount
    *
-   * @static
    */
   public static function calculateTaxAmount($amount, $taxRate) {
     $taxAmount = array();

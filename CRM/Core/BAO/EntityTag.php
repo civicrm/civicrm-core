@@ -48,7 +48,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @return array(
    * ) reference $tag array of category id's the contact belongs to.
    *
-   * @static
    */
   public static function &getTag($entityID, $entityTable = 'civicrm_contact') {
     $tags = array();
@@ -75,7 +74,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Core_BAO_EntityTag
-   * @static
    */
   public static function add(&$params) {
     $dataExists = self::dataExists($params);
@@ -106,7 +104,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *   An assoc array of name/value pairs.
    *
    * @return boolean
-   * @static
    */
   public static function dataExists($params) {
     return !($params['tag_id'] == 0);
@@ -119,7 +116,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Core_BAO_EntityTag
-   * @static
    */
   public static function del(&$params) {
     $entityTag = new CRM_Core_BAO_EntityTag();
@@ -143,7 +139,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *
    * @return array
    *   (total, added, notAdded) count of enities added to tag
-   * @static
    */
   public static function addEntitiesToTag(&$entityIds, $tagId, $entityTable = 'civicrm_contact') {
     $numEntitiesAdded = 0;
@@ -189,7 +184,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *
    * @return array
    *   (total, removed, notRemoved) count of entities removed from tags
-   * @static
    */
   public static function removeEntitiesFromTag(&$entityIds, $tagId, $entityTable = 'civicrm_contact') {
     $numEntitiesRemoved = 0;
@@ -232,7 +226,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @param int $entityID
    *
    * @return void
-   * @static
    */
   public static function create(&$params, $entityTable, $entityID) {
     // get categories for the entity id

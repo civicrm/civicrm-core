@@ -49,7 +49,6 @@ class CRM_Contact_Form_Edit_Phone {
    *   Is it block edit.
    *
    * @return void
-   * @static
    */
   public static function buildQuickForm(&$form, $addressBlockCount = NULL, $blockEdit = FALSE) {
     // passing this via the session is AWFUL. we need to fix this

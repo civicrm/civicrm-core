@@ -82,7 +82,6 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
    *
    * @return Object
    *   DAO object on sucess, null otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_ACL_DAO_EntityRole', $id, 'is_active', $is_active);
@@ -94,7 +93,6 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
    * @param int $entityRoleId
    *   ID of the EntityRole record to be deleted.
    *
-   * @static
    */
   public static function del($entityRoleId) {
     $entityDAO = new CRM_ACL_DAO_EntityRole();

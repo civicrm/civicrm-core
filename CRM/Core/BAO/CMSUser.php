@@ -55,7 +55,6 @@ class CRM_Core_BAO_CMSUser {
    *
    * @return void
    *
-   * @static
    */
   public static function synchronize($is_interactive = TRUE) {
     //start of schronization code
@@ -231,7 +230,6 @@ class CRM_Core_BAO_CMSUser {
    *
    * @return int
    *   contact id that has been created
-   * @static
    */
   public static function create(&$params, $mail) {
     $config = CRM_Core_Config::singleton();
@@ -265,7 +263,6 @@ class CRM_Core_BAO_CMSUser {
    * @return FALSE|void
    *   WTF
    *
-   * @static
    */
   public static function buildForm(&$form, $gid, $emailPresent, $action = CRM_Core_Action::NONE) {
     $config = CRM_Core_Config::singleton();
@@ -430,7 +427,6 @@ class CRM_Core_BAO_CMSUser {
    * @return int|bool
    *   uid if user exists, false otherwise
    *
-   * @static
    */
   public static function userExists(&$contact) {
     $config = CRM_Core_Config::singleton();

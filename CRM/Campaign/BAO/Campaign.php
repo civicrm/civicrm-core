@@ -45,7 +45,6 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Campaign_DAO_Campaign
-   * @static
    */
   public static function create(&$params) {
     if (empty($params)) {
@@ -339,7 +338,6 @@ Order By  camp.title";
   /**
    * Retrieve campaigns for dashboard.
    *
-   * @static
    */
   public static function getCampaignSummary($params = array(), $onlyCount = FALSE) {
     $campaigns = array();
@@ -486,7 +484,6 @@ SELECT  campaign.id               as id,
   /**
    * Get the campaign count.
    *
-   * @static
    */
   public static function getCampaignCount() {
     return (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_campaign');
@@ -499,7 +496,6 @@ SELECT  campaign.id               as id,
    *   Campaign id.
    *
    * @return array
-   * @static
    */
   public static function getCampaignGroups($campaignId) {
     static $campaignGroups;
@@ -537,7 +533,6 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
    *
    * @return CRM_Campaign_DAO_Campaign|null
    *   DAO object on sucess, null otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Campaign_DAO_Campaign', $id, 'is_active', $is_active);

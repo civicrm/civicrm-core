@@ -54,7 +54,6 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    *   Entity_table.
    *
    * @return CRM_Core_BAO_FinancialTrxn
-   * @static
    */
   public static function create(&$params, $trxnEntityTable = NULL) {
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
@@ -126,7 +125,6 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Contribute_BAO_ContributionType
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $financialItem = new CRM_Financial_DAO_FinancialTrxn();
@@ -151,7 +149,6 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @return array
    *   array of category id's the contact belongs to.
    *
-   * @static
    */
   public static function getFinancialTrxnId($entity_id, $orderBy = 'ASC', $newTrxn = FALSE) {
     $ids = array('entityFinancialTrxnId' => NULL, 'financialTrxnId' => NULL);
@@ -195,7 +192,6 @@ LIMIT 1;";
    * @return array
    *   array of catagory id's the contact belongs to.
    *
-   * @static
    */
   public static function getFinancialTrxnTotal($entity_id) {
     $query = "
@@ -219,7 +215,6 @@ WHERE ft.entity_table = 'civicrm_contribution' AND ft.entity_id = %1
    * @return array
    *   array of previous payments
    *
-   * @static
    */
   public static function getPayments($financial_trxn_id) {
     $query = "
@@ -273,7 +268,6 @@ WHERE  ef2.financial_trxn_id =%1
    * @return array
    *   array of catagory id's the contact belongs to.
    *
-   * @static
    */
   public static function getFinancialTrxnLineTotal($entity_id, $entity_table = 'civicrm_contribution') {
     $query = "SELECT lt.price_field_value_id AS id, ft.financial_trxn_id,ft.amount AS amount FROM civicrm_entity_financial_trxn AS ft
@@ -300,7 +294,6 @@ WHERE lt.entity_id = %1 ";
    * @param int $entity_id
    * @return bool
    *   TRUE on success, FALSE otherwise.
-   * @static
    */
   public static function deleteFinancialTrxn($entity_id) {
     $query = "DELETE ceft1, cfi, ceft, cft FROM `civicrm_financial_trxn` cft
@@ -318,7 +311,6 @@ WHERE ceft.entity_id = %1";
   /**
    * Create financial transaction for premium
    *
-   * @static
    */
   public static function createPremiumTrxn($params) {
     if ((empty($params['financial_type_id']) || empty($params['contributionId'])) && empty($params['oldPremium'])) {
@@ -368,7 +360,6 @@ WHERE ceft.entity_id = %1";
    * @param array $params
    *   To create trxn entries.
    *
-   * @static
    */
   public static function recordFees($params) {
     $expenseTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Expense Account is' "));

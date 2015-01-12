@@ -44,7 +44,6 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
    * The option group name
    *
    * @var string
-   * @static
    */
   protected $_gName;
 

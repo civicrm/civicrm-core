@@ -45,7 +45,6 @@ class CRM_Case_Task {
    * The task array
    *
    * @var array
-   * @static
    */
   static $_tasks = NULL;
 
@@ -53,7 +52,6 @@ class CRM_Case_Task {
    * The optional task array
    *
    * @var array
-   * @static
    */
   static $_optionalTasks = NULL;
 
@@ -63,7 +61,6 @@ class CRM_Case_Task {
    *
    * @return array
    *   the set of tasks for a group of contacts
-   * @static
    */
   public static function &tasks() {
     if (!self::$_tasks) {
@@ -108,7 +105,6 @@ class CRM_Case_Task {
    *
    * @return array
    *   the set of task titles
-   * @static
    */
   public static function &taskTitles() {
     self::tasks();
@@ -124,7 +120,6 @@ class CRM_Case_Task {
    *
    * @return array
    *   the set of optional tasks for a group of contacts
-   * @static
    */
   public static function &optionalTaskTitle() {
     $tasks = array();
@@ -167,7 +162,6 @@ class CRM_Case_Task {
    *
    * @return array
    *   the set of tasks for a group of contacts
-   * @static
    */
   public static function getTask($value) {
     self::tasks();

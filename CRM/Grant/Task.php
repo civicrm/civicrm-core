@@ -45,7 +45,6 @@ class CRM_Grant_Task {
    * The task array
    *
    * @var array
-   * @static
    */
   static $_tasks = NULL;
 
@@ -53,7 +52,6 @@ class CRM_Grant_Task {
    * The optional task array
    *
    * @var array
-   * @static
    */
   static $_optionalTasks = NULL;
 
@@ -63,7 +61,6 @@ class CRM_Grant_Task {
    *
    * @return array
    *   the set of tasks for a group of contacts
-   * @static
    */
   public static function &tasks() {
     if (!(self::$_tasks)) {
@@ -106,7 +103,6 @@ class CRM_Grant_Task {
    *
    * @return array
    *   the set of task titles
-   * @static
    */
   public static function &taskTitles() {
     self::tasks();
@@ -152,7 +148,6 @@ class CRM_Grant_Task {
    *
    * @return array
    *   the set of tasks for a group of contacts
-   * @static
    */
   public static function getTask($value) {
     self::tasks();

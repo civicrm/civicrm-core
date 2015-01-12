@@ -43,7 +43,6 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 

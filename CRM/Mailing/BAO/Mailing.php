@@ -1553,7 +1553,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @param array $ids
    *   Reference array contains the id.
    *
-   * @static
    *
    * @return object
    */
@@ -1603,7 +1602,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @return object
    *   $mailing      The new mailing object
-   * @static
    */
   public static function create(&$params, $ids = array()) {
 
@@ -1789,7 +1787,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @return array
    *   Associative array of reporting data
-   * @static
    */
   public static function &report($id, $skipDetails = FALSE, $isSMS = FALSE) {
     $mailing_id = CRM_Utils_Type::escape($id, 'Integer');
@@ -2342,7 +2339,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @return boolean
    *   | array - TRUE if the user has access to all mailings, else array of mailing IDs (possibly empty)
-   * @static
    */
   public static function mailingACLIDs() {
     // CRM-11633
@@ -2485,7 +2481,6 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    * @param int $id
    *
    * @return string
-   * @static
    */
   public static function showEmailDetails($id) {
     return CRM_Utils_System::url('civicrm/mailing/report', "mid=$id");
@@ -2498,7 +2493,6 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    *   Id of the mail to delete.
    *
    * @return void
-   * @static
    */
   public static function del($id) {
     if (empty($id)) {
@@ -2529,7 +2523,6 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    *   Id of the Job to delete.
    *
    * @return void
-   * @static
    */
   public static function delJob($id) {
     if (empty($id)) {
@@ -3059,7 +3052,6 @@ AND        m.id = %1
    * @return array
    *   Array of mailings for a contact
    *
-   * @static
    */
   static public function getContactMailings(&$params) {
     $params['version'] = 3;
@@ -3079,7 +3071,6 @@ AND        m.id = %1
    * @return int
    *   count of mailings for a contact
    *
-   * @static
    */
   static public function getContactMailingsCount(&$params) {
     $params['version'] = 3;

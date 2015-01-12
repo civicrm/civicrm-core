@@ -50,7 +50,6 @@ class CRM_Utils_Date {
    * @return string
    *   formatted string for date
    *
-   * @static
    */
   public static function format($date, $separator = '', $invalidDate = 0) {
     if (is_numeric($date) &&
@@ -172,7 +171,6 @@ class CRM_Utils_Date {
    * @return array
    *   0-based array with abbreviated weekday names
    *
-   * @static
    */
   public static function &getAbbrWeekdayNames() {
     static $abbrWeekdayNames;
@@ -194,7 +192,6 @@ class CRM_Utils_Date {
    * @return array
    *   0-based array with full weekday names
    *
-   * @static
    */
   public static function &getFullWeekdayNames() {
     static $fullWeekdayNames;
@@ -218,7 +215,6 @@ class CRM_Utils_Date {
    * @return array
    *   1-based array with abbreviated month names
    *
-   * @static
    */
   public static function &getAbbrMonthNames($month = FALSE) {
     static $abbrMonthNames;
@@ -242,7 +238,6 @@ class CRM_Utils_Date {
    * @return array
    *   1-based array with full month names
    *
-   * @static
    */
   public static function &getFullMonthNames() {
     static $fullMonthNames;
@@ -304,7 +299,6 @@ class CRM_Utils_Date {
    *
    * @return string
    *   the $format-formatted $date
-   * @static
    */
   public static function customFormat($dateString, $format = NULL, $dateParts = NULL) {
     // 1-based (January) month names arrays
@@ -439,7 +433,6 @@ class CRM_Utils_Date {
    *
    * @return string
    *   date/datetime in ISO format
-   * @static
    */
   public static function mysqlToIso($mysql) {
     $year = substr($mysql, 0, 4);
@@ -483,7 +476,6 @@ class CRM_Utils_Date {
    *
    * @return string
    *   date/datetime in MySQL format
-   * @static
    */
   public static function isoToMysql($iso) {
     $dropArray = array('-' => '', ':' => '', ' ' => '');
@@ -501,7 +493,6 @@ class CRM_Utils_Date {
    *   Index of params.
    *
    * @return bool
-   * @static
    */
   public static function convertToDefaultDate(&$params, $dateType, $dateParam) {
     $now = getdate();
@@ -737,7 +728,6 @@ class CRM_Utils_Date {
    *
    * @return string
    *   Return the customized todays date (Y-m-d)
-   * @static
    */
   public static function getToday($dayParams = NULL, $format = "Y-m-d") {
     if (is_null($dayParams) || empty($dayParams)) {
@@ -765,7 +755,6 @@ class CRM_Utils_Date {
    *
    * @return bool
    *   true if today's date is in the given date range
-   * @static
    */
   public static function getRange($startDate, $endDate) {
     $today = date("Y-m-d");
@@ -797,7 +786,6 @@ class CRM_Utils_Date {
    *
    * @return array
    *   start date, end date
-   * @static
    */
   public static function getFromTo($relative, $from, $to) {
     if ($relative) {
@@ -822,7 +810,6 @@ class CRM_Utils_Date {
    *
    * @return int
    *   array $results contains years or months
-   * @static
    */
   static public function calculateAge($birthDate) {
     $results = array();
@@ -980,7 +967,6 @@ class CRM_Utils_Date {
    *
    * @return array
    *   start date and end date for the relative time frame
-   * @static
    */
   public static function relativeToAbsolute($relativeTerm, $unit) {
     $now = getdate();
@@ -1655,7 +1641,6 @@ class CRM_Utils_Date {
    *
    * @return int
    *   $fy       Current Fiscl Year
-   * @static
    */
   public static function calculateFiscalYear($fyDate, $fyMonth) {
     $date = date("Y-m-d");
@@ -1808,7 +1793,6 @@ class CRM_Utils_Date {
    *
    * @return string
    *   the time in UTC
-   * @static
    */
   public static function getUTCTime($offset = 0) {
     $originalTimezone = date_default_timezone_get();

@@ -49,7 +49,6 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
    *
    * @return boolean
    *   True if the value is of the specified type
-   * @static
    */
   public static function typecheck($type, $value) {
     switch ($type) {
@@ -127,7 +126,6 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
    *
    * @return string|null
    *   the mysql data store placeholder
-   * @static
    */
   public static function typeToField($type) {
     switch ($type) {
@@ -202,7 +200,6 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
    *   Custom group ID.
    *
    * @return void
-   * @static
    */
   public static function deleteCustomValue($customValueID, $customGroupID) {
     // first we need to find custom value table, from custom group ID

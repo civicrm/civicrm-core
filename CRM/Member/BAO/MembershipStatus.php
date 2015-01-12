@@ -55,7 +55,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Member_BAO_MembershipStatus
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $membershipStatus = new CRM_Member_DAO_MembershipStatus();
@@ -77,7 +76,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    *
    * @return Object
    *   DAO object on sucess, null otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Member_DAO_MembershipStatus', $id, 'is_active', $is_active);
@@ -92,7 +90,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    *
    * @throws Exception
    * @return CRM_Member_BAO_MembershipStatus
-   * @static
    */
   public static function create($params) {
     $ids = array();
@@ -119,7 +116,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @param array $ids
    *   Array contains the id - this param is deprecated.
    *
-   * @static
    *
    * @return object
    */
@@ -174,7 +170,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @param int $membershipStatusId
    *
    * @return array
-   * @static
    */
   public static function getMembershipStatus($membershipStatusId) {
     $statusDetails = array();
@@ -192,7 +187,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @param int $membershipStatusId
    *
    * @throws CRM_Core_Exception
-   * @static
    */
   public static function del($membershipStatusId) {
     //check dependencies
@@ -233,7 +227,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    *   Membership params as available to calling function - passed to the hook.
    *
    * @return array
-   * @static
    */
   static function getMembershipStatusByDate(
     $startDate, $endDate, $joinDate,
@@ -385,7 +378,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * Function that return the status ids whose is_current_member is set
    *
    * @return array
-   * @static
    */
   public static function getMembershipStatusCurrent() {
     $statusIds = array();

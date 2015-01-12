@@ -19,7 +19,6 @@ class test_extension_manager_paymenttest extends CRM_Core_Payment {
    *   Should we force a reload of this payment object.
    *
    * @return object
-   * @static
    */
   static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     $processorName = $paymentProcessor['name'];

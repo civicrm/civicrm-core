@@ -259,7 +259,6 @@ class CRM_Case_Form_Activity_OpenCase {
    *
    * @return array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRule($fields, $files, $form) {
     if ($form->_context == 'caseActivity') {

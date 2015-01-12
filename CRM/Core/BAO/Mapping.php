@@ -51,7 +51,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *
    * @return object
    *   CRM_Core_DAO_Mapping object on success, otherwise NULL
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $mapping = new CRM_Core_DAO_Mapping();
@@ -70,7 +69,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *   Mapping id.
    *
    * @return boolean
-   * @static
    */
   public static function del($id) {
     // delete from mapping_field table
@@ -102,7 +100,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *
    * @return object
    *   CRM_Core_DAO_Mapper object on success, otherwise NULL
-   * @static
    */
   public static function add($params) {
     $mapping = new CRM_Core_DAO_Mapping();
@@ -120,7 +117,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *
    * @return array
    *   array of mapping name
-   * @static
    */
   public static function getMappings($mappingTypeId) {
     $mapping = array();
@@ -143,7 +139,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *
    * @return array
    *   array of mapping fields
-   * @static
    */
   public static function getMappingFields($mappingId) {
     //mapping is to be loaded from database
@@ -226,7 +221,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *
    * @return array
    *   associated array of elements
-   * @static
    */
   public static function getFormattedFields($smartGroupId) {
     $returnFields = array();
@@ -263,7 +257,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param NULL $exportMode
    *
    * @return void
-   * @static
    */
   public static function buildMappingForm(&$form, $mappingType = 'Export', $mappingId = NULL, $columnNo, $blockCount = 3, $exportMode = NULL) {
     if ($mappingType == 'Export') {
@@ -966,7 +959,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *
    * @return null|string
    *   $customGroupName all custom group names
-   * @static
    */
   public static function getCustomGroupName($customfieldId) {
     if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($customfieldId)) {
@@ -992,7 +984,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *
    * @return array
    *   formatted associated array of elements
-   * @static
    */
   public static function formattedFields(&$params, $row = FALSE) {
     $fields = array();
@@ -1191,7 +1182,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *   Mapping id.
    *
    * @return NULL
-   * @static
    */
   public static function saveMappingFields(&$params, $mappingId) {
     //delete mapping fields records for exixting mapping

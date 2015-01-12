@@ -42,7 +42,6 @@ class CRM_Utils_Check {
    * singleton pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 

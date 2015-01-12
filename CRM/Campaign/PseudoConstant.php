@@ -42,27 +42,23 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Activity types
    * @var array
-   * @static
    */
   private static $activityType;
 
   /**
    * Campaign Type
    * @var array
-   * @static
    */
   private static $campaignType = array();
 
   /**
    * Campaign Status
    * @var array
-   * @static
    */
   private static $campaignStatus = array();
 
   /**
    * Engagement Level
-   * @static
    */
   private static $engagementLevel;
 
@@ -75,7 +71,6 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return array
    *   array reference of all survey activity types.
-   * @static
    */
   public static function &activityType($returnColumn = 'name') {
     $cacheKey = $returnColumn;
@@ -99,7 +94,6 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * The static array campaignType is returned
    *
-   * @static
    *
    * @return array
    *   array reference of all campaign types.
@@ -118,7 +112,6 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * The static array campaignStatus is returned
    *
-   * @static
    *
    * @return array
    *   array reference of all campaign status.
@@ -137,7 +130,6 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * The static array Engagement Level is returned
    *
-   * @static
    *
    * @return array
    *   array reference of all Engagement Level.
@@ -154,7 +146,6 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db
    * next time it's requested.
    *
-   * @static
    *
    * @param bool|string $name pseudoconstant to be flushed
    */

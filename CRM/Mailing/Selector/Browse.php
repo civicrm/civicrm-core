@@ -42,7 +42,6 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    * Array of supported links, currenly null
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
@@ -50,7 +49,6 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
-   * @static
    */
   static $_columnHeaders;
 

@@ -24,7 +24,6 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 

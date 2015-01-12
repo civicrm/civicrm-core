@@ -45,7 +45,6 @@ class CRM_Utils_SoapServer {
 
   /**
    * Number of seconds we should let a soap process idle
-   * @static
    */
   static $soap_timeout = 0;
 
@@ -125,7 +124,6 @@ class CRM_Utils_SoapServer {
    * @throws SoapFault
    * @return string
    *   The SOAP Client key
-   * @static
    */
   public function authenticate($name, $pass, $loadCMSBootstrap = FALSE) {
     require_once str_replace('_', DIRECTORY_SEPARATOR, $this->ufClass) . '.php';

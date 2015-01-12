@@ -55,7 +55,6 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Friend_BAO_Friend
-   * @static
    */
   public static function add(&$params) {
     $friend = CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray);
@@ -73,7 +72,6 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    *
    * @return array
    *   values
-   * @static
    */
   public static function retrieve(&$params, &$values) {
     $friend = new CRM_Friend_DAO_Friend();
@@ -94,7 +92,6 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Contact_BAO_Contact
-   * @static
    */
   public static function create(&$params) {
     $transaction = new CRM_Core_Transaction();
@@ -344,7 +341,6 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Friend_BAO_Friend
-   * @static
    */
   public static function addTellAFriend(&$params) {
     $friendDAO = new CRM_Friend_DAO_Friend();

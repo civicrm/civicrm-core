@@ -227,7 +227,6 @@ class CRM_Utils_Rule {
    *
    * @return bool
    *   true if valid date
-   * @static
    */
   public static function currentDate($date, $monthRequired = TRUE) {
     $config = CRM_Core_Config::singleton();
@@ -319,7 +318,6 @@ class CRM_Utils_Rule {
    *
    * @return bool
    *   true if valid date
-   * @static
    */
   public static function mysqlDate($date) {
     // allow date to be null
@@ -628,7 +626,6 @@ class CRM_Utils_Rule {
    *
    * @return boolean
    *   true if object exists
-   * @static
    */
   public static function objectExists($value, $options) {
     $name = 'name';
@@ -756,7 +753,6 @@ class CRM_Utils_Rule {
    *
    * @return bool
    *   true if valid date
-   * @static
    */
   public static function qfDate($date) {
     $config = CRM_Core_Config::singleton();

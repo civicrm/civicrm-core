@@ -364,7 +364,6 @@ WHERE  inst.report_id = %1";
    *
    * @return boolean
    *   true if yes, else false
-   * @static
    */
   public static function isInstanceGroupRoleAllowed($instanceId) {
     if (!$instanceId) {

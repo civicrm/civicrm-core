@@ -139,7 +139,6 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
    *
    * @return array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRule($fields) {
     if (CRM_Core_BAO_UFField::checkProfileType($fields['uf_group_id'])) {

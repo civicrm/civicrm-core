@@ -48,7 +48,6 @@ class CRM_Core_Invoke {
    * @return string
    *   HTML. For non-HTML content, invoke() may call print() and exit().
    *
-   * @static
    */
   public static function invoke($args) {
     try {
@@ -325,7 +324,6 @@ class CRM_Core_Invoke {
    * @param $contact_type
    * @param $contact_sub_type
    *
-   * @static
    */
   public static function form($action, $contact_type, $contact_sub_type) {
     CRM_Utils_System::setUserContext(array('civicrm/contact/search/basic', 'civicrm/contact/view'));

@@ -55,7 +55,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_BAO_UFField
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_UFField', $params, $defaults);
@@ -70,7 +69,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    * @return string
    *   title
    *
-   * @static
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $groupId, 'title');
@@ -86,7 +84,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    *
    * @return Object
    *   DAO object on sucess, null otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     //check if custom data profile field is disabled
@@ -111,7 +108,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    *
    * @return boolean
    *
-   * @static
    */
   public static function del($id) {
     //delete  field field
@@ -131,7 +127,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    * @return mixed
    * @ids   array $ids    array that containd ids
    *
-   * @static
    */
   public static function duplicateField($params, $ids) {
     $ufField = new CRM_Core_DAO_UFField();
@@ -205,7 +200,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * @return CRM_Core_BAO_UFField
    *
-   * @static
    */
   public static function add(&$params, $ids = array()) {
     // set values for uf field properties and save
@@ -279,7 +273,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *   Set the is_active field.
    *
    * @return void
-   * @static
    */
   public static function setUFField($customFieldId, $is_active) {
     //find the profile id given custom field
@@ -303,7 +296,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *   In which to copy.
    *
    * @return void
-   * @static
    */
   public static function copy($old_id, $new_id) {
     $ufField = new CRM_Core_DAO_UFField();
@@ -325,7 +317,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * @return void
    *
-   * @static
    */
   public static function delUFField($customFieldId) {
     //find the profile id given custom field id
@@ -348,7 +339,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *   Value we want to set the is_active field.
    *
    * @return void
-   * @static
    */
   public static function setUFFieldStatus($customGroupId, $is_active) {
     //find the profile id given custom group id
@@ -372,7 +362,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * @return boolean
    *   false if custom field are disabled else true
-   * @static
    */
   public static function checkUFStatus($UFFieldId) {
     $fieldName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $UFFieldId, 'field_name');
@@ -462,7 +451,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *   Array of types those are optional.
    *
    * @return boolean
-   * @static
    */
   public static function checkValidProfileType($ufGroupId, $required, $optional = NULL) {
     if (!is_array($required) || empty($required)) {
@@ -510,7 +498,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * @return bool
    *   true for mix profile else false
-   * @static
    */
   public static function checkProfileType($ufGroupId) {
     $ufGroup = new CRM_Core_DAO_UFGroup();
@@ -581,7 +568,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * @return string
    *   profile group_type
-   * @static
    *
    * TODO Why is this function in this class? It seems to be about the UFGroup.
    */
@@ -606,7 +592,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * @return string
    *   profile group_type
-   * @static
    *
    * TODO Why is this function in this class? It seems to be about the UFGroup.
    */
@@ -710,7 +695,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * @return bool
    *   true for mix profile group else false
-   * @static
    */
   public static function checkProfileGroupType($ctype) {
     $ufGroup = new CRM_Core_DAO_UFGroup();
@@ -877,7 +861,6 @@ SELECT  id
    * @param int $gid : UF group ID
    * @param array $defaults : Form defaults
    * @return array, multidimensional; e.g. $result['FieldGroup']['field_name']['label']
-   * @static
    */
   public static function getAvailableFields($gid = NULL, $defaults = array()) {
     $fields = array(
@@ -1068,7 +1051,6 @@ SELECT  id
    * @param bool $force
    *
    * @return array, multidimensional; e.g. $result['field_name']['label']
-   * @static
    */
   public static function getAvailableFieldsFlat($force = FALSE) {
     // FIXME reset when data model changes
