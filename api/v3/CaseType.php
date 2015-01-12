@@ -48,7 +48,7 @@
  * @return array
  *   API result array
  *
- * @static void
+ * @static
  * @access public
  */
 function civicrm_api3_case_type_create($params) {

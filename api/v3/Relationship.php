@@ -49,7 +49,7 @@
  * @return array
  *   API Result Array
  * {@getfields relationship_create}
- * @static void
+ * @static
  * @access public
  */
 function civicrm_api3_relationship_create($params) {
@@ -80,7 +80,7 @@ function _civicrm_api3_relationship_create_spec(&$params) {
  * {@getfields relationship_delete}
  * @example RelationshipDelete.php Delete Example
  *
- * @static void
+ * @static
  * @access public
  */
 function civicrm_api3_relationship_delete($params) {

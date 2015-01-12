@@ -71,7 +71,7 @@ function civicrm_api3_pledge_create($params) {
  *
  * @return boolean
  *   true if success, else false
- * @static void
+ * @static
  * {@getfields pledge_delete}
  * @example PledgeDelete.php
  * @access public

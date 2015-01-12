@@ -50,7 +50,7 @@ define('API_V3_EXTENSION_DELIMITER', ',');
  *
  * @return array
  *   API result
- * @static void
+ * @static
  * @access public
  * @example ExtensionInstall.php
  *
@@ -76,7 +76,7 @@ function civicrm_api3_extension_install($params) {
  *
  * @return array
  *   API result
- * @static void
+ * @static
  * @access public
  *
  */
@@ -115,7 +115,7 @@ function civicrm_api3_extension_upgrade() {
  *
  * @return array
  *   API result
- * @static void
+ * @static
  * @access public
  * @example ExtensionEnable.php
  *
@@ -141,7 +141,7 @@ function civicrm_api3_extension_enable($params) {
  *
  * @return array
  *   API result
- * @static void
+ * @static
  * @access public
  * @example ExtensionDisable.php
  *
@@ -168,7 +168,7 @@ function civicrm_api3_extension_disable($params) {
  *
  * @return array
  *   API result
- * @static void
+ * @static
  * @access public
  * @example ExtensionUninstall.php
  *
@@ -195,7 +195,7 @@ function civicrm_api3_extension_uninstall($params) {
  * @throws API_Exception
  * @return array
  *   API result
- * @static void
+ * @static
  * @access public
  * @example ExtensionDownload.php
  */
@@ -247,7 +247,7 @@ function civicrm_api3_extension_download($params) {
  *
  * @return array
  *   API result
- * @static void
+ * @static
  * @access public
  * @example ExtensionRefresh.php
  *
@@ -280,7 +280,7 @@ function civicrm_api3_extension_refresh($params) {
  *
  * @return array
  *   API result
- * @static void
+ * @static
  * @access public
  * @example ExtensionGet.php
  */
