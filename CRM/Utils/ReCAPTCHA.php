@@ -47,7 +47,6 @@ class CRM_Utils_ReCAPTCHA {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
@@ -57,7 +56,6 @@ class CRM_Utils_ReCAPTCHA {
    * @param string the key to permit session scope's
    *
    * @return object
-   * @static
    */
   public static function &singleton() {
     if (self::$_singleton === NULL) {

@@ -46,7 +46,6 @@ class CRM_Utils_GlobalStack {
    * We don't have a container or dependency-injection, so use singleton instead
    *
    * @var object
-   * @static
    */
   private static $_singleton = NULL;
 

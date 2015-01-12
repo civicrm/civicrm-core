@@ -44,7 +44,6 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
    * This defines two actions- View and Edit.
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
@@ -52,14 +51,12 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
    * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
-   * @static
    */
   static $_columnHeaders;
 
   /**
    * Properties of contact we're interested in displaying
    * @var array
-   * @static
    */
 
   static $_properties = array(

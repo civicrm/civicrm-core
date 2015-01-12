@@ -276,7 +276,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @return array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRule($params, $files, $self) {
     $errors = array();

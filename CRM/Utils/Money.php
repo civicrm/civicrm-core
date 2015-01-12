@@ -62,7 +62,6 @@ class CRM_Utils_Money {
    * @return string
    *   formatted monetary string
    *
-   * @static
    */
   public static function format($amount, $currency = NULL, $format = NULL, $onlyNumber = FALSE, $valueFormat = NULL) {
 

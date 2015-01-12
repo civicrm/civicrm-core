@@ -43,7 +43,6 @@ class CRM_Campaign_BAO_Query {
    * Static field for all the campaign fields
    *
    * @var array
-   * @static
    */
   static $_campaignFields = NULL;
 
@@ -54,7 +53,6 @@ class CRM_Campaign_BAO_Query {
    *
    * @return array
    *   self::$_campaignFields  an associative array of campaign fields
-   * @static
    */
   public static function &getFields() {
     if (!isset(self::$_campaignFields)) {
@@ -342,7 +340,6 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
    *
    * @param CRM_Core_Form $form
    * @return void
-   * @static
    */
   public static function buildSearchForm(&$form) {
 
@@ -455,7 +452,6 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
    * @param array $criteria
    *   An array.
    * @return $voterClause as a string
-   * @static
    */
   /**
    * @param array $params

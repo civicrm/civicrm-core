@@ -352,7 +352,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @return array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRule($fields, $files, $self) {
     $errors = array();

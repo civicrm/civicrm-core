@@ -91,7 +91,6 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    *
    * @return array
    *   associated array of all the drop downs in the form
-   * @static
    */
   public static function getSelection($id = NULL) {
     $mapping = self::getMapping();
@@ -325,7 +324,6 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    *
    * @return array
    *   (reference)   reminder list
-   * @static
    */
   public static function &getList($namesOnly = FALSE, $entityValue = NULL, $id = NULL) {
     $activity_type = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
@@ -597,7 +595,6 @@ AND   cas.entity_value = $id AND
    *   The array that holds all the db ids.
    *
    * @return CRM_Core_DAO_ActionSchedule
-   * @static
    */
   public static function add(&$params, $ids = array()) {
     $actionSchedule = new CRM_Core_DAO_ActionSchedule();
@@ -618,7 +615,6 @@ AND   cas.entity_value = $id AND
    *
    * @return CRM_Core_DAO_ActionSchedule|null
    *   object on success, null otherwise
-   * @static
    */
   public static function retrieve(&$params, &$values) {
     if (empty($params)) {
@@ -644,7 +640,6 @@ AND   cas.entity_value = $id AND
    * @param int $id
    *   ID of the Reminder to be deleted.
    *
-   * @static
    */
   public static function del($id) {
     if ($id) {
@@ -668,7 +663,6 @@ AND   cas.entity_value = $id AND
    *
    * @return Object
    *   DAO object on success, null otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_ActionSchedule', $id, 'is_active', $is_active);

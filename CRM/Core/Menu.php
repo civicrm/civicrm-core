@@ -45,7 +45,6 @@ class CRM_Core_Menu {
    * The list of menu items
    *
    * @var array
-   * @static
    */
   static $_items = NULL;
 
@@ -53,7 +52,6 @@ class CRM_Core_Menu {
    * The list of permissioned menu items
    *
    * @var array
-   * @static
    */
   static $_permissionedItems = NULL;
 
@@ -166,7 +164,6 @@ class CRM_Core_Menu {
    * @param boolen $fetchFromXML
    *   Fetch the menu items from xml and not from cache.
    *
-   * @static
    */
   public static function &items($fetchFromXML = FALSE) {
     return self::xmlItems($fetchFromXML);
@@ -490,7 +487,6 @@ class CRM_Core_Menu {
    * @return array
    *   The breadcrumb for this path
    *
-   * @static
    */
   public static function buildBreadcrumb(&$menu, $path) {
     $crumbs = array();

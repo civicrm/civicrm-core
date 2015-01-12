@@ -591,7 +591,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *
    * @return bool
    *   email/openId
-   * @static
    */
   public static function formRule($fields, &$errors, $contactId = NULL) {
     $config = CRM_Core_Config::singleton();
@@ -1071,7 +1070,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *
    * @return boolean
    *   true if data exists, false otherwise
-   * @static
    */
   public static function blockDataExists(&$fields) {
     if (!is_array($fields)) {
@@ -1222,7 +1220,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *
    * @return array
    *   as array of sucess/fails for each address block
-   * @static
    */
   public function parseAddress(&$params) {
     $parseSuccess = $parsedFields = array();
@@ -1319,7 +1316,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *
    * @return null|string
    *   $statusMsg   string status message for all address blocks.
-   * @static
    */
   public static function parseAddressStatusMsg($parseResult) {
     $statusMsg = NULL;
@@ -1352,7 +1348,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *
    * @return string
    *   ordinal number for given number.
-   * @static
    */
   public static function ordinalNumber($number) {
     if (empty($number)) {

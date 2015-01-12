@@ -48,7 +48,6 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    *   The Queue Event ID of the recipient.
    *
    * @return void
-   * @static
    */
   public static function open($queue_id) {
     /* First make sure there's a matching queue event */
@@ -80,7 +79,6 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    *
    * @return int
    *   Number of rows in result set
-   * @static
    */
   public static function getTotalCount(
     $mailing_id,
@@ -137,7 +135,6 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    *
    * @return array
    *   Opened count per mailing ID
-   * @static
    */
   public static function getMailingTotalCount($mailingIDs) {
     $dao = new CRM_Core_DAO();
@@ -178,7 +175,6 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    *
    * @return array
    *   Count per mailing ID
-   * @static
    */
   public static function getMailingContactCount($mailingIDs, $contactID) {
     $dao = new CRM_Core_DAO();
@@ -231,7 +227,6 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    *
    * @return array
    *   Result set
-   * @static
    */
   public static function &getRows(
     $mailing_id, $job_id = NULL,

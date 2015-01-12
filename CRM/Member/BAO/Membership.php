@@ -38,7 +38,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * Static field for all the membership information that we can potentially import
    *
    * @var array
-   * @static
    */
   static $_importableFields = NULL;
 
@@ -70,7 +69,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *   The array that holds all the db ids.
    *
    * @return CRM_Member_BAO_Membership
-   * @static
    */
   public static function add(&$params, $ids = array()) {
     $oldStatus = $oldType = NULL;
@@ -198,7 +196,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *                        be returned
    *
    * @return CRM_Member_BAO_Membership|null the found object or null
-   * @static
    */
   public static function &getValues(&$params, &$values, $active = FALSE) {
     if (empty($params)) {
@@ -239,7 +236,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @throws CRM_Core_Exception
    *
    * @return CRM_Member_BAO_Membership
-   * @static
    */
   public static function create(&$params, &$ids, $skipRedirect = FALSE, $activityType = 'Membership Signup') {
     // always calculate status if is_override/skipStatusCal is not true.
@@ -452,7 +448,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *
    * @return Array
    *   array of contact_id of all related contacts.
-   * @static
    */
   public static function checkMembershipRelationship($membershipId, $contactId, $action = CRM_Core_Action::ADD) {
     $contacts = array();
@@ -520,7 +515,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *                        in a hierarchical manner
    *
    * @return CRM_Member_BAO_Membership
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $membership = new CRM_Member_DAO_Membership();
@@ -602,7 +596,6 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * @param int $membershipId
    *   Membership id that needs to be deleted.
    *
-   * @static
    *
    * @return $results   no of deleted Membership on success, false otherwise
    */
@@ -618,7 +611,6 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * @param int $membershipId
    *   Membership id that needs to be deleted.
    *
-   * @static
    *
    * @return $results   no of deleted Membership on success, false otherwise
    */
@@ -682,7 +674,6 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * @param int $contactId
    *
    * @return null
-   * @static
    */
   public static function deleteRelatedMemberships($ownerMembershipId, $contactId = NULL) {
     if (!$ownerMembershipId && !$contactId) {
@@ -715,7 +706,6 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *
    * @return array
    *   array of memberships based on status
-   * @static
    */
   public static function activeMembers($memberships, $status = 'active') {
     $actives = array();
@@ -757,7 +747,6 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * @return bool
    *   Is this a separate membership payment
    *
-   * @static
    */
   static function buildMembershipBlock(
     &$form,
@@ -952,7 +941,6 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *
    * @return array|null
    *
-   * @static
    */
   public static function getMembershipBlock($pageID) {
     $membershipBlock = array();
@@ -998,7 +986,6 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *   True if only Memberships with same parent org as the $memType wanted, false otherwise.
    *
    * @return array|bool
-   * @static
    */
   public static function getContactMembership($contactID, $memType, $isTest, $membershipId = NULL, $onlySameParentOrg = FALSE) {
     $dao = new CRM_Member_DAO_Membership();
@@ -1092,7 +1079,6 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *
    * @return array
    *   array of importable Fields
-   * @static
    */
   public static function &importableFields($contactType = 'Individual', $status = TRUE) {
     if (!self::$_importableFields) {
@@ -1153,7 +1139,6 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * Get all exportable fields
    *
    * @retun array return array of all exportable fields
-   * @static
    */
   public static function &exportableFields() {
     $expFieldMembership = CRM_Member_DAO_Membership::export();
@@ -1485,7 +1470,6 @@ AND civicrm_membership.is_test = %2";
    * @param \CRM_Contribute_BAO_Contribution|\CRM_Contribute_DAO_Contribution $contribution
    *
    * @return void
-   * @static
    */
   static public function updateRecurMembership(CRM_Member_DAO_Membership $membership, CRM_Contribute_BAO_Contribution $contribution) {
 
@@ -1534,7 +1518,6 @@ AND civicrm_membership.is_test = %2";
    *
    * @throws CRM_Core_Exception
    *
-   * @static
    */
   static function renewMembershipFormWrapper(
     $contactID,
@@ -1593,7 +1576,6 @@ AND civicrm_membership.is_test = %2";
    *   to be customised, null otherwise
    *
    * @return void
-   * @static
    */
   public static function fixMembershipStatusBeforeRenew(&$currentMembership, $changeToday) {
     $today = NULL;
@@ -1677,7 +1659,6 @@ AND civicrm_membership.is_test = %2";
    *
    * @return int
    *   contribution page id
-   * @static
    */
   public static function getContributionPageId($membershipID) {
     $query = "
@@ -1700,7 +1681,6 @@ SELECT c.contribution_page_id as pageID
    *   Owner Membership Id.
    * @param array $params
    *   Formatted array of key => value.
-   * @static
    */
   public static function updateRelatedMemberships($ownerMembershipId, $params) {
     $membership = new CRM_Member_DAO_Membership();
@@ -1728,7 +1708,6 @@ SELECT c.contribution_page_id as pageID
    *
    * @return array
    *   the list of membership fields
-   * @static
    */
   public static function getMembershipFields($mode = NULL) {
     $fields = CRM_Member_DAO_Membership::export();
@@ -1753,7 +1732,6 @@ SELECT c.contribution_page_id as pageID
    *
    * @return null|string
    *   sort name of the contact if found
-   * @static
    */
   public static function sortName($id) {
     $id = CRM_Utils_Type::escape($id, 'Integer');
@@ -1778,7 +1756,6 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    *
    * @return null|array
    *   array of memberships if created
-   * @static
    */
   public static function createRelatedMemberships(&$params, &$dao, $reset = FALSE) {
     static $relatedContactIds = array();
@@ -2031,7 +2008,6 @@ FROM   civicrm_membership_type
    * @param bool $activeOnly
    *
    * @return null|string
-   * @static
    */
   public static function getContactMembershipCount($contactID, $activeOnly = FALSE) {
     $select = "SELECT count(*) FROM civicrm_membership ";
@@ -2057,7 +2033,6 @@ FROM   civicrm_membership_type
    * @param bool $isNotCancelled
    *
    * @return boolean
-   * @static
    */
   public static function isCancelSubscriptionSupported($mid, $isNotCancelled = TRUE) {
     $cacheKeyString = "$mid";
@@ -2089,7 +2064,6 @@ FROM   civicrm_membership_type
    *
    * @return string
    *   contribution status
-   * @static
    */
   public static function isSubscriptionCancelled($mid) {
     $sql = "
@@ -2929,7 +2903,6 @@ WHERE      civicrm_membership.is_test = 0";
    *   (param in process of being removed - try to use params) array of ids.
    *
    * @return CRM_Contribute_BAO_Contribution
-   * @static
    */
   public static function recordMembershipContribution(&$params, $ids = array()) {
     $membershipId = $params['membership_id'];
@@ -3018,7 +2991,6 @@ WHERE      civicrm_membership.is_test = 0";
    *   Array with membership type and organization.
    * @param int $priceSetId
    *
-   * @static
    */
   public static function createLineItems(&$qf, $membershipType, &$priceSetId) {
     $qf->_priceSetId = $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
@@ -3072,7 +3044,6 @@ WHERE      civicrm_membership.is_test = 0";
    *
    * @return array
    *   Array of membership type
-   * @static
    */
   public static function getContactsCancelledMembership($contactID, $isTest = FALSE) {
     if (!$contactID) {

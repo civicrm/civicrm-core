@@ -38,7 +38,6 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
   static $_membershipTypesLinks = NULL;
@@ -465,7 +464,6 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    *
    * @return array
    *   (reference) of action links
-   * @static
    */
   static function &links(
     $status = 'all',

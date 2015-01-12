@@ -57,7 +57,6 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    *
    * @return CRM_Core_BAO_LocaationType|null
    *   object on success, null otherwise
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $locationType = new CRM_Core_DAO_LocationType();
@@ -80,7 +79,6 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    * @return Object
    *   DAO object on sucess, null otherwise
    *
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_LocationType', $id, 'is_active', $is_active);
@@ -94,7 +92,6 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    * @return object
    *   The default location type object on success,
    *                          null otherwise
-   * @static
    */
   public static function &getDefault() {
     if (self::$_defaultLocationType == NULL) {
@@ -124,7 +121,6 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    * @param array $params
    *   Reference array contains the values submitted by the form.
    *
-   * @static
    *
    * @return object
    */
@@ -152,7 +148,6 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    * @param int $locationTypeId
    *   ID of the location type to be deleted.
    *
-   * @static
    */
   public static function del($locationTypeId) {
     $entity = array('address', 'phone', 'email', 'im');

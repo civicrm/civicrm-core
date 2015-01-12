@@ -46,7 +46,6 @@
  *
  * @return boolean
  *   true if success, else false
- * @static
  * @access public
  * @example SystemFlush.php
  *

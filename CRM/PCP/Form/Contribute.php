@@ -107,7 +107,6 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    *
    * @return bool|array
    *   mixed true or array of errors
-   * @static
    */
   public static function formRule($params, $files, $self) {
     $errors = array();

@@ -423,7 +423,6 @@ class CRM_Activity_BAO_Query {
    *
    * @param CRM_Core_Form $form
    * @return void
-   * @static
    */
   public static function buildSearchForm(&$form) {
     $activityOptions = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);

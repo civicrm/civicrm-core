@@ -317,7 +317,6 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @throws Exception
    * @return string
    *   loginURL for the current CMS
-   * @static
    */
   public function getLoginURL($destination = '') {
     throw new Exception("Method not implemented: getLoginURL");

@@ -39,7 +39,6 @@ class CRM_Utils_Cache_NoCache implements CRM_Utils_Cache_Interface {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 

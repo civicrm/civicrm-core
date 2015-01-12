@@ -48,7 +48,6 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Contact_DAO_GroupOrganization
-   * @static
    */
   public static function add(&$params) {
     $formattedValues = array();
@@ -75,7 +74,6 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return void
-   * @static
    */
   public static function formatValues(&$params, &$formatedValues) {
     if (!empty($params['group_organization'])) {
@@ -98,7 +96,6 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return boolean
-   * @static
    */
   public static function dataExists($params) {
     // return if no data present
@@ -127,7 +124,6 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    * @param int $contactID
    *
    * @return boolean
-   * @static
    */
   public static function hasGroupAssociated($contactID) {
     $orgID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_GroupOrganization',

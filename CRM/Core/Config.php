@@ -193,7 +193,6 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    *   whether to force a reconstruction.
    *
    * @return CRM_Core_Config
-   * @static
    */
   public static function &singleton($loadFromDB = TRUE, $force = FALSE) {
     if (self::$_singleton === NULL || $force) {
@@ -674,7 +673,6 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * @param array (reference ) the parameters that need a value
    *
    * @return boolean
-   * @static
    */
   public static function check(&$config, &$required) {
     foreach ($required as $name) {

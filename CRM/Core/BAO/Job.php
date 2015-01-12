@@ -52,7 +52,6 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    *   An assoc array of name/value pairs.
    *
    * @return CRM_Financial_DAO_PaymentProcessorType
-   * @static
    */
   public static function create($params) {
     $job = new CRM_Core_DAO_Job();
@@ -72,7 +71,6 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    *
    * @return CRM_Core_DAO_Job|null
    *   object on success, null otherwise
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $job = new CRM_Core_DAO_Job();
@@ -95,7 +93,6 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    * @return Object
    *   DAO object on sucess, null otherwise
    *
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_Job', $id, 'is_active', $is_active);
@@ -108,7 +105,6 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    *   ID of the job to be deleted.
    *
    * @return bool|null
-   * @static
    */
   public static function del($jobID) {
     if (!$jobID) {

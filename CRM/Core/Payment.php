@@ -86,7 +86,6 @@ abstract class CRM_Core_Payment {
    *
    * @return CRM_Core_Payment
    * @throws \CRM_Core_Exception
-   * @static
    */
   public static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     // make sure paymentProcessor is not empty

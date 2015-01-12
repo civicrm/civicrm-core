@@ -66,7 +66,6 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
    *
    * @return object
    *   CRM_Core_BAO_Email object on success, null otherwise
-   * @static
    */
   public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
@@ -119,7 +118,6 @@ WHERE  contact_id = {$params['contact_id']}
    *   Input parameters to find object.
    *
    * @return boolean
-   * @static
    */
   public static function &getValues($entityBlock) {
     return CRM_Core_BAO_Block::getValues('email', $entityBlock);
@@ -135,7 +133,6 @@ WHERE  contact_id = {$params['contact_id']}
    *
    * @return array
    *   the array of email id's
-   * @static
    */
   public static function allEmails($id, $updateBlankLocInfo = FALSE) {
     if (!$id) {
@@ -193,7 +190,6 @@ ORDER BY  civicrm_email.is_primary DESC, email_id ASC ";
    *
    * @return array
    *   the array of email id's
-   * @static
    */
   public static function allEntityEmails(&$entityElements) {
     if (empty($entityElements)) {
@@ -241,7 +237,6 @@ ORDER BY e.is_primary DESC, email_id ASC ";
    *   Email object.
    *
    * @return void
-   * @static
    */
   public static function holdEmail(&$email) {
     //check for update mode
@@ -288,7 +283,6 @@ AND    reset_date IS NULL
    *
    * @return array
    *   an array of email ids
-   * @static
    */
   public static function getFromEmail() {
     $session = CRM_Core_Session::singleton();

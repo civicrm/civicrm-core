@@ -44,7 +44,6 @@
  *
  * @return array
  *   API result
- * @static
  * @access public
  *
  */
@@ -280,7 +279,6 @@ INNER JOIN civicrm_mailing_event_bounce meb ON meb.event_queue_id = meq.id
  *
  * @return array
  *   API result
- * @static
  * @access public
  * @example CRM/Mailing/BAO/Mailing.php
  *

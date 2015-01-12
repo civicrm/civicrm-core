@@ -55,7 +55,6 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Contribute_BAO_ContributionType
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $financialType = new CRM_Financial_DAO_FinancialType();
@@ -77,7 +76,6 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *
    * @return Object
    *   DAO object on sucess, null otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_FinancialType', $id, 'is_active', $is_active);
@@ -91,7 +89,6 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @param array $ids
    *   Reference array contains the id.
    *
-   * @static
    * @return object
    */
   public static function add(&$params, &$ids = array()) {
@@ -122,7 +119,6 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @param int $financialTypeId
    *
    * @return array|bool
-   * @static
    */
   public static function del($financialTypeId) {
     $financialType = new CRM_Financial_DAO_FinancialType();
@@ -169,7 +165,6 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *
    * @return array
    *   all financial type with income account is relationship
-   * @static
    */
   public static function getIncomeFinancialType() {
     // Financial Type

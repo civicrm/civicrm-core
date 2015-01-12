@@ -45,7 +45,6 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Report_DAO_ReportInstance
-   * @static
    */
   public static function add(&$params) {
     $instance = new CRM_Report_DAO_ReportInstance();
@@ -128,7 +127,6 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Report_BAO_ReportInstance
-   * @static
    */
   public static function &create(&$params) {
     if (isset($params['report_header'])) {

@@ -48,7 +48,6 @@ class CRM_Core_BAO_ConfigSetting {
    *   Associated array of civicrm variables.
    *
    * @return null
-   * @static
    */
   public static function create($params) {
     self::add($params);
@@ -65,7 +64,6 @@ class CRM_Core_BAO_ConfigSetting {
    *   Associated array of civicrm variables.
    *
    * @return null
-   * @static
    */
   public static function add(&$params) {
     self::fixParams($params);
@@ -147,7 +145,6 @@ class CRM_Core_BAO_ConfigSetting {
    *   Associated array of civicrm variables.
    *
    * @return null
-   * @static
    */
   public static function fixParams(&$params) {
     // in our old civicrm.settings.php we were using ISO code for country and
@@ -182,7 +179,6 @@ class CRM_Core_BAO_ConfigSetting {
    *   Associated array of civicrm variables stored in db.
    *
    * @return null
-   * @static
    */
   public static function formatParams(&$params, &$values) {
     if (empty($params) ||
@@ -206,7 +202,6 @@ class CRM_Core_BAO_ConfigSetting {
    * @param $defaults
    *
    * @return array
-   * @static
    */
   public static function retrieve(&$defaults) {
     $domain = new CRM_Core_DAO_Domain();
@@ -663,7 +658,6 @@ WHERE  option_group_id = (
    *
    * @return boolean
    *   true if valid component name and enabling succeeds, else false
-   * @static
    */
   public static function enableComponent($componentName) {
     $config = CRM_Core_Config::singleton();

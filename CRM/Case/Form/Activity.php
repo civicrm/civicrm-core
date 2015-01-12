@@ -363,7 +363,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
    *
    * @return bool|array
    *   true if no errors, else array of errors
-   * @static
    */
   public static function formRule($fields, $files, $self) {
     // skip form rule if deleting

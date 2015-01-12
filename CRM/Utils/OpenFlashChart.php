@@ -43,7 +43,6 @@ class CRM_Utils_OpenFlashChart {
   /**
    * Colours.
    * @var array
-   * @static
    */
   private static $_colours = array(
     "#C3CC38",
@@ -68,7 +67,6 @@ class CRM_Utils_OpenFlashChart {
    *
    * @return object
    *   $chart   object of open flash chart.
-   * @static
    */
   public static function &barChart(&$params) {
     $chart = NULL;
@@ -199,7 +197,6 @@ class CRM_Utils_OpenFlashChart {
    *
    * @return object
    *   $chart   object of open flash chart.
-   * @static
    */
   public static function &pieChart(&$params) {
     $chart = NULL;
@@ -264,7 +261,6 @@ class CRM_Utils_OpenFlashChart {
    *
    * @return object
    *   $chart   object of open flash chart.
-   * @static
    */
   public static function &bar_3dChart(&$params) {
     $chart = NULL;

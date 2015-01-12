@@ -47,7 +47,6 @@ class CRM_Contact_Form_Edit_Website {
    *   Block number to build.
    *
    * @return void
-   * @static
    */
   public static function buildQuickForm(&$form, $blockCount = NULL) {
     if (!$blockCount) {

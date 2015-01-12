@@ -141,7 +141,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    *
    * @return array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRule($values, $files, $self) {
     if (!empty($values['addMore']) || !empty($values['addBlock'])) {

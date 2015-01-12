@@ -164,7 +164,6 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
    * @param array $listOfRelatedEntities
    *   List of related event ids .
    *
-   * @static
    *
    * @return array
    */

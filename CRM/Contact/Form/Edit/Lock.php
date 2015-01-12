@@ -62,7 +62,6 @@ class CRM_Contact_Form_Edit_Lock {
    *
    * @return bool|array
    *   true if no errors, else array of errors
-   * @static
    */
   public static function formRule($fields, $files, $contactID = NULL) {
     $errors = array();

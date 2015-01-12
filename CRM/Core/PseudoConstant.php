@@ -52,7 +52,6 @@ class CRM_Core_PseudoConstant {
   /**
    * Static cache for pseudoconstant arrays
    * @var array
-   * @static
    */
   private static $cache;
 
@@ -61,42 +60,36 @@ class CRM_Core_PseudoConstant {
    *
    * activity type
    * @var array
-   * @static
    */
   private static $activityType;
 
   /**
    * States, provinces
    * @var array
-   * @static
    */
   private static $stateProvince;
 
   /**
    * Counties
    * @var array
-   * @static
    */
   private static $county;
 
   /**
    * States/provinces abbreviations
    * @var array
-   * @static
    */
   private static $stateProvinceAbbreviation;
 
   /**
    * Country
    * @var array
-   * @static
    */
   private static $country;
 
   /**
    * CountryIsoCode
    * @var array
-   * @static
    */
   private static $countryIsoCode;
 
@@ -105,56 +98,48 @@ class CRM_Core_PseudoConstant {
    *
    * group
    * @var array
-   * @static
    */
   private static $group;
 
   /**
    * GroupIterator
    * @var mixed
-   * @static
    */
   private static $groupIterator;
 
   /**
    * RelationshipType
    * @var array
-   * @static
    */
   private static $relationshipType;
 
   /**
    * Civicrm groups that are not smart groups
    * @var array
-   * @static
    */
   private static $staticGroup;
 
   /**
    * Currency codes
    * @var array
-   * @static
    */
   private static $currencyCode;
 
   /**
    * Payment processor
    * @var array
-   * @static
    */
   private static $paymentProcessor;
 
   /**
    * Payment processor types
    * @var array
-   * @static
    */
   private static $paymentProcessorType;
 
   /**
    * World Region
    * @var array
-   * @static
    */
   private static $worldRegions;
 
@@ -163,49 +148,42 @@ class CRM_Core_PseudoConstant {
    *
    * activity status
    * @var array
-   * @static
    */
   private static $activityStatus;
 
   /**
    * Visibility
    * @var array
-   * @static
    */
   private static $visibility;
 
   /**
    * Greetings
    * @var array
-   * @static
    */
   private static $greeting;
 
   /**
    * Default Greetings
    * @var array
-   * @static
    */
   private static $greetingDefaults;
 
   /**
    * Extensions of type module
    * @var array
-   * @static
    */
   private static $extensions;
 
   /**
    * Financial Account Type
    * @var array
-   * @static
    */
   private static $accountOptionValues;
 
   /**
    * Tax Rates
    * @var array
-   * @static
    */
   private static $taxRates;
 
@@ -233,7 +211,6 @@ class CRM_Core_PseudoConstant {
    * @return Array|bool
    *   array on success, FALSE on error.
    *
-   * @static
    */
   public static function get($daoName, $fieldName, $params = array(), $context = NULL) {
     CRM_Core_DAO::buildOptionsContext($context);
@@ -557,7 +534,6 @@ class CRM_Core_PseudoConstant {
    * @param null $force
    *
    * @return void
-   * @static
    */
   public static function populate(
     &$var,
@@ -609,7 +585,6 @@ class CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db
    * nex time it's requested.
    *
-   * @static
    *
    * @param bool|string $name pseudoconstant to be flushed
    */
@@ -629,7 +604,6 @@ class CRM_Core_PseudoConstant {
    *
    * The static array activityType is returned
    *
-   * @static
    *
    * @return array
    *   array reference of all activity types.
@@ -704,7 +678,6 @@ class CRM_Core_PseudoConstant {
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @static
    *
    * @param bool|int $id - Optional id to return
    *
@@ -760,7 +733,6 @@ class CRM_Core_PseudoConstant {
    *
    * Same as above, except gets the abbreviations instead of the names.
    *
-   * @static
    *
    * @param bool|int $id - Optional id to return
    *
@@ -828,7 +800,6 @@ WHERE  id = %1";
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @static
    *
    * @param bool|int $id - Optional id to return
    *
@@ -906,7 +877,6 @@ WHERE  id = %1";
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @static
    *
    * @param bool $id
    *
@@ -944,7 +914,6 @@ WHERE  id = %1";
    * @param bool $excludeHidden
    *   Exclude hidden groups.
    *
-   * @static
    *
    * @return array
    *   array reference of all groups.
@@ -973,7 +942,6 @@ WHERE  id = %1";
    * called for the first time
    *
    *
-   * @static
    *
    * @param bool $styledLabels
    *
@@ -1002,7 +970,6 @@ WHERE  id = %1";
    * @param bool $excludeHidden
    *   Exclude hidden groups.
    *
-   * @static
    *
    * @return array
    *   array reference of all groups.
@@ -1032,7 +999,6 @@ WHERE  id = %1";
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @static
    *
    * @param bool $onlyPublic
    * @param null $groupType
@@ -1076,7 +1042,6 @@ WHERE  id = %1";
    * @param bool $reset
    *   Reset relationship types if true.
    *
-   * @static
    *
    * @return array
    *   array reference of all relationship types.
@@ -1119,7 +1084,6 @@ WHERE  id = %1";
    *
    * @return array
    *   array reference of all currency codes
-   * @static
    */
   public static function &currencyCode() {
     if (!self::$currencyCode) {
@@ -1405,7 +1369,6 @@ WHERE  id = %1";
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @static
    *
    * @param bool|int $id - Optional id to return
    *
@@ -1436,7 +1399,6 @@ WHERE  id = %1";
    *
    * The static array paymentProcessor is returned
    *
-   * @static
    *
    * @param bool $all
    *   Get payment processors - default is to get only active ones.
@@ -1473,7 +1435,6 @@ WHERE  id = %1";
    *
    * The static array paymentProcessorType is returned
    *
-   * @static
    *
    * @param bool $all
    *   Get payment processors - default is to get only active ones.
@@ -1503,7 +1464,6 @@ WHERE  id = %1";
    *
    * @return array
    *   array reference of all World Regions
-   * @static
    */
   public static function &worldRegion($id = FALSE) {
     if (!self::$worldRegions) {
@@ -1529,7 +1489,6 @@ WHERE  id = %1";
    *
    * The static array activityStatus is returned
    *
-   * @static
    *
    * @param string $column
    *
@@ -1556,7 +1515,6 @@ WHERE  id = %1";
    *
    * The static array visibility is returned
    *
-   * @static
    *
    * @param string $column
    *
@@ -1696,7 +1654,6 @@ ORDER BY name";
    *
    * @return int
    *   the country id that the state belongs to
-   * @static
    */
   public static function countryIDForStateID($stateID) {
     if (empty($stateID)) {
@@ -1718,7 +1675,6 @@ WHERE  id = %1
    *
    * The static array of greeting is returned
    *
-   * @static
    *
    * @param $filter
    *   Get All Email Greetings - default is to get only active ones.
@@ -1770,7 +1726,6 @@ WHERE  id = %1
   /**
    * Construct array of default greeting values for contact type
    *
-   * @static
    *
    * @return array
    *   array reference of default greetings.
@@ -1806,7 +1761,6 @@ WHERE  id = %1
    * FIXME: This is called by civix but not by any core code. We
    * should provide an API call which civix can use instead.
    *
-   * @static
    *
    * @return array
    *   array($fullyQualifiedName => $label) list of extensions
@@ -1833,7 +1787,6 @@ WHERE  id = %1
    *
    * The static array option values is returned
    *
-   * @static
    *
    * @param bool $optionGroupName
    *   Get All Option Group values- default is to get only active ones.
@@ -1861,7 +1814,6 @@ WHERE  id = %1
    *
    * @param bool $fresh
    *   Whether to forcibly reload extensions list from canonical store.
-   * @static
    *
    * @return array
    *   array(array('prefix' => $, 'file' => $))
@@ -1875,8 +1827,6 @@ WHERE  id = %1
    * Get all tax rates
    *
    * The static array tax rates is returned
-   *
-   * @static
    *
    * @return array
    *   array list of tax rates with the financial type

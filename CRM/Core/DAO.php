@@ -102,7 +102,6 @@ class CRM_Core_DAO extends DB_DataObject {
    *   The database connection string.
    *
    * @return void
-   * @static
    */
   public static function init($dsn) {
     $options = &PEAR::getStaticProperty('DB_DataObject', 'options');
@@ -334,7 +333,6 @@ class CRM_Core_DAO extends DB_DataObject {
    *   The factory application object.
    *
    * @return void
-   * @static
    */
   public static function setFactory(&$factory) {
     self::$_factory = &$factory;
@@ -398,7 +396,6 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Returns list of FK relationships
    *
-   * @static
    *
    * @return array
    *   Array of CRM_Core_Reference_Interface
@@ -553,7 +550,6 @@ class CRM_Core_DAO extends DB_DataObject {
    *   (reference ) associative array of name/value pairs.
    *
    * @return void
-   * @static
    */
   public static function storeValues(&$object, &$values) {
     $fields = &$object->fields();
@@ -576,7 +572,6 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @return array|null
    *   the attributes for the object
-   * @static
    */
   public static function makeAttribute($field) {
     if ($field) {
@@ -630,7 +625,6 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @return array
    *   assoc array of name => attribute pairs
-   * @static
    */
   public static function getAttribute($class, $fieldName = NULL) {
     $object = new $class();
@@ -679,7 +673,6 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @return boolean
    *   true if object exists
-   * @static
    */
   public static function objectExists($value, $daoName, $daoID, $fieldName = 'name') {
     $object = new $daoName();
@@ -705,7 +698,6 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @return boolean
    *   true if exists, else false
-   * @static
    */
   public static function checkFieldExists($tableName, $columnName, $i18nRewrite = TRUE) {
     $query = "
@@ -731,7 +723,6 @@ LIKE %1
    * @param string $fieldName
    *
    * @return array
-   * @static
    */
   public static function getStorageValues($tableName = NULL, $maxTablesToCheck = 10, $fieldName = 'Engine') {
     $values = array();
@@ -791,7 +782,6 @@ LIKE %1
    *
    * @return boolean
    *   true if constraint exists, false otherwise
-   * @static
    */
   public static function checkConstraintExists($tableName, $constraint) {
     static $show = array();
@@ -856,7 +846,6 @@ LIKE %1
    *
    * @return boolean
    *   true if in format, false otherwise
-   * @static
    */
   public static function checkFKConstraintInFormat($tableName, $columnName) {
     static $show = array();
@@ -886,7 +875,6 @@ LIKE %1
    *
    * @return boolean
    *   true if the value is always $columnValue, false otherwise
-   * @static
    */
   public static function checkFieldHasAlwaysValue($tableName, $columnName, $columnValue) {
     $query = "SELECT * FROM $tableName WHERE $columnName != '$columnValue'";
@@ -904,7 +892,6 @@ LIKE %1
    *
    * @return boolean
    *   true if if the value is always NULL, false otherwise
-   * @static
    */
   public static function checkFieldIsAlwaysNull($tableName, $columnName) {
     $query = "SELECT * FROM $tableName WHERE $columnName IS NOT NULL";
@@ -921,7 +908,6 @@ LIKE %1
    *
    * @return boolean
    *   true if exists, else false
-   * @static
    */
   public static function checkTableExists($tableName) {
     $query = "
@@ -984,7 +970,6 @@ FROM   civicrm_domain
    *
    * @return string|null
    *   Value of $returnColumn in the retrieved record
-   * @static
    */
   public static function getFieldValue($daoName, $searchValue, $returnColumn = 'name', $searchColumn = 'id', $force = FALSE) {
     if (
@@ -1035,7 +1020,6 @@ FROM   civicrm_domain
    *
    * @return boolean
    *   true if we found and updated the object, else false
-   * @static
    */
   public static function setFieldValue($daoName, $searchValue, $setColumn, $setValue, $searchColumn = 'id') {
     $object = new $daoName();
@@ -1062,7 +1046,6 @@ FROM   civicrm_domain
    *
    * @return string
    *   sortString
-   * @static
    */
   public static function getSortString($sort, $default = NULL) {
     // check if sort is of type CRM_Utils_Sort
@@ -1094,7 +1077,6 @@ FROM   civicrm_domain
    *
    * @return object
    *   an object of type referenced by daoName
-   * @static
    */
   public static function commonRetrieve($daoName, &$params, &$defaults, $returnProperities = NULL) {
     $object = new $daoName();
@@ -1122,7 +1104,6 @@ FROM   civicrm_domain
    *   Id of the contact to delete.
    *
    * @return void
-   * @static
    */
   public static function deleteEntityContact($daoName, $contactId) {
     $object = new $daoName();
@@ -1147,7 +1128,6 @@ FROM   civicrm_domain
    *
    * @return CRM_Core_DAO
    *   object that holds the results of the query
-   * @static
    */
   static function &executeQuery(
     $query,
@@ -1198,7 +1178,6 @@ FROM   civicrm_domain
    * @return string|null
    *   the result of the query if any
    *
-   * @static
    */
   static function &singleValueQuery(
     $query,
@@ -1482,7 +1461,6 @@ SELECT contact_id
    *
    * @return object
    *   an object of type referenced by daoName
-   * @static
    */
   public static function commonRetrieveAll($daoName, $fieldIdName = 'id', $fieldId, &$details, $returnProperities = NULL) {
     require_once(str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php");

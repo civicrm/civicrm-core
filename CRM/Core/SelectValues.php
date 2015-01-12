@@ -39,7 +39,6 @@ class CRM_Core_SelectValues {
 
   /**
    * Preferred mail format
-   * @static
    */
   public static function pmf() {
     return array(
@@ -51,7 +50,6 @@ class CRM_Core_SelectValues {
 
   /**
    * Privacy options
-   * @static
    */
   public static function privacy() {
     return array(
@@ -66,7 +64,6 @@ class CRM_Core_SelectValues {
 
   /**
    * Various pre defined contact super types
-   * @static
    */
   public static function contactType() {
     static $contactType = NULL;
@@ -78,7 +75,6 @@ class CRM_Core_SelectValues {
 
   /**
    * Various pre defined unit list
-   * @static
    */
   public static function unitList($unitType = NULL) {
     $unitList = array(
@@ -94,7 +90,6 @@ class CRM_Core_SelectValues {
 
   /**
    * Membership type unit
-   * @static
    */
   public static function membershipTypeUnitList() {
     return self::unitList('duration');
@@ -102,7 +97,6 @@ class CRM_Core_SelectValues {
 
   /**
    * Various pre defined period types
-   * @static
    */
   public static function periodType() {
     return array(
@@ -113,7 +107,6 @@ class CRM_Core_SelectValues {
 
   /**
    * Various pre defined email selection methods
-   * @static
    */
   public static function emailSelectMethods() {
     return array(
@@ -126,7 +119,6 @@ class CRM_Core_SelectValues {
 
   /**
    * Various pre defined member visibility options
-   * @static
    */
   public static function memberVisibility() {
     return array(
@@ -137,7 +129,6 @@ class CRM_Core_SelectValues {
 
   /**
    * Member auto-renew options
-   * @static
    */
   public static function memberAutoRenew() {
     return array(
@@ -149,7 +140,6 @@ class CRM_Core_SelectValues {
 
   /**
    * Various pre defined event dates
-   * @static
    */
   public static function eventDate() {
     return array(
@@ -161,7 +151,6 @@ class CRM_Core_SelectValues {
 
   /**
    * Custom form field types
-   * @static
    */
   public static function customHtmlType() {
     return array(
@@ -188,7 +177,6 @@ class CRM_Core_SelectValues {
   /**
    * Various pre defined extensions for dynamic properties and groups
    *
-   * @static
    */
   public static function customGroupExtends() {
     $customGroupExtends = array(
@@ -217,7 +205,6 @@ class CRM_Core_SelectValues {
   /**
    * Styles for displaying the custom data group
    *
-   * @static
    */
   public static function customGroupStyle() {
     return array(
@@ -230,7 +217,6 @@ class CRM_Core_SelectValues {
   /**
    * For displaying the uf group types
    *
-   * @static
    */
   public static function ufGroupTypes() {
     $ufGroupType = array(
@@ -250,7 +236,6 @@ class CRM_Core_SelectValues {
   /**
    * The status of a contact within a group
    *
-   * @static
    */
   public static function groupContactStatus() {
     return array(
@@ -262,7 +247,6 @@ class CRM_Core_SelectValues {
 
   /**
    * List of Group Types
-   * @static
    */
   public static function groupType() {
     return array(
@@ -282,7 +266,6 @@ class CRM_Core_SelectValues {
    *
    * @return array
    *   the date array
-   * @static
    */
   public static function date($type = NULL, $format = NULL, $minOffset = NULL, $maxOffset = NULL) {
 
@@ -327,7 +310,6 @@ class CRM_Core_SelectValues {
   /**
    * Values for UF form visibility options
    *
-   * @static
    */
   public static function ufVisibility() {
     return array(
@@ -340,7 +322,6 @@ class CRM_Core_SelectValues {
   /**
    * Values for group form visibility options
    *
-   * @static
    */
   public static function groupVisibility() {
     return array(
@@ -352,7 +333,6 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Mailing Components
    *
-   * @static
    * return array
    */
   public static function mailingComponents() {
@@ -372,7 +352,6 @@ class CRM_Core_SelectValues {
    * Get hours
    *
    *
-   * @static
    */
   public function getHours() {
     $hours = array();
@@ -386,7 +365,6 @@ class CRM_Core_SelectValues {
    * Get minutes
    *
    *
-   * @static
    */
   public function getMinutes() {
     $minutes = array();
@@ -401,7 +379,6 @@ class CRM_Core_SelectValues {
    *
    * @return array
    *   array of map providers
-   * @static
    */
   public static function mapProvider() {
     static $map = NULL;
@@ -416,7 +393,6 @@ class CRM_Core_SelectValues {
    *
    * @return array
    *   array of geocoder providers
-   * @static
    */
   public static function geoProvider() {
     static $geo = NULL;
@@ -432,7 +408,6 @@ class CRM_Core_SelectValues {
    *
    * @return array
    *   array of address standardization providers
-   * @static
    */
   public static function addressProvider() {
     static $addr = NULL;
@@ -445,7 +420,6 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Mailing Tokens
    *
-   * @static
    * return array
    */
   public static function mailingTokens() {
@@ -472,7 +446,6 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Activity Tokens
    *
-   * @static
    * return array
    */
   public static function activityTokens() {
@@ -487,7 +460,6 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Membership Tokens
    *
-   * @static
    * return array
    */
   public static function membershipTokens() {
@@ -505,7 +477,6 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Event Tokens
    *
-   * @static
    * return array
    */
   public static function eventTokens() {
@@ -530,7 +501,6 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Event Tokens
    *
-   * @static
    * return array
    */
   public static function contributionTokens() {
@@ -564,7 +534,6 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Contact Tokens
    *
-   * @static
    * return array
    */
   public static function contactTokens() {
@@ -640,7 +609,6 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Participant Tokens
    *
-   * @static
    * return array
    */
   public static function participantTokens() {
@@ -756,8 +724,6 @@ class CRM_Core_SelectValues {
   /**
    * Get numeric options
    *
-   *
-   * @static
    */
   public static function getNumericOptions($start = 0, $end = 10) {
     $numericOptions = array();
@@ -769,7 +735,6 @@ class CRM_Core_SelectValues {
 
   /**
    * Barcode types
-   * @static
    */
   public static function getBarcodeTypes() {
     return array(
@@ -873,7 +838,6 @@ class CRM_Core_SelectValues {
   /**
    * Profile group types
    *
-   * @static
    */
   public static function getProfileGroupType() {
     $profileGroupType = array(

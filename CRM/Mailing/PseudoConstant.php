@@ -42,21 +42,18 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Mailing templates
    * @var array
-   * @static
    */
   private static $template;
 
   /**
    * Completed mailings
    * @var array
-   * @static
    */
   private static $completed;
 
   /**
    * Mailing components
    * @var array
-   * @static
    */
   private static $component;
 
@@ -73,7 +70,6 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return array
    *   array reference of all mailing components
-   * @static
    */
   public static function &component($type = NULL) {
     $name = $type ? $type : 'ALL';
@@ -115,7 +111,6 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return int
    *   The ID of the default mailing component.
-   * @static
    */
   public static function &defaultComponent($type, $undefined = NULL) {
     if (!self::$defaultComponent) {
@@ -142,7 +137,6 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return array
    *   array reference of all mailing templates if any
-   * @static
    */
   public static function &template() {
     if (!self::$template) {
@@ -159,7 +153,6 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return array
    *   array reference of all mailing templates if any
-   * @static
    */
   public static function &completed($mode = NULL) {
     if (!self::$completed) {
@@ -217,7 +210,6 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db
    * next time it's requested.
    *
-   * @static
    *
    * @param bool|string $name pseudoconstant to be flushed
    */

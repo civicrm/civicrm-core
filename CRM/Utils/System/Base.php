@@ -141,7 +141,6 @@ abstract class CRM_Utils_System_Base {
    *
    * @return string
    *   Formatted url.
-   * @static
    */
   function languageNegotiationURL(
     $url,
@@ -169,7 +168,6 @@ abstract class CRM_Utils_System_Base {
    *
    * @return string
    *   loginURL for the current CMS
-   * @static
    */
   public abstract function getLoginURL($destination = '');
 

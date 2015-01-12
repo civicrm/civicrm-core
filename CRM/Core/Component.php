@@ -424,7 +424,6 @@ class CRM_Core_Component {
    *   Array of tables.
    *
    * @return null
-   * @static
    */
   public static function tableNames(&$tables) {
     $info = self::_info();

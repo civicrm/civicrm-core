@@ -53,7 +53,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
    *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set
-   * @static
    */
   public static function create(&$params) {
     $priceSetBAO = new CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set();
@@ -73,7 +72,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set', $params, $defaults);
@@ -89,7 +87,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
    *
    * @return Object
    *   DAO object on sucess, null otherwise
-   * @static
    */
   public static function setIsActive($id, $isActive) {
     return CRM_Core_DAO::setFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set', $id, 'is_active', $isActive);
@@ -104,7 +101,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
    * @return int
    *   priceSetID
    *
-   * @static
    */
   public static function getDefaultPriceSet($entity = 'contribution') {
     if ($entity == 'contribution') {
@@ -143,7 +139,6 @@ WHERE       ps.name = '{$entityName}'
    * @return string
    *   title
    *
-   * @static
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set', $id, 'title');
@@ -261,7 +256,6 @@ WHERE     ct.id = cp.contribution_type_id AND
    *   false if fields exist for this set, true if the
    *   set could be deleted
    *
-   * @static
    */
   public static function deleteSet($id) {
     // remove from all inactive forms
@@ -387,7 +381,6 @@ WHERE     ct.id = cp.contribution_type_id AND
    *
    * @return int|null
    *   price set id on success, null otherwise
-   * @static
    */
   public static function getSetId(&$params) {
     $fid = NULL;
@@ -913,7 +906,6 @@ WHERE  id = %1";
    * @return array
    *   Array of the field ids
    *
-   * @static
    */
   public static function getFieldIds($id) {
     $priceField = new CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field();
@@ -932,7 +924,6 @@ WHERE  id = %1";
    *   The price set id to copy.
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field
-   * @static
    */
   static function copy($id) {
     $maxId = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_price_set");
@@ -1003,7 +994,6 @@ WHERE  id = %1";
    * @param bool $onlyActive
    *
    * @return int|null|string
-   * @static
    */
   public static function getPricesetCount($sid, $onlyActive = TRUE) {
     $count = 0;
@@ -1113,7 +1103,6 @@ GROUP BY     mt.member_of_contact_id";
    *
    * @return array
    *   associate array of frequency interval and unit
-   * @static
    */
   public static function getRecurDetails($priceSetId) {
     $query = 'SELECT mt.duration_interval, mt.duration_unit
@@ -1148,7 +1137,6 @@ GROUP BY     mt.member_of_contact_id";
    *
    * @return Object
    *   DAO object on sucess, null otherwise
-   * @static
    */
   public static function setIsQuickConfig($id, $isQuickConfig) {
     return CRM_Core_DAO::setFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set', $id, 'is_quick_config', $isQuickConfig);

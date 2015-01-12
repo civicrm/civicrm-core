@@ -318,7 +318,6 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    *
    * @return array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRule($fields, $fileParams, $options) {
     $errors = array();
@@ -445,7 +444,6 @@ WHERE  title = %1
    *
    * @return array
    *   parent groups
-   * @static
    */
   public static function buildParentGroups(&$form) {
     $groupNames = CRM_Core_PseudoConstant::group();

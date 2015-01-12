@@ -42,21 +42,18 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
    * static instance to hold the table name
    *
    * @var string
-   * @static
    */
   static $_tableName = 'civicrm_price_field';
   /**
    * static instance to hold the field values
    *
    * @var array
-   * @static
    */
   static $_fields = NULL;
   /**
    * static instance to hold the FK relationships
    *
    * @var string
-   * @static
    */
   static $_links = NULL;
   /**
@@ -64,7 +61,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
    * be imported
    *
    * @var array
-   * @static
    */
   static $_import = NULL;
   /**
@@ -72,7 +68,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
    * be exported
    *
    * @var array
-   * @static
    */
   static $_export = NULL;
   /**
@@ -80,7 +75,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
    * this table in the civicrm_log table
    *
    * @var boolean
-   * @static
    */
   static $_log = TRUE;
   /**
@@ -328,7 +322,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
   /**
    * returns the names of this table
    *
-   * @static
    * @return string
    */
   public static function getTableName() {
@@ -348,7 +341,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
    * returns the list of fields that can be imported
    *
    * return array
-   * @static
    */
   static function &import($prefix = FALSE) {
     if (!(self::$_import)) {
@@ -372,7 +364,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
    * returns the list of fields that can be exported
    *
    * return array
-   * @static
    */
   static function &export($prefix = FALSE) {
     if (!(self::$_export)) {

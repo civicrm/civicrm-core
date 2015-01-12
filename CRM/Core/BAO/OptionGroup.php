@@ -50,7 +50,6 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_BAO_OptionGroup
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $optionGroup = new CRM_Core_DAO_OptionGroup();
@@ -72,7 +71,6 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    *
    * @return Object
    *   DAO object on sucess, null otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_OptionGroup', $id, 'is_active', $is_active);
@@ -86,7 +84,6 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    * @param array $ids
    *   Reference array contains the id.
    *
-   * @static
    *
    * @return object
    */
@@ -119,7 +116,6 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    *
    * @return void
    *
-   * @static
    */
   public static function del($optionGroupId) {
     // need to delete all option value field before deleting group
@@ -141,7 +137,6 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    * @return String
    *   title
    *
-   * @static
    */
   public static function getTitle($optionGroupId) {
     $optionGroup = new CRM_Core_DAO_OptionGroup();

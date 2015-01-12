@@ -45,7 +45,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Contribute_DAO_ContributionPage
-   * @static
    */
   public static function &create(&$params) {
     $financialTypeId = NULL;
@@ -74,7 +73,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    *
    * @return Object
    *   DAO object on success, null otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_ContributionPage', $id, 'is_active', $is_active);
@@ -126,7 +124,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param null $fieldTypes
    *
    * @return void
-   * @static
    */
   public static function sendMail($contactID, $values, $isTest = FALSE, $returnMessageText = FALSE, $fieldTypes = NULL) {
     $gIds = $params = array();
@@ -475,7 +472,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param bool|object $autoRenewMembership is it a auto renew membership.
    *
    * @return void
-   * @static
    */
   public static function recurringNotify($type, $contactID, $pageID, $recur, $autoRenewMembership = FALSE) {
     $value = array();
@@ -577,7 +573,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param null $fieldTypes
    *
    * @return void
-   * @static
    */
   public static function buildCustomDisplay($gid, $name, $cid, &$template, &$params, $fieldTypes = NULL) {
     if ($gid) {
@@ -624,7 +619,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    *   The contribution page id to copy.
    *
    * @return CRM_Contribute_DAO_ContributionPage
-   * @static
    */
   public static function copy($id) {
     $fieldsFix = array(
@@ -722,7 +716,6 @@ WHERE entity_table = 'civicrm_contribution_page'
    *   true if payment processor supports recurring
    *   else false
    *
-   * @static
    */
   public static function checkRecurPaymentProcessor($contributionPageId) {
     //FIXME
@@ -746,7 +739,6 @@ WHERE entity_table = 'civicrm_contribution_page'
    * @param array $contribPageIds
    * @return array
    *   info regarding all sections.
-   * @static
    */
   public static function getSectionInfo($contribPageIds = array()) {
     $info = array();

@@ -41,7 +41,6 @@ class CRM_Core_Page_AJAX {
   /**
    * Call generic ajax forms
    *
-   * @static
    */
   public static function run() {
     $className = CRM_Utils_Type::escape($_REQUEST['class_name'], 'String');
@@ -92,7 +91,6 @@ class CRM_Core_Page_AJAX {
   /**
    * Change is_quick_config priceSet to complex
    *
-   * @static
    */
   public static function setIsQuickConfig() {
     $id = $context = NULL;

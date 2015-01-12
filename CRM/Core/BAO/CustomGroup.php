@@ -55,7 +55,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Core_DAO_CustomGroup
-   * @static
    */
   public static function create(&$params) {
     // create custom group dao, populate fields and then save.
@@ -232,7 +231,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_DAO_CustomGroup
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomGroup', $params, $defaults);
@@ -248,7 +246,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *
    * @return Object
    *   DAO object on sucess, null otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     // reset the cache
@@ -339,7 +336,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *   The reason for the info array in unclear and it could be determined from parsing the group tree after creation
    *   With caching the performance impact would be small & the function would be cleaner
    *
-   * @static
    */
   public static function &getTree(
     $entityType,
@@ -880,7 +876,6 @@ ORDER BY civicrm_custom_group.weight,
    * @return string
    *   title
    *
-   * @static
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $id, 'title');
@@ -904,7 +899,6 @@ ORDER BY civicrm_custom_group.weight,
    *   array consisting of all group and field details
    *
    *
-   * @static
    */
   public static function &getGroupDetail($groupId = NULL, $searchable = NULL, &$extends = NULL, $inSelector = NULL) {
     // create a new tree
@@ -1103,7 +1097,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return string
    *
-   * @static
    *
    * @see _apachesolr_civiAttachments_dereference_file_parent
    */
@@ -1185,7 +1178,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return void
    *
-   * @static
    */
   private static function _addWhereAdd(&$customGroupDAO, $entityType, $entityID = NULL, $allSubtypes = FALSE) {
     $addSubtypeClause = FALSE;
@@ -1253,7 +1245,6 @@ ORDER BY civicrm_custom_group.weight,
    * @return boolean
    *   false if field exists for this group, true if group gets deleted.
    *
-   * @static
    */
   public static function deleteGroup($group, $force = FALSE) {
 
@@ -1563,7 +1554,6 @@ ORDER BY civicrm_custom_group.weight,
    *   Prefix for custom grouptree assigned to template.
    *
    * @return void
-   * @static
    */
   public static function buildQuickForm(&$form, &$groupTree, $inactiveNeeded = FALSE, $prefix = '') {
     $form->assign_by_ref("{$prefix}groupTree", $groupTree);
@@ -1599,7 +1589,6 @@ ORDER BY civicrm_custom_group.weight,
    *   The type of custom group we are using.
    *
    * @return array
-   * @static
    */
   public static function extractGetParams(&$form, $type) {
     if (empty($_GET)) {
@@ -1709,7 +1698,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return boolean
    *   false if it matches else true
-   * @static
    */
   public static function checkCustomField($customFieldId, &$removeCustomFieldTypes) {
     $query = "SELECT cg.extends as extends

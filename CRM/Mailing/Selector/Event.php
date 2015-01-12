@@ -45,7 +45,6 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    * Array of supported links, currenly null
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
@@ -110,7 +109,6 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    * This method returns the links that are given for each search row.
    *
    * @return array
-   * @static
    */
   public static function &links() {
     return self::$_links;

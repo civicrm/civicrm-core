@@ -63,7 +63,6 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
    *
    * @param string $groupElementType
    *
-   * @static
    */
   static function buildQuickForm(
     &$form,
@@ -216,7 +215,6 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
    * @param string $groupElementType
    *
    * @return void
-   * @static
    */
   public static function setDefaults($id, &$defaults, $type = self::ALL, $fieldName = NULL, $groupElementType = 'checkbox') {
     $type = (int ) $type;

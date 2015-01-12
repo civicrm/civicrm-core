@@ -43,7 +43,6 @@ class CRM_Utils_Cache {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
@@ -63,7 +62,6 @@ class CRM_Utils_Cache {
    * Singleton function used to manage this object
    *
    * @return object
-   * @static
    */
   public static function &singleton() {
     if (self::$_singleton === NULL) {
@@ -99,7 +97,6 @@ class CRM_Utils_Cache {
    *
    * @return array
    *   associative array of settings for the cache
-   * @static
    */
   public static function getCacheSettings($cachePlugin) {
     switch ($cachePlugin) {

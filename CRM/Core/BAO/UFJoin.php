@@ -45,7 +45,6 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
    *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Core_DAO_UFJoin
-   * @static
    */
   public static function &create($params) {
     // see if a record exists with the same weight
@@ -97,7 +96,6 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
    *
    * @return int
    *   or null
-   * @static
    */
   public static function findJoinEntryId(&$params) {
     if (!empty($params['id'])) {
@@ -135,7 +133,6 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
    *
    * @return int
    *   or null
-   * @static
    */
   public static function findUFGroupId(&$params) {
 

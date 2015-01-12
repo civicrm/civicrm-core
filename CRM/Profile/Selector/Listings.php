@@ -45,7 +45,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * Array of supported links, currenly view and edit
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
@@ -53,7 +52,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
-   * @static
    */
   static $_columnHeaders;
 

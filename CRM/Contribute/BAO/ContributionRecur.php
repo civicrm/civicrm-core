@@ -58,7 +58,6 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Contribute_BAO_Contribution
-   * @static
    * @todo move hook calls / extended logic to create - requires changing calls to call create not add
    */
   public static function add(&$params) {
@@ -114,7 +113,6 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    *
    * @return boolean
    *   true if duplicate, false otherwise
-   * @static
    */
   public static function checkDuplicate($params, &$duplicates) {
     $id = CRM_Utils_Array::value('id', $params);
@@ -185,7 +183,6 @@ SELECT r.payment_processor_id
    *
    * @return array
    *   an array of recurring ids count
-   * @static
    */
   public static function getCount(&$ids) {
     $recurID = implode(',', $ids);
@@ -211,7 +208,6 @@ SELECT r.payment_processor_id
    * @param int $recurId
    *
    * @return bool
-   * @static
    */
   public static function deleteRecurContribution($recurId) {
     $result = FALSE;
@@ -238,7 +234,6 @@ SELECT r.payment_processor_id
    * @param array $activityParams
    *
    * @return bool
-   * @static
    */
   public static function cancelRecurContribution($recurId, $objects, $activityParams = array()) {
     if (!$recurId) {
@@ -334,7 +329,6 @@ SELECT r.payment_processor_id
    * @return array
    *   list of recurring contribution fields
    *
-   * @static
    */
   public static function getRecurContributions($contactId) {
     $params = array();

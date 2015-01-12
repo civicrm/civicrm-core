@@ -301,7 +301,6 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
    *
    * @return bool|array
    *   mixed true or array of errors
-   * @static
    */
   public static function formRule($params, $files, $self) {
     if (!empty($_POST['_qf_Import_refresh'])) {

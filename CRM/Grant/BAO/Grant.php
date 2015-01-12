@@ -37,7 +37,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Static field for all the grant information that we can potentially export
    * @var array
-   * @static
    */
   static $_exportableFields = NULL;
 
@@ -51,7 +50,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Get events Summary
    *
-   * @static
    *
    * @param bool $admin
    *
@@ -92,7 +90,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Get events Summary
    *
-   * @static
    *
    * @return array
    *   Array of event summary values
@@ -115,7 +112,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Retrieve statistics for grants.
    *
-   * @static
    *
    * @param bool $admin
    *
@@ -135,7 +131,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Grant_BAO_ManageGrant
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $grant = new CRM_Grant_DAO_Grant();
@@ -155,7 +150,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    * @param array $ids
    *   Reference array contains the id.
    *
-   * @static
    *
    * @return object
    */
@@ -258,7 +252,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *   Reference array contains the id.
    *
    * @return object
-   * @static
    */
   public static function create(&$params, &$ids) {
     $transaction = new CRM_Core_Transaction();
@@ -320,7 +313,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *
    * @return bool
    *
-   * @static
    */
   public static function deleteContact($id) {
     $grant = new CRM_Grant_DAO_Grant();
@@ -336,7 +328,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *   Grant id.
    *
    * @return bool|mixed
-   * @static
    */
   public static function del($id) {
     CRM_Utils_Hook::pre('delete', 'Grant', $id, CRM_Core_DAO::$_nullArray);
@@ -366,7 +357,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *
    * @return array
    *   array of exportable Fields
-   * @static
    */
   public static function &exportableFields() {
     if (!self::$_exportableFields) {
@@ -426,7 +416,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *
    * @return int
    *   count of grant records
-   * @static
    */
   public static function getContactGrantCount($contactID) {
     $query = "SELECT count(*) FROM civicrm_grant WHERE civicrm_grant.contact_id = {$contactID} ";

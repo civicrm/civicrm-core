@@ -52,7 +52,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field
-   * @static
    */
   public static function &add(&$params) {
     $priceFieldBAO = new CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field();
@@ -76,7 +75,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field
-   * @static
    */
   public static function create(&$params) {
 
@@ -164,7 +162,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field', $params, $defaults);
@@ -181,7 +178,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * @return Object
    *   DAO object on sucess, null otherwise
    *
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field', $id, 'is_active', $is_active);
@@ -196,7 +192,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * @return string
    *   name
    *
-   * @static
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field', $id, 'label');
@@ -219,7 +214,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * @param array $freezeOptions
    *
    * @return null
-   * @static
    */
   public static function addQuickFormElement(
     &$qf,
@@ -532,7 +526,6 @@ WHERE
    *
    * @return boolean
    *
-   * @static
    */
   public static function deleteField($id) {
     $field = new CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field();
@@ -581,7 +574,6 @@ WHERE
    * @param $fields
    * @param $error
    *
-   * @static
    */
 
   public static function priceSetValidation($priceSetId, $fields, &$error) {

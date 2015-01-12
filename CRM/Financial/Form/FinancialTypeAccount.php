@@ -239,7 +239,6 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
    *
    * @return array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRule($values, $files, $self) {
     $errorMsg = array();

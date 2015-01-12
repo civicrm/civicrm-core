@@ -57,7 +57,6 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_DAO_Domain
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_Domain', $params, $defaults);
@@ -69,7 +68,6 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @param null $reset
    *
    * @return CRM_Core_BAO_Domain|null
-   * @static
    */
   public static function &getDomain($reset = NULL) {
     static $domain = NULL;

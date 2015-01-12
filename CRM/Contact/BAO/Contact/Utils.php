@@ -47,7 +47,6 @@ class CRM_Contact_BAO_Contact_Utils {
    *   If profile overlay class should be added.
    *
    * @return string
-   * @static
    */
   public static function getImage($contactType, $urlOnly = FALSE, $contactId = NULL, $addProfileOverlay = TRUE) {
     static $imageInfo = array();
@@ -123,7 +122,6 @@ class CRM_Contact_BAO_Contact_Utils {
    * @return bool
    *   true if mix contact array else false
    *
-   * @static
    */
   public static function checkContactType(&$contactIds) {
     if (empty($contactIds)) {
@@ -158,7 +156,6 @@ WHERE  id IN ( $idString )
    *
    * @return array
    *   ( $cs, $ts, $live )
-   * @static
    */
   public static function generateChecksum($entityId, $ts = NULL, $live = NULL, $hash = NULL, $entityType = 'contact', $hashSize = NULL) {
     // return a warning message if we dont get a entityId
@@ -227,7 +224,6 @@ WHERE  id IN ( $idString )
    *
    * @return boolean
    *   true if valid, else false
-   * @static
    */
   public static function validChecksum($contactID, $inputCheck) {
 
@@ -261,7 +257,6 @@ WHERE  id IN ( $idString )
    *
    * @return int
    *   max locations for the contact
-   * @static
    */
   public static function maxLocations($contactId) {
     $contactLocations = array();
@@ -291,7 +286,6 @@ UNION
    * @param int $previousEmployerID
    * @param bool $newContact
    *
-   * @static
    */
   public static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL, $newContact = FALSE) {
     //if organization name is passed. CRM-15368,CRM-15547
@@ -374,7 +368,6 @@ UNION
    * @param int $previousEmpID
    *
    * @throws CiviCRM_API3_Exception
-   * @static
    */
   public static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE, $previousEmpID = NULL) {
     $ids = array();
@@ -492,7 +485,6 @@ WHERE id={$contactId}; ";
    * @param string $title
    *   fieldset title.
    *
-   * @static
    */
   public static function buildOnBehalfForm(&$form, $contactType, $countryID, $stateID, $title) {
 
@@ -587,7 +579,6 @@ UPDATE civicrm_contact
    *
    * @return array
    *   returns array with links to contact view
-   * @static
    */
   public static function formatContactIDSToLinks($contactIDs, $addViewLink = TRUE, $addEditLink = TRUE, $originalId = NULL) {
     $contactLinks = array();
@@ -696,7 +687,6 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
    *
    * @return array
    *   array of contact info.
-   * @static
    */
   public static function contactDetails($componentIds, $componentName, $returnProperties = array()) {
     $contactDetails = array();
@@ -825,7 +815,6 @@ Group By  componentId";
    *   This is associated array which contains submitted form values.
    *
    * @return void
-   * @static
    */
   public static function processSharedAddress(&$address) {
     if (!is_array($address)) {
@@ -878,7 +867,6 @@ Group By  componentId";
    *
    * @return array
    *   associated array of contact names
-   * @static
    */
   public static function getAddressShareContactNames(&$addresses) {
     $contactNames = array();
@@ -918,7 +906,6 @@ Group By  componentId";
    *   The contactID that was edited / deleted.
    *
    * @return void
-   * @static
    */
   public static function clearContactCaches($contactID = NULL) {
     // clear acl cache if any.
@@ -1133,7 +1120,6 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    * @param string $className
    *
    * @return void
-   * @static
    */
   public static function processGreetingTemplate(&$templateString, $contactDetails, $contactID, $className) {
     CRM_Utils_Token::replaceGreetingTokens($templateString, $contactDetails, $contactID, $className, TRUE);

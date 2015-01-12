@@ -60,7 +60,6 @@ class CRM_Utils_JSON {
    *
    * @return string
    *   JSON array
-   * @static
    */
   public static function encode($params, $identifier = 'id') {
     $buildObject = array();

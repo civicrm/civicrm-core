@@ -43,7 +43,6 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
   public $_permission = NULL;

@@ -49,7 +49,6 @@ class CRM_Pledge_BAO_PledgePayment extends CRM_Pledge_DAO_PledgePayment {
    *
    * @return array
    *   associated array of pledge payment details
-   * @static
    */
   public static function getPledgePayments($pledgeId) {
     $query = "
@@ -170,7 +169,6 @@ WHERE     pledge_id = %1
    *
    * @return int
    *   pledge payment id
-   * @static
    */
   public static function add($params) {
     if (!empty($params['id'])) {
@@ -214,7 +212,6 @@ WHERE     pledge_id = %1
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Pledge_BAO_PledgePayment
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $payment = new CRM_Pledge_BAO_PledgePayment;
@@ -233,7 +230,6 @@ WHERE     pledge_id = %1
    *
    * @return int
    *   pledge payment id
-   * @static
    */
   public static function del($id) {
     $payment = new CRM_Pledge_DAO_PledgePayment();
@@ -261,7 +257,6 @@ WHERE     pledge_id = %1
    *   Pledge id.
    *
    * @return bool
-   * @static
    */
   public static function deletePayments($id) {
     if (!CRM_Utils_Rule::positiveInteger($id)) {
@@ -295,7 +290,6 @@ WHERE     pledge_id = %1
    *   Contribution id.
    *
    * @return bool
-   * @static
    */
   public static function resetPledgePayment($contributionID) {
     //get all status
@@ -521,7 +515,6 @@ WHERE  civicrm_pledge.id = %2
    *
    * @return array
    *   Next scheduled date as an array
-   * @static
    */
   public static function calculateBaseScheduleDate(&$params) {
     $date = array();
@@ -591,7 +584,6 @@ WHERE  civicrm_pledge.id = %2
    *
    * @return int
    *   $statusId calculated status id of pledge
-   * @static
    */
   public static function calculatePledgeStatus($pledgeId) {
     $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -639,7 +631,6 @@ WHERE  civicrm_pledge.id = %2
    * @param bool $isScriptUpdate
    *   , is function being called from bin script?.
    *
-   * @static
    */
   static function updatePledgePayments(
     $pledgeId,
@@ -682,7 +673,6 @@ WHERE  civicrm_pledge_payment.pledge_id = %1
    * @param int $paymentId
    *   Payment id.
    *
-   * @static
    */
   public static function updateReminderDetails($paymentId) {
     $query = "
@@ -704,7 +694,6 @@ WHERE  civicrm_pledge_payment.id = {$paymentId}
    *
    * @return array
    *   associated array of pledge details
-   * @static
    */
   public static function getOldestPledgePayment($pledgeID, $limit = 1) {
     //get pending / overdue statuses

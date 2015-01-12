@@ -119,7 +119,6 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_BAO_MailSettings
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $mailSettings = new CRM_Core_DAO_MailSettings();
@@ -140,7 +139,6 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    * @param array $params
    *   Reference array contains the values submitted by the form.
    *
-   * @static
    *
    * @return object
    */
@@ -176,7 +174,6 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Core_BAO_MailSettings
-   * @static
    */
   public static function create(&$params) {
     $transaction = new CRM_Core_Transaction();
@@ -199,7 +196,6 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *   Mail settings id.
    *
    * @return mixed|null
-   * @static
    */
   public static function deleteMailSettings($id) {
     $results = NULL;

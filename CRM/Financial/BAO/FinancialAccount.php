@@ -55,7 +55,6 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Financial_BAO_FinancialAccount
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $financialAccount = new CRM_Financial_DAO_FinancialAccount();
@@ -77,7 +76,6 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    *
    * @return CRM_Core_DAO|null
    *   DAO object on success, null otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_FinancialAccount', $id, 'is_active', $is_active);
@@ -91,7 +89,6 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * @param array $ids
    *   Reference array contains the id.
    *
-   * @static
    * @return CRM_Financial_DAO_FinancialAccount
    */
   public static function add(&$params, &$ids = array()) {
@@ -122,7 +119,6 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * Delete financial Types
    *
    * @param int $financialAccountId
-   * @static
    */
   public static function del($financialAccountId) {
     //checking if financial type is present
@@ -161,7 +157,6 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    *
    * @return int
    *   accounting code
-   * @static
    */
   public static function getAccountingCode($financialTypeId) {
     $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
@@ -192,7 +187,6 @@ WHERE cft.id = %1
    *
    * @return int
    *   count
-   * @static
    */
   public static function getARAccounts($financialAccountId, $financialAccountTypeId = NULL, $accountTypeCode = 'ar') {
     if (!$financialAccountTypeId) {

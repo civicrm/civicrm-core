@@ -783,7 +783,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *
    * @return string
    *   loginURL for the current CMS
-   * @static
    */
   public function getLoginURL($destination = '') {
     $config = CRM_Core_Config::singleton();

@@ -46,7 +46,6 @@ class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
    * @param array $params
    *   Reference array contains the values submitted by the form.
    *
-   * @static
    *
    * @return object
    */
@@ -67,7 +66,6 @@ class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
    * @param int $id
    *
    * @return bool
-   * @static
    */
   public static function del($id) {
     $dao = new CRM_Member_DAO_MembershipBlock();

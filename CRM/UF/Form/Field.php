@@ -625,7 +625,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    *
    * @return array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRuleSubType($fieldType, $groupType, $errors) {
     if (in_array($fieldType, array(
@@ -680,7 +679,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    *
    * @return Array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRuleCustomDataExtentColumnValue($customField, $gid, $fieldType, &$errors) {
     // fix me : check object $customField
@@ -733,7 +731,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * @param array $errors
    *   Collect errors.
    *
-   * @static
    */
   public static function formRulePrimaryCheck($fields, $profileFieldName, $groupFields, &$errors) {
     //FIXME: This may need to also apply to website fields if they are refactored to allow more than one per profile
@@ -774,7 +771,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    *
    * @return array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRule($fields, $files, $self) {
     $is_required = CRM_Utils_Array::value('is_required', $fields, FALSE);

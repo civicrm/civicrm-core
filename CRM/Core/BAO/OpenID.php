@@ -46,7 +46,6 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
    *
    * @return object
    *   CRM_Core_BAO_OpenID object on success, null otherwise
-   * @static
    */
   public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
@@ -68,7 +67,6 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
    *   Input parameters to find object.
    *
    * @return mixed
-   * @static
    */
   public static function &getValues($entityBlock) {
     return CRM_Core_BAO_Block::getValues('openid', $entityBlock);
@@ -81,7 +79,6 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
    *   The OpenID to check.
    *
    * @return boolean
-   * @static
    */
   public static function isAllowedToLogin($identity_url) {
     $openId = new CRM_Core_DAO_OpenID();
@@ -102,7 +99,6 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
    *
    * @return array
    *   the array of openid's
-   * @static
    */
   public static function allOpenIDs($id, $updateBlankLocInfo = FALSE) {
     if (!$id) {

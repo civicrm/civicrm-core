@@ -181,7 +181,6 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
    *
    * @return array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRule($params) {
     $errors = array();

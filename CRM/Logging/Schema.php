@@ -659,7 +659,6 @@ COLS;
    * where we want to do a mass cleanup but dont want to bother with
    * an audit trail
    *
-   * @static
    */
   public static function disableLoggingForThisConnection() {
     // do this only if logging is enabled
