@@ -104,7 +104,7 @@ function civicrm_api3_payment_processor_type_get($params) {
  * @return array
  *   API Result Array
  * {@getfields PaymentProcessorType_delete}
- * @static void
+ * @static
  * @access public
  */
 function civicrm_api3_payment_processor_type_delete($params) {

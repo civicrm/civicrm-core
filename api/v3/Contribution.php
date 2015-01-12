@@ -46,7 +46,7 @@
  * @throws API_Exception
  * @return array
  *   Api result array
- * @static void
+ * @static
  * @access public
  * @example ContributionCreate.php
  * {@getfields Contribution_create}
@@ -179,7 +179,7 @@ function _civicrm_api3_contribution_create_legacy_support_45(&$params) {
  *
  * @return boolean
  *   true if success, else false
- * @static void
+ * @static
  * @access public
  * {@getfields Contribution_delete}
  * @example ContributionDelete.php
@@ -210,7 +210,7 @@ function _civicrm_api3_contribution_delete_spec(&$params) {
  *
  * @return array
  *   Array of contributions, if error an array with an error id and error message
- * @static void
+ * @static
  * @access public
  * {@getfields Contribution_get}
  * @example ContributionGet.php
@@ -307,7 +307,7 @@ function _civicrm_api3_contribution_transact_spec(&$params) {
  *
  * @return array
  *   (reference )        contribution of created or updated record (or a civicrm error)
- * @static void
+ * @static
  * @access public
  *
  */
@@ -362,7 +362,7 @@ function civicrm_api3_contribution_transact($params) {
  * @throws Exception
  * @return array
  *   Api result array
- * @static void
+ * @static
  * @access public
  */
 function civicrm_api3_contribution_sendconfirmation($params) {
@@ -420,7 +420,7 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
  * @throws API_Exception
  * @return array
  *   Api result array
- * @static void
+ * @static
  * @access public
  */
 function civicrm_api3_contribution_completetransaction(&$params) {

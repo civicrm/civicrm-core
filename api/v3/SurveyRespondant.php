@@ -50,7 +50,7 @@ function _civicrm_api3_survey_respondant_deprecation() {
  *
  * @return array
  *   (reference )        contribution_id of created or updated record
- * @static void
+ * @static
  * @access public
  * @deprecated - api currently not supported
  */

@@ -53,7 +53,7 @@
  * @return array
  *   API Result Array
  *
- * @static void
+ * @static
  * @access public
  */
 function civicrm_api3_contact_create($params) {
@@ -148,7 +148,7 @@ function _civicrm_api3_contact_create_spec(&$params) {
  * @return array
  *   API Result Array
  * (@getfields contact_get}
- * @static void
+ * @static
  * @access public
  *
  * @example ContactGet.php Standard GET example
@@ -879,7 +879,7 @@ function _civicrm_api3_contact_deprecation() {
  * @return array
  *   API Result Array
  *
- * @static void
+ * @static
  * @access public
  */
 function civicrm_api3_contact_merge($params) {
