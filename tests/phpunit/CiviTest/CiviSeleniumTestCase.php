@@ -1617,18 +1617,20 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * Generic function to compare expected values after an api call to retrieved
    * DB values.
    *
-   * @daoName  string   DAO Name of object we're evaluating.
-   * @id       int      Id of object
-   * @match    array    Associative array of field name => expected value. Empty if asserting
+   * @param string $daoName
+   *   DAO Name of object we're evaluating.
+   * @param int $id
+   *   Id of object
+   * @param array $match
+   *   Associative array of field name => expected value. Empty if asserting
    *                      that a DELETE occurred
-   * @delete   boolean  True if we're checking that a DELETE action occurred.
+   * @param boolean $delete
+   *   are we checking that a DELETE action occurred?
    */
   public function assertDBState($daoName, $id, $match, $delete = FALSE) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
+    if (self::checkDoLocalDBTest()) {
+      CiviDBAssert::assertDBState($this, $daoName, $id, $match, $delete);
     }
-
-    return CiviDBAssert::assertDBState($this, $daoName, $id, $match, $delete);
   }
 
   /**
