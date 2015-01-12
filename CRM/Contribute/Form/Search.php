@@ -130,7 +130,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       );
     }
 
-    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
+    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 1);
     $selector = new CRM_Contribute_Selector_Search($this->_queryParams,
       $this->_action,
       NULL,
@@ -269,12 +269,22 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     $config = CRM_Core_Config::singleton();
     if (!empty($_POST)) {
-      // CRM-13848
-      $financialType = CRM_Utils_Array::value('financial_type_id', $this->_formValues);
-      if ($financialType && is_array($financialType)) {
-        unset($this->_formValues['financial_type_id']);
-        foreach ($financialType as $notImportant => $typeID) {
-          $this->_formValues['financial_type_id'][$typeID] = 1;
+      $specialParams = array(
+        'financial_type_id',
+        'contribution_soft_credit_type_id',
+        'contribution_status_id',
+        'contribution_source',
+        'contribution_trxn_id'
+      );
+      foreach ($specialParams as $element) {
+        $value = CRM_Utils_Array::value($element, $this->_formValues);
+        if ($value) {
+          if (is_array($value)) {
+            $this->_formValues[$element] = array('IN' => $value);
+          }
+          else {
+            $this->_formValues[$element] = array('LIKE' => "%$value%");
+          }
         }
       }
 
