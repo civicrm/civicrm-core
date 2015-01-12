@@ -163,7 +163,8 @@ function _civicrm_api3_system_log_spec(&$params) {
 /**
  * System.Get API
  *
- * @param arary $params
+ * @param array $params
+ * @return array
  */
 function civicrm_api3_system_get($params) {
   $returnValues = array(

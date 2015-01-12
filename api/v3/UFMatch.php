@@ -62,7 +62,6 @@ function civicrm_api3_uf_match_get($params) {
  * @return array
  *   api result array
  * {@getfields uf_match_create}
- * @access public
  */
 function civicrm_api3_uf_match_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -92,7 +91,6 @@ function _civicrm_api3_uf_match_create_spec(&$params) {
  * @return array
  *   api result array
  * {@getfields uf_match_create}
- * @access public
  */
 function civicrm_api3_uf_match_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

@@ -46,7 +46,6 @@
  *
  * @return array
  *   Array of newly created activity contact records.
- * @access public
  */
 function civicrm_api3_activity_contact_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -73,7 +72,6 @@ function _civicrm_api3_activity_contact_create_spec(&$params) {
  *   Api Result
  *
  * @example ActivityContact.php
- * @access public
  */
 function civicrm_api3_activity_contact_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -90,7 +88,6 @@ function civicrm_api3_activity_contact_delete($params) {
  * @return array
  *   details of found tags else error
  *
- * @access public
  */
 function civicrm_api3_activity_contact_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);

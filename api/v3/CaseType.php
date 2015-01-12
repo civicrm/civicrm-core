@@ -48,7 +48,6 @@
  * @return array
  *   API result array
  *
- * @access public
  */
 function civicrm_api3_case_type_create($params) {
   civicrm_api3_verify_mandatory($params, _civicrm_api3_get_DAO(__FUNCTION__));
@@ -75,7 +74,6 @@ function civicrm_api3_case_type_create($params) {
  *
  * @return array
  *   case types keyed by id
- * @access public
  */
 function civicrm_api3_case_type_get($params) {
   if (!empty($params['options']) && !empty($params['options']['is_count'])) {

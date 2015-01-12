@@ -47,7 +47,6 @@
  * @return array
  *   campaign array
  * {@getfields campaign_create}
- * @access public
  */
 function civicrm_api3_campaign_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Campaign');
@@ -95,7 +94,6 @@ function civicrm_api3_campaign_get($params) {
  *   (reference) returns flag true if successful, error
  *                message otherwise
  * {@getfields campaign_delete}
- * @access public
  */
 function civicrm_api3_campaign_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

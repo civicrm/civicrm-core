@@ -536,7 +536,6 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    *
    * @throws Exception
    * @return void
-   * @access public
    */
   public static function sendEmail($params, $sendEmailMode) {
 
