@@ -75,10 +75,9 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Campaign $title");
 
     //Opening Edit Page of the created Campaign
-    $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[text()='{$campaignTitle}']/../td[13]/span/a[text()='Edit']");
-    $this->clickLink("//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[text()='{$campaignTitle}']/../td[13]/span/a[text()='Edit']", "//textarea[@id='description']");
-    $fetchedVaue = $this->getValue('description');
-    $this->assertEquals($campaignDescription, $fetchedVaue);
+    $this->waitForElementPresent("//div[@id='campaignList']/div/table/tbody//tr/td[3]/div[text()='{$campaignTitle}']/../../td[13]/span/a[1][text()='Edit']");
+    $this->clickLink("//div[@id='campaignList']/div/table/tbody//tr/td[3]/div[text()='{$campaignTitle}']/../../td[13]/span/a[1][text()='Edit']", "//textarea[@id='description']", FALSE);
+    $this->assertTrue($this->isTextPresent($campaignDescription), 'Missing text: ' . $campaignDescription);
   }
 
   public function testAjaxCustomGroupLoad() {
