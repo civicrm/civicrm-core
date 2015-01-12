@@ -220,6 +220,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // fill correct available option for select field
     $this->select("price_{$selectFieldId}", "value={$selectFieldOp2}");
 
+    $this->click("css=input[data-amount=10]");
     $this->click('_qf_Register_upload-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -916,7 +917,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->click('_qf_Participant_2_next-Array');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertStringsPresent(array('Sorry, currently only 4 seats are available for this option.'));
+    $this->assertStringsPresent(array('Sorry, this option is currently sold out.'));
 
     // Skip participant3 and register
     $this->click('_qf_Participant_2_next_skip-Array');
@@ -1221,6 +1222,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
   public function _checkConfirmationAndRegister() {
     $confirmStrings = array('Event Fee(s)', 'Billing Name and Address', 'Credit Card Information');
     $this->assertStringsPresent($confirmStrings);
+    $this->waitForElementPresent("_qf_Confirm_next-bottom");
     $this->click('_qf_Confirm_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $thankStrings = array('Thank You for Registering', 'Event Total', 'Transaction Date');
