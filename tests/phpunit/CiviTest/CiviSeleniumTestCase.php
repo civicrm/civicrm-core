@@ -1680,23 +1680,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param $expectedValues
    */
   public function assertDBCompareValues($daoName, $searchParams, $expectedValues) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
+    if (self::checkDoLocalDBTest()) {
+      CiviDBAssert::assertDBCompareValues($this, $daoName, $searchParams, $expectedValues);
     }
-
-    return CiviDBAssert::assertDBCompareValues($this, $daoName, $searchParams, $expectedValues);
-  }
-
-  /**
-   * @param $expectedValues
-   * @param $actualValues
-   */
-  public function assertAttributesEquals(&$expectedValues, &$actualValues) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
-    }
-
-    return CiviDBAssert::assertAttributesEquals($expectedValues, $actualValues);
   }
 
   /**
@@ -1705,7 +1691,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param string $message
    */
   public function assertType($expected, $actual, $message = '') {
-    return $this->assertInternalType($expected, $actual, $message);
+    $this->assertInternalType($expected, $actual, $message);
   }
 
   /**
@@ -2084,7 +2070,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * which uses the entity info as its selection value
    * @param array $pageUrl
    *   The url which on which the ajax custom group load takes place.
-   * @param bool $beforeTriggering
+   * @param string $beforeTriggering
    * @return void
    */
   public function customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl, $beforeTriggering = NULL) {
@@ -2275,6 +2261,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    * Enable or disable Pop-ups via Display Preferences
+   * @param bool $enabled
    */
   public function enableDisablePopups($enabled = TRUE) {
     $this->openCiviPage('admin/setting/preferences/display', 'reset=1');
