@@ -1617,88 +1617,60 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * Generic function to compare expected values after an api call to retrieved
    * DB values.
    *
-   * @daoName  string   DAO Name of object we're evaluating.
-   * @id       int      Id of object
-   * @match    array    Associative array of field name => expected value. Empty if asserting
+   * @param string $daoName
+   *   DAO Name of object we're evaluating.
+   * @param int $id
+   *   Id of object
+   * @param array $match
+   *   Associative array of field name => expected value. Empty if asserting
    *                      that a DELETE occurred
-   * @delete   boolean  True if we're checking that a DELETE action occurred.
+   * @param boolean $delete
+   *   are we checking that a DELETE action occurred?
    */
   public function assertDBState($daoName, $id, $match, $delete = FALSE) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
+    if (self::checkDoLocalDBTest()) {
+      CiviDBAssert::assertDBState($this, $daoName, $id, $match, $delete);
     }
-
-    return CiviDBAssert::assertDBState($this, $daoName, $id, $match, $delete);
   }
 
   /**
    * Request a record from the DB by seachColumn+searchValue. Success if a record is found.
    * @param string $daoName
-   * @param $searchValue
-   * @param $returnColumn
-   * @param $searchColumn
-   * @param $message
-   *
-   * @return null|string
+   * @param string $searchValue
+   * @param string $returnColumn
+   * @param string $searchColumn
+   * @param string $message
    */
   public function assertDBNotNull($daoName, $searchValue, $returnColumn, $searchColumn, $message) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
+    if (self::checkDoLocalDBTest()) {
+      CiviDBAssert::assertDBNotNull($this, $daoName, $searchValue, $returnColumn, $searchColumn, $message);
     }
-
-    return CiviDBAssert::assertDBNotNull($this, $daoName, $searchValue, $returnColumn, $searchColumn, $message);
   }
 
   /**
-   * Request a record from the DB by seachColumn+searchValue. Success if returnColumn value is NULL.
+   * Request a record from the DB by searchColumn+searchValue. Success if returnColumn value is NULL.
    * @param string $daoName
-   * @param $searchValue
-   * @param $returnColumn
-   * @param $searchColumn
-   * @param $message
+   * @param string $searchValue
+   * @param string $returnColumn
+   * @param string $searchColumn
+   * @param string $message
    */
   public function assertDBNull($daoName, $searchValue, $returnColumn, $searchColumn, $message) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
+    if (self::checkDoLocalDBTest()) {
+      CiviDBAssert::assertDBNull($this, $daoName, $searchValue, $returnColumn, $searchColumn, $message);
     }
-
-    return CiviDBAssert::assertDBNull($this, $daoName, $searchValue, $returnColumn, $searchColumn, $message);
   }
 
   /**
    * Request a record from the DB by id. Success if row not found.
    * @param string $daoName
    * @param int $id
-   * @param $message
-   */
-  public function assertDBRowNotExist($daoName, $id, $message) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
-    }
-
-    return CiviDBAssert::assertDBRowNotExist($this, $daoName, $id, $message);
-  }
-
-  /**
-   * Compare a single column value in a retrieved DB record to an expected value
-   * @param string $daoName
-   * @param $searchValue
-   * @param $returnColumn
-   * @param $searchColumn
-   * @param $expectedValue
    * @param string $message
    */
-  function assertDBCompareValue(
-    $daoName, $searchValue, $returnColumn, $searchColumn,
-    $expectedValue, $message
-  ) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
+  public function assertDBRowNotExist($daoName, $id, $message) {
+    if (self::checkDoLocalDBTest()) {
+      CiviDBAssert::assertDBRowNotExist($this, $daoName, $id, $message);
     }
-
-    return CiviDBAssert::assertDBCompareValue($daoName, $searchValue, $returnColumn, $searchColumn,
-      $expectedValue, $message
-    );
   }
 
   /**
@@ -1708,23 +1680,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param $expectedValues
    */
   public function assertDBCompareValues($daoName, $searchParams, $expectedValues) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
+    if (self::checkDoLocalDBTest()) {
+      CiviDBAssert::assertDBCompareValues($this, $daoName, $searchParams, $expectedValues);
     }
-
-    return CiviDBAssert::assertDBCompareValues($this, $daoName, $searchParams, $expectedValues);
-  }
-
-  /**
-   * @param $expectedValues
-   * @param $actualValues
-   */
-  public function assertAttributesEquals(&$expectedValues, &$actualValues) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
-    }
-
-    return CiviDBAssert::assertAttributesEquals($expectedValues, $actualValues);
   }
 
   /**
@@ -1733,7 +1691,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param string $message
    */
   public function assertType($expected, $actual, $message = '') {
-    return $this->assertInternalType($expected, $actual, $message);
+    $this->assertInternalType($expected, $actual, $message);
   }
 
   /**
@@ -2112,7 +2070,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * which uses the entity info as its selection value
    * @param array $pageUrl
    *   The url which on which the ajax custom group load takes place.
-   * @param bool $beforeTriggering
+   * @param string $beforeTriggering
    * @return void
    */
   public function customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl, $beforeTriggering = NULL) {
@@ -2303,6 +2261,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    * Enable or disable Pop-ups via Display Preferences
+   * @param bool $enabled
    */
   public function enableDisablePopups($enabled = TRUE) {
     $this->openCiviPage('admin/setting/preferences/display', 'reset=1');

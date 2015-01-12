@@ -2,6 +2,8 @@
 
 /**
  *  Functions to inform caller that Location is obsolete and Address, Phone, Email, Website should be used
+ * @param $params
+ * @return array
  */
 function civicrm_api3_location_create($params) {
   return civicrm_api3_create_error("API (Location, Create) does not exist, use the Address/Phone/Email/Website API instead", array('obsoleted' => TRUE));

@@ -1335,14 +1335,13 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @param string $entityName
    * @param int $count
    *
-   *
    * @return array
    */
   private function getMockableBAOObjects($entityName, $count = 2) {
     $baoString = _civicrm_api3_get_BAO($entityName);
     if (empty($baoString)) {
       $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
-      return;
+      return array();
     }
     $baos = array();
     $i = 0;

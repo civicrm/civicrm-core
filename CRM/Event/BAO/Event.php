@@ -915,16 +915,15 @@ WHERE civicrm_event.is_active = 1
    *
    * @param int $id
    *   The event id to copy.
-   *        obj     $newEvent    object of CRM_Event_DAO_Event
    *        boolean $afterCreate call to copy after the create function
    * @param null $newEvent
    * @param bool $afterCreate
    *
-   * @return void
+   * @return CRM_Event_DAO_Event
    */
   public static function copy($id, $newEvent = NULL, $afterCreate = FALSE) {
 
-    $defaults = $eventValues = array();
+    $eventValues = array();
 
     //get the require event values.
     $eventParams = array('id' => $id);
