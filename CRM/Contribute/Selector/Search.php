@@ -301,7 +301,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
   /**
    * Returns all the rows in the given offset and rowCount
    *
-   * @param enum $action
+   * @param string $action
    *   The action being performed.
    * @param int $offset
    *   The row number to start from.
@@ -309,7 +309,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
    *   The number of rows to return.
    * @param string $sort
    *   The sql string that describes the sort order.
-   * @param enum $output
+   * @param string $output
    *   What should the result set include (web/email/csv).
    *
    * @return int
@@ -428,12 +428,8 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
   }
 
   /**
-   * @return array
-   *   which contains an array of strings
+   * @inheritDoc
    */
-
-  // the current internationalisation is bad, but should more or less work
-  // for most of "European" languages
   public function getQILL() {
     return $this->_query->qill();
   }
@@ -444,7 +440,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
    *
    * @param string $action
    *   The action being performed.
-   * @param enum $output
+   * @param string $output
    *   What should the result set include (web/email/csv).
    *
    * @return array

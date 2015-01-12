@@ -1191,9 +1191,8 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *
    * @return int
    *   the number of members of type $membershipTypeId whose
-   *         start_date is between $startDate and $endDate
+   *   start_date is between $startDate and $endDate
    */
-  //LCD
   public static function getMembershipStarts($membershipTypeId, $startDate, $endDate, $isTest = 0, $isOwner = 0) {
 
     $testClause = 'membership.is_test = 1';
@@ -1586,12 +1585,12 @@ AND civicrm_membership.is_test = %2";
    *
    * @param array $currentMembership
    *   Reference to the array.
-   *                                     containing all values of
-   *                                     the current membership
+   *   containing all values of
+   *   the current membership
    * @param array $changeToday
    *   Array of month, day, year.
-   *                                     values in case today needs
-   *                                     to be customised, null otherwise
+   *   values in case today needs
+   *   to be customised, null otherwise
    *
    * @return void
    * @static
@@ -1674,10 +1673,10 @@ AND civicrm_membership.is_test = %2";
   /**
    * Get the contribution page id from the membership record
    *
-   * @param int membershipId membership id
+   * @param int $membershipID
    *
    * @return int
-   *   $contributionPageId contribution page id
+   *   contribution page id
    * @static
    */
   public static function getContributionPageId($membershipID) {
@@ -1725,6 +1724,7 @@ SELECT c.contribution_page_id as pageID
    * profile
    *
    * @param null $mode
+   *   FIXME: This param is ignored
    *
    * @return array
    *   the list of membership fields
@@ -1944,7 +1944,6 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * Delete the record that are associated with this Membership Payment
    *
    * @param int $membershipId
-   *   Membsership id.
    *
    * @return boolean
    *   true if deleted false otherwise
@@ -2175,8 +2174,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @return int
    *   returns the number of members of type $membershipTypeId
-   *         whose join_date is before $startDate and
-   *         whose start_date is between $startDate and $endDate
+   *   whose join_date is before $startDate and
+   *   whose start_date is between $startDate and $endDate
    */
   public static function getMembershipRenewals($membershipTypeId, $startDate, $endDate, $isTest = 0) {
     $testClause = 'membership.is_test = 1';
@@ -2339,7 +2338,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @param array $errors
    *
-   *
    * @return string
    */
   public static function compileErrorMessage($errors) {
@@ -2353,6 +2351,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
 
   /**
    * Extract relevant values from the form so we can separate form logic from BAO logcis
+   *
    * @param CRM_Core_Form $form
    * @param $changeToday
    * @param $membershipTypeDetails
@@ -2663,7 +2662,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   /**
    * Process price set and line items.
    *
-   *
    * @param int $membershipId
    * @param $lineItem
    *
@@ -2882,7 +2880,7 @@ WHERE      civicrm_membership.is_test = 0";
   }
 
   /**
-   * The function returns the membershiptypes for a particular contact
+   * Returns the membership types for a particular contact
    * who has lifetime membership without end date.
    *
    * @param int $contactID

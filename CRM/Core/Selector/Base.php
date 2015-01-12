@@ -159,7 +159,11 @@ class CRM_Core_Selector_Base {
    * Get the display text in plain language for the search
    * to display on the results page
    *
-   * @return string
+   * FIXME: the current internationalisation is bad, but should more or less work
+   * on most of "European" languages
+   *
+   * @return array
+   *   array of strings
    */
   public function getQill() {
     return NULL;

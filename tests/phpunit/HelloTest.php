@@ -70,7 +70,9 @@ class HelloTest extends PHPUnit_Framework_TestCase {
     unset($this->abc);
   }
 
-  // test the toString function
+  /**
+   * test the toString function
+   */
   public function testHello() {
     $result = $this->abc;
     $expected = 'hello';

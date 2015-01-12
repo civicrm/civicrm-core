@@ -42,10 +42,8 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate implements CRM_Contac
    */
   public function __construct(&$formValues) {
     $this->_formValues = $formValues;
-    /**
-     * Define the columns for search result rows
-     */
 
+    // Define the columns for search result rows
     $this->_columns = array(
       ts('Contact ID') => 'contact_id',
       ts('Name') => 'sort_name',
@@ -99,6 +97,8 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate implements CRM_Contac
 
   /**
    * Define the smarty template used to layout the search form and results listings.
+   *
+   * @return string
    */
   public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom/ContributionAggregate.tpl';
@@ -106,6 +106,14 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate implements CRM_Contac
 
   /**
    * Construct the search query
+   *
+   * @param int $offset
+   * @param int $rowcount
+   * @param string|object $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   *
+   * @return string
    */
   function all(
     $offset = 0, $rowcount = 0, $sort = NULL,
@@ -175,11 +183,9 @@ civicrm_contact AS contact_a
 ";
   }
 
-  /*
-      * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
-      *
-      */
   /**
+   * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
+   *
    * @param bool $includeContactIDs
    *
    * @return string
@@ -248,6 +254,10 @@ civicrm_contact AS contact_a
 
   /*
    * Functions below generally don't need to be modified
+   */
+
+  /**
+   * @inheritDoc
    */
   public function count() {
     $sql = $this->all();
