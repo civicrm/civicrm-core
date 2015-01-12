@@ -372,9 +372,9 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
 
   /**
    * @param string $context
-   * @param string $parentElement
-   *
+   * @param bool $dialog
    * @return mixed
+   *
    */
   public function _addRecords($context = 'Edit', $dialog = FALSE) {
     $params['text'] = 'text' . substr(sha1(rand()), 0, 3);

@@ -215,6 +215,8 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
 
   /**
    * Add custom fields for a contact sub-type
+   * @param $contactSubType
+   * @return array
    */
   public function _addCustomData($contactSubType) {
     $this->openCiviPage("admin/custom/group", "action=add&reset=1");
