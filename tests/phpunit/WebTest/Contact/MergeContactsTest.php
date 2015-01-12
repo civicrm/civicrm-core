@@ -247,7 +247,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
     $this->click('toggleSelect');
     $this->click('_qf_Merge_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec() * 4);
+    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isTextPresent("Staff, Student"));
   }
 
@@ -594,7 +594,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     $this->select("name=option51_length", "value=100");
     $totalContacts = $this->getXpathCount("//table[@class='pagerDisplay']/tbody/tr");
-    $this->click("xpath=//form[@id='DedupeFind']//a/span[text()='Batch Merge Duplicates']");
+    $this->click("//form[@id='DedupeFind']//a/span[contains(text(),'Batch Merge Duplicates')]");
 
     // Check confirmation alert.
     $this->assertTrue(
@@ -972,7 +972,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Contact Saved");
 
     $this->openCiviPage("contact/dedupefind", "reset=1&action=update&rgid=4");
-    $this->click("xpath=//a/span[text()='Refresh Duplicates']");
+    $this->click("//a/span[contains(text(),'Refresh Duplicates')]");
     $this->assertTrue((bool) preg_match("/This will refresh the duplicates list. Click OK to proceed./", $this->getConfirmation()));
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
