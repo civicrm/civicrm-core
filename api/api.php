@@ -127,10 +127,10 @@ function _civicrm_api_replace_variables(&$params, &$parentResult, $separator = '
   foreach ($params as $field => $value) {
 
     if (is_string($value) && substr($value, 0, 6) == '$value') {
-      $valuesubstitute = substr($value, 7);
+      $valueSubstitute = substr($value, 7);
 
-      if (!empty($parentResult[$valuesubstitute])) {
-        $params[$field] = $parentResult[$valuesubstitute];
+      if (!empty($parentResult[$valueSubstitute])) {
+        $params[$field] = $parentResult[$valueSubstitute];
       }
       else {
 
@@ -145,8 +145,8 @@ function _civicrm_api_replace_variables(&$params, &$parentResult, $separator = '
           $fieldname .= "." . array_shift($stringParts);
           if (array_key_exists($fieldname, $parentResult) && is_array($parentResult[$fieldname])) {
             $arrayLocation = $parentResult[$fieldname];
-            foreach ($stringParts as $key => $value) {
-              $arrayLocation = CRM_Utils_Array::value($value, $arrayLocation);
+            foreach ($stringParts as $key => $innerValue) {
+              $arrayLocation = CRM_Utils_Array::value($innerValue, $arrayLocation);
             }
             $params[$field] = $arrayLocation;
           }
