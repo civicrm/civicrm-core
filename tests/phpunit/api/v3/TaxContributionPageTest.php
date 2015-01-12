@@ -165,7 +165,6 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'financial_account_id' => 12,
       'is_active' => 1,
       'is_default' => 1,
-      'is_default' => 1,
       'user_name' => 'dummy',
       'url_site' => 'http://dummy.com',
       'url_recur' => 'http://dummyrecur.com',

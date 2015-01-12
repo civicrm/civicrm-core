@@ -86,7 +86,6 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       ));
     $contactIDs['b'] = $this->individualCreate(array(
         'email' => 'exclude.me@example.org',
-        'last_name' => 'Excluder',
         'last_name' => 'Excluder'
       ));
     $this->callAPISuccess('GroupContact', 'create', array(
@@ -184,8 +183,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       ));
     $contactIDs['excludeme'] = $this->individualCreate(array(
         'email' => 'exclude.me@example.org',
-        'last_name' => 'Excluder',
-        'last_name' => 'Excluder'
+          'last_name' => 'Excluder',
       ));
     $this->callAPISuccess('GroupContact', 'create', array(
         'group_id' => $groupIDs['inc'],
@@ -303,6 +301,9 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertEquals(array('alice@example.org', 'bob@example.org', 'carol@example.org'), $deliveredEmails);
   }
 
+  /**
+   * @return array
+   */
   public function submitProvider() {
     $cases = array(); // $useLogin, $params, $expectedFailure, $expectedJobCount
     $cases[] = array(
@@ -416,7 +417,7 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
    */
   public function testMailerDeleteSuccess() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
-    $jobs = $this->callAPIAndDocument($this->_entity, 'delete', array('id' => $result['id']), __FUNCTION__, __FILE__);
+    $this->callAPIAndDocument($this->_entity, 'delete', array('id' => $result['id']), __FUNCTION__, __FILE__);
     $this->assertAPIDeleted($this->_entity, $result['id']);
   }
 
@@ -438,7 +439,7 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
       'body' => 'Body...',
       'time_stamp' => '20111109212100',
     );
-    $result = $this->callAPIFailure('mailing_event', 'bounce', $params,
+    $this->callAPIFailure('mailing_event', 'bounce', $params,
       'Queue event could not be found'
     );
   }
@@ -459,7 +460,7 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
       'event_subscribe_id' => '123',
       'time_stamp' => '20111111010101',
     );
-    $result = $this->callAPIFailure('mailing_event', 'confirm', $params,
+    $this->callAPIFailure('mailing_event', 'confirm', $params,
       'Confirmation failed'
     );
   }
@@ -482,7 +483,7 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
       'replyTo' => $this->_email,
       'time_stamp' => '20111111010101',
     );
-    $result = $this->callAPIFailure('mailing_event', 'reply', $params,
+    $this->callAPIFailure('mailing_event', 'reply', $params,
       'Queue event could not be found'
     );
   }
@@ -504,7 +505,7 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
       'email' => $this->_email,
       'time_stamp' => '20111111010101',
     );
-    $result = $this->callAPIFailure('mailing_event', 'forward', $params,
+    $this->callAPIFailure('mailing_event', 'forward', $params,
       'Queue event could not be found'
     );
   }
