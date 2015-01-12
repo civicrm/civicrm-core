@@ -88,6 +88,7 @@ function civicrm_api3_premium_delete($params) {
 
 /**
  * return field specification specific to get requests
+ * @param array $params
  */
 function _civicrm_api3_premium_get_spec(&$params) {
   $params['premiums_active']['api.aliases'] = array('is_active');
@@ -95,6 +96,7 @@ function _civicrm_api3_premium_get_spec(&$params) {
 
 /**
  * return field specification specific to create requests
+ * @param array $params
  */
 function _civicrm_api3_premium_create_spec(&$params) {
   $params['premiums_active']['api.aliases'] = array('is_active');

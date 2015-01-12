@@ -174,8 +174,10 @@ function civicrm_api3_uf_field_delete($params) {
 
   return civicrm_api3_create_success($result, $params);
 }
+
 /**
  * field id accepted for backward compatibility - unset required on id
+ * @param array $params
  */
 function _civicrm_api3_uf_field_delete_spec(&$params) {
   // legacy support for field_id
