@@ -113,14 +113,14 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function isModulePermissionSupported() {
     return TRUE;
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function upgradePermissions($permissions) {
     if (empty($permissions)) {

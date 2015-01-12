@@ -38,11 +38,13 @@
 class CRM_Contribute_Info extends CRM_Core_Component_Info {
 
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   */
   protected $keyword = 'contribute';
 
   /**
-   * docs inherited from interface
+   * @inheritDoc
    * Provides base information about the component.
    * Needs to be implemented in component's information
    * class.
@@ -64,7 +66,7 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * docs inherited from interface
+   * @inheritDoc
    * Provides permissions that are used by component.
    * Needs to be implemented in component's information
    * class.
@@ -108,7 +110,7 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * docs inherited from interface
+   * @inheritDoc
    * Provides information about user dashboard element
    * offered by this component.
    *
@@ -129,7 +131,7 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * docs inherited from interface
+   * @inheritDoc
    * Provides information about user dashboard element
    * offered by this component.
    *
@@ -149,7 +151,7 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * docs inherited from interface
+   * @inheritDoc
    * Provides information about advanced search pane
    * offered by this component.
    *
@@ -168,7 +170,7 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * docs inherited from interface
+   * @inheritDoc
    * Provides potential activity types that this
    * component might want to register in activity history.
    * Needs to be implemented in component's information

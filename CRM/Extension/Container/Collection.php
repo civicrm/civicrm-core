@@ -81,7 +81,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function checkRequirements() {
     $errors = array();
@@ -92,7 +92,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function getKeys() {
     $k2c = $this->getKeysToContainer();
@@ -100,21 +100,21 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function getPath($key) {
     return $this->getContainer($key)->getPath($key);
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function getResUrl($key) {
     return $this->getContainer($key)->getResUrl($key);
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function refresh() {
     if ($this->cache) {

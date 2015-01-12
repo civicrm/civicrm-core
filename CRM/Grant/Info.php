@@ -37,11 +37,13 @@
  */
 class CRM_Grant_Info extends CRM_Core_Component_Info {
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   */
   protected $keyword = 'grant';
 
   /**
-   * docs inherited from interface
+   * @inheritDoc
    * @return array
    */
   public function getInfo() {
@@ -57,7 +59,7 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
 
 
   /**
-   * docs inherited from interface
+   * @inheritDoc
    * @param bool $getAllUnconditionally
    *
    * @return array
@@ -71,7 +73,7 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * docs inherited from interface
+   * @inheritDoc
    * @return null
    */
   public function getUserDashboardElement() {
@@ -80,7 +82,7 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * docs inherited from interface
+   * @inheritDoc
    * @return null
    */
   public function getUserDashboardObject() {
@@ -89,7 +91,7 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * docs inherited from interface
+   * @inheritDoc
    * @return array
    */
   public function registerTab() {
@@ -101,7 +103,7 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * docs inherited from interface
+   * @inheritDoc
    * @return array
    */
   public function registerAdvancedSearchPane() {
@@ -112,7 +114,7 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * docs inherited from interface
+   * @inheritDoc
    * @return null
    */
   public function getActivityTypes() {
