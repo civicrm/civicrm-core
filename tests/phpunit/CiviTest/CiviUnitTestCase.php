@@ -194,6 +194,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
   }
 
+  /**
+   * Override to run the test and assert its state.
+   * @return mixed
+   * @throws \Exception
+   * @throws \PHPUnit_Framework_IncompleteTest
+   * @throws \PHPUnit_Framework_SkippedTest
+   */
   protected function runTest() {
     try {
       return parent::runTest();
@@ -2002,23 +2009,23 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param array $params
    *   Parameters.
+   * @return array
    */
   public function activityTypeCreate($params) {
-    $result = $this->callAPISuccess('ActivityType', 'create', $params);
-    return $result;
-  }
+    return $this->callAPISuccess('ActivityType', 'create', $params);
+   }
 
   /**
    * Delete activity type
    *
    * @param int $activityTypeId
    *   Id of the activity type.
+   * @return array
    */
   public function activityTypeDelete($activityTypeId) {
     $params['activity_type_id'] = $activityTypeId;
-    $result = $this->callAPISuccess('ActivityType', 'delete', $params);
-    return $result;
-  }
+    return $this->callAPISuccess('ActivityType', 'delete', $params);
+   }
 
   /**
    * Create custom group
@@ -2480,6 +2487,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         return TRUE;
       }
     }
+    return FALSE;
   }
 
   /**

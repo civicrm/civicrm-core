@@ -1696,6 +1696,16 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    * Add new Financial Account
+   * @param $financialAccountTitle
+   * @param bool $financialAccountDescription
+   * @param bool $accountingCode
+   * @param bool $firstName
+   * @param bool $financialAccountType
+   * @param bool $taxDeductible
+   * @param bool $isActive
+   * @param bool $isTax
+   * @param bool $taxRate
+   * @param bool $isDefault
    */
   function _testAddFinancialAccount(
     $financialAccountTitle,

@@ -85,14 +85,16 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
       'subject' => 'this case should fail',
       'scheduled_date_time' => date('Ymd'),
     );
-    $result = $this->callAPIFailure('activity', 'create', $params);
+    $this->callAPIFailure('activity', 'create', $params);
   }
 
+  /**
+   *
+   */
   public function testActionScheduleWithScheduledDatesCreate() {
     $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
     $scheduledStatus = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
     $mappingId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionMapping', 'activity_type', 'id', 'entity_value');
     $activityTypeId = CRM_Core_OptionGroup::getValue('activity_type', "Meeting", 'name');

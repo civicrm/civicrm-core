@@ -11,6 +11,9 @@
  * (eg "MyFirstTest::testFoo").
  */
 class EnvTests extends \PHPUnit_Framework_TestSuite {
+  /**
+   * @return \EnvTests
+   */
   public static function suite() {
     require_once 'CRM/Core/ClassLoader.php';
     CRM_Core_ClassLoader::singleton()->register();
