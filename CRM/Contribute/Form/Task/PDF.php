@@ -248,7 +248,6 @@ AND    {$this->_componentClause}";
    * @return array
    *   array of common elements
    *
-   * @static
    */
   static public function getElements($contribIds, $params, $contactIds) {
     $pdfElements = array();

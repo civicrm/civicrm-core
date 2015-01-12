@@ -290,7 +290,6 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @param
    *
    * @return void
-   * @static
    */
   public function browse($action = NULL) {
     $ufGroup = array();

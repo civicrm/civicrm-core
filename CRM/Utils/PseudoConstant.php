@@ -51,7 +51,6 @@ class CRM_Utils_PseudoConstant {
    * doesn't need to know which class the Pseudoconstant is on
    * (some are on the Contribute_Pseudoconsant Class etc
    *
-   * @static
    *
    * @param $constant
    *
@@ -72,7 +71,6 @@ class CRM_Utils_PseudoConstant {
    * doesn't need to know which class the Pseudoconstant is on
    * (some are on the Contribute_Pseudoconsant Class etc
    *
-   * @static
    *
    * @param $constant
    *

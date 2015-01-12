@@ -104,7 +104,6 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    * Browse all CiviCRM Profile group fields.
    *
    * @return void
-   * @static
    */
   public function browse() {
     $resourceManager = CRM_Core_Resources::singleton();

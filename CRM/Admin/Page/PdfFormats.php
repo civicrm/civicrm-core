@@ -45,7 +45,6 @@ class CRM_Admin_Page_PdfFormats extends CRM_Core_Page_Basic {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
@@ -125,7 +124,6 @@ class CRM_Admin_Page_PdfFormats extends CRM_Core_Page_Basic {
    * @param null $action
    *
    * @return void
-   * @static
    */
   public function browse($action = NULL) {
     // Get list of configured PDF Page Formats

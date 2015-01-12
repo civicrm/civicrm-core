@@ -53,7 +53,6 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
@@ -214,7 +213,6 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
    *
    * @return array
    *   (reference) of action links
-   * @static
    */
   static
   public function &links() {

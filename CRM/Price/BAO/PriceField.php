@@ -52,7 +52,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Price_BAO_PriceField
-   * @static
    */
   public static function add(&$params) {
     $priceFieldBAO = new CRM_Price_BAO_PriceField();
@@ -76,7 +75,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Price_DAO_PriceField
-   * @static
    */
   public static function create(&$params) {
     if (empty($params['id']) && empty($params['name'])) {
@@ -178,7 +176,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Price_DAO_PriceField
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Price_DAO_PriceField', $params, $defaults);
@@ -195,7 +192,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @return Object
    *   DAO object on sucess, null otherwise
    *
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceField', $id, 'is_active', $is_active);
@@ -217,7 +213,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @return string
    *   name
    *
-   * @static
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $id, 'label');
@@ -242,7 +237,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *
    * @return null
    * @internal param bool $search true if used for search else false
-   * @static
    */
   public static function addQuickFormElement(
     &$qf,
@@ -644,7 +638,6 @@ WHERE
    *
    * @return boolean
    *
-   * @static
    */
   public static function deleteField($id) {
     $field = new CRM_Price_DAO_PriceField();
@@ -694,7 +687,6 @@ WHERE
    * @param $error
    * @param bool $allowNoneSelection
    *
-   * @static
    */
 
   public static function priceSetValidation($priceSetId, $fields, &$error, $allowNoneSelection = FALSE) {
@@ -795,7 +787,6 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
    * @return string
    *   tax label for custom field
    *
-   * @static
    */
   public static function getTaxLabel($opt, $valueFieldName, $displayOpt, $taxTerm) {
     if ($displayOpt == 'Do_not_show') {

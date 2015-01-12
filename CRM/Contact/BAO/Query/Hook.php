@@ -47,7 +47,6 @@ class CRM_Contact_BAO_Query_Hook {
    * Singleton function used to manage this object
    *
    * @return object
-   * @static
    */
   public static function singleton() {
     static $singleton = NULL;

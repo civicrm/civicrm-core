@@ -83,20 +83,17 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * We only need one instance of this object. So we use the singleton
    * pattern and cache the instance in this variable
    * @var object
-   * @static
    */
   private static $_singleton = NULL;
 
   /**
    * The logger object for this application
    * @var object
-   * @static
    */
   private static $_log = NULL;
 
   /**
    * If modeException == true, errors are raised as exception instead of returning civicrm_errors
-   * @static
    */
   public static $modeException = NULL;
 
@@ -110,7 +107,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param string $stackClass
    *
    * @return object
-   * @static
    */
   public static function &singleton($package = NULL, $msgCallback = FALSE, $contextCallback = FALSE, $throwPEAR_Error = FALSE, $stackClass = 'PEAR_ErrorStack') {
     if (self::$_singleton === NULL) {
@@ -307,7 +303,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @throws Exception
    *
    * @return void
-   * @static
    */
   public static function fatal($message = NULL, $code = NULL, $email = NULL) {
     $vars = array(
@@ -394,7 +389,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param Exception $exception
    *
    * @return void
-   * @static
    */
   public static function handleUnhandledException($exception) {
     try {
@@ -477,7 +471,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @return string
    *   the generated output
-   * @static
    */
   public static function debug($name, $variable = NULL, $log = TRUE, $html = TRUE, $checkPermission = TRUE) {
     $error = self::singleton();
@@ -529,7 +522,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *   the generated output
    *
    *
-   * @static
    *
    * @see CRM_Core_Error::debug()
    * @see CRM_Core_Error::debug_log_message()
@@ -579,7 +571,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *   format of the backtrace
    *
    *
-   * @static
    */
   public static function debug_log_message($message, $out = FALSE, $comp = '') {
     $config = CRM_Core_Config::singleton();
@@ -861,7 +852,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param null $redirect
    * @param string $title
    * @return void
-   * @static
    */
   public static function statusBounce($status, $redirect = NULL, $title = NULL) {
     $session = CRM_Core_Session::singleton();
@@ -881,7 +871,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Reset the error stack
    *
-   * @static
    */
   public static function reset() {
     $error = self::singleton();
@@ -907,7 +896,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *   The PEAR_ERROR object.
    * @return object
    *   $obj
-   * @static
    */
   public static function nullHandler($obj) {
     CRM_Core_Error::debug_log_message("Ignoring exception thrown by nullHandler: {$obj->code}, {$obj->message}");

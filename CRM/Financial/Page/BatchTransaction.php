@@ -42,7 +42,6 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
   static $_entityID;
@@ -124,7 +123,6 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
    *
    *
    * @return void
-   * @static
    */
   public function browse() {
   }

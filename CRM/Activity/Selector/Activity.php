@@ -43,7 +43,6 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
-   * @static
    */
   static $_columnHeaders;
 

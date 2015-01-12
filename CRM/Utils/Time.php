@@ -51,7 +51,6 @@ class CRM_Utils_Time {
    *
    * @return date
    *
-   * @static
    */
   public static function getTime($returnFormat = 'YmdHis') {
     return date($returnFormat, self::getTimeRaw());
@@ -76,7 +75,6 @@ class CRM_Utils_Time {
    *
    * @return date
    *
-   * @static
    */
   public static function setTime($newDateTime, $returnFormat = 'YmdHis') {
     self::$_delta = strtotime($newDateTime) - time();

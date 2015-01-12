@@ -44,7 +44,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
@@ -52,7 +51,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    * The option group name
    *
    * @var array
-   * @static
    */
   static $_gName = NULL;
 
@@ -60,7 +58,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    * The option group name in display format (capitalized, without underscores...etc)
    *
    * @var array
-   * @static
    */
   static $_gLabel = NULL;
 
@@ -68,7 +65,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    * The option group id
    *
    * @var array
-   * @static
    */
   static $_gId = NULL;
 
@@ -76,7 +72,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    * A boolean determining if you can add options to this group in the GUI
    *
    * @var boolean
-   * @static
    */
   static $_isLocked = FALSE;
 
@@ -238,7 +233,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    *
    *
    * @return void
-   * @static
    */
   public function browse() {
     if (!self::$_gName) {

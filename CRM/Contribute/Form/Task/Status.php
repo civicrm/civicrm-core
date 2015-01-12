@@ -187,7 +187,6 @@ AND    co.id IN ( $contribIDs )";
    *
    * @return array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRule($fields) {
     $seen = $errors = array();

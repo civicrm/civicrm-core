@@ -43,7 +43,6 @@ class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_BAO_Persistent
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $dao = new CRM_Core_DAO_Persistent();
@@ -67,7 +66,6 @@ class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
    * @param array $ids
    *   Reference array contains the id.
    *
-   * @static
    *
    * @return object
    */

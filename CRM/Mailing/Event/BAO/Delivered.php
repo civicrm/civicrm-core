@@ -48,7 +48,6 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    *   Associative array of delivery event values.
    *
    * @return void
-   * @static
    */
   public static function &create(&$params) {
     $q = &CRM_Mailing_Event_BAO_Queue::verify($params['job_id'],
@@ -93,7 +92,6 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    *
    * @return int
    *   Number of rows in result set
-   * @static
    */
   public static function getTotalCount($mailing_id, $job_id = NULL, $is_distinct = FALSE, $toDate = NULL) {
     $dao = new CRM_Core_DAO();
@@ -159,7 +157,6 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    *
    * @return array
    *   Result set
-   * @static
    */
   public static function &getRows(
     $mailing_id, $job_id = NULL,
@@ -283,7 +280,6 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    *   Consider mailings that were completed not more than $maxDays ago.
    *
    * @return void
-   * @static
    **/
   public static function updateEmailResetDate($minDays = 3, $maxDays = 7) {
     $dao = new CRM_Core_Dao();

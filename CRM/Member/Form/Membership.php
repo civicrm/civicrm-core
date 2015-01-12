@@ -761,7 +761,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
    * @throws CiviCRM_API3_Exception
    * @return bool|array
    *   mixed true or array of errors
-   * @static
    */
   public static function formRule($params, $files, $self) {
     $errors = array();
@@ -1725,7 +1724,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
    *
    * @return boolean
    *   true if mail was sent successfully
-   * @static
    */
   public static function emailReceipt(&$form, &$formValues, &$membership) {
     // retrieve 'from email id' for acknowledgement

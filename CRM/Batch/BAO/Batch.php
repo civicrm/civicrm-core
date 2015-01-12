@@ -86,7 +86,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    *
    * @return array
    *   CRM_Batch_BAO_Batch object on success, null otherwise
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $batch = new CRM_Batch_DAO_Batch();
@@ -106,7 +105,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    *
    * @return int
    *   $profileId   profile id
-   * @static
    */
   public static function getProfileId($batchTypeId) {
     //retrieve the profile specific to batch type
@@ -132,7 +130,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    *
    * @return string
    *   batch name
-   * @static
    */
   public static function generateBatchName() {
     $sql = "SELECT max(id) FROM civicrm_batch";
@@ -582,7 +579,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    *
    * @return void
    *
-   * @static
    */
   public static function exportFinancialBatch($batchIds, $exportFormat) {
     if (empty($batchIds)) {

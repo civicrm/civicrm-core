@@ -45,7 +45,6 @@ class CRM_Contact_Form_Edit_Demographics {
    *   Reference to the form object.
    *
    * @return void
-   * @static
    */
   public static function buildQuickForm(&$form) {
     // radio button for gender

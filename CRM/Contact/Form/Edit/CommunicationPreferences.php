@@ -41,7 +41,6 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
   /**
    * Greetings
    * @var array
-   * @static
    */
   static $greetings = array();
 
@@ -52,7 +51,6 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    *   Reference to the form object.
    *
    * @return void
-   * @static
    */
   public static function buildQuickForm(&$form) {
     // since the pcm - preferred comminication method is logically
@@ -142,7 +140,6 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    *
    * @return bool|array
    *   true if no errors, else array of errors
-   * @static
    */
   public static function formRule($fields, $files, $self) {
     //CRM-4575

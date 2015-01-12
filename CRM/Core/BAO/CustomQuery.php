@@ -107,7 +107,6 @@ class CRM_Core_BAO_CustomQuery {
    * This stores custom data group types and tables that it extends
    *
    * @var array
-   * @static
    */
   static $extendsMap = array(
     'Contact' => 'civicrm_contact',

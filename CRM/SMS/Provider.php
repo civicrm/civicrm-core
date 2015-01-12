@@ -39,7 +39,6 @@ abstract class CRM_SMS_Provider {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = array();
   const MAX_SMS_CHAR = 460;
@@ -51,7 +50,6 @@ abstract class CRM_SMS_Provider {
    * @param bool $force
    *
    * @return object
-   * @static
    */
   public static function &singleton($providerParams = array(), $force = FALSE) {
     $mailingID = CRM_Utils_Array::value('mailing_id', $providerParams);

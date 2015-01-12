@@ -44,7 +44,6 @@ class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
   /**
    * Get Petition Details for dashboard.
    *
-   * @static
    */
   public static function getPetitionSummary($params = array(), $onlyCount = FALSE) {
     //build the limit and order clause.
@@ -154,7 +153,6 @@ SELECT  petition.id                         as id,
   /**
    * Get the petition count.
    *
-   * @static
    */
   public static function getPetitionCount() {
     $whereClause = 'WHERE ( 1 )';
@@ -176,7 +174,6 @@ SELECT  petition.id                         as id,
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Campaign_BAO_Petition
-   * @static
    */
   public function createSignature(&$params) {
     if (empty($params)) {
@@ -283,7 +280,6 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    * @param int $surveyId
    *
    * @return array
-   * @static
    */
   public static function getPetitionSignatureTotalbyCountry($surveyId) {
     $countries = array();
@@ -326,7 +322,6 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    * @param int $surveyId
    *
    * @return array
-   * @static
    */
   public static function getPetitionSignatureTotal($surveyId) {
     $surveyInfo = CRM_Campaign_BAO_Petition::getSurveyInfo((int) $surveyId);
@@ -388,7 +383,6 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    * @param int $status_id
    *
    * @return array
-   * @static
    */
   public static function getPetitionSignature($surveyId, $status_id = NULL) {
 
@@ -487,7 +481,6 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    * @param int $contactId
    *
    * @return array
-   * @static
    */
   public static function checkSignature($surveyId, $contactId) {
 
@@ -544,7 +537,6 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    * @throws Exception
    * @return void
    * @access public
-   * @static
    */
   public static function sendEmail($params, $sendEmailMode) {
 

@@ -54,7 +54,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Contact_BAO_Group
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $group = new CRM_Contact_DAO_Group();
@@ -75,7 +74,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *   Group id.
    *
    * @return NULL
-   * @static
    */
   public static function discard($id) {
     CRM_Utils_Hook::pre('delete', 'Group', $id, CRM_Core_DAO::$_nullArray);
@@ -207,7 +205,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @return array
    *   this array contains the list of members for this group id
-   * @static
    */
   public static function &getMember($groupID, $useCache = TRUE) {
     $params = array(array('group', 'IN', array($groupID => 1), 0, 0));
@@ -312,7 +309,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @return string
    *   the permission that the user has (or NULL)
-   * @static
    */
   public static function checkPermission($id) {
     $allGroups = CRM_Core_PseudoConstant::allGroup();
@@ -351,7 +347,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @return CRM_Contact_BAO_Group|NULL
    *   The new group BAO (if created)
-   * @static
    */
   public static function &create(&$params) {
 
@@ -534,7 +529,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @return CRM_Contact_BAO_Group|NULL
    *   The new group BAO (if created)
-   * @static
    */
   public static function createSmartGroup(&$params) {
     if (!empty($params['formValues'])) {
@@ -565,7 +559,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @return CRM_Core_DAO|null
    *   DAO object on success, NULL otherwise
-   * @static
    */
   public static function setIsActive($id, $isActive) {
     return CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Group', $id, 'is_active', $isActive);
@@ -579,7 +572,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param bool $excludeHidden exclude hidden groups.
    *
    * @return string
-   * @static
    */
   public static function groupTypeCondition($groupType = NULL, $excludeHidden = TRUE) {
     $value = NULL;
@@ -653,7 +645,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @return array
    *   ( smartGroupId, ssId ) smart group id and saved search id
-   * @static
    */
   public static function createHiddenSmartGroup($params) {
     $ssId = CRM_Utils_Array::value('saved_search_id', $params);

@@ -43,7 +43,6 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
@@ -130,7 +129,6 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    *
    *
    * @return void
-   * @static
    */
   public function browse() {
     // get all financial types sorted by weight

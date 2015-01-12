@@ -127,7 +127,6 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
    *
    * @param CRM_Core_Form $form
    *
-   * @static
    */
   public static function buildQuickForm(&$form) {
     $form->assign('fieldSetTitle', ts('Organization Details'));

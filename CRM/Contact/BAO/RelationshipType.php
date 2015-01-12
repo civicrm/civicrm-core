@@ -50,7 +50,6 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Contact_BAO_RelationshipType
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $relationshipType = new CRM_Contact_DAO_RelationshipType();
@@ -73,7 +72,6 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
    *
    * @return Object
    *   DAO object on sucess, null otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_RelationshipType', $id, 'is_active', $is_active);
@@ -88,7 +86,6 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
    *   The array that holds all the db ids.
    *
    * @return CRM_Contact_DAO_RelationshipType
-   * @static
    */
   public static function add(&$params, &$ids) {
     //to change name, CRM-3336
@@ -141,7 +138,6 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
    *
    * @throws CRM_Core_Exception
    * @return mixed
-   * @static
    */
   public static function del($relationshipTypeId) {
     // make sure relationshipTypeId is an integer

@@ -52,7 +52,6 @@ class CRM_Mailing_Event_BAO_Resubscribe {
    *
    * @return array|null
    *   $groups    Array of all groups to which the contact was added, or null if the queue event could not be found.
-   * @static
    */
   public static function &resub_to_mailing($job_id, $queue_id, $hash) {
     /* First make sure there's a matching queue event */
@@ -200,7 +199,6 @@ class CRM_Mailing_Event_BAO_Resubscribe {
    *   The job ID.
    *
    * @return void
-   * @static
    */
   public static function send_resub_response($queue_id, $groups, $is_domain = FALSE, $job) {
     // param is_domain is not supported as of now.

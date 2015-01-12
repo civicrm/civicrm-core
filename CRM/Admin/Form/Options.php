@@ -43,7 +43,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    * The option group name
    *
    * @var array
-   * @static
    */
   protected $_gName;
 
@@ -51,7 +50,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    * The option group name in display format (capitalized, without underscores...etc)
    *
    * @var array
-   * @static
    */
   protected $_gLabel;
 
@@ -344,7 +342,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    *
    * @return array
    *   array of errors / empty array.
-   * @static
    */
   public static function formRule($fields, $files, $self) {
     $errors = array();

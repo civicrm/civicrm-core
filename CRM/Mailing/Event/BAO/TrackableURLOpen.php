@@ -52,7 +52,6 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
    *
    * @return string
    *   The redirection url, or base url on failure.
-   * @static
    */
   public static function track($queue_id, $url_id) {
 
@@ -110,7 +109,6 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
    *
    * @return int
    *   Number of rows in result set
-   * @static
    */
   public static function getTotalCount(
     $mailing_id, $job_id = NULL,
@@ -169,7 +167,6 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
    *
    * @return array
    *   trackable url count per mailing ID
-   * @static
    */
   public static function getMailingTotalCount($mailingIDs) {
     $dao = new CRM_Core_DAO();
@@ -210,7 +207,6 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
    *
    * @return array
    *   Count per mailing ID
-   * @static
    */
   public static function getMailingContactCount($mailingIDs, $contactID) {
     $dao = new CRM_Core_DAO();
@@ -265,7 +261,6 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
    *
    * @return array
    *   Result set
-   * @static
    */
   public static function &getRows(
     $mailing_id, $job_id = NULL,

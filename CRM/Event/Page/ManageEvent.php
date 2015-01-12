@@ -42,7 +42,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_actionLinks = NULL;
 

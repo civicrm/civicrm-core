@@ -116,7 +116,6 @@ class CRM_Core_Permission {
    *
    * @return boolean
    *   true if yes, else false
-   * @static
    */
   public static function check($permissions) {
     $permissions = (array) $permissions;
@@ -165,7 +164,6 @@ class CRM_Core_Permission {
    *
    * @return boolean
    *   true if yes, else false
-   * @static
    */
   public static function checkGroupRole($array) {
     $config = CRM_Core_Config::singleton();
@@ -199,7 +197,6 @@ class CRM_Core_Permission {
    * @param bool $excludeHidden
    *   exclude hidden groups.
    *
-   * @static
    *
    * @return array
    *   array reference of all groups.
@@ -718,7 +715,6 @@ class CRM_Core_Permission {
    * return string $componentName the name of component.
    *
    * @return int|null|string
-   * @static
    */
   public static function getComponentName($permission) {
     $componentName = NULL;

@@ -42,7 +42,6 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   private static $_stringActionLinks;
   private static $_customizeActionLinks;
@@ -104,7 +103,6 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
    *
    *
    * @return void
-   * @static
    */
   public function browse() {
     $permission = FALSE;

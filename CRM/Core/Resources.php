@@ -49,7 +49,6 @@ class CRM_Core_Resources {
    * We don't have a container or dependency-injection, so use singleton instead
    *
    * @var object
-   * @static
    */
   private static $_singleton = NULL;
 

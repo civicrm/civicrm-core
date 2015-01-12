@@ -38,7 +38,6 @@ class CRM_Core_OptionValue {
    * Static field for all the option value information that we can potentially export
    *
    * @var array
-   * @static
    */
   static $_exportableFields = NULL;
 
@@ -46,7 +45,6 @@ class CRM_Core_OptionValue {
    * Static field for all the option value information that we can potentially export
    *
    * @var array
-   * @static
    */
   static $_importableFields = NULL;
 
@@ -54,7 +52,6 @@ class CRM_Core_OptionValue {
    * Static field for all the option value information that we can potentially export
    *
    * @var array
-   * @static
    */
   static $_fields = NULL;
 
@@ -71,7 +68,6 @@ class CRM_Core_OptionValue {
    * @return array
    *   Array of option-values
    *
-   * @static
    */
   public static function getRows($groupParams, $links, $orderBy = 'weight') {
     $optionValue = array();
@@ -185,7 +181,6 @@ class CRM_Core_OptionValue {
    *
    * @return CRM_Core_DAO_OptionValue
    *
-   * @static
    */
   public static function addOptionValue(&$params, &$groupParams, &$action, &$optionValueID) {
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
@@ -257,7 +252,6 @@ class CRM_Core_OptionValue {
    *
    * @return boolean
    *   true if object exists
-   * @static
    */
   public static function optionExists($value, $daoName, $daoID, $optionGroupID, $fieldName = 'name') {
     $object = new $daoName();
@@ -280,7 +274,6 @@ class CRM_Core_OptionValue {
    *
    * @return boolean
    *   true if object exists
-   * @static
    */
   public static function getFields($mode = '', $contactType = 'Individual') {
     $key = "$mode $contactType";
@@ -394,7 +387,6 @@ class CRM_Core_OptionValue {
    * @return array
    *   Array of option-values
    *
-   * @static
    */
   public static function getValues($groupParams, &$values, $orderBy = 'weight', $isActive = FALSE) {
     if (empty($groupParams)) {

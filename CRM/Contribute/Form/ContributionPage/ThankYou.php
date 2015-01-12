@@ -101,7 +101,6 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
    *
    * @return bool|array
    *   true if no errors, else array of errors
-   * @static
    */
   public static function formRule($fields, $files, $options) {
     $errors = array();

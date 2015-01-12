@@ -484,7 +484,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
    *
    * @return bool|array
    *   mixed true or array of errors
-   * @static
    */
   public static function formRule($params) {
     $errors = array();

@@ -59,7 +59,6 @@ class CRM_Mailing_Event_BAO_Unsubscribe extends CRM_Mailing_Event_DAO_Unsubscrib
    *
    * @return boolean
    *   Was the contact successfully unsubscribed?
-   * @static
    */
   public static function unsub_from_domain($job_id, $queue_id, $hash) {
     $q = CRM_Mailing_Event_BAO_Queue::verify($job_id, $queue_id, $hash);
@@ -128,7 +127,6 @@ WHERE  email = %2
    *
    * @return array|null
    *   $groups    Array of all groups from which the contact was removed, or null if the queue event could not be found.
-   * @static
    */
   public static function &unsub_from_mailing($job_id, $queue_id, $hash, $return = FALSE) {
     /* First make sure there's a matching queue event */
@@ -303,7 +301,6 @@ WHERE  email = %2
    *   The job ID.
    *
    * @return void
-   * @static
    */
   public static function send_unsub_response($queue_id, $groups, $is_domain = FALSE, $job) {
     $config = CRM_Core_Config::singleton();
@@ -428,7 +425,6 @@ WHERE  email = %2
    *
    * @return int
    *   Number of rows in result set
-   * @static
    */
   public static function getTotalCount(
     $mailing_id, $job_id = NULL,
@@ -501,7 +497,6 @@ WHERE  email = %2
    * @param null $org_unsubscribe
    * @return array
    *   Result set
-   * @static
    */
   public static function &getRows(
     $mailing_id, $job_id = NULL,

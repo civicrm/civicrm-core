@@ -225,7 +225,6 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
    *
    * @return int
    *   Number of rows in result set
-   * @static
    */
   public static function getTotalCount(
     $mailing_id, $job_id = NULL,
@@ -286,7 +285,6 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
    *
    * @return array
    *   Result set
-   * @static
    */
   public static function &getRows(
     $mailing_id, $job_id = NULL,

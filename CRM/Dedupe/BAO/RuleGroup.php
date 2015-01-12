@@ -438,7 +438,6 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    * @param string $contactType
    *   Individual, Household or Organization.
    *
-   * @static
    *
    * @return array
    *   id => "nice name" of rule group

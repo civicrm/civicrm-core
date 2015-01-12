@@ -42,7 +42,6 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
    * @param array $ids
    *   Reference array contains the id.
    *
-   * @static
    *
    * @return object
    */
@@ -62,7 +61,6 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
    * @param int $membershipID
    *
    * @return mixed
-   * @static
    */
 
   public static function del($membershipID) {

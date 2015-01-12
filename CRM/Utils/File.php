@@ -106,7 +106,6 @@ class CRM_Utils_File {
    *   Should we abort or just return an invalid code.
    *
    * @return void
-   * @static
    */
   public static function createDir($path, $abort = TRUE) {
     if (is_dir($path) || empty($path)) {
@@ -139,7 +138,6 @@ class CRM_Utils_File {
    *
    * @throws Exception
    * @return void
-   * @static
    */
   public static function cleanDir($target, $rmdir = TRUE, $verbose = TRUE) {
     static $exceptions = array('.', '..');
@@ -253,7 +251,6 @@ class CRM_Utils_File {
    * @param string $slash
    *
    * @return string
-   * @static
    */
   public static function addTrailingSlash($path, $slash = NULL) {
     if (!$slash) {

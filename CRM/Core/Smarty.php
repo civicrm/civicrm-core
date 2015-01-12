@@ -69,7 +69,6 @@ class CRM_Core_Smarty extends Smarty {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 

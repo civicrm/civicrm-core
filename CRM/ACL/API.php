@@ -56,7 +56,6 @@ class CRM_ACL_API {
    *
    * @return boolean
    *   true if yes, else false
-   * @static
    */
   public static function check($str, $contactID = NULL) {
     if ($contactID == NULL) {

@@ -64,7 +64,6 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
    *
    * @return object|null
    *   The mailing object, or null on failure
-   * @static
    */
   public static function &reply($job_id, $queue_id, $hash, $replyto = NULL) {
     /* First make sure there's a matching queue event */
@@ -120,7 +119,6 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
    *   Whole email to forward in one string.
    *
    * @return void
-   * @static
    */
   public static function send($queue_id, &$mailing, &$bodyTxt, $replyto, &$bodyHTML = NULL, &$fullEmail = NULL) {
     $domain = CRM_Core_BAO_Domain::getDomain();
@@ -223,7 +221,6 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
    *   Optional reply-to from the reply.
    *
    * @return void
-   * @static
    */
   private static function autoRespond(&$mailing, $queue_id, $replyto) {
     $config = CRM_Core_Config::singleton();
@@ -316,7 +313,6 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
    *
    * @return int
    *   Number of rows in result set
-   * @static
    */
   public static function getTotalCount(
     $mailing_id, $job_id = NULL,
@@ -377,7 +373,6 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
    *
    * @return array
    *   Result set
-   * @static
    */
   public static function &getRows(
     $mailing_id, $job_id = NULL,

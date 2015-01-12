@@ -59,7 +59,6 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_DAO_WordRepalcement
-   * @static
    */
 
   public static function retrieve(&$params, &$defaults) {
@@ -72,7 +71,6 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @param null $reset
    *
    * @return null|CRM_Core_BAO_WordRepalcement
-   * @static
    */
   public static function getWordReplacement($reset = NULL) {
     static $wordReplacement = NULL;
@@ -133,7 +131,6 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    *   WordReplacement id.
    *
    * @return object
-   * @static
    */
   public static function del($id) {
     $dao = new CRM_Core_DAO_WordReplacement();

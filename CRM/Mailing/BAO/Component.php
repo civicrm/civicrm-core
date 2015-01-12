@@ -50,7 +50,6 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_BAO_LocaationType
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $component = new CRM_Mailing_DAO_Component();
@@ -72,7 +71,6 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
    *
    * @return Object
    *   DAO object on sucess, null otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Mailing_DAO_Component', $id, 'is_active', $is_active);
@@ -88,7 +86,6 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
    *
    * @return CRM_Mailing_BAO_Component
    *
-   * @static
    */
   public static function add(&$params, $ids = array()) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));

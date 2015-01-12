@@ -43,7 +43,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * Static field for all the case information that we can potentially export
    *
    * @var array
-   * @static
    */
   static $_exportableFields = NULL;
 
@@ -74,7 +73,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Case_BAO_Case
-   * @static
    */
   public static function add(&$params) {
     $caseDAO = new CRM_Case_DAO_Case();
@@ -94,7 +92,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    *   The array that holds all the db ids.
    *
    * @return CRM_Case_BAO_Case|null the found object or null
-   * @static
    */
   public static function &getValues(&$params, &$values, &$ids) {
     $case = new CRM_Case_BAO_Case();
@@ -116,7 +113,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Case_BAO_Case
-   * @static
    */
   public static function &create(&$params) {
     $transaction = new CRM_Core_Transaction();
@@ -260,7 +256,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    *   (reference) the array that holds all the db ids.
    *
    * @return CRM_Case_BAO_Case
-   * @static
    */
   public static function retrieve(&$params, &$defaults, &$ids) {
     $case = CRM_Case_BAO_Case::getValues($params, $defaults, $ids);
@@ -274,7 +269,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @static
    */
   public static function processCaseActivity(&$params) {
     $caseActivityDAO = new CRM_Case_DAO_CaseActivity();
@@ -292,7 +286,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    *   Activity id.
    *
    * @return string|null
-   * @static
    */
   public static function getCaseSubject($activityId) {
     $caseActivity = new CRM_Case_DAO_CaseActivity();
@@ -311,7 +304,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    *
    * @return string
    *   case type
-   * @static
    */
   public static function getCaseType($caseId, $colName = 'title') {
     $query = "
@@ -336,7 +328,6 @@ WHERE civicrm_case.id = %1";
    *
    * @return bool
    *   is successful
-   * @static
    */
   public static function deleteCase($caseId, $moveToTrash = FALSE) {
     CRM_Utils_Hook::pre('delete', 'Case', $caseId, CRM_Core_DAO::$_nullArray);
@@ -390,7 +381,6 @@ WHERE civicrm_case.id = %1";
    *   Action.
    *
    * @return void
-   * @static
    */
   public static function enableDisableCaseRelationships($caseId, $enable) {
     $contactIds = self::retrieveContactIdsByCaseId($caseId);
@@ -415,7 +405,6 @@ WHERE civicrm_case.id = %1";
    *   Id of the activity.
    *
    * @return void
-   * @static
    */
   public static function deleteCaseActivity($activityId) {
     $case = new CRM_Case_DAO_CaseActivity();
@@ -975,7 +964,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @return array
    *   case role / relationships
    *
-   * @static
    */
   public static function getCaseRoles($contactID, $caseID, $relationshipID = NULL) {
     $query = '
@@ -1039,7 +1027,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @return array
    *   Array of case activities
    *
-   * @static
    */
   public static function getCaseActivity($caseID, &$params, $contactID, $context = NULL, $userID = NULL, $type = NULL) {
     $values = array();
@@ -1380,7 +1367,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @return array
    *   array of return properties
    *
-   * @static
    */
   public static function getRelatedContacts($caseID, $skipDetails = FALSE) {
     $values = array();
@@ -1696,7 +1682,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    *   Array of scheduled activity type and date
    *
    *
-   * @static
    */
   public static function getNextScheduledActivity($cases, $type = 'upcoming') {
     $session = CRM_Core_Session::singleton();
@@ -1734,7 +1719,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    *
    * @return array
    *   array of exportable Fields
-   * @static
    */
   public static function &exportableFields() {
     if (!self::$_exportableFields) {
@@ -1765,7 +1749,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    *   Id of the case to restore.
    *
    * @return bool
-   * @static
    */
   public static function restoreCase($caseId) {
     //restore activities
@@ -1867,7 +1850,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @return array
    *   case activities due dates
    *
-   * @static
    */
   public static function getCaseActivityDates($caseID, $criteriaParams = array(), $latestDate = FALSE) {
     $values = array();
@@ -1922,7 +1904,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @return void
    *   on success creates activity and case activity
    *
-   * @static
    */
   public static function createCaseRoleActivity($caseId, $relationshipId, $relContactId = NULL, $contactId = NULL) {
     if (!$caseId || !$relationshipId || empty($relationshipId)) {
@@ -2017,7 +1998,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @return array
    *   array of contact on success otherwise empty
    *
-   * @static
    */
   public static function getCaseManagerContact($caseType, $caseId) {
     if (!$caseType || !$caseId) {
@@ -2361,7 +2341,6 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
    * @param bool $changeClient
    *
    * @return int|NULL
-   * @static
    */
   static function mergeCases(
     $mainContactId, $mainCaseId = NULL, $otherContactId = NULL,
@@ -2777,7 +2756,6 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    *   Info of the activity.
    *
    * @return void
-   * @static
    */
   public static function buildPermissionLinks(&$tplParams, $activityParams) {
     $activityTypeId = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $activityParams['source_record_id'],
@@ -2824,7 +2802,6 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    *   Do we need to check component enabled.
    *
    * @return boolean
-   * @static
    */
   public static function checkPermission($activityId, $operation, $actTypeId = NULL, $contactId = NULL, $checkComponent = TRUE) {
     $allow = FALSE;
@@ -3382,7 +3359,6 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    *
    * @return array
    *   associated array with client ids
-   * @static
    */
   public static function getCaseClients($caseId) {
     $clients = array();

@@ -279,7 +279,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * @return array
    *   if errors then list of errors to be posted back to the form,
    *                  true otherwise
-   * @static
    */
   public static function formRule($fields, $files, $form) {
     $errors = array();

@@ -45,7 +45,6 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    * (Dear God Why) Keep a global count of mails processed within the current
    * request.
    *
-   * @static
    * @var int
    */
   static $mailsProcessed = 0;
@@ -81,7 +80,6 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    * @param null $mode
    *
    * @return void
-   * @static
    */
   public static function runJobs($testParams = NULL, $mode = NULL) {
     $job = new CRM_Mailing_BAO_MailingJob();
@@ -817,7 +815,6 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
    *
    * @param int $mailingId
    *   The id of the mailing to be canceled.
-   * @static
    */
   public static function cancel($mailingId) {
     $sql = "
@@ -868,7 +865,6 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
    *
    * @return string
    *   The translated version
-   * @static
    */
   public static function status($status) {
     static $translation = NULL;
@@ -891,7 +887,6 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
    *
    * @return string
    *   For use in a WHERE clause
-   * @static
    */
   public static function workflowClause() {
     // add an additional check and only process

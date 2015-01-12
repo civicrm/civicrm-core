@@ -102,7 +102,6 @@ class CRM_Core_IDS {
    *
    * @return string
    *   the full path to the config file
-   * @static
    */
   public static function createConfigFile($force = FALSE) {
     $config = CRM_Core_Config::singleton();

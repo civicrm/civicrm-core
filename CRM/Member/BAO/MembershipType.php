@@ -57,7 +57,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Member_BAO_MembershipType
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $membershipType = new CRM_Member_DAO_MembershipType();
@@ -79,7 +78,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *
    * @return Object
    *   DAO object on sucess, null otherwise
-   * @static
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Member_DAO_MembershipType', $id, 'is_active', $is_active);
@@ -93,7 +91,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param array $ids
    *   Array contains the id (deprecated).
    *
-   * @static
    *
    * @return object
    */
@@ -142,7 +139,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *
    * @throws CRM_Core_Exception
    * @return bool|mixed
-   * @static
    */
   public static function del($membershipTypeId) {
     //check dependencies
@@ -204,7 +200,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *
    * @param array $membershipType
    *   An array of membershipType-details.
-   * @static
    */
   public static function convertDayFormat(&$membershipType) {
     $periodDays = array(
@@ -247,7 +242,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param bool $public
    *
    * @return array
-   * @static
    */
   public static function getMembershipTypes($public = TRUE) {
     $membershipTypes = array();
@@ -271,7 +265,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param int $membershipTypeId
    *
    * @return array|null
-   * @static
    */
   public static function getMembershipTypeDetails($membershipTypeId) {
     $membershipTypeDetails = array();
@@ -304,7 +297,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *
    * @return array
    *   associated array with  start date, end date and join date for the membership
-   * @static
    */
   public static function getDatesForMembershipType($membershipTypeId, $joinDate = NULL, $startDate = NULL, $endDate = NULL, $numRenewTerms = 1) {
     $membershipTypeDetails = self::getMembershipTypeDetails($membershipTypeId);
@@ -488,7 +480,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *
    * @return Array
    *   array fo the start date, end date and join date of the membership
-   * @static
    */
   public static function getRenewalDatesForMembershipType($membershipId, $changeToday = NULL, $membershipTypeID = NULL, $numRenewTerms = 1) {
     $params = array('id' => $membershipId);
@@ -596,7 +587,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *
    * @return Array
    *   array of the details of membership types
-   * @static
    */
   public static function getMembershipTypesByOrg($orgID) {
     $membershipTypes = array();
@@ -617,7 +607,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *
    * @return Array
    *   array of the details of membership types with Member of Contact id
-   * @static
    */
   public static function getMemberOfContactByMemTypes($membershipTypes) {
     $memTypeOrgs = array();
@@ -663,7 +652,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @return array
    *   arrays of organization and membership types
    *
-   * @static
    */
   public static function getMembershipTypeInfo() {
     if (!self::$_membershipTypeInfo) {

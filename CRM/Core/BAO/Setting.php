@@ -81,7 +81,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @return boolean
    *   true if item is already in cache
-   * @static
    */
   static function inCache(
     $group,
@@ -219,7 +218,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @return mixed
    *   The data if present in the setting table, else null
-   * @static
    */
   static function getItem(
     $group,
@@ -271,7 +269,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @domains array an array of domains to get settings for. Default is the current domain
    * @return void
-   * @static
    */
   public static function getItems(&$params, $domains = NULL, $settingsToReturn) {
     $originalDomain = CRM_Core_Config::domainID();
@@ -348,7 +345,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param int $domainID
    *
    * @return void
-   * @static
    */
   static function setItem(
     $value,
@@ -464,7 +460,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @throws api_Exception
    * @domains array an array of domains to get settings for. Default is the current domain
    * @return array
-   * @static
    */
   public static function setItems(&$params, $domains = NULL) {
     $originalDomain = CRM_Core_Config::domainID();

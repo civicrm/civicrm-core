@@ -163,7 +163,6 @@ class CRM_Core_Selector_Controller {
    * Array of properties that the controller dumps into the output object
    *
    * @var array
-   * @static
    */
   public static $_properties = array('columnHeaders', 'rows', 'rowsEmpty');
 

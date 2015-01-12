@@ -42,7 +42,6 @@ class CRM_Utils_Geocode_Google {
    * Server to retrieve the lat/long
    *
    * @var string
-   * @static
    */
   static protected $_server = 'maps.googleapis.com';
 
@@ -50,7 +49,6 @@ class CRM_Utils_Geocode_Google {
    * Uri of service
    *
    * @var string
-   * @static
    */
   static protected $_uri = '/maps/api/geocode/xml?sensor=false&address=';
 
@@ -64,7 +62,6 @@ class CRM_Utils_Geocode_Google {
    *
    * @return boolean
    *   true if we modified the address, false otherwise
-   * @static
    */
   public static function format(&$values, $stateName = FALSE) {
     // we need a valid country, else we ignore

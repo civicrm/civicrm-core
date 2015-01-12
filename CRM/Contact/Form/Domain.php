@@ -194,7 +194,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    *
    * @return array
    *   list of errors to be posted back to the form
-   * @static
    */
   public static function formRule($fields) {
     // check for state/country mapping

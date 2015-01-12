@@ -72,7 +72,6 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
    * @param array $params
    *   Array of name-value pairs of log table.
    *
-   * @static
    */
   public static function add(&$params) {
 
@@ -159,7 +158,6 @@ UPDATE civicrm_log
    *
    * @return int
    *   count of log records
-   * @static
    */
   public static function getContactLogCount($contactID) {
     $query = "SELECT count(*) FROM civicrm_log
@@ -173,7 +171,6 @@ UPDATE civicrm_log
    *
    * @return int
    *   report id of Contact Logging Report (Summary) / false
-   * @static
    */
   public static function useLoggingReport() {
     // first check if logging is enabled

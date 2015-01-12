@@ -102,7 +102,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @internal param string $url
    *
    * @return void
-   * @static
    */
   public function appendBreadCrumb($breadCrumbs) {
     $breadCrumb = wp_get_breadcrumb();
@@ -133,7 +132,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Reset an additional breadcrumb tag to the existing breadcrumb
    *
    * @return void
-   * @static
    */
   public function resetBreadCrumb() {
     $bc = array();
@@ -147,7 +145,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    *   The new string to be appended.
    *
    * @return void
-   * @static
    */
   public function addHTMLHead($head) {
     static $registered = FALSE;
@@ -243,7 +240,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @param null
    *
    * @return void
-   * @static
    */
   public function mapConfigToSSL() {
     global $base_url;
@@ -258,7 +254,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    *
    * @return string
    *   the url to post the form
-   * @static
    */
   public function postURL($action) {
     if (!empty($action)) {
@@ -408,7 +403,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    *
    * @return array|bool
    *   [contactID, ufID, uniqueString] if success else false if no auth
-   * @static
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     $config = CRM_Core_Config::singleton();
@@ -438,7 +432,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @param string $message
    *   The message to set.
    *
-   * @static
    */
   public function setMessage($message) {
   }

@@ -49,7 +49,6 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
    *
    * @return CRM_Core_BAO_LocationType|null
    *   object on success, null otherwise
-   * @static
    */
   public static function retrieve(&$params, &$defaults) {
     $extension = new CRM_Core_DAO_Extension();
@@ -69,7 +68,6 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
    *
    * @return void
    *
-   * @static
    */
   public static function del($id) {
     $extension = new CRM_Core_DAO_Extension();

@@ -43,7 +43,6 @@ class CRM_Contact_BAO_Contact_Permission {
    *
    * @return boolean
    *   true if the user has permission, false otherwise
-   * @static
    */
   public static function allow($id, $type = CRM_Core_Permission::VIEW) {
     $tables = array();
@@ -90,7 +89,6 @@ WHERE contact_a.id = %1 AND $permission";
    *   Should we force a recompute.
    *
    * @return void
-   * @static
    */
   public static function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
     static $_processed = array();
@@ -157,7 +155,6 @@ ON DUPLICATE KEY UPDATE
    *   Contact id.
    *
    * @return boolean
-   * @static
    */
   static function hasContactsInCache(
     $type = CRM_Core_Permission::VIEW,
@@ -252,7 +249,6 @@ AND    $operationClause LIMIT 1";
    * @return bool
    *   true if logged in user has permission to view
    *   selected contact record else false
-   * @static
    */
   public static function relationship($selectedContactID, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();
