@@ -96,7 +96,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   protected $_defaults = array();
 
-  /*
+  /**
    * By default most reports hide contact id.
    * Setting this to true makes it available
    */
@@ -1341,7 +1341,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
   }
 
-  /*
+  /**
    * Adds group filters to _columns (called from _Constuct
    */
   public function buildGroupFilter() {
@@ -2447,7 +2447,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $this->assign('sections', $this->_sections);
   }
 
-  /*
+  /**
    * In some cases other functions want to know which fields are selected for ordering by
    * Separating this into a separate function allows it to be called separately from constructing
    * the order by clause
@@ -2942,15 +2942,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     return $this->_resultSet;
   }
 
-  /*
-   * Get Template file name - use default form template if a specific one has not been set up for this report
-   */
   /**
    * Use the form name to create the tpl file name
    *
-   * @return string
-   */
-  /**
    * @return string
    */
   public function getTemplateFileName() {
@@ -2962,12 +2956,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     return $defaultTpl;
   }
 
-  /*
-   * Compile the report content
-   *
-   *  Although this function is super-short it is useful to keep separate so it can be over-ridden by report classes.
-   */
   /**
+   * Compile the report content
+   * Although this function is super-short it is useful to keep separate so it can be over-ridden by report classes.
+   *
    * @return string
    */
   public function compileContent() {
@@ -3002,6 +2994,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   /**
    * @param int $rowCount
+   * @return array
    */
   public function limit($rowCount = self::ROW_COUNT_LIMIT) {
     // lets do the pager if in html mode
@@ -3764,10 +3757,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     return $addressFields;
   }
 
-  /*
-   * Do AlterDisplay processing on Address Fields
-   */
   /**
+   * Do AlterDisplay processing on Address Fields
+   *
    * @param $row
    * @param $rows
    * @param $rowNum
@@ -3831,10 +3823,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     return $entryFound;
   }
 
-  /*
-   *  Adjusts dates passed in to YEAR() for fiscal year.
-   */
   /**
+   * Adjusts dates passed in to YEAR() for fiscal year.
+   *
    * @param string $fieldName
    *
    * @return string
@@ -3851,7 +3842,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     ($fy['d'] > 1 ? (" - INTERVAL " . ($fy['d'] - 1) . " DAY") : '') . " )";
   }
 
-  /*
+  /**
    * Add Address into From Table if required
    */
   public function addAddressFromClause() {
@@ -3972,7 +3963,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     }
   }
 
-  /* function used for showing charts on print screen */
+  /**
+   * function used for showing charts on print screen
+   */
   public static function uploadChartImage() {
     // upload strictly for '.png' images
     $name = trim(basename(CRM_Utils_Request::retrieve('name', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'GET')));
