@@ -113,7 +113,7 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param $undefined
    *   The value to use if no default is defined.
    *
-   * @return integer
+   * @return int
    *   The ID of the default mailing component.
    * @static
    */

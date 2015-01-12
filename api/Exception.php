@@ -47,8 +47,8 @@ class API_Exception extends Exception {
     $this->extraParams = $extraParams + array('error_code' => $error_code);
   }
 
-  // custom string representation of object
   /**
+   * custom string representation of object
    * @return string
    */
   public function __toString() {
@@ -101,8 +101,8 @@ class CiviCRM_API3_Exception extends Exception {
     $this->extraParams = $extraParams + array('error_code' => $error_code);
   }
 
-  // custom string representation of object
   /**
+   * custom string representation of object
    * @return string
    */
   public function __toString() {

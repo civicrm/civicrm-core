@@ -78,7 +78,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Activity_DAO_Activity object
+   * @return CRM_Activity_DAO_Activity
    */
   public static function retrieve(&$params, &$defaults) {
     $activity = new CRM_Activity_DAO_Activity();
@@ -907,7 +907,7 @@ ORDER BY    fixed_sort_order
    * component related activities w/ core activity retrieve process.
    *
    * @return array
-   *   of component id and name.
+   *   Array of component id and name.
    * @static
    **/
   public static function activityComponents() {

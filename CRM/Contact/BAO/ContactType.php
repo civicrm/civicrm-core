@@ -42,7 +42,8 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contact_BAO_ContactType object on success, null otherwise
+   * @return CRM_Contact_BAO_ContactType|null
+   *   object on success, null otherwise
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -72,7 +73,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    * @param bool $all
    *
    * @return array
-   *   of basic contact types information.
+   *   Array of basic contact types information.
    * @static
    */
   public static function &basicTypeInfo($all = FALSE) {
@@ -119,7 +120,7 @@ WHERE  parent_id IS NULL
    * @param bool $all
    *
    * @return array
-   *   of basic contact types
+   *   Array of basic contact types
    * @static
    */
   public static function basicTypes($all = FALSE) {
@@ -153,7 +154,7 @@ WHERE  parent_id IS NULL
    * @param bool $reset
    *
    * @return array
-   *   of sub type information
+   *   Array of sub type information
    * @static
    */
   public static function &subTypeInfo($contactType = NULL, $all = FALSE, $ignoreCache = FALSE, $reset = FALSE) {
@@ -223,8 +224,8 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    * @param bool $ignoreCache
    *
    * @return array
-   *   of all subtypes OR list of subtypes associated to
-   * a given basic contact type
+   *   all subtypes OR list of subtypes associated to
+   *   a given basic contact type
    * @static
    */
   public static function subTypes($contactType = NULL, $all = FALSE, $columnName = 'name', $ignoreCache = FALSE) {
@@ -266,7 +267,7 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    * @param bool $all
    *
    * @return array
-   *   of basic types + all subtypes.
+   *   Array of basic types + all subtypes.
    * @static
    */
   public static function contactTypes($all = FALSE) {
@@ -281,7 +282,7 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    * @param bool $reset
    *
    * @return array
-   *   of basic types + all subtypes.
+   *   Array of basic types + all subtypes.
    * @static
    */
   public static function contactTypeInfo($all = FALSE, $reset = FALSE) {
@@ -342,7 +343,7 @@ WHERE  type.name IS NOT NULL
    * @param null $delimiter
    *
    * @return array
-   *   of basictypes with name as 'built-in name' and 'label' as value
+   *   Array of basictypes with name as 'built-in name' and 'label' as value
    * @static
    */
   public static function contactTypePairs($all = FALSE, $typeName = NULL, $delimiter = NULL) {
@@ -514,7 +515,7 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
    * @param bool $ignoreCache
    *
    * @return array
-   *   of suppressed subTypes.
+   *   Array of suppressed subTypes.
    * @static
    */
   public static function suppressSubTypes(&$subTypes, $ignoreCache = FALSE) {

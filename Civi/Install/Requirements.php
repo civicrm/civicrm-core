@@ -85,7 +85,7 @@ class Requirements {
    * @param array $db_config
    *   An array with keys:
    *   - host (with optional port specified eg. localhost:12345)
-   *   = database (name of database to select)
+   *   - database (name of database to select)
    *   - username
    *   - password
    *

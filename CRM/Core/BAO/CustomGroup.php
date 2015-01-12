@@ -54,7 +54,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Core_DAO_CustomGroup object
+   * @return CRM_Core_DAO_CustomGroup
    * @static
    */
   public static function create(&$params) {
@@ -231,7 +231,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_DAO_CustomGroup object
+   * @return CRM_Core_DAO_CustomGroup
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -330,15 +330,14 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @param bool $onlySubType
    *
    * @return array
-   *   array  The returned array is keyed by group id and has the custom group table fields
-   * and a subkey 'fields' holding the specific custom fields.
-   * If entityId is passed in the fields keys have a subkey 'customValue' which holds custom data
-   * if set for the given entity. This is structured as an array of values with each one having the keys 'id', 'data'
+   *   The returned array is keyed by group id and has the custom group table fields
+   *   and a subkey 'fields' holding the specific custom fields.
+   *   If entityId is passed in the fields keys have a subkey 'customValue' which holds custom data
+   *   if set for the given entity. This is structured as an array of values with each one having the keys 'id', 'data'
    *
    * @todo - review this  - It also returns an array called 'info' with tables, select, from, where keys
-   * The reason for the info array in unclear and it could be determined from parsing the group tree after creation
-   * With caching the performance impact would be small & the function would be cleaner
-   *
+   *   The reason for the info array in unclear and it could be determined from parsing the group tree after creation
+   *   With caching the performance impact would be small & the function would be cleaner
    *
    * @static
    */
@@ -740,7 +739,7 @@ ORDER BY civicrm_custom_group.weight,
    * @param string $query
    * @param array $includedTables
    *   Tables to include - required because the function (for historical reasons).
-   * iterates through the group tree
+   *   iterates through the group tree
    */
   static public function buildTreeEntityDataFromQuery(&$groupTree, $query, $includedTables) {
     $dao = CRM_Core_DAO::executeQuery($query);
@@ -2293,7 +2292,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    *   Var which should have the list appended.
    *
    * @return array
-   *   of types.
+   *   Array of types.
    */
   public static function getExtendedObjectTypes(&$types = array()) {
     static $flag = FALSE, $objTypes = array();

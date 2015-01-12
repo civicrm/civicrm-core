@@ -110,7 +110,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Contact_BAO_Contact object
+   * @return CRM_Contact_BAO_Contact
    * @static
    */
   public static function add(&$params) {
@@ -276,7 +276,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * @param bool $skipDelete
    *
    * @throws Exception
-   * @return CRM_Contact_BAO_Contact object
+   * @return CRM_Contact_BAO_Contact
    * @static
    */
   public static function &create(&$params, $fixAddress = TRUE, $invokeHooks = TRUE, $skipDelete = FALSE) {
@@ -517,14 +517,12 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   /**
    * @param array $crudLinkSpec
    *   With keys:.
-   *  - action: int, CRM_Core_Action::UPDATE or CRM_Core_Action::VIEW [default: VIEW]
-   *  - entity_table: string, eg "civicrm_contact"
-   *  - entity_id: int
+   *   - action: int, CRM_Core_Action::UPDATE or CRM_Core_Action::VIEW [default: VIEW]
+   *   - entity_table: string, eg "civicrm_contact"
+   *   - entity_id: int
    * @return array|NULL
-   *   NULL if unavailable, or an array. array has keys:
-   *  - path: string
-   *  - query: string
-   *  - title: string
+   *   NULL if unavailable, or
+   *   [path: string, query: string, title: string]
    * @see CRM_Utils_System::createDefaultCrudLink
    */
   public function createDefaultCrudLink($crudLinkSpec) {
@@ -696,7 +694,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @param bool $microformat
    *   For location in microformat.
    *
-   * @return CRM_Contact_BAO_Contact object
+   * @return CRM_Contact_BAO_Contact
    * @static
    */
   public static function &retrieve(&$params, &$defaults, $microformat = FALSE) {
@@ -959,10 +957,10 @@ WHERE id={$id}; ";
   /**
    * Return proportional height and width of the image
    *
-   * @param Integer $imageWidth
+   * @param int $imageWidth
    *   Width of image.
    *
-   * @param Integer $imageHeight
+   * @param int $imageHeight
    *   Height of image.
    *
    * @return Array
@@ -1788,7 +1786,7 @@ WHERE  civicrm_contact.id = %1 ";
    *   Id of the contact.
    *
    * @return array
-   *   of display_name, email if found, do_not_email or (null,null,null)
+   *   Array of display_name, email if found, do_not_email or (null,null,null)
    * @static
    */
   public static function getContactDetails($id) {
@@ -2845,7 +2843,7 @@ AND       civicrm_openid.is_primary = 1";
    * @param int $contactId
    *
    * @return array
-   *   of context menu for logged in user.
+   *   Array of context menu for logged in user.
    * @static
    */
   public static function contextMenu($contactId = NULL) {
@@ -3314,9 +3312,9 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    *
    * @param string $fieldName
    * @param string $context
-   *   : @see CRM_Core_DAO::buildOptionsContext.
+   *   @see CRM_Core_DAO::buildOptionsContext.
    * @param array $props
-   *   : whatever is known about this dao object.
+   *   whatever is known about this dao object.
    *
    * @return Array|bool
    */

@@ -70,7 +70,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contribute_BAO_ContributionSoft object
+   * @return CRM_Contribute_BAO_ContributionSoft
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -150,7 +150,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    *   Include PCP data.
    *
    * @return array
-   *   of soft contribution ids, amounts, and associated contact ids
+   *   Array of soft contribution ids, amounts, and associated contact ids
    * @static
    */
   public static function getSoftContribution($contributionID, $all = FALSE) {

@@ -51,7 +51,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Price_DAO_LineItem object
+   * @return CRM_Price_DAO_LineItem
    * @static
    */
   public static function create(&$params) {
@@ -95,7 +95,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Price_BAO_LineItem object
+   * @return CRM_Price_BAO_LineItem
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -149,11 +149,11 @@ AND li.entity_id = {$entityId}
    *
    * @param string $overrideWhereClause
    *   E.g "WHERE contribution id = 7 " per the getLineItemsByContributionID wrapper.
-   * this function precedes the convenience of the contribution id but since it does quite a bit more than just a db retrieval we need to be able to use it even
-   * when we don't want it's entity-id magix
+   *   this function precedes the convenience of the contribution id but since it does quite a bit more than just a db retrieval we need to be able to use it even
+   *   when we don't want it's entity-id magix
    *
    * @return array
-   *   of line items
+   *   Array of line items
    */
   public static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL, $isQtyZero = TRUE, $relatedEntity = FALSE, $overrideWhereClause = '') {
     $whereClause = $fromClause = NULL;
@@ -273,7 +273,7 @@ AND li.entity_id = {$entityId}
    *                          to the price set used for particular event
    * @param array $values
    *   Reference to the values array(.
-   * this is
+   *   this is
    *                          lineItem array)
    *
    * @return void

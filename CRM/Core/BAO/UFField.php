@@ -54,7 +54,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_BAO_UFField object
+   * @return CRM_Core_BAO_UFField
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -203,7 +203,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * @param array $ids
    *   Array containing the id.
    *
-   * @return CRM_Core_BAO_UFField object
+   * @return CRM_Core_BAO_UFField
    *
    * @static
    */
@@ -803,7 +803,7 @@ SELECT  id
    *   Array of profile fields that relate to address fields.
    * @param array $profileFilter
    *   Filter to apply to profile fields - expected usage is to only fill based on.
-   * the bottom profile per CRM-13726
+   *   the bottom profile per CRM-13726
    *
    * @return bool
    *   Can the address block be hidden safe in the knowledge all fields are elsewhere collected (see CRM-15118)

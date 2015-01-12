@@ -35,7 +35,7 @@
  * @param $params : (array) api params
  *
  * @return array
- *   of permissions to check for this entity-action combo
+ *   Array of permissions to check for this entity-action combo
  */
 function _civicrm_api3_permissions($entity, $action, &$params) {
   $entity = _civicrm_api_get_entity_name_from_camel($entity);

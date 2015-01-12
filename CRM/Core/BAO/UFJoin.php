@@ -44,7 +44,7 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Core_DAO_UFJoin object
+   * @return CRM_Core_DAO_UFJoin
    * @static
    */
   public static function &create($params) {

@@ -73,7 +73,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Case_BAO_Case object
+   * @return CRM_Case_BAO_Case
    * @static
    */
   public static function add(&$params) {
@@ -115,7 +115,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Case_BAO_Case object
+   * @return CRM_Case_BAO_Case
    * @static
    */
   public static function &create(&$params) {
@@ -259,7 +259,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param array $ids
    *   (reference) the array that holds all the db ids.
    *
-   * @return CRM_Case_BAO_Case object
+   * @return CRM_Case_BAO_Case
    * @static
    */
   public static function retrieve(&$params, &$defaults, &$ids) {
@@ -1037,7 +1037,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param null $type
    *
    * @return array
-   *   of case activities
+   *   Array of case activities
    *
    * @static
    */
@@ -2360,7 +2360,7 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
    *
    * @param bool $changeClient
    *
-   * @return integer|NULL
+   * @return int|NULL
    * @static
    */
   static function mergeCases(

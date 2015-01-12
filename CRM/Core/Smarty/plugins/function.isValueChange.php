@@ -47,7 +47,7 @@
  *
  * @param array $params
  *   Template call's parameters.
- * @param object $smarty
+ * @param CRM_Core_Smarty $smarty
  *   The Smarty object.
  *
  * @return NULL

@@ -36,12 +36,12 @@
  * and call 'create' to save the revised entity.
  *
  * @param array $apiRequest
- *   Array with keys:.
- *  - entity: string
- *  - action: string
- *  - version: string
- *  - function: callback (mixed)
- *  - params: array, varies
+ *   Array with keys:
+ *   - entity: string
+ *   - action: string
+ *   - version: string
+ *   - function: callback (mixed)
+ *   - params: array, varies
  *
  * @return array|int|mixed
  */

@@ -53,7 +53,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Pledge_BAO_PledgeBlock object
+   * @return CRM_Pledge_BAO_PledgeBlock
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -72,7 +72,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Pledge_BAO_PledgeBlock object
+   * @return CRM_Pledge_BAO_PledgeBlock
    * @static
    */
   public static function &create(&$params) {

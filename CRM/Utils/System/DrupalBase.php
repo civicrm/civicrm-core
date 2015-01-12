@@ -96,7 +96,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    *
    * @return bool
    *   TRUE for internal paths, FALSE for external. The drupal_add_js fn is able to add js more
-   * efficiently if it is known to be in the drupal site
+   *   efficiently if it is known to be in the drupal site
    */
   public function formatResourceUrl(&$url) {
     $internal = FALSE;

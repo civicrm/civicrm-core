@@ -42,7 +42,7 @@
  *
  * This API is used for deleting a contact membership
  *
- * @param $params
+ * @param array $params
  *   Array array holding id - Id of the contact membership to be deleted.
  *
  * @return array
@@ -64,7 +64,7 @@ function civicrm_api3_membership_delete($params) {
  *   An associative array of name/value property values of civicrm_membership.
  *
  * @return array
- *   of newly created membership property values.
+ *   Array of newly created membership property values.
  * {@getfields membership_create}
  * @access public
  */
@@ -189,8 +189,8 @@ function _civicrm_api3_membership_get_spec(&$params) {
  *          options affecting the desired results; has legacy support
  *          for just passing the contact_id itself as the argument
  *
- * @return Array
- *   of all found membership property values.
+ * @return array
+ *   Array of all found membership property values.
  * @access public
  * @todo needs some love - basically only a get for a given contact right now
  * {@getfields membership_get}

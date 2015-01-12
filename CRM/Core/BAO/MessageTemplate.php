@@ -48,7 +48,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_BAO_MessageTemplate object
+   * @return CRM_Core_BAO_MessageTemplate
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -315,7 +315,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    *   A string-keyed array of function params, see function body for details.
    *
    * @return array
-   *   of four parameters: a boolean whether the email was sent, and the subject, text and HTML templates
+   *   Array of four parameters: a boolean whether the email was sent, and the subject, text and HTML templates
    */
   public static function sendTemplate($params) {
     $defaults = array(

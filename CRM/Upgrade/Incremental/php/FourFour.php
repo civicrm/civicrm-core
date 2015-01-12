@@ -482,7 +482,8 @@ ALTER TABLE civicrm_dashboard
   /**
    * @param int $startId
    * @param int $endId
-   * @return CRM_Core_DAO columns include "id" and "image_URL"
+   * @return CRM_Core_DAO
+   *   columns include "id" and "image_URL"
    */
   public static function findContactImageUrls($startId, $endId) {
     $sql = "

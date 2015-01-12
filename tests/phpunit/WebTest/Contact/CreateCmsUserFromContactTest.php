@@ -26,9 +26,9 @@
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
-//Tests for the ability to add a CMS user from a contact's record
-//See http://issues.civicrm.org/jira/browse/CRM-8723
 /**
+ * Tests for the ability to add a CMS user from a contact's record
+ * See http://issues.civicrm.org/jira/browse/CRM-8723
  * Class WebTest_Contact_CreateCmsUserFromContactTest
  */
 class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase {

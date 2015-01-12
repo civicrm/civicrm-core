@@ -38,10 +38,6 @@
  */
 
 /**
- * Files required for this package
- */
-
-/**
  * Create Note
  *
  * This API is used for creating a note.
@@ -102,7 +98,7 @@ function civicrm_api3_note_delete($params) {
  *
  * @return array
  *   array of properties,
- * if error an array with an error id and error message
+ *   if error an array with an error id and error message
  * {@getfields note_get}
  * @static void
  * @access public

@@ -50,61 +50,61 @@ class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function onPreInstall(CRM_Extension_Info $info) {
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function onPostInstall(CRM_Extension_Info $info) {
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function onPostPostInstall(CRM_Extension_Info $info) {
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function onPreEnable(CRM_Extension_Info $info) {
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function onPostEnable(CRM_Extension_Info $info) {
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function onPreDisable(CRM_Extension_Info $info) {
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function onPostDisable(CRM_Extension_Info $info) {
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function onPreUninstall(CRM_Extension_Info $info) {
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function onPostUninstall(CRM_Extension_Info $info) {
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function onPreReplace(CRM_Extension_Info $oldInfo, CRM_Extension_Info $newInfo) {
     if ($this->autoReplace) {
@@ -114,7 +114,7 @@ class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function onPostReplace(CRM_Extension_Info $oldInfo, CRM_Extension_Info $newInfo) {
     if ($this->autoReplace) {

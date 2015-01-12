@@ -11,16 +11,16 @@
  * Note: This will perform like a dog, but who cares -- at most, we deal with O(100) iterations
  * as part of a background task.
  *
- * @param $params
- *   , array with keys:.
- *  - activity_id: int, required
- *  - target_var: string, optional; name of a variable which will store the first/only target contact; default "target"
- *  - assignee_var: string, optional; name of a variable which will store the first/only assignee contact; default "assignee"
- *  - return: string, optional; comma-separated list of fields to return for each contact
+ * @param array $params
+ *   , Array with keys:
+ *   - activity_id: int, required
+ *   - target_var: string, optional; name of a variable which will store the first/only target contact; default "target"
+ *   - assignee_var: string, optional; name of a variable which will store the first/only assignee contact; default "assignee"
+ *   - return: string, optional; comma-separated list of fields to return for each contact
  *
- * @param $smarty
+ * @param CRM_Core_Smarty $smarty
  *
- * @return empty
+ * @return string
  */
 function smarty_function_simpleActivityContacts($params, &$smarty) {
   if (empty($params['activity_id'])) {

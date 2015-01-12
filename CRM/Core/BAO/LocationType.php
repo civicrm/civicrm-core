@@ -55,7 +55,8 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_BAO_LocaationType object on success, null otherwise
+   * @return CRM_Core_BAO_LocaationType|null
+   *   object on success, null otherwise
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -106,7 +107,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
 
   /*
    * Get ID of billing location type
-   * @return integer
+   * @return int
    */
   /**
    * @return mixed|null

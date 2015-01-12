@@ -88,8 +88,8 @@ function _civicrm_api3_membership_type_create_spec(&$params) {
  *   An associative array of name/value property values of civicrm_membership_type.
  * {getfields MembershipType_get}
  *
- * @return Array
- *   of all found membership type property values.
+ * @return array
+ *   Array of all found membership type property values.
  * @access public
  */
 function civicrm_api3_membership_type_get($params) {

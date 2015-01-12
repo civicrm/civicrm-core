@@ -47,7 +47,8 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *
    * @param bool $reset
    *
-   * @return CRM_Core_BAO_MailSettings  DAO with the default mail settings set
+   * @return CRM_Core_BAO_MailSettings
+   *   DAO with the default mail settings set
    */
   public static function defaultDAO($reset = FALSE) {
     static $mailSettings = array();
@@ -117,7 +118,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_BAO_MailSettings object
+   * @return CRM_Core_BAO_MailSettings
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -174,7 +175,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Core_BAO_MailSettings object
+   * @return CRM_Core_BAO_MailSettings
    * @static
    */
   public static function create(&$params) {

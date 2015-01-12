@@ -534,7 +534,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Get the variable from the form scope
    *
    * @param string $name
-   *   : name of the variable.
+   *   name of the variable.
    *
    *
    * @return mixed

@@ -642,7 +642,7 @@ ORDER BY civicrm_address.is_primary DESC, address_id ASC";
    *
    * @param array $entityElements
    *   The array containing entity_id and.
-   * entity_table name
+   *   entity_table name
    *
    * @return array
    *   the array of adrress data
@@ -680,7 +680,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    * Get address sequence
    *
    * @return array
-   *   of address sequence.
+   *   Array of address sequence.
    */
   public static function addressSequence() {
     $config = CRM_Core_Config::singleton();
@@ -1262,9 +1262,9 @@ SELECT is_primary,
    *
    * @param string $fieldName
    * @param string $context
-   *   : @see CRM_Core_DAO::buildOptionsContext.
+   *   @see CRM_Core_DAO::buildOptionsContext.
    * @param array $props
-   *   : whatever is known about this dao object.
+   *   whatever is known about this dao object.
    *
    * @return Array|bool
    */

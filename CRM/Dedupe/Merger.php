@@ -34,10 +34,10 @@
  */
 class CRM_Dedupe_Merger {
 
-  // FIXME: consider creating a common structure with cidRefs() and eidRefs()
-  // FIXME: the sub-pages references by the URLs should
-  // be loaded dynamically on the merge form instead
   /**
+   * FIXME: consider creating a common structure with cidRefs() and eidRefs()
+   * FIXME: the sub-pages references by the URLs should
+   * be loaded dynamically on the merge form instead
    * @return array
    */
   public static function relTables() {
@@ -1610,7 +1610,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
   /**
    * @return array
-   *   of field names which will be compared, so everything except ID.
+   *   Array of field names which will be compared, so everything except ID.
    */
   public static function getContactFields() {
     $contactFields = CRM_Contact_DAO_Contact::fields();

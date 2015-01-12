@@ -45,7 +45,7 @@ class CRM_Contact_Form_Search_Custom_FullText_Participant extends CRM_Contact_Fo
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function fillTempTable($queryText, $entityIDTableName, $toTable, $queryLimit, $detailLimit) {
     $queries = $this->prepareQueries($queryText, $entityIDTableName);

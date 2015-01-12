@@ -51,7 +51,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field object
+   * @return CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field
    * @static
    */
   public static function &add(&$params) {
@@ -75,7 +75,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field object
+   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field
    * @static
    */
   public static function create(&$params) {
@@ -163,7 +163,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field object
+   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field
    * @static
    */
   public static function retrieve(&$params, &$defaults) {

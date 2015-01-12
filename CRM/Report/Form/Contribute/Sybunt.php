@@ -516,8 +516,8 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     }
   }
 
-  // Override "This Year" $op options
   /**
+   * Override "This Year" $op options
    * @param string $type
    * @param null $fieldName
    *

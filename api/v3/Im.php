@@ -43,7 +43,7 @@
  * @param array $params
  *
  * @return array
- *   of newly created IM property values.
+ *   Array of newly created IM property values.
  * @access public
  */
 function civicrm_api3_im_create($params) {

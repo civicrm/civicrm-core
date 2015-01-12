@@ -419,8 +419,8 @@ ADD CONSTRAINT `FK_civicrm_financial_item_contact_id` FOREIGN KEY (`contact_id`)
     $this->addTask('Update Line Item Data', 'updateLineItemData', $rev);
   }
 
-  //CRM-11636
   /**
+   * CRM-11636
    * @return bool
    */
   public function assignFinancialTypeToPriceRecords() {

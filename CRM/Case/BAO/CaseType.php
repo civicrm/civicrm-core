@@ -59,7 +59,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    *
    * @throws CRM_Core_Exception
    *
-   * @return CRM_Case_BAO_CaseType object
+   * @return CRM_Case_BAO_CaseType
    * @static
    */
   public static function add(&$params) {
@@ -274,7 +274,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Case_BAO_CaseType object
+   * @return CRM_Case_BAO_CaseType
    * @static
    */
   public static function &create(&$params) {
@@ -318,7 +318,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    *   (reference ) an assoc array to hold the name / value pairs.
    *                        in a hierarchical manner
    *
-   * @return CRM_Case_BAO_CaseType object
+   * @return CRM_Case_BAO_CaseType
    * @static
    */
   public static function retrieve(&$params, &$defaults) {

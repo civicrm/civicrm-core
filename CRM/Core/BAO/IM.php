@@ -131,7 +131,7 @@ ORDER BY
    *
    * @param array $entityElements
    *   The array containing entity_id and.
-   * entity_table name
+   *   entity_table name
    *
    * @return array
    *   the array of im details

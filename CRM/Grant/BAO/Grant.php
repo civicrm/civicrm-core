@@ -134,7 +134,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Grant_BAO_ManageGrant object
+   * @return CRM_Grant_BAO_ManageGrant
    * @static
    */
   public static function retrieve(&$params, &$defaults) {

@@ -52,7 +52,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set object
+   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set
    * @static
    */
   public static function create(&$params) {
@@ -72,7 +72,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set object
+   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -259,7 +259,7 @@ WHERE     ct.id = cp.contribution_type_id AND
    *
    * @return boolean
    *   false if fields exist for this set, true if the
-   * set could be deleted
+   *   set could be deleted
    *
    * @static
    */
@@ -347,7 +347,7 @@ WHERE     ct.id = cp.contribution_type_id AND
    * @param null $isQuickConfig
    * @param null $setName
    *
-   * @return integer|false
+   * @return int|false
    *   price_set_id, or false if none found
    */
   public static function getFor($entityTable, $entityId, $usedFor = NULL, $isQuickConfig = NULL, &$setName = NULL) {
@@ -911,7 +911,7 @@ WHERE  id = %1";
    * @param int id Price Set id
    *
    * @return array
-   *   of the field ids
+   *   Array of the field ids
    *
    * @static
    */

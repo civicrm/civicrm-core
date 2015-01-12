@@ -42,7 +42,7 @@
  * function after deletion so that the field is available for us (getfields manages date conversion
  * among other things
  *
- * @param $params
+ * @param array $params
  *   Array Associative array of property name/value pairs to create new custom field.
  *
  * @return array
@@ -103,7 +103,7 @@ function _civicrm_api3_custom_field_create_spec(&$params) {
 /**
  * Use this API to delete an existing custom group field.
  *
- * @param $params
+ * @param array $params
  *   Array id of the field to be deleted.
  *
  * @return array

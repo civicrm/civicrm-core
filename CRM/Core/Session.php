@@ -262,9 +262,9 @@ class CRM_Core_Session {
    *
    *
    * @param string $name
-   *   : name of the variable.
+   *   name of the variable.
    * @param string $prefix
-   *   : adds another level of scope to the session.
+   *   adds another level of scope to the session.
    *
    * @return mixed
    */
@@ -327,9 +327,9 @@ class CRM_Core_Session {
    *
    *
    * @param string $name
-   *   : name of the timer.
+   *   name of the timer.
    * @param int $expire
-   *   : expiry time (in seconds).
+   *   expiry time (in seconds).
    *
    * @return mixed
    */
@@ -557,7 +557,7 @@ class CRM_Core_Session {
 
   /**
    * Retrieve contact id of the logged in user
-   * @return integer|NULL
+   * @return int|NULL
    *   contact ID of logged in user
    */
   public static function getLoggedInContactID() {

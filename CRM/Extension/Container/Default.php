@@ -7,7 +7,7 @@
 class CRM_Extension_Container_Default extends CRM_Extension_Container_Basic {
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function checkRequirements() {
     $errors = array();

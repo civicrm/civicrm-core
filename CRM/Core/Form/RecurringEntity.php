@@ -110,7 +110,7 @@ class CRM_Core_Form_RecurringEntity {
    * the default values are retrieved from the database
    *
    *
-   * @return None
+   * @return array
    */
   public static function setDefaultValues() {
     $defaults = array();
@@ -322,7 +322,7 @@ class CRM_Core_Form_RecurringEntity {
    * Process the form submission
    *
    *
-   * @return None
+   * @return void
    */
   public static function postProcess($params = array(), $type, $linkedEntities = array()) {
     //Check entity_id not present in params take it from class variable

@@ -247,7 +247,7 @@ function civicrm_api3_group_contact_update_status($params) {
 /**
  * @deprecated api notice
  * @return array
- *   of deprecated actions
+ *   Array of deprecated actions
  */
 function _civicrm_api3_group_contact_deprecation() {
   return array(

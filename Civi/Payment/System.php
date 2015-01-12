@@ -59,7 +59,7 @@ class System {
   }
 
   /**
-   * @param integer $id
+   * @param int $id
    * @throws \CiviCRM_API3_Exception
    */
   public function getById($id) {

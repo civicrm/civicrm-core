@@ -123,7 +123,7 @@ class CRM_Core_I18n {
    *   whether to return all languages or just the enabled ones.
    *
    * @return array
-   *   of code/language name mappings
+   *   Array of code/language name mappings
    */
   public static function languages($justEnabled = FALSE) {
     static $all = NULL;
@@ -503,7 +503,7 @@ class CRM_Core_I18n {
  *
  * @param $text
  *   String string for translating.
- * @param $params
+ * @param array $params
  *   Array an array of additional parameters.
  *
  * @return string

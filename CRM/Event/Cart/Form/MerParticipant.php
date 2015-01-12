@@ -107,8 +107,8 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
     return "Participant {$this->participant->get_participant_index()}";
   }
 
-  //XXX poor name
   /**
+   * XXX poor name
    * @param $participant
    *
    * @return CRM_Event_Cart_Form_MerParticipant

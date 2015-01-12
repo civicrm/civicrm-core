@@ -9,7 +9,7 @@ class CRM_Core_Permission_GenericTest extends CiviUnitTestCase {
 
   /**
    * @return array
-   *   of CRM_Core_Permission_Base
+   *   Array of CRM_Core_Permission_Base
    */
   public function permissionClasses() {
     $cases = array();

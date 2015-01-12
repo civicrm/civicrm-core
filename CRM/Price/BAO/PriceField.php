@@ -51,7 +51,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Price_BAO_PriceField object
+   * @return CRM_Price_BAO_PriceField
    * @static
    */
   public static function add(&$params) {
@@ -75,7 +75,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Price_DAO_PriceField object
+   * @return CRM_Price_DAO_PriceField
    * @static
    */
   public static function create(&$params) {
@@ -177,7 +177,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Price_DAO_PriceField object
+   * @return CRM_Price_DAO_PriceField
    * @static
    */
   public static function retrieve(&$params, &$defaults) {

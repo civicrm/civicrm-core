@@ -46,8 +46,8 @@ require_once 'Log.php';
  * Class CRM_Exception
  */
 class CRM_Exception extends PEAR_Exception {
-  // Redefine the exception so message isn't optional
   /**
+   * Redefine the exception so message isn't optional
    * Supported signatures:
    *  - PEAR_Exception(string $message);
    *  - PEAR_Exception(string $message, int $code);
@@ -74,7 +74,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
   /**
    * Status code of various types of errors
-   * @var const
    */
   const FATAL_ERROR = 2;
   const DUPLICATE_CONTACT = 8001;
@@ -250,10 +249,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     self::abend(1);
   }
 
-  // this function is used to trap and print errors
-  // during system initialization time. Hence the error
-  // message is quite ugly
   /**
+   * this function is used to trap and print errors
+   * during system initialization time. Hence the error
+   * message is quite ugly
+   *
    * @param $pearError
    */
   public static function simpleHandler($pearError) {
