@@ -146,7 +146,7 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
       $isPcpApprovalNeeded = FALSE,
       $isSeparatePayment = FALSE,
       $honoreeSection = FALSE,
-      $allowOtherAmmount = TRUE
+      $allowOtherAmount = TRUE
     );
 
     $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId", NULL);
