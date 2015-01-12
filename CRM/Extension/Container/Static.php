@@ -45,28 +45,28 @@ class CRM_Extension_Container_Static implements CRM_Extension_Container_Interfac
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function checkRequirements() {
     return array();
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function getName() {
     return $this->name;
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function getKeys() {
     return array_keys($this->exts);
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function getPath($key) {
     $e = $this->getExt($key);
@@ -74,7 +74,7 @@ class CRM_Extension_Container_Static implements CRM_Extension_Container_Interfac
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function getResUrl($key) {
     $e = $this->getExt($key);
@@ -82,7 +82,7 @@ class CRM_Extension_Container_Static implements CRM_Extension_Container_Interfac
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function refresh() {
   }

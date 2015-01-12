@@ -183,14 +183,14 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function isModulePermissionSupported() {
     return TRUE;
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    *
    * Does nothing in Drupal 6.
    */
