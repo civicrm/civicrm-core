@@ -60,7 +60,7 @@ function civicrm_api3($entity, $action, $params = array()) {
  *
  * @param array $apiRequest
  * @return array
-   *   getfields output
+ *   getfields output
  */
 function _civicrm_api3_api_getfields(&$apiRequest) {
   if (strtolower($apiRequest['action'] == 'getfields')) {
@@ -90,7 +90,7 @@ function _civicrm_api3_api_getfields(&$apiRequest) {
  * @param $result
  *
  * @return boolean
-   *   true if error, false otherwise
+ *   true if error, false otherwise
  * @static
  * @access public
  */
@@ -115,8 +115,13 @@ function _civicrm_api_get_camel_name($entity) {
 /**
  * Swap out any $values vars - ie. the value after $value is swapped for the parent $result
  * 'activity_type_id' => '$value.testfield',
-   'tag_id'  => '$value.api.tag.create.id',
-    'tag1_id' => '$value.api.entity.create.0.id'
+ * 'tag_id'  => '$value.api.tag.create.id',
+ * 'tag1_id' => '$value.api.entity.create.0.id'
+ * @param $entity
+ * @param $action
+ * @param array $params
+ * @param array $parentResult
+ * @param string $separator
  */
 function _civicrm_api_replace_variables($entity, $action, &$params, &$parentResult, $separator = '.') {
 
