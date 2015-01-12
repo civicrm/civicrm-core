@@ -77,6 +77,9 @@ function civicrm_api3_participant_create($params) {
 /**
  * @todo this should be done in the BAO not the api
  * Create a default participant line item
+ * @param $params
+ * @param $participant
+ * @throws \CiviCRM_API3_Exception
  */
 function _civicrm_api3_participant_createlineitem(&$params, $participant) {
   // it is possible that a fee level contains information about multiple

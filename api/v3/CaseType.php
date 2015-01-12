@@ -90,8 +90,9 @@ function civicrm_api3_case_type_get($params) {
 /**
  * format definition
  *
- * @param $caseTypes
+ * @param array $result
  * @return mixed
+ * @throws \CRM_Core_Exception
  */
 function _civicrm_api3_case_type_get_formatResult(&$result) {
   foreach ($result['values'] as $key => $caseType) {

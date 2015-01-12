@@ -108,6 +108,9 @@ function _civicrm_api3_dashboard_contact_check_params(&$params) {
  *
  * {@getfields dashboard_contact_delete}
  * @access public
+ * @param $params
+ * @return array
+ * @throws \API_Exception
  */
 function civicrm_api3_dashboard_contact_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

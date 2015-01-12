@@ -134,6 +134,9 @@ class civicrm_api3 {
 
   /**
    * Perform action
+   * @param $action
+   * @param $params
+   * @return bool
    */
   public function __call($action, $params) {
     // @TODO Check if it's a valid action.
@@ -147,6 +150,8 @@ class civicrm_api3 {
 
   /**
    *  As of PHP 5.3.0
+   * @param $name
+   * @param $arguments
    */
   public static function __callStatic($name, $arguments) {
     // Should we implement it ?
@@ -155,7 +160,10 @@ class civicrm_api3 {
 
   /**
    * Call via rest
-   * @return stdClass
+   * @param $entity
+   * @param $action
+   * @param array $params
+   * @return \stdClass
    */
   function remoteCall($entity, $action, $params = array()) {
     $fields = "key={$this->key}&api_key={$this->api_key}";
@@ -268,6 +276,8 @@ class civicrm_api3 {
   }
 
   /**
+   * @param $name
+   * @param null $value
    * @return $this
    */
   public function attr($name, $value = NULL) {
@@ -298,6 +308,7 @@ class civicrm_api3 {
   }
 
   /**
+   * @param $name
    * @return $this
    */
   public function __get($name) {

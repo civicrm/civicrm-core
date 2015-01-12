@@ -262,6 +262,8 @@ SELECT count(*)
 
 /**
  * CRM-15191 - Hack to ensure the cache gets cleared after updating a custom field
+ * @param $params
+ * @return array
  */
 function civicrm_api3_custom_field_setvalue($params) {
   require_once 'api/v3/Generic/Setvalue.php';

@@ -98,6 +98,8 @@ function _civicrm_api3_relationship_type_create_spec(&$params) {
  * @access  public
  * {@getfields RelationshipType_get}
  * @example RelationshipTypeGet.php
+ * @param $params
+ * @return array
  */
 function civicrm_api3_relationship_type_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
