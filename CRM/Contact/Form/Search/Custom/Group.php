@@ -595,8 +595,9 @@ WHERE  gcc.group_id = {$ssGroup->id}
   /*
    * Functions below generally don't need to be modified
    */
+
   /**
-   * @return mixed
+   * @inheritDoc
    */
   public function count() {
     $sql = $this->all();

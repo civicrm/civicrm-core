@@ -34,7 +34,9 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  // CRM-13964 and CRM-13965
+  /**
+   * CRM-13964 and CRM-13965
+   */
   public function testParticipantParitalPaymentInitiation() {
     // Log in using webtestLogin() method
     $this->webtestLogin();

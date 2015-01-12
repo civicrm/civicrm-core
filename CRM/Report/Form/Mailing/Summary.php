@@ -277,7 +277,9 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     parent::preProcess();
   }
 
-  // manipulate the select function to query count functions
+  /**
+   * manipulate the select function to query count functions
+   */
   public function select() {
 
     $count_tables = array(

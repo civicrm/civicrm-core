@@ -85,7 +85,9 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->isElementPresent("xpath=//div[@class='content other_amount-content']/input");
   }
 
-  // CRM-12510 Test copy contribution page
+  /**
+   * CRM-12510 Test copy contribution page
+   */
   public function testContributionPageCopy() {
     // open browser, login
     $this->webtestLogin();

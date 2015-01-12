@@ -166,7 +166,9 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     return array($participant, $contribution);
   }
 
-  // CRM-13964
+  /**
+   * CRM-13964
+   */
   public function testAddPartialPayment() {
     $feeAmt = 100;
     $amtPaid = 60;

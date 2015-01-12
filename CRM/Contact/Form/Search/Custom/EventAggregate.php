@@ -303,6 +303,10 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
   /*
    * Functions below generally don't need to be modified
    */
+
+  /**
+   * @inheritDoc
+   */
   public function count() {
     $sql = $this->all();
 
