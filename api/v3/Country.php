@@ -47,8 +47,8 @@ require_once 'CRM/Core/DAO/Country.php';
  * @example CountryCreate.php Standard Create Example
  *
  * @param array $params
- * @return array API result array
- * API result array
+ * @return array
+ *   API result array
  * @throws \API_Exception
  * @access public
  */
