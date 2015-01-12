@@ -466,7 +466,6 @@ return array(
     //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
-    'html_type' => 'text',
     'html_attributes' => array(
       'size' => 64,
       'maxlength' => 256,
@@ -490,7 +489,6 @@ return array(
     //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
-    'html_type' => 'text',
     'html_attributes' => array(
       'size' => 64,
       'maxlength' => 64,
@@ -514,31 +512,6 @@ return array(
     //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
-    'html_type' => 'text',
-    'html_attributes' => array(
-      'size' => 64,
-      'maxlength' => 64,
-    ),
-    'html_type' => 'Text',
-    'default' => NULL,
-    'add' => '4.3',
-    'title' => 'Recaptcha Private Key',
-    'is_domain' => 1,
-    'is_contact' => 0,
-    'description' => NULL,
-    'help_text' => NULL,
-  ),
-  'recaptchaPrivateKey' => array(
-    'group_name' => 'CiviCRM Preferences',
-    'group' => 'core',
-    'name' => 'recaptchaPrivateKey',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
-    'type' => 'String',
-    'quick_form_type' => 'Element',
-    'html_type' => 'text',
     'html_attributes' => array(
       'size' => 64,
       'maxlength' => 64,
@@ -562,7 +535,6 @@ return array(
     //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Integer',
     'quick_form_type' => 'Element',
-    'html_type' => 'text',
     'html_attributes' => array(
       'size' => 3,
       'maxlength' => 5,
@@ -584,7 +556,6 @@ return array(
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'Integer',
     'quick_form_type' => 'Element',
-    'html_type' => 'text',
     'html_attributes' => array(
       'size' => 2,
       'maxlength' => 8,
@@ -605,7 +576,6 @@ return array(
     'prefetch' => 0,
     'type' => 'String',
     'quick_form_type' => 'Element',
-    'html_type' => 'text',
     'html_attributes' => array(
       'size' => 64,
       'maxlength' => 128,
@@ -626,7 +596,6 @@ return array(
     'prefetch' => 0,
     'type' => 'String',
     'quick_form_type' => 'Element',
-    'html_type' => 'text',
     'html_attributes' => array(
       'size' => 64,
       'maxlength' => 128,
@@ -650,7 +619,6 @@ return array(
     //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
-    'html_type' => 'text',
     'html_attributes' => array(
       'size' => 16,
       'maxlength' => 16,

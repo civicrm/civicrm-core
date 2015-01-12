@@ -79,12 +79,15 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
     $this->assertEquals(0, $get['count'], 'ActivityContact not successfully deleted');
   }
 
+  /**
+   *
+   */
   public function testGetActivitiesByContact() {
-    $result = $this->callAPISuccess('ActivityContact', 'Get', array('contact_id' => $this->_contactID));
+    $this->callAPISuccess('ActivityContact', 'Get', array('contact_id' => $this->_contactID));
   }
 
-  public function testGetPartitipantsByActivity() {
-    $result = $this->callAPISuccess('ActivityContact', 'Get', array('activity_id' => $this->_activityID));
+  public function testGetParticipantsByActivity() {
+    $this->callAPISuccess('ActivityContact', 'Get', array('activity_id' => $this->_activityID));
   }
 
   /**

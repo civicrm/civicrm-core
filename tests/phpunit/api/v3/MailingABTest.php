@@ -95,6 +95,9 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
     ));
   }
 
+  /**
+   * @return array
+   */
   public function groupPctProvider() {
     $cases = array(); // array(int $totalSize, int $groupPct, int $expectedCountA, $expectedCountB, $expectedCountC)
     $cases[] = array(400, 7, 28, 28, 344);
@@ -167,6 +170,11 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
     $this->assertEquals($expectedCountC, $countC, "check mailing recipients C in line " . __LINE__);
   }
 
+  /**
+   * @param $expectedA
+   * @param $expectedB
+   * @param $expectedC
+   */
   protected function assertJobCounts($expectedA, $expectedB, $expectedC) {
     $this->assertDBQuery($expectedA, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', array(
       1 => array(

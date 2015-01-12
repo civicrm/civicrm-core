@@ -175,7 +175,6 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $expected = array(
       'Soft Credit To 1' => "{$softCreditFname} {$softCreditLname}",
       'Soft Credit To 2' => "{$softCreditSecondFname} {$softCreditSecondLname}",
-      'Amount (Soft Credit Type)' => '50.00 (Solicited)',
       'Amount (Soft Credit Type)' => '100.00 (In Honor of)',
     );
 

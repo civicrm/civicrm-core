@@ -81,7 +81,6 @@ return array(
     'prefetch' => 0,
     'type' => 'String',
     'quick_form_type' => 'Element',
-    'html_type' => 'text',
     'html_attributes' => array(
       'size' => 64,
       'maxlength' => 64,

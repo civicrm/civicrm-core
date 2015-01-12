@@ -760,21 +760,18 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
             'title' => ts($options['prefix_label'] . 'Street Number'),
             'type' => 1,
             'default' => CRM_Utils_Array::value('street_number', $options['defaults'], FALSE),
-            'name' => 'street_number',
           ),
           $options['prefix'] . 'street_name' => array(
             'name' => 'street_name',
             'title' => ts($options['prefix_label'] . 'Street Name'),
             'type' => 1,
             'default' => CRM_Utils_Array::value('street_name', $options['defaults'], FALSE),
-            'name' => 'street_name',
           ),
           $options['prefix'] . 'street_unit' => array(
             'name' => 'street_unit',
             'title' => ts($options['prefix_label'] . 'Street Unit'),
             'type' => 1,
             'default' => CRM_Utils_Array::value('street_unit', $options['defaults'], FALSE),
-            'name' => 'street_unit',
           ),
           $options['prefix'] . 'city' => array(
             'title' => ts($options['prefix_label'] . 'City'),
