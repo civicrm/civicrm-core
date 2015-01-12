@@ -744,16 +744,16 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     return $statistics;
   }
 
-  //Override to set limit is 10
   /**
+   * Override to set limit is 10
    * @param int $rowCount
    */
   public function limit($rowCount = self::ROW_COUNT_LIMIT) {
     parent::limit($rowCount);
   }
 
-  //Override to set pager with limit is 10
   /**
+   * Override to set pager with limit is 10
    * @param int $rowCount
    */
   public function setPager($rowCount = self::ROW_COUNT_LIMIT) {

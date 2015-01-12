@@ -221,9 +221,9 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     }
   }
 
-  // post process to determine if the parent job
-  // as well as the mailing is complete after the run
   /**
+   * post process to determine if the parent job
+   * as well as the mailing is complete after the run
    * @param null $mode
    */
   public static function runJobs_post($mode = NULL) {
@@ -293,8 +293,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   }
 
 
-  // before we run jobs, we need to split the jobs
   /**
+   * before we run jobs, we need to split the jobs
    * @param int $offset
    * @param null $mode
    */
@@ -380,9 +380,9 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     }
   }
 
-  // Split the parent job into n number of child job based on an offset
-  // If null or 0 , we create only one child job
   /**
+   * Split the parent job into n number of child job based on an offset
+   * If null or 0 , we create only one child job
    * @param int $offset
    */
   public function split_job($offset = 200) {

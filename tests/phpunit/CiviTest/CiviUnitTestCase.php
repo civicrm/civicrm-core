@@ -600,8 +600,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
   }
 
-  // Request a record from the DB by seachColumn+searchValue. Success if a record is found.
   /**
+   * Request a record from the DB by seachColumn+searchValue. Success if a record is found.
    * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
@@ -621,8 +621,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     return $value;
   }
 
-  // Request a record from the DB by seachColumn+searchValue. Success if returnColumn value is NULL.
   /**
+   * Request a record from the DB by seachColumn+searchValue. Success if returnColumn value is NULL.
    * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
@@ -634,8 +634,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $this->assertNull($value, $message);
   }
 
-  // Request a record from the DB by id. Success if row not found.
   /**
+   * Request a record from the DB by id. Success if row not found.
    * @param string $daoName
    * @param int $id
    * @param null $message
@@ -646,8 +646,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $this->assertNull($value, $message);
   }
 
-  // Request a record from the DB by id. Success if row not found.
   /**
+   * Request a record from the DB by id. Success if row not found.
    * @param string $daoName
    * @param int $id
    * @param null $message
@@ -658,8 +658,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $this->assertEquals($id, $value, $message);
   }
 
-  // Compare a single column value in a retrieved DB record to an expected value
   /**
+   * Compare a single column value in a retrieved DB record to an expected value
    * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
@@ -675,8 +675,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $this->assertEquals($value, $expectedValue, $message);
   }
 
-  // Compare all values in a single retrieved DB record to an array of expected values
   /**
+   * Compare all values in a single retrieved DB record to an array of expected values
    * @param string $daoName
    * @param array $searchParams
    * @param $expectedValues

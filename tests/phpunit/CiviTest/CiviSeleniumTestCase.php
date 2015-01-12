@@ -1631,8 +1631,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return CiviDBAssert::assertDBState($this, $daoName, $id, $match, $delete);
   }
 
-  // Request a record from the DB by seachColumn+searchValue. Success if a record is found.
   /**
+   * Request a record from the DB by seachColumn+searchValue. Success if a record is found.
    * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
@@ -1649,8 +1649,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return CiviDBAssert::assertDBNotNull($this, $daoName, $searchValue, $returnColumn, $searchColumn, $message);
   }
 
-  // Request a record from the DB by seachColumn+searchValue. Success if returnColumn value is NULL.
   /**
+   * Request a record from the DB by seachColumn+searchValue. Success if returnColumn value is NULL.
    * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
@@ -1665,8 +1665,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return CiviDBAssert::assertDBNull($this, $daoName, $searchValue, $returnColumn, $searchColumn, $message);
   }
 
-  // Request a record from the DB by id. Success if row not found.
   /**
+   * Request a record from the DB by id. Success if row not found.
    * @param string $daoName
    * @param int $id
    * @param $message
@@ -1679,8 +1679,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return CiviDBAssert::assertDBRowNotExist($this, $daoName, $id, $message);
   }
 
-  // Compare a single column value in a retrieved DB record to an expected value
   /**
+   * Compare a single column value in a retrieved DB record to an expected value
    * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
@@ -1701,8 +1701,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     );
   }
 
-  // Compare all values in a single retrieved DB record to an array of expected values
   /**
+   * Compare all values in a single retrieved DB record to an array of expected values
    * @param string $daoName
    * @param array $searchParams
    * @param $expectedValues

@@ -389,8 +389,8 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
     return 'civicrm/admin/pcp';
   }
 
-  //@TODO this function changed, debug this at runtime
   /**
+   * @TODO this function changed, debug this at runtime
    * @param $whereClause
    * @param array $whereParams
    */

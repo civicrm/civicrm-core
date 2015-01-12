@@ -232,8 +232,8 @@ class CRM_Report_Utils_Get {
     }
   }
 
-  //unset default filters
   /**
+   * unset default filters
    * @param $defaults
    */
   public static function unsetFilters(&$defaults) {

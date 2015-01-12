@@ -1,7 +1,7 @@
 <?php
 
-// TODO: How to handle NULL values/records?
 /**
+ * TODO: How to handle NULL values/records?
  * Class CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral
  */
 class CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral extends CRM_Dedupe_BAO_QueryBuilder {

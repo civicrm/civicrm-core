@@ -1213,10 +1213,10 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
   }
 
-  // a formrule function to ensure that fields selected in group_by
-  // (if any) should only be the ones present in display/select fields criteria;
-  // note: works if and only if any custom field selected in group_by.
   /**
+   * a formrule function to ensure that fields selected in group_by
+   * (if any) should only be the ones present in display/select fields criteria;
+   * note: works if and only if any custom field selected in group_by.
    * @param $fields
    * @param array $ignoreFields
    *
@@ -1254,9 +1254,9 @@ class CRM_Report_Form extends CRM_Core_Form {
     return $errors;
   }
 
-  // Note: $fieldName param allows inheriting class to build operationPairs
-  // specific to a field.
   /**
+   * Note: $fieldName param allows inheriting class to build operationPairs
+   * specific to a field.
    * @param string $type
    * @param null $fieldName
    *
@@ -2640,8 +2640,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $this->assign('statistics', $this->statistics($rows));
   }
 
-  // override this method to build your own statistics
   /**
+   * override this method to build your own statistics
    * @param $rows
    *
    * @return array
