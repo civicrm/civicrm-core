@@ -1098,18 +1098,8 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
   }
 
   /**
-   * Given the current formValues, gets the query in local
-   * language
-   *
-   * @param array (
-   * reference)   $formValues   submitted formValues
-   *
-   * @return array
-   *   which contains an array of strings
+   * @inheritDoc
    */
-
-  // the current internationalisation is bad, but should more or less work
-  // for most of "European" languages
   public function getQILL() {
     return $this->_query->qill();
   }

@@ -70,18 +70,19 @@ class CRM_Contact_BAO_ProximityQuery {
     }
   }
 
-  /**
+  /*
    * Latitudes in all of U. S.: from -7.2 (American Samoa) to 70.5 (Alaska).
    * Latitudes in continental U. S.: from 24.6 (Florida) to 49.0 (Washington).
    * Average latitude of all U. S. zipcodes: 37.9.
    */
 
-  /*
-    /**
-     * Estimate the Earth's radius at a given latitude.
-     * Default to an approximate average radius for the United States.
-     */
-
+  /**
+   * Estimate the Earth's radius at a given latitude.
+   * Default to an approximate average radius for the United States.
+   *
+   * @param float $latitude
+   * @return float
+   */
   public static function earthRadius($latitude) {
     $lat = deg2rad($latitude);
 
@@ -93,6 +94,11 @@ class CRM_Contact_BAO_ProximityQuery {
   /**
    * Convert longitude and latitude to earth-centered earth-fixed coordinates.
    * X axis is 0 long, 0 lat; Y axis is 90 deg E; Z axis is north pole.
+   *
+   * @param float $longitude
+   * @param float $latitude
+   * @param float $height
+   * @return array
    */
   public static function earthXYZ($longitude, $latitude, $height = 0) {
     $long = deg2rad($longitude);
@@ -114,6 +120,10 @@ class CRM_Contact_BAO_ProximityQuery {
 
   /**
    * Convert a given angle to earth-surface distance.
+   *
+   * @param float $angle
+   * @param float $latitude
+   * @return float
    */
   public static function earthArcLength($angle, $latitude) {
     return deg2rad($angle) * self::earthRadius($latitude);
@@ -121,6 +131,11 @@ class CRM_Contact_BAO_ProximityQuery {
 
   /**
    * Estimate the min and max longitudes within $distance of a given location.
+   *
+   * @param float $longitude
+   * @param float $latitude
+   * @param float $distance
+   * @return array
    */
   public static function earthLongitudeRange($longitude, $latitude, $distance) {
     $long = deg2rad($longitude);
@@ -148,6 +163,11 @@ class CRM_Contact_BAO_ProximityQuery {
 
   /**
    * Estimate the min and max latitudes within $distance of a given location.
+   *
+   * @param float $longitude
+   * @param float $latitude
+   * @param float $distance
+   * @return array
    */
   public static function earthLatitudeRange($longitude, $latitude, $distance) {
     $long = deg2rad($longitude);
@@ -186,9 +206,9 @@ class CRM_Contact_BAO_ProximityQuery {
   }
 
   /**
-   * @param $latitude
-   * @param $longitude
-   * @param $distance
+   * @param float $longitude
+   * @param float $latitude
+   * @param float $distance
    * @param string $tablePrefix
    *
    * @return string
@@ -243,7 +263,7 @@ ACOS(
 
   /**
    * @param $query
-   * @param $values
+   * @param array $values
    *
    * @throws Exception
    */
@@ -352,7 +372,7 @@ ACOS(
   }
 
   /**
-   * @param $input
+   * @param array $input
    */
   public static function fixInputParams(&$input) {
     foreach ($input as $param) {

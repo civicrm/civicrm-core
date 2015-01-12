@@ -328,12 +328,8 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
   }
 
   /**
-   * @return array
-   *   which contains an array of strings
+   * @inheritDoc
    */
-
-  // the current internationalisation is bad, but should more or less work
-  // for most of "European" languages
   public function getQILL() {
     return $this->_query->qill();
   }

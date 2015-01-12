@@ -428,11 +428,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   }
 
   /**
-   * FIXME: the current internationalisation is bad, but should more or less work
-   * on most of "European" languages
-   *
-   * @return array
-   *   which contains an array of strings
+   * @inheritDoc
    */
   public function getQILL() {
     return $this->_query->qill();
