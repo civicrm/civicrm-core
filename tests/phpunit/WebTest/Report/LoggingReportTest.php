@@ -49,7 +49,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->enableComponents("CiviCase");
 
     //add new contact
-    $orginalFirstName = $firstName = 'Anthony' . substr(sha1(rand()), 0, 7);
+    $originalFirstName = $firstName = 'Anthony' . substr(sha1(rand()), 0, 7);
     $lastName = 'Anderson' . substr(sha1(rand()), 0, 7);
 
     $this->webtestAddContact($firstName, $lastName);
@@ -254,18 +254,18 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $contactInfo['data'] = array(
       array(
         'field' => 'Sort Name',
-        'changed_from' => "{$lastName}, {$orginalFirstName}",
+        'changed_from' => "{$lastName}, {$originalFirstName}",
         'changed_to' => "{$lastName}, {$firstName}"
       ),
       array(
         'field' => 'Display Name',
-        'changed_from' => "{$orginalFirstName} {$lastName}",
+        'changed_from' => "{$originalFirstName} {$lastName}",
         'changed_to' => "{$firstName} {$lastName}"
       ),
-      array('field' => 'First Name', 'changed_from' => $orginalFirstName, 'changed_to' => $firstName),
-      // array('field' => 'Email Greeting', 'changed_from' => "Dear {$orginalFirstName}", 'changed_to' => "Dear {$firstName}"),
-      // array('field' => 'Postal Greeting', 'changed_from' => "Dear {$orginalFirstName}", 'changed_to' => "Dear {$firstName}"),
-      // array('field' => 'Addressee', 'changed_from' => "{$orginalFirstName} {$lastName}", 'changed_to' => "{$firstName} {$lastName}"),
+      array('field' => 'First Name', 'changed_from' => $originalFirstName, 'changed_to' => $firstName),
+      // array('field' => 'Email Greeting', 'changed_from' => "Dear {$originalFirstName}", 'changed_to' => "Dear {$firstName}"),
+      // array('field' => 'Postal Greeting', 'changed_from' => "Dear {$originalFirstName}", 'changed_to' => "Dear {$firstName}"),
+      // array('field' => 'Addressee', 'changed_from' => "{$originalFirstName} {$lastName}", 'changed_to' => "{$firstName} {$lastName}"),
     );
     $contactInfo = array_merge($contactInfo, $data[0]);
 

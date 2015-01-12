@@ -76,10 +76,11 @@ function _civicrm_api3_website_create_spec(&$params) {
  *
  * @param array $params
  * {@getfields website_delete}
+ * @return array
+ *   API result
+ * @throws \API_Exception
  * @example WebsiteDelete.php Std Delete Example
  *
- * @return array
- *   API result Array
  * @access public
  * @todo convert to using Basic delete - BAO function non standard
  */
@@ -96,7 +97,7 @@ function civicrm_api3_website_delete($params) {
     }
   }
   else {
-    return civicrm_api3_create_error('Could not delete website with id ' . $websiteID);
+    throw new API_Exception('Could not delete website with id ' . $websiteID);
   }
 }
 

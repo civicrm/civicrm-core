@@ -90,7 +90,7 @@ class WebTest_Contribute_VerifySSLContributionTest extends CiviSeleniumTestCase 
         $isPcpApprovalNeeded = FALSE,
         $isSeparatePayment = FALSE,
         $honoreeSection = FALSE,
-        $allowOtherAmmount = TRUE
+        $allowOtherAmount = TRUE
       );
 
       // enable verify ssl
