@@ -112,13 +112,13 @@ class CRM_Core_Config_Defaults {
 
   /**
    * Set the default values
+   * in an empty db, also called when setting component using GUI
    *
    * @param array $defaults
    *   Associated array of form elements.
-   * @param bool|\boolena $formMode this funtion is called to set default
-   *                           values in an empty db, also called when setting component using GUI
-   *                           this variable is set true for GUI
-   *                           mode (eg: Global setting >> Components)
+   * @param bool $formMode
+   *   this variable is set true for GUI
+   *   mode (eg: Global setting >> Components)
    *
    * @static
    */
@@ -233,10 +233,9 @@ class CRM_Core_Config_Defaults {
       $defaults['customFileUploadDir'] = $customDir;
     }
 
-    /* FIXME: hack to bypass the step for generating defaults for components,
-                  while running upgrade, to avoid any serious non-recoverable error
-                  which might hinder the upgrade process. */
-
+    // FIXME: hack to bypass the step for generating defaults for components,
+    // while running upgrade, to avoid any serious non-recoverable error
+    // which might hinder the upgrade process.
     $args = array();
     if (isset($_GET[$config->userFrameworkURLVar])) {
       $args = explode('/', $_GET[$config->userFrameworkURLVar]);

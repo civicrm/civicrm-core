@@ -358,9 +358,12 @@ ORDER BY contact_a.sort_name';
     return implode(' AND ', $clauses);
   }
 
-  /**
+  /*
    * Functions below generally don't need to be modified
-   * @return int
+   */
+
+  /**
+   * @inheritDoc
    */
   public function count() {
     $sql = $this->all();

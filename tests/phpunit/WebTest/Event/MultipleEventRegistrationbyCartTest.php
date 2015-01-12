@@ -35,7 +35,9 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     parent::setUp();
   }
 
-  // this functionality is broken hence skipping the test
+  /**
+   * this functionality is broken hence skipping the test
+   */
   public function skiptestAuthenticatedMultipleEvent() {
 
     // Log in using webtestLogin() method
@@ -128,7 +130,9 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->_checkContributionsandEventRegistration($value[0], $value[1], $events);
   }
 
-  // this functionality is broken hence skipping the test
+  /**
+   * this functionality is broken hence skipping the test
+   */
   public function skiptestAnonymousMultipleEvent() {
     // This is the path where our testing install resides.
     // The rest of URL is defined in CiviSeleniumTestCase base class, in

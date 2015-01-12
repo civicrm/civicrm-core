@@ -209,8 +209,9 @@ WHERE  $where
   /*
    * Functions below generally don't need to be modified
    */
+
   /**
-   * @return mixed
+   * @inheritDoc
    */
   public function count() {
     $sql = $this->all();

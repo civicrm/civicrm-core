@@ -241,6 +241,10 @@ class CRM_Contact_Form_Search_Custom_EmployerListing implements CRM_Contact_Form
   /*
    * Functions below generally don't need to be modified
    */
+
+  /**
+   * @inheritDoc
+   */
   public function count() {
     $sql = $this->all();
 

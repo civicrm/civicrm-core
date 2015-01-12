@@ -156,8 +156,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @param int $id
    *   Group id.
-   * @param enum|string $status status of members in group
-   *
+   * @param string $status
+   *   status of members in group
    * @param bool $countChildGroups
    *
    * @return int
@@ -229,11 +229,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *   Limits the set of groups returned.
    * @param array $returnProperties
    *   Which properties should be included in the returned group objects.
-   *                                       (member_count should be last element.)
-   *
-   * @param NULL $sort
-   * @param NULL $offset
-   * @param NULL $rowCount
+   *   (member_count should be last element.)
+   * @param string $sort
+   * @param int $offset
+   * @param int $rowCount
    *
    * @return array
    *   Array of group objects.
@@ -349,7 +348,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * Create a new group
    *
    * @param array $params
-   *   Associative array of parameters.
    *
    * @return CRM_Contact_BAO_Group|NULL
    *   The new group BAO (if created)
@@ -566,7 +564,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *   Value we want to set the is_active field.
    *
    * @return CRM_Core_DAO|null
-   *   DAO object on sucess, NULL otherwise
+   *   DAO object on success, NULL otherwise
    * @static
    */
   public static function setIsActive($id, $isActive) {
@@ -578,7 +576,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @param string $groupType
    *   Type of group(Access/Mailing) OR the key of the group.
-   * @param bool|\boolen $excludeHidden exclude hidden groups.
+   * @param bool $excludeHidden exclude hidden groups.
    *
    * @return string
    * @static
