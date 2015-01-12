@@ -39,7 +39,7 @@
 /**
  * Get CiviCRM Word Replacement details
  * {@getfields word_replacement_create}
- * @param $params
+ * @param array $params
  * @return array
  * @throws \API_Exception
  */

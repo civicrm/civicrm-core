@@ -1719,7 +1719,7 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array()) {
  * Return an array of fields for a given entity - this is the same as the BAO function but
  * fields are prefixed with 'custom_' to represent api params
  * @param $entity
- * @param $params
+ * @param array $params
  * @return array
  */
 function _civicrm_api_get_custom_fields($entity, &$params) {

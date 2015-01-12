@@ -77,7 +77,7 @@ function civicrm_api3_participant_create($params) {
 /**
  * @todo this should be done in the BAO not the api
  * Create a default participant line item
- * @param $params
+ * @param array $params
  * @param $participant
  * @throws \CiviCRM_API3_Exception
  */

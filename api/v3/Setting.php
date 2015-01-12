@@ -32,7 +32,7 @@
  * @subpackage API_Settings
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Settings.php
- * @param $params
+ * @param array $params
  * @return array
  */
 
@@ -74,7 +74,7 @@ function civicrm_api3_setting_getfields($params) {
 
 /**
  * Alter metadata for getfields functions
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_setting_getfields_spec(&$params) {
   $params['filters'] = array('title' => 'Fields you wish to filter by e.g. array("group_name" => "CiviCRM Preferences")');
@@ -86,7 +86,7 @@ function _civicrm_api3_setting_getfields_spec(&$params) {
  * Return default values for settings. We will domain key this as it could vary by domain (ie. urls)
  * as we will be creating the option for a function rather than an value to be in the defaults
  * Note that is not in place as yet
- * @param $params
+ * @param array $params
  * @return array
  * @throws \CiviCRM_API3_Exception
  * @throws \Exception
@@ -130,7 +130,7 @@ function _civicrm_api3_setting_getdefaults_spec(&$params) {
 
 /**
  * Revert settings to defaults
- * @param $params
+ * @param array $params
  * @return array
  * @throws \Exception
  */
@@ -155,7 +155,7 @@ function civicrm_api3_setting_revert(&$params) {
 
 /**
  * Alter metadata for getfields functions
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_setting_revert_spec(&$params) {
   $params['name'] = array('title' => 'Setting Name belongs to');
@@ -170,7 +170,7 @@ function _civicrm_api3_setting_revert_spec(&$params) {
 
 /**
  * Revert settings to defaults
- * @param $params
+ * @param array $params
  * @return array
  * @throws \CiviCRM_API3_Exception
  * @throws \Exception
@@ -195,7 +195,7 @@ function civicrm_api3_setting_fill(&$params) {
 
 /**
  * Alter metadata for getfields functions
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_setting_fill_spec(&$params) {
   $params['name'] = array('title' => 'Setting Name belongs to');
@@ -346,7 +346,7 @@ function _civicrm_api3_setting_getvalue_spec(&$params) {
  * Really domain_id should always be set but doing an empty check because at the moment
  * using crm-editable will pass an id & default won't be applied
  * we did talk about id being a pseudonym for domain_id in this api so applying it here
- * @param $params
+ * @param array $params
  * @return array
  * @throws \Exception
  */

@@ -151,7 +151,7 @@ function _civicrm_api3_contribution_create_spec(&$params) {
  * The main purpose of the API is to provide integrators a level of stability not provided by
  * the core code or schema - this means we have to provide support for api calls (where possible)
  * across schema changes.
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_contribution_create_legacy_support_45(&$params) {
   //legacy soft credit handling - recommended approach is chaining
@@ -197,7 +197,7 @@ function civicrm_api3_contribution_delete($params) {
 
 /**
  * modify metadata. Legacy support for contribution_id
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_contribution_delete_spec(&$params) {
   $params['id']['api.aliases'] = array('contribution_id');

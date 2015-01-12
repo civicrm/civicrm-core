@@ -139,7 +139,7 @@ function civicrm_api3_group_contact_delete($params) {
 
 /**
  * modify metadata
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_group_contact_delete_spec(&$params) {
   // set as not required no either/or std yet
@@ -229,7 +229,7 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
 
 /**
  * @deprecated - this should be part of create but need to know we aren't missing something
- * @param $params
+ * @param array $params
  * @return bool
  * @throws \API_Exception
  */
