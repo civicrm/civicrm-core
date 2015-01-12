@@ -63,9 +63,10 @@ class CRM_Core_DAO extends DB_DataObject {
     QUERY_FORMAT_WILDCARD = 1,
     QUERY_FORMAT_NO_QUOTES = 2;
 
-  /*
+  /**
    * Define entities that shouldn't be created or deleted when creating/ deleting
-   *  test objects - this prevents world regions, countries etc from being added / deleted
+   * test objects - this prevents world regions, countries etc from being added / deleted
+   * @var array
    */
   static $_testEntitiesToSkip = array();
   /**

@@ -171,12 +171,12 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
     }
 
     /*
-         * Build the private data string to pass to DPS, which they will give back to us with the
-         *
-         * transaction result.  We are building this as a comma-separated list so as to avoid long URLs.
-         *
-         * Parameters passed: a=contactID, b=contributionID,c=contributionTypeID,d=invoiceID,e=membershipID,f=participantID,g=eventID
-         */
+     * Build the private data string to pass to DPS, which they will give back to us with the
+     *
+     * transaction result.  We are building this as a comma-separated list so as to avoid long URLs.
+     *
+     * Parameters passed: a=contactID, b=contributionID,c=contributionTypeID,d=invoiceID,e=membershipID,f=participantID,g=eventID
+     */
 
     $privateData = "a={$params['contactID']},b={$params['contributionID']},c={$params['contributionTypeID']},d={$params['invoiceID']}";
 
@@ -210,8 +210,8 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $dpsParams);
 
     /*
-         *  determine whether method is pxaccess or pxpay by whether signature (mac key) is defined
-         */
+     *  determine whether method is pxaccess or pxpay by whether signature (mac key) is defined
+     */
 
     if (empty($this->_paymentProcessor['signature'])) {
       /*

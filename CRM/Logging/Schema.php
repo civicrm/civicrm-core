@@ -313,12 +313,11 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     }
   }
 
-  /*
-   * log_civicrm_contact.modified_date for example would always be copied from civicrm_contact.modified_date,
+  /**
+   * Log_civicrm_contact.modified_date for example would always be copied from civicrm_contact.modified_date,
    * so there's no need for a default timestamp and therefore we remove such default timestamps
    * also eliminate the NOT NULL constraint, since we always copy and schema can change down the road)
-   */
-  /**
+   *
    * @param $query
    *
    * @return mixed

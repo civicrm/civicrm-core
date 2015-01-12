@@ -903,7 +903,7 @@ LIMIT 1;";
     return $statusId;
   }
 
-  /*
+  /**
    * Update pledge associated with a recurring contribution
    *
    * If the contribution has a pledge_payment record pledge, then update the pledge_payment record & pledge based on that linkage.
@@ -915,9 +915,8 @@ LIMIT 1;";
    *
    * The pledge payment record should already exist & will need to be updated with the new contribution ID.
    * If not the contribution will also need to be linked to the pledge
-   */
-  /**
-   * @param $contribution
+   *
+   * @param CRM_Contribute_BAO_Contribution $contribution
    */
   public function updateRecurLinkedPledge(&$contribution) {
     $returnProperties = array('id', 'pledge_id');

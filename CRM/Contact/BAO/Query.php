@@ -2880,10 +2880,9 @@ class CRM_Contact_BAO_Query {
     $this->_where[$grouping][] = $groupClause;
     $this->_qill[$grouping][] = $qill;
   }
-  /*
-   * Function translates selection of group type into a list of groups
-   */
+
   /**
+   * Function translates selection of group type into a list of groups
    * @param $value
    *
    * @return array

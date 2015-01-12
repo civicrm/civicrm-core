@@ -38,35 +38,54 @@
  *
  */
 class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
-  /*
+
+  /**
    * Display name of the member
+   *
+   * @var string
    */
   protected $_memberDisplayName = NULL;
-  /*
-  * email of the person paying for the membership (used for receipts)
-  */
+
+  /**
+   * email of the person paying for the membership (used for receipts)
+   */
   protected $_memberEmail = NULL;
-  /*
-  * Contact ID of the member
-  */
+
+  /**
+   * Contact ID of the member
+   *
+   *
+   * @var int
+   */
   public $_contactID = NULL;
-  /*
-  * Display name of the person paying for the membership (used for receipts)
-  */
+
+  /**
+   * Display name of the person paying for the membership (used for receipts)
+   *
+   * @var string
+   */
   protected $_contributorDisplayName = NULL;
-  /*
-  * email of the person paying for the membership (used for receipts)
-  */
+
+  /**
+   * email of the person paying for the membership (used for receipts)
+   */
   protected $_contributorEmail = NULL;
-  /*
-  * email of the person paying for the membership (used for receipts)
-  */
+
+  /**
+   * email of the person paying for the membership (used for receipts)
+   *
+   * @var int
+   */
   protected $_contributorContactID = NULL;
-  /*
-  * ID of the person the receipt is to go to
-  */
+
+  /**
+   * ID of the person the receipt is to go to
+   *
+   * @var int
+   */
   protected $_receiptContactId = NULL;
-  /*
+
+  /**
    * context would be set to standalone if the contact is use is being selected from
    * the form rather than in the URL
    */

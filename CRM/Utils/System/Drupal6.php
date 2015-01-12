@@ -121,15 +121,11 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     return $form_state['user']->uid;
   }
 
-  /*
-   *  Change user name in host CMS
-   *
-   *  @param int $ufID User ID in CMS
-   *  @param string $ufName User name
-   */
   /**
-   * @param int $ufID
-   * @param string $ufName
+   * Change user name in host CMS
+   *
+   * @param int $ufID User ID in CMS
+   * @param string $ufName User name
    */
   public function updateCMSName($ufID, $ufName) {
     // CRM-5555

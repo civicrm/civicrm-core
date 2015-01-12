@@ -97,15 +97,13 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     return $form_state['user']->uid;
   }
 
-  /*
-   *  Change user name in host CMS
-   *
-   *  @param int $ufID User ID in CMS
-   *  @param string $ufName User name
-   */
   /**
+   * Change user name in host CMS
+   *
    * @param int $ufID
+   *   User ID in CMS
    * @param string $ufName
+   *   User name
    */
   public function updateCMSName($ufID, $ufName) {
     // CRM-5555
@@ -176,19 +174,14 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     }
   }
 
-  /*
+  /**
    * Get the drupal destination string. When this is passed in the
    * URL the user will be directed to it after filling in the drupal form
    *
    * @param CRM_Core_Form $form
    *   Form object representing the 'current' form - to which the user will be returned.
-   * @return string
-   *   destination value for URL
-   */
-  /**
-   * @param CRM_Core_Form $form
-   *
    * @return null|string
+   *   destination value for URL
    */
   public function getLoginDestination(&$form) {
     $args = NULL;
@@ -538,10 +531,9 @@ AND    u.status = 1
     return FALSE;
   }
 
-  /*
-   * Load user into session
-   */
   /**
+   * Load user into session
+   *
    * @param string $username
    *
    * @return bool

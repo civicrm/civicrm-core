@@ -702,7 +702,7 @@ class CRM_Utils_Array {
     return $elementArray;
   }
 
-  /*
+  /**
    * Searches array keys by regex, returning the value of the first match.
    *
    * Given a regular expression and an array, this method searches the keys
@@ -722,13 +722,6 @@ class CRM_Utils_Array {
    *
    * @return mixed
    *   The value found.
-   */
-  /**
-   * @param $regexKey
-   * @param $list
-   * @param null $default
-   *
-   * @return null
    */
   public static function valueByRegexKey($regexKey, $list, $default = NULL) {
     if (is_array($list) && $regexKey) {

@@ -47,20 +47,15 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
     $this->_processorName = ts('PayJunction');
   }
 
-  /*
+  /**
    * This function sends request and receives response from
    * PayJunction payment process
-   */
-  /**
-   * This function collects all the information from a web/api form and invokes
-   * the relevant payment processor specific functions to perform the transaction
    *
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    *
    * @return array
    *   the result in an nice formatted array (or an error object)
-   * @abstract
    */
   public function doDirectPayment(&$params) {
     $logon = $this->_paymentProcessor['user_name'];
@@ -178,11 +173,8 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
   // end function doDirectPayment
 
 
-  /*
-   * This function checks the PayJunction response code
-   */
   /**
-   * @param $response
+   * This function checks the PayJunction response code
    *
    * @return bool
    */
