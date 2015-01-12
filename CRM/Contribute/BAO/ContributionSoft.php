@@ -311,15 +311,11 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     return $result;
   }
 
-  /*
-   *  Function to assign honor profile fields to template/form, if $honorId (as soft-credit's contact_id)
-   *  is passed  then  whole honoreeprofile fields with title/value assoc array assigned or only honoreeName
-   *  is assigned
-   *
-   *  @static
-   */
-
   /**
+   * Function to assign honor profile fields to template/form, if $honorId (as soft-credit's contact_id)
+   * is passed  then  whole honoreeprofile fields with title/value assoc array assigned or only honoreeName
+   * is assigned
+   *
    * @param CRM_Core_Form $form
    * @param array $params
    * @param int $honoreeprofileId

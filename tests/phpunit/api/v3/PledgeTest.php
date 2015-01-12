@@ -287,9 +287,9 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->callAPISuccess('pledge', 'delete', array('pledge_id' => $pledge['id']));
   }
 
-  /*
+  /**
    * Test that pledge with weekly schedule calculates dates correctly
-  */
+   */
   public function testCreatePledgeMontlySchedule() {
     $params = array(
       'scheduled_date' => '20110510',

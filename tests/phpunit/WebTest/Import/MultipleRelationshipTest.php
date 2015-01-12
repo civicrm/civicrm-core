@@ -35,9 +35,9 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
     parent::setUp();
   }
 
-  /*
-    *  Test Multiple Relationship import for Individuals.
-    */
+  /**
+   * Test Multiple Relationship import for Individuals.
+   */
   public function testMultipleRelationshipImport() {
     $this->webtestLogin();
 
@@ -48,12 +48,10 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
     $this->importContacts($headers, $rows, 'Individual', 'Skip', $fieldMapper);
   }
 
-  /*
+  /**
    * Helper function to provide data for multiple relationship import
    * for Individuals.
-
-   */
-  /**
+   *
    * @return array
    */
   public function _individualRelationshipCSVData() {

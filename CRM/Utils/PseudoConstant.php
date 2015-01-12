@@ -29,7 +29,7 @@
  * Utilities for manipulating/inspecting CRM_*_PseudoConstant classes
  */
 class CRM_Utils_PseudoConstant {
-  /*
+  /**
    * CiviCRM pseudoconstant classes for wrapper functions
    */
   private static $constantClasses = array(

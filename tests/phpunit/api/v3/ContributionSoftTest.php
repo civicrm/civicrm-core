@@ -196,7 +196,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     );
   }
 
-  /*
+  /**
    * Function tests that additional financial records are created when fee amount is recorded
    */
   public function testCreateContributionSoft() {

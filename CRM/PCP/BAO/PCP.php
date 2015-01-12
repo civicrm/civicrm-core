@@ -428,10 +428,9 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
 
-  /*
-   * Add PCP form elements to a form
-   */
   /**
+   * Add PCP form elements to a form
+   *
    * @param int $pcpId
    * @param CRM_Core_Page $page
    * @param null $elements
@@ -481,10 +480,9 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
     }
   }
 
-  /*
-   * Process a PCP contribution/
-   */
   /**
+   * Process a PCP contribution
+   *
    * @param int $pcpId
    * @param $component
    * @param $entity

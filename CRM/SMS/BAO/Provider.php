@@ -53,13 +53,12 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
     return $activeProviders;
   }
 
-  /*
+  /**
    * Retrieves the list of providers from the database
    *
    * $selectArr array of coloumns to fetch
    * $getActive boolean to get active providers
-   */
-  /**
+   *
    * @param null $selectArr
    * @param null $filter
    * @param bool $getActive

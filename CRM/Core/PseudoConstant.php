@@ -981,10 +981,8 @@ WHERE  id = %1";
    */
   public static function &groupIterator($styledLabels = FALSE) {
     if (!self::$groupIterator) {
-      /*
-        When used as an object, GroupNesting implements Iterator
-        and iterates nested groups in a logical manner for us
-      */
+      // When used as an object, GroupNesting implements Iterator
+      // and iterates nested groups in a logical manner for us
       self::$groupIterator = new CRM_Contact_BAO_GroupNesting($styledLabels);
     }
     return self::$groupIterator;

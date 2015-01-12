@@ -158,7 +158,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
 
   public $_compId;
 
-  /*
+  /**
    * Store the line items if price set used.
    */
   public $_lineItems;

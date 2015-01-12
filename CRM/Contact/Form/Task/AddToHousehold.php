@@ -45,10 +45,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
    * @return void
    */
   public function preProcess() {
-    /*
-         * initialize the task and row fields
-         */
-
+    // initialize the task and row fields
     parent::preProcess();
   }
 

@@ -40,13 +40,15 @@
  */
 class CRM_Financial_BAO_ExportFormat {
 
-  /*
-   * Array of data which the individual export formats will output in the desired format
+  /**
+   * data which the individual export formats will output in the desired format
+   * @var array
    */
   protected $_exportParams;
 
-  /*
+  /**
    * smarty template
+   * @var CRM_Core_Smarty
    */
   static protected $_template;
 

@@ -445,11 +445,10 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
-  /*
-   *  Helper function to provide data for contact import for Household
-   *  Duplicate Matching.
-   */
   /**
+   * Helper function to provide data for contact import for Household
+   * Duplicate Matching.
+   *
    * @param $householdFields
    *
    * @return array
