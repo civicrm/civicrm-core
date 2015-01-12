@@ -57,7 +57,6 @@ function _civicrm_api3_uf_group_create_spec(&$params) {
  *   API result array
  * {@getfields UFGroup_create}
  * @example UFGroupCreate.php
- * @access public
  */
 function civicrm_api3_uf_group_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -75,7 +74,6 @@ function civicrm_api3_uf_group_create($params) {
  *   Array of matching profiles
  * {@getfields UFGroup_get}
  * @example UFGroupGet.php
- * @access public
  */
 function civicrm_api3_uf_group_get($params) {
 

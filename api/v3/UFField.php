@@ -140,7 +140,6 @@ function _civicrm_api3_uf_field_create_spec(&$params) {
  *   (reference) Array
  * {@getfields UFField_get
  * @example UFFieldGet.php
- * @access public
  */
 function civicrm_api3_uf_field_get($params) {
   return _civicrm_api3_basic_get('CRM_Core_BAO_UFField', $params);

@@ -712,7 +712,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *   This is contact id for adding relationship.
    *
    * @return string
-   * @access public
    */
   public static function checkValidRelationship($params, $ids, $contactId) {
     $errors = '';

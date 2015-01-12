@@ -46,7 +46,6 @@
  *
  * @return array
  *   Array of newly created tag property values.
- * @access public
  */
 function civicrm_api3_address_create(&$params) {
   /**
@@ -133,7 +132,6 @@ function _civicrm_api3_address_get_spec(&$params) {
  *
  * @return array
  *   api result array
- * @access public
  */
 function civicrm_api3_address_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -152,7 +150,6 @@ function civicrm_api3_address_delete($params) {
  * @return array
  *   details of found addresses else error
  * {@getfields address_get}
- * @access public
  */
 function civicrm_api3_address_get(&$params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Address');

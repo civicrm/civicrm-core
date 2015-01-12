@@ -311,7 +311,6 @@ function _civicrm_api3_case_deprecation() {
  * @return array
  *   api result array
  *
- * @access public
  */
 function civicrm_api3_case_update($params) {
   //check parameters
@@ -378,7 +377,6 @@ function civicrm_api3_case_update($params) {
  * @return boolean
  *   true if success, else false
  * {@getfields case_delete}
- * @access public
  */
 function civicrm_api3_case_delete($params) {
   //check parameters

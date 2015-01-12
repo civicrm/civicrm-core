@@ -113,7 +113,6 @@ function civicrm_api3_website_delete($params) {
  * @return array
  *   details of found websites
  *
- * @access public
  */
 function civicrm_api3_website_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'website');

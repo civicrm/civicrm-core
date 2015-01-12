@@ -44,7 +44,6 @@
  *
  * @return array
  *   Array of newly created batch property values.
- * @access public
  */
 function civicrm_api3_batch_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -81,7 +80,6 @@ function _civicrm_api3_batch_create_spec(&$params) {
  *
  * @return array
  *   Array of retrieved batch property values.
- * @access public
  */
 function civicrm_api3_batch_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -98,7 +96,6 @@ function civicrm_api3_batch_get($params) {
  *
  * @return array
  *   Array of deleted values.
- * @access public
  */
 function civicrm_api3_batch_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

@@ -52,9 +52,6 @@ function _civicrm_api3_activity_type_deprecation() {
  *
  * @return array
  *   activity types keyed by id
- * @access public
- *
- * @example ActivityTypeGet.php
  * @deprecated - use getoptions
  */
 function civicrm_api3_activity_type_get($params) {
@@ -67,13 +64,9 @@ function civicrm_api3_activity_type_get($params) {
  * create activity type (
  *
  * @param array $params
- *   Associated array of fields.
- *                 $params['option_value_id'] is required for updation of activity type
  *
  * @return array
  *   created / updated activity type
- *
- * @access public
  *
  * @deprecated - use option_value create
  */
@@ -114,8 +107,6 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
 
  * @return array
  *   API result array
- *
- * @access public
  *
  * @deprecated - we will introduce OptionValue Delete- plse consider helping with this if not done
  */

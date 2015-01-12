@@ -219,7 +219,6 @@ function _civicrm_api3_setting_fill_spec(&$params) {
  * @return array
  *   api result array
  * {@getfields setting_create}
- * @access public
  */
 function civicrm_api3_setting_create($params) {
   $domains = _civicrm_api3_setting_getDomainArray($params);
@@ -256,7 +255,6 @@ function _civicrm_api3_setting_create_spec(&$params) {
  * @return array
  *   Array of matching settings
  * {@getfields setting_get}
- * @access public
  */
 function civicrm_api3_setting_get($params) {
   $domains = _civicrm_api3_setting_getDomainArray($params);
@@ -291,7 +289,6 @@ function _civicrm_api3_setting_get_spec(&$params) {
  * @return array
  *   Array of matching settings
  * {@getfields setting_get}
- * @access public
  */
 function civicrm_api3_setting_getvalue($params) {
   $config = CRM_Core_Config::singleton();

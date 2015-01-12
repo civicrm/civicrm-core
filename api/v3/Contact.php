@@ -53,7 +53,6 @@
  * @return array
  *   API Result Array
  *
- * @access public
  */
 function civicrm_api3_contact_create($params) {
 

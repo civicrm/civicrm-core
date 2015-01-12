@@ -90,7 +90,6 @@ function _civicrm_api3_attachment_create_spec(&$spec) {
  * @param array $params
  * @return array
  *   Array of newly created file property values.
- * @access public
  * @throws API_Exception validation errors
  */
 function civicrm_api3_attachment_create($params) {
@@ -179,6 +178,9 @@ function civicrm_api3_attachment_get($params) {
   return civicrm_api3_create_success($result, $params, 'Attachment', 'create');
 }
 
+/**
+ * @param $spec
+ */
 function _civicrm_api3_attachment_delete_spec(&$spec) {
   unset($spec['id']['api.required']);
   $entityFileFields = CRM_Core_DAO_EntityFile::fields();
