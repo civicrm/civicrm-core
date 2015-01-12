@@ -1189,7 +1189,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * @param bool|int $isTest if true, membership is for a test site
    * @param bool|int $isOwner if true, only retrieve membership records for owners //LCD
    *
-   * @return integer
+   * @return int
    *   the number of members of type $membershipTypeId whose
    *         start_date is between $startDate and $endDate
    */
@@ -2173,7 +2173,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *   Date on which to end counting.
    * @param bool|int $isTest if true, membership is for a test site
    *
-   * @return integer
+   * @return int
    *   returns the number of members of type $membershipTypeId
    *         whose join_date is before $startDate and
    *         whose start_date is between $startDate and $endDate
@@ -2696,7 +2696,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @param int $membershipId
    *   Membership id.
    *
-   * @return integer
+   * @return int
    *   contribution id
    */
   public static function getMembershipContributionId($membershipId) {

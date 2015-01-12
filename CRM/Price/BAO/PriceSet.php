@@ -375,7 +375,7 @@ WHERE     ct.id = cp.financial_type_id AND
    * @param null $isQuickConfig
    * @param null $setName
    *
-   * @return integer|false
+   * @return int|false
    *   price_set_id, or false if none found
    */
   public static function getFor($entityTable, $entityId, $usedFor = NULL, $isQuickConfig = NULL, &$setName = NULL) {
@@ -413,7 +413,7 @@ WHERE     ct.id = cp.financial_type_id AND
    *                      array may contain either option id or
    *                      price field id
    *
-   * @return integer|NULL
+   * @return int|NULL
    *   price set id on success, null  otherwise
    * @static
    */
