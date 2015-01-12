@@ -213,7 +213,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
     //enable recaptcha in the profile
     $this->openCiviPage('admin/uf/group', 'reset=1');
-    $this->clickLink("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td[1]/span[text()= '$profileTitle']/../following-sibling::td[6]/span/a[2]");
+    $this->clickLink("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td[1]/div[text()= '$profileTitle']/../following-sibling::td[6]/span/a[2]");
     $this->click("//form[@id='Group']/div[2]/div[2]/div[1]");
     //reCaptcha settings
     $this->click('add_captcha');

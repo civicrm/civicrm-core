@@ -392,8 +392,8 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     //Reserve and interview respondents
     $this->openCiviPage('campaign', 'reset=1&subPage=survey');
-    $this->waitForElementPresent("xpath=//table[@class='surveys dataTable no-footer']/tbody//tr/td[2]/a[text()='{$surveyTitle}']/../following-sibling::td[@class=' crm-campaign-voterLinks']/span/ul/li/a");
-    $this->click("xpath=//table[@class='surveys dataTable no-footer']/tbody//tr/td[2]/a[text()='{$surveyTitle}']/../following-sibling::td[@class=' crm-campaign-voterLinks']/span/ul/li/a");
+    $this->waitForElementPresent("xpath=//table[@class='surveys dataTable no-footer']/tbody//tr/td[2]/div/a[text()='{$surveyTitle}']/../../following-sibling::td[@class=' crm-campaign-voterLinks']/span/ul/li/a");
+    $this->click("xpath=//table[@class='surveys dataTable no-footer']/tbody//tr/td[2]/div/a[text()='{$surveyTitle}']/../../following-sibling::td[@class=' crm-campaign-voterLinks']/span/ul/li/a");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("xpath=//div[@id='search_form_reserve']/div");
     $this->waitForElementPresent('sort_name');
