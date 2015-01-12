@@ -113,7 +113,7 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * @param string $entityTable
    *   Entity table to be searched.
    *
-   * @return integer
+   * @return int
    *   $dao->id       discount id of the set which matches
    *                                 the date criteria
    */

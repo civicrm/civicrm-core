@@ -107,7 +107,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
 
   /*
    * Get ID of billing location type
-   * @return integer
+   * @return int
    */
   /**
    * @return mixed|null

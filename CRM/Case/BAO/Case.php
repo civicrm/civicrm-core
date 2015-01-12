@@ -2360,7 +2360,7 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
    *
    * @param bool $changeClient
    *
-   * @return integer|NULL
+   * @return int|NULL
    * @static
    */
   static function mergeCases(

@@ -199,7 +199,7 @@ class CRM_Utils_Weight {
    * @param string $weightField
    *   Field which used to get the wt, default to 'weight'.
    *
-   * @return integer
+   * @return int
    */
   public static function getNewWeight($daoName, $fieldValues = NULL, $weightField = 'weight') {
     $selectField = "id AS fieldID, $weightField AS weight";
@@ -241,7 +241,7 @@ class CRM_Utils_Weight {
    *   Field which contains the weight value,.
    *   defaults to 'weight'
    *
-   * @return integer
+   * @return int
    */
   public static function getMax($daoName, $fieldValues = NULL, $weightField = 'weight') {
     $selectField = "MAX(ROUND($weightField)) AS max_weight";
@@ -264,7 +264,7 @@ class CRM_Utils_Weight {
    *   Field which contains the weight value,.
    *   defaults to 'weight'
    *
-   * @return integer
+   * @return int
    */
   public static function getDefaultWeight($daoName, $fieldValues = NULL, $weightField = 'weight') {
     $maxWeight = CRM_Utils_Weight::getMax($daoName, $fieldValues, $weightField);

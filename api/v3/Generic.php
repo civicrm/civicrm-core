@@ -150,7 +150,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
  *   Api request as an array. Keys are.
  *
  * @throws API_Exception
- * @return integer
+ * @return int
  *   count of results
  */
 function civicrm_api3_generic_getcount($apiRequest) {
@@ -171,7 +171,7 @@ function civicrm_api3_generic_getcount($apiRequest) {
  * @param array $apiRequest
  *   Api request as an array. Keys are.
  *
- * @return integer
+ * @return int
  *   count of results
  */
 function civicrm_api3_generic_getsingle($apiRequest) {
@@ -196,7 +196,7 @@ function civicrm_api3_generic_getsingle($apiRequest) {
  * @param array $apiRequest
  *   Api request as an array. Keys are.
  *
- * @return integer
+ * @return int
  *   count of results
  */
 function civicrm_api3_generic_getvalue($apiRequest) {
@@ -264,7 +264,7 @@ function civicrm_api3_generic_getrefcount($apiRequest) {
  * @param array $apiRequest
  *   Api request as an array. Keys are.
  *
- * @return integer
+ * @return int
  *   count of results
  */
 function civicrm_api3_generic_replace($apiRequest) {

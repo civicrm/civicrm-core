@@ -957,10 +957,10 @@ WHERE id={$id}; ";
   /**
    * Return proportional height and width of the image
    *
-   * @param Integer $imageWidth
+   * @param int $imageWidth
    *   Width of image.
    *
-   * @param Integer $imageHeight
+   * @param int $imageHeight
    *   Height of image.
    *
    * @return Array

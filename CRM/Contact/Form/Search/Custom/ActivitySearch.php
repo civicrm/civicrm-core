@@ -360,7 +360,7 @@ ORDER BY contact_a.sort_name';
 
   /**
    * Functions below generally don't need to be modified
-   * @return integer
+   * @return int
    */
   public function count() {
     $sql = $this->all();

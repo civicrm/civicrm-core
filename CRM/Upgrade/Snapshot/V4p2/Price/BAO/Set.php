@@ -347,7 +347,7 @@ WHERE     ct.id = cp.contribution_type_id AND
    * @param null $isQuickConfig
    * @param null $setName
    *
-   * @return integer|false
+   * @return int|false
    *   price_set_id, or false if none found
    */
   public static function getFor($entityTable, $entityId, $usedFor = NULL, $isQuickConfig = NULL, &$setName = NULL) {
