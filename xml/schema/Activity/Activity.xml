@@ -60,11 +60,11 @@
   </index>
   <field>
     <name>activity_type_id</name>
-    <title>Activity Type</title>
+    <title>Activity Type ID</title>
     <import>true</import>
     <type>int unsigned</type>
     <required>true</required>
-    <export>false</export>
+    <export>true</export>
     <default>1</default>
     <headerPattern>/(activity.)?type(.id$)/i</headerPattern>
     <comment>FK to civicrm_option_value.id, that has to be valid, registered activity type.</comment>
