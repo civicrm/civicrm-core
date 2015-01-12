@@ -86,10 +86,6 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
             'title' => ts('Last Name'),
             'no_repeat' => TRUE,
           ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
           'contact_type' => array(
             'title' => ts('Contact Type'),
           ),

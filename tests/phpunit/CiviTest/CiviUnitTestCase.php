@@ -1212,7 +1212,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @throws Exception
    */
   public function contactTypeDelete($contactTypeId) {
-    require_once 'CRM/Contact/BAO/ContactType.php';
     $result = CRM_Contact_BAO_ContactType::del($contactTypeId);
     if (!$result) {
       throw new Exception('Could not delete contact type');

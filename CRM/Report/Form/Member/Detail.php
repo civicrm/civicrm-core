@@ -86,10 +86,6 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           'last_name' => array(
             'title' => ts('Last Name'),
           ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
           'contact_type' => array(
             'title' => ts('Contact Type'),
           ),

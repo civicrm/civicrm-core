@@ -146,7 +146,6 @@ class CRM_Utils_Address {
         'contact.birth_date' => CRM_Utils_Array::value('birth_date', $fields),
         'contact.gender' => CRM_Utils_Array::value('gender', $fields),
         'contact.is_opt_out' => CRM_Utils_Array::value('is_opt_out', $fields),
-        'contact.home_URL' => CRM_Utils_Array::value('home_URL', $fields),
         'contact.preferred_mail_format' => CRM_Utils_Array::value('preferred_mail_format', $fields),
         'contact.phone' => CRM_Utils_Array::value('phone', $fields),
         'contact.home_URL' => CRM_Utils_Array::value('home_URL', $fields),
