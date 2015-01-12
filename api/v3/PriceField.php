@@ -68,7 +68,7 @@ function _civicrm_api3_price_field_create_spec(&$params) {
  *
  * @param array $params
  *   Array of one or more valid property_name=>value pairs. If $params is set.
- *  as null, all price_fields will be returned (default limit is 25)
+ *   as null, all price_fields will be returned (default limit is 25)
  *
  * @return array
  *   Array of matching price_fields
@@ -87,7 +87,7 @@ function civicrm_api3_price_field_get($params) {
  *
  * @param array $params
  *   Array containing id of the group.
- *  to be deleted
+ *   to be deleted
  *
  * @return array
  *   API result array

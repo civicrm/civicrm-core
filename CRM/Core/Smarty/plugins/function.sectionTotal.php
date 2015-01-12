@@ -28,7 +28,7 @@
 /**
  * CiviCRM's Smarty report section totals plugin
  *
- * Prints the correct report section total based on the given key and order in the section heirarchy
+ * Prints the correct report section total based on the given key and order in the section hierarchy
  *
  * @package CRM
  * @author Allen Shaw <allen@nswebsolutions.com>
@@ -37,7 +37,7 @@
  */
 
 /**
- * Smarty block function for printintg the correct report section total
+ * Smarty block function for printing the correct report section total
  *
  * Smarty param:  string $key     value of the current section column
  * Smarty param:  int    $depth   the depth of the current section
@@ -45,7 +45,7 @@
  *
  * @param array $params
  *   Template call's parameters.
- * @param object $smarty
+ * @param CRM_Core_Smarty $smarty
  *   The Smarty object.
  *
  * @return string
@@ -53,14 +53,14 @@
  */
 function smarty_function_sectionTotal($params, &$smarty) {
   /* section totals are stored in template variable 'sectionTotals',
-     * which is a two-dimensional array keyed to a string which is a delimited
-     * concatenation (using CRM_Core_DAO::VALUE_SEPARATOR) of ordered permutations
-     * of section header values, e.g.,
-     * 'foo' => 10,
-     * 'foo[VALUE_SEAPARATOR]bar' => 5,
-     * 'foo[VALUE_SEAPARATOR]bar2' => 5
-     * Note: This array is created and assigned to the template in CRM_Report_Form::sectionTotals()
-     */
+   * which is a two-dimensional array keyed to a string which is a delimited
+   * concatenation (using CRM_Core_DAO::VALUE_SEPARATOR) of ordered permutations
+   * of section header values, e.g.,
+   * 'foo' => 10,
+   * 'foo[VALUE_SEAPARATOR]bar' => 5,
+   * 'foo[VALUE_SEAPARATOR]bar2' => 5
+   * Note: This array is created and assigned to the template in CRM_Report_Form::sectionTotals()
+   */
 
   static $sectionValues = array();
 

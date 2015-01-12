@@ -101,7 +101,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Financial_DAO_PaymentProcessor object on success, null otherwise
+   * @return CRM_Financial_DAO_PaymentProcessor|null
+   *   object on success, null otherwise
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -122,8 +123,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object
-   *   DAO object on sucess, null otherwise
+   * @return CRM_Financial_DAO_PaymentProcessor|null
+   *   DAO object on success, null otherwise
    *
    * @static
    */
@@ -136,9 +137,9 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *
    * @param NULL
    *
-   * @return object
+   * @return CRM_Financial_DAO_PaymentProcessor|null
    *   The default payment processor object on success,
-   *                          null otherwise
+   *   null otherwise
    * @static
    */
   public static function &getDefault() {
@@ -151,7 +152,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
-   * Function  to delete payment processor
+   * Delete payment processor
    *
    * @param int $paymentProcessorID
    *
@@ -242,7 +243,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * Compare 2 payment processors to see which should go first based on is_default
    * (sort function for sortDefaultFirst)
    * @param array $processor1
-   * @param array_type $processor2
+   * @param array $processor2
    * @return number
    */
   public static function defaultComparison($processor1, $processor2) {
@@ -353,12 +354,11 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * arguably this could go on the pseudoconstant class
    *
    * @param array $capabilities
-   * capabilities of processor e.g
-   *  - BackOffice
-   *  - TestMode
-   *  - LiveMode
-   *  - FutureStartDate
-   *  include test processors (we want to phase this out in favour of the testMode Capability)
+   *   capabilities of processor e.g
+   *   - BackOffice
+   *   - TestMode
+   *   - LiveMode
+   *   - FutureStartDate
    *
    * @param array $ids
    *
@@ -417,8 +417,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param string $type
    *   Type of payment information to be retrieved.
    *
-   * @return int
-   *   / array / object based on type
+   * @return int|array|object
    * @static
    */
   public static function getProcessorForEntity($entityID, $component = 'contribute', $type = 'id') {

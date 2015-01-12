@@ -38,10 +38,6 @@
  */
 
 /**
- * Files required for this package
- */
-
-/**
  * Handle creation of a Mailing Job for a Mailing.
  */
 function civicrm_api3_mailing_job_create($params) {

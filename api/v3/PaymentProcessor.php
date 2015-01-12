@@ -43,7 +43,7 @@
  * @param array $params
  *
  * @return array
- *   of newly created PaymentProcessor property values.
+ *   Array of newly created PaymentProcessor property values.
  * @access public
  */
 function civicrm_api3_payment_processor_create($params) {

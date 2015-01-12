@@ -1440,17 +1440,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $label
    * @param array $props
    *   Mix of html and widget properties, including:.
-   *  - select - params to give to select2 widget
-   *  - entity - defaults to contact
-   *  - create - can the user create a new entity on-the-fly?
+   *   - select - params to give to select2 widget
+   *   - entity - defaults to contact
+   *   - create - can the user create a new entity on-the-fly?
    *             Set to TRUE if entity is contact and you want the default profiles,
    *             or pass in your own set of links. @see CRM_Core_BAO_UFGroup::getCreateLinks for format
    *             note that permissions are checked automatically
-   *  - api - array of settings for the getlist api wrapper
+   *   - api - array of settings for the getlist api wrapper
    *          note that it accepts a 'params' setting which will be passed to the underlying api
-   *  - placeholder - string
-   *  - multiple - bool
-   *  - class, etc. - other html properties
+   *   - placeholder - string
+   *   - multiple - bool
+   *   - class, etc. - other html properties
    * @param bool $required
    *
    * @return HTML_QuickForm_Element
@@ -1559,12 +1559,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Get contact if for a form object. Prioritise
-   *  - cid in URL if 0 (on behalf on someoneelse)
+   *   - cid in URL if 0 (on behalf on someoneelse)
    *      (@todo consider setting a variable if onbehalf for clarity of downstream 'if's
-   *  - logged in user id if it matches the one in the cid in the URL
-   *  - contact id validated from a checksum from a checksum
-   *  - cid from the url if the caller has ACL permission to view
-   *  - fallback is logged in user (or ? NULL if no logged in user) (@todo wouldn't 0 be more intuitive?)
+   *   - logged in user id if it matches the one in the cid in the URL
+   *   - contact id validated from a checksum from a checksum
+   *   - cid from the url if the caller has ACL permission to view
+   *   - fallback is logged in user (or ? NULL if no logged in user) (@todo wouldn't 0 be more intuitive?)
    *
    * @return NULL|integer
    */
@@ -1637,9 +1637,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   Ids of profiles that are on the form (to be autofilled).
    * @param array $autoCompleteField
    *
-   *  - name_field
-   *  - id_field
-   *  - url (for ajax lookup)
+   *   - name_field
+   *   - id_field
+   *   - url (for ajax lookup)
    *
    * @todo add data attributes so we can deal with multiple instances on a form
    */

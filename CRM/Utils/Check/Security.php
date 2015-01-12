@@ -81,7 +81,7 @@ class CRM_Utils_Check_Security {
    * requested directly.
    *
    * @return array
-   *   of messages
+   *   Array of messages
    * @see CRM-14091
    */
   public function checkLogFileIsNotAccessible() {
@@ -130,7 +130,7 @@ class CRM_Utils_Check_Security {
    * to search engines; it only means they can be requested directly.
    *
    * @return array
-   *   of messages
+   *   Array of messages
    * @see CRM-14091
    *
    * @TODO: Test with WordPress, Joomla.
@@ -176,7 +176,7 @@ class CRM_Utils_Check_Security {
    * we'll probably match that).
    *
    * @return array
-   *   of messages
+   *   Array of messages
    * @see CRM-14091
    *
    * @TODO: Test with WordPress, Joomla.

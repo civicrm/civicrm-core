@@ -33,8 +33,8 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
   public $contribution_id = NULL;
   public $cart = NULL;
 
-  //XXX
   /**
+   * XXX
    * @param null $participant
    */
   public function __construct($participant = NULL) {

@@ -32,7 +32,7 @@ require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   protected function setUp() {
     parent::setUp();

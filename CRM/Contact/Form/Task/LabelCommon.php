@@ -82,7 +82,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    *   UNUSED.
    *
    * @return array
-   *   of rows for labels
+   *   Array of rows for labels
    */
 
   public static function getRows($contactIDs, $locationTypeID, $respectDoNotMail, $mergeSameAddress, $mergeSameHousehold) {
@@ -253,13 +253,10 @@ class CRM_Contact_Form_Task_LabelCommon {
 
   /**
    * Get array of return properties for address fields required for mailing label
+   *
    * @return array
-   *   return properites for address e.g
-   * array (
-   *  - [street_address] => 1,
-   * -  [supplemental_address_1] => 1,
-   * -  [supplemental_address_2] => 1
-   * )
+   *   return properties for address e.g
+   *   [street_address => 1, supplemental_address_1 => 1, supplemental_address_2 => 1]
    */
   public static function getAddressReturnProperties() {
     $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
@@ -277,8 +274,8 @@ class CRM_Contact_Form_Task_LabelCommon {
 
   /**
    * Get token list from mailing format & contacts
-   * @param unknown_type $contacts
-   * @return unknown
+   * @param array $contacts
+   * @return array
    */
   public static function getTokenData(&$contacts) {
     $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
@@ -307,12 +304,12 @@ class CRM_Contact_Form_Task_LabelCommon {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */
   public function mergeSameHousehold(&$rows) {
-    # group selected contacts by type
+    // group selected contacts by type
     $individuals = array();
     $households = array();
     foreach ($rows as $contact_id => $row) {
@@ -324,7 +321,7 @@ class CRM_Contact_Form_Task_LabelCommon {
       }
     }
 
-    # exclude individuals belonging to selected households
+    // exclude individuals belonging to selected households
     foreach ($households as $household_id => $row) {
       $dao = new CRM_Contact_DAO_Relationship();
       $dao->contact_id_b = $household_id;
@@ -337,7 +334,7 @@ class CRM_Contact_Form_Task_LabelCommon {
       }
     }
 
-    # merge back individuals and households
+    // merge back individuals and households
     $rows = array_merge($individuals, $households);
     return $rows;
   }

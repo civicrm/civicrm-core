@@ -65,14 +65,14 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function fromApiInput($apiRequest) {
     return $apiRequest;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function toApiOutput($apiRequest, $result) {
     $reloadMode = NULL;

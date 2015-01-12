@@ -73,8 +73,8 @@ class CRM_Utils_REST {
     return self::simple(array('message' => "PONG: $key"));
   }
 
-  // Generates values needed for error messages
   /**
+   * Generates values needed for error messages
    * @param string $message
    *
    * @return array
@@ -87,8 +87,8 @@ class CRM_Utils_REST {
     return $values;
   }
 
-  // Generates values needed for non-error responses.
   /**
+   * Generates values needed for non-error responses.
    * @param array $params
    *
    * @return array

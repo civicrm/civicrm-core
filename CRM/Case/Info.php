@@ -38,11 +38,13 @@
 class CRM_Case_Info extends CRM_Core_Component_Info {
 
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   */
   protected $keyword = 'case';
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function getInfo() {
@@ -56,7 +58,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function getAngularModules() {
     $result = array();
@@ -74,8 +76,8 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     return $result;
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    * @throws CRM_Core_Exception
    */
@@ -88,8 +90,8 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     return $entities;
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @param bool $getAllUnconditionally
    *
    * @return array
@@ -105,7 +107,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function getReferenceCounts($dao) {
     $result = array();
@@ -139,16 +141,16 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     return $result;
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function getUserDashboardElement() {
     return array();
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function registerTab() {
@@ -159,8 +161,8 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     );
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function registerAdvancedSearchPane() {
@@ -170,16 +172,16 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     );
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return null
    */
   public function getActivityTypes() {
     return NULL;
   }
 
-  // add shortcut to Create New
   /**
+   * add shortcut to Create New
    * @param $shortCuts
    */
   public function creatNewShortcut(&$shortCuts) {

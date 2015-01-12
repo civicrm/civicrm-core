@@ -290,7 +290,7 @@ function civicrm_api3_case_activity_create($params) {
 /**
  * @deprecated api notice
  * @return array
- *   of deprecated actions
+ *   Array of deprecated actions
  */
 function _civicrm_api3_case_deprecation() {
   return array('activity_create' => 'Case api "activity_create" action is deprecated. Use the activity api instead.');

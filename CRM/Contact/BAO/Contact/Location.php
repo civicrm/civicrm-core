@@ -44,7 +44,7 @@ class CRM_Contact_BAO_Contact_Location {
    * @param int $locationTypeID
    *
    * @return array
-   *   of display_name, email, location type and location id if found, or (null,null,null, null)
+   *   Array of display_name, email, location type and location id if found, or (null,null,null, null)
    * @static
    */
   public static function getEmailDetails($id, $isPrimary = TRUE, $locationTypeID = NULL) {

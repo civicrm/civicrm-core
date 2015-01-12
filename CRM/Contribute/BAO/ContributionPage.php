@@ -44,7 +44,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Contribute_DAO_ContributionPage object
+   * @return CRM_Contribute_DAO_ContributionPage
    * @static
    */
   public static function &create(&$params) {
@@ -720,7 +720,7 @@ WHERE entity_table = 'civicrm_contribution_page'
    *
    * @return boolean
    *   true if payment processor supports recurring
-   * else false
+   *   else false
    *
    * @static
    */

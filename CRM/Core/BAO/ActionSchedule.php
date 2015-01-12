@@ -616,7 +616,8 @@ AND   cas.entity_value = $id AND
    * @param array $values
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_DAO_ActionSchedule object on success, null otherwise
+   * @return CRM_Core_DAO_ActionSchedule|null
+   *   object on success, null otherwise
    * @static
    */
   public static function retrieve(&$params, &$values) {

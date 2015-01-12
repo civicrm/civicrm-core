@@ -51,7 +51,8 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_DAO_PrintLabel object on success, null otherwise
+   * @return CRM_Core_DAO_PrintLabel|null
+   *   object on success, null otherwise
    * @static
    */
   public static function retrieve(&$params, &$defaults) {

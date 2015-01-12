@@ -711,8 +711,8 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
    * Get address columns to add to array
    *
    * @param array $options
-   *  - prefix Prefix to add to table (in case of more than one instance of the table)
-   *  - prefix_label Label to give columns from this address table instance
+   *   - prefix Prefix to add to table (in case of more than one instance of the table)
+   *   - prefix_label Label to give columns from this address table instance
    *
    * @return array
    *   address columns definition

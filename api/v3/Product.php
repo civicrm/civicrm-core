@@ -45,7 +45,7 @@
  *
  * @throws API_Exception
  * @return array
- *   of newly created product property values.
+ *   Array of newly created product property values.
  * @access public
  */
 function civicrm_api3_product_create($params) {
@@ -62,7 +62,7 @@ function civicrm_api3_product_create($params) {
  * @param array $params
  *
  * @return array
- *   of retrieved product property values.
+ *   Array of retrieved product property values.
  * @access public
  */
 function civicrm_api3_product_get($params) {
@@ -80,7 +80,7 @@ function civicrm_api3_product_get($params) {
  *
  * @throws API_Exception
  * @return array
- *   of deleted values.
+ *   Array of deleted values.
  * @access public
  */
 function civicrm_api3_product_delete($params) {

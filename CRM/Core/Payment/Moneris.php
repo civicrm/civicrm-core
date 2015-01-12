@@ -253,8 +253,8 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
     return TRUE;
   }
 
-  // ignore for now, more elaborate error handling later.
   /**
+   * ignore for now, more elaborate error handling later.
    * @param $response
    *
    * @return object

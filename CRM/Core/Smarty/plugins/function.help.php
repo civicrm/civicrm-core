@@ -38,7 +38,7 @@
  *
  * @param array $params
  *   The function params.
- * @param object $smarty
+ * @param CRM_Core_Smarty $smarty
  *   Reference to the smarty object.
  *
  * @return string

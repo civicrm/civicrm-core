@@ -32,8 +32,8 @@ interface CRM_Core_Reference_Interface {
    *   The instance for which we want references.
    * @return array
    *   a record describing the reference; must include the keys:
-   *  - 'type': string (not necessarily unique)
-   *  - 'count': int
+   *   - 'type': string (not necessarily unique)
+   *   - 'count': int
    */
   public function getReferenceCount($targetDao);
 }

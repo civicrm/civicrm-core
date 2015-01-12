@@ -122,7 +122,7 @@ class CRM_Utils_PseudoConstant {
    * This may be inefficient and should generally be avoided.
    *
    * @return array
-   *   of string, constant names
+   *   Array of string, constant names
    */
   public static function findConstants() {
     if (self::$constants === NULL) {
@@ -145,7 +145,7 @@ class CRM_Utils_PseudoConstant {
    * @param $class
    *
    * @return array
-   *   of string, constant names
+   *   Array of string, constant names
    */
   public static function findConstantsByClass($class) {
     $clazz = new ReflectionClass($class);

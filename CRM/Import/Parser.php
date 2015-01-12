@@ -234,9 +234,9 @@ abstract class CRM_Import_Parser {
    * Set and validate field values
    *
    * @param array $elements
-   *   : array.
+   *   array.
    * @param $erroneousField
-   *   : reference.
+   *   reference.
    *
    * @return int
    */

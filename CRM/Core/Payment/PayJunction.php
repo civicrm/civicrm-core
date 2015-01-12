@@ -198,8 +198,8 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
   }
 
 
-  // ignore for now, more elaborate error handling later.
   /**
+   * ignore for now, more elaborate error handling later.
    * @param $response
    *
    * @return mixed
@@ -216,7 +216,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
    *
    * @return mixed
    *   value of the field, or empty string if the field is
-   * not set
+   *   not set
    */
   public function _getParam($field) {
     if (isset($this->_params[$field])) {

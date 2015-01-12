@@ -538,10 +538,10 @@ class CRM_Utils_Rule {
     return TRUE;
   }
 
-  // allow between 4-6 digits as postal code since india needs 6 and US needs 5 (or
-  // if u disregard the first 0, 4 (thanx excel!)
-  // FIXME: we need to figure out how to localize such rules
   /**
+   * allow between 4-6 digits as postal code since india needs 6 and US needs 5 (or
+   * if u disregard the first 0, 4 (thanx excel!)
+   * FIXME: we need to figure out how to localize such rules
    * @param $value
    *
    * @return bool

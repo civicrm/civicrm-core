@@ -54,7 +54,8 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_BAO_PreferencesDate object on success, null otherwise
+   * @return CRM_Core_BAO_PreferencesDate|null
+   *   object on success, null otherwise
    * @static
    */
   public static function retrieve(&$params, &$defaults) {

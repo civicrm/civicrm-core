@@ -410,8 +410,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
 
   //  function checkConfig( $mode )          // CiviCRM V1.9 Declaration
 
-  // CiviCRM V2.0 Declaration
   /**
+   * CiviCRM V2.0 Declaration
    * This function checks to see if we have the right config values
    *
    * @internal param string $mode the mode we are operating in (live or test)

@@ -83,7 +83,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Event_BAO_Participant object
+   * @return CRM_Event_BAO_Participant
    * @static
    */
   public static function &add(&$params) {
@@ -189,7 +189,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Event_BAO_Participant object
+   * @return CRM_Event_BAO_Participant
    * @static
    */
   public static function create(&$params) {
@@ -942,9 +942,9 @@ WHERE  civicrm_participant.id = {$participantId}
    *   (reference ) an assoc array of name/value pairs.
    * @param array $input
    *   An assosiative array of name /value pairs.
-   * from other function
+   *   from other function
    *
-   * @return CRM_Contribute_BAO_Contribution object
+   * @return CRM_Contribute_BAO_Contribution
    * @static
    */
   public static function checkDuplicate($input, &$duplicates) {
@@ -1798,7 +1798,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
    *   An array of additional participant ids.
    *
    * @return array
-   *   of Urls.
+   *   Array of Urls.
    * @static
    */
   public static function getAdditionalParticipantUrl($participantIds) {
@@ -2201,9 +2201,9 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
    *
    * @param string $fieldName
    * @param string $context
-   *   : @see CRM_Core_DAO::buildOptionsContext.
+   *   @see CRM_Core_DAO::buildOptionsContext.
    * @param array $props
-   *   : whatever is known about this dao object.
+   *   whatever is known about this dao object.
    *
    * @return Array|bool
    */

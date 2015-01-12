@@ -53,7 +53,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @param string $trxnEntityTable
    *   Entity_table.
    *
-   * @return CRM_Core_BAO_FinancialTrxn object
+   * @return CRM_Core_BAO_FinancialTrxn
    * @static
    */
   public static function create(&$params, $trxnEntityTable = NULL) {
@@ -125,7 +125,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contribute_BAO_ContributionType object
+   * @return CRM_Contribute_BAO_ContributionType
    * @static
    */
   public static function retrieve(&$params, &$defaults) {

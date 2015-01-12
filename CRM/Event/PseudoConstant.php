@@ -177,7 +177,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * Return a status-type-keyed array of status classes
    *
    * @return array
-   *   of status classes, keyed by status type
+   *   Array of status classes, keyed by status type
    */
   public static function &participantStatusClass() {
     static $statusClasses = NULL;
@@ -273,7 +273,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param int $id
    *
    * @return array
-   *   of event id → template title pairs
+   *   Array of event id → template title pairs
    */
   public static function &eventTemplates($id = NULL) {
     if (!self::$eventTemplates) {

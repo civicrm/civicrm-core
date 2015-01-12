@@ -51,7 +51,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem extends CRM_Upgrade_Snapshot_
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem object
+   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem
    * @static
    */
   public static function create(&$params) {
@@ -80,7 +80,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem extends CRM_Upgrade_Snapshot_
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem object
+   * @return CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -105,7 +105,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem extends CRM_Upgrade_Snapshot_
    * @param null $isQuick
    *
    * @return array
-   *   of line items
+   *   Array of line items
    */
   public static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL) {
     $selectClause = $whereClause = $fromClause = NULL;
@@ -183,7 +183,7 @@ WHERE     %2.id = %1";
    *                          to the price set used for particular event
    * @param array $values
    *   Reference to the values array(.
-   * this is
+   *   this is
    *                          lineItem array)
    *
    * @return void

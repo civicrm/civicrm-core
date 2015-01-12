@@ -330,7 +330,7 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    *
    * @return string|null
    *   WHERE-style clause to filter results,
-   * or null if $table or $id is null
+   *   or null if $table or $id is null
    * @static
    */
   public static function getClause($table, $id, &$tables) {

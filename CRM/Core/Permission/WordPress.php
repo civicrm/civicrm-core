@@ -92,14 +92,14 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function isModulePermissionSupported() {
     return TRUE;
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function upgradePermissions($permissions) {
     return;

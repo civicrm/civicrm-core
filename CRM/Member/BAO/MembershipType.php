@@ -56,7 +56,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Member_BAO_MembershipType object
+   * @return CRM_Member_BAO_MembershipType
    * @static
    */
   public static function retrieve(&$params, &$defaults) {

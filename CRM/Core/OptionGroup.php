@@ -219,7 +219,7 @@ WHERE  v.option_group_id = g.id
    * @param bool $fresh
    *
    * @return array
-   *   of values as specified by the above params
+   *   Array of values as specified by the above params
    * @static
    * @void
    */

@@ -51,7 +51,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Contact_BAO_Group object
+   * @return CRM_Contact_BAO_Group
    * @static
    */
   public static function add(&$params) {
@@ -808,9 +808,9 @@ AND    contact_id IN ( $contactStr )
    *
    * @param string $fieldName
    * @param string $context
-   *   : @see CRM_Core_DAO::buildOptionsContext.
+   *   @see CRM_Core_DAO::buildOptionsContext.
    * @param array $props
-   *   : whatever is known about this dao object.
+   *   whatever is known about this dao object.
    *
    * @return Array|bool
    */

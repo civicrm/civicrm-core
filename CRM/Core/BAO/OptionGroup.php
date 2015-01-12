@@ -49,7 +49,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_BAO_OptionGroup object
+   * @return CRM_Core_BAO_OptionGroup
    * @static
    */
   public static function retrieve(&$params, &$defaults) {

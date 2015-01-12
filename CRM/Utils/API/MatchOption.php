@@ -76,7 +76,7 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function fromApiInput($apiRequest) {
     // Parse options.match or options.match-mandatory
@@ -163,7 +163,7 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function toApiOutput($apiRequest, $result) {
     return $result;

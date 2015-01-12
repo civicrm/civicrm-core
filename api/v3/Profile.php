@@ -697,7 +697,7 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
  *
  * @param int $profileID
  *
- * @return integer|string
+ * @return int|string
  * @throws CiviCRM_API3_Exception
  */
 function _civicrm_api3_profile_getProfileID($profileID) {
@@ -740,7 +740,7 @@ function _civicrm_api3_profile_appendaliases($values, $entity) {
 /**
  * @deprecated api notice
  * @return array
- *   of deprecated actions
+ *   Array of deprecated actions
  */
 function _civicrm_api3_profile_deprecation() {
   return array(

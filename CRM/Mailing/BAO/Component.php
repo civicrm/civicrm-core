@@ -49,7 +49,7 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_BAO_LocaationType object
+   * @return CRM_Core_BAO_LocaationType
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
@@ -86,7 +86,7 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
    * @param array $ids
    *   (deprecated) the array that holds all the db ids.
    *
-   * @return CRM_Mailing_BAO_Component object
+   * @return CRM_Mailing_BAO_Component
    *
    * @static
    */

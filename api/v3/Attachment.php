@@ -90,7 +90,7 @@ function _civicrm_api3_attachment_create_spec(&$spec) {
  *
  * @param array $params
  * @return array
- *   of newly created file property values.
+ *   Array of newly created file property values.
  * @access public
  * @throws API_Exception validation errors
  */
@@ -190,7 +190,7 @@ function _civicrm_api3_attachment_delete_spec(&$spec) {
 }
 
 /**
- * @param $params
+ * @param array $params
  * @return array
  * @throws API_Exception
  */

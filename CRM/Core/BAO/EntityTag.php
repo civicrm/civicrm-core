@@ -74,7 +74,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Core_BAO_EntityTag object
+   * @return CRM_Core_BAO_EntityTag
    * @static
    */
   public static function add(&$params) {
@@ -118,7 +118,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Core_BAO_EntityTag object
+   * @return CRM_Core_BAO_EntityTag
    * @static
    */
   public static function del(&$params) {
@@ -401,9 +401,9 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *
    * @param string $fieldName
    * @param string $context
-   *   : @see CRM_Core_DAO::buildOptionsContext.
+   *   @see CRM_Core_DAO::buildOptionsContext.
    * @param array $props
-   *   : whatever is known about this dao object.
+   *   whatever is known about this dao object.
    *
    * @return Array|bool
    */

@@ -191,7 +191,7 @@ WHERE cft.id = %1
    * @param string $accountTypeCode
    *   account type code
    *
-   * @return integer
+   * @return int
    *   count
    * @static
    */

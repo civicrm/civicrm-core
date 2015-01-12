@@ -41,7 +41,7 @@
  *   Template call's parameters.
  * @param string $text
  *   {ts} block contents from the template.
- * @param object $smarty
+ * @param CRM_Core_Smarty $smarty
  *   The Smarty object.
  *
  * @return string

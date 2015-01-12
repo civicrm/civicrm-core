@@ -38,10 +38,6 @@
  */
 
 /**
- * Files required for this package
- */
-
-/**
  * Create an Event Participant
  *
  * This API is used for creating a participants in an event.

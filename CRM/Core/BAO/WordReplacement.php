@@ -58,7 +58,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_DAO_WordRepalcement object
+   * @return CRM_Core_DAO_WordRepalcement
    * @static
    */
 

@@ -124,7 +124,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /*
    *  Change user name in host CMS
    *
-   *  @param integer $ufID User ID in CMS
+   *  @param int $ufID User ID in CMS
    *  @param string $ufName User name
    */
   /**

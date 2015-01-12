@@ -1628,7 +1628,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *   array of organization info.
    * @param int $contactID
    *   individual contact id. One.
-   * who is doing the process of signup / contribution.
+   *   who is doing the process of signup / contribution.
    *
    * @param array $values
    *   form values array.

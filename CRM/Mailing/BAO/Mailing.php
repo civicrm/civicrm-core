@@ -109,9 +109,9 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     return $eq->N;
   }
 
-  // note that $job_id is used only as a variable in the temp table construction
-  // and does not play a role in the queries generated
   /**
+   * note that $job_id is used only as a variable in the temp table construction
+   * and does not play a role in the queries generated
    * @param int $job_id
    *   (misnomer) a nonce value used to name temporary tables.
    * @param int $mailing_id
@@ -3057,7 +3057,7 @@ AND        m.id = %1
    * @param array $params
    *
    * @return array
-   *   of mailings for a contact
+   *   Array of mailings for a contact
    *
    * @static
    */

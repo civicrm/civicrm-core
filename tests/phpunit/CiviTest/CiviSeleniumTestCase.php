@@ -120,13 +120,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    * @param array $cookies
-   *   Each item is an array with keys:.
-   *  - name: string
-   *  - value: string; note that RFC's don't define particular encoding scheme, so
+   *   Each item is an Array with keys:
+   *   - name: string
+   *   - value: string; note that RFC's don't define particular encoding scheme, so
    *    you must pick one yourself and pre-encode; does not allow values with
    *    commas, semicolons, or whitespace
-   *  - path: string; default: '/'
-   *  - max_age: int; default: 1 week (7*24*60*60)
+   *   - path: string; default: '/'
+   *   - max_age: int; default: 1 week (7*24*60*60)
    */
   protected function setCookies($cookies) {
     foreach ($cookies as $cookie) {
@@ -652,7 +652,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *   Selector.
    * @param string $contactType
    * @return array
-   *   of contact attributes (id, names, email)
+   *   Array of contact attributes (id, names, email)
    */
   public function createDialogContact($field = 'contact_id', $contactType = 'Individual') {
     $selectId = 's2id_' . $this->getAttribute($field . '@id');
@@ -1631,8 +1631,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return CiviDBAssert::assertDBState($this, $daoName, $id, $match, $delete);
   }
 
-  // Request a record from the DB by seachColumn+searchValue. Success if a record is found.
   /**
+   * Request a record from the DB by seachColumn+searchValue. Success if a record is found.
    * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
@@ -1649,8 +1649,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return CiviDBAssert::assertDBNotNull($this, $daoName, $searchValue, $returnColumn, $searchColumn, $message);
   }
 
-  // Request a record from the DB by seachColumn+searchValue. Success if returnColumn value is NULL.
   /**
+   * Request a record from the DB by seachColumn+searchValue. Success if returnColumn value is NULL.
    * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
@@ -1665,8 +1665,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return CiviDBAssert::assertDBNull($this, $daoName, $searchValue, $returnColumn, $searchColumn, $message);
   }
 
-  // Request a record from the DB by id. Success if row not found.
   /**
+   * Request a record from the DB by id. Success if row not found.
    * @param string $daoName
    * @param int $id
    * @param $message
@@ -1679,8 +1679,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return CiviDBAssert::assertDBRowNotExist($this, $daoName, $id, $message);
   }
 
-  // Compare a single column value in a retrieved DB record to an expected value
   /**
+   * Compare a single column value in a retrieved DB record to an expected value
    * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
@@ -1701,8 +1701,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     );
   }
 
-  // Compare all values in a single retrieved DB record to an array of expected values
   /**
+   * Compare all values in a single retrieved DB record to an array of expected values
    * @param string $daoName
    * @param array $searchParams
    * @param $expectedValues
@@ -2105,7 +2105,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @param array $customSets
    *   Custom sets i.e entity wise sets want to be created and checked.
-   * e.g    $customSets = array(array('entity' => 'Contribution', 'subEntity' => 'Donation',
+   *   e.g    $customSets = array(array('entity' => 'Contribution', 'subEntity' => 'Donation',
    * 'triggerElement' => $triggerElement))
    * array  $triggerElement:   the element which is responsible for custom group to load
    *

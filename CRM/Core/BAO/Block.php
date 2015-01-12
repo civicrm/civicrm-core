@@ -57,7 +57,7 @@ class CRM_Core_BAO_Block {
    *   Input parameters to find object.
    *
    * @return array
-   *   of $block objects.
+   *   Array of $block objects.
    * @static
    */
   public static function &getValues($blockName, $params) {
@@ -104,7 +104,7 @@ class CRM_Core_BAO_Block {
    *   Name of the above object.
    *
    * @return array
-   *   of $block objects.
+   *   Array of $block objects.
    * @static
    */
   public static function retrieveBlock(&$block, $blockName) {

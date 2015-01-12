@@ -351,7 +351,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
    *   Event template id.
    *
    * @return array
-   *   of custom data defaults.
+   *   Array of custom data defaults.
    */
   public function templateCustomDataValues($templateId) {
     $defaults = array();

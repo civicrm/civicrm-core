@@ -451,7 +451,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @return mixed
    *   value of the field, or empty string if the field is
-   * not set
+   *   not set
    */
   public function _getParam($field) {
     if (isset($this->_params[$field])) {

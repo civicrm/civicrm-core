@@ -371,7 +371,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
 
   /**
    * @return array
-   *   of valid processors. The array resembles the DB table but also has 'object' as a key
+   *   Array of valid processors. The array resembles the DB table but also has 'object' as a key
    * @throws Exception
    */
   public function getValidProcessors() {

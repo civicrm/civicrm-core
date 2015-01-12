@@ -133,7 +133,8 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_BAO_Navigation object on success, NULL otherwise
+   * @return CRM_Core_BAO_Navigation|null
+   *   object on success, NULL otherwise
    * @static
    */
   public static function retrieve(&$params, &$defaults) {
