@@ -662,8 +662,8 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     return parent::getTemplateFileName();
   }
 
-  // check if user has already signed this petition
   /**
+   * check if user has already signed this petition
    * @param array $params
    */
   public function redirectIfSigned($params) {

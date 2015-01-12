@@ -1017,9 +1017,8 @@ LIMIT 1;";
     return $lineSets;
   }
 
-  // function to copy custom data of the
-  // initial contribution into its recurring contributions
   /**
+   * copy custom data of the initial contribution into its recurring contributions
    * @param int $recurId
    * @param int $targetContributionId
    */
@@ -1062,9 +1061,10 @@ LIMIT 1;";
     }
   }
 
-  // function to copy soft credit record of first recurring contribution
-  // and add new soft credit against $targetContributionId
   /**
+   * copy soft credit record of first recurring contribution
+   * and add new soft credit against $targetContributionId
+   *
    * @param int $recurId
    * @param int $targetContributionId
    */

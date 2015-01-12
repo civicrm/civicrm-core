@@ -419,16 +419,16 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contribution']}.contact_id, YEAR({$this->_aliases['civicrm_contribution']}.receive_date)";
   }
 
-  //Override to set limit is 10
   /**
+   * Override to set limit is 10
    * @param int $rowCount
    */
   public function limit($rowCount = self::ROW_COUNT_LIMIT) {
     parent::limit($rowCount);
   }
 
-  //Override to set pager with limit is 10
   /**
+   * Override to set pager with limit is 10
    * @param int $rowCount
    */
   public function setPager($rowCount = self::ROW_COUNT_LIMIT) {
@@ -710,8 +710,8 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     return array($relationshipRows, $relatedContactIds);
   }
 
-  // Override "This Year" $op options
   /**
+   * Override "This Year" $op options
    * @param string $type
    * @param null $fieldName
    *

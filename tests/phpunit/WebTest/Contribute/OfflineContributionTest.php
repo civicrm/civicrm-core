@@ -308,8 +308,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->_verifyAmounts($checkScenario5);
   }
 
-  //common function for doing offline contribution
   /**
+   * common function for doing offline contribution
    * @param array $params
    * @param string $firstName
    * @param string $lastName
@@ -364,8 +364,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("The contribution record has been processed."), "Status message didn't show up after saving!");
   }
 
-  //common function for verifing total_amount, and non_deductible_amount
   /**
+   * common function for verifing total_amount, and non_deductible_amount
    * @param $verifyData
    */
   public function _verifyAmounts($verifyData) {

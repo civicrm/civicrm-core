@@ -240,17 +240,17 @@ ORDER BY contact_a.sort_name';
     return $sql;
   }
 
-  // Alters the date display in the Activity Date Column. We do this after we already have
-  // the result so that sorting on the date column stays pertinent to the numeric date value
   /**
+   * Alters the date display in the Activity Date Column. We do this after we already have
+   * the result so that sorting on the date column stays pertinent to the numeric date value
    * @param $row
    */
   public function alterRow(&$row) {
     $row['activity_date'] = CRM_Utils_Date::customFormat($row['activity_date'], '%B %E%f, %Y %l:%M %P');
   }
 
-  // Regular JOIN statements here to limit results to contacts who have activities.
   /**
+   * Regular JOIN statements here to limit results to contacts who have activities.
    * @return string
    */
   public function from() {

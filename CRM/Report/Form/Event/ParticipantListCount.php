@@ -270,8 +270,8 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
     parent::preProcess();
   }
 
-  //Add The statistics
   /**
+   * Add The statistics
    * @param $rows
    *
    * @return array

@@ -214,8 +214,8 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     }
   }
 
-  //function to check match for sumbit Advance Search
   /**
+   * function to check match for sumbit Advance Search
    * @param string $firstName
    */
   public function submitSearch($firstName) {
@@ -258,8 +258,8 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->assertElementNotContainsText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[6]", $stateBeforeSort);
   }
 
-  // function to fill basic search detail
   /**
+   * function to fill basic search detail
    * @param string $firstName
    * @param string $groupName
    * @param $tagName
@@ -285,8 +285,8 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->check("preferred_communication_method[2]");
   }
 
-  // function to fill address search block values in advance search
   /**
+   * function to fill address search block values in advance search
    * @param $firstName
    */
   public function addAddressSearchDetail($firstName) {
@@ -306,8 +306,8 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->select2("state_province", "Alaska", TRUE);
   }
 
-  // function to fill activity search block in advance search
   /**
+   * function to fill activity search block in advance search
    * @param $firstName
    */
   public function addActivitySearchDetail($firstName) {
@@ -342,8 +342,8 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->check("civicrm_gender_Male_2");
   }
 
-  //function to fill contribution search details
   /**
+   * function to fill contribution search details
    * @param $firstName
    */
   public function addContributionSearchDetail($firstName) {
@@ -384,8 +384,8 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->type("participant_fee_amount_high", "150");
   }
 
-  // function to fill member search details
   /**
+   * function to fill member search details
    * @param $firstName
    */
   public function addMemberSearchDetail($firstName) {
@@ -411,8 +411,8 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->webtestFillDate("member_end_date_high", "+2 year");
   }
 
-  // function to fill member search details
   /**
+   * function to fill member search details
    * @param $firstName
    */
   public function addPledgeSearchDetail($firstName) {
@@ -439,8 +439,8 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->select("pledge_financial_type_id", "Donation");
   }
 
-  // function to create contact with details (contact details, address, Constituent information ...)
   /**
+   * function to create contact with details (contact details, address, Constituent information ...)
    * @param null $firstName
    */
   public function createDetailContact($firstName = NULL) {

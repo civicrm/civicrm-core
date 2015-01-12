@@ -118,8 +118,8 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("css=div." . $destination['name'], $fields['values'][$field_to_move]['label'], "Moved value does not display in the new fieldset on the contact record");
   }
 
-  //moves a field from one field to another
   /**
+   * moves a field from one field to another
    * @param $field_to_move
    * @param int $from_group_id
    * @param int $to_group_id
@@ -148,8 +148,8 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("CustomField-" . $field_to_move), "The moved custom field does not display on the new fieldset page");
   }
 
-  //create a contact and return the contact id
   /**
+   * create a contact and return the contact id
    * @param string $firstName
    * @param string $lastName
    *
@@ -165,8 +165,8 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     return $cid;
   }
 
-  //Get all custom field values for a given contact and custom group id using the api
   /**
+   * Get all custom field values for a given contact and custom group id using the api
    * @param int $contact_id
    * @param int $group_id
    * @param bool $reset_cache
@@ -208,8 +208,8 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     return $results;
   }
 
-  //creates a new custom group and fields in that group, and returns the group Id
   /**
+   * creates a new custom group and fields in that group, and returns the group Id
    * @param $prefix
    *
    * @return null
@@ -224,8 +224,8 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     return $group_id;
   }
 
-  //Creates a custom field group for a specific entity type and returns the custom group Id
   /**
+   * Creates a custom field group for a specific entity type and returns the custom group Id
    * @param string $prefix
    * @param string $entity
    *
@@ -253,9 +253,9 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     return $this->urlArg('gid');
   }
 
-  //Adds a new custom field to a specfied custom field group, using the given
-  //datatype and widget.
   /**
+   * Adds a new custom field to a specfied custom field group, using the given
+   * datatype and widget.
    * @param int $group_id
    * @param string $type
    * @param string $widget
@@ -411,8 +411,8 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     return $results['id'];
   }
 
-  //Populates $count options for a custom field on the add custom field page
   /**
+   * Populates $count options for a custom field on the add custom field page
    * @param int $count
    * @param string $prefix
    * @param array $values
@@ -428,8 +428,8 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     }
   }
 
-  //randomly generates data for a specific custom field
   /**
+   * randomly generates data for a specific custom field
    * @param int $contact_id
    * @param int $group_id
    */

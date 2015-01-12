@@ -221,9 +221,9 @@ class CRM_Contact_Form_Search_Custom_Base {
     return CRM_Core_DAO::composeQuery($where, $params, TRUE);
   }
 
-  // override this method to define the contact query object
-  // used for creating $sql
   /**
+   * override this method to define the contact query object
+   * used for creating $sql
    * @return null
    */
   public function getQueryObj() {

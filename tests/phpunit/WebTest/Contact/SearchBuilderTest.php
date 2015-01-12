@@ -71,8 +71,8 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->_searchBuilder("Postal Code", "100[0-9]", $sortName, "RLIKE");
   }
 
-  // function to create contact with details (contact details, address, Constituent information ...)
   /**
+   * function to create contact with details (contact details, address, Constituent information ...)
    * @param null $firstName
    */
   public function createDetailContact($firstName = NULL) {

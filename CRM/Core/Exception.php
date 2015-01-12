@@ -52,8 +52,8 @@ class CRM_Core_Exception extends PEAR_Exception {
     $this->errorData = $errorData + array('error_code' => $error_code);
   }
 
-  // custom string representation of object
   /**
+   * custom string representation of object
    * @return string
    */
   public function __toString() {

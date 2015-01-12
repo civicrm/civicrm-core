@@ -40,8 +40,8 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   // docs inherited from interface
   protected $keyword = 'event';
 
-  // docs inherited from interface
   /**
+   * docs inherited from interface
    * @return array
    */
   public function getInfo() {
@@ -54,8 +54,8 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
     );
   }
 
-  // docs inherited from interface
   /**
+   * docs inherited from interface
    * @param bool $getAllUnconditionally
    *
    * @return array
@@ -81,8 +81,8 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
     );
   }
 
-  // docs inherited from interface
   /**
+   * docs inherited from interface
    * @return array
    */
   public function getUserDashboardElement() {
@@ -94,8 +94,8 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
     );
   }
 
-  // docs inherited from interface
   /**
+   * docs inherited from interface
    * @return array
    */
   public function registerTab() {
@@ -107,8 +107,8 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
     );
   }
 
-  // docs inherited from interface
   /**
+   * docs inherited from interface
    * @return array
    */
   public function registerAdvancedSearchPane() {
@@ -118,8 +118,8 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
     );
   }
 
-  // docs inherited from interface
   /**
+   * docs inherited from interface
    * @return array
    */
   public function getActivityTypes() {
@@ -131,8 +131,8 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
     return $types;
   }
 
-  // add shortcut to Create New
   /**
+   * add shortcut to Create New
    * @param $shortCuts
    * @param $newCredit
    */

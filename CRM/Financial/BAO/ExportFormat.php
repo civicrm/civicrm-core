@@ -59,8 +59,8 @@ class CRM_Financial_BAO_ExportFormat {
     }
   }
 
-  // Override to assemble the appropriate subset of financial data for the specific export format
   /**
+   * Override to assemble the appropriate subset of financial data for the specific export format
    * @param array $exportParams
    *
    * @return mixed
@@ -102,8 +102,8 @@ class CRM_Financial_BAO_ExportFormat {
     return 'txt';
   }
 
-  // Override this if appropriate
   /**
+   * Override this if appropriate
    * @return null
    */
   public function getTemplateFileName() {

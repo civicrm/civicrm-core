@@ -26,11 +26,11 @@
 
 require_once 'ReleaseTestCase.php';
 
-// name of the class doesn't end with Test on purpose - this way this
-// webtest is not picked up by the suite, since it needs to run
-// on specially prepare sandbox
-// more details: http://wiki.civicrm.org/confluence/display/CRMDOC/Release+testing+script
 /**
+ * name of the class doesn't end with Test on purpose - this way this
+ * webtest is not picked up by the suite, since it needs to run
+ * on specially prepare sandbox
+ * more details: http://wiki.civicrm.org/confluence/display/CRMDOC/Release+testing+script
  * Class WebTest_Release_InstallScript
  */
 class WebTest_Release_InstallScript extends WebTest_Release_ReleaseTestCase {

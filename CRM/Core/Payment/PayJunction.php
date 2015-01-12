@@ -198,8 +198,8 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
   }
 
 
-  // ignore for now, more elaborate error handling later.
   /**
+   * ignore for now, more elaborate error handling later.
    * @param $response
    *
    * @return mixed

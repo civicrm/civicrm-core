@@ -298,9 +298,9 @@ SELECT *
     $this->table($contactIDs, 'civicrm_group_contact', $fields, 'contact_id', NULL);
   }
 
-  // TODO - support group inheritance
-  // Parent child group ids are encoded in a text string
   /**
+   * TODO - support group inheritance
+   * Parent child group ids are encoded in a text string
    * @param $contactIDs
    */
   public function group(&$contactIDs) {
@@ -329,8 +329,8 @@ WHERE  contact_id IN ( $ids )
     $this->savedSearch($groupIDs);
   }
 
-  // TODO - support search builder and custom saved searches
   /**
+   * TODO - support search builder and custom saved searches
    * @param $groupIDs
    */
   public function savedSearch(&$groupIDs) {
