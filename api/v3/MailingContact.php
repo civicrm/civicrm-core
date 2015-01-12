@@ -40,16 +40,12 @@
  * Get all the mailings and details that a contact was involved with
  *
  * @param array $params
- *   Input parameters.
- *                    - key: contact_id, value: int - required
- *                    - key: type, value: Delivered | Bounced - optional, defaults to Delivered
- *                    - Future extensions will include: Opened, Clicked, Forwarded
+ *   Input parameters - see _spec for details (returned by getfields)
  *
  * @return array
  *   API result
  * @static void
  * @access public
- * @example CRM/Mailing/BAO/Mailing.php
  *
  */
 function civicrm_api3_mailing_contact_get($params) {
@@ -64,7 +60,7 @@ function civicrm_api3_mailing_contact_get($params) {
  */
 function _civicrm_api3_mailing_contact_getresults($params, $count) {
   if (empty($params['type'])) {
-    //ie. because the api is an anomoly & passing in id is not valid
+    //ie. because the api is an anomaly & passing in id is not valid
     throw new Exception('This api call does not accept api as a parameter');
   }
   $options  = _civicrm_api3_get_options_from_params($params, TRUE,'contribution','get');
@@ -98,7 +94,6 @@ function _civicrm_api3_mailing_contact_get_spec(&$params) {
 }
 
 /**
- * @param $type
  * @param int $contactID
  * @param $offset
  * @param $limit
@@ -111,7 +106,6 @@ function _civicrm_api3_mailing_contact_get_spec(&$params) {
  * @return array
  */
 function _civicrm_api3_mailing_contact_query(
-  $type,
   $contactID,
   $offset,
   $limit,
@@ -140,11 +134,6 @@ GROUP BY   m.id
       1 => array($contactID, 'Integer'),
     );
     $dao = CRM_Core_DAO::executeQuery($sql, $qParams);
-
-    $params = array(
-      'type'   => $type,
-      'contact_id' => $contactID,
-    );
 
     $results = $dao->N;
   }
@@ -240,7 +229,6 @@ AND        meb.id IS NULL
 ";
 
   return _civicrm_api3_mailing_contact_query(
-    'Delivered',
     $contactID,
     $offset,
     $limit,
@@ -273,7 +261,6 @@ INNER JOIN civicrm_mailing_event_bounce meb ON meb.event_queue_id = meq.id
 ";
 
   return _civicrm_api3_mailing_contact_query(
-    'Bounced',
     $contactID,
     $offset,
     $limit,
@@ -289,10 +276,7 @@ INNER JOIN civicrm_mailing_event_bounce meb ON meb.event_queue_id = meq.id
  * Get count of all the mailings that a contact was involved with
  *
  * @param array $params
- *   Input parameters.
- *                    - key: contact_id, value: int - required
- *                    - key: type, value: Delivered | Bounced - optional, defaults to Delivered
- *                    - Future extensions will include: Opened, Clicked, Forwarded
+ *   Input parameters per getfields
  *
  * @return array
  *   API result
