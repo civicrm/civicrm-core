@@ -46,9 +46,10 @@ require_once 'CRM/Core/DAO/Country.php';
  *
  * @example CountryCreate.php Standard Create Example
  *
- * @return array
- *   API result array
- * {@getfields country_create}
+ * @param array $params
+ * @return array API result array
+ * API result array
+ * @throws \API_Exception
  * @access public
  */
 function civicrm_api3_country_create($params) {

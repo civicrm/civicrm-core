@@ -2,7 +2,7 @@
 
 /**
  *  Functions to inform caller that Location is obsolete and Address, Phone, Email, Website should be used
- * @param $params
+ * @param array $params
  * @return array
  */
 function civicrm_api3_location_create($params) {

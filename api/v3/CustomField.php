@@ -262,7 +262,7 @@ SELECT count(*)
 
 /**
  * CRM-15191 - Hack to ensure the cache gets cleared after updating a custom field
- * @param $params
+ * @param array $params
  * @return array
  */
 function civicrm_api3_custom_field_setvalue($params) {

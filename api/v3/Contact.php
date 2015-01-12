@@ -560,7 +560,7 @@ function _civicrm_api3_greeting_format_params($params) {
  * @deprecated
  *
  * {@example ContactGetquick.php 0}
- * @param $params
+ * @param array $params
  * @return array
  * @throws \API_Exception
  */

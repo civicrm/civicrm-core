@@ -38,7 +38,7 @@
 /**
  * Get CiviCRM Action Schedule details
  * {@getfields action_schedule_create}
- * @param $params
+ * @param array $params
  * @return array
  */
 function civicrm_api3_action_schedule_get($params) {

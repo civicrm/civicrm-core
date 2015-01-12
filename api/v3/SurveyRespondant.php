@@ -81,7 +81,7 @@ function civicrm_api3_survey_respondant_get(&$params) {
 
 /**
  * @deprecated - api currently not supported
- * @param $params
+ * @param array $params
  * @return array
  */
 function &civicrm_api3_survey_respondant_count($params) {

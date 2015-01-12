@@ -85,7 +85,7 @@ function _civicrm_api3_event_create_spec(&$params) {
  * The main purpose of the API is to provide integrators a level of stability not provided by
  * the core code or schema - this means we have to provide support for api calls (where possible)
  * across schema changes.
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_event_create_legacy_support_42(&$params) {
   if (!empty($params['payment_processor_id'])) {
@@ -189,7 +189,7 @@ function _civicrm_api3_event_get_legacy_support_42(&$event, $event_id) {
  *
  * This API is used for deleting a event
  *
- * @param $params
+ * @param array $params
  * @return array
  *
  * @access public

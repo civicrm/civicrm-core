@@ -38,7 +38,7 @@
 
 /**
  * Handle creation of a Mailing Job for a Mailing.
- * @param $params
+ * @param array $params
  * @return array
  * @throws \API_Exception
  */
@@ -77,7 +77,7 @@ function civicrm_api3_mailing_job_get($params, $ids = array()) {
 
 /**
  * Handle deletion of a Mailing Job for a Mailing.
- * @param $params
+ * @param array $params
  * @return array
  * @throws \API_Exception
  */

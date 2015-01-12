@@ -40,7 +40,7 @@
  * Get CiviCRM domain details
  * {@getfields domain_create}
  * @example DomainGet.php
- * @param $params
+ * @param array $params
  * @return array
  * @throws \API_Exception
  */

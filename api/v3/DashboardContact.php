@@ -108,7 +108,7 @@ function _civicrm_api3_dashboard_contact_check_params(&$params) {
  *
  * {@getfields dashboard_contact_delete}
  * @access public
- * @param $params
+ * @param array $params
  * @return array
  * @throws \API_Exception
  */
