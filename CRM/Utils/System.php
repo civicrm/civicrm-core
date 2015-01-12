@@ -285,7 +285,9 @@ class CRM_Utils_System {
     return $config->userSystem->logout();
   }
 
-  // this is a very drupal specific function for now
+  /**
+   * this is a very drupal specific function for now
+   */
   public static function updateCategories() {
     $config = CRM_Core_Config::singleton();
     if ($config->userSystem->is_drupal) {

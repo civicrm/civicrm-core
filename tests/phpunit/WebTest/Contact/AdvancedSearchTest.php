@@ -327,7 +327,9 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@id='activity']/table/tbody//tr/td[2]/label[text()='Activity Status']/../label[text()='Completed']");
   }
 
-  // function to fill demographic search details
+  /**
+   * function to fill demographic search details
+   */
   public function addDemographicSearchDetail() {
     // fill birth date range
     $this->select("birth_date_relative", "value=0");
@@ -367,7 +369,9 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->select("contribution_currency_type", "USD");
   }
 
-  // function to fill participant search details
+  /**
+   * function to fill participant search details
+   */
   public function addParticipantSearchDetail() {
     // fill event name
     $this->select2("event_id", "Fall Fundraiser Dinner");

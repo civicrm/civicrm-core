@@ -181,7 +181,7 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    * - View
    * - Edit
    *
-   * @param null $key
+   * @param string|null $key
    *
    * @return array
    */

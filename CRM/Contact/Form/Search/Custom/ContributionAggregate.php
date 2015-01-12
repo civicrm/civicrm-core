@@ -252,8 +252,12 @@ civicrm_contact AS contact_a
     return implode(' AND ', $clauses);
   }
 
-  /**
+  /*
    * Functions below generally don't need to be modified
+   */
+
+  /**
+   * @inheritDoc
    */
   public function count() {
     $sql = $this->all();

@@ -694,7 +694,9 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
     CRM_Core_DAO::executeQuery($query);
   }
 
-  // This method should initialize auth sources
+  /**
+   * This method should initialize auth sources
+   */
   public function initAuthSrc() {
     $session = CRM_Core_Session::singleton();
     if ($session->get('userID') && !$session->get('authSrc')) {

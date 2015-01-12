@@ -179,7 +179,9 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $self->assertTrue($self->isTextPresent("The tag '$tagName' has been saved."));
   }
 
-  // CRM-6586
+  /**
+   * CRM-6586
+   */
   public function testContactSearchExport() {
     $this->webtestLogin();
 
