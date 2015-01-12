@@ -74,7 +74,7 @@ interface CRM_Core_Selector_API {
    *
    * @param string $action
    *   The action being performed.
-   * @param enum $type
+   * @param string $type
    *   What should the result set include (web/email/csv).
    *
    * @return array
@@ -95,7 +95,7 @@ interface CRM_Core_Selector_API {
   /**
    * Returns all the rows in the given offset and rowCount
    *
-   * @param enum $action
+   * @param string $action
    *   The action being performed.
    * @param int $offset
    *   The row number to start from.
@@ -103,7 +103,7 @@ interface CRM_Core_Selector_API {
    *   The number of rows to return.
    * @param string $sort
    *   The sql string that describes the sort order.
-   * @param enum $type
+   * @param string $type
    *   What should the result set include (web/email/csv).
    *
    * @return int
