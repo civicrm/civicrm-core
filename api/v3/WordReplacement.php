@@ -39,7 +39,9 @@
 /**
  * Get CiviCRM Word Replacement details
  * {@getfields word_replacement_create}
- *
+ * @param array $params
+ * @return array
+ * @throws \API_Exception
  */
 function civicrm_api3_word_replacement_get($params) {
   $bao = new CRM_Core_BAO_WordReplacement();

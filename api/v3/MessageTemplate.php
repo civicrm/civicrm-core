@@ -33,6 +33,9 @@
 
 /**
  * @access public
+ * @param array $params
+ * @return array
+ * @throws \API_Exception
  */
 function civicrm_api3_message_template_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -94,6 +97,7 @@ function civicrm_api3_message_template_get($params) {
 
 /**
  * Sends a template.
+ * @param array $params
  */
 function civicrm_api3_message_template_send($params) {
   CRM_Core_BAO_MessageTemplates::sendTemplate($params);

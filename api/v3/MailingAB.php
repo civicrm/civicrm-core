@@ -40,7 +40,6 @@
  * Handle a create mailing ab testing
  *
  * @param array $params
- * @param array $ids
  *
  * @return array
  *   API Success Array
@@ -53,7 +52,6 @@ function civicrm_api3_mailing_a_b_create($params) {
  * Handle a delete event.
  *
  * @param array $params
- * @param array $ids
  *
  * @return array
  *   API Success Array

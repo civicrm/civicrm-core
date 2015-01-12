@@ -131,6 +131,8 @@ function civicrm_api3_custom_group_get($params) {
 
 /**
  * CRM-15191 - Hack to ensure the cache gets cleared after updating a custom group
+ * @param array $params
+ * @return array
  */
 function civicrm_api3_custom_group_setvalue($params) {
   require_once 'api/v3/Generic/Setvalue.php';
