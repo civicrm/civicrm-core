@@ -1636,71 +1636,41 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * Request a record from the DB by seachColumn+searchValue. Success if a record is found.
    * @param string $daoName
-   * @param $searchValue
-   * @param $returnColumn
-   * @param $searchColumn
-   * @param $message
-   *
-   * @return null|string
+   * @param string $searchValue
+   * @param string $returnColumn
+   * @param string $searchColumn
+   * @param string $message
    */
   public function assertDBNotNull($daoName, $searchValue, $returnColumn, $searchColumn, $message) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
+    if (self::checkDoLocalDBTest()) {
+      CiviDBAssert::assertDBNotNull($this, $daoName, $searchValue, $returnColumn, $searchColumn, $message);
     }
-
-    return CiviDBAssert::assertDBNotNull($this, $daoName, $searchValue, $returnColumn, $searchColumn, $message);
   }
 
   /**
-   * Request a record from the DB by seachColumn+searchValue. Success if returnColumn value is NULL.
+   * Request a record from the DB by searchColumn+searchValue. Success if returnColumn value is NULL.
    * @param string $daoName
-   * @param $searchValue
-   * @param $returnColumn
-   * @param $searchColumn
-   * @param $message
+   * @param string $searchValue
+   * @param string $returnColumn
+   * @param string $searchColumn
+   * @param string $message
    */
   public function assertDBNull($daoName, $searchValue, $returnColumn, $searchColumn, $message) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
+    if (self::checkDoLocalDBTest()) {
+      CiviDBAssert::assertDBNull($this, $daoName, $searchValue, $returnColumn, $searchColumn, $message);
     }
-
-    return CiviDBAssert::assertDBNull($this, $daoName, $searchValue, $returnColumn, $searchColumn, $message);
   }
 
   /**
    * Request a record from the DB by id. Success if row not found.
    * @param string $daoName
    * @param int $id
-   * @param $message
-   */
-  public function assertDBRowNotExist($daoName, $id, $message) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
-    }
-
-    return CiviDBAssert::assertDBRowNotExist($this, $daoName, $id, $message);
-  }
-
-  /**
-   * Compare a single column value in a retrieved DB record to an expected value
-   * @param string $daoName
-   * @param $searchValue
-   * @param $returnColumn
-   * @param $searchColumn
-   * @param $expectedValue
    * @param string $message
    */
-  function assertDBCompareValue(
-    $daoName, $searchValue, $returnColumn, $searchColumn,
-    $expectedValue, $message
-  ) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
+  public function assertDBRowNotExist($daoName, $id, $message) {
+    if (self::checkDoLocalDBTest()) {
+      CiviDBAssert::assertDBRowNotExist($this, $daoName, $id, $message);
     }
-
-    return CiviDBAssert::assertDBCompareValue($daoName, $searchValue, $returnColumn, $searchColumn,
-      $expectedValue, $message
-    );
   }
 
   /**
