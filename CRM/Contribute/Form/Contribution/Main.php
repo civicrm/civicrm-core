@@ -138,7 +138,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     //CRM-5001
-    if (!empty($this->_values['is_for_organization'])) {
+    //CRM-15787
+    $member = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
+    if (!empty($this->_values['is_for_organization']) && empty($member['is_active'])) {
       $msg = ts('Mixed profile not allowed for on behalf of registration/sign up.');
       $ufJoinParams = array(
         'module' => 'onBehalf',
