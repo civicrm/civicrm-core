@@ -13,6 +13,8 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider integerDataProvider
+   * @param $inputData
+   * @param $expectedResult
    */
   public function testInteger($inputData, $expectedResult) {
     $this->assertEquals($expectedResult, CRM_Utils_Rule::integer($inputData));
@@ -34,6 +36,8 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider positiveDataProvider
+   * @param $inputData
+   * @param $expectedResult
    */
   public function testPositive($inputData, $expectedResult) {
     $this->assertEquals($expectedResult, CRM_Utils_Rule::positiveInteger($inputData));
@@ -55,6 +59,8 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider numericDataProvider
+   * @param $inputData
+   * @param $expectedResult
    */
   public function testNumeric($inputData, $expectedResult) {
     $this->assertEquals($expectedResult, CRM_Utils_Rule::numeric($inputData));

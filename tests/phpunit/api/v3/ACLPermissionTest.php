@@ -247,6 +247,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * @dataProvider entities
    * confirm that without check permissions we still get 2 contacts returned
+   * @param $entity
    */
   public function testEntitiesGetHookLimitingHookNoCheck($entity) {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array();
@@ -262,6 +263,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * @dataProvider entities
    * confirm that without check permissions we still get 2 entities returned
+   * @param $entity
    */
   public function testEntitiesGetCoreACLLimitingHookNoCheck($entity) {
     $this->setupCoreACL();
@@ -278,6 +280,8 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * @dataProvider entities
    * confirm that with check permissions we don't get entities
+   * @param $entity
+   * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testEntitiesGetCoreACLLimitingCheck($entity) {
     $this->markTestIncomplete('this does not work in 4.4 but can be enabled in 4.5 or a security release of 4.4 including the important security fix CRM-14877');
@@ -294,6 +298,8 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * @dataProvider entities
    * Function tests that an empty where hook returns no results
+   * @param $entity
+   * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testEntityGetNoResultsHook($entity) {
     $this->markTestIncomplete('hook acls only work with contacts so far');
@@ -315,6 +321,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
 
   /**
    * Create 2 entities
+   * @param $entity
    */
   public function setUpEntities($entity) {
     $baoObj = new CRM_Core_DAO();
@@ -329,6 +336,11 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
 
   /**
    * No results returned
+   * @param $type
+   * @param $tables
+   * @param $whereTables
+   * @param $contactID
+   * @param $where
    */
   public function aclWhereHookNoResults($type, &$tables, &$whereTables, &$contactID, &$where) {
   }
@@ -336,6 +348,11 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * All results returned
    * @implements CRM_Utils_Hook::aclWhereClause
+   * @param $type
+   * @param $tables
+   * @param $whereTables
+   * @param $contactID
+   * @param $where
    */
   public function aclWhereHookAllResults($type, &$tables, &$whereTables, &$contactID, &$where) {
     $where = " (1) ";
@@ -344,6 +361,11 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * Full results returned
    * @implements CRM_Utils_Hook::aclWhereClause
+   * @param $type
+   * @param $tables
+   * @param $whereTables
+   * @param $contactID
+   * @param $where
    */
   public function aclWhereOnlySecond($type, &$tables, &$whereTables, &$contactID, &$where) {
     $where = " contact_a.id > 1";

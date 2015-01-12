@@ -44,6 +44,10 @@ class Utils {
 
   /**
    *  Construct an object for this database
+   * @param $host
+   * @param $port
+   * @param $user
+   * @param $pass
    */
   public function __construct($host, $port, $user, $pass) {
     try {

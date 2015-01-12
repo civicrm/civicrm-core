@@ -39,6 +39,10 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
   /**
    *  Test CRM_Contact_BAO_Query::searchQuery()
    * @dataProvider dataProvider
+   * @param $fv
+   * @param $count
+   * @param $ids
+   * @param $full
    */
   public function testSearch($fv, $count, $ids, $full) {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();

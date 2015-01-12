@@ -43,6 +43,11 @@ class CiviDBAssert {
    * @match    array    Associative array of field name => expected value. Empty if asserting
    *                      that a DELETE occurred
    * @delete   boolean  True if we're checking that a DELETE action occurred.
+   * @param $testCase
+   * @param $daoName
+   * @param $id
+   * @param $match
+   * @param bool $delete
    */
   public function assertDBState(&$testCase, $daoName, $id, $match, $delete = FALSE) {
     if (empty($id)) {
@@ -90,6 +95,13 @@ class CiviDBAssert {
 
   /**
    * Request a record from the DB by seachColumn+searchValue. Success if a record is found.
+   * @param $testCase
+   * @param $daoName
+   * @param $searchValue
+   * @param $returnColumn
+   * @param $searchColumn
+   * @param $message
+   * @return null|string
    */
   public function assertDBNotNull(&$testCase, $daoName, $searchValue, $returnColumn, $searchColumn, $message) {
     if (empty($searchValue)) {
@@ -103,6 +115,12 @@ class CiviDBAssert {
 
   /**
    * Request a record from the DB by seachColumn+searchValue. Success if returnColumn value is NULL.
+   * @param $testCase
+   * @param $daoName
+   * @param $searchValue
+   * @param $returnColumn
+   * @param $searchColumn
+   * @param $message
    */
   public function assertDBNull(&$testCase, $daoName, $searchValue, $returnColumn, $searchColumn, $message) {
     $value = CRM_Core_DAO::getFieldValue($daoName, $searchValue, $returnColumn, $searchColumn);
@@ -111,6 +129,10 @@ class CiviDBAssert {
 
   /**
    * Request a record from the DB by id. Success if row not found.
+   * @param $testCase
+   * @param $daoName
+   * @param $id
+   * @param $message
    */
   public function assertDBRowNotExist(&$testCase, $daoName, $id, $message) {
     $value = CRM_Core_DAO::getFieldValue($daoName, $id, 'id', 'id');
@@ -138,6 +160,10 @@ class CiviDBAssert {
 
   /**
    * Compare all values in a single retrieved DB record to an array of expected values
+   * @param $testCase
+   * @param $daoName
+   * @param $searchParams
+   * @param $expectedValues
    */
   public function assertDBCompareValues(&$testCase, $daoName, $searchParams, $expectedValues) {
     //get the values from db

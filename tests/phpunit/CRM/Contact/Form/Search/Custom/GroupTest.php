@@ -82,6 +82,11 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
   /**
    *  Test CRM_Contact_Form_Search_Custom_Group::count()
    * @dataProvider dataProvider
+   * @param $fv
+   * @param $count
+   * @param $ids
+   * @param $full
+   * @throws \Exception
    */
   public function testCount($fv, $count, $ids, $full) {
     $this->foreignKeyChecksOff();
@@ -114,6 +119,11 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
   /**
    *  Test CRM_Contact_Form_Search_Custom_Group::all()
    * @dataProvider dataProvider
+   * @param $fv
+   * @param $count
+   * @param $ids
+   * @param $full
+   * @throws \Exception
    */
   public function testAll($fv, $count, $ids, $full) {
     // Truncate affected tables
@@ -145,6 +155,11 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
   /**
    *  Test CRM_Contact_Form_Search_Custom_Group::contactIDs()
    * @dataProvider dataProvider
+   * @param $fv
+   * @param $count
+   * @param $ids
+   * @param $full
+   * @throws \Exception
    */
   public function testContactIDs($fv, $count, $ids, $full) {
     // Truncate affected tables
