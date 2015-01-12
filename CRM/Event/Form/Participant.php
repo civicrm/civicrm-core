@@ -151,7 +151,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   public $_lineItem = NULL;
 
-  /*
+  /**
    * Contribution mode for event registration for offline mode
    */
   public $_contributeMode = 'direct';

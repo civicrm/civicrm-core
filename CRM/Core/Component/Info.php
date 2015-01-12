@@ -90,7 +90,7 @@ abstract class CRM_Core_Component_Info {
    */
   public $info;
 
-  /*
+  /**
    * Stores component keyword
    * @var string name of component keyword
    */

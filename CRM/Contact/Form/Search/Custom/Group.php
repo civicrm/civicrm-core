@@ -154,10 +154,8 @@ class CRM_Contact_Form_Search_Custom_Group
     $form->assign('elements', array('includeGroups', 'excludeGroups', 'andOr', 'includeTags', 'excludeTags'));
   }
 
-  /*
-   * Set search form field defaults here.
-   */
   /**
+   * Set search form field defaults here.
    * @return array
    */
   public function setDefaultValues() {

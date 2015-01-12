@@ -534,7 +534,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals("test activity type id", $result['values'][0]['subject'], 'In line ' . __LINE__);
   }
 
-  /*
+  /**
    * test that get functioning does filtering
    */
   public function testGetFilter() {
@@ -607,7 +607,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     }
   }
 
-  /*
+  /**
    * test that get functioning does filtering
    */
   public function testGetStatusID() {
@@ -639,7 +639,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
   }
 
-  /*
+  /**
    * test that get functioning does filtering
    */
   public function testGetFilterMaxDate() {
@@ -1112,7 +1112,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals('Test activity type', $result['values'][$activity2['id']]['activity_name'], 'In line ' . __LINE__);
   }
 
-  /*
+  /**
    * test chained Activity format
    */
   public function testchainedActivityGet() {

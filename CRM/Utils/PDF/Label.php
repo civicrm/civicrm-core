@@ -149,10 +149,9 @@ class CRM_Utils_PDF_Label extends TCPDF {
     return $value;
   }
 
-  /*
-   * initialize label format settings
-   */
   /**
+   * initialize label format settings
+   *
    * @param $format
    * @param $unit
    */
@@ -182,11 +181,10 @@ class CRM_Utils_PDF_Label extends TCPDF {
     $this->paper_dimensions = array($w, $h);
   }
 
-  /*
-   * Generate the pdf of one label (can be modified using SetGenerator)
-   */
   /**
-   * @param $text
+   * Generate the pdf of one label (can be modified using SetGenerator)
+   *
+   * @param string $text
    */
   public function generateLabel($text) {
     $args = array(
@@ -229,10 +227,9 @@ class CRM_Utils_PDF_Label extends TCPDF {
     }
   }
 
-  /*
-   * Print a label
-   */
   /**
+   * Print a label
+   *
    * @param $texte
    */
   public function AddPdfLabel($texte) {

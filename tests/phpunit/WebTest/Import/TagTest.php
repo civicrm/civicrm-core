@@ -35,9 +35,9 @@ class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  /*
-    *  Test contact import for Individuals.
-    */
+  /**
+   * Test contact import for Individuals.
+   */
   public function testContactImportWithTag() {
     $this->webtestLogin();
 

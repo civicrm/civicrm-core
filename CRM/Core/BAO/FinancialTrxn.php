@@ -419,18 +419,17 @@ WHERE ceft.entity_id = %1";
     $financialItem = CRM_Financial_BAO_FinancialItem::create($fItemParams, NULL, $trxnIDS);
   }
 
-  /*
-   * get partial payment amount and type of it
-   * return @array : payment type => amount
-   * payment type  : 'amount_owed' or 'refund_due'
-   */
   /**
+   * get partial payment amount and type of it
+   *
    * @param int $entityId
    * @param string $entityName
    * @param bool $returnType
-   * @param NULL $lineItemTotal
+   * @param number $lineItemTotal
    *
    * @return array|int|NULL|string
+   *   [payment type => amount]
+   *   payment type: 'amount_owed' or 'refund_due'
    */
   public static function getPartialPaymentWithType($entityId, $entityName = 'participant', $returnType = TRUE, $lineItemTotal = NULL) {
     $value = NULL;

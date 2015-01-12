@@ -1172,7 +1172,7 @@ class CRM_Utils_System {
     }
   }
 
-  /*
+  /**
    * Get logged in user's IP address.
    *
    * Get IP address from HTTP REMOTE_ADDR header. If the CMS is Drupal then use
@@ -1184,11 +1184,6 @@ class CRM_Utils_System {
    *
    * @return string
    *   IP address of logged in user.
-   */
-  /**
-   * @param bool $strictIPV4
-   *
-   * @return mixed|string
    */
   public static function ipAddress($strictIPV4 = TRUE) {
     $address = CRM_Utils_Array::value('REMOTE_ADDR', $_SERVER);

@@ -61,9 +61,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
    * @return void
    */
   public function preProcess() {
-    /*
-         * initialize the task and row fields
-         */
+    // initialize the task and row fields
     parent::preProcess();
 
     //get the contact read only fields to display.

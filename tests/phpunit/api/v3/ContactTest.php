@@ -350,7 +350,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
 
-  /*
+  /**
    * Test creating a current employer through API
    */
   public function testContactCreateCurrentEmployer() {
@@ -385,10 +385,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   }
 
-  /*
+  /**
    * Test creating a current employer through API
    * - check it will re-activate a de-activated employer
-  */
+   */
   public function testContactCreateDuplicateCurrentEmployerEnables() {
     //set up  - create employer relationship
     $employerResult = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
@@ -465,10 +465,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $c2['id']));
   }
 
-  /*
+  /**
    * Test that we can retrieve contacts using
    * 'id' => array('IN' => array('3,4')) syntax
-  */
+   */
   public function testGetINIDArray() {
     $c1 = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $c2 = $this->callAPISuccess($this->_entity, 'create', array(
@@ -489,7 +489,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $c3['id']));
   }
 
-  /*
+  /**
    * Test variants on deleted behaviour
    */
   public function testGetDeleted() {
@@ -1604,7 +1604,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('http://civicrm.org', $result['values'][$result['id']]['api.website.getValue']);
   }
 
-  /*
+  /**
    * Test checks siusage of $values to pick & choose inputs
    */
   public function testChainingValuesCreate() {
@@ -1629,7 +1629,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->quickCleanup($tablesToTruncate, TRUE);
   }
 
-  /*
+  /**
    * test TrueFalse format - I couldn't come up with an easy way to get an error on Get
    */
   public function testContactGetFormatIsSuccessTrue() {
@@ -1643,7 +1643,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'Delete', $params);
   }
 
-  /*
+  /**
    * test TrueFalse format
    */
   public function testContactCreateFormatIsSuccessFalse() {
@@ -1656,7 +1656,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(0, $result);
   }
 
-  /*
+  /**
    * test Single Entity format
    */
   public function testContactGetSingle_entity_array() {
@@ -1671,7 +1671,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'Delete', $params);
   }
 
-  /*
+  /**
    * test Single Entity format
    */
   public function testContactGetFormatcount_only() {
@@ -1685,7 +1685,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'Delete', $params);
   }
 
-  /*
+  /**
     * Test id only format
     */
   public function testContactGetFormatID_only() {
@@ -1700,7 +1700,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'Delete', $params);
   }
 
-  /*
+  /**
     * Test id only format
     */
   public function testContactGetFormatSingleValue() {

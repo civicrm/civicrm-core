@@ -88,9 +88,9 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
     $this->defaults = array();
 
     /*
-         * we allow the controller to set force/reset externally, useful when we are being
-         * driven by the wizard framework
-         */
+     * we allow the controller to set force/reset externally, useful when we are being
+     * driven by the wizard framework
+     */
 
     $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);

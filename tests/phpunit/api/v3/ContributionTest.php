@@ -518,9 +518,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
   }
 
-  /*
+  /**
    * Create test with unique field name on source
-  */
+   */
   public function testCreateDefaultNow() {
 
     $params = $this->_params;

@@ -36,7 +36,7 @@ class CRM_Core_OptionGroup {
   static $_values = array();
   static $_cache = array();
 
-  /*
+  /**
    * $_domainIDGroups array maintains the list of option groups for whom
    * domainID is to be considered.
    */
@@ -639,7 +639,7 @@ WHERE  v.option_group_id = g.id
     return $row;
   }
 
-  /*
+  /**
    * Wrapper for calling values with fresh set to true to empty the given value
    *
    * Since there appears to be some inconsistency
@@ -647,9 +647,8 @@ WHERE  v.option_group_id = g.id
    * (for example CRM_Contribution_Pseudoconstant::paymentInstrument doesn't specify isActive
    * which is part of the cache key
    * will do a couple of variations & aspire to someone cleaning it up later
-   */
-  /**
-   * @param $name
+   *
+   * @param string $name
    * @param array $params
    */
   public static function flush($name, $params = array()) {

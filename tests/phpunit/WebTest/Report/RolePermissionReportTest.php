@@ -95,7 +95,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->_roleDelete($role2);
   }
 
-  /*
+  /**
    *check for CRM-10148
    */
   public function testReservedReportPermission() {

@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
@@ -916,12 +915,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     return $obj;
   }
 
-  /*
+  /**
    * @deprecated
    * This function is no longer used by v3 api.
    * @fixme Some core files call it but it should be re-thought & renamed or removed
-   */
-  /**
+   *
    * @param $msg
    * @param null $data
    *

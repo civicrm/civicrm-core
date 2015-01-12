@@ -260,7 +260,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('css=div#memberships');
   }
 
-  /*
+  /**
    * Webtest for CRM-10146
    */
   public function testInheritedMembershipActivity() {
