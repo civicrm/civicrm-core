@@ -151,6 +151,7 @@ function _civicrm_api3_contribution_create_spec(&$params) {
  * The main purpose of the API is to provide integrators a level of stability not provided by
  * the core code or schema - this means we have to provide support for api calls (where possible)
  * across schema changes.
+ * @param $params
  */
 function _civicrm_api3_contribution_create_legacy_support_45(&$params) {
   //legacy soft credit handling - recommended approach is chaining
@@ -196,6 +197,7 @@ function civicrm_api3_contribution_delete($params) {
 
 /**
  * modify metadata. Legacy support for contribution_id
+ * @param $params
  */
 function _civicrm_api3_contribution_delete_spec(&$params) {
   $params['id']['api.aliases'] = array('contribution_id');
@@ -239,6 +241,7 @@ function civicrm_api3_contribution_get($params) {
  * This function is used to format the soft credit for backward compatibility
  * as of v4.4 we support multiple soft credit, so now contribution returns array with 'soft_credit' as key
  * but we still return first soft credit as a part of contribution array
+ * @param $contribution
  */
 function _civicrm_api3_format_soft_credit(&$contribution) {
   if (!empty($contribution['soft_credit'])) {

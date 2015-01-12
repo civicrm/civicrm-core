@@ -102,6 +102,7 @@ function civicrm_api3_entity_tag_delete($params) {
 
 /**
  * modify metadata
+ * @param $params
  */
 function _civicrm_api3_entity_tag_delete_spec(&$params) {
   // set as not required as tag_id also acceptable & no either/or std yet
