@@ -189,6 +189,8 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
 
   /**
    * @dataProvider apiTestCases
+   * @param $query
+   * @param $is_error
    */
   public function testAPICalls($query, $is_error) {
     $client = CRM_Utils_HttpClient::singleton();

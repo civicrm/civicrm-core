@@ -82,6 +82,11 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
 
   /**
    * @dataProvider dataProvider
+   * @param $reportClass
+   * @param $inputParams
+   * @param $dataSet
+   * @param $expectedOutputCsvFile
+   * @throws \Exception
    */
   public function testReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
     $config = CRM_Core_Config::singleton();

@@ -143,6 +143,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
 
   /**
    * Helper function to select Editor.
+   * @param $editor
    */
   public function _selectEditor($editor) {
     $this->openCiviPage('admin/setting/preferences/display', 'reset=1');
@@ -158,6 +159,9 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
 
   /**
    * Helper function for Check Signature in Editor.
+   * @param $fieldName
+   * @param $signature
+   * @param $editor
    */
   public function _checkSignature($fieldName, $signature, $editor) {
     if ($editor == 'CKEditor') {
@@ -174,6 +178,8 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
 
   /**
    * Helper function for Check Signature in Activity.
+   * @param $subject
+   * @param $signature
    */
   public function _checkActivity($subject, $signature) {
     $this->openCiviPage('activity/search', 'reset=1', '_qf_Search_refresh');

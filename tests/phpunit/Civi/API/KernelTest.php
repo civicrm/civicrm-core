@@ -95,7 +95,6 @@ class KernelTest extends \CiviUnitTestCase {
    * @param array $monitoredEvents
    *   List of event names.
    *
-   * @internal param \Symfony\Component\EventDispatcher\EventDispatcher $this ->dispatcher
    */
   public function monitorEvents($monitoredEvents) {
     foreach ($monitoredEvents as $monitoredEvent) {

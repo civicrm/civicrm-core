@@ -639,6 +639,11 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
   /**
    * Helper FN
+   * @param null $firstName
+   * @param null $lastName
+   * @param null $organizationName
+   * @param string $contactType
+   * @return array
    */
   public function _createContacts($firstName = NULL, $lastName = NULL, $organizationName = NULL, $contactType = 'Individual') {
     if ($contactType == 'Individual') {
@@ -730,6 +735,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
   /**
    * Helper FN
    * to create new membership type
+   * @param $membershipOrganization
    */
   public function addMembershipType($membershipOrganization) {
     $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");

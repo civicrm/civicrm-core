@@ -114,6 +114,9 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider parsePrefixData
+   * @param $input
+   * @param $defaultPrefix
+   * @param $expected
    */
   public function testParsePrefix($input, $defaultPrefix, $expected) {
     $actual = CRM_Utils_String::parsePrefix(':', $input, $defaultPrefix);
