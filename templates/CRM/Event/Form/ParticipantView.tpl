@@ -47,10 +47,10 @@
     <table class="crm-info-panel">
     <tr class="crm-event-participantview-form-block-displayName">
       <td class="label">{ts}Participant Name{/ts}</td>
-      <td class="bold">
-        <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contact_id"}" title="{ts}View contact record{/ts}">{$displayName}</a>
-        <div class="crm-submit-buttons">
-            <a class="button" href="{crmURL p='civicrm/event/badge' q="reset=1&context=view&id=$id&cid=$contact_id"}" title="{ts}Print Event Name Badge{/ts}"><span><div class="icon ui-icon-print"></div> {ts}Print Name Badge{/ts}</span></a>
+      <td>
+        <strong><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contact_id"}" title="{ts}View contact record{/ts}">{$displayName}</a></strong>
+        <div>
+            <a class="action-item crm-hover-button" href="{crmURL p='civicrm/event/badge' q="reset=1&context=view&id=$id&cid=$contact_id"}"><span class="icon ui-icon-print"></span> {ts}Print Name Badge{/ts}</a>
         </div>
       </td>
   </tr>
@@ -110,7 +110,7 @@
                 <td class="label">{ts}Selections{/ts}</td>
                 <td>{include file="CRM/Price/Page/LineItem.tpl" context="Event"}
                 {if $hasPayment or $parentHasPayment}
-                   <a class="button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}' title="{ts}Change Selections{/ts}"><span><div class="icon ui-icon-pencil"></div> {ts}Change Selections{/ts}</span></a>
+                   <a class="action-item crm-hover-button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}'><span class="icon ui-icon-pencil"></span> {ts}Change Selections{/ts}</a>
                 {/if}
                 </td>
             {else}
