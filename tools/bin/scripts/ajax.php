@@ -64,6 +64,7 @@ function invoke() {
 
 /**
  * Test Function used for new hs-widget.
+ * @param $config
  */
 function states(&$config) {
   $elements = array();
@@ -155,6 +156,7 @@ ORDER BY name";
 
 /**
  * Test Function used for new hs-widget.
+ * @param $config
  */
 function countries(&$config) {
   //get the country limit and restrict the combo select options

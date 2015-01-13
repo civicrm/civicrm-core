@@ -36,6 +36,8 @@ define('CHUNK_SIZE', 128);
 
 /**
  * Split a large array of contactIDs into more manageable smaller chunks
+ * @param $contactIDs
+ * @return array
  */
 function &splitContactIDs(&$contactIDs) {
   // contactIDs could be a real large array, so we split it up into
@@ -65,6 +67,11 @@ function &splitContactIDs(&$contactIDs) {
 
 /**
  * Given a set of contact IDs get the values
+ * @param $contactIDs
+ * @param $values
+ * @param $allContactIDs
+ * @param $addditionalContactIDs
+ * @return array
  */
 function getValues(&$contactIDs, &$values, &$allContactIDs, &$addditionalContactIDs) {
   $values = array();
