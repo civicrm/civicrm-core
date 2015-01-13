@@ -1446,7 +1446,7 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $err
       }
       if (!empty($fieldInfo['api.unique'])) {
         $params['entity'] = $entity;
-        _civicrm_api3_validate_uniquekey($params, $fieldName, $fieldInfo);
+        _civicrm_api3_validate_unique_key($params, $fieldName);
       }
     }
   }
@@ -1543,11 +1543,9 @@ function _civicrm_api3_validate_constraint(&$fieldValue, &$fieldName, &$fieldInf
  *   Params from civicrm_api.
  * @param string $fieldName
  *   Uniquename of field being checked.
- * @param $fieldInfo
- *   Array of fields from getfields function.
  * @throws Exception
  */
-function _civicrm_api3_validate_uniquekey(&$params, &$fieldName, &$fieldInfo) {
+function _civicrm_api3_validate_unique_key(&$params, &$fieldName) {
   list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName);
   if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
     return;
