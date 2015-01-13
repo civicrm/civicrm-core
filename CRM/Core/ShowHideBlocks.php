@@ -64,7 +64,6 @@ class CRM_Core_ShowHideBlocks {
    *   Initial value of hide array.
    *
    * @return \CRM_Core_ShowHideBlocks the newly created object
-   * @access public
    */
   public function __construct($show = NULL, $hide = NULL) {
     if (!empty($show)) {

@@ -42,10 +42,6 @@
  * @param array $params
  *
  * @return array
- * @access public
- * {@getfields UFMatch_get}
- * @example UFMatchGet.php
- * @todo this class is missing delete & create functions (do after exisitng functions upgraded to v3)
  */
 function civicrm_api3_uf_match_get($params) {
   return _civicrm_api3_basic_get('CRM_Core_BAO_UFMatch', $params);

@@ -42,12 +42,9 @@
  * Creates or updates an Dashlet.
  *
  * @param array $params
- *   Array of property name/value.
- *                             pairs for the Dashlet.
  *
  * @return array
  *   Array containing 'is_error' to denote success or failure and details of the created activity
- *
  */
 function civicrm_api3_dashboard_create($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array(
@@ -74,11 +71,8 @@ function _civicrm_api3_dashboard_create_spec(&$params) {
  * Gets a CiviCRM Dashlets according to parameters
  *
  * @param array $params
- *   Associative array of property name/value.
- *                             pairs for the activity.
  *
  * @return array
- *
  */
 function civicrm_api3_dashboard_get($params) {
   $bao = new CRM_Core_BAO_Dashboard();
@@ -91,10 +85,9 @@ function civicrm_api3_dashboard_get($params) {
  * Delete a specified Dashlet.
  *
  * @param array $params
- *   Array holding 'id' OR 'name' of dashlet to be deleted.
+ *   Array holding 'id' of dashlet to be deleted.
  *
- * @return void|CRM_Core_Error  An error if 'name or ID' is invalid,
- *
+ * @return array
  */
 function civicrm_api3_dashboard_delete($params) {
   if (CRM_Core_BAO_Dashboard::deleteDashlet($params['id'])) {

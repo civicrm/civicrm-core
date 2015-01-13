@@ -37,7 +37,7 @@ require_once 'CRM/Core/Component/Info.php';
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- * */
+ */
 class CRM_Auction_Info extends CRM_Core_Component_Info {
 
   // docs inherited from interface

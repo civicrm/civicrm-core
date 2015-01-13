@@ -65,7 +65,6 @@
  * @return array
  *   ['values' => TRUE] or ['is_error' => 1, 'error_message' => 'what went wrong']
  *
- * @access public
  */
 function civicrm_api3_custom_value_create($params) {
   // @todo it's not clear where the entity_table is used as  CRM_Core_BAO_CustomValueTable::setValues($create)
@@ -138,7 +137,6 @@ function _civicrm_api3_custom_value_create_spec(&$params) {
  * @return array
  *
  *
- * @access public
  */
 function civicrm_api3_custom_value_get($params) {
 

@@ -44,7 +44,6 @@
  * @return array
  *   api result array
  * {@getfields mail_settings_create}
- * @access public
  */
 function civicrm_api3_mail_settings_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -72,7 +71,6 @@ function _civicrm_api3_mail_settings_create_spec(&$params) {
  * @return array
  *   Array of matching mail_settings
  * {@getfields mail_settings_get}
- * @access public
  */
 function civicrm_api3_mail_settings_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -91,7 +89,6 @@ function civicrm_api3_mail_settings_get($params) {
  * @return array
  *   api result array
  * {@getfields mail_settings_delete}
- * @access public
  */
 function civicrm_api3_mail_settings_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

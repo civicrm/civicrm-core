@@ -71,9 +71,6 @@ function civicrm_api3_group_contact_get($params) {
 
 /**
  * Add contact(s) to group(s)
- *
- * @access public
- *
  * @param array $params
  *   Input parameters.
  *

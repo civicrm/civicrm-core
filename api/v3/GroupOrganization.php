@@ -101,7 +101,6 @@ function _civicrm_api3_group_organization_create_spec(&$params) {
  *   API Result
  * {@getfields GroupOrganization_delete}
  * @example GroupOrganizationDelete.php
- * @access public
  */
 function civicrm_api3_group_organization_delete($params) {
 

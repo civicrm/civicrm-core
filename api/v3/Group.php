@@ -50,7 +50,6 @@
  *   API result array
  * @example GroupCreate.php
  * {@getfields group_create}
- * @access public
  */
 function civicrm_api3_group_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Group');
@@ -80,7 +79,6 @@ function _civicrm_api3_group_create_spec(&$params) {
  *   Array of matching groups
  * @example GroupGet.php
  * {@getfields group_get}
- * @access public
  */
 function civicrm_api3_group_get($params) {
   $options = _civicrm_api3_get_options_from_params($params, TRUE, 'group', 'get');
@@ -110,7 +108,6 @@ function civicrm_api3_group_get($params) {
  * @example GroupDelete.php
  * {@getfields group_delete}
  *
- * @access public
  */
 function civicrm_api3_group_delete($params) {
 

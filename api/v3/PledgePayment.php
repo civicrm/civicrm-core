@@ -51,7 +51,6 @@
  *
  * @return array
  *   API Result
- * @access public
  */
 function civicrm_api3_pledge_payment_create($params) {
 
@@ -100,7 +99,6 @@ function _civicrm_api3_pledge_payment_create_spec(&$params) {
  *
  * @return array
  *   API result
- * @access public
  */
 function civicrm_api3_pledge_payment_delete($params) {
 
@@ -122,7 +120,6 @@ function civicrm_api3_pledge_payment_delete($params) {
  *
  * @return array
  *   (reference )        array of pledges, if error an array with an error id and error message
- * @access public
  */
 function civicrm_api3_pledge_payment_get($params) {
 

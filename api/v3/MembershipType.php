@@ -44,8 +44,6 @@
  *
  * @return array
  *   newly created or updated membership type property values.
- * @access public
- * {getfields MembershipType_get}
  */
 function civicrm_api3_membership_type_create($params) {
   $ids['membershipType'] = CRM_Utils_Array::value('id', $params);
@@ -89,7 +87,6 @@ function _civicrm_api3_membership_type_create_spec(&$params) {
  *
  * @return array
  *   Array of all found membership type property values.
- * @access public
  */
 function civicrm_api3_membership_type_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -105,8 +102,6 @@ function civicrm_api3_membership_type_get($params) {
  *
  * @return boolean
  *   true if success, else false
- * @access public
- * {getfields MembershipType_delete}
  */
 function civicrm_api3_membership_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

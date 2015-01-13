@@ -43,9 +43,6 @@
  *   Associative array of property name/value pairs to insert in new relationship type.
  *
  * @return array
- * {@getfields RelationshipType_create}
- * @access public
- * {@schema Contact/RelationshipType.xml}
  */
 function civicrm_api3_relationship_type_create($params) {
 

@@ -45,7 +45,6 @@
  *   (reference )        membership_payment_id of created or updated record
  * {@getfields MembershipPayment_create}
  * @example MembershipPaymentCreate.php
- * @access public
  */
 function civicrm_api3_membership_payment_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -74,7 +73,6 @@ function _civicrm_api3_membership_payment_create_spec(&$params) {
  *   array of properties, if error an array with an error id and error message
  * @example MembershipPaymentGet
  * {@getfields MembershipPayment_get}
- * @access public
  */
 function civicrm_api3_membership_payment_get($params) {
   return _civicrm_api3_basic_get('CRM_Member_DAO_MembershipPayment', $params);

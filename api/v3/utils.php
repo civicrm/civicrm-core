@@ -439,7 +439,7 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
  *  others that use the query object. Note that this function passes permission information in.
  *  The others don't
  *
- * * Ideally this would be merged with _civicrm_get_query_object but we need to resolve differences in what the
+ * Ideally this would be merged with _civicrm_get_query_object but we need to resolve differences in what the
  * 2 variants call
  * @param $entity
  * @param array $params
