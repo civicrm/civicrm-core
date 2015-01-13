@@ -240,7 +240,7 @@ function civicrm_api3_attachment_delete($params) {
  * @param array $file
  *   The user-supplied vales for the file (mime_type, description, upload_date).
  * @param array $entityFile
- *   The user-supllied values of the entity-file (entity_table, entity_id).
+ *   The user-supplied values of the entity-file (entity_table, entity_id).
  * @param bool $isTrusted
  * @return CRM_Core_DAO
  * @throws API_Exception
