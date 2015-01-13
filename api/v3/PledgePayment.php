@@ -127,19 +127,6 @@ function civicrm_api3_pledge_payment_get($params) {
 }
 
 /**
- * @param int $pledgeId
- * @param int $paymentStatusId
- * @param $paymentIds
- *
- * @return mixed
- */
-function updatePledgePayments($pledgeId, $paymentStatusId, $paymentIds) {
-
-  $result = updatePledgePayments($pledgeId, $paymentStatusId, $paymentIds = NULL);
-  return $result;
-}
-
-/**
  * Gets field for civicrm_pledge_payment functions
  *
  * @param array $params
