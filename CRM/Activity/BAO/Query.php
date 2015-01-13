@@ -167,13 +167,12 @@ class CRM_Activity_BAO_Query {
    * @return void
    */
   public static function where(&$query) {
-    $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
       if (substr($query->_params[$id][0], 0, 9) == 'activity_') {
         if ($query->_mode == CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
-        $grouping = $query->_params[$id][3];
+        $query->_params[$id][3];
         self::whereClauseSingle($query->_params[$id], $query);
       }
     }
@@ -187,10 +186,9 @@ class CRM_Activity_BAO_Query {
    * @return void
    */
   public static function whereClauseSingle(&$values, &$query) {
-    list($name, $op, $value, $grouping, $wildcard) = $values;
+    list($name, $op, $value, $grouping) = $values;
 
     $fields = CRM_Activity_BAO_Activity::exportableFields();
-    $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     if ($query->_mode & CRM_Contact_BAO_Query::MODE_ACTIVITY) {
       $query->_skipDeleteClause = TRUE;
@@ -259,7 +257,7 @@ class CRM_Activity_BAO_Query {
         break;
 
       case 'activity_test':
-        // We dont want to include all tests for sql OR CRM-7827
+        // We don't want to include all tests for sql OR CRM-7827
         if (!$value || $query->getOperator() != 'OR') {
           $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_activity.is_test", $op, $value, "Boolean");
           if ($value) {
@@ -295,7 +293,6 @@ class CRM_Activity_BAO_Query {
         $activityTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
 
         $names = array();
-        $val = array();
         if (is_array($value)) {
           foreach ($value as $k => $v) {
             $names[] = $activityTags[$v];
@@ -372,7 +369,6 @@ class CRM_Activity_BAO_Query {
                       ON ( civicrm_activity.id = civicrm_activity_contact.activity_id
                       AND civicrm_activity.is_deleted = 0 AND civicrm_activity.is_current_revision = 1 )";
 
-        $activityRole = CRM_Contact_BAO_Query::$_activityRole;
         break;
 
       case 'activity_status':

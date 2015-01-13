@@ -162,6 +162,7 @@ class Frame {
    *   A PHP callback.
    * @param array|NULL $params Optional values to pass to callback.
    *          See php manual call_user_func_array for details.
+   * @param null $id
    */
   public function addCallback($phase, $callback, $params = NULL, $id = NULL) {
     if ($id) {

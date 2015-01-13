@@ -235,7 +235,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *
    * @throws CRM_Core_Exception
    *
-   * @return CRM_Member_BAO_Membership
+   * @return CRM_Member_BAO_Membership|CRM_Core_Error
    */
   public static function create(&$params, &$ids, $skipRedirect = FALSE, $activityType = 'Membership Signup') {
     // always calculate status if is_override/skipStatusCal is not true.

@@ -826,10 +826,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Process the participant
    *
-   * @param array $params
+   * @param CRM_Core_Form $form
    * @param int $contactID
-   *
-   * @return void
+   * @return \CRM_Event_BAO_Participant
    */
   public static function addParticipant(&$form, $contactID) {
     if (empty($form->_params)) {

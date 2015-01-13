@@ -42,12 +42,10 @@
  *
  * @param array $params
  *   Array of one or more valid.
- * @param array $ids
  *
  * @return array
  *   API return Array of matching mailing jobs
- * {@getfields mailing_recipient_get}
  */
-function civicrm_api3_mailing_recipients_get($params, $ids = array()) {
+function civicrm_api3_mailing_recipients_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }

@@ -8,7 +8,8 @@ use Symfony\Component\Finder\Finder;
  */
 class PHPUnitScanner {
   /**
-   * @return array<string> class names
+   * @param $path
+   * @return array <string> class names
    */
   public static function _findTestClasses($path) {
 //    print_r(array(
@@ -27,8 +28,10 @@ class PHPUnitScanner {
   }
 
   /**
-   * @return array
-   *   (string $file => string $class)
+   * @param $paths
+   * @return array (string $file => string $class)
+   * (string $file => string $class)
+   * @throws \Exception
    */
   public static function findTestClasses($paths) {
     $testClasses = array();

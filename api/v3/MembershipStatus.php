@@ -116,11 +116,8 @@ function &civicrm_api3_membership_status_update($params) {
  *
  * This API is used for deleting a membership status
  *
- * @param array Params array containing 'id' - Id of the membership status to be deleted
- * {@getfields MembershipStatus_delete}
- *
+ * @param array $params
  * @return array
- *   i
  */
 function civicrm_api3_membership_status_delete($params) {
 

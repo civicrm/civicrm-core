@@ -164,11 +164,10 @@ function _civicrm_api3_pledge_get_defaults() {
  *
  * @param array $values
  *   The reformatted properties that we can use internally.
- * @param bool $create
  *
- * @return array|CRM_Error
+ * @return array|CRM_Core_Error
  */
-function _civicrm_api3_pledge_format_params(&$values, $create = FALSE) {
+function _civicrm_api3_pledge_format_params(&$values) {
 
   // probably most of the below can be removed.... just needs a little more review
   if (array_key_exists('original_installment_amount', $values)) {

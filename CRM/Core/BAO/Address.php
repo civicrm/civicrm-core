@@ -141,8 +141,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *   True if you need to fix (format) address values.
    *                               before inserting in db
    *
-   * @return object
-   *   CRM_Core_BAO_Address object on success, null otherwise
+   * @return CRM_Core_BAO_Address|null
    */
   public static function add(&$params, $fixAddress) {
     static $customFields = NULL;

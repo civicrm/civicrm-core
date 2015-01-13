@@ -216,9 +216,6 @@ function civicrm_api3_contribution_get($params) {
     $contribution_details = $query->store($dao);
     $softContribution = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dao->contribution_id, TRUE);
     $contribution[$dao->contribution_id] = array_merge($contribution_details, $softContribution);
-    if (isset($contribution[$dao->contribution_id]['financial_type_id'])) {
-      $contribution[$dao->contribution_id]['financial_type_id'] = $contribution[$dao->contribution_id]['financial_type_id'];
-    }
     // format soft credit for backward compatibility
     _civicrm_api3_format_soft_credit($contribution[$dao->contribution_id]);
   }

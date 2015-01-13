@@ -157,6 +157,12 @@ class org_civicrm_search_activityimplementsCRM_Contact_Form_Search_Interface {
 
   /**
    * Construct the search query
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $onlyIDs
+   * @return string
    */
   function all($offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $onlyIDs = FALSE
