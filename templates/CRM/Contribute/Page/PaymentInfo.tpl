@@ -63,7 +63,7 @@ CRM.$(function($) {
     <td class='right'>
       {if $paymentInfo.paid > 0}
         {$paymentInfo.paid|crmMoney}<br/>
-        <a class="crm-hover-button action-item medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&cid=`$cid`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&action=browse"}'>
+        <a class="crm-hover-button action-item crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&cid=`$cid`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&action=browse"}'>
           <span class="icon ui-icon-zoomin"></span>
           {ts}view payments{/ts}
         </a>
@@ -78,6 +78,6 @@ CRM.$(function($) {
   {elseif $paymentInfo.balance < 0}
      {assign var=paymentButtonName value='Record Refund'}
   {/if}
-  <a class="button" href='{crmURL p="civicrm/payment" q="action=add&reset=1&component=`$component`&id=`$id`&cid=`$cid`"}' title="{ts}{$paymentButtonName}{/ts}"><span><div class="icon ui-icon-circle-plus"></div> {ts}{$paymentButtonName}{/ts}</span></a>
+  <a class="action-item crm-hover-button" href='{crmURL p="civicrm/payment" q="action=add&reset=1&component=`$component`&id=`$id`&cid=`$cid`"}'><span class="icon ui-icon-circle-plus"></span> {ts}{$paymentButtonName}{/ts}</a>
 {/if}
 {/if}
