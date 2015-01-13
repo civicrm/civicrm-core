@@ -404,7 +404,7 @@ function civicrm_api3_profile_apply($params) {
  */
 function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
 
-  $locations = civicrm_api3('address', 'getoptions', array('field' => 'location_type_id'));
+  $locations = civicrm_api3('address', 'getoptions', array('field' => 'location_type_id', 'context' => 'validate'));
   $locationTypeID = array_search('Billing', $locations['values']);
 
   if (empty($params['contact_id'])) {
