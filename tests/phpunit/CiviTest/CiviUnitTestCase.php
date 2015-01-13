@@ -1850,9 +1850,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @params array to add group
    *
-   * @param array $params
-   * @return int
-   *   groupId of created group
+   * @param int $groupID
+   * @param int $totalCount
+   * @return int groupId of created group
+   * groupId of created group
    */
   public function groupContactCreate($groupID, $totalCount = 10) {
     $params = array('group_id' => $groupID);

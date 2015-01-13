@@ -78,6 +78,12 @@ class ChainSubscriber implements EventSubscriberInterface {
    * Call any nested api calls
    *
    * TODO: We don't really need this to be a separate function.
+   * @param $params
+   * @param $result
+   * @param $action
+   * @param $entity
+   * @param $version
+   * @throws \Exception
    */
   protected function callNestedApi(&$params, &$result, $action, $entity, $version) {
     $entity = _civicrm_api_get_entity_name_from_camel($entity);
