@@ -895,9 +895,8 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
    * @param array $params
    *   Array of extra values including relationship_type_id per api spec.
    *
-   * return string the query for this diretion
-   *
    * @return array
+   *   [select, from, where]
    */
   public static function makeURLClause($contactId, $status, $numRelationship, $count, $relationshipId, $direction, $params = array()) {
     $select = $from = $where = '';
@@ -1024,7 +1023,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
   }
 
   /**
-   * This is the function to get the list of relationships
+   * Get a list of relationships
    *
    * @param int $contactId
    *   Contact id.
@@ -1034,19 +1033,17 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    *   No of relationships to display (limit).
    * @param int $count
    *   Get the no of relationships.
-   * $param int $relationshipId relationship id
-   * $param array $links the list of links to display
-   * $param int   $permissionMask  the permission mask to be applied for the actions
-   * $param boolean $permissionedContact to return only permissioned Contact
-   * $param array $params array of variables consistent with filters supported by the api
-   * return array $values relationship records
    * @param int $relationshipId
-   * @param null $links
-   * @param null $permissionMask
+   * @param array $links
+   *   the list of links to display
+   * @param int $permissionMask
+   *   the permission mask to be applied for the actions
    * @param bool $permissionedContact
+   *   to return only permissioned Contact
    * @param array $params
    *
    * @return array|int
+   *   relationship records
    */
   static function getRelationship(
     $contactId = NULL,

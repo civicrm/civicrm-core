@@ -37,7 +37,7 @@ class CRM_Contact_Page_View_Tag extends CRM_Core_Page {
   /**
    * called when action is browse
    *
-   * return null
+   * @return null
    */
   public function browse() {
     $controller = new CRM_Core_Controller_Simple('CRM_Tag_Form_Tag', ts('Contact Tags'), $this->_action);
@@ -68,7 +68,7 @@ class CRM_Contact_Page_View_Tag extends CRM_Core_Page {
    * the main function that is called when the page loads
    * it decides the which action has to be taken for the page.
    *
-   * return null
+   * @return null
    */
   public function run() {
     $this->preProcess();

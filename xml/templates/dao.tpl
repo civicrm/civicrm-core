@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
@@ -27,7 +26,6 @@
 */
 
 /**
- *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  *
@@ -52,7 +50,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       * static instance to hold the table name
       *
       * @var string
-      * @static
       */
       static $_tableName = '{$table.name}';
 
@@ -60,7 +57,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       * static instance to hold the field values
       *
       * @var array
-      * @static
       */
       static $_fields = null;
 
@@ -68,7 +64,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       * static instance to hold the keys used in $_fields for each field.
       *
       * @var array
-      * @static
       */
       static $_fieldKeys = null;
 
@@ -76,7 +71,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       * static instance to hold the FK relationships
       *
       * @var string
-      * @static
       */
       static $_links = null;
 
@@ -85,7 +79,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       * be imported
       *
       * @var array
-      * @static
       */
       static $_import = null;
 
@@ -94,7 +87,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
        * be exported
        *
        * @var array
-       * @static
        */
       static $_export = null;
 
@@ -103,7 +95,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
        * this table in the civicrm_log table
        *
        * @var boolean
-       * @static
        */
       static $_log = {$table.log};
 
@@ -122,7 +113,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
     /**
      * class constructor
      *
-     * @access public
      * @return {$table.name}
      */
     function __construct( ) {ldelim}
@@ -133,11 +123,10 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 
 {if $table.foreignKey || $table.dynamicForeignKey}
     /**
-     * return foreign keys and entity references
+     * Returns foreign keys and entity references
      *
-     * @static
-     * @access public
-     * @return array of CRM_Core_Reference_Interface
+     * @return array
+     *   [CRM_Core_Reference_Interface]
      */
     static function getReferenceColumns() {ldelim}
       if (!self::$_links) {ldelim}
@@ -155,9 +144,8 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {/if} {* table.foreignKey *}
 
       /**
-       * returns all the column names of this table
+       * Returns all the column names of this table
        *
-       * @access public
        * @return array
        */
       static function &fields( ) {ldelim}
@@ -247,7 +235,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
        * Returns an array containing, for each field, the arary key used for that
        * field in self::$_fields.
        *
-       * @access public
        * @return array
        */
       static function &fieldKeys( ) {ldelim}
@@ -268,10 +255,8 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       {rdelim}
 
       /**
-       * returns the names of this table
+       * Returns the names of this table
        *
-       * @access public
-       * @static
        * @return string
        */
       static function getTableName( ) {ldelim}
@@ -283,9 +268,8 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       {rdelim}
 
       /**
-       * returns if this table needs to be logged
+       * Returns if this table needs to be logged
        *
-       * @access public
        * @return boolean
        */
       function getLog( ) {ldelim}
@@ -293,11 +277,11 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       {rdelim}
 
       /**
-       * returns the list of fields that can be imported
+       * Returns the list of fields that can be imported
        *
-       * @access public
-       * return array
-       * @static
+       * @param bool $prefix
+       *
+       * @return array
        */
        static function &import( $prefix = false ) {ldelim}
             if ( ! ( self::$_import ) ) {ldelim}
@@ -325,12 +309,12 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       {rdelim}
 
        /**
-       * returns the list of fields that can be exported
-       *
-       * @access public
-       * return array
-       * @static
-       */
+        * Returns the list of fields that can be exported
+        *
+        * @param bool $prefix
+        *
+        * @return array
+        */
        static function &export( $prefix = false ) {ldelim}
             if ( ! ( self::$_export ) ) {ldelim}
                self::$_export = array ( );

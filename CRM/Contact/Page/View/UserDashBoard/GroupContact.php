@@ -37,7 +37,7 @@ class CRM_Contact_Page_View_UserDashBoard_GroupContact extends CRM_Contact_Page_
   /**
    * called when action is browse
    *
-   * return null
+   * @return null
    */
   public function browse() {
     $count = CRM_Contact_BAO_GroupContact::getContactGroup(
@@ -79,7 +79,7 @@ class CRM_Contact_Page_View_UserDashBoard_GroupContact extends CRM_Contact_Page_
    *
    * @param int $groupId
    *
-   * return null
+   * @return null
    */
   public function edit($groupId = NULL) {
     $this->assign('edit', $this->_edit);
@@ -132,7 +132,7 @@ class CRM_Contact_Page_View_UserDashBoard_GroupContact extends CRM_Contact_Page_
    * the main function that is called when the page loads,
    * it decides the which action has to be taken for the page.
    *
-   * return null
+   * @return null
    */
   public function run() {
     $this->edit();

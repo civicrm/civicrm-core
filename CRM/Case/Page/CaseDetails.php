@@ -38,7 +38,7 @@ class CRM_Case_Page_CaseDetails extends CRM_Core_Page {
    * the main function that is called when the page loads,
    * it decides the which action has to be taken for the page.
    *
-   * return null
+   * @return null
    */
   public function run() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');

@@ -330,13 +330,12 @@ class CRM_Contribute_Form_AdditionalInfo {
   /**
    * Send email receipt.
    *
-   * @form object  of Contribution form.
-   *
    * @param CRM_Core_Form $form
+   *   instance of Contribution form.
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   * @$ccContribution boolen,  is it credit card contribution.
    * @param bool $ccContribution
+   *   is it credit card contribution.
    *
    * @return array
    */

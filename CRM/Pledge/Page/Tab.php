@@ -39,7 +39,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   /**
    * called when action is browse
    *
-   * return null
+   * @return null
    */
   public function browse() {
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_Search', ts('Pledges'), $this->_action);
@@ -66,7 +66,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   /**
    * called when action is view
    *
-   * return null
+   * @return null
    */
   public function view() {
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_PledgeView',
@@ -83,7 +83,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   /**
    * called when action is update or new
    *
-   * return null
+   * @return null
    */
   public function edit() {
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_Pledge',
@@ -125,7 +125,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   /**
    * the main function that is called when the page loads, it decides the which action has to be taken for the page.
    *
-   * return null
+   * @return null
    */
   public function run() {
     $this->preProcess();
