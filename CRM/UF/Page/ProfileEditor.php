@@ -229,7 +229,8 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
       if (in_array($fieldName, $locationFields)) {
         $result['schema'][$fieldName]['civiIsLocation'] = TRUE;
       }
-      if (in_array($fieldName, array('phone', 'phone_and_ext'))) { // FIXME what about phone_ext?
+      if (in_array($fieldName, array('phone', 'phone_and_ext'))) {
+        // FIXME what about phone_ext?
         $result['schema'][$fieldName]['civiIsPhone'] = TRUE;
       }
     }
