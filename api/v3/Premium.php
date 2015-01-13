@@ -45,7 +45,6 @@
  * @throws API_Exception
  * @return array
  *   Array of newly created premium property values.
- * @access public
  */
 function civicrm_api3_premium_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -62,7 +61,6 @@ function civicrm_api3_premium_create($params) {
  *
  * @return array
  *   Array of retrieved premium property values.
- * @access public
  */
 function civicrm_api3_premium_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -80,7 +78,6 @@ function civicrm_api3_premium_get($params) {
  * @throws API_Exception
  * @return array
  *   Array of deleted values.
- * @access public
  */
 function civicrm_api3_premium_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

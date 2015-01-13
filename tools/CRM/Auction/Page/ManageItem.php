@@ -30,10 +30,8 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
-require_once 'CRM/Core/Page.php';
 
 /**
  * Page for displaying list of auctions
@@ -51,7 +49,6 @@ class CRM_Auction_Page_ManageItem extends CRM_Core_Page {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_actionLinks = NULL;
 
@@ -113,8 +110,6 @@ class CRM_Auction_Page_ManageItem extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
-   *
    */
   function run() {
     // get the requested action
@@ -175,10 +170,7 @@ class CRM_Auction_Page_ManageItem extends CRM_Core_Page {
   /**
    * Browse all auctions
    *
-   *
    * @return void
-   * @access public
-   * @static
    */
   function browse() {
     $this->assign('newItemURL', CRM_Utils_System::url('civicrm/auction/item/add',
@@ -274,7 +266,6 @@ class CRM_Auction_Page_ManageItem extends CRM_Core_Page {
    * all the fields in the event wizard
    *
    * @return void
-   * @access public
    */
   function copy() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE, 0, 'GET');

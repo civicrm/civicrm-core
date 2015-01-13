@@ -33,8 +33,6 @@
  *
  */
 
-require_once 'CRM/Core/Page.php';
-
 /**
  * Page for displaying list of auctions
  */
@@ -44,7 +42,6 @@ class CRM_Auction_Page_Manage extends CRM_Core_Page {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_actionLinks = NULL;
 
@@ -119,8 +116,6 @@ class CRM_Auction_Page_Manage extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
-   *
    */
   function run() {
     // get the requested action
@@ -179,10 +174,7 @@ class CRM_Auction_Page_Manage extends CRM_Core_Page {
   /**
    * Browse all auctions
    *
-   *
    * @return void
-   * @access public
-   * @static
    */
   function browse() {
 
@@ -251,6 +243,9 @@ ORDER BY start_date desc
     $this->assign('rows', $auctions);
   }
 
+  /**
+   *
+   */
   function search() {
     $form = new CRM_Core_Controller_Simple('CRM_Auction_Form_SearchAuction',
       ts('Search Items'), CRM_Core_Action::ADD
@@ -353,4 +348,3 @@ SELECT count(id)
     $this->assign('aToZ', $aToZBar);
   }
 }
-

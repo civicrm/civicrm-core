@@ -44,10 +44,7 @@ class CRM_Auction_Form_SearchItem extends CRM_Core_Form {
    * This virtual function is used to set the default values of
    * various form elements
    *
-   * access        public
-   *
    * @return array reference to the array of default values
-   *
    */
   function setDefaultValues() {
     $defaults = array();
@@ -58,9 +55,6 @@ class CRM_Auction_Form_SearchItem extends CRM_Core_Form {
 
   /**
    * Build the form object
-   *
-   * @access public
-   *
    * @return void
    */
   public function buildQuickForm() {
@@ -82,6 +76,9 @@ class CRM_Auction_Form_SearchItem extends CRM_Core_Form {
       ));
   }
 
+  /**
+   *
+   */
   function postProcess() {
     $params = $this->controller->exportValues($this->_name);
     $parent = $this->controller->getParent();

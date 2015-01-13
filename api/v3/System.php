@@ -44,11 +44,7 @@
  *                          - triggers: bool, whether to drop/create SQL triggers; default: FALSE
  *                          - session:  bool, whether to reset the CiviCRM session data; defaul: FALSE
  *
- * @return boolean
- *   true if success, else false
- * @access public
- * @example SystemFlush.php
- *
+ * @return array
  */
 function civicrm_api3_system_flush($params) {
   CRM_Core_Invoke::rebuildMenuAndCaches(
@@ -163,7 +159,8 @@ function _civicrm_api3_system_log_spec(&$params) {
 /**
  * System.Get API
  *
- * @param arary $params
+ * @param array $params
+ * @return array
  */
 function civicrm_api3_system_get($params) {
   $returnValues = array(

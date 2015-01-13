@@ -49,7 +49,6 @@
  *
  * @return array
  *   API result Array.
- * @access public
  */
 function civicrm_api3_event_create($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array('event_type_id', 'template_id'));
@@ -96,15 +95,10 @@ function _civicrm_api3_event_create_legacy_support_42(&$params) {
 /**
  * Get Event record.
  *
- *
  * @param array $params
- *   An associative array of name/value property values of civicrm_event.
- * {@getfields event_get}
  *
  * @return array
  *   Array of all found event property values.
- * @access public
- *
  */
 function civicrm_api3_event_get($params) {
 
@@ -191,10 +185,6 @@ function _civicrm_api3_event_get_legacy_support_42(&$event, $event_id) {
  *
  * @param array $params
  * @return array
- *
- * @access public
- *   note API has legacy support for 'event_id'
- *  {@getfields event_delete}
  */
 function civicrm_api3_event_delete($params) {
   return CRM_Event_BAO_Event::del($params['id']) ? civicrm_api3_create_success() : civicrm_api3_create_error(ts('Error while deleting event'));

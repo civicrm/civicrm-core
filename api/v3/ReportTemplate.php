@@ -13,7 +13,6 @@
  * @return array
  *   details of found Option Values
  * {@getfields OptionValue_get}
- * @access public
  */
 function civicrm_api3_report_template_get($params) {
   require_once 'api/v3/OptionValue.php';
@@ -35,7 +34,6 @@ function civicrm_api3_report_template_get($params) {
  * @return array
  *   Array of newly created option_value property values.
  * {@getfields OptionValue_create}
- * @access public
  */
 function civicrm_api3_report_template_create($params) {
   require_once 'api/v3/OptionValue.php';
@@ -77,7 +75,6 @@ function _civicrm_api3_report_template_create_spec(&$params) {
  * @return array
  *   Api result
  * {@getfields ReportTemplate_create}
- * @access public
  */
 function civicrm_api3_report_template_delete($params) {
   require_once 'api/v3/OptionValue.php';
@@ -92,7 +89,6 @@ function civicrm_api3_report_template_delete($params) {
  *
  * @return array
  *   details of found instances
- * @access public
  */
 function civicrm_api3_report_template_getrows($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array('report_id', 'instance_id'));
@@ -170,7 +166,6 @@ function civicrm_api3_report_template_getstatistics($params) {
  *
  * @return array
  *   details of found instances
- * @access public
  */
 function _civicrm_api3_report_template_getrows_spec(&$params) {
   $params['report_id'] = array(

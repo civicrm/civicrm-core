@@ -439,7 +439,7 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
  *  others that use the query object. Note that this function passes permission information in.
  *  The others don't
  *
- * * Ideally this would be merged with _civicrm_get_query_object but we need to resolve differences in what the
+ * Ideally this would be merged with _civicrm_get_query_object but we need to resolve differences in what the
  * 2 variants call
  * @param $entity
  * @param array $params
@@ -542,8 +542,7 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
  * @param array $params
  * @param string $mode
  * @param string $entity
- * @return CRM_Core_DAO
- *   query object
+ * @return array(CRM_Core_DAO|CRM_Contact_BAO_Query)
  */
 function _civicrm_api3_get_query_object($params, $mode, $entity) {
   $options          = _civicrm_api3_get_options_from_params($params, TRUE, $entity, 'get');
@@ -873,7 +872,6 @@ function _civicrm_api3_get_unique_name_array(&$bao) {
  *
  * @return array
  *
- * @access public
  */
 function _civicrm_api3_dao_to_array($dao, $params = NULL, $uniqueFields = TRUE, $entity = "", $autoFind = TRUE) {
   $result = array();
@@ -945,7 +943,6 @@ function _civicrm_api3_custom_fields_are_required($entity, $params) {
  * @param array|bool $uniqueFields
  *
  * @return array
- * @access public
  */
 function _civicrm_api3_object_to_array(&$dao, &$values, $uniqueFields = FALSE) {
 
@@ -1137,7 +1134,6 @@ function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
  * @return bool
  *   Sshould the missing fields be returned as an array (core error created as default)
  *   true if all fields present, depending on $result a core error is created of an array of missing fields is returned
- * @access public
  */
 function _civicrm_api3_check_required_fields($params, $daoName, $return = FALSE) {
   //@deprecated - see notes

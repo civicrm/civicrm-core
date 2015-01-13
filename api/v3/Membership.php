@@ -47,7 +47,6 @@
  * @return array
  *   api result
  * {@getfields membership_delete}
- * @access public
  */
 function civicrm_api3_membership_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -65,7 +64,6 @@ function civicrm_api3_membership_delete($params) {
  * @return array
  *   Array of newly created membership property values.
  * {@getfields membership_create}
- * @access public
  */
 function civicrm_api3_membership_create($params) {
   // check params for membership id during update
@@ -190,9 +188,6 @@ function _civicrm_api3_membership_get_spec(&$params) {
  *
  * @return array
  *   Array of all found membership property values.
- * @access public
- * @todo needs some love - basically only a get for a given contact right now
- * {@getfields membership_get}
  */
 function civicrm_api3_membership_get($params) {
   $activeOnly = $membershipTypeId = $membershipType = NULL;

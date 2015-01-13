@@ -87,7 +87,6 @@ function _civicrm_api3_action_schedule_create_spec(&$params) {
  * @return array
  *   API result array
  *
- * @access public
  */
 function civicrm_api3_action_schedule_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

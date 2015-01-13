@@ -47,7 +47,6 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
@@ -55,7 +54,6 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
    * mode of operation: live or test
    *
    * @var object
-   * @static
    */
   static protected $_mode = NULL;
 
@@ -81,7 +79,6 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
    *
    * @param object $paymentProcessor
    * @return object
-   * @static
    */
   static
   function &singleton($mode, &$paymentProcessor) {
@@ -139,7 +136,6 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
    * @param $component
    * @throws Exception
    * @return void
-   * @access public
    */
   function doTransferCheckout(&$params, $component) {
     $component = strtolower($component);

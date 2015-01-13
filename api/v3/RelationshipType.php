@@ -43,9 +43,6 @@
  *   Associative array of property name/value pairs to insert in new relationship type.
  *
  * @return array
- * {@getfields RelationshipType_create}
- * @access public
- * {@schema Contact/RelationshipType.xml}
  */
 function civicrm_api3_relationship_type_create($params) {
 
@@ -113,7 +110,6 @@ function civicrm_api3_relationship_type_get($params) {
  * @return array
  *   API Result Array
  * {@getfields RelationshipType_delete}
- * @access public
  */
 function civicrm_api3_relationship_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

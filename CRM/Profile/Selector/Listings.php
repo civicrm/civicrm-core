@@ -138,7 +138,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * @param bool $linkToUF
    *
    * @return \CRM_Profile_Selector_Listings
-   * @access public
    */
   function __construct(
     &$params,

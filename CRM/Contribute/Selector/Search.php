@@ -162,7 +162,6 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
    * @param null $compContext
    *
    * @return \CRM_Contribute_Selector_Search
-   * @access public
    */
   function __construct(
     &$queryParams,

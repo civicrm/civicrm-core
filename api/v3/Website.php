@@ -47,7 +47,6 @@
  *
  * @return array
  *   Array of newly created website property values.
- * @access public
  * @todo convert to using basic create - BAO function non-std
  */
 function civicrm_api3_website_create($params) {
@@ -72,16 +71,12 @@ function _civicrm_api3_website_create_spec(&$params) {
 
 /**
  * Deletes an existing Website
- *
+ * @todo convert to using Basic delete - BAO function non standard
  * @param array $params
  * {@getfields website_delete}
  * @return array
  *   API result
  * @throws \API_Exception
- * @example WebsiteDelete.php Std Delete Example
- *
- * @access public
- * @todo convert to using Basic delete - BAO function non standard
  */
 function civicrm_api3_website_delete($params) {
   //DO NOT USE THIS FUNCTION AS THE BASIS FOR A NEW API http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
@@ -113,7 +108,6 @@ function civicrm_api3_website_delete($params) {
  * @return array
  *   details of found websites
  *
- * @access public
  */
 function civicrm_api3_website_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'website');

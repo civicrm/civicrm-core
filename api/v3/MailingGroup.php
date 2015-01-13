@@ -94,6 +94,11 @@ function civicrm_api3_mailing_group_event_subscribe($params) {
   return civicrm_api('mailing_event_subscribe', 'create', $params);
 }
 
+/**
+ * @param array $params
+ * @return array
+ * @throws \API_Exception
+ */
 function civicrm_api3_mailing_group_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
@@ -107,10 +112,19 @@ function civicrm_api3_mailing_group_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
-function civicrm_api3_mailing_group_delete($params, $ids = array()) {
+/**
+ * @param array $params
+ * @return array
+ * @throws \API_Exception
+ */
+function civicrm_api3_mailing_group_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+/**
+ * @param array $params
+ * @return array
+ */
 function civicrm_api3_mailing_group_getfields($params) {
   $dao = _civicrm_api3_get_DAO('Subscribe');
   $d = new $dao();

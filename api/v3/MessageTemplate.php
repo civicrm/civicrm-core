@@ -32,7 +32,6 @@
  */
 
 /**
- * @access public
  * @param array $params
  * @return array
  * @throws \API_Exception
@@ -63,7 +62,6 @@ function _civicrm_api3_message_template_create_spec(&$params) {
  * @return boolean
  *   | error  true if successfull, error otherwise
  * {@getfields message_template_delete}
- * @access public
  */
 function civicrm_api3_message_template_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -78,18 +76,11 @@ function _civicrm_api3_message_template_get_spec(&$params) {
 /**
  * Retrieve one or more message_template
  *
- * @param array input parameters
- *
- *
- * @example SepaCreditorGet.php Standard Get Example
- *
  * @param array $params
  *   An associative array of name/value pairs.
  *
  * @return array
  *   api result array
- * {@getfields message_template_get}
- * @access public
  */
 function civicrm_api3_message_template_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);

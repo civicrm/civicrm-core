@@ -770,7 +770,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    *
    * @return mixed|null
    *   $results no of deleted Contribution on success, false otherwise
-   * @access public
    */
   public static function deleteContribution($id) {
     CRM_Utils_Hook::pre('delete', 'Contribution', $id, CRM_Core_DAO::$_nullArray);

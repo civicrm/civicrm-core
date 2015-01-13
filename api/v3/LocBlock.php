@@ -45,7 +45,6 @@
  * @return array
  *   api result array
  * {@getfields loc_block_create}
- * @access public
  */
 function civicrm_api3_loc_block_create($params) {
   $entities = array();
@@ -97,7 +96,6 @@ function civicrm_api3_loc_block_create($params) {
  * @return array
  *   Array of matching loc_blocks
  * {@getfields loc_block_get}
- * @access public
  */
 function civicrm_api3_loc_block_get($params) {
   $options = _civicrm_api3_get_options_from_params($params);
@@ -136,7 +134,6 @@ function civicrm_api3_loc_block_get($params) {
  * @return array
  *   API result array
  * {@getfields loc_block_delete}
- * @access public
  */
 function civicrm_api3_loc_block_delete($params) {
   return _civicrm_api3_basic_delete('CRM_Core_DAO_LocBlock', $params);

@@ -43,14 +43,12 @@ function _civicrm_api3_survey_respondant_deprecation() {
 
 /**
  * Get the list of signatories
- *
+ * @deprecated - api currently not supported
  * @param array $params
  *   (reference ) input parameters.
  *
  * @return array
- *   (reference )        contribution_id of created or updated record
- * @access public
- * @deprecated - api currently not supported
+ *  contribution_id of created or updated record
  */
 function civicrm_api3_survey_respondant_get(&$params) {
 

@@ -40,12 +40,12 @@
  * Handle a create event.
  *
  * @param array $params
- * @param array $ids
- *
- * @return array
- *   API Success Array
+ * @return array API Success Array
+ * API Success Array
+ * @throws \API_Exception
+ * @throws \Civi\API\Exception\UnauthorizedException
  */
-function civicrm_api3_mailing_create($params, $ids = array()) {
+function civicrm_api3_mailing_create($params) {
   if (CRM_Mailing_Info::workflowEnabled()) {
     if (!CRM_Core_Permission::check('create mailings')) {
       throw new \Civi\API\Exception\UnauthorizedException("This system uses advanced CiviMail workflows which require additional permissions");
@@ -64,6 +64,11 @@ function civicrm_api3_mailing_create($params, $ids = array()) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+/**
+ * @param array $params
+ * @return array
+ * @throws \API_Exception
+ */
 function civicrm_api3_mailing_get_token($params) {
   if (!array_key_exists("usage", $params)) {
     throw new API_Exception('Mandatory keys missing from params array: entity');
@@ -128,6 +133,9 @@ function civicrm_api3_mailing_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+/**
+ * @param array $spec
+ */
 function _civicrm_api3_mailing_submit_spec(&$spec) {
   $mailingFields = CRM_Mailing_DAO_Mailing::fields();
   $spec['id'] = $mailingFields['id'];
@@ -381,6 +389,11 @@ function civicrm_api3_mailing_event_open($params) {
   return civicrm_api3_create_success($params);
 }
 
+/**
+ * @param array $params
+ * @return array
+ * @throws \API_Exception
+ */
 function civicrm_api3_mailing_preview($params) {
   civicrm_api3_verify_mandatory($params,
     'CRM_Mailing_DAO_Mailing',
@@ -425,11 +438,20 @@ function civicrm_api3_mailing_preview($params) {
   ));
 }
 
+/**
+ * @param array $spec
+ */
 function _civicrm_api3_mailing_send_test_spec(&$spec) {
   $spec['test_group']['title'] = 'Test Group ID';
   $spec['test_email']['title'] = 'Test Email Address';
 }
 
+/**
+ * @param array $params
+ * @return array
+ * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
+ */
 function civicrm_api3_mailing_send_test($params) {
   if (!array_key_exists('test_group', $params) && !array_key_exists('test_email', $params)) {
     throw new API_Exception("Mandatory key(s) missing from params array: test_group and/or test_email field are required");
@@ -525,6 +547,11 @@ function _civicrm_api3_mailing_stats_spec(&$params) {
   $params['date']['title'] = 'Date';
 }
 
+/**
+ * @param array $params
+ * @return array
+ * @throws \API_Exception
+ */
 function civicrm_api3_mailing_stats($params) {
   civicrm_api3_verify_mandatory($params,
     'CRM_Mailing_DAO_MailingJob',

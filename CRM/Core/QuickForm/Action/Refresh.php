@@ -42,7 +42,6 @@ class CRM_Core_QuickForm_Action_Refresh extends CRM_Core_QuickForm_Action {
    *   Reference to state machine object.
    *
    * @return \CRM_Core_QuickForm_Action_Refresh
-   * @access public
    */
   public function __construct(&$stateMachine) {
     parent::__construct($stateMachine);

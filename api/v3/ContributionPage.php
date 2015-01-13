@@ -45,7 +45,6 @@
  * @return array
  *   api result array
  * {@getfields contribution_page_create}
- * @access public
  */
 function civicrm_api3_contribution_page_create($params) {
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -76,7 +75,6 @@ function _civicrm_api3_contribution_page_create_spec(&$params) {
  * @return array
  *   API Result array Array of matching contribution_pages
  * {@getfields contribution_page_get}
- * @access public
  */
 function civicrm_api3_contribution_page_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -95,7 +93,6 @@ function civicrm_api3_contribution_page_get($params) {
  * @return array
  *   API result Array
  * {@getfields contribution_page_delete}
- * @access public
  */
 function civicrm_api3_contribution_page_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -114,7 +111,6 @@ function civicrm_api3_contribution_page_delete($params) {
  * @return array
  *   API result array
  * {@getfields contribution_page_delete}
- * @access public
  */
 function civicrm_api3_contribution_page_submit($params) {
   $result = CRM_Contribute_Form_Contribution_Confirm::submit($params);

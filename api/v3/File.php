@@ -49,7 +49,6 @@
  *
  * @return array
  *   Array of newly created file property values.
- * @access public
  */
 function civicrm_api3_file_create($params) {
 
@@ -87,7 +86,6 @@ function civicrm_api3_file_create($params) {
  *
  * @return array
  *   Array of all found file object property values.
- * @access public
  */
 function civicrm_api3_file_get($params) {
   civicrm_api3_verify_one_mandatory($params);
@@ -133,7 +131,6 @@ function civicrm_api3_file_update($params) {
  *
  * @return array
  *   API result array
- * @access public
  */
 function civicrm_api3_file_delete($params) {
 
