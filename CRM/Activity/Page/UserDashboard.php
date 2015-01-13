@@ -41,7 +41,7 @@ class CRM_Activity_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoar
   /**
    * List participations for the UF user
    *
-   * return null
+   * @return null
    */
   public function listActivities() {
 
@@ -68,7 +68,7 @@ class CRM_Activity_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoar
    * the main function that is called when the page
    * loads, it decides the which action has to be taken for the page.
    *
-   * return null
+   * @return null
    */
   public function run() {
     parent::preProcess();

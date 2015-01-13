@@ -184,7 +184,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_SetEntity extends CRM_Core_DAO {
   /**
    * returns the list of fields that can be imported
    *
-   * return array
+   * @return array
    */
   static function &import($prefix = FALSE) {
     if (!(self::$_import)) {
@@ -207,7 +207,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_SetEntity extends CRM_Core_DAO {
   /**
    * returns the list of fields that can be exported
    *
-   * return array
+   * @return array
    */
   static function &export($prefix = FALSE) {
     if (!(self::$_export)) {

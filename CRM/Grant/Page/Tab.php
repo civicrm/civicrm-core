@@ -51,7 +51,7 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
   /**
    * called when action is browse
    *
-   * return null
+   * @return null
    */
   function browse() {
     $controller = new CRM_Core_Controller_Simple('CRM_Grant_Form_Search', ts('Grants'), $this->_action);
@@ -72,7 +72,7 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
   /**
    * called when action is view
    *
-   * return null
+   * @return null
    */
   public function view() {
     $controller = new CRM_Core_Controller_Simple('CRM_Grant_Form_GrantView', 'View Grant', $this->_action);
@@ -86,7 +86,7 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
   /**
    * called when action is update or new
    *
-   * return null
+   * @return null
    */
   public function edit() {
     $controller = new CRM_Core_Controller_Simple('CRM_Grant_Form_Grant', 'Create grant', $this->_action);
@@ -132,7 +132,7 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
    * the main function that is called when the page loads,
    * it decides the which action has to be taken for the page.
    *
-   * return null
+   * @return null
    */
   public function run() {
     $this->preProcess();
