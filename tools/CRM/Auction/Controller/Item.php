@@ -51,6 +51,9 @@ class CRM_Auction_Controller_Item extends CRM_Core_Controller {
 
   /**
    * class constructor
+   * @param null $title
+   * @param bool|int $action
+   * @param bool $modal
    */
   function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
     require_once 'CRM/Auction/StateMachine/Item.php';
