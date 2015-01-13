@@ -304,6 +304,9 @@ function civicrm_api3_contribution_transact($params) {
     $params['invoiceID'] = $params['invoice_id'];
   }
 
+  // Some payment processors expect a unique invoice_id - generate one if not supplied
+  $params['invoice_id'] = CRM_Utils_Array::value('invoice_id', $params, md5(uniqid(rand(), TRUE)));
+
   $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($params['payment_processor'], $params['payment_processor_mode']);
   if (civicrm_error($paymentProcessor)) {
     return $paymentProcessor;
