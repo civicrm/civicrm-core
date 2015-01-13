@@ -86,7 +86,7 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
    * @param int $tableID
    * @param int $userID
    */
-  static function register(
+  public static function register(
     $contactID,
     $tableName,
     $tableID,
