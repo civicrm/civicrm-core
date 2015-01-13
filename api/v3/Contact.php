@@ -401,8 +401,7 @@ function _civicrm_api3_contact_check_params(&$params, $dupeCheck = TRUE, $dupeEr
  * @param int $contactID
  *   If present the contact with that ID is updated.
  *
- * @return CRM_Contact_BAO_Contact
- * @access public
+ * @return CRM_Contact_BAO_Contact|CRM_Core_Error
  */
 function _civicrm_api3_contact_update($params, $contactID = NULL) {
   //@todo - doesn't contact create support 'id' which is already set- check & remove

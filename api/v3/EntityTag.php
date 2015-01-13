@@ -120,7 +120,6 @@ function _civicrm_api3_entity_tag_delete_spec(&$params) {
 function _civicrm_api3_entity_tag_common($params, $op = 'add') {
 
   $entityIDs   = array();
-  $tagsIDs     = array();
   $entityTable = 'civicrm_contact';
   if (is_array($params)) {
     foreach ($params as $n => $v) {

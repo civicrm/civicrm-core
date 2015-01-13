@@ -85,7 +85,6 @@ function civicrm_api3_address_create(&$params) {
     return civicrm_api3_create_error("Address is not created or updated ");
   }
   else {
-    $values = array();
     $values = _civicrm_api3_dao_to_array($addressBAO, $params);
     return civicrm_api3_create_success($values, $params, 'address', $addressBAO);
   }
