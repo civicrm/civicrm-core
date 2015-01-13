@@ -561,7 +561,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   /**
    * @param array $params
    *
-   * @return array
+   * @return array|void
    * @throws Exception
    */
   public function make_payment(&$params) {
