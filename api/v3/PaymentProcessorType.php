@@ -47,9 +47,6 @@
  *   Associative array of property name/value pairs to insert in new payment_processor type.
  *
  * @return array
- * {@getfields PaymentProcessorType_create}
- * @access public
- * {@schema Core/PaymentProcessorType.xml}
  */
 function civicrm_api3_payment_processor_type_create($params) {
   $ids = array();
@@ -85,11 +82,7 @@ function _civicrm_api3_payment_processor_type_create_spec(&$params) {
 }
 
 /**
- * get all payment_processor type
- * retruns  An array of PaymentProcessor_type
- * @access  public
- * {@getfields PaymentProcessorType_get}
- * @example PaymentProcessorTypeGet.php
+ * get all payment_processor types
  * @param array $params
  * @return array
  */
@@ -100,12 +93,10 @@ function civicrm_api3_payment_processor_type_get($params) {
 /**
  * Delete a payment_processor type delete
  *
- * @param id of payment_processor type $id
+ * @param array $params
  *
  * @return array
  *   API Result Array
- * {@getfields PaymentProcessorType_delete}
- * @access public
  */
 function civicrm_api3_payment_processor_type_delete($params) {
   if ($params['id'] != NULL && !CRM_Utils_Rule::integer($params['id'])) {

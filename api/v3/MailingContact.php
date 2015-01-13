@@ -44,8 +44,6 @@
  *
  * @return array
  *   API result
- * @access public
- *
  */
 function civicrm_api3_mailing_contact_get($params) {
   return civicrm_api3_create_success(_civicrm_api3_mailing_contact_getresults($params, FALSE));
@@ -279,9 +277,6 @@ INNER JOIN civicrm_mailing_event_bounce meb ON meb.event_queue_id = meq.id
  *
  * @return array
  *   API result
- * @access public
- * @example CRM/Mailing/BAO/Mailing.php
- *
  */
 function civicrm_api3_mailing_contact_getcount($params) {
   return _civicrm_api3_mailing_contact_getresults($params, TRUE);

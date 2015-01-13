@@ -34,7 +34,6 @@
  *
  */
 
-require_once 'CRM/Core/Form.php';
 
 /**
  * This class manages the auction form
@@ -43,7 +42,7 @@ require_once 'CRM/Core/Form.php';
 class CRM_Auction_Form_Auction extends CRM_Core_Form {
 
   /**
-   * the id of the auction we are proceessing
+   * the id of the auction we are processsing
    *
    * @var int
    */
@@ -59,7 +58,6 @@ class CRM_Auction_Form_Auction extends CRM_Core_Form {
    * set variables up before form is built
    *
    * @return void
-   * @access public
    */
   function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
@@ -83,13 +81,9 @@ class CRM_Auction_Form_Auction extends CRM_Core_Form {
   /**
    * Set default values for the form.
    * the default values are retrieved from the database
-   *
-   * @access public
-   *
-   * @return None
+   * @return array
    */
   function setDefaultValues() {
-    require_once 'CRM/Auction/BAO/Auction.php';
 
     $defaults = array();
 
@@ -107,8 +101,7 @@ class CRM_Auction_Form_Auction extends CRM_Core_Form {
   /**
    * Build the form object
    *
-   * @return None
-   * @access public
+   * @return array
    */
   public function buildQuickForm() {
     $this->applyFilter('__ALL__', 'trim');
@@ -211,14 +204,9 @@ class CRM_Auction_Form_Auction extends CRM_Core_Form {
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
    * @param $self
-   *
-   *
    * @return true if no errors, else array of errors
-   * @access public
-   * @static
    */
-  static
-  function formRule($fields, $files, $self) {
+  static function formRule($fields, $files, $self) {
     $errors = array();
 
     // add rules to validate dates and overlap
@@ -227,10 +215,6 @@ class CRM_Auction_Form_Auction extends CRM_Core_Form {
 
   /**
    * Process the form submission
-   *
-   * @access public
-   *
-   * @return None
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::VIEW) {

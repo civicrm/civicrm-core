@@ -36,7 +36,6 @@
 /**
  * Save an acl
  *
- * Allowed @params array keys are:
  * {@getfields acl_create}
  * @example aclCreate.php
  *
@@ -44,7 +43,6 @@
  *
  * @return array
  *   Array of newly created acl property values.
- * @access public
  */
 function civicrm_api3_acl_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -53,7 +51,6 @@ function civicrm_api3_acl_create($params) {
 /**
  * Get an acl
  *
- * Allowed @params array keys are:
  * {@getfields acl_get}
  * @example aclCreate.php
  *
@@ -61,7 +58,6 @@ function civicrm_api3_acl_create($params) {
  *
  * @return array
  *   Array of retrieved acl property values.
- * @access public
  */
 function civicrm_api3_acl_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -70,7 +66,6 @@ function civicrm_api3_acl_get($params) {
 /**
  * Delete an acl
  *
- * Allowed @params array keys are:
  * {@getfields acl_delete}
  * @example aclCreate.php
  *
@@ -78,7 +73,6 @@ function civicrm_api3_acl_get($params) {
  *
  * @return array
  *   Array of deleted values.
- * @access public
  */
 function civicrm_api3_acl_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

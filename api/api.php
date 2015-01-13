@@ -91,7 +91,6 @@ function _civicrm_api3_api_getfields(&$apiRequest) {
  *
  * @return boolean
  *   true if error, false otherwise
- * @access public
  */
 function civicrm_error($result) {
   if (is_array($result)) {

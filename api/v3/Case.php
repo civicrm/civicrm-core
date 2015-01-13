@@ -58,9 +58,6 @@
  * @throws API_Exception
  * @return array
  *   api result array
- *
- * @access public
- * {@getfields case_create}
  */
 function civicrm_api3_case_create($params) {
 
@@ -193,13 +190,10 @@ function _civicrm_api3_case_delete_spec(&$params) {
  * 'activity_id' => returns the case containing a specific activity
  * 'contact_id' => finds all cases associated with a contact (in any role, not just client)
  *
- * {@getfields case_get}
  *
  * @throws API_Exception
  * @return array
  *   (get mode, case_id provided): Array with case details, case roles, case activity ids, (search mode, case_id not provided): Array of cases found
- * @access public
- * @todo Erik Hommel 16 dec 2010 check if all DB fields are returned
  */
 function civicrm_api3_case_get($params) {
   $options = _civicrm_api3_get_options_from_params($params);
@@ -311,7 +305,6 @@ function _civicrm_api3_case_deprecation() {
  * @return array
  *   api result array
  *
- * @access public
  */
 function civicrm_api3_case_update($params) {
   //check parameters
@@ -377,8 +370,6 @@ function civicrm_api3_case_update($params) {
  * @throws API_Exception
  * @return boolean
  *   true if success, else false
- * {@getfields case_delete}
- * @access public
  */
 function civicrm_api3_case_delete($params) {
   //check parameters

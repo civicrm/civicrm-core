@@ -23,7 +23,6 @@ function civicrm_api3_option_group_get($params) {
  * @return array
  *   survey array
  *
- * @access public
  */
 function civicrm_api3_option_group_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -54,7 +53,6 @@ function _civicrm_api3_option_group_create_spec(&$params) {
  *   API Result Array
  *                message otherwise
  * {@getfields OptionGroup_delete}
- * @access public
  */
 function civicrm_api3_option_group_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

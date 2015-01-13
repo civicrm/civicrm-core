@@ -44,8 +44,6 @@
  *
  * @return array
  *   newly created or updated membership type property values.
- * @access public
- * {getfields MembershipBlock_get}
  */
 function civicrm_api3_membership_block_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -75,7 +73,6 @@ function _civicrm_api3_membership_block_create_spec(&$params) {
  *
  * @return array
  *   api result array of all found membership block property values.
- * @access public
  */
 function civicrm_api3_membership_block_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -91,8 +88,6 @@ function civicrm_api3_membership_block_get($params) {
  *
  * @return array
  *   api result array
- * @access public
- * {getfields MembershipBlock_delete}
  */
 function civicrm_api3_membership_block_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

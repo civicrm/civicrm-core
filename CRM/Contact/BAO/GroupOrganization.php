@@ -143,7 +143,6 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    *
    * @return int|null
    *   no of deleted group organization on success, false otherwise
-   * @access public
    */
   public static function deleteGroupOrganization($groupOrganizationID) {
     $results = NULL;

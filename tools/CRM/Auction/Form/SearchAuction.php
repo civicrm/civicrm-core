@@ -65,9 +65,6 @@ class CRM_Auction_Form_SearchAuction extends CRM_Core_Form {
 
   /**
    * Build the form object
-   *
-   * @access public
-   *
    * @return void
    */
   public function buildQuickForm() {

@@ -46,10 +46,6 @@
  *
  * @return array
  *   Newly created $ufFieldArray
- *
- * @access public
- * {@getfields UFField_create}
- * @example UFFieldCreate.php
  */
 function civicrm_api3_uf_field_create($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array('field_name', 'uf_group_id'));
@@ -140,7 +136,6 @@ function _civicrm_api3_uf_field_create_spec(&$params) {
  *   (reference) Array
  * {@getfields UFField_get
  * @example UFFieldGet.php
- * @access public
  */
 function civicrm_api3_uf_field_get($params) {
   return _civicrm_api3_basic_get('CRM_Core_BAO_UFField', $params);
@@ -154,10 +149,6 @@ function civicrm_api3_uf_field_get($params) {
  * @throws API_Exception
  *
  * @return array
- *
- * @access public
- * {@getfields UFField_delete}
- * @example UFFieldDelete.php
  */
 function civicrm_api3_uf_field_delete($params) {
   $fieldId = $params['id'];

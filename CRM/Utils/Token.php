@@ -861,7 +861,6 @@ class CRM_Utils_Token {
    * @param $str ref to the string that will be scanned and modified
    * @return void
    *   this function works directly on the string that is passed
-   * @access public
    */
   public static function unescapeTokens(&$str) {
     $str = preg_replace('/\\\\|\{(\{\w+\.\w+\})\}/', '\\1', $str);
@@ -1093,7 +1092,6 @@ class CRM_Utils_Token {
    *
    * @return array
    *   array of tokens mentioned in field
-   * @access public
    */
   public static function getTokens($string) {
     $matches = array();

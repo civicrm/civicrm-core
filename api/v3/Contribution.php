@@ -45,9 +45,6 @@
  * @throws API_Exception
  * @return array
  *   Api result array
- * @access public
- * @example ContributionCreate.php
- * {@getfields Contribution_create}
  */
 function civicrm_api3_contribution_create(&$params) {
   $values = array();
@@ -178,9 +175,6 @@ function _civicrm_api3_contribution_create_legacy_support_45(&$params) {
  *
  * @return boolean
  *   true if success, else false
- * @access public
- * {@getfields Contribution_delete}
- * @example ContributionDelete.php
  */
 function civicrm_api3_contribution_delete($params) {
 
@@ -209,9 +203,6 @@ function _civicrm_api3_contribution_delete_spec(&$params) {
  *
  * @return array
  *   Array of contributions, if error an array with an error id and error message
- * @access public
- * {@getfields Contribution_get}
- * @example ContributionGet.php
  */
 function civicrm_api3_contribution_get($params) {
 
@@ -268,18 +259,13 @@ function _civicrm_api3_contribution_get_spec(&$params) {
  * convert it into the same format that we use in QF and BAO object
  *
  * @param array $params
- *   Associative array of property name/value.
- *   pairs to insert in new contact.
+ *   property name/value  pairs to insert in new contact.
  * @param array $values
  *   The reformatted properties that we can use internally.
- * '
  *
- * @param bool $create
- *
- * @return array|CRM_Error
- * @access public
+ * @return array
  */
-function _civicrm_api3_contribute_format_params($params, &$values, $create = FALSE) {
+function _civicrm_api3_contribute_format_params($params, &$values) {
   //legacy way of formatting from v2 api - v3 way is to define metadata & do it in the api layer
   _civicrm_api3_filter_fields_for_bao('Contribution', $params, $values);
   return array();
@@ -305,9 +291,7 @@ function _civicrm_api3_contribution_transact_spec(&$params) {
  *   (reference ) input parameters.
  *
  * @return array
- *   (reference )        contribution of created or updated record (or a civicrm error)
- * @access public
- *
+ *   contribution of created or updated record (or a civicrm error)
  */
 function civicrm_api3_contribution_transact($params) {
   // Set some params specific to payment processing
@@ -355,12 +339,10 @@ function civicrm_api3_contribution_transact($params) {
  *
  * @param array $params
  *   Input parameters.
- * {@getfields Contribution_sendconfirmation}
  *
  * @throws Exception
  * @return array
  *   Api result array
- * @access public
  */
 function civicrm_api3_contribution_sendconfirmation($params) {
   $contribution = new CRM_Contribute_BAO_Contribution();
@@ -417,7 +399,6 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
  * @throws API_Exception
  * @return array
  *   Api result array
- * @access public
  */
 function civicrm_api3_contribution_completetransaction(&$params) {
 

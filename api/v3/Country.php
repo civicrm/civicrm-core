@@ -50,7 +50,6 @@ require_once 'CRM/Core/DAO/Country.php';
  * @return array
  *   API result array
  * @throws \API_Exception
- * @access public
  */
 function civicrm_api3_country_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_DAO(__FUNCTION__), $params);
@@ -77,7 +76,6 @@ function _civicrm_api3_country_create_spec(&$params) {
  * @return boolean
  *   | error  true if successfull, error otherwise
  * {@getfields country_delete}
- * @access public
  */
 function civicrm_api3_country_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_DAO(__FUNCTION__), $params);
@@ -97,7 +95,6 @@ function civicrm_api3_country_delete($params) {
  * @return array
  *   api result array
  * {@getfields country_get}
- * @access public
  */
 function civicrm_api3_country_get($params) {
 

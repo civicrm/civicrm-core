@@ -1587,7 +1587,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    *
    * @return array|void
    *   $activity object of newly creted activity via email
-   * @access public
    */
   public static function recordActivityViaEmail($file) {
     if (!file_exists($file) ||

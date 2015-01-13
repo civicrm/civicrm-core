@@ -408,7 +408,6 @@ class CRM_Contact_BAO_Query {
    * @param string $operator
    *
    * @return \CRM_Contact_BAO_Query
-   * @access public
    */
   function __construct(
     $params = NULL, $returnProperties = NULL, $fields = NULL,

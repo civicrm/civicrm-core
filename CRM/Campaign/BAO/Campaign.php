@@ -154,7 +154,6 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    *
    * @return mixed
    *   $campaigns a set of campaigns.
-   * @access public
    */
   public static function getCampaigns(
     $includeId = NULL,

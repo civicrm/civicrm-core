@@ -59,7 +59,6 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    *
    *
    * @return \CRM_Mailing_Selector_Browse
-   * @access public
    */
   public function __construct() {
   }

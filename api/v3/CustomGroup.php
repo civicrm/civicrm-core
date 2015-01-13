@@ -61,7 +61,6 @@
  *
  * @return array
  * @todo $params['extends'] is array format - is that std compatible
- * @access public
  */
 function civicrm_api3_custom_group_create($params) {
   if (isset($params['extends']) && is_string($params['extends'])) {
@@ -100,10 +99,7 @@ function _civicrm_api3_custom_group_create_spec(&$params) {
  *
  * @return Null
  *   if success
- * @access public
- * {@getfields CustomGroup_delete}
- * @example CustomGroupDelete.php
- **/
+ */
 function civicrm_api3_custom_group_delete($params) {
 
   $values = new CRM_Core_DAO_CustomGroup();
@@ -121,8 +117,7 @@ function civicrm_api3_custom_group_delete($params) {
  *   Array to search on.
  *
  * @return array
- * @access public
- * {@getfields CustomGroup_get}
+ * * {@getfields CustomGroup_get}
  * @example CustomGroupGet.php
  **/
 function civicrm_api3_custom_group_get($params) {

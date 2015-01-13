@@ -59,8 +59,6 @@ class CRM_Auction_Page_Item extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
-   *
    */
   function run() {
     // get the requested action
@@ -118,10 +116,7 @@ class CRM_Auction_Page_Item extends CRM_Core_Page {
   /**
    * Browse all auctions
    *
-   *
    * @return void
-   * @access public
-   * @static
    */
   function browse() {
     if ($this->_aid) {

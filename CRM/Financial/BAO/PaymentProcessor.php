@@ -311,7 +311,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
      * return $processors;
      * }
      * }
-     * */
+     */
     $retrievalParameters = array(
       'is_active' => TRUE,
       'options' => array('sort' => 'is_default DESC, name'),

@@ -48,7 +48,6 @@
  *   participant_status array
  * {@getfields ParticipantStatusType_create}
  * @example ParticipantStatusTypeCreate.php
- * @access public
  */
 function civicrm_api3_participant_status_type_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -66,7 +65,6 @@ function civicrm_api3_participant_status_type_create($params) {
  *   Array of matching participant_statuses
  * {@getfields ParticipantStatusType_get}
  * @example ParticipantStatusTypeGet.php
- * @access public
  */
 function civicrm_api3_participant_status_type_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -86,7 +84,6 @@ function civicrm_api3_participant_status_type_get($params) {
  *   api result array
  * {@getfields ParticipantStatusType_delete}
  * @example ParticipantStatusTypeDelete.php
- * @access public
  */
 function civicrm_api3_participant_status_type_delete($params) {
   if (CRM_Event_BAO_ParticipantStatusType::deleteParticipantStatusType($params['id'])) {

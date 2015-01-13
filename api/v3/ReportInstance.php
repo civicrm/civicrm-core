@@ -8,7 +8,6 @@
  *
  * @return array
  *   details of found instances
- * @access public
  */
 function civicrm_api3_report_instance_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -21,7 +20,6 @@ function civicrm_api3_report_instance_get($params) {
  *
  * @return array
  *   Array of newly created report instance property values.
- * @access public
  */
 function civicrm_api3_report_instance_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -46,7 +44,6 @@ function _civicrm_api3_report_instance_create_spec(&$params) {
  *
  * @return array
  *   Api result
- * @access public
  */
 function civicrm_api3_report_instance_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

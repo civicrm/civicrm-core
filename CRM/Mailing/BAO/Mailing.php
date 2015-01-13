@@ -2758,7 +2758,6 @@ SELECT  $mailing.id as mailing_id
    *
    * @return array
    *   array content/component.
-   * @access public
    */
   public static function getMailingContent(&$report, &$form, $isSMS = FALSE) {
     $htmlHeader = $textHeader = NULL;

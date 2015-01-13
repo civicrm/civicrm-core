@@ -44,7 +44,6 @@
  *
  * @return array
  *   Array of newly created IM property values.
- * @access public
  */
 function civicrm_api3_im_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -69,8 +68,6 @@ function _civicrm_api3_im_create_spec(&$params) {
  *
  * @return array
  *   API result Array
- * @access public
- * @todo convert to using Basic delete - BAO function non standard
  */
 function civicrm_api3_im_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -87,7 +84,6 @@ function civicrm_api3_im_delete($params) {
  * @return array
  *   details of found IM
  *
- * @access public
  */
 function civicrm_api3_im_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);

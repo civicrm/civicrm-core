@@ -47,7 +47,6 @@
  * @return array
  *   contact_type array
  *
- * @access public
  */
 function civicrm_api3_contact_type_create($params) {
   civicrm_api3_verify_mandatory($params, _civicrm_api3_get_DAO(__FUNCTION__), array('name', 'parent_id'));
@@ -75,7 +74,6 @@ function civicrm_api3_contact_type_create($params) {
  *
  * @return array
  *   Array of matching contact_types
- * @access public
  */
 function civicrm_api3_contact_type_get($params) {
   civicrm_api3_verify_mandatory($params);
@@ -95,7 +93,6 @@ function civicrm_api3_contact_type_get($params) {
  * @return array
  *   API Result Array
  *
- * @access public
  */
 function civicrm_api3_contact_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

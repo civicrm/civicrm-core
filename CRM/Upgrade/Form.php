@@ -91,7 +91,6 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    *   The name of the form if different from class name.
    *
    * @return \CRM_Core_Form
-   * @access public
    */
   /**
    * @param null|object $state

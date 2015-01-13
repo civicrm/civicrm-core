@@ -51,7 +51,6 @@ class CRM_Activity_BAO_ICalendar {
    *   Reference to an activity object.
    *
    * @return \CRM_Activity_BAO_ICalendar
-   * @access public
    */
   public function __construct(&$act) {
     $this->activity = $act;

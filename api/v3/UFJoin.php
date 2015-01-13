@@ -44,10 +44,6 @@
  *
  * @return array
  *   CRM_Core_DAO_UFJoin Array
- * @access public
- * @example UFJoinCreate.php
- *  {@getfields UFJoin_create}
- *
  */
 function civicrm_api3_uf_join_create($params) {
 
@@ -78,8 +74,6 @@ function _civicrm_api3_uf_join_create_spec(&$params) {
  * @return array
  *   CiviCRM Result Array or null
  * @todo Delete function missing
- * @access public
- * {getfields UFJoin_get}
  */
 function civicrm_api3_uf_join_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
