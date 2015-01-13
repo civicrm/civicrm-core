@@ -23,12 +23,13 @@ if [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
   echo
   echo "Usage: setup.sh [options] [schema file] [database data file] [database name] [database user] [database password] [database host] [database port] [additional args]"
   echo "[options] is a mix of zero or more of following:"
-  echo "  -a     (All)       Implies -Dgsdf (default)"
-  echo "  -D     (Download)  Download depdencies"
-  echo "  -g     (GenCode)   Generate DAO files, SQL files, etc"
-  echo "  -s     (Schema)    Load new schema in DB"
-  echo "  -d     (Data)      Load default data in DB"
-  echo "  -f     (Flush)     Flush caches and settings"
+  echo "  -a     (All)            Implies -Dgsef (default)"
+  echo "  -D     (Download)       Download dependencies"
+  echo "  -g     (GenCode)        Generate DAO files, SQL files, etc"
+  echo "  -s     (Schema)         Load new schema in DB"
+  echo "  -d     (Data-Plain)     Load basic dataset in DB"
+  echo "  -e     (Data-Examples)  Load example dataset in DB"
+  echo "  -f     (Flush)          Flush caches and settings"
   echo
   echo "Example: Perform a full setup"
   echo "   setup.sh -a"
@@ -37,7 +38,7 @@ if [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
   echo "   setup.sh -Dg"
   echo
   echo "Example: Keep the existing code but reset the DB"
-  echo "   setup.sh -sdf"
+  echo "   setup.sh -sef"
   exit 0
 fi
 
@@ -50,8 +51,9 @@ DO_GENCODE=
 DO_SCHEMA=
 DO_DATA=
 DO_FLUSH=
+DEFAULT_DATA=
 
-while getopts "aDgsdf" opt; do
+while getopts "aDgsdef" opt; do
   case $opt in
     a)
       DO_DOWNLOAD=1
@@ -75,6 +77,12 @@ while getopts "aDgsdf" opt; do
       ;;
     d)
       DO_DATA=1
+      DEFAULT_DATA=civicrm_data.mysql
+      FOUND_ACTION=1
+      ;;
+    e)
+      DO_DATA=1
+      DEFAULT_DATA=civicrm_generated.mysql
       FOUND_ACTION=1
       ;;
     f)
@@ -97,6 +105,7 @@ if [ -z "$FOUND_ACTION" ]; then
   DO_SCHEMA=1
   DO_DATA=1
   DO_FLUSH=1
+  DEFAULT_DATA=civicrm_generated.mysql
 fi
 
 shift $((OPTIND-1))
@@ -180,10 +189,11 @@ fi
 
 if [ -n "$DO_DATA" ]; then
   pushd "$CALLEDPATH/../sql"
-    # load civicrm_generated.mysql sample data unless special DBLOAD is passed
+    # load default data set unless system is configured with override
     if [ -z $DBLOAD ]; then
-        echo; echo Populating database with example data - civicrm_generated.mysql
-        $MYSQLCMD < civicrm_generated.mysql
+        echo;
+        echo "Populating database with dataset - $DEFAULT_DATA"
+        $MYSQLCMD < "$DEFAULT_DATA"
     else
         echo; echo Populating database with required data - civicrm_data.mysql
         $MYSQLCMD < civicrm_data.mysql
