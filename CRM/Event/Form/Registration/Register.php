@@ -1215,7 +1215,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @param int $contactID
    *
    * @return void
-   * @access public
    */
   public function processRegistration($params, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();

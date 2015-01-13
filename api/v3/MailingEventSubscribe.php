@@ -47,7 +47,6 @@
  * @return array
  *   api result array
  * {@getfields mailing_event_subscribe_create}
- * @access public
  */
 function civicrm_api3_mailing_event_subscribe_create($params) {
   $email      = $params['email'];

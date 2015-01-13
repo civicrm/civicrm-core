@@ -46,13 +46,6 @@
  *
  * @return array
  *   API success array
- *
- * @access public
- *
- * @example CustomFieldCreate.php
- * {@getfields CustomField_create}
- * {@example CustomFieldCreate.php 0}
- *
  */
 function civicrm_api3_custom_field_create($params) {
 
@@ -106,12 +99,7 @@ function _civicrm_api3_custom_field_create_spec(&$params) {
  *   Array id of the field to be deleted.
  *
  * @return array
- * @example CustomFieldDelete.php
- *
- * {@example CustomFieldDelete.php 0}
- * {@getfields CustomField_delete}
- * @access public
- **/
+ */
 function civicrm_api3_custom_field_delete($params) {
   $field = new CRM_Core_BAO_CustomField();
   $field->id = $params['id'];
@@ -128,10 +116,7 @@ function civicrm_api3_custom_field_delete($params) {
  *   Array to search on.
  *
  * @return array
- * @getfields CustomField_get
- * @access public
- *
- **/
+ */
 function civicrm_api3_custom_field_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }

@@ -88,7 +88,7 @@ function civicrm_api3_case_type_get($params) {
  * format definition
  *
  * @param array $result
- * @return mixed
+ * @return array
  * @throws \CRM_Core_Exception
  */
 function _civicrm_api3_case_type_get_formatResult(&$result) {
@@ -112,12 +112,9 @@ function _civicrm_api3_case_type_get_formatResult(&$result) {
  *
  * @param array $params
  *   Array including id of case_type to delete.
-
+ *
  * @return array
  *   API result array
- *
- * @access public
- *
  */
 function civicrm_api3_case_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

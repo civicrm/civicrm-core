@@ -48,10 +48,6 @@
  *
  * @return array
  *   API result array
- * @access public
- * @example NoteCreate.php Create example
- *
- *
  */
 function civicrm_api3_note_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -81,7 +77,6 @@ function _civicrm_api3_note_create_spec(&$params) {
  * {@getfields note_delete}
  *
  * @return null
- * @access public
  */
 function civicrm_api3_note_delete($params) {
 
@@ -99,7 +94,6 @@ function civicrm_api3_note_delete($params) {
  *   array of properties,
  *   if error an array with an error id and error message
  * {@getfields note_get}
- * @access public
  */
 function civicrm_api3_note_get($params) {
 

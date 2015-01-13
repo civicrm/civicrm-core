@@ -122,7 +122,6 @@ class CRM_Utils_Sort {
    *   Order to sort.
    *
    * @return \CRM_Utils_Sort
-   * @access public
    */
   public function __construct(&$vars, $defaultSortOrder = NULL) {
     $this->_vars = array();

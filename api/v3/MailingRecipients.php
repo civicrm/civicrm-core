@@ -47,7 +47,6 @@
  * @return array
  *   API return Array of matching mailing jobs
  * {@getfields mailing_recipient_get}
- * @access public
  */
 function civicrm_api3_mailing_recipients_get($params, $ids = array()) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);

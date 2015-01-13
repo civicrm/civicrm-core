@@ -72,7 +72,6 @@ function civicrm_api3_pledge_create($params) {
  *   true if success, else false
  * {@getfields pledge_delete}
  * @example PledgeDelete.php
- * @access public
  */
 function civicrm_api3_pledge_delete($params) {
   if (CRM_Pledge_BAO_Pledge::deletePledge($params['id'])) {
@@ -135,7 +134,6 @@ function _civicrm_api3_pledge_create_spec(&$params) {
  *   array of pledges, if error an array with an error id and error message
  * {@getfields pledge_get}
  * @example PledgeGet.php
- * @access public
  */
 function civicrm_api3_pledge_get($params) {
   $mode = CRM_Contact_BAO_Query::MODE_PLEDGE;
@@ -169,7 +167,6 @@ function _civicrm_api3_pledge_get_defaults() {
  * @param bool $create
  *
  * @return array|CRM_Error
- * @access public
  */
 function _civicrm_api3_pledge_format_params(&$values, $create = FALSE) {
 

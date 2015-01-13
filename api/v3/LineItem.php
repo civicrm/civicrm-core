@@ -45,7 +45,6 @@
  * @return array
  *   api result array
  * {@getfields line_item_create}
- * @access public
  */
 function civicrm_api3_line_item_create($params) {
   $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params,True);
@@ -77,7 +76,6 @@ function _civicrm_api3_line_item_create_spec(&$params) {
  * @return array
  *   Array of matching line_items
  * {@getfields line_item_get}
- * @access public
  */
 function civicrm_api3_line_item_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -96,7 +94,6 @@ function civicrm_api3_line_item_get($params) {
  * @return array
  *   API result array
  * {@getfields line_item_delete}
- * @access public
  */
 function civicrm_api3_line_item_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

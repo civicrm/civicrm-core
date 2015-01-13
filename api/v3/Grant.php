@@ -47,7 +47,6 @@
  * @return array
  *   grant array
  * {@getfields grant_create}
- * @access public
  */
 function civicrm_api3_grant_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Grant');
@@ -76,7 +75,6 @@ function _civicrm_api3_grant_create_spec(&$params) {
  * @return array
  *   Array of matching grants
  * {@getfields grant_get}
- * @access public
  */
 function civicrm_api3_grant_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Grant');
@@ -95,7 +93,6 @@ function civicrm_api3_grant_get($params) {
  * @return array
  *   API Result Array
  * {@getfields grant_delete}
- * @access public
  */
 function civicrm_api3_grant_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

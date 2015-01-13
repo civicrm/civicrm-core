@@ -64,8 +64,6 @@ function _civicrm_api3_job_create_spec(&$params) {
  *
  * @return array
  * {@getfields Job_create}
- * @access public
- * {@schema Core/Job.xml}
  */
 function civicrm_api3_job_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -77,7 +75,6 @@ function civicrm_api3_job_create($params) {
  * @return array
  *   api result array
  * {@getfields email_get}
- * @access public
  */
 function civicrm_api3_job_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -91,7 +88,6 @@ function civicrm_api3_job_get($params) {
  * @return array
  *   API Result Array
  * {@getfields Job_delete}
- * @access public
  */
 function civicrm_api3_job_delete($params) {
   _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -106,9 +102,6 @@ function civicrm_api3_job_delete($params) {
  *
  * @return array
  *   API Result Array
- *
- * @access public
- *
  */
 function civicrm_api3_job_execute($params) {
   $facility = new CRM_Core_JobManager();
@@ -135,11 +128,6 @@ function _civicrm_api3_job_execute_spec(&$params) {
  *
  * @return array
  *   API Result Array
- * {@getfields contact_geocode}
- *
- * @access public
- *
- *
  */
 function civicrm_api3_job_geocode($params) {
   $gc = new CRM_Utils_Address_BatchUpdate($params);
@@ -176,15 +164,12 @@ function _civicrm_api3_job_geocode_spec(&$params) {
  *                        now - the time to use, in YmdHis format
  *                            - makes testing a bit simpler since we can simulate past/future time
  *
- * @return boolean
- *   true if success, else false
- * @access public
- *
+ * @return array
  */
 function civicrm_api3_job_send_reminder($params) {
   //note that $params['rowCount' can be overridden by one of the preferred syntaxes ($options['limit'] = x
   //It's not clear whether than syntax can be passed in via the UI config - but this keeps the pre 4.4.4 behaviour
-  // in that case (ie. makes it unconfigurable via the UI). Another approach would be to set a default of 0
+  // in that case (ie. makes it non-configurable via the UI). Another approach would be to set a default of 0
   // in the _spec function - but since that is a deprecated value it seems more contentious than this approach
   $params['rowCount'] = 0;
   $lock = new CRM_Core_Lock('civimail.job.EmailProcessor');
@@ -226,10 +211,7 @@ function _civicrm_api3_job_send_reminder(&$params) {
  *                        instanceId - Integer - the report instance ID
  *                        resetVal - Integer - should we reset form state (always true)?
  *
- * @return boolean
- *   true if success, else false
- * @access public
- *
+ * @return array
  */
 function civicrm_api3_job_mail_report($params) {
   $result = CRM_Report_Utils_Report::processReport($params);
@@ -255,7 +237,6 @@ function civicrm_api3_job_mail_report($params) {
  *
  * @return boolean
  *   true if success, else false
- * @access public
  */
 function civicrm_api3_job_update_greeting($params) {
 
@@ -310,12 +291,7 @@ function _civicrm_api3_job_update_greeting_spec(&$params) {
  * Mass update pledge statuses
  *
  * @param array $params
- *   (reference ) input parameters.
- *
- * @return boolean
- *   true if success, else false
- * @access public
- *
+ * @return array
  */
 function civicrm_api3_job_process_pledge($params) {
   // *** Uncomment the next line if you want automated reminders to be sent
@@ -422,7 +398,6 @@ function civicrm_api3_job_fetch_activities($params) {
  *
  * @return array
  *   array of properties, if error an array with an error id and error message
- * @access public
  */
 function civicrm_api3_job_process_participant($params) {
   $result = CRM_Event_BAO_ParticipantStatusType::process($params);
@@ -448,7 +423,6 @@ function civicrm_api3_job_process_participant($params) {
  *
  * @return boolean
  *   true if success, else false
- * @access public
  */
 function civicrm_api3_job_process_membership($params) {
   $lock = new CRM_Core_Lock('civimail.job.updateMembership');
@@ -475,7 +449,6 @@ function civicrm_api3_job_process_membership($params) {
  *
  * @return boolean
  *   true if success, else false
- * @access public
  */
 function civicrm_api3_job_process_respondent($params) {
   $result = CRM_Campaign_BAO_Survey::releaseRespondent($params);
@@ -504,7 +477,6 @@ function civicrm_api3_job_process_respondent($params) {
  * @return array
  *   API Result Array
  *
- * @access public
  */
 function civicrm_api3_job_process_batch_merge($params) {
   $rgid = CRM_Utils_Array::value('rgid', $params);
@@ -532,7 +504,6 @@ function civicrm_api3_job_process_batch_merge($params) {
  * Expected @params array keys are:
  * {string  'processor_name' - the name of the payment processor, eg: Sagepay}
  *
- * @access public
  */
 function civicrm_api3_job_run_payment_cron($params) {
 
@@ -567,7 +538,6 @@ function civicrm_api3_job_run_payment_cron($params) {
  *
  * @return boolean
  *   true if success, else false
- * @access public
  */
 function civicrm_api3_job_cleanup($params) {
   $session   = CRM_Utils_Array::value('session', $params, true );

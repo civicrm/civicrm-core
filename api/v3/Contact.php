@@ -145,11 +145,6 @@ function _civicrm_api3_contact_create_spec(&$params) {
  *
  * @return array
  *   API Result Array
- * (@getfields contact_get}
- * @access public
- *
- * @example ContactGet.php Standard GET example
- *
  */
 function civicrm_api3_contact_get($params) {
   $options = array();
@@ -267,14 +262,10 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
  * Delete a contact with given contact id
  *
  * @param array $params
- *   (reference ) input parameters, contact_id element required.
+ *   input parameters per getfields
  *
  * @return array
  *   API Result Array
- * @access public
- *
- * @example ContactDelete.php
- * {@getfields contact_delete}
  */
 function civicrm_api3_contact_delete($params) {
 
@@ -431,7 +422,6 @@ function _civicrm_api3_contact_update($params, $contactID = NULL) {
  *
  * @throws API_Exception
  *
- * @access public
  */
 function _civicrm_api3_greeting_format_params($params) {
   $greetingParams = array('', '_id', '_custom');
@@ -877,7 +867,6 @@ function _civicrm_api3_contact_deprecation() {
  * @return array
  *   API Result Array
  *
- * @access public
  */
 function civicrm_api3_contact_merge($params) {
   $mode = CRM_Utils_Array::value('mode', $params, 'safe');

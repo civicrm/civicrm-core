@@ -290,7 +290,6 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    *
    * @return int|NULL
    *   no of deleted notes on success, null otherwise
-   * @access public
    */
   public static function del($id, $showStatus = TRUE) {
     $return = NULL;

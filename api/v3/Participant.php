@@ -49,7 +49,6 @@
  * @return array
  *   apiresult
  * {@getfields participant_create}
- * @access public
  */
 function civicrm_api3_participant_create($params) {
   //check that event id is not an template - should be done @ BAO layer
@@ -165,7 +164,6 @@ function _civicrm_api3_participant_create_spec(&$params) {
  * @return array
  *   (reference )        array of properties, if error an array with an error id and error message
  * {@getfields participant_get}
- * @access public
  */
 function civicrm_api3_participant_get($params) {
   $mode = CRM_Contact_BAO_Query::MODE_EVENT;
@@ -206,7 +204,6 @@ function _civicrm_api3_participant_get_spec(&$params) {
  * {@getfields participant_delete}
  * @throws Exception
  * @return array
- * @access public
  */
 function civicrm_api3_participant_delete($params) {
 
