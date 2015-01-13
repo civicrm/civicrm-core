@@ -139,7 +139,7 @@ CRM.$(function($) {
          <div class='label'>{ts}Total Paid{/ts}</div>
          <div class='content'>
            {$paymentInfo.paid|crmMoney}<br/>
-           <a class="crm-hover-button action-item medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&action=browse&cid=`$contactId`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&context=transaction"}'><span class="icon ui-icon-zoomin"></span> {ts}view payments{/ts}</a>
+           <a class="crm-hover-button action-item crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&action=browse&cid=`$contactId`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&context=transaction"}'><span class="icon ui-icon-zoomin"></span> {ts}view payments{/ts}</a>
          </div>
          <div class='label'><strong>{ts}Balance Owed{/ts}</strong></div><div class='content'><strong id='balance-fee'></strong></div>
           </div>
