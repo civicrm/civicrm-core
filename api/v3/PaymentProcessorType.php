@@ -49,19 +49,17 @@
  * @return array
  */
 function civicrm_api3_payment_processor_type_create($params) {
-  $ids = array();
   if (isset($params['id']) && !CRM_Utils_Rule::integer($params['id'])) {
     return civicrm_api3_create_error('Invalid value for payment_processor type ID');
   }
 
-  $payProcType = new CRM_Financial_BAO_PaymentProcessorType();
-  $payProcType = CRM_Financial_BAO_PaymentProcessorType::create($params);
+  $paymentProcessorType = CRM_Financial_BAO_PaymentProcessorType::create($params);
 
   $relType = array();
 
-  _civicrm_api3_object_to_array($payProcType, $relType[$payProcType->id]);
+  _civicrm_api3_object_to_array($paymentProcessorType, $relType[$paymentProcessorType->id]);
 
-  return civicrm_api3_create_success($relType, $params, 'payment_processor_type', 'create', $payProcType);
+  return civicrm_api3_create_success($relType, $params, 'payment_processor_type', 'create', $paymentProcessorType);
 }
 
 /**
