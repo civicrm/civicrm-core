@@ -373,7 +373,7 @@
         validate: true,
         refreshAction: ['next_new', 'submit_savenext', 'upload_new'],
         cancelButton: '.cancel',
-        openInline: 'a.open-inline, a.button, a.action-item',
+        openInline: 'a.open-inline, a.button, a.action-item, a.open-inline-noreturn',
         onCancel: function(event) {}
       }
     };
@@ -487,6 +487,10 @@
       if (settings.openInline) {
         settings.autoClose = $el.crmSnippet('isOriginalUrl');
         $(settings.openInline, this).not(exclude + ', .crm-popup').click(function(event) {
+          if ($(this).hasClass('open-inline-noreturn')) {
+            // Force reset of original url
+            $el.data('civiCrmSnippet')._originalUrl = $(this).attr('href');
+          }
           $el.crmSnippet('option', 'url', $(this).attr('href')).crmSnippet('refresh');
           return false;
         });
