@@ -183,7 +183,7 @@ class CRM_Utils_System {
    *
    * @return string
    */
-  static function theme(
+  public static function theme(
     &$content,
     $print = FALSE,
     $maintenance = FALSE
@@ -229,7 +229,7 @@ class CRM_Utils_System {
    * @return string
    *   An HTML string containing a link to the given path.
    */
-  static function url(
+  public static function url(
     $path = NULL,
     $query = NULL,
     $absolute = FALSE,
@@ -261,7 +261,7 @@ class CRM_Utils_System {
    *
    * @return string
    */
-  static function href(
+  public static function href(
     $text, $path = NULL, $query = NULL, $absolute = TRUE,
     $fragment = NULL, $htmlize = TRUE, $frontend = FALSE, $forceBackend = FALSE
   ) {
@@ -427,7 +427,7 @@ class CRM_Utils_System {
    * @param string $message
    *   (optional) The message to provide in the body of the redirect page.
    */
-  static function jsRedirect(
+  public static function jsRedirect(
     $url = NULL,
     $title = NULL,
     $message = NULL
@@ -799,7 +799,7 @@ class CRM_Utils_System {
    * @param bool $output
    * @param string $disposition
    */
-  static function download(
+  public static function download(
     $name, $mimeType, &$buffer,
     $ext = NULL,
     $output = TRUE,
@@ -1300,7 +1300,7 @@ class CRM_Utils_System {
    * @param array $params
    *   An array of parameters (see CRM_Utils_System::docURL2 method for names)
    *
-   * @return string
+   * @return string|void
    *   URL or link to documentation page, based on provided parameters.
    */
   public static function docURL($params) {
@@ -1464,15 +1464,16 @@ class CRM_Utils_System {
     CRM_ACL_BAO_Cache::resetCache();
 
     // reset various static arrays used here
-    CRM_Contact_BAO_Contact::$_importableFields =
-    CRM_Contact_BAO_Contact::$_exportableFields =
-    CRM_Contribute_BAO_Contribution::$_importableFields =
-    CRM_Contribute_BAO_Contribution::$_exportableFields =
-    CRM_Pledge_BAO_Pledge::$_exportableFields =
-    CRM_Contribute_BAO_Query::$_contributionFields =
-    CRM_Core_BAO_CustomField::$_importFields =
-    CRM_Core_BAO_Cache::$_cache =
-    CRM_Core_DAO::$_dbColumnValueCache = NULL;
+    CRM_Contact_BAO_Contact::$_importableFields
+      = CRM_Contact_BAO_Contact::$_exportableFields
+      = CRM_Contribute_BAO_Contribution::$_importableFields
+      = CRM_Contribute_BAO_Contribution::$_exportableFields
+      = CRM_Pledge_BAO_Pledge::$_exportableFields
+      = CRM_Contribute_BAO_Query::$_contributionFields
+      = CRM_Core_BAO_CustomField::$_importFields
+      = CRM_Core_BAO_Cache::$_cache
+      = CRM_Core_DAO::$_dbColumnValueCache
+      = NULL;
 
     CRM_Core_OptionGroup::flushAll();
     CRM_Utils_PseudoConstant::flushAll();
@@ -1642,7 +1643,7 @@ class CRM_Utils_System {
    * @return string
    *   , formatted url.
    */
-  static function languageNegotiationURL(
+  public static function languageNegotiationURL(
     $url,
     $addLanguagePart = TRUE,
     $removeLanguagePart = FALSE
@@ -1664,7 +1665,7 @@ class CRM_Utils_System {
    *   (optional) Sent by contribution/event reg/profile pages which uses a id
    *   specific extra file name if present.
    */
-  static function appendTPLFile(
+  public static function appendTPLFile(
     $fileName,
     &$content,
     $overideFileName = NULL

@@ -41,11 +41,8 @@ abstract class CRM_Core_Component_Config {
    * configuration file and injects them into system wide
    * configuration object.
    *
-   * @param $config
+   * @param CRM_Core_Config $config
    * @param $oldMode
-   *
-   * @return array
-   *   collection of component settings
    */
   public function add($config, $oldMode) {
     foreach (get_class_vars(get_class($this)) as $key => $value) {
@@ -54,7 +51,7 @@ abstract class CRM_Core_Component_Config {
   }
 
   /**
-   * TODO
+   * @param array $defaults
    */
   public function setDefaults(&$defaults) {
     foreach (get_class_vars(get_class($this)) as $key => $value) {
