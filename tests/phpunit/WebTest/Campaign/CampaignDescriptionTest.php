@@ -70,15 +70,14 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
 
     // click save
     $this->click("_qf_Campaign_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->waitForText('crm-notification-container', "Campaign $title");
 
     //Opening Edit Page of the created Campaign
     $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[text()='{$campaignTitle}']/../td[13]/span/a[text()='Edit']");
-    $this->clickLink("//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[text()='{$campaignTitle}']/../td[13]/span/a[text()='Edit']", "//textarea[@id='description']");
-    $fetchedVaue = $this->getValue('description');
-    $this->assertEquals($campaignDescription, $fetchedVaue);
+    $this->click("//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[text()='{$campaignTitle}']/../td[13]/span/a[text()='Edit']");
+    $this->waitForAjaxContent();
+    $this->assertTrue($this->isTextPresent($campaignDescription), 'Missing text: ' . $campaignDescription);
   }
 
   function testAjaxCustomGroupLoad() {

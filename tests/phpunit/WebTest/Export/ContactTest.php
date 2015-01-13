@@ -120,16 +120,6 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // All other rows to be check.
     $checkRows = array(
       1 => array(
-        'First Name' => $firstContactName,
-        'Last Name' => 'Smith',
-        'Email' => ''.strtolower($emailContactFirst).'',
-        'Sort Name' => $sortFirstName,
-        'Display Name' => $prefixLabelContactFrst.' '.$displayFirstName.' '.$suffixLabelContactFrst,
-        'Individual Prefix' => $prefixLabelContactFrst,
-        'Individual Suffix' => $suffixLabelContactFrst,
-        'Gender' => $genderLabelContactFrst,
-      ),
-      2 => array(
         'First Name' => $secondContactName,
         'Last Name' => 'John',
         'Email' => ''.strtolower($emailContactSecond).'',
@@ -138,6 +128,16 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
         'Individual Prefix' => $prefixLabelContactScnd,
         'Individual Suffix' => $suffixLabelContactScnd,
         'Gender' => $genderLabelContactScnd,
+      ),
+      2 => array(
+        'First Name' => $firstContactName,
+        'Last Name' => 'Smith',
+        'Email' => '' . strtolower($emailContactFirst) . '',
+        'Sort Name' => $sortFirstName,
+        'Display Name' => $prefixLabelContactFrst . ' ' . $displayFirstName . ' ' . $suffixLabelContactFrst,
+        'Individual Prefix' => $prefixLabelContactFrst,
+        'Individual Suffix' => $suffixLabelContactFrst,
+        'Gender' => $genderLabelContactFrst,
       ),
     );
 
@@ -239,18 +239,18 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // All other rows to be check.
     $checkRows = array(
       1 => array(
-        'First Name' => $firstName,
-        'Last Name' => 'Smith',
-        'Email' => "$firstName.smith@example.org",
-        'Sort Name' => $sortName,
-        'Display Name' => $displayName,
-      ),
-      2 => array(
         'First Name' => $childName,
         'Last Name' => 'John',
         'Email' => "$childName.john@example.org",
         'Sort Name' => $childSortName,
         'Display Name' => $childDisplayName,
+      ),
+      2 => array(
+        'First Name' => $firstName,
+        'Last Name' => 'Smith',
+        'Email' => "$firstName.smith@example.org",
+        'Sort Name' => $sortName,
+        'Display Name' => $displayName,
       ),
     );
 
@@ -282,7 +282,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->type("address_1_street_address", "121A Sherman St. Apt. 12");
     $this->type("address_1_city", "Dumfries");
     $this->type("address_1_postal_code", "1234");
-    $this->assertElementContainsText('address_table_1', "- select - United States");
+    $this->select("address_1_country_id", "United States");
     $this->select("address_1_state_province_id", "value=1019");
 
     $this->click('_qf_Contact_upload_view');
