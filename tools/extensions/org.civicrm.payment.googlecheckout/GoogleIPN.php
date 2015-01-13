@@ -48,7 +48,6 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
@@ -56,7 +55,6 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
    * mode of operation: live or test
    *
    * @var object
-   * @static
    */
   static protected $_mode = NULL;
 
@@ -275,10 +273,8 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
    * @param $component
    * @param $paymentProcessor
    * @return object
-   * @static
    */
-  static
-  function &singleton($mode, $component, &$paymentProcessor) {
+  static function &singleton($mode, $component, &$paymentProcessor) {
     if (self::$_singleton === NULL) {
       self::$_singleton = new org_civicrm_payment_googlecheckout_GoogleIPN($mode, $paymentProcessor);
     }
@@ -291,7 +287,6 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
    * @param int $orderNo <order-total> send by google
    *
    * @return amount
-   * @access public
    */
   function getAmount($orderNo) {
     require_once 'CRM/Contribute/DAO/Contribution.php';
@@ -314,12 +309,8 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
    * @param string  $root           root of xml-response
    *
    * @return array context of this call (test, module, payment processor id)
-   * @static
    */
-  static
-  function getContext($xml_response, $privateData, $orderNo, $root) {
-    require_once 'CRM/Contribute/DAO/Contribution.php';
-
+  static function getContext($xml_response, $privateData, $orderNo, $root) {
     $isTest = NULL;
     $module = NULL;
     if ($root == 'new-order-notification') {

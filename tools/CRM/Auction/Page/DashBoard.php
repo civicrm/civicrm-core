@@ -45,7 +45,6 @@ class CRM_Auction_Page_DashBoard extends CRM_Core_Page {
    * it decides the which action has to be taken for the page.
    *
    * return null
-   * @access public
    */
   function run() {
     parent::run();

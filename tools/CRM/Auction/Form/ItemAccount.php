@@ -75,11 +75,7 @@ class CRM_Auction_Form_ItemAccount extends CRM_Core_Form {
   /**
    * This virtual function is used to set the default values of
    * various form elements
-   *
-   * access        public
-   *
    * @return array reference to the array of default values
-   *
    */
   function setDefaultValues() {
     if (!$this->_donorID) {
@@ -110,9 +106,6 @@ class CRM_Auction_Form_ItemAccount extends CRM_Core_Form {
 
   /**
    * Build the form object
-   *
-   * @return None
-   * @access public
    */
   public function buildQuickForm() {
     $profileID = CRM_Core_DAO::getFieldValue('CRM_Auction_DAO_Auction',
@@ -183,15 +176,10 @@ class CRM_Auction_Form_ItemAccount extends CRM_Core_Form {
    * @param array $files the uploaded files if any
    * @param $self
    *
-   *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   * @return bool|array
    */
-  static
-  function formRule($fields, $files, $self) {
+  static function formRule($fields, $files, $self) {
     $errors = array();
-    require_once "CRM/Utils/Rule.php";
     foreach ($fields as $key => $value) {
       if (strpos($key, 'email-') !== FALSE) {
         $ufContactId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFMatch', $value, 'contact_id', 'uf_name');
@@ -205,10 +193,6 @@ class CRM_Auction_Form_ItemAccount extends CRM_Core_Form {
 
   /**
    * Process the form submission
-   *
-   * @access public
-   *
-   * @return None
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->getName());

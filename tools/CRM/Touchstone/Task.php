@@ -45,7 +45,6 @@ class CRM_Touchstone_Task {
    * the task array
    *
    * @var array
-   * @static
    */
   static $_tasks = NULL;
 
@@ -53,7 +52,6 @@ class CRM_Touchstone_Task {
    * the optional task array
    *
    * @var array
-   * @static
    */
   static $_optionalTasks = NULL;
 
@@ -62,11 +60,8 @@ class CRM_Touchstone_Task {
    * on a contact / group of contacts
    *
    * @return array the set of tasks for a group of contacts
-   * @static
-   * @access public
    */
-  static
-  function &tasks() {
+  static function &tasks() {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
         1 => ts('Perform First Task'),
