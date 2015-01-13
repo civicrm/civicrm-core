@@ -64,7 +64,6 @@ function civicrm_api3_relationship_type_create($params) {
     $ids['relationshipType'] = CRM_Utils_Array::value('id', $params);
   }
 
-  $relationType = new CRM_Contact_BAO_RelationshipType();
   $relationType = CRM_Contact_BAO_RelationshipType::add($params, $ids);
 
   $relType = array();
