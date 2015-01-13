@@ -48,7 +48,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   /**
    * called when action is browse
    *
-   * return null
+   * @return null
    */
   public function browse() {
     $links = self::links('all', $this->_isPaymentProcessor, $this->_accessContribution);
@@ -219,7 +219,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   /**
    * called when action is view
    *
-   * return null
+   * @return null
    */
   public function view() {
     $controller = new CRM_Core_Controller_Simple(
@@ -237,7 +237,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   /**
    * called when action is update or new
    *
-   * return null
+   * @return null
    */
   public function edit() {
     // set https for offline cc transaction
@@ -310,7 +310,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   /**
    * the main function that is called when the page loads, it decides the which action has to be taken for the page.
    *
-   * return null
+   * @return null
    */
   public function run() {
     $this->preProcess();
@@ -575,8 +575,11 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   /**
    * used for the to show the associated
    * contribution for the membership
-   * @form array $form (ref.) an assoc array of name/value pairs
-   * return null
+   *
+   * @param int $contactId
+   * @param int $membershipId
+   *
+   * @return null
    */
   public static function associatedContribution($contactId = NULL, $membershipId = NULL) {
     $controller = new CRM_Core_Controller_Simple(

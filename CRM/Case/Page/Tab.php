@@ -140,7 +140,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
   /**
    * called when action is browse
    *
-   * return null
+   * @return null
    */
   public function browse() {
 
@@ -163,7 +163,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
   /**
    * called when action is update or new
    *
-   * return null
+   * @return null
    */
   public function edit() {
     $config = CRM_Core_Config::singleton();
@@ -183,7 +183,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    * the main function that is called when the page loads,
    * it decides the which action has to be taken for the page.
    *
-   * return null
+   * @return null
    */
   public function run() {
     $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullArray);

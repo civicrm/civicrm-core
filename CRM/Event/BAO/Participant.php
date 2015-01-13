@@ -1220,8 +1220,6 @@ UPDATE  civicrm_participant
    *   Update status id.
    * @param int $fromStatusId
    *   From status id.
-   *
-   * return  void
    * @param bool $returnResult
    * @param bool $skipCascadeRule
    *
@@ -1460,8 +1458,6 @@ UPDATE  civicrm_participant
    *   Required domain values.
    * @param string $mailType
    *   (eg 'approval', 'confirm', 'expired' ).
-   *
-   * return  void
    *
    * @return bool
    */
