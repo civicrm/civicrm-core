@@ -50,21 +50,21 @@ class Container {
     $container->setParameter('civicrm_base_path', $civicrm_base_path);
     $container->set(self::SELF, $this);
 
-// TODO Move configuration to an external file; define caching structure
-//    if (empty($configDirectories)) {
-//      throw new \Exception(__CLASS__ . ': Missing required properties (civicrmRoot, configDirectories)');
-//    }
-//    $locator = new FileLocator($configDirectories);
-//    $loaderResolver = new LoaderResolver(array(
-//      new YamlFileLoader($container, $locator)
-//    ));
-//    $delegatingLoader = new DelegatingLoader($loaderResolver);
-//    foreach (array('services.yml') as $file) {
-//      $yamlUserFiles = $locator->locate($file, NULL, FALSE);
-//      foreach ($yamlUserFiles as $file) {
-//        $delegatingLoader->load($file);
-//      }
-//    }
+    // TODO Move configuration to an external file; define caching structure
+    //    if (empty($configDirectories)) {
+    //      throw new \Exception(__CLASS__ . ': Missing required properties (civicrmRoot, configDirectories)');
+    //    }
+    //    $locator = new FileLocator($configDirectories);
+    //    $loaderResolver = new LoaderResolver(array(
+    //      new YamlFileLoader($container, $locator)
+    //    ));
+    //    $delegatingLoader = new DelegatingLoader($loaderResolver);
+    //    foreach (array('services.yml') as $file) {
+    //      $yamlUserFiles = $locator->locate($file, NULL, FALSE);
+    //      foreach ($yamlUserFiles as $file) {
+    //        $delegatingLoader->load($file);
+    //      }
+    //    }
 
     $container->setDefinition('dispatcher', new Definition(
       '\Symfony\Component\EventDispatcher\EventDispatcher',
