@@ -137,7 +137,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
     // verify if custom data is present
     $this->openCiviPage('case', 'reset=1');
-    $this->clickLink("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[9]/span/a[text()='Manage']");
+    $this->clickLink("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[9]/span/a[1][text()='Manage']");
 
     $this->clickAjaxLink("css=#{$customGrp1} .crm-accordion-header", "css=#{$customGrp1} a.button");
     $cusId_1 = 'custom_' . $customId[0] . '_1';

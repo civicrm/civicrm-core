@@ -324,10 +324,10 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     // Go to Online Contribution tab
     $this->click("link=Online Registration");
     $this->waitForElementPresent("_qf_Registration_upload-bottom");
-    $this->click("xpath=//*[@id='additional_custom_post_id_multiple_1']/parent::td/span/a[text()='remove profile']");
-    $this->click("xpath=//*[@id='additional_custom_post_id_multiple_2']/parent::td/span/a[text()='remove profile']");
-    $this->click("xpath=//*[@id='additional_custom_post_id_multiple_3']/parent::td/span/a[text()='remove profile']");
-    $this->click("xpath=//*[@id='additional_custom_post_id_multiple_4']/parent::td/span/a[text()='remove profile']");
+    $this->click("xpath=//*[@id='additional_custom_post_id_multiple_1']/parent::td/span[1]/a");
+    $this->click("xpath=//*[@id='additional_custom_post_id_multiple_2']/parent::td/span[1]/a");
+    $this->click("xpath=//*[@id='additional_custom_post_id_multiple_3']/parent::td/span[1]/a");
+    $this->click("xpath=//*[@id='additional_custom_post_id_multiple_4']/parent::td/span[1]/a");
     $this->click("_qf_Registration_upload-bottom");
     $this->waitForElementPresent("_qf_Registration_upload-bottom");
   }
@@ -710,7 +710,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->type("city-Primary", "primecity");
     $this->type("phone-Primary-1", "98667764");
     $this->type("postal_code-Primary", "6548");
-
+    $this->waitForElementPresent('nick_name');
     $this->type("nick_name", "Nick1");
     $this->type("url-1", "http://www.part.com");
 
