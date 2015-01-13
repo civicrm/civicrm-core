@@ -55,7 +55,6 @@ class CRM_Utils_Mail {
    * @param array $params
    *   (by reference).
    *
-   *
    * @return boolean
    *   true if a mail was sent, else false
    */

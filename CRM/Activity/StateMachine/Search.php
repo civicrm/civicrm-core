@@ -43,7 +43,7 @@ class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
   /**
    * Class constructor
    * @param object $controller
-   * @param \const|int $action
+   * @param int $action
    */
   public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
@@ -105,9 +105,6 @@ class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
    * beginning from the final state, but retain the same session
    * values
    *
-   * @return boolean
-   */
-  /**
    * @return bool
    */
   public function shouldReset() {

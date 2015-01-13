@@ -673,7 +673,7 @@ class CRM_Core_Permission {
    * Validate user permission across
    * edit or view or with supportable acls.
    *
-   * return boolean true/false.
+   * @return boolean
    **/
   public static function giveMeAllACLs() {
     if (CRM_Core_Permission::check('view all contacts') ||
@@ -712,9 +712,8 @@ class CRM_Core_Permission {
    *
    * @param string $permission
    *
-   * return string $componentName the name of component.
-   *
-   * @return int|null|string
+   * @return null|string
+   *   the name of component.
    */
   public static function getComponentName($permission) {
     $componentName = NULL;

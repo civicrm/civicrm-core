@@ -74,7 +74,7 @@ class CRM_Event_Page_DashBoard extends CRM_Core_Page {
    * the main function that is called when the page loads,
    * it decides the which action has to be taken for the page.
    *
-   * return null
+   * @return null
    */
   public function run() {
     $this->preProcess();

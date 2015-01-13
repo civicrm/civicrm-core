@@ -236,7 +236,7 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
    * @param $optionId
    *   Value of option to be deleted.
    *
-   * return void
+   * @return void
    */
   public static function setOptionToNull($optionId) {
     if (!$optionId) {

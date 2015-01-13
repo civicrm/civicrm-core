@@ -615,10 +615,8 @@ AND    domain_id    = %4
    * @param int $ufID
    *   Uf id.
    *
-   * return array  $ufValues uf values.
-   * *
-   *
    * @return array
+   *   uf values.
    */
   public static function getUFValues($ufID = NULL) {
     if (!$ufID) {

@@ -39,6 +39,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Preferred mail format
+   * 
+   * @return array
    */
   public static function pmf() {
     return array(
@@ -50,6 +52,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Privacy options
+   *
+   * @return array
    */
   public static function privacy() {
     return array(
@@ -64,6 +68,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Various pre defined contact super types
+   *
+   * @return array
    */
   public static function contactType() {
     static $contactType = NULL;
@@ -75,6 +81,9 @@ class CRM_Core_SelectValues {
 
   /**
    * Various pre defined unit list
+   * 
+   * @param string $unitType
+   * @return array
    */
   public static function unitList($unitType = NULL) {
     $unitList = array(
@@ -90,6 +99,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Membership type unit
+   *
+   * @return array
    */
   public static function membershipTypeUnitList() {
     return self::unitList('duration');
@@ -97,6 +108,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Various pre defined period types
+   *
+   * @return array
    */
   public static function periodType() {
     return array(
@@ -107,6 +120,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Various pre defined email selection methods
+   *
+   * @return array
    */
   public static function emailSelectMethods() {
     return array(
@@ -119,6 +134,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Various pre defined member visibility options
+   *
+   * @return array
    */
   public static function memberVisibility() {
     return array(
@@ -129,6 +146,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Member auto-renew options
+   *
+   * @return array
    */
   public static function memberAutoRenew() {
     return array(
@@ -140,6 +159,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Various pre defined event dates
+   *
+   * @return array
    */
   public static function eventDate() {
     return array(
@@ -151,6 +172,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Custom form field types
+   *
+   * @return array
    */
   public static function customHtmlType() {
     return array(
@@ -176,6 +199,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Various pre defined extensions for dynamic properties and groups
+   *
+   * @return array
    *
    */
   public static function customGroupExtends() {
@@ -205,6 +230,8 @@ class CRM_Core_SelectValues {
   /**
    * Styles for displaying the custom data group
    *
+   * @return array
+   *
    */
   public static function customGroupStyle() {
     return array(
@@ -217,6 +244,7 @@ class CRM_Core_SelectValues {
   /**
    * For displaying the uf group types
    *
+   * @return array
    */
   public static function ufGroupTypes() {
     $ufGroupType = array(
@@ -236,6 +264,8 @@ class CRM_Core_SelectValues {
   /**
    * The status of a contact within a group
    *
+   * @return array
+   *
    */
   public static function groupContactStatus() {
     return array(
@@ -247,6 +277,8 @@ class CRM_Core_SelectValues {
 
   /**
    * List of Group Types
+   *
+   * @return array
    */
   public static function groupType() {
     return array(
@@ -258,9 +290,10 @@ class CRM_Core_SelectValues {
   /**
    * Compose the parameters for a date select object
    *
-   * @param string|NULL $type the type of date
-   * @param string|NULL $format date format ( QF format)
-   *
+   * @param string|NULL $type
+   *   the type of date
+   * @param string|NULL $format
+   *   date format (QF format)
    * @param null $minOffset
    * @param null $maxOffset
    *
@@ -268,7 +301,6 @@ class CRM_Core_SelectValues {
    *   the date array
    */
   public static function date($type = NULL, $format = NULL, $minOffset = NULL, $maxOffset = NULL) {
-
     $date = array(
       'addEmptyOption' => TRUE,
       'emptyOptionText' => ts('- select -'),
@@ -310,6 +342,7 @@ class CRM_Core_SelectValues {
   /**
    * Values for UF form visibility options
    *
+   * @return array
    */
   public static function ufVisibility() {
     return array(
@@ -322,6 +355,7 @@ class CRM_Core_SelectValues {
   /**
    * Values for group form visibility options
    *
+   * @return array
    */
   public static function groupVisibility() {
     return array(
@@ -333,7 +367,7 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Mailing Components
    *
-   * return array
+   * @return array
    */
   public static function mailingComponents() {
     return array(
@@ -351,7 +385,7 @@ class CRM_Core_SelectValues {
   /**
    * Get hours
    *
-   *
+   * @return array
    */
   public function getHours() {
     $hours = array();
@@ -364,7 +398,7 @@ class CRM_Core_SelectValues {
   /**
    * Get minutes
    *
-   *
+   * @return array
    */
   public function getMinutes() {
     $minutes = array();
@@ -403,8 +437,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Get the Address Standardization Providers from available
-   * plugins
+   * Get the Address Standardization Providers from available plugins
    *
    * @return array
    *   array of address standardization providers
@@ -420,7 +453,7 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Mailing Tokens
    *
-   * return array
+   * @return array
    */
   public static function mailingTokens() {
     return array(
@@ -446,7 +479,7 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Activity Tokens
    *
-   * return array
+   * @return array
    */
   public static function activityTokens() {
     return array(
@@ -460,7 +493,7 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Membership Tokens
    *
-   * return array
+   * @return array
    */
   public static function membershipTokens() {
     return array(
@@ -477,7 +510,7 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Event Tokens
    *
-   * return array
+   * @return array
    */
   public static function eventTokens() {
     return array(
@@ -501,7 +534,7 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Event Tokens
    *
-   * return array
+   * @return array
    */
   public static function contributionTokens() {
     return array(
@@ -534,7 +567,7 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Contact Tokens
    *
-   * return array
+   * @return array
    */
   public static function contactTokens() {
     static $tokens = NULL;
@@ -609,7 +642,7 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Participant Tokens
    *
-   * return array
+   * @return array
    */
   public static function participantTokens() {
     static $tokens = NULL;
@@ -650,7 +683,9 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   *  CiviCRM supported date input formats
+   * CiviCRM supported date input formats
+   *
+   * @return array
    */
   public static function getDatePluginInputFormats() {
     $dateInputFormats = array(
@@ -672,23 +707,25 @@ class CRM_Core_SelectValues {
     );
 
     /*
-         Year greater than 2000 get wrong result for following format
-         echo date( 'Y-m-d', strtotime( '7 Nov, 2001') );
-         echo date( 'Y-m-d', strtotime( '7 November, 2001') );
-         Return current year
-         expected :: 2001-11-07
-         output   :: 2009-11-07
-         However
-         echo date( 'Y-m-d', strtotime( 'Nov 7, 2001') );
-         echo date( 'Y-m-d', strtotime( 'November 7, 2001') );
-         gives proper result
-        */
+       Year greater than 2000 get wrong result for following format
+       echo date( 'Y-m-d', strtotime( '7 Nov, 2001') );
+       echo date( 'Y-m-d', strtotime( '7 November, 2001') );
+       Return current year
+       expected :: 2001-11-07
+       output   :: 2009-11-07
+       However
+       echo date( 'Y-m-d', strtotime( 'Nov 7, 2001') );
+       echo date( 'Y-m-d', strtotime( 'November 7, 2001') );
+       gives proper result
+     */
 
     return $dateInputFormats;
   }
 
   /**
    * Map date plugin and actual format that is used by PHP
+   *
+   * @return array
    */
   public static function datePluginToPHPFormats() {
     $dateInputFormats = array(
@@ -713,6 +750,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Time formats
+   *
+   * @return array
    */
   public static function getTimeFormats() {
     return array(
@@ -723,7 +762,11 @@ class CRM_Core_SelectValues {
 
   /**
    * Get numeric options
+   * 
+   * @param int $start
+   * @param int $end
    *
+   * @return array
    */
   public static function getNumericOptions($start = 0, $end = 10) {
     $numericOptions = array();
@@ -735,6 +778,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Barcode types
+   *
+   * @return array
    */
   public static function getBarcodeTypes() {
     return array(
@@ -745,6 +790,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Dedupe rule types
+   *
+   * @return array
    */
   public static function getDedupeRuleTypes() {
     return array(
@@ -756,6 +803,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Campaign group types
+   *
+   * @return array
    */
   public static function getCampaignGroupTypes() {
     return array(
@@ -766,6 +815,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Subscription history method
+   *
+   * @return array
    */
   public static function getSubscriptionHistoryMethods() {
     return array(
@@ -778,6 +829,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Premium units
+   *
+   * @return array
    */
   public static function getPremiumUnits() {
     return array(
@@ -790,6 +843,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Extension types
+   *
+   * @return array
    */
   public static function getExtensionTypes() {
     return array(
@@ -803,6 +858,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Job frequency
+   *
+   * @return array
    */
   public static function getJobFrequency() {
     return array(
@@ -814,6 +871,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Search builder operators
+   *
+   * @return array
    */
   public static function getSearchBuilderOperators() {
     return array(
@@ -838,6 +897,7 @@ class CRM_Core_SelectValues {
   /**
    * Profile group types
    *
+   * @return array
    */
   public static function getProfileGroupType() {
     $profileGroupType = array(
@@ -856,6 +916,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Word replacement match type
+   *
+   * @return array
    */
   public static function getWordReplacementMatchType() {
     return array(
@@ -866,6 +928,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Mailing group types
+   *
+   * @return array
    */
   public static function getMailingGroupTypes() {
     return array(
@@ -877,6 +941,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Mailing Job Status
+   *
+   * @return array
    */
   public static function getMailingJobStatus() {
     return array(
@@ -888,6 +954,9 @@ class CRM_Core_SelectValues {
     );
   }
 
+  /**
+   * @return array
+   */
   public static function billingMode() {
     return array(
       CRM_Core_Payment::BILLING_MODE_FORM => 'form',
@@ -898,6 +967,8 @@ class CRM_Core_SelectValues {
 
   /**
    * Frequency unit for schedule reminders
+   *
+   * @return array
    */
   public static function getScheduleReminderFrequencyUnits() {
     //@todo update schema to refer to option group direct & remove this

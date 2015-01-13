@@ -104,7 +104,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   /**
    * called when action is browse
    *
-   * return null
+   * @return null
    */
   public function browse() {
     // add annual contribution
@@ -200,7 +200,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   /**
    * called when action is view
    *
-   * return null
+   * @return null
    */
   public function view() {
     $controller = new CRM_Core_Controller_Simple(
@@ -218,7 +218,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   /**
    * called when action is update or new
    *
-   * return null
+   * @return null
    */
   public function edit() {
     // set https for offline cc transaction
@@ -273,7 +273,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * the main function that is called when the page
    * loads, it decides the which action has to be taken for the page.
    *
-   * return null
+   * @return null
    */
   public function run() {
     $this->preProcess();
