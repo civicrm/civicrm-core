@@ -167,7 +167,7 @@ WHERE     pledge_id = %1
    * @param array $params
    *   Associate array of field.
    *
-   * @return int
+   * @return CRM_Pledge_DAO_PledgePayment
    *   pledge payment id
    */
   public static function add($params) {
@@ -183,8 +183,7 @@ WHERE     pledge_id = %1
 
     // set currency for CRM-1496
     if (!isset($payment->currency)) {
-      $config = CRM_Core_Config::singleton();
-      $payment->currency = $config->defaultCurrency;
+      $payment->currency = CRM_Core_Config::singleton()->defaultCurrency;
     }
 
     $result = $payment->save();

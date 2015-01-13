@@ -66,6 +66,7 @@ function civicrm_api3_pledge_payment_create($params) {
   }
 
   $dao = CRM_Pledge_BAO_PledgePayment::add($paymentParams);
+  $result = array();
   if (empty($dao->pledge_id)) {
     $dao->find(TRUE);
   }

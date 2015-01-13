@@ -114,12 +114,11 @@ function _civicrm_api3_mailing_create_spec(&$params) {
  * Handle a delete event.
  *
  * @param array $params
- * @param array $ids
  *
  * @return array
  *   API Success Array
  */
-function civicrm_api3_mailing_delete($params, $ids = array()) {
+function civicrm_api3_mailing_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
