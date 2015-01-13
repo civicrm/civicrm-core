@@ -79,7 +79,7 @@
 class civicrm_api3 {
 
   /**
-   * @param array API configuration.
+   * @param array $config API configuration.
    */
   function __construct($config = NULL) {
     $this->local      = TRUE;

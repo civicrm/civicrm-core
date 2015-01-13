@@ -48,7 +48,8 @@ function _civicrm_api3_constant_deprecation() {
  * @deprecated as of CiviCRM 4.4.
  * It's recommended to use the api getoptions action instead
  *
- * @param  string  Name of a public static method of
+ * @param array $params
+ *  Name of a public static method of
  *                  CRM_Core_PseudoConstant: one of
  *  <ul>
  *    <li>activityStatus</li>

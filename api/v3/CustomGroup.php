@@ -95,13 +95,11 @@ function _civicrm_api3_custom_group_create_spec(&$params) {
 /**
  * Use this API to delete an existing group.
  *
- * @param array id of the group to be deleted
+ * @param array $params
  *
- * @return Null
- *   if success
+ * @return array
  */
 function civicrm_api3_custom_group_delete($params) {
-
   $values = new CRM_Core_DAO_CustomGroup();
   $values->id = $params['id'];
   $values->find(TRUE);
