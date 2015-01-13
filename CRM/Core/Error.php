@@ -953,8 +953,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * @param $error
-   * @param const $type
+   * @param array $error
+   * @param int $type
    *
    * @return bool
    */

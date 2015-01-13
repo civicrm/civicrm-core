@@ -34,6 +34,9 @@
  */
 
 /**
+ * @param $params
+ * @param $smarty
+ * @return string|void
  */
 function smarty_function_crmAPI($params, &$smarty) {
   if (!array_key_exists('action', $params)) {
