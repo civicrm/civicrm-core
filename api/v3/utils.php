@@ -848,7 +848,7 @@ function _civicrm_api3_build_fields_array(&$bao, $unique = TRUE) {
 /**
  * build fields array. This is the array of fields as it relates to the given DAO
  * returns unique fields as keys by default but if set but can return by DB fields
- * @param CRM_Core_BAO $bao
+ * @param CRM_Core_DAO $bao
  *
  * @return mixed
  */

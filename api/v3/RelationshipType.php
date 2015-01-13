@@ -104,11 +104,10 @@ function civicrm_api3_relationship_type_get($params) {
 /**
  * Delete a relationship type delete
  *
- * @param id of relationship type $id
+ * @param array $params
  *
  * @return array
  *   API Result Array
- * {@getfields RelationshipType_delete}
  */
 function civicrm_api3_relationship_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
