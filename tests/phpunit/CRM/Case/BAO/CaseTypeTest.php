@@ -15,11 +15,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
   public function definitionProvider() {
     $fixtures['empty-defn'] = array(
       'json' => json_encode(array()),
-      'xml' => '<?xml version="1.0" encoding="utf-8" ?>
-<CaseType>
-  <name>Housing Support</name>
-</CaseType>
-      ',
+      'xml' => file_get_contents(__DIR__ . '/xml/empty-defn.xml'),
     );
 
     $fixtures['empty-lists'] = array(
@@ -28,14 +24,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
         'activityTypes' => array(),
         'caseRoles' => array(),
       )),
-      'xml' => '<?xml version="1.0" encoding="utf-8" ?>
-<CaseType>
-  <name>Housing Support</name>
-  <ActivityTypes></ActivityTypes>
-  <ActivitySets></ActivitySets>
-  <CaseRoles></CaseRoles>
-</CaseType>
-      ',
+      'xml' => file_get_contents(__DIR__ . '/xml/empty-lists.xml'),
     );
 
     $fixtures['one-item-in-each'] = array(
@@ -57,36 +46,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
           array('name' => 'First role', 'creator' => 1, 'manager' => 1),
         ),
       )),
-      'xml' => '<?xml version="1.0" encoding="utf-8" ?>
-<CaseType>
-  <name>Housing Support</name>
-  <ActivityTypes>
-    <ActivityType>
-      <name>First act (foréign éxamplé)</name>
-    </ActivityType>
-  </ActivityTypes>
-  <ActivitySets>
-    <ActivitySet>
-      <name>set1</name>
-      <label>Label 1</label>
-      <timeline>true</timeline>
-      <ActivityTypes>
-        <ActivityType>
-          <name>Open Case</name>
-          <status>Completed</status>
-        </ActivityType>
-      </ActivityTypes>
-    </ActivitySet>
-  </ActivitySets>
-  <CaseRoles>
-    <RelationshipType>
-      <name>First role</name>
-      <creator>1</creator>
-      <manager>1</manager>
-    </RelationshipType>
-  </CaseRoles>
-</CaseType>
-      ',
+      'xml' => file_get_contents(__DIR__ . '/xml/one-item-in-each.xml'),
     );
 
     $fixtures['two-items-in-each'] = array(
@@ -125,85 +85,21 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
           array('name' => 'Second role'),
         ),
       )),
-      'xml' => '<?xml version="1.0" encoding="utf-8" ?>
-<CaseType>
-  <name>Housing Support</name>
-  <ActivityTypes>
-    <ActivityType>
-      <name>First act</name>
-    </ActivityType>
-    <ActivityType>
-      <name>Second act</name>
-    </ActivityType>
-  </ActivityTypes>
-  <ActivitySets>
-    <ActivitySet>
-      <name>set1</name>
-      <label>Label 1</label>
-      <timeline>true</timeline>
-      <ActivityTypes>
-        <ActivityType>
-          <name>Open Case</name>
-          <status>Completed</status>
-        </ActivityType>
-        <ActivityType>
-          <name>Meeting</name>
-          <reference_activity>Open Case</reference_activity>
-          <reference_offset>1</reference_offset>
-          <reference_select>newest</reference_select>
-        </ActivityType>
-      </ActivityTypes>
-    </ActivitySet>
-    <ActivitySet>
-      <name>set2</name>
-      <label>Label 2</label>
-      <sequence>true</sequence>
-      <ActivityTypes>
-        <ActivityType>
-          <name>First act</name>
-        </ActivityType>
-        <ActivityType>
-          <name>Second act</name>
-        </ActivityType>
-      </ActivityTypes>
-    </ActivitySet>
-  </ActivitySets>
-  <CaseRoles>
-    <RelationshipType>
-      <name>First role</name>
-      <creator>1</creator>
-      <manager>1</manager>
-    </RelationshipType>
-    <RelationshipType>
-      <name>Second role</name>
-    </RelationshipType>
-  </CaseRoles>
-</CaseType>
-      ',
+      'xml' => file_get_contents(__DIR__ . '/xml/two-items-in-each.xml'),
     );
 
     $fixtures['forkable-0'] = array(
       'json' => json_encode(array(
         'forkable' => 0,
       )),
-      'xml' => '<?xml version="1.0" encoding="utf-8" ?>
-<CaseType>
-  <name>Housing Support</name>
-  <forkable>0</forkable>
-</CaseType>
-      ',
+      'xml' => file_get_contents(__DIR__ . '/xml/forkable-0.xml'),
     );
 
     $fixtures['forkable-1'] = array(
       'json' => json_encode(array(
         'forkable' => 1,
       )),
-      'xml' => '<?xml version="1.0" encoding="utf-8" ?>
-<CaseType>
-  <name>Housing Support</name>
-  <forkable>1</forkable>
-</CaseType>
-      ',
+      'xml' => file_get_contents(__DIR__ . '/xml/forkable-1.xml'),
     );
 
     $cases = array();

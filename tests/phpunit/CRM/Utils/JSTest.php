@@ -61,15 +61,14 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
       array(),
     );
     $cases[] = array(// with arg
-      '
-      public function whits() {
-        for (a in b) {
-          mitts("wallaby", function(zoo) {
-            alert(zoo + ts("Hello"))
-          });
-        }
-      }
-      ',
+      "\n" .
+      "public function whits() {\n" .
+      "  for (a in b) {\n" .
+      "    mitts(\"wallaby\", function(zoo) {\n" .
+      "      alert(zoo + ts(\"Hello\"))\n" .
+      "    });\n" .
+      "  }\n" .
+      "}\n",
       array('Hello'),
     );
     $cases[] = array(// duplicate
