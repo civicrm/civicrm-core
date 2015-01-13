@@ -36,6 +36,8 @@ define('CHUNK_SIZE', 128);
 
 /**
  * Split a large array of contactIDs into more manageable smaller chunks
+ * @param $contactIDs
+ * @return array
  */
 function &splitContactIDs(&$contactIDs) {
   // contactIDs could be a real large array, so we split it up into
@@ -65,6 +67,8 @@ function &splitContactIDs(&$contactIDs) {
 
 /**
  * Given an array of values, generate the XML in the Solr format
+ * @param $values
+ * @return string
  */
 function &generateSolrXML($values) {
   $result = "<add>\n";
@@ -94,6 +98,9 @@ EOT;
 
 /**
  * Given a set of contact IDs get the values
+ * @param $contactIDs
+ * @param $values
+ * @return array
  */
 function getValues(&$contactIDs, &$values) {
   $values = array();

@@ -108,6 +108,9 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
 
   /**
    * {inheritdoc}
+   * @param array $apiRequest
+   * @return array
+   * @throws \API_Exception
    */
   public function invoke($apiRequest) {
     if (strtolower($apiRequest['entity']) == 'entity' && $apiRequest['action'] == 'get') {
@@ -129,6 +132,8 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
 
   /**
    * {inheritdoc}
+   * @param int $version
+   * @return array
    */
   public function getEntityNames($version) {
     return array('Entity');
@@ -136,6 +141,9 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
 
   /**
    * {inheritdoc}
+   * @param int $version
+   * @param string $entity
+   * @return array
    */
   public function getActionNames($version, $entity) {
     $entity = _civicrm_api_get_camel_name($entity, $version);

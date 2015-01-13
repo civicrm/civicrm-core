@@ -66,6 +66,7 @@ function civicrm_api3_pledge_payment_create($params) {
   }
 
   $dao = CRM_Pledge_BAO_PledgePayment::add($paymentParams);
+  $result = array();
   if (empty($dao->pledge_id)) {
     $dao->find(TRUE);
   }
@@ -124,19 +125,6 @@ function civicrm_api3_pledge_payment_delete($params) {
 function civicrm_api3_pledge_payment_get($params) {
 
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-}
-
-/**
- * @param int $pledgeId
- * @param int $paymentStatusId
- * @param $paymentIds
- *
- * @return mixed
- */
-function updatePledgePayments($pledgeId, $paymentStatusId, $paymentIds) {
-
-  $result = updatePledgePayments($pledgeId, $paymentStatusId, $paymentIds = NULL);
-  return $result;
 }
 
 /**

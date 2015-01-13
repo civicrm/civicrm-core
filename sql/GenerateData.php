@@ -147,6 +147,7 @@ class CRM_GCD {
   /**
    * Public wrapper for calling private "add" functions
    * Provides user feedback
+   * @param $itemName
    */
   public function generate($itemName) {
     echo "Generating $itemName\n";
@@ -260,7 +261,10 @@ class CRM_GCD {
 
   /*********************************
    * private methods
-   *********************************/
+   ********************************
+   * @param int $size
+   * @return string
+   */
 
   // get a randomly generated string
   private function randomString($size = 32) {
@@ -388,6 +392,9 @@ class CRM_GCD {
 
   /**
    * Automatically manage the is_primary field by tracking which contacts have each item
+   * @param $cid
+   * @param $type
+   * @return int
    */
   private function isPrimary($cid, $type) {
     if (empty($this->location[$type][$cid])) {
@@ -400,6 +407,9 @@ class CRM_GCD {
   /**
    * Execute a query unless we are doing a dry run
    * Note: this wrapper should not be used for SELECT queries
+   * @param $query
+   * @param array $params
+   * @return \CRM_Core_DAO
    */
   private function _query($query, $params = array()) {
     if (self::ADD_TO_DB) {
@@ -409,6 +419,7 @@ class CRM_GCD {
 
   /**
    * Call dao insert method unless we are doing a dry run
+   * @param $dao
    */
   private function _insert(&$dao) {
     if (self::ADD_TO_DB) {
@@ -422,6 +433,7 @@ class CRM_GCD {
 
   /**
    * Call dao update method unless we are doing a dry run
+   * @param $dao
    */
   private function _update(&$dao) {
     if (self::ADD_TO_DB) {
@@ -435,6 +447,8 @@ class CRM_GCD {
 
   /**
    * Add core DAO object
+   * @param $type
+   * @param $params
    */
   private function _addDAO($type, $params) {
     $daoName = "CRM_Core_DAO_$type";
@@ -450,6 +464,8 @@ class CRM_GCD {
 
   /**
    * Fetch contact type based on stored mapping
+   * @param $id
+   * @return
    */
   private function getContactType($id) {
     foreach (array('Individual', 'Household', 'Organization') as $type) {

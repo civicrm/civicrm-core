@@ -63,6 +63,8 @@ class I18nSubscriber implements EventSubscriberInterface {
    * Sets the tsLocale and dbLocale for multi-lingual sites.
    * Some code duplication from CRM/Core/BAO/ConfigSetting.php retrieve()
    * to avoid regressions from refactoring.
+   * @param $lcMessagesRequest
+   * @throws \API_Exception
    */
   public function setLocale($lcMessagesRequest) {
     // We must validate whether the locale is valid, otherwise setting a bad

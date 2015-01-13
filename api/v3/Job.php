@@ -28,9 +28,8 @@
 */
 
 /**
- * new version of civicrm apis. See blog post at
+ * new version of civicrm APIs. See blog post at
  * http://civicrm.org/node/131
- * @todo Write sth
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Job
@@ -103,7 +102,8 @@ function civicrm_api3_job_delete($params) {
  * @return array
  *   API Result Array
  */
-function civicrm_api3_job_execute($params) {
+function civicrm_api3_job_execute(/** @noinspection PhpUnusedParameterInspection */
+  $params) {
   $facility = new CRM_Core_JobManager();
   $facility->execute(FALSE);
 
@@ -153,7 +153,7 @@ function _civicrm_api3_job_geocode_spec(&$params) {
   $params['end'] = array('title' => 'End Date');
   $params['geocoding'] = array('title' => 'Geocode address?');
   $params['parse'] = array('title' => 'Parse street address?');
-  $params['throttle'] = array('title' => 'Throttle? if enabled, geocodes at a slow rate');
+  $params['throttle'] = array('title' => 'Throttle? if enabled, geo-codes at a slow rate');
 }
 
 /**
@@ -235,36 +235,24 @@ function civicrm_api3_job_mail_report($params) {
  *
  * @param array $params
  *
- * @return boolean
- *   true if success, else false
+ * @return array
  */
 function civicrm_api3_job_update_greeting($params) {
-
   if (isset($params['ct']) && isset($params['gt'])) {
-    $ct = $gt = array();
     $ct = explode(',', $params['ct']);
     $gt = explode(',', $params['gt']);
     foreach ($ct as $ctKey => $ctValue) {
       foreach ($gt as $gtKey => $gtValue) {
         $params['ct'] = trim($ctValue);
         $params['gt'] = trim($gtValue);
-        $result[] = CRM_Contact_BAO_Contact_Utils::updateGreeting($params);
+        CRM_Contact_BAO_Contact_Utils::updateGreeting($params);
       }
     }
   }
   else {
-    $result = CRM_Contact_BAO_Contact_Utils::updateGreeting($params);
+    CRM_Contact_BAO_Contact_Utils::updateGreeting($params);
   }
-
-  foreach ($result as $resultKey => $resultValue) {
-    if ($resultValue['is_error'] == 0) {
-      //really we should rely on the exception mechanism here - but we need to test that before removing this line
-      return civicrm_api3_create_success();
-    }
-    else {
-      return civicrm_api3_create_error($resultValue['messages']);
-    }
-  }
+  return civicrm_api3_create_success();
 }
 
 /**
@@ -343,7 +331,7 @@ function civicrm_api3_job_process_sms($params) {
 }
 
 /**
- * Job to get mail responses from civimailing
+ * Job to get mail responses from civiMailing
  *
  * @param array $params
  *
@@ -424,7 +412,8 @@ function civicrm_api3_job_process_participant($params) {
  * @return boolean
  *   true if success, else false
  */
-function civicrm_api3_job_process_membership($params) {
+function civicrm_api3_job_process_membership(/** @noinspection PhpUnusedParameterInspection */
+  $params) {
   $lock = new CRM_Core_Lock('civimail.job.updateMembership');
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error('Could not acquire lock, another Membership Processing process is running');
@@ -442,7 +431,7 @@ function civicrm_api3_job_process_membership($params) {
 }
 
 /**
- * This api checks and updates the status of all survey respondants.
+ * This api checks and updates the status of all survey respondents.
  *
  * @param array $params
  *   (reference ) input parameters.
@@ -467,13 +456,6 @@ function civicrm_api3_job_process_respondent($params) {
  * @param array $params
  *   Input parameters.
  *
- * Allowed @params array keys are:
- * {int     $rgid        rule group id}
- * {int     $gid         group id}
- * {string  mode        helps decide how to behave when there are conflicts.
- *                      A 'safe' value skips the merge if there are no conflicts. Does a force merge otherwise.}
- * {boolean auto_flip   wether to let api decide which contact to retain and which to delete.}
- *
  * @return array
  *   API Result Array
  *
@@ -493,6 +475,32 @@ function civicrm_api3_job_process_batch_merge($params) {
   else {
     return civicrm_api3_create_error($result['messages']);
   }
+}
+
+/**
+ * @param $params
+ */
+function _civicrm_api3_job_process_batch_merge_spec(&$params) {
+  $params['rgid'] = array(
+    'title' => 'rule group id',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['gid'] = array(
+    'title' => 'group id',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['mode'] = array(
+    'title' => 'Mode',
+    'description' => 'helps decide how to behave when there are conflicts.
+       A \'safe\' value skips the merge if there are no conflicts.
+       Does a force merge otherwise.',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['auto_flip'] = array(
+    'title' => 'Auto Flip',
+    'description' => 'let the api decide which contact to retain and which to delete?',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
 }
 
 /**
@@ -566,19 +574,17 @@ function civicrm_api3_job_cleanup($params) {
 
 /**
  * Set expired relationships to disabled.
- *
- * @param array $params
- *
+ * @param $params
  * @return array
+ * @throws \API_Exception
  */
-function civicrm_api3_job_disable_expired_relationships($params) {
+function civicrm_api3_job_disable_expired_relationships(/** @noinspection PhpUnusedParameterInspection */
+  $params) {
   $result = CRM_Contact_BAO_Relationship::disableExpiredRelationships();
-  if ($result) {
-    return civicrm_api3_create_success();
+  if (!$result) {
+    throw new API_Exception('Failed to disable all expired relationships.');
   }
-  else {
-    return civicrm_api3_create_error('Failed to disable all expired relationships.');
-  }
+  return civicrm_api3_create_success();
 }
 
 /**
@@ -588,13 +594,13 @@ function civicrm_api3_job_disable_expired_relationships($params) {
  * and use the cache
  *
  * @param array $params
- *
  * @return array
+ * @throws \API_Exception
  */
 function civicrm_api3_job_group_rebuild($params) {
   $lock = new CRM_Core_Lock('civimail.job.groupRebuild');
   if (!$lock->isAcquired()) {
-    return civicrm_api3_create_error('Could not acquire lock, another EmailProcessor process is running');
+    throw new API_Exception('Could not acquire lock, another EmailProcessor process is running');
   }
 
   $limit = CRM_Utils_Array::value('limit', $params, 0);

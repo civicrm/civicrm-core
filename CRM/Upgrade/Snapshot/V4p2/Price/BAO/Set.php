@@ -1132,11 +1132,11 @@ GROUP BY     mt.member_of_contact_id";
    *
    * @param int $id
    *   Id of the database record.
-   * @param bool $isQuickConfigValue we want to set the is_quick_config field.
+   * @param bool $isQuickConfig we want to set the is_quick_config field.
    *   Value we want to set the is_quick_config field.
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    */
   public static function setIsQuickConfig($id, $isQuickConfig) {
     return CRM_Core_DAO::setFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set', $id, 'is_quick_config', $isQuickConfig);

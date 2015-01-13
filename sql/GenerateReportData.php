@@ -240,7 +240,10 @@ class CRM_GCD {
 
   /*********************************
    * private methods
-   *********************************/
+   ********************************
+   * @param int $size
+   * @return string
+   */
 
   // get a randomly generated string
   private function _getRandomString($size = 32) {

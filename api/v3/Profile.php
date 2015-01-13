@@ -43,7 +43,7 @@
  *                             pairs to get profile field values
  *
  * @throws API_Exception
- * @return array|CRM_Error
+ * @return array
  *
  * NOTE this api is not standard & since it is tested we need to honour that
  * but the correct behaviour is for it to return an id indexed array as this supports
@@ -354,7 +354,7 @@ function civicrm_api3_profile_set($params) {
  *                             pairs to profile field values
  *
  * @throws API_Exception
- * @return array|CRM_Error
+ * @return array
  *
  * @todo add example
  * @todo add test cases

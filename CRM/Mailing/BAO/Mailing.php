@@ -898,7 +898,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    *  structures to represent the order in which tokens were found from left to right, top to bottom.
    *
    *
-   * @param string $propName of the property that holds the text that we want to scan for tokens (html, text).
+   * @param string $prop name of the property that holds the text that we want to scan for tokens (html, text).
    *   Name of the property that holds the text that we want to scan for tokens (html, text).
    *
    * @return void
