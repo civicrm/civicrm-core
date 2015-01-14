@@ -71,7 +71,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
    *
    * @return array
    */
-  function &actionLinks() {
+  public function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_actionLinks)) {
       // helper variable for nicer formatting
@@ -294,7 +294,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
         'url' => CRM_Utils_System::url(CRM_Utils_System::currentPath(),
           'reset=1'
         ),
-      )
+      ),
     );
 
     // what action to take ?
@@ -624,7 +624,7 @@ ORDER BY title asc
    *
    * @return int[]
    */
-  function getCampaignIds() {
+  pubic function getCampaignIds() {
     // The unfiltered value from the session cannot be trusted, it needs to be
     // processed to get a clean array of positive integers.
     $ids = array();
@@ -640,7 +640,7 @@ ORDER BY title asc
    * @param $whereClause
    * @param array $whereParams
    */
-  function pager($whereClause, $whereParams) {
+  public function pager($whereClause, $whereParams) {
 
     $params['status'] = ts('Contribution %%StatusMessage%%');
     $params['csvString'] = NULL;

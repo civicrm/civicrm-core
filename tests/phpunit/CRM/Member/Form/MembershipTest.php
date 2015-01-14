@@ -222,7 +222,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => array(),
     );
     $files = array();
-    $obj = new CRM_Member_Form_Membership;
+    $obj = new CRM_Member_Form_Membership();
     $rc = $obj->formRule($params, $files, $obj);
     $this->assertType('array', $rc,
       'In line ' . __LINE__
@@ -258,7 +258,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => array('23', '3'),
     );
     $files = array();
-    $obj = new CRM_Member_Form_Membership;
+    $obj = new CRM_Member_Form_Membership();
     $rc = call_user_func(array('CRM_Member_Form_Membership', 'formRule'),
       $params, $files, $obj
     );
@@ -287,7 +287,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => array('23', '3'),
     );
     $files = array();
-    $obj = new CRM_Member_Form_Membership;
+    $obj = new CRM_Member_Form_Membership();
     $rc = $obj->formRule($params, $files, $obj);
     $this->assertType('array', $rc,
       'In line ' . __LINE__
@@ -314,7 +314,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => array('23', '3'),
     );
     $files = array();
-    $obj = new CRM_Member_Form_Membership;
+    $obj = new CRM_Member_Form_Membership();
     $rc = $obj->formRule($params, $files, $obj);
     $this->assertType('array', $rc,
       'In line ' . __LINE__
@@ -340,7 +340,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => array('23', '13'),
     );
     $files = array();
-    $obj = new CRM_Member_Form_Membership;
+    $obj = new CRM_Member_Form_Membership();
     $rc = $obj->formRule($params, $files, $obj);
     $this->assertType('array', $rc);
     $this->assertTrue(array_key_exists('status_id', $rc));
@@ -359,7 +359,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'is_override' => TRUE,
     );
     $files = array();
-    $obj = new CRM_Member_Form_Membership;
+    $obj = new CRM_Member_Form_Membership();
     $rc = $obj->formRule($params, $files, $obj);
     $this->assertType('array', $rc,
       'In line ' . __LINE__
@@ -383,7 +383,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => array('23', '3'),
     );
     $files = array();
-    $obj = new CRM_Member_Form_Membership;
+    $obj = new CRM_Member_Form_Membership();
     $rc = $obj->formRule($params, $files, $obj);
 
     //  Should have found no valid membership status
@@ -408,7 +408,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => array('23', '3'),
     );
     $files = array();
-    $obj = new CRM_Member_Form_Membership;
+    $obj = new CRM_Member_Form_Membership();
     $rc = $obj->formRule($params, $files, $obj);
 
     //  Should have found New membership status
@@ -429,7 +429,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => array('23', '3'),
     );
     $files = array();
-    $obj = new CRM_Member_Form_Membership;
+    $obj = new CRM_Member_Form_Membership();
     $rc = $obj->formRule($params, $files, $obj);
 
     //  Should have found New membership status
@@ -450,7 +450,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => array('23', '3'),
     );
     $files = array();
-    $obj = new CRM_Member_Form_Membership;
+    $obj = new CRM_Member_Form_Membership();
     $rc = $obj->formRule($params, $files, $obj);
 
     //  Should have found Current membership status
@@ -471,7 +471,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => array('23', '3'),
     );
     $files = array();
-    $obj = new CRM_Member_Form_Membership;
+    $obj = new CRM_Member_Form_Membership();
     $rc = $obj->formRule($params, $files, $obj);
 
     //  Should have found Grace membership status
@@ -492,7 +492,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => array('23', '3'),
     );
     $files = array();
-    $obj = new CRM_Member_Form_Membership;
+    $obj = new CRM_Member_Form_Membership();
     $rc = $obj->formRule($params, $files, $obj);
 
     //  Should have found Expired membership status
@@ -513,7 +513,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => array('23', '7'),
     );
     $files = array();
-    $obj = new CRM_Member_Form_Membership;
+    $obj = new CRM_Member_Form_Membership();
     $rc = $obj->formRule($params, $files, $obj);
 
     //  Should have found Current membership status

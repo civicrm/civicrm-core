@@ -71,7 +71,6 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   /**
    * Get all fields of the type Date
    */
-
   public static function getDateFields() {
     $allFields = CRM_Core_BAO_CustomField::getFields('');
     $dateFields = array('birth_date' => ts('Birth Date'));
@@ -489,7 +488,7 @@ AND   cas.entity_value = $id AND
       foreach (array(
                  'text',
                  'html',
-                 'sms_text'
+                 'sms_text',
                ) as $elem) {
         $$elem = $smarty->fetch("string:{$$elem}");
       }
@@ -529,7 +528,7 @@ AND   cas.entity_value = $id AND
         $smsParams = array(
           'To' => $phoneNumber,
           'provider_id' => $schedule->sms_provider_id,
-          'activity_subject' => $messageSubject
+          'activity_subject' => $messageSubject,
         );
         $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
           'SMS',
@@ -701,16 +700,16 @@ AND   cas.entity_value = $id AND
       $activityStatusID = FALSE;
       if ($actionSchedule->record_activity) {
         if ($mapping->entity == 'civicrm_membership') {
-          $activityTypeID =
-            CRM_Core_OptionGroup::getValue('activity_type', 'Membership Renewal Reminder', 'name');
+          $activityTypeID
+            = CRM_Core_OptionGroup::getValue('activity_type', 'Membership Renewal Reminder', 'name');
         }
         else {
-          $activityTypeID =
-            CRM_Core_OptionGroup::getValue('activity_type', 'Reminder Sent', 'name');
+          $activityTypeID
+            = CRM_Core_OptionGroup::getValue('activity_type', 'Reminder Sent', 'name');
         }
 
-        $activityStatusID =
-          CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name');
+        $activityStatusID
+          = CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name');
       }
 
       if ($mapping->entity == 'civicrm_activity') {
@@ -753,7 +752,7 @@ LEFT JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option
           'fee_amount',
           'contact_email',
           'contact_phone',
-          'balance'
+          'balance',
         );
         $extraSelect = ', ov.label as event_type, ev.title, ev.id as event_id, ev.start_date, ev.end_date, ev.summary, ev.description, address.street_address, address.city, address.state_province_id, address.postal_code, email.email as contact_email, phone.phone as contact_phone ';
 
@@ -880,8 +879,8 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         if ($toEmail || !(empty($toPhoneNumber) or $toDoNotSms)) {
           $to['email'] = $toEmail;
           $to['phone'] = $toPhoneNumber;
-          $result =
-            CRM_Core_BAO_ActionSchedule::sendReminder(
+          $result
+            = CRM_Core_BAO_ActionSchedule::sendReminder(
               $dao->contactID,
               $to,
               $actionSchedule->id,
@@ -913,8 +912,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           $activityParams = array(
             'subject' => $actionSchedule->title,
             'details' => $actionSchedule->body_html,
-            'source_contact_id' =>
-              $session->get('userID') ? $session->get('userID') : $dao->contactID,
+            'source_contact_id' => $session->get('userID') ? $session->get('userID') : $dao->contactID,
             'target_contact_id' => $dao->contactID,
             'activity_date_time' => date('YmdHis'),
             'status_id' => $activityStatusID,
@@ -1333,9 +1331,10 @@ INNER JOIN {$reminderJoinClause}
         $valsqlInsertValues = CRM_Core_DAO::executeQuery($sqlInsertValues, array(
             1 => array(
               $actionSchedule->id,
-              'Integer'
-            )
-          ));
+              'Integer',
+            ),
+          )
+        );
 
         $arrValues = array();
         while ($valsqlInsertValues->fetch()) {
