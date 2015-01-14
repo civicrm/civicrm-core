@@ -177,6 +177,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
 
     //visit the logging contact summary report
     $this->openCiviPage('report/logging/contact/summary', 'reset=1');
+    $this->waitForElementPresent('altered_contact_value');
     $this->type('altered_contact_value', $firstName);
     $this->click("_qf_LoggingSummary_submit");
     $this->waitForPageToLoad($this->getTimeoutMsec());

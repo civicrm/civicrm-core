@@ -644,7 +644,7 @@ LIMIT 1;";
           'labelColumn' => 'name',
           'flip' => 1
         ));
-      if ((empty($input['prevContribution']) && $paymentProcessorId) || (!$input['prevContribution']->is_pay_later && -$input['prevContribution']->contribution_status_id == $contributionStatuses['Pending'])) {
+      if ((empty($input['prevContribution']) && $paymentProcessorId) || (!$input['prevContribution']->is_pay_later && $input['prevContribution']->contribution_status_id == $contributionStatuses['Pending'])) {
         $input['payment_processor'] = $paymentProcessorId;
       }
       $input['contribution_status_id'] = $contributionStatuses['Completed'];
