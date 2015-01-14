@@ -147,9 +147,6 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_tagFilter = FALSE;
 
   /**
-   * <<<<<<< HEAD
-   * Build groups filter
-   * =======
    * specify entity table for tags filter
    *
    */
@@ -158,7 +155,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * build groups filter
    *
-   * >>>>>>> 098a61330d0fe12153370741ec98cb1172ece849
+   * @var bool
    */
   protected $_groupFilter = FALSE;
 
@@ -206,6 +203,21 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_rowsFound = NULL;
   protected $_selectAliases = array();
   protected $_rollup = NULL;
+
+  /**
+   * @var array
+   */
+  protected $_aliases = array();
+
+  /**
+   * @var string
+   */
+  protected $_where;
+
+  /**
+   * @var string
+   */
+  protected $_from;
 
   /**
    * SQL Limit clause
@@ -1408,11 +1420,14 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * @param $field
-   * @param $op
-   * @param $value
-   * @param $min
-   * @param $max
+   * Generate where clause.
+   * This is over-ridable in reports for special treatment of a field
+   *
+   * @param string $field
+   * @param string $op
+   * @param mixed $value
+   * @param float $min
+   * @param float $max
    *
    * @return null|string
    */
@@ -1486,7 +1501,7 @@ class CRM_Report_Form extends CRM_Core_Form {
           if (CRM_Utils_Array::value('type', $field) ==
             CRM_Utils_Type::T_STRING
           ) {
-            //cycle through selections and esacape values
+            //cycle through selections and escape values
             foreach ($value as $key => $selection) {
               $value[$key] = CRM_Utils_Type::escape($selection, $type);
             }
@@ -1583,10 +1598,10 @@ class CRM_Report_Form extends CRM_Core_Form {
       $clause = $this->whereTagClause($field, $value, $op);
     }
     elseif (!empty($field['membership_org']) && $clause) {
-      $clause = $this->whereMembershipOrgClause($field, $value, $op);
+      $clause = $this->whereMembershipOrgClause($value, $op);
     }
     elseif (!empty($field['membership_type']) && $clause) {
-      $clause = $this->whereMembershipTypeClause($field, $value, $op);
+      $clause = $this->whereMembershipTypeClause($value, $op);
     }
     return $clause;
   }
@@ -1594,8 +1609,8 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * @param string $fieldName
    * @param $relative
-   * @param $from
-   * @param $to
+   * @param string $from
+   * @param string $to
    * @param null $type
    * @param null $fromTime
    * @param null $toTime
@@ -1665,11 +1680,11 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * @param $relative
-   * @param $from
-   * @param $to
-   * @param null $fromtime
-   * @param null $totime
+   * @param bool $relative
+   * @param string $from
+   * @param string $to
+   * @param string $fromtime
+   * @param string $totime
    *
    * @return array
    */
@@ -1918,7 +1933,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   public function fixSubTotalDisplay(&$row, $fields, $subtotal = TRUE) {
     foreach ($row as $colName => $colVal) {
       if (in_array($colName, $fields)) {
-        $row[$colName] = $row[$colName];
       }
       elseif (isset($this->_columnHeaders[$colName])) {
         if ($subtotal) {
@@ -3135,7 +3149,15 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                           WHERE entity_table = '$entity_table' AND {$clause} ) ";
   }
 
-  public function whereMembershipOrgClause($field, $value, $op) {
+  /**
+   * Generate membership organization clause.
+   *
+   * @param mixed $value
+   * @param string $op SQL Operator
+   *
+   * @return string
+   */
+  public function whereMembershipOrgClause($value, $op) {
     $sqlOp = $this->getSQLOperator($op);
     if (!is_array($value)) {
       $value = array($value);
@@ -3154,7 +3176,15 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                           AND mem_status.is_active = '1' )  ";
   }
 
-  public function whereMembershipTypeClause($field, $value, $op) {
+  /**
+   * Generate Membership Type SQL Clause
+   * @param mixed $value
+   * @param string $op
+   *
+   * @return string
+   *   SQL query string
+   */
+  public function whereMembershipTypeClause($value, $op) {
     $sqlOp = $this->getSQLOperator($op);
     if (!is_array($value)) {
       $value = array($value);
