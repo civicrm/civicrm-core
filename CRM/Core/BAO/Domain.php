@@ -131,8 +131,6 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Get the location values of a domain
    *
-   * @param NULL
-   *
    * @return array
    *   Location::getValues
    */

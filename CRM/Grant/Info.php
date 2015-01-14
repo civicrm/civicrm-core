@@ -135,7 +135,7 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
           'query' => "reset=1&action=add&context=standalone",
           'ref' => 'new-grant',
           'title' => ts('Grant'),
-        )
+        ),
       ));
     }
   }

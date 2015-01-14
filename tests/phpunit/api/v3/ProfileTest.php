@@ -176,13 +176,13 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
         'contact_id' => $contactId,
         'street_address' => '25 Big Street',
         'city' => 'big city',
-        'location_type_id' => 5
+        'location_type_id' => 5,
       ));
     $this->callAPISuccess('email', 'create', array(
         'contact_id' => $contactId,
         'email' => 'big@once.com',
         'location_type_id' => 2,
-        'is_billing' => 1
+        'is_billing' => 1,
       ));
 
     $expected = current($individual);
@@ -309,7 +309,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->_addCustomFieldToProfile($this->_profileID);
     $result = $this->callAPIAndDocument('profile', 'getfields', array(
         'action' => 'submit',
-        'profile_id' => $this->_profileID
+        'profile_id' => $this->_profileID,
       ), __FUNCTION__, __FILE__,
       'demonstrates retrieving profile fields passing in an id');
     $this->assertArrayKeyExists('first_name', $result['values']);
@@ -327,7 +327,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('profile', 'getfields', array(
         'action' => 'submit',
         'profile_id' => 'participant_status',
-        'get_options' => 'all'
+        'get_options' => 'all',
       )
     );
     $this->assertTrue(array_key_exists('participant_status_id', $result['values']));
@@ -343,7 +343,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('profile', 'getfields', array(
         'action' => 'submit',
         'profile_id' => 'membership_batch_entry',
-        'get_options' => 'all'
+        'get_options' => 'all',
       )
     );
     $this->assertTrue(array_key_exists('total_amount', $result['values']));
@@ -351,7 +351,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->assertEquals(array(
         'contribution_type_id',
         'contribution_type',
-        'financial_type'
+        'financial_type',
       ), $result['values']['financial_type_id']['api.aliases']);
     $this->assertTrue(!array_key_exists('financial_type', $result['values']));
     $this->assertEquals(12, $result['values']['receive_date']['type']);
@@ -368,7 +368,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       $result = $this->callAPISuccess('profile', 'getfields', array(
           'action' => 'submit',
           'profile_id' => $profileID,
-          'get_options' => 'all'
+          'get_options' => 'all',
         )
       );
     }
@@ -475,11 +475,11 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $profileFields = $this->callAPISuccess('profile', 'getfields', array(
         'get_options' => 'all',
         'action' => 'submit',
-        'profile_id' => 'membership_batch_entry'
+        'profile_id' => 'membership_batch_entry',
       ));
     $getoptions = $this->callAPISuccess('membership', 'getoptions', array(
         'field' => 'membership_type',
-        'context' => 'validate'
+        'context' => 'validate',
       ));
     $this->assertEquals(array_keys($membershipTypes['values']), array_keys($getoptions['values']));
     $this->assertEquals(array_keys($membershipTypes['values']), array_keys($profileFields['values']['membership_type_id']['options']));
@@ -492,7 +492,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   public function testMembershipGetFieldsOrder() {
     $result = $this->callAPISuccess('profile', 'getfields', array(
         'action' => 'submit',
-        'profile_id' => 'membership_batch_entry'
+        'profile_id' => 'membership_batch_entry',
       ));
     $weight = 1;
     foreach ($result['values'] as $fieldName => $field) {
@@ -716,7 +716,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     foreach (array(
                'email',
                'phone',
-               'address'
+               'address',
              ) as $fieldType) {
       $typeValues = array_pop($result['values'][$fieldType]);
       foreach ($expected[$fieldType] as $field => $value) {
@@ -933,7 +933,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->uFFieldCreate(array(
         'uf_group_id' => $profileID,
         'field_name' => 'custom_' . $ids['custom_field_id'],
-        'contact_type' => 'Contact'
+        'contact_type' => 'Contact',
       ));
   }
 }

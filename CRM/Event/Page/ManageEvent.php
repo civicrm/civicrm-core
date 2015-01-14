@@ -214,7 +214,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
         array(
           'title' => ts('Manage Events'),
           'url' => CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1'),
-        )
+        ),
       );
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
     }
@@ -302,7 +302,7 @@ ORDER BY start_date desc
     // get the list of active event pcps
     $eventPCPS = array();
 
-    $pcpDao = new CRM_PCP_DAO_PCPBlock;
+    $pcpDao = new CRM_PCP_DAO_PCPBlock();
     $pcpDao->entity_table = 'civicrm_event';
     $pcpDao->find();
 

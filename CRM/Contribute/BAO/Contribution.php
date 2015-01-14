@@ -642,16 +642,16 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           'title' => ts('Contribution Page'),
           'name' => 'contribution_page',
           'where' => 'civicrm_contribution_page.title',
-          'data_type' => CRM_Utils_Type::T_STRING
-        ));
+          'data_type' => CRM_Utils_Type::T_STRING,
+        )
+      );
 
       $contributionNote = array(
-        'contribution_note' =>
-          array(
-            'title' => ts('Contribution Note'),
-            'name' => 'contribution_note',
-            'data_type' => CRM_Utils_Type::T_TEXT,
-          ),
+        'contribution_note' => array(
+          'title' => ts('Contribution Note'),
+          'name' => 'contribution_note',
+          'data_type' => CRM_Utils_Type::T_TEXT,
+        ),
       );
 
       $contributionRecurId = array(
@@ -844,7 +844,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    *   (reference) store ids of duplicate contribs.
    * @param int $id
    *
-   * @return boolean
+   * @return bool
    *   true if duplicate, false otherwise
    */
   public static function checkDuplicate($input, &$duplicates, $id = NULL) {
@@ -1580,7 +1580,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
               WHERE     membership_id=$membership->id
               ORDER BY  id DESC
               LIMIT     1;";
-            $dao = new CRM_Core_DAO;
+            $dao = new CRM_Core_DAO();
             $dao->query($sql);
             if ($dao->fetch()) {
               if (!empty($dao->membership_type_id)) {
@@ -2570,7 +2570,7 @@ WHERE  contribution_id = %1 ";
    *
    * @param bool $isNotCancelled
    *
-   * @return boolean
+   * @return bool
    */
   public static function isCancelSubscriptionSupported($contributionId, $isNotCancelled = TRUE) {
     $cacheKeyString = "$contributionId";
@@ -3156,7 +3156,7 @@ WHERE  contribution_id = %1 ";
    * @param array $props
    *   whatever is known about this dao object.
    *
-   * @return Array|bool
+   * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     $className = __CLASS__;
