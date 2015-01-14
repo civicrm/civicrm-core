@@ -84,7 +84,7 @@ class Analyzer {
       $activityStatusGroup = civicrm_api3('option_group', 'get', array('name' => 'activity_status'));
       $activityStatus = array(
         'name' => $status,
-        'option_group_id' => $activityStatusGroup['id']
+        'option_group_id' => $activityStatusGroup['id'],
       );
       $activityStatusID = civicrm_api3('option_value', 'get', $activityStatus);
       $activityStatusID = $activityStatusID['values'][$activityStatusID['id']]['value'];

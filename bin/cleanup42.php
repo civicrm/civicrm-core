@@ -30,6 +30,9 @@
  * in order to correct the condition where a contribution row is linked to > 1 membership.
  */
 
+/**
+ * Initialization
+ */
 function initialize() {
   session_start();
   if (!function_exists('drush_get_context')) {

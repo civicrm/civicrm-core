@@ -37,7 +37,7 @@ class CRM_Contact_Page_View_Sunlight extends CRM_Contact_Page_View {
   /**
    * called when action is browse
    *
-   * @return null
+   * @return void
    */
   public function browse() {
     // get the primary city, state and zip for the contact

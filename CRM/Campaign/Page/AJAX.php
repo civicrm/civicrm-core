@@ -158,7 +158,7 @@ class CRM_Campaign_Page_AJAX {
     //format multi-select group and contact types.
     foreach (array(
                'group',
-               'contact_type'
+               'contact_type',
              ) as $param) {
       $paramValue = CRM_Utils_Array::value($param, $params);
       if ($paramValue) {
@@ -174,7 +174,7 @@ class CRM_Campaign_Page_AJAX {
     foreach (array(
                'campaign_survey_id',
                'survey_interviewer_id',
-               'campaign_search_voter_for'
+               'campaign_search_voter_for',
              ) as $fld) {
       $voterClauseParams[$fld] = CRM_Utils_Array::value($fld, $params);
     }
@@ -499,7 +499,7 @@ class CRM_Campaign_Page_AJAX {
       array(
         'value' => '',
         'title' => ts('- select -'),
-      )
+      ),
     );
     foreach ($campaigns as $value => $title) {
       $class = NULL;
@@ -546,7 +546,7 @@ class CRM_Campaign_Page_AJAX {
       array(
         'value' => '',
         'title' => ts('- select -'),
-      )
+      ),
     );
     foreach ($campGroups as $grpId => $title) {
       $groups[] = array(
@@ -565,7 +565,7 @@ class CRM_Campaign_Page_AJAX {
   /**
    * Retrieve campaigns as for campaign dashboard.
    *
-   **/
+   */
   public function campaignList() {
     //get the search criteria params.
     $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
@@ -635,7 +635,7 @@ class CRM_Campaign_Page_AJAX {
                'sort',
                'offset',
                'rowCount',
-               'sortOrder'
+               'sortOrder',
              ) as $sortParam) {
       $params[$sortParam] = $$sortParam;
     }
@@ -666,7 +666,7 @@ class CRM_Campaign_Page_AJAX {
   /**
    * Retrieve survey for survey dashboard.
    *
-   **/
+   */
   public function surveyList() {
     //get the search criteria params.
     $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
@@ -738,7 +738,7 @@ class CRM_Campaign_Page_AJAX {
                'sort',
                'offset',
                'rowCount',
-               'sortOrder'
+               'sortOrder',
              ) as $sortParam) {
       $params[$sortParam] = $$sortParam;
     }
@@ -769,7 +769,7 @@ class CRM_Campaign_Page_AJAX {
   /**
    * Retrieve petitions for petition dashboard.
    *
-   **/
+   */
   public function petitionList() {
     //get the search criteria params.
     $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
@@ -836,7 +836,7 @@ class CRM_Campaign_Page_AJAX {
                'sort',
                'offset',
                'rowCount',
-               'sortOrder'
+               'sortOrder',
              ) as $sortParam) {
       $params[$sortParam] = $$sortParam;
     }

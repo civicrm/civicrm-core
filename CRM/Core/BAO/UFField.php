@@ -106,7 +106,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    * @param int $id
    *   Field Id.
    *
-   * @return boolean
+   * @return bool
    *
    */
   public static function del($id) {
@@ -360,7 +360,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * @param int $UFFieldId
    *
-   * @return boolean
+   * @return bool
    *   false if custom field are disabled else true
    */
   public static function checkUFStatus($UFFieldId) {
@@ -450,11 +450,11 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * @param array $optional
    *   Array of types those are optional.
    *
-   * @return boolean
+   * @return bool
    */
   public static function checkValidProfileType($ufGroupId, $required, $optional = NULL) {
     if (!is_array($required) || empty($required)) {
-      return;
+      return FALSE;
     }
 
     $ufGroup = new CRM_Core_DAO_UFGroup();
@@ -569,7 +569,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * @return string
    *   profile group_type
    *
-   * TODO Why is this function in this class? It seems to be about the UFGroup.
    */
   public static function getProfileType($ufGroupId, $returnMixType = TRUE, $onlyPure = FALSE, $skipComponentType = FALSE) {
     $ufGroup = new CRM_Core_DAO_UFGroup();
@@ -590,10 +589,8 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *   True if only pure profiles are required.
    * @param bool $skipComponentType
    *
-   * @return string
-   *   profile group_type
+   * @return string  profile group_type
    *
-   * TODO Why is this function in this class? It seems to be about the UFGroup.
    */
   public static function calculateProfileType($ufGroupType, $returnMixType = TRUE, $onlyPure = FALSE, $skipComponentType = FALSE) {
     // profile types
@@ -728,7 +725,7 @@ SELECT ufg.id as id
    *
    * @param int $profileID
    *
-   * @return boolean
+   * @return bool
    */
   public static function checkSearchableORInSelector($profileID) {
     $result = FALSE;
@@ -802,7 +799,7 @@ SELECT  id
         'return' => 'field_name, is_required',
         'options' => array(
           'limit' => 0,
-        )
+        ),
       )
     ));
     //check for valid fields ( fields that are present in billing block )
@@ -831,7 +828,7 @@ SELECT  id
     }
 
     if (!in_array($prefixName, $validProfileFields)) {
-      return;
+      return FALSE;
     }
 
     if (!empty($index) && (
@@ -1029,7 +1026,7 @@ SELECT  id
     ));
     //unset selected fields
     foreach ($groupFieldList as $key => $value) {
-      if (is_integer($key)) {
+      if (is_int($key)) {
         unset($fields['Individual'][$value], $fields['Household'][$value], $fields['Organization'][$value]);
         continue;
       }

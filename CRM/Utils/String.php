@@ -51,8 +51,7 @@ class CRM_Utils_String {
    * Convert a display name into a potential variable
    * name that we could use in forms/code
    *
-   * @param name Name of the string
-   *
+   * @param $title title of the string
    * @param int $maxLength
    *
    * @return string
@@ -209,7 +208,7 @@ class CRM_Utils_String {
    * @param bool $utf8
    *   Attempt utf8 match on failure (default yes).
    *
-   * @return boolean
+   * @return bool
    *   true if string is ascii
    */
   public static function isAscii($str, $utf8 = TRUE) {
@@ -312,7 +311,7 @@ class CRM_Utils_String {
    * @param string $str
    *   Input string.
    *
-   * @return boolean
+   * @return bool
    */
   public static function isUtf8($str) {
     if (!function_exists(mb_detect_encoding)) {
@@ -342,7 +341,7 @@ class CRM_Utils_String {
    * @param string $url2
    *   The second url to be matched against.
    *
-   * @return boolean
+   * @return bool
    *   true if the urls match, else false
    */
   public static function match($url1, $url2) {
@@ -391,7 +390,7 @@ class CRM_Utils_String {
    * @param string $str
    *   The string to be translated.
    *
-   * @return boolean
+   * @return bool
    */
   public static function strtobool($str) {
     if (!is_scalar($str)) {
@@ -410,7 +409,7 @@ class CRM_Utils_String {
    * @param string $str
    *   The string to be translated.
    *
-   * @return boolean
+   * @return bool
    */
   public static function strtoboolstr($str) {
     if (!is_scalar($str)) {
@@ -571,7 +570,7 @@ class CRM_Utils_String {
    * @return string
    *   the sanitized string
    */
-  static function stripPathChars(
+  public static function stripPathChars(
     $string,
     $search = NULL,
     $replace = NULL
@@ -737,7 +736,7 @@ class CRM_Utils_String {
    * @param bool $case
    *   Boolean indicating whether you want the comparison to be case sensitive or not.
    *
-   * @return boolean
+   * @return bool
    *   TRUE (string are identical); FALSE (strings are not identical)
    */
   public static function compareStr($strOne, $strTwo, $case) {
@@ -771,7 +770,7 @@ class CRM_Utils_String {
    * (because most other odd characters are %-escaped in URLs; and %-escaped
    * strings don't need any extra escaping in HTML).
    *
-   * @param string $url
+   * @param string $htmlUrl
    *   URL with HTML entities.
    * @return string
    *   URL without HTML entities
