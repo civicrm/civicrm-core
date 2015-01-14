@@ -63,7 +63,7 @@ class CRM_Utils_Geocode_Yahoo {
    * @param bool $stateName
    *   This parameter currently has no function.
    *
-   * @return boolean
+   * @return bool
    *   true if we modified the address, false otherwise
    */
   public static function format(&$values, $stateName = FALSE) {
@@ -118,7 +118,7 @@ class CRM_Utils_Geocode_Yahoo {
 
     $add = 'q=' . urlencode('select * from geo.placefinder where ');
 
-    $add .= join(urlencode(' and '), $whereComponents);
+    $add .= implode(urlencode(' and '), $whereComponents);
 
     $add .= "&appid=" . urlencode($config->mapAPIKey);
 

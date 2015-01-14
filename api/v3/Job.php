@@ -63,7 +63,7 @@ function _civicrm_api3_job_create_spec(&$params) {
  *
  * @return array
  *
- * {@getfields Job_create}
+ *   {@getfields Job_create}
  */
 function civicrm_api3_job_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -76,7 +76,7 @@ function civicrm_api3_job_create($params) {
  *   input parameters
  * @return array
  *
- * {@getfields email_get}
+ *   {@getfields email_get}
  */
 function civicrm_api3_job_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -103,8 +103,9 @@ function civicrm_api3_job_delete($params) {
  * @return array
  *   API Result Array
  */
-function civicrm_api3_job_execute(/** @noinspection PhpUnusedParameterInspection */
-  $params) {
+function civicrm_api3_job_execute($params) {
+  // @noinspection PhpUnusedParameterInspection
+
   $facility = new CRM_Core_JobManager();
   $facility->execute(FALSE);
 
@@ -412,8 +413,7 @@ function civicrm_api3_job_process_participant($params) {
  * @return bool
  *   true if success, else false
  */
-function civicrm_api3_job_process_membership(/** @noinspection PhpUnusedParameterInspection */
-  $params) {
+function civicrm_api3_job_process_membership($params) {
   $lock = new CRM_Core_Lock('civimail.job.updateMembership');
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error('Could not acquire lock, another Membership Processing process is running');
@@ -491,9 +491,7 @@ function _civicrm_api3_job_process_batch_merge_spec(&$params) {
   );
   $params['mode'] = array(
     'title' => 'Mode',
-    'description' => 'helps decide how to behave when there are conflicts.
-       A \'safe\' value skips the merge if there are no conflicts.
-       Does a force merge otherwise.',
+    'description' => 'helps decide how to behave when there are conflicts. A \'safe\' value skips the merge if there are no conflicts. Does a force merge otherwise.',
     'type' => CRM_Utils_Type::T_STRING,
   );
   $params['auto_flip'] = array(
@@ -575,8 +573,8 @@ function civicrm_api3_job_cleanup($params) {
  * @return array
  * @throws \API_Exception
  */
-function civicrm_api3_job_disable_expired_relationships(/** @noinspection PhpUnusedParameterInspection */
-  $params) {
+function civicrm_api3_job_disable_expired_relationships($params) {
+  /** @noinspection PhpUnusedParameterInspection */
   $result = CRM_Contact_BAO_Relationship::disableExpiredRelationships();
   if (!$result) {
     throw new API_Exception('Failed to disable all expired relationships.');

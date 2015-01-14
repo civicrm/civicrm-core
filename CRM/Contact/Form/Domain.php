@@ -298,7 +298,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
       $emailParams['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue', $fieldValues);
     }
 
-
     //reset default within domain.
     $emailParams['reset_default_for'] = array('domain_id' => CRM_Core_Config::domainID());
 

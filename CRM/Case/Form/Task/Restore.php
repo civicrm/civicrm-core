@@ -53,7 +53,7 @@ class CRM_Case_Form_Task_Restore extends CRM_Case_Form_Task {
    *
    * @return void
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 

@@ -139,7 +139,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
           'start_date',
           'end_date',
           'registration_start_date',
-          'registration_end_date'
+          'registration_end_date',
         )
       );
     }

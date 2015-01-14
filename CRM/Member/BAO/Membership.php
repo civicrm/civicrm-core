@@ -446,7 +446,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *
    * @param int $action
    *
-   * @return Array
+   * @return array
    *   array of contact_id of all related contacts.
    */
   public static function checkMembershipRelationship($membershipId, $contactId, $action = CRM_Core_Action::ADD) {
@@ -597,7 +597,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *   Membership id that needs to be deleted.
    *
    *
-   * @return $results   no of deleted Membership on success, false otherwise
+   * @return int $results  id of deleted Membership on success, false otherwise
    */
   public static function del($membershipId) {
     //delete related first and then delete parent.
@@ -612,7 +612,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *   Membership id that needs to be deleted.
    *
    *
-   * @return $results   no of deleted Membership on success, false otherwise
+   * @return int $results id of deleted Membership on success, false otherwise
    */
   public static function deleteMembership($membershipId) {
     // CRM-12147, retrieve membership data before we delete it for hooks
@@ -677,7 +677,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    */
   public static function deleteRelatedMemberships($ownerMembershipId, $contactId = NULL) {
     if (!$ownerMembershipId && !$contactId) {
-      return;
+      return FALSE;
     }
 
     $membership = new CRM_Member_DAO_Membership();
@@ -748,7 +748,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *   Is this a separate membership payment
    *
    */
-  static function buildMembershipBlock(
+  public static function buildMembershipBlock(
     &$form,
     $pageID,
     $cid,
@@ -1519,7 +1519,7 @@ AND civicrm_membership.is_test = %2";
    * @throws CRM_Core_Exception
    *
    */
-  static function renewMembershipFormWrapper(
+  public static function renewMembershipFormWrapper(
     $contactID,
     $membershipTypeID,
     $is_test,
@@ -1762,7 +1762,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
     if ($reset) {
       // not sure why a static var is in use here - we need a way to reset it from the test suite
       $relatedContactIds = array();
-      return;
+      return FALSE;
     }
 
     $membership = new CRM_Member_DAO_Membership();
@@ -1898,7 +1898,8 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
               CRM_Member_BAO_Membership::create($params, $relMemIds);
               $available--;
             }
-            else { // we have run out of inherited memberships, so delete extras
+            else {
+              // we have run out of inherited memberships, so delete extras
               self::deleteMembership($params['id']);
             }
             // we need to first check if there will remain inherited memberships, so queue it up
@@ -1922,22 +1923,22 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    *
    * @param int $membershipId
    *
-   * @return boolean
-   *   true if deleted false otherwise
+   * @return object
+   *   $membershipPayment deleted membership payment object
    */
   public static function deleteMembershipPayment($membershipId) {
 
-    $membesrshipPayment = new CRM_Member_DAO_MembershipPayment();
-    $membesrshipPayment->membership_id = $membershipId;
-    $membesrshipPayment->find();
+    $membershipPayment = new CRM_Member_DAO_MembershipPayment();
+    $membershipPayment->membership_id = $membershipId;
+    $membershipPayment->find();
 
-    while ($membesrshipPayment->fetch()) {
-      CRM_Contribute_BAO_Contribution::deleteContribution($membesrshipPayment->contribution_id);
-      CRM_Utils_Hook::pre('delete', 'MembershipPayment', $membesrshipPayment->id, $membesrshipPayment);
+    while ($membershipPayment->fetch()) {
+      CRM_Contribute_BAO_Contribution::deleteContribution($membershipPayment->contribution_id);
+      CRM_Utils_Hook::pre('delete', 'MembershipPayment', $membershipPayment->id, $membershipPayment);
       $membesrshipPayment->delete();
-      CRM_Utils_Hook::post('delete', 'MembershipPayment', $membesrshipPayment->id, $membesrshipPayment);
+      CRM_Utils_Hook::post('delete', 'MembershipPayment', $membershipPayment->id, $membershipPayment);
     }
-    return $membesrshipPayment;
+    return $membershipPayment;
   }
 
   /**
@@ -2032,7 +2033,7 @@ FROM   civicrm_membership_type
    *
    * @param bool $isNotCancelled
    *
-   * @return boolean
+   * @return bool
    */
   public static function isCancelSubscriptionSupported($mid, $isNotCancelled = TRUE) {
     $cacheKeyString = "$mid";
