@@ -711,7 +711,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->type("city-Primary", "primecity");
     $this->type("phone-Primary-1", "98667764");
     $this->type("postal_code-Primary", "6548");
-
+    $this->waitForElementPresent('nick_name');
     $this->type("nick_name", "Nick1");
     $this->type("url-1", "http://www.part.com");
 
