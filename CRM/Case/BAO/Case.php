@@ -153,7 +153,8 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   /**
    * Create case contact record
    *
-   * @param array case_id, contact_id
+   * @param array $params
+   *   case_id, contact_id
    *
    * @return object
    */
@@ -195,7 +196,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   /**
    * Delet case contact record
    *
-   * @param int case_id
+   * @param int $caseID
    *
    * @return Void
    */
@@ -2341,7 +2342,7 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
    *
    * @return int|NULL
    */
-  static function mergeCases(
+  public static function mergeCases(
     $mainContactId, $mainCaseId = NULL, $otherContactId = NULL,
     $otherCaseId = NULL, $changeClient = FALSE) {
     $moveToTrash = TRUE;
@@ -2800,7 +2801,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * @param bool $checkComponent
    *   Do we need to check component enabled.
    *
-   * @return boolean
+   * @return bool
    */
   public static function checkPermission($activityId, $operation, $actTypeId = NULL, $contactId = NULL, $checkComponent = TRUE) {
     $allow = FALSE;
@@ -3111,7 +3112,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * @param int $activityID
    *   Activity id.
    *
-   * @return boolean
+   * @return bool
    */
   public static function isCaseActivity($activityID) {
     $isCaseActivity = FALSE;
@@ -3382,7 +3383,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * @param array $props
    *   Whatever is known about this dao object.
    *
-   * @return Array|bool
+   * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     $className = __CLASS__;

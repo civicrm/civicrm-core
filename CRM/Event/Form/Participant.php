@@ -290,7 +290,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           array(
             'title' => ts('CiviEvent Dashboard'),
             'url' => CRM_Utils_System::url('civicrm/event', 'reset=1'),
-          )
+          ),
         );
 
         CRM_Utils_System::appendBreadCrumb($breadCrumbs);
@@ -643,7 +643,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if ($this->_single && $this->_context == 'standalone') {
       $this->addEntityRef('contact_id', ts('Contact'), array(
           'create' => TRUE,
-          'api' => array('extra' => array('email'))
+          'api' => array('extra' => array('email')),
         ), TRUE);
     }
 
@@ -703,8 +703,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
       );
       $checkCancelledJs = array(
-        'onchange' =>
-          "checkCancelled( this.value, {$cancelledparticipantStatusId},{$cancelledContributionStatusId});",
+        'onchange' => "checkCancelled( this.value, {$cancelledparticipantStatusId},{$cancelledContributionStatusId});",
       );
 
       $participantStatusId = array_search('Pending from pay later',
@@ -742,7 +741,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     $this->addSelect('status_id', $checkCancelledJs + array(
         'options' => $statusOptions,
-        'option_url' => 'civicrm/admin/participant_status'
+        'option_url' => 'civicrm/admin/participant_status',
       ), TRUE);
 
     $this->addElement('checkbox', 'is_notify', ts('Send Notification'), NULL);
@@ -857,7 +856,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $contactId = $self->_contactId;
       $eventId = CRM_Utils_Array::value('event_id', $values);
       if (!empty($contactId) && !empty($eventId)) {
-        $dupeCheck = new CRM_Event_BAO_Participant;
+        $dupeCheck = new CRM_Event_BAO_Participant();
         $dupeCheck->contact_id = $contactId;
         $dupeCheck->event_id = $eventId;
         $dupeCheck->find(TRUE);
@@ -907,7 +906,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $duplicateContacts = 0;
         while (list($k, $dupeCheckContactId) = each($this->_contactIds)) {
           // Eliminate contacts that have already been assigned to this event.
-          $dupeCheck = new CRM_Event_BAO_Participant;
+          $dupeCheck = new CRM_Event_BAO_Participant();
           $dupeCheck->contact_id = $dupeCheckContactId;
           $dupeCheck->event_id = $event_id;
           $dupeCheck->find(TRUE);
@@ -1078,8 +1077,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         CRM_Core_Error::fatal(ts('Selected Event is not Paid Event '));
       }
 
-      $eventTitle =
-        CRM_Core_DAO::getFieldValue(
+      $eventTitle
+        = CRM_Core_DAO::getFieldValue(
           'CRM_Event_DAO_Event',
           $params['event_id'],
           'title'
@@ -1089,7 +1088,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if (empty($params['source'])) {
         $this->_params['participant_source'] = ts('Offline Registration for Event: %2 by: %1', array(
             1 => $userName,
-            2 => $eventTitle
+            2 => $eventTitle,
           ));
       }
       else {
@@ -1115,8 +1114,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
 
       // also add location name to the array
-      $params["address_name-{$this->_bltID}"] =
-        CRM_Utils_Array::value('billing_first_name', $params) . ' ' .
+      $params["address_name-{$this->_bltID}"]
+        = CRM_Utils_Array::value('billing_first_name', $params) . ' ' .
         CRM_Utils_Array::value('billing_middle_name', $params) . ' ' .
         CRM_Utils_Array::value('billing_last_name', $params);
 
@@ -1228,8 +1227,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       );
 
       //add contribution record
-      $this->_params['financial_type_id'] =
-        CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'financial_type_id');
+      $this->_params['financial_type_id']
+        = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'financial_type_id');
       $this->_params['mode'] = $this->_mode;
 
       //add contribution reocord
@@ -1322,7 +1321,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           if (empty($params['source'])) {
             $contributionParams['source'] = ts('%1 : Offline registration (by %2)', array(
                 1 => $eventTitle,
-                2 => $userName
+                2 => $userName,
               ));
           }
           else {

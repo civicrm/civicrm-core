@@ -294,7 +294,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $defaultLocation = $this->_location_types[$defaultLocationType->id];
       unset($this->_location_types[$defaultLocationType->id]);
       $this->_location_types = array(
-          $defaultLocationType->id => $defaultLocation
+          $defaultLocationType->id => $defaultLocation,
         ) + $this->_location_types;
     }
 
@@ -562,7 +562,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $showBestResult = FALSE;
       if (in_array($ufField->field_name, array(
           'country',
-          'state_province'
+          'state_province',
         )) && count($config->countryLimit) > 1
       ) {
         // get state or country field weight if exists
@@ -631,7 +631,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       'Participant',
       'Contribution',
       'Membership',
-      'Activity'
+      'Activity',
     ))) {
       $individualSubTypes = CRM_Contact_BAO_ContactType::subTypes('Individual');
       foreach ($groupType as $value) {
@@ -677,7 +677,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * @param array $errors
    *   Collect errors.
    *
-   * @return Array
+   * @return array
    *   list of errors to be posted back to the form
    */
   public static function formRuleCustomDataExtentColumnValue($customField, $gid, $fieldType, &$errors) {
@@ -687,7 +687,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       'Contribution',
       'Membership',
       'Activity',
-      'Case'
+      'Case',
     ))) {
       $params = array('id' => $customField->custom_group_id);
       $customGroup = array();
@@ -796,7 +796,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         'Contribution',
         'Participant',
         'Membership',
-        'Activity'
+        'Activity',
       ))
     ) {
       $errors['in_selector'] = ts("'In Selector' cannot be checked for %1 fields.", array(1 => $entityName));
@@ -988,7 +988,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
             if ($fieldType != $profileType) {
               $errors['field_name'] = ts('Cannot add or update profile field type "%1" with combination of "%2".', array(
                   1 => $fieldType,
-                  2 => $profileType
+                  2 => $profileType,
                 ));
             }
           }
@@ -1000,7 +1000,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
             ) {
               $errors['field_name'] = ts('Cannot add or update profile field type "%1" with combination of "%2".', array(
                   1 => $fieldType,
-                  2 => $profileType
+                  2 => $profileType,
                 ));
             }
           }

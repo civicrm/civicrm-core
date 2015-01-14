@@ -81,7 +81,7 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
       foreach (array(
                  'surveyId',
                  'contactIds',
-                 'interviewerId'
+                 'interviewerId',
                ) as $fld) {
         $this->{"_$fld"} = $this->get($fld);
       }
@@ -300,7 +300,7 @@ WHERE {$clause}
       $this->addElement('select', "order_bys[{$i}][column]", ts('Order by Column'), $options);
       $this->addElement('select', "order_bys[{$i}][order]", ts('Order by Order'), array(
           'ASC' => 'Ascending',
-          'DESC' => 'Descending'
+          'DESC' => 'Descending',
         ));
     }
 
@@ -321,7 +321,7 @@ WHERE {$clause}
       if (!empty($this->_resultOptions)) {
         $this->add('select', "field[$contactId][result]", ts('Result'),
           array(
-            '' => ts('- select -')
+            '' => ts('- select -'),
           ) +
           array_combine($this->_resultOptions, $this->_resultOptions)
         );
@@ -350,7 +350,7 @@ WHERE {$clause}
         'name' => ts('Done'),
         'subName' => 'interview',
         'isDefault' => TRUE,
-      )
+      ),
     );
 
     $buttons[] = array(
@@ -431,11 +431,10 @@ WHERE {$clause}
     else {
       $defaults['order_bys'] =
         array(
-          1 =>
-            array(
-              'column' => 'contact_a.sort_name',
-              'order' => 'ASC',
-            ),
+          1 => array(
+            'column' => 'contact_a.sort_name',
+            'order' => 'ASC',
+          ),
         );
     }
     return $defaults;
@@ -458,7 +457,7 @@ WHERE {$clause}
       foreach (array(
                  'surveyId',
                  'contactIds',
-                 'interviewerId'
+                 'interviewerId',
                ) as $fld) {
         $this->controller->set($fld, $this->{"_$fld"});
       }
@@ -466,7 +465,6 @@ WHERE {$clause}
     }
 
     // vote is done through ajax
-    return;
   }
 
   /**

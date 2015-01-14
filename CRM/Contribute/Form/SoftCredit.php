@@ -133,7 +133,7 @@ class CRM_Contribute_Form_SoftCredit {
       $form->addSelect("soft_credit_type[{$rowNumber}]", array(
           'entity' => 'contribution_soft',
           'field' => 'soft_credit_type_id',
-          'label' => ts('Type')
+          'label' => ts('Type'),
         ));
       if (!empty($form->_softCreditInfo['soft_credit'][$rowNumber]['soft_credit_id'])) {
         $form->add('hidden', "soft_credit_id[{$rowNumber}]",

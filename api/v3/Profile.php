@@ -31,19 +31,12 @@
  * @package CiviCRM_APIv3
  * @subpackage API_ActivityProfile
  * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: ActivityProfile.php 30486 2011-05-20 16:12:09Z rajan $
+ * @version $Id: Profile.php 30486 2011-05-20 16:12:09Z rajan $
  *
  */
 
 /**
  * Retrieve Profile field values.
- *
- * @param array $params
- *   Associative array of property name/value.
- *                             pairs to get profile field values
- *
- * @throws API_Exception
- * @return array
  *
  * NOTE this api is not standard & since it is tested we need to honour that
  * but the correct behaviour is for it to return an id indexed array as this supports
@@ -51,6 +44,13 @@
  * in order to avoid breaking code. (This could still be confusing :-( but we have to keep the tested behaviour working
  *
  * Note that if contact_id is empty an array of defaults is returned
+ *
+ * @param array $params
+ *   Associative array of property name/value.
+ *   pairs to get profile field values
+ *
+ * @throws API_Exception
+ * @return array
  */
 function civicrm_api3_profile_get($params) {
   $nonStandardLegacyBehaviour = is_numeric($params['profile_id']) ? TRUE : FALSE;
