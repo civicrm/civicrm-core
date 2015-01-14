@@ -51,8 +51,7 @@ function _civicrm_api3_option_group_create_spec(&$params) {
  *
  * @return array
  *   API Result Array
- *                message otherwise
- * {@getfields OptionGroup_delete}
+ *   {@getfields OptionGroup_delete}
  */
 function civicrm_api3_option_group_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

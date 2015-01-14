@@ -530,7 +530,7 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
    * @param $awardedGrantsAmount
    * @param bool $customData
    */
-  static function getStatistics(
+  public static function getStatistics(
     &$grantStatistics, $fieldValue, $values,
     $awardedGrants, $awardedGrantsAmount, $customData = FALSE
   ) {

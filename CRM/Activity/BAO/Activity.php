@@ -59,7 +59,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return boolean
+   * @return bool
    */
   public static function dataExists(&$params) {
     if (!empty($params['source_contact_id']) || !empty($params['id'])) {
@@ -249,8 +249,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *
    * @param int $activityId
    * @param int $recordTypeID
-   *
-   * @return null
    */
   public static function deleteActivityContact($activityId, $recordTypeID = NULL) {
     $activityContact = new CRM_Activity_BAO_ActivityContact();
@@ -269,7 +267,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *
    * @throws CRM_Core_Exception
    *
-   * @return $this|null|object
+   * @return CRM_Activity_BAO_Activity|null|object
    */
   public static function create(&$params) {
     // check required params
@@ -905,7 +903,7 @@ ORDER BY    fixed_sort_order
    *
    * @return array
    *   Array of component id and name.
-   **/
+   */
   public static function activityComponents() {
     $components = array();
     $compInfo = CRM_Core_Component::getEnabledComponents();
@@ -1052,7 +1050,6 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
       $includeCaseActivities = TRUE;
     }
 
-
     // build main activity table select clause
     $sourceSelect = '';
 
@@ -1176,7 +1173,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    * @return array
    *   ( sent, activityId) if any email is sent and activityId
    */
-  static function sendEmail(
+  public static function sendEmail(
     &$contactDetails,
     &$subject,
     &$text,
@@ -1272,7 +1269,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
         }
       }
     }
-
 
     // get token details for contacts, call only if tokens are used
     $details = array();
@@ -1370,7 +1366,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    * @return array
    * @throws CRM_Core_Exception
    */
-  static function sendSMS(
+  public static function sendSMS(
     &$contactDetails,
     &$activityParams,
     &$smsParams = array(),
@@ -1508,7 +1504,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    * @return bool|PEAR_Error
    *   true on success or PEAR_Error object
    */
-  static function sendSMSMessage(
+  public static function sendSMSMessage(
     $toID,
     &$tokenText,
     $smsParams = array(),
@@ -1556,7 +1552,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
-
     // add activity target record for every sms that is send
     $activityTargetParams = array(
       'activity_id' => $activityID,
@@ -1588,10 +1583,10 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    * @param null $cc
    * @param null $bcc
    *
-   * @return boolean
-   *   true if successfull else false.
+   * @return bool
+   *   TRUE if successful else FALSE.
    */
-  static function sendMessage(
+  public static function sendMessage(
     $from,
     $fromID,
     $toID,
@@ -1724,7 +1719,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
-
     // First look for activities where contactId is one of the targets
     $query = "
 SELECT activity_id, record_type_id
@@ -1791,9 +1785,9 @@ WHERE      activity.id IN ($activityIds)";
    *   For Membership Signup or Renewal.
    * @param int $targetContactID
    *
-   * @return bool
+   * @return bool|NULL
    */
-  static function addActivity(
+  public static function addActivity(
     &$activity,
     $activityType = 'Membership Signup',
     $targetContactID = NULL
@@ -1849,7 +1843,7 @@ SELECT  display_name
     elseif ($activity->__table == 'civicrm_contribution') {
       //create activity record only for Completed Contributions
       if ($activity->contribution_status_id != 1) {
-        return;
+        return NULL;
       }
 
       $subject = NULL;
@@ -2058,11 +2052,11 @@ AND cl.modified_id  = c.id
    *   activity id of parent activity.
    * @param array $params
    *
-   * @return $this|null|object
+   * @return CRM_Activity_BAO_Activity|null|object
    */
   public static function createFollowupActivity($activityId, $params) {
     if (!$activityId) {
-      return;
+      return NULL;
     }
 
     $session = CRM_Core_Session::singleton();
@@ -2164,7 +2158,6 @@ AND cl.modified_id  = c.id
           'title' => ts('Source Contact'),
           'type' => CRM_Utils_Type::T_STRING,
         );
-
 
         $Activityfields = array(
           'activity_type' => array('title' => ts('Activity Type'), 'name' => 'activity_type', 'type' => CRM_Utils_Type::T_STRING),
@@ -2297,7 +2290,7 @@ AND cl.modified_id  = c.id
    * @param int $action
    *   Edit/view.
    *
-   * @return boolean
+   * @return bool
    */
   public static function checkPermission($activityId, $action) {
     $allow = FALSE;
@@ -2612,7 +2605,8 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
       }
 
       foreach ($customValues as $key => $value) {
-        if ($value !== NULL) { // CRM-10542
+        if ($value !== NULL) {
+          // CRM-10542
           if (in_array($key, $htmlType)) {
             $fileValues = CRM_Core_BAO_File::path($value, $params['activityID']);
             $customParams["custom_{$key}_-1"] = array(

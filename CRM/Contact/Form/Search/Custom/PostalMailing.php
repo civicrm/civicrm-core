@@ -75,7 +75,7 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
    *
    * @return string
    */
-  function all(
+  public function all(
     $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
