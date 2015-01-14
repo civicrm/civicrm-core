@@ -74,7 +74,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * The set of all columns in the report. An associative array
-   * with column name as the key and attribues as the value
+   * with column name as the key and attributes as the value
    *
    * @var array
    */
@@ -284,7 +284,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_selectedTables;
 
   /**
-   * Outputmode e.g 'print', 'csv', 'pdf'
+   * Output mode e.g 'print', 'csv', 'pdf'
    * @var string
    */
   protected $_outputMode;
@@ -848,10 +848,10 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * Setter for $_id
    *
-   * @param int $instanceid
+   * @param int $instanceID
    */
-  public function setID($instanceid) {
-    $this->_id = $instanceid;
+  public function setID($instanceID) {
+    $this->_id = $instanceID;
   }
 
   /**
@@ -1224,10 +1224,10 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * a formrule function to ensure that fields selected in group_by
+   * A form rule function to ensure that fields selected in group_by
    * (if any) should only be the ones present in display/select fields criteria;
    * note: works if and only if any custom field selected in group_by.
-   * @param $fields
+   * @param array $fields
    * @param array $ignoreFields
    *
    * @return array
@@ -1352,7 +1352,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * Adds group filters to _columns (called from _Constuct
+   * Adds group filters to _columns (called from _Construct
    */
   public function buildGroupFilter() {
     $this->_columns['civicrm_group']['filters'] = array(
@@ -1423,7 +1423,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    * Generate where clause.
    * This can be overridden in reports for special treatment of a field
    *
-   * @param string $field Field name
+   * @param array $field Field specifications
    * @param string $op Query operator (not an exact match to sql)
    * @param mixed $value
    * @param float $min
@@ -1646,7 +1646,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * @todo - could not find any instances where this is called
    *
-   * @param unknown_type $relative
+   * @param bool $relative
    * @param string $from
    * @param string_type $to
    *
@@ -3526,6 +3526,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   /**
    * Check for empty order_by configurations and remove them; also set
    * template to hide them.
+   *
+   * @param array $formValues
    */
   public function preProcessOrderBy(&$formValues) {
     // Object to show/hide form elements
