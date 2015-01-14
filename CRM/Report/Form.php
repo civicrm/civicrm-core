@@ -334,6 +334,42 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_chartId;
 
   /**
+   * @var int
+   */
+  protected $_section;
+
+  /**
+   * @var string Report description.
+   */
+  protected $_description;
+
+  /**
+   * @var bool Is an address field selected.
+   *   This was intended to determine if the address table should be joined in
+   *   The isTableSelected function is now preferred for this purpose
+   */
+  protected $_addressField;
+
+  /**
+   * @var bool Is an email field selected.
+   *   This was intended to determine if the email table should be joined in
+   *   The isTableSelected function is now preferred for this purpose
+   */
+  protected $_emailField;
+
+  /**
+   * @var bool Is a phone field selected.
+   *   This was intended to determine if the phone table should be joined in
+   *   The isTableSelected function is now preferred for this purpose
+   */
+  protected $_phoneField;
+
+  /**
+   * @var bool Create new report instance? (or update existing) on save.
+   */
+  protected $_createNew;
+
+  /**
    */
   public function __construct() {
     parent::__construct();
@@ -1695,14 +1731,14 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @param bool $relative
    * @param string $from
    * @param string $to
-   * @param string $fromtime
-   * @param string $totime
+   * @param string $fromTime
+   * @param string $toTime
    *
    * @return array
    */
-  public function getFromTo($relative, $from, $to, $fromtime = NULL, $totime = NULL) {
-    if (empty($totime)) {
-      $totime = '235959';
+  public function getFromTo($relative, $from, $to, $fromTime = NULL, $toTime = NULL) {
+    if (empty($toTime)) {
+      $toTime = '235959';
     }
     //FIX ME not working for relative
     if ($relative) {
@@ -1712,8 +1748,8 @@ class CRM_Report_Form extends CRM_Core_Form {
       //Take only Date Part, Sometime Time part is also present in 'to'
       $to = substr($dateRange['to'], 0, 8);
     }
-    $from = CRM_Utils_Date::processDate($from, $fromtime);
-    $to = CRM_Utils_Date::processDate($to, $totime);
+    $from = CRM_Utils_Date::processDate($from, $fromTime);
+    $to = CRM_Utils_Date::processDate($to, $toTime);
     return array($from, $to);
   }
 
@@ -2486,7 +2522,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       !empty($this->_params['order_bys'])
     ) {
 
-      // Proces order_bys in user-specified order
+      // Process order_bys in user-specified order
       foreach ($this->_params['order_bys'] as $orderBy) {
         $orderByField = array();
         foreach ($this->_columns as $tableName => $table) {
