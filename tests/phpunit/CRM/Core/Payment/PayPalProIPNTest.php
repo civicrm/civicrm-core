@@ -75,7 +75,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $paypalIPN->main();
     $contribution = $this->callAPISuccess('contribution', 'get', array(
         'contribution_recur_id' => $this->_contributionRecurID,
-        'sequential' => 1
+        'sequential' => 1,
       ));
     $this->assertEquals(2, $contribution['count']);
     $this->assertEquals('secondone', $contribution['values'][1]['trxn_id']);
@@ -102,17 +102,17 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $this->assertEquals(strtotime('+ 1 year', strtotime($membershipEndDate)), strtotime($this->callAPISuccessGetValue('membership', array('return' => 'end_date'))));
     $contribution = $this->callAPISuccess('contribution', 'get', array(
         'contribution_recur_id' => $this->_contributionRecurID,
-        'sequential' => 1
+        'sequential' => 1,
       ));
     $this->assertEquals(2, $contribution['count']);
     $this->assertEquals('secondone', $contribution['values'][1]['trxn_id']);
     $this->callAPISuccessGetCount('line_item', array(
         'entity_id' => $this->ids['membership'],
-        'entity_table' => 'civicrm_membership'
+        'entity_table' => 'civicrm_membership',
       ), 2);
     $this->callAPISuccessGetSingle('line_item', array(
         'contribution_id' => $contribution['values'][1]['id'],
-        'entity_table' => 'civicrm_membership'
+        'entity_table' => 'civicrm_membership',
       ));
     $this->callAPISuccessGetSingle('membership_payment', array('contribution_id' => $contribution['values'][1]['id']));
 
@@ -141,7 +141,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $paypalIPN->main();
     $contribution = $this->callAPISuccess('contribution', 'get', array(
         'contribution_recur_id' => $this->_contributionRecurID,
-        'sequential' => 1
+        'sequential' => 1,
       ));
     $this->assertEquals(1, $contribution['count']);
     $this->assertEquals('secondone', $contribution['values'][0]['trxn_id']);
@@ -321,11 +321,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'amount_per_cycle' => '15.00',
       'mc_gross' => '15.00',
       'payment_date' => '03:59:05 Jul 14, 2013 PDT',
-      'rp_invoice_id' => 'i=' . $this->_invoiceID
-        . '&m=contribute&c='
-        . $this->_contactID
-        . '&r=' . $this->_contributionRecurID
-        . '&b=' . $this->_contributionID . '&p=' . $this->_contributionPageID,
+      'rp_invoice_id' => 'i=' . $this->_invoiceID . '&m=contribute&c=' . $this->_contactID . '&r=' . $this->_contributionRecurID . '&b=' . $this->_contributionID . '&p=' . $this->_contributionPageID,
       'payment_status' => 'Completed',
       'business' => 'nowhere@civicrm.org',
       'last_name' => 'Roberty',

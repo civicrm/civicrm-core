@@ -180,7 +180,7 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
           'query' => 'reset=1&action=add&context=standalone',
           'ref' => 'new-pledge',
           'title' => ts('Pledge'),
-        )
+        ),
       ));
     }
   }

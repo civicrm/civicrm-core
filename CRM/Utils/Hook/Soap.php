@@ -67,12 +67,12 @@ class CRM_Utils_Hook_Soap extends CRM_Utils_Hook {
    *
    * @return mixed
    */
-  function invoke(
+  public function invoke(
     $numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix
   ) {
     // suppress all hok calls during soap
-    return;
+    return NULL;
   }
 }

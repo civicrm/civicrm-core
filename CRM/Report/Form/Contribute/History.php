@@ -80,131 +80,131 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     }
 
     $this->_columns = array(
-        'civicrm_contact' => array(
-          'dao' => 'CRM_Contact_DAO_Contact',
-          'fields' => array(
-            'sort_name' => array(
-              'title' => ts('Contact Name'),
-              'default' => TRUE,
-              'required' => TRUE,
-              'no_repeat' => TRUE,
-            ),
-            'id' => array(
-              'no_display' => TRUE,
-              'default' => TRUE,
-              'required' => TRUE,
-            ),
-            'contact_type' => array(
-              'title' => ts('Contact Type'),
-            ),
-            'contact_sub_type' => array(
-              'title' => ts('Contact Subtype'),
-            ),
+      'civicrm_contact' => array(
+        'dao' => 'CRM_Contact_DAO_Contact',
+        'fields' => array(
+          'sort_name' => array(
+            'title' => ts('Contact Name'),
+            'default' => TRUE,
+            'required' => TRUE,
+            'no_repeat' => TRUE,
           ),
-          'grouping' => 'contact-fields',
-          'filters' => array(
-            'sort_name' => array('title' => ts('Contact Name')),
-            'id' => array(
-              'title' => ts('Contact ID'),
-              'no_display' => TRUE,
-            ),
+          'id' => array(
+            'no_display' => TRUE,
+            'default' => TRUE,
+            'required' => TRUE,
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
           ),
         ),
-        'civicrm_email' => array(
-          'dao' => 'CRM_Core_DAO_Email',
-          'fields' => array(
-            'email' => array(
-              'title' => ts('Email'),
-              'no_repeat' => TRUE,
-            ),
-          ),
-          'grouping' => 'contact-fields',
-        ),
-        'civicrm_phone' => array(
-          'dao' => 'CRM_Core_DAO_Phone',
-          'fields' => array(
-            'phone' => array(
-              'title' => ts('Phone'),
-              'no_repeat' => TRUE,
-            ),
-          ),
-          'grouping' => 'contact-fields',
-        ),
-      ) + $this->addAddressFields(FALSE, FALSE, FALSE, array()) + array(
-        'civicrm_relationship' => array(
-          'dao' => 'CRM_Contact_DAO_Relationship',
-          'fields' => array(
-            'relationship_type_id' => array(
-              'title' => ts('Relationship Type'),
-              'default' => TRUE,
-            ),
-            'contact_id_a' => array('no_display' => TRUE),
-            'contact_id_b' => array('no_display' => TRUE),
-          ),
-          'filters' => array(
-            'relationship_type_id' => array(
-              'title' => ts('Relationship Type'),
-              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-              'options' => $relationTypeOp,
-              'type' => CRM_Utils_Type::T_STRING,
-            ),
+        'grouping' => 'contact-fields',
+        'filters' => array(
+          'sort_name' => array('title' => ts('Contact Name')),
+          'id' => array(
+            'title' => ts('Contact ID'),
+            'no_display' => TRUE,
           ),
         ),
-      ) + array(
-        'civicrm_contribution' => array(
-          'dao' => 'CRM_Contribute_DAO_Contribution',
-          'fields' => array(
-            'total_amount' => array(
-              'title' => ts('Amount Statistics'),
-              'default' => TRUE,
-              'required' => TRUE,
-              'no_display' => TRUE,
-              'statistics' => array('sum' => ts('Aggregate Amount')),
-            ),
-            'receive_date' => array(
-              'required' => TRUE,
-              'default' => TRUE,
-              'no_display' => TRUE,
-            ),
-          ),
-          'grouping' => 'contri-fields',
-          'filters' => array(
-            'this_year' => array(
-              'title' => ts('This Year'),
-              'operatorType' => CRM_Report_Form::OP_SELECT,
-              'options' => $optionYear,
-              'default' => '',
-            ),
-            'other_year' => array(
-              'title' => ts('Other Years'),
-              'operatorType' => CRM_Report_Form::OP_SELECT,
-              'options' => $optionYear,
-              'default' => '',
-            ),
-            'receive_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
-            'contribution_status_id' => array(
-              'title' => ts('Contribution Status'),
-              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-              'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
-              'default' => array(1),
-            ),
-            'financial_type_id' => array(
-              'title' => ts('Financial Type'),
-              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-              'options' => CRM_Contribute_PseudoConstant::financialType(),
-            ),
-            'total_amount' => array(
-              'title' => ts('Contribution Amount'),
-            ),
-            'total_sum' => array(
-              'title' => ts('Aggregate Amount'),
-              'type' => CRM_Report_Form::OP_INT,
-              'dbAlias' => 'civicrm_contribution_total_amount_sum',
-              'having' => TRUE,
-            ),
+      ),
+      'civicrm_email' => array(
+        'dao' => 'CRM_Core_DAO_Email',
+        'fields' => array(
+          'email' => array(
+            'title' => ts('Email'),
+            'no_repeat' => TRUE,
           ),
         ),
-      );
+        'grouping' => 'contact-fields',
+      ),
+      'civicrm_phone' => array(
+        'dao' => 'CRM_Core_DAO_Phone',
+        'fields' => array(
+          'phone' => array(
+            'title' => ts('Phone'),
+            'no_repeat' => TRUE,
+          ),
+        ),
+        'grouping' => 'contact-fields',
+      ),
+    ) + $this->addAddressFields(FALSE, FALSE, FALSE, array()) + array(
+      'civicrm_relationship' => array(
+        'dao' => 'CRM_Contact_DAO_Relationship',
+        'fields' => array(
+          'relationship_type_id' => array(
+            'title' => ts('Relationship Type'),
+            'default' => TRUE,
+          ),
+          'contact_id_a' => array('no_display' => TRUE),
+          'contact_id_b' => array('no_display' => TRUE),
+        ),
+        'filters' => array(
+          'relationship_type_id' => array(
+            'title' => ts('Relationship Type'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => $relationTypeOp,
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+        ),
+      ),
+    ) + array(
+      'civicrm_contribution' => array(
+        'dao' => 'CRM_Contribute_DAO_Contribution',
+        'fields' => array(
+          'total_amount' => array(
+            'title' => ts('Amount Statistics'),
+            'default' => TRUE,
+            'required' => TRUE,
+            'no_display' => TRUE,
+            'statistics' => array('sum' => ts('Aggregate Amount')),
+          ),
+          'receive_date' => array(
+            'required' => TRUE,
+            'default' => TRUE,
+            'no_display' => TRUE,
+          ),
+        ),
+        'grouping' => 'contri-fields',
+        'filters' => array(
+          'this_year' => array(
+            'title' => ts('This Year'),
+            'operatorType' => CRM_Report_Form::OP_SELECT,
+            'options' => $optionYear,
+            'default' => '',
+          ),
+          'other_year' => array(
+            'title' => ts('Other Years'),
+            'operatorType' => CRM_Report_Form::OP_SELECT,
+            'options' => $optionYear,
+            'default' => '',
+          ),
+          'receive_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
+          'contribution_status_id' => array(
+            'title' => ts('Contribution Status'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'default' => array(1),
+          ),
+          'financial_type_id' => array(
+            'title' => ts('Financial Type'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contribute_PseudoConstant::financialType(),
+          ),
+          'total_amount' => array(
+            'title' => ts('Contribution Amount'),
+          ),
+          'total_sum' => array(
+            'title' => ts('Aggregate Amount'),
+            'type' => CRM_Report_Form::OP_INT,
+            'dbAlias' => 'civicrm_contribution_total_amount_sum',
+            'having' => TRUE,
+          ),
+        ),
+      ),
+    );
 
     $this->_columns['civicrm_contribution']['fields']['civicrm_upto_' .
     $this->_yearStatisticsFrom] = array(
@@ -623,8 +623,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
       return $rows;
     }
 
-    $sqlContribution =
-      "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" .
+    $sqlContribution = "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" .
       implode(',', $contactIds) .
       ") AND {$this->_aliases['civicrm_contribution']}.is_test = 0 {$this->_statusClause} {$this->_groupBy} ";
 
@@ -681,8 +680,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     if (!empty($this->_relationshipColumns)) {
       $addRelSelect = ', ' . implode(', ', $this->_relationshipColumns);
     }
-    $sqlRelationship =
-      "SELECT {$this->_aliases['civicrm_relationship']}.relationship_type_id as relationship_type_id, {$this->_aliases['civicrm_relationship']}.contact_id_a as contact_id_a, {$this->_aliases['civicrm_relationship']}.contact_id_b as contact_id_b {$addRelSelect} FROM civicrm_contact {$relContactAlias} {$this->_relationshipFrom} WHERE {$relContactAlias}.id IN (" .
+    $sqlRelationship = "SELECT {$this->_aliases['civicrm_relationship']}.relationship_type_id as relationship_type_id, {$this->_aliases['civicrm_relationship']}.contact_id_a as contact_id_a, {$this->_aliases['civicrm_relationship']}.contact_id_b as contact_id_b {$addRelSelect} FROM civicrm_contact {$relContactAlias} {$this->_relationshipFrom} WHERE {$relContactAlias}.id IN (" .
       implode(',', $contactIds) .
       ") AND {$this->_aliases['civicrm_relationship']}.is_active = 1 {$this->_relationshipWhere} GROUP BY {$this->_aliases['civicrm_relationship']}.contact_id_a, {$this->_aliases['civicrm_relationship']}.contact_id_b";
     $relationshipTypes = CRM_Core_PseudoConstant::relationshipType();

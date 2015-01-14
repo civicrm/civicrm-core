@@ -85,9 +85,9 @@ class CRM_Financial_Page_AJAX {
           $selectedArray['selected'] = 'Selected';
         }
         $elements[] = array(
-            'name' => $name,
-            'value' => $id,
-          ) + $selectedArray;
+          'name' => $name,
+          'value' => $id,
+        ) + $selectedArray;
       }
     }
     CRM_Utils_JSON::output($elements);
@@ -261,18 +261,17 @@ class CRM_Financial_Page_AJAX {
   }
 
   public static function getFinancialTransactionsList() {
-    $sortMapper =
-      array(
-        0 => '',
-        1 => '',
-        2 => 'sort_name',
-        3 => 'amount',
-        4 => 'trxn_id',
-        5 => 'transaction_date',
-        6 => 'payment_method',
-        7 => 'status',
-        8 => 'name',
-      );
+    $sortMapper = array(
+      0 => '',
+      1 => '',
+      2 => 'sort_name',
+      3 => 'amount',
+      4 => 'trxn_id',
+      5 => 'transaction_date',
+      6 => 'payment_method',
+      7 => 'status',
+      8 => 'name',
+    );
 
     $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
     $offset = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
@@ -290,34 +289,32 @@ class CRM_Financial_Page_AJAX {
       $params['sortBy'] = $sort . ' ' . $sortOrder;
     }
 
-    $returnvalues =
-      array(
-        'civicrm_financial_trxn.payment_instrument_id as payment_method',
-        'civicrm_contribution.contact_id as contact_id',
-        'civicrm_contribution.id as contributionID',
-        'contact_a.sort_name',
-        'civicrm_financial_trxn.total_amount as amount',
-        'civicrm_financial_trxn.trxn_id as trxn_id',
-        'contact_a.contact_type',
-        'contact_a.contact_sub_type',
-        'civicrm_financial_trxn.trxn_date as transaction_date',
-        'name',
-        'civicrm_contribution.currency as currency',
-        'civicrm_financial_trxn.status_id as status',
-        'civicrm_financial_trxn.check_number as check_number',
-      );
+    $returnvalues = array(
+      'civicrm_financial_trxn.payment_instrument_id as payment_method',
+      'civicrm_contribution.contact_id as contact_id',
+      'civicrm_contribution.id as contributionID',
+      'contact_a.sort_name',
+      'civicrm_financial_trxn.total_amount as amount',
+      'civicrm_financial_trxn.trxn_id as trxn_id',
+      'contact_a.contact_type',
+      'contact_a.contact_sub_type',
+      'civicrm_financial_trxn.trxn_date as transaction_date',
+      'name',
+      'civicrm_contribution.currency as currency',
+      'civicrm_financial_trxn.status_id as status',
+      'civicrm_financial_trxn.check_number as check_number',
+    );
 
-    $columnHeader =
-      array(
-        'contact_type' => '',
-        'sort_name' => ts('Contact Name'),
-        'amount' => ts('Amount'),
-        'trxn_id' => ts('Trxn ID'),
-        'transaction_date' => ts('Received'),
-        'payment_method' => ts('Payment Method'),
-        'status' => ts('Status'),
-        'name' => ts('Type'),
-      );
+    $columnHeader = array(
+      'contact_type' => '',
+      'sort_name' => ts('Contact Name'),
+      'amount' => ts('Amount'),
+      'trxn_id' => ts('Trxn ID'),
+      'transaction_date' => ts('Received'),
+      'payment_method' => ts('Payment Method'),
+      'status' => ts('Status'),
+      'name' => ts('Type'),
+    );
 
     if ($sort && $sortOrder) {
       $params['sortBy'] = $sort . ' ' . $sortOrder;
@@ -450,19 +447,18 @@ class CRM_Financial_Page_AJAX {
     }
 
     $iFilteredTotal = $iTotal = $params['total'];
-    $selectorElements =
-      array(
-        'check',
-        'contact_type',
-        'sort_name',
-        'amount',
-        'trxn_id',
-        'transaction_date',
-        'payment_method',
-        'status',
-        'name',
-        'action',
-      );
+    $selectorElements = array(
+      'check',
+      'contact_type',
+      'sort_name',
+      'amount',
+      'trxn_id',
+      'transaction_date',
+      'payment_method',
+      'status',
+      'name',
+      'action',
+    );
 
     echo CRM_Utils_JSON::encodeDataTableSelector($financialitems, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
@@ -484,12 +480,11 @@ class CRM_Financial_Page_AJAX {
     foreach ($cIDs as $key => $value) {
       $recordPID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $value, 'payment_instrument_id');
       if ($action == 'Remove' || ($recordPID == $batchPID && $action == 'Assign') || !isset($batchPID)) {
-        $params =
-          array(
-            'entity_id' => $value,
-            'entity_table' => 'civicrm_financial_trxn',
-            'batch_id' => $entityID,
-          );
+        $params = array(
+          'entity_id' => $value,
+          'entity_table' => 'civicrm_financial_trxn',
+          'batch_id' => $entityID,
+        );
         if ($action == 'Assign') {
           $updated = CRM_Batch_BAO_Batch::addBatchEntity($params);
         }
@@ -512,18 +507,17 @@ class CRM_Financial_Page_AJAX {
     $params = array('id' => $batchID);
     $batchInfo = CRM_Batch_BAO_Batch::retrieve($params, $value);
     $batchTotals = CRM_Batch_BAO_Batch::batchTotals(array($batchID));
-    $batchSummary =
-      array(
-        'created_by' => CRM_Contact_BAO_Contact::displayName($batchInfo->created_id),
-        'status' => CRM_Core_OptionGroup::getLabel('batch_status', $batchInfo->status_id),
-        'description' => $batchInfo->description,
-        'payment_instrument' => CRM_Core_OptionGroup::getLabel('payment_instrument', $batchInfo->payment_instrument_id),
-        'item_count' => $batchInfo->item_count,
-        'assigned_item_count' => $batchTotals[$batchID]['item_count'],
-        'total' => CRM_Utils_Money::format($batchInfo->total),
-        'assigned_total' => CRM_Utils_Money::format($batchTotals[$batchID]['total']),
-        'opened_date' => CRM_Utils_Date::customFormat($batchInfo->created_date),
-      );
+    $batchSummary = array(
+      'created_by' => CRM_Contact_BAO_Contact::displayName($batchInfo->created_id),
+      'status' => CRM_Core_OptionGroup::getLabel('batch_status', $batchInfo->status_id),
+      'description' => $batchInfo->description,
+      'payment_instrument' => CRM_Core_OptionGroup::getLabel('payment_instrument', $batchInfo->payment_instrument_id),
+      'item_count' => $batchInfo->item_count,
+      'assigned_item_count' => $batchTotals[$batchID]['item_count'],
+      'total' => CRM_Utils_Money::format($batchInfo->total),
+      'assigned_total' => CRM_Utils_Money::format($batchTotals[$batchID]['total']),
+      'opened_date' => CRM_Utils_Date::customFormat($batchInfo->created_date),
+    );
 
     CRM_Utils_JSON::output($batchSummary);
   }

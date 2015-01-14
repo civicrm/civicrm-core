@@ -563,7 +563,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Helps decide how to behave when there are conflicts.
    *                              A 'safe' value skips the merge if there are any un-resolved conflicts.
    *                              Does a force merge otherwise.
-   * @param bool $autoFlipWether to let api decide which contact to retain and which to delete.
+   * @param bool $autoFlip to let api decide which contact to retain and which to delete.
    *   Wether to let api decide which contact to retain and which to delete.
    * @param bool $redirectForPerformance
    *
@@ -608,7 +608,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Helps decide how to behave when there are conflicts.
    *                             A 'safe' value skips the merge if there are any un-resolved conflicts.
    *                             Does a force merge otherwise (aggressive mode).
-   * @param bool $autoFlipWether to let api decide which contact to retain and which to delete.
+   * @param bool $autoFlip to let api decide which contact to retain and which to delete.
    *   Wether to let api decide which contact to retain and which to delete.
    *
    *
@@ -823,7 +823,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $params = array(
         'contact_id' => $cid,
         'version' => 3,
-        'return' => array_merge(array('display_name'), self::getContactFields())
+        'return' => array_merge(array('display_name'), self::getContactFields()),
       );
       $result = civicrm_api('contact', 'get', $params);
 
@@ -855,11 +855,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $specialValues[$moniker]['preferred_communication_method'] = CRM_Core_DAO::VALUE_SEPARATOR . $prefCommList . CRM_Core_DAO::VALUE_SEPARATOR;
       }
       $names = array(
-        'preferred_communication_method' =>
-          array(
-            'newName' => 'preferred_communication_method_display',
-            'groupName' => 'preferred_communication_method',
-          ),
+        'preferred_communication_method' => array(
+          'newName' => 'preferred_communication_method_display',
+          'groupName' => 'preferred_communication_method',
+        ),
       );
       CRM_Core_OptionGroup::lookupValues($specialValues[$moniker], $names);
 
@@ -1430,7 +1429,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
                 if (in_array($htmlType, array(
                   'CheckBox',
                   'Multi-Select',
-                  'AdvMulti-Select'
+                  'AdvMulti-Select',
                 ))) {
                   $submitted[$key] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
                       $mergeValue
@@ -1443,7 +1442,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             }
             elseif (in_array($htmlType, array(
               'Multi-Select Country',
-              'Multi-Select State/Province'
+              'Multi-Select State/Province',
             ))) {
               //we require submitted values should be in array format
               if ($value) {
@@ -1617,7 +1616,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'modified_date',
       'primary_contact_id',
       'sort_name',
-      'user_unique_id'
+      'user_unique_id',
     );
     foreach ($contactFields as $field => $value) {
       if (in_array($field, $invalidFields)) {
@@ -1629,10 +1628,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
   /**
    * Added for CRM-12695
-   * Based on the contactId provided
+   * Based on the contactID provided
    * add/update membership(s) to related contacts
    *
-   * @param contactId
+   * @param int $contactID
    */
   public static function addMembershipToRealtedContacts($contactID) {
     $dao = new CRM_Member_DAO_Membership();

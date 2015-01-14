@@ -56,21 +56,21 @@ class CRM_Core_Config_MailerTest extends CiviUnitTestCase {
   public function testHookAlterMailer() {
     $test = $this;
     $mockMailer = new CRM_Utils_FakeObject(array(
-      'send' => function ($recipients, $headers, $body) use ($test) {
-        $test->calls['send']++;
-        $test->assertEquals(array('to@example.org'), $recipients);
-        $test->assertEquals('Subject Example', $headers['Subject']);
-      },
+    'send' => function ($recipients, $headers, $body) use ($test) {
+      $test->calls['send']++;
+      $test->assertEquals(array('to@example.org'), $recipients);
+      $test->assertEquals('Subject Example', $headers['Subject']);
+    },
     ));
 
     CRM_Utils_Hook::singleton()->setHook('civicrm_alterMailer',
-      function (&$mailer, $driver, $params) use ($test, $mockMailer) {
-        $test->calls['civicrm_alterMailer']++;
-        $test->assertTrue(is_string($driver) && !empty($driver));
-        $test->assertTrue(is_array($params));
-        $test->assertTrue(is_callable(array($mailer, 'send')));
-        $mailer = $mockMailer;
-      }
+    function (&$mailer, $driver, $params) use ($test, $mockMailer) {
+      $test->calls['civicrm_alterMailer']++;
+      $test->assertTrue(is_string($driver) && !empty($driver));
+      $test->assertTrue(is_array($params));
+      $test->assertTrue(is_callable(array($mailer, 'send')));
+      $mailer = $mockMailer;
+    }
     );
 
     $params = array();

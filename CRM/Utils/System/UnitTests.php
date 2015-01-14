@@ -59,7 +59,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @param null $pageTitle
    */
   public function setTitle($title, $pageTitle = NULL) {
-    return;
+    return NULL;
   }
 
   /**
@@ -103,11 +103,11 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @param $breadCrumbs
    */
   public function appendBreadCrumb($breadCrumbs) {
-    return;
+    return NULL;
   }
 
   public function resetBreadCrumb() {
-    return;
+    return NULL;
   }
 
   /**
@@ -122,7 +122,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @param string $head
    */
   public function addHTMLHead($head) {
-    return;
+    return NULL;
   }
 
   public function mapConfigToSSL() {
@@ -142,10 +142,10 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
   /**
    * @param mix $action
    *
-   * @return string
+   * @return void
    */
   public function postURL($action) {
-    return;
+    return NULL;
   }
 
   /**
@@ -182,7 +182,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    *
    * @return string
    */
-  function url(
+  public function url(
     $path = NULL, $query = NULL, $absolute = FALSE,
     $fragment = NULL, $htmlize = TRUE,
     $frontend = FALSE, $forceBackend = FALSE
@@ -270,7 +270,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @param string $message
    */
   public function setMessage($message) {
-    return;
+    return NULL;
   }
 
   public function permissionDenied() {
@@ -289,7 +289,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    *   with the locale or null for none
    */
   /**
-   * @return string
+   * @return void
    */
   public function getUFLocale() {
     return NULL;
@@ -314,8 +314,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @param string $destination
    *   If present, add destination to querystring (works for Drupal only).
    *
-   * @throws Exception
-   * @return string
+   * @Throws Exception
    *   loginURL for the current CMS
    */
   public function getLoginURL($destination = '') {
