@@ -189,16 +189,15 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   * @param int $contactId
-   *   This is contact id for adding relationship.
    * @param array $ids
    *   The array that holds all the db ids.
+   * @param int $contactId
+   *   This is contact id for adding relationship.
    *
    * @return CRM_Contact_BAO_Relationship
    */
   public static function add(&$params, $ids = array(), $contactId = NULL) {
-    $relationshipId =
-      CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
+    $relationshipId = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
 
     $hook = 'create';
     if ($relationshipId) {
@@ -372,7 +371,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return boolean
+   * @return bool
    */
   public static function dataExists(&$params) {
     // return if no data present
@@ -407,7 +406,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @return array
    *   array reference of all relationship types with context to current contact.
    */
-  static function getContactRelationshipType(
+  public static function getContactRelationshipType(
     $contactId = NULL,
     $contactSuffix = NULL,
     $relationshipId = NULL,
@@ -582,7 +581,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @param $action
    *
-   * @return null
    */
   public static function disableEnableRelationship($id, $action) {
     $relationship = self::clearCurrentEmployer($id, $action);
@@ -668,7 +666,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param int $relationshipTypeId
    *   Relationship type id.
    *
-   * @return boolean
+   * @return bool
    *   true if it is valid relationship else false
    */
   public static function checkRelationshipType($contact_a, $contact_b, $relationshipTypeId) {
@@ -739,7 +737,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param int $relationshipId
    *   This is relationship id for the contact.
    *
-   * @return boolean
+   * @return bool
    *   true if record exists else false
    */
   public static function checkDuplicateRelationship(&$params, $id, $contactId = 0, $relationshipId = 0) {
@@ -1045,7 +1043,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    * @return array|int
    *   relationship records
    */
-  static function getRelationship(
+  public static function getRelationship(
     $contactId = NULL,
     $status = 0, $numRelationship = 0,
     $count = 0, $relationshipId = 0,
@@ -1700,7 +1698,7 @@ AND cc.sort_name LIKE '%$name%'";
    *   Api input array.
    * @param null $direction
    *
-   * @return array
+   * @return array|void
    */
   public static function membershipTypeToRelationshipTypes(&$params, $direction = NULL) {
     $membershipType = civicrm_api3('membership_type', 'getsingle', array(
@@ -1709,12 +1707,12 @@ AND cc.sort_name LIKE '%$name%'";
     ));
     $relationshipTypes = $membershipType['relationship_type_id'];
     if (empty($relationshipTypes)) {
-      return;
+      return NULL;
     }
     // if we don't have any contact data we can only filter on type
     if (empty($params['contact_id']) && empty($params['contact_id_a']) && empty($params['contact_id_a'])) {
       $params['relationship_type_id'] = array('IN' => $relationshipTypes);
-      return;
+      return NULL;
     }
     else {
       $relationshipDirections = (array) $membershipType['relationship_direction'];

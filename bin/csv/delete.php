@@ -31,7 +31,7 @@
  * php bin/csv/delete.php -e <entity> --file /path/to/csv/file [ -s site.org ]
  * e.g.: php bin/csv/delete.php -e Contact --file /tmp/delete.csv
  *
- **/
+ */
 
 require_once dirname(__DIR__) . '/cli.class.php';
 

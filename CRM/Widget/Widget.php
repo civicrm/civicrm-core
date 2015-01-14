@@ -62,7 +62,7 @@ class CRM_Widget_Widget {
    * @param int $contributionPageID
    * @param string $widgetID
    *
-   * @return stdClass
+   * @return object
    */
   public function getContributionPageData($contributionPageID, $widgetID) {
     $config = CRM_Core_Config::singleton();

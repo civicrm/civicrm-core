@@ -144,20 +144,19 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $coreTypes = array('Contact', 'Organization');
 
     $entities[] = array(
-      'entity_name' => array ('contact_1'),
+      'entity_name' => array('contact_1'),
       'entity_type' => 'OrganizationModel',
     );
 
     if ($member && $member['is_active']) {
       $coreTypes[] = 'Membership';
       $entities[] = array(
-        'entity_name' => array ('membership_1'),
+        'entity_name' => array('membership_1'),
         'entity_type' => 'MembershipModel',
       );
     }
-    
-    $allowCoreTypes = array_merge($coreTypes, 
-      CRM_Contact_BAO_ContactType::subTypes('Organization'));
+
+    $allowCoreTypes = array_merge($coreTypes, CRM_Contact_BAO_ContactType::subTypes('Organization'));
     $allowSubTypes = array();
 
     $this->addProfileSelector('onbehalf_profile_id', ts('Organization Profile'), $allowCoreTypes, $allowSubTypes, $entities);
@@ -207,7 +206,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
         'Contact',
         'Individual',
         'Organization',
-        'Household'
+        'Household',
       ), CRM_Contact_BAO_ContactType::subTypes('Individual'));
     $allowSubTypes = array();
 
@@ -349,19 +348,17 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $dao = CRM_Contribute_BAO_ContributionPage::create($params);
 
     $ufJoinParams = array(
-      'onbehalf_profile_id' =>
-        array(
-          'is_active' => 1,
-          'module' => 'OnBehalf',
-          'entity_table' => 'civicrm_contribution_page',
-          'entity_id' => $dao->id,
-        ),
-      'honor_block_is_active' =>
-        array(
-          'module' => 'soft_credit',
-          'entity_table' => 'civicrm_contribution_page',
-          'entity_id' => $dao->id,
-        ),
+      'onbehalf_profile_id' => array(
+        'is_active' => 1,
+        'module' => 'OnBehalf',
+        'entity_table' => 'civicrm_contribution_page',
+        'entity_id' => $dao->id,
+      ),
+      'honor_block_is_active' => array(
+        'module' => 'soft_credit',
+        'entity_table' => 'civicrm_contribution_page',
+        'entity_id' => $dao->id,
+      ),
     );
 
     foreach ($ufJoinParams as $index => $ufJoinParam) {
