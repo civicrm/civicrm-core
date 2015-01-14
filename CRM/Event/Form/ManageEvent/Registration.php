@@ -248,12 +248,12 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       ts('Allow Online Registration'),
       NULL,
       array(
-        'onclick' => "return showHideByValue('is_online_registration',
-        '',
-        'registration_blocks',
-        'block',
-        'radio',
-        false );",
+        'onclick' => "return showHideByValue('is_online_registration'," . 
+          "''," .
+          "'registration_blocks'," .
+          "'block'," .
+          "'radio'," .
+          "false );",
       )
     );
 
@@ -354,7 +354,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *   Label.
    * @param array $configs
    *   Optional, for addProfileSelector(), defaults to using getProfileSelectorTypes().
-   **/
+   */
   public function buildMultipleProfileBottom(&$form, $count, $prefix = '', $label = 'Include Profile', $configs = NULL) {
     extract((is_null($configs)) ? self::getProfileSelectorTypes() : $configs);
     $element = $prefix . "custom_post_id_multiple[$count]";
@@ -367,7 +367,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @return array
    *   ['allowCoreTypes' => array, 'allowSubTypes' => array, 'profileEntities' => array]
-   **/
+   */
   public static function getProfileSelectorTypes() {
     $configs = array(
       'allowCoreTypes' => array(),
@@ -377,7 +377,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     $configs['allowCoreTypes'] = array_merge(array(
         'Contact',
-        'Individual'
+        'Individual',
       ), CRM_Contact_BAO_ContactType::subTypes('Individual'));
     $configs['allowCoreTypes'][] = 'Participant';
     //CRM-15427
@@ -393,7 +393,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $configs['profileEntities'][] = array(
       'entity_name' => 'participant_1',
       'entity_type' => 'ParticipantModel',
-      'entity_sub_type' => '*'
+      'entity_sub_type' => '*',
     );
 
     return $configs;
@@ -672,7 +672,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * Collect all email fields for an array of profile ids
    *
    * @param $profileIds
-   * @return boolean
+   * @return bool
    */
   public static function getEmailFields($profileIds) {
     $emailFields = array();
@@ -693,7 +693,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * Check if a profile contains required fields
    *
    * @param $profileIds
-   * @return boolean
+   * @return bool
    */
   public static function isProfileComplete($profileIds) {
     $profileReqFields = array();
@@ -728,9 +728,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @param $profileIds
    * @param int $rgId
-   * @return boolean
+   * @return bool
    */
-
   public function canProfilesDedupe($profileIds, $rgId = 0) {
 
     // find the unsupervised rule

@@ -301,7 +301,7 @@ class CRM_Utils_PDF_Utils {
    * @param string $author
    * @param string $title
    */
-  static function &pdflib(
+  pubic static function &pdflib(
     $fileName,
     $searchPath,
     &$values,

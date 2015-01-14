@@ -189,7 +189,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     // also load the class loader
     require_once 'CRM/Core/ClassLoader.php';
     CRM_Core_ClassLoader::singleton()->register();
-    if (function_exists('_civix_phpunit_setUp')) { // FIXME: loosen coupling
+    if (function_exists('_civix_phpunit_setUp')) {
+      // FIXME: loosen coupling
       _civix_phpunit_setUp();
     }
   }
@@ -679,7 +680,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param $expectedValue
    * @param $message
    */
-  function assertDBCompareValue(
+  public function assertDBCompareValue(
     $daoName, $searchValue, $returnColumn, $searchColumn,
     $expectedValue, $message
   ) {
@@ -1024,7 +1025,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'debug' => 1,
     );
     $result = $this->civicrm_api($entity, 'getcount', $params);
-    if (!is_integer($result) || !empty($result['is_error']) || isset($result['values'])) {
+    if (!is_int($result) || !empty($result['is_error']) || isset($result['values'])) {
       throw new Exception('Invalid getcount result : ' . print_r($result, TRUE) . " type :" . gettype($result));
     }
     if (is_int($count)) {
@@ -1176,7 +1177,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     );
     $params = array('contact_type' => $contact_type);
     foreach ($samples[$contact_type] as $key => $values) {
-      $params[$key] = $values[$seq % sizeof($values)];
+      $params[$key] = $values[$seq % count($values)];
     }
     if ($contact_type == 'Individual') {
       $params['email'] = strtolower(
@@ -1214,7 +1215,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *   Contact ID to delete
    */
   public function contactDelete($contactID) {
-    $domain = new CRM_Core_BAO_Domain;
+    $domain = new CRM_Core_BAO_Domain();
     $domain->contact_id = $contactID;
     if (!$domain->find(TRUE)) {
       $this->callAPISuccess('contact', 'delete', array(
@@ -1304,7 +1305,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   public function membershipDelete($membershipID) {
     $deleteParams = array('id' => $membershipID);
     $result = $this->callAPISuccess('Membership', 'Delete', $deleteParams);
-    return;
   }
 
   /**
@@ -1332,7 +1332,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       return;
     }
     $result = $this->callAPISuccess('MembershipStatus', 'Delete', array('id' => $membershipStatusID));
-    return;
   }
 
   /**
@@ -1811,7 +1810,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Delete a Location Type
    *
-   * @param int location type id
+   * @param int locationTypeId
    */
   public function locationTypeDelete($locationTypeId) {
     $locationType = new CRM_Core_DAO_LocationType();
@@ -1852,8 +1851,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param int $groupID
    * @param int $totalCount
-   * @return int groupId of created group
-   * groupId of created group
+   * @return int
+   *    groupId of created group
    */
   public function groupContactCreate($groupID, $totalCount = 10) {
     $params = array('group_id' => $groupID);
@@ -1929,7 +1928,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Delete a UF Join Entry
    *
-   * @param array with missing uf_group_id
+   * @param array $params
+   *   with missing uf_group_id
    */
   public function ufjoinDelete($params = NULL) {
     if ($params === NULL) {

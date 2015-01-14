@@ -74,7 +74,7 @@ interface CRM_Report_Interface {
    * Retrieve all the values that match the current input parameters
    * Used by the selector
    */
-  function all(
+  public function all(
     $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE
   );

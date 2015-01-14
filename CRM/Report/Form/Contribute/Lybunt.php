@@ -70,102 +70,102 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     }
 
     $this->_columns = array(
-        'civicrm_contact' => array(
-          'dao' => 'CRM_Contact_DAO_Contact',
-          'grouping' => 'contact-field',
-          'fields' => array(
-            'sort_name' => array(
-              'title' => ts('Donor Name'),
-              'default' => TRUE,
-              'required' => TRUE,
-            ),
-            'first_name' => array(
-              'title' => ts('First Name'),
-            ),
-            'last_name' => array(
-              'title' => ts('Last Name'),
-            ),
-            'contact_type' => array(
-              'title' => ts('Contact Type'),
-            ),
-            'contact_sub_type' => array(
-              'title' => ts('Contact Subtype'),
-            ),
+      'civicrm_contact' => array(
+        'dao' => 'CRM_Contact_DAO_Contact',
+        'grouping' => 'contact-field',
+        'fields' => array(
+          'sort_name' => array(
+            'title' => ts('Donor Name'),
+            'default' => TRUE,
+            'required' => TRUE,
           ),
-          'filters' => array(
-            'sort_name' => array(
-              'title' => ts('Donor Name'),
-              'operator' => 'like',
-            ),
+          'first_name' => array(
+            'title' => ts('First Name'),
+          ),
+          'last_name' => array(
+            'title' => ts('Last Name'),
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
           ),
         ),
-        'civicrm_email' => array(
-          'dao' => 'CRM_Core_DAO_Email',
-          'grouping' => 'contact-field',
-          'fields' => array(
-            'email' => array(
-              'title' => ts('Email'),
-              'default' => TRUE,
-            ),
+        'filters' => array(
+          'sort_name' => array(
+            'title' => ts('Donor Name'),
+            'operator' => 'like',
           ),
         ),
-        'civicrm_phone' => array(
-          'dao' => 'CRM_Core_DAO_Phone',
-          'grouping' => 'contact-field',
-          'fields' => array(
-            'phone' => array(
-              'title' => ts('Phone'),
-              'default' => TRUE,
-            ),
+      ),
+      'civicrm_email' => array(
+        'dao' => 'CRM_Core_DAO_Email',
+        'grouping' => 'contact-field',
+        'fields' => array(
+          'email' => array(
+            'title' => ts('Email'),
+            'default' => TRUE,
           ),
         ),
-      )
-      + $this->addAddressFields()
-      + array(
-        'civicrm_contribution' => array(
-          'dao' => 'CRM_Contribute_DAO_Contribution',
-          'fields' => array(
-            'contact_id' => array(
-              'title' => ts('contactId'),
-              'no_display' => TRUE,
-              'required' => TRUE,
-              'no_repeat' => TRUE,
-            ),
-            'total_amount' => array(
-              'title' => ts('Total Amount'),
-              'no_display' => TRUE,
-              'required' => TRUE,
-              'no_repeat' => TRUE,
-            ),
-            'receive_date' => array(
-              'title' => ts('Year'),
-              'no_display' => TRUE,
-              'required' => TRUE,
-              'no_repeat' => TRUE,
-            ),
-          ),
-          'filters' => array(
-            'yid' => array(
-              'name' => 'receive_date',
-              'title' => ts('This Year'),
-              'operatorType' => CRM_Report_Form::OP_SELECT,
-              'options' => $optionYear,
-              'default' => date('Y'),
-            ),
-            'financial_type_id' => array(
-              'title' => ts('Financial Type'),
-              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-              'options' => CRM_Contribute_PseudoConstant::financialType(),
-            ),
-            'contribution_status_id' => array(
-              'title' => ts('Contribution Status'),
-              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-              'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
-              'default' => array('1'),
-            ),
+      ),
+      'civicrm_phone' => array(
+        'dao' => 'CRM_Core_DAO_Phone',
+        'grouping' => 'contact-field',
+        'fields' => array(
+          'phone' => array(
+            'title' => ts('Phone'),
+            'default' => TRUE,
           ),
         ),
-      );
+      ),
+    )
+    + $this->addAddressFields()
+    + array(
+      'civicrm_contribution' => array(
+        'dao' => 'CRM_Contribute_DAO_Contribution',
+        'fields' => array(
+          'contact_id' => array(
+            'title' => ts('contactId'),
+            'no_display' => TRUE,
+            'required' => TRUE,
+            'no_repeat' => TRUE,
+          ),
+          'total_amount' => array(
+            'title' => ts('Total Amount'),
+            'no_display' => TRUE,
+            'required' => TRUE,
+            'no_repeat' => TRUE,
+          ),
+          'receive_date' => array(
+            'title' => ts('Year'),
+            'no_display' => TRUE,
+            'required' => TRUE,
+            'no_repeat' => TRUE,
+          ),
+        ),
+        'filters' => array(
+          'yid' => array(
+            'name' => 'receive_date',
+            'title' => ts('This Year'),
+            'operatorType' => CRM_Report_Form::OP_SELECT,
+            'options' => $optionYear,
+            'default' => date('Y'),
+          ),
+          'financial_type_id' => array(
+            'title' => ts('Financial Type'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contribute_PseudoConstant::financialType(),
+          ),
+          'contribution_status_id' => array(
+            'title' => ts('Contribution Status'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'default' => array('1'),
+          ),
+        ),
+      ),
+    );
 
     // If we have a campaign, build out the relevant elements
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
