@@ -205,19 +205,19 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
 
     CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, array($this, '_preCommit'), array(
         'qwe',
-        'rty'
+        'rty',
       ));
     CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, array($this, '_postCommit'), array(
         'uio',
-        'p[]'
+        'p[]',
       ));
     CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_ROLLBACK, array(
         $this,
-        '_preRollback'
+        '_preRollback',
       ), array('asd', 'fgh'));
     CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_ROLLBACK, array(
         $this,
-        '_postRollback'
+        '_postRollback',
       ), array('jkl', ';'));
 
     CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET id = 100 WHERE id = 100');
@@ -233,19 +233,19 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
 
     CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, array($this, '_preCommit'), array(
         'ewq',
-        'ytr'
+        'ytr',
       ));
     CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, array($this, '_postCommit'), array(
         'oiu',
-        '][p'
+        '][p',
       ));
     CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_ROLLBACK, array(
         $this,
-        '_preRollback'
+        '_preRollback',
       ), array('dsa', 'hgf'));
     CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_ROLLBACK, array(
         $this,
-        '_postRollback'
+        '_postRollback',
       ), array('lkj', ';'));
 
     CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET id = 100 WHERE id = 100');
@@ -395,8 +395,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    *   See assertContactsMix.
    * @param string $outcome
    *   'rollback'|'implicit-commit'|'explicit-commit' how to finish transaction.
-   * @return int
-   *   cid
+   * @return void
    */
   public function runBatch($nesting, $callbacks, $existsByOffset, $outcome) {
     if ($nesting != 'reuse-tx' && $nesting != 'nest-tx') {

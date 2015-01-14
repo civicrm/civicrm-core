@@ -11,7 +11,7 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
    * @return CRM_Mailing_BAO_QueryTestDataProvider
    */
   public function dataProvider() {
-    return new CRM_Mailing_BAO_QueryTestDataProvider;
+    return new CRM_Mailing_BAO_QueryTestDataProvider();
   }
 
   public function setUp() {

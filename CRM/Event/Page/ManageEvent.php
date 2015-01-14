@@ -111,64 +111,64 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
       self::$_tabLinks = array();
     }
     if (!isset(self::$_tabLinks[$cacheKey])) {
-      self::$_tabLinks[$cacheKey]['settings'] =
-        array(
+      self::$_tabLinks[$cacheKey]['settings']
+        = array(
           'title' => ts('Info and Settings'),
           'url' => 'civicrm/event/manage/settings',
           'field' => 'id',
         );
-      self::$_tabLinks[$cacheKey]['location'] =
-        array(
+      self::$_tabLinks[$cacheKey]['location']
+        = array(
           'title' => ts('Location'),
           'url' => 'civicrm/event/manage/location',
           'field' => 'loc_block_id',
         );
 
-      self::$_tabLinks[$cacheKey]['fee'] =
-        array(
+      self::$_tabLinks[$cacheKey]['fee']
+        = array(
           'title' => ts('Fees'),
           'url' => 'civicrm/event/manage/fee',
           'field' => 'is_monetary',
         );
-      self::$_tabLinks[$cacheKey]['registration'] =
-        array(
+      self::$_tabLinks[$cacheKey]['registration']
+        = array(
           'title' => ts('Online Registration'),
           'url' => 'civicrm/event/manage/registration',
           'field' => 'is_online_registration',
         );
+
       if (CRM_Core_Permission::check('administer CiviCRM')) {
-        self::$_tabLinks[$cacheKey]['reminder'] =
-          array(
+        self::$_tabLinks[$cacheKey]['reminder']
+          = array(
             'title' => ts('Schedule Reminders'),
             'url' => 'civicrm/event/manage/reminder',
             'field' => 'reminder',
           );
       }
-      self::$_tabLinks[$cacheKey]['conference'] =
-        array(
+      self::$_tabLinks[$cacheKey]['conference']
+        = array(
           'title' => ts('Conference Slots'),
           'url' => 'civicrm/event/manage/conference',
           'field' => 'slot_label_id',
         );
-      self::$_tabLinks[$cacheKey]['friend'] =
-        array(
+      self::$_tabLinks[$cacheKey]['friend']
+        = array(
           'title' => ts('Tell a Friend'),
           'url' => 'civicrm/event/manage/friend',
           'field' => 'friend',
         );
-      self::$_tabLinks[$cacheKey]['pcp'] =
-        array(
+      self::$_tabLinks[$cacheKey]['pcp']
+        = array(
           'title' => ts('Personal Campaign Pages'),
           'url' => 'civicrm/event/manage/pcp',
           'field' => 'is_pcp_enabled',
         );
-      self::$_tabLinks[$cacheKey]['repeat'] =
-        array(
+      self::$_tabLinks[$cacheKey]['repeat']
+        = array(
           'title' => ts('Repeat'),
           'url' => 'civicrm/event/manage/repeat',
           'field' => 'is_repeating_event',
         );
-
     }
 
     if (!$enableCart) {
@@ -418,8 +418,7 @@ ORDER BY start_date desc
   }
 
   public function search() {
-    if (isset($this->_action) &
-      (CRM_Core_Action::ADD |
+    if (isset($this->_action) & (CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE |
         CRM_Core_Action::DELETE
       )

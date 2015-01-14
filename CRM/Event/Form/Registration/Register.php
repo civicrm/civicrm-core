@@ -255,8 +255,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     // add this event's default participant role to defaults array
     // (for cases where participant_role field is included in form via profile)
     if ($this->_values['event']['default_role_id']) {
-      $this->_defaults['participant_role'] =
-      $this->_defaults['participant_role_id'] = $this->_values['event']['default_role_id'];
+      $this->_defaults['participant_role']
+        = $this->_defaults['participant_role_id'] = $this->_values['event']['default_role_id'];
     }
     if ($this->_priceSetId && !empty($this->_feeBlock)) {
       foreach ($this->_feeBlock as $key => $val) {
@@ -750,7 +750,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $maxValue = CRM_Utils_Array::value('max_value', $option, 0);
         $dbTotalCount = CRM_Utils_Array::value($optId, $recordedOptionsCount, 0);
         $currentTotalCount = CRM_Utils_Array::value($optId, $currentOptionsCount, 0);
-
 
         $totalCount = $currentTotalCount + $dbTotalCount;
         $isFull = FALSE;

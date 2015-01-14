@@ -90,7 +90,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
           'type' => 'next',
           'name' => ts('Save'),
           'spacing' => '',
-          'isDefault' => FALSE
+          'isDefault' => FALSE,
         ),
       )
     );
@@ -143,7 +143,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
           CRM_Core_Session::setStatus(
             ts('The %1 role was assigned one or more permissions that may prove dangerous for users of that role to have. Please reconsider assigning %2 to them.', array(
                 1 => $wp_roles->role_names[$role],
-                2 => implode(', ', $warningPermissionNames)
+                2 => implode(', ', $warningPermissionNames),
               )),
             ts('Unsafe Permission Settings')
           );

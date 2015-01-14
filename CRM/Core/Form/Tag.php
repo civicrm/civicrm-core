@@ -60,7 +60,7 @@ class CRM_Core_Form_Tag {
    *
    * @return void
    */
-  static function buildQuickForm(
+  public static function buildQuickForm(
     &$form, $parentNames, $entityTable, $entityId = NULL, $skipTagCreate = FALSE,
     $skipEntityAction = FALSE, $tagsetElementName = NULL) {
     $tagset = $form->_entityTagValues = array();

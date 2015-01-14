@@ -94,7 +94,7 @@ class CRM_Utils_Recent {
    *
    * @return void
    */
-  static function add(
+  public static function add(
     $title,
     $url,
     $id,

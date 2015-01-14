@@ -99,10 +99,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   /**
    * Delete the Message Templates
    *
-   *
    * @param int $messageTemplatesID
-   *
-   * @return object
+   * @return void
    */
   public static function del($messageTemplatesID) {
     // make sure messageTemplatesID is an integer
@@ -229,7 +227,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $smarty = CRM_Core_Smarty::singleton();
       foreach (array(
                  'text',
-                 'html'
+                 'html',
                ) as $elem) {
         $$elem = $smarty->fetch("string:{$$elem}");
       }
@@ -274,12 +272,12 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   /**
    * Revert a message template to its default subject+text+HTML state
    *
-   * @param int id id of the template
+   * @param int $id id of the template
    *
    * @return void
    */
   public static function revert($id) {
-    $diverted = new self;
+    $diverted = new CRM_Core_BAO_MessageTemplate();
     $diverted->id = (int) $id;
     $diverted->find(1);
 
@@ -287,7 +285,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       CRM_Core_Error::fatal(ts('Did not find a message template with id of %1.', array(1 => $id)));
     }
 
-    $orig = new self;
+    $orig = new CRM_Core_BAO_MessageTemplate();
     $orig->workflow_id = $diverted->workflow_id;
     $orig->is_reserved = 1;
     $orig->find(1);
@@ -379,7 +377,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       else {
         CRM_Core_Error::fatal(ts('No such message template: option group %1, option value %2.', array(
               1 => $params['groupName'],
-              2 => $params['valueName']
+              2 => $params['valueName'],
             )));
       }
     }
@@ -409,7 +407,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     // replace tokens in the three elements (in subject as if it was the text body)
     $domain = CRM_Core_BAO_Domain::getDomain();
     $hookTokens = array();
-    $mailing = new CRM_Mailing_BAO_Mailing;
+    $mailing = new CRM_Mailing_BAO_Mailing();
     $mailing->body_text = $text;
     $mailing->body_html = $html;
     $tokens = $mailing->getTokens();
@@ -452,7 +450,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $text = CRM_Utils_Token::replaceContactTokens($text, $contact, FALSE, $tokens['text'], FALSE, TRUE);
       $html = CRM_Utils_Token::replaceContactTokens($html, $contact, FALSE, $tokens['html'], FALSE, TRUE);
 
-
       $contactArray = array($contactID => $contact);
       CRM_Utils_Hook::tokenValues($contactArray,
         array($contactID),
@@ -472,8 +469,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $subject = "{strip}$subject{/strip}";
 
     // parse the three elements with Smarty
-
-
     $smarty = CRM_Core_Smarty::singleton();
     foreach ($params['tplParams'] as $name => $value) {
       $smarty->assign($name, $value);
@@ -481,7 +476,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     foreach (array(
                'subject',
                'text',
-               'html'
+               'html',
              ) as $elem) {
       $$elem = $smarty->fetch("string:{$$elem}");
     }

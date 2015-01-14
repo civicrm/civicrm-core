@@ -74,7 +74,7 @@ class CRM_Grant_Form_Task extends CRM_Core_Form {
    *
    * @return void
    */
-  function preProcess() {
+  public function preProcess() {
     self::preProcessCommon($this);
   }
 
