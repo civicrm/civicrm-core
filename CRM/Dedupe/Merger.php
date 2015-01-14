@@ -196,6 +196,7 @@ class CRM_Dedupe_Merger {
     if (!$cidRefs) {
       $sql = "
 SELECT
+	table_schema,
     table_name,
     column_name
 FROM information_schema.key_column_usage
@@ -206,7 +207,7 @@ WHERE
       ";
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
-        $cidRefs[$dao->table_name][] = $dao->column_name;
+        $cidRefs[$dao->table_schema . "." . $dao->table_name][] = $dao->column_name;
       }
 
       // FixME for time being adding below line statically as no Foreign key constraint defined for table 'civicrm_entity_tag'
