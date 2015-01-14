@@ -129,7 +129,7 @@ class CRM_Core_DAO extends DB_DataObject {
       $required = TRUE;
     }
     if (!$required && $dbName != 'contact_id') {
-      $fkDAO = new $FKClassName;
+      $fkDAO = new $FKClassName();
       if ($fkDAO->find(TRUE)) {
         $this->$dbName = $fkDAO->id;
       }
@@ -221,8 +221,8 @@ class CRM_Core_DAO extends DB_DataObject {
 
         case CRM_Utils_Type::T_TIME:
           CRM_Core_Error::fatal('T_TIME shouldnt be used.');
-        //$object->$dbName='000000';
-        //break;
+          //$object->$dbName='000000';
+          //break;
         case CRM_Utils_Type::T_CCNUM:
           $this->$dbName = '4111 1111 1111 1111';
           break;
@@ -409,7 +409,7 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @return array
    */
-  static function &fields() {
+  public static function &fields() {
     $result = NULL;
     return $result;
   }
@@ -417,7 +417,6 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Get/set an associative array of table columns
    *
-   * @param array key=>type array
    * @return array
    *   (associative)
    */
@@ -504,8 +503,8 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param array $params
    *   (reference ) associative array of name/value pairs.
    *
-   * @return boolean
-   *   did we copy all null values into the object
+   * @return bool
+   *   Did we copy all null values into the object
    */
   public function copyValues(&$params) {
     $fields = &$this->fields();
@@ -670,7 +669,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param string $fieldName
    *   The name of the field in the DAO.
    *
-   * @return boolean
+   * @return bool
    *   true if object exists
    */
   public static function objectExists($value, $daoName, $daoID, $fieldName = 'name') {
@@ -695,7 +694,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param bool $i18nRewrite
    *   Whether to rewrite the query on multilingual setups.
    *
-   * @return boolean
+   * @return bool
    *   true if exists, else false
    */
   public static function checkFieldExists($tableName, $columnName, $i18nRewrite = TRUE) {
@@ -779,7 +778,7 @@ LIKE %1
    * @param string $tableName
    * @param string $constraint
    *
-   * @return boolean
+   * @return bool
    *   true if constraint exists, false otherwise
    */
   public static function checkConstraintExists($tableName, $constraint) {
@@ -807,7 +806,7 @@ LIKE %1
    *
    * @throws Exception
    *
-   * @return boolean
+   * @return bool
    *   true if CONSTRAINT keyword exists, false otherwise
    */
   public static function schemaRequiresRebuilding($tables = array("civicrm_contact")) {
@@ -843,7 +842,7 @@ LIKE %1
    * @param string $tableName
    * @param string $columnName
    *
-   * @return boolean
+   * @return bool
    *   true if in format, false otherwise
    */
   public static function checkFKConstraintInFormat($tableName, $columnName) {
@@ -872,7 +871,7 @@ LIKE %1
    * @param string $columnName
    * @param string $columnValue
    *
-   * @return boolean
+   * @return bool
    *   true if the value is always $columnValue, false otherwise
    */
   public static function checkFieldHasAlwaysValue($tableName, $columnName, $columnValue) {
@@ -889,7 +888,7 @@ LIKE %1
    * @param string $tableName
    * @param string $columnName
    *
-   * @return boolean
+   * @return bool
    *   true if if the value is always NULL, false otherwise
    */
   public static function checkFieldIsAlwaysNull($tableName, $columnName) {
@@ -905,7 +904,7 @@ LIKE %1
    *
    * @param string $tableName
    *
-   * @return boolean
+   * @return bool
    *   true if exists, else false
    */
   public static function checkTableExists($tableName) {
@@ -1017,7 +1016,7 @@ FROM   civicrm_domain
    * @param string $searchColumn
    *   Name of the column you want to search by.
    *
-   * @return boolean
+   * @return bool
    *   true if we found and updated the object, else false
    */
   public static function setFieldValue($daoName, $searchValue, $setColumn, $setValue, $searchColumn = 'id') {
@@ -1128,7 +1127,7 @@ FROM   civicrm_domain
    * @return CRM_Core_DAO
    *   object that holds the results of the query
    */
-  static function &executeQuery(
+  public static function &executeQuery(
     $query,
     $params = array(),
     $abort = TRUE,
@@ -1178,7 +1177,7 @@ FROM   civicrm_domain
    *   the result of the query if any
    *
    */
-  static function &singleValueQuery(
+  public static function &singleValueQuery(
     $query,
     $params = array(),
     $abort = TRUE,
@@ -1309,7 +1308,7 @@ FROM   civicrm_domain
    * @return CRM_Core_DAO
    *   the newly created copy of the object
    */
-  static function &copyGeneric($daoName, $criteria, $newData = NULL, $fieldsFix = NULL, $blockCopyOfDependencies = NULL) {
+  public static function &copyGeneric($daoName, $criteria, $newData = NULL, $fieldsFix = NULL, $blockCopyOfDependencies = NULL) {
     $object = new $daoName();
     if (!$newData) {
       $object->id = $criteria['id'];
@@ -1462,7 +1461,7 @@ SELECT contact_id
    *   an object of type referenced by daoName
    */
   public static function commonRetrieveAll($daoName, $fieldIdName = 'id', $fieldId, &$details, $returnProperities = NULL) {
-    require_once(str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php");
+    require_once str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php";
     $object = new $daoName();
     $object->$fieldIdName = $fieldId;
 
@@ -1583,9 +1582,10 @@ SELECT contact_id
    * @param int $numObjects
    * @param bool $createOnly
    *
-   * @return
+   * @return object|array|NULL
+   *   NULL if $createOnly. A single object if $numObjects==1. Otherwise, an array of multiple objects.
    */
-  static function createTestObject(
+  public static function createTestObject(
     $daoName,
     $params = array(),
     $numObjects = 1,
@@ -1602,7 +1602,7 @@ SELECT contact_id
       'CRM_Core_DAO_StateProvince',
       'CRM_Core_DAO_Country',
       'CRM_Core_DAO_Domain',
-      'CRM_Financial_DAO_FinancialType'
+      'CRM_Financial_DAO_FinancialType',
       //because valid ones exist & we use pick them due to pseudoconstant can't reliably create & delete these
     );
 
@@ -1651,7 +1651,7 @@ SELECT contact_id
     }
 
     if ($createOnly) {
-      return;
+      return NULL;
     }
     elseif ($numObjects == 1) {
       return $objects[0];
@@ -1823,7 +1823,7 @@ SELECT contact_id
   public static function triggerRebuild($tableName = NULL, $force = FALSE) {
     $info = array();
 
-    $logging = new CRM_Logging_Schema;
+    $logging = new CRM_Logging_Schema();
     $logging->triggerInfo($info, $tableName, $force);
 
     CRM_Core_I18n_Schema::triggerInfo($info, $tableName);
@@ -1864,7 +1864,7 @@ SELECT contact_id
   public static function dropTriggers($tableName = NULL) {
     $info = array();
 
-    $logging = new CRM_Logging_Schema;
+    $logging = new CRM_Logging_Schema();
     $logging->triggerInfo($info, $tableName);
 
     // drop all existing triggers on all tables
@@ -2122,11 +2122,11 @@ SELECT contact_id
    *
    * @param string $fieldName
    * @param string $context
-   *   @see CRM_Core_DAO::buildOptionsContext.
+   * @see CRM_Core_DAO::buildOptionsContext
    * @param array $props
    *   whatever is known about this bao object.
    *
-   * @return Array|bool
+   * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     // If a given bao does not override this function
@@ -2142,7 +2142,7 @@ SELECT contact_id
   public function getOptionLabels() {
     $fields = $this->fields();
     if ($fields === NULL) {
-      throw new Exception ('Cannot call getOptionLabels on CRM_Core_DAO');
+      throw new Exception('Cannot call getOptionLabels on CRM_Core_DAO');
     }
     foreach ($fields as $field) {
       $name = CRM_Utils_Array::value('name', $field);
@@ -2270,13 +2270,12 @@ SELECT contact_id
             }
             $escapedCriteria = array_map(array(
               'CRM_Core_DAO',
-              'escapeString'
+              'escapeString',
             ), $criteria);
             if (!$returnSanitisedArray) {
               return (sprintf('%s %s ("%s")', $fieldName, $operator, implode('", "', $escapedCriteria)));
             }
             return $escapedCriteria;
-            break;
 
           // binary operators
 
@@ -2313,7 +2312,7 @@ SELECT contact_id
       'BETWEEN',
       'NOT BETWEEN',
       'IS NOT NULL',
-      'IS NULL'
+      'IS NULL',
     );
   }
 

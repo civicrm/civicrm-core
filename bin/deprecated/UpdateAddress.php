@@ -273,8 +273,6 @@ WHERE      {$whereClause}
       }
     }
   }
-
-  return;
 }
 
 run();

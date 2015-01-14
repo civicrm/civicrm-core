@@ -47,24 +47,28 @@ class HelloTest extends PHPUnit_Framework_TestCase {
   var $abc;
 
   /**
-   * @param null $name
+   * @param string|null $name
    */
   public function __construct($name = NULL) {
     parent::__construct($name);
   }
 
-  // called before the test functions will be executed
-  // this function is defined in PHPUnit_TestCase and overwritten
-  // here
+  /**
+   * Called before the test functions will be executed
+   * this function is defined in PHPUnit_TestCase and overwritten
+   * here
+   */
   public function setUp() {
     // create a new instance of String with the
     // string 'abc'
     $this->abc = "hello";
   }
 
-  // called after the test functions are executed
-  // this function is defined in PHPUnit_TestCase and overwritten
-  // here
+  /**
+   * Called after the test functions are executed
+   * this function is defined in PHPUnit_TestCase and overwritten
+   * here.
+   */
   public function tearDown() {
     // delete your instance
     unset($this->abc);
