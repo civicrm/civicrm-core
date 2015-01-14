@@ -669,7 +669,6 @@ AND       CEF.entity_id    = %2";
     foreach ($currentAttachmentInfo as $fileKey => $fileValue) {
       $fileID = $fileValue['fileID'];
       $fileType = $fileValue['mime_type'];
-      $eid = $entityID;
       if ($fileID) {
         if ($fileType == 'image/jpeg' ||
           $fileType == 'image/pjpeg' ||
