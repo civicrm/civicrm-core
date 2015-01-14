@@ -41,7 +41,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
       'edit-1-profile-listings-and-forms',
       'edit-1-access-all-custom-data',
       'edit-1-register-for-events',
-      'edit-1-make-online-contributions'
+      'edit-1-make-online-contributions',
     );
     $this->changePermissions($permission);
 

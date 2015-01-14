@@ -37,9 +37,9 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
-  /* check function add()
-     *
-     */
+  /**
+   * Check function add()
+   */
   public function testAdd() {
     $params = array(
       'name' => 'pending',

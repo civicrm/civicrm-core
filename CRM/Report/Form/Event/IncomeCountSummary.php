@@ -370,8 +370,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
       foreach ($rows as $key => $value) {
         if ($value['civicrm_event_id']) {
           $graphRows['totalParticipants'][] = ($rows[$key]['civicrm_line_item_participant_count_count']);
-          $graphRows[$this->_interval][] =
-            substr($rows[$key]['civicrm_event_title'], 0, 12) . "..(" .
+          $graphRows[$this->_interval][] = substr($rows[$key]['civicrm_event_title'], 0, 12) . "..(" .
             $rows[$key]['civicrm_event_id'] . ") ";
           $graphRows['value'][] = ($rows[$key]['civicrm_line_item_participant_count_count']);
         }

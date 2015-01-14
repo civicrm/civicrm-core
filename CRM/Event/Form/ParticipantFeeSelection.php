@@ -181,7 +181,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $statusOptions = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     $this->add('select', 'status_id', ts('Participant Status'),
       array(
-        '' => ts('- select -')
+        '' => ts('- select -'),
       ) + $statusOptions,
       TRUE
     );

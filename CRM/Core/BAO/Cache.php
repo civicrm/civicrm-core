@@ -376,7 +376,7 @@ AND    CREATE_TIME < date_sub( NOW( ), INTERVAL $timeIntervalDays day )
       );
       foreach ($transactionPages as $trPage) {
         $params[] = array("%${trPage}%", 'String');
-        $where[] = 'path LIKE %' . sizeof($params);
+        $where[] = 'path LIKE %' . count($params);
       }
 
       $sql = "
