@@ -73,7 +73,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return boolean
+   * @return bool
    */
   public static function dataExists(&$params) {
     // return if no data present
@@ -129,14 +129,13 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @return array
    *   (total, added, notAdded) count of contacts added to group
    */
-  static function addContactsToGroup(
+  public static function addContactsToGroup(
     $contactIds,
     $groupId,
     $method = 'Admin',
     $status = 'Added',
     $tracking = NULL
   ) {
-
 
     CRM_Utils_Hook::pre('create', 'GroupContact', $groupId, $contactIds);
 
@@ -179,7 +178,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @return array
    *   (total, removed, notRemoved) count of contacts removed to group
    */
-  static function removeContactsFromGroup(
+  public static function removeContactsFromGroup(
     &$contactIds,
     $groupId,
     $method = 'Admin',
@@ -329,13 +328,11 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *
    * @param bool $excludeHidden
    *
-   * @return array
-   *   (reference )|int $values the relevant data object values for the contact or
-   *                                 the total count when $count is TRUE
-   *
-   * $access public
+   * @return array (reference)|int $values
+   *   the relevant data object values for the contact or
+   *   the total count when $count is TRUE
    */
-  static function &getContactGroup(
+  public static function &getContactGroup(
     $contactId,
     $status = NULL,
     $numGroupContact = NULL,
@@ -720,7 +717,7 @@ AND       group_id IN ( $groupIDString )
    * @return array
    *   (total, added, notAdded) count of contacts added to group
    */
-  static function bulkAddContactsToGroup(
+  public static function bulkAddContactsToGroup(
     $contactIDs,
     $groupID,
     $method = 'Admin',
@@ -797,11 +794,11 @@ AND    contact_id IN ( $contactStr )
    *
    * @param string $fieldName
    * @param string $context
-   *   @see CRM_Core_DAO::buildOptionsContext.
+   * @see CRM_Core_DAO::buildOptionsContext
    * @param array $props
    *   whatever is known about this dao object.
    *
-   * @return Array|bool
+   * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     $params = array();

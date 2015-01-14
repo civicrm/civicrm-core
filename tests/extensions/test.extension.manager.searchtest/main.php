@@ -9,7 +9,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   /**
    * @param $formValues
    */
-  function __construct(&$formValues) {
+  public function __construct(&$formValues) {
     parent::__construct($formValues);
   }
 
@@ -20,7 +20,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
    *   Modifiable.
    * @return void
    */
-  function buildForm(&$form) {
+  public function buildForm(&$form) {
     CRM_Utils_System::setTitle(ts('My Search Title'));
 
     $form->add('text',
@@ -52,7 +52,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
    *   - summary: string
    *   - total: numeric
    */
-  function summary() {
+  public function summary() {
     return NULL;
     // return array(
     //   'summary' => 'This is a summary',
@@ -65,7 +65,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
    *
    * @return array, keys are printable column headers and values are SQL column names
    */
-  function &columns() {
+  public function &columns() {
     // return by reference
     $columns = array(
       ts('Contact ID') => 'contact_id',
@@ -86,7 +86,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
    *
    * @return string, sql
    */
-  function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE) {
+  public function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE) {
     // delegate to $this->sql(), $this->select(), $this->from(), $this->where(), etc.
     return $this->sql($this->select(), $offset, $rowcount, $sort, $includeContactIDs, NULL);
   }
@@ -96,7 +96,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
    *
    * @return string, sql fragment with SELECT arguments
    */
-  function select() {
+  public function select() {
     return "
       contact_a.id           as contact_id  ,
       contact_a.contact_type as contact_type,
@@ -110,7 +110,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
    *
    * @return string, sql fragment with FROM and JOIN clauses
    */
-  function from() {
+  public function from() {
     return "
       FROM      civicrm_contact contact_a
       LEFT JOIN civicrm_address address ON ( address.contact_id       = contact_a.id AND
@@ -128,7 +128,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
    *
    * @return string, sql fragment with conditional expressions
    */
-  function where($includeContactIDs = FALSE) {
+  public function where($includeContactIDs = FALSE) {
     $params = array();
     $where = "contact_a.contact_type   = 'Household'";
 
@@ -172,7 +172,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
    *
    * @return string, template path (findable through Smarty template path)
    */
-  function templateFile() {
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
@@ -183,7 +183,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
    *   Modifiable SQL result row.
    * @return void
    */
-  function alterRow(&$row) {
+  public function alterRow(&$row) {
     $row['sort_name'] .= ' ( altered )';
   }
 

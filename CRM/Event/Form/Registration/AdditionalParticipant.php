@@ -178,7 +178,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     $pre = $post = array();
     foreach (array(
                'pre',
-               'post'
+               'post',
              ) as $keys) {
       if (isset($this->_values['additional_custom_' . $keys . '_id'])) {
         $this->buildCustom($this->_values['additional_custom_' . $keys . '_id'], 'additionalCustom' . ucfirst($keys), TRUE);
@@ -186,7 +186,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       }
       foreach (array(
                  'first_name',
-                 'last_name'
+                 'last_name',
                ) as $name) {
         if (array_key_exists($name, $$keys) &&
           CRM_Utils_Array::value('is_required', CRM_Utils_Array::value($name, $$keys))
@@ -258,20 +258,20 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
           if ($this->_requireApproval) {
             $statusMessage = ts("It looks like you are now registering a group of %1 participants. The event has %2 available spaces (you will not be wait listed). Registration for this event requires approval. You will receive an email once your registration has been reviewed.", array(
                 1 => ++$processedCnt,
-                2 => $spaces
+                2 => $spaces,
               ));
           }
           else {
             $statusMessage = ts("It looks like you are now registering a group of %1 participants. The event has %2 available spaces (you will not be wait listed).", array(
                 1 => ++$processedCnt,
-                2 => $spaces
+                2 => $spaces,
               ));
           }
         }
         else {
           $statusMessage = ts("It looks like you are now registering a group of %1 participants. The event has %2 available spaces (you will not be wait listed). Please go back to the main registration page and reduce the number of additional people. You will also need to complete payment information.", array(
               1 => ++$processedCnt,
-              2 => $spaces
+              2 => $spaces,
             ));
           $allowToProceed = FALSE;
         }
@@ -365,7 +365,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
               'name' => ts('Skip Participant'),
               'subName' => 'skip',
               'icon' => 'seek-next',
-            )
+            ),
           )
         );
       }
@@ -487,7 +487,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
           ) {
             $errors['_qf_default'] = ts('It looks like event has only %2 seats available and you are trying to register %1 participants, so could you please select price options accordingly.', array(
                 1 => $totalParticipants,
-                2 => $self->_availableRegistrations
+                2 => $self->_availableRegistrations,
               ));
           }
         }
@@ -763,7 +763,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    *
    * @param bool $isButtonJs
    *
-   * @return boolean
+   * @return bool
    *   ture on success.
    */
   public function isLastParticipant($isButtonJs = FALSE) {
@@ -777,7 +777,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   /**
    * Reset values for all options those are full.
    *
-   **/
+   */
   public function resetElementValue($optionFullIds = array()) {
     if (!is_array($optionFullIds) ||
       empty($optionFullIds) ||
@@ -847,7 +847,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     foreach (array(
                'constantValues',
                'submitValues',
-               'defaultValues'
+               'defaultValues',
              ) as $val) {
       $values = &$this->{"_$val"};
       if (!is_array($values) || empty($values)) {

@@ -47,7 +47,7 @@ class CRM_Core_BAO_ConfigSetting {
    * @param array $params
    *   Associated array of civicrm variables.
    *
-   * @return null
+   * @return void
    */
   public static function create($params) {
     self::add($params);
@@ -63,7 +63,7 @@ class CRM_Core_BAO_ConfigSetting {
    * @param array $params
    *   Associated array of civicrm variables.
    *
-   * @return null
+   * @return void
    */
   public static function add(&$params) {
     self::fixParams($params);
@@ -71,8 +71,8 @@ class CRM_Core_BAO_ConfigSetting {
     // also set a template url so js files can use this
     // CRM-6194
     $params['civiRelativeURL'] = CRM_Utils_System::url('CIVI_BASE_TEMPLATE');
-    $params['civiRelativeURL'] =
-      str_replace(
+    $params['civiRelativeURL']
+      = str_replace(
         'CIVI_BASE_TEMPLATE',
         '',
         $params['civiRelativeURL']
@@ -144,7 +144,7 @@ class CRM_Core_BAO_ConfigSetting {
    * @param array $params
    *   Associated array of civicrm variables.
    *
-   * @return null
+   * @return void
    */
   public static function fixParams(&$params) {
     // in our old civicrm.settings.php we were using ISO code for country and
@@ -178,7 +178,7 @@ class CRM_Core_BAO_ConfigSetting {
    * @param array $values
    *   Associated array of civicrm variables stored in db.
    *
-   * @return null
+   * @return void
    */
   public static function formatParams(&$params, &$values) {
     if (empty($params) ||
@@ -228,7 +228,7 @@ class CRM_Core_BAO_ConfigSetting {
       $defaults = unserialize($domain->config_backend);
       if ($defaults === FALSE || !is_array($defaults)) {
         $defaults = array();
-        return;
+        return FALSE;
       }
 
       $skipVars = self::skipVars();
@@ -519,7 +519,6 @@ class CRM_Core_BAO_ConfigSetting {
     list($oldURL, $oldDir, $oldSiteName, $oldSiteRoot) = self::getConfigSettings();
     list($newURL, $newDir, $newSiteName, $newSiteRoot) = self::getBestGuessSettings();
 
-
     // retrieve these values from the argument list
     $variables = array('URL', 'Dir', 'SiteName', 'SiteRoot', 'Val_1', 'Val_2', 'Val_3');
     $states = array('old', 'new');
@@ -656,7 +655,7 @@ WHERE  option_group_id = (
    * @param string $componentName
    *   Name of the component to be enabled, needs to be valid.
    *
-   * @return boolean
+   * @return bool
    *   true if valid component name and enabling succeeds, else false
    */
   public static function enableComponent($componentName) {
@@ -672,8 +671,8 @@ WHERE  option_group_id = (
     }
 
     // get enabled-components from DB and add to the list
-    $enabledComponents =
-      CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
+    $enabledComponents
+      = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
     $enabledComponents[] = $componentName;
 
     self::setEnabledComponents($enabledComponents);
@@ -691,8 +690,8 @@ WHERE  option_group_id = (
     }
 
     // get enabled-components from DB and add to the list
-    $enabledComponents =
-      CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
+    $enabledComponents
+      = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
     $enabledComponents = array_diff($enabledComponents, array($componentName));
 
     self::setEnabledComponents($enabledComponents);

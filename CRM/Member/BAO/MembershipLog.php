@@ -62,7 +62,6 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
    *
    * @return mixed
    */
-
   public static function del($membershipID) {
     $membershipLog = new CRM_Member_DAO_MembershipLog();
     $membershipLog->membership_id = $membershipID;
