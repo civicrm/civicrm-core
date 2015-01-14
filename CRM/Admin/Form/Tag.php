@@ -94,7 +94,7 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
       );
       $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
           'CRM_Core_DAO_Tag',
-          $this->_id
+          $this->_id,
         ));
 
       $this->add('text', 'description', ts('Description'),
