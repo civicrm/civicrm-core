@@ -130,7 +130,6 @@ AND    v.option_group_id = g.id
 AND    v.is_active = 1
 ";
 
-
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       if (!$dao->value) {

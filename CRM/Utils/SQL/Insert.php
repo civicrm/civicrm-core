@@ -53,7 +53,7 @@ class CRM_Utils_SQL_Insert {
   /**
    * Create a new SELECT query
    *
-   * @param string $from
+   * @param string $table
    *   Table-name and optional alias.
    */
   public function __construct($table) {
