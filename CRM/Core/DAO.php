@@ -1124,8 +1124,10 @@ FROM   civicrm_domain
    * @param bool $i18nRewrite
    * @param bool $trapException
    *
-   * @return CRM_Core_DAO
+   * @return CRM_Core_DAO|object
    *   object that holds the results of the query
+   *   NB - if this is defined as just returning a DAO phpstorm keeps pointing
+   *   out all the properties that are not part of the DAO
    */
   public static function &executeQuery(
     $query,

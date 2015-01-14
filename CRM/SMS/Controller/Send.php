@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
@@ -37,7 +37,7 @@ class CRM_SMS_Controller_Send extends CRM_Core_Controller {
   /**
    * Class constructor
    *
-   * @param null $title
+   * @param string $title
    * @param bool|int $action
    * @param bool $modal
    */
@@ -68,8 +68,7 @@ class CRM_SMS_Controller_Send extends CRM_Core_Controller {
       CRM_Core_BAO_File::uploadNames()
     );
 
-    $config = CRM_Core_Config::singleton();
-    $this->addActions($config->uploadDir,
+    $this->addActions(CRM_Core_Config::singleton()->uploadDir,
       $uploadNames
     );
   }
