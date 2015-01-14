@@ -250,7 +250,9 @@ class CRM_Utils_Type {
         break;
 
       default:
-        CRM_Core_Error::fatal("Cannot recognize $type for $data");
+        CRM_Core_Error::fatal(
+          $type . " is not a recognised (camel cased) data type."
+        );
         break;
     }
 
