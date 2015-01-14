@@ -126,7 +126,7 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
         'url' => CRM_Utils_System::url('civicrm/admin/access',
           'reset=1'
         ),
-      )
+      ),
     );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     CRM_Utils_System::setTitle(ts('Assign Users to Roles'));

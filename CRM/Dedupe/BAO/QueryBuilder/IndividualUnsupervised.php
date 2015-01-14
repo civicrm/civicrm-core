@@ -108,5 +108,3 @@ AND    " . self::internalFilters($rg);
     return array("civicrm_contact.{$rg->name}.{$rg->threshold}" => $query);
   }
 }
-
-;

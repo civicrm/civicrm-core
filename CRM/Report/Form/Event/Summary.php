@@ -242,9 +242,10 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
     return $participant_info;
   }
 
-  //build header for table
+  /**
+   * Build header for table.
+   */
   public function buildColumnHeaders() {
-
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
@@ -343,8 +344,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
     if (!empty($this->_params['charts'])) {
       foreach ($rows as $key => $value) {
         $graphRows['totalAmount'][] = $graphRows['value'][] = CRM_Utils_Array::value('totalAmount', $rows[$key]);
-        $graphRows[$this->_interval][] =
-          substr($rows[$key]['civicrm_event_title'], 0, 12) . "..(" .
+        $graphRows[$this->_interval][] = substr($rows[$key]['civicrm_event_title'], 0, 12) . "..(" .
           $rows[$key]['civicrm_event_id'] . ") ";
       }
 

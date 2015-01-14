@@ -57,7 +57,7 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
    * @param string $hash
    *   The hash.
    *
-   * @return boolean
+   * @return bool
    *   True on success
    */
   public static function confirm($contact_id, $subscribe_id, $hash) {

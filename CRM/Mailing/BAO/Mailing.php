@@ -123,7 +123,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
    *
    * @return CRM_Mailing_Event_BAO_Queue|string
    */
-  static function &getRecipients(
+  public static function &getRecipients(
     $job_id,
     $mailing_id = NULL,
     $offset = NULL,
@@ -623,11 +623,8 @@ ORDER BY   i.contact_id, i.{$tempColumn}
   }
 
   /**
-   *
-   * Returns the regex patterns that are used for preparing the text and html templates
-   *
-   *
-   **/
+   * Returns the regex patterns that are used for preparing the text and html templates.
+   */
   private function &getPatterns($onlyHrefs = FALSE) {
 
     $patterns = array();
@@ -648,16 +645,17 @@ ORDER BY   i.contact_id, i.{$tempColumn}
     $patterns[] = '\\\\\{\w+\.\w+\\\\\}|\{\{\w+\.\w+\}\}';
     $patterns[] = '\{\w+\.\w+\}';
 
-    $patterns = '{' . join('|', $patterns) . '}im';
+    $patterns = '{' . implode('|', $patterns) . '}im';
 
     return $patterns;
   }
 
   /**
-   *  returns an array that denotes the type of token that we are dealing with
-   *  we use the type later on when we are doing a token replcement lookup
+   * Returns an array that denotes the type of token that we are dealing with
+   * we use the type later on when we are doing a token replacement lookup
    *
-   * @param string $token The token for which we will be doing adata lookup
+   * @param string $token
+   *   The token for which we will be doing adata lookup.
    *
    * @return array
    *   An array that holds the token itself and the type.
@@ -723,9 +721,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    * Prepares the text and html templates
    * for generating the emails and returns a copy of the
    * prepared templates
-   *
-   *
-   **/
+   */
   private function getPreparedTemplates() {
     if (!$this->preparedTemplates) {
       $patterns['html'] = $this->getPatterns(TRUE);
@@ -737,7 +733,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
       foreach (array(
                  'html',
                  'text',
-                 'subject'
+                 'subject',
                ) as $key) {
         if (!isset($templates[$key])) {
           continue;
@@ -765,16 +761,13 @@ ORDER BY   i.contact_id, i.{$tempColumn}
   }
 
   /**
-   *
-   *  Retrieve a ref to an array that holds the email and text templates for this email
-   *  assembles the complete template including the header and footer
-   *  that the user has uploaded or declared (if they have dome that)
-   *
+   * Retrieve a ref to an array that holds the email and text templates for this email
+   * assembles the complete template including the header and footer
+   * that the user has uploaded or declared (if they have dome that)
    *
    * @return array
    *   reference to an assoc array
-   *
-   **/
+   */
   private function &getTemplates() {
     if (!$this->templates) {
       $this->getHeaderFooter();
@@ -792,7 +785,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
           $template[] = $this->footer->body_text;
         }
 
-        $this->templates['text'] = join("\n", $template);
+        $this->templates['text'] = implode("\n", $template);
       }
 
       if ($this->body_html) {
@@ -808,7 +801,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
           $template[] = $this->footer->body_html;
         }
 
-        $this->templates['html'] = join("\n", $template);
+        $this->templates['html'] = implode("\n", $template);
 
         // this is where we create a text template from the html template if the text template did not exist
         // this way we ensure that every recipient will receive an email even if the pref is set to text and the
@@ -821,7 +814,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
       if ($this->subject) {
         $template = array();
         $template[] = $this->subject;
-        $this->templates['subject'] = join("\n", $template);
+        $this->templates['subject'] = implode("\n", $template);
       }
     }
     return $this->templates;
@@ -841,8 +834,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    *
    * @return array
    *   reference to an assoc array
-   *
-   **/
+   */
   public function &getTokens() {
     if (!$this->tokens) {
 
@@ -875,8 +867,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    *
    * @return array
    *   reference to an assoc array
-   *
-   **/
+   */
   public function &getFlattenedTokens() {
     if (!$this->flattenedTokens) {
       $tokens = $this->getTokens();
@@ -934,7 +925,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
           'return' => 'id',
           'options' => array(
             'limit' => 100000000000,
-          )
+          ),
         )
       );
 
@@ -968,11 +959,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * Retrieve the header and footer for this mailing
-   *
-   * @param void
-   *
-   * @return void
+   * Load this->header and this->footer.
    */
   private function getHeaderFooter() {
     if (!$this->header and $this->header_id) {
@@ -1303,7 +1290,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         ($contact['preferred_mail_format'] == 'HTML' && !array_key_exists('html', $pEmails))
       )
     ) {
-      $textBody = join('', $text);
+      $textBody = implode('', $text);
       if ($useSmarty) {
         $textBody = $smarty->fetch("string:$textBody");
       }
@@ -1314,7 +1301,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
           $contact['preferred_mail_format'] == 'Both'
         ))
     ) {
-      $htmlBody = join('', $html);
+      $htmlBody = implode('', $html);
       if ($useSmarty) {
         $htmlBody = $smarty->fetch("string:$htmlBody");
       }
@@ -1335,7 +1322,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $mailingSubject = CRM_Utils_Array::value('subject', $pEmails);
     if (is_array($mailingSubject)) {
-      $mailingSubject = join('', $mailingSubject);
+      $mailingSubject = implode('', $mailingSubject);
     }
     $mailParams['Subject'] = $mailingSubject;
 
@@ -1358,7 +1345,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         'html',
         'attachments',
         'toName',
-        'toEmail'
+        'toEmail',
       ))
       ) {
         $headers[$paramKey] = $paramValue;
@@ -1806,8 +1793,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'bounce' => CRM_Mailing_Event_BAO_Bounce::getTableName(),
       'forward' => CRM_Mailing_Event_BAO_Forward::getTableName(),
       'url' => CRM_Mailing_BAO_TrackableURL::getTableName(),
-      'urlopen' =>
-        CRM_Mailing_Event_BAO_TrackableURLOpen::getTableName(),
+      'urlopen' => CRM_Mailing_Event_BAO_TrackableURLOpen::getTableName(),
       'component' => CRM_Mailing_BAO_Component::getTableName(),
       'spool' => CRM_Mailing_BAO_Spool::getTableName(),
     );
@@ -1876,10 +1862,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $report['component'][] = array(
         'type' => $components[$mailing->type],
         'name' => $mailing->name,
-        'link' =>
-          CRM_Utils_System::url('civicrm/mailing/component',
-            "reset=1&action=update&id={$mailing->id}"
-          ),
+        'link' => CRM_Utils_System::url('civicrm/mailing/component',
+          "reset=1&action=update&id={$mailing->id}"
+        ),
       );
     }
 
@@ -2070,7 +2055,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       foreach (array(
                  'scheduled_date',
                  'start_date',
-                 'end_date'
+                 'end_date',
                ) as $key) {
         $row[$key] = CRM_Utils_Date::customFormat($row[$key]);
       }
@@ -2124,16 +2109,14 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     while ($mailing->fetch()) {
       $report['click_through'][] = array(
         'url' => $mailing->url,
-        'link' =>
-          CRM_Utils_System::url(
-            'civicrm/mailing/report/event',
-            "reset=1&event=click&mid=$mailing_id&uid={$mailing->id}"
-          ),
-        'link_unique' =>
-          CRM_Utils_System::url(
-            'civicrm/mailing/report/event',
-            "reset=1&event=click&mid=$mailing_id&uid={$mailing->id}&distinct=1"
-          ),
+        'link' => CRM_Utils_System::url(
+          'civicrm/mailing/report/event',
+          "reset=1&event=click&mid=$mailing_id&uid={$mailing->id}"
+        ),
+        'link_unique' => CRM_Utils_System::url(
+          'civicrm/mailing/report/event',
+          "reset=1&event=click&mid=$mailing_id&uid={$mailing->id}&distinct=1"
+        ),
         'clicks' => $mailing->clicks,
         'unique' => $mailing->unique_clicks,
         'rate' => CRM_Utils_Array::value('delivered', $report['event_totals']) ? (100.0 * $mailing->unique_clicks) / $report['event_totals']['delivered'] : 0,
@@ -2185,11 +2168,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $actionLinks = array(CRM_Core_Action::VIEW => array('name' => ts('Report')));
     if (CRM_Core_Permission::check('view all contacts')) {
-      $actionLinks[CRM_Core_Action::ADVANCED] =
-        array(
-          'name' => ts('Advanced Search'),
-          'url' => 'civicrm/contact/search/advanced',
-        );
+      $actionLinks[CRM_Core_Action::ADVANCED] = array(
+        'name' => ts('Advanced Search'),
+        'url' => 'civicrm/contact/search/advanced',
+      );
     }
     $action = array_sum(array_keys($actionLinks));
 
@@ -2306,7 +2288,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     if (!in_array($id, $mailingIDs)) {
       CRM_Core_Error::fatal(ts('You do not have permission to access this mailing report'));
     }
-    return;
   }
 
   /**
@@ -2337,8 +2318,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * where the user has access to ALL groups, and hence ALL mailings and return a
    * value of TRUE (to avoid the downstream where clause with a list of mailing list IDs
    *
-   * @return boolean
-   *   | array - TRUE if the user has access to all mailings, else array of mailing IDs (possibly empty)
+   * @return bool|array
+   *   TRUE if the user has access to all mailings, else array of mailing IDs (possibly empty).
    */
   public static function mailingACLIDs() {
     // CRM-11633
@@ -2692,7 +2673,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       $form->assign('templates', TRUE);
       $form->add('select', 'template', ts('Select Template'),
         array(
-          '' => ts('- select -')
+          '' => ts('- select -'),
         ) + $form->_templates, FALSE,
         array('onChange' => "selectValue( this.value,'' );")
       );
@@ -2839,7 +2820,7 @@ WHERE  civicrm_mailing_job.id = %1
     if ($mode == NULL && CRM_Core_BAO_MailSettings::defaultDomain() == "EXAMPLE.ORG") {
       throw new CRM_Core_Exception(ts('The <a href="%1">default mailbox</a> has not been configured. You will find <a href="%2">more info in the online user and administrator guide</a>', array(
             1 => CRM_Utils_System::url('civicrm/admin/mailSettings', 'reset=1'),
-            2 => "http://book.civicrm.org/user/advanced-configuration/email-system-configuration/"
+            2 => "http://book.civicrm.org/user/advanced-configuration/email-system-configuration/",
           )));
     }
 
