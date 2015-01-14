@@ -358,9 +358,9 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
 
     // fill in Receipt details
     $this->type('thankyou_title', "Thank-you Page Title $hash");
-    $this->click("xpath=//form[@id='ThankYou']/div[2]/table[1]/tbody/tr[2]/td[2]/div/a/span");
+    $this->click("thankyou_text-plain");
     $this->fillRichTextField('thankyou_text', 'This is thankyou message for ' . $pageTitle, 'CKEditor');
-    $this->click("xpath=//form[@id='ThankYou']/div[2]/table[1]/tbody/tr[3]/td[2]/div/a/span");
+    $this->click("thankyou_footer-plain");
     $this->fillRichTextField('thankyou_footer', 'This is thankyou footer message for ' . $pageTitle, 'CKEditor');
     $this->click('is_email_receipt');
     $this->waitForElementPresent('bcc_receipt');
@@ -397,8 +397,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->type('title', $pageTitle);
     $this->click('_qf_SearchContribution_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->isElementPresent("xpath=//table[@id='option11_wrapper']/tbody/tr/td/strong[text()='$pageTitle']");
-    $this->waitForElementPresent("xpath=//table[@id='option11']/tbody/tr/td[4]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']");
+    $this->isElementPresent("xpath=//table[@class='display dataTable no-footer']/tbody/tr/td[1]/strong[text()='$pageTitle']");
+    $this->waitForElementPresent("xpath=//table[@class='display dataTable no-footer']/tbody/tr/td[4]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']");
     $this->click("xpath=//table[@id='option11']/tbody/tr/td[4]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']");
     $this->waitForElementPresent("xpath=//table[@id='option11']/tbody/tr/td[4]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']/ul[@class='panel']/li[8]/a[@title='Premiums']");
     $this->click("xpath=//table[@id='option11']/tbody/tr/td[4]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']/ul[@class='panel']/li[8]/a[@title='Premiums']");
