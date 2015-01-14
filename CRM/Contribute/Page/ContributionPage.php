@@ -624,7 +624,7 @@ ORDER BY title asc
    *
    * @return int[]
    */
-  pubic function getCampaignIds() {
+  public function getCampaignIds() {
     // The unfiltered value from the session cannot be trusted, it needs to be
     // processed to get a clean array of positive integers.
     $ids = array();
