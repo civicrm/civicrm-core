@@ -821,7 +821,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * @param $group
+   * @param string $group
    * @param string $grpFieldName
    *
    * @return bool
@@ -1268,7 +1268,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    * Note: $fieldName param allows inheriting class to build operationPairs
    * specific to a field.
    * @param string $type
-   * @param null $fieldName
+   * @param string $fieldName
    *
    * @return array
    */
@@ -1421,20 +1421,17 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * Generate where clause.
-   * This is over-ridable in reports for special treatment of a field
+   * This can be overridden in reports for special treatment of a field
    *
-   * @param string $field
-   * @param string $op
+   * @param string $field Field name
+   * @param string $op Query operator (not an exact match to sql)
    * @param mixed $value
    * @param float $min
    * @param float $max
    *
    * @return null|string
    */
-  public function whereClause(
-    &$field, $op,
-    $value, $min, $max
-  ) {
+  public function whereClause(&$field, $op, $value, $min, $max) {
 
     $type = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $field));
     $clause = NULL;
@@ -2943,6 +2940,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
   }
 
+  /**
+   * Set store result set indicator to TRUE
+   * @todo explain what this does
+   */
   public function storeResultSet() {
     $this->_storeResultSet = TRUE;
   }
@@ -3021,12 +3022,14 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
       $pageId = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
 
+      // @todo all http vars should be extracted in the preProcess
+      // - not randomly in the class
       if (!$pageId && !empty($_POST)) {
         if (isset($_POST['PagerBottomButton']) && isset($_POST['crmPID_B'])) {
-          $pageId = max((int) @$_POST['crmPID_B'], 1);
+          $pageId = max((int) $_POST['crmPID_B'], 1);
         }
         elseif (isset($_POST['PagerTopButton']) && isset($_POST['crmPID'])) {
-          $pageId = max((int) @$_POST['crmPID'], 1);
+          $pageId = max((int) $_POST['crmPID'], 1);
         }
         unset($_POST['crmPID_B'], $_POST['crmPID']);
       }
