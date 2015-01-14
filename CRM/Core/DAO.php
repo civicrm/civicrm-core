@@ -1158,7 +1158,7 @@ FROM   civicrm_domain
     if ($freeDAO ||
       preg_match('/^(insert|update|delete|create|drop|replace)/i', $queryStr)
     ) {
-      // we typically do this for insert/update/delete stataments OR if explicitly asked to
+      // we typically do this for insert/update/delete statements OR if explicitly asked to
       // free the dao
       $dao->free();
     }

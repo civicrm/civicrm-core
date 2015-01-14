@@ -172,8 +172,6 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *   Should we add a unique sequence number to the end of the key.
    * @param bool $ignoreKey
    *   Should we not set a qfKey for this controller (for standalone forms).
-   *
-   * @internal param bool $whether controller is modal
    */
   function __construct(
     $title = NULL,
