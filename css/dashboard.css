@@ -115,6 +115,7 @@
   float:right;
 }
 #crm-container .widget-icon.close-icon {
+  background-position: -80px -128px;
   float:right;
 }
 #crm-container .widget-icon:hover {
