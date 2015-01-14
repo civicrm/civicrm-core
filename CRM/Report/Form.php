@@ -319,6 +319,21 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_currencyColumn = NULL;
 
   /**
+   * @var string
+   */
+  protected $_interval;
+
+  /**
+   * @var bool
+   */
+  protected $_sendmail;
+
+  /**
+   * @var int
+   */
+  protected $_chartId;
+
+  /**
    */
   public function __construct() {
     parent::__construct();
@@ -2911,7 +2926,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
             'openFlashChart/' . $chartImg;
           //Load the image
           $chart = imagecreatefrompng($uploadUrl);
-          //convert it into formattd png
+          //convert it into formatted png
           header('Content-type: image/png');
           //overwrite with same image
           imagepng($chart, $uploadImg);
