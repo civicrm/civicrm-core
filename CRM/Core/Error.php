@@ -57,7 +57,7 @@ class CRM_Exception extends PEAR_Exception {
    *  - PEAR_Exception(string $message, array $causes);
    *  - PEAR_Exception(string $message, array $causes, int $code);
    *
-   * @param string exception message
+   * @param string $message exception message
    * @param int $code
    * @param Exception $previous
    */
@@ -167,7 +167,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * the errors we expect are from the pear modules DB, DB_DataObject
    * which currently use PEAR::raiseError to notify of error messages.
    *
-   * @param object PEAR_Error
+   * @param object $pearError PEAR_Error
    *
    * @return void
    */
@@ -461,11 +461,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Outputs pre-formatted debug information. Flushes the buffers
    * so we can interrupt a potential POST/redirect
    *
-   * @param string name of debug section
-   * @param mixed reference to variables that we need a trace of
-   * @param bool should we log or return the output
-   * @param bool whether to generate a HTML-escaped output
-   * @param bool should we check permissions before displaying output
+   * @param string $name name of debug section
+   * @param $variable mixed reference to variables that we need a trace of
+   * @param bool $log should we log or return the output
+   * @param bool $html whether to generate a HTML-escaped output
+   * @param bool $checkPermission should we check permissions before displaying output
    *                useful when we die during initialization and permissioning
    *                subsystem is not initialized - CRM-13765
    *
@@ -526,7 +526,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @see CRM_Core_Error::debug()
    * @see CRM_Core_Error::debug_log_message()
    */
-  static function debug_var(
+  public static function debug_var(
     $variable_name,
     $variable,
     $print = TRUE,

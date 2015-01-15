@@ -20,7 +20,7 @@ class test_extension_manager_paymenttest extends CRM_Core_Payment {
    *
    * @return object
    */
-  static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
+  public static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     $processorName = $paymentProcessor['name'];
     if (self::$_singleton[$processorName] === NULL) {
       self::$_singleton[$processorName] = new test_extension_manager_paymenttest();
@@ -30,19 +30,19 @@ class test_extension_manager_paymenttest extends CRM_Core_Payment {
 
   static $counts = array();
 
-  function install() {
+  public function install() {
     self::$counts['install'] = 1 + (int) self::$counts['install'];
   }
 
-  function uninstall() {
+  public function uninstall() {
     self::$counts['uninstall'] = 1 + (int) self::$counts['uninstall'];
   }
 
-  function disable() {
+  public function disable() {
     self::$counts['disable'] = 1 + (int) self::$counts['disable'];
   }
 
-  function enable() {
+  public function enable() {
     self::$counts['enable'] = 1 + (int) self::$counts['enable'];
   }
 
@@ -53,13 +53,10 @@ class test_extension_manager_paymenttest extends CRM_Core_Payment {
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    *
-   * @return array
-   *   the result in an nice formatted array (or an error object)
-   * @abstract
    */
-  function doDirectPayment(&$params) {
+  public function doDirectPayment(&$params) {
   }
 
-  function checkConfig() {
+  public function checkConfig() {
   }
 }

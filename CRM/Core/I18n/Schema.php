@@ -121,7 +121,7 @@ class CRM_Core_I18n_Schema {
    * @return void
    */
   public static function makeSinglelingual($retain) {
-    $domain = new CRM_Core_DAO_Domain;
+    $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
     $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
 
@@ -131,7 +131,7 @@ class CRM_Core_I18n_Schema {
     }
 
     // lets drop all triggers first
-    $logging = new CRM_Logging_Schema;
+    $logging = new CRM_Logging_Schema();
     $logging->dropTriggers();
 
     // turn subsequent tables singlelingual
@@ -166,13 +166,13 @@ class CRM_Core_I18n_Schema {
    *
    * @return void
    */
-  static function makeSinglelingualTable(
+  public static function makeSinglelingualTable(
     $retain,
     $table,
     $class = 'CRM_Core_I18n_SchemaStructure',
     $triggers = array()
   ) {
-    $domain = new CRM_Core_DAO_Domain;
+    $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
     $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
 
@@ -212,7 +212,7 @@ class CRM_Core_I18n_Schema {
     $queries = array_merge($queries, self::createIndexQueries(NULL, $table));
 
     // execute the queries without i18n rewriting
-    $dao = new CRM_Core_DAO;
+    $dao = new CRM_Core_DAO();
     foreach ($queries as $query) {
       $dao->query($query, FALSE);
     }
@@ -318,7 +318,7 @@ class CRM_Core_I18n_Schema {
     $indices =& $class::indices();
     $tables =& $class::tables();
     $queries = array();
-    $dao = new CRM_Core_DAO;
+    $dao = new CRM_Core_DAO();
 
     // get all of the already existing indices
     $existing = array();
@@ -562,7 +562,7 @@ class CRM_Core_I18n_Schema {
         foreach ($locales as $old) {
           $trigger[] = "ELSEIF NEW.{$column}_{$old} IS NOT NULL THEN";
           foreach (array_merge($locales, array(
-            $locale
+            $locale,
           )) as $loc) {
             if ($loc == $old) {
               continue;
@@ -593,7 +593,7 @@ class CRM_Core_I18n_Schema {
         foreach ($locales as $old) {
           $trigger[] = "ELSEIF NEW.{$column}_{$old} IS NOT NULL THEN";
           foreach (array_merge($locales, array(
-            $locale
+            $locale,
           )) as $loc) {
             if ($loc == $old) {
               continue;
