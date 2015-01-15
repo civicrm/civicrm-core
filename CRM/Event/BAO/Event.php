@@ -260,7 +260,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *
    * @return array
    */
-  static function getEvents(
+  public static function getEvents(
     $all = 0,
     $id = FALSE,
     $isActive = TRUE,
@@ -579,13 +579,13 @@ $event_summary_limit
    * Get participant count
    *
    * @param int $eventId
-   * @param bool $considerStatusConsider status for participant count.
+   * @param bool $considerStatus consider status for participant count.
    *   Consider status for participant count.
-   * @param bool $statusConsider counted participant.
+   * @param bool $status counted participant.
    *   Consider counted participant.
-   * @param bool $considerRoleConsider role for participant count.
+   * @param bool $considerRole consider role for participant count.
    *   Consider role for participant count.
-   * @param bool $roleConsider counted( is filter role) participant.
+   * @param bool $role consider counted( is filter role) participant.
    *   Consider counted( is filter role) participant.
    *
    *
@@ -713,19 +713,19 @@ WHERE civicrm_address.geo_code_1 IS NOT NULL
    *
    * @param date $start
    *   Get events with start date >= this date.
-   * @param int $typeGet events on the a specific event type (by event_type_id).
+   * @param int $type Get events on the a specific event type (by event_type_id).
    *   Get events on the a specific event type (by event_type_id).
-   * @param int $eventIdReturn a single event - by event id.
+   * @param int $eventId Return a single event - by event id.
    *   Return a single event - by event id.
    * @param date $end
    *   Also get events with end date >= this date.
-   * @param bool $onlyPublicInclude public events only, default TRUE.
+   * @param bool $onlyPublic Include public events only, default TRUE.
    *   Include public events only, default TRUE.
    *
    * @return array
    *   array of all the events that are searched
    */
-  static function &getCompleteInfo(
+  public static function &getCompleteInfo(
     $start = NULL,
     $type = NULL,
     $eventId = NULL,
@@ -944,7 +944,7 @@ WHERE civicrm_event.is_active = 1
         array('id' => $id),
         array(
           'loc_block_id' =>
-            ($locBlockId) ? $locBlockId : NULL,
+          ($locBlockId) ? $locBlockId : NULL,
         ),
         $fieldsFix
       );
@@ -1260,7 +1260,7 @@ WHERE civicrm_event.is_active = 1
    *
    * @return void
    */
-  static function buildCustomDisplay(
+  public static function buildCustomDisplay(
     $id,
     $name,
     $cid,
@@ -1724,7 +1724,7 @@ WHERE  id = $cfID
    * @return array
    *   array of Additional participant's info OR array of Ids.
    */
-  static function buildCustomProfile(
+  public static function buildCustomProfile(
     $participantId,
     $values,
     $contactId = NULL,
@@ -1885,7 +1885,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    *
    * @param array $values
    * @param int $eventID
-   * @return boolean
+   * @return bool
    */
   public static function validRegistrationRequest($values, $eventID) {
     // check that the user has permission to register for this event
@@ -2218,7 +2218,7 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
         // Fixme - this is going to ignore context, better to get conditions, add params, and call PseudoConstant::get
         return CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
 
-        break;
+      break;
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
