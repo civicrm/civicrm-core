@@ -55,8 +55,8 @@ class CRM_Utils_Mail {
    * @param array $params
    *   (by reference).
    *
-   * @return boolean
-   *   true if a mail was sent, else false
+   * @return bool
+   *   TRUE if a mail was sent, else FALSE.
    */
   public static function send(&$params) {
     $returnPath = CRM_Core_BAO_MailSettings::defaultReturnPath();
@@ -91,12 +91,11 @@ class CRM_Utils_Mail {
       $headers = array_merge($headers, $params['headers']);
     }
     $headers['From'] = $params['from'];
-    $headers['To'] =
-      self::formatRFC822Email(
-        CRM_Utils_Array::value('toName', $params),
-        CRM_Utils_Array::value('toEmail', $params),
-        FALSE
-      );
+    $headers['To'] = self::formatRFC822Email(
+      CRM_Utils_Array::value('toName', $params),
+      CRM_Utils_Array::value('toEmail', $params),
+      FALSE
+    );
     $headers['Cc'] = CRM_Utils_Array::value('cc', $params);
     $headers['Bcc'] = CRM_Utils_Array::value('bcc', $params);
     $headers['Subject'] = CRM_Utils_Array::value('subject', $params);
@@ -200,7 +199,7 @@ class CRM_Utils_Mail {
    */
   public static function errorMessage($mailer, $result) {
     $message = '<p>' . ts('An error occurred when CiviCRM attempted to send an email (via %1). If you received this error after submitting on online contribution or event registration - the transaction was completed, but we were unable to send the email receipt.', array(
-        1 => 'SMTP'
+        1 => 'SMTP',
       )) . '</p>' . '<p>' . ts('The mail library returned the following error message:') . '<br /><span class="font-red"><strong>' . $result->getMessage() . '</strong></span></p>' . '<p>' . ts('This is probably related to a problem in your Outbound Email Settings (Administer CiviCRM &raquo; System Settings &raquo; Outbound Email), OR the FROM email address specifically configured for your contribution page or event. Possible causes are:') . '</p>';
 
     if (is_a($mailer, 'Mail_smtp')) {
@@ -211,7 +210,7 @@ class CRM_Utils_Mail {
     }
 
     $message .= '<li>' . ts('The FROM Email Address configured for this feature may not be a valid sender based on your email service provider rules.') . '</li>' . '</ul>' . '<p>' . ts('Check <a href="%1">this page</a> for more information.', array(
-        1 => CRM_Utils_System::docURL2('user/advanced-configuration/email-system-configuration', TRUE)
+        1 => CRM_Utils_System::docURL2('user/advanced-configuration/email-system-configuration', TRUE),
       )) . '</p>';
 
     return $message;
@@ -274,8 +273,8 @@ class CRM_Utils_Mail {
   /**
    * Get the Active outBound email
    *
-   * @return boolean
-   *   true if valid outBound email configuration found, false otherwise
+   * @return bool
+   *   TRUE if valid outBound email configuration found, false otherwise.
    */
   public static function validOutBoundMail() {
     $mailingInfo = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,

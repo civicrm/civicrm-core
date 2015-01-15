@@ -64,7 +64,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
    * @param string $groupElementType
    *
    */
-  static function buildQuickForm(
+  public static function buildQuickForm(
     &$form,
     $contactId = 0,
     $type = self::ALL,

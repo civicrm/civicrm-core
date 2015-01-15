@@ -85,7 +85,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
    *
    * @throws Exception
    */
-  static function filePostProcess(
+  public static function filePostProcess(
     $data,
     $fileTypeID,
     $entityTable,
@@ -495,7 +495,7 @@ AND       CEF.entity_id    = %2";
    * @param $entityTable
    * @param int $entityID
    */
-  static function formatAttachment(
+  public static function formatAttachment(
     &$formValues,
     &$params,
     $entityTable,

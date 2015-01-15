@@ -115,9 +115,7 @@ function civicrm_api3_custom_group_delete($params) {
  *   Array to search on.
  *
  * @return array
- * * {@getfields CustomGroup_get}
- * @example CustomGroupGet.php
- **/
+ */
 function civicrm_api3_custom_group_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }

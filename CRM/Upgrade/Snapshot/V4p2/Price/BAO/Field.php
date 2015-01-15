@@ -278,7 +278,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
           $label = ts('Additional Contribution');
           $useRequired = 0;
         }
-        elseif (!empty($fieldOptions[$optionKey]['label'])) {      //check for label.
+        elseif (!empty($fieldOptions[$optionKey]['label'])) {
           $label = $fieldOptions[$optionKey]['label'];
         }
 
@@ -409,9 +409,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
           }
         }
         $element = &$qf->add('select', $elementName, $label,
-          array(
-            '' => ts('- select -')
-          ) + $selectOption,
+          array('' => ts('- select -')) + $selectOption,
           $useRequired && $field->is_required,
           array('price' => json_encode($priceVal))
         );
@@ -510,7 +508,7 @@ WHERE
 
     $dao = CRM_Core_DAO::executeQuery($query, array(
         1 => array($optionGroupName, 'String'),
-        2 => array($optionLabel, 'String')
+        2 => array($optionLabel, 'String'),
       ));
 
     while ($dao->fetch()) {
@@ -524,8 +522,8 @@ WHERE
    * @param int $id
    *   Field Id.
    *
-   * @return boolean
-   *
+   * @return mixed
+   *   Boolean-ish
    */
   public static function deleteField($id) {
     $field = new CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field();
@@ -567,15 +565,9 @@ WHERE
    * Validate the priceset
    *
    * @param int $priceSetId
-   *   , array $fields.
-   *
-   * retrun the error string
-   *
-   * @param $fields
-   * @param $error
-   *
+   * @param array $fields
+   * @param array $error
    */
-
   public static function priceSetValidation($priceSetId, $fields, &$error) {
     // check for at least one positive
     // amount price field should be selected.

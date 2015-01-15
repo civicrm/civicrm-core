@@ -57,7 +57,7 @@ class CRM_Mailing_Event_BAO_Unsubscribe extends CRM_Mailing_Event_DAO_Unsubscrib
    * @param string $hash
    *   The hash.
    *
-   * @return boolean
+   * @return bool
    *   Was the contact successfully unsubscribed?
    */
   public static function unsub_from_domain($job_id, $queue_id, $hash) {
