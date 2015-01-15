@@ -45,7 +45,6 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   /**
    * Define action links
    *
-   * @return array
    *   self::$_links array of action links
    */
   public function &links() {

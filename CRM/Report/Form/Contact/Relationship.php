@@ -223,9 +223,9 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'title' => ts('Relationship'),
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => array(
-                '' => '- any relationship type -',
-              ) +
-              CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE),
+              '' => '- any relationship type -',
+            ) +
+            CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE),
             'type' => CRM_Utils_Type::T_INT,
           ),
         ),
@@ -587,8 +587,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           'reset=1&force=1&id_op=eq&id_value=' . $row['civicrm_contact_id'],
           $this->_absoluteUrl, $this->_id, $this->_drilldownReport
         );
-        $rows[$rowNum]['civicrm_contact_sort_name_a'] =
-          $rows[$rowNum]['civicrm_contact_sort_name_a'] . ' (' .
+        $rows[$rowNum]['civicrm_contact_sort_name_a']
+          = $rows[$rowNum]['civicrm_contact_sort_name_a'] . ' (' .
           $rows[$rowNum]['civicrm_contact_id'] . ')';
         $rows[$rowNum]['civicrm_contact_sort_name_a_link'] = $url;
         $rows[$rowNum]['civicrm_contact_sort_name_a_hover'] = ts("View Contact details for this contact.");
@@ -602,8 +602,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           'reset=1&force=1&id_op=eq&id_value=' . $row['civicrm_contact_b_id'],
           $this->_absoluteUrl, $this->_id, $this->_drilldownReport
         );
-        $rows[$rowNum]['civicrm_contact_b_sort_name_b'] =
-          $rows[$rowNum]['civicrm_contact_b_sort_name_b'] . ' (' .
+        $rows[$rowNum]['civicrm_contact_b_sort_name_b']
+          = $rows[$rowNum]['civicrm_contact_b_sort_name_b'] . ' (' .
           $rows[$rowNum]['civicrm_contact_b_id'] . ')';
         $rows[$rowNum]['civicrm_contact_b_sort_name_b_link'] = $url;
         $rows[$rowNum]['civicrm_contact_b_sort_name_b_hover'] = ts("View Contact details for this contact.");
@@ -613,8 +613,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       if (array_key_exists('civicrm_relationship_relationship_id', $row) &&
         array_key_exists('civicrm_contact_id', $row)
       ) {
-        $url =
-          "/civicrm/contact/view/rel?reset=1&action=update&rtype=a_b&cid=" .
+        $url = "/civicrm/contact/view/rel?reset=1&action=update&rtype=a_b&cid=" .
           $row['civicrm_contact_id'] . "&id=" .
           $row['civicrm_relationship_relationship_id'];
         $rows[$rowNum]['civicrm_relationship_relationship_id_link'] = $url;

@@ -157,8 +157,6 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get page orientations recognized by the DOMPDF package used to create PDF letters.
    *
-   * @param void
-   *
    * @return array
    *   array of page orientations
    */
@@ -186,8 +184,6 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get font sizes supported by the TCPDF package used to create PDF labels.
    *
-   * @param void
-   *
    * @return array
    *   array of font sizes
    */
@@ -202,8 +198,6 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
 
   /**
    * Get measurement units recognized by the TCPDF package used to create PDF labels.
-   *
-   * @param void
    *
    * @return array
    *   array of measurement units
@@ -220,8 +214,6 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get text alignment recognized by the TCPDF package used to create PDF labels.
    *
-   * @param void
-   *
    * @return array
    *   array of alignments
    */
@@ -235,8 +227,6 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
 
   /**
    * Get text alignment recognized by the TCPDF package used to create PDF labels.
-   *
-   * @param void
    *
    * @return array
    *   array of alignments
@@ -280,6 +270,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   public static function addOrder(&$list, $returnURL) {
     $filter = "option_group_id = " . self::_getGid();
     CRM_Utils_Weight::addOrder($list, 'CRM_Core_DAO_OptionValue', 'id', $returnURL, $filter);
+    return $list;
   }
 
   /**
@@ -461,8 +452,6 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
 
   /**
    * Return the name of the group for customized labels
-   *
-   * @param void
    *
    * @return void
    */

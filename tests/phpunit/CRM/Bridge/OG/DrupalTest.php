@@ -40,7 +40,7 @@ require_once 'api/api.php';
  * @package CiviCRM
  */
 class CRM_Bridge_OG_DrupalTest extends CiviUnitTestCase {
-  /*
+  /**
    * Test that one (ane only one) role (option value) is deleted by the updateCiviACLRole function
    */
   public function testACLRoleDeleteFunctionality() {

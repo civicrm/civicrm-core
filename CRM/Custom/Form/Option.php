@@ -67,8 +67,6 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
   /**
    * Set variables up before form is built
    *
-   * @param null
-   *
    * @return void
    */
   public function preProcess() {
@@ -102,8 +100,6 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
   /**
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
-   *
-   * @param null
    *
    * @return array
    *   array of default values
@@ -150,8 +146,6 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
 
   /**
    * Build the form object
-   *
-   * @param null
    *
    * @return void
    */
@@ -392,8 +386,6 @@ SELECT count(*)
   /**
    * Process the form
    *
-   * @param null
-   *
    * @return void
    */
   public function postProcess() {
@@ -425,8 +417,8 @@ SELECT count(*)
     }
 
     $fieldValues = array('option_group_id' => $this->_optionGroupID);
-    $customOption->weight =
-      CRM_Utils_Weight::updateOtherWeights(
+    $customOption->weight
+      = CRM_Utils_Weight::updateOtherWeights(
         'CRM_Core_DAO_OptionValue',
         $oldWeight,
         $params['weight'],
@@ -456,8 +448,8 @@ SELECT count(*)
           else {
             $defVal[] = $customOption->value;
           }
-          $customField->default_value =
-            CRM_Core_DAO::VALUE_SEPARATOR .
+          $customField->default_value
+            = CRM_Core_DAO::VALUE_SEPARATOR .
             implode(CRM_Core_DAO::VALUE_SEPARATOR, $defVal) .
             CRM_Core_DAO::VALUE_SEPARATOR;
           $customField->save();
@@ -471,8 +463,8 @@ SELECT count(*)
           }
         }
 
-        $customField->default_value =
-          CRM_Core_DAO::VALUE_SEPARATOR .
+        $customField->default_value
+          = CRM_Core_DAO::VALUE_SEPARATOR .
           implode(CRM_Core_DAO::VALUE_SEPARATOR, $tempVal) .
           CRM_Core_DAO::VALUE_SEPARATOR;
         $customField->save();

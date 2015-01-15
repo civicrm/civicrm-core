@@ -313,7 +313,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     foreach (array(
                'joinDate',
                'startDate',
-               'endDate'
+               'endDate',
              ) as $date) {
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }
@@ -403,7 +403,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     foreach (array(
                'joinDate',
                'startDate',
-               'endDate'
+               'endDate',
              ) as $date) {
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }

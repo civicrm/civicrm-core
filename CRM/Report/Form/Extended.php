@@ -250,12 +250,12 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
         // are grouped together across price sets but there may be a separate need to group
         // by id so that entries in one price set are distinct from others. Not quite sure what
         // to call the distinction for end users benefit
-          array(
-            'price_field_value_label' => array(
-              'title' => ts('Price Field Value Label'),
-              'name' => 'label',
-            ),
+        array(
+          'price_field_value_label' => array(
+            'title' => ts('Price Field Value Label'),
+            'name' => 'label',
           ),
+        ),
       ),
     );
   }
@@ -596,8 +596,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
         'filters' => array(
           'id' => array(
             'title' => ts('Contact ID'),
-          )
-        ,
+          ),
           'sort_name' => array(
             'title' => ts('Contact Name'),
           ),
@@ -1222,7 +1221,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    */
   public function alterNickName($value, &$row) {
     if (empty($row['civicrm_contact_id'])) {
-      return;
+      return NULL;
     }
     $contactID = $row['civicrm_contact_id'];
     return "<div id=contact-{$contactID} class='crm-entity'>
@@ -1374,7 +1373,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    */
   public function alterParticipantStatus($value) {
     if (empty($value)) {
-      return;
+      return NULL;
     }
     return CRM_Event_PseudoConstant::participantStatus($value, FALSE, 'label');
   }
@@ -1386,7 +1385,7 @@ WHERE   line_item_civireport.id IS NOT NULL
    */
   public function alterParticipantRole($value) {
     if (empty($value)) {
-      return;
+      return NULL;
     }
     $roles = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
     $value = array();

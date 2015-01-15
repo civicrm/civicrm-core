@@ -78,7 +78,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param object $note
    *   Either the id of the note to retrieve, or the CRM_Core_DAO_Note object itself.
    *
-   * @return boolean
+   * @return bool
    *   TRUE if the note should be displayed, otherwise FALSE
    *
    */
@@ -223,7 +223,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return boolean
+   * @return bool
    */
   public static function dataExists(&$params) {
     // return if no data present

@@ -115,7 +115,7 @@ class CRM_Admin_Page_AJAX {
             $ret['illegal'] = TRUE;
             $table = $template->fetch('CRM/Price/Page/table.tpl');
             $ret['content'] = ts('Unable to disable the \'%1\' price set - it is currently in use by one or more active events, contribution pages or contributions.', array(
-                1 => $priceSet
+                1 => $priceSet,
               )) . "<br/> $table";
           }
           else {
