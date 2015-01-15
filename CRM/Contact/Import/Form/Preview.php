@@ -149,7 +149,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     if (!empty($groups)) {
       $this->addElement('select', 'groups', ts('Add imported records to existing group(s)'), $groups, array(
           'multiple' => "multiple",
-          'class' => 'crm-select2'
+          'class' => 'crm-select2',
         ));
     }
 

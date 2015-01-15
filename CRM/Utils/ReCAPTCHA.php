@@ -53,7 +53,6 @@ class CRM_Utils_ReCAPTCHA {
   /**
    * Singleton function used to manage this object
    *
-   * @param string the key to permit session scope's
    *
    * @return object
    */
