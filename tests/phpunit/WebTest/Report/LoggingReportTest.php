@@ -190,28 +190,28 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
       array(
         "log_type" => "Relationship",
         "altered_contact" => "{$firstName} {$lastName} [Employee of]",
-        "action" => "Update"
+        "action" => "Update",
       ),
       array(
         "log_type" => "Relationship",
         "altered_contact" => "{$firstName} {$lastName} [Employee of]",
-        "action" => "Insert"
+        "action" => "Insert",
       ),
       array(
         "log_type" => "Relationship",
         "altered_contact" => "{$firstName} {$lastName} [Employee of]",
-        "action" => "Delete"
+        "action" => "Delete",
       ),
       //group data check
       array(
         "log_type" => "Group",
         "altered_contact" => "{$firstName} {$lastName} [Case Resources]",
-        "action" => "Added"
+        "action" => "Added",
       ),
       array(
         "log_type" => "Group",
         "altered_contact" => "{$firstName} {$lastName} [Case Resources]",
-        "action" => "Removed"
+        "action" => "Removed",
       ),
       //note data check
       array("log_type" => "Note", "altered_contact" => "{$firstName} {$lastName}", "action" => "Update"),
@@ -222,30 +222,30 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
       array(
         "log_type" => "Tag",
         "altered_contact" => "{$firstName} {$lastName} [Government Entity]",
-        "action" => "Insert"
+        "action" => "Insert",
       ),
       array("log_type" => "Tag", "altered_contact" => "{$firstName} {$lastName} [Company]", "action" => "Delete"),
       //case data check
       array(
         "log_type" => "Case",
         "altered_contact" => "{$firstName} {$lastName} [Housing Support]",
-        "action" => "Update"
+        "action" => "Update",
       ),
       array(
         "log_type" => "Case",
         "altered_contact" => "{$firstName} {$lastName} [Housing Support]",
-        "action" => "Insert"
+        "action" => "Insert",
       ),
       //case activity check
       array(
         "log_type" => "Activity",
         "altered_contact" => "{$firstName} {$lastName} [Interview]",
-        "action" => "Update"
+        "action" => "Update",
       ),
       array(
         "log_type" => "Activity",
         "altered_contact" => "{$firstName} {$lastName} [Interview]",
-        "action" => "Insert"
+        "action" => "Insert",
       ),
     );
     $this->verifyReportData($data);
@@ -256,12 +256,12 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
       array(
         'field' => 'Sort Name',
         'changed_from' => "{$lastName}, {$originalFirstName}",
-        'changed_to' => "{$lastName}, {$firstName}"
+        'changed_to' => "{$lastName}, {$firstName}",
       ),
       array(
         'field' => 'Display Name',
         'changed_from' => "{$originalFirstName} {$lastName}",
-        'changed_to' => "{$firstName} {$lastName}"
+        'changed_to' => "{$firstName} {$lastName}",
       ),
       array('field' => 'First Name', 'changed_from' => $originalFirstName, 'changed_to' => $firstName),
       // array('field' => 'Email Greeting', 'changed_from' => "Dear {$originalFirstName}", 'changed_to' => "Dear {$firstName}"),
@@ -314,8 +314,8 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
       array(
         "log_type" => "Contact",
         "altered_contact" => "{$firstName} {$lastName}",
-        "action" => "Delete (to trash)"
-      )
+        "action" => "Delete (to trash)",
+      ),
     );
     $this->verifyReportData($contactDataDelete);
 

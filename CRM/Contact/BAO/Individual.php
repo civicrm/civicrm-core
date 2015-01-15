@@ -56,7 +56,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    */
   public static function format(&$params, &$contact) {
     if (!self::dataExists($params)) {
-      return;
+      return NULL;
     }
 
     // "null" value for example is passed by dedupe merge in order to empty.
@@ -274,7 +274,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     if ($date = CRM_Utils_Array::value('birth_date', $params)) {
       if (in_array($format, array(
         'dd-mm',
-        'mm/dd'
+        'mm/dd',
       ))) {
         $separator = '/';
         if ($format == 'dd-mm') {
@@ -283,17 +283,17 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         $date = $date . $separator . '1902';
       }
       elseif (in_array($format, array(
-        'yy-mm'
+        'yy-mm',
       ))) {
         $date = $date . '-01';
       }
       elseif (in_array($format, array(
-        'M yy'
+        'M yy',
       ))) {
         $date = $date . '-01';
       }
       elseif (in_array($format, array(
-        'yy'
+        'yy',
       ))) {
         $date = $date . '-01-01';
       }
@@ -306,7 +306,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     if ($date = CRM_Utils_Array::value('deceased_date', $params)) {
       if (in_array($format, array(
         'dd-mm',
-        'mm/dd'
+        'mm/dd',
       ))) {
         $separator = '/';
         if ($format == 'dd-mm') {
@@ -315,17 +315,17 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         $date = $date . $separator . '1902';
       }
       elseif (in_array($format, array(
-        'yy-mm'
+        'yy-mm',
       ))) {
         $date = $date . '-01';
       }
       elseif (in_array($format, array(
-        'M yy'
+        'M yy',
       ))) {
         $date = $date . '-01';
       }
       elseif (in_array($format, array(
-        'yy'
+        'yy',
       ))) {
         $date = $date . '-01-01';
       }
@@ -410,7 +410,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return boolean
+   * @return bool
    */
   public static function dataExists(&$params) {
     if ($params['contact_type'] == 'Individual') {
