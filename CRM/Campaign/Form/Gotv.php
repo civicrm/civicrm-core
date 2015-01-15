@@ -93,10 +93,7 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
-   *
-   *
-   * @return void
+   * Build the form object.
    */
   public function buildQuickForm() {
     if ($this->_search) {

@@ -99,11 +99,10 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   *
-   * @return void
+   * Note that in edit/view mode the default values are retrieved from the
+   * database
    */
   public function setDefaultValues() {
     return $this->_defaults;

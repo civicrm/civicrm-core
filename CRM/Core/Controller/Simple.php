@@ -116,7 +116,9 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
   }
 
   /**
-   * @return mixed
+   * Get template file name.
+   *
+   * @return string
    */
   public function getTemplateFileName() {
     // there is only one form here, so should be quite easy

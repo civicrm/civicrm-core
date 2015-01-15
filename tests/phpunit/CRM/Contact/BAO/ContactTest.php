@@ -533,8 +533,9 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for retrieve( )
-   * test with all values.
+   * Test case for retrieve( ).
+   *
+   * Test with all values.
    */
   public function testRetrieve() {
     //take the common contact params
@@ -632,7 +633,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for deleteContact( )
+   * Test case for deleteContact( ).
    */
   public function testDeleteContact() {
     $contactParams = $this->contactParams();
@@ -1181,7 +1182,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for getPrimaryOpenId( )
+   * Test case for getPrimaryOpenId( ).
    */
   public function testGetPrimaryOpenId() {
     //get the contact params
@@ -1205,7 +1206,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for matchContactOnEmail( )
+   * Test case for matchContactOnEmail( ).
    */
   public function testMatchContactOnEmail() {
     //get the contact params
@@ -1226,7 +1227,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for getContactType( )
+   * Test case for getContactType( ).
    */
   public function testGetContactType() {
     //get the contact params
@@ -1245,7 +1246,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for displayName( )
+   * Test case for displayName( ).
    */
   public function testDisplayName() {
     //get the contact params
@@ -1272,7 +1273,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for getDisplayAndImage( )
+   * Test case for getDisplayAndImage( ).
    */
   public function testGetDisplayAndImage() {
     //get the contact params
@@ -1301,7 +1302,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Build common params
+   * Build common params.
    */
   private function contactParams() {
 
@@ -1451,7 +1452,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Ensure that civicrm_contact.modified_date is updated when manipulating an email
+   * Ensure that civicrm_contact.modified_date is updated when manipulating an email.
    */
   public function testTimestamps_phone() {
     $test = $this;

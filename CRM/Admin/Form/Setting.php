@@ -85,11 +85,11 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
       //Set defaults for autocomplete and contact reference options
       $this->_defaults['autocompleteContactSearch'] = array(
-          '1' => 1,
-        ) + $autoSearchFields;
+        '1' => 1,
+      ) + $autoSearchFields;
       $this->_defaults['autocompleteContactReference'] = array(
-          '1' => 1,
-        ) + $cRSearchFields;
+        '1' => 1,
+      ) + $cRSearchFields;
 
       // we can handle all the ones defined in the metadata here. Others to be converted
       foreach ($this->_settings as $setting => $group) {
@@ -111,7 +111,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
@@ -173,6 +173,10 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
   }
 
   /**
+   * Common Process.
+   *
+   * @todo Document what I do.
+   *
    * @param array $params
    */
   public function commonProcess(&$params) {
