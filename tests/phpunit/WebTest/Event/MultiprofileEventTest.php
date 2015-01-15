@@ -557,6 +557,8 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   }
 
   /**
+   * Test adding multiple profiles.
+   *
    * @param int $profileId
    *
    * @return null
