@@ -167,7 +167,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         $message .= '<br/>' . ts('%3. There are some contacts who have this membership type assigned to them. Search for contacts with this membership type from <a href=\'%1\'>Find Members</a>. If you are still getting this message after deleting these memberships, there may be contacts in the Trash (deleted) with this membership type. Try using <a href="%2">Advanced Search</a> and checking "Search in Trash".', array(
               1 => $findMembersURL,
               2 => $deleteURL,
-              3 => $cnt
+              3 => $cnt,
             ));
         $cnt++;
       }
@@ -176,7 +176,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         $deleteURL = CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1');
         $message .= ts('%2. This Membership Type is used in an <a href=\'%1\'>Online Contribution page</a>. Uncheck this membership type in the Memberships tab.', array(
             1 => $deleteURL,
-            2 => $cnt
+            2 => $cnt,
           ));
         throw new CRM_Core_Exception($message);
       }
@@ -305,7 +305,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     foreach (array(
                'joinDate',
                'startDate',
-               'endDate'
+               'endDate',
              ) as $dateParam) {
       if (!empty($$dateParam)) {
         $$dateParam = CRM_Utils_Date::processDate($$dateParam, NULL, FALSE, 'Y-m-d');
@@ -478,7 +478,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *
    * CRM-7297 Membership Upsell - Added $membershipTypeID param to facilitate calculations of dates when membership type changes
    *
-   * @return Array
+   * @return array
    *   array fo the start date, end date and join date of the membership
    */
   public static function getRenewalDatesForMembershipType($membershipId, $changeToday = NULL, $membershipTypeID = NULL, $numRenewTerms = 1) {
@@ -585,7 +585,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param int $orgID
    *   Id of Organization.
    *
-   * @return Array
+   * @return array
    *   array of the details of membership types
    */
   public static function getMembershipTypesByOrg($orgID) {
@@ -603,9 +603,9 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   /**
    * Retrieve all Membership Types with Member of Contact id
    *
-   * @param array membership types
-   *
-   * @return Array
+   * @param array $membershipTypes
+   *   array of membership type ids
+   * @return array
    *   array of the details of membership types with Member of Contact id
    */
   public static function getMemberOfContactByMemTypes($membershipTypes) {
@@ -752,12 +752,12 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     }
   }
 
-  /** This function updates all price field value for quick config
+  /**                                                                                                                                                                                                         * This function updates all price field value for quick config
    * price set which has membership type
    *
-   * @param  integer      membership type id
+   * @param  int $membershipTypeId membership type id
    *
-   * @param  integer      financial type id
+   * @param  array $params
    */
   public static function updateAllPriceFieldValue($membershipTypeId, $params) {
     if (!empty($params['minimum_fee'])) {

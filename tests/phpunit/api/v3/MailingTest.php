@@ -82,19 +82,19 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $contactIDs['a'] = $this->individualCreate(array(
         'email' => 'include.me@example.org',
         'first_name' => 'Includer',
-        'last_name' => 'Person'
+        'last_name' => 'Person',
       ));
     $contactIDs['b'] = $this->individualCreate(array(
         'email' => 'exclude.me@example.org',
-        'last_name' => 'Excluder'
+        'last_name' => 'Excluder',
       ));
     $this->callAPISuccess('GroupContact', 'create', array(
         'group_id' => $groupIDs['a'],
-        'contact_id' => $contactIDs['a']
+        'contact_id' => $contactIDs['a'],
       ));
     $this->callAPISuccess('GroupContact', 'create', array(
         'group_id' => $groupIDs['b'],
-        'contact_id' => $contactIDs['b']
+        'contact_id' => $contactIDs['b'],
       ));
     // END SAMPLE DATA
 
@@ -179,7 +179,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $contactIDs['include_me'] = $this->individualCreate(array(
         'email' => 'include.me@example.org',
         'first_name' => 'Includer',
-        'last_name' => 'Person'
+        'last_name' => 'Person',
       ));
     $contactIDs['exclude_me'] = $this->individualCreate(array(
         'email' => 'exclude.me@example.org',
@@ -187,15 +187,15 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       ));
     $this->callAPISuccess('GroupContact', 'create', array(
         'group_id' => $groupIDs['inc'],
-        'contact_id' => $contactIDs['include_me']
+        'contact_id' => $contactIDs['include_me'],
       ));
     $this->callAPISuccess('GroupContact', 'create', array(
         'group_id' => $groupIDs['inc'],
-        'contact_id' => $contactIDs['exclude_me']
+        'contact_id' => $contactIDs['exclude_me'],
       ));
     $this->callAPISuccess('GroupContact', 'create', array(
         'group_id' => $groupIDs['exc'],
-        'contact_id' => $contactIDs['exclude_me']
+        'contact_id' => $contactIDs['exclude_me'],
       ));
 
     $params = $this->_params;
@@ -241,7 +241,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $contactIDs['alice'] = $this->individualCreate(array(
         'email' => 'alice@example.org',
         'first_name' => 'Alice',
-        'last_name' => 'Person'
+        'last_name' => 'Person',
       ));
 
     $mail = $this->callAPISuccess('mailing', 'create', $this->_params);
@@ -266,29 +266,29 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $contactIDs['alice'] = $this->individualCreate(array(
         'email' => 'alice@example.org',
         'first_name' => 'Alice',
-        'last_name' => 'Person'
+        'last_name' => 'Person',
       ));
     $contactIDs['bob'] = $this->individualCreate(array(
         'email' => 'bob@example.org',
         'first_name' => 'Bob',
-        'last_name' => 'Person'
+        'last_name' => 'Person',
       ));
     $contactIDs['carol'] = $this->individualCreate(array(
         'email' => 'carol@example.org',
         'first_name' => 'Carol',
-        'last_name' => 'Person'
+        'last_name' => 'Person',
       ));
     $this->callAPISuccess('GroupContact', 'create', array(
         'group_id' => $groupIDs['inc'],
-        'contact_id' => $contactIDs['alice']
+        'contact_id' => $contactIDs['alice'],
       ));
     $this->callAPISuccess('GroupContact', 'create', array(
         'group_id' => $groupIDs['inc'],
-        'contact_id' => $contactIDs['bob']
+        'contact_id' => $contactIDs['bob'],
       ));
     $this->callAPISuccess('GroupContact', 'create', array(
         'group_id' => $groupIDs['inc'],
-        'contact_id' => $contactIDs['carol']
+        'contact_id' => $contactIDs['carol'],
       ));
     // END SAMPLE DATA
 
