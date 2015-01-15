@@ -138,7 +138,7 @@ class CRM_Contribute_BAO_Query {
 
     // get payment instrument id
     if (!empty($query->_returnProperties['payment_instrument_id'])) {
-      $query->_select['instrument_id'] =  "contribution_payment_instrument.value as instrument_id";
+      $query->_select['instrument_id'] = "contribution_payment_instrument.value as instrument_id";
       $query->_select['payment_instrument_id'] = "contribution_payment_instrument.value as payment_instrument_id";
       $query->_element['instrument_id'] = $query->_element['payment_instrument_id'] = 1;
       $query->_tables['civicrm_contribution'] = 1;
@@ -362,7 +362,7 @@ class CRM_Contribute_BAO_Query {
 
       case 'financial_type':
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fields[$name]['where'], $op, $value, 'String');
-        CRM_Core_Error::debug( '$query', $query->_where[$grouping] );
+        CRM_Core_Error::debug('$query', $query->_where[$grouping]);
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contribute_DAO_Contribution', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$name]['title'], 2 => $op, 3 => $value));
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
@@ -876,7 +876,7 @@ class CRM_Contribute_BAO_Query {
     $form->add('select', 'contribution_currency_type',
       ts('Currency Type'),
       array(
-        '' => ts('- any -')
+        '' => ts('- any -'),
       ) +
       CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array('labelColumn' => 'name')),
       FALSE, array('class' => 'crm-select2')
@@ -890,7 +890,7 @@ class CRM_Contribute_BAO_Query {
     $form->add('select', 'contribution_page_id',
       ts('Contribution Page'),
       array(
-        '' => ts('- any -')
+        '' => ts('- any -'),
       ) +
       CRM_Contribute_PseudoConstant::contributionPage(),
       FALSE, array('class' => 'crm-select2')
@@ -903,7 +903,7 @@ class CRM_Contribute_BAO_Query {
     $form->add('select', 'contribution_pcp_made_through_id',
       ts('Personal Campaign Page'),
       array(
-        '' => ts('- any -')
+        '' => ts('- any -'),
       ) +
       CRM_Contribute_PseudoConstant::pcPage(),
       FALSE, array('class' => 'crm-select2')
@@ -1038,7 +1038,7 @@ class CRM_Contribute_BAO_Query {
   public static function buildDateWhere(&$values, $query, $name, $field, $title) {
     $fieldPart = strpos($name, $field);
     if ($fieldPart === FALSE) {
-      return;
+      return NULL;
     }
     // we only have recurring dates using this ATM so lets' short cut to find the table name
     $table = 'contribution_recur';

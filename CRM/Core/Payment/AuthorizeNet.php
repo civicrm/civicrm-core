@@ -396,7 +396,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    *
    * @return string
    *   the HMAC_MD5 encoding string
-   **/
+   */
   public function hmac($key, $data) {
     if (function_exists('mhash')) {
       // Use PHP mhash extension
@@ -459,7 +459,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    *
    * @return string
    *   fingerprint
-   **/
+   */
   public function CalculateFP() {
     $x_tran_key = $this->_getParam('paymentKey');
     $loginid = $this->_getParam('apiLogin');

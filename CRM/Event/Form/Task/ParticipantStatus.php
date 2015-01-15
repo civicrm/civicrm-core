@@ -36,7 +36,7 @@ class CRM_Event_Form_Task_ParticipantStatus extends CRM_Event_Form_Task_Batch {
   public function buildQuickForm() {
     // CRM_Event_Form_Task_Batch::buildQuickForm() gets ufGroupId
     // from the form, so set it here to the id of the reserved profile
-    $dao = new CRM_Core_DAO_UFGroup;
+    $dao = new CRM_Core_DAO_UFGroup();
     $dao->name = 'participant_status';
     $dao->find(TRUE);
     $this->set('ufGroupId', $dao->id);
@@ -45,7 +45,7 @@ class CRM_Event_Form_Task_ParticipantStatus extends CRM_Event_Form_Task_Batch {
     asort($statuses, SORT_STRING);
     $this->add('select', 'status_change', ts('Change All Statuses'),
       array(
-        '' => ts('- select status -')
+        '' => ts('- select status -'),
       ) + $statuses
     );
 

@@ -70,7 +70,7 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
         'url' => CRM_Utils_System::url('civicrm/contact/search/custom/list',
           'reset=1'
         ),
-      )
+      ),
     );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 

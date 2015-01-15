@@ -100,7 +100,7 @@ class Container {
     $dispatcher->addListener('DAO::post-delete', array('\CRM_Core_BAO_RecurringEntity', 'triggerDelete'));
     $dispatcher->addListener('hook_civicrm_unhandled_exception', array(
         'CRM_Core_LegacyErrorHandler',
-        'handleException'
+        'handleException',
       ));
     return $dispatcher;
   }
