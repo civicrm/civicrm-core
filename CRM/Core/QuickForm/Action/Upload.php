@@ -47,7 +47,7 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
   protected $_uploadDir;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param object $stateMachine
    *   Reference to state machine object.
@@ -134,6 +134,8 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
   }
 
   /**
+   * Real perform.
+   *
    * @todo document what I do.
    *
    * @param CRM_Core_Form $page

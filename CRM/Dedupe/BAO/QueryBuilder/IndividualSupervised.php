@@ -66,9 +66,7 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised extends CRM_Dedupe_BAO_Qu
             WHERE contact1.contact_type = 'Individual'
               AND " . self::internalFilters($rg);
     return array(
-      "civicrm_contact.{$rg->name}.{$rg->threshold}" => $query
+      "civicrm_contact.{$rg->name}.{$rg->threshold}" => $query,
     );
   }
 }
-
-;
