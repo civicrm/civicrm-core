@@ -55,22 +55,22 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
 
     $this->_participantID = $this->participantCreate(array(
         'contactID' => $this->_contactID,
-        'eventID' => $this->_eventID
+        'eventID' => $this->_eventID,
       ));
     $this->_contactID2 = $this->individualCreate();
     $this->_participantID2 = $this->participantCreate(array(
         'contactID' => $this->_contactID2,
-        'eventID' => $this->_eventID
+        'eventID' => $this->_eventID,
       ));
     $this->_participantID3 = $this->participantCreate(array(
         'contactID' => $this->_contactID2,
-        'eventID' => $this->_eventID
+        'eventID' => $this->_eventID,
       ));
 
     $this->_contactID3 = $this->individualCreate();
     $this->_participantID4 = $this->participantCreate(array(
         'contactID' => $this->_contactID3,
-        'eventID' => $this->_eventID
+        'eventID' => $this->_eventID,
       ));
   }
 

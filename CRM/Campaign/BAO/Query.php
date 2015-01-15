@@ -267,7 +267,7 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
    *
    * @return array|null
    */
-  static function defaultReturnProperties(
+  public static function defaultReturnProperties(
     $mode,
     $includeCustomFields = TRUE
   ) {
@@ -406,7 +406,7 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
     while ($dao->fetch()) {
       foreach (array(
                  'ward',
-                 'precinct'
+                 'precinct',
                ) as $name) {
         if (stripos($name, $dao->label) !== FALSE) {
           $fieldId = $dao->id;
@@ -571,7 +571,7 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
   /**
    * Build the campaign clause for component serach.
    *
-   **/
+   */
   public static function componentSearchClause(&$params, &$query) {
     $op = CRM_Utils_Array::value('op', $params, '=');
     $campaign = CRM_Utils_Array::value('campaign', $params);
@@ -586,7 +586,7 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
     if (is_array($campaign)) {
       foreach (array(
                  'current_campaign',
-                 'past_campaign'
+                 'past_campaign',
                ) as $ignore) {
         $index = array_search($ignore, $campaign);
         if ($index !== FALSE) {

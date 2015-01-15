@@ -173,8 +173,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
       $financialItems = array();
       $this->_batchIds = $batchId;
       while ($dao->fetch()) {
-        $creditAccountName = $creditAccountType =
-        $creditAccount = NULL;
+        $creditAccountName = $creditAccountType = $creditAccount = NULL;
         if ($dao->credit_account) {
           $creditAccountName = $dao->credit_account_name;
           $creditAccountType = $dao->credit_account_type_code;

@@ -241,8 +241,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    *
    * @return bool
    */
-  static
-  public function _recordValue($taskCtx, $value) {
+  static public function _recordValue($taskCtx, $value) {
     self::$_recordedValues[] = $value;
     return TRUE;
   }
@@ -252,8 +251,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    *
    * @return bool
    */
-  static
-  public function _returnFalse($taskCtx) {
+  static public function _returnFalse($taskCtx) {
     return FALSE;
   }
 
@@ -263,8 +261,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    *
    * @throws Exception
    */
-  static
-  public function _throwException($taskCtx, $value) {
+  static public function _throwException($taskCtx, $value) {
     throw new Exception("Manufactured error: $value");
   }
 
@@ -275,8 +272,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    *
    * @return bool
    */
-  static
-  public function _enqueueNumbers($taskCtx, $low, $high) {
+  static public function _enqueueNumbers($taskCtx, $low, $high) {
     for ($i = $low; $i <= $high; $i++) {
       $taskCtx->queue->createItem(new CRM_Queue_Task(
         array('CRM_Queue_RunnerTest', '_recordValue'),

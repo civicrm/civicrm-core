@@ -149,7 +149,7 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
    * @param $addBreadCrumb
    * @param string $type
    *
-   * @return string
+   * @return;
    *   the location of the file we have created
    */
   public static function createMapXML($ids, $locationId, &$page, $addBreadCrumb, $type = 'Contact') {

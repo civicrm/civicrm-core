@@ -152,7 +152,9 @@ class CRM_Core_I18n {
         if ($code == 'en_US') {
           continue;
         }
-        if (!in_array($code, $codes)) unset($all[$code]);
+        if (!in_array($code, $codes)) {
+          unset($all[$code]);
+        }
       }
     }
 
@@ -176,7 +178,6 @@ class CRM_Core_I18n {
    *
    * @param string $str
    *   source string.
-   * @param mixed arguments, can be passed in an array or through single variables
    *
    * @return string
    *   modified string
@@ -368,7 +369,7 @@ class CRM_Core_I18n {
    *
    * @return void
    */
-  function localizeArray(
+  public function localizeArray(
     &$array,
     $params = array()
   ) {
@@ -411,7 +412,7 @@ class CRM_Core_I18n {
    * @param $key
    *   Key of the extension (can be 'civicrm', or 'org.example.foo').
    *
-   * @return Boolean
+   * @return Bool
    *   True if the domain was changed for an extension.
    */
   public function setGettextDomain($key) {

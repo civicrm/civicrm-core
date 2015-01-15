@@ -168,13 +168,13 @@ class Frame {
     if ($id) {
       $this->callbacks[$phase][$id] = array(
         'callback' => $callback,
-        'parameters' => (is_array($params) ? $params : array($params))
+        'parameters' => (is_array($params) ? $params : array($params)),
       );
     }
     else {
       $this->callbacks[$phase][] = array(
         'callback' => $callback,
-        'parameters' => (is_array($params) ? $params : array($params))
+        'parameters' => (is_array($params) ? $params : array($params)),
       );
     }
   }

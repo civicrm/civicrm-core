@@ -213,7 +213,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
             // hack to handle custom data of type state and country
             if (in_array($type, array(
               'Country',
-              'StateProvince'
+              'StateProvince',
             ))) {
               $type = "Integer";
             }
@@ -423,7 +423,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    * FIXME: When our core fields contain reliable metadata this will be much simpler.
    * @return array
    *   (string => string) key: field_name value: api entity name
-   * Note: options are fetched via ajax using the api "getoptions" method
+   *   Note: options are fetched via ajax using the api "getoptions" method
    */
   public static function fieldOptions() {
     // Hack to add options not retrieved by getfields
@@ -450,7 +450,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       'member',
       'contribution',
       'case',
-      'grant'
+      'grant',
     );
     CRM_Contact_BAO_Query_Hook::singleton()->alterSearchBuilderOptions($entities, $options);
     foreach ($entities as $entity) {
@@ -468,7 +468,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
         }
         elseif (in_array(substr($field, 0, 3), array(
               'is_',
-              'do_'
+              'do_',
             )) || CRM_Utils_Array::value('data_type', $info) == 'Boolean'
         ) {
           $options[$field] = 'yesno';

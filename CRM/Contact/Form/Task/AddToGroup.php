@@ -234,20 +234,20 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
     $status = array(
       ts('%count contact added to group', array(
           'count' => $added,
-          'plural' => '%count contacts added to group'
-        ))
+          'plural' => '%count contacts added to group',
+      )),
     );
     if ($notAdded) {
       $status[] = ts('%count contact was already in group', array(
           'count' => $notAdded,
-          'plural' => '%count contacts were already in group'
+          'plural' => '%count contacts were already in group',
         ));
     }
     $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
     CRM_Core_Session::setStatus($status, ts('Added Contact to %1', array(
           1 => $groupName,
           'count' => $added,
-          'plural' => 'Added Contacts to %1'
+          'plural' => 'Added Contacts to %1',
         )), 'success', array('expires' => 0));
 
     if ($this->_context === 'amtg') {
