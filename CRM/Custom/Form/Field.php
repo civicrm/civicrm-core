@@ -84,8 +84,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   /**
    * Set variables up before form is built
    *
-   * @param null
-   *
    * @return void
    */
   public function preProcess() {
@@ -170,8 +168,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   /**
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
-   *
-   * @param null
    *
    * @return array
    *   array of default values
@@ -278,8 +274,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   /**
    * Build the form object
    *
-   * @param null
-   *
    * @return void
    */
   public function buildQuickForm() {
@@ -342,7 +336,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         'option_group_id',
         ts('Multiple Choice Option Sets'),
         array(
-          '' => ts('- select -')
+          '' => ts('- select -'),
         ) + $optionGroups
       );
     }
@@ -351,7 +345,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       ts('Option Type'),
       $optionTypes,
       array(
-        'onclick' => "showOptionSelect();"
+        'onclick' => "showOptionSelect();",
       ), '<br/>'
     );
 
@@ -901,8 +895,6 @@ AND    option_group_id = %2";
   /**
    * Process the form
    *
-   * @param null
-   *
    * @return void
    */
   public function postProcess() {
@@ -924,7 +916,7 @@ AND    option_group_id = %2";
       1,
       2,
       3,
-      5
+      5,
     ))) {
       if (empty($params['is_searchable'])) {
         $params['is_search_range'] = 0;

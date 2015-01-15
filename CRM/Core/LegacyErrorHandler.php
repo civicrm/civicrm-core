@@ -5,7 +5,7 @@ class CRM_Core_LegacyErrorHandler {
    * @param \Civi\Core\Event\UnhandledExceptionEvent $event
    * @throws Exception
    */
-  static function handleException($event) {
+  public static function handleException($event) {
     $e = $event->exception;
     if ($e instanceof CRM_Core_Exception) {
       $params = $e->getErrorData();

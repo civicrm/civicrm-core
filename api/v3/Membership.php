@@ -46,7 +46,7 @@
  *
  * @return array
  *   api result
- * {@getfields membership_delete}
+ *   {@getfields membership_delete}
  */
 function civicrm_api3_membership_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -63,7 +63,7 @@ function civicrm_api3_membership_delete($params) {
  *
  * @return array
  *   Array of newly created membership property values.
- * {@getfields membership_create}
+ *   {@getfields membership_create}
  */
 function civicrm_api3_membership_create($params) {
   // check params for membership id during update
@@ -112,10 +112,10 @@ function civicrm_api3_membership_create($params) {
   // Fixme: This code belongs in the BAO
   $action = CRM_Core_Action::ADD;
   // we need user id during add mode
-    $ids = array();
-    if (!empty($params['contact_id'])) {
-      $ids['userId'] = $params['contact_id'];
-    }
+  $ids = array();
+  if (!empty($params['contact_id'])) {
+    $ids['userId'] = $params['contact_id'];
+  }
   //for edit membership id should be present
   if (!empty($params['id'])) {
     $ids['membership'] = $params['id'];
@@ -202,7 +202,7 @@ function civicrm_api3_membership_get($params) {
     $params['status_id'] = array('IN' => CRM_Member_BAO_MembershipStatus::getMembershipStatusCurrent());
   }
 
-  $options = _civicrm_api3_get_options_from_params($params, TRUE,'membership', 'get');
+  $options = _civicrm_api3_get_options_from_params($params, TRUE, 'membership', 'get');
   if ($options['is_count']) {
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
@@ -218,7 +218,7 @@ function civicrm_api3_membership_get($params) {
     return civicrm_api3_create_success($membershipValues, $params, 'membership', 'get');
   }
 
-  $members =  _civicrm_api3_membership_relationsship_get_customv2behaviour($params, $membershipValues, $contactID);
+  $members = _civicrm_api3_membership_relationsship_get_customv2behaviour($params, $membershipValues, $contactID);
   return civicrm_api3_create_success($members, $params, 'membership', 'get');
 }
 
