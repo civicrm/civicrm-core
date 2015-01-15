@@ -248,6 +248,7 @@ class CRM_Core_Transaction {
    */
   static public function addCallback($phase, $callback, $params = NULL, $id = NULL) {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getBaseFrame();
+    if (empty($frame)) return NULL;
     $frame->addCallback($phase, $callback, $params, $id);
   }
 }
