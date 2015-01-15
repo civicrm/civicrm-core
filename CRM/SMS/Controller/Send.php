@@ -36,6 +36,10 @@ class CRM_SMS_Controller_Send extends CRM_Core_Controller {
 
   /**
    * Class constructor
+   *
+   * @param string $title
+   * @param bool|int $action
+   * @param bool $modal
    */
   public function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
     parent::__construct($title, $modal, NULL, FALSE, TRUE);
@@ -64,8 +68,7 @@ class CRM_SMS_Controller_Send extends CRM_Core_Controller {
       CRM_Core_BAO_File::uploadNames()
     );
 
-    $config = CRM_Core_Config::singleton();
-    $this->addActions($config->uploadDir,
+    $this->addActions(CRM_Core_Config::singleton()->uploadDir,
       $uploadNames
     );
   }

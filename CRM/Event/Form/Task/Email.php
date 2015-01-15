@@ -30,7 +30,6 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: Email.php 45499 2013-02-08 12:31:05Z kurund $
- *
  */
 
 /**
@@ -64,10 +63,8 @@ class CRM_Event_Form_Task_Email extends CRM_Event_Form_Task {
 
   /**
    * Build all the data structures needed to build the form
-   *
-   * @return void
    */
-  function preProcess() {
+  public function preProcess() {
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
     parent::preProcess();
 
@@ -78,10 +75,7 @@ class CRM_Event_Form_Task_Email extends CRM_Event_Form_Task {
   }
 
   /**
-   * Build the form object
-   *
-   *
-   * @return void
+   * Build the form object.
    */
   public function buildQuickForm() {
     //enable form element
@@ -91,10 +85,7 @@ class CRM_Event_Form_Task_Email extends CRM_Event_Form_Task {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
-   *
-   *
-   * @return void
+   * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
     CRM_Contact_Form_Task_EmailCommon::postProcess($this);

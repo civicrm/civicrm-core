@@ -7,7 +7,9 @@
 class CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised extends CRM_Dedupe_BAO_QueryBuilder {
 
   /**
-   * @param $rg
+   * Record - what do I do.
+   *
+   * @param object $rg
    *
    * @return array
    */
@@ -17,9 +19,18 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised extends CRM_Dedupe_BAO_Qu
     $civicrm_email = CRM_Utils_Array::value('civicrm_email', $rg->params, array());
 
     $params = array(
-      1 => array(CRM_Utils_Array::value('first_name', $civicrm_contact, ''), 'String'),
-      2 => array(CRM_Utils_Array::value('last_name', $civicrm_contact, ''), 'String'),
-      3 => array(CRM_Utils_Array::value('email', $civicrm_email, ''), 'String'),
+      1 => array(
+        CRM_Utils_Array::value('first_name', $civicrm_contact, ''),
+        'String',
+      ),
+      2 => array(
+        CRM_Utils_Array::value('last_name', $civicrm_contact, ''),
+        'String',
+      ),
+      3 => array(
+        CRM_Utils_Array::value('email', $civicrm_email, ''),
+        'String',
+      ),
     );
 
     return array(
@@ -35,7 +46,9 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised extends CRM_Dedupe_BAO_Qu
   }
 
   /**
-   * @param $rg
+   * Internal - what do I do.
+   *
+   * @param object $rg
    *
    * @return array
    */
@@ -52,7 +65,9 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised extends CRM_Dedupe_BAO_Qu
                 email1.email=email2.email
             WHERE contact1.contact_type = 'Individual'
               AND " . self::internalFilters($rg);
-    return array("civicrm_contact.{$rg->name}.{$rg->threshold}" => $query);
+    return array(
+      "civicrm_contact.{$rg->name}.{$rg->threshold}" => $query
+    );
   }
 }
 

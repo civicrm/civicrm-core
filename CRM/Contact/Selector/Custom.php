@@ -30,14 +30,12 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: Selector.php 11510 2007-09-18 09:21:34Z lobo $
- *
  */
 
 /**
  * This class is used to retrieve and display a range of
  * contacts that match the given criteria (specifically for
  * results of advanced search options.
- *
  */
 class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
 
@@ -117,7 +115,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    *
    * @return \CRM_Contact_Selector_Custom
    */
-  function __construct(
+  public function __construct(
     $customSearchClass,
     $formValues = NULL,
     $params = NULL,
@@ -154,8 +152,8 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
 
   /**
    * This method returns the links that are given for each search row.
-   * currently the links added for each row are
    *
+   * Currently the links added for each row are
    * - View
    * - Edit
    *
@@ -214,8 +212,9 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * Returns the column headers as an array of tuples:
-   * (name, sortName (key to the sort array))
+   * Returns the column headers as an array of tuples.
+   *
+   * Keys are name, sortName, key to the sort array.
    *
    * @param string $action
    *   The action being performed.
@@ -251,7 +250,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   /**
    * Returns total number of rows for the query.
    *
-   * @param
+   * @param null $action
    *
    * @return int
    *   Total number of rows
@@ -261,7 +260,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * Returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount.
    *
    * @param string $action
    *   The action being performed.
@@ -371,11 +370,9 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * Given the current formValues, gets the query in local
-   * language
+   * Given the current formValues, gets the query in local language.
    *
-   * @param array (
-   * reference)   $formValues   submitted formValues
+   * @param array $formValues   submitted formValues
    *
    * @return array
    *   which contains an array of strings
@@ -412,6 +409,8 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
+   * Generate contact ID query.
+   *
    * @param array $params
    * @param $action
    * @param int $sortID
@@ -420,7 +419,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    *
    * @return Object
    */
-  public function &contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
+  public function contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
     $params = array();
     $sql = $this->_search->contactIDs($params);
 
@@ -428,7 +427,9 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * @param $rows
+   * Add actions.
+   *
+   * @param array $rows
    */
   public function addActions(&$rows) {
     $links = self::links($this->_key);
@@ -453,7 +454,9 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * @param $rows
+   * Remove actions.
+   *
+   * @param array $rows
    */
   public function removeActions(&$rows) {
     foreach ($rows as $rid => & $rValue) {
