@@ -613,8 +613,12 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
-   * @param $activity
-   * @param null $logMessage
+   * Create an activity.
+   *
+   * @todo elaborate on what this does.
+   *
+   * @param CRM_Core_DAO_Activity $activity
+   * @param string $logMessage
    *
    * @return bool
    */
@@ -638,7 +642,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
-   * Get the list Activities
+   * Get the list Activities.
    *
    * @param array $input
    *   Array of parameters.
@@ -653,8 +657,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *    - activity_type_id int|string the activitiy types we want to restrict by
    *
    * @return array
-   *   (reference)      $values the relevant data object values of open activities
-   *
+   *   Relevant data object values of open activities
    */
   public static function &getActivities($input) {
     //step 1: Get the basic activity data
@@ -897,9 +900,12 @@ ORDER BY    fixed_sort_order
   }
 
   /**
-   * Get the component id and name those are enabled and logged in
-   * user has permission. To decide whether we are going to include
-   * component related activities w/ core activity retrieve process.
+   * Get the component id and name if those are enabled and allowed.
+   *
+   * Checks whether logged in user has permission.
+   * To decide whether we are going to include
+   * component related activities with core activity retrieve process.
+   * (what did that just mean?)
    *
    * @return array
    *   Array of component id and name.
@@ -930,7 +936,7 @@ ORDER BY    fixed_sort_order
   }
 
   /**
-   * Get the activity Count
+   * Get the activity Count.
    *
    * @param array $input
    *   Array of parameters.
@@ -943,7 +949,6 @@ ORDER BY    fixed_sort_order
    *
    * @return int
    *   count of activities
-   *
    */
   public static function &getActivitiesCount($input) {
     $input['count'] = TRUE;
@@ -966,7 +971,7 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
   }
 
   /**
-   * Get the activity sql clause to pick activities
+   * Get the activity sql clause to pick activities.
    *
    * @param array $input
    *   Array of parameters.
@@ -980,7 +985,6 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
    *
    * @return int
    *   count of activities
-   *
    */
   public static function getActivitySQLClause($input) {
     $params = array();
@@ -1145,8 +1149,9 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   }
 
   /**
-   * Send the message to all the contacts and also insert a
-   * contact activity in each contacts record
+   * Send the message to all the contacts.
+   *
+   * Also insert a contact activity in each contacts record.
    *
    * @param array $contactDetails
    *   The array of contact details to send the email.
@@ -1357,6 +1362,8 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   }
 
   /**
+   * Send SMS.
+   *
    * @param array $contactDetails
    * @param array $activityParams
    * @param array $smsParams
