@@ -98,7 +98,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   protected $_customSearchClass;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param $customSearchClass
    * @param array $formValues
@@ -372,8 +372,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   /**
    * Given the current formValues, gets the query in local language.
    *
-   * @param array $formValues   submitted formValues
-   *
    * @return array
    *   which contains an array of strings
    */
@@ -382,6 +380,8 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
+   * Get summary.
+   *
    * @return mixed
    */
   public function getSummary() {
@@ -402,6 +402,8 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
+   * Do nothing.
+   *
    * @return null
    */
   public function alphabetQuery() {

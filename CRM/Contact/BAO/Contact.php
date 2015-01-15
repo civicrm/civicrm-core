@@ -536,6 +536,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   public function createDefaultCrudLink($crudLinkSpec) {
     switch ($crudLinkSpec['action']) {
       case CRM_Core_Action::VIEW:
+
         return array(
           'title' => $this->display_name,
           'path' => 'civicrm/contact/view',
@@ -1177,7 +1178,7 @@ WHERE id={$id}; ";
    * @return array
    *   array of importable Fields
    */
-  static function importableFields(
+  public static function importableFields(
     $contactType = 'Individual',
     $status = FALSE,
     $showAll = FALSE,
@@ -1401,8 +1402,14 @@ WHERE id={$id}; ";
       if (!$fields) {
         $fields = CRM_Contact_DAO_Contact::export();
 
-        // the fields are meant for contact types
-        if (in_array($contactType, array('Individual', 'Household', 'Organization', 'All'))) {
+        // The fields are meant for contact types.
+        if (in_array($contactType, array(
+          'Individual',
+          'Household',
+          'Organization',
+          'All',
+          )
+        )) {
           $fields = array_merge($fields, CRM_Core_OptionValue::getFields('', $contactType));
         }
         // add current employer for individuals
@@ -1615,8 +1622,8 @@ WHERE id={$id}; ";
 
     $returnProperties = self::makeHierReturnProperties($fields, $contactId);
 
-    // We don't know the contents of return properties, but we need the lower level ids of the contact
-    // so add a few fields.
+    // We don't know the contents of return properties, but we need the lower
+    // level ids of the contact so add a few fields.
     $returnProperties['first_name'] =
     $returnProperties['organization_name'] =
     $returnProperties['household_name'] =
@@ -2549,12 +2556,14 @@ AND       civicrm_openid.is_primary = 1";
         return CRM_Core_BAO_EntityTag::getContactTags($contactId, TRUE);
 
       case 'rel':
+
         return CRM_Contact_BAO_Relationship::getRelationship($contactId,
           CRM_Contact_BAO_Relationship::CURRENT,
           0, 1
         );
 
       case 'group':
+
         return CRM_Contact_BAO_GroupContact::getContactGroup($contactId, "Added", NULL, TRUE);
 
       case 'log':
@@ -2610,7 +2619,7 @@ AND       civicrm_openid.is_primary = 1";
   }
 
   /**
-   * Process greetings and cache
+   * Process greetings and cache.
    *
    * @param object $contact
    *   Contact object after save.
@@ -3082,8 +3091,9 @@ AND       civicrm_openid.is_primary = 1";
   }
 
   /**
-   * Retrieve display name of contact that address is shared
-   * based on $masterAddressId or $contactId .
+   * Retrieve display name of contact that address is shared.
+   *
+   * This is based on $masterAddressId or $contactId .
    *
    * @param int $masterAddressId
    *   Master id.
@@ -3118,11 +3128,12 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
   }
 
   /**
-   * Get the creation/modification times for a contact
+   * Get the creation/modification times for a contact.
    *
    * @param int $contactId
    *
-   * @return array('created_date' => $, 'modified_date' => $)
+   * @return array
+   *  Dates - ('created_date' => $, 'modified_date' => $)
    */
   public static function getTimestamps($contactId) {
     $timestamps = CRM_Core_DAO::executeQuery(
@@ -3145,8 +3156,10 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
   }
 
   /**
-   * Generate triggers to update the timestamp on the corresponding civicrm_contact row,
-   * on insert/update/delete to a table that extends civicrm_contact.
+   * Generate triggers to update the timestamp.
+   *
+   * The corresponding civicrm_contact row is updated on insert/update/delete
+   * to a table that extends civicrm_contact.
    * Don't regenerate triggers for all such tables if only asked for one table.
    *
    * @param array $info
@@ -3157,7 +3170,6 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    *   Array of all core or all custom table names extending civicrm_contact
    * @param string $contactRefColumn
    *   'contact_id' if processing core tables, 'entity_id' if processing custom tables
-   * @return void
    *
    * @link https://issues.civicrm.org/jira/browse/CRM-15602
    * @see triggerInfo
@@ -3285,7 +3297,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    *
    * @param string $fieldName
    * @param string $context
-   *   @see CRM_Core_DAO::buildOptionsContext.
+   * @see CRM_Core_DAO::buildOptionsContext
    * @param array $props
    *   whatever is known about this dao object.
    *

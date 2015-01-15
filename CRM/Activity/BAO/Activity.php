@@ -1187,7 +1187,8 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $attachments = NULL,
     $cc = NULL,
     $bcc = NULL,
-    $contactIds, // FIXME a param with no default shouldn't be last
+    // FIXME a param with no default shouldn't be last
+    $contactIds,
     $additionalDetails = NULL
   ) {
     // get the contact details of logged in contact, which we set as from email
@@ -1494,7 +1495,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   }
 
   /**
-   * Send the sms message to a specific contact
+   * Send the sms message to a specific contact.
    *
    * @param int $toID
    *   The contact id of the recipient.
@@ -1568,7 +1569,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   }
 
   /**
-   * Send the message to a specific contact
+   * Send the message to a specific contact.
    *
    * @param string $from
    *   The name and email of the sender.
@@ -2097,7 +2098,6 @@ AND cl.modified_id  = c.id
    *
    * @return string|bool
    *   if file exists returns $activityTypeFile activity filename otherwise false.
-   *
    */
   public static function getFileForActivityTypeId($activityTypeId, $crmDir = 'Activity') {
     $activityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
@@ -2164,8 +2164,16 @@ AND cl.modified_id  = c.id
         );
 
         $Activityfields = array(
-          'activity_type' => array('title' => ts('Activity Type'), 'name' => 'activity_type', 'type' => CRM_Utils_Type::T_STRING),
-          'activity_status' => array('title' => ts('Activity Status'), 'name' => 'activity_status', 'type' => CRM_Utils_Type::T_STRING),
+          'activity_type' => array(
+            'title' => ts('Activity Type'),
+            'name' => 'activity_type',
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+          'activity_status' => array(
+            'title' => ts('Activity Status'),
+            'name' => 'activity_status',
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
         );
         $fields = array_merge($Activityfields, $exportableFields);
       }
@@ -2203,7 +2211,7 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * Get the allowed profile fields for Activities
+   * Get the allowed profile fields for Activities.
    *
    * @return array
    *   array of activity profile Fields
@@ -2239,8 +2247,10 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * This function deletes the activity record related to contact record,
-   * when there are no target and assignee record w/ other contact.
+   * This function deletes the activity record related to contact record.
+   *
+   * This is conditional on there being no target and assignee record
+   * with other contacts.
    *
    * @param int $contactId
    *   ContactId.
@@ -2287,7 +2297,7 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * Does user has sufficient permission for view/edit activity record?
+   * Does user has sufficient permission for view/edit activity record.
    *
    * @param int $activityId
    *   Activity record id.
@@ -2589,7 +2599,8 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
   /**
-   * copy custom fields and attachments from an existing activity to another.
+   * Copy custom fields and attachments from an existing activity to another.
+   *
    * @see CRM_Case_Page_AJAX::_convertToCaseActivity()
    *
    * @param array $params
@@ -2633,6 +2644,8 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
   /**
+   * Get activity contact.
+   *
    * @param int $activityId
    * @param int $recordTypeID
    * @param string $column
@@ -2652,6 +2665,8 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
   /**
+   * Get source contact id.
+   *
    * @param int $activityId
    *
    * @return null
@@ -2667,6 +2682,10 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
   /**
+   * Set api filter.
+   *
+   * @todo Document what this is for.
+   *
    * @param array $params
    */
   public function setApiFilter(&$params) {
