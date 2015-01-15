@@ -43,10 +43,8 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
   /**
    * Set default values for the form.
-   * default values are retrieved from the database
    *
-   *
-   * @return void
+   * Default values are retrieved from the database.
    */
   public function setDefaultValues() {
     if (!$this->_defaults) {
@@ -168,10 +166,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
-   *
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
     // store the submitted values in an array
