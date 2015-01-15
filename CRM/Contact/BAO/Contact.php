@@ -1698,7 +1698,7 @@ WHERE id={$id}; ";
   }
 
   /**
-   * Return the primary location type of a contact
+   * Return the primary location type of a contact.
    *
    * $params int     $contactId contact_id
    * $params boolean $isPrimaryExist if true, return primary contact location type otherwise null
@@ -1766,7 +1766,7 @@ WHERE  civicrm_contact.id = %1 ";
   }
 
   /**
-   * Get the display name, primary email and location type of a contact
+   * Get the display name, primary email and location type of a contact.
    *
    * @param int $id
    *   Id of the contact.
@@ -1822,7 +1822,7 @@ ORDER BY civicrm_email.is_primary DESC";
    *   Specifies the default group to which contact is added.
    * @param int $ufGroupId
    *   Uf group id (profile id).
-   * @param ctype
+   * @param string $ctype
    * @param bool $visibility
    *   Basically lets us know where this request is coming from.
    *                                if via a profile from web, we restrict what groups are changed
@@ -1830,7 +1830,7 @@ ORDER BY civicrm_email.is_primary DESC";
    * @return int
    *   contact id created/edited
    */
-  static function createProfileContact(
+  public static function createProfileContact(
     &$params,
     &$fields,
     $contactID = NULL,
@@ -1922,6 +1922,8 @@ ORDER BY civicrm_email.is_primary DESC";
   }
 
   /**
+   * Format profile contact parameters.
+   *
    * @param array $params
    * @param $fields
    * @param int $contactID
@@ -1931,7 +1933,7 @@ ORDER BY civicrm_email.is_primary DESC";
    *
    * @return array
    */
-  static function formatProfileContactParams(
+  public static function formatProfileContactParams(
     &$params,
     &$fields,
     $contactID = NULL,
@@ -2292,9 +2294,10 @@ ORDER BY civicrm_email.is_primary DESC";
   }
 
   /**
-   * Find the get contact details
-   * does not respect ACLs for now, which might need to be rectified at some
-   * stage based on how its used
+   * Find the get contact details.
+   *
+   * This function does not respect ACLs for now, which might need to be rectified at some
+   * stage based on how its used.
    *
    * @param string $mail
    *   Primary email address of the contact.
@@ -2314,7 +2317,6 @@ SELECT     civicrm_contact.id as contact_id,
            civicrm_contact.contact_sub_type as contact_sub_type
 FROM       civicrm_contact
 INNER JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )";
-
 
     if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME, 'uniq_email_per_site')) {
       // try to find a match within a site (multisite).
@@ -2346,7 +2348,7 @@ WHERE      civicrm_email.email = %1 AND civicrm_contact.is_deleted=0";
   }
 
   /**
-   * Find the contact details associated with an OpenID
+   * Find the contact details associated with an OpenID.
    *
    * @param string $openId
    *   OpenId of the contact.
@@ -2385,13 +2387,13 @@ WHERE      civicrm_openid.openid = %1";
   }
 
   /**
-   * Funtion to get primary email of the contact
+   * Get primary email of the contact.
    *
    * @param int $contactID
    *   Contact id.
    *
    * @return string
-   *   >email  email address if present else null
+   *   Email address if present else null
    */
   public static function getPrimaryEmail($contactID) {
     // fetch the primary email
@@ -2413,7 +2415,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
   }
 
   /**
-   * Funtion to get primary OpenID of the contact
+   * Function to get primary OpenID of the contact.
    *
    * @param int $contactID
    *   Contact id.
@@ -2441,15 +2443,15 @@ AND       civicrm_openid.is_primary = 1";
   }
 
   /**
-   * Given the list of params in the params array, fetch the object
-   * and store the values in the values array
+   * Fetch the object and store the values in the values array.
    *
    * @param array $params
    *   Input parameters to find object.
    * @param array $values
    *   Output values of the object.
    *
-   * @return CRM_Contact_BAO_Contact|null the found object or null
+   * @return CRM_Contact_BAO_Contact|null
+   *   The found object or null
    */
   public static function getValues(&$params, &$values) {
     $contact = new CRM_Contact_BAO_Contact();
