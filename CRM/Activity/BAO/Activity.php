@@ -1494,7 +1494,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   }
 
   /**
-   * Send the sms message to a specific contact
+   * Send the sms message to a specific contact.
    *
    * @param int $toID
    *   The contact id of the recipient.
@@ -1568,7 +1568,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   }
 
   /**
-   * Send the message to a specific contact
+   * Send the message to a specific contact.
    *
    * @param string $from
    *   The name and email of the sender.

@@ -536,6 +536,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   public function createDefaultCrudLink($crudLinkSpec) {
     switch ($crudLinkSpec['action']) {
       case CRM_Core_Action::VIEW:
+
         return array(
           'title' => $this->display_name,
           'path' => 'civicrm/contact/view',
@@ -1177,7 +1178,7 @@ WHERE id={$id}; ";
    * @return array
    *   array of importable Fields
    */
-  static function importableFields(
+  public static function importableFields(
     $contactType = 'Individual',
     $status = FALSE,
     $showAll = FALSE,
@@ -1401,8 +1402,14 @@ WHERE id={$id}; ";
       if (!$fields) {
         $fields = CRM_Contact_DAO_Contact::export();
 
-        // the fields are meant for contact types
-        if (in_array($contactType, array('Individual', 'Household', 'Organization', 'All'))) {
+        // The fields are meant for contact types.
+        if (in_array($contactType, array(
+          'Individual',
+          'Household',
+          'Organization',
+          'All',
+          )
+        )) {
           $fields = array_merge($fields, CRM_Core_OptionValue::getFields('', $contactType));
         }
         // add current employer for individuals
@@ -1615,8 +1622,8 @@ WHERE id={$id}; ";
 
     $returnProperties = self::makeHierReturnProperties($fields, $contactId);
 
-    // We don't know the contents of return properties, but we need the lower level ids of the contact
-    // so add a few fields.
+    // We don't know the contents of return properties, but we need the lower
+    // level ids of the contact so add a few fields.
     $returnProperties['first_name'] =
     $returnProperties['organization_name'] =
     $returnProperties['household_name'] =

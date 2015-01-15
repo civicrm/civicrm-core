@@ -340,7 +340,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    */
   public function buildQuickForm() {
     $this->addDefaultButtons(ts('Confirm Action'));
@@ -381,10 +381,8 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
 
   /**
    * Replace ids of household members in $this->_contactIds with the id of their household.
+   *
    * CRM-8338
-   *
-   *
-   * @return void
    */
   public function mergeContactIdsByHousehold() {
     if (empty($this->_contactIds)) {
