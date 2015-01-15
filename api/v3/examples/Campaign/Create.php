@@ -1,70 +1,87 @@
 <?php
 /**
- * Test Generated example of using campaign create API
- * Create a campaign - Note use of relative dates here http://www.php.net/manual/en/datetime.formats.relative.php *
+ * @file
+ * Test Generated API Example.
+ * See bottom of this file for more detail.
  */
-function campaign_create_example(){
-$params = array(
-  'title' => 'campaign title',
-  'description' => 'Call people, ask for money',
-  'created_date' => 'first sat of July 2008',
-);
 
-try{
-  $result = civicrm_api3('campaign', 'create', $params);
-}
-catch (CiviCRM_API3_Exception $e) {
-  // handle error here
-  $errorMessage = $e->getMessage();
-  $errorCode = $e->getErrorCode();
-  $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
-}
+/**
+ * Test Generated example of using campaign create API.
+ *
+ * Create a campaign - Note use of relative dates here http://www.php.net/manual/en/datetime.formats.relative.php
+ *
+ * @return array
+ *   API result array
+ */
+function campaign_create_example() {
+  $params = array(
+    'title' => 'campaign title',
+    'description' => 'Call people, ask for money',
+    'created_date' => 'first sat of July 2008',
+  );
 
-return $result;
+  try{
+    $result = civicrm_api3('campaign', 'create', $params);
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    // Handle error here.
+    $errorMessage = $e->getMessage();
+    $errorCode = $e->getErrorCode();
+    $errorData = $e->getExtraParams();
+    return array(
+      'error' => $errorMessage,
+      'error_code' => $errorCode,
+      'error_data' => $errorData,
+    );
+  }
+
+  return $result;
 }
 
 /**
- * Function returns array of result expected from previous function
+ * Function returns array of result expected from previous function.
+ *
+ * @return array
+ *   API result array
  */
-function campaign_create_expectedresult(){
+function campaign_create_expectedresult() {
 
   $expectedResult = array(
-  'is_error' => 0,
-  'version' => 3,
-  'count' => 1,
-  'id' => 1,
-  'values' => array(
+    'is_error' => 0,
+    'version' => 3,
+    'count' => 1,
+    'id' => 1,
+    'values' => array(
       '1' => array(
-          'id' => '1',
-          'name' => 'campaign_title',
-          'title' => 'campaign title',
-          'description' => 'Call people, ask for money',
-          'start_date' => '',
-          'end_date' => '',
-          'campaign_type_id' => '',
-          'status_id' => '',
-          'external_identifier' => '',
-          'parent_id' => '',
-          'is_active' => '',
-          'created_id' => '',
-          'created_date' => '2013-07-28 08:49:19',
-          'last_modified_id' => '',
-          'last_modified_date' => '',
-          'goal_general' => '',
-          'goal_revenue' => '',
-        ),
+        'id' => '1',
+        'name' => 'campaign_title',
+        'title' => 'campaign title',
+        'description' => 'Call people, ask for money',
+        'start_date' => '',
+        'end_date' => '',
+        'campaign_type_id' => '',
+        'status_id' => '',
+        'external_identifier' => '',
+        'parent_id' => '',
+        'is_active' => '',
+        'created_id' => '',
+        'created_date' => '2013-07-28 08:49:19',
+        'last_modified_id' => '',
+        'last_modified_date' => '',
+        'goal_general' => '',
+        'goal_revenue' => '',
+      ),
     ),
-);
+  );
 
   return $expectedResult;
 }
 
-
-/*
-* This example has been generated from the API test suite. The test that created it is called
-*
-* testCreateCampaign and can be found in
+/**
+* This example has been generated from the API test suite.
+* The test that created it is called
+* testCreateCampaign
+* and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/CampaignTest.php
 *
 * You can see the outcome of the API tests at

@@ -1,61 +1,77 @@
 <?php
 /**
- * Test Generated example of using im get API
- * *
+ * @file
+ * Test Generated API Example.
+ * See bottom of this file for more detail.
  */
-function im_get_example(){
-$params = array(
-  'contact_id' => 1,
-  'name' => 'My Yahoo IM Handle',
-  'location_type_id' => 1,
-  'provider_id' => 1,
-);
 
-try{
-  $result = civicrm_api3('im', 'get', $params);
-}
-catch (CiviCRM_API3_Exception $e) {
-  // handle error here
-  $errorMessage = $e->getMessage();
-  $errorCode = $e->getErrorCode();
-  $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
-}
+/**
+ * Test Generated example of using im get API.
+ *
+ *
+ * @return array
+ *   API result array
+ */
+function im_get_example() {
+  $params = array(
+    'contact_id' => 4,
+    'name' => 'My Yahoo IM Handle',
+    'location_type_id' => 1,
+    'provider_id' => 1,
+  );
 
-return $result;
+  try{
+    $result = civicrm_api3('im', 'get', $params);
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    // Handle error here.
+    $errorMessage = $e->getMessage();
+    $errorCode = $e->getErrorCode();
+    $errorData = $e->getExtraParams();
+    return array(
+      'error' => $errorMessage,
+      'error_code' => $errorCode,
+      'error_data' => $errorData,
+    );
+  }
+
+  return $result;
 }
 
 /**
- * Function returns array of result expected from previous function
+ * Function returns array of result expected from previous function.
+ *
+ * @return array
+ *   API result array
  */
-function im_get_expectedresult(){
+function im_get_expectedresult() {
 
   $expectedResult = array(
-  'is_error' => 0,
-  'version' => 3,
-  'count' => 1,
-  'id' => 1,
-  'values' => array(
-      '1' => array(
-          'id' => '1',
-          'contact_id' => '1',
-          'location_type_id' => '1',
-          'name' => 'My Yahoo IM Handle',
-          'provider_id' => '1',
-          'is_primary' => 0,
-          'is_billing' => 0,
-        ),
+    'is_error' => 0,
+    'version' => 3,
+    'count' => 1,
+    'id' => 2,
+    'values' => array(
+      '2' => array(
+        'id' => '2',
+        'contact_id' => '4',
+        'location_type_id' => '1',
+        'name' => 'My Yahoo IM Handle',
+        'provider_id' => '1',
+        'is_primary' => 0,
+        'is_billing' => 0,
+      ),
     ),
-);
+  );
 
   return $expectedResult;
 }
 
-
-/*
-* This example has been generated from the API test suite. The test that created it is called
-*
-* testGetIm and can be found in
+/**
+* This example has been generated from the API test suite.
+* The test that created it is called
+* testGetIm
+* and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ImTest.php
 *
 * You can see the outcome of the API tests at

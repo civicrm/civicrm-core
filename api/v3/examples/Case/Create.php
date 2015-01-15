@@ -1,61 +1,77 @@
 <?php
 /**
- * Test Generated example of using case create API
- * *
+ * @file
+ * Test Generated API Example.
+ * See bottom of this file for more detail.
  */
-function case_create_example(){
-$params = array(
-  'subject' => 'Test case',
-  'contact_id' => 17,
-  'case_type' => 'housing_support',
-);
 
-try{
-  $result = civicrm_api3('case', 'create', $params);
-}
-catch (CiviCRM_API3_Exception $e) {
-  // handle error here
-  $errorMessage = $e->getMessage();
-  $errorCode = $e->getErrorCode();
-  $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
-}
+/**
+ * Test Generated example of using case create API.
+ *
+ *
+ * @return array
+ *   API result array
+ */
+function case_create_example() {
+  $params = array(
+    'subject' => 'Test case',
+    'contact_id' => 17,
+    'case_type' => 'housing_support',
+  );
 
-return $result;
+  try{
+    $result = civicrm_api3('case', 'create', $params);
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    // Handle error here.
+    $errorMessage = $e->getMessage();
+    $errorCode = $e->getErrorCode();
+    $errorData = $e->getExtraParams();
+    return array(
+      'error' => $errorMessage,
+      'error_code' => $errorCode,
+      'error_data' => $errorData,
+    );
+  }
+
+  return $result;
 }
 
 /**
- * Function returns array of result expected from previous function
+ * Function returns array of result expected from previous function.
+ *
+ * @return array
+ *   API result array
  */
-function case_create_expectedresult(){
+function case_create_expectedresult() {
 
   $expectedResult = array(
-  'is_error' => 0,
-  'version' => 3,
-  'count' => 1,
-  'id' => 2,
-  'values' => array(
+    'is_error' => 0,
+    'version' => 3,
+    'count' => 1,
+    'id' => 2,
+    'values' => array(
       '2' => array(
-          'id' => '2',
-          'case_type_id' => '1',
-          'subject' => 'Test case',
-          'start_date' => '2013-07-29 00:00:00',
-          'end_date' => '',
-          'details' => '',
-          'status_id' => '1',
-          'is_deleted' => '',
-        ),
+        'id' => '2',
+        'case_type_id' => '1',
+        'subject' => 'Test case',
+        'start_date' => '2013-07-29 00:00:00',
+        'end_date' => '',
+        'details' => '',
+        'status_id' => '1',
+        'is_deleted' => '',
+      ),
     ),
-);
+  );
 
   return $expectedResult;
 }
 
-
-/*
-* This example has been generated from the API test suite. The test that created it is called
-*
-* testCaseCreate and can be found in
+/**
+* This example has been generated from the API test suite.
+* The test that created it is called
+* testCaseCreate
+* and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/CaseTest.php
 *
 * You can see the outcome of the API tests at

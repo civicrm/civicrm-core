@@ -1,58 +1,75 @@
 <?php
 /**
- * Test Generated example of using setting create API
- * shows setting a variable for specified domains *
+ * @file
+ * Test Generated API Example.
+ * See bottom of this file for more detail.
  */
-function setting_create_example(){
-$params = array(
-  'domain_id' => array(
+
+/**
+ * Test Generated example of using setting create API.
+ *
+ * shows setting a variable for specified domains
+ *
+ * @return array
+ *   API result array
+ */
+function setting_create_example() {
+  $params = array(
+    'domain_id' => array(
       '0' => 1,
       '1' => 3,
     ),
-  'uniq_email_per_site' => 0,
-);
+    'uniq_email_per_site' => 0,
+  );
 
-try{
-  $result = civicrm_api3('setting', 'create', $params);
-}
-catch (CiviCRM_API3_Exception $e) {
-  // handle error here
-  $errorMessage = $e->getMessage();
-  $errorCode = $e->getErrorCode();
-  $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
-}
+  try{
+    $result = civicrm_api3('setting', 'create', $params);
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    // Handle error here.
+    $errorMessage = $e->getMessage();
+    $errorCode = $e->getErrorCode();
+    $errorData = $e->getExtraParams();
+    return array(
+      'error' => $errorMessage,
+      'error_code' => $errorCode,
+      'error_data' => $errorData,
+    );
+  }
 
-return $result;
+  return $result;
 }
 
 /**
- * Function returns array of result expected from previous function
+ * Function returns array of result expected from previous function.
+ *
+ * @return array
+ *   API result array
  */
-function setting_create_expectedresult(){
+function setting_create_expectedresult() {
 
   $expectedResult = array(
-  'is_error' => 0,
-  'version' => 3,
-  'count' => 2,
-  'values' => array(
+    'is_error' => 0,
+    'version' => 3,
+    'count' => 2,
+    'values' => array(
       '1' => array(
-          'uniq_email_per_site' => 0,
-        ),
+        'uniq_email_per_site' => 0,
+      ),
       '3' => array(
-          'uniq_email_per_site' => 0,
-        ),
+        'uniq_email_per_site' => 0,
+      ),
     ),
-);
+  );
 
   return $expectedResult;
 }
 
-
-/*
-* This example has been generated from the API test suite. The test that created it is called
-*
-* testCreateSettingMultipleDomains and can be found in
+/**
+* This example has been generated from the API test suite.
+* The test that created it is called
+* testCreateSettingMultipleDomains
+* and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/SettingTest.php
 *
 * You can see the outcome of the API tests at
