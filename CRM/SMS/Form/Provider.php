@@ -61,9 +61,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
-   *
-   * @return void
+   * Build the form object.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -123,7 +121,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
   }
 
   /**
-   * Set the default values of various form elements
+   * Set the default values of various form elements.
    *
    * @return array
    */

@@ -67,7 +67,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -137,12 +137,12 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
-   * Delete the activity
+   * Delete the activity.
    *
    * @param array $params
    * @param bool $moveToTrash
    *
-   * @return void
+   * @return mixed
    */
   public static function deleteActivity(&$params, $moveToTrash = FALSE) {
     // CRM-9137
@@ -243,7 +243,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
-   * Delete activity assignment record
+   * Delete activity assignment record.
    *
    * @param int $activityId
    * @param int $recordTypeID
@@ -258,7 +258,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
-   * Process the activities
+   * Process the activities.
    *
    * @param array $params
    *   Associated array of the submitted values.

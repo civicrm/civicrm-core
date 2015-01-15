@@ -64,7 +64,7 @@ class CRM_Event_Form_Task_Email extends CRM_Event_Form_Task {
   /**
    * Build all the data structures needed to build the form
    */
-  function preProcess() {
+  public function preProcess() {
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
     parent::preProcess();
 

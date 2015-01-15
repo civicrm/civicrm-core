@@ -85,10 +85,10 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
       //Set defaults for autocomplete and contact reference options
       $this->_defaults['autocompleteContactSearch'] = array(
-          '1' => 1
+          '1' => 1,
         ) + $autoSearchFields;
       $this->_defaults['autocompleteContactReference'] = array(
-          '1' => 1
+          '1' => 1,
         ) + $cRSearchFields;
 
       // we can handle all the ones defined in the metadata here. Others to be converted
