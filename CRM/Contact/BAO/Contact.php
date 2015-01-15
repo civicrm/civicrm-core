@@ -30,7 +30,6 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
 
@@ -64,14 +63,24 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    *
    * @var array
    */
-  static $_commPrefs = array('do_not_phone', 'do_not_email', 'do_not_mail', 'do_not_sms', 'do_not_trade');
+  static $_commPrefs = array(
+    'do_not_phone',
+    'do_not_email',
+    'do_not_mail',
+    'do_not_sms',
+    'do_not_trade',
+  );
 
   /**
    * Types of greetings
    *
    * @var array
    */
-  static $_greetingTypes = array('addressee', 'email_greeting', 'postal_greeting');
+  static $_greetingTypes = array(
+    'addressee',
+    'email_greeting',
+    'postal_greeting',
+  );
 
   /**
    * Static field for all the contact information that we can potentially import
@@ -88,27 +97,25 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
   static $_exportableFields = NULL;
 
   /**
-   * Class constructor
-   *
-   * @return \CRM_Contact_DAO_Contact
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Takes an associative array and creates a contact object
+   * Takes an associative array and creates a contact object.
    *
-   * the function extract all the params it needs to initialize the create a
+   * The function extracts all the params it needs to initialize the create a
    * contact object. the params array could contain additional unused name/value
    * pairs
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Contact_BAO_Contact
+   * @return CRM_Contact_BAO_Contact|CRM_Core_Error
+   *   Created or updated contact object or error object.
+   *   (error objects are being phased out in favour of exceptions)
    */
   public static function add(&$params) {
     $contact = new CRM_Contact_DAO_Contact();
@@ -117,7 +124,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       return;
     }
 
-    //fix for validate contact sub type CRM-5143
+    // Fix for validate contact sub type CRM-5143.
     if (isset($params['contact_sub_type'])) {
       if (empty($params['contact_sub_type'])) {
         $params['contact_sub_type'] = 'null';
@@ -140,17 +147,17 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       }
     }
     else {
-      // reset the value
-      // CRM-101XX
+      // Reset the value.
+      // CRM-101XX.
       $params['contact_sub_type'] = 'null';
     }
 
-    //fixed contact source
+    // Fixed contact source.
     if (isset($params['contact_source'])) {
       $params['source'] = $params['contact_source'];
     }
 
-    //fix for preferred communication method
+    // Fix for preferred communication method.
     $prefComm = CRM_Utils_Array::value('preferred_communication_method', $params);
     if ($prefComm && is_array($prefComm)) {
       unset($params['preferred_communication_method']);
@@ -179,7 +186,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     if ($contact->contact_type == 'Individual') {
       $allNull = FALSE;
 
-      //format individual fields
+      // Format individual fields.
       CRM_Contact_BAO_Individual::format($params, $contact);
     }
     elseif ($contact->contact_type == 'Household') {
@@ -195,7 +202,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       }
     }
 
-    // privacy block
     $privacy = CRM_Utils_Array::value('privacy', $params);
     if ($privacy &&
       is_array($privacy) &&
@@ -207,9 +213,9 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       }
     }
 
-    // since hash was required, make sure we have a 0 value for it, CRM-1063
-    // fixed in 1.5 by making hash optional
-    // only do this in create mode, not update
+    // Since hash was required, make sure we have a 0 value for it (CRM-1063).
+    // @todo - does this mean we can remove this block?
+    // Fixed in 1.5 by making hash optional, only do this in create mode, not update.
     if ((!array_key_exists('hash', $contact) || !$contact->hash) && !$contact->id) {
       $allNull = FALSE;
       $contact->hash = md5(uniqid(rand(), TRUE));
@@ -230,7 +236,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     }
 
     if ($contact->contact_type == 'Individual' && (isset($params['current_employer']) || isset($params['employer_id']))) {
-      // create current employer
+      // Create current employer.
       $newEmployer = !empty($params['employer_id']) ? $params['employer_id'] : CRM_Utils_Array::value('current_employer', $params);
 
       $newContact = FALSE;
@@ -241,14 +247,13 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
         CRM_Contact_BAO_Contact_Utils::createCurrentEmployerRelationship($contact->id, $newEmployer, $employerId, $newContact);
       }
       else {
-        //unset if employer id exits
         if ($employerId) {
           CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($contact->id, $employerId);
         }
       }
     }
 
-    //update cached employee name
+    // Update cached employer name.
     if ($contact->contact_type == 'Organization') {
       CRM_Contact_BAO_Contact_Utils::updateCurrentEmployer($contact->id);
     }
@@ -257,7 +262,8 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
   }
 
   /**
-   * Create contact
+   * Create contact.
+   *
    * takes an associative array and creates a contact object and all the associated
    * derived objects (i.e. individual, location, email, phone etc)
    *
@@ -271,9 +277,14 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    *   If we need to invoke hooks.
    *
    * @param bool $skipDelete
+   *   Unclear parameter, passed to website create
+   *
+   * @todo explain this parameter
    *
    * @throws Exception
-   * @return CRM_Contact_BAO_Contact
+   * @return CRM_Contact_BAO_Contact|CRM_Core_Error
+   *   Created or updated contribution object. We are deprecating returning an error in
+   *   favour of exceptions
    */
   public static function &create(&$params, $fixAddress = TRUE, $invokeHooks = TRUE, $skipDelete = FALSE) {
     $contact = NULL;
@@ -294,17 +305,17 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
 
     $config = CRM_Core_Config::singleton();
 
-    // CRM-6942: set preferred language to the current language if it’s unset (and we’re creating a contact)
+    // CRM-6942: set preferred language to the current language if it’s unset (and we’re creating a contact).
     if (empty($params['contact_id']) && empty($params['preferred_language'])) {
       $params['preferred_language'] = $config->lcMessages;
     }
 
-    // CRM-9739: set greeting & addressee if unset and we’re creating a contact
+    // CRM-9739: set greeting & addressee if unset and we’re creating a contact.
     if (empty($params['contact_id'])) {
       foreach (self::$_greetingTypes as $greeting) {
         if (empty($params[$greeting . '_id'])) {
-          if ($defaultGreetingTypeId =
-            CRM_Contact_BAO_Contact_Utils::defaultGreeting($params['contact_type'], $greeting)
+          if ($defaultGreetingTypeId
+            = CRM_Contact_BAO_Contact_Utils::defaultGreeting($params['contact_type'], $greeting)
           ) {
             $params[$greeting . '_id'] = $defaultGreetingTypeId;
           }
@@ -316,7 +327,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
 
     $contact = self::add($params);
     if (!$contact) {
-      // not dying here is stupid, since we get into wierd situation and into a bug that
+      // Not dying here is stupid, since we get into wierd situation and into a bug that
       // is impossible to figure out for the user or for us
       // CRM-7925
       CRM_Core_Error::fatal();
@@ -325,7 +336,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     $params['contact_id'] = $contact->id;
 
     if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME, 'is_enabled')) {
-      // Enabling multisite causes the contact to be added to the domain group
+      // Enabling multisite causes the contact to be added to the domain group.
       $domainGroupID = CRM_Core_BAO_Domain::getGroupId();
       if (!empty($domainGroupID)) {
         if (!empty($params['group']) && is_array($params['group'])) {
@@ -349,7 +360,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       }
     }
 
-    //add location Block data
+    // Add location Block data.
     $blocks = CRM_Core_BAO_Location::create($params, $fixAddress);
     foreach ($blocks as $name => $value) {
       $contact->$name = $value;
@@ -405,7 +416,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       }
     }
 
-
     // update the UF user_unique_id if that has changed
     CRM_Core_BAO_UFMatch::updateUFName($contact->id);
 
@@ -459,17 +469,18 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
   }
 
   /**
-   * Get the display name and image of a contact
+   * Get the display name and image of a contact.
    *
    * @param int $id
    *   The contactId.
    *
-   * @param bool $type
+   * @param bool $includeTypeInReturnParameters
+   *   Should type be part of the returned array?
    *
    * @return array
    *   the displayName and contactImage for this contact
    */
-  public static function getDisplayAndImage($id, $type = FALSE) {
+  public static function getDisplayAndImage($id, $includeTypeInReturnParameters = FALSE) {
     //CRM-14276 added the * on the civicrm_contact table so that we have all the contact info available
     $sql = "
 SELECT    civicrm_contact.*,
@@ -498,7 +509,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
 
       CRM_Utils_Hook::alterDisplayName($displayName, $id, $dao);
 
-      return $type ? array(
+      return $includeTypeInReturnParameters ? array(
         $displayName,
         $image,
         $dao->contact_type,
@@ -510,6 +521,8 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
+   * Create last viewed link to recently updated contact.
+   *
    * @param array $crudLinkSpec
    *   With keys:.
    *   - action: int, CRM_Core_Action::UPDATE or CRM_Core_Action::VIEW [default: VIEW]
@@ -553,11 +566,9 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    *   (reference) the default values, some of which need to be resolved.
    * @param bool $reverse
    *   True if we want to resolve the values in the reverse direction (value -> name).
-   *
-   * @return void
    */
   public static function resolveDefaults(&$defaults, $reverse = FALSE) {
-    // hack for birth_date
+    // Hack for birth_date.
     if (!empty($defaults['birth_date'])) {
       if (is_array($defaults['birth_date'])) {
         $defaults['birth_date'] = CRM_Utils_Date::format($defaults['birth_date'], '-');
@@ -671,7 +682,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
           );
         }
 
-        //kill the reference.
+        // Kill the reference.
         unset($values);
       }
     }
